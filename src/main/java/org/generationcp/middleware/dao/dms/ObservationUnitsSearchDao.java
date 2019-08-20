@@ -57,6 +57,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
+	private static final List<String> EXP_PROPS_VAR_TYPES = Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.name(), VariableType.TREATMENT_FACTOR.name());
 
 	static {
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
@@ -86,6 +87,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "    inner join project p on p.project_id = nde.project_id " //
 				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 				+ "    inner join stock s ON s.stock_id = nde.stock_id " //
+				// FIXME won't work for sub-sub-obs
+				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) " //
 				+ " where " //
 				+ "	p.project_id = :datasetId ");
 
@@ -720,13 +723,15 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		// Otherwise, look in "props" tables
 		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
-		if (VariableType.EXPERIMENTAL_DESIGN.name().equals(variableType)) {
+		if (EXP_PROPS_VAR_TYPES.contains(variableType)) {
 			sql.append(" AND EXISTS ( SELECT 1 FROM nd_experimentprop xp "
-				+ "WHERE xp.nd_experiment_id = nde.parent_id AND xp.type_id = :" + variableId
+				+ "WHERE xp.nd_experiment_id = plot.nd_experiment_id AND xp.type_id = :" + variableId
 				+ "_Id AND value ").append(matchClause).append(" )");
 
 		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
-			// IF searching by list of values, search for the values in 1)cvterm.name or 2)perform IN operation on stockprop.value
+			// IF searching by list of values, search for the values in:
+			// 1)cvterm.name (for categorical variables) or
+			// 2)perform IN operation on stockprop.value
 			// Otherwise, search the value like a text by LIKE operation
 			final String stockMatchClause = performLikeOperation ? "sp.value LIKE :" + variableId + "_text " :
 				" (cvt.name IN (:" + variableId + "_values) OR sp.value IN (:" + variableId + "_values ))";
@@ -946,7 +951,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return observationUnitRow;
 	}
 
-	private String getEnvironmentColumnName(String variableName) {
+	private String getEnvironmentColumnName(final String variableName) {
 		return variableName + ENVIRONMENT_COLUMN_NAME_SUFFIX;
 	}
 }

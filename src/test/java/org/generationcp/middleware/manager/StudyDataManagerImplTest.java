@@ -211,6 +211,22 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testGetInstanceIdLocationIdMap() throws Exception {
+		final StudyReference newStudy = this.studyTDI.addTestStudy();
+		final Integer studyId = newStudy.getId();
+		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
+		final Random random = new Random();
+		final String locationId = String.valueOf(random.nextInt());
+		final String season = String.valueOf(random.nextInt());
+		this.studyTDI.addEnvironmentDataset(this.crop, studyId, locationId, season);
+
+		this.manager.getActiveSession().flush();
+
+		final Map<Integer, String> instanceIdLocationIdMap = this.manager.getInstanceIdLocationIdMap(Arrays.asList(this.studyTDI.getGeolocationId()));
+		Assert.assertEquals(locationId, instanceIdLocationIdMap.get(this.studyTDI.getGeolocationId()));
+	}
+
+	@Test
 	public void testSearchStudiesForStartDate() throws Exception {
 		// Study search query expect datasets for studies to be returned
 		this.studyTDI.addTestDataset(this.studyReference.getId());
