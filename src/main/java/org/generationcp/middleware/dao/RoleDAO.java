@@ -5,6 +5,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -47,6 +48,12 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 		}
 		return toReturn;
 
+	}
+
+	public Role getRoleById (final Integer id) {
+		final Role role = getById(id);
+		Hibernate.initialize(role.getUserRoles());
+		return role;
 	}
 
 }
