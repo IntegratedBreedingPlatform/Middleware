@@ -2,6 +2,7 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.beust.jcommander.internal.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -259,7 +260,7 @@ public class StudyServiceImplTest {
 					"studyName");
 
 		final UserDto user = new UserDto();
-		user.setEmail("a@a.com");
+		user.setEmail(RandomStringUtils.randomAlphabetic(10) + "@gmail.com");
 		user.setFirstName("name");
 		user.setLastName("last");
 		final UserRoleDto userRoleDto = new UserRoleDto(1,

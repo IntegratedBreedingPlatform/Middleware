@@ -173,19 +173,6 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<ProjectUserInfo> getByProjectIdAndUserIds(final Long projectId, final List<Integer> userIds) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
-			criteria.add(Restrictions.eq("project.projectId", projectId));
-			criteria.add(Restrictions.in("user.userid", userIds));
-			return criteria.list();
-		} catch (final HibernateException ex) {
-			throw new MiddlewareQueryException("Error in getByProjectIdAndUserIds(projectId = " + projectId + ", userIds = " + userIds + "):"
-					+ ex.getMessage(), ex);
-		}
-	}
-
 	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
 		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
 		// of synch with

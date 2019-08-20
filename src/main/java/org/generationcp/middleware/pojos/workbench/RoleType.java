@@ -1,7 +1,7 @@
 package org.generationcp.middleware.pojos.workbench;
 
-import org.pojomatic.Pojomatic;
-import org.pojomatic.annotations.AutoProperty;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +12,6 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "role_type")
-@AutoProperty
 public class RoleType {
 
 	@Id
@@ -46,19 +45,32 @@ public class RoleType {
 		this.name = name;
 	}
 
+
 	@Override
 	public int hashCode() {
-		return Pojomatic.hashCode(this);
+		return new HashCodeBuilder().append(this.id).hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (!RoleType.class.isInstance(obj)) {
+			return false;
+		}
+
+		final RoleType otherObj = (RoleType) obj;
+
+		return new EqualsBuilder().append(this.id, otherObj.id).isEquals();
 	}
 
 	@Override
 	public String toString() {
-		return Pojomatic.toString(this);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return Pojomatic.equals(this, o);
+		return "RoleType{" + "id=" + this.id + ", name='" + this.name + '}';
 	}
 
 }

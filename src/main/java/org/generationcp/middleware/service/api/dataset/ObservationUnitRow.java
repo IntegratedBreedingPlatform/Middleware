@@ -18,6 +18,9 @@ public class ObservationUnitRow {
 
 	private Map<String, ObservationUnitData> variables;
 
+	// Contains environment level variables (variables added in Environment Details and Environment Conditions)
+	private Map<String, ObservationUnitData> environmentVariables;
+
 	private String obsUnitId;
 
 	private String samplesCount;
@@ -60,6 +63,15 @@ public class ObservationUnitRow {
 
 	public Map<String, ObservationUnitData> getVariables() {
 		return this.variables;
+	}
+
+	public Map<String, ObservationUnitData> getEnvironmentVariables() {
+		return this.environmentVariables;
+	}
+
+	public void setEnvironmentVariables(
+		final Map<String, ObservationUnitData> environmentVariables) {
+		this.environmentVariables = environmentVariables;
 	}
 
 	public void setObsUnitId(final String obsUnitId) {
