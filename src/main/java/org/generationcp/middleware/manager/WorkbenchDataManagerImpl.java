@@ -529,6 +529,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Role getRoleById(final Integer id) {
-		return this.workbenchDaoFactory.getRoleDao().getById(id);
+		final Role role = this.workbenchDaoFactory.getRoleDao().getById(id);
+		role.getUserRoles();
+		return role;
 	}
 }

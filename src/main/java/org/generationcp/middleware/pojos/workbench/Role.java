@@ -85,7 +85,7 @@ public class Role implements Serializable {
 	private List<Permission> permissions = new ArrayList<>();
 
 	@Fetch(FetchMode.SUBSELECT)
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = "users_roles",
 			joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
