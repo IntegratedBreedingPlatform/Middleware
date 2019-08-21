@@ -74,14 +74,6 @@ public interface UserService {
 	List<WorkbenchUser> getUsersByProjectId(Long projectId, String cropName);
 
 	/**
-	 * Return a Map of {@link Person} records identified by {@link WorkbenchUser} ids associated with a {@link Project}.
-	 *
-	 * @param projectId - the project id
-	 * @return the Maps of {@link Person} records identified by {@link WorkbenchUser} ids
-	 */
-	Map<Integer, Person> getPersonsByProjectId(final Long projectId);
-
-	/**
 	 * Gets the all Users Sorted
 	 *
 	 * @return

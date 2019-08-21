@@ -392,8 +392,12 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 					final Integer personId = (Integer) user[7];
 					final Integer aDate = (Integer) user[8];
 					final Integer cDate = (Integer) user[9];
+					final String fName = (String) user[10];
+					final String lName = (String) user[11];
 					final Person person = new Person();
 					person.setId(personId);
+					person.setFirstName(fName);
+					person.setLastName(lName);
 					final WorkbenchUser u =
 						new WorkbenchUser(userId, instalId, uStatus, uAccess, uType, uName, upswd, person, aDate, cDate);
 					users.add(u);
