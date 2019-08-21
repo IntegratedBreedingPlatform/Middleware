@@ -66,13 +66,6 @@ public interface UserService {
 	List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName);
 
 	/**
-	 * Retrieves the users that are members of any program in a crop.
-	 * @param cropType
-	 * @return
-	 */
-	List<WorkbenchUser> getUsersWithoutAssociatedPrograms(final CropType cropType);
-
-	/**
 	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
 	 *
 	 * @param projectId - the project id
