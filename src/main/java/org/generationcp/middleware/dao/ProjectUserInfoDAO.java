@@ -52,12 +52,6 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 			+ "WHERE pu.project_id = :projectId "
 			+ "GROUP BY users.userid";
 
-	public static final String GET_ACTIVE_USER_IDS_BY_PROJECT_ID =
-		"SELECT DISTINCT pu.user_id "
-			+ "FROM workbench_project_user_info pu "
-			+ "INNER JOIN users u ON u.userid = pu.user_id "
-			+ "WHERE u.ustatus = 0 AND pu.project_id = :projectId";
-
 
 	public static final String GET_PERSONS_BY_PROJECT_ID = "SELECT users.userid, persons.personid, persons.fname, persons.ioname, "
 		+ "persons.lname "
@@ -100,21 +94,6 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 				+ e.getMessage(), e);
 		}
 		return users;
-	}
-
-	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
-		final List<Integer> userIDs = new ArrayList<>();
-		try {
-			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(ProjectUserInfoDAO.GET_ACTIVE_USER_IDS_BY_PROJECT_ID);
-				query.setParameter("projectId", projectId);
-				return query.list();
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getActiveUserIDsByProjectId(projectId=" + projectId + ") query from ProjectUser: "
-				+ e.getMessage(), e);
-		}
-		return userIDs;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -171,20 +150,6 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 			throw new MiddlewareQueryException("Error in getByProjectId(projectId = " + projectId + "):" + ex.getMessage(), ex);
 		}
 		return null;
-	}
-
-	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
-		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
-		// of synch with
-		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-		// statement
-		this.getSession().flush();
-		final String sql = "DELETE project_user_info FROM workbench_project_user_info project_user_info"
-			+ " WHERE project_user_info.project_id = :projectId AND project_user_info.user_id in (:workbenchUserIds)";
-		final SQLQuery statement = this.getSession().createSQLQuery(sql);
-		statement.setParameter("projectId", projectId);
-		statement.setParameterList("workbenchUserIds", workbenchUserIds);
-		statement.executeUpdate();
 	}
 
 	public List<WorkbenchUser> getUsersWithoutAssociatedPrograms(final CropType cropType) {

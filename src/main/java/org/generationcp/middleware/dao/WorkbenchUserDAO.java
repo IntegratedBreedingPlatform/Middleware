@@ -3,6 +3,7 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -353,4 +354,56 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 
 	}
+
+	public List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName) {
+		final List<Integer> userIDs = new ArrayList<>();
+		try {
+			if (projectId != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_ACTIVE_USER_IDS_BY_PROJECT_ID);
+				query.setParameter("projectId", projectId);
+				query.setParameter("cropName", cropName);
+				return query.list();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getActiveUserIDsByProjectId(projectId=" + projectId + ") query from ProjectUser: "
+				+ e.getMessage(), e);
+		}
+		return userIDs;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<WorkbenchUser> getUsersByProjectId(final Long projectId, final String cropName) {
+		final List<WorkbenchUser> users = new ArrayList<>();
+		try {
+			if (projectId != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_USERS_BY_PROJECT_ID);
+				query.setParameter("projectId", projectId);
+				query.setParameter("cropName", cropName);
+				final List<Object> results = query.list();
+				for (final Object o : results) {
+					final Object[] user = (Object[]) o;
+					final Integer userId = (Integer) user[0];
+					final Integer instalId = (Integer) user[1];
+					final Integer uStatus = (Integer) user[2];
+					final Integer uAccess = (Integer) user[3];
+					final Integer uType = (Integer) user[4];
+					final String uName = (String) user[5];
+					final String upswd = (String) user[6];
+					final Integer personId = (Integer) user[7];
+					final Integer aDate = (Integer) user[8];
+					final Integer cDate = (Integer) user[9];
+					final Person person = new Person();
+					person.setId(personId);
+					final WorkbenchUser u =
+						new WorkbenchUser(userId, instalId, uStatus, uAccess, uType, uName, upswd, person, aDate, cDate);
+					users.add(u);
+				}
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getUsersByProjectId(projectId=" + projectId + ") query from ProjectUserInfoDao: "
+				+ e.getMessage(), e);
+		}
+		return users;
+	}
+
 }
