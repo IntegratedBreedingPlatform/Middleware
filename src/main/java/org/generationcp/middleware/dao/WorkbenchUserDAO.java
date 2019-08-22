@@ -353,7 +353,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 	}
 
-	public Long countUserByFullName(final String fullname) {
+	public Long countUsersByFullName(final String fullname) {
 		try {
 			final Query query = this.getSession().getNamedQuery(WorkbenchUser.COUNT_BY_FULLNAME);
 			query.setParameter("fullname", fullname);

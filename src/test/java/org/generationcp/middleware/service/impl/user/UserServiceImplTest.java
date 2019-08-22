@@ -208,6 +208,38 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testGetUserByFullname() {
+		final Person person = this.workbenchTestDataUtil.createTestPersonData();
+		this.userService.addPerson(person);
+		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
+		user.setStatus(0);
+		user.setPerson(person);
+		this.userService.addUser(user);
+		WorkbenchUser retrievedUser = this.userService.getUserByFullname(user.getPerson().getDisplayName());
+		Assert.assertEquals(user.getUserid(), retrievedUser.getUserid());
+
+		user.setStatus(1);
+		this.userService.addUser(user);
+		Assert.assertNull(this.userService.getUserByFullname(user.getPerson().getDisplayName()));
+	}
+
+	@Test
+	public void testCountUsersByFullname() {
+		final Person person = this.workbenchTestDataUtil.createTestPersonData();
+		this.userService.addPerson(person);
+		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
+		user.setStatus(0);
+		user.setPerson(person);
+		this.userService.addUser(user);
+		final Long count = this.userService.countUsersByFullname(user.getPerson().getDisplayName());
+
+		user.setStatus(1);
+		this.userService.addUser(user);
+		final Long newCount = this.userService.countUsersByFullname(user.getPerson().getDisplayName());
+		Assert.assertEquals(count.toString(), String.valueOf(newCount+1));
+	}
+
+	@Test
 	public void testCountAllPersons() {
 		final long count = this.userService.countAllPersons();
 		assertTrue(count > 0);

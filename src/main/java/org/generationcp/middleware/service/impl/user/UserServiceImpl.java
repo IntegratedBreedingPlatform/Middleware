@@ -60,8 +60,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Long countUserByFullname(final String fullname) {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO().countUserByFullName(fullname);
+	public Long countUsersByFullname(final String fullname) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().countUsersByFullName(fullname);
 	}
 
 	@Override
