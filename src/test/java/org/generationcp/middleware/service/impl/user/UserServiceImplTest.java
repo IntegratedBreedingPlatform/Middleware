@@ -215,7 +215,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		user.setStatus(0);
 		user.setPerson(person);
 		this.userService.addUser(user);
-		WorkbenchUser retrievedUser = this.userService.getUserByFullname(user.getPerson().getDisplayName());
+		final WorkbenchUser retrievedUser = this.userService.getUserByFullname(user.getPerson().getDisplayName());
 		Assert.assertEquals(user.getUserid(), retrievedUser.getUserid());
 
 		user.setStatus(1);
