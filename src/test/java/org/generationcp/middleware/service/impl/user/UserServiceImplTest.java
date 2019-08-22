@@ -120,7 +120,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		adminUser.setAssignDate(20140101);
 		adminUser.setCloseDate(20140101);
 
-		final List<UserRole> adminRoles = new ArrayList<UserRole>();
+		final List<UserRole> adminRoles = new ArrayList<>();
 		// Role ID 1 = ADMIN
 		adminRoles.add(new UserRole(adminUser, 1));
 		adminUser.setRoles(adminRoles);
@@ -156,7 +156,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		breederUser.setAssignDate(20140101);
 		breederUser.setCloseDate(20140101);
 
-		final List<UserRole> breederRoles = new ArrayList<UserRole>();
+		final List<UserRole> breederRoles = new ArrayList<>();
 		// Role ID 2 = BREEDER
 		breederRoles.add(new UserRole(breederUser, 2));
 		breederUser.setRoles(breederRoles);
@@ -192,7 +192,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		technicianUser.setAssignDate(20140101);
 		technicianUser.setCloseDate(20140101);
 
-		final List<UserRole> technicianRoles = new ArrayList<UserRole>();
+		final List<UserRole> technicianRoles = new ArrayList<>();
 		// Role ID 3 = TECHNICIAN
 		technicianRoles.add(new UserRole(technicianUser, 3));
 		technicianUser.setRoles(technicianRoles);
@@ -305,7 +305,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		this.userService.saveProjectUserInfo(pui);
 
 		final List<Integer> userIDs = this.userService.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
-		assertTrue("The newly added member should be added in the retrieved list.", prevListOfUserIDs.size() + 1 == userIDs.size());
+		assertEquals("The newly added member should be added in the retrieved list.", prevListOfUserIDs.size() + 1,  userIDs.size());
 	}
 
 	@Test
@@ -328,15 +328,15 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		final int id = this.userService.createUser(userDto);
 		userDto.setUserId(id);
 		List<WorkbenchUser> listOfActiveUsers = this.userService.getAllActiveUsersSorted();
-		assertTrue("The newly added user should be added in the retrieved list.",
-			prevListOfActiveUsers.size() + 1 == listOfActiveUsers.size());
+		assertEquals("The newly added user should be added in the retrieved list.",
+			prevListOfActiveUsers.size() + 1, listOfActiveUsers.size());
 
 		//Deactivate the user to check if it's not retrieved
 		userDto.setStatus(1);
 		this.userService.updateUser(userDto);
 		listOfActiveUsers = this.userService.getAllActiveUsersSorted();
-		assertTrue("The newly added user should be added in the retrieved list.",
-			prevListOfActiveUsers.size() == listOfActiveUsers.size());
+		assertEquals("The newly added user should be added in the retrieved list.",
+			prevListOfActiveUsers.size(), listOfActiveUsers.size());
 
 	}
 
@@ -354,13 +354,13 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		final int id = this.userService.createUser(userDto);
 		userDto.setUserId(id);
 		List<WorkbenchUser> users = this.userService.getUsersByCrop(cropName);
-		assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size() + 1 == users.size());
+		assertEquals("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size() + 1, users.size());
 
 		//Deactivate the user to check if it's not retrieved
 		userDto.setStatus(1);
 		this.userService.updateUser(userDto);
 		users = this.userService.getUsersByCrop(cropName);
-		assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size() == users.size());
+		assertEquals("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size(), users.size());
 
 	}
 
@@ -413,7 +413,6 @@ public class UserServiceImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllUserDtosSorted() {
-		final UserDto user = this.workbenchTestDataUtil.createTestUserDTO(25);
 		final List<UserDto> userDtos = this.userService.getAllUsersSortedByLastName();
 		assertThat("Expected list users not null.", userDtos != null);
 		assertThat("Expected list users not empty.", !userDtos.isEmpty());
