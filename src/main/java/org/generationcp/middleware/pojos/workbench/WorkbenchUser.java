@@ -54,8 +54,10 @@ import org.hibernate.annotations.NotFoundAction;
 		@NamedQuery(name = "getUserByNameUsingLike", query = "SELECT s FROM WorkbenchUser s WHERE s.name LIKE :name"),
 		@NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name = :name"),
 		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name LIKE :name"),
-		@NamedQuery(name = "getByFullName", query = "SELECT u FROM WorkbenchUser u, Person p WHERE u.person.id = p.id AND "
-			+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
+		@NamedQuery(name = "getByFullName", query = "SELECT u FROM WorkbenchUser u, Person p WHERE u.status = 0 AND u.person.id = p.id AND "
+			+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)"),
+		@NamedQuery(name = "countByFullName", query = "SELECT COUNT(u) FROM WorkbenchUser u, Person p WHERE u.status = 0 AND u.person.id = p.id AND "
+		+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
 
 })
 @NamedNativeQueries({@NamedNativeQuery(name = "getAllActiveUsersSorted", query = "SELECT u.* FROM users u, persons p "
@@ -70,6 +72,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 	public static final String GET_BY_FULLNAME = "getByFullName";
+	public static final String COUNT_BY_FULLNAME = "countByFullName";
 
 	public static final String GET_USERS_BY_PROJECT_UUID =
 		"SELECT users.userid, users.uname, person.fname, person.lname, role.id, role.description, users.ustatus, person.pemail \n"

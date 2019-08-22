@@ -37,6 +37,8 @@ public interface UserService {
 
 	WorkbenchUser getUserByFullname(final String fullname);
 
+	Long countUserByFullname(final String fullname);
+
 	Map<Integer, String> getUserIDFullNameMap(final List<Integer> userIds);
 
 	Map<Integer, String> getAllUserIDFullNameMap();
