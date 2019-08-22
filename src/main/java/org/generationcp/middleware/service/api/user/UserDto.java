@@ -7,7 +7,7 @@ package org.generationcp.middleware.service.api.user;
 import org.generationcp.middleware.domain.workbench.CropDto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +27,7 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	private Integer status;
 	private String email;
 	private String password;
-	private List<CropDto> crops;
+	private Set<CropDto> crops;
 	private Set<String> authorities;
 
 	public UserDto() {
@@ -147,14 +147,14 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		return true;
 	}
 
-	public List<CropDto> getCrops() {
+	public Set<CropDto> getCrops() {
 		if (this.crops == null) {
-			this.crops = new ArrayList<>();
+			this.crops = new HashSet<>();
 		}
 		return this.crops;
 	}
 
-	public void setCrops(final List<CropDto> crops) {
+	public void setCrops(final Set<CropDto> crops) {
 		this.crops = crops;
 	}
 

@@ -21,8 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class WorkbenchTestDataUtil {
 
@@ -86,7 +88,7 @@ public class WorkbenchTestDataUtil {
 		userRoleDto.add(userRole);
 		user.setRoles(userRoleDto);
 
-		final List<CropType> crops = new ArrayList<>();
+		final Set<CropType> crops = new HashSet<>();
 		crops.add(this.cropType);
 		person.setCrops(crops);
 		return user;
@@ -118,7 +120,7 @@ public class WorkbenchTestDataUtil {
 		this.commonTestProject = this.createTestProjectData();
 		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
 		this.commonTestProject.setCropType(this.cropType);
-		final List<CropType> crops = new ArrayList<>();
+		final Set<CropType> crops = new HashSet<>();
 		crops.add(this.cropType);
 
 		this.testPerson1 = this.createTestPersonData();

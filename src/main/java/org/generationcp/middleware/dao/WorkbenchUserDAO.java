@@ -24,8 +24,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
@@ -150,10 +152,11 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 	
 	@SuppressWarnings("unchecked")
 	public List<UserDto> getAllUsersSortedByLastName() {
+
 		try {
 			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
 
-			criteria.createAlias("person", "person");
+			criteria.createAlias("person", "person", CriteriaSpecification.LEFT_JOIN);
 			criteria.createAlias("person.crops", "crops", CriteriaSpecification.LEFT_JOIN);
 			criteria.addOrder(Order.asc("person.lastName"));
 			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
@@ -174,7 +177,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 						user.setLastName(workbenchUser.getPerson().getLastName());
 
 						if (workbenchUser.getPerson().getCrops() != null) {
-							final List<CropDto> crops = new ArrayList<>();
+							final Set<CropDto> crops = new HashSet<>();
 							for (final CropType cropType : workbenchUser.getPerson().getCrops()) {
 								final CropDto crop = new CropDto();
 								crop.setCropName(cropType.getCropName());

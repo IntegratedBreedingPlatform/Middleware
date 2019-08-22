@@ -27,8 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -173,7 +175,7 @@ public class UserServiceImpl implements UserService {
 		}
 		user.setRoles(userRoles);
 
-		final List<CropType> crops = new ArrayList<>();
+		final Set<CropType> crops = new HashSet<>();
 		for (final CropDto crop : userDto.getCrops()) {
 			final CropType cropType = new CropType();
 			cropType.setCropName(crop.getCropName());
@@ -254,7 +256,7 @@ public class UserServiceImpl implements UserService {
 				user.getRoles().addAll(userRoles);
 			}
 
-			final List<CropType> crops = new ArrayList<>();
+			final Set<CropType> crops = new HashSet<>();
 			for (final CropDto crop : userDto.getCrops()) {
 				final CropType cropType = new CropType();
 				cropType.setCropName(crop.getCropName());

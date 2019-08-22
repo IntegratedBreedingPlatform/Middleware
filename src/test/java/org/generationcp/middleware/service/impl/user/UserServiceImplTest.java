@@ -25,8 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -291,7 +293,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		final List<WorkbenchUser> prevListOfActiveUsers = this.userService.getUsersByCrop(cropName);
 		final UserDto userDto =
 			UserDtoTestDataInitializer.createUserDto("FirstName", "LastName", "email@leafnode.io", "password", null, "username");
-		final ArrayList<CropDto> crops = new ArrayList<>();
+		final Set<CropDto> crops = new HashSet<>();
 		final CropDto cropDto = new CropDto();
 		cropDto.setCropName(cropName);
 		crops.add(cropDto);

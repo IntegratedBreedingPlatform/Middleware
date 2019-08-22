@@ -31,8 +31,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * POJO for persons table.
@@ -95,7 +95,7 @@ public class Person implements Comparable<Person>, Serializable {
 			name = "crop_persons",
 			joinColumns = @JoinColumn(name = "personid"),
 			inverseJoinColumns = @JoinColumn(name = "crop_name"))
-	private List<CropType> crops = new ArrayList<>();
+	private Set<CropType> crops = new HashSet<>();
 	
 	public Person() {
 	}
@@ -342,11 +342,11 @@ public class Person implements Comparable<Person>, Serializable {
 		return 0;
 	}
 
-	public List<CropType> getCrops() {
+	public Set<CropType> getCrops() {
 		return crops;
 	}
 
-	public void setCrops(final List<CropType> crops) {
+	public void setCrops(final Set<CropType> crops) {
 		this.crops = crops;
 	}
 }

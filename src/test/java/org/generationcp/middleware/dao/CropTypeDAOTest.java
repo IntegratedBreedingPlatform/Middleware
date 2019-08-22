@@ -10,7 +10,7 @@
 
 package org.generationcp.middleware.dao;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Set;
 
 public class CropTypeDAOTest extends IntegrationTestBase {
 
@@ -53,8 +54,8 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 		final CropType customCrop3 = this.createCropType(crop3);
 
 		final WorkbenchUser workbenchUser1 = this.createWorkbenchUser(RandomStringUtils.randomAlphabetic(10),
-				Lists.newArrayList(customCrop1, customCrop2));
-		final WorkbenchUser workbenchUser2 = this.createWorkbenchUser(RandomStringUtils.randomAlphabetic(10), Lists.newArrayList(customCrop3));
+				Sets.newHashSet(customCrop1, customCrop2));
+		final WorkbenchUser workbenchUser2 = this.createWorkbenchUser(RandomStringUtils.randomAlphabetic(10), Sets.newHashSet(customCrop3));
 
 		final List<CropType> cropsForWorkbenchUser1 = this.cropTypeDAO.getAvailableCropsForUser(workbenchUser1.getUserid());
 		final List<CropType> cropsForWorkbenchUser2 = this.cropTypeDAO.getAvailableCropsForUser(workbenchUser2.getUserid());
@@ -68,7 +69,7 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 
 	}
 
-	WorkbenchUser createWorkbenchUser(final String userName, final List<CropType> crops) {
+	WorkbenchUser createWorkbenchUser(final String userName, final Set<CropType> crops) {
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setName(userName);
 		final Person person = new Person();
