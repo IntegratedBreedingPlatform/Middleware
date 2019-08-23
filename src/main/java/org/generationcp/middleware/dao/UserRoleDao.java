@@ -29,7 +29,7 @@ public class UserRoleDao extends GenericDAO<UserRole, Long> {
 			+"  inner join permission p on rp.permission_id = p.permission_id " //
 			+"  where (r.role_type_id = " + RoleType.INSTANCE.getId() + " and p.name in ('" + PermissionsEnum.ADMIN.toString() + "', '"+ PermissionsEnum.CROP_MANAGEMENT.toString() //
 			+"','"+ PermissionsEnum.ADD_PROGRAM.toString()+"', '"+ PermissionsEnum.MANAGE_PROGRAMS+"'))" //
-			+"  and ur.userid = :userId";//
+			+"  and ur.userid = :userId and r.active = 1";//
 
 
 		private static final String GET_CROPS_WITH_ADD_PROGRAM_PERMISSION_FOR_A_CROP_ROLE_SQL = "select distinct ur.crop_name from users_roles ur "//
@@ -39,7 +39,7 @@ public class UserRoleDao extends GenericDAO<UserRole, Long> {
 		+"  inner join permission p on rp.permission_id = p.permission_id "//
 		+"  where (r.role_type_id = " + RoleType.CROP.getId() + " and p.name in ('" + PermissionsEnum.CROP_MANAGEMENT.toString() + "', '"+ PermissionsEnum.MANAGE_PROGRAMS.toString() //
 		+"','"+ PermissionsEnum.ADD_PROGRAM.toString()+"'))" //
-		+"  and ur.userid = :userId"; //
+		+"  and ur.userid = :userId and r.active =1 "; //
 
 	public List<UserRole> getByProgramId(final Long programId) {
 		List<UserRole> toReturn;
