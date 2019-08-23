@@ -531,4 +531,15 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public Role getRoleById(final Integer id) {
 		return this.workbenchDaoFactory.getRoleDao().getRoleById(id);
 	}
+
+	@Override
+	public List<CropType> getCropsWithAddProgramPermission(final int workbenchUserId) {
+		final boolean hasInstanceRoleWithAddProgramPermission = this.workbenchDaoFactory.getUserRoleDao().hasInstanceRoleWithAddProgramPermission(workbenchUserId);
+		if (hasInstanceRoleWithAddProgramPermission) {
+			return getAvailableCropsForUser(workbenchUserId);
+		} else {
+			return new ArrayList<>(this.workbenchDaoFactory.getUserRoleDao().getCropsWithAddProgramPermissionForCropRoles(workbenchUserId));
+		}
+	}
+
 }

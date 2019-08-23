@@ -365,4 +365,6 @@ public interface WorkbenchDataManager {
 
 	Role getRoleById(Integer id);
 
+	List<CropType> getCropsWithAddProgramPermission(int workbenchUserId);
+
 }
