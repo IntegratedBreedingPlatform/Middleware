@@ -347,24 +347,61 @@ public interface WorkbenchDataManager {
 	 */
 	List<RoleType> getRoleTypes();
 
+	/**
+	 * Get standard preset
+	 * @param presetId
+	 * @return StandardPreset
+	 */
 	StandardPreset getStandardPresetById(Integer presetId);
 
 	// TODO Move role methods to RoleServiceImp
 
+	/**
+	 * Get role type
+	 * @param id
+	 * @return ROle Type
+	 */
 	RoleType getRoleType(Integer id);
 
-	WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksById(Integer workbenchSidebarCategoryLink);
+	/**
+	 * Get sidebar links by category
+	 * @param workbenchSidebarCategoryLink
+	 * @return
+	 */
+	WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksByCategoryId(Integer workbenchSidebarCategoryLink);
 
-	List<WorkbenchSidebarCategory> getCategoriesByLinkIds(final List<Integer> linkIds);
-
+	/**
+	 * Save or update role
+	 * @param userRole
+	 */
 	void saveOrUpdateUserRole(UserRole userRole);
 
+	/**
+	 * Save role
+	 * @param role
+	 * @return Role
+	 */
 	Role saveRole(Role role);
 
+	/**
+	 * Get role by name
+	 * @param name
+	 * @return Role
+	 */
 	Role getRoleByName(String name);
 
+	/**
+	 * Get role by id
+	 * @param id
+	 * @return Role
+	 */
 	Role getRoleById(Integer id);
 
+	/**
+	 *
+	 * @param workbenchUserId
+	 * @return Crops for which user has permissions to add a program
+	 */
 	List<CropType> getCropsWithAddProgramPermission(int workbenchUserId);
 
 }

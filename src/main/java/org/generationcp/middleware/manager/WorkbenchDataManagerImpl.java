@@ -492,13 +492,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksById(final Integer workbenchSidebarCategoryLink) {
+	public WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksByCategoryId(final Integer workbenchSidebarCategoryLink) {
 		return this.workbenchDaoFactory.getWorkbenchSidebarCategoryLinkDao().getById(workbenchSidebarCategoryLink);
-	}
-
-	@Override
-	public List<WorkbenchSidebarCategory> getCategoriesByLinkIds(final List<Integer> linkIds) {
-		return this.workbenchDaoFactory.getWorkbenchSidebarCategoryDao().getCategoriesByLinkIds(linkIds);
 	}
 
 	@Override
