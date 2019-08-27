@@ -46,7 +46,7 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 		+ "where  p.parent_id = :parentId ";
 
 	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId) {
-
+		//FIXME. Try an user with ADMIN and MANAGE_PROGRAM_SETTINGS, Only ADMIN should be retrieved and given that MANAGE_PROGRAMS is not a row in the result, both permissions are returned
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(PermissionDAO.SQL_FILTERED_PERMISSIONS);
 			query.setParameter("userId", userId);

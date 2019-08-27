@@ -358,30 +358,28 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 	}
 
-	public List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName) {
+	public List<Integer> getActiveUserIDsWithProgramRoleByProjectId(final Long projectId) {
 		final List<Integer> userIDs = new ArrayList<>();
 		try {
 			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_ACTIVE_USER_IDS_BY_PROJECT_ID);
+				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_ACTIVE_USER_IDS_WITH_PROGRAM_ROLE_BY_PROJECT_ID);
 				query.setParameter("projectId", projectId);
-				query.setParameter("cropName", cropName);
 				return query.list();
 			}
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getActiveUserIDsByProjectId(projectId=" + projectId + ") query from ProjectUser: "
+			throw new MiddlewareQueryException("Error in getActiveUserIDsWithProgramRoleByProjectId(projectId=" + projectId + ") query from ProjectUser: "
 				+ e.getMessage(), e);
 		}
 		return userIDs;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<WorkbenchUser> getUsersByProjectId(final Long projectId, final String cropName) {
+	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
 		final List<WorkbenchUser> users = new ArrayList<>();
 		try {
 			if (projectId != null) {
 				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_USERS_BY_PROJECT_ID);
 				query.setParameter("projectId", projectId);
-				query.setParameter("cropName", cropName);
 				final List<Object> results = query.list();
 				for (final Object o : results) {
 					final Object[] user = (Object[]) o;

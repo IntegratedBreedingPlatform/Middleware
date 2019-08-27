@@ -60,10 +60,9 @@ public interface UserService {
 	 * Retrieves the user ids of the program members using the project id
 	 *
 	 * @param projectId
-	 * @param cropName
 	 * @return
 	 */
-	List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName);
+	List<Integer> getActiveUserIDsWithProgramRoleByProjectId(final Long projectId);
 
 	/**
 	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
@@ -71,7 +70,7 @@ public interface UserService {
 	 * @param projectId - the project id
 	 * @return the List of {@link WorkbenchUser} records
 	 */
-	List<WorkbenchUser> getUsersByProjectId(Long projectId, String cropName);
+	List<WorkbenchUser> getUsersByProjectId(Long projectId);
 
 	/**
 	 * Gets the all Users Sorted

@@ -88,8 +88,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName) {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO().getActiveUserIDsByProjectId(projectId, cropName);
+	public List<Integer> getActiveUserIDsWithProgramRoleByProjectId(final Long projectId) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getActiveUserIDsWithProgramRoleByProjectId(projectId);
 	}
 
 	@Override
@@ -98,9 +98,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	//TODO Verify is cropName is needed
-	public List<WorkbenchUser> getUsersByProjectId(final Long projectId, final String cropName) {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByProjectId(projectId, cropName);
+	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByProjectId(projectId);
 	}
 
 	@Override

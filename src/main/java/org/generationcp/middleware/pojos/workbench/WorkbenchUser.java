@@ -90,14 +90,14 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		+ "       users_roles ur ON ur.userid = users.userid "
 		+ "           INNER JOIN role r ON ur.role_id = r.id  "
 		+ "   where  (r.role_type_id =  " + RoleType.INSTANCE.getId()
-		+ "     or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = :cropName)  "
+		+ "     or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = p.crop_type)  "
 		+ "     or (r.role_type_id =  " + RoleType.PROGRAM.getId()
-		+ " and ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id))  "
+		+ " and ur.crop_name = p.crop_type AND ur.workbench_project_id = p.project_id))  "
 		+ "    AND "
 		+ "       p.project_id = :projectId "
 		+ "    GROUP BY users.userid";
 
-	public static final String GET_ACTIVE_USER_IDS_BY_PROJECT_ID =
+	public static final String GET_ACTIVE_USER_IDS_WITH_PROGRAM_ROLE_BY_PROJECT_ID =
 		"SELECT DISTINCT users.userid "
 			+ "    FROM "
 			+ "       workbench_project p "
@@ -109,7 +109,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 			+ "       users_roles ur ON ur.userid = users.userid "
 			+ "           INNER JOIN role r ON ur.role_id = r.id  "
 			+ "   where  (r.role_type_id =  " + RoleType.PROGRAM.getId()
-			+ " 			AND ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id) "
+			+ " 			AND ur.crop_name = p.crop_type AND ur.workbench_project_id = p.project_id) "
 			+ "    	AND p.project_id = :projectId "
 			+ "  	AND users.ustatus = 0 ";
 
@@ -118,6 +118,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 	public static final String GET_BY_FULLNAME = "getByFullName";
 
+	//TODO We should have only one query BY_PROJECT_ID to avoid maintaining two
 	public static final String GET_USERS_BY_PROJECT_UUID = "SELECT  "
 		+ "       u.userid, "
 		+ "       u.uname, "
