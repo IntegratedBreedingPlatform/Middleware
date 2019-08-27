@@ -27,7 +27,6 @@ import java.util.List;
 @Transactional
 public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 
-	//Used to get the last opened date, if there is no row, a new one will be created
 	public ProjectUserInfo getByProjectIdAndUserId(final Long projectId, final Integer userId) {
 		try {
 			if (projectId != null && userId != null) {
@@ -44,7 +43,6 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	// Used when deleting a program
 	public List<ProjectUserInfo> getByProjectId(final Long projectId) {
 		try {
 			if (projectId != null) {
