@@ -200,11 +200,7 @@ public class UserServiceImpl implements UserService {
 				for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
 					boolean found = false;
 					for (final UserRole userRole : user.getRoles()) {
-						if (userRole.getRole().getId().equals(userRoleDto.getRole().getId()) &&
-							(userRole.getCropType() == null && userRoleDto.getCrop() == null || userRole.getCropType().getCropName()
-								.equals(userRoleDto.getCrop().getCropName())) &&
-							(userRole.getWorkbenchProject() == null && userRoleDto.getProgram() == null || userRole.getWorkbenchProject()
-								.getUniqueID().equals(userRoleDto.getProgram().getUuid()))) {
+						if (userRoleEqualsToUserRoleDto(userRole, userRoleDto)) {
 							userRoles.add(userRole);
 							found = true;
 							break;
@@ -524,6 +520,14 @@ public class UserServiceImpl implements UserService {
 		userRole.setCreatedDate(new Date());
 		userRole.setCreatedBy(creator);
 		return userRole;
+	}
+
+	private boolean userRoleEqualsToUserRoleDto(final UserRole userRole, final UserRoleDto userRoleDto) {
+		return userRole.getRole().getId().equals(userRoleDto.getRole().getId()) &&
+			(userRole.getCropType() == null && userRoleDto.getCrop() == null || userRole.getCropType().getCropName()
+				.equals(userRoleDto.getCrop().getCropName())) &&
+			(userRole.getWorkbenchProject() == null && userRoleDto.getProgram() == null || userRole.getWorkbenchProject()
+				.getUniqueID().equals(userRoleDto.getProgram().getUuid()));
 	}
 
 }

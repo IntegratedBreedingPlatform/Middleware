@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users_roles")
@@ -126,6 +127,21 @@ public class UserRole {
 
 	public String getCapitalizedRole() {
 		return this.getRole().getCapitalizedRole();
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		final UserRole userRole = (UserRole) o;
+		return Objects.equals(id, userRole.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
 	}
 
 }
