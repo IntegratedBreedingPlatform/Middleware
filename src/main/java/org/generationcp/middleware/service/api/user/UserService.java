@@ -49,14 +49,6 @@ public interface UserService {
 	List<WorkbenchUser> getAllUsers();
 
 	/**
-	 * Gets the user by project_uuid.
-	 *
-	 * @param projectUuid
-	 * @return the user matching the given project_uuid
-	 */
-	List<UserDto> getUsersByProjectUuid(final String projectUuid, final String cropName);
-
-	/**
 	 * Retrieves the user ids of the program members using the project id
 	 *
 	 * @param projectId

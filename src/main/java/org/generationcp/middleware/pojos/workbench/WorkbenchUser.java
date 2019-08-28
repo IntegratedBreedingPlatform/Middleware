@@ -118,32 +118,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 	public static final String GET_BY_FULLNAME = "getByFullName";
 
-	//TODO We should have only one query BY_PROJECT_ID to avoid maintaining two
-	public static final String GET_USERS_BY_PROJECT_UUID = "SELECT  "
-		+ "       u.userid, "
-		+ "       u.uname, "
-		+ "       person.fname, "
-		+ "       person.lname, "
-		+ "       u.ustatus, "
-		+ "       person.pemail "
-		+ "    FROM "
-		+ "       workbench_project p "
-		+ "           INNER JOIN "
-		+ "       crop_persons cp ON cp.crop_name = p.crop_type "
-		+ "           INNER JOIN "
-		+ "       persons person ON person.personid = cp.personid "
-		+ "           INNER JOIN "
-		+ "       users u ON person.personid = u.personid "
-		+ "           INNER JOIN "
-		+ "       users_roles ur ON ur.userid = u.userid "
-		+ "           INNER JOIN role r ON ur.role_id = r.id  "
-		+ "   where  (r.role_type_id =  " + RoleType.INSTANCE.getId()
-		+ "     or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = :cropName)  "
-		+ "     or (r.role_type_id =  " + RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id))  "
-		+ "    AND "
-		+ "       p.project_uuid = :project_uuid "
-		+ "    GROUP BY u.userid";
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)

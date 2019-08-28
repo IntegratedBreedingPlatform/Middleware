@@ -92,11 +92,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDto> getUsersByProjectUuid(final String projectUuid, final String cropName) {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByProjectUUId(projectUuid, cropName);
-	}
-
-	@Override
 	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByProjectId(projectId);
 	}

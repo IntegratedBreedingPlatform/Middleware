@@ -115,36 +115,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return new ArrayList<>();
 	}
 	
-	@SuppressWarnings({"unchecked"})
-	public List<UserDto> getUsersByProjectUUId(final String projectUUID, final String cropName) {
-		final List<UserDto> users = new ArrayList<>();
-		try {
-			if (projectUUID != null) {
-
-				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_USERS_BY_PROJECT_UUID);
-				query.setParameter("project_uuid", projectUUID);
-				query.setParameter("cropName", cropName);
-
-				final List<Object> results = query.list();
-				for (final Object o : results) {
-					final Object[] user = (Object[]) o;
-					final Integer userId = (Integer) user[0];
-					final String username = (String) user[1];
-					final String firstName = (String) user[2];
-					final String lastName = (String) user[3];
-					final Integer status = (Integer) user[4];
-					final String email = (String) user[5];
-					//TODO load list of userRoles if needed
-					final UserDto u = new UserDto(userId, username, firstName, lastName, null, status, email);
-					users.add(u);
-				}
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getUsersByProjectUUId(project_uuid=" + projectUUID + ")", e);
-		}
-		return users;
-	}
-	
 	@SuppressWarnings("unchecked")
 	public List<UserDto> getAllUsersSortedByLastName() {
 
