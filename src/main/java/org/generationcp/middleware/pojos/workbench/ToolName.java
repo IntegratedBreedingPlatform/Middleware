@@ -55,16 +55,6 @@ public enum ToolName {
 		return this.name;
 	}
 
-	public static boolean isCorrectTool(final String name) {
-		for (ToolName tool : ToolName.values()) {
-			if (tool.getName().equals(name)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	public static boolean isURLAccessibleTool(final String name) {
 		final List<ToolName> workbenchTools = Arrays.asList(BV_SSA, BV_META_ANALYSIS, BV_GXE, MANAGE_PROGRAMS);
 		final List<ToolName> toolsWithURL = new ArrayList<>(Arrays.asList(ToolName.values()));
