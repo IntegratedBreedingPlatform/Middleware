@@ -529,6 +529,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public List<CropType> getCropsWithAddProgramPermission(final int workbenchUserId) {
+
 		final boolean hasInstanceRoleWithAddProgramPermission = this.workbenchDaoFactory.getUserRoleDao().hasInstanceRoleWithAddProgramPermission(workbenchUserId);
 		if (hasInstanceRoleWithAddProgramPermission) {
 			return getAvailableCropsForUser(workbenchUserId);
