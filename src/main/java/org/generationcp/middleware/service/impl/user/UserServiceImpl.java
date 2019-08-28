@@ -148,30 +148,14 @@ public class UserServiceImpl implements UserService {
 		final List<UserRole> userRoles = new ArrayList<>();
 		if (userDto.getUserRoles() != null) {
 			for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
-				final UserRole userRole = new UserRole();
-				final Role role = new Role();
-				role.setId(userRoleDto.getRole().getId());
-				userRole.setRole(role);
-				userRole.setUser(user);
-				if (userRoleDto.getCrop() != null) {
-					userRole.setCropType(new CropType(userRoleDto.getCrop().getCropName()));
-				}
-				if (userRoleDto.getProgram() != null) {
-					final Project project =
-						this.workbenchDaoFactory.getProjectDAO().getByUuid(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
-					userRole.setWorkbenchProject(project);
-				}
-				userRole.setCreatedDate(new Date());
-				userRole.setCreatedBy(this.getUserById(userRoleDto.getCreatedBy()));
-				userRoles.add(userRole);
+				userRoles.add(this.buildNewUserRole(user, userRoleDto));
 			}
 		}
 		user.setRoles(userRoles);
 
 		final Set<CropType> crops = new HashSet<>();
 		for (final CropDto crop : userDto.getCrops()) {
-			final CropType cropType = new CropType();
-			cropType.setCropName(crop.getCropName());
+			final CropType cropType = new CropType(crop.getCropName());
 			crops.add(cropType);
 		}
 		person.setCrops(crops);
@@ -227,22 +211,7 @@ public class UserServiceImpl implements UserService {
 						}
 					}
 					if (!found) {
-						final UserRole userRole = new UserRole();
-						final Role role = new Role();
-						role.setId(userRoleDto.getRole().getId());
-						userRole.setRole(role);
-						userRole.setUser(user);
-						if (userRoleDto.getCrop() != null) {
-							userRole.setCropType(new CropType(userRoleDto.getCrop().getCropName()));
-						}
-						if (userRoleDto.getProgram() != null) {
-							final Project project =
-								this.workbenchDaoFactory.getProjectDAO().getByUuid(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
-							userRole.setWorkbenchProject(project);
-						}
-						userRole.setCreatedDate(new Date());
-						userRole.setCreatedBy(this.getUserById(userRoleDto.getCreatedBy()));
-						userRoles.add(userRole);
+						userRoles.add(this.buildNewUserRole(user, userRoleDto));
 					}
 				}
 				user.getRoles().clear();
@@ -251,8 +220,7 @@ public class UserServiceImpl implements UserService {
 
 			final Set<CropType> crops = new HashSet<>();
 			for (final CropDto crop : userDto.getCrops()) {
-				final CropType cropType = new CropType();
-				cropType.setCropName(crop.getCropName());
+				final CropType cropType = new CropType(crop.getCropName());
 				crops.add(cropType);
 			}
 			user.getPerson().setCrops(crops);
@@ -536,6 +504,26 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<WorkbenchUser> getUsersWithRole(final int roleId) {
 		return this.workbenchDaoFactory.getUserRoleDao().getUsersByRoleId(roleId);
+	}
+
+	private UserRole buildNewUserRole(final WorkbenchUser user, final UserRoleDto userRoleDto) {
+		final Role role = new Role(userRoleDto.getRole().getId());
+
+		CropType cropType = null;
+		if (userRoleDto.getCrop() != null) {
+			cropType = new CropType(userRoleDto.getCrop().getCropName());
+		}
+		Project project = null;
+		if (userRoleDto.getProgram() != null) {
+			project = this.workbenchDaoFactory.getProjectDAO()
+				.getByUuid(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
+		}
+		final WorkbenchUser creator = this.getUserById(userRoleDto.getCreatedBy());
+
+		final UserRole userRole = new UserRole(user, role, cropType, project);
+		userRole.setCreatedDate(new Date());
+		userRole.setCreatedBy(creator);
+		return userRole;
 	}
 
 }
