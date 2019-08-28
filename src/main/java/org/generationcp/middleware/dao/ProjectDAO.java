@@ -172,7 +172,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		throws MiddlewareException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Project.class);
-			for (Map.Entry<ProgramFilters, Object> entry : filters.entrySet()) {
+			for (final Map.Entry<ProgramFilters, Object> entry : filters.entrySet()) {
 				final ProgramFilters filter = entry.getKey();
 				final Object value = entry.getValue();
 				criteria.add(Restrictions.eq(filter.getStatement(), value));
@@ -184,7 +184,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
 			return criteria.list();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			throw new MiddlewareException(
 				"Error in getProjectsByFilter(start=" + pageNumber + ", numOfRows=" + pageSize + "): " + e.getMessage(), e);
 		}
@@ -193,14 +193,14 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 	public long countProjectsByFilter(final Map<ProgramFilters, Object> filters) throws MiddlewareException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Project.class);
-			for (Map.Entry<ProgramFilters, Object> entry : filters.entrySet()) {
+			for (final Map.Entry<ProgramFilters, Object> entry : filters.entrySet()) {
 				final ProgramFilters filter = entry.getKey();
 				final Object value = entry.getValue();
 				criteria.add(Restrictions.eq(filter.getStatement(), value));
 			}
 
 			return criteria.list().size();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			throw new MiddlewareException("Error in countProjectsByFilter(): " + e.getMessage(), e);
 		}
 	}
