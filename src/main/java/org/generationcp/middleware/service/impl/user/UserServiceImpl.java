@@ -18,7 +18,6 @@ import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
-import org.generationcp.middleware.service.api.user.UserRoleMapper;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.springframework.stereotype.Service;
@@ -324,13 +323,8 @@ public class UserServiceImpl implements UserService {
 		final List<WorkbenchUser> workbenchUsers = this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByPersonIds(personIds);
 		final List<UserDto> userDtos = new ArrayList<>();
 		for (final WorkbenchUser workbenchUser : workbenchUsers) {
-			final UserDto userDto = new UserDto();
-			final Person person = workbenchUser.getPerson();
-			userDto.setUsername(workbenchUser.getName());
-			userDto.setEmail(person.getEmail());
-			userDto.setFirstName(person.getFirstName());
-			userDto.setLastName(person.getLastName());
-			userDto.setUserRoles(UserRoleMapper.map(workbenchUser.getRoles()));
+			final UserDto userDto = new UserDto(workbenchUser);
+			userDtos.add(userDto);
 		}
 		return userDtos;
 	}

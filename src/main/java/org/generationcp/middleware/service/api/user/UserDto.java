@@ -5,6 +5,8 @@
 package org.generationcp.middleware.service.api.user;
 
 import org.generationcp.middleware.domain.workbench.CropDto;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -49,6 +51,30 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.userRoles = userRoles;
 		this.status = status;
 		this.email = email;
+	}
+
+	public UserDto(final WorkbenchUser workbenchUser) {
+		if (workbenchUser.getRoles() != null && !workbenchUser.getRoles().isEmpty()) {
+			this.setUserRoles(UserRoleMapper.map(workbenchUser.getRoles()));
+		}
+		this.setUserId(workbenchUser.getUserid());
+		if (workbenchUser.getPerson() != null) {
+			this.setEmail(workbenchUser.getPerson().getEmail());
+			this.setFirstName(workbenchUser.getPerson().getFirstName());
+			this.setLastName(workbenchUser.getPerson().getLastName());
+
+			if (workbenchUser.getPerson().getCrops() != null) {
+				final Set<CropDto> crops = new HashSet<>();
+				for (final CropType cropType : workbenchUser.getPerson().getCrops()) {
+					final CropDto crop = new CropDto(cropType);
+					crops.add(crop);
+				}
+				this.setCrops(crops);
+			}
+
+		}
+		this.setStatus(workbenchUser.getStatus());
+		this.setUsername(workbenchUser.getName());
 	}
 
 	public Integer getUserId() {

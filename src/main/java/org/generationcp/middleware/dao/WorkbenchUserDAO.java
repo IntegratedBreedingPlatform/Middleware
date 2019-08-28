@@ -1,14 +1,11 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.generationcp.middleware.service.api.user.UserRoleMapper;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -24,10 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
@@ -166,30 +161,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			final List<UserDto> users = new ArrayList<>();
 			if (workbenchUsers != null) {
 				for (final WorkbenchUser workbenchUser : workbenchUsers) {
-					final UserDto user = new UserDto();
-					if (workbenchUser.getRoles() != null && !workbenchUser.getRoles().isEmpty()) {
-						user.setUserRoles(UserRoleMapper.map(workbenchUser.getRoles()));
-					}
-					user.setUserId(workbenchUser.getUserid());
-					if (workbenchUser.getPerson() != null) {
-						user.setEmail(workbenchUser.getPerson().getEmail());
-						user.setFirstName(workbenchUser.getPerson().getFirstName());
-						user.setLastName(workbenchUser.getPerson().getLastName());
-
-						if (workbenchUser.getPerson().getCrops() != null) {
-							final Set<CropDto> crops = new HashSet<>();
-							for (final CropType cropType : workbenchUser.getPerson().getCrops()) {
-								final CropDto crop = new CropDto();
-								crop.setCropName(cropType.getCropName());
-								crops.add(crop);
-							}
-							user.setCrops(crops);
-						}
-
-					}
-					user.setStatus(workbenchUser.getStatus());
-					user.setUsername(workbenchUser.getName());
-					users.add(user);
+					users.add(new UserDto(workbenchUser));
 				}
 			}
 			return users;
