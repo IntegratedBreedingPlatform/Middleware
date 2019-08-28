@@ -139,7 +139,7 @@
 			</not>
 		</preConditions>
 		<comment>
-			Alter table users_roles to add created_date
+			Alter table users_roles to add created_date, doing a separate sentence to add a default value so old rows keep null value for created_date
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE users_roles
@@ -211,7 +211,8 @@
 			</not>
 		</preConditions>
 		<comment>
-			Alter table role to add role_type_id
+			Alter table role to add role_type_id. Roles admin and super admin will become INSTANCE ROLE type, Roles Breeder and Technician will become CROP ROLE type, Role Readonly
+			will become PROGRAM ROLE type
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
@@ -284,11 +285,9 @@
 
 	<changeSet author="vanina" id="v12.5.0-12">
 		<preConditions onFail="MARK_RAN">
-			<and>
-				<not>
-					<columnExists tableName="role" columnName="created_by"/>
-				</not>
-			</and>
+			<not>
+				<columnExists tableName="role" columnName="created_by"/>
+			</not>
 		</preConditions>
 		<comment>
 			Alter table role to add created_by column
@@ -315,7 +314,7 @@
 			</not>
 		</preConditions>
 		<comment>
-			Alter table role to add created_date column
+			Alter table role to add created_date column, old values should keep NULL value since we dont know when they were created
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
@@ -468,67 +467,67 @@
 			INSERT INTO table permission
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-        	 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (1, 'ADMIN','Full',null,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (2, 'ADMINISTRATION','Administration',1,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (3, 'CROP_MANAGEMENT','Crop Management',1,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (4, 'BREEDING_ACTIVITIES','Breeding Activities',1,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (5, 'INFORMATION_MANAGEMENT','Information Management',1,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (6, 'STATISTICAL_ANALYSIS','Statistical Analysis',1,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (7, 'SITE_ADMIN','Site Admin',2,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 8, 'MANAGE_ONTOLOGIES','Manage Ontologies',3,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'ontology_manager') ,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 9, 'IMPORT_GERMPLASM','Import Germplasm',3,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'germplasm_import') ,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 10, 'MANAGE_GENOTYPING_DATA','Manage Genotyping Data',3,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'gdms') ,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (11, 'MANAGE_PROGRAMS','Manage programs',3,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (12, 'ADD_PROGRAM','Add Program',11,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 13, 'MANAGE_PROGRAM_SETTINGS','Manage Program Settings',11,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'manage_program') ,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 14, 'MANAGE_GERMPLASM','Manage Germplasm',4,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'bm_list_manager_main') ,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 15, 'MANAGE_SAMPLES','Manage Samples',4,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'sample_manager') ,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 16, 'MANAGE_STUDIES','Manage Studies',4,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'study_manager_fieldbook_web') ,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 17, 'BROWSE_STUDIES','Browse Studies',5,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'study_browser') ,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 18, 'HEAD_TO_HEAD_QUERY','Head to Head Query',5,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'germplasm_mainheadtohead') ,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 19, 'MULTI_TRAIT_QUERY','Multi-trait Query',5,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'trait_donor_query') ,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 20, 'IMPORT_DATASETS','Import Datasets',5,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'dataset_importer') ,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 21, 'SINGLE_SITE_ANALYSIS','Single-Site Analysis',6,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'breeding_view_wb') ,null);
-			 INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
-			 select 22, 'MULTI_SITE_ANALYSIS','Multi-Site Analysis',6,
-				 IFNULL( ( select  sidebar_category_link_id
-						   from workbench_sidebar_category_link where tool_name = 'breeding_gxe') ,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (1, 'ADMIN','Full',null,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (2, 'ADMINISTRATION','Administration',1,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (3, 'CROP_MANAGEMENT','Crop Management',1,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (4, 'BREEDING_ACTIVITIES','Breeding Activities',1,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (5, 'INFORMATION_MANAGEMENT','Information Management',1,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (6, 'STATISTICAL_ANALYSIS','Statistical Analysis',1,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (7, 'SITE_ADMIN','Site Admin',2,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 8, 'MANAGE_ONTOLOGIES','Manage Ontologies',3,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'ontology_manager');
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 9, 'IMPORT_GERMPLASM','Import Germplasm',3,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'germplasm_import');
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 10, 'MANAGE_GENOTYPING_DATA','Manage Genotyping Data',3,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'gdms');
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (11, 'MANAGE_PROGRAMS','Manage programs',3,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id) values (12, 'ADD_PROGRAM','Add Program',11,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 13, 'MANAGE_PROGRAM_SETTINGS','Manage Program Settings',11,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'manage_program');
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 14, 'MANAGE_GERMPLASM','Manage Germplasm',4,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'bm_list_manager_main');
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 15, 'MANAGE_SAMPLES','Manage Samples',4,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'sample_manager');
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 16, 'MANAGE_STUDIES','Manage Studies',4,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'study_manager_fieldbook_web');
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 17, 'BROWSE_STUDIES','Browse Studies',5,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'study_browser');
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 18, 'HEAD_TO_HEAD_QUERY','Head to Head Query',5,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'germplasm_mainheadtohead');
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 19, 'MULTI_TRAIT_QUERY','Multi-trait Query',5,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'trait_donor_query');
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 20, 'IMPORT_DATASETS','Import Datasets',5,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'dataset_importer');
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 21, 'SINGLE_SITE_ANALYSIS','Single-Site Analysis',6,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'breeding_view_wb');
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_link_id)
+			select 22, 'MULTI_SITE_ANALYSIS','Multi-Site Analysis',6,
+			   ( select  sidebar_category_link_id
+						from workbench_sidebar_category_link where tool_name = 'breeding_gxe');
 		</sql>
 	</changeSet>
 
@@ -640,7 +639,7 @@
 			</sqlCheck>
 		</preConditions>
 		<comment>
-			Update table role where row is SUPERADMIN
+			Update table role where row is SUPERADMIN, so this role becomes not editable and not assignable
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE role SET editable = 0, assignable = 0 WHERE id = 5;
