@@ -1,12 +1,6 @@
 
 package org.generationcp.middleware;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -15,13 +9,22 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 public class WorkbenchTestDataUtil {
 
@@ -73,10 +76,21 @@ public class WorkbenchTestDataUtil {
 		user.setPerson(person);
 		user.setAssignDate(20150101);
 		user.setCloseDate(20150101);
-		user.setRoles(Arrays.asList(new UserRole(user, new Role(1, "Admin"))));
-		final List<CropType> crops = new ArrayList<>();
+		final UserRole userRole = new UserRole();
+		userRole.setUser(user);
+		final Role role = new Role();
+		role.setId(1);
+		final RoleType roleType = new RoleType();
+		roleType.setId(1);
+		role.setRoleType(roleType);
+		userRole.setRole(role);
+		final List<UserRole> userRoleDto = new ArrayList<>();
+		userRoleDto.add(userRole);
+		user.setRoles(userRoleDto);
+
+		final Set<CropType> crops = new HashSet<>();
 		crops.add(this.cropType);
-		user.setCrops(crops);
+		person.setCrops(crops);
 		return user;
 	}
 
@@ -106,7 +120,7 @@ public class WorkbenchTestDataUtil {
 		this.commonTestProject = this.createTestProjectData();
 		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
 		this.commonTestProject.setCropType(this.cropType);
-		final List<CropType> crops = new ArrayList<>();
+		final Set<CropType> crops = new HashSet<>();
 		crops.add(this.cropType);
 
 		this.testPerson1 = this.createTestPersonData();
@@ -116,11 +130,11 @@ public class WorkbenchTestDataUtil {
 
 		this.testUser1 = this.createTestUserData();
 		this.testUser1.setPerson(this.testPerson1);
-		this.testUser1.setCrops(crops);
+		this.testPerson1.setCrops(crops);
 		this.userService.addUser(this.testUser1);
 		this.testUser2 = this.createTestUserData();
 		this.testUser2.setPerson(this.testPerson2);
-		this.testUser2.setCrops(crops);
+		this.testPerson2.setCrops(crops);
 		this.userService.addUser(this.testUser2);
 
 		this.commonTestProject.setUserId(this.testUser1.getUserid());
@@ -145,13 +159,13 @@ public class WorkbenchTestDataUtil {
 		pui.setProject(this.commonTestProject);
 		pui.setUser(workbenchUser);
 		pui.setLastOpenDate(new Date());
-		this.userService.saveProjectUserInfo(pui);
+		this.userService.saveOrUpdateProjectUserInfo(pui);
 
 		pui = new ProjectUserInfo();
 		pui.setProject(this.commonTestProject);
 		pui.setUser(this.testUser2);
 		pui.setLastOpenDate(new Date());
-		this.userService.saveProjectUserInfo(pui);
+		this.userService.saveOrUpdateProjectUserInfo(pui);
 	}
 
 	public Project getCommonTestProject() {
@@ -192,7 +206,13 @@ public class WorkbenchTestDataUtil {
 		userdto.setFirstName(firstName);
 		final String lastName = RandomStringUtils.randomAlphanumeric(50);
 		userdto.setLastName(lastName);
-		userdto.setRole(new Role(1, "ADMIN"));
+		final UserRoleDto userRoleDto = new UserRoleDto(1,
+			new RoleDto(1, "Admin", "",
+				"instance", true, true,
+				true), null,
+			null, null);
+		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
+		userRoleDtos.add(userRoleDto);
 		userdto.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
 		final String email = RandomStringUtils.randomAlphanumeric(24);
 		userdto.setEmail("test" + email + "@leafnode.io");

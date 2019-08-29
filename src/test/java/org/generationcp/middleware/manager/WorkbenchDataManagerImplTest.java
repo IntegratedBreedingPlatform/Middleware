@@ -19,12 +19,8 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLinkRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -44,6 +40,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
+
+	private final static String CROP_NAME = "maize";
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -349,68 +347,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final ProjectUserInfo userInfo2 = results.get(1);
 		Assert.assertEquals(userInfo2.getProject(), this.commonTestProject);
 		Assert.assertEquals(userInfo2.getUser().getUserid(), this.workbenchTestDataUtil.getTestUser2().getUserid());
-	}
-
-	@Test
-	public void testGetProjectsByProjectId() {
-		final List<Project> projects = this.workbenchDataManager.getProjectsByUser(this.testUser1);
-
-		Assert.assertNotNull(projects);
-		Assert.assertNotNull(projects.get(0));
-		Assert.assertEquals(projects.get(0), this.commonTestProject);
-	}
-
-	@Test
-	public void testDeleteProjectDependencies() {
-		// Create new project - for deletion later
-		this.workbenchTestDataUtil.setUpWorkbench();
-		final Project testProject = this.workbenchTestDataUtil.getCommonTestProject();
-		final Long id = testProject.getProjectId();
-
-		// Check project dependencies exist before deleting
-		final List<ProjectActivity> projectActiviesBefore =
-			this.workbenchDataManager.getProjectActivitiesByProjectId(id, 0, Integer.MAX_VALUE);
-		Assert.assertNotNull(projectActiviesBefore);
-		Assert.assertFalse(projectActiviesBefore.isEmpty());
-		final List<WorkbenchUser> usersBefore = this.userService.getUsersByProjectId(id);
-		Assert.assertNotNull(usersBefore);
-		Assert.assertFalse(usersBefore.isEmpty());
-
-		// Method to test
-		this.workbenchDataManager.deleteProjectDependencies(testProject);
-
-		final List<ProjectActivity> projectActiviesAfter =
-			this.workbenchDataManager.getProjectActivitiesByProjectId(id, 0, Integer.MAX_VALUE);
-		Assert.assertNotNull(projectActiviesAfter);
-		Assert.assertTrue(projectActiviesAfter.isEmpty());
-		final List<WorkbenchUser> usersAfter = this.userService.getUsersByProjectId(id);
-		Assert.assertNotNull(usersAfter);
-		Assert.assertTrue(usersAfter.isEmpty());
-	}
-
-	@Test
-	public void testGetAllWorkbenchSidebarLinksByCategoryId() {
-		final WorkbenchSidebarCategory category = new WorkbenchSidebarCategory();
-		// Retrieve links for "Program Administration" category
-		category.setSidebarCategoryId(7);
-		final List<WorkbenchSidebarCategoryLink> sidebarLinks = this.workbenchDataManager.getAllWorkbenchSidebarLinksByCategoryId(category);
-		Assert.assertNotNull(sidebarLinks);
-		Assert.assertEquals(2, sidebarLinks.size());
-
-		// Verify the roles allowed to access per link
-		for (final WorkbenchSidebarCategoryLink link : sidebarLinks) {
-			if ("manage_program".equals(link.getSidebarLinkName())) {
-				final List<WorkbenchSidebarCategoryLinkRole> roles = link.getRoles();
-				Assert.assertEquals(2, roles.size());
-				Assert.assertEquals("ADMIN", roles.get(0).getRole().getCapitalizedRole());
-				Assert.assertEquals(Role.SUPERADMIN, roles.get(1).getRole().getCapitalizedRole());
-
-			} else if ("backup_restore".equals(link.getSidebarLinkName())) {
-				final List<WorkbenchSidebarCategoryLinkRole> roles = link.getRoles();
-				Assert.assertTrue(roles.isEmpty());
-
-			}
-		}
 	}
 
 }

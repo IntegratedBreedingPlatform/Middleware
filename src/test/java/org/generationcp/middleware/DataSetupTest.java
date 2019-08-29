@@ -183,7 +183,7 @@ public class DataSetupTest extends IntegrationTestBase {
 
         final ProjectUserInfo pUserInfo = new ProjectUserInfo(program,
                 workbenchUser);
-        this.userService.saveProjectUserInfo(pUserInfo);
+        this.userService.saveOrUpdateProjectUserInfo(pUserInfo);
 
         return program.getUniqueID();
     }

@@ -11,10 +11,16 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.domain.workbench.PermissionDto;
+import org.generationcp.middleware.domain.workbench.RoleType;
+import org.generationcp.middleware.pojos.BeanFormState;
+import org.generationcp.middleware.pojos.Person;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -25,7 +31,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
@@ -34,15 +39,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.pojos.BeanFormState;
-import org.generationcp.middleware.pojos.Person;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * POJO for users table in Workbench Database.
@@ -66,21 +65,58 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final String GET_USERS_BY_PROJECT_ID = "SELECT  "
+		+ "  users.userid, "
+		+ "  users.instalid, "
+		+ "  users.ustatus, "
+		+ "  users.uaccess, "
+		+ "  users.utype, "
+		+ "  users.uname, "
+		+ "  users.upswd, "
+		+ "  users.personid, "
+		+ "  users.adate, "
+		+ "  users.cdate, "
+		+ "  pr.fname, "
+		+ "  pr.lname "
+		+ "    FROM "
+		+ "       workbench_project p "
+		+ "           INNER JOIN "
+		+ "       crop_persons cp ON cp.crop_name = p.crop_type "
+		+ "           INNER JOIN "
+		+ "       users ON cp.personid = users.personid "
+		+ "           INNER JOIN "
+		+ "       persons pr ON pr.personid = users.personid "
+		+ "           INNER JOIN "
+		+ "       users_roles ur ON ur.userid = users.userid "
+		+ "           INNER JOIN role r ON ur.role_id = r.id  "
+		+ "   where  (r.role_type_id =  " + RoleType.INSTANCE.getId()
+		+ "     or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = p.crop_type)  "
+		+ "     or (r.role_type_id =  " + RoleType.PROGRAM.getId()
+		+ " and ur.crop_name = p.crop_type AND ur.workbench_project_id = p.project_id))  "
+		+ "    AND "
+		+ "       p.project_id = :projectId "
+		+ "    GROUP BY users.userid";
+
+	public static final String GET_ACTIVE_USER_IDS_WITH_PROGRAM_ROLE_BY_PROJECT_ID =
+		"SELECT DISTINCT users.userid "
+			+ "    FROM "
+			+ "       workbench_project p "
+			+ "           INNER JOIN "
+			+ "       crop_persons cp ON cp.crop_name = p.crop_type "
+			+ "           INNER JOIN "
+			+ "       users ON cp.personid = users.personid "
+			+ "           INNER JOIN "
+			+ "       users_roles ur ON ur.userid = users.userid "
+			+ "           INNER JOIN role r ON ur.role_id = r.id  "
+			+ "   where  (r.role_type_id =  " + RoleType.PROGRAM.getId()
+			+ " 			AND ur.crop_name = p.crop_type AND ur.workbench_project_id = p.project_id) "
+			+ "    	AND p.project_id = :projectId "
+			+ "  	AND users.ustatus = 0 ";
+
 	public static final String GET_BY_NAME_USING_EQUAL = "getUserByNameUsingEqual";
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 	public static final String GET_BY_FULLNAME = "getByFullName";
-
-	public static final String GET_USERS_BY_PROJECT_UUID =
-		"SELECT users.userid, users.uname, person.fname, person.lname, role.id, role.description, users.ustatus, person.pemail \n"
-		+ "FROM users \n"
-		+ "INNER JOIN workbench_project_user_info pu ON users.userid = pu.user_id \n"
-		+ "INNER JOIN persons person ON person.personid = users.personid \n "
-		+ "INNER JOIN workbench_project pp ON pu.project_id = pp.project_id \n "
-		+ "INNER JOIN users_roles ur ON ur.userid = users.userid "
-		+ "INNER JOIN role ON role.id = ur.role_id "
-		+ "WHERE pp.project_uuid = :project_uuid \n "
-		+ "GROUP BY users.userid";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -112,7 +148,8 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@Column(name = "cdate")
 	private Integer cdate;
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch(FetchMode.SUBSELECT)
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	@NotFound(action = NotFoundAction.IGNORE)
 	private List<UserRole> roles;
 
@@ -124,19 +161,14 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@NotFound(action = NotFoundAction.IGNORE)
 	private Person person;
 
-	@Fetch(FetchMode.SUBSELECT)
-	@OneToMany(fetch = FetchType.EAGER)
-	@JoinTable(
-		name = "users_crops",
-		joinColumns = @JoinColumn(name = "user_id"),
-		inverseJoinColumns = @JoinColumn(name = "crop_name"))
-	private List<CropType> crops = new ArrayList<>();
-
 	@Transient
 	private Boolean active = false;
 
 	@Transient
 	private Boolean enabled = true;
+
+	@Transient
+	private List<PermissionDto> permissions = new ArrayList<>();
 
 	public WorkbenchUser() {
 	}
@@ -354,27 +386,24 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@Override
 	public void setEnabled(final Boolean val) {
 		this.enabled = val;
-
 	}
 
-	public boolean hasRole(final String role) {
-		if (!Objects.equals(this.roles,null)) {
-			for (final UserRole userRole : this.roles) {
-				if (userRole.getRole().getCapitalizedRole().equalsIgnoreCase(role)) {
-					return true;
-				}
+	public List<PermissionDto> getPermissions() {
+		return this.permissions;
+	}
+
+	public void setPermissions(final List<PermissionDto> permissions) {
+		this.permissions = permissions;
+	}
+
+	public boolean isSuperAdmin() {
+		boolean found = false;
+		for (final UserRole userRole : this.roles) {
+			if (userRole.getRole().getName().toUpperCase().equals(Role.SUPERADMIN)) {
+				found = true;
+				break;
 			}
 		}
-
-		return false;
+		return found;
 	}
-
-	public List<CropType> getCrops() {
-		return this.crops;
-	}
-
-	public void setCrops(final List<CropType> crops) {
-		this.crops = crops;
-	}
-
 }

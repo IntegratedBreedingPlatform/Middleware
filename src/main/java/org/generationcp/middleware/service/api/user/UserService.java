@@ -6,11 +6,9 @@ import org.generationcp.middleware.pojos.workbench.CropPerson;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,27 +49,12 @@ public interface UserService {
 	List<WorkbenchUser> getAllUsers();
 
 	/**
-	 * Gets the user by project_uuid.
-	 *
-	 * @param projectUuid
-	 * @return the user matching the given project_uuid
-	 */
-	List<UserDto> getUsersByProjectUuid(final String projectUuid);
-
-	/**
 	 * Retrieves the user ids of the program members using the project id
 	 *
 	 * @param projectId
 	 * @return
 	 */
-	List<Integer> getActiveUserIDsByProjectId(final Long projectId);
-
-	/**
-	 * Retrieves the users that are members of any program in a crop.
-	 * @param cropType
-	 * @return
-	 */
-	List<WorkbenchUser> getUsersWithoutAssociatedPrograms(final CropType cropType);
+	List<Integer> getActiveUserIDsWithProgramRoleByProjectId(final Long projectId);
 
 	/**
 	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
@@ -80,14 +63,6 @@ public interface UserService {
 	 * @return the List of {@link WorkbenchUser} records
 	 */
 	List<WorkbenchUser> getUsersByProjectId(Long projectId);
-
-	/**
-	 * Return a Map of {@link Person} records identified by {@link WorkbenchUser} ids associated with a {@link Project}.
-	 *
-	 * @param projectId - the project id
-	 * @return the Maps of {@link Person} records identified by {@link WorkbenchUser} ids
-	 */
-	Map<Integer, Person> getPersonsByProjectId(final Long projectId);
 
 	/**
 	 * Gets the all Users Sorted
@@ -308,34 +283,11 @@ public interface UserService {
 	void insertOrUpdateUserInfo(UserInfo userDetails);
 
 	/**
-	 * Returns list of roles that can be assigned to a new user
-	 *
-	 * @return
-	 */
-	List<Role> getAssignableRoles();
-
-	/**
-	 * Returns list of roles
-	 *
-	 * @return
-	 */
-	List<Role> getAllRoles();
-
-	/**
 	 * Return users with SUPERADMIN role
 	 *
 	 * @return
 	 */
 	List<WorkbenchUser> getSuperAdminUsers();
-
-	/**
-	 * Returns ProjectUserInfo List with the given project id and user ids
-	 *
-	 * @param projectId
-	 * @param ids
-	 * @return
-	 */
-	List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(Long projectId, List<Integer> ids);
 
 	/**
 	 * Returns ProjectUserInfo with the given project id and user id
@@ -352,7 +304,7 @@ public interface UserService {
 	 * @param projectUserInfo the project user info
 	 * @return ProjectUserInfo
 	 */
-	void saveProjectUserInfo(ProjectUserInfo projectUserInfo);
+	void saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo);
 
 	void saveCropPerson(CropPerson cropPerson);
 
@@ -362,4 +314,7 @@ public interface UserService {
 
 	Map<Integer, String> getPersonNamesByPersonIds(List<Integer> personIds);
 
+	WorkbenchUser getUserWithAuthorities(final String userName, final String cropName, final String programUuid);
+
+	List<WorkbenchUser> getUsersWithRole(int id);
 }

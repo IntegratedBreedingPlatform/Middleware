@@ -44,7 +44,8 @@ public class CropTypeDAO extends GenericDAO<CropType, Long> {
 	public List<CropType> getAvailableCropsForUser(final int workbenchUserId) {
 		try {
 			final Query query = this.getSession().createQuery("select distinct cropType from WorkbenchUser as workbenchUser "
-				+ " inner join workbenchUser.crops as cropType "
+				+ " inner join workbenchUser.person as person "
+					+ " inner join person.crops as cropType "
 				+ " where workbenchUser.userid = :workbenchUserId ");
 			query.setParameter("workbenchUserId", workbenchUserId);
 			return query.list();

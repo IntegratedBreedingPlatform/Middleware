@@ -1,21 +1,23 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA. User: cyrus Date: 11/20/13 Time: 5:42 PM To change this template use File | Settings | File Templates.
  */
 @Entity
 @Table(name = "workbench_sidebar_category")
-public class WorkbenchSidebarCategory implements Serializable {
+public class WorkbenchSidebarCategory implements Serializable, Comparable<WorkbenchSidebarCategory> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -31,10 +33,13 @@ public class WorkbenchSidebarCategory implements Serializable {
 	@Column(name = "sidebar_category_label")
 	private String sidebarCategorylabel;
 
+	@OneToMany(mappedBy = "workbenchSidebarCategory", cascade = CascadeType.ALL)
+	private List<WorkbenchSidebarCategoryLink> workbenchSidebarCategoryLinks;
+
 	public WorkbenchSidebarCategory() {
 	}
 
-	public WorkbenchSidebarCategory(String sidebarCategoryName, String sidebarCategorylabel) {
+	public WorkbenchSidebarCategory(final String sidebarCategoryName, final String sidebarCategorylabel) {
 		this.sidebarCategoryName = sidebarCategoryName;
 		this.sidebarCategorylabel = sidebarCategorylabel;
 	}
@@ -43,7 +48,7 @@ public class WorkbenchSidebarCategory implements Serializable {
 		return this.sidebarCategoryId;
 	}
 
-	public void setSidebarCategoryId(Integer sidebarCategoryId) {
+	public void setSidebarCategoryId(final Integer sidebarCategoryId) {
 		this.sidebarCategoryId = sidebarCategoryId;
 	}
 
@@ -51,7 +56,7 @@ public class WorkbenchSidebarCategory implements Serializable {
 		return this.sidebarCategoryName;
 	}
 
-	public void setSidebarCategoryName(String sidebarCategoryName) {
+	public void setSidebarCategoryName(final String sidebarCategoryName) {
 		this.sidebarCategoryName = sidebarCategoryName;
 	}
 
@@ -59,7 +64,25 @@ public class WorkbenchSidebarCategory implements Serializable {
 		return this.sidebarCategorylabel;
 	}
 
-	public void setSidebarCategorylabel(String sidebarCategorylabel) {
+	public void setSidebarCategorylabel(final String sidebarCategorylabel) {
 		this.sidebarCategorylabel = sidebarCategorylabel;
+	}
+
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
+
+	public List<WorkbenchSidebarCategoryLink> getWorkbenchSidebarCategoryLinks() {
+		return this.workbenchSidebarCategoryLinks;
+	}
+
+	public void setWorkbenchSidebarCategoryLinks(
+		final List<WorkbenchSidebarCategoryLink> workbenchSidebarCategoryLinks) {
+		this.workbenchSidebarCategoryLinks = workbenchSidebarCategoryLinks;
+	}
+
+	@Override
+	public int compareTo(WorkbenchSidebarCategory d) {
+		return this.sidebarCategoryId - d.getSidebarCategoryId();
 	}
 }

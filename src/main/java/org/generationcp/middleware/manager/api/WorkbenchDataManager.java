@@ -14,13 +14,16 @@ import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
+import org.generationcp.middleware.service.api.user.RoleSearchDto;
 
 import java.util.List;
 import java.util.Map;
@@ -84,9 +87,20 @@ public interface WorkbenchDataManager {
 	 * Gets the list of Projects that the specified User is associated with.
 	 *
 	 * @param user - the User associated with the projects to be retrieved
+	 * @param cropName - the Crop Name associated with the projects to be retrieved
+
 	 * @return the projects which the specified user is involved
 	 */
-	List<Project> getProjectsByUser(WorkbenchUser user);
+	List<Project> getProjectsByUser(final WorkbenchUser user, final String cropName);
+
+	/**
+	 * Gets the list of Projects that the specified User is associated with.
+	 *
+	 * @param cropName - the Crop Name associated with the projects to be retrieved
+
+	 * @return the projects which the specified user is involved
+	 */
+	List<Project> getProjectsByCropName(final String cropName);
 
 	/**
 	 * Save or update project.
@@ -319,5 +333,75 @@ public interface WorkbenchDataManager {
 	 */
 	void close();
 
+	/**
+	 * Returns list of roles filtered according to roleSearchDto
+	 *
+	 * @return
+	 */
+	List<Role> getRoles(RoleSearchDto roleSearchDto);
+
+	/**
+	 * Returns list of roleTypes
+	 *
+	 * @return
+	 */
+	List<RoleType> getRoleTypes();
+
+	/**
+	 * Get standard preset
+	 * @param presetId
+	 * @return StandardPreset
+	 */
 	StandardPreset getStandardPresetById(Integer presetId);
+
+	// TODO Move role methods to RoleServiceImp
+
+	/**
+	 * Get role type
+	 * @param id
+	 * @return ROle Type
+	 */
+	RoleType getRoleType(Integer id);
+
+	/**
+	 * Get sidebar links by category
+	 * @param workbenchSidebarCategoryLink
+	 * @return
+	 */
+	WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksByCategoryId(Integer workbenchSidebarCategoryLink);
+
+	/**
+	 * Save or update role
+	 * @param userRole
+	 */
+	void saveOrUpdateUserRole(UserRole userRole);
+
+	/**
+	 * Save role
+	 * @param role
+	 * @return Role
+	 */
+	Role saveRole(Role role);
+
+	/**
+	 * Get role by name
+	 * @param name
+	 * @return Role
+	 */
+	Role getRoleByName(String name);
+
+	/**
+	 * Get role by id
+	 * @param id
+	 * @return Role
+	 */
+	Role getRoleById(Integer id);
+
+	/**
+	 *
+	 * @param workbenchUserId
+	 * @return Crops for which user has permissions to add a program
+	 */
+	List<CropType> getCropsWithAddProgramPermission(int workbenchUserId);
+
 }

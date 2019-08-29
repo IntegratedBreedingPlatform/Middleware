@@ -2,6 +2,7 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.beust.jcommander.internal.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -12,7 +13,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
@@ -23,7 +23,9 @@ import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -258,10 +260,16 @@ public class StudyServiceImplTest {
 					"studyName");
 
 		final UserDto user = new UserDto();
-		user.setEmail("a@a.com");
+		user.setEmail(RandomStringUtils.randomAlphabetic(10) + "@gmail.com");
 		user.setFirstName("name");
 		user.setLastName("last");
-		user.setRole(new Role(1, "ADMIN"));
+		final UserRoleDto userRoleDto = new UserRoleDto(1,
+			new RoleDto(1, "Admin", "",
+				"instance", true, true,
+				true), null,
+			null, null);
+		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
+		userRoleDtos.add(userRoleDto);
 		user.setUserId(1);
 		final List<UserDto> users = new ArrayList<>();
 		users.add(user);
@@ -303,7 +311,13 @@ public class StudyServiceImplTest {
 		user.setEmail("a@a.com");
 		user.setFirstName("name");
 		user.setLastName("last");
-		user.setRole(new Role(1, "ADMIN"));
+		final UserRoleDto userRoleDto = new UserRoleDto(1,
+			new RoleDto(1, "Admin", "",
+				"instance", true, true,
+				true), null,
+			null, null);
+		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
+		userRoleDtos.add(userRoleDto);
 		user.setUserId(1);
 		final List<UserDto> users1 = new ArrayList<>();
 		users1.add(user);
