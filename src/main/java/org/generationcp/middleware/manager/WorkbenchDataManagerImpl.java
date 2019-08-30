@@ -20,12 +20,16 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
+import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -92,8 +96,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Project> getProjectsByUser(final WorkbenchUser user) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getProjectsByUser(user);
+	public List<Project> getProjectsByUser(final WorkbenchUser user, final String cropName) {
+		return this.workbenchDaoFactory.getProjectDAO().getProjectsByUser(user, cropName);
+	}
+
+	@Override
+	public List<Project> getProjectsByCropName(final String cropName) {
+		return this.workbenchDaoFactory.getProjectDAO().getProjectsByCropName(cropName);
 	}
 
 	@Override
@@ -147,6 +156,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			final List<ProjectUserInfo> projectUserInfos = this.getByProjectId(projectId);
 			for (final ProjectUserInfo projectUserInfo : projectUserInfos) {
 				this.deleteProjectUserInfo(projectUserInfo);
+			}
+
+			final List<UserRole> userRolesPerProgram = this.workbenchDaoFactory.getUserRoleDao().getByProgramId(projectId);
+			for (final UserRole userRole : userRolesPerProgram) {
+				userRole.getUser().getRoles().remove(userRole);
+				this.workbenchDaoFactory.getUserRoleDao().delete(userRole);
 			}
 
 		} catch (final Exception e) {
@@ -242,7 +257,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			throw new MiddlewareQueryException("Crop type already exists.");
 		}
 
-		String idSaved = null;
+		final String idSaved;
 		try {
 
 			final CropType recordSaved = dao.saveOrUpdate(cropType);
@@ -459,6 +474,68 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Project getProjectByUuid(final String projectUuid) {
 		return this.workbenchDaoFactory.getProjectDAO().getByUuid(projectUuid);
+	}
+
+	@Override
+	public List<Role> getRoles(final RoleSearchDto roleSearchDto) {
+		return this.workbenchDaoFactory.getRoleDao().getRoles(roleSearchDto);
+	}
+
+	@Override
+	public List<RoleType> getRoleTypes() {
+		return this.workbenchDaoFactory.getRoleTypeDAO().getRoleTypes();
+	}
+
+	@Override
+	public RoleType getRoleType(final Integer id) {
+		return this.workbenchDaoFactory.getRoleTypeDAO().getById(id);
+	}
+
+	@Override
+	public WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksByCategoryId(final Integer workbenchSidebarCategoryLink) {
+		return this.workbenchDaoFactory.getWorkbenchSidebarCategoryLinkDao().getById(workbenchSidebarCategoryLink);
+	}
+
+	@Override
+	public void saveOrUpdateUserRole(final UserRole userRole) {
+		this.workbenchDaoFactory.getUserRoleDao().saveOrUpdate(userRole);
+	}
+
+	@Override
+	public Role saveRole(final Role role) {
+
+		try {
+			this.workbenchDaoFactory.getRoleDao().saveOrUpdate(role);
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+				"Cannot save Role: WorkbenchDataManager.saveRole(role=" + role + "): " + e.getMessage(), e);
+		}
+
+		return role;
+	}
+
+	@Override
+	public Role getRoleByName(final String name) {
+		final RoleSearchDto roleSearchDto = new RoleSearchDto();
+		roleSearchDto.setName(name);
+		final List<Role> roles = this.workbenchDaoFactory.getRoleDao().getRoles(roleSearchDto);
+		return roles.isEmpty() ? null : roles.get(0);
+	}
+
+	@Override
+	public Role getRoleById(final Integer id) {
+		return this.workbenchDaoFactory.getRoleDao().getRoleById(id);
+	}
+
+	@Override
+	public List<CropType> getCropsWithAddProgramPermission(final int workbenchUserId) {
+
+		final boolean hasInstanceRoleWithAddProgramPermission = this.workbenchDaoFactory.getUserRoleDao().hasInstanceRoleWithAddProgramPermission(workbenchUserId);
+		if (hasInstanceRoleWithAddProgramPermission) {
+			return getAvailableCropsForUser(workbenchUserId);
+		} else {
+			return new ArrayList<>(this.workbenchDaoFactory.getUserRoleDao().getCropsWithAddProgramPermissionForCropRoles(workbenchUserId));
+		}
 	}
 
 }

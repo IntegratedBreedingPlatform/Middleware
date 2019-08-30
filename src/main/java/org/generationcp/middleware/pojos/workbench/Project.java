@@ -81,11 +81,26 @@ public class Project implements Serializable {
 	@Transient
 	private Set<Location> locations;
 
+	public Project(final Long projectId, final String uniqueID, final String projectName, final Date startDate, final int userId,
+		final CropType cropType, final Date lastOpenDate) {
+		this.uniqueID = uniqueID;
+		this.projectName = projectName;
+		this.startDate = startDate;
+		this.userId = userId;
+		this.cropType = cropType;
+		this.lastOpenDate = lastOpenDate;
+		this.projectId = projectId;
+	}
+
+	public Project() {
+		super();
+	}
+
 	public Long getProjectId() {
 		return this.projectId;
 	}
 
-	public void setProjectId(Long projectId) {
+	public void setProjectId(final Long projectId) {
 		this.projectId = projectId;
 	}
 
@@ -97,11 +112,11 @@ public class Project implements Serializable {
 		return this.uniqueID;
 	}
 
-	public void setUniqueID(String uniqueID) {
+	public void setUniqueID(final String uniqueID) {
 		this.uniqueID = uniqueID;
 	}
 
-	public void setUserId(int userId) {
+	public void setUserId(final int userId) {
 		this.userId = userId;
 	}
 
@@ -109,7 +124,7 @@ public class Project implements Serializable {
 		return this.projectName;
 	}
 
-	public void setProjectName(String projectName) {
+	public void setProjectName(final String projectName) {
 		this.projectName = projectName;
 	}
 
@@ -117,7 +132,7 @@ public class Project implements Serializable {
 		return this.startDate;
 	}
 
-	public void setStartDate(Date startDate) {
+	public void setStartDate(final Date startDate) {
 		this.startDate = startDate;
 	}
 
@@ -125,11 +140,11 @@ public class Project implements Serializable {
 		return this.cropType;
 	}
 
-	public void setCropType(CropType cropType) {
+	public void setCropType(final CropType cropType) {
 		this.cropType = cropType;
 	}
 
-	public void setLastOpenDate(Date lastOpenDate) {
+	public void setLastOpenDate(final Date lastOpenDate) {
 		this.lastOpenDate = lastOpenDate;
 	}
 
@@ -141,7 +156,7 @@ public class Project implements Serializable {
 		return this.members;
 	}
 
-	public void setMembers(Set<WorkbenchUser> members) {
+	public void setMembers(final Set<WorkbenchUser> members) {
 		this.members = members;
 	}
 
@@ -149,7 +164,7 @@ public class Project implements Serializable {
 		return this.methods;
 	}
 
-	public void setMethods(Set<Method> methods) {
+	public void setMethods(final Set<Method> methods) {
 		this.methods = methods;
 	}
 
@@ -157,7 +172,7 @@ public class Project implements Serializable {
 		return this.locations;
 	}
 
-	public void setLocations(Set<Location> locations) {
+	public void setLocations(final Set<Location> locations) {
 		this.locations = locations;
 	}
 
@@ -176,7 +191,7 @@ public class Project implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -187,7 +202,7 @@ public class Project implements Serializable {
 			return false;
 		}
 
-		Project otherObj = (Project) obj;
+		final Project otherObj = (Project) obj;
 
 		return new EqualsBuilder().append(this.projectId, otherObj.projectId).isEquals();
 	}

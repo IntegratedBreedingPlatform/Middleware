@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users_roles")
@@ -28,6 +29,21 @@ public class UserRole {
 	@JoinColumn(name = "role_id", nullable = false)
 	private Role role;
 
+	@ManyToOne
+	@JoinColumn(name = "crop_name", nullable = true)
+	private CropType cropType;
+
+	@ManyToOne
+	@JoinColumn(name = "workbench_project_id", nullable = true)
+	private Project workbenchProject;
+
+	@ManyToOne
+	@JoinColumn(name = "created_by", nullable = true)
+	private WorkbenchUser createdBy;
+
+	@Column(name = "created_date")
+	private Date createdDate;
+
 	public UserRole() {
 	}
 
@@ -35,19 +51,24 @@ public class UserRole {
 		this.user = user;
 		this.role = new Role(roleId);
 	}
-	
+
 	public UserRole(final WorkbenchUser user, final Role role) {
 		this.user = user;
 		this.role = role;
 	}
-	
-	
+
+	public UserRole(final WorkbenchUser user, final Role role, final CropType cropType, final Project workbenchProject) {
+		this.user = user;
+		this.role = role;
+		this.cropType = cropType;
+		this.workbenchProject = workbenchProject;
+	}
 
 	public Integer getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
@@ -55,7 +76,7 @@ public class UserRole {
 		return this.user;
 	}
 
-	public void setUser(WorkbenchUser user) {
+	public void setUser(final WorkbenchUser user) {
 		this.user = user;
 	}
 
@@ -67,13 +88,60 @@ public class UserRole {
 		this.role = role;
 	}
 
+	public CropType getCropType() {
+		return this.cropType;
+	}
+
+	public void setCropType(final CropType cropName) {
+		this.cropType = cropName;
+	}
+
+	public Project getWorkbenchProject() {
+		return this.workbenchProject;
+	}
+
+	public void setWorkbenchProject(final Project workbenchProject) {
+		this.workbenchProject = workbenchProject;
+	}
+
+	public WorkbenchUser getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public void setCreatedBy(final WorkbenchUser createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Date getCreatedDate() {
+		return this.createdDate;
+	}
+
+	public void setCreatedDate(final Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
 	@Override
 	public String toString() {
 		return "UserRole [User=" + this.user.getUserid() + ", Role=" + this.role + "]";
 	}
-	
+
 	public String getCapitalizedRole() {
 		return this.getRole().getCapitalizedRole();
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		final UserRole userRole = (UserRole) o;
+		return Objects.equals(id, userRole.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
 	}
 
 }

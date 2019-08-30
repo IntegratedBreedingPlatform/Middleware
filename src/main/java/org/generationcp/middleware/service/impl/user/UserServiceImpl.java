@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl.user;
 
 import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.domain.workbench.CropDto;
+import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
@@ -9,23 +10,26 @@ import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropPerson;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -88,28 +92,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDto> getUsersByProjectUuid(final String projectUuid) {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByProjectUUId(projectUuid);
-	}
-
-	@Override
-	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getActiveUserIDsByProjectId(projectId);
-	}
-
-	@Override
-	public List<WorkbenchUser> getUsersWithoutAssociatedPrograms(final CropType cropType) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getUsersWithoutAssociatedPrograms(cropType);
+	public List<Integer> getActiveUserIDsWithProgramRoleByProjectId(final Long projectId) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getActiveUserIDsWithProgramRoleByProjectId(projectId);
 	}
 
 	@Override
 	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getUsersByProjectId(projectId);
-	}
-
-	@Override
-	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getPersonsByProjectId(projectId);
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByProjectId(projectId);
 	}
 
 	@Override
@@ -161,15 +150,20 @@ public class UserServiceImpl implements UserService {
 		user.setType(0);
 
 		// Add user roles to the particular user
-		user.setRoles(Arrays.asList(new UserRole(user, userDto.getRole())));
+		final List<UserRole> userRoles = new ArrayList<>();
+		if (userDto.getUserRoles() != null) {
+			for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
+				userRoles.add(this.buildNewUserRole(user, userRoleDto));
+			}
+		}
+		user.setRoles(userRoles);
 
-		final List<CropType> crops = new ArrayList<>();
+		final Set<CropType> crops = new HashSet<>();
 		for (final CropDto crop : userDto.getCrops()) {
-			final CropType cropType = new CropType();
-			cropType.setCropName(crop.getCropName());
+			final CropType cropType = new CropType(crop.getCropName());
 			crops.add(cropType);
 		}
-		user.setCrops(crops);
+		person.setCrops(crops);
 
 		try {
 
@@ -206,26 +200,38 @@ public class UserServiceImpl implements UserService {
 			user.setCloseDate(currentDate);
 			user.setStatus(userDto.getStatus());
 
-			// update user roles to the particular user
-			final UserRole role = user.getRoles().get(0);
-			if (!role.getRole().equals(userDto.getRole())) {
-				role.setRole(userDto.getRole());
+			final List<UserRole> userRoles = new ArrayList<>();
+			if (userDto.getUserRoles() != null) {
+				for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
+					boolean found = false;
+					for (final UserRole userRole : user.getRoles()) {
+						if (userRoleEqualsToUserRoleDto(userRole, userRoleDto)) {
+							userRoles.add(userRole);
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						userRoles.add(this.buildNewUserRole(user, userRoleDto));
+					}
+				}
+				user.getRoles().clear();
+				user.getRoles().addAll(userRoles);
 			}
 
-			final List<CropType> crops = new ArrayList<>();
+			final Set<CropType> crops = new HashSet<>();
 			for (final CropDto crop : userDto.getCrops()) {
-				final CropType cropType = new CropType();
-				cropType.setCropName(crop.getCropName());
+				final CropType cropType = new CropType(crop.getCropName());
 				crops.add(cropType);
 			}
-			user.setCrops(crops);
+			user.getPerson().setCrops(crops);
 
 			this.workbenchDaoFactory.getWorkbenchUserDAO().saveOrUpdate(user);
 			idUserSaved = user.getUserid();
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-				"Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
+				"Error encountered while saving User: UserServiceImpl.updateUser(org.generationcp.middleware.service.api.user.UserDto)(user=" + user + "): " + e.getMessage(), e);
 		}
 
 		return idUserSaved;
@@ -273,7 +279,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
-		this.workbenchDaoFactory.getProjectUserInfoDAO().removeUsersFromProgram(workbenchUserIds, projectId);
+		this.workbenchDaoFactory.getUserRoleDao().removeUsersFromProgram(workbenchUserIds, projectId);
 	}
 
 	@Override
@@ -281,17 +287,8 @@ public class UserServiceImpl implements UserService {
 		final List<WorkbenchUser> workbenchUsers = this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByPersonIds(personIds);
 		final List<UserDto> userDtos = new ArrayList<>();
 		for (final WorkbenchUser workbenchUser : workbenchUsers) {
-			final UserDto userDto = new UserDto();
-			final Person person = workbenchUser.getPerson();
-			userDto.setUsername(workbenchUser.getName());
-			userDto.setEmail(person.getEmail());
-			userDto.setFirstName(person.getFirstName());
-			userDto.setLastName(person.getLastName());
-			final Iterator<UserRole> userRoleIterator = workbenchUser.getRoles().iterator();
-			if (userRoleIterator.hasNext()) {
-				final UserRole userRole = userRoleIterator.next();
-				userDto.setRole(userRole.getRole());
-			}
+			final UserDto userDto = new UserDto(workbenchUser);
+			userDtos.add(userDto);
 		}
 		return userDtos;
 	}
@@ -461,23 +458,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(final Long projectId, final List<Integer> userIds) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getByProjectIdAndUserIds(projectId, userIds);
-	}
-
-	@Override
 	public ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(final Long projectId, final Integer userId) {
 		return this.workbenchDaoFactory.getProjectUserInfoDAO().getByProjectIdAndUserId(projectId, userId);
 	}
 
 	@Override
-	public void saveProjectUserInfo(final ProjectUserInfo projectUserInfo) {
-		final ProjectUserInfo existingProjectUserInfo = this.workbenchDaoFactory.getProjectUserInfoDAO()
-			.getByProjectIdAndUserId(projectUserInfo.getProject().getProjectId(), projectUserInfo.getUser().getUserid());
-		// Only save if the record with the same projectId and userId not yet exists.
-		if (existingProjectUserInfo == null) {
-			this.workbenchDaoFactory.getProjectUserInfoDAO().saveOrUpdate(projectUserInfo);
-		}
+	public void saveOrUpdateProjectUserInfo(final ProjectUserInfo projectUserInfo) {
+		this.workbenchDaoFactory.getProjectUserInfoDAO().merge(projectUserInfo);
 	}
 
 	@Override
@@ -501,18 +488,51 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<Role> getAssignableRoles() {
-		return this.workbenchDaoFactory.getRoleDAO().getAssignableRoles();
-	}
-
-	@Override
 	public List<WorkbenchUser> getSuperAdminUsers() {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().getSuperAdminUsers();
 	}
 
 	@Override
-	public List<Role> getAllRoles() {
-		return this.workbenchDaoFactory.getRoleDAO().getAll();
+	public WorkbenchUser getUserWithAuthorities(final String userName, final String cropName, final String programUuid) {
+		final WorkbenchUser user = this.workbenchDaoFactory.getWorkbenchUserDAO().getUserByUserName(userName);
+		final Project project = this.workbenchDaoFactory.getProjectDAO().getByUuid(programUuid);
+		final Integer programId = project != null ? project.getProjectId().intValue() : null;
+		final List<PermissionDto> permissions = this.workbenchDaoFactory.getPermissionDAO().getPermissions(user.getUserid(), cropName, programId);
+		user.setPermissions(permissions);
+		return user;
+	}
+
+	@Override
+	public List<WorkbenchUser> getUsersWithRole(final int roleId) {
+		return this.workbenchDaoFactory.getUserRoleDao().getUsersByRoleId(roleId);
+	}
+
+	private UserRole buildNewUserRole(final WorkbenchUser user, final UserRoleDto userRoleDto) {
+		final Role role = new Role(userRoleDto.getRole().getId());
+
+		CropType cropType = null;
+		if (userRoleDto.getCrop() != null) {
+			cropType = new CropType(userRoleDto.getCrop().getCropName());
+		}
+		Project project = null;
+		if (userRoleDto.getProgram() != null) {
+			project = this.workbenchDaoFactory.getProjectDAO()
+				.getByUuid(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
+		}
+		final WorkbenchUser creator = this.getUserById(userRoleDto.getCreatedBy());
+
+		final UserRole userRole = new UserRole(user, role, cropType, project);
+		userRole.setCreatedDate(new Date());
+		userRole.setCreatedBy(creator);
+		return userRole;
+	}
+
+	private boolean userRoleEqualsToUserRoleDto(final UserRole userRole, final UserRoleDto userRoleDto) {
+		return userRole.getRole().getId().equals(userRoleDto.getRole().getId()) &&
+			(userRole.getCropType() == null && userRoleDto.getCrop() == null || userRole.getCropType().getCropName()
+				.equals(userRoleDto.getCrop().getCropName())) &&
+			(userRole.getWorkbenchProject() == null && userRoleDto.getProgram() == null || userRole.getWorkbenchProject()
+				.getUniqueID().equals(userRoleDto.getProgram().getUuid()));
 	}
 
 }

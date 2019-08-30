@@ -2,7 +2,6 @@ package org.generationcp.middleware.utils.test;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -316,7 +315,6 @@ public class IntegrationTestDataInitializer {
 		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, new Role(1, "Admin"))));
 		final List<CropType> crops = new ArrayList<>();
 		crops.add(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
-		workbenchUser.setCrops(crops);
 		this.userService.addUser(workbenchUser);
 
 		return workbenchUser;
