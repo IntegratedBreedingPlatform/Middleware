@@ -64,6 +64,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public Long countUsersByFullname(final String fullname) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().countUsersByFullName(fullname);
+	}
+
+	@Override
 	public Map<Integer, String> getUserIDFullNameMap(final List<Integer> userIds) {
 		if (!userIds.isEmpty()) {
 			return this.workbenchDaoFactory.getWorkbenchUserDAO().getUserIDFullNameMap(userIds);

@@ -121,7 +121,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		adminUser.setAssignDate(20140101);
 		adminUser.setCloseDate(20140101);
 
-		final List<UserRole> adminRoles = new ArrayList<UserRole>();
+		final List<UserRole> adminRoles = new ArrayList<>();
 		// Role ID 1 = ADMIN
 		adminRoles.add(new UserRole(adminUser, 1));
 		adminUser.setRoles(adminRoles);
@@ -157,7 +157,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		breederUser.setAssignDate(20140101);
 		breederUser.setCloseDate(20140101);
 
-		final List<UserRole> breederRoles = new ArrayList<UserRole>();
+		final List<UserRole> breederRoles = new ArrayList<>();
 		// Role ID 2 = BREEDER
 		breederRoles.add(new UserRole(breederUser, 2));
 		breederUser.setRoles(breederRoles);
@@ -193,7 +193,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		technicianUser.setAssignDate(20140101);
 		technicianUser.setCloseDate(20140101);
 
-		final List<UserRole> technicianRoles = new ArrayList<UserRole>();
+		final List<UserRole> technicianRoles = new ArrayList<>();
 		// Role ID 3 = TECHNICIAN
 		technicianRoles.add(new UserRole(technicianUser, 3));
 		technicianUser.setRoles(technicianRoles);
@@ -206,6 +206,38 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		final WorkbenchUser user = this.userService.getUserByName(this.testUser1.getName(), 0, 1, Operation.EQUAL).get(0);
 		assertEquals(this.testUser1.getName(), user.getName());
 		assertEquals(this.testUser1.getUserid(), user.getUserid());
+	}
+
+	@Test
+	public void testGetUserByFullname() {
+		final Person person = this.workbenchTestDataUtil.createTestPersonData();
+		this.userService.addPerson(person);
+		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
+		user.setStatus(0);
+		user.setPerson(person);
+		this.userService.addUser(user);
+		final WorkbenchUser retrievedUser = this.userService.getUserByFullname(user.getPerson().getDisplayName());
+		Assert.assertEquals(user.getUserid(), retrievedUser.getUserid());
+
+		user.setStatus(1);
+		this.userService.addUser(user);
+		Assert.assertNull(this.userService.getUserByFullname(user.getPerson().getDisplayName()));
+	}
+
+	@Test
+	public void testCountUsersByFullname() {
+		final Person person = this.workbenchTestDataUtil.createTestPersonData();
+		this.userService.addPerson(person);
+		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
+		user.setStatus(0);
+		user.setPerson(person);
+		this.userService.addUser(user);
+		final Long count = this.userService.countUsersByFullname(user.getPerson().getDisplayName());
+
+		user.setStatus(1);
+		this.userService.addUser(user);
+		final Long newCount = this.userService.countUsersByFullname(user.getPerson().getDisplayName());
+		Assert.assertEquals(count.toString(), String.valueOf(newCount+1));
 	}
 
 	@Test
@@ -275,15 +307,15 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		final int id = this.userService.createUser(userDto);
 		userDto.setUserId(id);
 		List<WorkbenchUser> listOfActiveUsers = this.userService.getAllActiveUsersSorted();
-		assertTrue("The newly added user should be added in the retrieved list.",
-			prevListOfActiveUsers.size() + 1 == listOfActiveUsers.size());
+		assertEquals("The newly added user should be added in the retrieved list.",
+			prevListOfActiveUsers.size() + 1, listOfActiveUsers.size());
 
 		//Deactivate the user to check if it's not retrieved
 		userDto.setStatus(1);
 		this.userService.updateUser(userDto);
 		listOfActiveUsers = this.userService.getAllActiveUsersSorted();
-		assertTrue("The newly added user should be added in the retrieved list.",
-			prevListOfActiveUsers.size() == listOfActiveUsers.size());
+		assertEquals("The newly added user should be added in the retrieved list.",
+			prevListOfActiveUsers.size(), listOfActiveUsers.size());
 
 	}
 
@@ -301,13 +333,13 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		final int id = this.userService.createUser(userDto);
 		userDto.setUserId(id);
 		List<WorkbenchUser> users = this.userService.getUsersByCrop(cropName);
-		assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size() + 1 == users.size());
+		assertEquals("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size() + 1, users.size());
 
 		//Deactivate the user to check if it's not retrieved
 		userDto.setStatus(1);
 		this.userService.updateUser(userDto);
 		users = this.userService.getUsersByCrop(cropName);
-		assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size() == users.size());
+		assertEquals("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size(), users.size());
 
 	}
 
@@ -339,7 +371,19 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void tGetAllUserDtosSorted() {
+	public void testGetUsersByProjectId() {
+		final List<WorkbenchUser> results = this.userService.getUsersByProjectId(this.commonTestProject.getProjectId());
+		assertNotNull(results);
+		this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
+
+		this.sessionProvder.getSession().flush();
+		final List<WorkbenchUser> newResults = this.userService.getUsersByProjectId(this.commonTestProject.getProjectId());
+		assertNotNull(newResults);
+		Assert.assertEquals(results.size() + 1, newResults.size());
+	}
+
+	@Test
+	public void testGetAllUserDtosSorted() {
 		final List<UserDto> userDtos = this.userService.getAllUsersSortedByLastName();
 		assertThat("Expected list users not null.", userDtos != null);
 		assertThat("Expected list users not empty.", !userDtos.isEmpty());
