@@ -64,6 +64,32 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="clarysabel" id="v12.5.0-0">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="users_roles_bkp"/>
+			</not>
+			<tableExists tableName="users_roles"/>
+			<not>
+				<columnExists tableName="users_roles" columnName="crop_name"/>
+			</not>
+		</preConditions>
+		<comment>
+			Backup users_roles table before migration, including role name since it can be edited after 12.5 release
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `users_roles_bkp` (
+			`id` int(11) NOT NULL,
+  			`userid` int(11) NOT NULL,
+  			`role_id` int(11) DEFAULT NULL,
+  			`role_name` varchar(255) DEFAULT NULL,
+  			PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8
+			SELECT users_roles.id id, users_roles.userid userid, users_roles.role_id role_id, role.description as role_name FROM users_roles
+			INNER JOIN role ON users_roles.role_id = role.id;
+		</sql>
+	</changeSet>
+
 	<changeSet author="vanina" id="v12.5.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
