@@ -400,13 +400,14 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	}
 
 	public boolean isSuperAdmin() {
-		boolean found = false;
+		if (this.roles == null) {
+			return false;
+		}
 		for (final UserRole userRole : this.roles) {
 			if (userRole.getRole().getName().toUpperCase().equals(Role.SUPERADMIN)) {
-				found = true;
-				break;
+				return true;
 			}
 		}
-		return found;
+		return false;
 	}
 }
