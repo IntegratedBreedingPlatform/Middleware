@@ -18,16 +18,18 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Transactional
 public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbenchUserDAO.class);
-	
+
 	public boolean isUsernameExists(final String username) {
 		try {
 			if (username != null) {
@@ -114,7 +116,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 		return new ArrayList<>();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<UserDto> getAllUsersSortedByLastName() {
 
@@ -141,7 +143,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
-	
+
 	public WorkbenchUser getUserByUserName(final String username) {
 		try {
 			if (username != null) {
@@ -187,7 +189,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 		return false;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getSuperAdminUsers() {
 		try {
@@ -196,14 +198,14 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			criteria.createAlias("roles.role", "role");
 			criteria.add(Restrictions.eq("role.name", Role.SUPERADMIN));
 			return criteria.list();
-			
+
 		} catch (final HibernateException e) {
 			final String message = "Error with getSuperAdminUsers query from WorkbenchUserDAO: " + e.getMessage();
 			WorkbenchUserDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public boolean isSuperAdminUser(final Integer userId) {
 		try {
@@ -213,7 +215,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 				criteria.createAlias("roles.role", "role");
 				criteria.add(Restrictions.eq("role.name", Role.SUPERADMIN));
 				criteria.add(Restrictions.eq("userid", userId));
-				
+
 				final List<WorkbenchUser> users = criteria.list();
 				return !users.isEmpty();
 			}
@@ -300,6 +302,19 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 	}
 
+	public Long countUsersByFullName(final String fullname) {
+		try {
+			final Query query = this.getSession().getNamedQuery(WorkbenchUser.COUNT_BY_FULLNAME);
+			query.setParameter("fullname", fullname);
+			return (Long) query.uniqueResult();
+		} catch (final HibernateException e) {
+			final String message = "Error with getUserByFullName query from User: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+	}
+
 	public List<Integer> getActiveUserIDsWithProgramRoleByProjectId(final Long projectId) {
 		final List<Integer> userIDs = new ArrayList<>();
 		try {
@@ -352,5 +367,4 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 		return users;
 	}
-
 }
