@@ -11,11 +11,6 @@
 
 package org.generationcp.middleware.dao;
 
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
@@ -28,6 +23,11 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link Person}.
@@ -141,52 +141,6 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 			this.logAndThrowException(String.format("Error with getPersonNamesByPersonIds(id=[%s])", StringUtils.join(personIds, ",")), e);
 		}
 		return map;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<Integer, String> getPersonNamesByUserIds(final List<Integer> userIds) throws MiddlewareQueryException {
-		final Map<Integer, String> map = new HashMap<Integer, String>();
-		try {
-			final StringBuffer sqlString = new StringBuffer()
-					.append("SELECT DISTINCT users.userid, persons.fname, persons.ioname, persons.lname ")
-					.append("FROM persons JOIN users ON persons.personid = users.personid ").append("WHERE users.userid = :userIds ");
-
-			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
-			query.setParameterList("userIds", userIds);
-
-			final List<Object[]> results = query.list();
-
-			for (final Object[] row : results) {
-				final Integer userId = (Integer) row[0];
-				final String firstName = (String) row[1];
-				final String middleName = (String) row[2];
-				final String lastName = (String) row[3];
-
-				map.put(userId, new Person(firstName, middleName, lastName).getDisplayName());
-			}
-
-		} catch (final HibernateException e) {
-			this.logAndThrowException(String.format("Error with getPersonNamesByUserIds(id=[%s])", StringUtils.join(userIds, ",")), e);
-		}
-		return map;
-	}
-
-	public Person getPersonByName(final String firstName, final String middleName, final String lastName) {
-		Person person = null;
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Person.class);
-			criteria.add(Restrictions.eq("firstName", firstName));
-			criteria.add(Restrictions.eq("lastName", lastName));
-			criteria.add(Restrictions.eq("middleName", middleName));
-
-			person = (Person) criteria.uniqueResult();
-
-		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					String.format("Error with getPersonByName(firstName=[%s],middleName=[%s],lastName)", firstName, middleName, lastName),
-					e);
-		}
-		return person;
 	}
 
 	public List<Person> getPersonsByCrop(final CropType cropType) {
