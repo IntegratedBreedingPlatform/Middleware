@@ -3,10 +3,8 @@ package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
-import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.User;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
@@ -17,8 +15,8 @@ import java.util.Set;
 public interface SampleService {
 
 	Sample buildSample(final String cropName, final String cropPrefix, final Integer entryNumber,
-		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, User createdBy,
-		Date createdDate, User takenBy, Integer sampleNumber);
+		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, Integer createdBy,
+		Date createdDate, Integer takenBy, Integer sampleNumber);
 
 	List<SampleDTO> filter(final String obsUnitId, Integer listId, Pageable pageable);
 

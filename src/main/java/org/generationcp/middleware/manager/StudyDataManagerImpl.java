@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.base.Function;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
@@ -45,13 +46,9 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
-import org.generationcp.middleware.domain.search.StudyResultSet;
-import org.generationcp.middleware.domain.search.StudyResultSetByGid;
 import org.generationcp.middleware.domain.search.StudyResultSetByNameStartDateSeasonCountry;
-import org.generationcp.middleware.domain.search.StudyResultSetByParentFolder;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
-import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -59,6 +56,9 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.StockBuilder;
+import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -72,6 +72,8 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
@@ -79,6 +81,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -93,6 +97,18 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;
+
+	@Resource
+	private UserService userService;
+
+	@Resource
+	private DataSetBuilder dataSetBuilder;
+
+	@Resource
+	private StockBuilder stockBuilder;
+
+	@Resource
+	private TrialEnvironmentBuilder trialEnvironmentBuilder;
 
 	public StudyDataManagerImpl() {
 	}
@@ -143,12 +159,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Reference> getRootFolders(final String programUUID) {
-		return this.getDmsProjectDao().getRootFolders(programUUID, null);
+		final List<Reference> references = this.getDmsProjectDao().getRootFolders(programUUID, null);
+		this.populateStudyOwnerName(references);
+		return references;
 	}
 
 	@Override
 	public List<Reference> getChildrenOfFolder(final int folderId, final String programUUID) {
-		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, null);
+		final List<Reference> childrenOfFolder = this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, null);
+		this.populateStudyOwnerName(childrenOfFolder);
+		return childrenOfFolder;
 	}
 
 	@Override
@@ -158,7 +178,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public DataSet getDataSet(final int dataSetId) {
-		return this.getDataSetBuilder().build(dataSetId);
+		return this.dataSetBuilder.build(dataSetId);
 	}
 
 	@Override
@@ -172,15 +192,48 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public StudyResultSet searchStudies(final StudyQueryFilter filter, final int numOfRows) {
-		if (filter instanceof ParentFolderStudyQueryFilter) {
-			return new StudyResultSetByParentFolder((ParentFolderStudyQueryFilter) filter, numOfRows, this.sessionProvider);
-		} else if (filter instanceof GidStudyQueryFilter) {
-			return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows, this.sessionProvider);
+	public List<StudyReference> searchStudies(final StudyQueryFilter filter) {
+		final List<StudyReference> studyReferences = new ArrayList<>();
+		if (filter instanceof GidStudyQueryFilter) {
+			final int gid = ((GidStudyQueryFilter) filter).getGid();
+			studyReferences.addAll(this.daoFactory.getStockDao().getStudiesByGid(gid));
+
 		} else if (filter instanceof BrowseStudyQueryFilter) {
-			return new StudyResultSetByNameStartDateSeasonCountry((BrowseStudyQueryFilter) filter, this.sessionProvider);
+			final StudyResultSetByNameStartDateSeasonCountry studyResultSet =
+				new StudyResultSetByNameStartDateSeasonCountry((BrowseStudyQueryFilter) filter, this.sessionProvider);
+			studyReferences.addAll(studyResultSet.getMatchingStudies());
 		}
-		return null;
+
+		// Retrieve study owner names from workbench DB
+		this.populateStudyOwnerName(studyReferences);
+		return studyReferences;
+	}
+
+	private void populateStudyOwnerName(final List<? extends Reference> references) {
+		final List<StudyReference> studyReferences = new ArrayList<>();
+		for (final Reference reference : references) {
+			if (reference instanceof StudyReference) {
+				studyReferences.add((StudyReference) reference);
+			}
+		}
+		if (!studyReferences.isEmpty()) {
+			final List<Integer> userIds = Lists.transform(studyReferences, new Function<StudyReference, Integer>() {
+
+				@Nullable
+				@Override
+				public Integer apply(@Nullable final StudyReference input) {
+					return input.getOwnerId();
+				}
+			});
+			if (!userIds.isEmpty()) {
+				final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
+				for (final StudyReference study : studyReferences) {
+					if (study.getOwnerId() != null) {
+						study.setOwnerName(userIDFullNameMap.get(study.getOwnerId()));
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -225,27 +278,27 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Experiment> getExperiments(final int dataSetId, final int start, final int numRows) {
-		final VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
+		final VariableTypeList variableTypes = this.dataSetBuilder.getVariableTypes(dataSetId);
 		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
 	}
 
 	@Override
 	public List<Experiment> getExperimentsOfFirstInstance(final int dataSetId, final int start, final int numOfRows) {
-		final VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
+		final VariableTypeList variableTypes = this.dataSetBuilder.getVariableTypes(dataSetId);
 		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numOfRows, variableTypes, true);
 	}
 
 	@Override
 	public VariableTypeList getTreatmentFactorVariableTypes(final int dataSetId) {
-		return this.getDataSetBuilder().getTreatmentFactorVariableTypes(dataSetId);
+		return this.dataSetBuilder.getTreatmentFactorVariableTypes(dataSetId);
 	}
 
 	@Override
 	public List<Experiment> getExperimentsWithTrialEnvironment(
 		final int trialDataSetId, final int dataSetId, final int start,
 		final int numRows) {
-		final VariableTypeList trialVariableTypes = this.getDataSetBuilder().getVariableTypes(trialDataSetId);
-		final VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
+		final VariableTypeList trialVariableTypes = this.dataSetBuilder.getVariableTypes(trialDataSetId);
+		final VariableTypeList variableTypes = this.dataSetBuilder.getVariableTypes(dataSetId);
 
 		variableTypes.addAll(trialVariableTypes);
 
@@ -330,7 +383,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final List<DataSet> datasets = new ArrayList<>();
 
 		for (final DmsProject datasetProject : datasetProjects) {
-			datasets.add(this.getDataSetBuilder().build(datasetProject.getProjectId()));
+			datasets.add(this.dataSetBuilder.build(datasetProject.getProjectId()));
 		}
 
 		return datasets;
@@ -352,12 +405,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public TrialEnvironments getTrialEnvironmentsInDataset(final int datasetId) {
 		final DmsProject study = this.getDmsProjectDao().getById(datasetId).getStudy();
-		return this.getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(study.getProjectId(), datasetId);
+		return this.trialEnvironmentBuilder.getTrialEnvironmentsInDataset(study.getProjectId(), datasetId);
 	}
 
 	@Override
 	public Stocks getStocksInDataset(final int datasetId) {
-		return this.getStockBuilder().getStocksInDataset(datasetId);
+		return this.stockBuilder.getStocksInDataset(datasetId);
 	}
 
 	@Override
@@ -792,7 +845,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				}
 			}
 			if (detail.getPiName() != null && !"".equals(detail.getPiName().trim()) && detail.getPiId() != null) {
-				final Person person = this.daoFactory.getPersonDAO().getById(detail.getPiId());
+				final Person person = this.userService.getPersonById(detail.getPiId());
 				if (person != null) {
 					detail.setPiName(person.getDisplayName());
 				}
@@ -833,7 +886,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			siteMap.putAll(this.daoFactory.getLocationDAO().getLocationNamesByLocationIDs(siteIds));
 		}
 		if (!personIds.isEmpty()) {
-			personMap.putAll(this.daoFactory.getPersonDAO().getPersonNamesByPersonIds(personIds));
+			personMap.putAll(this.userService.getPersonNamesByPersonIds(personIds));
 		}
 	}
 
@@ -931,6 +984,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	public void setLocationDataManager(final LocationDataManager locationDataManager) {
 		this.locationDataManager = locationDataManager;
+	}
+
+	public void setUserService(final UserService userService) {
+		this.userService = userService;
 	}
 
 	@Override
@@ -1059,6 +1116,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public Map<Integer, String> getInstanceIdLocationIdMap(final List<Integer> instanceIds) {
+		return this.getGeolocationPropertyDao().getInstanceIdLocationIdMap(instanceIds);
+	}
+
+	@Override
 	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer studyId) {
 		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByGeolocation(studyId);
 	}
@@ -1183,7 +1245,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	 */
 	@Override
 	public List<Reference> getChildrenOfFolderByStudyType(final int folderId, final String programUUID, final Integer studyTypeId) {
-		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypeId);
+		final List<Reference> children = this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypeId);
+		this.populateStudyOwnerName(children);
+		return children;
 	}
 
 	@Override
@@ -1210,7 +1274,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyReference getStudyReference(final Integer studyId) {
-		return this.getDmsProjectDao().getStudyReference(studyId);
+		final StudyReference studyReference = this.getDmsProjectDao().getStudyReference(studyId);
+		this.populateStudyOwnerName(Collections.singletonList(studyReference));
+		return studyReference;
 	}
 
 	public Boolean existInstances(final Set<Integer> instanceIds) {
@@ -1251,5 +1317,25 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			phenotypeMap.put(phenotype.getObservableId(), phenotype.getValue());
 		}
 		return phenotypeMap;
+	}
+
+	@Override
+	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) {
+		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToStudy(studyId);
+		return this.userService.getUsersByPersonIds(personIds);
+	}
+
+	@Override
+	public List<UserDto> getUsersForEnvironment(final Integer instanceId) {
+		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToEnvironment(instanceId);
+		return this.userService.getUsersByPersonIds(personIds);
+	}
+
+	void setDataSetBuilder(final DataSetBuilder dataSetBuilder) {
+		this.dataSetBuilder = dataSetBuilder;
+	}
+
+	void setTrialEnvironmentBuilder(final TrialEnvironmentBuilder trialEnvironmentBuilder) {
+		this.trialEnvironmentBuilder = trialEnvironmentBuilder;
 	}
 }

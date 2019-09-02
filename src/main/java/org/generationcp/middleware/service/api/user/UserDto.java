@@ -4,12 +4,14 @@
 
 package org.generationcp.middleware.service.api.user;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.domain.workbench.CropDto;
-import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author vmaletta
@@ -23,12 +25,12 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	private String username;
 	private String firstName;
 	private String lastName;
-	// TODO n roles
-	private Role role;
+	private List<UserRoleDto> userRoles;
 	private Integer status;
 	private String email;
 	private String password;
-	private List<CropDto> crops;
+	private Set<CropDto> crops;
+	private Set<String> authorities;
 
 	public UserDto() {
 		this.userId = 0;
@@ -40,15 +42,39 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.status = 0;
 	}
 
-	public UserDto(final Integer userId, final String username, final String firstName, final String lastName, final Role role,
+	public UserDto(final Integer userId, final String username, final String firstName, final String lastName, List<UserRoleDto> userRoles,
 		Integer status, String email) {
 		this.userId = userId;
 		this.username = username;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.role = role;
+		this.userRoles = userRoles;
 		this.status = status;
 		this.email = email;
+	}
+
+	public UserDto(final WorkbenchUser workbenchUser) {
+		if (workbenchUser.getRoles() != null && !workbenchUser.getRoles().isEmpty()) {
+			this.setUserRoles(UserRoleMapper.map(workbenchUser.getRoles()));
+		}
+		this.setUserId(workbenchUser.getUserid());
+		if (workbenchUser.getPerson() != null) {
+			this.setEmail(workbenchUser.getPerson().getEmail());
+			this.setFirstName(workbenchUser.getPerson().getFirstName());
+			this.setLastName(workbenchUser.getPerson().getLastName());
+
+			if (workbenchUser.getPerson().getCrops() != null) {
+				final Set<CropDto> crops = new HashSet<>();
+				for (final CropType cropType : workbenchUser.getPerson().getCrops()) {
+					final CropDto crop = new CropDto(cropType);
+					crops.add(crop);
+				}
+				this.setCrops(crops);
+			}
+
+		}
+		this.setStatus(workbenchUser.getStatus());
+		this.setUsername(workbenchUser.getName());
 	}
 
 	public Integer getUserId() {
@@ -81,14 +107,6 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}
-
-	public Role getRole() {
-		return role;
-	}
-
-	public void setRole(final Role role) {
-		this.role = role;
 	}
 
 	public Integer getStatus() {
@@ -128,7 +146,8 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		result = prime * result + (this.username == null ? 0 : this.username.hashCode());
 		result = prime * result + (this.firstName == null ? 0 : this.firstName.hashCode());
 		result = prime * result + (this.lastName == null ? 0 : this.lastName.hashCode());
-		result = prime * result + (this.role == null ? 0 : this.role.hashCode());
+		result = prime * result + (this.userRoles == null ? 0 : this.userRoles.hashCode());
+
 		result = prime * result + (this.email == null ? 0 : this.email.hashCode());
 
 		result = prime * result + (int) (this.status ^ this.status >>> 32);
@@ -154,14 +173,30 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		return true;
 	}
 
-	public List<CropDto> getCrops() {
+	public Set<CropDto> getCrops() {
 		if (this.crops == null) {
-			this.crops = new ArrayList<>();
+			this.crops = new HashSet<>();
 		}
 		return this.crops;
 	}
 
-	public void setCrops(final List<CropDto> crops) {
+	public void setCrops(final Set<CropDto> crops) {
 		this.crops = crops;
+	}
+
+	public Set<String> getAuthorities() {
+		return authorities;
+	}
+
+	public void setAuthorities(final Set<String> authorities) {
+		this.authorities = authorities;
+	}
+
+	public List<UserRoleDto> getUserRoles() {
+		return userRoles;
+	}
+
+	public void setUserRoles(final List<UserRoleDto> userRoles) {
+		this.userRoles = userRoles;
 	}
 }

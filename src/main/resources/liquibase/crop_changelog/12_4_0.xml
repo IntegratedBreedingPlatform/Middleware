@@ -1,0 +1,799 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<changeSet author="darla" id="v12.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					  FROM persons p
+					 WHERE NOT EXISTS (
+						   SELECT 1 FROM workbench.persons wp WHERE wp.pemail = p.pemail);
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Insert into backup table in crop database any persons (matching by email) that don't exist in workbench database.
+			Insert into workbench database these crop-only persons records.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			  CREATE TABLE persons_migrated (
+				`personid` int(11) NOT NULL,
+				`fname` varchar(20) NOT NULL DEFAULT '-',
+				`lname` varchar(50) NOT NULL DEFAULT '-',
+				`ioname` varchar(15) NOT NULL DEFAULT '-',
+				`institid` int(11) NOT NULL DEFAULT '0',
+				`ptitle` varchar(25) NOT NULL DEFAULT '-',
+				`poname` varchar(50) NOT NULL DEFAULT '-',
+				`plangu` int(11) NOT NULL DEFAULT '0',
+				`pphone` varchar(20) NOT NULL DEFAULT '-',
+				`pextent` varchar(20) NOT NULL DEFAULT '-',
+				`pfax` varchar(20) NOT NULL DEFAULT '-',
+				`pemail` varchar(40) NOT NULL DEFAULT '-',
+				`prole` int(11) NOT NULL DEFAULT '0',
+				`sperson` int(11) NOT NULL DEFAULT '0',
+				`eperson` int(11) NOT NULL DEFAULT '0',
+				`pstatus` int(11) NOT NULL DEFAULT '0',
+				`pnotes` varchar(255) NOT NULL DEFAULT '-',
+				`contact` varchar(255) NOT NULL DEFAULT '-',
+				 PRIMARY KEY (`personid`),
+				 UNIQUE KEY `persons_bkp_uk` (`pemail`)
+			);
+
+			INSERT INTO persons_migrated
+			SELECT *
+			  FROM persons p
+			 WHERE NOT EXISTS (
+					SELECT 1 FROM workbench.persons wp WHERE wp.pemail = p.pemail);
+
+			INSERT INTO workbench.persons(fname, lname, pemail)
+			SELECT fname, lname, pemail
+			  FROM persons p
+			 WHERE NOT EXISTS (
+					SELECT 1 FROM workbench.persons wp WHERE wp.pemail = p.pemail);
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					    SELECT COUNT(1) FROM users u
+						 INNER JOIN persons p on p.personid = u.personid
+     					 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
+
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Insert into backup table in crop database any users (matching by username) that don't exist in workbench database.
+			Insert into workbench database these crop-only usets records.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE users_migrated (
+  				`userid` int(11) NOT NULL,
+  				`instalid` int(11) NOT NULL DEFAULT '0',
+  				`ustatus` int(11) NOT NULL DEFAULT '0',
+  				`uaccess` int(11) NOT NULL DEFAULT '0',
+  				`utype` int(11) NOT NULL DEFAULT '0',
+  				`uname` varchar(30) NOT NULL DEFAULT '-',
+  				`upswd` varchar(60) NOT NULL DEFAULT '-',
+  				`personid` int(11) NOT NULL DEFAULT '0',
+  				`adate` int(11) NOT NULL DEFAULT '0',
+  				`cdate` int(11) NOT NULL DEFAULT '0',
+  				PRIMARY KEY (`userid`)
+			);
+
+			INSERT INTO users_migrated
+			SELECT u.* FROM users u
+			 INNER JOIN persons p on p.personid = u.personid
+			 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
+
+
+			INSERT INTO workbench.users(`ustatus`, `uaccess`, `utype`, `uname`, `upswd`, `personid`, `adate`, `cdate`)
+			SELECT 1, uaccess, utype, uname, upswd, wp.personid, adate, cdate
+			  FROM users u
+			 INNER JOIN persons p on p.personid = u.personid
+			 INNER JOIN workbench.persons wp on wp.pemail = p.pemail
+			 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="names" columnName="nuid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Backup nuid field of NAMES table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="names">
+			<column name="nuid_bkp" type="INT" afterColumn="nuid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE names
+			   SET nuid_bkp = nuid;
+
+			UPDATE names
+			 INNER JOIN users u ON u.userid = nuid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET nuid = wu.userid
+			 WHERE nuid != 0;
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="darla" id="v12.4.0-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="udflds" columnName="fuid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy fuid field of UDFLDS table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="udflds">
+			<column name="fuid_bkp" type="INT" afterColumn="fuid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE udflds
+			   SET fuid_bkp = fuid;
+
+			UPDATE udflds
+			 INNER JOIN users u ON u.userid = fuid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET fuid = wu.userid
+			 WHERE fuid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-5">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="germplsm" columnName="germuid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy germuid field of GERMPLSM table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="germplsm">
+			<column name="germuid_bkp" type="INT" afterColumn="germuid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE germplsm
+			   SET germuid_bkp = germuid;
+
+			UPDATE germplsm
+			 INNER JOIN users u ON u.userid = germuid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET germuid = wu.userid
+			 WHERE germuid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="project" columnName="created_by_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy created_by field of PROJECT table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="project">
+			<column name="created_by_bkp" type="INT" afterColumn="created_by">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE project
+			   SET created_by_bkp = created_by;
+
+			UPDATE project
+			 INNER JOIN users u ON u.userid = created_by
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET created_by = wu.userid
+			 WHERE created_by != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-7">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="methods" columnName="muid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy muid field of METHODS table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="methods">
+			<column name="muid_bkp" type="INT" afterColumn="muid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE methods
+			   SET muid_bkp = muid;
+
+			UPDATE methods
+			 INNER JOIN users u ON u.userid = muid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET muid = wu.userid
+			 WHERE muid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-8">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="atributs" columnName="auid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy auid field of ATRIBUTS table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="atributs">
+			<column name="auid_bkp" type="INT" afterColumn="auid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE atributs
+			   SET auid_bkp = auid;
+
+			UPDATE atributs
+			 INNER JOIN users u ON u.userid = auid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET auid = wu.userid
+			 WHERE auid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-9">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="listnms" columnName="listuid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy listuid field of LISTNMS table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="listnms">
+			<column name="listuid_bkp" type="INT" afterColumn="listuid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE listnms
+			   SET listuid_bkp = listuid;
+
+			UPDATE listnms
+			 INNER JOIN users u ON u.userid = listuid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET listuid = wu.userid
+			 WHERE listuid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-10">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="user_program_tree_state" columnName="userid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy userid field of USER_PROGRAM_TREE_STATE table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<dropIndex indexName="unique" tableName="user_program_tree_state"/>
+		<addColumn tableName="user_program_tree_state">
+			<column name="userid_bkp" type="INT" afterColumn="userid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE user_program_tree_state
+			   SET userid_bkp = userid;
+
+			UPDATE user_program_tree_state tree
+			 INNER JOIN users u ON u.userid = tree.userid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET tree.userid = wu.userid
+			 WHERE tree.userid != 0;
+		</sql>
+		<createIndex indexName="user_program_tree_state_unique" tableName="user_program_tree_state" unique="true">
+			<column name="userid" type="int" />
+			<column name="program_uuid" type="varchar(255)" />
+			<column name="tree_type" type="varchar(45)" />
+		</createIndex>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-11">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="gdms_dataset_users" columnName="user_id_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy user_id field of GDMS_DATASET_USERS table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="gdms_dataset_users">
+			<column name="user_id_bkp" type="INT" afterColumn="user_id">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE gdms_dataset_users
+			   SET user_id_bkp = user_id;
+
+			UPDATE gdms_dataset_users
+			 INNER JOIN users u ON u.userid = user_id
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET user_id = wu.userid
+			 WHERE user_id != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-12">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="gdms_track_data" columnName="user_id_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy user_id field of GDMS_TRACK_DATA table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="gdms_track_data">
+			<column name="user_id_bkp" type="INT" afterColumn="user_id">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE gdms_track_data
+			   SET user_id_bkp = user_id;
+
+			UPDATE gdms_track_data
+			 INNER JOIN users u ON u.userid = user_id
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET user_id = wu.userid
+			 WHERE user_id != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-13">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="sample_list" columnName="created_by_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy created_by field of SAMPLE_LIST table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<dropForeignKeyConstraint baseTableName="sample_list" constraintName="fk_sample_list_user"/>
+		<addColumn tableName="sample_list">
+			<column name="created_by_bkp" type="INT" afterColumn="created_by">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE sample_list
+			   SET created_by_bkp = created_by;
+
+			UPDATE sample_list
+			 INNER JOIN users u ON u.userid = created_by
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET created_by = wu.userid
+			 WHERE created_by != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-14">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<columnExists tableName="sample" columnName="created_by_bkp"/>
+				</not>
+				<not>
+					<columnExists tableName="sample" columnName="taken_by_bkp"/>
+				</not>
+			</and>
+
+		</preConditions>
+		<comment>
+			Copy created_by and taken_by fields of SAMPLE table to backup columns and transform their values to refer to users table in workbench database
+		</comment>
+		<dropForeignKeyConstraint baseTableName="sample" constraintName="fk_sample_created_by"/>
+		<dropForeignKeyConstraint baseTableName="sample" constraintName="fk_sample_user"/>
+		<addColumn tableName="sample">
+			<column name="created_by_bkp" type="INT" afterColumn="created_by">
+				<constraints nullable="true"/>
+			</column>
+			<column name="taken_by_bkp" type="INT" afterColumn="taken_by">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE sample
+			   SET created_by_bkp = created_by,
+			       taken_by_bkp = taken_by;
+
+			UPDATE sample
+			 INNER JOIN users u ON u.userid = created_by
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			  LEFT JOIN users tu ON tu.userid = taken_by
+			  LEFT JOIN workbench.users twu on twu.uname = tu.uname
+			   SET created_by = wu.userid,
+			       taken_by = twu.userid;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-15">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="ims_lot" columnName="userid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy userid field of IMS_LOT table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="ims_lot">
+			<column name="userid_bkp" type="INT" afterColumn="userid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_lot
+			   SET userid_bkp = userid;
+
+			UPDATE ims_lot lot
+			  INNER JOIN users u ON u.userid = lot.userid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET lot.userid = wu.userid
+			 WHERE lot.userid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-16">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<columnExists tableName="ims_transaction" columnName="userid_bkp"/>
+				</not>
+				<not>
+				 	<columnExists tableName="ims_transaction" columnName="personid_bkp"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Copy userid and personid fields of IMS_TRANSACTION table to backup column and transform their values to refer to users and persons tables, respectively, in workbench database
+		</comment>
+		<addColumn tableName="ims_transaction">
+			<column name="userid_bkp" type="INT" afterColumn="userid">
+				<constraints nullable="true"/>
+			</column>
+			<column name="personid_bkp" type="INT" afterColumn="personid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			   SET userid_bkp = userid,
+			       personid_bkp = personid;
+
+			UPDATE ims_transaction tr
+			 INNER JOIN users u ON u.userid = tr.userid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			  LEFT JOIN persons p ON p.personid = tr.personid
+			  LEFT JOIN workbench.persons wp ON wp.pemail = p.pemail
+			   SET tr.userid = wu.userid,
+				   tr.personid = wp.personid
+			 WHERE tr.userid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-17">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="locdes" columnName="duid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy duid field of LOCDES table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="locdes">
+			<column name="duid_bkp" type="INT" afterColumn="duid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE locdes
+			   SET duid_bkp = duid;
+
+			UPDATE locdes
+			 INNER JOIN users u ON u.userid = duid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET duid = wu.userid
+			 WHERE duid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-18">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="changes" columnName="cuid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy cuid field of CHANGES table, albeit unused in BMS code, to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="changes">
+			<column name="cuid_bkp" type="INT" afterColumn="cuid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE changes
+			   SET cuid_bkp = cuid;
+
+			UPDATE changes
+			 INNER JOIN users u ON u.userid = cuid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET cuid = wu.userid
+			 WHERE cuid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-19">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="reflinks" columnName="refuid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy refuid field of REFLINKS table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="reflinks">
+			<column name="refuid_bkp" type="INT" afterColumn="refuid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE reflinks
+			   SET refuid_bkp = refuid;
+
+			UPDATE reflinks
+			 INNER JOIN users u ON u.userid = refuid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET refuid = wu.userid
+			 WHERE refuid != 0;
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="darla" id="v12.4.0-20">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<sqlCheck expectedResult="0">
+						SELECT COUNT(1) FROM projectprop pp
+						 WHERE pp.value IS NOT null AND pp.value != '' AND pp.variable_id IN (
+								SELECT var.cvterm_id
+								  FROM cvterm var
+								 INNER JOIN cvterm_relationship scale ON var.cvterm_id = scale.subject_id AND scale.type_id = 1220
+								 WHERE scale.object_id = 1901
+							);
+					</sqlCheck>
+				</not>
+				<not>
+					<tableExists tableName="projectprop_users_bkp" />
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Transform study settings variables that refer to crop persons to now point to persons table in workbench database
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE projectprop_users_bkp (
+			  `projectprop_id` int(11) NOT NULL AUTO_INCREMENT,
+			  `project_id` int(11) NOT NULL,
+			  `type_id` int(11) NOT NULL,
+			  `value` varchar(255) DEFAULT NULL,
+			  `rank` int(11) NOT NULL DEFAULT '0',
+			  `variable_id` int(11) NOT NULL,
+			  `alias` varchar(255) DEFAULT NULL,
+			  PRIMARY KEY (`projectprop_id`),
+			  UNIQUE KEY `projectprop_users_bkp_idx1` (`project_id`,`type_id`,`rank`,`variable_id`)
+			);
+
+			<!-- Insert into backup table records of variables with "Person ID" scale (1901) -->
+			INSERT INTO projectprop_users_bkp
+			SELECT * FROM projectprop pp
+			 WHERE pp.value IS NOT null AND pp.value != '' AND pp.variable_id IN (
+					SELECT var.cvterm_id
+					  FROM cvterm var
+					 INNER JOIN cvterm_relationship scale ON var.cvterm_id = scale.subject_id AND scale.type_id = 1220
+					 WHERE scale.object_id = 1901
+				);
+
+			<!-- Update person ID values to refer to persons in workbench DB for variables with "Person ID" scale -->
+			UPDATE projectprop pp
+			 INNER JOIN persons p on p.personid = pp.value
+			 INNER JOIN workbench.persons wp ON wp.pemail = p.pemail
+			   SET pp.value = wp.personid
+			 WHERE pp.value IS NOT null AND pp.value != '' AND pp.variable_id IN (
+					SELECT var.cvterm_id
+					  FROM cvterm var
+					 INNER JOIN cvterm_relationship scale ON var.cvterm_id = scale.subject_id AND scale.type_id = 1220
+					 WHERE scale.object_id = 1901
+				);
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-21">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<sqlCheck expectedResult="0">
+						SELECT COUNT(1) FROM nd_geolocationprop gp
+						 WHERE gp.value IS NOT null AND gp.value != '' AND gp.type_id IN (
+								SELECT var.cvterm_id
+								  FROM cvterm var
+								 INNER JOIN cvterm_relationship scale ON var.cvterm_id = scale.subject_id AND scale.type_id = 1220
+								 WHERE scale.object_id = 1901
+							);
+					</sqlCheck>
+				</not>
+				<not>
+					<tableExists tableName="nd_geolocationprop_users_bkp" />
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Transform environment variables that refer to crop persons to now point to persons table in workbench database
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE nd_geolocationprop_users_bkp (
+			  `nd_geolocationprop_id` int(11) NOT NULL AUTO_INCREMENT,
+			  `nd_geolocation_id` int(11) NOT NULL,
+			  `type_id` int(11) NOT NULL,
+			  `value` varchar(255) DEFAULT NULL,
+			  `rank` int(11) NOT NULL DEFAULT '0',
+			  PRIMARY KEY (`nd_geolocationprop_id`),
+			  UNIQUE KEY `nd_geolocationprop_users_bkp_idx1` (`nd_geolocation_id`,`type_id`,`rank`)
+			);
+
+			<!-- Insert into backup table records of variables with "Person ID" scale (1901) -->
+			INSERT INTO nd_geolocationprop_users_bkp
+			SELECT * FROM nd_geolocationprop gp
+			 WHERE gp.value IS NOT null AND gp.value != '' AND gp.type_id IN (
+					SELECT var.cvterm_id
+					  FROM cvterm var
+					 INNER JOIN cvterm_relationship scale ON var.cvterm_id = scale.subject_id AND scale.type_id = 1220
+					 WHERE scale.object_id = 1901
+				);
+
+			<!-- Update person ID values to refer to persons in workbench DB for variables with "Person ID" scale -->
+			UPDATE nd_geolocationprop gp
+			 INNER JOIN persons p on p.personid = gp.value
+			 INNER JOIN workbench.persons wp ON wp.pemail = p.pemail
+			   SET gp.value = wp.personid
+			 WHERE gp.value IS NOT null AND gp.value != '' AND gp.type_id IN (
+					SELECT var.cvterm_id
+					  FROM cvterm var
+					 INNER JOIN cvterm_relationship scale ON var.cvterm_id = scale.subject_id AND scale.type_id = 1220
+					 WHERE scale.object_id = 1901
+				);
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-22">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					  FROM persons p
+					 INNER JOIN workbench.persons wp ON wp.pemail = p.pemail
+					 INNER JOIN workbench.workbench_crop crop ON crop.db_name = DATABASE()
+					 WHERE NOT EXISTS (
+							SELECT 1 FROM workbench.crop_persons cp
+							 WHERE cp.personid = wp.personid AND cp.crop_name = crop.crop_name);
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Associate persons to crop by inserting to CROP_PERSONS table in workbench database
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench.crop_persons
+			SELECT crop_name, wp.personid
+			  FROM persons p
+			 INNER JOIN workbench.persons wp ON wp.pemail = p.pemail
+			 INNER JOIN workbench.workbench_crop crop ON crop.db_name = DATABASE()
+			 WHERE NOT EXISTS (
+					SELECT 1 FROM workbench.crop_persons cp
+					 WHERE cp.personid = wp.personid AND cp.crop_name = crop.crop_name);
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-23">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="persons_bkp" />
+			</not>
+		</preConditions>
+		<comment>
+			Store into backup table the PERSONS table, then drop the PERSONS table.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			  CREATE TABLE persons_bkp (
+				`personid` int(11) NOT NULL,
+				`fname` varchar(20) NOT NULL DEFAULT '-',
+				`lname` varchar(50) NOT NULL DEFAULT '-',
+				`ioname` varchar(15) NOT NULL DEFAULT '-',
+				`institid` int(11) NOT NULL DEFAULT '0',
+				`ptitle` varchar(25) NOT NULL DEFAULT '-',
+				`poname` varchar(50) NOT NULL DEFAULT '-',
+				`plangu` int(11) NOT NULL DEFAULT '0',
+				`pphone` varchar(20) NOT NULL DEFAULT '-',
+				`pextent` varchar(20) NOT NULL DEFAULT '-',
+				`pfax` varchar(20) NOT NULL DEFAULT '-',
+				`pemail` varchar(40) NOT NULL DEFAULT '-',
+				`prole` int(11) NOT NULL DEFAULT '0',
+				`sperson` int(11) NOT NULL DEFAULT '0',
+				`eperson` int(11) NOT NULL DEFAULT '0',
+				`pstatus` int(11) NOT NULL DEFAULT '0',
+				`pnotes` varchar(255) NOT NULL DEFAULT '-',
+				`contact` varchar(255) NOT NULL DEFAULT '-',
+				 PRIMARY KEY (`personid`),
+				 UNIQUE KEY `persons_bkp_uk` (`pemail`)
+			);
+
+			INSERT INTO persons_bkp
+			SELECT * FROM persons;
+
+			DROP TABLE persons;
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="darla" id="v12.4.0-24">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="users_bkp" />
+			</not>
+		</preConditions>
+		<comment>
+			Store into backup table the USERS table, then drop the USERS table.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE users_bkp (
+  				`userid` int(11) NOT NULL,
+  				`instalid` int(11) NOT NULL DEFAULT '0',
+  				`ustatus` int(11) NOT NULL DEFAULT '0',
+  				`uaccess` int(11) NOT NULL DEFAULT '0',
+  				`utype` int(11) NOT NULL DEFAULT '0',
+  				`uname` varchar(30) NOT NULL DEFAULT '-',
+  				`upswd` varchar(60) NOT NULL DEFAULT '-',
+  				`personid` int(11) NOT NULL DEFAULT '0',
+  				`adate` int(11) NOT NULL DEFAULT '0',
+  				`cdate` int(11) NOT NULL DEFAULT '0',
+  				PRIMARY KEY (`userid`)
+			);
+
+			INSERT INTO users_bkp
+			SELECT * FROM users;
+
+			DROP TABLE users;
+		</sql>
+	</changeSet>
+</databaseChangeLog>

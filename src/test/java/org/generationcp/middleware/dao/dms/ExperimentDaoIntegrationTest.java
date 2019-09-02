@@ -9,11 +9,11 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,7 +47,7 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
 
-		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder);
+		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
 		this.plot = this.testDataInitializer
 			.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
@@ -187,9 +187,9 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 1);
 
-		final User user = this.testDataInitializer.createUserForTesting();
-		final SampleList sampleList = this.testDataInitializer.createTestSampleList("MyList", user);
-		final List<Sample> samples = this.testDataInitializer.addSamples(experimentModels, sampleList, user);
+		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
+		final SampleList sampleList = this.testDataInitializer.createTestSampleList("MyList", user.getUserid());
+		final List<Sample> samples = this.testDataInitializer.addSamples(experimentModels, sampleList, user.getUserid());
 
 		final Map<Integer, List<SampleDTO>> resultMap = this.experimentDao.getExperimentSamplesDTOMap(this.study.getProjectId());
 

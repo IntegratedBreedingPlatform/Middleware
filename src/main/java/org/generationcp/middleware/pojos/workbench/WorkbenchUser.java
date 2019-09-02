@@ -11,10 +11,16 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.domain.workbench.PermissionDto;
+import org.generationcp.middleware.domain.workbench.RoleType;
+import org.generationcp.middleware.pojos.BeanFormState;
+import org.generationcp.middleware.pojos.Person;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -25,7 +31,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
@@ -34,19 +39,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.pojos.BeanFormState;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * POJO for users table in Workbench Database. 
+ * POJO for users table in Workbench Database.
  * It differs from users in crop dbs as there are no
  * users_roles and role table and therefore relation in crop DBs
  *
@@ -54,7 +52,12 @@ import org.hibernate.annotations.NotFoundAction;
 @NamedQueries({@NamedQuery(name = "getUserByNameUsingEqual", query = "SELECT s FROM WorkbenchUser s WHERE s.name = :name"),
 		@NamedQuery(name = "getUserByNameUsingLike", query = "SELECT s FROM WorkbenchUser s WHERE s.name LIKE :name"),
 		@NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name = :name"),
-		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name LIKE :name")
+		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name LIKE :name"),
+		@NamedQuery(name = "getByFullName", query = "SELECT u FROM WorkbenchUser u, Person p WHERE u.status = 0 AND u.person.id = p.id AND "
+			+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)"),
+		@NamedQuery(name = "countByFullName", query = "SELECT COUNT(u) FROM WorkbenchUser u, Person p WHERE u.status = 0 AND u.person.id = p.id AND "
+		+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
+
 })
 @NamedNativeQueries({@NamedNativeQuery(name = "getAllActiveUsersSorted", query = "SELECT u.* FROM users u, persons p "
 		+ "WHERE u.personid = p.personid AND  u.ustatus = 0 ORDER BY fname, lname", resultClass = WorkbenchUser.class)})
@@ -64,22 +67,59 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final String GET_USERS_BY_PROJECT_ID = "SELECT  "
+		+ "  users.userid, "
+		+ "  users.instalid, "
+		+ "  users.ustatus, "
+		+ "  users.uaccess, "
+		+ "  users.utype, "
+		+ "  users.uname, "
+		+ "  users.upswd, "
+		+ "  users.personid, "
+		+ "  users.adate, "
+		+ "  users.cdate, "
+		+ "  pr.fname, "
+		+ "  pr.lname "
+		+ "    FROM "
+		+ "       workbench_project p "
+		+ "           INNER JOIN "
+		+ "       crop_persons cp ON cp.crop_name = p.crop_type "
+		+ "           INNER JOIN "
+		+ "       users ON cp.personid = users.personid "
+		+ "           INNER JOIN "
+		+ "       persons pr ON pr.personid = users.personid "
+		+ "           INNER JOIN "
+		+ "       users_roles ur ON ur.userid = users.userid "
+		+ "           INNER JOIN role r ON ur.role_id = r.id  "
+		+ "   where  (r.role_type_id =  " + RoleType.INSTANCE.getId()
+		+ "     or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = p.crop_type)  "
+		+ "     or (r.role_type_id =  " + RoleType.PROGRAM.getId()
+		+ " and ur.crop_name = p.crop_type AND ur.workbench_project_id = p.project_id))  "
+		+ "    AND "
+		+ "       p.project_id = :projectId "
+		+ "    GROUP BY users.userid";
+
+	public static final String GET_ACTIVE_USER_IDS_WITH_PROGRAM_ROLE_BY_PROJECT_ID =
+		"SELECT DISTINCT users.userid "
+			+ "    FROM "
+			+ "       workbench_project p "
+			+ "           INNER JOIN "
+			+ "       crop_persons cp ON cp.crop_name = p.crop_type "
+			+ "           INNER JOIN "
+			+ "       users ON cp.personid = users.personid "
+			+ "           INNER JOIN "
+			+ "       users_roles ur ON ur.userid = users.userid "
+			+ "           INNER JOIN role r ON ur.role_id = r.id  "
+			+ "   where  (r.role_type_id =  " + RoleType.PROGRAM.getId()
+			+ " 			AND ur.crop_name = p.crop_type AND ur.workbench_project_id = p.project_id) "
+			+ "    	AND p.project_id = :projectId "
+			+ "  	AND users.ustatus = 0 ";
+
 	public static final String GET_BY_NAME_USING_EQUAL = "getUserByNameUsingEqual";
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
-	public static final String COUNT_BY_NAME_USING_EQUAL = "countUserByNameUsingEqual";
-	public static final String COUNT_BY_NAME_USING_LIKE = "countUserByNameUsingLike";
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
-
-	public static final String GET_USERS_BY_PROJECT_UUID =
-		"SELECT users.userid, users.uname, person.fname, person.lname, role.id, role.description, users.ustatus, person.pemail \n"
-		+ "FROM users \n"
-		+ "INNER JOIN workbench_project_user_info pu ON users.userid = pu.user_id \n"
-		+ "INNER JOIN persons person ON person.personid = users.personid \n "
-		+ "INNER JOIN workbench_project pp ON pu.project_id = pp.project_id \n "
-		+ "INNER JOIN users_roles ur ON ur.userid = users.userid "
-		+ "INNER JOIN role ON role.id = ur.role_id "
-		+ "WHERE pp.project_uuid = :project_uuid \n "
-		+ "GROUP BY users.userid";
+	public static final String GET_BY_FULLNAME = "getByFullName";
+	public static final String COUNT_BY_FULLNAME = "countByFullName";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -105,16 +145,14 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@Column(name = "upswd")
 	private String password;
 
-	@Column(name = "personid")
-	private Integer personid;
-
 	@Column(name = "adate")
 	private Integer adate;
 
 	@Column(name = "cdate")
 	private Integer cdate;
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch(FetchMode.SUBSELECT)
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	@NotFound(action = NotFoundAction.IGNORE)
 	private List<UserRole> roles;
 
@@ -122,17 +160,9 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	private Boolean isnew = false;
 
 	@OneToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="personid", insertable=false, updatable=false)
+	@JoinColumn(name="personid")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private Person person;
-
-	@Fetch(FetchMode.SUBSELECT)
-	@OneToMany(fetch = FetchType.EAGER)
-	@JoinTable(
-		name = "users_crops",
-		joinColumns = @JoinColumn(name = "user_id"),
-		inverseJoinColumns = @JoinColumn(name = "crop_name"))
-	private List<CropType> crops = new ArrayList<>();
 
 	@Transient
 	private Boolean active = false;
@@ -140,16 +170,19 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@Transient
 	private Boolean enabled = true;
 
+	@Transient
+	private List<PermissionDto> permissions = new ArrayList<>();
+
 	public WorkbenchUser() {
 	}
 
-	public WorkbenchUser(Integer userid) {
+	public WorkbenchUser(final Integer userid) {
 		super();
 		this.userid = userid;
 	}
 
-	public WorkbenchUser(Integer userid, Integer instalid, Integer status, Integer access, Integer type, String name, String password,
-			Integer personid, Integer adate, Integer cdate) {
+	public WorkbenchUser(final Integer userid, final Integer instalid, final Integer status, final Integer access, final Integer type, final String name, final String password,
+			final Person person, final Integer adate, final Integer cdate) {
 		super();
 		this.userid = userid;
 		this.instalid = instalid;
@@ -158,7 +191,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		this.type = type;
 		this.name = name;
 		this.password = password;
-		this.personid = personid;
+		this.person = person;
 		this.adate = adate;
 		this.cdate = cdate;
 
@@ -166,40 +199,18 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 	/**
 	 * Get a copy of this {@link WorkbenchUser} object. Note that this method will not copy the {@link WorkbenchUser#userid} field.
-	 * 
+	 *
 	 * @return the copy of the User object
 	 */
 	public WorkbenchUser copy() {
-		WorkbenchUser user = new WorkbenchUser();
+		final WorkbenchUser user = new WorkbenchUser();
 		user.setInstalid(this.instalid);
 		user.setStatus(this.status);
 		user.setAccess(this.access);
 		user.setType(this.type);
 		user.setName(this.name);
 		user.setPassword(this.password);
-		user.setPersonid(this.personid);
-		user.setAssignDate(this.adate);
-		user.setCloseDate(this.cdate);
-		user.setIsNew(this.isnew);
-		user.setActive(this.active);
-		user.setEnabled(this.enabled);
-		return user;
-	}
-	
-	/**
-	 * Get a copy of this {@link WorkbenchUser} object. Note that this method will not copy the {@link WorkbenchUser#userid} field.
-	 * 
-	 * @return the copy of the User object
-	 */
-	public User copyToUser() {
-		User user = new User();
-		user.setInstalid(this.instalid);
-		user.setStatus(this.status);
-		user.setAccess(this.access);
-		user.setType(this.type);
-		user.setName(this.name);
-		user.setPassword(this.password);
-		user.setPersonid(this.personid);
+		user.setPerson(this.person);
 		user.setAssignDate(this.adate);
 		user.setCloseDate(this.cdate);
 		user.setIsNew(this.isnew);
@@ -212,7 +223,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.userid;
 	}
 
-	public void setUserid(Integer userid) {
+	public void setUserid(final Integer userid) {
 		this.userid = userid;
 	}
 
@@ -220,7 +231,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.instalid;
 	}
 
-	public void setInstalid(Integer instalid) {
+	public void setInstalid(final Integer instalid) {
 		this.instalid = instalid;
 	}
 
@@ -228,7 +239,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.status;
 	}
 
-	public void setStatus(Integer status) {
+	public void setStatus(final Integer status) {
 		this.status = status;
 	}
 
@@ -236,7 +247,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.access;
 	}
 
-	public void setAccess(Integer access) {
+	public void setAccess(final Integer access) {
 		this.access = access;
 	}
 
@@ -244,7 +255,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.type;
 	}
 
-	public void setType(Integer type) {
+	public void setType(final Integer type) {
 		this.type = type;
 	}
 
@@ -252,7 +263,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -260,23 +271,15 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.password;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(final String password) {
 		this.password = password;
-	}
-
-	public Integer getPersonid() {
-		return this.personid;
-	}
-
-	public void setPersonid(Integer personid) {
-		this.personid = personid;
 	}
 
 	public Integer getAssignDate() {
 		return this.adate;
 	}
 
-	public void setAssignDate(Integer adate) {
+	public void setAssignDate(final Integer adate) {
 		this.adate = adate;
 	}
 
@@ -284,7 +287,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.cdate;
 	}
 
-	public void setCloseDate(Integer cdate) {
+	public void setCloseDate(final Integer cdate) {
 		this.cdate = cdate;
 	}
 
@@ -292,7 +295,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.person;
 	}
 
-	public void setPerson(Person person) {
+	public void setPerson(final Person person) {
 		this.person = person;
 	}
 
@@ -300,7 +303,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.isnew;
 	}
 
-	public void setIsNew(Boolean val) {
+	public void setIsNew(final Boolean val) {
 		this.isnew = val;
 	}
 
@@ -308,7 +311,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.roles;
 	}
 
-	public void setRoles(List<UserRole> roles) {
+	public void setRoles(final List<UserRole> roles) {
 		this.roles = roles;
 	}
 
@@ -318,25 +321,25 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
 		if (obj == this) {
 			return true;
 		}
-		if (!WorkbenchUser.class.isInstance(obj)) {
+		if (!(obj instanceof WorkbenchUser)) {
 			return false;
 		}
 
-		WorkbenchUser otherObj = (WorkbenchUser) obj;
+		final WorkbenchUser otherObj = (WorkbenchUser) obj;
 
 		return new EqualsBuilder().append(this.userid, otherObj.userid).isEquals();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("User [userid=");
 		builder.append(this.userid);
 		builder.append(", instalid=");
@@ -351,8 +354,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		builder.append(this.name);
 		builder.append(", password=");
 		builder.append(this.password);
-		builder.append(", personid=");
-		builder.append(this.personid);
 		builder.append(", adate=");
 		builder.append(this.adate);
 		builder.append(", cdate=");
@@ -376,7 +377,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	}
 
 	@Override
-	public void setActive(Boolean val) {
+	public void setActive(final Boolean val) {
 		this.active = val;
 	}
 
@@ -386,29 +387,27 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	}
 
 	@Override
-	public void setEnabled(Boolean val) {
+	public void setEnabled(final Boolean val) {
 		this.enabled = val;
-
 	}
 
-	public boolean hasRole(String role) {
-		if (!Objects.equals(this.roles,null)) {
-			for (UserRole userRole : this.roles) {
-				if (userRole.getRole().getCapitalizedRole().equalsIgnoreCase(role)) {
-					return true;
-				}
+	public List<PermissionDto> getPermissions() {
+		return this.permissions;
+	}
+
+	public void setPermissions(final List<PermissionDto> permissions) {
+		this.permissions = permissions;
+	}
+
+	public boolean isSuperAdmin() {
+		if (this.roles == null) {
+			return false;
+		}
+		for (final UserRole userRole : this.roles) {
+			if (userRole.getRole().getName().toUpperCase().equals(Role.SUPERADMIN)) {
+				return true;
 			}
 		}
-
 		return false;
 	}
-
-	public List<CropType> getCrops() {
-		return crops;
-	}
-
-	public void setCrops(final List<CropType> crops) {
-		this.crops = crops;
-	}
-
 }

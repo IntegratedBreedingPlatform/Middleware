@@ -2,10 +2,8 @@ package org.generationcp.middleware.utils.test;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
@@ -17,21 +15,20 @@ import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
-import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -42,12 +39,19 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.UserRole;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.generationcp.middleware.service.api.user.UserService;
+import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class IntegrationTestDataInitializer {
 
@@ -62,13 +66,14 @@ public class IntegrationTestDataInitializer {
 	private CVTermDao cvTermDao;
 	private SampleDao sampleDao;
 	private SampleListDao sampleListDao;
-	private UserDAO userDAO;
-	private PersonDAO personDAO;
 	private ProjectPropertyDao projectPropertyDao;
 
 	private DaoFactory daoFactory;
+	private UserService userService;
+	private WorkbenchDataManager workbenchDataManager;
 
-	public IntegrationTestDataInitializer(final HibernateSessionProvider hibernateSessionProvider) {
+	public IntegrationTestDataInitializer(final HibernateSessionProvider hibernateSessionProvider,
+		final HibernateSessionProvider workbenchSessionProvider) {
 		this.daoFactory = new DaoFactory(hibernateSessionProvider);
 		this.experimentDao = this.daoFactory.getExperimentDao();
 		this.geolocationDao = this.daoFactory.getGeolocationDao();
@@ -82,9 +87,9 @@ public class IntegrationTestDataInitializer {
 		this.cvTermDao = this.daoFactory.getCvTermDao();
 		this.sampleDao = this.daoFactory.getSampleDao();
 		this.sampleListDao = this.daoFactory.getSampleListDao();
-		this.userDAO = this.daoFactory.getUserDao();
-		this.personDAO = this.daoFactory.getPersonDAO();
 		this.projectPropertyDao = this.daoFactory.getProjectPropertyDAO();
+		this.workbenchDataManager = new WorkbenchDataManagerImpl(workbenchSessionProvider);
+		this.userService = new UserServiceImpl(workbenchSessionProvider);
 	}
 
 	public DmsProject createDmsProject(final String name, final String description, final DmsProject study, final DmsProject parent,
@@ -184,23 +189,23 @@ public class IntegrationTestDataInitializer {
 
 	}
 
-	public SampleList createTestSampleList(final String listName, final User user) {
+	public SampleList createTestSampleList(final String listName, final Integer userId) {
 
-		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user);
+		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(userId);
 		sampleList.setListName(listName);
 		sampleList.setDescription("DESCRIPTION-" + listName);
-		sampleList.setCreatedBy(user);
+		sampleList.setCreatedByUserId(userId);
 		this.sampleListDao.saveOrUpdate(sampleList);
 		return sampleList;
 
 	}
 
-	public List<Sample> addSamples(final List<ExperimentModel> experimentModels, final SampleList sampleList, final User user) {
+	public List<Sample> addSamples(final List<ExperimentModel> experimentModels, final SampleList sampleList, final Integer userId) {
 
 		final List<Sample> samples = new ArrayList<>();
 		int i = 1;
 		for (final ExperimentModel experimentModel : experimentModels) {
-			final Sample sample = SampleTestDataInitializer.createSample(sampleList, user);
+			final Sample sample = SampleTestDataInitializer.createSample(sampleList, userId);
 			sample.setSampleName("SAMPLE-" + sampleList.getListName() + ":" + i);
 			sample.setSampleBusinessKey("BUSINESS-KEY-" + sampleList.getListName() + i);
 			sample.setEntryNumber(i);
@@ -213,22 +218,6 @@ public class IntegrationTestDataInitializer {
 			i++;
 		}
 		return samples;
-	}
-
-	public User createUserForTesting() {
-
-		final Person person = PersonTestDataInitializer.createPerson("FirstName", "LastName");
-		this.personDAO.saveOrUpdate(person);
-
-		final User user = UserTestDataInitializer.createUser();
-		user.setName("AnyUserName");
-		user.setUserid(null);
-		user.setPersonid(person.getId());
-		this.userDAO.saveOrUpdate(user);
-		this.userDAO.refresh(user);
-
-		return user;
-
 	}
 
 	public void addPhenotypes(final List<ExperimentModel> experimentModels, final int traitId, final String value) {
@@ -293,4 +282,42 @@ public class IntegrationTestDataInitializer {
 		return observationUnitsSearchDTO;
 	}
 
+	public WorkbenchUser createUserForTesting() {
+
+		final Person person = new Person();
+		person.setInstituteId(1);
+		person.setFirstName("John");
+		person.setMiddleName("M");
+		final int randomNumber = new Random().nextInt();
+		person.setLastName("Doe");
+		person.setPositionName("King of Icewind Dale");
+		person.setTitle("His Highness");
+		person.setExtension("Ext");
+		person.setFax("Fax");
+		person.setEmail("lichking" + randomNumber + "@blizzard.com");
+		person.setNotes("notes");
+		person.setContact("Contact");
+		person.setLanguage(1);
+		person.setPhone("Phone");
+
+		this.userService.addPerson(person);
+
+		final WorkbenchUser workbenchUser = new WorkbenchUser();
+		workbenchUser.setInstalid(1);
+		workbenchUser.setStatus(1);
+		workbenchUser.setAccess(1);
+		workbenchUser.setType(1);
+		workbenchUser.setName("user_test" + new Random().nextInt());
+		workbenchUser.setPassword("user_password");
+		workbenchUser.setPerson(person);
+		workbenchUser.setAssignDate(20150101);
+		workbenchUser.setCloseDate(20150101);
+		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, new Role(1, "Admin"))));
+		final List<CropType> crops = new ArrayList<>();
+		crops.add(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
+		this.userService.addUser(workbenchUser);
+
+		return workbenchUser;
+
+	}
 }

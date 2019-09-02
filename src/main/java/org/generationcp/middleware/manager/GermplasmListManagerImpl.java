@@ -13,13 +13,11 @@ package org.generationcp.middleware.manager;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
@@ -39,10 +37,12 @@ import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,6 +64,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	public static final String TRUNCATED = "(truncated)";
 
 	private DaoFactory daoFactory;
+
+	@Resource
+	private UserService userService;
+
+	@Resource
+	private ListDataProjectSaver ListDataProjectSaver;
 
 	/**
 	 * Caches the udflds table. udflds should be small so this cache should be fine in terms of size. The string is the database url. So the
@@ -500,22 +506,22 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		final Map<Integer, GermplasmListMetadata> listMetadata = new HashMap<>();
 
 		final List<Object[]> queryResults = this.daoFactory.getGermplasmListDAO().getAllListMetadata(listIdsFromGermplasmList);
-
+		final List<Integer> userIds = new ArrayList<>();
 		for (final Object[] row : queryResults) {
 			final Integer listId = (Integer) row[0];
 			final Integer entryCount = (Integer) row[1];
-			final String ownerUser = (String) row[2];
-			final String ownerFirstName = (String) row[3];
-			final String ownerLastName = (String) row[4];
-
-			String owner = "";
-			if (StringUtils.isNotBlank(ownerFirstName) && StringUtils.isNotBlank(ownerLastName)) {
-				owner = ownerFirstName + " " + ownerLastName;
-			} else {
-				owner = Strings.nullToEmpty(ownerUser);
+			final Integer ownerId = (Integer) row[2];
+			userIds.add(ownerId);
+			listMetadata.put(listId, new GermplasmListMetadata(listId, entryCount, ownerId));
+		}
+		// Retrieve list owner names from workbench db
+		if (!userIds.isEmpty()) {
+			final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
+			for (final GermplasmListMetadata data : listMetadata.values()) {
+				if (data.getOwnerId() != null) {
+					data.setOwnerName(userIDFullNameMap.get(data.getOwnerId()));
+				}
 			}
-
-			listMetadata.put(listId, new GermplasmListMetadata(listId, entryCount, owner));
 		}
 		return listMetadata;
 	}
@@ -666,12 +672,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	private void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
 		final List<GermplasmList> germplasmLists = this.daoFactory.getGermplasmListDAO().getByListRef(listId);
 		for (final GermplasmList germplasmList : germplasmLists) {
-			this.getListDataProjectSaver().performListDataProjectEntriesDeletion(germplasms, germplasmList.getId());
+			this.ListDataProjectSaver.performListDataProjectEntriesDeletion(germplasms, germplasmList.getId());
 		}
-	}
-
-	private final ListDataProjectSaver getListDataProjectSaver() {
-		return new ListDataProjectSaver(this.sessionProvider);
 	}
 
 	@Override

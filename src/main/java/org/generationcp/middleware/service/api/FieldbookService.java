@@ -347,21 +347,6 @@ public interface FieldbookService {
 	List<ValueReference> getAllNurseryTypes(String programUUID);
 
 	/**
-	 * Gets the all persons.
-	 *
-	 * @return all persons
-	 */
-	List<Person> getAllPersons();
-
-	/**
-	 * Returns all Persons from local sorted by first-middle-last followed by
-	 * all persons from local sorted by first-middle-last.
-	 *
-	 * @return the all persons ordered by local central
-	 */
-	List<Person> getAllPersonsOrderedByLocalCentral();
-
-	/**
 	 * Count plots with plants selectedof nursery.
 	 *
 	 * @param nurseryId
@@ -492,15 +477,6 @@ public interface FieldbookService {
 	 * @return the location by id
 	 */
 	Location getLocationById(int id);
-
-	/**
-	 * Get person by id.
-	 *
-	 * @param id
-	 *            the id
-	 * @return the person by id
-	 */
-	Person getPersonById(int id);
 
 	/**
 	 * get the dataset id of the measurement dataset of the study.

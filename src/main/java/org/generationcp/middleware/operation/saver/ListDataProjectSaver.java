@@ -5,18 +5,22 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.Util;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ListDataProjectSaver {
 
 	public static final int DEFAULT_ACTIVE = 1;
-	private Saver saver;
+
+	@Resource
+	private StudyDataManager studyDataManager;
 
 	private DaoFactory daoFactory;
 
@@ -25,12 +29,12 @@ public class ListDataProjectSaver {
 	}
 
 	public ListDataProjectSaver(final HibernateSessionProvider sessionProvider) {
-		this.saver = new Saver(sessionProvider);
-		daoFactory = new DaoFactory(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
-	public int saveOrUpdateListDataProject(final int projectId, final GermplasmListType type, final Integer originalListId, final List<ListDataProject> listDatas,
-			final int userId) {
+	public int saveOrUpdateListDataProject(final int projectId, final GermplasmListType type, final Integer originalListId,
+		final List<ListDataProject> listDatas,
+		final int userId) {
 
 		final boolean isAdvanced = type == GermplasmListType.ADVANCED || GermplasmListType.isCrosses(type);
 		GermplasmList snapList = isAdvanced ? null : this.getGermplasmList(projectId, type);
@@ -50,13 +54,13 @@ public class ListDataProjectSaver {
 
 		if (!isCreate && !isAdvanced) {
 			// delete old list data projects
-			this.saver.getListDataProjectDAO().deleteByListId(snapList.getId());
+			this.daoFactory.getListDataProjectDAO().deleteByListId(snapList.getId());
 		}
 
 		if (listDatas != null) {
 			for (final ListDataProject listDataProject : listDatas) {
 				this.prepareListDataProjectForSaving(listDataProject, snapList);
-				this.saver.getListDataProjectDAO().save(listDataProject);
+				this.daoFactory.getListDataProjectDAO().save(listDataProject);
 			}
 		}
 
@@ -65,7 +69,7 @@ public class ListDataProjectSaver {
 
 	protected GermplasmList createInitialGermplasmList(final int projectId, final GermplasmListType type) {
 
-		final DmsProject project = this.saver.getStudyDataManager().getProject(projectId);
+		final DmsProject project = this.studyDataManager.getProject(projectId);
 		final GermplasmList snapList = new GermplasmList();
 		snapList.setProjectId(projectId);
 		snapList.setProgramUUID(project.getProgramUUID());
@@ -151,7 +155,7 @@ public class ListDataProjectSaver {
 	}
 
 	public void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
-		final ListDataProjectDAO listDataProjectDAO = this.saver.getListDataProjectDAO();
+		final ListDataProjectDAO listDataProjectDAO = this.daoFactory.getListDataProjectDAO();
 		for (final Integer gid : germplasms) {
 			final ListDataProject listDataProject = listDataProjectDAO.getByListIdAndGid(listId, gid);
 			this.deleteListDataProject(listDataProject);
@@ -170,14 +174,14 @@ public class ListDataProjectSaver {
 	private void deleteListDataProject(final ListDataProject listDataProject) {
 		try {
 			if (listDataProject != null) {
-				this.saver.getListDataProjectDAO().makeTransient(listDataProject);
+				this.daoFactory.getListDataProjectDAO().makeTransient(listDataProject);
 			}
 
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while deleting List Data Project: ListDataProjectSaver.deleteListDataProject(listDataProject="
-							+ listDataProject + "): " + e.getMessage(), e);
+				"Error encountered while deleting List Data Project: ListDataProjectSaver.deleteListDataProject(listDataProject="
+					+ listDataProject + "): " + e.getMessage(), e);
 		}
 
 	}
@@ -188,7 +192,7 @@ public class ListDataProjectSaver {
 
 			for (final ListDataProject germplasmListData : listDataProjects) {
 
-				final ListDataProject recordSaved = this.saver.getListDataProjectDAO().saveOrUpdate(germplasmListData);
+				final ListDataProject recordSaved = this.daoFactory.getListDataProjectDAO().saveOrUpdate(germplasmListData);
 				idGermplasmListDataSaved.add(recordSaved.getListDataProjectId());
 
 			}
@@ -196,15 +200,11 @@ public class ListDataProjectSaver {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving List Data Project: ListDataProjectSaver.updateListDataProject(listDataProjects="
-							+ listDataProjects + "): " + e.getMessage(), e);
+				"Error encountered while saving List Data Project: ListDataProjectSaver.updateListDataProject(listDataProjects="
+					+ listDataProjects + "): " + e.getMessage(), e);
 		}
 
 		return idGermplasmListDataSaved;
-	}
-
-	public void setSaver(final Saver saver) {
-		this.saver = saver;
 	}
 
 	public void setDaoFactory(final DaoFactory daoFactory) {

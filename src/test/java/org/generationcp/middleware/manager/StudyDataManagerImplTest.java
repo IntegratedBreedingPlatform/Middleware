@@ -45,20 +45,17 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
-import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -66,7 +63,9 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyFilters;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
 import org.junit.Assert;
@@ -112,10 +111,19 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private LocationDataManager locationManager;
 
 	@Autowired
-	private UserDataManager userDataManager;
+	private UserService userService;
+
+	@Autowired
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
+	@Autowired
+	private DataSetBuilder datasetBuilder;
+
+	@Autowired
+	private TrialEnvironmentBuilder trialEnvironmentBuilder;
 
 	private Project commonTestProject;
-	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
 	private static CrossExpansionProperties crossExpansionProperties;
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
@@ -124,10 +132,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
-		if (this.workbenchTestDataUtil == null) {
-			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
-			this.workbenchTestDataUtil.setUpWorkbench();
-		}
+		this.manager.setUserService(this.userService);
+
+		this.workbenchTestDataUtil.setUpWorkbench();
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
@@ -138,7 +145,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		StudyDataManagerImplTest.crossExpansionProperties = new CrossExpansionProperties(mockProperties);
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
-			this.locationManager, this.userDataManager);
+			this.locationManager);
 
 		this.studyReference = this.studyTDI.addTestStudy();
 
@@ -148,6 +155,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		studyType.setName(StudyTypeDto.TRIAL_NAME);
 		studyType.setCvTermId(10010);
 		studyType.setVisible(true);
+
+		this.manager.setDataSetBuilder(this.datasetBuilder);
+		this.manager.setTrialEnvironmentBuilder(this.trialEnvironmentBuilder);
 	}
 
 	@Test
@@ -177,13 +187,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudiesByFolder() {
-		final StudyResultSet resultSet = this.manager.searchStudies(new ParentFolderStudyQueryFilter(1), 5);
-		// We are sure that the result set will return at least one study, the study that we added in the setup
-		Assert.assertTrue("The size should be greater than 0.", resultSet.size() > 0);
-	}
-
-	@Test
 	public void testSearchStudiesForName() throws Exception {
 		// Study search query expect datasets for studies to be returned
 		this.studyTDI.addTestDataset(this.studyReference.getId());
@@ -193,13 +196,34 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		filter.setProgramUUID(this.studyReference.getProgramUUID());
 
 		filter.setName(RandomStringUtils.randomAlphanumeric(100));
-		StudyResultSet resultSet = this.manager.searchStudies(filter, 10);
-		Assert.assertEquals("The size should be zero since the study is not existing", 0, resultSet.size());
+		List<StudyReference> studyReferences = this.manager.searchStudies(filter);
+		Assert.assertEquals("The size should be zero since the study is not existing", 0, studyReferences.size());
 
 		filter.setName(this.studyReference.getName());
-		resultSet = this.manager.searchStudies(filter, 10);
+		studyReferences = this.manager.searchStudies(filter);
 
-		Assert.assertTrue("The study search by name results should contain test study", resultSet.size() > 0);
+		Assert.assertTrue("The study search by name results should contain test study", studyReferences.size() > 0);
+		// The owner ID is not retrieved in query hence, owner name is null too
+		for (final StudyReference study : studyReferences) {
+			Assert.assertNull(study.getOwnerId());
+			Assert.assertNull(study.getOwnerName());
+		}
+	}
+
+	@Test
+	public void testGetInstanceIdLocationIdMap() throws Exception {
+		final StudyReference newStudy = this.studyTDI.addTestStudy();
+		final Integer studyId = newStudy.getId();
+		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
+		final Random random = new Random();
+		final String locationId = String.valueOf(random.nextInt());
+		final String season = String.valueOf(random.nextInt());
+		this.studyTDI.addEnvironmentDataset(this.crop, studyId, locationId, season);
+
+		this.manager.getActiveSession().flush();
+
+		final Map<Integer, String> instanceIdLocationIdMap = this.manager.getInstanceIdLocationIdMap(Arrays.asList(this.studyTDI.getGeolocationId()));
+		Assert.assertEquals(locationId, instanceIdLocationIdMap.get(this.studyTDI.getGeolocationId()));
 	}
 
 	@Test
@@ -211,8 +235,13 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		filter.setStartDate(new Integer(StudyTestDataInitializer.START_DATE));
 		filter.setProgramUUID(this.studyReference.getProgramUUID());
 
-		final StudyResultSet resultSet = this.manager.searchStudies(filter, 10);
-		Assert.assertTrue("The study search by start date results should contain test study", resultSet.size() > 0);
+		final List<StudyReference> studyReferences = this.manager.searchStudies(filter);
+		Assert.assertTrue("The study search by start date results should contain test study", studyReferences.size() > 0);
+		// The owner ID is not retrieved in query hence, owner name is null too
+		for (final StudyReference study : studyReferences) {
+			Assert.assertNull(study.getOwnerId());
+			Assert.assertNull(study.getOwnerName());
+		}
 	}
 
 	@Test
@@ -233,9 +262,15 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getActiveSession().flush();
 
 		final GidStudyQueryFilter filter = new GidStudyQueryFilter(gid);
-		final StudyResultSet resultSet = this.manager.searchStudies(filter, 50);
+		final List<StudyReference> studyReferences = this.manager.searchStudies(filter);
 		// We are sure that the result set will contain the test study we added in the set up
-		Assert.assertTrue("The size should be greater than 0", resultSet.size() > 0);
+		Assert.assertTrue("The size should be greater than 0", studyReferences.size() > 0);
+		for (final StudyReference study : studyReferences) {
+			Assert.assertNotNull(study.getOwnerId());
+			final WorkbenchUser workbenchUser = this.userService.getUserById(study.getOwnerId());
+			Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
+
+		}
 	}
 
 	@Test
@@ -287,9 +322,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 				Assert.assertEquals(this.studyReference.getStudyType(), study.getStudyType());
 				Assert.assertFalse(study.getIsLocked());
 				Assert.assertEquals(this.studyReference.getOwnerId(), study.getOwnerId());
-				final User user = this.userDataManager.getUserById(this.studyReference.getOwnerId());
-				final Person person = this.userDataManager.getPersonById(user.getPersonid());
-				Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), study.getOwnerName());
+				final WorkbenchUser workbenchUser = this.userService.getUserById(this.studyReference.getOwnerId());
+				Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
 			}
 		}
 	}
@@ -883,9 +917,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.studyReference.getStudyType(), studyFromDB.getStudyType());
 		Assert.assertFalse(studyFromDB.getIsLocked());
 		Assert.assertEquals(this.studyReference.getOwnerId(), studyFromDB.getOwnerId());
-		final User user = this.userDataManager.getUserById(this.studyReference.getOwnerId());
-		final Person person = this.userDataManager.getPersonById(user.getPersonid());
-		Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), studyFromDB.getOwnerName());
+		final WorkbenchUser workbenchUser = this.userService.getUserById(this.studyReference.getOwnerId());
+		Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), studyFromDB.getOwnerName());
 	}
 
 	@Test

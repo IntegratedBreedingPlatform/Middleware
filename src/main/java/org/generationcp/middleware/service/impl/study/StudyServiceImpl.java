@@ -16,9 +16,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.Service;
@@ -95,8 +93,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private StudyDataManager studyDataManager;
 
-	private UserDataManager userDataManager;
-
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
 	private DaoFactory daoFactory;
@@ -114,8 +110,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 			this.getOntologyPropertyDataManager(), this.getOntologyScaleDataManager(), this.getFormulaService(), sessionProvider);
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
 		this.measurementVariableService = new MeasurementVariableServiceImpl(currentSession);
-
-		this.userDataManager = new UserDataManagerImpl(sessionProvider);
 
 		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {
 
@@ -539,9 +533,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 				studyDetailsDto.setMetadata(studyMetadata);
 				final List<UserDto> users = new ArrayList<>();
 				final Map<String, String> properties = new HashMap<>();
-
-				users.addAll(this.userDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
-				users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
+				users.addAll(this.studyDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
+				users.addAll(this.studyDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
 				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(geolocationId));
 				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
 				studyDetailsDto.setContacts(users);
@@ -586,10 +579,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
-	}
-
-	public void setUserDataManager(final UserDataManager userDataManager) {
-		this.userDataManager = userDataManager;
 	}
 
 	String getYearFromStudy(final int studyIdentifier) {
