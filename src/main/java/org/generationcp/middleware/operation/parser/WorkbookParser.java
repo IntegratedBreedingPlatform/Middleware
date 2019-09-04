@@ -212,7 +212,7 @@ public class WorkbookParser {
 		// Move to the next line
 		this.currentRowZeroBased++;
 
-		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.STUDY_DETAILS.getName()));
+		conditions.addAll(this.readMeasurementVariables(excelWorkbook, Section.STUDY_DETAILS.getName()));
 		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.EXPERIMENTAL_DESIGN.getName()));
 		conditions.addAll(this.readMeasurementVariables(excelWorkbook, Section.ENVIRONMENT_DETAILS.getName()));
 		constants.addAll(this.readMeasurementVariables(excelWorkbook, Section.ENVIRONMENTAL_CONDITIONS.getName()));
@@ -221,6 +221,7 @@ public class WorkbookParser {
 
 		if (isReadTraits) {
 			traits.addAll(this.readMeasurementVariables(excelWorkbook, Section.TRAIT.getName()));
+			traits.addAll(this.readMeasurementVariables(excelWorkbook, Section.SELECTIONS.getName()));
 		}
 
 		workbook.setFactors(factors);
