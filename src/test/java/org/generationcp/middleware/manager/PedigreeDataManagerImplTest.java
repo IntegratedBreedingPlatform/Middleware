@@ -29,6 +29,9 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	private Germplasm crossWithKnownParents;
 	
 	private Germplasm germplasmWithPolyCrosses;
+
+	private Germplasm maternalGrandParent1;
+	private Germplasm maternalGrandParent2;
 	
 	private Germplasm femaleParent;
 
@@ -36,8 +39,25 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	
 	@Before
 	public void setup() {
+		if (this.maternalGrandParent1 == null){
+			this.maternalGrandParent1 = GermplasmTestDataInitializer.createGermplasm(1);
+			this.germplasmManager.save(this.maternalGrandParent1);
+			this.maternalGrandParent1.getPreferredName().setGermplasmId(this.maternalGrandParent1.getGid());
+			this.germplasmManager.addGermplasmName(this.maternalGrandParent1.getPreferredName());
+
+		}
+
+		if (this.maternalGrandParent2 == null){
+			this.maternalGrandParent2 = GermplasmTestDataInitializer.createGermplasm(1);
+			this.germplasmManager.save(this.maternalGrandParent2);
+			this.maternalGrandParent2.getPreferredName().setGermplasmId(this.maternalGrandParent2.getGid());
+			this.germplasmManager.addGermplasmName(this.maternalGrandParent2.getPreferredName());
+		}
+
 		if (this.femaleParent == null){
 			this.femaleParent = GermplasmTestDataInitializer.createGermplasm(1);
+			this.femaleParent.setGpid1(this.maternalGrandParent1.getGid());
+			this.femaleParent.setGpid2(this.maternalGrandParent2.getGid());
 			this.germplasmManager.save(this.femaleParent);
 			this.femaleParent.getPreferredName().setGermplasmId(this.femaleParent.getGid());
 			this.germplasmManager.addGermplasmName(this.femaleParent.getPreferredName());
@@ -82,6 +102,31 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		final Germplasm unknownGermplasm = nodes.get(1).getGermplasm();
 		Assert.assertEquals(0, unknownGermplasm.getGid().intValue());
 		Assert.assertEquals(Name.UNKNOWN, unknownGermplasm.getPreferredName().getNval());
+	}
+
+	@Test
+	public void testGeneratePedigreeTreeWithUnknownMaleParentIncludingDerivativeLines() {
+		this.crossWithUnknownParent.setGnpgs(-1);
+		this.germplasmManager.save(this.crossWithUnknownParent);
+
+		final GermplasmPedigreeTree tree = this.pedigreeManager.generatePedigreeTree(this.crossWithUnknownParent.getGid(), 3, true);
+		Assert.assertEquals(this.crossWithUnknownParent, tree.getRoot().getGermplasm());
+		final List<GermplasmPedigreeTreeNode> nodes = tree.getRoot().getLinkedNodes();
+		Assert.assertEquals(1, nodes.size());
+		final Germplasm femaleGermplasm = nodes.get(0).getGermplasm();
+ 		Assert.assertEquals(this.crossWithUnknownParent.getGpid1(), femaleGermplasm.getGid());
+		Assert.assertEquals(this.femaleParent.getGid(), femaleGermplasm.getGid());
+		Assert.assertEquals(this.femaleParent.getPreferredName().getNval(), femaleGermplasm.getPreferredName().getNval());
+
+		final List<GermplasmPedigreeTreeNode> grandparentNodes = nodes.get(0).getLinkedNodes();
+		Assert.assertEquals(2, grandparentNodes.size());
+		final Germplasm maternalGP1 = grandparentNodes.get(0).getGermplasm();
+		Assert.assertEquals(this.maternalGrandParent1.getGid(), maternalGP1.getGid());
+		Assert.assertEquals(this.maternalGrandParent1.getPreferredName().getNval(), maternalGP1.getPreferredName().getNval());
+		final Germplasm maternalGP2 = grandparentNodes.get(1).getGermplasm();
+		Assert.assertEquals(this.maternalGrandParent2.getGid(), maternalGP2.getGid());
+		Assert.assertEquals(this.maternalGrandParent2.getPreferredName().getNval(), maternalGP2.getPreferredName().getNval());
+
 	}
 
 	@Test
