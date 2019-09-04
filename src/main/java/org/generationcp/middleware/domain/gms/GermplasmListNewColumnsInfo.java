@@ -1,14 +1,14 @@
 
 package org.generationcp.middleware.domain.gms;
 
+import org.generationcp.middleware.util.Debug;
+
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.generationcp.middleware.util.Debug;
 
 public class GermplasmListNewColumnsInfo implements Serializable {
 
@@ -114,7 +114,7 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 	
 	public Set<String> getColumns() {
 		if (this.columnValuesMap != null) {
-			return this.columnValuesMap.keySet();
+			return new LinkedHashSet(this.columnValuesMap.keySet());
 		}
 		return new HashSet<>();
 	}
