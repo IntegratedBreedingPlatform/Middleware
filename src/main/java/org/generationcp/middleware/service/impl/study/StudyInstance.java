@@ -9,6 +9,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class StudyInstance {
 
 	private int instanceDbId;
+	private Integer locationId;
 	private String locationName;
 	private String locationAbbreviation;
 	private String customLocationAbbreviation;
@@ -19,8 +20,10 @@ public class StudyInstance {
 
 	}
 
-	public StudyInstance(final int instanceDbId, final String locationName, final String locationAbbreviation, final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldMap) {
+	public StudyInstance(final int instanceDbId, final Integer locationId, final String locationName, final String locationAbbreviation,
+		final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldMap) {
 		this.instanceDbId = instanceDbId;
+		this.locationId = locationId;
 		this.locationName = locationName;
 		this.locationAbbreviation = locationAbbreviation;
 		this.instanceNumber = instanceNumber;
@@ -60,6 +63,13 @@ public class StudyInstance {
 		this.instanceNumber = instanceNumber;
 	}
 
+	public Integer getLocationId() {
+		return this.locationId;
+	}
+
+	public void setLocationId(final Integer locationId) {
+		this.locationId = locationId;
+	}
 
 	public String getCustomLocationAbbreviation() {
 		return customLocationAbbreviation;

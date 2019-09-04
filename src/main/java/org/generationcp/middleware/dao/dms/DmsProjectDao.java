@@ -1135,7 +1135,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		try {
 			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
-				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
+				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as LOCATION_ID, \n"  // 8190 = cvterm for LOCATION_ID
+				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" +
 				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
 				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" +
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
@@ -1152,6 +1153,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("datasetId", datasetId);
 			query.addScalar("INSTANCE_DBID", new IntegerType());
+			query.addScalar("LOCATION_ID", new IntegerType());
 			query.addScalar("LOCATION_NAME", new StringType());
 			query.addScalar("LOCATION_ABBR", new StringType());
 			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
@@ -1164,7 +1166,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				final Object[] row = (Object[]) result;
 				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[4]);
 				final StudyInstance instance =
-					new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[5], (String) row[3], hasFieldmap);
+					new StudyInstance((Integer) row[0], (Integer) row[1] ,(String) row[2], (String) row[3], (Integer) row[6], (String) row[4], hasFieldmap);
 				instances.add(instance);
 			}
 			return instances;
