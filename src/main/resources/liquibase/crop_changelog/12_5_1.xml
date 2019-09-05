@@ -105,11 +105,9 @@
 			(37485,1105,30175,1110),
 			(37486,1105,30176,1110);
 
-			-- Delete variable and scale. Duplicate of 8371 Crop_season_Code
 			UPDATE cvterm SET is_obsolete=1 WHERE cvterm_id=22529;
 			UPDATE cvterm SET is_obsolete=1 WHERE cvterm_id=30168;
 
-			-- scale NOT used by any variable
 			UPDATE cvterm SET is_obsolete=1 WHERE cvterm_id=26581; 
 			SET FOREIGN_KEY_CHECKS=1;
 		</sql>
