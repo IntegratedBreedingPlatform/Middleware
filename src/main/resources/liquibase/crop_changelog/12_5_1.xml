@@ -129,7 +129,6 @@
 			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23974,'23982','1-9 nodulation score');
 			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23975,'23940','1-9 visual score');
 
-			-- MarDam_EstDeg_1to4
 			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24145,23972,'1','1=mild symptoms',NULL,0,0);
 			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24146,23972,'2','2=moderate symptoms',NULL,0,0);
 			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24147,23972,'3','3=heavy infestation',NULL,0,0);
@@ -463,6 +462,27 @@
 			
 			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3040, 1190, 17040, 3016);
 		    SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+	
+		<changeSet author="corina" id="v12.5.1-16">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_bean_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+			<sqlCheck expectedResult="0">SELECT COUNT(*) > 1 FROM cvterm_relationship WHERE type_id=1190 AND subject_id=22026;</sqlCheck>
+		</preConditions>
+		<comment>
+			Create categories for bean scale 22026 Testigo
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+		   SET FOREIGN_KEY_CHECKS=0;
+		   
+		   REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (70587, 20018, '0', '0=IS NOT a CHECK', NULL, 0, 0);
+		   REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (70588, 20018, '1', '1=IS a CHECK', NULL, 0, 0);
+ 
+		    REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (70851, 1190, 22026, 70587);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (70852, 1190, 22026, 70588);
+
+		   SET FOREIGN_KEY_CHECKS=1;
 		</sql>
 	</changeSet>
 	
