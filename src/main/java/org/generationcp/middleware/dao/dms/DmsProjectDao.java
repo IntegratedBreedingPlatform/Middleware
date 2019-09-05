@@ -1164,7 +1164,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final List<StudyInstance> instances = new ArrayList<>();
 			for (final Object result : queryResults) {
 				final Object[] row = (Object[]) result;
-				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[4]);
+				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[5]);
 				final StudyInstance instance =
 					new StudyInstance((Integer) row[0], (Integer) row[1] ,(String) row[2], (String) row[3], (Integer) row[6], (String) row[4], hasFieldmap);
 				instances.add(instance);
