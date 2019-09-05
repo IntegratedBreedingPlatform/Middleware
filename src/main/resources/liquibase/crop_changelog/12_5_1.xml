@@ -358,7 +358,7 @@
 		</sql>
 	</changeSet>
 	
-		<changeSet author="corina" id="v12.5.1-11">
+	<changeSet author="corina" id="v12.5.1-11">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">select case when ('ibdbv2_cassava_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
 		</preConditions>
@@ -372,6 +372,20 @@
 			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (19313, 1225, 15120, 1340);
 
 			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="corina" id="v12.5.1-12">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_algodao_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT COUNT(*) > 0 FROM cvterm WHERE cv_id=1020 AND cvterm_id=20001 AND `name`="";</sqlCheck>
+		</preConditions>
+		<comment>
+			Set blank method name of 20001 to 'Estimativa'.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+		   REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`) VALUES (20001,1020,'Estimativa','Estimativa');
+		   UPDATE cvterm SET definition = REPLACE(definition,"BY  IN","::") WHERE cv_id=1040 AND definition LIKE '%BY  IN%';
 		</sql>
 	</changeSet>
 	
