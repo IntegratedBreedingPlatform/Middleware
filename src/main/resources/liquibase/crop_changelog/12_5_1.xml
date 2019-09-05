@@ -389,5 +389,63 @@
 		</sql>
 	</changeSet>
 	
+	<changeSet author="corina" id="v12.5.1-13">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_maize_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+			<sqlCheck expectedResult="0">SELECT COUNT(*) > 1 FROM cvterm_relationship WHERE type_id=1190 AND subject_id=20201;</sqlCheck>
+		</preConditions>
+		<comment>
+			Create categories for maize scale 20201 "Score (1-5)"
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+		   SET FOREIGN_KEY_CHECKS=0;
+		   
+		   REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (60200, '20201', 'Categorical values for Score 1-5');
+		
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62601, 60200, '1', '1=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62602, 60200, '2', '2=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62603, 60200, '3', '3=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62604, 60200, '4', '4=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62605, 60200, '5', '5=', NULL, 0, 0);
+
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40600, 1190, 20201, 62601);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40601, 1190, 20201, 62602);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40602, 1190, 20201, 62603);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40603, 1190, 20201, 62604);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40604, 1190, 20201, 62605);
+
+		   SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="corina" id="v12.5.1-14">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_maize_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+			<sqlCheck expectedResult="0">SELECT COUNT(*) > 1 FROM cvterm_relationship WHERE type_id=1190 AND subject_id=62182;</sqlCheck>
+		</preConditions>
+		<comment>
+			Create categories for maize scale 62182 1-5 Anthocyanin coloration scale
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+		   SET FOREIGN_KEY_CHECKS=0;
+		   
+		   REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (60201, '62182', 'Categorical values for 1-5 Anthocyanin coloration scale');
+
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62606, 60201, '1', '1=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62607, 60201, '2', '2=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62608, 60201, '3', '3=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62609, 60201, '4', '4=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62610, 60201, '5', '5=', NULL, 0, 0);
+
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40605, 1190, 62182, 62606);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40606, 1190, 62182, 62607);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40607, 1190, 62182, 62608);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40608, 1190, 62182, 62609);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40609, 1190, 62182, 62610);
+
+		   SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+	
 
 </databaseChangeLog>
