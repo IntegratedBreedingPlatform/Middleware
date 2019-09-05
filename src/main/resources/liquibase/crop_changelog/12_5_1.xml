@@ -281,27 +281,82 @@
 		<changeSet author="corina" id="v12.5.1-7">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
-				select count(*) from cvterm_relationship where type_id=1190 and subject_id in (6050,17278,17279,17280);
+				select count(*) from cvterm_relationship where type_id=1190 and subject_id=6050;
 			</sqlCheck>
 		</preConditions>
-		<comment> Create missing categories for categorical scales common to all crops. IBP-3019
+		<comment> Create dummy category for categorical scale 6050 Code for Project. IBP-3019
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+			
 			REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4012, '6050', 'Categorical values for Code for Project');
-			REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4013, '17278', 'Categorical values for Name of Mega_Environment');
-			REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4014, '17279', 'Categorical values for Code of FB_Type');
-            REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4015, '17280', 'Categorical values for Code of Trial_Type');
 			
 			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3013, 4012, 'P1', 'Project 1', NULL, 0, 0);
-			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3014, 4013, 'ME1', 'Mega_Environment 1', NULL, 0, 0);
-			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3015, 4014, 'FB1', 'FB_Type 1', NULL, 0, 0);
-			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3016, 4015, 'TT1', 'Trial_Type 1', NULL, 0, 0);
-			
+				
 			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3000, 1190, 6050, 3013);
-			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3010, 1190, 17278, 3014);
-			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3020, 1190, 17279, 3015);
-			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3030, 1190, 17280, 3016);
+			
+		    SET FOREIGN_KEY_CHECKS=1;
 		</sql>
 	</changeSet>
+	
+	<changeSet author="corina" id="v12.5.1-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm_relationship where type_id=1190 and subject_id=17278;
+			</sqlCheck>
+		</preConditions>
+		<comment> Create dummy category for categorical scale 17278 Name of Mega_Environment. IBP-3019
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+		
+			REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4013, '17278', 'Categorical values for Name of Mega_Environment');
+			
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3014, 4013, 'ME1', 'Mega_Environment 1', NULL, 0, 0);
+			
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3010, 1190, 17278, 3014);
+			
+			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="corina" id="v12.5.1-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm_relationship where type_id=1190 and subject_id=17279;
+			</sqlCheck>
+		</preConditions>
+		<comment> Create dummy category for categorical scale 17279 FB_Type. IBP-3019
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+			REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4014, '17279', 'Categorical values for Code of FB_Type');
+       	
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3015, 4014, 'FB1', 'FB_Type 1', NULL, 0, 0);
+				
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3020, 1190, 17279, 3015);
+		    SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="corina" id="v12.5.1-10">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm_relationship where type_id=1190 and subject_id=17040;
+			</sqlCheck>
+		</preConditions>
+		<comment> Create dummy category for categorical scale 17040 Score. IBP-3019
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+		    REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4015, '17280', 'Categorical values for Code of Trial_Type');
+			
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3016, 4015, 'TT1', 'Trial_Type 1', NULL, 0, 0);
+			
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3030, 1190, 17280, 3016);
+		    SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+	
 
 </databaseChangeLog>
