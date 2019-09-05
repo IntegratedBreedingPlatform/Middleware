@@ -27,27 +27,27 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			REPLACE INTO cv (cv_id,`name`,definition) VALUES 
-			(20425,'22464','COOP:Categorical values for Name of COOP'),
-			(20426,'22546','YLD_LOCAL:Categorical values for Code of YLD_LOCAL'),
-			(20427,'22547','YLD_NATL:Categorical values for Code of YLD_NATL'),
-			(20428,'22548','YLD_STATE:Categorical values for Code of YLD_STATE'),
-			(20429,'22485','LAND_INCLINATION:Categorical values for Code of LAND_INCLINATION'),
-			(20430,'22518','OTHER_FERTI_USED:Categorical values for Name of OTHER_FERTI_USED'),
-			(20431,'22534','STAGE_MOIST:Categorical values for Growth stage of STAGE_MOIST'),
-			(20432,'22479','H2O_SOURCE_TYPE:Categorical values for Code of H2O_SOURCE_TYPE'),
-			(20433,'22477','H2O_LEVEL_TYPE:Categorical values for Code of H2O_LEVEL_TYPE'),
-			(20434,'22533','STAGE_FLOOD:Categorical values for Growth stage'),
-			(20435,'22463','BUNDED:Categorical values for Code of BUNDED'),
-			(20436,'22482','INSPROT:Categorical values for Code of INSPROT'),
-			(20437,'22472','DISPROT:Categorical values for Code of DISPROT'),
-			(20438,'22470','DEG_MOIST:Categorical values for Code of DEG_MOIST'),
-			(20439,'21763','PA_HARV:Categorical values for IRGC Panicle Axis Code (Wild Rice)'),
-			(20440,'22520','OUT_TRAIT:Categorical values for Name of OUT_TRAIT'),
-			(20441,'22524','PEST_NAME:Categorical values for Name of PEST_NAME'),
-			(20442,'22473','GENE_CONSERVE:Categorical values for Code of GENE_CONSERVE'),
-			(20443,'22519','OTHER_PURPOSE:Categorical values for Name of OTHER_PURPOSE'),
-			(20444,'22528','SCREEN_STRESS:Categorical values for Name of SCREEN_STRESS'),
-			(20445,'22481','HYBRID_TRAIT:Categorical values for Name of HYBRID_TRAIT');
+			(20425,'30153','Categorical values for Name of COOP'),
+			(20426,'30177','Categorical values for Code of YLD_LOCAL'),
+			(20427,'30178','Categorical values for Code of YLD_NATL'),
+			(20428,'30179','Categorical values for Code of YLD_STATE'),
+			(20429,'30162','Categorical values for Code of LAND_INCLINATION'),
+			(20430,'30163','Categorical values for Name of OTHER_FERTI_USED'),
+			(20431,'30169','Categorical values for Growth stage of STAGE_MOIST'),
+			(20432,'30159','Categorical values for Code of H2O_SOURCE_TYPE'),
+			(20433,'30158','Categorical values for Code of H2O_LEVEL_TYPE'),
+			(20434,'22246','Categorical values for Growth stage'),
+			(20435,'30152','Categorical values for Code of BUNDED'),
+			(20436,'30161','Categorical values for Code of INSPROT'),
+			(20437,'30156','Categorical values for Code of DISPROT'),
+			(20438,'30155','Categorical values for Code of DEG_MOIST'),
+			(20439,'21674','Categorical values for IRGC Panicle Axis Code (Wild Rice)'),
+			(20440,'30165','Categorical values for Name of OUT_TRAIT'),
+			(20441,'30166','Categorical values for Name of PEST_NAME'),
+			(20442,'30157','Categorical values for Code of GENE_CONSERVE'),
+			(20443,'30164','Categorical values for Name of OTHER_PURPOSE'),
+			(20444,'30167','Categorical values for Name of SCREEN_STRESS'),
+			(20445,'30160','Categorical values for Name of HYBRID_TRAIT');
 			
 			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES 
 			(30208,20425,'1','1=Code 1',NULL,0,0),
@@ -125,10 +125,10 @@
 		<sql dbms="mysql" splitStatements="true">
 			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (28998,1105,24097,1120); -- PREV_CROP
  
-			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23972,'23973','1-4 rating scale');
-			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23973,'23974','1-9 rating scale');
-			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23974,'23978','1-9 nodulation score');
-			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23975,'23980','1-9 visual score');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23972,'23984','1-4 rating scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23973,'23983','1-9 rating scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23974,'23982','1-9 nodulation score');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23975,'23940','1-9 visual score');
 
 			-- MarDam_EstDeg_1to4
 			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24145,23972,'1','1=mild symptoms',NULL,0,0);
@@ -215,7 +215,8 @@
 		<sql dbms="mysql" splitStatements="true">
 		
 			SET FOREIGN_KEY_CHECKS=0;
-			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20699,'29187','0-5 TANSPOT field response scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20699,'27034','0-5 TANSPOT field response scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (18010,'17040','Disease pressure - visual assessment (score)');
 
 			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (17040, 1030, 'Disease pressure - visual assessment (score)','Disease pressure - visual assessment (score)', NULL,0,0);
 			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (38720,20699,'0','0= No visible infection on plants',NULL,0,0);
@@ -231,6 +232,7 @@
 			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (41584,1190,27034,38723);
 			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (41585,1190,27034,38724);
 			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (41586,1190,27034,38725);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (41587,1105,17040,1130);
 
 			UPDATE cvterm SET is_obsolete = 1 WHERE cvterm_id = 27020;
 			SET FOREIGN_KEY_CHECKS=1;
@@ -258,10 +260,10 @@
 			Apply fix on tobacco crop (Jira IBP-3011).
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20053,'20581','Cigarette aroma scale');
-			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20054,'20585','Cigarette combustibility scale');
-			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20055,'20589','Cigarette smoke flavour scale');
-			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20056,'20609','Cured leaf colour scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20053,'20580','Cigarette aroma scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20054,'20584','Cigarette combustibility scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20055,'20588','Cigarette smoke flavour scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20056,'20608','Cured leaf color scale scale');
 
 			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (20737,20053,'1','1=Code 1',NULL,0,0);
 			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (20738,20054,'1','1=Code 1',NULL,0,0);
