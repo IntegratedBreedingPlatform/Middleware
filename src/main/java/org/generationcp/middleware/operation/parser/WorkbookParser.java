@@ -77,6 +77,8 @@ public class WorkbookParser {
 	private static final String DESCRIPTION_SHEET_NAME = "Description";
 	private static final String OBSERVATION_SHEET_NAME = "Observation";
 
+	private static final int NUMBER_OF_COLUMNS = 9;
+
 	public static final int DEFAULT_MAX_ROW_LIMIT = 10000;
 
 	private int currentRowZeroBased;
@@ -354,7 +356,7 @@ public class WorkbookParser {
 			new StudyDetails(study, description, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null, Util
 				.getCurrentDateAsStringValue(), createdBy, false);
 
-		while (!WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
+		while (!WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, NUMBER_OF_COLUMNS)) {
 			this.currentRowZeroBased++;
 		}
 		return studyDetails;
@@ -398,18 +400,17 @@ public class WorkbookParser {
 			}
 
 			// Cannot have more than one empty row in the description worksheet.
-			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
+			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, NUMBER_OF_COLUMNS)) {
 				this.currentRowZeroBased++;
 			}
 
-			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
+			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, NUMBER_OF_COLUMNS)) {
 				this.errorMessages.add(new Message("error.to.many.empty.rows", name, Integer.toString(this.currentRowZeroBased - 1),
 					Integer.toString(this.currentRowZeroBased)));
 				return Collections.<MeasurementVariable>emptyList();
 			}
 
 			// Check if headers are correct
-
 			final boolean valid = this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased);
 
 			if (!valid) {
@@ -431,7 +432,7 @@ public class WorkbookParser {
 		// Moving to the next line is necessary as at this point one is on the previous row.
 		this.currentRowZeroBased++;
 
-		if (WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
+		if (WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, NUMBER_OF_COLUMNS)) {
 			this.errorMessages.add(new Message("error.to.many.empty.rows", sectionName, Integer.toString(this.currentRowZeroBased - 1),
 				Integer.toString(this.currentRowZeroBased)));
 			return;
@@ -446,7 +447,7 @@ public class WorkbookParser {
 			}
 		}
 
-		while (!WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
+		while (!WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, NUMBER_OF_COLUMNS)) {
 
 			final Integer displayRowNumber = this.currentRowZeroBased + 1;
 
