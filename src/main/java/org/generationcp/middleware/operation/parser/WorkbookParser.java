@@ -193,7 +193,7 @@ public class WorkbookParser {
 		final boolean isReadTraits, final String createdBy) throws WorkbookParserException {
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
-		this.rowIndex = 0;
+
 		this.errorMessages = new LinkedList<>();
 		this.setHasIncorrectDatatypeValue(false);
 		this.validateExistenceOfSheets(excelWorkbook);
@@ -208,27 +208,29 @@ public class WorkbookParser {
 		final List<MeasurementVariable> constants = new ArrayList<>();
 		final List<MeasurementVariable> traits = new ArrayList<>();
 
-		// Read the study details (metadata: name, objective, start/end date etc..)
-		workbook.setStudyDetails(this.readStudyDetails(excelWorkbook, createdBy));
-		this.incrementDescriptionSheetRowIndex(excelWorkbook);
 
-		// Section.STUDY_DETAILS is the "Study Settings" section in Study Manager
+		// Read the study details (metadata: name, objective, start/end date etc..)
+		// The first 7 rows are reserved from study details
+		workbook.setStudyDetails(this.readStudyDetails(excelWorkbook, createdBy));
+
+		// Assumes the first section Study Details (aka "Study Settings") is in row 8
+		this.rowIndex = 7;
 		conditions.addAll(this.readMeasurementVariables(excelWorkbook, Section.STUDY_DETAILS.getName()));
-		this.incrementDescriptionSheetRowIndex(excelWorkbook);
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
 		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.EXPERIMENTAL_DESIGN.getName()));
-		this.incrementDescriptionSheetRowIndex(excelWorkbook);
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
 		conditions.addAll(this.readMeasurementVariables(excelWorkbook, Section.ENVIRONMENT_DETAILS.getName()));
-		this.incrementDescriptionSheetRowIndex(excelWorkbook);
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
 		constants.addAll(this.readMeasurementVariables(excelWorkbook, Section.ENVIRONMENTAL_CONDITIONS.getName()));
-		this.incrementDescriptionSheetRowIndex(excelWorkbook);
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
 		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.GERMPLASM_DECRIPTORS.getName()));
-		this.incrementDescriptionSheetRowIndex(excelWorkbook);
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
 		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.OBSERVATION_UNIT.getName()));
 
 		if (isReadTraits) {
-			this.incrementDescriptionSheetRowIndex(excelWorkbook);
+			this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
 			traits.addAll(this.readMeasurementVariables(excelWorkbook, Section.TRAIT.getName()));
-			this.incrementDescriptionSheetRowIndex(excelWorkbook);
+			this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
 			traits.addAll(this.readMeasurementVariables(excelWorkbook, Section.SELECTIONS.getName()));
 		}
 
@@ -754,14 +756,9 @@ public class WorkbookParser {
 	}
 
 	private void incrementDescriptionSheetRowIndex(final Workbook workbook) {
-		this.rowIndex++;
-		final int checkEmptyRowLimit = 50;
-		int emptyRowCounter = 0;
-		while (!WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, NUMBER_OF_COLUMNS) && emptyRowCounter < checkEmptyRowLimit) {
+		while (WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, NUMBER_OF_COLUMNS)) {
 			this.rowIndex++;
-			emptyRowCounter++;
 		}
-		this.rowIndex++;
 	}
 
 	private static boolean rowIsEmpty(final Workbook wb, final Integer sheet, final Integer row, final int len) {
