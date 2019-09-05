@@ -358,5 +358,22 @@
 		</sql>
 	</changeSet>
 	
+		<changeSet author="corina" id="v12.5.1-11">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_cassava_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<comment>
+			Assign trait class to properties 15020 (Plant height),15120 (Harvest index)	
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+		    SET FOREIGN_KEY_CHECKS=0;
+			
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (19302, 1225, 15020, 1350);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (19313, 1225, 15120, 1340);
+
+			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+	
 
 </databaseChangeLog>
