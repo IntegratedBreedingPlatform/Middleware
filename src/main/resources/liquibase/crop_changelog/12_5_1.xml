@@ -342,10 +342,10 @@
 	<changeSet author="corina" id="v12.5.1-10">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
-				select count(*) from cvterm_relationship where type_id=1190 and subject_id=17040;
+				select count(*) from cvterm_relationship where type_id=1190 and subject_id=17280;
 			</sqlCheck>
 		</preConditions>
-		<comment> Create dummy category for categorical scale 17040 Score. IBP-3019
+		<comment> Create dummy category for categorical scale 17280 Code of Trial_Type. IBP-3019
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			SET FOREIGN_KEY_CHECKS=0;
@@ -444,6 +444,25 @@
 			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40609, 1190, 62182, 62610);
 
 		   SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="corina" id="v12.5.1-15">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm_relationship where type_id=1190 and subject_id=17040;
+			</sqlCheck>
+		</preConditions>
+		<comment> Create dummy category for categorical scale 17040 Score. IBP-3019
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+		    REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4016, '17040', 'Categorical values for Score');
+			
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3016, 4016, '1', '1=', NULL, 0, 0);
+			
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3040, 1190, 17040, 3016);
+		    SET FOREIGN_KEY_CHECKS=1;
 		</sql>
 	</changeSet>
 	
