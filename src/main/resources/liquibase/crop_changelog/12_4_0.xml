@@ -88,7 +88,7 @@
 			</not>
 		</preConditions>
 		<comment>
-			Insert into backup table any crop-specific users (matching by username) that are referenced in at least one record in cropa.
+			Insert into backup table any crop-specific users (matching by username) that are referenced in at least one record in crop database.
 			Insert into workbench database these crop-only users records.
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
