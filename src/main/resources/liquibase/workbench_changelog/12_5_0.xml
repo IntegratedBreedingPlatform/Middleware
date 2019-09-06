@@ -237,16 +237,16 @@
 			</not>
 		</preConditions>
 		<comment>
-			Alter table role to add role_type_id. Roles admin and super admin will become INSTANCE ROLE type, Roles Breeder and Technician will become CROP ROLE type, Role Readonly
-			will become PROGRAM ROLE type
+			Alter table role to add role_type_id. Role super admin will become INSTANCE ROLE type, Roles Breeder, Technician, Admin and ReadOnly will become PROGRAM ROLE type. Admin
+			role will be renamed to ProgramAdmin
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			ADD COLUMN role_type_id INT(11) NULL AFTER DESCRIPTION;
 
-			update role set role_type_id = 1 where id = 1;
-			update role set role_type_id = 2 where id = 2;
-			update role set role_type_id = 2 where id = 3;
+			update role set role_type_id = 3, name='ProgramAdmin' where id = 1;
+			update role set role_type_id = 3 where id = 2;
+			update role set role_type_id = 3 where id = 3;
 			update role set role_type_id = 3 where id = 4;
 			update role set role_type_id = 1 where id = 5;
 
@@ -637,13 +637,14 @@
 			INSERT INTO table role_permission
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			INSERT INTO role_permission (permission_id, role_id) VALUES (1,1);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (13,1);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (4,1);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (5,1);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (6,1);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (1,5);
-			INSERT INTO role_permission (permission_id, role_id) VALUES (10,2);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (4,2);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (5,2);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (6,2);
-			INSERT INTO role_permission (permission_id, role_id) VALUES (10,3);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (4,3);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (5,3);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (6,3);
@@ -651,7 +652,6 @@
 			INSERT INTO role_permission (permission_id, role_id) VALUES (17,4);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (18,4);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (19,4);
-			INSERT INTO role_permission (permission_id, role_id) VALUES (20,4);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (21,4);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (22,4);
 		</sql>
@@ -672,37 +672,16 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="clarysabel" id="v12.5.0-23">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<sqlCheck expectedResult="0">
-					select count(1) from users_roles
-					where role_id in (2, 3) and crop_name is null;
-				</sqlCheck>
-			</not>
-		</preConditions>
-		<comment>Expand breeder and technician roles rows to apply to all user crops, removing rows with empty crop_name</comment>
-		<sql dbms="mysql" splitStatements="true">
-			insert into users_roles (userid, role_id, crop_name)
-			select ur.userid, ur.role_id, uc.crop_name
-			from users_roles ur
-					 inner join users_crops uc on (uc.user_id = ur.userid)
-			where ur.role_id in (2, 3);
-			delete from users_roles
-			where role_id in (2, 3) and crop_name is null;
-		</sql>
-	</changeSet>
-
 	<changeSet author="clarysabel" id="v12.5.0-24">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
 					select count(1) from users_roles
-					where role_id = 4 and crop_name is null
+					where role_id in (1,2,3,4) and crop_name is null
 				</sqlCheck>
 			</not>
 		</preConditions>
-		<comment>Associate the readonly role to the crop and programs which user is member of, given that readonly role is a program role</comment>
+		<comment>Associate the breeder, technician, program admin and readonly roles to the crop and programs which user is member of, given that they are program roles</comment>
 		<sql dbms="mysql" splitStatements="true">
 			insert into users_roles (userid, role_id, crop_name, workbench_project_id)
 			select ur.userid, ur.role_id, wp.crop_type, wpui.project_id
@@ -710,10 +689,10 @@
 				   inner join workbench_project_user_info wpui on (wpui.user_id = ur.userid)
 				   inner join workbench_project wp on (wp.project_id = wpui.project_id)
 				   inner join workbench_crop wc on wp.crop_type = wc.crop_name
-			where ur.role_id = 4;
+			where ur.role_id in (1,2,3,4);
 			delete
 			from users_roles
-			where role_id = 4 and crop_name is null;
+			where role_id in (1,2,3,4) and crop_name is null;
 		</sql>
 	</changeSet>
 
