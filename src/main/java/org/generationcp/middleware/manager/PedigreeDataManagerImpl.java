@@ -220,14 +220,21 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 			// get parents of node
 			final Germplasm germplasmOfNode = node.getGermplasm();
 			final Integer maleGid = germplasmOfNode.getGpid2();
+			final Integer femaleGid = germplasmOfNode.getGpid1();
 			final boolean excludeDerivativeLines = false;
 			if (germplasmOfNode.getGnpgs() == -1) {
-				// Get and add the source germplasm
-				this.addNodeForKnownParent(node, level, maleGid, excludeDerivativeLines);
+				// Get and add the source germplasm, if it is unknown
+				if (maleGid != 0) {
+					this.addNodeForKnownParent(node, level, maleGid, excludeDerivativeLines);
+
+				// Use female parent to continue traversal if source is unknown
+				} else if (femaleGid != 0){
+					this.addNodeForKnownParent(node, level, femaleGid, excludeDerivativeLines);
+				}
+
 
 			} else if (germplasmOfNode.getGnpgs() >= 2) {
 				// Get and add female and male parents
-				final Integer femaleGid = germplasmOfNode.getGpid1();
 				this.addNodesForParents(node, level, femaleGid, maleGid, excludeDerivativeLines);
 
 				// IF there are more parents, get and add each of them
