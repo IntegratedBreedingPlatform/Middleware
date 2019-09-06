@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -375,10 +376,18 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		final List<WorkbenchUser> results = this.userService.getUsersByProjectId(this.commonTestProject.getProjectId());
 		assertNotNull(results);
 		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
-		user.getRoles().get(0).setWorkbenchProject(this.commonTestProject);
 		this.userService.addUser(user);
 
+		final UserRole userRole = new UserRole();
+		userRole.setCreatedBy(this.testUser1);
+		userRole.setWorkbenchProject(this.commonTestProject);
+		userRole.setCropType(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
+		userRole.setUser(user);
+		userRole.setCreatedDate(new Date());
+		this.workbenchDataManager.saveOrUpdateUserRole(userRole);
+
 		this.sessionProvder.getSession().flush();
+
 		final List<WorkbenchUser> newResults = this.userService.getUsersByProjectId(this.commonTestProject.getProjectId());
 		assertNotNull(newResults);
 		Assert.assertEquals(results.size() + 1, newResults.size());
