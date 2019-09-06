@@ -374,7 +374,9 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	public void testGetUsersByProjectId() {
 		final List<WorkbenchUser> results = this.userService.getUsersByProjectId(this.commonTestProject.getProjectId());
 		assertNotNull(results);
-		this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
+		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
+		user.getRoles().get(0).setWorkbenchProject(this.commonTestProject);
+		this.userService.addUser(user);
 
 		this.sessionProvder.getSession().flush();
 		final List<WorkbenchUser> newResults = this.userService.getUsersByProjectId(this.commonTestProject.getProjectId());
