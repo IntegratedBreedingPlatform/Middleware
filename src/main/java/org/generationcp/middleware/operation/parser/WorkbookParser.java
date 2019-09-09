@@ -386,10 +386,10 @@ public class WorkbookParser {
 	}
 
 	StudyTypeDto determineStudyType(final Workbook wb) {
-		final String studyTypeName = WorkbookParser
+		final String studyTypeLabel = WorkbookParser
 			.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TYPE_ROW_INDEX,
 				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-		return new StudyTypeDto(StringUtils.isEmpty(studyTypeName) ? StudyTypeDto.NURSERY_NAME : studyTypeName);
+		return new StudyTypeDto(StudyTypeDto.TRIAL_LABEL.equals(studyTypeLabel) ? StudyTypeDto.TRIAL_NAME : StudyTypeDto.NURSERY_NAME);
 	}
 
 	protected Date validateDate(final String dateString, final boolean isStartDate, final Message errorMessage) {

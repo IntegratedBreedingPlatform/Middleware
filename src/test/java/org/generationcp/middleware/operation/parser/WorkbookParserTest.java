@@ -518,11 +518,18 @@ public class WorkbookParserTest {
 		Mockito.when(sheet.getRow(Matchers.anyInt())).thenReturn(row);
 		final Cell cell = Mockito.mock(Cell.class);
 		Mockito.when(row.getCell(Matchers.anyInt())).thenReturn(cell);
-		Mockito.when(cell.getStringCellValue()).thenReturn(StudyTypeDto.TRIAL_NAME);
+		Mockito.when(cell.getStringCellValue()).thenReturn(StudyTypeDto.TRIAL_LABEL);
 		Mockito.when(cell.getCellType()).thenReturn(Cell.CELL_TYPE_STRING);
-		final StudyTypeDto studyTypeDto = this.workbookParser.determineStudyType(wb);
-		assertEquals(StudyTypeDto.TRIAL_NAME, studyTypeDto.getName());
+		final StudyTypeDto studyTypeDtoTrial = this.workbookParser.determineStudyType(wb);
+		assertEquals(StudyTypeDto.TRIAL_NAME, studyTypeDtoTrial.getName());
+
+		Mockito.when(cell.getStringCellValue()).thenReturn(StudyTypeDto.NURSERY_LABEL);
+		Mockito.when(cell.getCellType()).thenReturn(Cell.CELL_TYPE_STRING);
+		final StudyTypeDto studyTypeDtoNursery = this.workbookParser.determineStudyType(wb);
+		assertEquals(StudyTypeDto.NURSERY_NAME, studyTypeDtoNursery.getName());
 	}
+
+
 
 	@Test
 	public void testConvertSheetRowToDataListKeepInvalidValues() {
