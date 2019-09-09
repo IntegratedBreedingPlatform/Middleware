@@ -44,6 +44,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -94,20 +95,38 @@ public class WorkbookParser {
 
 
 	public enum Section {
-		STUDY_DETAILS("STUDY DETAILS"),
-		EXPERIMENTAL_DESIGN("EXPERIMENTAL DESIGN"),
-		ENVIRONMENT_DETAILS("ENVIRONMENT DETAILS"),
-		ENVIRONMENTAL_CONDITIONS("ENVIRONMENTAL CONDITIONS"),
-		GERMPLASM_DECRIPTORS("GERMPLASM DESCRIPTORS"),
-		OBSERVATION_UNIT("OBSERVATION UNIT"),
-		CONSTANT("CONSTANT"),
-		TRAIT("TRAITS"),
-		SELECTIONS("SELECTIONS");
+		STUDY_DETAILS("STUDY DETAILS", PhenotypicType.STUDY, PhenotypicType.STUDY.getLabelList().get(0), VariableType.STUDY_DETAIL),
+		EXPERIMENTAL_DESIGN("EXPERIMENTAL DESIGN", PhenotypicType.TRIAL_DESIGN, PhenotypicType.TRIAL_DESIGN.getLabelList().get(0), VariableType.EXPERIMENTAL_DESIGN),
+		ENVIRONMENT_DETAILS("ENVIRONMENT DETAILS", PhenotypicType.TRIAL_ENVIRONMENT, PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), VariableType.ENVIRONMENT_DETAIL),
+		ENVIRONMENTAL_CONDITIONS("ENVIRONMENTAL CONDITIONS", PhenotypicType.TRIAL_ENVIRONMENT, PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), VariableType.STUDY_CONDITION),
+		GERMPLASM_DECRIPTORS("GERMPLASM DESCRIPTORS", PhenotypicType.GERMPLASM, PhenotypicType.GERMPLASM.getLabelList().get(0), VariableType.GERMPLASM_DESCRIPTOR),
+		OBSERVATION_UNIT("OBSERVATION UNIT", PhenotypicType.TRIAL_DESIGN, PhenotypicType.TRIAL_DESIGN.getLabelList().get(1), VariableType.EXPERIMENTAL_DESIGN),
+		TRAIT("TRAITS", PhenotypicType.VARIATE, PhenotypicType.VARIATE.getLabelList().get(1), VariableType.TRAIT),
+		SELECTIONS("SELECTIONS", PhenotypicType.VARIATE, PhenotypicType.VARIATE.getLabelList().get(1), VariableType.SELECTION_METHOD);
 
 		private final String name;
 
-		Section(final String name) {
+		public PhenotypicType getRole() {
+			return role;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public VariableType getVariableType() {
+			return variableType;
+		}
+
+		private final PhenotypicType role;
+		private final String label;
+		private final VariableType variableType;
+
+		Section(final String name, final PhenotypicType role, final String label, final VariableType variableType) {
 			this.name = name;
+			this.role = role;
+			this.label = label;
+			this.variableType = variableType;
 		}
 
 		public String getName() {
@@ -184,7 +203,6 @@ public class WorkbookParser {
 	/**
 	 * Parses given file and transforms it into a Workbook
 	 *
-	 * @param file
 	 * @param createdBy
 	 * @return workbook
 	 * @throws org.generationcp.middleware.exceptions.WorkbookParserException
@@ -215,23 +233,23 @@ public class WorkbookParser {
 
 		// Assumes the first section Study Details (aka "Study Settings") is in row 8
 		this.rowIndex = 7;
-		conditions.addAll(this.readMeasurementVariables(excelWorkbook, Section.STUDY_DETAILS.getName()));
+		conditions.addAll(this.readMeasurementVariables(excelWorkbook, Section.STUDY_DETAILS));
 		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
-		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.EXPERIMENTAL_DESIGN.getName()));
+		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.EXPERIMENTAL_DESIGN));
 		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
-		conditions.addAll(this.readMeasurementVariables(excelWorkbook, Section.ENVIRONMENT_DETAILS.getName()));
+		conditions.addAll(this.readMeasurementVariables(excelWorkbook, Section.ENVIRONMENT_DETAILS));
 		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
-		constants.addAll(this.readMeasurementVariables(excelWorkbook, Section.ENVIRONMENTAL_CONDITIONS.getName()));
+		constants.addAll(this.readMeasurementVariables(excelWorkbook, Section.ENVIRONMENTAL_CONDITIONS));
 		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
-		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.GERMPLASM_DECRIPTORS.getName()));
+		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.GERMPLASM_DECRIPTORS));
 		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
-		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.OBSERVATION_UNIT.getName()));
+		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.OBSERVATION_UNIT));
 
 		if (isReadTraits) {
 			this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
-			traits.addAll(this.readMeasurementVariables(excelWorkbook, Section.TRAIT.getName()));
+			traits.addAll(this.readMeasurementVariables(excelWorkbook, Section.TRAIT));
 			this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
-			traits.addAll(this.readMeasurementVariables(excelWorkbook, Section.SELECTIONS.getName()));
+			traits.addAll(this.readMeasurementVariables(excelWorkbook, Section.SELECTIONS));
 		}
 
 		workbook.setFactors(factors);
@@ -394,7 +412,7 @@ public class WorkbookParser {
 		return date;
 	}
 
-	protected List<MeasurementVariable> readMeasurementVariables(final Workbook wb, final String name) throws WorkbookParserException {
+	protected List<MeasurementVariable> readMeasurementVariables(final Workbook wb, final Section section) throws WorkbookParserException {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
 		try {
@@ -408,11 +426,11 @@ public class WorkbookParser {
 			final boolean valid = this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex);
 
 			if (!valid) {
-				throw new WorkbookParserException("Incorrect headers for " + name);
+				throw new WorkbookParserException("Incorrect headers for " + section.getName());
 			}
 
 			// If file is still valid (after checking headers), proceed
-			this.extractMeasurementVariablesForSection(wb, name, measurementVariables);
+			this.extractMeasurementVariablesForSection(wb, section, measurementVariables);
 
 			return measurementVariables;
 		} catch (final Exception e) {
@@ -420,14 +438,14 @@ public class WorkbookParser {
 		}
 	}
 
-	protected void extractMeasurementVariablesForSection(final Workbook workbook, final String sectionName,
+	protected void extractMeasurementVariablesForSection(final Workbook workbook, final Section currentSection,
 		final List<MeasurementVariable> measurementVariables) {
 
 		// Moving to the next line is necessary as at this point one is on the previous row.
 		this.rowIndex++;
 
 		if (WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, NUMBER_OF_COLUMNS)) {
-			this.errorMessages.add(new Message("error.to.many.empty.rows", sectionName, Integer.toString(this.rowIndex - 1),
+			this.errorMessages.add(new Message("error.to.many.empty.rows", currentSection.getName(), Integer.toString(this.rowIndex - 1),
 				Integer.toString(this.rowIndex)));
 			return;
 		}
@@ -465,7 +483,7 @@ public class WorkbookParser {
 
 			this.validateRequiredFields(measurementVariable, displayRowNumber);
 			this.validateDataTypeIfNecessary(measurementVariable, displayRowNumber);
-			this.assignVariableTypeAndRoleBasedOnSectionName(sectionName, measurementVariable);
+			this.assignVariableTypeAndRoleBasedOnSectionName(currentSection, measurementVariable);
 
 			measurementVariables.add(measurementVariable);
 
@@ -473,35 +491,12 @@ public class WorkbookParser {
 		}
 	}
 
-	protected void assignVariableTypeAndRoleBasedOnSectionName(final String sectionName, final MeasurementVariable measurementVariable) {
-		if (Section.STUDY_DETAILS.getName().equals(sectionName)) {
-			measurementVariable.setRole(PhenotypicType.STUDY);
-			measurementVariable.setLabel(PhenotypicType.STUDY.getLabelList().get(0));
-			measurementVariable.setVariableType(VariableType.STUDY_DETAIL);
-		} else if (Section.EXPERIMENTAL_DESIGN.getName().equals(sectionName)) {
-			measurementVariable.setRole(PhenotypicType.TRIAL_DESIGN);
-			measurementVariable.setLabel(PhenotypicType.TRIAL_DESIGN.getLabelList().get(0));
-			measurementVariable.setVariableType(VariableType.EXPERIMENTAL_DESIGN);
-		} else if (Section.ENVIRONMENT_DETAILS.getName().equals(sectionName)) {
-			measurementVariable.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
-			measurementVariable.setLabel(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0));
-			measurementVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
-		} else if (Section.ENVIRONMENTAL_CONDITIONS.getName().equals(sectionName)) {
-			measurementVariable.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
-			measurementVariable.setLabel(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0));
-			measurementVariable.setVariableType(VariableType.STUDY_CONDITION);
-		} else if (Section.GERMPLASM_DECRIPTORS.getName().equals(sectionName)) {
-			measurementVariable.setRole(PhenotypicType.GERMPLASM);
-			measurementVariable.setLabel(PhenotypicType.GERMPLASM.getLabelList().get(0));
-			measurementVariable.setVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-		} else if (Section.TRAIT.getName().equals(sectionName)) {
-			measurementVariable.setRole(PhenotypicType.VARIATE);
-			measurementVariable.setLabel(PhenotypicType.VARIATE.getLabelList().get(1));
-			measurementVariable.setVariableType(VariableType.TRAIT);
-		} else if (Section.SELECTIONS.toString().equals(sectionName)) {
-			measurementVariable.setRole(PhenotypicType.VARIATE);
-			measurementVariable.setLabel(PhenotypicType.VARIATE.getLabelList().get(1));
-			measurementVariable.setVariableType(VariableType.SELECTION_METHOD);
+	protected void assignVariableTypeAndRoleBasedOnSectionName(final Section section, final MeasurementVariable measurementVariable) {
+		final List<Section> sections = Arrays.asList(Section.STUDY_DETAILS, Section.EXPERIMENTAL_DESIGN, Section.ENVIRONMENT_DETAILS, Section.ENVIRONMENTAL_CONDITIONS, Section.GERMPLASM_DECRIPTORS, Section.TRAIT, Section.ENVIRONMENT_DETAILS.SELECTIONS);
+		if (sections.contains(section)) {
+			measurementVariable.setRole(section.getRole());
+			measurementVariable.setLabel(section.getLabel());
+			measurementVariable.setVariableType(section.getVariableType());
 		}
 	}
 

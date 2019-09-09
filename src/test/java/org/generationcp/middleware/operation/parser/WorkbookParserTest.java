@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -138,7 +137,7 @@ public class WorkbookParserTest {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final List<Message> errorMessages = new ArrayList<>();
 		this.workbookParser.setErrorMessages(errorMessages);
-		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
+		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section, measurementVariables);
 		assertTrue("There should be no error after extracting the measurement variables", errorMessages.isEmpty());
 	}
 
@@ -157,7 +156,7 @@ public class WorkbookParserTest {
 
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final List<Message> errorMessages = this.workbookParser.getErrorMessages();
-		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
+		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section, measurementVariables);
 
 		// assertions
 		assertEquals("There should be 6 errors after extracting the measurement variables", 6, errorMessages.size());
@@ -210,7 +209,7 @@ public class WorkbookParserTest {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final List<Message> errorMessages = new ArrayList<>();
 		this.workbookParser.setErrorMessages(errorMessages);
-		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
+		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section, measurementVariables);
 
 		// assertions
 		assertEquals("There should be 2 errors after extracting the measurement variables", 1, errorMessages.size());
@@ -237,37 +236,37 @@ public class WorkbookParserTest {
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 
-		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.STUDY_DETAILS.getName(), measurementVariable);
+		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.STUDY_DETAILS, measurementVariable);
 		assertEquals(PhenotypicType.STUDY, measurementVariable.getRole());
 		assertEquals(PhenotypicType.STUDY.getLabelList().get(0), measurementVariable.getLabel());
 		assertEquals(VariableType.STUDY_DETAIL, measurementVariable.getVariableType());
 
-		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.EXPERIMENTAL_DESIGN.getName(), measurementVariable);
+		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.EXPERIMENTAL_DESIGN, measurementVariable);
 		assertEquals(PhenotypicType.TRIAL_DESIGN, measurementVariable.getRole());
 		assertEquals(PhenotypicType.TRIAL_DESIGN.getLabelList().get(0), measurementVariable.getLabel());
 		assertEquals(VariableType.EXPERIMENTAL_DESIGN, measurementVariable.getVariableType());
 
-		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.ENVIRONMENT_DETAILS.getName(), measurementVariable);
+		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.ENVIRONMENT_DETAILS, measurementVariable);
 		assertEquals(PhenotypicType.TRIAL_ENVIRONMENT, measurementVariable.getRole());
 		assertEquals(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), measurementVariable.getLabel());
 		assertEquals(VariableType.ENVIRONMENT_DETAIL, measurementVariable.getVariableType());
 
-		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.ENVIRONMENTAL_CONDITIONS.getName(), measurementVariable);
+		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.ENVIRONMENTAL_CONDITIONS, measurementVariable);
 		assertEquals(PhenotypicType.TRIAL_ENVIRONMENT, measurementVariable.getRole());
 		assertEquals(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), measurementVariable.getLabel());
 		assertEquals(VariableType.STUDY_CONDITION, measurementVariable.getVariableType());
 
-		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.GERMPLASM_DECRIPTORS.getName(), measurementVariable);
+		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.GERMPLASM_DECRIPTORS, measurementVariable);
 		assertEquals(PhenotypicType.GERMPLASM, measurementVariable.getRole());
 		assertEquals(PhenotypicType.GERMPLASM.getLabelList().get(0), measurementVariable.getLabel());
 		assertEquals(VariableType.GERMPLASM_DESCRIPTOR, measurementVariable.getVariableType());
 
-		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.TRAIT.getName(), measurementVariable);
+		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.TRAIT, measurementVariable);
 		assertEquals(PhenotypicType.VARIATE, measurementVariable.getRole());
 		assertEquals(PhenotypicType.VARIATE.getLabelList().get(1), measurementVariable.getLabel());
 		assertEquals(VariableType.TRAIT, measurementVariable.getVariableType());
 
-		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.SELECTIONS.getName(), measurementVariable);
+		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.SELECTIONS, measurementVariable);
 		assertEquals(PhenotypicType.VARIATE, measurementVariable.getRole());
 		assertEquals(PhenotypicType.VARIATE.getLabelList().get(1), measurementVariable.getLabel());
 		assertEquals(VariableType.SELECTION_METHOD, measurementVariable.getVariableType());
@@ -671,7 +670,7 @@ public class WorkbookParserTest {
 		excelWorkbook.createSheet("Observation");
 
 		final WorkbookParser workbookParser = new WorkbookParser();
-		final List<MeasurementVariable> readMeasurementVariables = workbookParser.readMeasurementVariables(excelWorkbook, "CONDITION");
+		final List<MeasurementVariable> readMeasurementVariables = workbookParser.readMeasurementVariables(excelWorkbook, Section.STUDY_DETAILS);
 		assertTrue("Since the work book has no description sheet, measurement variables should be empty",
 			readMeasurementVariables.isEmpty());
 	}
