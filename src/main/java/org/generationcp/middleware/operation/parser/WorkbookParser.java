@@ -64,7 +64,6 @@ public class WorkbookParser {
 	public static final int END_DATE_ROW_INDEX = 4;
 	public static final int STUDY_TYPE_ROW_INDEX = 5;
 
-	public static final int STUDY_DETAILS_LABEL_COLUMN_INDEX = 0;
 	public static final int STUDY_DETAILS_VALUE_COLUMN_INDEX = 1;
 
 	private static final String DESCRIPTION = "DESCRIPTION";
@@ -492,8 +491,8 @@ public class WorkbookParser {
 	}
 
 	protected void assignVariableTypeAndRoleBasedOnSectionName(final Section section, final MeasurementVariable measurementVariable) {
-		final List<Section> sections = Arrays.asList(Section.STUDY_DETAILS, Section.EXPERIMENTAL_DESIGN, Section.ENVIRONMENT_DETAILS, Section.ENVIRONMENTAL_CONDITIONS, Section.GERMPLASM_DECRIPTORS, Section.TRAIT, Section.ENVIRONMENT_DETAILS.SELECTIONS);
-		if (sections.contains(section)) {
+		// Import of sub-observations not yet supported
+		if (!Section.OBSERVATION_UNIT.equals(section)) {
 			measurementVariable.setRole(section.getRole());
 			measurementVariable.setLabel(section.getLabel());
 			measurementVariable.setVariableType(section.getVariableType());
