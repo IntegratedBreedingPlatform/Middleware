@@ -28,6 +28,8 @@ public class PhenotypeSearchDTO {
 	private String entryType;
 	private String entryNumber;
 
+	private String instanceNumber;
+
 	private List<PhenotypeSearchObservationDTO> observations;
 
 	public String getObservationUnitDbId() {
@@ -191,6 +193,14 @@ public class PhenotypeSearchDTO {
 
 	public void setObservationUnitName(String observationUnitName) {
 		this.observationUnitName = observationUnitName;
+	}
+
+	public String getInstanceNumber() {
+		return this.instanceNumber;
+	}
+
+	public void setInstanceNumber(final String instanceNumber) {
+		this.instanceNumber = instanceNumber;
 	}
 
 	@Override
