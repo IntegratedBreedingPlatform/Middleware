@@ -10,20 +10,12 @@
 
 package org.generationcp.middleware.dao.ims;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.collect.Lists;
-
 import com.google.common.collect.Sets;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
+import org.generationcp.middleware.domain.inventory_new.LotDto;
+import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -36,6 +28,15 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Lot}.
@@ -634,4 +635,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 	}
 
+	//New inventory functions, please locate them below this line to help cleaning in the near future.
+	public List<LotDto> searchLots(final LotsSearchDto lotsSearchDto) {
+		return null;
+	}
 }
