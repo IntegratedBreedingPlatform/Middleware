@@ -544,4 +544,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return this.workbenchDaoFactory.getRCallDao().getAll();
 	}
 
+	@Override
+	public List<RCall> getRCallsByPackageId(final Integer packageId) {
+		return this.workbenchDaoFactory.getRCallDao().getRCallsByPackageId(packageId);
+	}
+
 }
