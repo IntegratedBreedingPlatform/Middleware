@@ -9,34 +9,26 @@ import java.util.Date;
 @AutoProperty
 public class LotDto {
 
-	private Integer id;
+	private Integer lotId;
+	private String stockId;
+	private Integer gid;
+	private Integer mgid;
+	private String designation;
+	private String status;
+	private Integer locationId;
+	private String locationName;
+	private Integer scaleId;
+	private String scaleName;
+	private Double actualBalance;
+	private Double availableBalance;
+	private Double reservedTotal;
+	private Double withdrawalTotal;
+	private String comments;
+	private String createdByUsername;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	private Date createdDate;
 
-	private Integer gid;
-
-	private Integer mgid;
-
-	private String locationName;
-
-	private String designation;
-
-	private String status;
-
-	private String scaleName;
-
-	private String stockId;
-
-	private Double actualBalance;
-
-	private Double availableBalance;
-
-	private Double reservedTotal;
-
-	private Double withdrawalTotal;
-
-	private String createdByUsername;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	private Date lastDepositDate;
@@ -44,14 +36,13 @@ public class LotDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	private Date lastWithdrawalDate;
 
-	private String comments;
 
-	public Integer getId() {
-		return id;
+	public Integer getLotId() {
+		return lotId;
 	}
 
-	public void setId(final Integer id) {
-		this.id = id;
+	public void setLotId(final Integer lotId) {
+		this.lotId = lotId;
 	}
 
 	public Date getCreatedDate() {
@@ -180,6 +171,22 @@ public class LotDto {
 
 	public void setCreatedByUsername(final String createdByUsername) {
 		this.createdByUsername = createdByUsername;
+	}
+
+	public Integer getLocationId() {
+		return locationId;
+	}
+
+	public void setLocationId(final Integer locationId) {
+		this.locationId = locationId;
+	}
+
+	public Integer getScaleId() {
+		return scaleId;
+	}
+
+	public void setScaleId(final Integer scaleId) {
+		this.scaleId = scaleId;
 	}
 
 	@Override

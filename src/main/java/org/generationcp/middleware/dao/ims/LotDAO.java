@@ -28,6 +28,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -636,7 +637,40 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	}
 
 	//New inventory functions, please locate them below this line to help cleaning in the near future.
-	public List<LotDto> searchLots(final LotsSearchDto lotsSearchDto) {
+	private final String SEARCH_LOT_QUERY = "SELECT lot.lotid as lotId, " //
+		+ "  GROUP_CONCAT(transaction.inventory_id SEPARATOR ', ') AS stockId, " //
+		+ "  lot.eid as gid, " //
+		+ "  g.mgid as mgid, " //
+		+ "  n.nval as designation, "
+		+ "  CASE WHEN lot.status = 0 then 'Active' else 'Closed' end as status, " //
+		+ "  lot.locid as locationId, " //
+ 		+ "  l.lname as locationName, " //
+		+ "  lot.scaleid as scaleId, " //
+		+ "  scale.name as scaleName, " //
+		+ "  SUM(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty > 0 THEN transaction.trnqty ELSE 0 END) AS actualBalance, " //
+		+ "  CASE WHEN SUM(transaction.trnqty) is null THEN 0 ELSE SUM(transaction.trnqty) END AS availableBalance, " //
+		+ "  SUM(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty <= 0 THEN transaction.trnqty * -1 ELSE 0 END) AS reservedTotal, " //
+		+ "  SUM(CASE WHEN transaction.trnstat = 1 AND transaction.trnqty <= 0 THEN transaction.trnqty * -1 ELSE 0 END) AS withdrawalTotal, " //
+		+ "  lot.comments as comments, " //
+		+ "  users.uname as createdByUsername, " //
+		+ "  MIN(transaction.trndate) as createdDate, " //
+		+ "  MAX(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty > 0 THEN str_to_date(CAST(transaction.trndate as CHAR), '%Y%m%d') ELSE null END) AS lastDepositDate, " //
+		+ "  MAX(CASE WHEN transaction.trnstat = 1 AND transaction.trnqty <= 0 THEN str_to_date(CAST(transaction.trndate as CHAR), '%Y%m%d') ELSE null END) AS lastWithdrawalDate " //
+		+ "FROM ims_lot lot " //
+		+ "       LEFT JOIN ims_transaction transaction ON transaction.lotid = lot.lotid AND transaction.trnstat <> 9 " //
+		+ "       INNER JOIN germplsm g on g.gid = lot.eid " //
+		+ "       INNER JOIN names n ON n.gid = lot.eid AND n.nstat = 1 " //
+		+ "       INNER JOIN location l on l.locid = lot.locid " //
+		+ "       inner join cvterm scale on scale.cvterm_id = lot.scaleid " //
+		+ "       INNER JOIN workbench.users users on users.userid = lot.userid " //
+		+ "WHERE (lot.status = 0 OR 0) AND lot.etype = 'GERMPLSM' " //
+		+ "GROUP BY lot.lotid";
+
+	public List<LotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
 		return null;
+	}
+
+	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
+		return 0;
 	}
 }

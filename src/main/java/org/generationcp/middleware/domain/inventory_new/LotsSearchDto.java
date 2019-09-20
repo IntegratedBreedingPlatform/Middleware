@@ -1,5 +1,7 @@
 package org.generationcp.middleware.domain.inventory_new;
 
-public class LotsSearchDto {
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
+
+public class LotsSearchDto extends SearchRequestDto {
 
 }
