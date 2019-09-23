@@ -22,10 +22,13 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -666,11 +669,50 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "WHERE (lot.status = 0 OR 0) AND lot.etype = 'GERMPLSM' " //
 		+ "GROUP BY lot.lotid";
 
+	private String buildSearchLotsQuery(final LotsSearchDto lotsSearchDto) {
+		return SEARCH_LOT_QUERY;
+	}
+
 	public List<LotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
-		return null;
+		try {
+			final String filterLotsQuery = buildSearchLotsQuery(lotsSearchDto);
+			final SQLQuery query = this.getSession().createSQLQuery(filterLotsQuery);
+			query.setResultTransformer(Transformers.aliasToBean(LotDto.class));
+			query.addScalar("lotId");
+			query.addScalar("stockId");
+			query.addScalar("gid");
+			query.addScalar("mgid");
+			query.addScalar("designation");
+			query.addScalar("status");
+			query.addScalar("locationId");
+			query.addScalar("locationName");
+			query.addScalar("scaleId");
+			query.addScalar("scaleName");
+			query.addScalar("actualBalance");
+			query.addScalar("availableBalance");
+			query.addScalar("reservedTotal");
+			query.addScalar("withdrawalTotal");
+			query.addScalar("comments");
+			query.addScalar("createdByUsername");
+			query.addScalar("createdDate", Hibernate.DATE);
+			query.addScalar("lastDepositDate", Hibernate.DATE);
+			query.addScalar("lastWithdrawalDate",Hibernate.DATE);
+			final List<LotDto> lotDtos = query.list();
+			return lotDtos;
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at searchLots() query on LotDAO: " + e.getMessage(), e);
+		}
+
 	}
 
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
-		return 0;
+		try {
+			final String countLotsQuey = "Select count(1) from (" + buildSearchLotsQuery(lotsSearchDto) + ") as filteredLots";
+			final SQLQuery query = this.getSession().createSQLQuery(countLotsQuey);
+			return ((BigInteger) query.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at countSearchLots() query on LotDAO: " + e.getMessage(), e);
+		}
 	}
 }

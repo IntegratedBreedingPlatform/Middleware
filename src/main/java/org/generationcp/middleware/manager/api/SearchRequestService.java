@@ -6,5 +6,5 @@ public interface SearchRequestService {
 
 	Integer saveSearchRequest(SearchRequestDto searchRequestDto, Class<? extends SearchRequestDto> searchRequestDtoClass);
 
-	public SearchRequestDto getSearchRequest(Integer requestId, Class<? extends SearchRequestDto> searchRequestDtoClass);
+	SearchRequestDto getSearchRequest(Integer requestId, Class<? extends SearchRequestDto> searchRequestDtoClass);
 }

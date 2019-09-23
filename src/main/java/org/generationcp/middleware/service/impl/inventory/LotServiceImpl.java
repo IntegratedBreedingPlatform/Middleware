@@ -31,6 +31,6 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
-		return 0;
+		return this.daoFactory.getLotDao().countSearchLots(lotsSearchDto);
 	}
 }
