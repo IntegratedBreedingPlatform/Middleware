@@ -663,21 +663,27 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "       LEFT JOIN ims_transaction transaction ON transaction.lotid = lot.lotid AND transaction.trnstat <> 9 " //
 		+ "       INNER JOIN germplsm g on g.gid = lot.eid " //
 		+ "       INNER JOIN names n ON n.gid = lot.eid AND n.nstat = 1 " //
-		+ "       INNER JOIN location l on l.locid = lot.locid " //
-		+ "       inner join cvterm scale on scale.cvterm_id = lot.scaleid " //
+			// location id and scale id are suppossed to be mandatory but they are not, left join should be replaced by inner join
+		+ "       LEFT JOIN location l on l.locid = lot.locid " //
+		+ "       LEFT join cvterm scale on scale.cvterm_id = lot.scaleid " //
 		+ "       INNER JOIN workbench.users users on users.userid = lot.userid " //
-		+ "WHERE (lot.status = 0 OR 0) AND lot.etype = 'GERMPLSM' " //
-		+ "GROUP BY lot.lotid";
+		+ "WHERE lot.etype = 'GERMPLSM' "; //
 
 	private String buildSearchLotsQuery(final LotsSearchDto lotsSearchDto) {
-		return SEARCH_LOT_QUERY;
+		final StringBuilder query = new StringBuilder(SEARCH_LOT_QUERY);
+		if (lotsSearchDto != null) {
+			if (lotsSearchDto.getStatus() != null) {
+				query.append(" and lot.status = ").append(lotsSearchDto.getStatus());
+			}
+		}
+		query.append(" GROUP BY lot.lotid ");
+		return query.toString();
 	}
 
 	public List<LotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
 		try {
 			final String filterLotsQuery = buildSearchLotsQuery(lotsSearchDto);
 			final SQLQuery query = this.getSession().createSQLQuery(filterLotsQuery);
-			query.setResultTransformer(Transformers.aliasToBean(LotDto.class));
 			query.addScalar("lotId");
 			query.addScalar("stockId");
 			query.addScalar("gid");
@@ -697,7 +703,16 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("createdDate", Hibernate.DATE);
 			query.addScalar("lastDepositDate", Hibernate.DATE);
 			query.addScalar("lastWithdrawalDate",Hibernate.DATE);
+
+			query.setResultTransformer(Transformers.aliasToBean(LotDto.class));
+
+			if (pageable!= null) {
+				query.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
+				query.setMaxResults(pageable.getPageSize());
+			}
+
 			final List<LotDto> lotDtos = query.list();
+
 			return lotDtos;
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error at searchLots() query on LotDAO: " + e.getMessage(), e);
@@ -707,8 +722,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
 		try {
-			final String countLotsQuey = "Select count(1) from (" + buildSearchLotsQuery(lotsSearchDto) + ") as filteredLots";
-			final SQLQuery query = this.getSession().createSQLQuery(countLotsQuey);
+			final StringBuilder countLotsQuery =
+					new StringBuilder("Select count(1) from (").append(buildSearchLotsQuery(lotsSearchDto)).append(") as filteredLots");
+			final SQLQuery query = this.getSession().createSQLQuery(countLotsQuery.toString());
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
