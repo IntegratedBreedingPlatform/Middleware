@@ -287,7 +287,7 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	public StandardVariable getByName(final String name, final String programUUID) {
-		final CVTerm cvTerm = daoFactory.getCvTermDao().getByName(name);
+		final CVTerm cvTerm = daoFactory.getCvTermDao().getByNameAndCvId(name, CvId.VARIABLES.getId());
 		if (cvTerm != null && cvTerm.getCvTermId() != null) {
 			return this.getStandardVariableBuilder().create(cvTerm.getCvTermId(), programUUID);
 		}
