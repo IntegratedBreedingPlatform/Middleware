@@ -10,6 +10,7 @@
 
 package org.generationcp.middleware.dao.ims;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -32,6 +33,7 @@ import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -677,12 +679,31 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 		}
 		query.append(" GROUP BY lot.lotid ");
+
 		return query.toString();
+	}
+
+	private String addSortToSearchLotsQuery(final String lotsSearchQuery, final Pageable pageable) {
+		if (pageable!=null) {
+			final StringBuilder sortedLotsSearchQuery = new StringBuilder(lotsSearchQuery);
+			if (pageable.getSort() != null) {
+				final List<String> sorts = new ArrayList<>();
+				for (Sort.Order order : pageable.getSort()) {
+					sorts.add(order.getProperty() + " " + order.getDirection().toString());
+				}
+				if (!sorts.isEmpty()) {
+					sortedLotsSearchQuery.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
+					return sortedLotsSearchQuery.toString();
+				}
+			}
+		}
+		return lotsSearchQuery;
 	}
 
 	public List<LotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
 		try {
-			final String filterLotsQuery = buildSearchLotsQuery(lotsSearchDto);
+			final String filterLotsQuery = addSortToSearchLotsQuery(buildSearchLotsQuery(lotsSearchDto), pageable);
+
 			final SQLQuery query = this.getSession().createSQLQuery(filterLotsQuery);
 			query.addScalar("lotId");
 			query.addScalar("stockId");
