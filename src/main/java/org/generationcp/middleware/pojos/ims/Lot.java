@@ -79,8 +79,8 @@ public class Lot implements Serializable {
 	@Column(name = "comments")
 	private String comments;
 
-	@Column(name = "creation_date")
-	private Date creationDate;
+	@Column(name = "created_date")
+	private Date createdDate;
 
 	@OneToMany(mappedBy = "lot")
 	private Set<Transaction> transactions = new HashSet<Transaction>();
@@ -216,12 +216,12 @@ public class Lot implements Serializable {
 		this.aggregateData = aggregateData;
 	}
 
-	public Date getCreationDate() {
-		return this.creationDate;
+	public Date getCreatedDate() {
+		return this.createdDate;
 	}
 
-	public void setCreationDate(final Date creationDate) {
-		this.creationDate = creationDate;
+	public void setCreatedDate(final Date createdDate) {
+		this.createdDate = createdDate;
 	}
 
 	@Override

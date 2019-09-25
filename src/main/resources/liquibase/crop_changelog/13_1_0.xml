@@ -6,10 +6,10 @@
 
 	<changeSet author="vanina" id="v13.1.0-1">
 		<preConditions onFail="MARK_RAN">
-			<not><columnExists tableName="ims_lot" columnName="creation_date"/> </not>
+			<not><columnExists tableName="ims_lot" columnName="created_date"/> </not>
 		</preConditions>
 		<addColumn tableName="ims_lot">
-			<column name="creation_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" >
+			<column name="created_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" >
 				<constraints nullable="false"/>
 			</column>
 		</addColumn>
@@ -17,10 +17,10 @@
 
 	<changeSet author="vanina" id="v13.1.0-2">
 		<preConditions onFail="MARK_RAN">
-				<columnExists tableName="ims_lot" columnName="creation_date"/>
+				<columnExists tableName="ims_lot" columnName="created_date"/>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE ims_lot lot SET creation_date = ( SELECT trndate FROM ims_transaction where ims_transaction.lotid = lot.lotid);
+			UPDATE ims_lot lot SET created_date = ( SELECT MIN(trndate) FROM ims_transaction where ims_transaction.lotid = lot.lotid);
 		</sql>
 	</changeSet>
 
