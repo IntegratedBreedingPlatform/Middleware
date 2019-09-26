@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -497,10 +498,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 		final List<TransactionReportRow> transactions = new ArrayList<>();
 		try {
-			final String sql = "SELECT i.userid,i.lotid,i.trndate,i.trnstat,i.trnqty,i.sourceid,l.listname, i.comments,"
+			final String sql = "SELECT i.userid,i.lotid,lot.created_date,i.trnstat,i.trnqty,i.sourceid,l.listname, i.comments,"
 					+ "(CASE WHEN i.comments in ('Lot closed', 'Discard') THEN i.comments WHEN trnstat = 0 AND trnqty > 0 THEN 'Deposit' "
 					+ "WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation' WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal' END) as trntype "
 					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
+					+ " INNER JOIN ims_lot lot ON lot.lotid = i.lotid "
 					+ "WHERE i.lotid = :lotId AND i.trnstat <> 9 ORDER BY i.lotid";
 
 			final Query query = this.getSession().createSQLQuery(sql);
@@ -526,7 +528,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 			final Integer userId = (Integer) row[0];
 			final Integer lotId = (Integer) row[1];
-			final Integer trnDate = (Integer) row[2];
+			final Date trnDate = (Date) row[2];
 			final Integer trnState = (Integer) row[3];
 			final Double trnQty = (Double) row[4];
 			final Integer listId = (Integer) row[5];

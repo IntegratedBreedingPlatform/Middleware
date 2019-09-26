@@ -296,7 +296,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 		for (final org.generationcp.middleware.pojos.ims.Transaction t : transactions) {
 			final TransactionReportRow row = new TransactionReportRow();
-			row.setDate(t.getTransactionDate());
+			row.setDate(t.getLot().getCreatedDate());
 			row.setQuantity(t.getQuantity());
 			row.setCommentOfLot(t.getLot().getComments());
 
@@ -326,7 +326,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		final List<org.generationcp.middleware.pojos.ims.Transaction> transactions = this.getAllReserveTransactions(start, numOfRows);
 		for (final org.generationcp.middleware.pojos.ims.Transaction t : transactions) {
 			final TransactionReportRow row = new TransactionReportRow();
-			row.setDate(t.getTransactionDate());
+			row.setDate(t.getLot().getCreatedDate());
 			row.setQuantity(t.getQuantity());
 			row.setCommentOfLot(t.getLot().getComments());
 			row.setEntityIdOfLot(t.getLot().getEntityId());
@@ -359,7 +359,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			this.daoFactory.getTransactionDAO().getAllWithdrawals(start, numOfRows);
 		for (final org.generationcp.middleware.pojos.ims.Transaction t : transactions) {
 			final TransactionReportRow row = new TransactionReportRow();
-			row.setDate(t.getTransactionDate());
+			row.setDate(t.getLot().getCreatedDate());
 			row.setQuantity(t.getQuantity());
 			row.setCommentOfLot(t.getLot().getComments());
 			row.setEntityIdOfLot(t.getLot().getEntityId());

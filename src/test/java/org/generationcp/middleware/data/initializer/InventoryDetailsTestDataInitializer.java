@@ -1,11 +1,6 @@
 
 package org.generationcp.middleware.data.initializer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.beust.jcommander.internal.Lists;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
@@ -18,6 +13,12 @@ import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class InventoryDetailsTestDataInitializer {
 
 	private static final int PERSON_ID = 1;
@@ -26,7 +27,7 @@ public class InventoryDetailsTestDataInitializer {
 	private static final int USER_ID = 1;
 	private static final int NO_OF_STOCK_LIST_ENTRIES = 20;
 
-	public static final Integer DATE = 19122016;
+	public static final Date DATE = new Date(19122016);
 	public static final String LIST_NAME = "List1";
 	public static final String USER = "User";
 	public static final String STATUS = "Active";
