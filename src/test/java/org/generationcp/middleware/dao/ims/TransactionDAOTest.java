@@ -1,18 +1,13 @@
 
 package org.generationcp.middleware.dao.ims;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.beust.jcommander.internal.Lists;
+import org.apache.commons.lang.time.DateUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
-import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -31,7 +26,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.beust.jcommander.internal.Lists;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TransactionDAOTest extends IntegrationTestBase {
 
@@ -74,11 +74,11 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		this.germplasmListDataDAO = new GermplasmListDataDAO();
 		this.germplasmListDataDAO.setSession(this.sessionProvder.getSession());
 
-		germplasmListData = Lists.newArrayList();
+		this.germplasmListData = Lists.newArrayList();
 
 		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
-		initializeGermplasms(1);
+		this.initializeGermplasms(1);
 		this.initializeGermplasmsListAndListData(this.germplasmMap);
 		this.initLotsAndTransactions(this.germplasmListId);
 	}
@@ -86,27 +86,27 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	@Test
 	public void testRetrieveStockIds() {
 
-		List<Integer> lRecIDs = new ArrayList<>();
+		final List<Integer> lRecIDs = new ArrayList<>();
 		lRecIDs.add(1);
-		Map<Integer, String> lRecIDStockIDMap = this.dao.retrieveStockIds(lRecIDs);
+		final Map<Integer, String> lRecIDStockIDMap = this.dao.retrieveStockIds(lRecIDs);
 		Assert.assertNotNull(lRecIDStockIDMap);
 	}
 
 	@Test
 	public void testGetStockIdsByListDataProjectListId() throws MiddlewareQueryException {
-		List<String> stockIds = this.dao.getStockIdsByListDataProjectListId(17);
+		final List<String> stockIds = this.dao.getStockIdsByListDataProjectListId(17);
 		Assert.assertNotNull(stockIds);
 	}
 
 	@Test
 	public void testGetInventoryDetailsByTransactionRecordId() throws MiddlewareQueryException {
-		List<Integer> recordIds = new ArrayList<Integer>();
-		List<GermplasmListData> listDataList = this.germplasmListDataDAO.getByListId(1);
-		for (GermplasmListData germplasmListData : listDataList) {
+		final List<Integer> recordIds = new ArrayList<Integer>();
+		final List<GermplasmListData> listDataList = this.germplasmListDataDAO.getByListId(1);
+		for (final GermplasmListData germplasmListData : listDataList) {
 			recordIds.add(germplasmListData.getId());
 		}
-		List<InventoryDetails> inventoryDetailsList = this.dao.getInventoryDetailsByTransactionRecordId(recordIds);
-		for (InventoryDetails inventoryDetails : inventoryDetailsList) {
+		final List<InventoryDetails> inventoryDetailsList = this.dao.getInventoryDetailsByTransactionRecordId(recordIds);
+		for (final InventoryDetails inventoryDetails : inventoryDetailsList) {
 			Assert.assertTrue(recordIds.contains(inventoryDetails.getSourceRecordId()));
 		}
 	}
@@ -125,14 +125,14 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testRetrieveWithdrawalBalanceWithDistinctScale() throws MiddlewareQueryException{
-		List<Integer> recordsList = Lists.newArrayList();
-		Integer recordsId = this.germplasmListData.get(0).getId();
+		final List<Integer> recordsList = Lists.newArrayList();
+		final Integer recordsId = this.germplasmListData.get(0).getId();
 		recordsList.add(recordsId);
 
-		Map<Integer, Object[]> returnMap = this.dao.retrieveWithdrawalBalanceWithDistinctScale(recordsList);
+		final Map<Integer, Object[]> returnMap = this.dao.retrieveWithdrawalBalanceWithDistinctScale(recordsList);
 
 		Assert.assertNotNull(returnMap);
-		Object[] returnObjectArray = returnMap.get(recordsId);
+		final Object[] returnObjectArray = returnMap.get(recordsId);
 		Assert.assertNotNull(returnObjectArray);
 		Assert.assertEquals(100.0, returnObjectArray[0]);
 		Assert.assertEquals(new BigInteger("1"), ((BigInteger) returnObjectArray[1]));
@@ -142,7 +142,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testRetrieveWithdrawalStatus() throws MiddlewareQueryException{
-		List<Object[]> returnObjectArray = dao.retrieveWithdrawalStatus(this.germplasmListId, new ArrayList<>(germplasmMap.keySet()));
+		final List<Object[]> returnObjectArray = this.dao.retrieveWithdrawalStatus(this.germplasmListId, new ArrayList<>(this.germplasmMap.keySet()));
 		Assert.assertNotNull(returnObjectArray);
 		Assert.assertEquals(this.germplasmListData.get(0).getGid(), returnObjectArray.get(0)[1]);
 		Assert.assertEquals(this.germplasmListData.get(0).getId(), returnObjectArray.get(0)[2]);
@@ -190,7 +190,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		}
 
 
-		for (final GermplasmListData listEntry : germplasmListData) {
+		for (final GermplasmListData listEntry : this.germplasmListData) {
 			final Integer gid = listEntry.getGermplasmId();
 			lotIdLrecIdMap.put(gidLotIdMap.get(gid), listEntry.getId());
 		}
@@ -217,37 +217,38 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
 
-		Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
+		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
+		final Date createdDate = new Date();
+		lot.setCreatedDate(createdDate);
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
 
-		Transaction depositTransaction =
+		final Transaction depositTransaction =
 				InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, "Deposit", lot, 1, 1, 1, "LIST");
 		depositTransaction.setTransactionDate(20150101);
 		depositTransaction.setUserId(user.getUserid());
 
-		Transaction closedTransaction =
+		final Transaction closedTransaction =
 				InventoryDetailsTestDataInitializer.createReservationTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST");
 		closedTransaction.setTransactionDate(20151010);
 		closedTransaction.setUserId(user.getUserid());
 
-		List<Transaction> transactionList = new ArrayList<>();
+		final List<Transaction> transactionList = new ArrayList<>();
 		transactionList.add(depositTransaction);
 		transactionList.add(closedTransaction);
 		this.inventoryDataManager.addTransactions(transactionList);
 
-		List<TransactionReportRow> transactionReportRows = this.dao.getTransactionDetailsForLot(lot.getId());
+		final List<TransactionReportRow> transactionReportRows = this.dao.getTransactionDetailsForLot(lot.getId());
 
-		for (TransactionReportRow reportRow : transactionReportRows) {
+		for (final TransactionReportRow reportRow : transactionReportRows) {
+			Assert.assertTrue(DateUtils.isSameDay(createdDate, reportRow.getDate()));
 			if (LOT_DEPOSIT.equals(reportRow.getLotStatus())) {
 
 				Assert.assertEquals(depositTransaction.getQuantity(), reportRow.getQuantity());
 				Assert.assertEquals(LOT_DEPOSIT, reportRow.getLotStatus());
-				Assert.assertEquals(depositTransaction.getTransactionDate(), reportRow.getDate());
 				Assert.assertEquals(depositTransaction.getComments(), reportRow.getCommentOfLot());
 
 			}
 			if (LOT_DISCARD.equals(reportRow.getLotStatus())) {
-				Assert.assertEquals(closedTransaction.getTransactionDate(), reportRow.getDate());
 				Assert.assertEquals(closedTransaction.getComments(), reportRow.getCommentOfLot());
 				Assert.assertEquals(closedTransaction.getQuantity(), reportRow.getQuantity());
 				Assert.assertEquals(LOT_DISCARD, reportRow.getLotStatus());
