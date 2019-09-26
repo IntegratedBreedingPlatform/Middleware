@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+   <changeSet author="diego" id="v13.1.0-1">
+      <preConditions onFail="MARK_RAN">
+         <sqlCheck expectedResult="0">SELECT COUNT(*) FROM workbench_tool where group_name="inventory_manager";</sqlCheck>
+      </preConditions>
+      <comment>Add Inventory Manager side menu</comment>
+      <sql dbms="mysql" splitStatements="true">
+		  INSERT INTO workbench_tool (name, group_name, title, version, tool_type, path)
+			VALUES ('inventory_manager', 'inventory_manager', 'Manage Inventory', '13.1', 'WEB', 'inventory-manager/#/inventory-manager');</sql>
+   </changeSet>
+   <changeSet author="diego" id="v13.1.0-2">
+      <preConditions onFail="MARK_RAN">
+         <sqlCheck expectedResult="0">
+			 SELECT COUNT(*) FROM workbench_sidebar_category where sidebar_category_name="inventory_manager";</sqlCheck>
+      </preConditions>
+      <comment>Add Inventory Manager side menu</comment>
+      <sql dbms="mysql" splitStatements="true">
+		  INSERT INTO workbench_sidebar_category (sidebar_category_name, sidebar_category_label)
+			VALUES ('inventory_manager', 'Inventory Manager');</sql>
+   </changeSet>
+   <changeSet author="diego" id="v13.1.0-3">
+      <preConditions onFail="MARK_RAN">
+         <sqlCheck expectedResult="0">SELECT COUNT(*) FROM workbench_sidebar_category_link where tool_name="inventory_manager";</sqlCheck>
+      </preConditions>
+      <comment>Add Manager Inventory side Item menu</comment>
+      <sql dbms="mysql" splitStatements="true">
+		  INSERT INTO workbench_sidebar_category_link (tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title)
+			VALUES ('inventory_manager', (SELECT sidebar_category_id FROM workbench_sidebar_category where sidebar_category_name="inventory_manager"), 'inventory_manager', 'Manage Inventory');
+	  </sql>
+   </changeSet>
+	   <changeSet author="diego" id="v13.1.0-4">
+      <preConditions onFail="MARK_RAN">
+         <sqlCheck expectedResult="0">SELECT COUNT(*) FROM workbench_sidebar_category_link_role where sidebar_category_link_id=(SELECT sidebar_category_link_id FROM workbench_sidebar_category_LINK where tool_name="inventory_manager");</sqlCheck>
+      </preConditions>
+      <comment>Add Manager Inventory side role Item menu</comment>
+      <sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_sidebar_category_link_role (role_id,sidebar_category_link_id)
+				SELECT 1,(SELECT sidebar_category_link_id FROM workbench_sidebar_category_LINK where tool_name="inventory_manager");
+			INSERT INTO workbench_sidebar_category_link_role (role_id,sidebar_category_link_id)
+				SELECT 5,(SELECT sidebar_category_link_id FROM workbench_sidebar_category_LINK where tool_name="inventory_manager");
+	  </sql>
+   </changeSet>
+   <changeSet author="diego" id="v13.1.0-5">
+      <preConditions onFail="MARK_RAN">
+         <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name ='MANAGEMENT_INVENTORY'</sqlCheck>
+      </preConditions>
+      <comment>INSERT INTO table permission to MANAGEMENT_INVENTORY</comment>
+      <sql dbms="mysql" splitStatements="true">INSERT INTO permission (name, description, parent_id, workbench_sidebar_category_link_id)
+			select 'MANAGEMENT_INVENTORY', 'Management Inventory', 3, (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name="inventory_manager");
+	  </sql>
+   </changeSet>
+   <changeSet author="diego" id="v13.1.0-6">
+      <preConditions onFail="MARK_RAN">
+         <sqlCheck expectedResult="0">select count(1)
+				from role_type_permission where permission_id = (SELECT permission_id FROM permission where name ='MANAGEMENT_INVENTORY');</sqlCheck>
+      </preConditions>
+      <comment>INSERT INTO table role_type_permission</comment>
+      <sql dbms="mysql" splitStatements="true">
+		  INSERT INTO role_type_permission (role_type_id,permission_id,selectable) select 2,(SELECT permission_id FROM permission where name ='MANAGEMENT_INVENTORY'),1;
+	  </sql>
+   </changeSet>
+   <changeSet author="diego" id="v13.1.0-7">
+      <preConditions onFail="MARK_RAN">
+         <sqlCheck expectedResult="0">select count(1)
+				from role_permission where permission_id = (SELECT permission_id FROM permission where name ='MANAGEMENT_INVENTORY');</sqlCheck>
+      </preConditions>
+      <comment>INSERT INTO table role_permission</comment>
+      <sql dbms="mysql" splitStatements="true">
+		  	INSERT INTO role_permission (role_id,permission_id) select 1,(SELECT permission_id FROM permission where name ='MANAGEMENT_INVENTORY');
+			INSERT INTO role_permission (role_id,permission_id) select 2,(SELECT permission_id FROM permission where name ='MANAGEMENT_INVENTORY');
+			INSERT INTO role_permission (role_id,permission_id) select 3,(SELECT permission_id FROM permission where name ='MANAGEMENT_INVENTORY');
+	  </sql>
+   </changeSet>
+</databaseChangeLog>
