@@ -13,10 +13,7 @@ import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +26,7 @@ public class InventoryDetailsTestDataInitializer {
 	private static final int USER_ID = 1;
 	private static final int NO_OF_STOCK_LIST_ENTRIES = 20;
 
-	private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-	private static String dateString = format.format( new Date()   );
-	public static Date DATE;
+	public static final Integer DATE = 19122016;
 	public static final String LIST_NAME = "List1";
 	public static final String USER = "User";
 	public static final String STATUS = "Active";
@@ -186,7 +181,7 @@ public class InventoryDetailsTestDataInitializer {
 	}
 
 	public static List<GermplasmListData> createGermplasmListDataForReservedEntries(){
-		List germplasmListData = Lists.newArrayList();
+		final List germplasmListData = Lists.newArrayList();
 
 		final GermplasmListData listEntry = new GermplasmListData();
 		listEntry.setId(1);
@@ -204,7 +199,7 @@ public class InventoryDetailsTestDataInitializer {
 		lotDetails.setReservedTotalForEntry(2.0);
 		lotDetails.setLotScaleMethodName("weight");
 		lotDetails.setLotScaleNameAbbr("g");
-		Location location = new Location(1);
+		final Location location = new Location(1);
 		location.setLname("locName");
 		lotDetails.setLocationOfLot(location);
 		lotDetails.setStockIds("stockIds");
@@ -216,7 +211,7 @@ public class InventoryDetailsTestDataInitializer {
 		lotDetails.setReservedTotal(2.0);
 
 		lots.add(lotDetails);
-		ListDataInventory listDataInfo = new ListDataInventory(1,28);
+		final ListDataInventory listDataInfo = new ListDataInventory(1,28);
 		listDataInfo.setLotRows(lots);
 		listEntry.setInventoryInfo(listDataInfo);
 		germplasmListData.add(listEntry);
@@ -226,7 +221,7 @@ public class InventoryDetailsTestDataInitializer {
 
 
 	public static List<Transaction> createValidReservedTransactions(){
-		Transaction transaction = new Transaction();
+		final Transaction transaction = new Transaction();
 		transaction.setId(110);
 		transaction.setQuantity(-2.0);
 		transaction.setStatus(0);
@@ -235,9 +230,10 @@ public class InventoryDetailsTestDataInitializer {
 		return Lists.newArrayList(transaction);
 	}
 
-	public static Transaction createReservationTransaction(Double quantity, Integer status, String comments, Lot lot, Integer personId,
-						Integer sourceId, Integer sourceRecordId, String sourceType){
-		Transaction transaction = new Transaction();
+	public static Transaction createReservationTransaction(
+		final Double quantity, final Integer status, final String comments, final Lot lot, final Integer personId,
+						final Integer sourceId, final Integer sourceRecordId, final String sourceType){
+		final Transaction transaction = new Transaction();
 		transaction.setQuantity(quantity);
 		transaction.setStatus(status);
 		transaction.setComments(comments);
@@ -250,9 +246,10 @@ public class InventoryDetailsTestDataInitializer {
 		return  transaction;
 	}
 
-	public static Transaction createDepositTransaction(Double quantity, Integer status, String comments, Lot lot, Integer personId,
-			Integer sourceId, Integer sourceRecordId, String sourceType, String inventoryID){
-		Transaction transaction = new Transaction();
+	public static Transaction createDepositTransaction(
+		final Double quantity, final Integer status, final String comments, final Lot lot, final Integer personId,
+			final Integer sourceId, final Integer sourceRecordId, final String sourceType, final String inventoryID){
+		final Transaction transaction = new Transaction();
 		transaction.setQuantity(quantity);
 		transaction.setStatus(status);
 		transaction.setComments(comments);
@@ -268,9 +265,11 @@ public class InventoryDetailsTestDataInitializer {
 
 
 
-	public static Lot createLot(Integer userId, String entityType, Integer entityId, Integer locationId, Integer scaleId, Integer status,
-			Integer sourceId, String comments) {
-		Lot lot = new Lot();
+	@SuppressWarnings("LocalCanBeFinal")
+	public static Lot createLot(
+		final Integer userId, final String entityType, final Integer entityId, final Integer locationId, final Integer scaleId, final Integer status,
+			final Integer sourceId, final String comments) {
+		final Lot lot = new Lot();
 		lot.setUserId(userId);
 		lot.setEntityType(entityType);
 		lot.setEntityId(entityId);
@@ -285,24 +284,15 @@ public class InventoryDetailsTestDataInitializer {
 
 	public static List<TransactionReportRow> createTransactionReportRowTestData() {
 
-		List<TransactionReportRow> transactionReportRowList = new ArrayList<>();
-		TransactionReportRow transactionReportRows = new TransactionReportRow();
+		final List<TransactionReportRow> transactionReportRowList = new ArrayList<>();
+		final TransactionReportRow transactionReportRows = new TransactionReportRow();
 		transactionReportRows.setListName(LIST_NAME);
 		transactionReportRows.setLotStatus(STATUS);
-		transactionReportRows.setDate(getDATE());
+		transactionReportRows.setDate(DATE);
 		transactionReportRows.setQuantity(AMOUNT);
 		transactionReportRows.setUser(USER);
 
 		transactionReportRowList.add(transactionReportRows);
 		return transactionReportRowList;
-	}
-
-	public static Date getDATE() {
-		try {
-			return format.parse("2009-12-31");
-		} catch (ParseException e) {
-			e.printStackTrace();
-			return null;
-		}
 	}
 }

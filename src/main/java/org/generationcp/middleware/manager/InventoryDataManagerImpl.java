@@ -296,9 +296,10 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 		for (final org.generationcp.middleware.pojos.ims.Transaction t : transactions) {
 			final TransactionReportRow row = new TransactionReportRow();
-			row.setDate(t.getLot().getCreatedDate());
+			row.setDate(t.getTransactionDate());
 			row.setQuantity(t.getQuantity());
 			row.setCommentOfLot(t.getLot().getComments());
+			row.setLotDate(t.getLot().getCreatedDate());
 
 			final Term termScale = ontologyManager.getTermById(t.getLot().getScaleId());
 			row.setScaleOfLot(termScale);
@@ -326,10 +327,11 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		final List<org.generationcp.middleware.pojos.ims.Transaction> transactions = this.getAllReserveTransactions(start, numOfRows);
 		for (final org.generationcp.middleware.pojos.ims.Transaction t : transactions) {
 			final TransactionReportRow row = new TransactionReportRow();
-			row.setDate(t.getLot().getCreatedDate());
+			row.setDate(t.getTransactionDate());
 			row.setQuantity(t.getQuantity());
 			row.setCommentOfLot(t.getLot().getComments());
 			row.setEntityIdOfLot(t.getLot().getEntityId());
+			row.setLotDate(t.getLot().getCreatedDate());
 
 			final Term termScale = ontologyManager.getTermById(t.getLot().getScaleId());
 			row.setScaleOfLot(termScale);
@@ -359,10 +361,11 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			this.daoFactory.getTransactionDAO().getAllWithdrawals(start, numOfRows);
 		for (final org.generationcp.middleware.pojos.ims.Transaction t : transactions) {
 			final TransactionReportRow row = new TransactionReportRow();
-			row.setDate(t.getLot().getCreatedDate());
+			row.setDate(t.getTransactionDate());
 			row.setQuantity(t.getQuantity());
 			row.setCommentOfLot(t.getLot().getComments());
 			row.setEntityIdOfLot(t.getLot().getEntityId());
+			row.setLotDate(t.getLot().getCreatedDate());
 
 			final Term termScale = ontologyManager.getTermById(t.getLot().getScaleId());
 			row.setScaleOfLot(termScale);

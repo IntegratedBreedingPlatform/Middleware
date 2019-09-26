@@ -2,7 +2,6 @@
 package org.generationcp.middleware.dao.ims;
 
 import com.beust.jcommander.internal.Lists;
-import org.apache.commons.lang.time.DateUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
@@ -28,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -218,8 +216,6 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
-		final Date createdDate = new Date();
-		lot.setCreatedDate(createdDate);
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
 
 		final Transaction depositTransaction =
@@ -240,15 +236,16 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final List<TransactionReportRow> transactionReportRows = this.dao.getTransactionDetailsForLot(lot.getId());
 
 		for (final TransactionReportRow reportRow : transactionReportRows) {
-			Assert.assertTrue(DateUtils.isSameDay(createdDate, reportRow.getDate()));
 			if (LOT_DEPOSIT.equals(reportRow.getLotStatus())) {
 
 				Assert.assertEquals(depositTransaction.getQuantity(), reportRow.getQuantity());
 				Assert.assertEquals(LOT_DEPOSIT, reportRow.getLotStatus());
+				Assert.assertEquals(depositTransaction.getTransactionDate(), reportRow.getDate());
 				Assert.assertEquals(depositTransaction.getComments(), reportRow.getCommentOfLot());
 
 			}
 			if (LOT_DISCARD.equals(reportRow.getLotStatus())) {
+				Assert.assertEquals(closedTransaction.getTransactionDate(), reportRow.getDate());
 				Assert.assertEquals(closedTransaction.getComments(), reportRow.getCommentOfLot());
 				Assert.assertEquals(closedTransaction.getQuantity(), reportRow.getQuantity());
 				Assert.assertEquals(LOT_DISCARD, reportRow.getLotStatus());
