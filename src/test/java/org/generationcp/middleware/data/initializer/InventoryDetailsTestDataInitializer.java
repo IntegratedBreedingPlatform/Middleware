@@ -13,6 +13,8 @@ import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,7 +29,9 @@ public class InventoryDetailsTestDataInitializer {
 	private static final int USER_ID = 1;
 	private static final int NO_OF_STOCK_LIST_ENTRIES = 20;
 
-	public static final Date DATE = new Date(19122016);
+	private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+	private static String dateString = format.format( new Date()   );
+	public static Date DATE;
 	public static final String LIST_NAME = "List1";
 	public static final String USER = "User";
 	public static final String STATUS = "Active";
@@ -285,11 +289,20 @@ public class InventoryDetailsTestDataInitializer {
 		TransactionReportRow transactionReportRows = new TransactionReportRow();
 		transactionReportRows.setListName(LIST_NAME);
 		transactionReportRows.setLotStatus(STATUS);
-		transactionReportRows.setDate(DATE);
+		transactionReportRows.setDate(getDATE());
 		transactionReportRows.setQuantity(AMOUNT);
 		transactionReportRows.setUser(USER);
 
 		transactionReportRowList.add(transactionReportRows);
 		return transactionReportRowList;
+	}
+
+	public static Date getDATE() {
+		try {
+			return format.parse("2009-12-31");
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
