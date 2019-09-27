@@ -8,7 +8,7 @@
       <comment>Add Inventory Manager side menu</comment>
       <sql dbms="mysql" splitStatements="true">
 		  INSERT INTO workbench_tool (name, group_name, title, version, tool_type, path)
-			VALUES ('inventory_manager', 'inventory_manager', 'Manage Inventory', '13.1', 'WEB', 'inventory-manager/#/inventory-manager');</sql>
+			VALUES ('inventory_manager', 'inventory_manager', 'Manage Inventory', '13.1', 'WEB', 'inventory-manager/#/');</sql>
    </changeSet>
 
    <changeSet author="diego" id="v13.1.0-2">
