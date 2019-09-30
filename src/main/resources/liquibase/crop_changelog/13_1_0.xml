@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="vanina" id="v13.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT count(1)
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME = 'ims_transaction'
+					AND COLUMN_NAME = 'trndate'
+					AND TABLE_SCHEMA = DATABASE()
+					AND DATA_TYPE = 'int';
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Change trndate type from int to timestamp
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			CHANGE COLUMN trndate trndate TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;
+		</sql>
+	</changeSet>
+</databaseChangeLog>
