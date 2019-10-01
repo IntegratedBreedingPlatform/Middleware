@@ -89,7 +89,7 @@ public class Lot implements Serializable {
 	private LotAggregateData aggregateData;
 
 	public Lot() {
-
+		this.createdDate = new Date();
 	}
 
 	public Lot(final Integer id) {
@@ -110,6 +110,7 @@ public class Lot implements Serializable {
 		this.status = status;
 		this.sourceId = sourceId;
 		this.comments = comments;
+		this.createdDate = new Date();
 	}
 
 	public Lot(
@@ -126,6 +127,7 @@ public class Lot implements Serializable {
 		this.sourceId = sourceId;
 		this.comments = comments;
 		this.transactions = transactions;
+		this.createdDate = new Date();
 	}
 
 	public Integer getId() {
