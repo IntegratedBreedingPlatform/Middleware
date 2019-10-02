@@ -32,16 +32,16 @@ public class InventoryDetailsTestDataInitializer {
 	public static final String USER = "User";
 	public static final String STATUS = "Active";
 	public static final Double AMOUNT = -50.0;
-	public Date DATE;
+	public Date date;
 
 	public InventoryDetailsTestDataInitializer() {
 		// do nothing
 		final String sDate1 = "13/04/2014";
 		try {
-			this.DATE = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+			this.date = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
 		} catch (final ParseException e) {
 			e.printStackTrace();
-			this.DATE = null;
+			this.date = null;
 		}
 	}
 
@@ -296,7 +296,7 @@ public class InventoryDetailsTestDataInitializer {
 		final TransactionReportRow transactionReportRows = new TransactionReportRow();
 		transactionReportRows.setListName(LIST_NAME);
 		transactionReportRows.setLotStatus(STATUS);
-		transactionReportRows.setDate(this.DATE);
+		transactionReportRows.setDate(this.date);
 		transactionReportRows.setQuantity(AMOUNT);
 		transactionReportRows.setUser(USER);
 
