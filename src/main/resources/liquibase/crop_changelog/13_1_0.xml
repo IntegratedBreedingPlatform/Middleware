@@ -1,0 +1,31 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="vanina" id="v13.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="ims_lot" columnName="created_date"/> </not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_lot
+			ADD COLUMN created_date TIMESTAMP NULL DEFAULT NULL;
+
+			alter table ims_lot
+			modify COLUMN created_date TIMESTAMP NULL default CURRENT_TIMESTAMP;
+		</sql>
+
+	</changeSet>
+
+	<changeSet author="vanina" id="v13.1.0-2">
+		<preConditions onFail="MARK_RAN">
+				<columnExists tableName="ims_lot" columnName="created_date"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_lot lot SET created_date = ( SELECT MIN(str_to_date(CAST(trndate as CHAR), '%Y%m%d')) FROM ims_transaction where ims_transaction.lotid = lot.lotid);
+		</sql>
+	</changeSet>
+
+
+</databaseChangeLog>
