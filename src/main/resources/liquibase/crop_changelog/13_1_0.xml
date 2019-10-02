@@ -23,7 +23,8 @@
 				<columnExists tableName="ims_lot" columnName="created_date"/>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE ims_lot lot SET created_date = ( SELECT MIN(str_to_date(CAST(trndate as CHAR), '%Y%m%d')) FROM ims_transaction where ims_transaction.lotid = lot.lotid);
+			UPDATE ims_lot lot SET created_date = ( SELECT MIN(str_to_date(CAST(trndate as CHAR), '%Y%m%d')) FROM ims_transaction where ims_transaction.lotid = lot.lotid)
+			where created_date is null;
 		</sql>
 	</changeSet>
 
