@@ -277,7 +277,7 @@
 		</sql>
 	</changeSet>
 
-		<changeSet author="corina" id="v13.2.0-7">
+	<changeSet author="corina" id="v13.2.0-7">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(*) from cvterm_relationship where type_id=1190 and subject_id=6050;
