@@ -13,6 +13,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -374,9 +376,25 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	public void testGetUsersByProjectId() {
 		final List<WorkbenchUser> results = this.userService.getUsersByProjectId(this.commonTestProject.getProjectId());
 		assertNotNull(results);
-		this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
+		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
+		this.userService.addUser(user);
+
+		final UserRole userRole = new UserRole();
+		userRole.setCreatedBy(this.testUser1);
+		userRole.setWorkbenchProject(this.commonTestProject);
+		userRole.setCropType(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
+		userRole.setUser(user);
+		userRole.setCreatedDate(new Date());
+		final Role role = new Role();
+		role.setId(1);
+		final RoleType roleType = new RoleType();
+		roleType.setId(1);
+		role.setRoleType(roleType);
+		userRole.setRole(role);
+		this.workbenchDataManager.saveOrUpdateUserRole(userRole);
 
 		this.sessionProvder.getSession().flush();
+
 		final List<WorkbenchUser> newResults = this.userService.getUsersByProjectId(this.commonTestProject.getProjectId());
 		assertNotNull(newResults);
 		Assert.assertEquals(results.size() + 1, newResults.size());

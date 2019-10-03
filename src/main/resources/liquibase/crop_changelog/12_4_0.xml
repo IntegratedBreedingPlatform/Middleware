@@ -60,16 +60,36 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					    SELECT COUNT(1) FROM users u
-						 INNER JOIN persons p on p.personid = u.personid
-     					 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
-
+					   SELECT COUNT(1) FROM users u
+					    INNER JOIN persons p on p.personid = u.personid
+                        WHERE NOT EXISTS (SELECT 1 FROM workbench.users wu WHERE wu.uname = u.uname)
+                          AND u.userid IN (
+								SELECT * FROM (
+									SELECT DISTINCT created_by AS userId FROM sample UNION
+									SELECT DISTINCT taken_by AS userId FROM sample UNION
+									SELECT DISTINCT created_by AS userId FROM sample_list UNION
+									SELECT DISTINCT userid  AS userid FROM user_program_tree_state UNION
+									SELECT DISTINCT user_id AS userid FROM gdms_dataset_users UNION
+									SELECT DISTINCT user_id as userid FROM gdms_track_data UNION
+									SELECT DISTINCT userid as userid FROM ims_lot UNION
+									SELECT DISTINCT userid as userid FROM ims_transaction UNION
+									SELECT DISTINCT created_by as userid FROM project UNION
+									SELECT DISTINCT listuid as userid FROM listnms UNION
+									SELECT DISTINCT auid as userid FROM atributs UNION
+									SELECT DISTINCT cuid as userid FROM changes UNION
+									SELECT DISTINCT germuid as userid FROM germplsm UNION
+									SELECT DISTINCT duid as userid FROM locdes UNION
+									SELECT DISTINCT muid as userid FROM methods UNION
+									SELECT DISTINCT nuid as userid FROM names UNION
+									SELECT DISTINCT fuid as userid FROM udflds UNION
+									SELECT DISTINCT refuid as userid FROM reflinks) as a
+								WHERE a.userId IS NOT NULL);
 				</sqlCheck>
 			</not>
 		</preConditions>
 		<comment>
-			Insert into backup table in crop database any users (matching by username) that don't exist in workbench database.
-			Insert into workbench database these crop-only usets records.
+			Insert into backup table any crop-specific users (matching by username) that are referenced in at least one record in crop database.
+			Insert into workbench database these crop-only users records.
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE users_migrated (
@@ -89,7 +109,28 @@
 			INSERT INTO users_migrated
 			SELECT u.* FROM users u
 			 INNER JOIN persons p on p.personid = u.personid
-			 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
+			 WHERE NOT EXISTS (SELECT 1 FROM workbench.users wu WHERE wu.uname = u.uname)
+			   AND u.userid IN (
+								SELECT * FROM (
+									SELECT DISTINCT created_by AS userId FROM sample UNION
+									SELECT DISTINCT taken_by AS userId FROM sample UNION
+									SELECT DISTINCT created_by AS userId FROM sample_list UNION
+									SELECT DISTINCT userid  AS userid FROM user_program_tree_state UNION
+									SELECT DISTINCT user_id AS userid FROM gdms_dataset_users UNION
+									SELECT DISTINCT user_id as userid FROM gdms_track_data UNION
+									SELECT DISTINCT userid as userid FROM ims_lot UNION
+									SELECT DISTINCT userid as userid FROM ims_transaction UNION
+									SELECT DISTINCT created_by as userid FROM project UNION
+									SELECT DISTINCT listuid as userid FROM listnms UNION
+									SELECT DISTINCT auid as userid FROM atributs UNION
+									SELECT DISTINCT cuid as userid FROM changes UNION
+									SELECT DISTINCT germuid as userid FROM germplsm UNION
+									SELECT DISTINCT duid as userid FROM locdes UNION
+									SELECT DISTINCT muid as userid FROM methods UNION
+									SELECT DISTINCT nuid as userid FROM names UNION
+									SELECT DISTINCT fuid as userid FROM udflds UNION
+									SELECT DISTINCT refuid as userid FROM reflinks) as a
+								WHERE a.userId IS NOT NULL);
 
 
 			INSERT INTO workbench.users(`ustatus`, `uaccess`, `utype`, `uname`, `upswd`, `personid`, `adate`, `cdate`)
@@ -97,7 +138,28 @@
 			  FROM users u
 			 INNER JOIN persons p on p.personid = u.personid
 			 INNER JOIN workbench.persons wp on wp.pemail = p.pemail
-			 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
+			 WHERE NOT EXISTS (SELECT 1 FROM workbench.users wu WHERE wu.uname = u.uname)
+			   AND u.userid IN (
+								SELECT * FROM (
+									SELECT DISTINCT created_by AS userId FROM sample UNION
+									SELECT DISTINCT taken_by AS userId FROM sample UNION
+									SELECT DISTINCT created_by AS userId FROM sample_list UNION
+									SELECT DISTINCT userid  AS userid FROM user_program_tree_state UNION
+									SELECT DISTINCT user_id AS userid FROM gdms_dataset_users UNION
+									SELECT DISTINCT user_id as userid FROM gdms_track_data UNION
+									SELECT DISTINCT userid as userid FROM ims_lot UNION
+									SELECT DISTINCT userid as userid FROM ims_transaction UNION
+									SELECT DISTINCT created_by as userid FROM project UNION
+									SELECT DISTINCT listuid as userid FROM listnms UNION
+									SELECT DISTINCT auid as userid FROM atributs UNION
+									SELECT DISTINCT cuid as userid FROM changes UNION
+									SELECT DISTINCT germuid as userid FROM germplsm UNION
+									SELECT DISTINCT duid as userid FROM locdes UNION
+									SELECT DISTINCT muid as userid FROM methods UNION
+									SELECT DISTINCT nuid as userid FROM names UNION
+									SELECT DISTINCT fuid as userid FROM udflds UNION
+									SELECT DISTINCT refuid as userid FROM reflinks) as a
+								WHERE a.userId IS NOT NULL);
 		</sql>
 	</changeSet>
 

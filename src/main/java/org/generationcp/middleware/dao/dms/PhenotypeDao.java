@@ -1240,7 +1240,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public List<Phenotype> getDatasetDraftData(final Integer datasetId) {
 		final List<Map<String, Object>> results = this.getSession().createSQLQuery("select {ph.*}, {e.*}, "
 			+ " (select exists( "
-			+ "     select 1 from formula where target_variable_id = ph.observable_id "
+			+ "     select 1 from formula where target_variable_id = ph.observable_id and active = 1"
 			+ " )) as isDerivedTrait "
 			+ " from phenotype ph"
 			+ " inner join nd_experiment e on ph.nd_experiment_id = e.nd_experiment_id"

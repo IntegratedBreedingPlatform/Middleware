@@ -10,7 +10,6 @@ import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
@@ -67,6 +66,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -168,7 +168,7 @@ public class DatasetServiceImpl implements DatasetService {
 				.getObservationSetVariables(observationSetId, PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
 		} else {
 			//SUBOBS
-			DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(observationSetId).getParent();
+			final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(observationSetId).getParent();
 			// TODO get immediate parent columns
 			// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
 			factorColumns =
@@ -202,7 +202,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		// Virtual columns
 		if (this.daoFactory.getSampleDao().countByDatasetId(observationSetId) > 0) {
-			factorColumns.add(buildSampleColumn());
+			factorColumns.add(this.buildSampleColumn());
 		}
 
 		// Other edge cases
@@ -1068,7 +1068,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public Map<Integer, List<ObservationUnitRow>> getInstanceIdToObservationUnitRowsMap(
 		final int studyId, final int datasetId,
 		final List<Integer> instanceIds) {
-		final Map<Integer, List<ObservationUnitRow>> instanceMap = new HashMap<>();
+		final Map<Integer, List<ObservationUnitRow>> instanceMap = new LinkedHashMap<>();
 
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
