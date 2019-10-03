@@ -10,17 +10,7 @@
 
 package org.generationcp.middleware.dao.ims;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.collect.Lists;
-
 import com.google.common.collect.Sets;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
@@ -36,6 +26,15 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Lot}.
@@ -69,7 +68,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			+ "  SUM(CASE WHEN trnstat = 1 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS committed_amt, ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS =
-			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS + "  GROUP_CONCAT(inventory_id SEPARATOR ', ') AS stockids ";
+			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS + "  GROUP_CONCAT(DISTINCT stock_id SEPARATOR ', ') AS stockids ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM_CONDITION =
 			"FROM ims_lot i " + "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
@@ -634,4 +633,16 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 	}
 
+	public List<String> getInventoryIDsWithBreederIdentifier(final String identifier) {
+		try {
+			final String queryString = "select stock_id FROM ims_lot WHERE stock_id "
+				+ "RLIKE '^:identifier[0-9][0-9]*.*'".replace(":identifier", identifier);
+			final Query query = this.getSession().createSQLQuery(queryString);
+			return query.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getInventoryIDsWithBreederIdentifier query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }

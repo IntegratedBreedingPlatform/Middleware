@@ -486,5 +486,74 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="vanina" id="v13.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="stock_id_bkp"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create stockId backup table and migrate inventory_id values for more than 1 stock_id
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE stock_id_bkp (
+			ims_lot INT(11) NOT NULL,
+			ims_transaction INT(11) NOT NULL,
+			stock_id VARCHAR(35) NOT NULL,
+			PRIMARY KEY (ims_lot, ims_transaction, stock_id));
+
+			INSERT INTO stock_id_bkp
+			SELECT
+			t.lotid, t.trnid, t.inventory_id
+			FROM
+			ims_transaction t
+			WHERE t.inventory_id IS NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v13.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="ims_lot" columnName="stock_id"/>
+			</not>
+		</preConditions>
+		<comment>
+			Add column stock_id to ims_lot table
+		</comment>
+		<addColumn tableName="ims_lot">
+			<column name="stock_id" type="VARCHAR(35)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="vanina" id="v13.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="ims_lot" columnName="stock_id"/>
+		</preConditions>
+		<comment>
+			Update column stock_id with the lower stock_id
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_lot AS lot
+			INNER JOIN
+			(SELECT
+			trx.lotid, inventory_id, MIN(trnid)
+			FROM
+			ims_transaction trx
+			WHERE
+			trx.inventory_id IS NOT NULL
+			GROUP BY trx.lotid) AS t ON t.lotid = lot.lotid
+			SET lot.stock_id = t.inventory_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v13.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="ims_transaction" columnName="inventory_id"/>
+		</preConditions>
+		<comment>Drop role column inventory_id from ims_transaction table</comment>
+		<dropColumn columnName="inventory_id" tableName="ims_transaction"/>
+	</changeSet>
 
 </databaseChangeLog>

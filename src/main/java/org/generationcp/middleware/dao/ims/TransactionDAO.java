@@ -59,18 +59,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
-	public List<String> getInventoryIDsWithBreederIdentifier(final String identifier) {
-		try {
-			final String queryString = Transaction.GET_INVENTORY_ID_WITH_IDENTIFIER_QUERY.replace(":identifier", identifier);
-			final Query query = this.getSession().createSQLQuery(queryString);
-			return query.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getInventoryIDsWithBreederIdentifier query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	public long countAllReserve() {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
@@ -212,7 +200,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 			final StringBuilder sql =
 					new StringBuilder().append("SELECT lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
-							.append("tran.sourceid, tran.trnqty, tran.inventory_id, lot.comments, tran.recordid ")
+							.append("tran.sourceid, tran.trnqty, lot.stock_id, lot.comments, tran.recordid ")
 							.append("FROM ims_transaction tran ").append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
 							.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue())
 							.append("		 AND tran.recordid IN (:recordIds) ");
@@ -444,7 +432,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final Map<Integer, String> gIdStockIdMap = new HashMap<>();
 
 		final String sql =
-				"SELECT a.gid,group_concat(inventory_id SEPARATOR ', ')  " + "FROM listdata a  "
+				"SELECT a.gid,group_concat(distinct b.stock_id SEPARATOR ', ')  " + "FROM listdata a  "
 						+ "inner join ims_lot b ON a.gid = b.eid  "
 						+ "INNER JOIN ims_transaction c ON b.lotid = c.lotid and a.lrecid = c.recordid "
 						+ "WHERE a.gid in (:gIds) GROUP BY a.gid";
@@ -473,7 +461,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			return new ArrayList<>();
 		}
 
-		final String sql = "SELECT inventory_id" + " FROM ims_transaction" + " WHERE inventory_id IN (:STOCK_ID_LIST)";
+		final String sql = "SELECT stock_id" + " FROM ims_lot" + " WHERE stock_id IN (:STOCK_ID_LIST)";
 		final Query query = this.getSession().createSQLQuery(sql).setParameterList("STOCK_ID_LIST", stockIds);
 
 		return query.list();
@@ -483,8 +471,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	public List<String> getStockIdsByListDataProjectListId(final Integer listId) {
 		try {
 			final String sql =
-					"SELECT tran.inventory_id" + " FROM ims_transaction tran, listnms l" + " WHERE l.listId = :listId "
-							+ " AND sourceId = l.listref AND sourceType = 'LIST'" + " AND inventory_id IS NOT NULL";
+				"SELECT lot.stock_id" + " FROM ims_transaction tran, listnms l, lot " + " WHERE l.listId = :listId "
+					+ " AND tran.lotid = lot.lotid AND sourceId = l.listref AND sourceType = 'LIST'" + " AND lot.stock_id IS NOT NULL";
 			final Query query = this.getSession().createSQLQuery(sql).setParameter("listId", listId);
 			return query.list();
 		} catch (final Exception e) {

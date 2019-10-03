@@ -11,13 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
@@ -47,6 +40,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 
@@ -750,7 +750,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		final Map<Integer, String> germplsmWiseStockID = this.manager.retrieveStockIds(Lists.newArrayList(germplasmId));
 
 		Assert.assertNotNull(germplsmWiseStockID);
-		Assert.assertEquals(depositTransactionForLotOne.getInventoryID()+", "+depositTransactionForLotTwo.getInventoryID()
-				, germplsmWiseStockID.get(germplasmId));
+		Assert.assertEquals(depositTransactionForLotOne.getLot().getStock_id() + ", " + depositTransactionForLotTwo.getLot().getStock_id()
+			, germplsmWiseStockID.get(germplasmId));
 	}
 }

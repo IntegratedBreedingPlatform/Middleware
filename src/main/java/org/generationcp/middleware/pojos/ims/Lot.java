@@ -11,7 +11,7 @@
 
 package org.generationcp.middleware.pojos.ims;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
 
@@ -81,6 +81,9 @@ public class Lot implements Serializable {
 
 	@Column(name = "created_date")
 	private Date createdDate;
+
+	@Column(name = "stock_id")
+	private String stock_id;
 
 	@OneToMany(mappedBy = "lot")
 	private Set<Transaction> transactions = new HashSet<Transaction>();
@@ -224,6 +227,14 @@ public class Lot implements Serializable {
 
 	public void setCreatedDate(final Date createdDate) {
 		this.createdDate = createdDate;
+	}
+
+	public String getStock_id() {
+		return this.stock_id;
+	}
+
+	public void setStock_id(final String stock_id) {
+		this.stock_id = stock_id;
 	}
 
 	@Override
