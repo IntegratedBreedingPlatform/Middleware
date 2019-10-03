@@ -45,6 +45,8 @@ public class TransactionReportRow implements Serializable {
 	private Integer listId;
 	private Integer trnStatus;
 	private String lotStatus;
+	private Date lotDate;
+
 
 	public TransactionReportRow() {
 
@@ -56,6 +58,14 @@ public class TransactionReportRow implements Serializable {
 
 	public void setDate(final Date date) {
 		this.date = date;
+	}
+
+	public Date getLotDate() {
+		return this.lotDate;
+	}
+
+	public void setLotDate(final Date lotDate) {
+		this.lotDate = lotDate;
 	}
 
 	public Double getQuantity() {
