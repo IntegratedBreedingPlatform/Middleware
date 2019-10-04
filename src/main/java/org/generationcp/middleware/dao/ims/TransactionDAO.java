@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -388,7 +389,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate "
 							+ "WHERE trnstat = 0 AND recordid IN (:entryIds) " + "AND sourceType = 'LIST'";
 			final Query query =
-					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDateAsIntegerValue())
+					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDate())
 							.setParameterList("entryIds", listEntryIds);
 			query.executeUpdate();
 		} catch (final Exception e) {
@@ -410,7 +411,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate " + "WHERE trnstat = 0 AND lotId = :lotId "
 							+ "AND recordId = :lrecId " + "AND trnqty < 0 " + "AND sourceType = 'LIST'";
 			final Query query =
-					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDateAsIntegerValue())
+					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDate())
 							.setParameter("lotId", lotId).setParameter("lrecId", lrecId);
 			query.executeUpdate();
 		} catch (final Exception e) {
@@ -428,7 +429,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 							+ "WHERE trnstat = 0 AND sourceType = 'LIST' " + "AND lotid in ( select lotid from ims_lot "
 							+ "WHERE status = 0 AND etype = 'GERMPLSM' " + "AND eid in (:gids))";
 			final Query query =
-					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDateAsIntegerValue())
+					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDate())
 							.setParameterList("gids", gids);
 			query.executeUpdate();
 		} catch (final Exception e) {
@@ -499,8 +500,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		try {
 			final String sql = "SELECT i.userid,i.lotid,i.trndate,i.trnstat,i.trnqty,i.sourceid,l.listname, i.comments,"
 					+ "(CASE WHEN i.comments in ('Lot closed', 'Discard') THEN i.comments WHEN trnstat = 0 AND trnqty > 0 THEN 'Deposit' "
-					+ "WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation' WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal' END) as trntype "
+					+ "WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation' WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal' END) as trntype, "
+					+ "lot.created_date "
 					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
+					+ " INNER JOIN ims_lot lot ON lot.lotid = i.lotid "
 					+ "WHERE i.lotid = :lotId AND i.trnstat <> 9 ORDER BY i.lotid";
 
 			final Query query = this.getSession().createSQLQuery(sql);
@@ -526,13 +529,14 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 			final Integer userId = (Integer) row[0];
 			final Integer lotId = (Integer) row[1];
-			final Integer trnDate = (Integer) row[2];
+			final Date trnDate = (Date) row[2];
 			final Integer trnState = (Integer) row[3];
 			final Double trnQty = (Double) row[4];
 			final Integer listId = (Integer) row[5];
 			final String listName = (String) row[6];
 			final String comments = (String) row[7];
 			final String lotStatus = (String) row[8];
+			final Date lotDate = (Date) row[9];
 
 			transaction = new TransactionReportRow();
 			transaction.setUserId(userId);
@@ -544,6 +548,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			transaction.setListName(listName);
 			transaction.setCommentOfLot(comments);
 			transaction.setLotStatus(lotStatus);
+			transaction.setLotDate(lotDate);
 
 			transactionReportRows.add(transaction);
 		}
