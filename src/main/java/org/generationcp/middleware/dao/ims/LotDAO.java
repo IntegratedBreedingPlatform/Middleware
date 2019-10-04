@@ -658,9 +658,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "  SUM(CASE WHEN transaction.trnstat = 1 AND transaction.trnqty <= 0 THEN transaction.trnqty * -1 ELSE 0 END) AS withdrawalTotal, " //
 		+ "  lot.comments as comments, " //
 		+ "  users.uname as createdByUsername, " //
-		+ "  MIN(transaction.trndate) as createdDate, " //
-		+ "  MAX(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty > 0 THEN str_to_date(CAST(transaction.trndate as CHAR), '%Y%m%d') ELSE null END) AS lastDepositDate, " //
-		+ "  MAX(CASE WHEN transaction.trnstat = 1 AND transaction.trnqty <= 0 THEN str_to_date(CAST(transaction.trndate as CHAR), '%Y%m%d') ELSE null END) AS lastWithdrawalDate " //
+		+ "  lot.created_date as createdDate, " //
+		+ "  MAX(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty > 0 THEN transaction.trndate ELSE null END) AS lastDepositDate, " //
+		+ "  MAX(CASE WHEN transaction.trnstat = 1 AND transaction.trnqty <= 0 THEN transaction.trndate ELSE null END) AS lastWithdrawalDate " //
 		+ "FROM ims_lot lot " //
 		+ "       LEFT JOIN ims_transaction transaction ON transaction.lotid = lot.lotid AND transaction.trnstat <> 9 " //
 		+ "       INNER JOIN germplsm g on g.gid = lot.eid " //
