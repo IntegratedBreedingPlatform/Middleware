@@ -19,6 +19,7 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.util.Util;
 
 import java.text.DecimalFormat;
+import java.util.Date;
 
 public class TransactionBuilder extends Builder {
 
@@ -41,9 +42,9 @@ public class TransactionBuilder extends Builder {
 		return transaction;
 	}
 
-	private Integer getCurrentDate() {
+	private Date getCurrentDate() {
 		// Get current date in ICIS date format YYYMMDD
-		return Util.getCurrentDateAsIntegerValue();
+		return Util.getCurrentDate();
 	}
 
 	private Double formatAmount(final Double amount) {
