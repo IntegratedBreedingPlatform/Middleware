@@ -471,8 +471,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	public List<String> getStockIdsByListDataProjectListId(final Integer listId) {
 		try {
 			final String sql =
-				"SELECT lot.stock_id" + " FROM ims_transaction tran, listnms l, lot " + " WHERE l.listId = :listId "
-					+ " AND tran.lotid = lot.lotid AND sourceId = l.listref AND sourceType = 'LIST'" + " AND lot.stock_id IS NOT NULL";
+				"SELECT lot.stock_id" + " FROM ims_transaction tran, listnms l, ims_lot lot " + " WHERE l.listId = :listId "
+					+ " AND tran.lotid = lot.lotid AND tran.sourceId = l.listref AND sourceType = 'LIST'" + " AND lot.stock_id IS NOT NULL";
 			final Query query = this.getSession().createSQLQuery(sql).setParameter("listId", listId);
 			return query.list();
 		} catch (final Exception e) {

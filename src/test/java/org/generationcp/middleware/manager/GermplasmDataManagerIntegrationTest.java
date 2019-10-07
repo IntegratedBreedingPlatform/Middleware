@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -53,7 +52,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -654,7 +652,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testAddGermplasmWithNameAndProgenitors() {
 
-		final UserDefinedField nameType = createUserdefinedField("NAMES", "NAME", RandomStringUtils.randomAlphabetic(5).toUpperCase());
+		final UserDefinedField nameType = this.createUserdefinedField("NAMES", "NAME", RandomStringUtils.randomAlphabetic(5).toUpperCase());
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		germplasm.getPreferredName().setTypeId(nameType.getFldno());
 
@@ -897,10 +895,10 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
 
-		Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
+		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.lotDAO.save(lot);
 
-		Transaction transaction =
+		final Transaction transaction =
 			InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, "2 reserved", lot, 1, 1, 1, "LIST");
 		this.transactionDAO.save(transaction);
 
@@ -1149,13 +1147,13 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final int GID1 = 1;
 		final int GID2 = 2;
 		final int GID3 = 3;
-		GermplasmDataManager germplasmDataManager = Mockito.mock(GermplasmDataManager.class);
+		final GermplasmDataManager germplasmDataManager = Mockito.mock(GermplasmDataManager.class);
 
 		final Map<Integer, String[]> parentsInfo = new HashMap<>();
 
-		String[] parent1 = new String[] {separator, parent1Name};
-		String[] parent2 = new String[] {separator, parent2Name};
-		String[] parent3 = new String[] {separator, parent3Name};
+		final String[] parent1 = new String[] {separator, parent1Name};
+		final String[] parent2 = new String[] {separator, parent2Name};
+		final String[] parent3 = new String[] {separator, parent3Name};
 		parentsInfo.put(1, parent1);
 		parentsInfo.put(2, parent2);
 		parentsInfo.put(3, parent3);
@@ -1197,21 +1195,21 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetAttributeValue() {
 		final String attributeVal = "TEST_ATTRIBUTE";
-		final Germplasm germplasm = createGermplasm();
+		final Germplasm germplasm = this.createGermplasm();
 		assertThat(germplasm.getGid(), is(notNullValue()));
 
 		final Germplasm germplasmDB = this.germplasmDAO.getById(germplasm.getGid());
 		assertThat(germplasm, is(equalTo(germplasmDB)));
 		assertThat(germplasmDB, is(notNullValue()));
 
-		final UserDefinedField userdefinedField = createUserdefinedField("ATRIBUTS", "PASSPORT", "TEST_ATT");
+		final UserDefinedField userdefinedField = this.createUserdefinedField("ATRIBUTS", "PASSPORT", "TEST_ATT");
 		assertThat(userdefinedField.getFldno(), is(notNullValue()));
 
 		final UserDefinedField userdefinedFieldDB = this.userDefinedFieldDAO.getById(userdefinedField.getFldno());
 		assertThat(userdefinedFieldDB, is(notNullValue()));
 		assertThat(userdefinedField, is(equalTo(userdefinedFieldDB)));
 
-		final Attribute attr = createAttribute(germplasmDB, userdefinedFieldDB, attributeVal);
+		final Attribute attr = this.createAttribute(germplasmDB, userdefinedFieldDB, attributeVal);
 		assertThat(attr.getAid(), is(notNullValue()));
 
 		final Attribute attrDB = this.germplasmDataManager.getAttributeById(attr.getAid());
@@ -1226,7 +1224,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testSave() {
 
-		final Germplasm germplasm = createGermplasm();
+		final Germplasm germplasm = this.createGermplasm();
 		try {
 			this.germplasmDataManager.save(germplasm);
 		} catch (final MiddlewareQueryException e) {
@@ -1237,7 +1235,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetNamesByTypeAndGIDList() {
-		final UserDefinedField nameType = createUserdefinedField("NAMES", "NAME", RandomStringUtils.randomAlphabetic(5).toUpperCase());
+		final UserDefinedField nameType = this.createUserdefinedField("NAMES", "NAME", RandomStringUtils.randomAlphabetic(5).toUpperCase());
 		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		germplasm1.getPreferredName().setTypeId(nameType.getFldno());
 		final Integer gid1 = this.germplasmDataManager.addGermplasm(germplasm1, germplasm1.getPreferredName());
@@ -1249,7 +1247,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Germplasm germplasm3 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer gid3 = this.germplasmDataManager.addGermplasm(germplasm3, germplasm3.getPreferredName());
 		
-		Map<Integer, String> namesMap = this.germplasmDataManager.getNamesByTypeAndGIDList(nameType.getFldno(), Arrays.asList(gid1, gid2, gid3));
+		final Map<Integer, String> namesMap = this.germplasmDataManager.getNamesByTypeAndGIDList(nameType.getFldno(), Arrays.asList(gid1, gid2, gid3));
 		Assert.assertNotNull(namesMap);
 		Assert.assertEquals(3, namesMap.size());
 		Assert.assertEquals(germplasm1.getPreferredName().getNval(), namesMap.get(gid1));

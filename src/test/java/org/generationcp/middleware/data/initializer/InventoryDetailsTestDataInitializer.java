@@ -21,11 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class InventoryDetailsTestDataInitializer {
 
 	private static final int PERSON_ID = 1;
@@ -282,8 +277,9 @@ public class InventoryDetailsTestDataInitializer {
 
 
 	public static Lot createLot(
-		final Integer userId, final String entityType, final Integer entityId, final Integer locationId, final Integer scaleId, final Integer status,
-			final Integer sourceId, final String comments) {
+		final Integer userId, final String entityType, final Integer entityId, final Integer locationId, final Integer scaleId,
+		final Integer status,
+		final Integer sourceId, final String comments, final String stockId) {
 		final Lot lot = new Lot();
 		lot.setUserId(userId);
 		lot.setEntityType(entityType);
@@ -293,6 +289,7 @@ public class InventoryDetailsTestDataInitializer {
 		lot.setStatus(status);
 		lot.setSource(sourceId);
 		lot.setComments(comments);
+		lot.setStock_id(stockId);
 
 		return lot;
 	}
