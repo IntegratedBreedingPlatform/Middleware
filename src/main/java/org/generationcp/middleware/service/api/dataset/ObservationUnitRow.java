@@ -14,9 +14,9 @@ public class ObservationUnitRow {
 
 	private String designation;
 
-	private Integer stockId;
+	private Integer trialInstance;
 
-	private Integer geolocationId;
+	private Integer stockId;
 
 	private String action;
 
@@ -106,12 +106,12 @@ public class ObservationUnitRow {
 		this.stockId = stockId;
 	}
 
-	public Integer getGeolocationId() {
-		return geolocationId;
+	public Integer getTrialInstance() {
+		return trialInstance;
 	}
 
-	public void setGeolocationId(final Integer geolocationId) {
-		this.geolocationId = geolocationId;
+	public void setTrialInstance(final Integer trialInstance) {
+		this.trialInstance = trialInstance;
 	}
 
 	@Override

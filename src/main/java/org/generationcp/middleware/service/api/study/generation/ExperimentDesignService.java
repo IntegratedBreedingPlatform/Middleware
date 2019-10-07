@@ -10,7 +10,6 @@ public interface ExperimentDesignService {
 
 	void deleteExperimentDesign(int studyId);
 
-	void saveExperimentDesign(CropType crop, int studyId, List<MeasurementVariable> variables, List<ObservationUnitRow> rows,
-		Boolean isDeletePreviousDesign);
+	void saveExperimentDesign(CropType crop, int studyId, List<MeasurementVariable> variables, List<ObservationUnitRow> rows);
 
 }

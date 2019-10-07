@@ -279,6 +279,15 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		query.executeUpdate();
 	}
 
+	public void deleteProjectVariablesByVariableTypes(final Integer projectId, final List<Integer> variableTypeIds) {
+		final String sql = "DELETE FROM projectprop WHERE project_id = :projectId AND type_id IN (:variableTypeIds)";
+		final Query query =
+			this.getSession().createSQLQuery(sql);
+		query.setParameter("projectId", projectId);
+		query.setParameterList("variableTypeIds", variableTypeIds);
+		query.executeUpdate();
+	}
+
 	public List<String> getGermplasmDescriptors(final int studyIdentifier) {
 		final List<String> list = this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
 			Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
