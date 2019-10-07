@@ -229,7 +229,7 @@ public class ExperimentDaoTest {
 	@Test
 	public void testDeleteExperimentsByStudy() {
 		final int studyId = 1234;
-		this.experimentDao.deleteExperimentsByStudy(studyId);
+		this.experimentDao.deleteExperimentsForDataset(studyId);
 
 		Mockito.verify(this.mockSession).flush();
 		final String deletePhenotypeSql = "DELETE pheno FROM nd_experiment e"

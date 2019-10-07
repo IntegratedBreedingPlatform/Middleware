@@ -17,7 +17,7 @@ public class ExperimentDestroyer extends Destroyer {
 	}
 
 	public void deleteExperimentsByStudy(int datasetId) throws MiddlewareQueryException {
-		this.getExperimentDao().deleteExperimentsByStudy(datasetId);
+		this.getExperimentDao().deleteExperimentsForDataset(datasetId);
 	}
 
 	public void deleteTrialExperimentsOfStudy(int trialDatasetId) throws MiddlewareQueryException {
