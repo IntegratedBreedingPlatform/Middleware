@@ -111,7 +111,7 @@ public class InventoryDetailsTestDataInitializer {
 		final List<Transaction> transactions = new ArrayList<Transaction>();
 
 		for (final Lot lot : lots) {
-			lot.setStock_id(inventoryIdPrefix + lot.getId());
+			lot.setStockId(inventoryIdPrefix + lot.getId());
 
 			final Transaction transaction = new Transaction();
 			transaction.setUserId(USER_ID);
@@ -144,7 +144,7 @@ public class InventoryDetailsTestDataInitializer {
 		final List<Transaction> transactions = new ArrayList<Transaction>();
 
 		for (final Lot lot : lots) {
-			lot.setStock_id(inventoryIdPrefix + lot.getId());
+			lot.setStockId(inventoryIdPrefix + lot.getId());
 
 			final Transaction transaction = new Transaction();
 			transaction.setUserId(USER_ID);
@@ -269,7 +269,7 @@ public class InventoryDetailsTestDataInitializer {
 		transaction.setSourceId(sourceId);
 		transaction.setSourceRecordId(sourceRecordId);
 		transaction.setSourceType(sourceType);
-		lot.setStock_id(inventoryID);
+		lot.setStockId(inventoryID);
 
 		return  transaction;
 	}
@@ -289,7 +289,7 @@ public class InventoryDetailsTestDataInitializer {
 		lot.setStatus(status);
 		lot.setSource(sourceId);
 		lot.setComments(comments);
-		lot.setStock_id(stockId);
+		lot.setStockId(stockId);
 
 		return lot;
 	}

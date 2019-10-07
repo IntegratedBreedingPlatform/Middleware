@@ -83,7 +83,7 @@ public class Lot implements Serializable {
 	private Date createdDate;
 
 	@Column(name = "stock_id")
-	private String stock_id;
+	private String stockId;
 
 	@OneToMany(mappedBy = "lot")
 	private Set<Transaction> transactions = new HashSet<Transaction>();
@@ -229,12 +229,12 @@ public class Lot implements Serializable {
 		this.createdDate = createdDate;
 	}
 
-	public String getStock_id() {
-		return this.stock_id;
+	public String getStockId() {
+		return this.stockId;
 	}
 
-	public void setStock_id(final String stock_id) {
-		this.stock_id = stock_id;
+	public void setStockId(final String stockId) {
+		this.stockId = stockId;
 	}
 
 	@Override

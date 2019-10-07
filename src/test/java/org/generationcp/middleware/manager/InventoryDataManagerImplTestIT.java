@@ -752,7 +752,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		final Map<Integer, String> germplsmWiseStockID = this.manager.retrieveStockIds(Lists.newArrayList(germplasmId));
 
 		Assert.assertNotNull(germplsmWiseStockID);
-		Assert.assertEquals(depositTransactionForLotOne.getLot().getStock_id() + ", " + depositTransactionForLotTwo.getLot().getStock_id()
+		Assert.assertEquals(depositTransactionForLotOne.getLot().getStockId() + ", " + depositTransactionForLotTwo.getLot().getStockId()
 			, germplsmWiseStockID.get(germplasmId));
 	}
 }

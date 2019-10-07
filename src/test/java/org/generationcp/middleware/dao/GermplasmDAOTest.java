@@ -126,7 +126,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final List<Transaction> transactions = this.inventoryDM.getAllTransactions(0, 1);
 		if (transactions != null && !transactions.isEmpty()) {
 			final Transaction transaction = transactions.get(0);
-			transaction.getLot().setStock_id(GermplasmDAOTest.DUMMY_STOCK_ID);
+			transaction.getLot().setStockId(GermplasmDAOTest.DUMMY_STOCK_ID);
 			this.inventoryDM.updateTransaction(transaction);
 		}
 	}

@@ -125,7 +125,7 @@ public class Transaction implements Serializable {
 		this.sourceRecordId = sourceRecordId;
 		this.previousAmount = previousAmount;
 		this.personId = personId;
-		this.lot.setStock_id(inventoryID);
+		this.lot.setStockId(inventoryID);
 	}
 
 	public Integer getId() {
