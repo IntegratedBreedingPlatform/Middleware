@@ -14,6 +14,10 @@ public class ObservationUnitRow {
 
 	private String designation;
 
+	private Integer stockId;
+
+	private Integer geolocationId;
+
 	private String action;
 
 	private Map<String, ObservationUnitData> variables;
@@ -92,6 +96,22 @@ public class ObservationUnitRow {
 
 	public void setSamplesCount(final String samplesCount) {
 		this.samplesCount = samplesCount;
+	}
+
+	public Integer getStockId() {
+		return stockId;
+	}
+
+	public void setStockId(final Integer stockId) {
+		this.stockId = stockId;
+	}
+
+	public Integer getGeolocationId() {
+		return geolocationId;
+	}
+
+	public void setGeolocationId(final Integer geolocationId) {
+		this.geolocationId = geolocationId;
 	}
 
 	@Override
