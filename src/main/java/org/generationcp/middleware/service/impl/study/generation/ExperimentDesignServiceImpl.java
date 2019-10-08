@@ -156,15 +156,13 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 	@Override
 	public void deleteExperimentDesign(final int studyId) {
-		// Delete variables and experiments of plot dataset
-		final Integer environmentDatasetId = this.getPlotDatasetId(studyId);
+		// Delete variables and experiments of environment dataset
+		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO().deleteProjectVariablesByVariableTypes(environmentDatasetId,
 			Collections.singletonList(VariableType.EXPERIMENTAL_DESIGN.getId()));
 
-		// Delete variables and experiments of plot dataset
+		// Delete experiments of plot dataset
 		final Integer plotDatasetId = this.getPlotDatasetId(studyId);
-		this.daoFactory.getProjectPropertyDAO().deleteProjectVariablesByVariableTypes(plotDatasetId,
-			Arrays.asList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId()));
 		this.daoFactory.getExperimentDao().deleteExperimentsForDataset(plotDatasetId);
 	}
 
