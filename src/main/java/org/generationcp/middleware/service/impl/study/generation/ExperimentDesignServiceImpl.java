@@ -131,6 +131,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 			StockModel stockModel = stocksMap.get(entryNumber);
 			if (stockModel == null) {
 				stockModel = new StockModelGenerator().generate(variablesMap, Lists.newArrayList(row.getVariables().values()));
+				this.daoFactory.getStockDao().save(stockModel);
 			}
 			experimentModel.setStock(stockModel);
 			this.daoFactory.getExperimentDao().save(experimentModel);
