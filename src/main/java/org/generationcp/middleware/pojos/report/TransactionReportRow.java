@@ -31,7 +31,7 @@ public class TransactionReportRow implements Serializable {
 
 	private static final long serialVersionUID = 4363149565820886638L;
 
-	private Integer date;
+	private Date date;
 	private Double quantity;
 	private Term scaleOfLot;
 	private Location locationOfLot;
@@ -52,11 +52,11 @@ public class TransactionReportRow implements Serializable {
 
 	}
 
-	public Integer getDate() {
+	public Date getDate() {
 		return this.date;
 	}
 
-	public void setDate(final Integer date) {
+	public void setDate(final Date date) {
 		this.date = date;
 	}
 

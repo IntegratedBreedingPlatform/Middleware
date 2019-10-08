@@ -26,6 +26,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * POJO for ims_transaction table.
@@ -63,7 +64,7 @@ public class Transaction implements Serializable {
 
 	@Basic(optional = false)
 	@Column(name = "trndate")
-	private Integer transactionDate;
+	private Date transactionDate;
 
 	@Basic(optional = false)
 	@Column(name = "trnstat")
@@ -112,7 +113,7 @@ public class Transaction implements Serializable {
 		this.id = id;
 	}
 
-	public Transaction(final Integer id, final Integer userId, final Lot lot, final Integer transactionDate, final Integer status, final Double quantity, final String comments,
+	public Transaction(final Integer id, final Integer userId, final Lot lot, final Date transactionDate, final Integer status, final Double quantity, final String comments,
 			final Integer commitmentDate, final String sourceType, final Integer sourceId, final Integer sourceRecordId, final Double previousAmount, final Integer personId,
 			final String inventoryID) {
 		super();
@@ -156,11 +157,11 @@ public class Transaction implements Serializable {
 		this.lot = lot;
 	}
 
-	public Integer getTransactionDate() {
+	public Date getTransactionDate() {
 		return this.transactionDate;
 	}
 
-	public void setTransactionDate(final Integer transactionDate) {
+	public void setTransactionDate(final Date transactionDate) {
 		this.transactionDate = transactionDate;
 	}
 

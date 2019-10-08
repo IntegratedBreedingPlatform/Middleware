@@ -26,7 +26,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,7 +210,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetTransactionDetailsForLot() {
+	public void testGetTransactionDetailsForLot() throws ParseException {
 
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
@@ -218,14 +221,18 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
 
+		final String sDate1 = "01/01/2015";
+		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
 		final Transaction depositTransaction =
 				InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, "Deposit", lot, 1, 1, 1, "LIST");
-		depositTransaction.setTransactionDate(20150101);
+		depositTransaction.setTransactionDate(date1);
 		depositTransaction.setUserId(user.getUserid());
 
+		final String sDate2 = "10/10/2015";
+		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
 		final Transaction closedTransaction =
 				InventoryDetailsTestDataInitializer.createReservationTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST");
-		closedTransaction.setTransactionDate(20151010);
+		closedTransaction.setTransactionDate(date2);
 		closedTransaction.setUserId(user.getUserid());
 
 		final List<Transaction> transactionList = new ArrayList<>();
