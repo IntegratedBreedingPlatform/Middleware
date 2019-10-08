@@ -515,7 +515,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 
 		} catch (Exception e) {
-			this.logAndThrowException("Error at retrieveLotScalesForGermplasms for GIDss = " + gids+ AT_LOT_DAO + e.getMessage(), e);
+			this.logAndThrowException("Error at retrieveLotScalesForGermplasms for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
 		}
 
 		return lotScalesForGermplasm;
@@ -674,11 +674,56 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	private String buildSearchLotsQuery(final LotsSearchDto lotsSearchDto) {
 		final StringBuilder query = new StringBuilder(SEARCH_LOT_QUERY);
 		if (lotsSearchDto != null) {
+			if (lotsSearchDto.getLotIds() != null && !lotsSearchDto.getLotIds().isEmpty()) {
+				query.append("and lot.lotid IN (").append(Joiner.on(",").join(lotsSearchDto.getLotIds())).append(") ");
+			}
+
+			if (lotsSearchDto.getGids() != null && !lotsSearchDto.getGids().isEmpty()) {
+				query.append("and lot.eid IN (").append(Joiner.on(",").join(lotsSearchDto.getGids())).append(") ");
+			}
+
+			if (lotsSearchDto.getMgids() != null && !lotsSearchDto.getMgids().isEmpty()) {
+				query.append("and g.mgid IN (").append(Joiner.on(",").join(lotsSearchDto.getMgids())).append(") ");
+			}
+
+			if (lotsSearchDto.getLocationIds() != null && !lotsSearchDto.getLocationIds().isEmpty()) {
+				query.append("and lot.locid IN (").append(Joiner.on(",").join(lotsSearchDto.getLocationIds())).append(") ");
+			}
+
+			if (lotsSearchDto.getScaleIds() != null && !lotsSearchDto.getScaleIds().isEmpty()) {
+				query.append("and lot.scaleid IN (").append(Joiner.on(",").join(lotsSearchDto.getScaleIds())).append(") ");
+			}
+
+			if (lotsSearchDto.getDesignation()!=null) {
+				query.append("and n.nval = '").append(lotsSearchDto.getDesignation()).append("' ");
+			}
+
 			if (lotsSearchDto.getStatus() != null) {
 				query.append(" and lot.status = ").append(lotsSearchDto.getStatus());
 			}
+
 		}
 		query.append(" GROUP BY lot.lotid ");
+
+		if (lotsSearchDto != null) {
+
+			query.append(" having 1=1 ");
+
+			if (lotsSearchDto.getStockId() != null) {
+				query.append("and GROUP_CONCAT(transaction.inventory_id SEPARATOR ', ') = '").append(lotsSearchDto.getStockId())
+						.append("' ");
+			}
+
+			if (lotsSearchDto.getMinActualBalance() != null) {
+				query.append("and SUM(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty > 0 THEN transaction.trnqty ELSE 0 END) >= ")
+						.append(lotsSearchDto.getMinActualBalance()).append(" ");
+			}
+
+			if (lotsSearchDto.getMaxActualBalance() != null) {
+				query.append("and SUM(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty > 0 THEN transaction.trnqty ELSE 0 END) <= ")
+						.append(lotsSearchDto.getMaxActualBalance()).append(" ");
+			}
+		}
 
 		return query.toString();
 	}
