@@ -16,7 +16,7 @@ public class ObservationUnitRow {
 
 	private Integer trialInstance;
 
-	private Integer stockId;
+	private Integer entryNumber;
 
 	private String action;
 
@@ -98,20 +98,20 @@ public class ObservationUnitRow {
 		this.samplesCount = samplesCount;
 	}
 
-	public Integer getStockId() {
-		return stockId;
-	}
-
-	public void setStockId(final Integer stockId) {
-		this.stockId = stockId;
-	}
-
 	public Integer getTrialInstance() {
 		return trialInstance;
 	}
 
 	public void setTrialInstance(final Integer trialInstance) {
 		this.trialInstance = trialInstance;
+	}
+
+	public Integer getEntryNumber() {
+		return entryNumber;
+	}
+
+	public void setEntryNumber(final Integer entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	@Override
