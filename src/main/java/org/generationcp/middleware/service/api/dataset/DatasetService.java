@@ -262,6 +262,8 @@ public interface DatasetService {
 	 */
 	void deleteDataset(int datasetId);
 
+	List<MeasurementVariable> getDatasetMeasurementVariablesByVariableType(Integer datasetId, List<Integer> variableTypes);
+
 	/**
 	 * Return map with information by InstanceId
 	 * @param studyId
