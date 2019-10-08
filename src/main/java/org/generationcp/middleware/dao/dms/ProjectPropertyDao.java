@@ -336,6 +336,13 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		}
 	}
 
+	public List<Integer> getVariableIdsForDataset(final Integer datasetId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("project.projectId", datasetId));
+		criteria.setProjection(Projections.property("variableId"));
+		return criteria.list();
+	}
+
 	public List<ProjectProperty> getByProjectIdAndVariableIds(final Integer projectId, final List<Integer> standardVariableIds) {
 		final List<ProjectProperty> list;
 		final DmsProject dmsProject = new DmsProject();

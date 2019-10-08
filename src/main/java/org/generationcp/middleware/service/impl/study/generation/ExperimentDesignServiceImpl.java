@@ -2,7 +2,9 @@ package org.generationcp.middleware.service.impl.study.generation;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -13,25 +15,22 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
-import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImpl;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 	private DaoFactory daoFactory;
+	private ExperimentModelGenerator experimentGenerator;
 
 	public ExperimentDesignServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -39,14 +38,62 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 	public ExperimentDesignServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
+		this.experimentGenerator = new ExperimentModelGenerator(sessionProvider);
 	}
 
 	@Override
-	public void saveExperimentDesign(final CropType crop, final int studyId, final List<MeasurementVariable> variables, final List<ObservationUnitRow> rows) {
+	public void saveExperimentDesign(final CropType crop, final int studyId, final List<MeasurementVariable> variables,
+		final List<ObservationUnitRow> rows) {
 		// TODO VALIDATE that a previous design does not exist for study. Do not continue if so
 
-		// TODO: create stocks if necessary
+		Preconditions.checkNotNull(crop);
+		Preconditions.checkState(!CollectionUtils.isEmpty(variables));
+		Preconditions.checkState(!CollectionUtils.isEmpty(rows));
 
+		final Integer plotDatasetId = this.getPlotDatasetId(studyId);
+		this.saveVariables(studyId, variables, plotDatasetId);
+
+		// Save experiments and stocks (if applicable) in plot dataset
+		this.saveObservationUnitRows(crop, studyId, plotDatasetId, variables, rows);
+
+	}
+
+	private void saveVariables(final int studyId, final List<MeasurementVariable> variables, final Integer plotDatasetId) {
+		final int plotDatasetNextRank = this.daoFactory.getProjectPropertyDAO().getNextRank(plotDatasetId);
+		final List<Integer> plotVariableIds = this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(plotDatasetId);
+
+		final Integer envDatasetId = this.getEnvironmentDatasetId(studyId);
+		final int envDatasetNextRank = this.daoFactory.getProjectPropertyDAO().getNextRank(envDatasetId);
+		final List<Integer> envVariableIds = this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(envDatasetId);
+		// Save project variables in environment and plot datasets
+		for (final MeasurementVariable variable : variables) {
+			final int variableId = variable.getTermId();
+			final VariableType variableType = variable.getVariableType();
+			final boolean isEnvironmentVariable = VariableType.ENVIRONMENT_DETAIL.equals(variableType);
+			if (!this.variableExists(variableId, isEnvironmentVariable, envVariableIds, plotVariableIds)) {
+				Integer projectId = plotDatasetId;
+				Integer rank = plotDatasetNextRank;
+				if (isEnvironmentVariable) {
+					projectId = envDatasetId;
+					rank = envDatasetNextRank;
+				}
+				final DmsProject project = new DmsProject();
+				project.setProjectId(projectId);
+				final ProjectProperty property =
+					new ProjectProperty(project, variableType.getId(), variable.getValue(), rank, variableId, variable.getAlias());
+				this.daoFactory.getProjectPropertyDAO().save(property);
+			}
+
+		}
+	}
+
+	private boolean variableExists(final Integer variableId,final Boolean isEnvironmentVariable, final List<Integer> environmentVariableIds, final List<Integer> plotVariableIds) {
+		return isEnvironmentVariable ? environmentVariableIds.contains(variableId) : plotVariableIds.contains(variableId);
+	}
+
+	private void saveObservationUnitRows(final CropType crop, final Integer studyId, final Integer plotDatasetId,
+		final List<MeasurementVariable> variables,
+		final List<ObservationUnitRow> rows) {
 		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId);
 		final ImmutableMap<String, Geolocation> trialInstanceGeolocationMap =
 			Maps.uniqueIndex(geolocations, new Function<Geolocation, String>() {
@@ -57,18 +104,42 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 				}
 			});
 
-		final Integer plotDatasetId = this.getPlotDatasetId(studyId);
+		final Set<StockModel> stocks = this.daoFactory.getStockDao().findInDataSet(plotDatasetId);
+		final ImmutableMap<String, StockModel> stocksMap =
+			Maps.uniqueIndex(stocks, new Function<StockModel, String>() {
+
+				@Override
+				public String apply(final StockModel stock) {
+					return stock.getUniqueName();
+				}
+			});
+
+		final ImmutableMap<Integer, MeasurementVariable> variablesMap =
+			Maps.uniqueIndex(variables, new Function<MeasurementVariable, Integer>() {
+
+				@Override
+				public Integer apply(final MeasurementVariable measurementVariable) {
+					return measurementVariable.getTermId();
+				}
+			});
+
 		for (final ObservationUnitRow row : rows) {
 			final Optional<Geolocation> geolocation = this.getGeolocation(trialInstanceGeolocationMap, row);
-			final ExperimentModel experimentModel = this.createExperiment(crop, plotDatasetId, row, ExperimentType.PLOT, geolocation);
-			experimentModel.setProperties(this.createTrialDesignExperimentProperties(experimentModel, row, variables));
+			final ExperimentModel
+				experimentModel = this.experimentGenerator.generate(crop, plotDatasetId, row, ExperimentType.PLOT, geolocation, variables);
+			final String entryNumber = String.valueOf(row.getEntryNumber());
+			StockModel stockModel = stocksMap.get(entryNumber);
+			if (stockModel == null) {
+				stockModel = new StockModelGenerator().generate(variablesMap, Lists.newArrayList(row.getVariables().values()));
+			}
+			experimentModel.setStock(stockModel);
 			this.daoFactory.getExperimentDao().save(experimentModel);
 		}
-
 	}
 
 	private Integer getPlotDatasetId(final int studyId) {
-		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId());
+		final List<DmsProject> plotDatasets =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		if (CollectionUtils.isEmpty(plotDatasets)) {
 			throw new MiddlewareException("Study does not have a plot dataset associated to it");
 		}
@@ -76,14 +147,16 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	}
 
 	private Integer getEnvironmentDatasetId(final int studyId) {
-		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
+		final List<DmsProject> plotDatasets =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		if (CollectionUtils.isEmpty(plotDatasets)) {
 			throw new MiddlewareException("Study does not have a trial environment dataset associated to it");
 		}
 		return plotDatasets.get(0).getProjectId();
 	}
 
-	private Optional<Geolocation> getGeolocation(final ImmutableMap<String, Geolocation> trialInstanceGeolocationMap, final ObservationUnitRow row) {
+	private Optional<Geolocation> getGeolocation(final ImmutableMap<String, Geolocation> trialInstanceGeolocationMap,
+		final ObservationUnitRow row) {
 		final Integer trialInstance = row.getTrialInstance();
 		if (trialInstance != null) {
 			final Geolocation geolocation = trialInstanceGeolocationMap.get(trialInstance.toString());
@@ -94,69 +167,9 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		return Optional.absent();
 	}
 
-	private ExperimentModel createExperiment(final CropType crop, final Integer projectId, final ObservationUnitRow row, final ExperimentType expType, final Optional<Geolocation> geolocation) {
-		final ExperimentModel experimentModel = new ExperimentModel();
-		final DmsProject project = new DmsProject();
-		project.setProjectId(projectId);
-		experimentModel.setProject(project);
-		experimentModel.setTypeId(expType.getTermId());
-		final Integer stockId = row.getStockId();
-		if (stockId != null) {
-			experimentModel.setStock(this.daoFactory.getStockDao().getById(stockId));
-		}
-
-		final Geolocation location = geolocation.isPresent()? geolocation.get() : this.createNewGeoLocation();
-		experimentModel.setGeoLocation(location);
-
-		final ObservationUnitIDGenerator observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl();
-		observationUnitIDGenerator.generateObservationUnitIds(crop, Collections.singletonList(experimentModel));
-		return experimentModel;
-	}
-
-	private Geolocation createNewGeoLocation() {
-		final Geolocation location = new Geolocation();
-		location.setDescription("1");
-		this.daoFactory.getGeolocationDao().save(location);
-		return location;
-	}
-
-	private List<ExperimentProperty> createTrialDesignExperimentProperties(final ExperimentModel experimentModel,
-		final ObservationUnitRow row, final List<MeasurementVariable> variables) {
-		final ImmutableMap<String, MeasurementVariable> variableMap = Maps.uniqueIndex(variables, new Function<MeasurementVariable, String>() {
-			@Override
-			public String apply(final MeasurementVariable variable) {
-				return variable.getName();
-			}
-		});
-
-		final List<ExperimentProperty> experimentProperties = new ArrayList<>();
-
-		for (final Map.Entry<String, ObservationUnitData> rowData : row.getVariables().entrySet()) {
-			final String variableName = rowData.getKey();
-			final MeasurementVariable measurementVariable = variableMap.get(variableName);
-			int rank = 1;
-			if (measurementVariable != null && VariableType.EXPERIMENTAL_DESIGN.equals(measurementVariable.getVariableType())) {
-				experimentProperties.add(this.createTrialDesignProperty(experimentModel, measurementVariable, rank++));
-			}
-		}
-
-		return experimentProperties;
-	}
-
-	private ExperimentProperty createTrialDesignProperty(final ExperimentModel experimentModel, final MeasurementVariable measurementVariable, final Integer rank) {
-
-		final ExperimentProperty experimentProperty = new ExperimentProperty();
-		experimentProperty.setExperiment(experimentModel);
-		experimentProperty.setTypeId(measurementVariable.getTermId());
-		experimentProperty.setValue(measurementVariable.getValue());
-		experimentProperty.setRank(rank);
-
-		return experimentProperty;
-	}
-
 	@Override
 	public void deleteExperimentDesign(final int studyId) {
-		// Delete variables and experiments of environment dataset
+		// FIXME: Delete variables of environment dataset related to EXP DESIGN
 		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO().deleteProjectVariablesByVariableTypes(environmentDatasetId,
 			Collections.singletonList(VariableType.EXPERIMENTAL_DESIGN.getId()));

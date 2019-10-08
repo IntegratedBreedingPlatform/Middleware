@@ -40,6 +40,11 @@ public class ObservationUnitData {
 	public ObservationUnitData() {
 	}
 
+	public ObservationUnitData(final Integer variableId, final String value) {
+		this.variableId = variableId;
+		this.value = value;
+	}
+
 	public ObservationUnitData(final String value) {
 		this.value = value;
 	}
