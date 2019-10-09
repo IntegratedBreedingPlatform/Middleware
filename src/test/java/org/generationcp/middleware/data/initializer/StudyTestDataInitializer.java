@@ -266,7 +266,7 @@ public class StudyTestDataInitializer {
 
 	}
 
-	public Integer addEnvironmentDataset(final CropType crop, final int studyId, final String locationId, final String seasonId)
+	public Integer createEnvironmentDataset(final CropType crop, final int studyId, final String locationId, final String seasonId)
 		throws Exception {
 		final DatasetValues datasetValues = new DatasetValues();
 		datasetValues.setName("ENVIRONMENT " + StudyTestDataInitializer.DATASET_NAME);

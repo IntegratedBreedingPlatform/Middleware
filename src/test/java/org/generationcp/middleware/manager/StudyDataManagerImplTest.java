@@ -218,7 +218,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final Random random = new Random();
 		final String locationId = String.valueOf(random.nextInt());
 		final String season = String.valueOf(random.nextInt());
-		this.studyTDI.addEnvironmentDataset(this.crop, studyId, locationId, season);
+		this.studyTDI.createEnvironmentDataset(this.crop, studyId, locationId, season);
 
 		this.manager.getActiveSession().flush();
 
@@ -669,7 +669,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetTrialInstanceNumberByGeolocationId() throws Exception {
 		final Integer studyId = this.studyReference.getId();
-		final Integer dataSetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, "1", "1");
+		final Integer dataSetId = this.studyTDI.createEnvironmentDataset(this.crop, studyId, "1", "1");
 		final TrialEnvironments trialEnvironments = this.manager.getTrialEnvironmentsInDataset(dataSetId);
 		Assert.assertNotNull(trialEnvironments.getTrialEnvironments());
 		Assert.assertFalse(trialEnvironments.getTrialEnvironments().isEmpty());
@@ -872,9 +872,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		this.studyTDI.addTestDataset(this.studyReference.getId(), DatasetTypeEnum.SUMMARY_DATA.getId());
 
-		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), afghanistanLocationId, "1");
-		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), albaniaLocationId, "1");
-		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), algeriaLocationId, "1");
+		this.studyTDI.createEnvironmentDataset(this.crop, this.studyReference.getId(), afghanistanLocationId, "1");
+		this.studyTDI.createEnvironmentDataset(this.crop, this.studyReference.getId(), albaniaLocationId, "1");
+		this.studyTDI.createEnvironmentDataset(this.crop, this.studyReference.getId(), algeriaLocationId, "1");
 
 		this.sessionProvder.getSession().flush();
 		final Map<String, String> result = this.manager.createInstanceLocationIdToNameMapFromStudy(this.studyReference.getId());
@@ -941,7 +941,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
 		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
-		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
+		final Integer datasetId = this.studyTDI.createEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
 
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.manager.getActiveSession().flush();
@@ -959,7 +959,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
 		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
-		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
+		final Integer datasetId = this.studyTDI.createEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
 
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.manager.getActiveSession().flush();
@@ -977,7 +977,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
 		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
-		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
+		final Integer datasetId = this.studyTDI.createEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
 
 		Assert.assertFalse(this.manager.areAllInstancesExistInDataset(datasetId, Sets.newHashSet(999)));
 
@@ -1090,7 +1090,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final Random random = new Random();
 		final String location1 = String.valueOf(random.nextInt());
 		final String season = String.valueOf(random.nextInt());
-		this.studyTDI.addEnvironmentDataset(this.crop, studyId, location1, season);
+		this.studyTDI.createEnvironmentDataset(this.crop, studyId, location1, season);
 
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.manager.getActiveSession().flush();
@@ -1114,7 +1114,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final Random random = new Random();
 		final String location1 = String.valueOf(random.nextInt());
 		final String season = String.valueOf(random.nextInt());
-		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, location1, season);
+		final Integer datasetId = this.studyTDI.createEnvironmentDataset(this.crop, studyId, location1, season);
 		final String location2 = String.valueOf(random.nextInt());
 		this.studyTDI.addEnvironmentToDataset(this.crop, datasetId, location2, season);
 
