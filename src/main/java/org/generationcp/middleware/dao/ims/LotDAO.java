@@ -36,8 +36,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,6 +66,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	private static final String ENTITY_TYPE = "entityType";
 
 	private static final String ENTITY_ID = "entityId";
+
+	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
 	/*
 	 * NOTE setting the trnstat=0 for actual_balance to include anticipated transaction to the total_amount. This is only temporary change
@@ -702,6 +706,22 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				query.append(" and lot.status = ").append(lotsSearchDto.getStatus());
 			}
 
+			if (lotsSearchDto.getCommentContainsString() != null) {
+				query.append(" and lot.comments like '%").append(lotsSearchDto.getCommentContainsString()).append("%' ");
+			}
+
+			if(lotsSearchDto.getCreatedDateFrom() != null) {
+				query.append(" and DATE(lot.created_date) >= '").append(formatDate(lotsSearchDto.getCreatedDateFrom())).append("' ");
+			}
+
+			if(lotsSearchDto.getCreatedDateTo() != null) {
+				query.append(" and DATE(lot.created_date) <= '").append(formatDate(lotsSearchDto.getCreatedDateTo())).append("' ");
+			}
+
+			if(lotsSearchDto.getCreatedByUsername() != null) {
+				query.append(" and users.uname like '%").append(lotsSearchDto.getCreatedByUsername()).append("%'" );
+			}
+
 		}
 		query.append(" GROUP BY lot.lotid ");
 
@@ -723,8 +743,65 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				query.append("and SUM(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty > 0 THEN transaction.trnqty ELSE 0 END) <= ")
 						.append(lotsSearchDto.getMaxActualBalance()).append(" ");
 			}
-		}
 
+			if (lotsSearchDto.getMinAvailableBalance() != null) {
+				query.append("and CASE WHEN SUM(transaction.trnqty) is null THEN 0 ELSE SUM(transaction.trnqty) END >= ")
+						.append(lotsSearchDto.getMinAvailableBalance()).append(" ");
+			}
+
+			if (lotsSearchDto.getMaxAvailableBalance() != null) {
+				query.append("and CASE WHEN SUM(transaction.trnqty) is null THEN 0 ELSE SUM(transaction.trnqty) END <= ")
+						.append(lotsSearchDto.getMaxAvailableBalance()).append(" ");
+			}
+
+			if (lotsSearchDto.getMinReservedTotal() != null) {
+				query.append(
+						"and SUM(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty <= 0 THEN transaction.trnqty * -1 ELSE 0 END) >= ")
+						.append(lotsSearchDto.getMinReservedTotal()).append(" ");
+			}
+
+			if (lotsSearchDto.getMaxReservedTotal() != null) {
+				query.append(
+						"and SUM(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty <= 0 THEN transaction.trnqty * -1 ELSE 0 END) <= ")
+						.append(lotsSearchDto.getMaxReservedTotal()).append(" ");
+			}
+
+			if (lotsSearchDto.getMinWithdrawalTotal() != null) {
+				query.append(
+						"and SUM(CASE WHEN transaction.trnstat = 1 AND transaction.trnqty <= 0 THEN transaction.trnqty * -1 ELSE 0 END) >= ")
+						.append(lotsSearchDto.getMinWithdrawalTotal()).append(" ");
+			}
+
+			if (lotsSearchDto.getMaxWithdrawalTotal() != null) {
+				query.append(
+						"and SUM(CASE WHEN transaction.trnstat = 1 AND transaction.trnqty <= 0 THEN transaction.trnqty * -1 ELSE 0 END) <= ")
+						.append(lotsSearchDto.getMaxWithdrawalTotal()).append(" ");
+			}
+
+			if (lotsSearchDto.getLastDepositDateFrom() != null) {
+				query.append(
+						" and DATE(MAX(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty > 0 THEN transaction.trndate ELSE null END)) >= '")
+						.
+								append(formatDate(lotsSearchDto.getLastDepositDateFrom())).append("' ");
+			}
+
+			if (lotsSearchDto.getLastDepositDateTo() != null) {
+				query.append(
+						" and DATE(MAX(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty > 0 THEN transaction.trndate ELSE null END)) <= '")
+						.
+								append(formatDate(lotsSearchDto.getLastDepositDateTo())).append("' ");
+			}
+
+			if (lotsSearchDto.getLastWithdrawalDateFrom() != null) {
+				query.append(" and DATE(MAX(CASE WHEN transaction.trnstat = 1 AND transaction.trnqty <= 0 THEN transaction.trndate ELSE null END)) >= '").
+						append(formatDate(lotsSearchDto.getLastWithdrawalDateFrom())).append("' ");
+			}
+
+			if (lotsSearchDto.getLastWithdrawalDateTo() != null) {
+				query.append(" and DATE(MAX(CASE WHEN transaction.trnstat = 1 AND transaction.trnqty <= 0 THEN transaction.trndate ELSE null END)) <= '").
+						append(formatDate(lotsSearchDto.getLastWithdrawalDateTo())).append("' ");
+			}
+		}
 		return query.toString();
 	}
 
@@ -797,4 +874,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			throw new MiddlewareQueryException("Error at countSearchLots() query on LotDAO: " + e.getMessage(), e);
 		}
 	}
+
+	private String formatDate(final Date date){
+		return format.format(date);
+	}
+
 }

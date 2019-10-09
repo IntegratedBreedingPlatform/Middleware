@@ -56,6 +56,8 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private Date lastWithdrawalDateTo;
 
+	private String commentContainsString;
+
 	public Integer getStatus() {
 		return status;
 	}
@@ -238,6 +240,14 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	public void setLastWithdrawalDateTo(final Date lastWithdrawalDateTo) {
 		this.lastWithdrawalDateTo = lastWithdrawalDateTo;
+	}
+
+	public String getCommentContainsString() {
+		return commentContainsString;
+	}
+
+	public void setCommentContainsString(final String commentContainsString) {
+		this.commentContainsString = commentContainsString;
 	}
 
 	@Override
