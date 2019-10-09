@@ -58,33 +58,36 @@ public class ExperimentModelGenerator {
 
 	private List<ExperimentProperty> createTrialDesignExperimentProperties(final ExperimentModel experimentModel,
 		final ObservationUnitRow row, final List<MeasurementVariable> variables) {
-		final ImmutableMap<String, MeasurementVariable> variableMap = Maps.uniqueIndex(variables, new Function<MeasurementVariable, String>() {
+		final ImmutableMap<Integer, MeasurementVariable> variableMap = Maps.uniqueIndex(variables, new Function<MeasurementVariable, Integer>() {
 			@Override
-			public String apply(final MeasurementVariable variable) {
-				return String.valueOf(variable.getTermId());
+			public Integer apply(final MeasurementVariable variable) {
+				return variable.getTermId();
 			}
 		});
 
 		final List<ExperimentProperty> experimentProperties = new ArrayList<>();
 
 		for (final Map.Entry<String, ObservationUnitData> rowData : row.getVariables().entrySet()) {
-			final Integer variableId = rowData.getValue().getVariableId();
+			final ObservationUnitData unitData = rowData.getValue();
+			final Integer variableId = unitData.getVariableId();
 			final MeasurementVariable measurementVariable = variableMap.get(variableId);
 			int rank = 1;
 			if (measurementVariable != null && VariableType.EXPERIMENTAL_DESIGN.equals(measurementVariable.getVariableType())) {
-				experimentProperties.add(this.createTrialDesignProperty(experimentModel, measurementVariable, rank++));
+				experimentProperties.add(this.createTrialDesignProperty(experimentModel, measurementVariable, unitData.getValue(), rank));
+				rank++;
 			}
 		}
 
 		return experimentProperties;
 	}
 
-	private ExperimentProperty createTrialDesignProperty(final ExperimentModel experimentModel, final MeasurementVariable measurementVariable, final Integer rank) {
+	private ExperimentProperty createTrialDesignProperty(final ExperimentModel experimentModel,
+		final MeasurementVariable measurementVariable, final String value, final Integer rank) {
 
 		final ExperimentProperty experimentProperty = new ExperimentProperty();
 		experimentProperty.setExperiment(experimentModel);
 		experimentProperty.setTypeId(measurementVariable.getTermId());
-		experimentProperty.setValue(measurementVariable.getValue());
+		experimentProperty.setValue(value);
 		experimentProperty.setRank(rank);
 
 		return experimentProperty;
