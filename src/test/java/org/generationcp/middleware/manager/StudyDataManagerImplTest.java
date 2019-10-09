@@ -1116,7 +1116,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final String season = String.valueOf(random.nextInt());
 		final Integer datasetId = this.studyTDI.createEnvironmentDataset(this.crop, studyId, location1, season);
 		final String location2 = String.valueOf(random.nextInt());
-		this.studyTDI.addEnvironmentToDataset(this.crop, datasetId, location2, season);
+		this.studyTDI.addEnvironmentToDataset(this.crop, datasetId, 2, location2, season);
 
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.manager.getActiveSession().flush();
