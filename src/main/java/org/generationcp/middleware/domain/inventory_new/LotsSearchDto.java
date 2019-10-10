@@ -1,5 +1,7 @@
 package org.generationcp.middleware.domain.inventory_new;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -8,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 @AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class LotsSearchDto extends SearchRequestDto {
 
 	private Integer status;
@@ -44,16 +47,22 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private String createdByUsername;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date createdDateFrom;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date createdDateTo;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date lastDepositDateFrom;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date lastDepositDateTo;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date lastWithdrawalDateFrom;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date lastWithdrawalDateTo;
 
 	private String commentContainsString;
