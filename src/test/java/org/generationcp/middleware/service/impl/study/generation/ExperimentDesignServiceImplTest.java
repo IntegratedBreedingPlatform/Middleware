@@ -112,8 +112,10 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 				this.studyTDI.addEnvironmentToDataset(new CropType(), this.environmentDatasetId, i + 1, null, null);
 			}
 			this.plotDatasetId = this.studyTDI.addTestDataset(this.studyId, DatasetTypeEnum.PLOT_DATA.getId()).getId();
-			this.treatmentFactor = this.daoFactory.getCvTermDao().save(CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId()));
-			this.treatmentFactorLabel = this.daoFactory.getCvTermDao().save(CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId()));
+			this.treatmentFactor = this.daoFactory.getCvTermDao()
+				.save(CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId()));
+			this.treatmentFactorLabel = this.daoFactory.getCvTermDao()
+				.save(CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId()));
 		}
 
 		if (this.gids == null) {
@@ -128,7 +130,6 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		this.experimentDesignService
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows());
 
-		this.sessionProvder.getSession().flush();
 		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
 		Assert.assertNotNull(rows);
 
@@ -156,26 +157,51 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(GERMPLASM_PREFIX + gid, row.getVariables().get("DESIGNATION").getValue());
 	}
 
+	@Test
+	public void testDeleteExperimentDesign() {
+		// Save design first, then delete
+		this.experimentDesignService
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows());
+		this.experimentDesignService.deleteExperimentDesign(this.studyId);
+
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		Assert.assertTrue(rows.isEmpty());
+
+		final List<Integer> environmentVariableIds =
+			this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(this.environmentDatasetId);
+		Assert.assertFalse(environmentVariableIds.contains(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
+		Assert.assertFalse(environmentVariableIds.contains(TermId.NUMBER_OF_REPLICATES.getId()));
+
+		final List<Integer> plotVariableIds =
+			this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(this.plotDatasetId);
+		for (final TermId variable : PLOT_VARIABLES) {
+			Assert.assertFalse(plotVariableIds.contains(variable.getId()));
+		}
+		Assert.assertFalse(plotVariableIds.contains(this.treatmentFactor.getCvTermId()));
+		Assert.assertFalse(plotVariableIds.contains(this.treatmentFactorLabel.getCvTermId()));
+	}
+
 	private void verifyPlotVariablesWereSaved() {
 		final List<Integer> plotVariableIds = this.daoFactory.getProjectPropertyDAO()
-			.getDatasetVariableIdsForGivenStoredInIds(this.plotDatasetId, Arrays.asList(VariableType.GERMPLASM_DESCRIPTOR.getId(),
+			.getDatasetVariableIdsForVariableTypeIds(this.plotDatasetId, Arrays.asList(VariableType.GERMPLASM_DESCRIPTOR.getId(),
 				VariableType.EXPERIMENTAL_DESIGN.getId()), null);
 		for (final TermId variable : Lists.newArrayList(Iterables.concat(PLOT_VARIABLES, GERMPLASM_VARIABLES))) {
 			Assert.assertTrue(plotVariableIds.contains(variable.getId()));
 		}
-		Assert.assertTrue(plotVariableIds.contains(treatmentFactor.getCvTermId()));
-		Assert.assertTrue(plotVariableIds.contains(treatmentFactorLabel.getCvTermId()));
+		Assert.assertTrue(plotVariableIds.contains(this.treatmentFactor.getCvTermId()));
+		Assert.assertTrue(plotVariableIds.contains(this.treatmentFactorLabel.getCvTermId()));
 
 		final List<Integer> treatmentFactorVariableIds = this.daoFactory.getProjectPropertyDAO()
-			.getDatasetVariableIdsForGivenStoredInIds(this.plotDatasetId, Collections.singletonList(TermId.MULTIFACTORIAL_INFO.getId()), null);
-		Assert.assertTrue(treatmentFactorVariableIds.contains(treatmentFactor.getCvTermId()));
-		Assert.assertTrue(treatmentFactorVariableIds.contains(treatmentFactorLabel.getCvTermId()));
+			.getDatasetVariableIdsForVariableTypeIds(this.plotDatasetId, Collections.singletonList(TermId.MULTIFACTORIAL_INFO.getId()),
+				null);
+		Assert.assertTrue(treatmentFactorVariableIds.contains(this.treatmentFactor.getCvTermId()));
+		Assert.assertTrue(treatmentFactorVariableIds.contains(this.treatmentFactorLabel.getCvTermId()));
 	}
 
 	private void verifyEnvironmentVariablesWereSaved() {
 		final List<MeasurementVariable> environmentVariables =
 			this.datasetService.getDatasetMeasurementVariablesByVariableType(this.environmentDatasetId,
-				Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId()));
+				Collections.singletonList(VariableType.ENVIRONMENT_DETAIL.getId()));
 		final ImmutableMap<Integer, MeasurementVariable> environmentVariablesMap =
 			Maps.uniqueIndex(environmentVariables, new Function<MeasurementVariable, Integer>() {
 
@@ -227,20 +253,20 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		}
 
 		// Treatment Factor variables
-		final Integer tfVariableId1 = treatmentFactor.getCvTermId();
+		final Integer tfVariableId1 = this.treatmentFactor.getCvTermId();
 		final MeasurementVariable tfVariable = new MeasurementVariable();
 		tfVariable.setVariableType(VariableType.TREATMENT_FACTOR);
-		tfVariable.setAlias(treatmentFactor.getName());
+		tfVariable.setAlias(this.treatmentFactor.getName());
 		tfVariable.setTermId(tfVariableId1);
-		tfVariable.setValue(treatmentFactor.getName());
+		tfVariable.setValue(this.treatmentFactor.getName());
 		variables.add(tfVariable);
 
-		final Integer tfVariableId2 = treatmentFactorLabel.getCvTermId();
+		final Integer tfVariableId2 = this.treatmentFactorLabel.getCvTermId();
 		final MeasurementVariable tfLabelVariable = new MeasurementVariable();
 		tfLabelVariable.setVariableType(VariableType.TREATMENT_FACTOR);
-		tfLabelVariable.setAlias(treatmentFactorLabel.getName());
+		tfLabelVariable.setAlias(this.treatmentFactorLabel.getName());
 		tfLabelVariable.setTermId(tfVariableId2);
-		tfLabelVariable.setValue(treatmentFactor.getName());
+		tfLabelVariable.setValue(this.treatmentFactor.getName());
 		variables.add(tfLabelVariable);
 
 		return variables;
@@ -266,16 +292,20 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 						row.getVariables()
 							.put(String.valueOf(TermId.GID.getId()), new ObservationUnitData(TermId.GID.getId(), String.valueOf(gid)));
 						row.getVariables()
-							.put(String.valueOf(TermId.DESIG.getId()), new ObservationUnitData(TermId.DESIG.getId(), "GERMPLASM_PREFIX" + gid));
+							.put(String.valueOf(TermId.DESIG.getId()),
+								new ObservationUnitData(TermId.DESIG.getId(), "GERMPLASM_PREFIX" + gid));
 						row.getVariables().put(String.valueOf(TermId.ENTRY_NO.getId()),
 							new ObservationUnitData(TermId.ENTRY_NO.getId(), String.valueOf(entry)));
 						row.getVariables()
 							.put(String.valueOf(TermId.PLOT_NO.getId()),
 								new ObservationUnitData(TermId.PLOT_NO.getId(), String.valueOf(plotNo++)));
 						row.getVariables()
-							.put(String.valueOf(TermId.REP_NO.getId()), new ObservationUnitData(TermId.REP_NO.getId(), String.valueOf(rep)));
-						row.getVariables().put(treatmentFactor.getCvTermId().toString(), new ObservationUnitData(treatmentFactor.getCvTermId(), String.valueOf(treatment)));
-						row.getVariables().put(treatmentFactorLabel.getCvTermId().toString(), new ObservationUnitData(treatmentFactorLabel.getCvTermId(), String.valueOf(treatment*100)));
+							.put(String.valueOf(TermId.REP_NO.getId()),
+								new ObservationUnitData(TermId.REP_NO.getId(), String.valueOf(rep)));
+						row.getVariables().put(this.treatmentFactor.getCvTermId().toString(),
+							new ObservationUnitData(this.treatmentFactor.getCvTermId(), String.valueOf(treatment)));
+						row.getVariables().put(this.treatmentFactorLabel.getCvTermId().toString(),
+							new ObservationUnitData(this.treatmentFactorLabel.getCvTermId(), String.valueOf(treatment * 100)));
 						rows.add(row);
 					}
 				}

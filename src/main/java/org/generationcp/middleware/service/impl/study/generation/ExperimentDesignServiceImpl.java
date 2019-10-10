@@ -24,13 +24,19 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class ExperimentDesignServiceImpl implements ExperimentDesignService {
+
+	private static final List<Integer> EXPERIMENTAL_DESIGN_VARIABLES = Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+		TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(), TermId.BLOCKS_PER_REPLICATE.getId(),
+		TermId.PERCENTAGE_OF_REPLICATION.getId(),
+		TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
+		TermId.NO_OF_COLS_IN_REPS.getId(), TermId.NO_OF_CROWS_LATINIZE.getId(), TermId.NO_OF_CCOLS_LATINIZE.getId(),
+		TermId.NO_OF_CBLKS_LATINIZE.getId(), TermId.EXPT_DESIGN_SOURCE.getId(), TermId.NBLKS.getId(),
+		TermId.CHECK_PLAN.getId(), TermId.CHECK_INTERVAL.getId(), TermId.CHECK_START.getId());
 
 	private DaoFactory daoFactory;
 	private ExperimentModelGenerator experimentGenerator;
@@ -189,13 +195,15 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 	@Override
 	public void deleteExperimentDesign(final int studyId) {
-		// FIXME: Delete variables of environment dataset related to EXP DESIGN
+		// Delete environment variables related to experiment design
 		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
-		this.daoFactory.getProjectPropertyDAO().deleteProjectVariablesByVariableTypes(environmentDatasetId,
-			Collections.singletonList(VariableType.EXPERIMENTAL_DESIGN.getId()));
+		this.daoFactory.getProjectPropertyDAO()
+			.deleteProjectVariables(environmentDatasetId, ExperimentDesignServiceImpl.EXPERIMENTAL_DESIGN_VARIABLES);
 
-		// Delete experiments of plot dataset
+		// Delete variables related to experiment design and experiments of plot dataset
 		final Integer plotDatasetId = this.getPlotDatasetId(studyId);
+		this.daoFactory.getProjectPropertyDAO().deleteProjectVariablesByVariableTypes(plotDatasetId,
+			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), TermId.MULTIFACTORIAL_INFO.getId()));
 		this.daoFactory.getExperimentDao().deleteExperimentsForDataset(plotDatasetId);
 	}
 

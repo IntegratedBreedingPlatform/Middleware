@@ -198,7 +198,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		if (doExcludeIds) {
 			query.setParameterList("excludeIds", varIdsToExclude);
 		}
-		query.setParameterList("storedInIds", variableTypeIds);
+		query.setParameterList("variableTypeIds", variableTypeIds);
 		return query.list();
 
 	}
