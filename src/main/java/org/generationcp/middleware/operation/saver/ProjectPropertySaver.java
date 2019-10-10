@@ -454,7 +454,7 @@ public class ProjectPropertySaver {
 		storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
 
 		final List<Integer> germplasmPlotVariateIds =
-				this.saver.getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(datasetId, storedInIds, variableIds);
+				this.saver.getProjectPropertyDao().getDatasetVariableIdsForVariableTypeIds(datasetId, storedInIds, variableIds);
 		this.updateVariableRank(germplasmPlotVariateIds, rank, projectProperties);
 	}
 

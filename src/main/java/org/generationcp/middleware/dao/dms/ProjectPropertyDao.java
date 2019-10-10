@@ -181,10 +181,10 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getDatasetVariableIdsForGivenStoredInIds(final Integer projectId, final List<Integer> storedInIds,
+	public List<Integer> getDatasetVariableIdsForVariableTypeIds(final Integer projectId, final List<Integer> variableTypeIds,
 			final List<Integer> varIdsToExclude) {
 		final String mainSql = " SELECT variable_id " + " FROM projectprop pp " + " WHERE project_id = :projectId ";
-		final String existsClause = " AND pp.type_id in (:storedInIds) ORDER BY rank ";
+		final String existsClause = " AND pp.type_id IN (:variableTypeIds) ORDER BY rank ";
 		final boolean doExcludeIds = varIdsToExclude != null && !varIdsToExclude.isEmpty();
 
 		final StringBuilder sb = new StringBuilder(mainSql);
@@ -198,7 +198,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		if (doExcludeIds) {
 			query.setParameterList("excludeIds", varIdsToExclude);
 		}
-		query.setParameterList("storedInIds", storedInIds);
+		query.setParameterList("storedInIds", variableTypeIds);
 		return query.list();
 
 	}
