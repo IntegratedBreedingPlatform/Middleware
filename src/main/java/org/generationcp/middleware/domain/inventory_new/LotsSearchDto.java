@@ -47,6 +47,8 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private String createdByUsername;
 
+	private Integer germplasmListId;
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date createdDateFrom;
 
@@ -257,6 +259,14 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	public void setCommentContainsString(final String commentContainsString) {
 		this.commentContainsString = commentContainsString;
+	}
+
+	public Integer getGermplasmListId() {
+		return germplasmListId;
+	}
+
+	public void setGermplasmListId(final Integer germplasmListId) {
+		this.germplasmListId = germplasmListId;
 	}
 
 	@Override

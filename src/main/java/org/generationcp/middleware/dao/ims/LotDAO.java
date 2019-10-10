@@ -722,6 +722,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				query.append(" and users.uname like '%").append(lotsSearchDto.getCreatedByUsername()).append("%'" );
 			}
 
+			if(lotsSearchDto.getGermplasmListId() != null) {
+				query.append(" and lot.eid in (select gid from listdata where listid = ").append(lotsSearchDto.getGermplasmListId()).
+						append(") ");
+			}
+
 		}
 		query.append(" GROUP BY lot.lotid ");
 
