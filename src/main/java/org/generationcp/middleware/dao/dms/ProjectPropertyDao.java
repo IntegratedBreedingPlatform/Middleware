@@ -30,7 +30,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -184,7 +183,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	@SuppressWarnings("unchecked")
 	public List<Integer> getDatasetVariableIdsForGivenStoredInIds(final Integer projectId, final List<Integer> storedInIds,
 			final List<Integer> varIdsToExclude) {
-		final List<Integer> variableIds = new ArrayList<>();
 		final String mainSql = " SELECT variable_id " + " FROM projectprop pp " + " WHERE project_id = :projectId ";
 		final String existsClause = " AND pp.type_id in (:storedInIds) ORDER BY rank ";
 		final boolean doExcludeIds = varIdsToExclude != null && !varIdsToExclude.isEmpty();
@@ -201,12 +199,8 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			query.setParameterList("excludeIds", varIdsToExclude);
 		}
 		query.setParameterList("storedInIds", storedInIds);
-		final List<String> results = query.list();
-		for (final String value : results) {
-			variableIds.add(Integer.parseInt(value));
-		}
+		return query.list();
 
-		return variableIds;
 	}
 
 	@SuppressWarnings("unchecked")

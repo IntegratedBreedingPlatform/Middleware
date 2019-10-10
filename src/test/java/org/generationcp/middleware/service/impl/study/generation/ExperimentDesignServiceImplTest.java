@@ -5,22 +5,27 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -34,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,6 +48,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	private static final Integer NO_INSTANCES = 3;
 	private static final Integer NO_REPS = 2;
 	private static final Integer NO_ENTRIES = 5;
+	private static final Integer NO_TREATMENTS = 3;
 	private static final List<TermId> GERMPLASM_VARIABLES =
 		Arrays.asList(TermId.ENTRY_TYPE, TermId.GID, TermId.DESIG, TermId.ENTRY_NO);
 	private static final List<TermId> PLOT_VARIABLES =
@@ -60,8 +67,8 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
+	private DaoFactory daoFactory;
 	private StudyDataManagerImpl studyDataManager;
-
 	private StudyTestDataInitializer studyTDI;
 
 	private DatasetService datasetService;
@@ -73,6 +80,8 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	private Integer studyId;
 	private Integer plotDatasetId;
 	private Integer environmentDatasetId;
+	private CVTerm treatmentFactor;
+	private CVTerm treatmentFactorLabel;
 	private Integer[] gids;
 
 	@Before
@@ -80,6 +89,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		this.experimentDesignService = new ExperimentDesignServiceImpl(this.sessionProvder);
 		this.datasetService = new DatasetServiceImpl(this.sessionProvder);
 		this.studyDataManager = new StudyDataManagerImpl(this.sessionProvder);
+		this.daoFactory = new DaoFactory(this.sessionProvder);
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
@@ -102,6 +112,8 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 				this.studyTDI.addEnvironmentToDataset(new CropType(), this.environmentDatasetId, i + 1, null, null);
 			}
 			this.plotDatasetId = this.studyTDI.addTestDataset(this.studyId, DatasetTypeEnum.PLOT_DATA.getId()).getId();
+			this.treatmentFactor = this.daoFactory.getCvTermDao().save(CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId()));
+			this.treatmentFactorLabel = this.daoFactory.getCvTermDao().save(CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId()));
 		}
 
 		if (this.gids == null) {
@@ -125,8 +137,8 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		this.verifyPlotVariablesWereSaved();
 
 		// Check that plot experiments are created
-		Assert.assertEquals(NO_INSTANCES * NO_ENTRIES * NO_REPS, rows.size());
-		final ObservationUnitRow row = rows.get(7);
+		Assert.assertEquals(NO_INSTANCES * NO_ENTRIES * NO_REPS * NO_TREATMENTS, rows.size());
+		final ObservationUnitRow row = rows.get(21);
 		final Integer gid = this.gids[2];
 		Assert.assertEquals(gid, row.getGid());
 		Assert.assertEquals(GERMPLASM_PREFIX + gid, row.getDesignation());
@@ -137,27 +149,27 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(gid.toString(), row.getVariables().get("GID").getValue());
 		Assert.assertEquals("3", row.getVariables().get("ENTRY_NO").getValue());
 		Assert.assertEquals("2", row.getVariables().get("REP_NO").getValue());
-		Assert.assertEquals("8", row.getVariables().get("PLOT_NO").getValue());
+		Assert.assertEquals("22", row.getVariables().get("PLOT_NO").getValue());
+		Assert.assertEquals("1", row.getVariables().get(this.treatmentFactor.getName()).getValue());
+		Assert.assertEquals("100", row.getVariables().get(this.treatmentFactorLabel.getName()).getValue());
 		Assert.assertEquals("Test entry", row.getVariables().get("ENTRY_TYPE").getValue());
 		Assert.assertEquals(GERMPLASM_PREFIX + gid, row.getVariables().get("DESIGNATION").getValue());
 	}
 
 	private void verifyPlotVariablesWereSaved() {
-		final List<MeasurementVariable> plotVariables =
-			this.datasetService
-				.getDatasetMeasurementVariablesByVariableType(this.plotDatasetId, Arrays.asList(VariableType.GERMPLASM_DESCRIPTOR.getId(),
-					VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId()));
-		final ImmutableMap<Integer, MeasurementVariable> plotVariablesMap =
-			Maps.uniqueIndex(plotVariables, new Function<MeasurementVariable, Integer>() {
-
-				@Override
-				public Integer apply(final MeasurementVariable variable) {
-					return variable.getTermId();
-				}
-			});
+		final List<Integer> plotVariableIds = this.daoFactory.getProjectPropertyDAO()
+			.getDatasetVariableIdsForGivenStoredInIds(this.plotDatasetId, Arrays.asList(VariableType.GERMPLASM_DESCRIPTOR.getId(),
+				VariableType.EXPERIMENTAL_DESIGN.getId()), null);
 		for (final TermId variable : Lists.newArrayList(Iterables.concat(PLOT_VARIABLES, GERMPLASM_VARIABLES))) {
-			Assert.assertNotNull(plotVariablesMap.get(variable.getId()));
+			Assert.assertTrue(plotVariableIds.contains(variable.getId()));
 		}
+		Assert.assertTrue(plotVariableIds.contains(treatmentFactor.getCvTermId()));
+		Assert.assertTrue(plotVariableIds.contains(treatmentFactorLabel.getCvTermId()));
+
+		final List<Integer> treatmentFactorVariableIds = this.daoFactory.getProjectPropertyDAO()
+			.getDatasetVariableIdsForGivenStoredInIds(this.plotDatasetId, Collections.singletonList(TermId.MULTIFACTORIAL_INFO.getId()), null);
+		Assert.assertTrue(treatmentFactorVariableIds.contains(treatmentFactor.getCvTermId()));
+		Assert.assertTrue(treatmentFactorVariableIds.contains(treatmentFactorLabel.getCvTermId()));
 	}
 
 	private void verifyEnvironmentVariablesWereSaved() {
@@ -213,6 +225,24 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			plotVariable.setTermId(variable.getId());
 			variables.add(plotVariable);
 		}
+
+		// Treatment Factor variables
+		final Integer tfVariableId1 = treatmentFactor.getCvTermId();
+		final MeasurementVariable tfVariable = new MeasurementVariable();
+		tfVariable.setVariableType(VariableType.TREATMENT_FACTOR);
+		tfVariable.setAlias(treatmentFactor.getName());
+		tfVariable.setTermId(tfVariableId1);
+		tfVariable.setValue(treatmentFactor.getName());
+		variables.add(tfVariable);
+
+		final Integer tfVariableId2 = treatmentFactorLabel.getCvTermId();
+		final MeasurementVariable tfLabelVariable = new MeasurementVariable();
+		tfLabelVariable.setVariableType(VariableType.TREATMENT_FACTOR);
+		tfLabelVariable.setAlias(treatmentFactorLabel.getName());
+		tfLabelVariable.setTermId(tfVariableId2);
+		tfLabelVariable.setValue(treatmentFactor.getName());
+		variables.add(tfLabelVariable);
+
 		return variables;
 	}
 
@@ -223,27 +253,31 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		for (int instance = 1; instance <= NO_INSTANCES; instance++)
 			for (int rep = 1; rep <= NO_REPS; rep++) {
 				for (int entry = 1; entry <= NO_ENTRIES; entry++) {
-					final ObservationUnitRow row = new ObservationUnitRow();
-					row.setEntryNumber(entry);
-					row.setTrialInstance(instance);
-					row.setVariables(new HashMap<String, ObservationUnitData>());
-					row.getVariables().put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()),
-						new ObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), "1"));
-					row.getVariables().put(String.valueOf(TermId.ENTRY_TYPE.getId()), new ObservationUnitData(TermId.ENTRY_TYPE.getId(),
-						String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
-					final Integer gid = this.gids[entry - 1];
-					row.getVariables()
-						.put(String.valueOf(TermId.GID.getId()), new ObservationUnitData(TermId.GID.getId(), String.valueOf(gid)));
-					row.getVariables()
-						.put(String.valueOf(TermId.DESIG.getId()), new ObservationUnitData(TermId.DESIG.getId(), "GERMPLASM_PREFIX" + gid));
-					row.getVariables().put(String.valueOf(TermId.ENTRY_NO.getId()),
-						new ObservationUnitData(TermId.ENTRY_NO.getId(), String.valueOf(entry)));
-					row.getVariables()
-						.put(String.valueOf(TermId.PLOT_NO.getId()),
-							new ObservationUnitData(TermId.PLOT_NO.getId(), String.valueOf(plotNo++)));
-					row.getVariables()
-						.put(String.valueOf(TermId.REP_NO.getId()), new ObservationUnitData(TermId.REP_NO.getId(), String.valueOf(rep)));
-					rows.add(row);
+					for (int treatment = 1; treatment <= NO_TREATMENTS; treatment++) {
+						final ObservationUnitRow row = new ObservationUnitRow();
+						row.setEntryNumber(entry);
+						row.setTrialInstance(instance);
+						row.setVariables(new HashMap<String, ObservationUnitData>());
+						row.getVariables().put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()),
+							new ObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), "1"));
+						row.getVariables().put(String.valueOf(TermId.ENTRY_TYPE.getId()), new ObservationUnitData(TermId.ENTRY_TYPE.getId(),
+							String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
+						final Integer gid = this.gids[entry - 1];
+						row.getVariables()
+							.put(String.valueOf(TermId.GID.getId()), new ObservationUnitData(TermId.GID.getId(), String.valueOf(gid)));
+						row.getVariables()
+							.put(String.valueOf(TermId.DESIG.getId()), new ObservationUnitData(TermId.DESIG.getId(), "GERMPLASM_PREFIX" + gid));
+						row.getVariables().put(String.valueOf(TermId.ENTRY_NO.getId()),
+							new ObservationUnitData(TermId.ENTRY_NO.getId(), String.valueOf(entry)));
+						row.getVariables()
+							.put(String.valueOf(TermId.PLOT_NO.getId()),
+								new ObservationUnitData(TermId.PLOT_NO.getId(), String.valueOf(plotNo++)));
+						row.getVariables()
+							.put(String.valueOf(TermId.REP_NO.getId()), new ObservationUnitData(TermId.REP_NO.getId(), String.valueOf(rep)));
+						row.getVariables().put(treatmentFactor.getCvTermId().toString(), new ObservationUnitData(treatmentFactor.getCvTermId(), String.valueOf(treatment)));
+						row.getVariables().put(treatmentFactorLabel.getCvTermId().toString(), new ObservationUnitData(treatmentFactorLabel.getCvTermId(), String.valueOf(treatment*100)));
+						rows.add(row);
+					}
 				}
 			}
 		return rows;

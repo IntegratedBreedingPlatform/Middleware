@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -24,7 +25,9 @@ import org.generationcp.middleware.service.api.study.generation.ExperimentDesign
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ExperimentDesignServiceImpl implements ExperimentDesignService {
@@ -59,11 +62,11 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	}
 
 	private void saveVariables(final int studyId, final List<MeasurementVariable> variables, final Integer plotDatasetId) {
-		final int plotDatasetNextRank = this.daoFactory.getProjectPropertyDAO().getNextRank(plotDatasetId);
+		int plotDatasetNextRank = this.daoFactory.getProjectPropertyDAO().getNextRank(plotDatasetId);
 		final List<Integer> plotVariableIds = this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(plotDatasetId);
 
 		final Integer envDatasetId = this.getEnvironmentDatasetId(studyId);
-		final int envDatasetNextRank = this.daoFactory.getProjectPropertyDAO().getNextRank(envDatasetId);
+		int envDatasetNextRank = this.daoFactory.getProjectPropertyDAO().getNextRank(envDatasetId);
 		final List<Integer> envVariableIds = this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(envDatasetId);
 		// Save project variables in environment and plot datasets
 		for (final MeasurementVariable variable : variables) {
@@ -72,15 +75,31 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 			final boolean isEnvironmentVariable = VariableType.ENVIRONMENT_DETAIL.equals(variableType);
 			if (!this.variableExists(variableId, isEnvironmentVariable, envVariableIds, plotVariableIds)) {
 				Integer projectId = plotDatasetId;
-				Integer rank = plotDatasetNextRank;
+				Integer rank = 1;
+				Integer variableTypeId = variableType.getId();
 				if (isEnvironmentVariable) {
 					projectId = envDatasetId;
-					rank = envDatasetNextRank;
+					rank = envDatasetNextRank++;
+
+				} else {
+					// FIXME: Current bug that saves treatment factor as projectprop with type_id = 1100. Should be 1809
+					if (VariableType.TREATMENT_FACTOR.equals(variableType)) {
+						variableTypeId = TermId.MULTIFACTORIAL_INFO.getId();
+
+						// Save a record for same variable with variable type = EXPERIMENT_DESIGN
+						final DmsProject project = new DmsProject();
+						project.setProjectId(projectId);
+						final ProjectProperty property =
+							new ProjectProperty(project, VariableType.EXPERIMENTAL_DESIGN.getId(), "", plotDatasetNextRank++, variableId, variable.getAlias());
+						this.daoFactory.getProjectPropertyDAO().save(property);
+					}
+					rank = plotDatasetNextRank++;
 				}
+
 				final DmsProject project = new DmsProject();
 				project.setProjectId(projectId);
 				final ProjectProperty property =
-					new ProjectProperty(project, variableType.getId(), variable.getValue(), rank, variableId, variable.getAlias());
+					new ProjectProperty(project, variableTypeId, variable.getValue(), rank, variableId, variable.getAlias());
 				this.daoFactory.getProjectPropertyDAO().save(property);
 			}
 
@@ -126,7 +145,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		for (final ObservationUnitRow row : rows) {
 			final Optional<Geolocation> geolocation = this.getGeolocation(trialInstanceGeolocationMap, row);
 			final ExperimentModel
-				experimentModel = this.experimentGenerator.generate(crop, plotDatasetId, row, ExperimentType.PLOT, geolocation, variables);
+				experimentModel = this.experimentGenerator.generate(crop, plotDatasetId, row, ExperimentType.PLOT, geolocation, variablesMap);
 			final String entryNumber = String.valueOf(row.getEntryNumber());
 			StockModel stockModel = stocksMap.get(entryNumber);
 			if (stockModel == null) {
