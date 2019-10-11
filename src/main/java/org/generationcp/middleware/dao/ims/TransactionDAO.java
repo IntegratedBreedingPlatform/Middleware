@@ -602,7 +602,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "    i.etype = 'GERMPLSM' "; //
 
 	private String buildSearchTransactionsQuery(final TransactionsSearchDto transactionsSearchDto) {
-		final StringBuilder query = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
+		final StringBuilder query = new StringBuilder(this.SEARCH_TRANSACTIONS_QUERY);
 		/*	private List<String> transactionType;*/
 		if (transactionsSearchDto != null) {
 			if (transactionsSearchDto.getLotIds() != null && !transactionsSearchDto.getLotIds().isEmpty()) {
@@ -634,11 +634,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			}
 
 			if (transactionsSearchDto.getTransactionDateFrom() != null) {
-				query.append(" and DATE(act.trndate) >= '").append(formatDate(transactionsSearchDto.getTransactionDateFrom())).append("' ");
+				query.append(" and DATE(act.trndate) >= '").append(this.formatDate(transactionsSearchDto.getTransactionDateFrom())).append("' ");
 			}
 
 			if (transactionsSearchDto.getTransactionDateTo() != null) {
-				query.append(" and DATE(act.trndate) <= '").append(formatDate(transactionsSearchDto.getTransactionDateTo())).append("' ");
+				query.append(" and DATE(act.trndate) <= '").append(this.formatDate(transactionsSearchDto.getTransactionDateTo())).append("' ");
 			}
 
 			if (transactionsSearchDto.getUser() != null) {
@@ -685,7 +685,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			final StringBuilder sortedLotsSearchQuery = new StringBuilder(lotsSearchQuery);
 			if (pageable.getSort() != null) {
 				final List<String> sorts = new ArrayList<>();
-				for (Sort.Order order : pageable.getSort()) {
+				for (final Sort.Order order : pageable.getSort()) {
 					sorts.add(order.getProperty() + " " + order.getDirection().toString());
 				}
 				if (!sorts.isEmpty()) {
@@ -699,7 +699,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	public List<TransactionDto> searchTransactions(final TransactionsSearchDto transactionsSearchDto, final Pageable pageable) {
 		try {
-			final String filterLotsQuery = addSortToSearchTransactionsQuery(buildSearchTransactionsQuery(transactionsSearchDto), pageable);
+			final String filterLotsQuery =
+				this.addSortToSearchTransactionsQuery(this.buildSearchTransactionsQuery(transactionsSearchDto), pageable);
 
 			final SQLQuery query = this.getSession().createSQLQuery(filterLotsQuery);
 			query.addScalar("lotId");
@@ -734,7 +735,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	public long countSearchTransactions(final TransactionsSearchDto transactionsSearchDto) {
 		try {
 			final StringBuilder countTransactionsQuery =
-				new StringBuilder("Select count(1) from (").append(buildSearchTransactionsQuery(transactionsSearchDto))
+				new StringBuilder("Select count(1) from (").append(this.buildSearchTransactionsQuery(transactionsSearchDto))
 					.append(") as filteredTransactions");
 			final SQLQuery query = this.getSession().createSQLQuery(countTransactionsQuery.toString());
 			return ((BigInteger) query.uniqueResult()).longValue();
