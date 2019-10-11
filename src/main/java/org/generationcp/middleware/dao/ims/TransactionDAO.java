@@ -11,24 +11,32 @@
 
 package org.generationcp.middleware.dao.ims;
 
+import com.google.common.base.Joiner;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
+import org.generationcp.middleware.domain.inventory_new.TransactionDto;
+import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +50,7 @@ import java.util.Map;
 public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TransactionDAO.class);
+	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
 	@SuppressWarnings("unchecked")
 	public List<Transaction> getAllReserve(final int start, final int numOfRows) {
@@ -553,5 +562,189 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			transactionReportRows.add(transaction);
 		}
 
+	}
+
+	//New inventory functions, please locate them below this line to help cleaning in the near future.
+	private final String SEARCH_TRANSACTIONS_QUERY = "SELECT " //
+		+ "    i.lotid AS lotId," //
+		+ "    i.eid AS gid,"//
+		+ "    n.nval AS designation,"//
+		+ "    inventory_id AS stockId,"//
+		+ "    act.trnid AS transactionId,"//
+		+ "    users.uname AS user,"//
+		+ "    (CASE"//
+		+ "        WHEN i.comments IN ('Lot closed' , 'Discard') THEN i.comments"//
+		+ "        WHEN trnstat = 0 AND trnqty > 0 THEN 'Deposit'"//
+		+ "        WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation'"//
+		+ "        WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal'"//
+		+ "    END) AS transactionType,"//
+		+ "    SUM(CASE"//
+		+ "        WHEN trnstat = 0 AND trnqty > 0 THEN trnqty"//
+		+ "        ELSE 0"//
+		+ "    END) AS amount,"//
+		+ "    act.comments AS notes,"//
+		+ "    scaleid AS scaleId,"//
+		+ "    scale.name AS scaleName," //
+		+ "    act.trndate as transactionDate "//
+		+ " FROM"//
+		+ "    ims_lot i"//
+		+ "        LEFT JOIN"//
+		+ "    ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9"//
+		+ "        LEFT JOIN"//
+		+ "    cvterm scale ON scale.cvterm_id = i.scaleid"//
+		+ "        LEFT JOIN"//
+		+ "    germplsm g ON g.gid = i.eid"//
+		+ "        LEFT JOIN"//
+		+ "    names n ON n.gid = i.eid AND n.nstat = 1"//
+		+ "        LEFT JOIN"//
+		+ "    workbench.users users ON users.userid = i.userid"//
+		+ " WHERE"//
+		+ "    i.etype = 'GERMPLSM' "; //
+
+	private String buildSearchTransactionsQuery(final TransactionsSearchDto transactionsSearchDto) {
+		final StringBuilder query = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
+		/*	private List<String> transactionType;*/
+		if (transactionsSearchDto != null) {
+			if (transactionsSearchDto.getLotIds() != null && !transactionsSearchDto.getLotIds().isEmpty()) {
+				query.append(" and i.lotid IN (").append(Joiner.on(",").join(transactionsSearchDto.getLotIds())).append(") ");
+			}
+
+			if (transactionsSearchDto.getTransactionIds() != null && !transactionsSearchDto.getTransactionIds().isEmpty()) {
+				query.append(" and trnid IN (").append(Joiner.on(",").join(transactionsSearchDto.getTransactionIds())).append(") ");
+			}
+
+			if (transactionsSearchDto.getGids() != null && !transactionsSearchDto.getGids().isEmpty()) {
+				query.append(" and i.eid IN (").append(Joiner.on(",").join(transactionsSearchDto.getGids())).append(") ");
+			}
+
+			if (transactionsSearchDto.getScaleIds() != null && !transactionsSearchDto.getScaleIds().isEmpty()) {
+				query.append(" and i.scaleid IN (").append(Joiner.on(",").join(transactionsSearchDto.getScaleIds())).append(") ");
+			}
+
+			if (transactionsSearchDto.getDesignation() != null) {
+				query.append(" and n.nval = '").append(transactionsSearchDto.getDesignation()).append("' ");
+			}
+
+			if (transactionsSearchDto.getStockId() != null) {
+				query.append(" and inventory_id = '").append(transactionsSearchDto.getStockId()).append("' ");
+			}
+
+			if (transactionsSearchDto.getNotes() != null) {
+				query.append(" and act.comments like '%").append(transactionsSearchDto.getNotes()).append("%' ");
+			}
+
+			if (transactionsSearchDto.getTransactionDateFrom() != null) {
+				query.append(" and DATE(act.trndate) >= '").append(formatDate(transactionsSearchDto.getTransactionDateFrom())).append("' ");
+			}
+
+			if (transactionsSearchDto.getTransactionDateTo() != null) {
+				query.append(" and DATE(act.trndate) <= '").append(formatDate(transactionsSearchDto.getTransactionDateTo())).append("' ");
+			}
+
+			if (transactionsSearchDto.getUser() != null) {
+				query.append(" and users.uname like '%").append(transactionsSearchDto.getUser()).append("%'");
+			}
+
+			if (transactionsSearchDto.getMinAmount() != null) {
+				query.append("and CASE WHEN act.trnqty is null THEN 0 ELSE act.trnqty END >= ")
+					.append(transactionsSearchDto.getMinAmount()).append(" ");
+			}
+
+			if (transactionsSearchDto.getMaxAmount() != null) {
+				query.append("and CASE WHEN act.trnqty is null THEN 0 ELSE act.trnqty END <= ")
+					.append(transactionsSearchDto.getMaxAmount()).append(" ");
+			}
+
+			if (transactionsSearchDto.getTransactionType() != null) {
+				query.append("and (CASE"
+					+ "        WHEN i.comments IN ('Lot closed' , 'Discard') THEN i.comments"
+					+ "        WHEN trnstat = 0 AND trnqty > 0 THEN 'Deposit'"
+					+ "        WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation'"
+					+ "        WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal'"
+					+ "    END) = '")
+					.append(transactionsSearchDto.getTransactionType()).append("' ");
+			}
+
+		}
+		query.append(" GROUP BY act.trnid ");
+
+		if (transactionsSearchDto != null) {
+
+			query.append(" having 1=1 ");
+
+			if (transactionsSearchDto.getStockId() != null) {
+				query.append(" and GROUP_CONCAT(inventory_id SEPARATOR ', ') = '").append(transactionsSearchDto.getStockId())
+					.append("' ");
+			}
+		}
+		return query.toString();
+	}
+
+	private String addSortToSearchTransactionsQuery(final String lotsSearchQuery, final Pageable pageable) {
+		if (pageable != null) {
+			final StringBuilder sortedLotsSearchQuery = new StringBuilder(lotsSearchQuery);
+			if (pageable.getSort() != null) {
+				final List<String> sorts = new ArrayList<>();
+				for (Sort.Order order : pageable.getSort()) {
+					sorts.add(order.getProperty() + " " + order.getDirection().toString());
+				}
+				if (!sorts.isEmpty()) {
+					sortedLotsSearchQuery.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
+					return sortedLotsSearchQuery.toString();
+				}
+			}
+		}
+		return lotsSearchQuery;
+	}
+
+	public List<TransactionDto> searchTransactions(final TransactionsSearchDto transactionsSearchDto, final Pageable pageable) {
+		try {
+			final String filterLotsQuery = addSortToSearchTransactionsQuery(buildSearchTransactionsQuery(transactionsSearchDto), pageable);
+
+			final SQLQuery query = this.getSession().createSQLQuery(filterLotsQuery);
+			query.addScalar("lotId");
+			query.addScalar("gid");
+			query.addScalar("designation");
+			query.addScalar("stockId");
+			query.addScalar("transactionId");
+			query.addScalar("user");
+			query.addScalar("transactionType");
+			query.addScalar("amount");
+			query.addScalar("notes");
+			query.addScalar("scaleId");
+			query.addScalar("scaleName");
+			query.addScalar("transactionDate", Hibernate.DATE);
+
+			query.setResultTransformer(Transformers.aliasToBean(TransactionDto.class));
+
+			if (pageable != null) {
+				query.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
+				query.setMaxResults(pageable.getPageSize());
+			}
+
+			final List<TransactionDto> transactionDtos = query.list();
+
+			return transactionDtos;
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at searchLots() query on LotDAO: " + e.getMessage(), e);
+		}
+
+	}
+
+	public long countSearchTransactions(final TransactionsSearchDto transactionsSearchDto) {
+		try {
+			final StringBuilder countTransactionsQuery =
+				new StringBuilder("Select count(1) from (").append(buildSearchTransactionsQuery(transactionsSearchDto))
+					.append(") as filteredTransactions");
+			final SQLQuery query = this.getSession().createSQLQuery(countTransactionsQuery.toString());
+			return ((BigInteger) query.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at countTransactionsQuery() query on LotDAO: " + e.getMessage(), e);
+		}
+	}
+
+	private String formatDate(final Date date) {
+		return format.format(date);
 	}
 }

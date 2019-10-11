@@ -1,0 +1,152 @@
+package org.generationcp.middleware.domain.inventory_new;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
+
+import java.util.Date;
+import java.util.List;
+
+@AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class TransactionsSearchDto extends SearchRequestDto {
+
+	private String designation;
+	private String stockId;
+	private List<Integer> transactionIds;
+	private String user;
+	private String transactionType;
+	private String notes;
+	private List<Integer> lotIds;
+	private List<Integer> gids;
+	private List<Integer> scaleIds;
+	private Double minAmount;
+	private Double maxAmount;
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date transactionDateFrom;
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date transactionDateTo;
+
+	public String getDesignation() {
+		return this.designation;
+	}
+
+	public void setDesignation(final String designation) {
+		this.designation = designation;
+	}
+
+	public String getStockId() {
+		return this.stockId;
+	}
+
+	public void setStockId(final String stockId) {
+		this.stockId = stockId;
+	}
+
+	public String getUser() {
+		return this.user;
+	}
+
+	public void setUser(final String user) {
+		this.user = user;
+	}
+
+	public List<Integer> getTransactionIds() {
+		return this.transactionIds;
+	}
+
+	public void setTransactionIds(final List<Integer> transactionIds) {
+		this.transactionIds = transactionIds;
+	}
+
+	public String getTransactionType() {
+		return this.transactionType;
+	}
+
+	public void setTransactionType(final String transactionType) {
+		this.transactionType = transactionType;
+	}
+
+	public String getNotes() {
+		return this.notes;
+	}
+
+	public void setNotes(final String notes) {
+		this.notes = notes;
+	}
+
+	public List<Integer> getLotIds() {
+		return this.lotIds;
+	}
+
+	public void setLotIds(final List<Integer> lotIds) {
+		this.lotIds = lotIds;
+	}
+
+	public List<Integer> getGids() {
+		return this.gids;
+	}
+
+	public void setGids(final List<Integer> gids) {
+		this.gids = gids;
+	}
+
+	public List<Integer> getScaleIds() {
+		return this.scaleIds;
+	}
+
+	public void setScaleIds(final List<Integer> scaleIds) {
+		this.scaleIds = scaleIds;
+	}
+
+	public Double getMinAmount() {
+		return this.minAmount;
+	}
+
+	public void setMinAmount(final Double minAmount) {
+		this.minAmount = minAmount;
+	}
+
+	public Double getMaxAmount() {
+		return this.maxAmount;
+	}
+
+	public void setMaxAmount(final Double maxAmount) {
+		this.maxAmount = maxAmount;
+	}
+
+	public Date getTransactionDateFrom() {
+		return this.transactionDateFrom;
+	}
+
+	public void setTransactionDateFrom(final Date transactionDateFrom) {
+		this.transactionDateFrom = transactionDateFrom;
+	}
+
+	public Date getTransactionDateTo() {
+		return this.transactionDateTo;
+	}
+
+	public void setTransactionDateTo(final Date transactionDateTo) {
+		this.transactionDateTo = transactionDateTo;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+}
