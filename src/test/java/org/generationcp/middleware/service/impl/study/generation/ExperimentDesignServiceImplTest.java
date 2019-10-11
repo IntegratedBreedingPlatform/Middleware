@@ -25,6 +25,8 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -53,7 +55,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Arrays.asList(TermId.ENTRY_TYPE, TermId.GID, TermId.DESIG, TermId.ENTRY_NO);
 	private static final List<TermId> PLOT_VARIABLES =
 		Arrays.asList(TermId.PLOT_NO, TermId.REP_NO);
-	public static final String GERMPLASM_PREFIX = "GERMPLASM_PREFIX";
+	private static final String GERMPLASM_PREFIX = "GERMPLASM_PREFIX";
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -179,6 +181,22 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		}
 		Assert.assertFalse(plotVariableIds.contains(this.treatmentFactor.getCvTermId()));
 		Assert.assertFalse(plotVariableIds.contains(this.treatmentFactorLabel.getCvTermId()));
+	}
+
+	@Test
+	public void testGetExperimentDesignTypeTermId() {
+		Assert.assertFalse(this.experimentDesignService.getExperimentDesignTypeTermId(this.studyId).isPresent());
+
+		final Integer exptDesignId = ExperimentDesignType.P_REP.getTermId();
+		final ProjectProperty property = new ProjectProperty();
+		property.setVariableId(TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		property.setProject(new DmsProject(this.environmentDatasetId));
+		property.setRank(this.daoFactory.getProjectPropertyDAO().getNextRank(this.environmentDatasetId));
+		property.setAlias("EXPT_DESIGN");
+		property.setValue(exptDesignId.toString());
+		property.setTypeId(VariableType.ENVIRONMENT_DETAIL.getId());
+		this.daoFactory.getProjectPropertyDAO().save(property);
+		Assert.assertEquals(exptDesignId, this.experimentDesignService.getExperimentDesignTypeTermId(this.studyId).get());
 	}
 
 	private void verifyPlotVariablesWereSaved() {

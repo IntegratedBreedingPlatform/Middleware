@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -65,6 +66,17 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		// Save experiments and stocks (if applicable) in plot dataset
 		this.saveObservationUnitRows(crop, studyId, plotDatasetId, variables, rows);
 
+	}
+
+	@Override
+	public Optional<Integer> getExperimentDesignTypeTermId(final int studyId) {
+		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
+		final ProjectProperty projectProp = this.daoFactory.getProjectPropertyDAO()
+			.getByStandardVariableId(new DmsProject(environmentDatasetId), TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		if (projectProp != null && projectProp.getValue() != null && NumberUtils.isDigits(projectProp.getValue())) {
+			return Optional.of(Integer.valueOf(projectProp.getValue()));
+		}
+		return Optional.absent();
 	}
 
 	private void saveVariables(final int studyId, final List<MeasurementVariable> variables, final Integer plotDatasetId) {
