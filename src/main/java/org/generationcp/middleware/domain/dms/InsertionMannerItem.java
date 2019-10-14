@@ -15,4 +15,8 @@ public enum InsertionMannerItem {
 		this.name = name;
 		this.definition = definition;
 	}
+
+	public Integer getId() {
+		return this.id;
+	}
 }
