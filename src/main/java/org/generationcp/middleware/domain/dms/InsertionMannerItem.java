@@ -6,17 +6,25 @@ public enum InsertionMannerItem {
 	INSERT_ALL_CHECKS(8415,"2","Insert all checks at each position");
 
 
-	private Integer id;
-	private String name;
-	private String definition;
+	private final Integer id;
+	private final String name;
+	private final String description;
 
-	InsertionMannerItem(final Integer id, final String name, final String definition) {
+	InsertionMannerItem(final Integer id, final String name, final String description) {
 		this.id = id;
 		this.name = name;
-		this.definition = definition;
+		this.description = description;
 	}
 
 	public Integer getId() {
 		return this.id;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public String getDescription() {
+		return this.description;
 	}
 }
