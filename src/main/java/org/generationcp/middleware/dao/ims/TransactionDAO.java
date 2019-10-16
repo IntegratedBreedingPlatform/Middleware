@@ -680,29 +680,30 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return query.toString();
 	}
 
-	private String addSortToSearchTransactionsQuery(final String lotsSearchQuery, final Pageable pageable) {
+	private String addSortToSearchTransactionsQuery(final String transactionsSearchQuery, final Pageable pageable) {
+		final StringBuilder sortedTransactionsSearchQuery = new StringBuilder(transactionsSearchQuery);
 		if (pageable != null) {
-			final StringBuilder sortedLotsSearchQuery = new StringBuilder(lotsSearchQuery);
 			if (pageable.getSort() != null) {
 				final List<String> sorts = new ArrayList<>();
 				for (final Sort.Order order : pageable.getSort()) {
 					sorts.add(order.getProperty() + " " + order.getDirection().toString());
 				}
 				if (!sorts.isEmpty()) {
-					sortedLotsSearchQuery.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
-					return sortedLotsSearchQuery.toString();
+					sortedTransactionsSearchQuery.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
 				}
+			} else {
+				sortedTransactionsSearchQuery.append(" ORDER BY lotId");
 			}
 		}
-		return lotsSearchQuery;
+		return sortedTransactionsSearchQuery.toString();
 	}
 
 	public List<TransactionDto> searchTransactions(final TransactionsSearchDto transactionsSearchDto, final Pageable pageable) {
 		try {
-			final String filterLotsQuery =
+			final String filterTransactionsQuery =
 				this.addSortToSearchTransactionsQuery(this.buildSearchTransactionsQuery(transactionsSearchDto), pageable);
 
-			final SQLQuery query = this.getSession().createSQLQuery(filterLotsQuery);
+			final SQLQuery query = this.getSession().createSQLQuery(filterTransactionsQuery);
 			query.addScalar("lotId");
 			query.addScalar("gid");
 			query.addScalar("designation");
@@ -727,7 +728,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 			return transactionDtos;
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at searchLots() query on LotDAO: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at searchTransactions() query on TransactionDAO: " + e.getMessage(), e);
 		}
 
 	}
@@ -741,7 +742,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at countTransactionsQuery() query on LotDAO: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at countTransactionsQuery() query on TransactionDAO: " + e.getMessage(), e);
 		}
 	}
 
