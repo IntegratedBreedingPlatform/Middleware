@@ -699,7 +699,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 
 			if (lotsSearchDto.getDesignation()!=null) {
-				query.append("and n.nval = '").append(lotsSearchDto.getDesignation()).append("' ");
+				query.append("and n.nval like '%").append(lotsSearchDto.getDesignation()).append("%' ");
 			}
 
 			if (lotsSearchDto.getStatus() != null) {
@@ -708,6 +708,10 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 			if (lotsSearchDto.getCommentContainsString() != null) {
 				query.append(" and lot.comments like '%").append(lotsSearchDto.getCommentContainsString()).append("%' ");
+			}
+
+			if (lotsSearchDto.getLocationNameContainsString() != null) {
+				query.append(" and l.lname like '%").append(lotsSearchDto.getLocationNameContainsString()).append("%' ");
 			}
 
 			if(lotsSearchDto.getCreatedDateFrom() != null) {
@@ -735,8 +739,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.append(" having 1=1 ");
 
 			if (lotsSearchDto.getStockId() != null) {
-				query.append("and GROUP_CONCAT(transaction.inventory_id SEPARATOR ', ') = '").append(lotsSearchDto.getStockId())
-						.append("' ");
+				query.append("and GROUP_CONCAT(transaction.inventory_id SEPARATOR ', ') like '").append(lotsSearchDto.getStockId())
+						.append("%' ");
 			}
 
 			if (lotsSearchDto.getMinActualBalance() != null) {

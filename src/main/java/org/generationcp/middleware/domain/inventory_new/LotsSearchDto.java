@@ -69,6 +69,8 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private String commentContainsString;
 
+	private String locationNameContainsString;
+
 	public Integer getStatus() {
 		return status;
 	}
@@ -267,6 +269,14 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	public void setGermplasmListId(final Integer germplasmListId) {
 		this.germplasmListId = germplasmListId;
+	}
+
+	public String getLocationNameContainsString() {
+		return locationNameContainsString;
+	}
+
+	public void setLocationNameContainsString(final String locationNameContainsString) {
+		this.locationNameContainsString = locationNameContainsString;
 	}
 
 	@Override
