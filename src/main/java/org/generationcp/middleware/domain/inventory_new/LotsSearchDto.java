@@ -47,7 +47,7 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private String createdByUsername;
 
-	private Integer germplasmListId;
+	private List<Integer> germplasmListIds;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date createdDateFrom;
@@ -263,12 +263,12 @@ public class LotsSearchDto extends SearchRequestDto {
 		this.commentContainsString = commentContainsString;
 	}
 
-	public Integer getGermplasmListId() {
-		return germplasmListId;
+	public List<Integer> getGermplasmListIds() {
+		return germplasmListIds;
 	}
 
-	public void setGermplasmListId(final Integer germplasmListId) {
-		this.germplasmListId = germplasmListId;
+	public void setGermplasmListIds(final List<Integer> germplasmListIds) {
+		this.germplasmListIds = germplasmListIds;
 	}
 
 	public String getLocationNameContainsString() {
