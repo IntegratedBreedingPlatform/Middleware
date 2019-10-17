@@ -1,13 +1,15 @@
 
 package org.generationcp.middleware.dao.ims;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
+import org.generationcp.middleware.domain.inventory_new.TransactionDto;
+import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -229,7 +231,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		depositTransaction.setUserId(user.getUserid());
 
 		final String sDate2 = "10/10/2015";
-		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate2);
 		final Transaction closedTransaction =
 				InventoryDetailsTestDataInitializer.createReservationTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST");
 		closedTransaction.setTransactionDate(date2);
@@ -260,5 +262,74 @@ public class TransactionDAOTest extends IntegrationTestBase {
 			Assert.assertEquals(user.getUserid(), reportRow.getUserId());
 		}
 
+	}
+
+	@Test
+	public void testSearchTransactions() throws ParseException {
+
+		final Germplasm germplasm =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1,
+				1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+
+		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
+
+		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1,
+			8264, 0, 1, "Comments");
+		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
+
+		final String sDate1 = "01/01/2015";
+		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+		final Transaction depositTransaction =
+			InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, "Deposit", lot, 1,
+				1, 1, "LIST");
+		depositTransaction.setTransactionDate(date1);
+		depositTransaction.setUserId(user.getUserid());
+		depositTransaction.setInventoryID("ABC-1");
+
+		final String sDate2 = "10/10/2015";
+		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate2);
+		final Transaction closedTransaction =
+			InventoryDetailsTestDataInitializer.createReservationTransaction(-5.0, 1, "Discard", lot, 1,
+				1, 1, "LIST");
+		closedTransaction.setTransactionDate(date2);
+		closedTransaction.setUserId(user.getUserid());
+		closedTransaction.setInventoryID("ABC-2");
+
+		final List<Transaction> transactionList = new ArrayList<>();
+		transactionList.add(depositTransaction);
+		transactionList.add(closedTransaction);
+		this.inventoryDataManager.addTransactions(transactionList);
+		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+		transactionsSearchDto.setDesignation(germplasm.getPreferredName().getNval());
+		transactionsSearchDto.setGids(Lists.newArrayList(germplasmId));
+		transactionsSearchDto.setLotIds(Lists.newArrayList(lot.getId()));
+		transactionsSearchDto.setMaxAmount(10.0);
+		transactionsSearchDto.setMinAmount(-10.0);
+		transactionsSearchDto.setNotes("Deposit");
+		transactionsSearchDto.setScaleIds(Lists.newArrayList(8264));
+		transactionsSearchDto.setStockId("ABC-1");
+		transactionsSearchDto.setTransactionDateFrom(date1);
+		transactionsSearchDto.setTransactionDateTo(date1);
+		transactionsSearchDto.setTransactionIds(Lists.newArrayList(depositTransaction.getId(), closedTransaction.getId()));
+		transactionsSearchDto.setTransactionType("Deposit");
+		transactionsSearchDto.setUser(user.getName());
+
+		final List<TransactionDto> transactionDtos = this.dao.searchTransactions(transactionsSearchDto, null);
+
+		for (final TransactionDto transactionDto : transactionDtos) {
+			Assert.assertTrue(transactionDto.getDesignation().equalsIgnoreCase(germplasm.getPreferredName().getNval()));
+			Assert.assertTrue(transactionDto.getGid().equals(germplasmId));
+			Assert.assertTrue(transactionDto.getLotId().equals(lot.getId()));
+			Assert.assertTrue(transactionDto.getAmount() <= 10.0);
+			Assert.assertTrue(transactionDto.getAmount() >= -10.0);
+			Assert.assertTrue(transactionDto.getNotes().equalsIgnoreCase("Deposit"));
+			Assert.assertTrue(transactionDto.getScaleId().equals(8264));
+			Assert.assertTrue(transactionDto.getStockId().equalsIgnoreCase("ABC-1"));
+			Assert.assertTrue(transactionDto.getTransactionDate().equals(date1));
+			Assert.assertTrue(transactionDto.getTransactionId().equals(depositTransaction.getId()));
+			Assert.assertTrue(transactionDto.getTransactionType().equalsIgnoreCase("Deposit"));
+			Assert.assertTrue(transactionDto.getUser().equalsIgnoreCase(user.getName()));
+		}
 	}
 }
