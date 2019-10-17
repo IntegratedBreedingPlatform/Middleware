@@ -673,7 +673,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "       LEFT JOIN location l on l.locid = lot.locid " //
 		+ "       LEFT join cvterm scale on scale.cvterm_id = lot.scaleid " //
 		+ "       INNER JOIN workbench.users users on users.userid = lot.userid " //
-		+ "WHERE lot.etype = 'GERMPLSM' "; //
+		+ "WHERE 1=1 "; //
 
 	private String buildSearchLotsQuery(final LotsSearchDto lotsSearchDto) {
 		final StringBuilder query = new StringBuilder(SEARCH_LOT_QUERY);
@@ -683,11 +683,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 
 			if (lotsSearchDto.getGids() != null && !lotsSearchDto.getGids().isEmpty()) {
-				query.append("and lot.eid IN (").append(Joiner.on(",").join(lotsSearchDto.getGids())).append(") ");
+				query.append("and lot.eid IN (").append(Joiner.on(",").join(lotsSearchDto.getGids())).append(") and lot.etype = 'GERMPLSM' ");
 			}
 
 			if (lotsSearchDto.getMgids() != null && !lotsSearchDto.getMgids().isEmpty()) {
-				query.append("and g.mgid IN (").append(Joiner.on(",").join(lotsSearchDto.getMgids())).append(") ");
+				query.append("and g.mgid IN (").append(Joiner.on(",").join(lotsSearchDto.getMgids())).append(") and lot.etype = 'GERMPLSM' ");
 			}
 
 			if (lotsSearchDto.getLocationIds() != null && !lotsSearchDto.getLocationIds().isEmpty()) {
@@ -724,7 +724,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 			if(lotsSearchDto.getGermplasmListId() != null) {
 				query.append(" and lot.eid in (select gid from listdata where listid = ").append(lotsSearchDto.getGermplasmListId()).
-						append(") ");
+						append(") and lot.etype = 'GERMPLSM' ");
 			}
 
 		}
