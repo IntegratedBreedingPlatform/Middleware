@@ -35,6 +35,7 @@ import org.hibernate.Hibernate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -374,7 +375,7 @@ public class ProjectPropertySaver {
 				this.saver.getGeolocationSaver().setGeolocation(geolocation, termId, null);
 				this.saver.getGeolocationDao().saveOrUpdate(geolocation);
 			} else {
-				this.saver.getGeolocationPropertyDao().deleteGeolocationPropertyValueInProject(project.getProjectId(), termId);
+				this.saver.getGeolocationPropertyDao().deleteGeolocationPropertiesInProject(project.getProjectId(), Collections.singletonList(termId));
 			}
 
 		} else if (PhenotypicType.VARIATE == role) {

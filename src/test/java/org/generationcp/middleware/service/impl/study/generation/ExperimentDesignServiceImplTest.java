@@ -143,7 +143,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		// Verify saving of variables
 		this.verifyEnvironmentVariablesWereSaved();
 		this.verifyPlotVariablesWereSaved();
-		this.verifyGeolocationPropRecords();
+		this.verifyGeolocationPropRecords(true);
 
 
 		// Check that plot experiments are created
@@ -188,6 +188,8 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		}
 		Assert.assertFalse(plotVariableIds.contains(this.treatmentFactor.getCvTermId()));
 		Assert.assertFalse(plotVariableIds.contains(this.treatmentFactorLabel.getCvTermId()));
+
+		this.verifyGeolocationPropRecords(false);
 	}
 
 	@Test
@@ -244,7 +246,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(NO_REPS.toString(), nrepVariable.getValue());
 	}
 
-	private void verifyGeolocationPropRecords() {
+	private void verifyGeolocationPropRecords(final boolean shouldExist) {
 		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId);
 		Assert.assertEquals(NO_INSTANCES.intValue(), geolocations.size());
 
@@ -261,10 +263,16 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 					}
 				});
 
-			Assert.assertNotNull(propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
-			Assert.assertEquals(String.valueOf(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId()), propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()).getValue());
-			Assert.assertNotNull(propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()));
-			Assert.assertEquals(NO_REPS.toString(), propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()).getValue());
+			if (shouldExist) {
+				Assert.assertNotNull(propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
+				Assert.assertEquals(String.valueOf(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId()), propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()).getValue());
+				Assert.assertNotNull(propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()));
+				Assert.assertEquals(NO_REPS.toString(), propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()).getValue());
+			} else {
+				Assert.assertNull(propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
+				Assert.assertNull(propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()));
+			}
+			// Location ID should always exist with or without design
 			Assert.assertNotNull(propertiesMap.get(TermId.LOCATION_ID.getId()));
 			Assert.assertEquals(LOCATION_ID, propertiesMap.get(TermId.LOCATION_ID.getId()).getValue());
 		}

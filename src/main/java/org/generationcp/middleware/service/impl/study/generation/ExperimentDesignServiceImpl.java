@@ -228,7 +228,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO()
 			.deleteProjectVariables(environmentDatasetId, ExperimentDesignServiceImpl.EXPERIMENTAL_DESIGN_VARIABLES);
-		// TODO delete nd_geolocationprop records
+		this.daoFactory.getGeolocationPropertyDao().deleteGeolocationPropertiesInProject(environmentDatasetId, ExperimentDesignServiceImpl.EXPERIMENTAL_DESIGN_VARIABLES);
 
 		// Delete variables related to experiment design and experiments of plot dataset
 		final Integer plotDatasetId = this.getPlotDatasetId(studyId);

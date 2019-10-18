@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.hibernate.Criteria;
@@ -72,33 +73,35 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-	public void deleteGeolocationPropertyValueInProject(final int studyId, final int termId) {
+	public void deleteGeolocationPropertiesInProject(final int projectId, final List<Integer> variableIds) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
 
-			this.deleteValues(studyId, termId);
+			this.deleteValues(projectId, variableIds);
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at deleteGeolocationPropertyValueInProject=" + studyId + ", " + termId
+			throw new MiddlewareQueryException("Error at deleteGeolocationPropertiesInProject=" + projectId + ", " + variableIds
 				+ " query on GeolocationPropertyDao: " + e.getMessage(), e);
 		}
 	}
 
-	private void deleteValues(final int studyId,final int termId) {
+	private void deleteValues(final int projectId, final List<Integer> variableIds) {
 		final StringBuilder sql1 = new StringBuilder().append("Delete ngp.* FROM nd_geolocationprop ngp "
-				+ "INNER JOIN nd_experiment e ON ngp.nd_geolocation_id = e.nd_geolocation_id AND ngp.type_id = :termId "
+				+ "INNER JOIN nd_experiment e ON ngp.nd_geolocation_id = e.nd_geolocation_id AND ngp.type_id IN (:variableIds) "
 				+ "INNER JOIN project p ON p.project_id = e.project_id "
-				+ "WHERE (p.study_id = :studyId OR p.project_id = :studyId)");
+				+ "WHERE (p.study_id = :projectId OR p.project_id = :projectId)");
 
 		final SQLQuery sqlQuery1 = this.getSession().createSQLQuery(sql1.toString());
-		sqlQuery1.setParameter("studyId", studyId);
-		sqlQuery1.setParameter("termId", termId);
+		sqlQuery1.setParameter("projectId", projectId);
+		sqlQuery1.setParameterList("variableIds", variableIds);
 
 		sqlQuery1.executeUpdate();
 	}
+
+
 
 	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer geolocationId) {
 		Preconditions.checkNotNull(geolocationId);
