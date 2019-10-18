@@ -174,4 +174,10 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 		return geoProperties;
 	}
+
+	public List<GeolocationProperty> getByGeolocation(final Integer geolocationId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("geolocation.locationId", geolocationId));
+		return criteria.list();
+	}
 }

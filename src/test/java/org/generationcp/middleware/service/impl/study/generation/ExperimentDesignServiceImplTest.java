@@ -26,6 +26,8 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -39,11 +41,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 
@@ -56,6 +60,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	private static final List<TermId> PLOT_VARIABLES =
 		Arrays.asList(TermId.PLOT_NO, TermId.REP_NO);
 	private static final String GERMPLASM_PREFIX = "GERMPLASM_PREFIX";
+	public static final String LOCATION_ID = "9011";
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -109,9 +114,9 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		if (this.studyReference == null) {
 			this.studyReference = this.studyTDI.addTestStudy();
 			this.studyId = this.studyReference.getId();
-			this.environmentDatasetId = this.studyTDI.createEnvironmentDataset(new CropType(), this.studyId, null, null);
+			this.environmentDatasetId = this.studyTDI.createEnvironmentDataset(new CropType(), this.studyId, LOCATION_ID, null);
 			for (int i = 1; i < NO_INSTANCES; i++) {
-				this.studyTDI.addEnvironmentToDataset(new CropType(), this.environmentDatasetId, i + 1, null, null);
+				this.studyTDI.addEnvironmentToDataset(new CropType(), this.environmentDatasetId, i + 1, LOCATION_ID, null);
 			}
 			this.plotDatasetId = this.studyTDI.addTestDataset(this.studyId, DatasetTypeEnum.PLOT_DATA.getId()).getId();
 			this.treatmentFactor = this.daoFactory.getCvTermDao()
@@ -138,6 +143,8 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		// Verify saving of variables
 		this.verifyEnvironmentVariablesWereSaved();
 		this.verifyPlotVariablesWereSaved();
+		this.verifyGeolocationPropRecords();
+
 
 		// Check that plot experiments are created
 		Assert.assertEquals(NO_INSTANCES * NO_ENTRIES * NO_REPS * NO_TREATMENTS, rows.size());
@@ -235,6 +242,32 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		final MeasurementVariable nrepVariable = environmentVariablesMap.get(TermId.NUMBER_OF_REPLICATES.getId());
 		Assert.assertNotNull(nrepVariable);
 		Assert.assertEquals(NO_REPS.toString(), nrepVariable.getValue());
+	}
+
+	private void verifyGeolocationPropRecords() {
+		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId);
+		Assert.assertEquals(NO_INSTANCES.intValue(), geolocations.size());
+
+		for (final Geolocation geolocation : geolocations) {
+
+			final List<GeolocationProperty> properties =
+				this.daoFactory.getGeolocationPropertyDao().getByGeolocation(geolocation.getLocationId());
+			final ImmutableMap<Object, GeolocationProperty> propertiesMap =
+				Maps.uniqueIndex(properties, new Function<GeolocationProperty, Object>() {
+
+					@Override
+					public Object apply(@Nullable final GeolocationProperty input) {
+						return input.getTypeId();
+					}
+				});
+
+			Assert.assertNotNull(propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
+			Assert.assertEquals(String.valueOf(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId()), propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()).getValue());
+			Assert.assertNotNull(propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()));
+			Assert.assertEquals(NO_REPS.toString(), propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()).getValue());
+			Assert.assertNotNull(propertiesMap.get(TermId.LOCATION_ID.getId()));
+			Assert.assertEquals(LOCATION_ID, propertiesMap.get(TermId.LOCATION_ID.getId()).getValue());
+		}
 	}
 
 	private List<MeasurementVariable> createMeasurementVariables() {

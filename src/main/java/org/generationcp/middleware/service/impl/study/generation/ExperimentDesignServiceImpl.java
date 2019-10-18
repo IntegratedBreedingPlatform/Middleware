@@ -18,6 +18,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -26,6 +27,7 @@ import org.generationcp.middleware.service.api.study.generation.ExperimentDesign
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -63,10 +65,11 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		Preconditions.checkState(!CollectionUtils.isEmpty(rows));
 
 		final Integer plotDatasetId = this.getPlotDatasetId(studyId);
-		this.saveVariables(studyId, variables, plotDatasetId);
+		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId);
+		this.saveVariables(studyId, variables, plotDatasetId, geolocations);
 
 		// Save experiments and stocks (if applicable) in plot dataset
-		this.saveObservationUnitRows(crop, studyId, plotDatasetId, variables, rows);
+		this.saveObservationUnitRows(crop, plotDatasetId, variables, rows, geolocations);
 
 	}
 
@@ -81,7 +84,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		return Optional.absent();
 	}
 
-	private void saveVariables(final int studyId, final List<MeasurementVariable> variables, final Integer plotDatasetId) {
+	private void saveVariables(final int studyId, final List<MeasurementVariable> variables, final Integer plotDatasetId, final List<Geolocation> geolocations) {
 		int plotDatasetNextRank = this.daoFactory.getProjectPropertyDAO().getNextRank(plotDatasetId);
 		final List<Integer> plotVariableIds = this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(plotDatasetId);
 
@@ -118,9 +121,22 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 				final DmsProject project = new DmsProject();
 				project.setProjectId(projectId);
+				final String value = variable.getValue();
 				final ProjectProperty property =
-					new ProjectProperty(project, variableTypeId, variable.getValue(), rank, variableId, variable.getAlias());
+					new ProjectProperty(project, variableTypeId, value, rank, variableId, variable.getAlias());
 				this.daoFactory.getProjectPropertyDAO().save(property);
+
+				// FIXME Undo this duplicate saving in nd_geolocationprop (logged as part of IBP-3150)
+				if (isEnvironmentVariable) {
+					for (final Geolocation geolocation : geolocations) {
+						final GeolocationProperty geolocationProperty = new GeolocationProperty();
+						geolocationProperty.setGeolocation(geolocation);
+						geolocationProperty.setType(variableId);
+						geolocationProperty.setRank(rank);
+						geolocationProperty.setValue(value);
+						this.daoFactory.getGeolocationPropertyDao().save(geolocationProperty);
+					}
+				}
 			}
 
 		}
@@ -130,10 +146,9 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		return isEnvironmentVariable ? environmentVariableIds.contains(variableId) : plotVariableIds.contains(variableId);
 	}
 
-	private void saveObservationUnitRows(final CropType crop, final Integer studyId, final Integer plotDatasetId,
-		final List<MeasurementVariable> variables,
-		final List<ObservationUnitRow> rows) {
-		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId);
+	private void saveObservationUnitRows(final CropType crop, final Integer plotDatasetId,
+		final List<MeasurementVariable> variables, final List<ObservationUnitRow> rows, final List<Geolocation> geolocations) {
+
 		final ImmutableMap<String, Geolocation> trialInstanceGeolocationMap =
 			Maps.uniqueIndex(geolocations, new Function<Geolocation, String>() {
 
@@ -213,6 +228,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO()
 			.deleteProjectVariables(environmentDatasetId, ExperimentDesignServiceImpl.EXPERIMENTAL_DESIGN_VARIABLES);
+		// TODO delete nd_geolocationprop records
 
 		// Delete variables related to experiment design and experiments of plot dataset
 		final Integer plotDatasetId = this.getPlotDatasetId(studyId);
