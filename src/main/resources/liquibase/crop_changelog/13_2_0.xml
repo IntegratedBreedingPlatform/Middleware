@@ -488,12 +488,15 @@
 
 	<changeSet author="vanina" id="v13.2.0-1">
 		<preConditions onFail="MARK_RAN">
-			<not>
-				<tableExists tableName="stock_id_bkp"></tableExists>
-			</not>
+			<and>
+				<not>
+					<tableExists tableName="stock_id_bkp"></tableExists>
+				</not>
+				<columnExists tableName="ims_transaction" columnName="inventory_id"/>
+			</and>
 		</preConditions>
 		<comment>
-			Create stockId backup table and migrate inventory_id values for more than 1 stock_id
+			Create stockId backup table and migrate inventory_id values for all inventory_ids except by the null ones
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE stock_id_bkp (
@@ -550,9 +553,12 @@
 
 	<changeSet author="vanina" id="v13.2.0-4">
 		<preConditions onFail="MARK_RAN">
-			<columnExists tableName="ims_transaction" columnName="inventory_id"/>
+			<and>
+				<columnExists tableName="ims_transaction" columnName="inventory_id"/>
+				<columnExists tableName="ims_lot" columnName="stock_id"/>
+			</and>
 		</preConditions>
-		<comment>Drop role column inventory_id from ims_transaction table</comment>
+		<comment>Drop column inventory_id from ims_transaction table</comment>
 		<dropColumn columnName="inventory_id" tableName="ims_transaction"/>
 	</changeSet>
 
