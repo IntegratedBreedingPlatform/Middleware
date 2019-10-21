@@ -11,22 +11,15 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListMetadata;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -41,11 +34,20 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link GermplasmList}.
@@ -97,6 +99,13 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			+ " AND liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
 			+ "      OR desig = :q OR listname = :q " + "      OR desig = :qNoSpaces "
 			+ "      OR desig = :qStandardized " + ")";
+
+	protected static final String SEARCH_GERMPLASM_LIST_CONTAINS =
+		"SELECT DISTINCT listnms.listid as id, listnms.listname as name, listnms.listdesc as description FROM listnms "
+			+ "WHERE listnms.listtype = :listType AND (listnms.program_uuid = :program_uuid OR listnms.program_uuid IS NULL) AND listnms.listname LIKE :searchString ";
+	protected static final String SEARCH_GERMPLASM_LIST_EXACT_MATCH =
+		"SELECT DISTINCT listnms.listid as id, listnms.listname as name, listnms.listdesc as description FROM listnms "
+			+ "WHERE listnms.listtype = :listType AND (listnms.program_uuid = :program_uuid OR listnms.program_uuid IS NULL) AND listnms.listname = :searchString ";
 
 	private static final String FILTER_BY_PROGRAM_UUID = " AND (program_uuid = :programUUID OR program_uuid IS NULL)";
 	
@@ -722,5 +731,45 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			resultMap.put((Integer) result[0], (String) result[1]);
 		}
 		return resultMap;
+	}
+
+	public List<GermplasmList> searchGermplasmLists(
+		final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
+
+		final SQLQuery query = this.getSession()
+			.createSQLQuery(this.addOrder(exactMatch ? SEARCH_GERMPLASM_LIST_EXACT_MATCH : SEARCH_GERMPLASM_LIST_CONTAINS, pageable));
+
+		query.setParameter("searchString", searchString + (exactMatch ? "" : "%"));
+		query.setParameter("listType", GermplasmList.LIST_TYPE.toString());
+		query.setParameter("program_uuid", programUUID);
+
+		query.addScalar("id", new IntegerType());
+		query.addScalar("name", new StringType());
+		query.addScalar("description", new StringType());
+		query.setResultTransformer(Transformers.aliasToBean(GermplasmList.class));
+
+		return query.list();
+
+	}
+
+	String addOrder(final String queryString, final Pageable pageable) {
+
+		final StringBuilder stringBuilder = new StringBuilder(queryString);
+
+		if (pageable == null || pageable.getSort() == null) {
+			return stringBuilder.toString();
+		}
+
+		stringBuilder.append("ORDER BY ");
+
+		final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+		while (iterator.hasNext()) {
+			final Sort.Order order = iterator.next();
+			stringBuilder.append(order.getProperty() + " " + order.getDirection().name());
+			if (iterator.hasNext())
+				stringBuilder.append(",");
+		}
+
+		return stringBuilder.toString();
 	}
 }

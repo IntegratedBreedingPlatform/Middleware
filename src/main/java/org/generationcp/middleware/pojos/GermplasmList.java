@@ -11,9 +11,9 @@
 
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -31,10 +31,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-import org.hibernate.annotations.SQLDelete;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * POJO for listnms table.
@@ -413,7 +412,7 @@ public class GermplasmList implements Serializable {
 	}
 
 	public boolean isLockedList() {
-		return this.getStatus() >= 100;
+		return (this.getStatus() != null ? this.getStatus() >= 100 : false);
 	}
 
 	public String getTabLabel() {
