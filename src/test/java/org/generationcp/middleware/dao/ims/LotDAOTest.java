@@ -1,16 +1,18 @@
 package org.generationcp.middleware.dao.ims;
 
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
+import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
+import org.generationcp.middleware.domain.inventory_new.LotDto;
+import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.junit.Assert;
@@ -18,11 +20,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.collect.Lists;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class LotDAOTest extends IntegrationTestBase {
 
 	private LotDAO lotDAO;
+
+	private LocationDAO locationDAO;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -30,11 +37,24 @@ public class LotDAOTest extends IntegrationTestBase {
 	@Autowired
 	private InventoryDataManager inventoryDataManager;
 
+	private Lot lot1, lot2, lot3;
+	private Transaction transaction1, transaction2, transaction3;
+	private Location location;
+	private Germplasm germplasm1, germplasm2;
+
+	private static final String GERMPLASM = "GERMPLSM";
+
+	private static final String DEPOSIT = "Deposit";
+
 
 	@Before
 	public void setUp() throws Exception {
 		this.lotDAO = new LotDAO();
 		this.lotDAO.setSession(this.sessionProvder.getSession());
+		this.locationDAO = new LocationDAO();
+		this.locationDAO.setSession(this.sessionProvder.getSession());
+		this.createLocationForSearchLotTest();
+		this.createDataForSearchLotsTest();
 	}
 
 	@Test
@@ -156,5 +176,90 @@ public class LotDAOTest extends IntegrationTestBase {
 		final Set<Integer> gids = this.lotDAO.getGermplasmsWithOpenLots(Lists.newArrayList(germplasm.getGid()));
 
 		Assert.assertEquals(0, gids.size());
+	}
+
+	@Test
+	public void testSearchAllLots() {
+
+		final List<LotDto> lotDtos = lotDAO.searchLots(null, null);
+		Assert.assertTrue(lotDtos.size() >= 3);
+
+	}
+
+	@Test
+	public void testSearchLotsByLotIds() {
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+
+		lotsSearchDto.setLotIds(Lists.newArrayList(lot1.getId(), lot2.getId()));
+
+		final List<LotDto> lotDtos = lotDAO.searchLots(lotsSearchDto, null);
+		Assert.assertEquals(lotDtos.size(), 2);
+	}
+
+	@Test
+	public void testSearchLotsByLocationIds() {
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLocationIds(Lists.newArrayList(location.getLocid()));
+		final List<LotDto> lotDtos = lotDAO.searchLots(lotsSearchDto, null);
+
+		Assert.assertEquals(lotDtos.size() ,1 );
+	}
+
+	@Test
+	public void testSearchLotsByGids() {
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setGids(Lists.newArrayList(germplasm1.getGid()));
+		final List<LotDto> lotDtos = lotDAO.searchLots(lotsSearchDto, null);
+
+		Assert.assertEquals(lotDtos.size() ,2 );
+	}
+
+
+	private void createLocationForSearchLotTest() {
+		final String programUUID = RandomStringUtils.randomAlphabetic(16);
+		final int ltype = 405;
+		final String labbr = RandomStringUtils.randomAlphabetic(7);
+		final String lname = RandomStringUtils.randomAlphabetic(9);
+
+		final int cntryid = 1;
+		location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr, programUUID);
+		location.setCntryid(cntryid);
+
+		final int provinceId = 1001;
+		location.setSnl1id(provinceId);
+
+		locationDAO.saveOrUpdate(location);
+
+	}
+
+	private void createDataForSearchLotsTest() {
+
+		germplasm1 =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer germplasmId1 = this.germplasmDataManager.addGermplasm(germplasm1, germplasm1.getPreferredName());
+
+		germplasm2 =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer germplasmId2 = this.germplasmDataManager.addGermplasm(germplasm2, germplasm2.getPreferredName());
+
+		lot1 = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId1, location.getLocid(), 8264, 0, 1, "Comments");
+
+		lot2 = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId1, 2, 8267, 0, 1, "Comments");
+
+		lot3 = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId2, 1, 8267, 0, 1, "Comments");
+
+		transaction1 =
+			InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, DEPOSIT, lot1, 1, 1, 1, "LIST");
+
+		transaction2 =
+			InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, DEPOSIT, lot2, 1, 1, 1, "LIST");
+
+		transaction3 =
+			InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, DEPOSIT, lot3, 1, 1, 1, "LIST");
+
+		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction1, transaction2, transaction3));
+
+		this.inventoryDataManager.addLots(Lists.newArrayList(lot1, lot2, lot3));
+
 	}
 }
