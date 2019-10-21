@@ -197,6 +197,22 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		}
 	}
 
+	@Test
+	public void testTransformStandardVariable()  {
+		final boolean isFactor = true;
+		final VariableTypeList varTypeList = this.createTrialConstantVariableTypeList();
+		final StandardVariable standardVariable = varTypeList.getVariableTypes().get(0).getStandardVariable();
+		final VariableType expectedVariableType = VariableType.TREATMENT_FACTOR;
+		final MeasurementVariable measurementVariable = this.transformer.transform(standardVariable, isFactor,
+			expectedVariableType);
+
+		final StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
+		final DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
+		this.validateMeasurementVariable(measurementVariable, variableType, false);
+		Assert.assertEquals("Variable type must be " + expectedVariableType, expectedVariableType,
+			measurementVariable.getVariableType());
+	}
+
 	private VariableTypeList createVariateVariableTypeList() throws MiddlewareException {
 		final VariableTypeList varTypeList = new VariableTypeList();
 		final StandardVariable asi = this.getStandardVariable(20308);
