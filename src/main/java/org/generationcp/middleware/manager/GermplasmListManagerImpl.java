@@ -40,6 +40,7 @@ import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -779,4 +780,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		}
 	}
 
+	@Override
+	public List<GermplasmList> searchGermplasmLists(final String searchString, final boolean exactMatch, final String programUUID,
+		final Pageable pageable) {
+		final List<GermplasmList> germplasmLists =
+			this.daoFactory.getGermplasmListDAO().searchGermplasmLists(searchString, exactMatch, programUUID, pageable);
+		return germplasmLists;
+	}
 }

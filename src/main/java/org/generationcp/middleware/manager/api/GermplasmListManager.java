@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.springframework.data.domain.Pageable;
 
 /**
  * This is the API for retrieving information about Germplasm Lists.
@@ -446,4 +447,7 @@ public interface GermplasmListManager {
 	 */
 	List<Integer> deleteGermplasms(final List<Integer> germplasms, final Integer listId);
 
+	List<GermplasmList> searchGermplasmLists(
+		String searchString, boolean exactMatch, String programUUID,
+		Pageable pageable);
 }
