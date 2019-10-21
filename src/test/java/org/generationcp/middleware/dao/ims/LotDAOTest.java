@@ -3,15 +3,20 @@ package org.generationcp.middleware.dao.ims;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.domain.inventory_new.LotDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
@@ -31,6 +36,11 @@ public class LotDAOTest extends IntegrationTestBase {
 
 	private LocationDAO locationDAO;
 
+	private GermplasmListDAO germplasmListDAO;
+
+	@Autowired
+	private GermplasmListManager manager;
+
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
 
@@ -41,10 +51,23 @@ public class LotDAOTest extends IntegrationTestBase {
 	private Transaction transaction1, transaction2, transaction3;
 	private Location location;
 	private Germplasm germplasm1, germplasm2;
+	private GermplasmList germplasmList;
 
 	private static final String GERMPLASM = "GERMPLSM";
 
 	private static final String DEPOSIT = "Deposit";
+
+	private static final String TEST_GERMPLASM_LIST_NAME = "TestGermplasmListName";
+	private static final String TEST_GERMPLASM_LIST_DESC = "TestGermplasmListDesc";
+	private static final long TEST_GERMPLASM_LIST_DATE = 20141103;
+	private static final String TEST_GERMPLASM_LIST_TYPE_LST = "LST";
+	private static final String TEST_GERMPLASM_LIST_TYPE_FOLDER = "FOLDER";
+	private static final String TEST_LIST_DESCRIPTION = "Test List Description";
+
+	private static final int TEST_GERMPLASM_LIST_USER_ID = 9999;
+	private static final Integer STATUS_ACTIVE = 0;
+	private static final Integer STATUS_DELETED = 9;
+	private static final String PROGRAM_UUID = "1001";
 
 
 	@Before
@@ -53,6 +76,8 @@ public class LotDAOTest extends IntegrationTestBase {
 		this.lotDAO.setSession(this.sessionProvder.getSession());
 		this.locationDAO = new LocationDAO();
 		this.locationDAO.setSession(this.sessionProvder.getSession());
+		this.germplasmListDAO = new GermplasmListDAO();
+		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
 		this.createLocationForSearchLotTest();
 		this.createDataForSearchLotsTest();
 	}
@@ -214,6 +239,15 @@ public class LotDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(lotDtos.size() ,2 );
 	}
 
+	@Test
+	public void testSearchLotsByGermplasmListIds() {
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setGermplasmListIds(Lists.newArrayList(germplasmList.getId()));
+		final List<LotDto> lotDtos = lotDAO.searchLots(lotsSearchDto, null);
+
+		Assert.assertEquals(lotDtos.size() ,2 );
+	}
+
 
 	private void createLocationForSearchLotTest() {
 		final String programUUID = RandomStringUtils.randomAlphabetic(16);
@@ -260,6 +294,16 @@ public class LotDAOTest extends IntegrationTestBase {
 		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction1, transaction2, transaction3));
 
 		this.inventoryDataManager.addLots(Lists.newArrayList(lot1, lot2, lot3));
+
+		germplasmList = germplasmListDAO.save(GermplasmListTestDataInitializer.createGermplasmListTestData(
+			TEST_GERMPLASM_LIST_NAME, TEST_GERMPLASM_LIST_DESC,
+			TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
+			TEST_GERMPLASM_LIST_USER_ID, STATUS_ACTIVE, PROGRAM_UUID, null));
+
+		final GermplasmListData listData1 = new GermplasmListData(null, germplasmList, germplasm1.getGid(), 1, "EntryCode",
+			"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
+
+		this.manager.addGermplasmListData(listData1);
 
 	}
 }
