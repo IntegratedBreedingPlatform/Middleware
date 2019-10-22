@@ -47,7 +47,7 @@ public class StockModelGenerator {
 			} else if (TermId.ENTRY_CODE.getId() == variableId) {
 				stockModel.setValue(value);
 
-			} else if (variable != null && VariableType.GERMPLASM_DESCRIPTOR.equals(variable.getVariableType())) {
+			} else if (variable != null && VariableType.GERMPLASM_DESCRIPTOR.equals(variable.getVariableType()) && TermId.OBS_UNIT_ID.getId() != variableId) {
 				this.addProperty(stockModel, this.createProperty(variableId, value, rank++));
 			}
 		}

@@ -154,6 +154,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(GERMPLASM_PREFIX + gid, row.getDesignation());
 		Assert.assertEquals(3, row.getEntryNumber().intValue());
 		Assert.assertEquals(1, row.getTrialInstance().intValue());
+		Assert.assertNotNull(row.getObsUnitId());
 
 		Assert.assertEquals("1", row.getVariables().get("TRIAL_INSTANCE").getValue());
 		Assert.assertEquals(gid.toString(), row.getVariables().get("GID").getValue());
@@ -164,6 +165,9 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("100", row.getVariables().get(this.treatmentFactorLabel.getName()).getValue());
 		Assert.assertEquals("Test entry", row.getVariables().get("ENTRY_TYPE").getValue());
 		Assert.assertEquals(GERMPLASM_PREFIX + gid, row.getVariables().get("DESIGNATION").getValue());
+		Assert.assertNotNull(row.getVariables().get("OBS_UNIT_ID").getValue());
+
+
 	}
 
 	@Test
