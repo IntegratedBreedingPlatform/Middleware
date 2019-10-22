@@ -27,7 +27,6 @@ import org.generationcp.middleware.service.api.study.generation.ExperimentDesign
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -74,7 +73,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	}
 
 	@Override
-	public Optional<Integer> getExperimentDesignTypeTermId(final int studyId) {
+	public Optional<Integer> getStudyExperimentDesignTypeTermId(final int studyId) {
 		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
 		final ProjectProperty projectProp = this.daoFactory.getProjectPropertyDAO()
 			.getByStandardVariableId(new DmsProject(environmentDatasetId), TermId.EXPERIMENT_DESIGN_FACTOR.getId());
@@ -223,7 +222,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	}
 
 	@Override
-	public void deleteExperimentDesign(final int studyId) {
+	public void deleteStudyExperimentDesign(final int studyId) {
 		// Delete environment variables related to experiment design
 		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO()
@@ -232,7 +231,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 		// Delete variables related to experiment design and experiments of plot dataset
 		final Integer plotDatasetId = this.getPlotDatasetId(studyId);
-		this.daoFactory.getProjectPropertyDAO().deleteProjectVariablesByVariableTypes(plotDatasetId,
+		this.daoFactory.getProjectPropertyDAO().deleteDatasetVariablesByVariableTypes(plotDatasetId,
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), TermId.MULTIFACTORIAL_INFO.getId()));
 		this.daoFactory.getExperimentDao().deleteExperimentsForDataset(plotDatasetId);
 	}

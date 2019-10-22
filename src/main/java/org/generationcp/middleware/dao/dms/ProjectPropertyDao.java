@@ -273,7 +273,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		query.executeUpdate();
 	}
 
-	public void deleteProjectVariablesByVariableTypes(final Integer projectId, final List<Integer> variableTypeIds) {
+	public void deleteDatasetVariablesByVariableTypes(final Integer projectId, final List<Integer> variableTypeIds) {
 		final String sql = "DELETE FROM projectprop WHERE project_id = :projectId AND type_id IN (:variableTypeIds)";
 		final Query query =
 			this.getSession().createSQLQuery(sql);

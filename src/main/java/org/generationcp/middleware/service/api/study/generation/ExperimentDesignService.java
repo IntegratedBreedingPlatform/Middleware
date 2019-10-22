@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface ExperimentDesignService {
 
-	void deleteExperimentDesign(int studyId);
+	void deleteStudyExperimentDesign(int studyId);
 
 	void saveExperimentDesign(CropType crop, int studyId, List<MeasurementVariable> variables, List<ObservationUnitRow> rows);
 
-	Optional<Integer> getExperimentDesignTypeTermId(int studyId);
+	Optional<Integer> getStudyExperimentDesignTypeTermId(int studyId);
 }

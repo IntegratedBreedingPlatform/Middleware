@@ -47,7 +47,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 
@@ -175,7 +174,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		// Save design first, then delete
 		this.experimentDesignService
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows());
-		this.experimentDesignService.deleteExperimentDesign(this.studyId);
+		this.experimentDesignService.deleteStudyExperimentDesign(this.studyId);
 
 		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
 		Assert.assertTrue(rows.isEmpty());
@@ -198,7 +197,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetExperimentDesignTypeTermId() {
-		Assert.assertFalse(this.experimentDesignService.getExperimentDesignTypeTermId(this.studyId).isPresent());
+		Assert.assertFalse(this.experimentDesignService.getStudyExperimentDesignTypeTermId(this.studyId).isPresent());
 
 		final Integer exptDesignId = ExperimentDesignType.P_REP.getTermId();
 		final ProjectProperty property = new ProjectProperty();
@@ -209,7 +208,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		property.setValue(exptDesignId.toString());
 		property.setTypeId(VariableType.ENVIRONMENT_DETAIL.getId());
 		this.daoFactory.getProjectPropertyDAO().save(property);
-		Assert.assertEquals(exptDesignId, this.experimentDesignService.getExperimentDesignTypeTermId(this.studyId).get());
+		Assert.assertEquals(exptDesignId, this.experimentDesignService.getStudyExperimentDesignTypeTermId(this.studyId).get());
 	}
 
 	private void verifyPlotVariablesWereSaved() {
