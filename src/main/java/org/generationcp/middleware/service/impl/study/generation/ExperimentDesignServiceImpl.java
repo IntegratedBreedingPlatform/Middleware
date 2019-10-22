@@ -109,30 +109,22 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 						variableTypeId = TermId.MULTIFACTORIAL_INFO.getId();
 
 						// Save a record for same variable with variable type = EXPERIMENT_DESIGN
-						final DmsProject project = new DmsProject();
-						project.setProjectId(projectId);
 						final ProjectProperty property =
-							new ProjectProperty(project, VariableType.EXPERIMENTAL_DESIGN.getId(), "", plotDatasetNextRank++, variableId, variable.getAlias());
+							new ProjectProperty(new DmsProject(projectId), VariableType.EXPERIMENTAL_DESIGN.getId(), "", plotDatasetNextRank++, variableId, variable.getAlias());
 						this.daoFactory.getProjectPropertyDAO().save(property);
 					}
 					rank = plotDatasetNextRank++;
 				}
 
-				final DmsProject project = new DmsProject();
-				project.setProjectId(projectId);
 				final String value = variable.getValue();
 				final ProjectProperty property =
-					new ProjectProperty(project, variableTypeId, value, rank, variableId, variable.getAlias());
+					new ProjectProperty(new DmsProject(projectId), variableTypeId, value, rank, variableId, variable.getAlias());
 				this.daoFactory.getProjectPropertyDAO().save(property);
 
 				// FIXME Undo this duplicate saving in nd_geolocationprop (logged as part of IBP-3150)
 				if (isEnvironmentVariable) {
 					for (final Geolocation geolocation : geolocations) {
-						final GeolocationProperty geolocationProperty = new GeolocationProperty();
-						geolocationProperty.setGeolocation(geolocation);
-						geolocationProperty.setType(variableId);
-						geolocationProperty.setRank(rank);
-						geolocationProperty.setValue(value);
+						final GeolocationProperty geolocationProperty = new GeolocationProperty(geolocation, value, rank, variableId);
 						this.daoFactory.getGeolocationPropertyDao().save(geolocationProperty);
 					}
 				}
