@@ -532,7 +532,10 @@
 
 	<changeSet author="vanina" id="v13.2.0-3">
 		<preConditions onFail="MARK_RAN">
-			<columnExists tableName="ims_lot" columnName="stock_id"/>
+			<and>
+				<columnExists tableName="ims_lot" columnName="stock_id"/>
+				<columnExists tableName="ims_transaction" columnName="inventory_id"/>
+			</and>
 		</preConditions>
 		<comment>
 			Update column stock_id with the lower stock_id
