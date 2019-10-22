@@ -211,6 +211,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		this.validateMeasurementVariable(measurementVariable, variableType, false);
 		Assert.assertEquals("Variable type must be " + expectedVariableType, expectedVariableType,
 			measurementVariable.getVariableType());
+		Assert.assertEquals(stdVariable.getName(), measurementVariable.getAlias());
 	}
 
 	private VariableTypeList createVariateVariableTypeList() throws MiddlewareException {

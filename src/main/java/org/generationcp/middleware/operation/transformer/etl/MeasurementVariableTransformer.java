@@ -128,6 +128,7 @@ public class MeasurementVariableTransformer extends Transformer {
 	public MeasurementVariable transform(final StandardVariable standardVariable, final boolean isFactor, final VariableType variableType) {
 		final MeasurementVariable measurementVariable = this.transform(standardVariable, isFactor);
 		measurementVariable.setVariableType(variableType);
+		measurementVariable.setAlias(standardVariable.getName());
 		return measurementVariable;
 	}
 
