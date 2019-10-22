@@ -67,7 +67,7 @@ public class ExperimentModelGenerator {
 			final MeasurementVariable measurementVariable = variablesMap.get(variableId);
 			int rank = 1;
 			if (measurementVariable != null && ExperimentModelGenerator.EXPT_DESIGN_TYPES.contains(measurementVariable.getVariableType())) {
-				experimentProperties.add(this.createTrialDesignProperty(experimentModel, measurementVariable, unitData.getValue(), rank));
+				experimentProperties.add(new ExperimentProperty(experimentModel, measurementVariable, unitData.getValue(), rank));
 				rank++;
 			}
 		}
@@ -75,16 +75,6 @@ public class ExperimentModelGenerator {
 		return experimentProperties;
 	}
 
-	private ExperimentProperty createTrialDesignProperty(final ExperimentModel experimentModel,
-		final MeasurementVariable measurementVariable, final String value, final Integer rank) {
 
-		final ExperimentProperty experimentProperty = new ExperimentProperty();
-		experimentProperty.setExperiment(experimentModel);
-		experimentProperty.setTypeId(measurementVariable.getTermId());
-		experimentProperty.setValue(value);
-		experimentProperty.setRank(rank);
-
-		return experimentProperty;
-	}
 
 }

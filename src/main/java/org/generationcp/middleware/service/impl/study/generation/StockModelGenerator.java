@@ -48,7 +48,7 @@ public class StockModelGenerator {
 				stockModel.setValue(value);
 
 			} else if (variable != null && VariableType.GERMPLASM_DESCRIPTOR.equals(variable.getVariableType()) && TermId.OBS_UNIT_ID.getId() != variableId) {
-				this.addProperty(stockModel, this.createProperty(variableId, value, rank++));
+				this.addProperty(stockModel, new StockProperty(variableId, value, rank++));
 			}
 		}
 
@@ -61,15 +61,6 @@ public class StockModelGenerator {
 		}
 		property.setStock(stockModel);
 		stockModel.getProperties().add(property);
-	}
-
-	private StockProperty createProperty(final Integer variableId, final String value, final Integer rank) {
-		final StockProperty property = new StockProperty();
-		property.setTypeId(variableId);
-		property.setValue(value);
-		property.setRank(rank);
-
-		return property;
 	}
 
 }
