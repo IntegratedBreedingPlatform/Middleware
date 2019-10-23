@@ -63,6 +63,13 @@ public class GeolocationProperty implements Serializable {
 	public GeolocationProperty() {
 	}
 
+	public GeolocationProperty(final Geolocation geolocation, final String value, final Integer rank, final Integer typeId) {
+		this.geolocation = geolocation;
+		this.value = value;
+		this.rank = rank;
+		this.typeId = typeId;
+	}
+
 	public GeolocationProperty(Integer geolocationPropertyId, Geolocation geolocation, String value, Integer rank, Integer typeId) {
 		super();
 		this.geolocationPropertyId = geolocationPropertyId;

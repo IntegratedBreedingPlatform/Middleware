@@ -1,21 +1,30 @@
 package org.generationcp.middleware.domain.dms;
 
-import org.generationcp.middleware.domain.oms.TermSummary;
+public enum InsertionMannerItem {
 
-import java.util.ArrayList;
-import java.util.List;
+	INSERT_EACH_IN_TURN(8414,"1","Insert each check in turn"),
+	INSERT_ALL_CHECKS(8415,"2","Insert all checks at each position");
 
 
-public class InsertionMannerItem {
+	private final Integer id;
+	private final String name;
+	private final String description;
 
-	public static final TermSummary INSERT_EACH_IN_TURN = new TermSummary(8414,"1","Insert each check in turn");
-	public static final TermSummary INSERT_ALL_CHECKS = new TermSummary(8415,"2","Insert all checks at each position");
-
-	public static List<TermSummary> getInsertionManners() {
-		final java.util.List<TermSummary> list = new ArrayList<>();
-		list.add(INSERT_EACH_IN_TURN);
-		list.add(INSERT_ALL_CHECKS);
-		return list;
+	InsertionMannerItem(final Integer id, final String name, final String description) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
 	}
 
+	public Integer getId() {
+		return this.id;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
 }

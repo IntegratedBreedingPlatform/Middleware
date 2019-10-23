@@ -198,8 +198,7 @@ public class WorkbookBuilder extends Builder {
 			if (varType != null) {
 				stdVariable.setPhenotypicType(varType.getRole());
 
-				// DA geolocation prop access for value
-				final String value = this.studyDataManager.getGeolocationPropValue(stdVariableId, id);
+				final String value = projectProperty.getValue();
 
 				if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
 
@@ -388,7 +387,7 @@ public class WorkbookBuilder extends Builder {
 
 					String value = null;
 					if (PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
-						value = this.studyDataManager.getGeolocationPropValue(stdVariable.getId(), id);
+						value = projectProperty.getValue();
 						if (value == null) {
 							value = StringUtils.EMPTY;
 						}

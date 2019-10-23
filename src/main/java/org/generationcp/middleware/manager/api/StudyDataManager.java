@@ -36,7 +36,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
@@ -529,14 +528,6 @@ public interface StudyDataManager {
 	 */
 	int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds);
 
-	/**
-	 * Gets the geolocation prop value.
-	 *
-	 * @param stdVarId the std var id
-	 * @param studyId  the study id
-	 * @return the geolocation prop value
-	 */
-	String getGeolocationPropValue(int stdVarId, int studyId);
 
 	/**
 	 * Gets the all field maps in block by block id.
