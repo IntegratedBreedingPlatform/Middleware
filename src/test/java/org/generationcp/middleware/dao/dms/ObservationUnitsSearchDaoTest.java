@@ -376,7 +376,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 		final CVTerm trait1 = this.testDataInitializer.createTrait(traitName);
 		final VariableOverrides variableOverrides = variableOverridesDao.save(trait1.getCvTermId(),null, trait1.getName(), "10", "100");
-		final CVTermProperty cvTermProperty = this.cvTermPropertyDao.save(trait1.getCvTermId(), trait1.getCv(), "10", 1);
+		final CVTermProperty cvTermProperty = this.cvTermPropertyDao.save(trait1.getCvTermId(), trait1.getCv(), "", 1);
 		final List<ExperimentModel> unitsWithObservations = Arrays.asList(instance1Units.get(0));
 		this.testDataInitializer.addPhenotypes(unitsWithObservations, trait1.getCvTermId(), "4000");
 
@@ -396,7 +396,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<ObservationUnitRow> measurementRows = this.obsUnitSearchDao.getObservationUnitsByVariable(observationUnitsSearchDTO);
-		System.out.println(measurementRows);
+		assertEquals(1, measurementRows.size());
 
 	}
 
