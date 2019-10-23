@@ -2,6 +2,9 @@ package org.generationcp.middleware.dao.dms;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
+import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -9,6 +12,8 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -17,16 +22,9 @@ import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
@@ -39,6 +37,9 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 	private DmsProject plot;
 	private DmsProject summary;
 
+	private VariableOverridesDao variableOverridesDao;
+	private CvTermPropertyDao cvTermPropertyDao;
+
 	@Before
 	public void setUp() {
 
@@ -46,6 +47,10 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		this.obsUnitSearchDao.setSession(this.sessionProvder.getSession());
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		this.variableOverridesDao = new VariableOverridesDao();
+		this.variableOverridesDao.setSession(this.sessionProvder.getSession());
+		this.cvTermPropertyDao = new CvTermPropertyDao();
+		this.cvTermPropertyDao.setSession(this.sessionProvder.getSession());
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
@@ -54,6 +59,8 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		this.summary = this.testDataInitializer
 			.createDmsProject("Environment Dataset", "Environment Dataset-Description", this.study, this.study,
 				DatasetTypeEnum.SUMMARY_DATA);
+
+
 	}
 
 	@Test
@@ -354,6 +361,43 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Germplasm");
 		assertEquals(3,
 			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+	}
+
+
+	@Test
+	public void testFilterByOutOfBounds() {
+
+		final String traitName = "MyTrait";
+
+
+		final int numberOfPlotExperiments = 1;
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, numberOfPlotExperiments);
+
+		final CVTerm trait1 = this.testDataInitializer.createTrait(traitName);
+		final VariableOverrides variableOverrides = variableOverridesDao.save(trait1.getCvTermId(),null, trait1.getName(), "10", "100");
+		final CVTermProperty cvTermProperty = this.cvTermPropertyDao.save(trait1.getCvTermId(), trait1.getCv(), "10", 1);
+		final List<ExperimentModel> unitsWithObservations = Arrays.asList(instance1Units.get(0));
+		this.testDataInitializer.addPhenotypes(unitsWithObservations, trait1.getCvTermId(), "4000");
+
+		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(trait1.getCvTermId(), trait1.getName());
+		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
+		final Integer datasetId = this.plot.getProjectId();
+		observationUnitsSearchDTO.setDatasetId(datasetId);
+		observationUnitsSearchDTO.setSelectionMethodsAndTraits(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
+
+		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
+		filter.setByOutOfBound(true);
+		filter.setVariableId(variableOverrides.getVariableId());
+		observationUnitsSearchDTO.setFilter(filter);
+
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
+
+		final List<ObservationUnitRow> measurementRows = this.obsUnitSearchDao.getObservationUnitsByVariable(observationUnitsSearchDTO);
+		System.out.println(measurementRows);
+
 	}
 
 }
