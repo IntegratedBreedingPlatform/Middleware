@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -904,9 +905,19 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		observationUnitRow.setDesignation(designation);
 		observationVariables.put(DESIGNATION, new ObservationUnitData(designation));
 
-		observationVariables.put(TRIAL_INSTANCE, new ObservationUnitData((String) row.get(TRIAL_INSTANCE)));
+		final String trialInstance = (String) row.get(TRIAL_INSTANCE);
+		if (NumberUtils.isDigits(trialInstance)) {
+			observationUnitRow.setTrialInstance(Integer.valueOf(trialInstance));
+		}
+		observationVariables.put(TRIAL_INSTANCE, new ObservationUnitData(trialInstance));
+
+		final String entryNumber = (String) row.get(ENTRY_NO);
+		if (NumberUtils.isDigits(trialInstance)) {
+			observationUnitRow.setEntryNumber(Integer.valueOf(entryNumber));
+		}
+		observationVariables.put(ENTRY_NO, new ObservationUnitData(entryNumber));
+
 		observationVariables.put(ENTRY_TYPE, new ObservationUnitData((String) row.get(ENTRY_TYPE)));
-		observationVariables.put(ENTRY_NO, new ObservationUnitData((String) row.get(ENTRY_NO)));
 		observationVariables.put(ENTRY_CODE, new ObservationUnitData((String) row.get(ENTRY_CODE)));
 		observationVariables.put(REP_NO, new ObservationUnitData((String) row.get(REP_NO)));
 		observationVariables.put(PLOT_NO, new ObservationUnitData((String) row.get(PLOT_NO)));

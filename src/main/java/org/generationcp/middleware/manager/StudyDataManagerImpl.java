@@ -806,11 +806,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public String getGeolocationPropValue(final int stdVarId, final int studyId) {
-		return this.getGeolocationPropertyDao().getGeolocationPropValue(stdVarId, studyId);
-	}
-
-	@Override
 	public String getFolderNameById(final Integer folderId) {
 		final DmsProject currentFolder = this.getDmsProjectDao().getById(folderId);
 		return currentFolder.getName();

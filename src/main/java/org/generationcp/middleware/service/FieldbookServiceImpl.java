@@ -1160,7 +1160,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
 			storedInIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());
 			workbook.setColumnOrderedLists(
-					this.getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(plotDatasetId, storedInIds, null));
+					this.getProjectPropertyDao().getDatasetVariableIdsForVariableTypeIds(plotDatasetId, storedInIds, null));
 			return true;
 		}
 		return false;

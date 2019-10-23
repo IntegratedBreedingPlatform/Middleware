@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 import java.util.ArrayList;
@@ -121,6 +122,13 @@ public class MeasurementVariableTransformer extends Transformer {
 			measurementVariable.setRole(stdVariable.getPhenotypicType());
 		}
 
+		return measurementVariable;
+	}
+
+	public MeasurementVariable transform(final StandardVariable standardVariable, final boolean isFactor, final VariableType variableType) {
+		final MeasurementVariable measurementVariable = this.transform(standardVariable, isFactor);
+		measurementVariable.setVariableType(variableType);
+		measurementVariable.setAlias(standardVariable.getName());
 		return measurementVariable;
 	}
 
