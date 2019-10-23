@@ -30,7 +30,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -182,11 +181,10 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getDatasetVariableIdsForGivenStoredInIds(final Integer projectId, final List<Integer> storedInIds,
+	public List<Integer> getDatasetVariableIdsForVariableTypeIds(final Integer projectId, final List<Integer> variableTypeIds,
 			final List<Integer> varIdsToExclude) {
-		final List<Integer> variableIds = new ArrayList<>();
 		final String mainSql = " SELECT variable_id " + " FROM projectprop pp " + " WHERE project_id = :projectId ";
-		final String existsClause = " AND pp.type_id in (:storedInIds) ORDER BY rank ";
+		final String existsClause = " AND pp.type_id IN (:variableTypeIds) ORDER BY rank ";
 		final boolean doExcludeIds = varIdsToExclude != null && !varIdsToExclude.isEmpty();
 
 		final StringBuilder sb = new StringBuilder(mainSql);
@@ -200,13 +198,9 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		if (doExcludeIds) {
 			query.setParameterList("excludeIds", varIdsToExclude);
 		}
-		query.setParameterList("storedInIds", storedInIds);
-		final List<String> results = query.list();
-		for (final String value : results) {
-			variableIds.add(Integer.parseInt(value));
-		}
+		query.setParameterList("variableTypeIds", variableTypeIds);
+		return query.list();
 
-		return variableIds;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -279,6 +273,15 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		query.executeUpdate();
 	}
 
+	public void deleteDatasetVariablesByVariableTypes(final Integer projectId, final List<Integer> variableTypeIds) {
+		final String sql = "DELETE FROM projectprop WHERE project_id = :projectId AND type_id IN (:variableTypeIds)";
+		final Query query =
+			this.getSession().createSQLQuery(sql);
+		query.setParameter("projectId", projectId);
+		query.setParameterList("variableTypeIds", variableTypeIds);
+		query.executeUpdate();
+	}
+
 	public List<String> getGermplasmDescriptors(final int studyIdentifier) {
 		final List<String> list = this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
 			Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
@@ -325,6 +328,13 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public List<Integer> getVariableIdsForDataset(final Integer datasetId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("project.projectId", datasetId));
+		criteria.setProjection(Projections.property("variableId"));
+		return criteria.list();
 	}
 
 	public List<ProjectProperty> getByProjectIdAndVariableIds(final Integer projectId, final List<Integer> standardVariableIds) {

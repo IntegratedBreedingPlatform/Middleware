@@ -132,6 +132,10 @@ public class DmsProject implements Serializable {
 		super();
 	}
 
+	public DmsProject(final Integer projectId) {
+		this.projectId = projectId;
+	}
+
 	public DmsProject(
 		final String name, final String description, final String programUUID, final List<ProjectProperty> properties,
 		final boolean deleted,

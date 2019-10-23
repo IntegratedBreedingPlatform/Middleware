@@ -534,7 +534,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		crop.setUseUUID(true);
 		final StudyReference studyReference4 =
 				studyTestDataInitializer.addTestStudy(StudyTypeDto.getTrialDto(), StudySearchDaoTest.TEST_STUDY_NAME_4);
-		studyTestDataInitializer.addEnvironmentDataset(crop, studyReference4.getId(),
+		studyTestDataInitializer.createEnvironmentDataset(crop, studyReference4.getId(),
 				String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), String.valueOf(TermId.SEASON_DRY.getId()));
 		this.dryStudies.add(studyReference4);
 		

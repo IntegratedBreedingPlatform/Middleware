@@ -16,6 +16,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * This POJO represents a row in reports about Transaction records. Note that different reports require different information and so some
@@ -30,7 +31,7 @@ public class TransactionReportRow implements Serializable {
 
 	private static final long serialVersionUID = 4363149565820886638L;
 
-	private Integer date;
+	private Date date;
 	private Double quantity;
 	private Term scaleOfLot;
 	private Location locationOfLot;
@@ -44,17 +45,27 @@ public class TransactionReportRow implements Serializable {
 	private Integer listId;
 	private Integer trnStatus;
 	private String lotStatus;
+	private Date lotDate;
+
 
 	public TransactionReportRow() {
 
 	}
 
-	public Integer getDate() {
+	public Date getDate() {
 		return this.date;
 	}
 
-	public void setDate(final Integer date) {
+	public void setDate(final Date date) {
 		this.date = date;
+	}
+
+	public Date getLotDate() {
+		return this.lotDate;
+	}
+
+	public void setLotDate(final Date lotDate) {
+		this.lotDate = lotDate;
 	}
 
 	public Double getQuantity() {
@@ -101,7 +112,7 @@ public class TransactionReportRow implements Serializable {
 		return this.person;
 	}
 
-	public void setPerson(Person person) {
+	public void setPerson(final Person person) {
 		this.person = person;
 	}
 

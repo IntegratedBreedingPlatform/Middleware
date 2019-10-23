@@ -63,6 +63,7 @@ import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.gdms.DatasetService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
@@ -74,6 +75,7 @@ import org.generationcp.middleware.service.impl.study.MeasurementVariableService
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
+import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -324,6 +326,10 @@ public class ManagerFactory implements Serializable {
 
 	public DerivedVariableService getDerivedVariableService() {
 		return new DerivedVariableServiceImpl(this.sessionProvider);
+	}
+
+	public ExperimentDesignService getExperimentDesignService() {
+		return new ExperimentDesignServiceImpl(this.sessionProvider);
 	}
 
 	public TrialEnvironmentBuilder getTrialEnvironmentBuilder() {
