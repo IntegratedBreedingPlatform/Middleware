@@ -247,7 +247,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public void deleteExperimentsByStudy(final int datasetId) {
+	public void deleteExperimentsForDataset(final int datasetId) {
 
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
@@ -273,7 +273,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			statement.setParameter("datasetId", datasetId);
 			statement.executeUpdate();
 		} catch (final HibernateException e) {
-			final String message = "Error at deleteExperimentsByStudy=" + datasetId + " query at ExperimentDao: " + e.getMessage();
+			final String message = "Error at deleteExperimentsForDataset=" + datasetId + " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

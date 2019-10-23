@@ -61,6 +61,16 @@ public class StockProperty implements Serializable {
 	@Column(name = "rank")
 	private Integer rank;
 
+	public StockProperty() {
+
+	}
+
+	public StockProperty (final Integer variableId, final String value, final Integer rank) {
+		this.setTypeId(variableId);
+		this.setValue(value);
+		this.setRank(rank);
+	}
+
 	public Integer getStockPropId() {
 		return this.stockPropId;
 	}

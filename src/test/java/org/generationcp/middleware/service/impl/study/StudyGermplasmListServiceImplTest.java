@@ -70,6 +70,9 @@ public class StudyGermplasmListServiceImplTest {
 		studyGermplasmDto.setPosition("1");
 		studyGermplasmDto.setSeedSource(listDataProject.getSeedSource());
 		studyGermplasmDto.setEntryType(germplasmList.getType());
+		studyGermplasmDto.setCheckType(listDataProject.getCheckType());
+		studyGermplasmDto.setGroupId(listDataProject.getGroupId());
+		studyGermplasmDto.setStockIds(listDataProject.getStockIDs());
 		return studyGermplasmDto;
 	}
 
