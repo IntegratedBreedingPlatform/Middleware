@@ -72,6 +72,8 @@ public class IntegrationTestDataInitializer {
 	private UserService userService;
 	private WorkbenchDataManager workbenchDataManager;
 
+	private  final String PROGRAM_UUID = "68f0d114-5b5b-11e5-885d-feff819cdc9f";
+
 	public IntegrationTestDataInitializer(final HibernateSessionProvider hibernateSessionProvider,
 		final HibernateSessionProvider workbenchSessionProvider) {
 		this.daoFactory = new DaoFactory(hibernateSessionProvider);
@@ -96,6 +98,7 @@ public class IntegrationTestDataInitializer {
 		final DatasetTypeEnum datasetTypeEnum) {
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setName(name);
+		dmsProject.setProgramUUID(this.PROGRAM_UUID);
 		dmsProject.setDescription(description);
 		dmsProject.setStudy(study);
 		dmsProject.setParent(parent);

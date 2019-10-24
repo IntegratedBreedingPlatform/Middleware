@@ -370,13 +370,14 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
 	}
 
-	@Test
-	public void testFilterByOutOfBoundsWithoutOutOfBounds() {
-		final String traitName = "MyTrait";
 
+	@Test
+	public void testFilterByOutOfBoundsWithoutOutOfBoundsMinValue10MaxValue100() {
+		final String traitName = "MyTrait";
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 2);
-		final Integer traitId = this.createTrait(traitName);
+		//trait minvalue 10 maxvalue 100
+		final Integer traitId = this.createTrait(traitName, "10", "100", null, null);
 		final List<ExperimentModel> unitsWithObservations = Collections.singletonList(instance1Units.get(0));
 		final List<ExperimentModel> unitsWithObservations2 = Collections.singletonList(instance1Units.get(1));
 		this.testDataInitializer.addPhenotypes(unitsWithObservations, traitId, "40");
@@ -398,16 +399,18 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<ObservationUnitRow> measurementRows = this.obsUnitSearchDao.getObservationUnitsByVariable(observationUnitsSearchDTO);
-		assertEquals(0, measurementRows.size());
+
+		assertTrue(measurementRows.isEmpty());
 	}
 
 	@Test
-	public void testFilterByOutOfBoundsSomeOutOfBounds() {
+	public void testFilterByOutOfBoundsSomeOutOfBoundsMinValue10MaxValue100() {
 		final String traitName = "MyTrait";
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 3);
-		final Integer traitId = this.createTrait(traitName);
+		//trait minvalue 10 maxvalue 100
+		final Integer traitId = this.createTrait(traitName, "10", "100", null, null);
 		final List<ExperimentModel> unitsWithObservations = Collections.singletonList(instance1Units.get(0));
 		final List<ExperimentModel> unitsWithObservations2 = Collections.singletonList(instance1Units.get(1));
 		final List<ExperimentModel> unitsWithObservations3 = Collections.singletonList(instance1Units.get(2));
@@ -431,16 +434,18 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<ObservationUnitRow> measurementRows = this.obsUnitSearchDao.getObservationUnitsByVariable(observationUnitsSearchDTO);
+		assertEquals(unitsWithObservations.get(0).getNdExperimentId(), measurementRows.get(0).getObservationUnitId());
 		assertEquals(1, measurementRows.size());
 	}
 
 	@Test
-	public void testFilterByOutOfBoundsAllIsOutOfBounds() {
+	public void testFilterByOutOfBoundsAllIsOutOfBoundsMinValue10MaxValue() {
 		final String traitName = "MyTrait";
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 3);
-		final Integer traitId = this.createTrait(traitName);
+		//trait minvalue 10 maxvalue 100
+		final Integer traitId = this.createTrait(traitName, "10", "100", "", "");
 		final List<ExperimentModel> unitsWithObservations = Collections.singletonList(instance1Units.get(0));
 		final List<ExperimentModel> unitsWithObservations2 = Collections.singletonList(instance1Units.get(1));
 		final List<ExperimentModel> unitsWithObservations3 = Collections.singletonList(instance1Units.get(2));
@@ -467,12 +472,48 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		assertEquals(3, measurementRows.size());
 	}
 
+
+
+	@Test
+	public void testFilterByOutOfBoundsAllIsOutOfBoundsExpectedMinValue10ExpectedMaxValue() {
+		final String traitName = "MyTrait";
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 3);
+		//trait minvalue 10 maxvalue 100 expected minvalue 0 expected maxvalue 1
+		final Integer traitId = this.createTrait(traitName, "10", "100", "0", "1");
+		final List<ExperimentModel> unitsWithObservations = Collections.singletonList(instance1Units.get(0));
+		final List<ExperimentModel> unitsWithObservations2 = Collections.singletonList(instance1Units.get(1));
+		final List<ExperimentModel> unitsWithObservations3 = Collections.singletonList(instance1Units.get(2));
+		this.testDataInitializer.addPhenotypes(unitsWithObservations, traitId, "19");
+		this.testDataInitializer.addPhenotypes(unitsWithObservations2, traitId, "10");
+		this.testDataInitializer.addPhenotypes(unitsWithObservations3, traitId, "5");
+
+		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(traitId, traitName);
+		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
+		final Integer datasetId = this.plot.getProjectId();
+		observationUnitsSearchDTO.setDatasetId(datasetId);
+		observationUnitsSearchDTO.setSelectionMethodsAndTraits(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
+
+		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
+		filter.setByOutOfBound(true);
+		filter.setVariableId(traitId);
+		observationUnitsSearchDTO.setFilter(filter);
+
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
+
+		final List<ObservationUnitRow> measurementRows = this.obsUnitSearchDao.getObservationUnitsByVariable(observationUnitsSearchDTO);
+		assertEquals(3,measurementRows.size());
+	}
+
+
 	/**
 	 * Properly Create Trait
 	 * @param traitName
 	 * @return cvTermId
 	 */
-	private Integer createTrait(final String traitName) {
+	private Integer createTrait(final String traitName, final String minValue, final String maxValue, final String expectedMinValue, final String expectedMaxValue) {
 		final Method method = new Method();
 		method.setName(OntologyDataCreationUtil.getNewRandomName());
 		method.setDefinition("Test Method");
@@ -489,8 +530,8 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		scale.setName(OntologyDataCreationUtil.getNewRandomName());
 		scale.setDefinition("Test Scale");
 		scale.setDataType(DataType.NUMERIC_VARIABLE);
-		scale.setMinValue("10");
-		scale.setMaxValue("100");
+		scale.setMinValue(minValue);
+		scale.setMaxValue(maxValue);
 		this.scaleManager.addScale(scale);
 
 		OntologyVariableInfo variableInfo = new OntologyVariableInfo();
@@ -501,8 +542,8 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		variableInfo.setPropertyId(property.getId());
 		variableInfo.setScaleId(scale.getId());
 		variableInfo.setAlias(traitName);
-		variableInfo.setExpectedMin("");
-		variableInfo.setExpectedMax("");
+		variableInfo.setExpectedMin(expectedMinValue);
+		variableInfo.setExpectedMax(expectedMaxValue);
 		variableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
 		variableInfo.setIsFavorite(true);
 		this.variableManager.addVariable(variableInfo);
