@@ -138,7 +138,7 @@ public class InventoryServiceImplTest {
 	public void testGetCurrentNotificationNumber_NullInventoryIds() throws MiddlewareException {
 		final String breederIdentifier = "TR";
 
-		Mockito.doReturn(null).when(this.transactionDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
+		Mockito.doReturn(null).when(this.lotDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
 		final Integer currentNotificationNumber = this.inventoryServiceImpl.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
 		Assert.assertEquals(0, currentNotificationNumber.intValue());
 	}
@@ -146,7 +146,7 @@ public class InventoryServiceImplTest {
 	@Test
 	public void testGetCurrentNotificationNumber_EmptyInventoryIds() throws MiddlewareException {
 		final String breederIdentifier = "TR";
-		Mockito.doReturn(new ArrayList<String>()).when(this.transactionDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
+		Mockito.doReturn(new ArrayList<String>()).when(this.lotDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
 		final Integer currentNotificationNumber = this.inventoryServiceImpl.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
 		Assert.assertEquals(0, currentNotificationNumber.intValue());
 	}
@@ -162,7 +162,7 @@ public class InventoryServiceImplTest {
 		inventoryIDs.add("PRE35-1");
 
 		final String breederIdentifier = "PRE";
-		Mockito.doReturn(inventoryIDs).when(this.transactionDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
+		Mockito.doReturn(inventoryIDs).when(this.lotDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
 		final Integer currentNotationNumber = this.inventoryServiceImpl.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
 		Assert.assertEquals(35, currentNotationNumber.intValue());
 
@@ -174,7 +174,7 @@ public class InventoryServiceImplTest {
 		inventoryIDs.add("DUMMY1-1");
 
 		final String breederIdentifier = "PRE";
-		Mockito.doReturn(inventoryIDs).when(this.transactionDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
+		Mockito.doReturn(inventoryIDs).when(this.lotDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
 		final Integer currentNotationNumber = this.inventoryServiceImpl.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
 		Assert.assertEquals("0 must be returned because PRE is not found in DUMMY1-1", 0, currentNotationNumber.intValue());
 
