@@ -674,9 +674,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "          ) " //
 			+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId() //
 			// get the numericals whose value is not within bounds
-			+ "          then ph2." + filterByDraftOrValue + " < scaleMinRange.value or ph2." + filterByDraftOrValue
-			+ " > scaleMaxRange.value " //
-			+ "            or ph2." + filterByDraftOrValue + " < vo.expected_min or ph2." + filterByDraftOrValue + " > vo.expected_max "
+			+ "          then cast(ph2." + filterByDraftOrValue + " as unsigned) < scaleMinRange.value or cast(ph2." + filterByDraftOrValue
+			+ " as unsigned) > scaleMaxRange.value " //
+			+ "            or cast(ph2." + filterByDraftOrValue + " as unsigned) < vo.expected_min or cast(ph2." + filterByDraftOrValue + " as unsigned) > vo.expected_max "
 			//
 			+ "        else false " //
 			+ "        end " //
