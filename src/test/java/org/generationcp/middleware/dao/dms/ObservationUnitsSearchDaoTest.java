@@ -1,13 +1,20 @@
 package org.generationcp.middleware.dao.dms;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.bouncycastle.asn1.esf.CrlValidatedID;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.dao.oms.VariableOverridesDao;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.ontology.*;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -19,8 +26,11 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
+import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
+import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -39,6 +49,18 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 	private VariableOverridesDao variableOverridesDao;
 	private CvTermPropertyDao cvTermPropertyDao;
+
+	@Autowired
+	private OntologyMethodDataManager methodManager;
+
+	@Autowired
+	private OntologyPropertyDataManager propertyManager;
+
+	@Autowired
+	private OntologyScaleDataManager scaleManager;
+
+	@Autowired
+	private OntologyVariableDataManager variableManager;
 
 	@Before
 	public void setUp() {
@@ -361,43 +383,6 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Germplasm");
 		assertEquals(3,
 			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
-	}
-
-
-	@Test
-	public void testFilterByOutOfBounds() {
-
-		final String traitName = "MyTrait";
-
-
-		final int numberOfPlotExperiments = 1;
-		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, numberOfPlotExperiments);
-
-		final CVTerm trait1 = this.testDataInitializer.createTrait(traitName);
-		final VariableOverrides variableOverrides = variableOverridesDao.save(trait1.getCvTermId(),null, trait1.getName(), "10", "100");
-		final CVTermProperty cvTermProperty = this.cvTermPropertyDao.save(trait1.getCvTermId(), trait1.getCv(), "", 1);
-		final List<ExperimentModel> unitsWithObservations = Arrays.asList(instance1Units.get(0));
-		this.testDataInitializer.addPhenotypes(unitsWithObservations, trait1.getCvTermId(), "4000");
-
-		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(trait1.getCvTermId(), trait1.getName());
-		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
-		final Integer datasetId = this.plot.getProjectId();
-		observationUnitsSearchDTO.setDatasetId(datasetId);
-		observationUnitsSearchDTO.setSelectionMethodsAndTraits(Collections.singletonList(measurementVariableDto));
-		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
-
-		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
-		filter.setByOutOfBound(true);
-		filter.setVariableId(variableOverrides.getVariableId());
-		observationUnitsSearchDTO.setFilter(filter);
-
-		// Need to flush session to sync with underlying database before querying
-		this.sessionProvder.getSession().flush();
-
-		final List<ObservationUnitRow> measurementRows = this.obsUnitSearchDao.getObservationUnitsByVariable(observationUnitsSearchDTO);
-//		assertEquals(1, measurementRows.size());
-
 	}
 
 }
