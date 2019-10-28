@@ -1,15 +1,8 @@
 
 package org.generationcp.middleware.dao;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
@@ -25,8 +18,14 @@ import org.hibernate.SQLQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for Germplasm Search functionality.
@@ -235,7 +234,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			// 1. find germplasms with GID = or like q
 			this.searchInGidCriteria(queryString, params, q, o);
 
-			// 2. find germplasms with inventory_id = or like q
+			// 2. find germplasms with stock_id = or like q
 			this.searchInStockIdCriteria(queryString, params, q, o);
 
 			// 3. find germplasms with nVal = or like q
@@ -312,11 +311,11 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		queryString.append("SELECT eid as GID FROM ims_lot l " + "INNER JOIN germplsm g on l.eid = g.gid "
 				+ "INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' ");
 		if (o.equals(Operation.LIKE)) {
-			queryString.append("WHERE t.inventory_id LIKE :inventory_id");
+			queryString.append("WHERE l.stock_id LIKE :stock_id");
 		} else {
-			queryString.append("WHERE t.inventory_id = :inventory_id");
+			queryString.append("WHERE l.stock_id = :stock_id");
 		}
-		params.put("inventory_id", q);
+		params.put("stock_id", q);
 
 		// make sure to not include deleted germplasm from the search results
 		queryString.append(GermplasmSearchDAO.GERMPLASM_NOT_DELETED_CLAUSE + GermplasmSearchDAO.LIMIT_CLAUSE);
@@ -446,7 +445,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		final StringBuilder selectClause = new StringBuilder();
 		selectClause.append("SELECT g.*, \n" + " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nval SEPARATOR" + "       ', ')\n"
 				+ "                                   AS `" + GermplasmSearchDAO.NAMES + "`, \n"
-				+ "       Group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR \n" + "       ', ') \n"
+				+ "       Group_concat(DISTINCT gl.stock_id ORDER BY gl.stock_id SEPARATOR \n" + "       ', ') \n"
 				+ "                                   AS `" + GermplasmSearchDAO.STOCK_IDS + "`, \n"
 				+ "       g.gid                     AS `" + GermplasmSearchDAO.GID + "`, \n" + "       g.mgid                     AS `"
 				+ GermplasmSearchDAO.GROUP_ID + "`, \n" + "       Count(DISTINCT gt.lotid)    AS `" + GermplasmSearchDAO.AVAIL_LOTS

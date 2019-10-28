@@ -45,8 +45,6 @@ public class Transaction implements Serializable {
 	private static final long serialVersionUID = 77866453513905521L;
 	public static final String GET_EMPTY_LOT = "getEmptyLot";
 	public static final String GET_LOT_WITH_MINIMUM_AMOUNT = "getLotWithMinimumAmount";
-	public static final String GET_INVENTORY_ID_WITH_IDENTIFIER_QUERY = "select inventory_id FROM ims_transaction WHERE inventory_id "
-			+ "RLIKE '^:identifier[0-9][0-9]*.*'";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -96,9 +94,6 @@ public class Transaction implements Serializable {
 	@Column(name = "personid")
 	private Integer personId;
 
-	@Column(name = "inventory_id")
-	private String inventoryID;
-
 	@Column(name = "bulk_with")
 	private String bulkWith;
 
@@ -130,7 +125,10 @@ public class Transaction implements Serializable {
 		this.sourceRecordId = sourceRecordId;
 		this.previousAmount = previousAmount;
 		this.personId = personId;
-		this.inventoryID = inventoryID;
+
+		if (this.lot != null) {
+			this.lot.setStockId(inventoryID);
+		}
 	}
 
 	public Integer getId() {
@@ -287,14 +285,6 @@ public class Transaction implements Serializable {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 37).append(this.id).toHashCode();
-	}
-
-	public String getInventoryID() {
-		return this.inventoryID;
-	}
-
-	public void setInventoryID(final String inventoryID) {
-		this.inventoryID = inventoryID;
 	}
 
 	public String getBulkWith() {

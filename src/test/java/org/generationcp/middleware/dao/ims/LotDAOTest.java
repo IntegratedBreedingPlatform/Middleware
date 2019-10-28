@@ -78,13 +78,13 @@ public class LotDAOTest extends IntegrationTestBase {
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
 
-		Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, RandomStringUtils.randomAlphabetic(6));
+		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
 
 		Transaction transaction = InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, DEPOSIT, lot, 1, 1, 1, LIST);
 		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction));
 
-		List<Object[]> scalesForGermplsms = this.lotDAO.retrieveLotScalesForGermplasms(Lists.newArrayList(germplasmId));
+		final List<Object[]> scalesForGermplsms = this.lotDAO.retrieveLotScalesForGermplasms(Lists.newArrayList(germplasmId));
 
 		Assert.assertEquals(1, scalesForGermplsms.size());
 		Assert.assertEquals(germplasmId, scalesForGermplsms.get(0)[0]);
@@ -99,13 +99,13 @@ public class LotDAOTest extends IntegrationTestBase {
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
 
-		Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, RandomStringUtils.randomAlphabetic(6));
+		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.inventoryDataManager.addLots(Lists.newArrayList(lot));
 
-		Transaction transaction = InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, DEPOSIT, lot, 1, 1, 1, LIST);
+		final Transaction transaction = InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, DEPOSIT, lot, 1, 1, 1, LIST);
 		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction));
 
-		Map<Integer, Object[]> availableBalanceCountAndTotalLotsCount =
+		final Map<Integer, Object[]> availableBalanceCountAndTotalLotsCount =
 				this.lotDAO.getAvailableBalanceCountAndTotalLotsCount(Lists.newArrayList(germplasmId));
 
 		Assert.assertEquals(1, availableBalanceCountAndTotalLotsCount.size());
@@ -126,7 +126,7 @@ public class LotDAOTest extends IntegrationTestBase {
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
 
-		Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, RandomStringUtils.randomAlphabetic(6));
+		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
 
 		Transaction transaction =
@@ -162,7 +162,7 @@ public class LotDAOTest extends IntegrationTestBase {
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
 
 		final Lot lot =
-				InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, RandomStringUtils.randomAlphabetic(6));
+			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
 
 		final Transaction transaction =
@@ -181,7 +181,7 @@ public class LotDAOTest extends IntegrationTestBase {
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
 
 		final Lot lot =
-				InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 1, 1, RandomStringUtils.randomAlphabetic(6));
+			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 1, 1, "Comments", "InventoryId");
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
 
 		final Transaction transaction =
@@ -264,11 +264,11 @@ public class LotDAOTest extends IntegrationTestBase {
 		final Integer germplasmId2 = this.germplasmDataManager.addGermplasm(germplasm2, germplasm2.getPreferredName());
 
 		lot1 = InventoryDetailsTestDataInitializer
-				.createLot(1, GERMPLASM, germplasmId1, location.getLocid(), 8264, 0, 1, RandomStringUtils.randomAlphabetic(6));
+				.createLot(1, GERMPLASM, germplasmId1, location.getLocid(), 8264, 0, 1, "Comments", "InventoryId");
 
-		lot2 = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId1, 2, 8267, 0, 1, RandomStringUtils.randomAlphabetic(6));
+		lot2 = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId1, 2, 8267, 0, 1, "Comments", "InventoryId");
 
-		lot3 = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId2, 1, 8267, 0, 1, RandomStringUtils.randomAlphabetic(6));
+		lot3 = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId2, 1, 8267, 0, 1, "Comments", "InventoryId");
 
 		transaction1 = InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, DEPOSIT, lot1, 1, 1, 1, LIST);
 

@@ -703,7 +703,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 				"LocationName");
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
 
-		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
+		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.manager.addLots(Lists.<Lot>newArrayList(lot));
 
 		final Transaction transaction = InventoryDetailsTestDataInitializer
@@ -735,8 +735,10 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 				GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList, germplasmId, 2);
 		this.germplasmListManager.addGermplasmListData(germplasmListData);
 
-		final Lot lotOne = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "First Lot for Gemrplasm");
-		final Lot lotTwo = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Second Lot for Gemrplasm");
+		final Lot lotOne = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "First Lot for Gemrplasm",
+			"InventoryId");
+		final Lot lotTwo = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Second Lot for Gemrplasm",
+			"InventoryId");
 		this.manager.addLots(Lists.<Lot>newArrayList(lotOne, lotTwo));
 
 
@@ -750,7 +752,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		final Map<Integer, String> germplsmWiseStockID = this.manager.retrieveStockIds(Lists.newArrayList(germplasmId));
 
 		Assert.assertNotNull(germplsmWiseStockID);
-		Assert.assertEquals(depositTransactionForLotOne.getInventoryID()+", "+depositTransactionForLotTwo.getInventoryID()
-				, germplsmWiseStockID.get(germplasmId));
+		Assert.assertEquals(depositTransactionForLotOne.getLot().getStockId() + ", " + depositTransactionForLotTwo.getLot().getStockId()
+			, germplsmWiseStockID.get(germplasmId));
 	}
 }

@@ -80,7 +80,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			+ "  SUM(CASE WHEN trnstat = 1 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS committed_amt, ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS =
-			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS + "  GROUP_CONCAT(inventory_id SEPARATOR ', ') AS stockids ";
+			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS + "  GROUP_CONCAT(DISTINCT stock_id SEPARATOR ', ') AS stockids ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM_CONDITION =
 			"FROM ims_lot i " + "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
@@ -888,4 +888,16 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		return format.format(date);
 	}
 
+	public List<String> getInventoryIDsWithBreederIdentifier(final String identifier) {
+		try {
+			final String queryString = "select stock_id FROM ims_lot WHERE stock_id "
+				+ "RLIKE '^:identifier[0-9][0-9]*.*'".replace(":identifier", identifier);
+			final Query query = this.getSession().createSQLQuery(queryString);
+			return query.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getInventoryIDsWithBreederIdentifier query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }

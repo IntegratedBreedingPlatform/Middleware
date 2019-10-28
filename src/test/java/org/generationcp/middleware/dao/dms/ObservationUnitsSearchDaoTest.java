@@ -3,8 +3,13 @@ package org.generationcp.middleware.dao.dms;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.ontology.*;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -15,24 +20,18 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
+import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 	private ObservationUnitsSearchDao obsUnitSearchDao;
-	private DmsProjectDao dmsProjectDao;
 
 	private IntegrationTestDataInitializer testDataInitializer;
 
@@ -40,21 +39,36 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 	private DmsProject plot;
 	private DmsProject summary;
 
+
+	@Autowired
+	private OntologyMethodDataManager methodManager;
+
+	@Autowired
+	private OntologyPropertyDataManager propertyManager;
+
+	@Autowired
+	private OntologyScaleDataManager scaleManager;
+
+	@Autowired
+	private OntologyVariableDataManager variableManager;
+
 	@Before
 	public void setUp() {
 
 		this.obsUnitSearchDao = new ObservationUnitsSearchDao();
 		this.obsUnitSearchDao.setSession(this.sessionProvder.getSession());
-		this.dmsProjectDao = new DmsProjectDao();
-		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		DmsProjectDao dmsProjectDao = new DmsProjectDao();
+		dmsProjectDao.setSession(this.sessionProvder.getSession());
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
-		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
+		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, dmsProjectDao.getById(1), null);
 		this.plot = this.testDataInitializer
 			.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
 		this.summary = this.testDataInitializer
 			.createDmsProject("Environment Dataset", "Environment Dataset-Description", this.study, this.study,
 				DatasetTypeEnum.SUMMARY_DATA);
+
+
 	}
 
 	@Test
@@ -361,4 +375,143 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
 	}
 
+	@Test
+	public void testFilterByOutOfBoundsWithoutOutOfBounds() {
+		final String traitName = "MyTrait";
+
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 2);
+		final Integer traitId = this.createTrait(traitName);
+		final List<ExperimentModel> unitsWithObservations = Collections.singletonList(instance1Units.get(0));
+		final List<ExperimentModel> unitsWithObservations2 = Collections.singletonList(instance1Units.get(1));
+		this.testDataInitializer.addPhenotypes(unitsWithObservations, traitId, "40");
+		this.testDataInitializer.addPhenotypes(unitsWithObservations2, traitId, "100");
+
+		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(traitId, traitName);
+		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
+		final Integer datasetId = this.plot.getProjectId();
+		observationUnitsSearchDTO.setDatasetId(datasetId);
+		observationUnitsSearchDTO.setSelectionMethodsAndTraits(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
+
+		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
+		filter.setByOutOfBound(true);
+		filter.setVariableId(traitId);
+		observationUnitsSearchDTO.setFilter(filter);
+
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
+
+		final List<ObservationUnitRow> measurementRows = this.obsUnitSearchDao.getObservationUnitsByVariable(observationUnitsSearchDTO);
+		assertEquals(0, measurementRows.size());
+	}
+
+	@Test
+	public void testFilterByOutOfBoundsSomeOutOfBounds() {
+		final String traitName = "MyTrait";
+
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 3);
+		final Integer traitId = this.createTrait(traitName);
+		final List<ExperimentModel> unitsWithObservations = Collections.singletonList(instance1Units.get(0));
+		final List<ExperimentModel> unitsWithObservations2 = Collections.singletonList(instance1Units.get(1));
+		final List<ExperimentModel> unitsWithObservations3 = Collections.singletonList(instance1Units.get(2));
+		this.testDataInitializer.addPhenotypes(unitsWithObservations, traitId, "1000");
+		this.testDataInitializer.addPhenotypes(unitsWithObservations2, traitId, "100");
+		this.testDataInitializer.addPhenotypes(unitsWithObservations3, traitId, "40");
+
+		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(traitId, traitName);
+		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
+		final Integer datasetId = this.plot.getProjectId();
+		observationUnitsSearchDTO.setDatasetId(datasetId);
+		observationUnitsSearchDTO.setSelectionMethodsAndTraits(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
+
+		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
+		filter.setByOutOfBound(true);
+		filter.setVariableId(traitId);
+		observationUnitsSearchDTO.setFilter(filter);
+
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
+
+		final List<ObservationUnitRow> measurementRows = this.obsUnitSearchDao.getObservationUnitsByVariable(observationUnitsSearchDTO);
+		assertEquals(1, measurementRows.size());
+	}
+
+	@Test
+	public void testFilterByOutOfBoundsAllIsOutOfBounds() {
+		final String traitName = "MyTrait";
+
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 3);
+		final Integer traitId = this.createTrait(traitName);
+		final List<ExperimentModel> unitsWithObservations = Collections.singletonList(instance1Units.get(0));
+		final List<ExperimentModel> unitsWithObservations2 = Collections.singletonList(instance1Units.get(1));
+		final List<ExperimentModel> unitsWithObservations3 = Collections.singletonList(instance1Units.get(2));
+		this.testDataInitializer.addPhenotypes(unitsWithObservations, traitId, "1000");
+		this.testDataInitializer.addPhenotypes(unitsWithObservations2, traitId, "3000");
+		this.testDataInitializer.addPhenotypes(unitsWithObservations3, traitId, "5");
+
+		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(traitId, traitName);
+		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
+		final Integer datasetId = this.plot.getProjectId();
+		observationUnitsSearchDTO.setDatasetId(datasetId);
+		observationUnitsSearchDTO.setSelectionMethodsAndTraits(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
+
+		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
+		filter.setByOutOfBound(true);
+		filter.setVariableId(traitId);
+		observationUnitsSearchDTO.setFilter(filter);
+
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
+
+		final List<ObservationUnitRow> measurementRows = this.obsUnitSearchDao.getObservationUnitsByVariable(observationUnitsSearchDTO);
+		assertEquals(3, measurementRows.size());
+	}
+
+	/**
+	 * Properly Create Trait
+	 * @param traitName
+	 * @return cvTermId
+	 */
+	private Integer createTrait(final String traitName) {
+		final Method method = new Method();
+		method.setName(OntologyDataCreationUtil.getNewRandomName());
+		method.setDefinition("Test Method");
+		this.methodManager.addMethod(method);
+
+		final Property property = new Property();
+		property.setName(OntologyDataCreationUtil.getNewRandomName());
+		property.setDefinition("Test Property");
+		property.setCropOntologyId("CO:0000001");
+		property.addClass("My New Class");
+		this.propertyManager.addProperty(property);
+
+		final Scale scale = new Scale();
+		scale.setName(OntologyDataCreationUtil.getNewRandomName());
+		scale.setDefinition("Test Scale");
+		scale.setDataType(DataType.NUMERIC_VARIABLE);
+		scale.setMinValue("10");
+		scale.setMaxValue("100");
+		this.scaleManager.addScale(scale);
+
+		OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+		variableInfo.setProgramUuid(this.plot.getProgramUUID());
+		variableInfo.setName(traitName);
+		variableInfo.setDescription("Test Variable");
+		variableInfo.setMethodId(method.getId());
+		variableInfo.setPropertyId(property.getId());
+		variableInfo.setScaleId(scale.getId());
+		variableInfo.setAlias(traitName);
+		variableInfo.setExpectedMin("");
+		variableInfo.setExpectedMax("");
+		variableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
+		variableInfo.setIsFavorite(true);
+		this.variableManager.addVariable(variableInfo);
+
+		return variableInfo.getId();
+	}
 }
