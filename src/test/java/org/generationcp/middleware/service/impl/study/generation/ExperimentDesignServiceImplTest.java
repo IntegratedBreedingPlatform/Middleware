@@ -47,6 +47,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 
@@ -132,9 +133,11 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveExperimentDesign() {
+	public void testSaveExperimentDesign_ForAllStudyInstancesAtOnce() {
+		final List<Integer> instanceNumbers = Arrays.asList(1, 2, 3);
 		this.experimentDesignService
-			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows());
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(
+				instanceNumbers));
 
 		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
 		Assert.assertNotNull(rows);
@@ -142,38 +145,100 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		// Verify saving of variables
 		this.verifyEnvironmentVariablesWereSaved();
 		this.verifyPlotVariablesWereSaved();
-		this.verifyGeolocationPropRecords(true);
+		this.verifyGeolocationPropRecords(true, instanceNumbers);
 
-
-		// Check that plot experiments are created
+		// Check that plot experiments are created per instance
 		Assert.assertEquals(NO_INSTANCES * NO_ENTRIES * NO_REPS * NO_TREATMENTS, rows.size());
-		final ObservationUnitRow row = rows.get(21);
-		final Integer gid = this.gids[2];
-		Assert.assertEquals(gid, row.getGid());
-		Assert.assertEquals(GERMPLASM_PREFIX + gid, row.getDesignation());
-		Assert.assertEquals(3, row.getEntryNumber().intValue());
-		Assert.assertEquals(1, row.getTrialInstance().intValue());
-		Assert.assertNotNull(row.getObsUnitId());
+		final Map<Integer, List<ObservationUnitRow>> instancesRowMap = new HashMap<>();
+		for (final ObservationUnitRow row : rows) {
+			final Integer trialInstance = row.getTrialInstance();
+			if (instancesRowMap.get(trialInstance) == null) {
+				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+			}
+			instancesRowMap.get(trialInstance).add(row);
+		}
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(1).size());
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(2).size());
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(3).size());
 
-		Assert.assertEquals("1", row.getVariables().get("TRIAL_INSTANCE").getValue());
-		Assert.assertEquals(gid.toString(), row.getVariables().get("GID").getValue());
-		Assert.assertEquals("3", row.getVariables().get("ENTRY_NO").getValue());
-		Assert.assertEquals("2", row.getVariables().get("REP_NO").getValue());
-		Assert.assertEquals("22", row.getVariables().get("PLOT_NO").getValue());
-		Assert.assertEquals("1", row.getVariables().get(this.treatmentFactor.getName()).getValue());
-		Assert.assertEquals("100", row.getVariables().get(this.treatmentFactorLabel.getName()).getValue());
-		Assert.assertEquals("Test entry", row.getVariables().get("ENTRY_TYPE").getValue());
-		Assert.assertEquals(GERMPLASM_PREFIX + gid, row.getVariables().get("DESIGNATION").getValue());
-		Assert.assertNotNull(row.getVariables().get("OBS_UNIT_ID").getValue());
+		verifyObservationUnitRowValues(instancesRowMap);
+	}
+
+	@Test
+	public void testSaveExperimentDesign_IterativeForAllStudyInstances() {
+		// Save design first instance
+		this.experimentDesignService
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(Collections.singletonList(1)));
+
+		// Save design for other instances
+		this.experimentDesignService
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(Arrays.asList(2, 3)));
 
 
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		Assert.assertNotNull(rows);
+
+		// Verify saving of variables
+		this.verifyEnvironmentVariablesWereSaved();
+		this.verifyPlotVariablesWereSaved();
+		this.verifyGeolocationPropRecords(true, Arrays.asList(1, 2, 3));
+
+		// Check that plot experiments are created per instance
+		Assert.assertEquals(NO_INSTANCES * NO_ENTRIES * NO_REPS * NO_TREATMENTS, rows.size());
+		final Map<Integer, List<ObservationUnitRow>> instancesRowMap = new HashMap<>();
+		for (final ObservationUnitRow row : rows) {
+			final Integer trialInstance = row.getTrialInstance();
+			if (instancesRowMap.get(trialInstance) == null) {
+				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+			}
+			instancesRowMap.get(trialInstance).add(row);
+		}
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(1).size());
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(2).size());
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(3).size());
+
+		verifyObservationUnitRowValues(instancesRowMap);
+	}
+
+	@Test
+	public void testSaveExperimentDesign_SubsetOfInstances() {
+		final List<Integer> instanceNumbers = Arrays.asList(1, 3);
+		final Map<Integer, List<ObservationUnitRow>> instanceRowsMap = this.createObservationUnitRows(instanceNumbers);
+		this.experimentDesignService
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), instanceRowsMap);
+
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		Assert.assertNotNull(rows);
+
+		// Verify saving of variables
+		this.verifyEnvironmentVariablesWereSaved();
+		this.verifyPlotVariablesWereSaved();
+		this.verifyGeolocationPropRecords(true, instanceNumbers);
+
+		// Check that plot experiments are created for selected instances
+		Assert.assertEquals(instanceRowsMap.keySet().size() * NO_ENTRIES * NO_REPS * NO_TREATMENTS, rows.size());
+		final Map<Integer, List<ObservationUnitRow>> instancesRowMap = new HashMap<>();
+		for (final ObservationUnitRow row : rows) {
+			final Integer trialInstance = row.getTrialInstance();
+			if (instancesRowMap.get(trialInstance) == null) {
+				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+			}
+			instancesRowMap.get(trialInstance).add(row);
+		}
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(1).size());
+		Assert.assertNull(instancesRowMap.get(2));
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(3).size());
+
+		this.verifyObservationUnitRowValues(instancesRowMap);
 	}
 
 	@Test
 	public void testDeleteExperimentDesign() {
 		// Save design first, then delete
+		final List<Integer> instanceNumbers = Arrays.asList(1, 2, 3);
 		this.experimentDesignService
-			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows());
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(
+				instanceNumbers));
 		this.experimentDesignService.deleteStudyExperimentDesign(this.studyId);
 
 		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
@@ -192,7 +257,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertFalse(plotVariableIds.contains(this.treatmentFactor.getCvTermId()));
 		Assert.assertFalse(plotVariableIds.contains(this.treatmentFactorLabel.getCvTermId()));
 
-		this.verifyGeolocationPropRecords(false);
+		this.verifyGeolocationPropRecords(false, instanceNumbers);
 	}
 
 	@Test
@@ -209,6 +274,27 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		property.setTypeId(VariableType.ENVIRONMENT_DETAIL.getId());
 		this.daoFactory.getProjectPropertyDAO().save(property);
 		Assert.assertEquals(exptDesignId, this.experimentDesignService.getStudyExperimentDesignTypeTermId(this.studyId).get());
+	}
+
+	private void verifyObservationUnitRowValues(final Map<Integer, List<ObservationUnitRow>> instancesRowMap) {
+		final ObservationUnitRow row = instancesRowMap.get(1).get(21);
+		final Integer gid = this.gids[2];
+		Assert.assertEquals(gid, row.getGid());
+		Assert.assertEquals(GERMPLASM_PREFIX + gid, row.getDesignation());
+		Assert.assertEquals(3, row.getEntryNumber().intValue());
+		Assert.assertEquals(1, row.getTrialInstance().intValue());
+		Assert.assertNotNull(row.getObsUnitId());
+
+		Assert.assertEquals("1", row.getVariables().get("TRIAL_INSTANCE").getValue());
+		Assert.assertEquals(gid.toString(), row.getVariables().get("GID").getValue());
+		Assert.assertEquals("3", row.getVariables().get("ENTRY_NO").getValue());
+		Assert.assertEquals("2", row.getVariables().get("REP_NO").getValue());
+		Assert.assertEquals("22", row.getVariables().get("PLOT_NO").getValue());
+		Assert.assertEquals("1", row.getVariables().get(this.treatmentFactor.getName()).getValue());
+		Assert.assertEquals("100", row.getVariables().get(this.treatmentFactorLabel.getName()).getValue());
+		Assert.assertEquals("Test entry", row.getVariables().get("ENTRY_TYPE").getValue());
+		Assert.assertEquals(GERMPLASM_PREFIX + gid, row.getVariables().get("DESIGNATION").getValue());
+		Assert.assertNotNull(row.getVariables().get("OBS_UNIT_ID").getValue());
 	}
 
 	private void verifyPlotVariablesWereSaved() {
@@ -249,7 +335,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(NO_REPS.toString(), nrepVariable.getValue());
 	}
 
-	private void verifyGeolocationPropRecords(final boolean shouldExist) {
+	private void verifyGeolocationPropRecords(final boolean shouldExist, final List<Integer> instanceNumbers) {
 		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId);
 		Assert.assertEquals(NO_INSTANCES.intValue(), geolocations.size());
 
@@ -265,11 +351,13 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 						return input.getTypeId();
 					}
 				});
+			final Integer instanceNumber = Integer.valueOf(geolocation.getDescription());
 
-			if (shouldExist) {
-				Assert.assertNotNull(propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
-				Assert.assertEquals(String.valueOf(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId()), propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()).getValue());
-				Assert.assertNotNull(propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()));
+			if (shouldExist && instanceNumbers.contains(instanceNumber)) {
+				Assert.assertNotNull("Expecting EXP_DESIGN factor for instance " + instanceNumber, propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
+				Assert.assertEquals(String.valueOf(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId()),
+					propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()).getValue());
+				Assert.assertNotNull("Expecting NO_REPS factor for instance " + instanceNumber, propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()));
 				Assert.assertEquals(NO_REPS.toString(), propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()).getValue());
 			} else {
 				Assert.assertNull(propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
@@ -334,45 +422,52 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		return variables;
 	}
 
-	private List<ObservationUnitRow> createObservationUnitRows() {
+	private Map<Integer, List<ObservationUnitRow>> createObservationUnitRows(final List<Integer> instanceNumbers) {
 
-		final List<ObservationUnitRow> rows = new ArrayList<>();
-		int plotNo = 1;
-		for (int instance = 1; instance <= NO_INSTANCES; instance++)
-			for (int rep = 1; rep <= NO_REPS; rep++) {
-				for (int entry = 1; entry <= NO_ENTRIES; entry++) {
-					for (int treatment = 1; treatment <= NO_TREATMENTS; treatment++) {
-						final ObservationUnitRow row = new ObservationUnitRow();
-						row.setEntryNumber(entry);
-						row.setTrialInstance(instance);
-						row.setVariables(new HashMap<String, ObservationUnitData>());
-						row.getVariables().put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()),
-							new ObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), "1"));
-						row.getVariables().put(String.valueOf(TermId.ENTRY_TYPE.getId()), new ObservationUnitData(TermId.ENTRY_TYPE.getId(),
-							String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
-						final Integer gid = this.gids[entry - 1];
-						row.getVariables()
-							.put(String.valueOf(TermId.GID.getId()), new ObservationUnitData(TermId.GID.getId(), String.valueOf(gid)));
-						row.getVariables()
-							.put(String.valueOf(TermId.DESIG.getId()),
-								new ObservationUnitData(TermId.DESIG.getId(), "GERMPLASM_PREFIX" + gid));
-						row.getVariables().put(String.valueOf(TermId.ENTRY_NO.getId()),
-							new ObservationUnitData(TermId.ENTRY_NO.getId(), String.valueOf(entry)));
-						row.getVariables()
-							.put(String.valueOf(TermId.PLOT_NO.getId()),
-								new ObservationUnitData(TermId.PLOT_NO.getId(), String.valueOf(plotNo++)));
-						row.getVariables()
-							.put(String.valueOf(TermId.REP_NO.getId()),
-								new ObservationUnitData(TermId.REP_NO.getId(), String.valueOf(rep)));
-						row.getVariables().put(this.treatmentFactor.getCvTermId().toString(),
-							new ObservationUnitData(this.treatmentFactor.getCvTermId(), String.valueOf(treatment)));
-						row.getVariables().put(this.treatmentFactorLabel.getCvTermId().toString(),
-							new ObservationUnitData(this.treatmentFactorLabel.getCvTermId(), String.valueOf(treatment * 100)));
-						rows.add(row);
+		final Map<Integer, List<ObservationUnitRow>> instanceRowsMap = new HashMap<>();
+		for (int instance = 1; instance <= NO_INSTANCES; instance++) {
+
+			if (instanceNumbers.contains(instance)) {
+				instanceRowsMap.put(instance, new ArrayList<ObservationUnitRow>());
+				int plotNo = 1;
+				for (int rep = 1; rep <= NO_REPS; rep++) {
+					for (int entry = 1; entry <= NO_ENTRIES; entry++) {
+						for (int treatment = 1; treatment <= NO_TREATMENTS; treatment++) {
+							final ObservationUnitRow row = new ObservationUnitRow();
+							row.setEntryNumber(entry);
+							row.setTrialInstance(instance);
+							row.setVariables(new HashMap<String, ObservationUnitData>());
+							row.getVariables().put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()),
+								new ObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), "1"));
+							row.getVariables()
+								.put(String.valueOf(TermId.ENTRY_TYPE.getId()), new ObservationUnitData(TermId.ENTRY_TYPE.getId(),
+									String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
+							final Integer gid = this.gids[entry - 1];
+							row.getVariables()
+								.put(String.valueOf(TermId.GID.getId()), new ObservationUnitData(TermId.GID.getId(), String.valueOf(gid)));
+							row.getVariables()
+								.put(String.valueOf(TermId.DESIG.getId()),
+									new ObservationUnitData(TermId.DESIG.getId(), "GERMPLASM_PREFIX" + gid));
+							row.getVariables().put(String.valueOf(TermId.ENTRY_NO.getId()),
+								new ObservationUnitData(TermId.ENTRY_NO.getId(), String.valueOf(entry)));
+							row.getVariables()
+								.put(String.valueOf(TermId.PLOT_NO.getId()),
+									new ObservationUnitData(TermId.PLOT_NO.getId(), String.valueOf(plotNo++)));
+							row.getVariables()
+								.put(String.valueOf(TermId.REP_NO.getId()),
+									new ObservationUnitData(TermId.REP_NO.getId(), String.valueOf(rep)));
+							row.getVariables().put(this.treatmentFactor.getCvTermId().toString(),
+								new ObservationUnitData(this.treatmentFactor.getCvTermId(), String.valueOf(treatment)));
+							row.getVariables().put(this.treatmentFactorLabel.getCvTermId().toString(),
+								new ObservationUnitData(this.treatmentFactorLabel.getCvTermId(), String.valueOf(treatment * 100)));
+							instanceRowsMap.get(instance).add(row);
+						}
 					}
 				}
 			}
-		return rows;
+		}
+
+		return instanceRowsMap;
 	}
 
 }
