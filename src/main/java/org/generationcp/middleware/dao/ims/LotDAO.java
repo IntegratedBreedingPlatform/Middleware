@@ -647,7 +647,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	//New inventory functions, please locate them below this line to help cleaning in the near future.
 	private final String SEARCH_LOT_QUERY = "SELECT lot.lotid as lotId, " //
-		+ "  GROUP_CONCAT(transaction.inventory_id SEPARATOR ', ') AS stockId, " //
+		+ "  lot.stock_id AS stockId, " //
 		+ "  lot.eid as gid, " //
 		+ "  g.mgid as mgid, " //
 		+ "  n.nval as designation, "
@@ -731,17 +731,17 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 						append(")) and lot.etype = 'GERMPLSM' ");
 			}
 
+			if (lotsSearchDto.getStockId() != null) {
+				query.append("and lot.stock_id like '").append(lotsSearchDto.getStockId())
+						.append("%' ");
+			}
+
 		}
 		query.append(" GROUP BY lot.lotid ");
 
 		if (lotsSearchDto != null) {
 
 			query.append(" having 1=1 ");
-
-			if (lotsSearchDto.getStockId() != null) {
-				query.append("and GROUP_CONCAT(transaction.inventory_id SEPARATOR ', ') like '").append(lotsSearchDto.getStockId())
-						.append("%' ");
-			}
 
 			if (lotsSearchDto.getMinActualBalance() != null) {
 				query.append("and SUM(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty > 0 THEN transaction.trnqty ELSE 0 END) >= ")
