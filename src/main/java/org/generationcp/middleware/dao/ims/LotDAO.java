@@ -732,7 +732,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 
 			if (lotsSearchDto.getStockId() != null) {
-				query.append("and lot.stock_id like '").append(lotsSearchDto.getStockId())
+				query.append(" and lot.stock_id like '").append(lotsSearchDto.getStockId())
 						.append("%' ");
 			}
 
