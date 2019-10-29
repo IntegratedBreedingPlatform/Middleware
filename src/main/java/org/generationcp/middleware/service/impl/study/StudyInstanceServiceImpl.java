@@ -41,7 +41,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private DatasetService datasetService;
 
 	@Override
-	public void addStudyInstance(final CropType crop, final Integer datasetId, final String instanceNumber) {
+	public void createStudyInstance(final CropType crop, final Integer datasetId, final String instanceNumber) {
 
 		final List<MeasurementVariable> measurementVariables = this.datasetService.getObservationSetVariables(datasetId,
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
