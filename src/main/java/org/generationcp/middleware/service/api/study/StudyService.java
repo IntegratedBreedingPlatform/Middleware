@@ -73,4 +73,8 @@ public interface StudyService {
 	List<String> getGenericGermplasmDescriptors(final int studyIdentifier);
 
 	List<String> getAdditionalDesignFactors(final int studyIdentifier);
+
+	Integer getPlotDatasetId(final int studyId);
+
+	Integer getEnvironmentDatasetId(final int studyId);
 }
