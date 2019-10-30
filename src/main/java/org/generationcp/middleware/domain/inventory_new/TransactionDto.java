@@ -23,6 +23,7 @@ public class TransactionDto {
 	private LotDto lot;
 
 	public TransactionDto() {
+		this.lot = new LotDto();
 	}
 
 	public TransactionDto(final Integer transactionId, final String user, final String transactionType, final Double amount,
