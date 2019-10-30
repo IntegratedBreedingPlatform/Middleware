@@ -317,14 +317,14 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final List<TransactionDto> transactionDtos = this.dao.searchTransactions(transactionsSearchDto, null);
 
 		for (final TransactionDto transactionDto : transactionDtos) {
-			Assert.assertTrue(transactionDto.getDesignation().equalsIgnoreCase(germplasm.getPreferredName().getNval()));
-			Assert.assertTrue(transactionDto.getGid().equals(germplasmId));
-			Assert.assertTrue(transactionDto.getLotId().equals(lot.getId()));
+			Assert.assertTrue(transactionDto.getLot().getDesignation().equalsIgnoreCase(germplasm.getPreferredName().getNval()));
+			Assert.assertTrue(transactionDto.getLot().getGid().equals(germplasmId));
+			Assert.assertTrue(transactionDto.getLot().getLotId().equals(lot.getId()));
 			Assert.assertTrue(transactionDto.getAmount() <= 10.0);
 			Assert.assertTrue(transactionDto.getAmount() >= -10.0);
 			Assert.assertTrue(transactionDto.getNotes().equalsIgnoreCase("Deposit"));
-			Assert.assertTrue(transactionDto.getScaleId().equals(8264));
-			Assert.assertTrue(transactionDto.getStockId().equalsIgnoreCase("ABC-1"));
+			Assert.assertTrue(transactionDto.getLot().getScaleId().equals(8264));
+			Assert.assertTrue(transactionDto.getLot().getStockId().equalsIgnoreCase("ABC-1"));
 			Assert.assertTrue(transactionDto.getTransactionDate().equals(date1));
 			Assert.assertTrue(transactionDto.getTransactionId().equals(depositTransaction.getId()));
 			Assert.assertTrue(transactionDto.getTransactionType().equalsIgnoreCase("Deposit"));

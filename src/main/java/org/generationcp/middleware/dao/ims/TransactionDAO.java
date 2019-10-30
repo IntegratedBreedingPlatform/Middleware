@@ -29,12 +29,13 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.Transformers;
+import org.hibernate.transform.AliasToBeanConstructorResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -683,20 +684,20 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				this.addSortToSearchTransactionsQuery(this.buildSearchTransactionsQuery(transactionsSearchDto), pageable);
 
 			final SQLQuery query = this.getSession().createSQLQuery(filterTransactionsQuery);
-			query.addScalar("lotId");
-			query.addScalar("gid");
-			query.addScalar("designation");
-			query.addScalar("stockId");
 			query.addScalar("transactionId");
 			query.addScalar("user");
 			query.addScalar("transactionType");
 			query.addScalar("amount");
 			query.addScalar("notes");
+			query.addScalar("transactionDate", Hibernate.DATE);
+			query.addScalar("lotId");
+			query.addScalar("gid");
+			query.addScalar("designation");
+			query.addScalar("stockId");
 			query.addScalar("scaleId");
 			query.addScalar("scaleName");
-			query.addScalar("transactionDate", Hibernate.DATE);
 
-			query.setResultTransformer(Transformers.aliasToBean(TransactionDto.class));
+			query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
 
 			if (pageable != null) {
 				query.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
@@ -727,5 +728,14 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	private String formatDate(final Date date) {
 		return format.format(date);
+	}
+
+	private Constructor<TransactionDto> getTransactionDtoConstructor() {
+		try {
+			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class,  Double.class,
+			 String.class, Date.class, Integer.class, Integer.class, String.class, String.class, Integer.class, String.class);
+		} catch (NoSuchMethodException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 }

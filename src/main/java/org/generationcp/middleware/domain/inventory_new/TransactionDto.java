@@ -1,51 +1,48 @@
 package org.generationcp.middleware.domain.inventory_new;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Date;
 
 @AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionDto {
 
-	private Integer lotId;
-	private Integer gid;
-	private String designation;
-	private String stockId;
 	private Integer transactionId;
 	private String user;
 	private String transactionType;
 	private Double amount;
 	private String notes;
-	private Integer scaleId;
-	private String scaleName;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	private Date transactionDate;
 
-	public Integer getGid() {
-		return this.gid;
+	private LotDto lot;
+
+	public TransactionDto() {
 	}
 
-	public void setGid(final Integer gid) {
-		this.gid = gid;
-	}
+	public TransactionDto(final Integer transactionId, final String user, final String transactionType, final Double amount,
+		final String notes,
+		final Date transactionDate, final Integer lotId, final Integer gid, final String designation, final String stockId,
+		final Integer scaleId, final String scaleName) {
+		this.transactionId = transactionId;
+		this.user = user;
+		this.transactionType = transactionType;
+		this.amount = amount;
+		this.notes = notes;
+		this.transactionDate = transactionDate;
+		this.lot = new LotDto();
+		this.lot.setLotId(lotId);
+		this.lot.setGid(gid);
+		this.lot.setDesignation(designation);
+		this.lot.setStockId(stockId);
+		this.lot.setScaleId(scaleId);
+		this.lot.setScaleName(scaleName);
 
-	public String getDesignation() {
-		return this.designation;
-	}
-
-	public void setDesignation(final String designation) {
-		this.designation = designation;
-	}
-
-	public String getStockId() {
-		return this.stockId;
-	}
-
-	public void setStockId(final String stockId) {
-		this.stockId = stockId;
 	}
 
 	public Integer getTransactionId() {
@@ -88,36 +85,20 @@ public class TransactionDto {
 		this.notes = notes;
 	}
 
-	public Integer getScaleId() {
-		return this.scaleId;
-	}
-
-	public void setScaleId(final Integer scaleId) {
-		this.scaleId = scaleId;
-	}
-
-	public Integer getLotId() {
-		return this.lotId;
-	}
-
-	public void setLotId(final Integer lotId) {
-		this.lotId = lotId;
-	}
-
-	public String getScaleName() {
-		return this.scaleName;
-	}
-
-	public void setScaleName(final String scaleName) {
-		this.scaleName = scaleName;
-	}
-
 	public Date getTransactionDate() {
 		return this.transactionDate;
 	}
 
 	public void setTransactionDate(final Date transactionDate) {
 		this.transactionDate = transactionDate;
+	}
+
+	public LotDto getLot() {
+		return lot;
+	}
+
+	public void setLot(final LotDto lot) {
+		this.lot = lot;
 	}
 
 	@Override
