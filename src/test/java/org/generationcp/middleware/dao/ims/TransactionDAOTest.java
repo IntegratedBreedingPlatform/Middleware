@@ -276,7 +276,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1,
-			8264, 0, 1, "Comments");
+			8264, 0, 1, "Comments","ABC-1");
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
 
 		final String sDate1 = "01/01/2015";
@@ -286,7 +286,6 @@ public class TransactionDAOTest extends IntegrationTestBase {
 				1, 1, "LIST");
 		depositTransaction.setTransactionDate(date1);
 		depositTransaction.setUserId(user.getUserid());
-		depositTransaction.setInventoryID("ABC-1");
 
 		final String sDate2 = "10/10/2015";
 		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate2);
@@ -295,7 +294,6 @@ public class TransactionDAOTest extends IntegrationTestBase {
 				1, 1, "LIST");
 		closedTransaction.setTransactionDate(date2);
 		closedTransaction.setUserId(user.getUserid());
-		closedTransaction.setInventoryID("ABC-2");
 
 		final List<Transaction> transactionList = new ArrayList<>();
 		transactionList.add(depositTransaction);
@@ -314,7 +312,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		transactionsSearchDto.setTransactionDateTo(date1);
 		transactionsSearchDto.setTransactionIds(Lists.newArrayList(depositTransaction.getId(), closedTransaction.getId()));
 		transactionsSearchDto.setTransactionType("Deposit");
-		transactionsSearchDto.setUser(user.getName());
+		transactionsSearchDto.setCreatedByUsername(user.getName());
 
 		final List<TransactionDto> transactionDtos = this.dao.searchTransactions(transactionsSearchDto, null);
 

@@ -16,7 +16,7 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	private String designation;
 	private String stockId;
 	private List<Integer> transactionIds;
-	private String user;
+	private String createdByUsername;
 	private String transactionType;
 	private String notes;
 	private List<Integer> lotIds;
@@ -30,6 +30,8 @@ public class TransactionsSearchDto extends SearchRequestDto {
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date transactionDateTo;
+
+	private List<Integer> statusIds;
 
 	public String getDesignation() {
 		return this.designation;
@@ -47,12 +49,12 @@ public class TransactionsSearchDto extends SearchRequestDto {
 		this.stockId = stockId;
 	}
 
-	public String getUser() {
-		return this.user;
+	public String getCreatedByUsername() {
+		return this.createdByUsername;
 	}
 
-	public void setUser(final String user) {
-		this.user = user;
+	public void setCreatedByUsername(final String createdByUsername) {
+		this.createdByUsername = createdByUsername;
 	}
 
 	public List<Integer> getTransactionIds() {
@@ -133,6 +135,14 @@ public class TransactionsSearchDto extends SearchRequestDto {
 
 	public void setTransactionDateTo(final Date transactionDateTo) {
 		this.transactionDateTo = transactionDateTo;
+	}
+
+	public List<Integer> getStatusIds() {
+		return statusIds;
+	}
+
+	public void setStatusIds(final List<Integer> statusIds) {
+		this.statusIds = statusIds;
 	}
 
 	@Override

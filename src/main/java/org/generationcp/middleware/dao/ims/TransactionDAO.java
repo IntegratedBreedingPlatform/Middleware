@@ -557,7 +557,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "    i.lotid AS lotId," //
 		+ "    i.eid AS gid,"//
 		+ "    n.nval AS designation,"//
-		+ "    inventory_id AS stockId,"//
+		+ "    i.stock_id AS stockId,"//
 		+ "    act.trnid AS transactionId,"//
 		+ "    users.uname AS user,"//
 		+ "    (CASE"//
@@ -566,18 +566,15 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "        WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation'"//
 		+ "        WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal'"//
 		+ "    END) AS transactionType,"//
-		+ "    SUM(CASE"//
-		+ "        WHEN trnstat = 0 AND trnqty > 0 THEN trnqty"//
-		+ "        ELSE 0"//
-		+ "    END) AS amount,"//
+		+ "    act.trnqty AS amount,"//
 		+ "    act.comments AS notes,"//
 		+ "    scaleid AS scaleId,"//
 		+ "    scale.name AS scaleName," //
 		+ "    act.trndate as transactionDate "//
 		+ " FROM"//
-		+ "    ims_lot i"//
-		+ "        LEFT JOIN"//
-		+ "    ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9"//
+		+ "   ims_transaction act "//
+		+ "        INNER JOIN"//
+		+ "    ims_lot i ON act.lotid = i.lotid "//
 		+ "        LEFT JOIN"//
 		+ "    cvterm scale ON scale.cvterm_id = i.scaleid"//
 		+ "        LEFT JOIN"//
@@ -610,11 +607,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			}
 
 			if (transactionsSearchDto.getDesignation() != null) {
-				query.append(" and n.nval = '").append(transactionsSearchDto.getDesignation()).append("' ");
+				query.append(" and n.nval like '%").append(transactionsSearchDto.getDesignation()).append("%' ");
 			}
 
 			if (transactionsSearchDto.getStockId() != null) {
-				query.append(" and inventory_id = '").append(transactionsSearchDto.getStockId()).append("' ");
+				query.append(" and i.stock_id like '").append(transactionsSearchDto.getStockId()).append("%' ");
 			}
 
 			if (transactionsSearchDto.getNotes() != null) {
@@ -629,17 +626,17 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				query.append(" and DATE(act.trndate) <= '").append(this.formatDate(transactionsSearchDto.getTransactionDateTo())).append("' ");
 			}
 
-			if (transactionsSearchDto.getUser() != null) {
-				query.append(" and users.uname like '%").append(transactionsSearchDto.getUser()).append("%'");
+			if (transactionsSearchDto.getCreatedByUsername() != null) {
+				query.append(" and users.uname like '%").append(transactionsSearchDto.getCreatedByUsername()).append("%'");
 			}
 
 			if (transactionsSearchDto.getMinAmount() != null) {
-				query.append("and CASE WHEN act.trnqty is null THEN 0 ELSE act.trnqty END >= ")
+				query.append("and act.trnqty >= ")
 					.append(transactionsSearchDto.getMinAmount()).append(" ");
 			}
 
 			if (transactionsSearchDto.getMaxAmount() != null) {
-				query.append("and CASE WHEN act.trnqty is null THEN 0 ELSE act.trnqty END <= ")
+				query.append("and act.trnqty <= ")
 					.append(transactionsSearchDto.getMaxAmount()).append(" ");
 			}
 
@@ -653,18 +650,12 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					.append(transactionsSearchDto.getTransactionType()).append("' ");
 			}
 
-		}
-		query.append(" GROUP BY act.trnid ");
-
-		if (transactionsSearchDto != null) {
-
-			query.append(" having 1=1 ");
-
-			if (transactionsSearchDto.getStockId() != null) {
-				query.append(" and GROUP_CONCAT(inventory_id SEPARATOR ', ') = '").append(transactionsSearchDto.getStockId())
-					.append("' ");
+			if (transactionsSearchDto.getStatusIds() != null && !transactionsSearchDto.getStatusIds().isEmpty()) {
+				query.append(" and act.trnstat IN (").append(Joiner.on(",").join(transactionsSearchDto.getStatusIds())).append(") ");
 			}
+
 		}
+
 		return query.toString();
 	}
 
