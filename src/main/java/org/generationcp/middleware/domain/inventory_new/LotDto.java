@@ -19,20 +19,18 @@ public class LotDto {
 	private String locationName;
 	private Integer scaleId;
 	private String scaleName;
+	private String comments;
+	private String createdByUsername;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
+	private Date createdDate;
+
+	//Aggregated Data
 	private Double actualBalance;
 	private Double availableBalance;
 	private Double reservedTotal;
 	private Double withdrawalTotal;
-	private String comments;
-	private String createdByUsername;
-
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
-	private Date createdDate;
-
-
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	private Date lastDepositDate;
-
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	private Date lastWithdrawalDate;
 

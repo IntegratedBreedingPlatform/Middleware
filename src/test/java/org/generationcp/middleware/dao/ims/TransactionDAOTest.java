@@ -220,7 +220,8 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
 
-		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
+		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments",
+			"InventoryId");
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
 
 		final String sDate1 = "01/01/2015";

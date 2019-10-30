@@ -21,11 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class InventoryDetailsTestDataInitializer {
 
 	private static final int PERSON_ID = 1;
@@ -116,6 +111,8 @@ public class InventoryDetailsTestDataInitializer {
 		final List<Transaction> transactions = new ArrayList<Transaction>();
 
 		for (final Lot lot : lots) {
+			lot.setStockId(inventoryIdPrefix + lot.getId());
+
 			final Transaction transaction = new Transaction();
 			transaction.setUserId(USER_ID);
 			transaction.setPersonId(PERSON_ID);
@@ -125,7 +122,6 @@ public class InventoryDetailsTestDataInitializer {
 			transaction.setQuantity(Math.random() * lots.size());
 			transaction.setSourceType(LIST_SOURCE_TYPE);
 			transaction.setSourceRecordId(lotIdLrecIdMap.get(lot.getId()));
-			transaction.setInventoryID(inventoryIdPrefix + lot.getId());
 			transaction.setSourceId(listId);
 
 			transactions.add(transaction);
@@ -148,6 +144,8 @@ public class InventoryDetailsTestDataInitializer {
 		final List<Transaction> transactions = new ArrayList<Transaction>();
 
 		for (final Lot lot : lots) {
+			lot.setStockId(inventoryIdPrefix + lot.getId());
+
 			final Transaction transaction = new Transaction();
 			transaction.setUserId(USER_ID);
 			transaction.setPersonId(PERSON_ID);
@@ -157,7 +155,6 @@ public class InventoryDetailsTestDataInitializer {
 			transaction.setQuantity(new Double("-100"));
 			transaction.setSourceType(LIST_SOURCE_TYPE);
 			transaction.setSourceRecordId(lotIdLrecIdMap.get(lot.getId()));
-			transaction.setInventoryID(inventoryIdPrefix + lot.getId());
 			transaction.setSourceId(listId);
 
 			transactions.add(transaction);
@@ -272,7 +269,7 @@ public class InventoryDetailsTestDataInitializer {
 		transaction.setSourceId(sourceId);
 		transaction.setSourceRecordId(sourceRecordId);
 		transaction.setSourceType(sourceType);
-		transaction.setInventoryID(inventoryID);
+		lot.setStockId(inventoryID);
 
 		return  transaction;
 	}
@@ -280,8 +277,9 @@ public class InventoryDetailsTestDataInitializer {
 
 
 	public static Lot createLot(
-		final Integer userId, final String entityType, final Integer entityId, final Integer locationId, final Integer scaleId, final Integer status,
-			final Integer sourceId, final String comments) {
+		final Integer userId, final String entityType, final Integer entityId, final Integer locationId, final Integer scaleId,
+		final Integer status,
+		final Integer sourceId, final String comments, final String stockId) {
 		final Lot lot = new Lot();
 		lot.setUserId(userId);
 		lot.setEntityType(entityType);
@@ -291,6 +289,7 @@ public class InventoryDetailsTestDataInitializer {
 		lot.setStatus(status);
 		lot.setSource(sourceId);
 		lot.setComments(comments);
+		lot.setStockId(stockId);
 
 		return lot;
 	}
