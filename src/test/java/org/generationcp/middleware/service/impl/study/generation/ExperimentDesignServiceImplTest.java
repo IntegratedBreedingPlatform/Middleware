@@ -201,6 +201,43 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testSaveExperimentDesign_IterativeAndRegeneratePreviousInstance() {
+		// Save design - first 2 instances
+		this.experimentDesignService
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows((Arrays.asList(1, 2))));
+		final List<ObservationUnitRow> previousRows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		Assert.assertEquals(2 * NO_ENTRIES * NO_REPS * NO_TREATMENTS, previousRows.size());
+
+		// Save design - overwrite first instance
+		this.experimentDesignService
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(Arrays.asList(1, 3)));
+
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		Assert.assertNotNull(rows);
+
+		// Verify saving of variables
+		this.verifyEnvironmentVariablesWereSaved();
+		this.verifyPlotVariablesWereSaved();
+		this.verifyGeolocationPropRecords(true, Arrays.asList(1, 2, 3));
+
+		// Check that plot experiments are created per instance
+		Assert.assertEquals(NO_INSTANCES * NO_ENTRIES * NO_REPS * NO_TREATMENTS, rows.size());
+		final Map<Integer, List<ObservationUnitRow>> instancesRowMap = new HashMap<>();
+		for (final ObservationUnitRow row : rows) {
+			final Integer trialInstance = row.getTrialInstance();
+			if (instancesRowMap.get(trialInstance) == null) {
+				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+			}
+			instancesRowMap.get(trialInstance).add(row);
+		}
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(1).size());
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(2).size());
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(3).size());
+
+		verifyObservationUnitRowValues(instancesRowMap);
+	}
+
+	@Test
 	public void testSaveExperimentDesign_SubsetOfInstances() {
 		final List<Integer> instanceNumbers = Arrays.asList(1, 3);
 		final Map<Integer, List<ObservationUnitRow>> instanceRowsMap = this.createObservationUnitRows(instanceNumbers);

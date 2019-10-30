@@ -8,7 +8,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.Stock;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -68,10 +67,16 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 			Preconditions.checkState(!CollectionUtils.isEmpty(instanceRowsMap.get(instance)));
 		}
 
+		// Delete previous experiments from the specified instances (if any)
+		final List<Integer> instanceNumbers = Lists.newArrayList(instanceRowsMap.keySet());
 		final Integer plotDatasetId = this.getPlotDatasetId(studyId);
+		final Integer environmentDatasetId = getEnvironmentDatasetId(studyId);
+		this.deleteTrialInstanceExperiments(plotDatasetId, environmentDatasetId, instanceNumbers);
+
+		// Save variables at trial and plot dataset level
 		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao()
-			.getEnvironmentGeolocationsForInstances(studyId, Lists.newArrayList(instanceRowsMap.keySet()));
-		this.saveVariables(studyId, variables, plotDatasetId, geolocations);
+			.getEnvironmentGeolocationsForInstances(studyId, instanceNumbers);
+		this.saveVariables(variables, plotDatasetId, environmentDatasetId, geolocations);
 
 		// Save experiments and stocks (if applicable) in plot dataset
 		this.saveObservationUnitRows(crop, plotDatasetId, variables, instanceRowsMap, geolocations);
@@ -89,13 +94,12 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		return Optional.absent();
 	}
 
-	private void saveVariables(final int studyId, final List<MeasurementVariable> variables, final Integer plotDatasetId, final List<Geolocation> geolocations) {
+	private void saveVariables(final List<MeasurementVariable> variables, final Integer plotDatasetId, final Integer environmentDatasetId,  final List<Geolocation> geolocations) {
 		int plotDatasetNextRank = this.daoFactory.getProjectPropertyDAO().getNextRank(plotDatasetId);
 		final List<Integer> plotVariableIds = this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(plotDatasetId);
 
-		final Integer envDatasetId = this.getEnvironmentDatasetId(studyId);
-		int envDatasetNextRank = this.daoFactory.getProjectPropertyDAO().getNextRank(envDatasetId);
-		final List<Integer> envVariableIds = this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(envDatasetId);
+		int envDatasetNextRank = this.daoFactory.getProjectPropertyDAO().getNextRank(environmentDatasetId);
+		final List<Integer> envVariableIds = this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(environmentDatasetId);
 		// Save project variables in environment and plot datasets
 		for (final MeasurementVariable variable : variables) {
 			final int variableId = variable.getTermId();
@@ -107,7 +111,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 				Integer projectId = plotDatasetId;
 				Integer variableTypeId = variableType.getId();
 				if (isEnvironmentVariable) {
-					projectId = envDatasetId;
+					projectId = environmentDatasetId;
 					rank = envDatasetNextRank++;
 
 				} else {
@@ -215,13 +219,19 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		return Optional.absent();
 	}
 
+	private void deleteTrialInstanceExperiments(final Integer plotDatasetId, final Integer environmentDatasetId, final List<Integer> instanceNumbers) {
+		this.daoFactory.getExperimentDao().deleteExperimentsForDatasetInstances(plotDatasetId, instanceNumbers);
+		this.daoFactory.getGeolocationPropertyDao().deletePropertiesInDatasetInstances(environmentDatasetId, instanceNumbers, ExperimentDesignServiceImpl.EXPERIMENTAL_DESIGN_VARIABLES);
+	}
+
+
 	@Override
 	public void deleteStudyExperimentDesign(final int studyId) {
 		// Delete environment variables related to experiment design
 		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO()
 			.deleteProjectVariables(environmentDatasetId, ExperimentDesignServiceImpl.EXPERIMENTAL_DESIGN_VARIABLES);
-		this.daoFactory.getGeolocationPropertyDao().deleteGeolocationPropertiesInProject(environmentDatasetId, ExperimentDesignServiceImpl.EXPERIMENTAL_DESIGN_VARIABLES);
+		this.daoFactory.getGeolocationPropertyDao().deletePropertiesInDataset(environmentDatasetId, ExperimentDesignServiceImpl.EXPERIMENTAL_DESIGN_VARIABLES);
 
 		// Delete variables related to experiment design and experiments of plot dataset
 		final Integer plotDatasetId = this.getPlotDatasetId(studyId);
