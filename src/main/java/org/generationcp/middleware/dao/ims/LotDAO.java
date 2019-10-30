@@ -435,7 +435,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.setParameterList("gids", gids);
 			query.setParameter("listId", listId);
 			List<Integer> statusList = Lists.newArrayList();
-			statusList.add(0);
+			statusList.add(TransactionStatus.ANTICIPATED.getIntValue());
 			query.setParameterList("statusList", statusList);
 			query.setParameter("includeCloseLots", 0);
 
@@ -590,7 +590,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				if (recordId != null && qty != null && transactionState != null) {
 					Double prevValue = null;
 					Double prevTotal = null;
-					if(TransactionStatus.ANTICIPATED.getIntValue() == transactionState && qty < 0.0) {
+					if(TransactionStatus.ANTICIPATED.getIntValue() == transactionState && (qty * -1) < 0.0) {
 						prevValue = reservationMap.get(recordId);
 						prevTotal = prevValue == null ? 0d : prevValue;
 
