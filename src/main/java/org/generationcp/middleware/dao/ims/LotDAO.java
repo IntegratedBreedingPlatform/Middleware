@@ -673,7 +673,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "       LEFT JOIN location l on l.locid = lot.locid " //
 		+ "       LEFT join cvterm scale on scale.cvterm_id = lot.scaleid " //
 		+ "       INNER JOIN workbench.users users on users.userid = lot.userid " //
-		+ "WHERE lot.etype = 'GERMPLSM' "; //
+		+ "WHERE 1=1 "; //
 
 	private String buildSearchLotsQuery(final LotsSearchDto lotsSearchDto) {
 		final StringBuilder query = new StringBuilder(SEARCH_LOT_QUERY);
@@ -683,11 +683,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 
 			if (lotsSearchDto.getGids() != null && !lotsSearchDto.getGids().isEmpty()) {
-				query.append("and lot.eid IN (").append(Joiner.on(",").join(lotsSearchDto.getGids())).append(") ");
+				query.append("and lot.eid IN (").append(Joiner.on(",").join(lotsSearchDto.getGids())).append(") and lot.etype = 'GERMPLSM' ");
 			}
 
 			if (lotsSearchDto.getMgids() != null && !lotsSearchDto.getMgids().isEmpty()) {
-				query.append("and g.mgid IN (").append(Joiner.on(",").join(lotsSearchDto.getMgids())).append(") ");
+				query.append("and g.mgid IN (").append(Joiner.on(",").join(lotsSearchDto.getMgids())).append(") and lot.etype = 'GERMPLSM' ");
 			}
 
 			if (lotsSearchDto.getLocationIds() != null && !lotsSearchDto.getLocationIds().isEmpty()) {
@@ -699,7 +699,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 
 			if (lotsSearchDto.getDesignation()!=null) {
-				query.append("and n.nval = '").append(lotsSearchDto.getDesignation()).append("' ");
+				query.append("and n.nval like '%").append(lotsSearchDto.getDesignation()).append("%' ");
 			}
 
 			if (lotsSearchDto.getStatus() != null) {
@@ -708,6 +708,10 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 			if (lotsSearchDto.getCommentContainsString() != null) {
 				query.append(" and lot.comments like '%").append(lotsSearchDto.getCommentContainsString()).append("%' ");
+			}
+
+			if (lotsSearchDto.getLocationNameContainsString() != null) {
+				query.append(" and l.lname like '%").append(lotsSearchDto.getLocationNameContainsString()).append("%' ");
 			}
 
 			if(lotsSearchDto.getCreatedDateFrom() != null) {
@@ -722,6 +726,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				query.append(" and users.uname like '%").append(lotsSearchDto.getCreatedByUsername()).append("%'" );
 			}
 
+			if(lotsSearchDto.getGermplasmListIds() != null && !lotsSearchDto.getGermplasmListIds().isEmpty()) {
+				query.append(" and lot.eid in (select distinct (gid) from listdata where listid in (").append(Joiner.on(",").join(lotsSearchDto.getGermplasmListIds())).
+						append(")) and lot.etype = 'GERMPLSM' ");
+			}
+
 		}
 		query.append(" GROUP BY lot.lotid ");
 
@@ -730,8 +739,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.append(" having 1=1 ");
 
 			if (lotsSearchDto.getStockId() != null) {
-				query.append("and GROUP_CONCAT(transaction.inventory_id SEPARATOR ', ') = '").append(lotsSearchDto.getStockId())
-						.append("' ");
+				query.append("and GROUP_CONCAT(transaction.inventory_id SEPARATOR ', ') like '").append(lotsSearchDto.getStockId())
+						.append("%' ");
 			}
 
 			if (lotsSearchDto.getMinActualBalance() != null) {

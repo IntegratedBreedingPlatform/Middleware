@@ -14,6 +14,10 @@ public class ObservationUnitRow {
 
 	private String designation;
 
+	private Integer trialInstance;
+
+	private Integer entryNumber;
+
 	private String action;
 
 	private Map<String, ObservationUnitData> variables;
@@ -92,6 +96,22 @@ public class ObservationUnitRow {
 
 	public void setSamplesCount(final String samplesCount) {
 		this.samplesCount = samplesCount;
+	}
+
+	public Integer getTrialInstance() {
+		return trialInstance;
+	}
+
+	public void setTrialInstance(final Integer trialInstance) {
+		this.trialInstance = trialInstance;
+	}
+
+	public Integer getEntryNumber() {
+		return entryNumber;
+	}
+
+	public void setEntryNumber(final Integer entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	@Override

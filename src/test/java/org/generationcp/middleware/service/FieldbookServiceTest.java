@@ -97,7 +97,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 			this.locationManager);
 
 		this.studyReference = this.studyTDI.addTestStudy();
-		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), "1", String.valueOf(TermId.SEASON_DRY.getId()));
+		this.studyTDI.createEnvironmentDataset(this.crop, this.studyReference.getId(), "1", String.valueOf(TermId.SEASON_DRY.getId()));
 		this.studyTDI.addTestDataset(this.studyReference.getId(), DatasetTypeEnum.PLOT_DATA.getId());
 		this.fieldbookService.setStudyDataManager(this.studyDataManager);
 		this.fieldbookService.setDataSetBuilder(this.dataSetBuilder);

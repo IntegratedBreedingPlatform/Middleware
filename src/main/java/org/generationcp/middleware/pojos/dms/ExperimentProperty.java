@@ -11,7 +11,9 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import java.io.Serializable;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -23,9 +25,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import java.io.Serializable;
 
 /**
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experimentprop
@@ -66,9 +66,17 @@ public class ExperimentProperty implements Serializable {
 	public ExperimentProperty() {
 	}
 
+	public ExperimentProperty (final ExperimentModel experimentModel,
+		final MeasurementVariable measurementVariable, final String value, final Integer rank) {
+		this.experiment = experimentModel;
+		this.typeId = measurementVariable.getTermId();
+		this.value = value;
+		this.rank = rank;
+	}
+
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append("ExperimentProperties [nd_experimentprop_id=" + this.ndExperimentpropId);
 		sb.append(", type_id=" + this.typeId);
 		sb.append(", value=" + this.value);
@@ -88,7 +96,7 @@ public class ExperimentProperty implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -99,7 +107,7 @@ public class ExperimentProperty implements Serializable {
 			return false;
 		}
 
-		ExperimentProperty other = (ExperimentProperty) obj;
+		final ExperimentProperty other = (ExperimentProperty) obj;
 		if (this.ndExperimentpropId == null) {
 			if (other.ndExperimentpropId != null) {
 				return false;
@@ -115,7 +123,7 @@ public class ExperimentProperty implements Serializable {
 		return this.ndExperimentpropId;
 	}
 
-	public void setNdExperimentpropId(Integer ndExperimentpropId) {
+	public void setNdExperimentpropId(final Integer ndExperimentpropId) {
 		this.ndExperimentpropId = ndExperimentpropId;
 	}
 
@@ -123,7 +131,7 @@ public class ExperimentProperty implements Serializable {
 		return this.typeId;
 	}
 
-	public void setTypeId(Integer typeId) {
+	public void setTypeId(final Integer typeId) {
 		this.typeId = typeId;
 	}
 
@@ -131,7 +139,7 @@ public class ExperimentProperty implements Serializable {
 		return this.value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 
@@ -139,7 +147,7 @@ public class ExperimentProperty implements Serializable {
 		return this.rank;
 	}
 
-	public void setRank(Integer rank) {
+	public void setRank(final Integer rank) {
 		this.rank = rank;
 	}
 
@@ -147,7 +155,7 @@ public class ExperimentProperty implements Serializable {
 		return this.experiment;
 	}
 
-	public void setExperiment(ExperimentModel experiment) {
+	public void setExperiment(final ExperimentModel experiment) {
 		this.experiment = experiment;
 	}
 

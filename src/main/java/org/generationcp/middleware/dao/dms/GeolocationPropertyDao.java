@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.hibernate.Criteria;
@@ -53,22 +54,6 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-	public String getGeolocationPropValue(final int stdVarId, final int studyId) {
-		try {
-			final StringBuilder sql =
-				new StringBuilder().append("SELECT value ").append("FROM nd_experiment e ")
-					.append("INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id ")
-					.append("WHERE e.project_id = :projectId AND gp.type_id = :stdVarId ORDER BY e.nd_geolocation_id ");
-			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-			query.setParameter("projectId", studyId);
-			query.setParameter("stdVarId", stdVarId);
-			return (String) query.uniqueResult();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error at getGeolocationPropValue=" + stdVarId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	public String getValueOfTrialInstance(final int datasetId, final int typeId, final String trialInstance) {
 		try {
@@ -88,33 +73,35 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-	public void deleteGeolocationPropertyValueInProject(final int studyId, final int termId) {
+	public void deleteGeolocationPropertiesInProject(final int projectId, final List<Integer> variableIds) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
 
-			this.deleteValues(studyId, termId);
+			this.deleteValues(projectId, variableIds);
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at deleteGeolocationPropertyValueInProject=" + studyId + ", " + termId
+			throw new MiddlewareQueryException("Error at deleteGeolocationPropertiesInProject=" + projectId + ", " + variableIds
 				+ " query on GeolocationPropertyDao: " + e.getMessage(), e);
 		}
 	}
 
-	private void deleteValues(final int studyId,final int termId) {
+	private void deleteValues(final int projectId, final List<Integer> variableIds) {
 		final StringBuilder sql1 = new StringBuilder().append("Delete ngp.* FROM nd_geolocationprop ngp "
-				+ "INNER JOIN nd_experiment e ON ngp.nd_geolocation_id = e.nd_geolocation_id AND ngp.type_id = :termId "
+				+ "INNER JOIN nd_experiment e ON ngp.nd_geolocation_id = e.nd_geolocation_id AND ngp.type_id IN (:variableIds) "
 				+ "INNER JOIN project p ON p.project_id = e.project_id "
-				+ "WHERE (p.study_id = :studyId OR p.project_id = :studyId)");
+				+ "WHERE (p.study_id = :projectId OR p.project_id = :projectId)");
 
 		final SQLQuery sqlQuery1 = this.getSession().createSQLQuery(sql1.toString());
-		sqlQuery1.setParameter("studyId", studyId);
-		sqlQuery1.setParameter("termId", termId);
+		sqlQuery1.setParameter("projectId", projectId);
+		sqlQuery1.setParameterList("variableIds", variableIds);
 
 		sqlQuery1.executeUpdate();
 	}
+
+
 
 	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer geolocationId) {
 		Preconditions.checkNotNull(geolocationId);
@@ -189,5 +176,11 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			geoProperties.put(variableId, value);
 		}
 		return geoProperties;
+	}
+
+	public List<GeolocationProperty> getByGeolocation(final Integer geolocationId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("geolocation.locationId", geolocationId));
+		return criteria.list();
 	}
 }

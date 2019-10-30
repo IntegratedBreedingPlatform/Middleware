@@ -8,6 +8,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -111,9 +112,13 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 		final ObservationUnitRow observationUnitRow = measurementRows.get(0);
 
-		assertEquals(plantExperimentModels.get(0).getStock().getName(), observationUnitRow.getDesignation());
-		assertNotNull(observationUnitRow.getGid());
+		final StockModel stock = plantExperimentModels.get(0).getStock();
+		assertEquals(stock.getName(), observationUnitRow.getDesignation());
+		assertEquals(stock.getGermplasm().getGid(), observationUnitRow.getGid());
 		assertEquals("-", observationUnitRow.getSamplesCount());
+		assertEquals(1, observationUnitRow.getEntryNumber().intValue());
+		assertEquals(1, observationUnitRow.getTrialInstance().intValue());
+
 		assertNotNull(observationUnitRow.getObsUnitId());
 
 		final Map<String, ObservationUnitData> dataMap = observationUnitRow.getVariables();
@@ -129,7 +134,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		assertNull(dataMap.get(ObservationUnitsSearchDao.ENTRY_TYPE).getValue());
 		assertNull(dataMap.get(ObservationUnitsSearchDao.EXPT_DESIGN).getValue());
 		assertEquals("1", dataMap.get(ObservationUnitsSearchDao.ENTRY_NO).getValue());
-		assertEquals(plantExperimentModels.get(0).getStock().getName(), dataMap.get(ObservationUnitsSearchDao.DESIGNATION).getValue());
+		assertEquals(stock.getName(), dataMap.get(ObservationUnitsSearchDao.DESIGNATION).getValue());
 		assertEquals("1", dataMap.get(ObservationUnitsSearchDao.TRIAL_INSTANCE).getValue());
 		assertNull(dataMap.get(ObservationUnitsSearchDao.ENTRY_CODE).getValue());
 		assertNull(dataMap.get(ObservationUnitsSearchDao.BLOCK_NO).getValue());

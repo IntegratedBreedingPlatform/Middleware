@@ -1065,6 +1065,11 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public List<MeasurementVariable> getDatasetMeasurementVariablesByVariableType(final Integer datasetId, final List<Integer> variableTypes) {
+		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, variableTypes);
+	}
+
+	@Override
 	public Map<Integer, List<ObservationUnitRow>> getInstanceIdToObservationUnitRowsMap(
 		final int studyId, final int datasetId,
 		final List<Integer> instanceIds) {
