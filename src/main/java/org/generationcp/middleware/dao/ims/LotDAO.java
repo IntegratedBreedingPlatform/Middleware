@@ -590,7 +590,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				if (recordId != null && qty != null && transactionState != null) {
 					Double prevValue = null;
 					Double prevTotal = null;
-					if(TransactionStatus.RESERVED.getIntValue() == transactionState) {
+					if(TransactionStatus.ANTICIPATED.getIntValue() == transactionState && qty < 0.0) {
 						prevValue = reservationMap.get(recordId);
 						prevTotal = prevValue == null ? 0d : prevValue;
 

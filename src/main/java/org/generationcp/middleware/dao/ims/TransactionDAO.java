@@ -487,7 +487,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final List<TransactionReportRow> transactions = new ArrayList<>();
 		try {
 			final String sql = "SELECT i.userid,i.lotid,i.trndate,i.trnstat,i.trnqty,i.sourceid,l.listname, i.comments,"
-					+ "(CASE WHEN i.comments in ('Lot closed', 'Discard') THEN i.comments WHEN trnstat = 0 AND trnqty > 0 THEN 'Deposit' "
+					+ "(CASE WHEN trnstat = 1 AND trnqty > 0 THEN 'Deposit' "
 					+ "WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation' WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal' END) as trntype, "
 					+ "lot.created_date "
 					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
