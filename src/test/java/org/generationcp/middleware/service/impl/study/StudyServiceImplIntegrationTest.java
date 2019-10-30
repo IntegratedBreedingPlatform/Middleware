@@ -3,11 +3,14 @@ package org.generationcp.middleware.service.impl.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
@@ -21,6 +24,7 @@ import java.util.List;
 public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private DmsProjectDao dmsProjectDao;
+	private GeolocationPropertyDao geolocPropertyDao;
 	private StudyService studyService;
 	private IntegrationTestDataInitializer testDataInitializer;
 	private DmsProject study;
@@ -32,6 +36,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		this.geolocPropertyDao = new GeolocationPropertyDao();
+		this.geolocPropertyDao.setSession(this.sessionProvder.getSession());
 		this.studyService = new StudyServiceImpl(this.sessionProvder);
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
@@ -87,6 +93,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Geolocation instance1 = this.testDataInitializer.createTestGeolocation("1", 1);
 		final Geolocation instance2 = this.testDataInitializer.createTestGeolocation("2", 2);
+		this.saveGeolocationProperty(instance1, ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		this.saveGeolocationProperty(instance2, RandomStringUtils.random(5), TermId.BLOCK_ID.getId());
 
 		this.testDataInitializer.createTestExperiment(someSummary, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
 		this.testDataInitializer.createTestExperiment(someSummary, instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
@@ -103,6 +111,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("AFG", studyInstance1.getLocationAbbreviation());
 		Assert.assertEquals("Afghanistan", studyInstance1.getLocationName());
 		Assert.assertFalse(studyInstance1.isHasFieldmap());
+		Assert.assertTrue(studyInstance1.isHasExperimentalDesign());
 
 		final StudyInstance studyInstance2 = studyInstances.get(1);
 
@@ -111,8 +120,14 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertNull(studyInstance2.getCustomLocationAbbreviation());
 		Assert.assertEquals("ALB", studyInstance2.getLocationAbbreviation());
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
-		Assert.assertFalse(studyInstance2.isHasFieldmap());
+		Assert.assertTrue(studyInstance2.isHasFieldmap());
+		Assert.assertFalse(studyInstance2.isHasExperimentalDesign());
 
+	}
+
+	private void saveGeolocationProperty(final Geolocation geolocation, final String value, final Integer variableId) {
+		final GeolocationProperty geolocationProperty = new GeolocationProperty(geolocation, value, 1, variableId);
+		this.geolocPropertyDao.save(geolocationProperty);
 	}
 
 }

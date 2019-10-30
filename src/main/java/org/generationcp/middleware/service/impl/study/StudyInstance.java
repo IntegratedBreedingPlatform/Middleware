@@ -15,6 +15,7 @@ public class StudyInstance {
 	private String customLocationAbbreviation;
 	private int instanceNumber;
 	private boolean hasFieldmap;
+	private boolean hasExperimentalDesign;
 
 	public StudyInstance() {
 
@@ -85,6 +86,14 @@ public class StudyInstance {
 
 	public void setHasFieldmap(boolean hasFieldmap) {
 		this.hasFieldmap = hasFieldmap;
+	}
+
+	public boolean isHasExperimentalDesign() {
+		return hasExperimentalDesign;
+	}
+
+	public void setHasExperimentalDesign(final boolean hasExperimentalDesign) {
+		this.hasExperimentalDesign = hasExperimentalDesign;
 	}
 
 	@Override

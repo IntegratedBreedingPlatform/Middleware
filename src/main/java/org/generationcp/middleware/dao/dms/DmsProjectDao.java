@@ -1142,6 +1142,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
 				"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n" +
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
+				"	max(if(geoprop.type_id = 8135, geoprop.value, null)) as EXP_DESIGN, \n" +
+				// 8135 = cvterm for EXP_DESIGN
 				"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
 				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 				+ "    inner join project proj on proj.project_id = nde.project_id \n"
@@ -1158,6 +1160,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("LOCATION_ABBR", new StringType());
 			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
 			query.addScalar("FIELDMAP_BLOCK", new StringType());
+			query.addScalar("EXP_DESIGN", new StringType());
 			query.addScalar("INSTANCE_NUMBER", new IntegerType());
 
 			final List queryResults = query.list();
@@ -1165,8 +1168,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			for (final Object result : queryResults) {
 				final Object[] row = (Object[]) result;
 				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[5]);
+				final boolean hasExperimentalDesign = !StringUtils.isEmpty((String) row[6]);
 				final StudyInstance instance =
-					new StudyInstance((Integer) row[0], (Integer) row[1] ,(String) row[2], (String) row[3], (Integer) row[6], (String) row[4], hasFieldmap);
+					new StudyInstance((Integer) row[0], (Integer) row[1] ,(String) row[2], (String) row[3], (Integer) row[7], (String) row[4], hasFieldmap);
+				instance.setHasExperimentalDesign(hasExperimentalDesign);
 				instances.add(instance);
 			}
 			return instances;
