@@ -123,7 +123,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertFalse(studyInstance1.isHasFieldmap());
 		Assert.assertTrue(studyInstance1.isHasExperimentalDesign());
 		// Design re-generation not allowed because instance has subobservation
- 		Assert.assertFalse(studyInstance1.isDesignReGenerationAllowed());
+ 		Assert.assertFalse(studyInstance1.isDesignRegenerationAllowed());
 		Assert.assertTrue(studyInstance1.isHasMeasurements());
 
 		final StudyInstance studyInstance2 = studyInstances.get(1);
@@ -135,7 +135,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertFalse(studyInstance2.isHasExperimentalDesign());
 		// Design re-generation not allowed because instance has fieldmap
-		Assert.assertFalse(studyInstance2.isDesignReGenerationAllowed());
+		Assert.assertFalse(studyInstance2.isDesignRegenerationAllowed());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 	}
 
