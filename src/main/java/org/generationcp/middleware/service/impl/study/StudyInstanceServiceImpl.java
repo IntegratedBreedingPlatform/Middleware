@@ -39,7 +39,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	public void createStudyInstance(final CropType crop, final Integer datasetId, final String instanceNumber) {
 
 		// Get the existing environment dataset variables.
-		// Since we are creating a new study instance, the values of these variables will be blank.
+		// Since we are creating a new study instance, the values of these variables are just blank.
 		final List<MeasurementVariable> measurementVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId,
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
 
@@ -55,7 +55,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Override
 	public void removeStudyInstance(final CropType crop, final Integer datasetId, final String instanceNumber) {
-
+		// TODO: To be implemented in IBP-3160
 	}
 
 	protected Geolocation createGeolocation(final List<MeasurementVariable> measurementVariables, final String instanceNumber) {
