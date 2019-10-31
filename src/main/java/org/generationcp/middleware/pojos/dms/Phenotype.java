@@ -141,6 +141,12 @@ public class Phenotype implements Serializable {
 		this.draftValue = draftValue;
 	}
 
+	public Phenotype(final Integer observableId, final String value, final ExperimentModel experiment) {
+		this.observableId = observableId;
+		this.value = value;
+		this.experiment = experiment;
+	}
+
 	public Integer getPhenotypeId() {
 		return this.phenotypeId;
 	}

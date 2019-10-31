@@ -16,6 +16,7 @@ public class StudyInstance {
 	private int instanceNumber;
 	private boolean hasFieldmap;
 	private boolean hasExperimentalDesign;
+	private boolean hasMeasurements;
 	private boolean isDesignReGenerationAllowed;
 
 	public StudyInstance() {
@@ -95,6 +96,14 @@ public class StudyInstance {
 
 	public void setHasExperimentalDesign(final boolean hasExperimentalDesign) {
 		this.hasExperimentalDesign = hasExperimentalDesign;
+	}
+
+	public boolean isHasMeasurements() {
+		return hasMeasurements;
+	}
+
+	public void setHasMeasurements(final boolean hasMeasurements) {
+		this.hasMeasurements = hasMeasurements;
 	}
 
 	public boolean isDesignReGenerationAllowed() {

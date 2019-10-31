@@ -1151,7 +1151,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "	 (select 1 from nd_experiment exp "
 				+ "   INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 "
 				+ "   INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as HAS_SUBOBS "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as HAS_SUBOBS, "
+				+ "  (select 1 from phenotype ph "
+				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
+				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) as HAS_MEASUREMENTS "
 				+ "    from	nd_geolocation geoloc \n"
 				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 				+ "    inner join project proj on proj.project_id = nde.project_id \n"
@@ -1172,6 +1176,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("EXP_DESIGN", new StringType());
 			query.addScalar("HAS_SAMPLE", new IntegerType());
 			query.addScalar("HAS_SUBOBS", new IntegerType());
+			query.addScalar("HAS_MEASUREMENTS", new IntegerType());
 
 			final List queryResults = query.list();
 			final List<StudyInstance> instances = new ArrayList<>();
@@ -1181,10 +1186,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				final boolean hasExperimentalDesign = !StringUtils.isEmpty((String) row[7]);
 				final boolean hasSample = ((Integer) row[8]) != null;
 				final boolean hasSubobservations = ((Integer) row[9]) != null;
+				final boolean hasMeasurements = ((Integer) row[10]) != null;
 
 				final StudyInstance instance =
 					new StudyInstance((Integer) row[0], (Integer) row[2] ,(String) row[3], (String) row[4], (Integer) row[1], (String) row[5], hasFieldmap);
 				instance.setHasExperimentalDesign(hasExperimentalDesign);
+				instance.setHasMeasurements(hasMeasurements);
 				instance.setDesignReGenerationAllowed(!hasFieldmap && !hasSample && !hasSubobservations);
 				instances.add(instance);
 			}

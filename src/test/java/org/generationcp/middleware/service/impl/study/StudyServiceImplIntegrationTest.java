@@ -3,14 +3,12 @@ package org.generationcp.middleware.service.impl.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
@@ -19,12 +17,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private DmsProjectDao dmsProjectDao;
-	private GeolocationPropertyDao geolocPropertyDao;
 	private StudyService studyService;
 	private IntegrationTestDataInitializer testDataInitializer;
 	private DmsProject study;
@@ -36,8 +34,6 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
-		this.geolocPropertyDao = new GeolocationPropertyDao();
-		this.geolocPropertyDao.setSession(this.sessionProvder.getSession());
 		this.studyService = new StudyServiceImpl(this.sessionProvder);
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
@@ -85,26 +81,40 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyInstances() {
 
-		final DmsProject someStudy =
+		final DmsProject study =
 			this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
-		final DmsProject someSummary =
+		final DmsProject environmentDataset =
 			this.testDataInitializer
-				.createDmsProject("Summary Dataset", "Summary Dataset-Description", someStudy, someStudy, DatasetTypeEnum.SUMMARY_DATA);
+				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
+		final DmsProject plotDataset =
+			this.testDataInitializer
+				.createDmsProject("Plot Dataset", "Plot Dataset-Description", study, study, DatasetTypeEnum.PLOT_DATA);
+		final DmsProject subObsDataset =
+			this.testDataInitializer
+				.createDmsProject("Plot Dataset", "Plot Dataset-Description", study, plotDataset, DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS);
+
 
 		final Geolocation instance1 = this.testDataInitializer.createTestGeolocation("1", 1);
 		final Geolocation instance2 = this.testDataInitializer.createTestGeolocation("2", 2);
-		this.saveGeolocationProperty(instance1, ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), TermId.EXPERIMENT_DESIGN_FACTOR.getId());
-		this.saveGeolocationProperty(instance2, RandomStringUtils.randomAlphabetic(5), TermId.BLOCK_ID.getId());
+		this.testDataInitializer.addGeolocationProp(instance1,  TermId.EXPERIMENT_DESIGN_FACTOR.getId(),  ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), 1);
+		this.testDataInitializer.addGeolocationProp(instance2,  TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5), 1);
 
-		this.testDataInitializer.createTestExperiment(someSummary, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
-		this.testDataInitializer.createTestExperiment(someSummary, instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		this.testDataInitializer.createTestExperiment(environmentDataset, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		final ExperimentModel instance1PlotExperiment =
+			this.testDataInitializer.createTestExperiment(plotDataset, instance1, TermId.PLOT_EXPERIMENT.getId(), "1", null);
+		final ExperimentModel instance1SubObsExperiment =
+			this.testDataInitializer.createTestExperiment(subObsDataset, instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
+		this.savePhenotype(instance1SubObsExperiment);
 
-		final List<StudyInstance> studyInstances = this.studyService.getStudyInstances(someStudy.getProjectId());
+		this.testDataInitializer.createTestExperiment(environmentDataset, instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		final ExperimentModel instance2PlotExperiment =
+			this.testDataInitializer.createTestExperiment(plotDataset, instance2, TermId.PLOT_EXPERIMENT.getId(), "1", null);
+
+		final List<StudyInstance> studyInstances = this.studyService.getStudyInstances(study.getProjectId());
 
 		Assert.assertEquals(2, studyInstances.size());
 
 		final StudyInstance studyInstance1 = studyInstances.get(0);
-
 		Assert.assertEquals(instance1.getLocationId().intValue(), studyInstance1.getInstanceDbId());
 		Assert.assertEquals(1, studyInstance1.getInstanceNumber());
 		Assert.assertNull(studyInstance1.getCustomLocationAbbreviation());
@@ -112,11 +122,11 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Afghanistan", studyInstance1.getLocationName());
 		Assert.assertFalse(studyInstance1.isHasFieldmap());
 		Assert.assertTrue(studyInstance1.isHasExperimentalDesign());
-		// Design re-generation not allowed because instance has fieldmap
-		Assert.assertTrue(studyInstance1.isDesignReGenerationAllowed());
+		// Design re-generation not allowed because instance has subobservation
+ 		Assert.assertFalse(studyInstance1.isDesignReGenerationAllowed());
+		Assert.assertTrue(studyInstance1.isHasMeasurements());
 
 		final StudyInstance studyInstance2 = studyInstances.get(1);
-
 		Assert.assertEquals(instance2.getLocationId().intValue(), studyInstance2.getInstanceDbId());
 		Assert.assertEquals(2, studyInstance2.getInstanceNumber());
 		Assert.assertNull(studyInstance2.getCustomLocationAbbreviation());
@@ -124,12 +134,16 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertFalse(studyInstance2.isHasExperimentalDesign());
+		// Design re-generation not allowed because instance has fieldmap
 		Assert.assertFalse(studyInstance2.isDesignReGenerationAllowed());
+		Assert.assertFalse(studyInstance2.isHasMeasurements());
 	}
 
-	private void saveGeolocationProperty(final Geolocation geolocation, final String value, final Integer variableId) {
-		final GeolocationProperty geolocationProperty = new GeolocationProperty(geolocation, value, 1, variableId);
-		this.geolocPropertyDao.save(geolocationProperty);
+	private void savePhenotype(final ExperimentModel experiment){
+		final CVTerm trait1 = this.testDataInitializer.createTrait(RandomStringUtils.randomAlphabetic(10));
+		this.testDataInitializer.addPhenotypes(Collections.singletonList(experiment), trait1.getCvTermId(), "100");
 	}
+
+
 
 }
