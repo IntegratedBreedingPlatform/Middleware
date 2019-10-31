@@ -11,9 +11,11 @@ public interface StudyService {
 
 	List<StudySummary> search(final StudySearchParameters serchParameters);
 
-	public boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId);
+	boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId);
 
-	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
+	boolean hasAdvancedOrCrossesList(final int studyId);
+
+	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
 
 	List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize,
 			final String sortBy, final String sortOrder);

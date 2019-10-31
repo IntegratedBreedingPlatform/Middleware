@@ -229,6 +229,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
+	public boolean hasAdvancedOrCrossesList(final int studyId) {
+		return this.daoFactory.getGermplasmListDAO().hasAdvancedOrCrossesList(studyId);
+	}
+
+	@Override
 	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
 		try {
 			final SQLQuery query = this.getCurrentSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT

@@ -4,6 +4,7 @@ package org.generationcp.middleware.service.impl.study;
 import com.beust.jcommander.internal.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
+import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -161,6 +162,15 @@ public class StudyServiceImplTest {
 		assertThat(false,is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
 	}
 
+	@Test
+	public void testHasAdvancedOrCrossesList() {
+		final GermplasmListDAO listDao = Mockito.mock(GermplasmListDAO.class);
+		Mockito.doReturn(listDao).when(this.daoFactory).getGermplasmListDAO();
+		final int studyId = new Random().nextInt();
+		this.studyServiceImpl.hasAdvancedOrCrossesList(studyId);
+		Mockito.verify(listDao).hasAdvancedOrCrossesList(studyId);
+	}
+
 	/**
 	 * Run the StudyServiceImpl(HibernateSessionProvider) constructor test.
 	 *
@@ -233,31 +243,41 @@ public class StudyServiceImplTest {
 	@Test
 	public void testGetStudyInstances() {
 
-		final Object[] testDBRow = {12345, 455, "Gujarat, India", "GUJ", "", "1", 1};
-		final Object[] testDBRow2 = {1, 213, "Afghanistan", "AFG", "Afghanz", "", 2};
-		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow, testDBRow2);
-		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int environmentDatasetId = random.nextInt();
+		Mockito.doReturn(Collections.singletonList(new DmsProject(environmentDatasetId))).when(this.dmsProjectDao)
+			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 
-		final List<StudyInstance> studyInstances = this.studyServiceImpl.getStudyInstances(123);
+		final StudyInstance instance1 = new StudyInstance(random.nextInt(), random.nextInt(), RandomStringUtils.randomAlphabetic(10),
+			RandomStringUtils.randomAlphabetic(10),
+			1, RandomStringUtils.randomAlphabetic(10), true);
+		final StudyInstance instance2 = new StudyInstance(random.nextInt(), random.nextInt(), RandomStringUtils.randomAlphabetic(10),
+			RandomStringUtils.randomAlphabetic(10),
+			2, RandomStringUtils.randomAlphabetic(10), false);
+		Mockito.doReturn(Arrays.asList(instance1, instance2)).when(this.dmsProjectDao).getDatasetInstances(environmentDatasetId);
+
+		final List<StudyInstance> studyInstances = this.studyServiceImpl.getStudyInstances(studyId);
 
 		Assert.assertEquals(2, studyInstances.size());
 		final StudyInstance firstInstance = studyInstances.get(0);
-		Assert.assertEquals(testDBRow[0], firstInstance.getInstanceDbId());
-		Assert.assertEquals(testDBRow[1], firstInstance.getLocationId());
-		Assert.assertEquals(testDBRow[2], firstInstance.getLocationName());
-		Assert.assertEquals(testDBRow[3], firstInstance.getLocationAbbreviation());
-		Assert.assertEquals(testDBRow[4], firstInstance.getCustomLocationAbbreviation());
+		Assert.assertEquals(instance1.getInstanceDbId(), firstInstance.getInstanceDbId());
+		Assert.assertEquals(instance1.getLocationId(), firstInstance.getLocationId());
+		Assert.assertEquals(instance1.getLocationName(), firstInstance.getLocationName());
+		Assert.assertEquals(instance1.getLocationAbbreviation(), firstInstance.getLocationAbbreviation());
+		Assert.assertEquals(instance1.getCustomLocationAbbreviation(), firstInstance.getCustomLocationAbbreviation());
 		Assert.assertTrue(firstInstance.isHasFieldmap());
-		Assert.assertEquals(testDBRow[6], firstInstance.getInstanceNumber());
+		Assert.assertEquals(instance1.getInstanceNumber(), firstInstance.getInstanceNumber());
 		
 		final StudyInstance secondInstance = studyInstances.get(1);
-		Assert.assertEquals(testDBRow2[0], secondInstance.getInstanceDbId());
-		Assert.assertEquals(testDBRow2[1], secondInstance.getLocationId());
-		Assert.assertEquals(testDBRow2[2], secondInstance.getLocationName());
-		Assert.assertEquals(testDBRow2[3], secondInstance.getLocationAbbreviation());
-		Assert.assertEquals(testDBRow2[4], secondInstance.getCustomLocationAbbreviation());
+		Assert.assertEquals(instance2.getInstanceDbId(), secondInstance.getInstanceDbId());
+		Assert.assertEquals(instance2.getLocationId(), secondInstance.getLocationId());
+		Assert.assertEquals(instance2.getLocationName(), secondInstance.getLocationName());
+		Assert.assertEquals(instance2.getLocationAbbreviation(), secondInstance.getLocationAbbreviation());
+		Assert.assertEquals(instance2.getCustomLocationAbbreviation(), secondInstance.getCustomLocationAbbreviation());
 		Assert.assertFalse(secondInstance.isHasFieldmap());
-		Assert.assertEquals(testDBRow2[6], secondInstance.getInstanceNumber());
+		Assert.assertEquals(instance2.getInstanceNumber(), secondInstance.getInstanceNumber());
+
 	}
 
 	@Test
