@@ -295,7 +295,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				final BigInteger distinctWithdrawalScale = (BigInteger) row[2];
 				final Integer withdrawalScale = (Integer) row[3];
 
-				mapWithdrawalStatusEntryWise.put(entryId, new Object[]{ withdrawalBalance, 	distinctWithdrawalScale, withdrawalScale});
+				mapWithdrawalStatusEntryWise.put(entryId, new Object[] {withdrawalBalance, distinctWithdrawalScale, withdrawalScale});
 			}
 
 		} catch (final Exception e) {
@@ -555,10 +555,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	//New inventory functions, please locate them below this line to help cleaning in the near future.
 	private final String SEARCH_TRANSACTIONS_QUERY = "SELECT " //
-		+ "    i.lotid AS lotId," //
-		+ "    i.eid AS gid,"//
-		+ "    n.nval AS designation,"//
-		+ "    i.stock_id AS stockId,"//
 		+ "    act.trnid AS transactionId,"//
 		+ "    users.uname AS user,"//
 		+ "    (CASE"//
@@ -569,9 +565,14 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "    END) AS transactionType,"//
 		+ "    act.trnqty AS amount,"//
 		+ "    act.comments AS notes,"//
-		+ "    scaleid AS scaleId,"//
-		+ "    scale.name AS scaleName," //
-		+ "    act.trndate as transactionDate "//
+		+ "    act.trndate as transactionDate, "//
+		+ "    i.lotid AS lotLotId," //
+		+ "    i.eid AS lotGid,"//
+		+ "    n.nval AS lotDesignation,"//
+		+ "    i.stock_id AS lotStockId,"//
+		+ "    scaleid AS lotScaleId,"//
+		+ "    scale.name AS lotScaleName," //
+		+ "    (CASE WHEN i.status = 0 THEN 'Active' WHEN i.status = 1 THEN 'Closed' END) AS lotStatus "
 		+ " FROM"//
 		+ "   ims_transaction act "//
 		+ "        INNER JOIN"//
@@ -589,7 +590,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	private String buildSearchTransactionsQuery(final TransactionsSearchDto transactionsSearchDto) {
 		final StringBuilder query = new StringBuilder(this.SEARCH_TRANSACTIONS_QUERY);
-		/*	private List<String> transactionType;*/
 		if (transactionsSearchDto != null) {
 			if (transactionsSearchDto.getLotIds() != null && !transactionsSearchDto.getLotIds().isEmpty()) {
 				query.append(" and i.lotid IN (").append(Joiner.on(",").join(transactionsSearchDto.getLotIds())).append(") ");
@@ -655,6 +655,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				query.append(" and act.trnstat IN (").append(Joiner.on(",").join(transactionsSearchDto.getStatusIds())).append(") ");
 			}
 
+			if (transactionsSearchDto.getLotStatus() != null) {
+				query.append(" and i.status = ").append(transactionsSearchDto.getLotStatus()).append(" ");
+			}
+
 		}
 
 		return query.toString();
@@ -666,13 +670,13 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			if (pageable.getSort() != null) {
 				final List<String> sorts = new ArrayList<>();
 				for (final Sort.Order order : pageable.getSort()) {
-					sorts.add(order.getProperty() + " " + order.getDirection().toString());
+					sorts.add(order.getProperty().replace(".", "") + " " + order.getDirection().toString());
 				}
 				if (!sorts.isEmpty()) {
 					sortedTransactionsSearchQuery.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
 				}
 			} else {
-				sortedTransactionsSearchQuery.append(" ORDER BY lotId");
+				sortedTransactionsSearchQuery.append(" ORDER BY lotLotId");
 			}
 		}
 		return sortedTransactionsSearchQuery.toString();
@@ -690,12 +694,14 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			query.addScalar("amount");
 			query.addScalar("notes");
 			query.addScalar("transactionDate", Hibernate.DATE);
-			query.addScalar("lotId");
-			query.addScalar("gid");
-			query.addScalar("designation");
-			query.addScalar("stockId");
-			query.addScalar("scaleId");
-			query.addScalar("scaleName");
+			query.addScalar("lotLotId");
+			query.addScalar("lotGid");
+			query.addScalar("lotDesignation");
+			query.addScalar("lotStockId");
+			query.addScalar("lotScaleId");
+			query.addScalar("lotScaleName");
+			query.addScalar("lotStatus");
+
 
 			query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
 
@@ -733,7 +739,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
 			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class,  Double.class,
-			 String.class, Date.class, Integer.class, Integer.class, String.class, String.class, Integer.class, String.class);
+			 String.class, Date.class, Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class);
 		} catch (NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
 		}

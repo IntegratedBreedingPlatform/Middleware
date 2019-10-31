@@ -29,7 +29,7 @@ public class TransactionDto {
 	public TransactionDto(final Integer transactionId, final String user, final String transactionType, final Double amount,
 		final String notes,
 		final Date transactionDate, final Integer lotId, final Integer gid, final String designation, final String stockId,
-		final Integer scaleId, final String scaleName) {
+		final Integer scaleId, final String scaleName, final String lotStatus) {
 		this.transactionId = transactionId;
 		this.user = user;
 		this.transactionType = transactionType;
@@ -43,7 +43,7 @@ public class TransactionDto {
 		this.lot.setStockId(stockId);
 		this.lot.setScaleId(scaleId);
 		this.lot.setScaleName(scaleName);
-
+		this.lot.setStatus(lotStatus);
 	}
 
 	public Integer getTransactionId() {

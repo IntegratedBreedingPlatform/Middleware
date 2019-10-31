@@ -33,6 +33,8 @@ public class TransactionsSearchDto extends SearchRequestDto {
 
 	private List<Integer> statusIds;
 
+	private Integer lotStatus;
+
 	public String getDesignation() {
 		return this.designation;
 	}
@@ -143,6 +145,14 @@ public class TransactionsSearchDto extends SearchRequestDto {
 
 	public void setStatusIds(final List<Integer> statusIds) {
 		this.statusIds = statusIds;
+	}
+
+	public Integer getLotStatus() {
+		return lotStatus;
+	}
+
+	public void setLotStatus(final Integer lotStatus) {
+		this.lotStatus = lotStatus;
 	}
 
 	@Override
