@@ -1135,6 +1135,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		try {
 			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
+			    + " geoloc.description as INSTANCE_NUMBER, \n"
 				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as LOCATION_ID, \n"  // 8190 = cvterm for LOCATION_ID
 				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" +
 				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
@@ -1142,9 +1143,16 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
 				"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n" +
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
-				"	max(if(geoprop.type_id = 8135, geoprop.value, null)) as EXP_DESIGN, \n" +
+				"	max(if(geoprop.type_id = 8135, geoprop.value, null)) as EXP_DESIGN, \n"
 				// 8135 = cvterm for EXP_DESIGN
-				"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
+				+ "  (select 1 from sample s "
+				+ "  inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as HAS_SAMPLE, "
+				+ "	 (select 1 from nd_experiment exp "
+				+ "   INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 "
+				+ "   INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as HAS_SUBOBS "
+				+ "    from	nd_geolocation geoloc \n"
 				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 				+ "    inner join project proj on proj.project_id = nde.project_id \n"
 				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
@@ -1155,23 +1163,29 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("datasetId", datasetId);
 			query.addScalar("INSTANCE_DBID", new IntegerType());
+			query.addScalar("INSTANCE_NUMBER", new IntegerType());
 			query.addScalar("LOCATION_ID", new IntegerType());
 			query.addScalar("LOCATION_NAME", new StringType());
 			query.addScalar("LOCATION_ABBR", new StringType());
 			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
 			query.addScalar("FIELDMAP_BLOCK", new StringType());
 			query.addScalar("EXP_DESIGN", new StringType());
-			query.addScalar("INSTANCE_NUMBER", new IntegerType());
+			query.addScalar("HAS_SAMPLE", new IntegerType());
+			query.addScalar("HAS_SUBOBS", new IntegerType());
 
 			final List queryResults = query.list();
 			final List<StudyInstance> instances = new ArrayList<>();
 			for (final Object result : queryResults) {
 				final Object[] row = (Object[]) result;
-				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[5]);
-				final boolean hasExperimentalDesign = !StringUtils.isEmpty((String) row[6]);
+				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[6]);
+				final boolean hasExperimentalDesign = !StringUtils.isEmpty((String) row[7]);
+				final boolean hasSample = ((Integer) row[8]) != null;
+				final boolean hasSubobservations = ((Integer) row[9]) != null;
+
 				final StudyInstance instance =
-					new StudyInstance((Integer) row[0], (Integer) row[1] ,(String) row[2], (String) row[3], (Integer) row[7], (String) row[4], hasFieldmap);
+					new StudyInstance((Integer) row[0], (Integer) row[2] ,(String) row[3], (String) row[4], (Integer) row[1], (String) row[5], hasFieldmap);
 				instance.setHasExperimentalDesign(hasExperimentalDesign);
+				instance.setDesignReGenerationAllowed(!hasFieldmap && !hasSample && !hasSubobservations);
 				instances.add(instance);
 			}
 			return instances;

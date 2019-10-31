@@ -94,7 +94,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final Geolocation instance1 = this.testDataInitializer.createTestGeolocation("1", 1);
 		final Geolocation instance2 = this.testDataInitializer.createTestGeolocation("2", 2);
 		this.saveGeolocationProperty(instance1, ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), TermId.EXPERIMENT_DESIGN_FACTOR.getId());
-		this.saveGeolocationProperty(instance2, RandomStringUtils.random(5), TermId.BLOCK_ID.getId());
+		this.saveGeolocationProperty(instance2, RandomStringUtils.randomAlphabetic(5), TermId.BLOCK_ID.getId());
 
 		this.testDataInitializer.createTestExperiment(someSummary, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
 		this.testDataInitializer.createTestExperiment(someSummary, instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
@@ -112,6 +112,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Afghanistan", studyInstance1.getLocationName());
 		Assert.assertFalse(studyInstance1.isHasFieldmap());
 		Assert.assertTrue(studyInstance1.isHasExperimentalDesign());
+		// Design re-generation not allowed because instance has fieldmap
+		Assert.assertTrue(studyInstance1.isDesignReGenerationAllowed());
 
 		final StudyInstance studyInstance2 = studyInstances.get(1);
 
@@ -122,7 +124,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertFalse(studyInstance2.isHasExperimentalDesign());
-
+		Assert.assertFalse(studyInstance2.isDesignReGenerationAllowed());
 	}
 
 	private void saveGeolocationProperty(final Geolocation geolocation, final String value, final Integer variableId) {
