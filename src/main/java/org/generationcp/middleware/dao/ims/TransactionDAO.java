@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
@@ -487,8 +488,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final List<TransactionReportRow> transactions = new ArrayList<>();
 		try {
 			final String sql = "SELECT i.userid,i.lotid,i.trndate,i.trnstat,i.trnqty,i.sourceid,l.listname, i.comments,"
-					+ "(CASE WHEN trnstat = 1 AND trnqty > 0 THEN 'Deposit' "
-					+ "WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation' WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal' END) as trntype, "
+					+ "(CASE WHEN trnstat = 1 AND trnqty > 0 THEN '" + TransactionType.DEPOSIT.getValue()
+					+ "' WHEN trnstat = 0 AND trnqty < 0 THEN '" + TransactionType.RESERVATION.getValue()
+					+ "' WHEN trnstat = 1 AND trnqty < 0 THEN '" + TransactionType.WITHDRAWAL.getValue()
+					+ "' END) as trntype, "
 					+ "lot.created_date "
 					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
 					+ " INNER JOIN ims_lot lot ON lot.lotid = i.lotid "
