@@ -11,7 +11,7 @@
 					select count(1)
 					from ims_transaction it
 					where it.trnstat = 0
-					and it.trnqty > 0;
+					and it.trnqty >= 0;
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -21,7 +21,7 @@
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction SET trnstat=1
 			where trnstat = 0
-			and trnqty > 0;
+			and trnqty >= 0;
 		</sql>
 	</changeSet>
 
