@@ -578,7 +578,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	public boolean hasAdvancedOrCrossesList(final int studyId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
-			criteria.add(Restrictions.eq("studyId", studyId));
+			criteria.add(Restrictions.eq("projectId", studyId));
 			criteria.add(Restrictions.in("type", Arrays.asList(GermplasmListType.ADVANCED.name(), GermplasmListType.IMP_CROSS.name(), GermplasmListType.CRT_CROSS.name())));
 			criteria.add(Restrictions.ne(GermplasmListDAO.STATUS, GermplasmListDAO.STATUS_DELETED));
 
