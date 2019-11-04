@@ -9,6 +9,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class StudyInstance {
 
 	private int instanceDbId;
+	private int experimentId;
 	private Integer locationId;
 	private String locationName;
 	private String locationAbbreviation;
@@ -85,6 +86,14 @@ public class StudyInstance {
 
 	public void setHasFieldmap(boolean hasFieldmap) {
 		this.hasFieldmap = hasFieldmap;
+	}
+
+	public int getExperimentId() {
+		return this.experimentId;
+	}
+
+	public void setExperimentId(final int experimentId) {
+		this.experimentId = experimentId;
 	}
 
 	@Override

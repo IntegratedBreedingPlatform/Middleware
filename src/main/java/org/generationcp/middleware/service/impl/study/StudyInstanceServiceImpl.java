@@ -10,6 +10,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 public class StudyInstanceServiceImpl implements StudyInstanceService {
@@ -36,21 +38,35 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private DaoFactory daoFactory;
 
 	@Override
-	public void createStudyInstance(final CropType crop, final Integer datasetId, final String instanceNumber) {
+	public StudyInstance createStudyInstance(final CropType crop, final Integer datasetId, final String instanceNumber) {
 
 		// Get the existing environment dataset variables.
 		// Since we are creating a new study instance, the values of these variables are just blank.
 		final List<MeasurementVariable> measurementVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId,
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
 
+		// The default value of an instance's location name is "Unspecified Location"
+		final Optional<Location> location = this.getUnspecifiedLocation();
 		final Geolocation geolocation =
-			this.createGeolocation(measurementVariables, instanceNumber);
+			this.createGeolocation(measurementVariables, instanceNumber, location.isPresent() ? location.get().getLocid() : null);
 		this.daoFactory.getGeolocationDao().save(geolocation);
 
 		final ExperimentValues experimentValue = new ExperimentValues();
 		experimentValue.setLocationId(geolocation.getLocationId());
-		this.experimentModelSaver.addExperiment(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
+		final ExperimentModel experimentModel =
+			this.experimentModelSaver.addExperiment(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
 
+		final StudyInstance studyInstance = new StudyInstance();
+		studyInstance.setInstanceDbId(geolocation.getLocationId());
+		studyInstance.setInstanceNumber(Integer.valueOf(instanceNumber));
+		studyInstance.setExperimentId(experimentModel.getNdExperimentId());
+		if (location.isPresent()) {
+			studyInstance.setLocationId(location.get().getLocid());
+			studyInstance.setLocationName(location.get().getLname());
+			studyInstance.setLocationAbbreviation(location.get().getLabbr());
+		}
+
+		return studyInstance;
 	}
 
 	@Override
@@ -58,7 +74,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		// TODO: To be implemented in IBP-3160
 	}
 
-	protected Geolocation createGeolocation(final List<MeasurementVariable> measurementVariables, final String instanceNumber) {
+	protected Geolocation createGeolocation(final List<MeasurementVariable> measurementVariables, final String instanceNumber,
+		final Integer locationId) {
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setProperties(new ArrayList<GeolocationProperty>());
 
@@ -70,9 +87,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			} else if (VariableType.ENVIRONMENT_DETAIL == measurementVariable.getVariableType()) {
 				String value = measurementVariable.getValue();
 
-				// The default value of an instance's location name is "Unspecified Location"
 				if (measurementVariable.getTermId() == TermId.LOCATION_ID.getId()) {
-					value = this.getLocationIdOfUnspecifiedLocation();
+					value = String.valueOf(locationId);
 				}
 				final GeolocationProperty geolocationProperty =
 					new GeolocationProperty(geolocation, value, rank, measurementVariable.getTermId());
@@ -84,12 +100,12 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		return geolocation;
 	}
 
-	protected String getLocationIdOfUnspecifiedLocation() {
+	protected Optional<Location> getUnspecifiedLocation() {
 		final List<Location> locations = this.daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 		if (!locations.isEmpty()) {
-			return String.valueOf(locations.get(0).getLocid());
+			return Optional.of(locations.get(0));
 		}
-		return "";
+		return Optional.empty();
 	}
 
 }
