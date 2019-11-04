@@ -15,9 +15,9 @@ public class StudyInstance {
 	private String customLocationAbbreviation;
 	private int instanceNumber;
 	private boolean hasFieldmap;
-	private boolean hasExperimentalDesign;
-	private boolean hasMeasurements;
-	private boolean isDesignRegenerationAllowed;
+	private Boolean hasExperimentalDesign;
+	private Boolean hasMeasurements;
+	private Boolean isDesignRegenerationAllowed;
 
 	public StudyInstance() {
 
@@ -75,7 +75,7 @@ public class StudyInstance {
 	}
 
 	public String getCustomLocationAbbreviation() {
-		return customLocationAbbreviation;
+		return this.customLocationAbbreviation;
 	}
 
 	public void setCustomLocationAbbreviation(final String customLocationAbbreviation) {
@@ -83,35 +83,35 @@ public class StudyInstance {
 	}
 
 	public boolean isHasFieldmap() {
-		return hasFieldmap;
+		return this.hasFieldmap;
 	}
 
-	public void setHasFieldmap(boolean hasFieldmap) {
+	public void setHasFieldmap(final boolean hasFieldmap) {
 		this.hasFieldmap = hasFieldmap;
 	}
 
-	public boolean isHasExperimentalDesign() {
-		return hasExperimentalDesign;
+	public Boolean isHasExperimentalDesign() {
+		return this.hasExperimentalDesign;
 	}
 
 	public void setHasExperimentalDesign(final boolean hasExperimentalDesign) {
 		this.hasExperimentalDesign = hasExperimentalDesign;
 	}
 
-	public boolean isHasMeasurements() {
-		return hasMeasurements;
+	public Boolean isHasMeasurements() {
+		return this.hasMeasurements;
 	}
 
 	public void setHasMeasurements(final boolean hasMeasurements) {
 		this.hasMeasurements = hasMeasurements;
 	}
 
-	public boolean isDesignRegenerationAllowed() {
-		return isDesignRegenerationAllowed;
+	public Boolean isDesignRegenerationAllowed() {
+		return this.isDesignRegenerationAllowed;
 	}
 
 	public void setDesignRegenerationAllowed(final boolean designRegenerationAllowed) {
-		isDesignRegenerationAllowed = designRegenerationAllowed;
+		this.isDesignRegenerationAllowed = designRegenerationAllowed;
 	}
 
 	@Override
