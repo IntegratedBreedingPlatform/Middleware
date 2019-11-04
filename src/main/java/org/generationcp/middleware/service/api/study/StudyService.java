@@ -26,8 +26,6 @@ public interface StudyService {
 
 	String getProgramUUID(Integer studyIdentifier);
 
-	List<StudyInstance> getStudyInstances(int studyId);
-
 	TrialObservationTable getTrialObservationTable(int studyIdentifier);
 
 	/**

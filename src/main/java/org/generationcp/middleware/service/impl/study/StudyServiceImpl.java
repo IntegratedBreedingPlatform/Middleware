@@ -334,55 +334,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public List<StudyInstance> getStudyInstances(final int studyId) {
-
-		try {
-			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
-				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as LOCATION_ID, \n" // 8190 = cvterm for LOCATION_ID
-				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" +
-				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" +
-				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n" +
-				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
-				"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
-				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "    inner join project proj on proj.project_id = nde.project_id \n"
-				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
-				+ " where \n"
-				+ "    proj.study_id = :studyId and proj.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId() + " \n"
-				+ "    group by geoloc.nd_geolocation_id \n" + "    order by (1 * geoloc.description) asc ";
-
-			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
-			query.setParameter("studyId", studyId);
-			query.addScalar("INSTANCE_DBID", new IntegerType());
-			query.addScalar("LOCATION_ID", new IntegerType());
-			query.addScalar("LOCATION_NAME", new StringType());
-			query.addScalar("LOCATION_ABBR", new StringType());
-			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
-			query.addScalar("FIELDMAP_BLOCK", new StringType());
-			query.addScalar("INSTANCE_NUMBER", new IntegerType());
-
-			final List queryResults = query.list();
-			final List<StudyInstance> instances = new ArrayList<>();
-			for (final Object result : queryResults) {
-				final Object[] row = (Object[]) result;
-				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[5]);
-				final StudyInstance instance =
-					new StudyInstance((Integer) row[0], (Integer) row[1], (String) row[2], (String) row[3], (Integer) row[6],
-						(String) row[4], hasFieldmap);
-				instances.add(instance);
-			}
-			return instances;
-		} catch (final HibernateException he) {
-			throw new MiddlewareQueryException(
-				"Unexpected error in executing getStudyInstances(studyId = " + studyId + ") query: " + he.getMessage(), he);
-		}
-	}
-
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return this.getTrialObservationTable(studyIdentifier, null);

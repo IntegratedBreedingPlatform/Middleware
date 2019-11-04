@@ -224,36 +224,6 @@ public class StudyServiceImplTest {
 	}
 
 	@Test
-	public void testGetStudyInstances() throws Exception {
-
-		final Object[] testDBRow = {12345, 455, "Gujarat, India", "GUJ", "", "1", 1};
-		final Object[] testDBRow2 = {1, 213, "Afghanistan", "AFG", "Afghanz", "", 2};
-		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow, testDBRow2);
-		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
-
-		final List<StudyInstance> studyInstances = this.studyServiceImpl.getStudyInstances(123);
-
-		Assert.assertEquals(2, studyInstances.size());
-		final StudyInstance firstInstance = studyInstances.get(0);
-		Assert.assertEquals(testDBRow[0], firstInstance.getInstanceDbId());
-		Assert.assertEquals(testDBRow[1], firstInstance.getLocationId());
-		Assert.assertEquals(testDBRow[2], firstInstance.getLocationName());
-		Assert.assertEquals(testDBRow[3], firstInstance.getLocationAbbreviation());
-		Assert.assertEquals(testDBRow[4], firstInstance.getCustomLocationAbbreviation());
-		Assert.assertTrue(firstInstance.isHasFieldmap());
-		Assert.assertEquals(testDBRow[6], firstInstance.getInstanceNumber());
-		
-		final StudyInstance secondInstance = studyInstances.get(1);
-		Assert.assertEquals(testDBRow2[0], secondInstance.getInstanceDbId());
-		Assert.assertEquals(testDBRow2[1], secondInstance.getLocationId());
-		Assert.assertEquals(testDBRow2[2], secondInstance.getLocationName());
-		Assert.assertEquals(testDBRow2[3], secondInstance.getLocationAbbreviation());
-		Assert.assertEquals(testDBRow2[4], secondInstance.getCustomLocationAbbreviation());
-		Assert.assertFalse(secondInstance.isHasFieldmap());
-		Assert.assertEquals(testDBRow2[6], secondInstance.getInstanceNumber());
-	}
-
-	@Test
 	public void testGetStudyDetailsForANursery() {
 		final List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
