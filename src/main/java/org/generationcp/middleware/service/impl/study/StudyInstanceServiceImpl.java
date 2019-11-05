@@ -142,8 +142,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variableId) {
 				geolocation.setDescription(instanceNumber);
 			} else if (VariableType.ENVIRONMENT_DETAIL == measurementVariable.getVariableType()) {
-				String value = measurementVariable.getValue();
-
+				String value = "";
 				if (measurementVariable.getTermId() == TermId.LOCATION_ID.getId()) {
 					value = String.valueOf(locationId);
 				}
