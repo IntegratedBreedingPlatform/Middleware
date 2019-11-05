@@ -298,6 +298,64 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testDeleteThenSaveExperimentDesignAgain() {
+		// Save design first
+		List<Integer> instanceNumbers = Arrays.asList(1, 2, 3);
+		this.experimentDesignService
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(
+				instanceNumbers));
+
+
+		// Delete Design
+		this.experimentDesignService.deleteStudyExperimentDesign(this.studyId);
+		List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		Assert.assertTrue(rows.isEmpty());
+
+		final List<Integer> environmentVariableIds =
+			this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(this.environmentDatasetId);
+		Assert.assertFalse(environmentVariableIds.contains(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
+		Assert.assertFalse(environmentVariableIds.contains(TermId.NUMBER_OF_REPLICATES.getId()));
+
+		final List<Integer> plotVariableIds =
+			this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(this.plotDatasetId);
+		for (final TermId variable : PLOT_VARIABLES) {
+			Assert.assertFalse(plotVariableIds.contains(variable.getId()));
+		}
+		Assert.assertFalse(plotVariableIds.contains(this.treatmentFactor.getCvTermId()));
+		Assert.assertFalse(plotVariableIds.contains(this.treatmentFactorLabel.getCvTermId()));
+		this.verifyGeolocationPropRecords(false, instanceNumbers);
+
+
+		// Save instances again
+		instanceNumbers = Arrays.asList(1, 3);
+		final Map<Integer, List<ObservationUnitRow>> instanceRowsMap = this.createObservationUnitRows(instanceNumbers);
+		this.experimentDesignService
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(),instanceRowsMap);
+		rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		Assert.assertNotNull(rows);
+
+		// Verify saving of variables
+		this.verifyEnvironmentVariablesWereSaved();
+		this.verifyPlotVariablesWereSaved();
+		this.verifyGeolocationPropRecords(true, instanceNumbers);
+
+		// Check that plot experiments are created for selected instances
+		Assert.assertEquals(instanceRowsMap.keySet().size() * NO_ENTRIES * NO_REPS * NO_TREATMENTS, rows.size());
+		final Map<Integer, List<ObservationUnitRow>> instancesRowMap = new HashMap<>();
+		for (final ObservationUnitRow row : rows) {
+			final Integer trialInstance = row.getTrialInstance();
+			if (instancesRowMap.get(trialInstance) == null) {
+				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+			}
+			instancesRowMap.get(trialInstance).add(row);
+		}
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(1).size());
+		Assert.assertNull(instancesRowMap.get(2));
+		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(3).size());
+		this.verifyObservationUnitRowValues(instancesRowMap);
+	}
+
+	@Test
 	public void testGetExperimentDesignTypeTermId() {
 		Assert.assertFalse(this.experimentDesignService.getStudyExperimentDesignTypeTermId(this.studyId).isPresent());
 
@@ -422,6 +480,12 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		nrepVariable.setTermId(TermId.NUMBER_OF_REPLICATES.getId());
 		nrepVariable.setValue(NO_REPS.toString());
 		variables.add(nrepVariable);
+
+		final MeasurementVariable trialInstanceVariable = new MeasurementVariable();
+		trialInstanceVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		trialInstanceVariable.setAlias("TRIAL_INSTANCE");
+		trialInstanceVariable.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		variables.add(trialInstanceVariable);
 
 		for (final TermId variable : GERMPLASM_VARIABLES) {
 			final MeasurementVariable germplasmVariable = new MeasurementVariable();

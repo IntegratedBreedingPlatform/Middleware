@@ -132,7 +132,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 			}
 
 			// FIXME Undo this duplicate saving in nd_geolocationprop (logged as part of IBP-3150)
-			if (isEnvironmentVariable) {
+			if (isEnvironmentVariable && EXPERIMENTAL_DESIGN_VARIABLES.contains(variableId)) {
 				for (final Geolocation geolocation : geolocations) {
 					final GeolocationProperty geolocationProperty = new GeolocationProperty(geolocation, value, rank, variableId);
 					this.daoFactory.getGeolocationPropertyDao().save(geolocationProperty);
