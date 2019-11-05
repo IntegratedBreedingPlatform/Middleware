@@ -102,9 +102,13 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.testDataInitializer.createTestExperiment(environmentDataset, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
 		final ExperimentModel instance1PlotExperiment =
 			this.testDataInitializer.createTestExperiment(plotDataset, instance1, TermId.PLOT_EXPERIMENT.getId(), "1", null);
-		final ExperimentModel instance1SubObsExperiment =
+		// Create 2 Sub-obs records
+		final ExperimentModel instance1SubObsExperiment1 =
 			this.testDataInitializer.createTestExperiment(subObsDataset, instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
-		this.savePhenotype(instance1SubObsExperiment);
+		this.savePhenotype(instance1SubObsExperiment1);
+		final ExperimentModel instance1SubObsExperiment2 = this.testDataInitializer
+			.createTestExperiment(subObsDataset, instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
+		this.savePhenotype(instance1SubObsExperiment2);
 
 		this.testDataInitializer.createTestExperiment(environmentDataset, instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
 		final ExperimentModel instance2PlotExperiment =

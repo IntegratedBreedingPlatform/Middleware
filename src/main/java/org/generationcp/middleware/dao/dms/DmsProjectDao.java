@@ -1145,14 +1145,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
 				"	max(if(geoprop.type_id = 8135, geoprop.value, null)) as EXP_DESIGN, \n"
 				// 8135 = cvterm for EXP_DESIGN
-				+ "  (select 1 from sample s "
+				+ "  (select count(1) from sample s "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
 				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as HAS_SAMPLE, "
-				+ "	 (select 1 from nd_experiment exp "
+				+ "	 (select count(1) from nd_experiment exp "
 				+ "   INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 "
 				+ "   INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 "
 				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as HAS_SUBOBS, "
-				+ "  (select 1 from phenotype ph "
+				+ "  (select count(1) from phenotype ph "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
 				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
 				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) as HAS_MEASUREMENTS "
@@ -1184,9 +1184,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				final Object[] row = (Object[]) result;
 				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[6]);
 				final boolean hasExperimentalDesign = !StringUtils.isEmpty((String) row[7]);
-				final boolean hasSample = ((Integer) row[8]) != null;
-				final boolean hasSubobservations = ((Integer) row[9]) != null;
-				final boolean hasMeasurements = ((Integer) row[10]) != null;
+				final Integer sampleCount = (Integer) row[8];
+				final boolean hasSample = sampleCount != null && sampleCount > 0;
+				final Integer subObservationsCount = (Integer) row[9];
+				final boolean hasSubobservations = subObservationsCount != null && subObservationsCount > 0;
+				final Integer measurementsCount = (Integer) row[10];
+				final boolean hasMeasurements = measurementsCount != null && measurementsCount > 0;
 
 				final StudyInstance instance =
 					new StudyInstance((Integer) row[0], (Integer) row[2] ,(String) row[3], (String) row[4], (Integer) row[1], (String) row[5], hasFieldmap);
