@@ -126,8 +126,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Afghanistan", studyInstance1.getLocationName());
 		Assert.assertFalse(studyInstance1.isHasFieldmap());
 		Assert.assertTrue(studyInstance1.isHasExperimentalDesign());
-		// Design re-generation not allowed because instance has subobservation
- 		Assert.assertFalse(studyInstance1.isDesignRegenerationAllowed());
+		// Instance deletion not allowed because instance has subobservation
+ 		Assert.assertFalse(studyInstance1.getCanBeDeleted());
 		Assert.assertTrue(studyInstance1.isHasMeasurements());
 
 		final StudyInstance studyInstance2 = studyInstances.get(1);
@@ -138,7 +138,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertFalse(studyInstance2.isHasExperimentalDesign());
-		Assert.assertTrue(studyInstance2.isDesignRegenerationAllowed());
+		Assert.assertTrue(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 	}
 
