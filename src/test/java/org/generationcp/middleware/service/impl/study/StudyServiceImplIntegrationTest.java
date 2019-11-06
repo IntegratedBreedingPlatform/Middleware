@@ -138,8 +138,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertFalse(studyInstance2.isHasExperimentalDesign());
-		// Design re-generation not allowed because instance has fieldmap
-		Assert.assertFalse(studyInstance2.isDesignRegenerationAllowed());
+		Assert.assertTrue(studyInstance2.isDesignRegenerationAllowed());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 	}
 

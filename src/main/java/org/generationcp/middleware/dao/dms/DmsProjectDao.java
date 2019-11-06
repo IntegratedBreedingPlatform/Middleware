@@ -1195,7 +1195,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					new StudyInstance((Integer) row[0], (Integer) row[2] ,(String) row[3], (String) row[4], (Integer) row[1], (String) row[5], hasFieldmap);
 				instance.setHasExperimentalDesign(hasExperimentalDesign);
 				instance.setHasMeasurements(hasMeasurements);
-				instance.setDesignRegenerationAllowed(!hasFieldmap && !hasSample && !hasSubobservations);
+				instance.setDesignRegenerationAllowed(!hasSample && !hasSubobservations);
 				instances.add(instance);
 			}
 			return instances;
