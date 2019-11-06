@@ -94,7 +94,7 @@ public class StudyInstance {
 		return this.hasExperimentalDesign;
 	}
 
-	public void setHasExperimentalDesign(final boolean hasExperimentalDesign) {
+	public void setHasExperimentalDesign(final Boolean hasExperimentalDesign) {
 		this.hasExperimentalDesign = hasExperimentalDesign;
 	}
 
@@ -102,7 +102,7 @@ public class StudyInstance {
 		return this.hasMeasurements;
 	}
 
-	public void setHasMeasurements(final boolean hasMeasurements) {
+	public void setHasMeasurements(final Boolean hasMeasurements) {
 		this.hasMeasurements = hasMeasurements;
 	}
 
@@ -110,7 +110,7 @@ public class StudyInstance {
 		return this.isDesignRegenerationAllowed;
 	}
 
-	public void setDesignRegenerationAllowed(final boolean designRegenerationAllowed) {
+	public void setDesignRegenerationAllowed(final Boolean designRegenerationAllowed) {
 		this.isDesignRegenerationAllowed = designRegenerationAllowed;
 	}
 
