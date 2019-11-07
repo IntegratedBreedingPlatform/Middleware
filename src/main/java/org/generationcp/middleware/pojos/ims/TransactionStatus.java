@@ -3,11 +3,9 @@ package org.generationcp.middleware.pojos.ims;
 
 public enum TransactionStatus {
 
-	ANTICIPATED(0), DEPOSITED(0), RESERVED(0)
+	//  Transaction status: 0=Anticipated (Deposit or Reserved), 1=Confirmed (Stored or Retrieved), 9=Cancelled Transaction
 
-	, CONFIRMED(1), STORED(1), RETRIEVED(1), COMMITTED(1)
-
-	, CANCELLED(9);
+	ANTICIPATED(0), COMMITTED(1), CANCELLED(9);
 
 	private int status;
 

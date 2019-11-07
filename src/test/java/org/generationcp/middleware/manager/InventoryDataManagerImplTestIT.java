@@ -32,6 +32,7 @@ import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.ReservedInventoryKey;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.service.api.InventoryService;
@@ -707,7 +708,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		this.manager.addLots(Lists.<Lot>newArrayList(lot));
 
 		final Transaction transaction = InventoryDetailsTestDataInitializer
-				.createReservationTransaction(2.0, 0, "Deposit", lot, 1, 1, 1, "LIST");
+				.createReservationTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST");
 		this.manager.addTransactions(Lists.<Transaction>newArrayList(transaction));
 
 		final List<Germplasm> availableBalanceForGermplasms =
@@ -743,9 +744,9 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 
 
 		final Transaction depositTransactionForLotOne =  InventoryDetailsTestDataInitializer
-				.createDepositTransaction(5.0, 0, "Deposit", lotOne, 1, 1, germplasmListData.getId(), "LIST", "StockID1");
+				.createDepositTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lotOne, 1, 1, germplasmListData.getId(), "LIST", "StockID1");
 		final Transaction depositTransactionForLotTwo =  InventoryDetailsTestDataInitializer
-				.createDepositTransaction(5.0, 0, "Deposit", lotTwo, 1, 1, germplasmListData.getId(), "LIST", "StockID2");
+				.createDepositTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lotTwo, 1, 1, germplasmListData.getId(), "LIST", "StockID2");
 		this.manager.addTransactions(Lists.<Transaction>newArrayList(depositTransactionForLotOne, depositTransactionForLotTwo));
 
 
