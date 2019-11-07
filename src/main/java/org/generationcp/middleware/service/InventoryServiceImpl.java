@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -274,7 +275,9 @@ public class InventoryServiceImpl implements InventoryService {
 	 *
 	 */
 	@Override
-	public void addLotAndTransaction(final InventoryDetails details, final GermplasmListData listData, final ListDataProject listDataProject) {
+	public void addLotAndTransaction(
+		final InventoryDetails details, final GermplasmListData listData, final ListDataProject listDataProject,
+		final CropType cropType) {
 		final Lot existingLot =
 				this.getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(EntityType.GERMPLSM.name(), details.getGid(),
 						details.getLocationId(), details.getScaleId());
@@ -287,7 +290,7 @@ public class InventoryServiceImpl implements InventoryService {
 
 		final Lot lot =
 				this.lotBuilder.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(),
-						details.getUserId());
+						details.getUserId(), cropType);
 
 		this.daoFactory.getLotDao().saveOrUpdate(lot);
 
