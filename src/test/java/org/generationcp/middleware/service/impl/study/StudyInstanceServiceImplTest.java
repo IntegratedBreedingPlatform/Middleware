@@ -104,7 +104,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	public void testCreateStudyInstance() {
 
 		final int instanceNumber = 1;
-		this.studyInstanceService.createStudyInstance(this.cropType, this.environmentDataset.getId(), String.valueOf(instanceNumber));
+		this.studyInstanceService.createStudyInstance(this.cropType, this.environmentDataset.getId(), instanceNumber);
 
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();

@@ -48,7 +48,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private DaoFactory daoFactory;
 
 	@Override
-	public StudyInstance createStudyInstance(final CropType crop, final Integer datasetId, final String instanceNumber) {
+	public StudyInstance createStudyInstance(final CropType crop, final int datasetId, final int instanceNumber) {
 
 		// Get the existing environment dataset variables.
 		// Since we are creating a new study instance, the values of these variables are just blank.
@@ -68,7 +68,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceDbId(geolocation.getLocationId());
-		studyInstance.setInstanceNumber(Integer.valueOf(instanceNumber));
+		studyInstance.setInstanceNumber(instanceNumber);
 		studyInstance.setExperimentId(experimentModel.getNdExperimentId());
 		if (location.isPresent()) {
 			studyInstance.setLocationId(location.get().getLocid());
@@ -119,7 +119,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		}
 	}
 
-	protected Geolocation createGeolocation(final List<MeasurementVariable> measurementVariables, final String instanceNumber,
+	protected Geolocation createGeolocation(final List<MeasurementVariable> measurementVariables, final int instanceNumber,
 		final Integer locationId) {
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setProperties(new ArrayList<GeolocationProperty>());
@@ -128,7 +128,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			final int variableId = measurementVariable.getTermId();
 			if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variableId) {
-				geolocation.setDescription(instanceNumber);
+				geolocation.setDescription(String.valueOf(instanceNumber));
 			} else if (VariableType.ENVIRONMENT_DETAIL == measurementVariable.getVariableType()) {
 				String value = "";
 				if (measurementVariable.getTermId() == TermId.LOCATION_ID.getId()) {
