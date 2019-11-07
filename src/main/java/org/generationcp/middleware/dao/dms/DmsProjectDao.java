@@ -1141,21 +1141,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
 				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" +
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n" +
+				"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n"
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
-				"	max(if(geoprop.type_id = 8135, geoprop.value, null)) as EXP_DESIGN, \n"
-				// 8135 = cvterm for EXP_DESIGN
+				+ "  (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
+				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) as PLOT_EXP_COUNT, "
 				+ "  (select count(1) from sample s "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as HAS_SAMPLE, "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as SAMPLE_COUNT, "
 				+ "	 (select count(1) from nd_experiment exp "
 				+ "   INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 "
 				+ "   INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as HAS_SUBOBS, "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as SUBOBS_COUNT, "
 				+ "  (select count(1) from phenotype ph "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
 				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
-				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) as HAS_MEASUREMENTS "
+				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) as MEASUREMENTS_COUNT "
 				+ "    from	nd_geolocation geoloc \n"
 				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 				+ "    inner join project proj on proj.project_id = nde.project_id \n"
@@ -1173,17 +1173,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("LOCATION_ABBR", new StringType());
 			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
 			query.addScalar("FIELDMAP_BLOCK", new StringType());
-			query.addScalar("EXP_DESIGN", new StringType());
-			query.addScalar("HAS_SAMPLE", new IntegerType());
-			query.addScalar("HAS_SUBOBS", new IntegerType());
-			query.addScalar("HAS_MEASUREMENTS", new IntegerType());
+			query.addScalar("PLOT_EXP_COUNT", new IntegerType());
+			query.addScalar("SAMPLE_COUNT", new IntegerType());
+			query.addScalar("SUBOBS_COUNT", new IntegerType());
+			query.addScalar("MEASUREMENTS_COUNT", new IntegerType());
 
 			final List queryResults = query.list();
 			final List<StudyInstance> instances = new ArrayList<>();
 			for (final Object result : queryResults) {
 				final Object[] row = (Object[]) result;
 				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[6]);
-				final boolean hasExperimentalDesign = !StringUtils.isEmpty((String) row[7]);
+				final Integer plotExperimentsCount = (Integer) row[7];
+				final boolean hasExperimentalDesign = plotExperimentsCount != null && plotExperimentsCount > 0;
 				final Integer sampleCount = (Integer) row[8];
 				final boolean hasSample = sampleCount != null && sampleCount > 0;
 				final Integer subObservationsCount = (Integer) row[9];
