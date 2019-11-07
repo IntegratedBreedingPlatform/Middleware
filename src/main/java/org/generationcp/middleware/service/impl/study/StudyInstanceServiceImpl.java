@@ -76,7 +76,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			studyInstance.setLocationAbbreviation(location.get().getLabbr());
 		}
 
-		return new StudyInstance();
+		return studyInstance;
 	}
 
 	@Override
