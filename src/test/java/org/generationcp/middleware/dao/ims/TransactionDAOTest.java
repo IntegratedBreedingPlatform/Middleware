@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
@@ -45,7 +46,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	private static final int SCALE_ID = 1;
 
 	private static final String LOT_DISCARD = "Discard" ;
-	private static final String LOT_DEPOSIT = "Deposit";
+	private static final String LOT_DEPOSIT = TransactionType.DEPOSIT.getValue();
 
 	private final Map<Integer, Germplasm> germplasmMap = new HashMap<Integer, Germplasm>();
 
@@ -225,7 +226,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final String sDate1 = "01/01/2015";
 		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
 		final Transaction depositTransaction =
-				InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, "Deposit", lot, 1, 1, 1, "LIST");
+				InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST");
 		depositTransaction.setTransactionDate(date1);
 		depositTransaction.setUserId(user.getUserid());
 
