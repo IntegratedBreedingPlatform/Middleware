@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.inventory;
 
+import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory_new.LotDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -25,12 +26,17 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public List<LotDto> searchLots(final LotsSearchDto lotsSearchDto,final Pageable pageable) {
+	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto,final Pageable pageable) {
 		return this.daoFactory.getLotDao().searchLots(lotsSearchDto, pageable);
 	}
 
 	@Override
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
 		return this.daoFactory.getLotDao().countSearchLots(lotsSearchDto);
+	}
+
+	@Override
+	public Integer saveLot(final LotDto lotDto) {
+		return null;
 	}
 }
