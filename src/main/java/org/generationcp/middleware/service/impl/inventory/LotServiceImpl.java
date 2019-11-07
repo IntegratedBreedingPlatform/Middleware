@@ -8,7 +8,6 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
-import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -52,7 +51,7 @@ public class LotServiceImpl implements LotService {
 		lot.setStockId(lotDto.getStockId());
 		lot.setStatus(0);
 		lot.setSource(0);
-		lot.setScaleId(lot.getScaleId());
+		lot.setScaleId(lotDto.getScaleId());
 
 		if (lotDto.getTransactions().size() == 1) {
 			Transaction transaction = new Transaction();
