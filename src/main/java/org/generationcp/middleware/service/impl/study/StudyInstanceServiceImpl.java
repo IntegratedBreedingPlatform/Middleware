@@ -1,6 +1,5 @@
 package org.generationcp.middleware.service.impl.study;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -20,6 +19,8 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.BooleanType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,22 +76,23 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			studyInstance.setLocationAbbreviation(location.get().getLabbr());
 		}
 
-		return studyInstance;
+		return new StudyInstance();
 	}
 
 	@Override
 	public List<StudyInstance> getStudyInstances(final int studyId) {
-
 		try {
-			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
-				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as LOCATION_ID, \n" // 8190 = cvterm for LOCATION_ID
-				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" +
-				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" +
-				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n" +
+			final String sql = "select \n" + "	geoloc.nd_geolocation_id as instanceDbId, \n"
+				+ "	nde.nd_experiment_id as experimentId, \n"
+				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as locationId, \n" // 8190 = cvterm for LOCATION_ID
+				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as locationName, \n" +
+				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as locationAbbreviation, \n" + // 8189 = cvterm for LOCATION_ABBR
+				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as customLocationAbbreviation, \n" +
+				// 8189 = cvterm for customLocationAbbreviation
+				"	case when max(if(geoprop.type_id = 8583, geoprop.value, null)) "
+				+ "is null then 0 else 1 end as hasFieldmap, \n" +
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
-				"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
+				"   geoloc.description as instanceNumber \n" + " from \n" + "	nd_geolocation geoloc \n"
 				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 				+ "    inner join project proj on proj.project_id = nde.project_id \n"
 				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
@@ -101,34 +103,20 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 			final SQLQuery query = this.sessionProvider.getSession().createSQLQuery(sql);
 			query.setParameter("studyId", studyId);
-			query.addScalar("INSTANCE_DBID", new IntegerType());
-			query.addScalar("LOCATION_ID", new IntegerType());
-			query.addScalar("LOCATION_NAME", new StringType());
-			query.addScalar("LOCATION_ABBR", new StringType());
-			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
-			query.addScalar("FIELDMAP_BLOCK", new StringType());
-			query.addScalar("INSTANCE_NUMBER", new IntegerType());
-
-			final List queryResults = query.list();
-			final List<StudyInstance> instances = new ArrayList<>();
-			for (final Object result : queryResults) {
-				final Object[] row = (Object[]) result;
-				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[5]);
-				final StudyInstance instance =
-					new StudyInstance((Integer) row[0], (Integer) row[1], (String) row[2], (String) row[3], (Integer) row[6],
-						(String) row[4], hasFieldmap);
-				instances.add(instance);
-			}
-			return instances;
+			query.addScalar("instanceDbId", new IntegerType());
+			query.addScalar("experimentId", new IntegerType());
+			query.addScalar("locationId", new IntegerType());
+			query.addScalar("locationName", new StringType());
+			query.addScalar("locationAbbreviation", new StringType());
+			query.addScalar("customLocationAbbreviation", new StringType());
+			query.addScalar("hasFieldmap", new BooleanType());
+			query.addScalar("instanceNumber", new IntegerType());
+			query.setResultTransformer(Transformers.aliasToBean(StudyInstance.class));
+			return query.list();
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
 				"Unexpected error in executing getStudyInstances(studyId = " + studyId + ") query: " + he.getMessage(), he);
 		}
-	}
-
-	@Override
-	public void removeStudyInstance(final CropType crop, final Integer datasetId, final String instanceNumber) {
-		// TODO: To be implemented in IBP-3160
 	}
 
 	protected Geolocation createGeolocation(final List<MeasurementVariable> measurementVariables, final String instanceNumber,

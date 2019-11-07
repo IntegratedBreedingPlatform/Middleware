@@ -21,7 +21,8 @@ public class StudyInstance {
 
 	}
 
-	public StudyInstance(final int instanceDbId, final Integer locationId, final String locationName, final String locationAbbreviation,
+	public StudyInstance(final int instanceDbId, final Integer experimentId, final Integer locationId, final String locationName,
+		final String locationAbbreviation,
 		final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldMap) {
 		this.instanceDbId = instanceDbId;
 		this.locationId = locationId;
@@ -30,6 +31,7 @@ public class StudyInstance {
 		this.instanceNumber = instanceNumber;
 		this.customLocationAbbreviation = customLocationAbbreviation;
 		this.hasFieldmap = hasFieldMap;
+		this.experimentId = experimentId;
 	}
 
 	public int getInstanceDbId() {

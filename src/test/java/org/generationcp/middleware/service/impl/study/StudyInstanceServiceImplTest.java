@@ -30,6 +30,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
@@ -119,6 +120,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertFalse(studyInstance.isHasFieldmap());
 		assertEquals("Unspecified Location", studyInstance.getLocationName());
 		assertEquals("NOLOC", studyInstance.getLocationAbbreviation());
+		assertNull(studyInstance.getCustomLocationAbbreviation());
 	}
 
 }

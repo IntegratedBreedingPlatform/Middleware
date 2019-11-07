@@ -11,5 +11,4 @@ public interface StudyInstanceService {
 
 	List<StudyInstance> getStudyInstances(int studyId);
 
-	void removeStudyInstance(CropType crop, Integer datasetId, String instanceNumber);
 }
