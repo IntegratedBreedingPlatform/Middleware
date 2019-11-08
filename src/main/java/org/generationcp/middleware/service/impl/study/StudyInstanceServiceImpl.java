@@ -81,42 +81,10 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Override
 	public List<StudyInstance> getStudyInstances(final int studyId) {
-		try {
-			final String sql = "select \n" + "	geoloc.nd_geolocation_id as instanceDbId, \n"
-				+ "	nde.nd_experiment_id as experimentId, \n"
-				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as locationId, \n" // 8190 = cvterm for LOCATION_ID
-				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as locationName, \n" +
-				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as locationAbbreviation, \n" + // 8189 = cvterm for LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as customLocationAbbreviation, \n" +
-				// 8189 = cvterm for customLocationAbbreviation
-				"	case when max(if(geoprop.type_id = 8583, geoprop.value, null)) "
-				+ "is null then 0 else 1 end as hasFieldmap, \n" +
-				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
-				"   geoloc.description as instanceNumber \n" + " from \n" + "	nd_geolocation geoloc \n"
-				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "    inner join project proj on proj.project_id = nde.project_id \n"
-				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
-				+ " where \n"
-				+ "    proj.study_id = :studyId and proj.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId() + " \n"
-				+ "    group by geoloc.nd_geolocation_id \n" + "    order by (1 * geoloc.description) asc ";
-
-			final SQLQuery query = this.sessionProvider.getSession().createSQLQuery(sql);
-			query.setParameter("studyId", studyId);
-			query.addScalar("instanceDbId", new IntegerType());
-			query.addScalar("experimentId", new IntegerType());
-			query.addScalar("locationId", new IntegerType());
-			query.addScalar("locationName", new StringType());
-			query.addScalar("locationAbbreviation", new StringType());
-			query.addScalar("customLocationAbbreviation", new StringType());
-			query.addScalar("hasFieldmap", new BooleanType());
-			query.addScalar("instanceNumber", new IntegerType());
-			query.setResultTransformer(Transformers.aliasToBean(StudyInstance.class));
-			return query.list();
-		} catch (final HibernateException he) {
-			throw new MiddlewareQueryException(
-				"Unexpected error in executing getStudyInstances(studyId = " + studyId + ") query: " + he.getMessage(), he);
-		}
+		final int environmentDatasetId =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0)
+				.getProjectId();
+		return this.daoFactory.getDmsProjectDAO().getDatasetInstances(environmentDatasetId);
 	}
 
 	protected Geolocation createGeolocation(final List<MeasurementVariable> measurementVariables, final int instanceNumber,
