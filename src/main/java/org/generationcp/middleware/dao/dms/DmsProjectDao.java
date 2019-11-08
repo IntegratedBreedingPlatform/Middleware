@@ -1147,14 +1147,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
 				"	case when max(if(geoprop.type_id = 8583, geoprop.value, null)) is null then 0 else 1 end as hasFieldmap, \n"
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
+
+				// If study has any plot experiments, hasExperimentalDesign flag = true
 				+ "  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
 				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
+
+				// If study has sub-observations or samples, canBeDeleted = false
 				+ "  case when (select count(1) from sample s "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 and (select count(1) from nd_experiment exp \n"
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 or (select count(1) from nd_experiment exp \n"
 				+ " INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 \n"
 				+ " INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0"
 				+ " then 0 else 1 end as canBeDeleted, "
+
+				// if study has any pending or accepted plot observations, hasMeasurements = true
 				+ "  case when (select count(1) from phenotype ph "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
 				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
