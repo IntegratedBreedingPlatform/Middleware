@@ -49,11 +49,13 @@ public class ExperimentModelSaver {
 		this.stockModelBuilder = new StockModelBuilder(sessionProvider);
 	}
 
-	public void addExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
+	public ExperimentModel addExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
 		final ExperimentModel experimentModel = this.create(crop, projectId, values, experimentType);
 
 		this.daoFactory.getExperimentDao().save(experimentModel);
 		this.phenotypeSaver.savePhenotypes(experimentModel, values.getVariableList());
+
+		return experimentModel;
 	}
 
 	public void addOrUpdateExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {

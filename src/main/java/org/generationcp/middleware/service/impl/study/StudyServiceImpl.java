@@ -349,13 +349,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public List<StudyInstance> getStudyInstances(final int studyId) {
-		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
-		return this.daoFactory.getDmsProjectDAO().getDatasetInstances(environmentDatasetId);
-	}
-
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return this.getTrialObservationTable(studyIdentifier, null);

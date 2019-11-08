@@ -57,7 +57,7 @@ import static org.hamcrest.core.Is.is;
  * @author Akhil
  */
 public class StudyServiceImplTest {
-	
+
 	private static final String FACT1 = "FACT1";
 
 	private static final String STOCK_ID = "STOCK_ID";
@@ -75,10 +75,10 @@ public class StudyServiceImplTest {
 
 	@Mock
 	private StudyDataManager studyDataManager;
-	
+
 	@Mock
 	private StudyMeasurements studyMeasurements;
-	
+
 	@Mock
 	private MeasurementVariableService measurementVariableService;
 
@@ -92,11 +92,11 @@ public class StudyServiceImplTest {
 	private DmsProjectDao dmsProjectDao;
 
 	private StudyServiceImpl studyServiceImpl;
-	
+
 	final List<String> additionalGermplasmDescriptors = Lists.newArrayList(STOCK_ID);
-	
+
 	final List<String> additionalDesignFactors = Lists.newArrayList(FACT1);
-	
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -111,19 +111,19 @@ public class StudyServiceImplTest {
 		Mockito.when(this.mockSession.createSQLQuery(ArgumentMatchers.anyString())).thenReturn(this.mockSqlQuery);
 		Mockito.when(this.mockSqlQuery.addScalar(ArgumentMatchers.anyString())).thenReturn(this.mockSqlQuery);
 		Mockito.when(this.studyServiceImpl.getGenericGermplasmDescriptors(StudyServiceImplTest.STUDY_ID))
-				.thenReturn(Lists.newArrayList(TermId.GID.name(), ColumnLabels.DESIGNATION.name(), TermId.ENTRY_NO.name(),
-						TermId.ENTRY_TYPE.name(), TermId.ENTRY_CODE.name(), TermId.OBS_UNIT_ID.name(), StudyServiceImplTest.STOCK_ID));
+			.thenReturn(Lists.newArrayList(TermId.GID.name(), ColumnLabels.DESIGNATION.name(), TermId.ENTRY_NO.name(),
+				TermId.ENTRY_TYPE.name(), TermId.ENTRY_CODE.name(), TermId.OBS_UNIT_ID.name(), StudyServiceImplTest.STOCK_ID));
 		Mockito.when(this.studyServiceImpl.getAdditionalDesignFactors(StudyServiceImplTest.STUDY_ID))
-				.thenReturn(Lists.newArrayList(TermId.REP_NO.name(), TermId.PLOT_NO.name(), StudyServiceImplTest.FACT1));
-
+			.thenReturn(Lists.newArrayList(TermId.REP_NO.name(), TermId.PLOT_NO.name(), StudyServiceImplTest.FACT1));
 
 	}
 
 	@Test
 	public void testHasMeasurementDataOnEnvironmentAssertTrue() {
 		Mockito.when(this.mockSqlQuery.uniqueResult()).thenReturn(1);
-		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
-				.thenReturn(this.mockSqlQuery);
+		Mockito.when(
+			this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
+			.thenReturn(this.mockSqlQuery);
 
 		Assert.assertTrue(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
 	}
@@ -131,22 +131,23 @@ public class StudyServiceImplTest {
 	@Test
 	public void testHasMeasurementDataOnEnvironmentAssertFalse() {
 		Mockito.when(this.mockSqlQuery.uniqueResult()).thenReturn(0);
-		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
-				.thenReturn(this.mockSqlQuery);
+		Mockito.when(
+			this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
+			.thenReturn(this.mockSqlQuery);
 
 		Assert.assertFalse(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
 	}
 
 	@Test
 	public void testHasMeasurementDataEnteredAssertTrue() {
-		final Object[] testDBRow = {2503,51547, "AleuCol_E_1to5", 43};
+		final Object[] testDBRow = {2503, 51547, "AleuCol_E_1to5", 43};
 		final List<Object[]> testResult = Collections.singletonList(testDBRow);
 		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
 
 		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
 			.thenReturn(this.mockSqlQuery);
 
-		final List<Integer> ids = Arrays.asList(1000,1002);
+		final List<Integer> ids = Arrays.asList(1000, 1002);
 		assertThat(true, is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
 	}
 
@@ -158,8 +159,8 @@ public class StudyServiceImplTest {
 		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
 			.thenReturn(this.mockSqlQuery);
 
-		final List<Integer> ids = Arrays.asList(1000,1002);
-		assertThat(false,is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
+		final List<Integer> ids = Arrays.asList(1000, 1002);
+		assertThat(false, is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
 	}
 
 	@Test
@@ -173,7 +174,6 @@ public class StudyServiceImplTest {
 
 	/**
 	 * Run the StudyServiceImpl(HibernateSessionProvider) constructor test.
-	 *
 	 */
 	@Test
 	public void testGetObservations() {
@@ -185,35 +185,37 @@ public class StudyServiceImplTest {
 		studyServiceImpl.setDaoFactory(this.daoFactory);
 
 		final List<MeasurementVariableDto> projectTraits =
-				Arrays.<MeasurementVariableDto>asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
+			Arrays.<MeasurementVariableDto>asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
 		Mockito.when(mockTraits.getVariables(StudyServiceImplTest.STUDY_ID, VariableType.TRAIT.getId(),
-				VariableType.SELECTION_METHOD.getId())).thenReturn(projectTraits);
+			VariableType.SELECTION_METHOD.getId())).thenReturn(projectTraits);
 		final List<MeasurementDto> traits = new ArrayList<>();
 		traits.add(new MeasurementDto(new MeasurementVariableDto(1, "traitName"), 9999, "traitValue", Phenotype.ValueStatus.OUT_OF_SYNC));
 		final ObservationDto measurement = new ObservationDto(1, "trialInstance", "entryType", StudyServiceImplTest.STUDY_ID, "designation",
-				"entryNo", "seedSource", "repitionNumber", "plotNumber", "blockNumber", traits);
+			"entryNo", "seedSource", "repitionNumber", "plotNumber", "blockNumber", traits);
 		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
 		final int instanceId = 1;
 		final int pageNumber = 1;
 		final int pageSize = 100;
 		Mockito.when(mockMeasurements.getAllMeasurements(StudyServiceImplTest.STUDY_ID, projectTraits,
-				this.additionalGermplasmDescriptors, this.additionalDesignFactors, instanceId, pageNumber, pageSize, null, null))
-				.thenReturn(testMeasurements);
+			this.additionalGermplasmDescriptors, this.additionalDesignFactors, instanceId, pageNumber, pageSize, null, null))
+			.thenReturn(testMeasurements);
 
 		// Method to test
-		final List<ObservationDto> actualMeasurements = studyServiceImpl.getObservations(StudyServiceImplTest.STUDY_ID, 1, 1, 100, null, null);
+		final List<ObservationDto> actualMeasurements =
+			studyServiceImpl.getObservations(StudyServiceImplTest.STUDY_ID, 1, 1, 100, null, null);
 
 		Assert.assertEquals(testMeasurements, actualMeasurements);
 		Mockito.verify(mockMeasurements).getAllMeasurements(StudyServiceImplTest.STUDY_ID, projectTraits,
-				this.additionalGermplasmDescriptors, this.additionalDesignFactors, instanceId, pageNumber, pageSize, null, null);
+			this.additionalGermplasmDescriptors, this.additionalDesignFactors, instanceId, pageNumber, pageSize, null, null);
 	}
 
 	@Test
 	public void testListAllStudies() {
 		final StudyTypeDto studyTypeDto = StudyTypeDto.getTrialDto();
-		final Object[] testDBRow = {2007, "Wheat Study 1", "Wheat Study 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", studyTypeDto.getId(),
+		final Object[] testDBRow = {
+			2007, "Wheat Study 1", "Wheat Study 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", studyTypeDto.getId(),
 			studyTypeDto.getLabel(), studyTypeDto.getName(), Byte.valueOf("1"), studyTypeDto.getCvTermId(),
-				"Wheat Study 1 Objective", "20150417", "20150422", "Mr. Breeder", "Auckland", "Summer"};
+			"Wheat Study 1 Objective", "20150417", "20150422", "Mr. Breeder", "Auckland", "Summer"};
 		final List<Object[]> testResult = Collections.singletonList(testDBRow);
 
 		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
@@ -241,52 +243,12 @@ public class StudyServiceImplTest {
 	}
 
 	@Test
-	public void testGetStudyInstances() {
-
-		final Random random = new Random();
-		final int studyId = random.nextInt();
-		final int environmentDatasetId = random.nextInt();
-		Mockito.doReturn(Collections.singletonList(new DmsProject(environmentDatasetId))).when(this.dmsProjectDao)
-			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
-
-		final StudyInstance instance1 = new StudyInstance(random.nextInt(), random.nextInt(), RandomStringUtils.randomAlphabetic(10),
-			RandomStringUtils.randomAlphabetic(10),
-			1, RandomStringUtils.randomAlphabetic(10), true);
-		final StudyInstance instance2 = new StudyInstance(random.nextInt(), random.nextInt(), RandomStringUtils.randomAlphabetic(10),
-			RandomStringUtils.randomAlphabetic(10),
-			2, RandomStringUtils.randomAlphabetic(10), false);
-		Mockito.doReturn(Arrays.asList(instance1, instance2)).when(this.dmsProjectDao).getDatasetInstances(environmentDatasetId);
-
-		final List<StudyInstance> studyInstances = this.studyServiceImpl.getStudyInstances(studyId);
-
-		Assert.assertEquals(2, studyInstances.size());
-		final StudyInstance firstInstance = studyInstances.get(0);
-		Assert.assertEquals(instance1.getInstanceDbId(), firstInstance.getInstanceDbId());
-		Assert.assertEquals(instance1.getLocationId(), firstInstance.getLocationId());
-		Assert.assertEquals(instance1.getLocationName(), firstInstance.getLocationName());
-		Assert.assertEquals(instance1.getLocationAbbreviation(), firstInstance.getLocationAbbreviation());
-		Assert.assertEquals(instance1.getCustomLocationAbbreviation(), firstInstance.getCustomLocationAbbreviation());
-		Assert.assertTrue(firstInstance.isHasFieldmap());
-		Assert.assertEquals(instance1.getInstanceNumber(), firstInstance.getInstanceNumber());
-		
-		final StudyInstance secondInstance = studyInstances.get(1);
-		Assert.assertEquals(instance2.getInstanceDbId(), secondInstance.getInstanceDbId());
-		Assert.assertEquals(instance2.getLocationId(), secondInstance.getLocationId());
-		Assert.assertEquals(instance2.getLocationName(), secondInstance.getLocationName());
-		Assert.assertEquals(instance2.getLocationAbbreviation(), secondInstance.getLocationAbbreviation());
-		Assert.assertEquals(instance2.getCustomLocationAbbreviation(), secondInstance.getCustomLocationAbbreviation());
-		Assert.assertFalse(secondInstance.isHasFieldmap());
-		Assert.assertEquals(instance2.getInstanceNumber(), secondInstance.getInstanceNumber());
-
-	}
-
-	@Test
 	public void testGetStudyDetailsForANursery() {
 		final List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
 		final StudyMetadata metadata =
-				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyTypeDto.NURSERY_NAME,
-					"studyName");
+			new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyTypeDto.NURSERY_NAME,
+				"studyName");
 
 		final UserDto user = new UserDto();
 		user.setEmail(RandomStringUtils.randomAlphabetic(10) + "@gmail.com");
@@ -333,8 +295,8 @@ public class StudyServiceImplTest {
 		final List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
 		final StudyMetadata metadata =
-				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "studyName", StudyTypeDto.TRIAL_NAME,
-					"studyName");
+			new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "studyName", StudyTypeDto.TRIAL_NAME,
+				"studyName");
 
 		final UserDto user = new UserDto();
 		user.setEmail("a@a.com");
@@ -353,7 +315,6 @@ public class StudyServiceImplTest {
 
 		final List<UserDto> users2 = new ArrayList<>();
 
-
 		final Map<String, String> properties1 = new HashMap<>();
 		properties1.put("p1", "v1");
 
@@ -364,8 +325,8 @@ public class StudyServiceImplTest {
 		Mockito.when(this.studyDataManager.getUsersForEnvironment(metadata.getStudyDbId())).thenReturn(users2);
 		Mockito.when(this.studyDataManager.getStudyMetadataForGeolocationId(metadata.getStudyDbId())).thenReturn(metadata);
 		Mockito.when(this.studyDataManager.getProjectPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties1);
-		Mockito.when(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(metadata.getNurseryOrTrialId())).thenReturn(properties2);
-
+		Mockito.when(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(metadata.getNurseryOrTrialId()))
+			.thenReturn(properties2);
 
 		final StudyDetailsDto studyDetailsDto = this.studyServiceImpl.getStudyDetailsForGeolocation(metadata.getStudyDbId());
 
@@ -384,44 +345,51 @@ public class StudyServiceImplTest {
 		assertThat(studyDetailsDto.getContacts().size(), equalTo(users1.size() + users2.size()));
 
 	}
-	
+
 	@Test
 	public void testFindGenericGermplasmDescriptors() {
 		final List<String> genericGermplasmFactors = this.studyServiceImpl.getGenericGermplasmDescriptors(StudyServiceImplTest.STUDY_ID);
 		Assert.assertEquals(this.additionalGermplasmDescriptors, genericGermplasmFactors);
 	}
-	
+
 	@Test
 	public void testFindAdditionalDesignFactors() {
 		final List<String> genericDesignFactors = this.studyServiceImpl.getAdditionalDesignFactors(StudyServiceImplTest.STUDY_ID);
 		Assert.assertEquals(this.additionalDesignFactors, genericDesignFactors);
 	}
-	
+
 	@Test
 	public void testGetYearFromStudy() {
 		Mockito.when(this.studyDataManager.getProjectStartDateByProjectId(ArgumentMatchers.anyInt())).thenReturn("20180404");
 		final String year = this.studyServiceImpl.getYearFromStudy(1);
 		Assert.assertEquals("2018", year);
 	}
-	
+
 	@Test
 	public void testGetYearFromStudyNull() {
 		Mockito.when(this.studyDataManager.getProjectStartDateByProjectId(ArgumentMatchers.anyInt())).thenReturn(null);
 		final String year = this.studyServiceImpl.getYearFromStudy(1);
 		Assert.assertNull(year);
 	}
-	
+
 	@Test
 	public void testGetTrialObservationTable() {
 		final List<Object[]> results = new ArrayList<>();
-		final Object[] result = {1, 1, "Test", 1, "desig", 1, "entry code", "1", "PLOT_NO", "1", 1, 1, "OBS_UNIT_ID", "LOC_NAME", "LOC_ABBR", 1, 1, 1, 1, "Study Name", 1};
+		final Object[] result = {
+			1, 1, "Test", 1, "desig", 1, "entry code", "1", "PLOT_NO", "1", 1, 1, "OBS_UNIT_ID", "LOC_NAME", "LOC_ABBR", 1, 1, 1, 1,
+			"Study Name", 1};
 		results.add(result);
-		Mockito.when(this.studyMeasurements.getAllStudyDetailsAsTable(ArgumentMatchers.anyInt(), ArgumentMatchers.anyListOf(MeasurementVariableDto.class), ArgumentMatchers.anyInt())).thenReturn(results);
-		Mockito.when(this.measurementVariableService.getVariables(1, VariableType.TRAIT.getId())).thenReturn(Arrays.asList(new MeasurementVariableDto(TermId.ALTITUDE.getId(), TermId.ALTITUDE.name())));
+		Mockito.when(this.studyMeasurements
+			.getAllStudyDetailsAsTable(ArgumentMatchers.anyInt(), ArgumentMatchers.anyListOf(MeasurementVariableDto.class),
+				ArgumentMatchers.anyInt())).thenReturn(results);
+		Mockito.when(this.measurementVariableService.getVariables(1, VariableType.TRAIT.getId()))
+			.thenReturn(Arrays.asList(new MeasurementVariableDto(TermId.ALTITUDE.getId(), TermId.ALTITUDE.name())));
 		Mockito.when(this.studyDataManager.getProjectStartDateByProjectId(1)).thenReturn("20180821");
-		
+
 		final TrialObservationTable dto = this.studyServiceImpl.getTrialObservationTable(1, 1);
-		Mockito.verify(this.studyMeasurements).getAllStudyDetailsAsTable(ArgumentMatchers.anyInt(), ArgumentMatchers.anyListOf(MeasurementVariableDto.class), ArgumentMatchers.anyInt());
+		Mockito.verify(this.studyMeasurements)
+			.getAllStudyDetailsAsTable(ArgumentMatchers.anyInt(), ArgumentMatchers.anyListOf(MeasurementVariableDto.class),
+				ArgumentMatchers.anyInt());
 		Mockito.verify(this.measurementVariableService).getVariables(1, VariableType.TRAIT.getId());
 		Assert.assertNotNull(dto.getHeaderRow());
 		Assert.assertEquals("1", dto.getStudyDbId().toString());

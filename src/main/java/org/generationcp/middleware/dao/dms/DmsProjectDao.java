@@ -51,6 +51,7 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.BooleanType;
 import org.hibernate.type.DoubleType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -866,7 +867,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER).addScalar("project_id").addScalar("name")
 					.addScalar("description").addScalar("is_study", new IntegerType()).addScalar("program_uuid").addScalar("studyType")
 					.addScalar("label")
-					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("created_by", new IntegerType());
+					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked")
+					.addScalar("created_by", new IntegerType());
 			query.setParameter("folderId", folderId);
 			query.setParameter("studyTypeId", studyType);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
@@ -908,7 +910,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final Boolean isLocked = (Boolean) row[9];
 					final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
 					final String ownerId = (String) row[10];
-					studyReference = new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, Integer.valueOf(ownerId));
+					studyReference =
+						new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, Integer.valueOf(ownerId));
 				}
 			}
 
@@ -1134,28 +1137,29 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<StudyInstance> getDatasetInstances(final int datasetId) {
 
 		try {
-			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
-			    + " geoloc.description as INSTANCE_NUMBER, \n"
-				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as LOCATION_ID, \n"  // 8190 = cvterm for LOCATION_ID
-				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" +
-				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" +
+			final String sql = "select \n" + "	geoloc.nd_geolocation_id as instanceDbId, \n"
+				+ "	nde.nd_experiment_id as experimentId, \n"
+				+ " geoloc.description as instanceNumber, \n"
+				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as locationId, \n"  // 8190 = cvterm for LOCATION_ID
+				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as locationName, \n" +
+				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as locationAbbreviation, \n" + // 8189 = cvterm for LOCATION_ABBR
+				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as customLocationAbbreviation, \n" +
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n"
+				"	case when max(if(geoprop.type_id = 8583, geoprop.value, null)) is null then 0 else 1 end as hasFieldmap, \n"
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
-				+ "  (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
-				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) as PLOT_EXP_COUNT, "
-				+ "  (select count(1) from sample s "
+				+ "  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
+				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
+				+ "  case when (select count(1) from sample s "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as SAMPLE_COUNT, "
-				+ "	 (select count(1) from nd_experiment exp "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasSample, "
+				+ "	 case when (select count(1) from nd_experiment exp "
 				+ "   INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 "
 				+ "   INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as SUBOBS_COUNT, "
-				+ "  (select count(1) from phenotype ph "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasSubobservations, "
+				+ "  case when (select count(1) from phenotype ph "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
 				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
-				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) as MEASUREMENTS_COUNT "
+				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) > 0 then 1 else 0 end as hasMeasurements "
 				+ "    from	nd_geolocation geoloc \n"
 				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 				+ "    inner join project proj on proj.project_id = nde.project_id \n"
@@ -1166,40 +1170,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("datasetId", datasetId);
-			query.addScalar("INSTANCE_DBID", new IntegerType());
-			query.addScalar("INSTANCE_NUMBER", new IntegerType());
-			query.addScalar("LOCATION_ID", new IntegerType());
-			query.addScalar("LOCATION_NAME", new StringType());
-			query.addScalar("LOCATION_ABBR", new StringType());
-			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
-			query.addScalar("FIELDMAP_BLOCK", new StringType());
-			query.addScalar("PLOT_EXP_COUNT", new IntegerType());
-			query.addScalar("SAMPLE_COUNT", new IntegerType());
-			query.addScalar("SUBOBS_COUNT", new IntegerType());
-			query.addScalar("MEASUREMENTS_COUNT", new IntegerType());
 
-			final List queryResults = query.list();
-			final List<StudyInstance> instances = new ArrayList<>();
-			for (final Object result : queryResults) {
-				final Object[] row = (Object[]) result;
-				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[6]);
-				final Integer plotExperimentsCount = (Integer) row[7];
-				final boolean hasExperimentalDesign = plotExperimentsCount != null && plotExperimentsCount > 0;
-				final Integer sampleCount = (Integer) row[8];
-				final boolean hasSample = sampleCount != null && sampleCount > 0;
-				final Integer subObservationsCount = (Integer) row[9];
-				final boolean hasSubobservations = subObservationsCount != null && subObservationsCount > 0;
-				final Integer measurementsCount = (Integer) row[10];
-				final boolean hasMeasurements = measurementsCount != null && measurementsCount > 0;
-
-				final StudyInstance instance =
-					new StudyInstance((Integer) row[0], (Integer) row[2] ,(String) row[3], (String) row[4], (Integer) row[1], (String) row[5], hasFieldmap);
-				instance.setHasExperimentalDesign(hasExperimentalDesign);
-				instance.setHasMeasurements(hasMeasurements);
-				instance.setCanBeDeleted(!hasSample && !hasSubobservations);
-				instances.add(instance);
-			}
-			return instances;
+			query.addScalar("instanceDbId", new IntegerType());
+			query.addScalar("experimentId", new IntegerType());
+			query.addScalar("locationId", new IntegerType());
+			query.addScalar("locationName", new StringType());
+			query.addScalar("locationAbbreviation", new StringType());
+			query.addScalar("customLocationAbbreviation", new StringType());
+			query.addScalar("hasFieldmap", new BooleanType());
+			query.addScalar("instanceNumber", new IntegerType());
+			query.addScalar("hasExperimentalDesign", new BooleanType());
+			query.addScalar("hasSample", new BooleanType());
+			query.addScalar("hasSubobservations", new BooleanType());
+			query.addScalar("hasMeasurements", new BooleanType());
+			query.setResultTransformer(Transformers.aliasToBean(StudyInstance.class));
+			return query.list();
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
 				"Unexpected error in executing getDatasetInstances(datasetId = " + datasetId + ") query: " + he.getMessage(), he);
@@ -1318,12 +1303,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			criteria.add(Restrictions.eq("dt.datasetTypeId", datasetTypeId));
 			return criteria.list();
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error getting getDatasetsByTypeForStudy for datasetTypeId =" + datasetTypeId + ":" + e.getMessage();
+			final String errorMessage =
+				"Error getting getDatasetsByTypeForStudy for datasetTypeId =" + datasetTypeId + ":" + e.getMessage();
 			DmsProjectDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
-
 
 	public List<Integer> getPersonIdsAssociatedToStudy(final Integer studyId) {
 		Preconditions.checkNotNull(studyId);
