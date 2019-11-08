@@ -17,9 +17,9 @@ import java.util.UUID;
 @Service
 public class LotIDGeneratorImpl implements LotIDGenerator {
 
-	protected static final String MID_STRING = "L";
+	public static final String MID_STRING = "L";
 
-	protected static final int SUFFIX_LENGTH = 8;
+	public static final int SUFFIX_LENGTH = 8;
 
 	@Override
 	public void generateLotIds(final CropType crop, final List<Lot> lots) {
