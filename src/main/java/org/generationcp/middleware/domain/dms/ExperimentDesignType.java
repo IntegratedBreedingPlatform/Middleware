@@ -11,16 +11,16 @@ public class ExperimentDesignType {
 	// Constants for well known (e.g. BreedingView) design types.
 	public static final ExperimentDesignType RANDOMIZED_COMPLETE_BLOCK = new ExperimentDesignType(0, "Randomized Complete Block Design",
 		TermId.RANDOMIZED_COMPLETE_BLOCK.getId(), 0,
-		"randomizedCompleteBlockParams.html", 0, 0, "Randomized block design");
+		"randomizedCompleteBlockParams.html", 0, 0, "RandomizedBlock");
 
 	public static final ExperimentDesignType RESOLVABLE_INCOMPLETE_BLOCK =
 		new ExperimentDesignType(1, "Resolvable Incomplete Block Design", TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId(),
 			TermId.RESOLVABLE_INCOMPLETE_BLOCK_LATIN.getId(),
-			"incompleteBlockParams.html", 0, 0, "Resolvable incomplete block design");
+			"incompleteBlockParams.html", 0, 0, "ResolvableIncompleteBlock");
 
 	public static final ExperimentDesignType ROW_COL =
 		new ExperimentDesignType(2, "Row-and-Column", TermId.RESOLVABLE_INCOMPLETE_ROW_COL.getId(),
-			TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId(), "rowAndColumnParams.html", 0, 0, "Resolvable row-column design");
+			TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId(), "rowAndColumnParams.html", 0, 0, "ResolvableRowColumn");
 
 	public static final ExperimentDesignType
 		CUSTOM_IMPORT = new ExperimentDesignType(3, "Custom Import Design", TermId.OTHER_DESIGN.getId(), 0, null, 0, 0, "");
@@ -28,14 +28,14 @@ public class ExperimentDesignType {
 	// Augmented design is just a variation of the Incomplete Block Design type.
 	public static final ExperimentDesignType AUGMENTED_RANDOMIZED_BLOCK =
 		new ExperimentDesignType(4, "Augmented Randomized Block design", TermId.AUGMENTED_RANDOMIZED_BLOCK.getId(), 0,
-			"augmentedRandomizedBlockParams.html", 0, 0, "Incomplete block design");
+			"augmentedRandomizedBlockParams.html", 0, 0, "Augmented");
 
 	public static final ExperimentDesignType
 		ENTRY_LIST_ORDER = new ExperimentDesignType(5, "Entry list order", TermId.ENTRY_LIST_ORDER.getId(), 0,
 		"entryListOrderParams.html", 0, 0, "");
 
 	public static final ExperimentDesignType P_REP = new ExperimentDesignType(6, "P-Rep Design", TermId.P_REP.getId(), 0,
-		"pRepParams.html", 0, 0, "P-rep design");
+		"pRepParams.html", 0, 0, "Prep");
 
 	private static final List<ExperimentDesignType> values = ImmutableList
 		.of(RANDOMIZED_COMPLETE_BLOCK, RESOLVABLE_INCOMPLETE_BLOCK, ROW_COL, CUSTOM_IMPORT, AUGMENTED_RANDOMIZED_BLOCK, ENTRY_LIST_ORDER,
@@ -63,7 +63,7 @@ public class ExperimentDesignType {
 
 	public static int getTermIdByDesignTypeId(final int designTypeId, final Boolean isLatinized) {
 		for (final ExperimentDesignType experimentDesignType : values) {
-			if (experimentDesignType.getId().intValue() == designTypeId) {
+			if (experimentDesignType.getId() == designTypeId) {
 				return isLatinized == Boolean.TRUE ? experimentDesignType.getTermIdLatinized() : experimentDesignType.getTermId();
 			}
 		}
@@ -72,13 +72,21 @@ public class ExperimentDesignType {
 
 	public static ExperimentDesignType getDesignTypeItemByTermId(final int termId) {
 		for (final ExperimentDesignType experimentDesignType : values) {
-			if (experimentDesignType.getTermId().intValue() == termId || experimentDesignType.getTermIdLatinized().intValue() == termId) {
+			if (experimentDesignType.getTermId() == termId || experimentDesignType.getTermIdLatinized() == termId) {
 				return experimentDesignType;
 			}
 		}
 		return null;
 	}
 
+	public static ExperimentDesignType getDesignTypeById(final int id) {
+		for (final ExperimentDesignType experimentDesignType : values) {
+			if (experimentDesignType.getId() == id) {
+				return experimentDesignType;
+			}
+		}
+		return null;
+	}
 	public static boolean isLatinized(final int termId) {
 		return TermId.RESOLVABLE_INCOMPLETE_BLOCK_LATIN.getId() == termId ||
 			TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId() == termId;

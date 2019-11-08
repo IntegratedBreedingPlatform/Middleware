@@ -1135,14 +1135,28 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		try {
 			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
+			    + " geoloc.description as INSTANCE_NUMBER, \n"
 				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as LOCATION_ID, \n"  // 8190 = cvterm for LOCATION_ID
 				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" +
 				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
 				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" +
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n" +
+				"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n"
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
-				"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
+				+ "  (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
+				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) as PLOT_EXP_COUNT, "
+				+ "  (select count(1) from sample s "
+				+ "  inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as SAMPLE_COUNT, "
+				+ "	 (select count(1) from nd_experiment exp "
+				+ "   INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 "
+				+ "   INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) as SUBOBS_COUNT, "
+				+ "  (select count(1) from phenotype ph "
+				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
+				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) as MEASUREMENTS_COUNT "
+				+ "    from	nd_geolocation geoloc \n"
 				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 				+ "    inner join project proj on proj.project_id = nde.project_id \n"
 				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
@@ -1153,20 +1167,36 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("datasetId", datasetId);
 			query.addScalar("INSTANCE_DBID", new IntegerType());
+			query.addScalar("INSTANCE_NUMBER", new IntegerType());
 			query.addScalar("LOCATION_ID", new IntegerType());
 			query.addScalar("LOCATION_NAME", new StringType());
 			query.addScalar("LOCATION_ABBR", new StringType());
 			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
 			query.addScalar("FIELDMAP_BLOCK", new StringType());
-			query.addScalar("INSTANCE_NUMBER", new IntegerType());
+			query.addScalar("PLOT_EXP_COUNT", new IntegerType());
+			query.addScalar("SAMPLE_COUNT", new IntegerType());
+			query.addScalar("SUBOBS_COUNT", new IntegerType());
+			query.addScalar("MEASUREMENTS_COUNT", new IntegerType());
 
 			final List queryResults = query.list();
 			final List<StudyInstance> instances = new ArrayList<>();
 			for (final Object result : queryResults) {
 				final Object[] row = (Object[]) result;
-				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[5]);
+				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[6]);
+				final Integer plotExperimentsCount = (Integer) row[7];
+				final boolean hasExperimentalDesign = plotExperimentsCount != null && plotExperimentsCount > 0;
+				final Integer sampleCount = (Integer) row[8];
+				final boolean hasSample = sampleCount != null && sampleCount > 0;
+				final Integer subObservationsCount = (Integer) row[9];
+				final boolean hasSubobservations = subObservationsCount != null && subObservationsCount > 0;
+				final Integer measurementsCount = (Integer) row[10];
+				final boolean hasMeasurements = measurementsCount != null && measurementsCount > 0;
+
 				final StudyInstance instance =
-					new StudyInstance((Integer) row[0], (Integer) row[1] ,(String) row[2], (String) row[3], (Integer) row[6], (String) row[4], hasFieldmap);
+					new StudyInstance((Integer) row[0], (Integer) row[2] ,(String) row[3], (String) row[4], (Integer) row[1], (String) row[5], hasFieldmap);
+				instance.setHasExperimentalDesign(hasExperimentalDesign);
+				instance.setHasMeasurements(hasMeasurements);
+				instance.setCanBeDeleted(!hasSample && !hasSubobservations);
 				instances.add(instance);
 			}
 			return instances;
