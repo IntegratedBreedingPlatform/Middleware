@@ -561,8 +561,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "    act.trnid AS transactionId,"//
 		+ "    users.uname AS user,"//
 		+ "    (CASE"//
-		+ "        WHEN i.comments IN ('Lot closed' , 'Discard') THEN i.comments"//
-		+ "        WHEN trnstat = 0 AND trnqty > 0 THEN 'Deposit'"//
+		+ "        WHEN trnstat = 1 AND trnqty >= 0 THEN 'Deposit'"//
 		+ "        WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation'"//
 		+ "        WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal'"//
 		+ "    END) AS transactionType,"//
@@ -646,7 +645,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 			if (transactionsSearchDto.getTransactionType() != null) {
 				query.append("and (CASE"
-					+ "        WHEN trnstat = 0 AND trnqty >= 0 THEN 'Deposit'"
+					+ "        WHEN trnstat = 1 AND trnqty >= 0 THEN 'Deposit'"
 					+ "        WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation'"
 					+ "        WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal'"
 					+ "    END) = '")
