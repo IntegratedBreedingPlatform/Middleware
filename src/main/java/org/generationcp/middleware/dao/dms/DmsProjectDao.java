@@ -1151,11 +1151,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
 				+ "  case when (select count(1) from sample s "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasSample, "
-				+ "	 case when (select count(1) from nd_experiment exp "
-				+ "   INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 "
-				+ "   INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasSubobservations, "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 and (select count(1) from nd_experiment exp \n"
+				+ " INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 \n"
+				+ " INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0"
+				+ " then 1 else 0 end as canBeDeleted, "
 				+ "  case when (select count(1) from phenotype ph "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
 				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
@@ -1180,8 +1179,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("hasFieldmap", new BooleanType());
 			query.addScalar("instanceNumber", new IntegerType());
 			query.addScalar("hasExperimentalDesign", new BooleanType());
-			query.addScalar("hasSample", new BooleanType());
-			query.addScalar("hasSubobservations", new BooleanType());
+			query.addScalar("canBeDeleted", new BooleanType());
 			query.addScalar("hasMeasurements", new BooleanType());
 			query.setResultTransformer(Transformers.aliasToBean(StudyInstance.class));
 			return query.list();
