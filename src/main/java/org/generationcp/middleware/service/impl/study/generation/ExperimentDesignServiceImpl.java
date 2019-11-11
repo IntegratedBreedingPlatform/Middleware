@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -29,7 +28,6 @@ import org.generationcp.middleware.service.api.study.generation.ExperimentDesign
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,7 +38,6 @@ import java.util.Set;
 @Transactional
 public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
-	//  TODO: Investigate how BLOCK_NAME (termId=8584) is saved in projectprop
 	private static final List<Integer> FIELDMAP_ENVT_VARIABLES = Collections.singletonList(TermId.BLOCK_ID.getId());
 
 	private static final List<Integer> EXPERIMENTAL_DESIGN_VARIABLES = Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
@@ -49,7 +46,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
 		TermId.NO_OF_COLS_IN_REPS.getId(), TermId.NO_OF_CROWS_LATINIZE.getId(), TermId.NO_OF_CCOLS_LATINIZE.getId(),
 		TermId.NO_OF_CBLKS_LATINIZE.getId(), TermId.EXPT_DESIGN_SOURCE.getId(), TermId.NBLKS.getId(),
-		TermId.CHECK_PLAN.getId(), TermId.CHECK_INTERVAL.getId(), TermId.CHECK_START.getId(), TermId.BLOCK_ID.getId());
+		TermId.CHECK_PLAN.getId(), TermId.CHECK_INTERVAL.getId(), TermId.CHECK_START.getId());
 
 
 	private DaoFactory daoFactory;
