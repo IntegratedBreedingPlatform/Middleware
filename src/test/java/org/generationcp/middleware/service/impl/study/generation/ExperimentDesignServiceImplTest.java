@@ -90,6 +90,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	private CVTerm treatmentFactor;
 	private CVTerm treatmentFactorLabel;
 	private Integer[] gids;
+	private List<Integer> geolocationIds;
 
 	@Before
 	public void setup() throws Exception {
@@ -115,8 +116,11 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			this.studyReference = this.studyTDI.addTestStudy();
 			this.studyId = this.studyReference.getId();
 			this.environmentDatasetId = this.studyTDI.createEnvironmentDataset(new CropType(), this.studyId, LOCATION_ID, null);
+			this.geolocationIds = new ArrayList<>();
 			for (int i = 1; i < NO_INSTANCES; i++) {
-				this.studyTDI.addEnvironmentToDataset(new CropType(), this.environmentDatasetId, i + 1, LOCATION_ID, null);
+				final Integer geolocationId =
+					this.studyTDI.addEnvironmentToDataset(new CropType(), this.environmentDatasetId, i + 1, LOCATION_ID, null);
+				this.geolocationIds.add(geolocationId);
 			}
 			this.plotDatasetId = this.studyTDI.addTestDataset(this.studyId, DatasetTypeEnum.PLOT_DATA.getId()).getId();
 			this.treatmentFactor = this.daoFactory.getCvTermDao()
@@ -207,6 +211,11 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows((Arrays.asList(1, 2))));
 		final List<ObservationUnitRow> previousRows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
 		Assert.assertEquals(2 * NO_ENTRIES * NO_REPS * NO_TREATMENTS, previousRows.size());
+		final Integer gelocationId1 = this.geolocationIds.get(0);
+		this.daoFactory.getGeolocationPropertyDao().save(this.createGeolocationProperty(gelocationId1, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5)));
+		Assert.assertTrue(this.daoFactory.getGeolocationPropertyDao()
+			.getGeoLocationPropertyByVariableId(this.environmentDatasetId, gelocationId1)
+			.containsKey(TermId.BLOCK_ID.getId()));
 
 		// Save design - overwrite first instance
 		this.experimentDesignService
@@ -219,6 +228,9 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		this.verifyEnvironmentVariablesWereSaved();
 		this.verifyPlotVariablesWereSaved();
 		this.verifyGeolocationPropRecords(true, Arrays.asList(1, 2, 3));
+		Assert.assertFalse(this.daoFactory.getGeolocationPropertyDao()
+			.getGeoLocationPropertyByVariableId(this.environmentDatasetId, gelocationId1)
+			.containsKey(TermId.BLOCK_ID.getId()));
 
 		// Check that plot experiments are created per instance
 		Assert.assertEquals(NO_INSTANCES * NO_ENTRIES * NO_REPS * NO_TREATMENTS, rows.size());
@@ -276,15 +288,31 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		this.experimentDesignService
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(
 				instanceNumbers));
+		// Add fieldmap-related environment variables
+		this.daoFactory.getProjectPropertyDAO().save(new ProjectProperty(new DmsProject(this.environmentDatasetId), VariableType.ENVIRONMENT_DETAIL.getId(), null, 1, TermId.BLOCK_ID.getId(), "BLOCK_ID"));
+		this.daoFactory.getGeolocationPropertyDao().save(this.createGeolocationProperty(this.geolocationIds.get(0), TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5)));
+
+		List<Integer> environmentVariableIds =
+			this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(this.environmentDatasetId);
+		Assert.assertTrue(environmentVariableIds.contains(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
+		Assert.assertTrue(environmentVariableIds.contains(TermId.NUMBER_OF_REPLICATES.getId()));
+		Assert.assertTrue(environmentVariableIds.contains(TermId.BLOCK_ID.getId()));
+		Assert.assertTrue(this.daoFactory.getGeolocationPropertyDao()
+			.getGeoLocationPropertyByVariableId(this.environmentDatasetId, this.geolocationIds.get(0))
+			.containsKey(TermId.BLOCK_ID.getId()));
+
+
+		// Delete experiment design
 		this.experimentDesignService.deleteStudyExperimentDesign(this.studyId);
 
 		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
 		Assert.assertTrue(rows.isEmpty());
 
-		final List<Integer> environmentVariableIds =
+		environmentVariableIds =
 			this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(this.environmentDatasetId);
 		Assert.assertFalse(environmentVariableIds.contains(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
 		Assert.assertFalse(environmentVariableIds.contains(TermId.NUMBER_OF_REPLICATES.getId()));
+		Assert.assertFalse(environmentVariableIds.contains(TermId.BLOCK_ID.getId()));
 
 		final List<Integer> plotVariableIds =
 			this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(this.plotDatasetId);
@@ -457,6 +485,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			} else {
 				Assert.assertNull(propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
 				Assert.assertNull(propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()));
+				Assert.assertNull(propertiesMap.get(TermId.BLOCK_ID.getId()));
 			}
 			// Location ID should always exist with or without design
 			Assert.assertNotNull(propertiesMap.get(TermId.LOCATION_ID.getId()));
@@ -480,6 +509,12 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		nrepVariable.setTermId(TermId.NUMBER_OF_REPLICATES.getId());
 		nrepVariable.setValue(NO_REPS.toString());
 		variables.add(nrepVariable);
+
+		final MeasurementVariable blockIdVariable = new MeasurementVariable();
+		blockIdVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		blockIdVariable.setAlias("BLOCK_ID");
+		blockIdVariable.setTermId(TermId.BLOCK_ID.getId());
+		variables.add(blockIdVariable);
 
 		final MeasurementVariable trialInstanceVariable = new MeasurementVariable();
 		trialInstanceVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
@@ -569,6 +604,15 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		}
 
 		return instanceRowsMap;
+	}
+
+	private GeolocationProperty createGeolocationProperty(final Integer geolocationId, final Integer variableId, final String value) {
+		final GeolocationProperty property = new GeolocationProperty();
+		property.setGeolocation(this.daoFactory.getGeolocationDao().getById(geolocationId));
+		property.setType(variableId);
+		property.setRank(1);
+		property.setValue(value);
+		return property;
 	}
 
 }

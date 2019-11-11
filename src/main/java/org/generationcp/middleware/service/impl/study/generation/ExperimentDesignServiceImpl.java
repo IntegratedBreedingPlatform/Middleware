@@ -4,8 +4,10 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -27,7 +29,9 @@ import org.generationcp.middleware.service.api.study.generation.ExperimentDesign
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,13 +40,17 @@ import java.util.Set;
 @Transactional
 public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
+	//  TODO: Investigate how BLOCK_NAME (termId=8584) is saved in projectprop
+	private static final List<Integer> FIELDMAP_ENVT_VARIABLES = Collections.singletonList(TermId.BLOCK_ID.getId());
+
 	private static final List<Integer> EXPERIMENTAL_DESIGN_VARIABLES = Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
 		TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(), TermId.BLOCKS_PER_REPLICATE.getId(),
 		TermId.PERCENTAGE_OF_REPLICATION.getId(),
 		TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
 		TermId.NO_OF_COLS_IN_REPS.getId(), TermId.NO_OF_CROWS_LATINIZE.getId(), TermId.NO_OF_CCOLS_LATINIZE.getId(),
 		TermId.NO_OF_CBLKS_LATINIZE.getId(), TermId.EXPT_DESIGN_SOURCE.getId(), TermId.NBLKS.getId(),
-		TermId.CHECK_PLAN.getId(), TermId.CHECK_INTERVAL.getId(), TermId.CHECK_START.getId());
+		TermId.CHECK_PLAN.getId(), TermId.CHECK_INTERVAL.getId(), TermId.CHECK_START.getId(), TermId.BLOCK_ID.getId());
+
 
 	private DaoFactory daoFactory;
 	private ExperimentModelGenerator experimentGenerator;
@@ -221,17 +229,19 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 	private void deleteTrialInstanceExperiments(final Integer plotDatasetId, final Integer environmentDatasetId, final List<Integer> instanceNumbers) {
 		this.daoFactory.getExperimentDao().deleteExperimentsForDatasetInstances(plotDatasetId, instanceNumbers);
-		this.daoFactory.getGeolocationPropertyDao().deletePropertiesInDatasetInstances(environmentDatasetId, instanceNumbers, ExperimentDesignServiceImpl.EXPERIMENTAL_DESIGN_VARIABLES);
+		final List<Integer> geolocVariables = Lists.newArrayList(Iterables.concat(EXPERIMENTAL_DESIGN_VARIABLES, FIELDMAP_ENVT_VARIABLES));
+		this.daoFactory.getGeolocationPropertyDao().deletePropertiesInDatasetInstances(environmentDatasetId, instanceNumbers, geolocVariables);
 	}
 
 
 	@Override
 	public void deleteStudyExperimentDesign(final int studyId) {
-		// Delete environment variables related to experiment design
+		// Delete environment variables related to experiment design and fieldmap
+		final List<Integer> geolocVariables = Lists.newArrayList(Iterables.concat(EXPERIMENTAL_DESIGN_VARIABLES, FIELDMAP_ENVT_VARIABLES));
 		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO()
-			.deleteProjectVariables(environmentDatasetId, ExperimentDesignServiceImpl.EXPERIMENTAL_DESIGN_VARIABLES);
-		this.daoFactory.getGeolocationPropertyDao().deletePropertiesInDataset(environmentDatasetId, ExperimentDesignServiceImpl.EXPERIMENTAL_DESIGN_VARIABLES);
+			.deleteProjectVariables(environmentDatasetId, geolocVariables);
+		this.daoFactory.getGeolocationPropertyDao().deletePropertiesInDataset(environmentDatasetId, geolocVariables);
 
 		// Delete variables related to experiment design and experiments of plot dataset
 		final Integer plotDatasetId = this.getPlotDatasetId(studyId);
