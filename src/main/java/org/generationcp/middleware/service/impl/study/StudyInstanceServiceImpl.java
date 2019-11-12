@@ -90,7 +90,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		}
 		return instances;
 	}
-	}
 
 	protected Optional<Location> getUnspecifiedLocation() {
 		final List<Location> locations = this.daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
