@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -10,6 +11,7 @@ import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -18,6 +20,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -164,6 +167,10 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		final DmsProject subObsDataset =
 			this.testDataInitializer
 				.createDmsProject("Plot Dataset", "Plot Dataset-Description", study, plotDataset, DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS);
+		final GermplasmList advanceList = GermplasmListTestDataInitializer.createGermplasmListWithType(null,
+			GermplasmListType.ADVANCED.name());
+		advanceList.setProjectId(study.getProjectId());
+		this.daoFactory.getGermplasmListDAO().save(advanceList);
 
 		final Geolocation instance1 = this.testDataInitializer.createTestGeolocation("1", 1);
 		final Geolocation instance2 = this.testDataInitializer.createTestGeolocation("2", 2);
@@ -217,7 +224,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertTrue(studyInstance2.isHasExperimentalDesign());
-		Assert.assertTrue(studyInstance2.getCanBeDeleted());
+		// Instance deletion not allowed because study has advance list and design already generated for instance
+		Assert.assertFalse(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 
 		final StudyInstance studyInstance3 = studyInstances.get(2);

@@ -78,7 +78,18 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final int environmentDatasetId =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0)
 				.getProjectId();
-		return this.daoFactory.getDmsProjectDAO().getDatasetInstances(environmentDatasetId);
+		final List<StudyInstance> instances = this.daoFactory.getDmsProjectDAO().getDatasetInstances(environmentDatasetId);
+		// If study has advance or cross list and instance has experiment design, mark instance as cannot be deleted
+		final boolean hasAdvancedOrCrossesList = this.daoFactory.getGermplasmListDAO().hasAdvancedOrCrossesList(studyId);
+		if (hasAdvancedOrCrossesList) {
+			for (final StudyInstance instance : instances) {
+				if (instance.isHasExperimentalDesign()) {
+					instance.setCanBeDeleted(false);
+				}
+			}
+		}
+		return instances;
+	}
 	}
 
 	protected Optional<Location> getUnspecifiedLocation() {
