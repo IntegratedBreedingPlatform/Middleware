@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface StudyInstanceService {
 
-	StudyInstance createStudyInstance(final CropType crop, final int datasetId, final int instanceNumber);
+	StudyInstance createStudyInstance(final CropType crop, final int studyId, final int datasetId);
 
 	List<StudyInstance> getStudyInstances(int studyId);
 

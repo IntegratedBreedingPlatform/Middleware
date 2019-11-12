@@ -115,9 +115,13 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testCreateStudyInstance() {
 
-		final int instanceNumber = 1;
-		this.studyInstanceService.createStudyInstance(this.cropType, this.environmentDataset.getId(), instanceNumber);
+		// Create instance 1
+		this.studyInstanceService.createStudyInstance(this.cropType, this.studyReference.getId(), this.environmentDataset.getId());
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
 
+		// Create instance 2
+		this.studyInstanceService.createStudyInstance(this.cropType, this.studyReference.getId(), this.environmentDataset.getId());
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
 
@@ -125,7 +129,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			this.studyInstanceService.getStudyInstances(this.studyReference.getId());
 
 		final StudyInstance studyInstance = studyInstances.get(0);
-		assertEquals(instanceNumber, studyInstance.getInstanceNumber());
+		assertEquals(1, studyInstance.getInstanceNumber());
 		assertNotNull(studyInstance.getInstanceDbId());
 		assertNotNull(studyInstance.getExperimentId());
 		assertNotNull(studyInstance.getLocationId());
@@ -133,13 +137,24 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertEquals("Unspecified Location", studyInstance.getLocationName());
 		assertEquals("NOLOC", studyInstance.getLocationAbbreviation());
 		assertNull(studyInstance.getCustomLocationAbbreviation());
+
+		final StudyInstance studyInstance2 = studyInstances.get(1);
+		assertEquals(2, studyInstance2.getInstanceNumber());
+		assertNotNull(studyInstance2.getInstanceDbId());
+		assertNotNull(studyInstance2.getExperimentId());
+		assertNotNull(studyInstance2.getLocationId());
+		assertFalse(studyInstance2.isHasFieldmap());
+		assertEquals("Unspecified Location", studyInstance2.getLocationName());
+		assertEquals("NOLOC", studyInstance2.getLocationAbbreviation());
+		assertNull(studyInstance2.getCustomLocationAbbreviation());
 	}
 
 	@Test
 	public void testGetStudyInstances() {
 
 		final DmsProject study =
-			this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.daoFactory.getDmsProjectDAO().getById(1), null);
+			this.testDataInitializer
+				.createDmsProject("Study1", "Study-Description", null, this.daoFactory.getDmsProjectDAO().getById(1), null);
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
@@ -150,12 +165,12 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			this.testDataInitializer
 				.createDmsProject("Plot Dataset", "Plot Dataset-Description", study, plotDataset, DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS);
 
-
 		final Geolocation instance1 = this.testDataInitializer.createTestGeolocation("1", 1);
 		final Geolocation instance2 = this.testDataInitializer.createTestGeolocation("2", 2);
 		final Geolocation instance3 = this.testDataInitializer.createTestGeolocation("3", 3);
-		this.testDataInitializer.addGeolocationProp(instance1,  TermId.EXPERIMENT_DESIGN_FACTOR.getId(),  ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), 1);
-		this.testDataInitializer.addGeolocationProp(instance2,  TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5), 1);
+		this.testDataInitializer.addGeolocationProp(instance1, TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), 1);
+		this.testDataInitializer.addGeolocationProp(instance2, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5), 1);
 
 		// Instance 1
 		this.testDataInitializer.createTestExperiment(environmentDataset, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
@@ -163,7 +178,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			this.testDataInitializer.createTestExperiment(plotDataset, instance1, TermId.PLOT_EXPERIMENT.getId(), "1", null);
 		// Create 2 Sub-obs records
 		final ExperimentModel instance1SubObsExperiment1 =
-			this.testDataInitializer.createTestExperiment(subObsDataset, instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
+			this.testDataInitializer
+				.createTestExperiment(subObsDataset, instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
 		this.savePhenotype(instance1SubObsExperiment1);
 		final ExperimentModel instance1SubObsExperiment2 = this.testDataInitializer
 			.createTestExperiment(subObsDataset, instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
@@ -216,7 +232,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertFalse(studyInstance3.isHasMeasurements());
 	}
 
-	private void savePhenotype(final ExperimentModel experiment){
+	private void savePhenotype(final ExperimentModel experiment) {
 		final CVTerm trait1 = this.testDataInitializer.createTrait(RandomStringUtils.randomAlphabetic(10));
 		this.testDataInitializer.addPhenotypes(Collections.singletonList(experiment), trait1.getCvTermId(), "100");
 	}
