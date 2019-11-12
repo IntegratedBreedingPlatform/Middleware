@@ -904,7 +904,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		sqlQuery.addScalar("nd_experiment_id").addScalar("observationUnitDbId", new StringType()).addScalar("observationUnitName")
 			.addScalar("observationLevel").addScalar("plantNumber", new IntegerType()).addScalar("germplasmDbId", new StringType())
-			.addScalar("germplasmName").addScalar("studyDbId", new StringType()).addScalar("studyName").addScalar("programName")
+			.addScalar("germplasmName").addScalar("instanceNumber").addScalar("studyDbId", new StringType()).addScalar("studyName").addScalar("programName")
 			.addScalar("FieldMapRow").addScalar("FieldMapCol").addScalar("plotNumber", new StringType())
 			.addScalar("blockNumber", new StringType()).addScalar("replicate", new StringType()).addScalar("COL").addScalar("ROW")
 			.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
@@ -929,24 +929,25 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setPlantNumber((String) row[4]);
 				observationUnit.setGermplasmDbId((String) row[5]);
 				observationUnit.setGermplasmName((String) row[6]);
-				observationUnit.setStudyDbId((String) row[7]);
-				observationUnit.setStudyName((String) row[8]);
-				observationUnit.setProgramName((String) row[9]);
-				String x = (String) row[15]; // ROW
-				String y = (String) row[16]; // COL
+				observationUnit.setInstanceNumber((String) row[7]);
+				observationUnit.setStudyDbId((String) row[8]);
+				observationUnit.setStudyName((String) row[9]);
+				observationUnit.setProgramName((String) row[10]);
+				String x = (String) row[16]; // ROW
+				String y = (String) row[17]; // COL
 				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-					x = (String) row[10]; // fieldMapRow
-					y = (String) row[11]; // fieldMapCol
+					x = (String) row[11]; // fieldMapRow
+					y = (String) row[12]; // fieldMapCol
 				}
 				observationUnit.setX(x);
 				observationUnit.setY(y);
-				observationUnit.setPlotNumber((String) row[12]);
-				observationUnit.setBlockNumber((String) row[13]);
-				observationUnit.setReplicate((String) row[14]);
-				observationUnit.setStudyLocationDbId((String) row[17]);
-				observationUnit.setStudyLocation((String) row[18]);
-				observationUnit.setEntryType((String) row[19]);
-				observationUnit.setEntryNumber((String) row[20]);
+				observationUnit.setPlotNumber((String) row[13]);
+				observationUnit.setBlockNumber((String) row[14]);
+				observationUnit.setReplicate((String) row[15]);
+				observationUnit.setStudyLocationDbId((String) row[18]);
+				observationUnit.setStudyLocation((String) row[19]);
+				observationUnit.setEntryType((String) row[20]);
+				observationUnit.setEntryNumber((String) row[21]);
 
 				observationUnitsByNdExpId.put(ndExperimentId, observationUnit);
 			}

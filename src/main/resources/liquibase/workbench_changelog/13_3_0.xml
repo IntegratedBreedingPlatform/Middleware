@@ -1,0 +1,85 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="aldrin" id="v13.0.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="r_package"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create table r_package
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `r_package` (
+			  `id_package` int(11) NOT NULL AUTO_INCREMENT,
+			  `description` varchar(255) DEFAULT NULL,
+			  `endpoint` varchar(500) DEFAULT NULL,
+			  PRIMARY KEY (`id_package`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+			INSERT INTO `r_package` VALUES
+			(1,'R Cast package','http://public.opencpu.org/ocpu/library/reshape/R/cast'),
+			(2,'R Melt package','http://public.opencpu.org/ocpu/library/reshape/R/melt');
+		</sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v13.0.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="r_call"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create table r_call
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `r_call` (
+			  `id_call` int(11) NOT NULL,
+			  `description` varchar(255) DEFAULT NULL,
+			  `id_package` int(11) DEFAULT NULL,
+			  PRIMARY KEY (`id_call`),
+			  KEY `FK_id_package_idx` (`id_package`),
+			  CONSTRAINT `FK_id_package` FOREIGN KEY (`id_package`) REFERENCES `r_package` (`id_package`) ON DELETE NO ACTION ON UPDATE NO ACTION
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+			INSERT INTO `r_call` VALUES
+			(1,'MEANS: Traits over Trial Instance per Entry Number',1),
+			(2,'PLOT: Average of traits per germplasm and instance',1),
+			(3,'Melt data',2);
+		</sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v13.0.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="r_call_parameter"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create table r_call_parameter
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `r_call_parameter` (
+			  `id_call_parameter` int(11) NOT NULL,
+			  `key` varchar(45) DEFAULT NULL,
+			  `value` varchar(500) DEFAULT NULL,
+			  `id_call` int(11) DEFAULT NULL,
+			  PRIMARY KEY (`id_call_parameter`),
+			  KEY `FK_rcall_idx` (`id_call`),
+			  CONSTRAINT `FK_rcall` FOREIGN KEY (`id_call`) REFERENCES `r_call` (`id_call`) ON DELETE NO ACTION ON UPDATE NO ACTION
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+			INSERT INTO `r_call_parameter` VALUES
+			(1,'formula','entryNumber~variable+instanceNumber',1),
+			(2,'formula','instanceNumber+entryNumber~variable',2),
+			(3,'fun.aggregate','mean',2),
+			(4,'id','c(\"instanceNumber\",\"blockNumber\",\"entryNumber\",\"entryType\",\"germplasmDbId\",\"germplasmName\",\"observationLevel\",\"observationLevels\",\"observationUnitDbId\",\"observationUnitName\",\"plantNumber\",\"plotNumber\",\"programName\",\"replicate\",\"studyDbId\",\"studyLocation\",\"studyLocationDbId\",\"studyName\",\"x\",\"y\")',3);
+
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

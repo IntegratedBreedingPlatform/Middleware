@@ -7,6 +7,7 @@ import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
+import org.generationcp.middleware.dao.RCallDAO;
 import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.RoleTypeDAO;
 import org.generationcp.middleware.dao.RoleTypePermissionDAO;
@@ -142,7 +143,6 @@ public class WorkbenchDaoFactory {
 		return workbenchSidebarCategoryLinkDAO;
 	}
 
-
 	public UserRoleDao getUserRoleDao() {
 		final UserRoleDao userRoleDao = new UserRoleDao();
 		userRoleDao.setSession(this.sessionProvider.getSession());
@@ -153,5 +153,11 @@ public class WorkbenchDaoFactory {
 		final RoleDAO roleDao = new RoleDAO();
 		roleDao.setSession(this.sessionProvider.getSession());
 		return roleDao;
+	}
+
+	public RCallDAO getRCallDao() {
+		final RCallDAO rCallDAO = new RCallDAO();
+		rCallDAO.setSession(this.sessionProvider.getSession());
+		return rCallDAO;
 	}
 }

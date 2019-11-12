@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.RCall;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -536,6 +537,16 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} else {
 			return new ArrayList<>(this.workbenchDaoFactory.getUserRoleDao().getCropsWithAddProgramPermissionForCropRoles(workbenchUserId));
 		}
+	}
+
+	@Override
+	public List<RCall> getAllRCalls() {
+		return this.workbenchDaoFactory.getRCallDao().getAll();
+	}
+
+	@Override
+	public List<RCall> getRCallsByPackageId(final Integer packageId) {
+		return this.workbenchDaoFactory.getRCallDao().getRCallsByPackageId(packageId);
 	}
 
 }
