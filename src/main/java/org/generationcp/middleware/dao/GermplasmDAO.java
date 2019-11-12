@@ -63,6 +63,49 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String QUERY_FROM_GERMPLASM = ") query from Germplasm: ";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
+	public static final String SEARCH_GERMPLASM_BY_STUDYDBID =
+		"SELECT DISTINCT convert(g.gid, char) AS germplasmDbId, reference.btable AS germplasmPUI, " //
+			+ "  (SELECT n.nval FROM names n " //
+			+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'ACCNO' AND u.fldno = n.ntype)" //
+			+ "   WHERE (n.gid = g.gid) LIMIT 1) AS accessionNumber, " //
+			+ "   STR_TO_DATE (convert(g.gdate,char), '%Y%m%d') AS acquisitionDate," //
+			+ "  (SELECT a.aval FROM atributs a " //
+			+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'ORI_COUN' AND u.fldno = a.atype)" //
+			+ "   WHERE (a.gid = g.gid) LIMIT 1) AS countryOfOriginCode, " //
+			+ "   (SELECT n.nval FROM names n WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) AS germplasmName," //
+			+ "  (SELECT n.nval FROM names n " //
+			+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'GENUS' AND u.fldno = n.ntype)" //
+			+ "   WHERE (n.gid = g.gid) LIMIT 1) AS genus," //
+			+ "   (SELECT ld.source FROM listdata ld" //
+			+ "   WHERE ld.gid = g.gid LIMIT 1) AS germplasmSeedSource, " //
+			+ "   (SELECT a.aval FROM atributs a " //
+			+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPNAM' AND u.fldno = a.atype)" //
+			+ "   WHERE (a.gid = g.gid) LIMIT 1) AS species, " //
+			+ "   (SELECT a.aval FROM atributs a " //
+			+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPAUTH' AND u.fldno = a.atype)" //
+			+ "   WHERE (a.gid = g.gid) LIMIT 1) AS speciesAuthority, " //
+			+ "   (SELECT a.aval FROM atributs a " //
+			+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SUBTAX' AND u.fldno = a.atype)" //
+			+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxa, " //
+			+ "   (SELECT a.aval FROM atributs a " //
+			+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'STAUTH' AND u.fldno = a.atype)" //
+			+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority, " //
+			+ "   (SELECT a.aval FROM atributs a " //
+			+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'PROGM' AND u.fldno = a.atype)" //
+			+ "   WHERE (a.gid = g.gid) LIMIT 1) AS instituteCode, " //
+			+ "   m.mname as breedingMethodDbId, " //
+			+ "   pp.name as trialName, "
+			+ "   s.uniquename AS entryNumber "
+			+ "  FROM "//
+			+ " germplsm g "//
+			+ "  LEFT JOIN reflinks reference ON reference.brefid = g.gref " //
+			+ "  LEFT join methods m ON g.methn = m.mid " //
+			+ " INNER JOIN stock s ON s.dbxref_id = g.gid "//
+			+ " INNER JOIN nd_experiment e ON e.stock_id = s.stock_id "//
+			+ " INNER JOIN project p ON e.project_id = p.project_id "//
+			+ " INNER JOIN project pp ON pp.project_id = p.parent_project_id "
+			+ " WHERE g.deleted = 0 AND g.grplce = 0 "//
+			+ " AND e.nd_geolocation_id = :studyDbId ";
 
 	@Override
 	public Germplasm getById(final Integer gid, final boolean lock) {
@@ -1565,4 +1608,41 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	}
 
+	public long countGermplasmByStudy(final Integer studyDbId) {
+		final String queryString = "select count(1) from (" + SEARCH_GERMPLASM_BY_STUDYDBID + ") AS T ";//
+
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString);
+		sqlQuery.setParameter("studyDbId", studyDbId);
+
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	public List<GermplasmDTO> getGermplasmByStudy(final Integer studyDbId, final Integer pageNumber, final Integer pageSize) {
+		try {
+			final String queryString = SEARCH_GERMPLASM_BY_STUDYDBID; //
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString);
+			sqlQuery.setParameter("studyDbId", studyDbId);
+
+			sqlQuery.addScalar("germplasmDbId").addScalar("germplasmPUI").addScalar("accessionNumber").addScalar("acquisitionDate")
+				.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmSeedSource")
+				.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority")
+				.addScalar("instituteCode").addScalar("breedingMethodDbId").addScalar("trialName").addScalar("entryNumber") //
+				.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
+
+			if (pageNumber != null && pageSize != null) {
+				sqlQuery.setFirstResult(pageSize * pageNumber);
+				sqlQuery.setMaxResults(pageSize);
+			}
+
+			final List<GermplasmDTO> germplasmDTOList = sqlQuery.list();
+
+			return germplasmDTOList;
+
+		} catch (final HibernateException e) {
+			final String message = "Error with getGermplasmDTOList" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }
