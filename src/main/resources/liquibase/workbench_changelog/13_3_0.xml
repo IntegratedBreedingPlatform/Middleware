@@ -22,8 +22,8 @@
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 			INSERT INTO `r_package` VALUES
-			(1,'R Cast package','http://public.opencpu.org/ocpu/library/reshape/R/cast'),
-			(2,'R Melt package','http://public.opencpu.org/ocpu/library/reshape/R/melt');
+			(1,'R Cast package','https://cloud.opencpu.org/ocpu/library/reshape/R/cast'),
+			(2,'R Melt package','https://cloud.opencpu.org/ocpu/library/reshape/R/melt');
 		</sql>
 	</changeSet>
 
