@@ -16,7 +16,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 import java.math.BigInteger;
@@ -57,34 +57,34 @@ public class ExperimentDaoTest {
 		this.experimentDao.setSession(this.mockSession);
 
 		this.mockQuery = Mockito.mock(SQLQuery.class);
-		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockQuery);
+		Mockito.when(this.mockSession.createSQLQuery(ArgumentMatchers.anyString())).thenReturn(this.mockQuery);
 
 		this.mockCriteria = Mockito.mock(Criteria.class);
 		Mockito.when(this.mockSession.createCriteria(ExperimentModel.class)).thenReturn(this.mockCriteria);
-		Mockito.when(this.mockCriteria.list()).thenReturn(dummyIds);
+		Mockito.when(this.mockCriteria.list()).thenReturn(this.dummyIds);
 	}
 
 	@Test
 	public void testGetSampledPlants_Ok() {
 		Mockito.when(this.mockSession.createSQLQuery(ExperimentDao.SQL_GET_SAMPLED_OBSERVATION_BY_STUDY)).thenReturn(this.mockQuery);
 
-		List<Object[]> mockQueryResult = new ArrayList<Object[]>();
+		final List<Object[]> mockQueryResult = new ArrayList<Object[]>();
 
-		Object[] mockDBRow1 = new Object[] {1, 1, 1};
+		final Object[] mockDBRow1 = new Object[] {1, 1, 1};
 		mockQueryResult.add(mockDBRow1);
 
-		Object[] mockDBRow2 = new Object[] {1, 2, 2};
+		final Object[] mockDBRow2 = new Object[] {1, 2, 2};
 		mockQueryResult.add(mockDBRow2);
 
-		Object[] mockDBRow3 = new Object[] {2, 3, 1};
+		final Object[] mockDBRow3 = new Object[] {2, 3, 1};
 		mockQueryResult.add(mockDBRow3);
 
-		Object[] mockDBRow4 = new Object[] {3, 3, 1};
+		final Object[] mockDBRow4 = new Object[] {3, 3, 1};
 		mockQueryResult.add(mockDBRow4);
 
 		Mockito.when(this.mockQuery.list()).thenReturn(mockQueryResult);
 
-		final Map<Integer, List<SampleDTO>> result = experimentDao.getExperimentSamplesDTOMap(1);
+		final Map<Integer, List<SampleDTO>> result = this.experimentDao.getExperimentSamplesDTOMap(1);
 		assertThat(result.size(), equalTo(3));
 		assertThat(result.get(1).size(), equalTo(2));
 		assertThat(result.get(2).size(), equalTo(1));
@@ -95,7 +95,7 @@ public class ExperimentDaoTest {
 	public void testGetSampledPlants_ThrowsException() {
 		Mockito.when(this.mockSession.createSQLQuery(ExperimentDao.SQL_GET_SAMPLED_OBSERVATION_BY_STUDY))
 				.thenThrow(MiddlewareQueryException.class);
-		experimentDao.getExperimentSamplesDTOMap(1);
+		this.experimentDao.getExperimentSamplesDTOMap(1);
 	}
 
 	@Test
@@ -111,8 +111,8 @@ public class ExperimentDaoTest {
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-		Mockito.verify(this.mockQuery).setParameterList(Matchers.eq("gids"), Matchers.eq(gids));
-		Mockito.verify(this.mockQuery).setParameter(Matchers.eq("programUUID"), Matchers.eq(ExperimentDaoTest.PROGRAM_UUID));
+		Mockito.verify(this.mockQuery).setParameterList(ArgumentMatchers.eq("gids"), ArgumentMatchers.eq(gids));
+		Mockito.verify(this.mockQuery).setParameter(ArgumentMatchers.eq("programUUID"), ArgumentMatchers.eq(ExperimentDaoTest.PROGRAM_UUID));
 
 		Assert.assertEquals(gids, environmentsMap.keySet());
 		Assert.assertEquals(new LinkedHashSet<>(this.gid1Environments), environmentsMap.get(1));
@@ -131,9 +131,9 @@ public class ExperimentDaoTest {
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-		Mockito.verify(this.mockQuery).setParameterList(Matchers.eq("gids"), Matchers.eq(gids));
-		Mockito.verify(this.mockQuery, Mockito.never()).setParameter(Matchers.eq("programUUID"),
-				Matchers.eq(ExperimentDaoTest.PROGRAM_UUID));
+		Mockito.verify(this.mockQuery).setParameterList(ArgumentMatchers.eq("gids"), ArgumentMatchers.eq(gids));
+		Mockito.verify(this.mockQuery, Mockito.never()).setParameter(ArgumentMatchers.eq("programUUID"),
+				ArgumentMatchers.eq(ExperimentDaoTest.PROGRAM_UUID));
 
 		Assert.assertEquals(gids, environmentsMap.keySet());
 		Assert.assertEquals(new LinkedHashSet<>(this.gid1Environments), environmentsMap.get(1));
@@ -142,7 +142,7 @@ public class ExperimentDaoTest {
 	}
 
 	private void setupEnvironmentsOfGermplasmMocks() {
-		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockQuery);
+		Mockito.when(this.mockSession.createSQLQuery(ArgumentMatchers.anyString())).thenReturn(this.mockQuery);
 
 		final List<Object[]> mockQueryResult = new ArrayList<Object[]>();
 		for (final Integer env : this.gid1Environments) {
@@ -163,7 +163,7 @@ public class ExperimentDaoTest {
 		final Map<Integer, Set<Integer>> environmentsMap =
 				this.experimentDao.getEnvironmentsOfGermplasms(gids, ExperimentDaoTest.PROGRAM_UUID);
 
-		Mockito.verify(this.mockSession, Mockito.never()).createSQLQuery(Matchers.anyString());
+		Mockito.verify(this.mockSession, Mockito.never()).createSQLQuery(ArgumentMatchers.anyString());
 		Assert.assertTrue(environmentsMap.isEmpty());
 	}
 
@@ -177,7 +177,7 @@ public class ExperimentDaoTest {
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-		Mockito.verify(this.mockQuery).setParameter(Matchers.eq("datasetId"), Matchers.eq(id));
+		Mockito.verify(this.mockQuery).setParameter(ArgumentMatchers.eq("datasetId"), ArgumentMatchers.eq(id));
 		Assert.assertEquals(20L, count);
 	}
 
@@ -185,9 +185,9 @@ public class ExperimentDaoTest {
 	public void testGetExperimentIdsByStockIds() {
 		final Collection<Integer> stockIds = Arrays.asList(11, 22, 33);
 		final List<Integer> returnedIds = this.experimentDao.getExperimentIdsByStockIds(stockIds);
-		Mockito.verify(this.mockCriteria).add(Matchers.refEq(Restrictions.in("stock.stockId", stockIds)));
-		Mockito.verify(this.mockCriteria).setProjection(Matchers.refEq(Projections.property("ndExperimentId")));
-		Assert.assertEquals(dummyIds, returnedIds);
+		Mockito.verify(this.mockCriteria).add(ArgumentMatchers.refEq(Restrictions.in("stock.stockId", stockIds)));
+		Mockito.verify(this.mockCriteria).setProjection(ArgumentMatchers.refEq(Projections.property("ndExperimentId")));
+		Assert.assertEquals(this.dummyIds, returnedIds);
 	}
 
 	@Test
@@ -227,21 +227,23 @@ public class ExperimentDaoTest {
 	}
 
 	@Test
-	public void testDeleteExperimentsByStudy() {
-		final int studyId = 1234;
-		this.experimentDao.deleteExperimentsForDataset(studyId);
+	public void testDeleteExperimentsForDataset() {
+		final int dataset = 1234;
+		this.experimentDao.deleteExperimentsForDataset(dataset);
 
 		Mockito.verify(this.mockSession).flush();
 		final String deletePhenotypeSql = "DELETE pheno FROM nd_experiment e"
+				+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
 				+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id" + "  WHERE e.project_id = :datasetId ";
 		final String deleteExperimentSql = "DELETE e, eprop " + "FROM nd_experiment e "
-				+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id " + "WHERE e.project_id = :datasetId ";
+				+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
+				+ "  LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id " + "  WHERE e.project_id = :datasetId ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession, Mockito.times(2)).createSQLQuery(sqlCaptor.capture());
 		final List<String> queries = sqlCaptor.getAllValues();
 		Assert.assertEquals(deletePhenotypeSql, queries.get(0));
 		Assert.assertEquals(deleteExperimentSql, queries.get(1));
-		Mockito.verify(this.mockQuery, Mockito.times(2)).setParameter("datasetId", studyId);
+		Mockito.verify(this.mockQuery, Mockito.times(2)).setParameter("datasetId", dataset);
 		Mockito.verify(this.mockQuery, Mockito.times(2)).executeUpdate();
 	}
 
@@ -269,7 +271,7 @@ public class ExperimentDaoTest {
 	@Test
 	public void testGetExperiments_FirstInstance() {
 		final Query query = Mockito.mock(Query.class);
-		Mockito.when(this.mockSession.createQuery(Matchers.anyString())).thenReturn(query);
+		Mockito.when(this.mockSession.createQuery(ArgumentMatchers.anyString())).thenReturn(query);
 		final int projectId = 1011;
 		final int start = 1000;
 		final int numOfRows = 5000;
@@ -282,7 +284,7 @@ public class ExperimentDaoTest {
 				+ "where exp.project.projectId =:p_id and exp.typeId in (:type_ids) " + "and exp.geoLocation.description = 1 "
 				+ "order by (exp.geoLocation.description * 1) ASC, " + "(plot.value * 1) ASC, " + "(rep.value * 1) ASC, "
 				+ "(st.uniqueName * 1) ASC, " + "exp.ndExperimentId ASC";
-		Mockito.verify(this.mockSession).createQuery(Matchers.eq(sql));
+		Mockito.verify(this.mockSession).createQuery(ArgumentMatchers.eq(sql));
 		Mockito.verify(query).setParameter("p_id", projectId);
 		Mockito.verify(query).setParameterList("type_ids",
 				Arrays.asList(TermId.PLOT_EXPERIMENT.getId(), TermId.SAMPLE_EXPERIMENT.getId()));
@@ -293,7 +295,7 @@ public class ExperimentDaoTest {
 	@Test
 	public void testGetExperiments_NotFirstInstance() {
 		final Query query = Mockito.mock(Query.class);
-		Mockito.when(this.mockSession.createQuery(Matchers.anyString())).thenReturn(query);
+		Mockito.when(this.mockSession.createQuery(ArgumentMatchers.anyString())).thenReturn(query);
 		final int projectId = 1011;
 		final int start = 1000;
 		final int numOfRows = 5000;
@@ -306,7 +308,7 @@ public class ExperimentDaoTest {
 				+ "where exp.project.projectId =:p_id and exp.typeId in (:type_ids) "
 				+ "order by (exp.geoLocation.description * 1) ASC, " + "(plot.value * 1) ASC, " + "(rep.value * 1) ASC, "
 				+ "(st.uniqueName * 1) ASC, " + "exp.ndExperimentId ASC";
-		Mockito.verify(this.mockSession).createQuery(Matchers.eq(sql));
+		Mockito.verify(this.mockSession).createQuery(ArgumentMatchers.eq(sql));
 		Mockito.verify(query).setParameter("p_id", projectId);
 		Mockito.verify(query).setParameterList("type_ids",
 				Arrays.asList(TermId.PLOT_EXPERIMENT.getId(), TermId.SAMPLE_EXPERIMENT.getId()));
@@ -322,7 +324,7 @@ public class ExperimentDaoTest {
 		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(ran.nextInt()));
 
 		final SQLQuery query = Mockito.mock(SQLQuery.class);
-		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(query);
+		Mockito.when(this.mockSession.createSQLQuery(ArgumentMatchers.anyString())).thenReturn(query);
 		Mockito.when(query.uniqueResult()).thenReturn(BigInteger.valueOf(1));
 		Assert.assertTrue(this.experimentDao.areAllInstancesExistInDataset(datasetId, instanceIds));
 
