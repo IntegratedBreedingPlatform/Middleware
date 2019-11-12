@@ -1,44 +1,42 @@
 package org.generationcp.middleware.service.impl.study;
 
+import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
+import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
+import org.generationcp.middleware.service.impl.study.generation.GeolocationGenerator;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Transactional
 public class StudyInstanceServiceImpl implements StudyInstanceService {
+
+	private ExperimentModelGenerator experimentModelGenerator;
+	private GeolocationGenerator geolocationGenerator;
+	private DaoFactory daoFactory;
 
 	public StudyInstanceServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
 
 	public StudyInstanceServiceImpl(final HibernateSessionProvider sessionProvider) {
-		this.sessionProvider = sessionProvider;
 		this.daoFactory = new DaoFactory(sessionProvider);
-		this.experimentModelSaver = new ExperimentModelSaver(sessionProvider);
+		this.experimentModelGenerator = new ExperimentModelGenerator(sessionProvider);
+		this.geolocationGenerator = new GeolocationGenerator(sessionProvider);
 	}
-
-	private HibernateSessionProvider sessionProvider;
-	private ExperimentModelSaver experimentModelSaver;
-	private DaoFactory daoFactory;
 
 	@Override
 	public StudyInstance createStudyInstance(final CropType crop, final int datasetId, final int instanceNumber) {
@@ -51,13 +49,13 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		// The default value of an instance's location name is "Unspecified Location"
 		final Optional<Location> location = this.getUnspecifiedLocation();
 		final Geolocation geolocation =
-			this.createGeolocation(measurementVariables, instanceNumber, location.isPresent() ? location.get().getLocid() : null);
-		this.daoFactory.getGeolocationDao().save(geolocation);
+			this.geolocationGenerator
+				.createGeolocation(measurementVariables, instanceNumber, location.isPresent() ? location.get().getLocid() : null);
 
-		final ExperimentValues experimentValue = new ExperimentValues();
-		experimentValue.setLocationId(geolocation.getLocationId());
 		final ExperimentModel experimentModel =
-			this.experimentModelSaver.addExperiment(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
+			this.experimentModelGenerator.generate(crop, datasetId, Optional.of(geolocation), ExperimentType.TRIAL_ENVIRONMENT);
+
+		this.daoFactory.getExperimentDao().save(experimentModel);
 
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceDbId(geolocation.getLocationId());
@@ -80,37 +78,12 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		return this.daoFactory.getDmsProjectDAO().getDatasetInstances(environmentDatasetId);
 	}
 
-	protected Geolocation createGeolocation(final List<MeasurementVariable> measurementVariables, final int instanceNumber,
-		final Integer locationId) {
-		final Geolocation geolocation = new Geolocation();
-		geolocation.setProperties(new ArrayList<GeolocationProperty>());
-
-		int rank = 1;
-		for (final MeasurementVariable measurementVariable : measurementVariables) {
-			final int variableId = measurementVariable.getTermId();
-			if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variableId) {
-				geolocation.setDescription(String.valueOf(instanceNumber));
-			} else if (VariableType.ENVIRONMENT_DETAIL == measurementVariable.getVariableType()) {
-				String value = "";
-				if (measurementVariable.getTermId() == TermId.LOCATION_ID.getId()) {
-					value = String.valueOf(locationId);
-				}
-				final GeolocationProperty geolocationProperty =
-					new GeolocationProperty(geolocation, value, rank, measurementVariable.getTermId());
-				geolocation.getProperties().add(geolocationProperty);
-				rank++;
-			}
-
-		}
-		return geolocation;
-	}
-
 	protected Optional<Location> getUnspecifiedLocation() {
 		final List<Location> locations = this.daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 		if (!locations.isEmpty()) {
 			return Optional.of(locations.get(0));
 		}
-		return Optional.empty();
+		return Optional.absent();
 	}
 
 }
