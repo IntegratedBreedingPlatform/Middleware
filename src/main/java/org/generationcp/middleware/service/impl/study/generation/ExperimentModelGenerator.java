@@ -35,25 +35,18 @@ public class ExperimentModelGenerator {
 	public ExperimentModel generate(final CropType crop, final Integer projectId, final ObservationUnitRow row,
 		final ExperimentType expType, final Optional<Geolocation> geolocation, final Map<Integer, MeasurementVariable> variablesMap) {
 
-		final ExperimentModel experimentModel = this.createExperimentModel(projectId, expType, geolocation);
+		final ExperimentModel experimentModel = this.createExperimentModel(crop, projectId, expType, geolocation);
 		experimentModel.setProperties(this.createTrialDesignExperimentProperties(experimentModel, row, variablesMap));
 
-		final ObservationUnitIDGenerator observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl();
-		observationUnitIDGenerator.generateObservationUnitIds(crop, Collections.singletonList(experimentModel));
 		return experimentModel;
 	}
 
 	public ExperimentModel generate(final CropType crop, final Integer projectId, final Optional<Geolocation> geolocation,
 		final ExperimentType expType) {
-
-		final ExperimentModel experimentModel = this.createExperimentModel(projectId, expType, geolocation);
-
-		final ObservationUnitIDGenerator observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl();
-		observationUnitIDGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
-		return experimentModel;
+		return this.createExperimentModel(crop, projectId, expType, geolocation);
 	}
 
-	private ExperimentModel createExperimentModel(final Integer projectId, final ExperimentType expType,
+	private ExperimentModel createExperimentModel(final CropType crop, final Integer projectId, final ExperimentType expType,
 		final Optional<Geolocation> geolocation) {
 
 		final ExperimentModel experimentModel = new ExperimentModel();
@@ -64,6 +57,9 @@ public class ExperimentModelGenerator {
 
 		final Geolocation location = geolocation.isPresent() ? geolocation.get() : this.geolocationGenerator.createGeoLocation();
 		experimentModel.setGeoLocation(location);
+
+		final ObservationUnitIDGenerator observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl();
+		observationUnitIDGenerator.generateObservationUnitIds(crop, Collections.singletonList(experimentModel));
 
 		return experimentModel;
 	}
