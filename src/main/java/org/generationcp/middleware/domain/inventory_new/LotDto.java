@@ -1,6 +1,5 @@
 package org.generationcp.middleware.domain.inventory_new;
 
-import java.util.List;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -18,8 +17,6 @@ public class LotDto {
 	private String comments;
 	private String createdByUsername;
 	private String status;
-
-	private List<TransactionDto> transactions;
 
 	public Integer getLotId() {
 		return lotId;
@@ -83,14 +80,6 @@ public class LotDto {
 
 	public void setStatus(final String status) {
 		this.status = status;
-	}
-
-	public List<TransactionDto> getTransactions() {
-		return transactions;
-	}
-
-	public void setTransactions(final List<TransactionDto> transactions) {
-		this.transactions = transactions;
 	}
 
 	@Override
