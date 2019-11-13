@@ -14,7 +14,6 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.hibernate.Criteria;
@@ -26,7 +25,9 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,31 +74,35 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-	public void deleteGeolocationPropertiesInProject(final int projectId, final List<Integer> variableIds) {
-		try {
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
-			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-			// statement
-			this.getSession().flush();
-
-			this.deleteValues(projectId, variableIds);
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at deleteGeolocationPropertiesInProject=" + projectId + ", " + variableIds
-				+ " query on GeolocationPropertyDao: " + e.getMessage(), e);
-		}
+	public void deletePropertiesInDataset(final int datasetId, final List<Integer> variableIds) {
+		this.deleteValues(datasetId, Collections.<Integer>emptyList(), variableIds);
 	}
 
-	private void deleteValues(final int projectId, final List<Integer> variableIds) {
+	public void deletePropertiesInDatasetInstances(final int datasetId, final List<Integer> instanceNumbers, final List<Integer> variableIds) {
+		this.deleteValues(datasetId, instanceNumbers, variableIds);
+	}
+
+	private void deleteValues(final int projectId, final List<Integer> instanceNumbers, final List<Integer> variableIds) {
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+		// statement
+		this.getSession().flush();
+
 		final StringBuilder sql1 = new StringBuilder().append("Delete ngp.* FROM nd_geolocationprop ngp "
-				+ "INNER JOIN nd_experiment e ON ngp.nd_geolocation_id = e.nd_geolocation_id AND ngp.type_id IN (:variableIds) "
+				+ "INNER JOIN nd_geolocation g on g.nd_geolocation_id = ngp.nd_geolocation_id "
+				+ "INNER JOIN nd_experiment e ON ngp.nd_geolocation_id = g.nd_geolocation_id "
 				+ "INNER JOIN project p ON p.project_id = e.project_id "
-				+ "WHERE (p.study_id = :projectId OR p.project_id = :projectId)");
+				+ "WHERE (p.study_id = :datasetId OR p.project_id = :datasetId) AND ngp.type_id IN (:variableIds) ");
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			sql1.append(" AND g.description IN (:instanceNumbers)");
+		}
 
 		final SQLQuery sqlQuery1 = this.getSession().createSQLQuery(sql1.toString());
-		sqlQuery1.setParameter("projectId", projectId);
+		sqlQuery1.setParameter("datasetId", projectId);
 		sqlQuery1.setParameterList("variableIds", variableIds);
-
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			sqlQuery1.setParameterList("instanceNumbers", instanceNumbers);
+		}
 		sqlQuery1.executeUpdate();
 	}
 

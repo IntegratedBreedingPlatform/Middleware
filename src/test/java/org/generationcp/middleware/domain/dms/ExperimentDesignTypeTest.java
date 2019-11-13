@@ -53,7 +53,7 @@ public class ExperimentDesignTypeTest {
 	}
 
 	@Test
-	public void testDesignTypeFromString() {
+	public void testDesignTypeFromBVDesignName() {
 
 		assertEquals(
 			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK,
@@ -70,6 +70,49 @@ public class ExperimentDesignTypeTest {
 		assertEquals(
 			ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK,
 			ExperimentDesignType.getExperimentDesignTypeByBVDesignName(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getBvDesignName()));
+	}
+
+	@Test
+	public void testDesignTypeFromBVName() {
+
+		assertEquals(
+			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK,
+			ExperimentDesignType.getExperimentDesignTypeByBVName(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getBvName()));
+		assertEquals(
+			ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK,
+			ExperimentDesignType.getExperimentDesignTypeByBVName(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getBvName()));
+		assertEquals(
+			ExperimentDesignType.ROW_COL,
+			ExperimentDesignType.getExperimentDesignTypeByBVName(ExperimentDesignType.ROW_COL.getBvName()));
+		assertEquals(
+			ExperimentDesignType.P_REP,
+			ExperimentDesignType.getExperimentDesignTypeByBVName(ExperimentDesignType.P_REP.getBvName()));
+		assertEquals(
+			ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK,
+			ExperimentDesignType.getExperimentDesignTypeByBVName(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getBvName()));
+	}
+
+	@Test
+	public void testDesignTypeById() {
+
+		assertEquals(
+			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK,
+			ExperimentDesignType.getDesignTypeById(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId()));
+		assertEquals(
+			ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK,
+			ExperimentDesignType.getDesignTypeById(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId()));
+		assertEquals(
+			ExperimentDesignType.ROW_COL,
+			ExperimentDesignType.getDesignTypeById(ExperimentDesignType.ROW_COL.getId()));
+		assertEquals(
+			ExperimentDesignType.P_REP,
+			ExperimentDesignType.getDesignTypeById(ExperimentDesignType.P_REP.getId()));
+		assertEquals(
+			ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK,
+			ExperimentDesignType.getDesignTypeById(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getId()));
+		assertEquals(
+			ExperimentDesignType.ENTRY_LIST_ORDER,
+			ExperimentDesignType.getDesignTypeById(ExperimentDesignType.ENTRY_LIST_ORDER.getId()));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
