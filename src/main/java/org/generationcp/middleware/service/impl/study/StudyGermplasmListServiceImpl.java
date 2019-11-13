@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.impl.study;
 
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
@@ -25,6 +26,7 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 		final Criteria listDataCriteria =
 			this.currentSession.createCriteria(ListDataProject.class).createAlias("list", "l")
 				.add(Restrictions.eq("l.projectId", studyBusinessIdentifier));
+		listDataCriteria.add(Restrictions.eq("l.type", GermplasmListType.STUDY.name()));
 		final List<ListDataProject> list = listDataCriteria.list();
 		final List<StudyGermplasmDto> studyGermplasmDtos = new ArrayList<>();
 		Integer index = 0;
