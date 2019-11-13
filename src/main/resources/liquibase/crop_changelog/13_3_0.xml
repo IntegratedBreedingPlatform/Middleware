@@ -79,7 +79,8 @@
 			SELECT COUNT(*)
 			INTO useUuid
 			FROM workbench.workbench_crop
-			WHERE use_uuid = 1;
+			WHERE use_uuid = 1
+			AND db_name = DATABASE();
 
 			IF useUuid = 0
 			THEN

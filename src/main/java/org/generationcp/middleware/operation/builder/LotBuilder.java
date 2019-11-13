@@ -20,8 +20,6 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.LotsResult;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.LotIDGenerator;
-import org.generationcp.middleware.service.impl.inventory.LotIDGeneratorImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +27,6 @@ import java.util.List;
 public class LotBuilder extends Builder {
 
 	private static final int LOT_NOT_DERIVED_FROM_ANOTHER = 0;
-
-	private LotIDGenerator lotIDGenerator;
 
 	private final DaoFactory daoFactory;
 
@@ -107,8 +103,8 @@ public class LotBuilder extends Builder {
 			throws MiddlewareQueryException {
 		final Lot lot = new Lot(null, userId, EntityType.GERMPLSM.name(), gid, locationId, scaleId, LotStatus.ACTIVE.getIntValue(),
 			LotBuilder.LOT_NOT_DERIVED_FROM_ANOTHER, comment);
-		this.lotIDGenerator = new LotIDGeneratorImpl();
-		this.lotIDGenerator.generateLotIds(cropType, Lists.newArrayList(lot));
+
+		this.getInventoryDataManager().generateLotIds(cropType, Lists.newArrayList(lot));
 		return lot;
 	}
 
