@@ -47,8 +47,8 @@
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 			INSERT INTO `r_call` VALUES
-			(1,'MEANS: Traits over Trial Instance per Entry Number',1),
-			(2,'PLOT: Average of traits per germplasm and instance',1),
+			(1,'Traits over trial instances',1),
+			(2,'Average of traits per germplasm',1),
 			(3,'Melt data',2);
 		</sql>
 	</changeSet>
