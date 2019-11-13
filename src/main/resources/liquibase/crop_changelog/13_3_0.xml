@@ -76,7 +76,7 @@
 
 			DECLARE useUuid INT DEFAULT 1;
 
-			SELECT COUNT(*)
+			SELECT use_uuid
 			INTO useUuid
 			FROM workbench.workbench_crop
 			WHERE use_uuid = 1
