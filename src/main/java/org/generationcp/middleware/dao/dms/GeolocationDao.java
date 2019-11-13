@@ -33,6 +33,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -416,24 +417,33 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return tiMetadata;
 	}
 
-	public List<Geolocation> getEnvironmentGeolocations(final Integer studyId) {
+	public List<Geolocation> getEnvironmentGeolocationsForInstances(final Integer studyId, final List<Integer> instanceNumbers) {
 		List<Geolocation> returnList = new ArrayList<>();
 		if (studyId != null) {
-			try {
-				final String sql = "SELECT DISTINCT g.* " + //
-					" FROM nd_geolocation g " + //
-					" INNER JOIN nd_experiment exp ON (exp.nd_geolocation_id = g.nd_geolocation_id) " + //
-					" INNER JOIN project envdataset on (envdataset.project_id = exp.project_ID) " + //
-					" WHERE envdataset.study_id = :studyId and envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId();
-				final SQLQuery query = this.getSession().createSQLQuery(sql);
-				query.addEntity("g", Geolocation.class);
-				query.setParameter("studyId", studyId);
-				returnList = query.list();
-			} catch (final HibernateException e) {
-				throw new MiddlewareQueryException("Error with getEnvironmentGeolocations(studyId=" + studyId + "): " + e.getMessage(), e);
+			final String sql = "SELECT DISTINCT g.* " + //
+				" FROM nd_geolocation g " + //
+				" INNER JOIN nd_experiment exp ON (exp.nd_geolocation_id = g.nd_geolocation_id) " + //
+				" INNER JOIN project envdataset on (envdataset.project_id = exp.project_ID) " + //
+				" WHERE envdataset.study_id = :studyId and envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId();
+			final StringBuilder sb = new StringBuilder(sql);
+			if (!CollectionUtils.isEmpty(instanceNumbers)) {
+				sb.append(" AND g.description IN (:instanceNumbers)");
 			}
+			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+			query.addEntity("g", Geolocation.class);
+			query.setParameter("studyId", studyId);
+			if (!CollectionUtils.isEmpty(instanceNumbers)) {
+				query.setParameterList("instanceNumbers", instanceNumbers);
+			}
+			returnList = query.list();
+
 		}
 		return returnList;
+	}
+
+
+	public List<Geolocation> getEnvironmentGeolocations(final Integer studyId) {
+		return this.getEnvironmentGeolocationsForInstances(studyId, Collections.<Integer>emptyList());
 	}
 
 	public Boolean existInstances(final Set<Integer> instanceIds) {

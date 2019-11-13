@@ -5,7 +5,6 @@ import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
@@ -27,34 +26,42 @@ public class ExperimentModelGenerator {
 	private static final List<VariableType> EXPT_DESIGN_TYPES =
 		Arrays.asList(VariableType.EXPERIMENTAL_DESIGN, VariableType.TREATMENT_FACTOR);
 
-	private DaoFactory daoFactory;
-		public ExperimentModelGenerator(final HibernateSessionProvider sessionProvider) {
-			this.daoFactory = new DaoFactory(sessionProvider);
+	private final GeolocationGenerator geolocationGenerator;
+
+	public ExperimentModelGenerator(final HibernateSessionProvider sessionProvider) {
+		this.geolocationGenerator = new GeolocationGenerator(sessionProvider);
 	}
 
 	public ExperimentModel generate(final CropType crop, final Integer projectId, final ObservationUnitRow row,
 		final ExperimentType expType, final Optional<Geolocation> geolocation, final Map<Integer, MeasurementVariable> variablesMap) {
+
+		final ExperimentModel experimentModel = this.createExperimentModel(crop, projectId, expType, geolocation);
+		experimentModel.setProperties(this.createTrialDesignExperimentProperties(experimentModel, row, variablesMap));
+
+		return experimentModel;
+	}
+
+	public ExperimentModel generate(final CropType crop, final Integer projectId, final Optional<Geolocation> geolocation,
+		final ExperimentType expType) {
+		return this.createExperimentModel(crop, projectId, expType, geolocation);
+	}
+
+	private ExperimentModel createExperimentModel(final CropType crop, final Integer projectId, final ExperimentType expType,
+		final Optional<Geolocation> geolocation) {
+
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final DmsProject project = new DmsProject();
 		project.setProjectId(projectId);
 		experimentModel.setProject(project);
 		experimentModel.setTypeId(expType.getTermId());
 
-		final Geolocation location = geolocation.isPresent() ? geolocation.get() : this.createNewGeoLocation();
+		final Geolocation location = geolocation.isPresent() ? geolocation.get() : this.geolocationGenerator.createGeoLocation();
 		experimentModel.setGeoLocation(location);
-
-		experimentModel.setProperties(this.createTrialDesignExperimentProperties(experimentModel, row, variablesMap));
 
 		final ObservationUnitIDGenerator observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl();
 		observationUnitIDGenerator.generateObservationUnitIds(crop, Collections.singletonList(experimentModel));
-		return experimentModel;
-	}
 
-	private Geolocation createNewGeoLocation() {
-		final Geolocation location = new Geolocation();
-		location.setDescription("1");
-		this.daoFactory.getGeolocationDao().save(location);
-		return location;
+		return experimentModel;
 	}
 
 	private List<ExperimentProperty> createTrialDesignExperimentProperties(final ExperimentModel experimentModel,
@@ -74,7 +81,5 @@ public class ExperimentModelGenerator {
 
 		return experimentProperties;
 	}
-
-
 
 }

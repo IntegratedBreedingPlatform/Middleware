@@ -176,7 +176,7 @@ public class StudyTestDataInitializer {
 		return variableList;
 	}
 
-	private VariableList createEnvironmentWithLocationAndSeason(
+	public VariableList createEnvironmentWithLocationAndSeason(
 		final String trialInstance, final String siteName, final String locationId, final String seasonId)
 		throws Exception {
 		final VariableList variableList = new VariableList();
