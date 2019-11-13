@@ -105,7 +105,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			+ " INNER JOIN project p ON e.project_id = p.project_id "//
 			+ " INNER JOIN project pp ON pp.project_id = p.parent_project_id "
 			+ " WHERE g.deleted = 0 AND g.grplce = 0 "//
-			+ " AND e.nd_geolocation_id = :studyDbId ";
+			+ " AND e.nd_geolocation_id = :studyDbId "
+			+ " ORDER BY CAST(s.uniquename as SIGNED INTEGER) ";
 
 	@Override
 	public Germplasm getById(final Integer gid, final boolean lock) {
