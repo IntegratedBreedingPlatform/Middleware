@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Transactional
@@ -66,10 +67,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 		this.daoFactory.getExperimentDao().save(experimentModel);
 
-		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(geolocation.getLocationId());
-		studyInstance.setInstanceNumber(instanceNumber);
-		studyInstance.setExperimentId(experimentModel.getNdExperimentId());
+		final StudyInstance studyInstance =
+			new StudyInstance(geolocation.getLocationId(), experimentModel.getNdExperimentId(), instanceNumber, false, false, false, true);
 		if (location.isPresent()) {
 			studyInstance.setLocationId(location.get().getLocid());
 			studyInstance.setLocationName(location.get().getLname());
