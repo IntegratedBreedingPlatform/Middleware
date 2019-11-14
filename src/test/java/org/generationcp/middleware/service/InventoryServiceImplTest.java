@@ -116,7 +116,7 @@ public class InventoryServiceImplTest {
 	private final InventoryServiceImpl inventoryServiceImpl = new InventoryServiceImpl();
 
 	@Mock
-	CropType cropType;
+	private CropType cropType;
 
 	@Before
 	public void setup() {
