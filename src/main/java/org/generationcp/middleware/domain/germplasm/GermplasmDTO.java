@@ -32,8 +32,6 @@ public class GermplasmDTO {
 	private String germplasmGenus;
 	private String germplasmSpecies;
 	private String seedSource;
-	private String studyDbId;
-	private String trialName;
 	private String entryNumber;
 	private final static String documentationURL = null;
 
@@ -222,22 +220,6 @@ public class GermplasmDTO {
 
 	public void setAcquisitionDate(final Date acquisitionDate) {
 		this.acquisitionDate = acquisitionDate;
-	}
-
-	public String getStudyDbId() {
-		return this.studyDbId;
-	}
-
-	public void setStudyDbId(final String studyDbId) {
-		this.studyDbId = studyDbId;
-	}
-
-	public String getTrialName() {
-		return this.trialName;
-	}
-
-	public void setTrialName(final String trialName) {
-		this.trialName = trialName;
 	}
 
 	public String getEntryNumber() {
