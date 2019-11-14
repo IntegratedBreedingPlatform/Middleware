@@ -454,4 +454,19 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		}
 		return Boolean.TRUE;
 	}
+
+	public Integer getNextInstanceNumber(final Integer datasetId) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("SELECT max(cast(g.description as unsigned)) ");
+		sb.append(" FROM nd_geolocation g ");
+		sb.append(" INNER JOIN nd_experiment e ON e.nd_geolocation_id = g.nd_geolocation_id ");
+		sb.append(" WHERE e.project_id = :datasetId" );
+		final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+		query.setParameter("datasetId", datasetId);
+		final BigInteger maxInstanceNumber = (BigInteger) query.uniqueResult();
+		if (maxInstanceNumber != null) {
+			return maxInstanceNumber.intValue() + 1;
+		}
+		return 1;
+	}
 }

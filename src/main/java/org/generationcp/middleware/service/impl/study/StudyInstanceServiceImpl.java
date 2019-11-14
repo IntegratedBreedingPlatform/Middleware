@@ -18,8 +18,6 @@ import org.generationcp.middleware.service.impl.study.generation.GeolocationGene
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Transactional
@@ -47,7 +45,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final List<MeasurementVariable> measurementVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId,
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
 
-		final int instanceNumber = this.getNextInstanceNumber(studyId);
+		final int instanceNumber = this.daoFactory.getGeolocationDao().getNextInstanceNumber(datasetId);
 
 		// The default value of an instance's location name is "Unspecified Location"
 		final Optional<Location> location = this.getUnspecifiedLocation();
@@ -97,22 +95,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			return Optional.of(locations.get(0));
 		}
 		return Optional.absent();
-	}
-
-	protected int getNextInstanceNumber(final int studyId) {
-		final List<StudyInstance> studyInstances = this.getStudyInstances(studyId);
-		if (!studyInstances.isEmpty()) {
-			final StudyInstance maxStudyInstance = Collections.max(studyInstances, new Comparator<StudyInstance>() {
-
-				@Override
-				public int compare(final StudyInstance o1, final StudyInstance o2) {
-					return Integer.compare(o1.getInstanceNumber(), o2.getInstanceNumber());
-				}
-			});
-			return maxStudyInstance.getInstanceNumber() + 1;
-		}
-		return 1;
-
 	}
 
 }
