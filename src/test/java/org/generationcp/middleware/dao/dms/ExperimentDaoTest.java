@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -68,7 +69,7 @@ public class ExperimentDaoTest {
 	public void testGetSampledPlants_Ok() {
 		Mockito.when(this.mockSession.createSQLQuery(ExperimentDao.SQL_GET_SAMPLED_OBSERVATION_BY_STUDY)).thenReturn(this.mockQuery);
 
-		final List<Object[]> mockQueryResult = new ArrayList<Object[]>();
+		final List<Object[]> mockQueryResult = new ArrayList<>();
 
 		final Object[] mockDBRow1 = new Object[] {1, 1, 1};
 		mockQueryResult.add(mockDBRow1);
@@ -144,7 +145,7 @@ public class ExperimentDaoTest {
 	private void setupEnvironmentsOfGermplasmMocks() {
 		Mockito.when(this.mockSession.createSQLQuery(ArgumentMatchers.anyString())).thenReturn(this.mockQuery);
 
-		final List<Object[]> mockQueryResult = new ArrayList<Object[]>();
+		final List<Object[]> mockQueryResult = new ArrayList<>();
 		for (final Integer env : this.gid1Environments) {
 			mockQueryResult.add(new Object[] {1, env});
 		}
@@ -234,16 +235,16 @@ public class ExperimentDaoTest {
 		Mockito.verify(this.mockSession).flush();
 		final String deletePhenotypeSql = "DELETE pheno FROM nd_experiment e"
 				+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
-				+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id" + "  WHERE e.project_id = :datasetId ";
+				+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id" + "  WHERE e.project_id IN (:datasetIds) ";
 		final String deleteExperimentSql = "DELETE e, eprop " + "FROM nd_experiment e "
 				+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
-				+ "  LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id " + "  WHERE e.project_id = :datasetId ";
+				+ "  LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id " + "  WHERE e.project_id IN (:datasetIds) ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession, Mockito.times(2)).createSQLQuery(sqlCaptor.capture());
 		final List<String> queries = sqlCaptor.getAllValues();
 		Assert.assertEquals(deletePhenotypeSql, queries.get(0));
 		Assert.assertEquals(deleteExperimentSql, queries.get(1));
-		Mockito.verify(this.mockQuery, Mockito.times(2)).setParameter("datasetId", dataset);
+		Mockito.verify(this.mockQuery, Mockito.times(2)).setParameterList("datasetIds", Collections.singletonList(dataset));
 		Mockito.verify(this.mockQuery, Mockito.times(2)).executeUpdate();
 	}
 
@@ -321,7 +322,7 @@ public class ExperimentDaoTest {
 
 		final Random ran = new Random();
 		final int datasetId = ran.nextInt();
-		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(ran.nextInt()));
+		final Set<Integer> instanceIds = Collections.singleton(ran.nextInt());
 
 		final SQLQuery query = Mockito.mock(SQLQuery.class);
 		Mockito.when(this.mockSession.createSQLQuery(ArgumentMatchers.anyString())).thenReturn(query);
