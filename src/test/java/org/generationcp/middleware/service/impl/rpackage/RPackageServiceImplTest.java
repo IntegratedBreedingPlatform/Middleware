@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.rpackage;
 
+import com.google.common.base.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
@@ -54,6 +55,20 @@ public class RPackageServiceImplTest extends IntegrationTestBase {
 		final RCall savedRCall = rCalls.get(0);
 		Assert.assertEquals(rCall.getDescription(), savedRCall.getDescription());
 		Assert.assertEquals(rCall.getrPackage(), savedRCall.getrPackage());
+
+	}
+
+	@Test
+	public void testGetRPackageById() {
+
+		final RPackage rPackage = new RPackage();
+		rPackage.setEndpoint(RandomStringUtils.randomAlphanumeric(BOUND));
+		rPackage.setDescription(RandomStringUtils.randomAlphanumeric(BOUND));
+		this.workbenchDaoFactory.getRPackageDao().save(rPackage);
+
+		final Optional<RPackage> result = this.rPackageService.getRPackageById(rPackage.getId());
+
+		Assert.assertTrue(result.isPresent());
 
 	}
 
