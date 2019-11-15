@@ -1,7 +1,6 @@
-package org.generationcp.middleware.service.impl.inventory;
+package org.generationcp.middleware.manager;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.manager.InventoryDataManagerImpl;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Before;
