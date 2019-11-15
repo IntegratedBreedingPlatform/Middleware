@@ -22,6 +22,17 @@ public class RCallParameter {
 	@Column(name = "value")
 	private String value;
 
+
+	public RCallParameter() {
+
+	}
+
+	public RCallParameter(final int id, final String key, final String value) {
+		this.id = id;
+		this.key = key;
+		this.value = value;
+	}
+
 	public Integer getId() {
 		return this.id;
 	}

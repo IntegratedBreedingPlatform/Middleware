@@ -38,7 +38,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `r_call` (
-			  `id_call` int(11) NOT NULL,
+			  `id_call` int(11) NOT NULL AUTO_INCREMENT,
 			  `description` varchar(255) DEFAULT NULL,
 			  `id_package` int(11) DEFAULT NULL,
 			  PRIMARY KEY (`id_call`),
@@ -64,7 +64,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `r_call_parameter` (
-			  `id_call_parameter` int(11) NOT NULL,
+			  `id_call_parameter` int(11) NOT NULL AUTO_INCREMENT,
 			  `key` varchar(45) DEFAULT NULL,
 			  `value` varchar(500) DEFAULT NULL,
 			  `id_call` int(11) DEFAULT NULL,

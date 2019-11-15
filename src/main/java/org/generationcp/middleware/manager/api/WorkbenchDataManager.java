@@ -405,7 +405,4 @@ public interface WorkbenchDataManager {
 	 */
 	List<CropType> getCropsWithAddProgramPermission(int workbenchUserId);
 
-	List<RCall> getAllRCalls();
-
-	List<RCall> getRCallsByPackageId(Integer packageId);
 }

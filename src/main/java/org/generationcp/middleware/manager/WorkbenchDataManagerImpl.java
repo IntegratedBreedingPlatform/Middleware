@@ -539,14 +539,4 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		}
 	}
 
-	@Override
-	public List<RCall> getAllRCalls() {
-		return this.workbenchDaoFactory.getRCallDao().getAll();
-	}
-
-	@Override
-	public List<RCall> getRCallsByPackageId(final Integer packageId) {
-		return this.workbenchDaoFactory.getRCallDao().getRCallsByPackageId(packageId);
-	}
-
 }
