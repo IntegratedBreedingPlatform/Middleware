@@ -14,7 +14,9 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.fest.util.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -24,6 +26,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -145,6 +148,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return null;
 	}
 
+	public ExperimentModel getExperimentByProjectIdAndGeoLocationAndType(final Integer projectId, final Integer geolocationId, final Integer typeId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("project.projectId", projectId));
+		criteria.add(Restrictions.eq("geoLocation.locationId", geolocationId));
+		criteria.add(Restrictions.eq("typeId", typeId));
+		return (ExperimentModel) criteria.uniqueResult();
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<ExperimentModel> getExperimentsByProjectIds(final List<Integer> projectIds) {
 		try {
@@ -253,7 +264,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	}
 
-	public void deleteExperimentsForDatasetInstances(final int datasetId, final List<Integer> instanceNumbers) {
+	public void deleteExperimentsForDatasets(final List<Integer> datasetIds, final List<Integer> instanceNumbers) {
 
 
 		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
@@ -265,7 +276,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		String queryString = "DELETE pheno FROM nd_experiment e"
 			+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
 			+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
-			+ "  WHERE e.project_id = :datasetId ";
+			+ "  WHERE e.project_id IN (:datasetIds) ";
 		StringBuilder sb = new StringBuilder(queryString);
 		if (!CollectionUtils.isEmpty(instanceNumbers)) {
 			sb.append(" AND g.description IN (:instanceNumbers)");
@@ -273,7 +284,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		Query statement =
 			this.getSession()
 				.createSQLQuery(sb.toString());
-		statement.setParameter("datasetId", datasetId);
+		statement.setParameterList("datasetIds", datasetIds);
 		if (!CollectionUtils.isEmpty(instanceNumbers)) {
 			statement.setParameterList("instanceNumbers", instanceNumbers);
 		}
@@ -284,7 +295,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		queryString = "DELETE e, eprop " + "FROM nd_experiment e "
 			+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
 			+ "  LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
-			+ "  WHERE e.project_id = :datasetId ";
+			+ "  WHERE e.project_id IN (:datasetIds) ";
 		sb = new StringBuilder(queryString);
 		if (!CollectionUtils.isEmpty(instanceNumbers)) {
 			sb.append(" AND g.description IN (:instanceNumbers)");
@@ -292,11 +303,15 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		statement =
 			this.getSession()
 				.createSQLQuery(sb.toString());
-		statement.setParameter("datasetId", datasetId);
+		statement.setParameterList("datasetIds", datasetIds);
 		if (!CollectionUtils.isEmpty(instanceNumbers)) {
 			statement.setParameterList("instanceNumbers", instanceNumbers);
 		}
 		statement.executeUpdate();
+	}
+
+	public void deleteExperimentsForDatasetInstances(final int datasetId, final List<Integer> instanceNumbers) {
+		this.deleteExperimentsForDatasets(Collections.singletonList(datasetId), instanceNumbers);
 	}
 
 	public void deleteTrialExperimentsOfStudy(final int datasetId) {
@@ -453,7 +468,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	public long count(final int dataSetId) {
 		try {
-			return (Long) this.getSession().createQuery("select count(*) from ExperimentModel where project_id = " + dataSetId)
+			return (Long) this.getSession().createQuery("select count(*) from 	ExperimentModel where project_id = " + dataSetId)
 				.uniqueResult();
 		} catch (final HibernateException e) {
 			final String message = "Error at countExperiments=" + dataSetId;
@@ -955,6 +970,34 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		return map;
+	}
+
+	// Update study experiment if the Geolocation ID to be the one is the one used by the study experiment
+	public void updateStudyExperimentGeolocationIfNecessary(final Integer studyId, final Integer geolocationId) {
+		final ExperimentModel studyExperiment = this.getExperimentByProjectIdAndGeoLocationAndType(studyId, geolocationId,
+			ExperimentType.STUDY_INFORMATION.getTermId());
+
+		if (studyExperiment != null) {
+			// Query the next available Geolocation ID from environments that will remain
+			final String queryString = "select min(if (e.nd_geolocation_id != :geolocationId, nd_geolocation_id, null))\n"
+				+ "from nd_experiment e "
+				+ "inner join project p on e.project_id = p.project_id "
+				+ "WHERE p.study_id = :studyId or p.project_id = :studyId";
+			final StringBuilder sb = new StringBuilder(queryString);
+			final SQLQuery statement = this.getSession().createSQLQuery(sb.toString());
+			statement.setParameter("studyId", studyId);
+			statement.setParameter("geolocationId", geolocationId);
+			final BigInteger nextGeolocationId = (BigInteger) statement.uniqueResult();
+
+			if (nextGeolocationId != null) {
+				studyExperiment.setGeoLocation(new Geolocation(nextGeolocationId.intValue()));
+				this.update(studyExperiment);
+			} else {
+				throw new MiddlewareQueryException("Cannot update GeolocationID=" + geolocationId + " for Study=" + studyId
+					+ " as no other environments will remain for the study.");
+			}
+
+		}
 	}
 
 }
