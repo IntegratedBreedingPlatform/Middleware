@@ -745,6 +745,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public long countGermplasmByStudy(final Integer studyDbId) {
+		return this.daoFactory.getGermplasmDao().countGermplasmByStudy(studyDbId);
+	}
+
+	@Override
+	public List<GermplasmDTO> getGermplasmByStudy(final Integer studyDbId, final Integer pageNumber, final Integer pageSize) {
+		return this.daoFactory.getGermplasmDao().getGermplasmByStudy(studyDbId, pageNumber, pageSize);
+	}
+
+	@Override
 	public Integer updateGermplasm(final Germplasm germplasm) {
 		final List<Germplasm> germplasms = new ArrayList<>();
 		germplasms.add(germplasm);
