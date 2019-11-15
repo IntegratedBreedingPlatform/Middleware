@@ -4,7 +4,9 @@ package org.generationcp.middleware.service.api.study;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-public class StudyGermplasmDto {
+import java.io.Serializable;
+
+public class StudyGermplasmDto implements Serializable {
 
 	private String entryType;
 
@@ -21,6 +23,12 @@ public class StudyGermplasmDto {
 	private String cross;
 
 	private String seedSource;
+
+	private Integer checkType;
+
+	private Integer groupId;
+
+	private String stockIds;
 
 	/**
 	 * @return the entryType
@@ -59,7 +67,6 @@ public class StudyGermplasmDto {
 
 	/**
 	 * @param desingation the desingation to set
-	 *
 	 */
 	public void setDesignation(final String designation) {
 		this.designation = designation;
@@ -135,6 +142,48 @@ public class StudyGermplasmDto {
 		this.entryCode = entryCode;
 	}
 
+	/**
+	 * @return the check type
+	 */
+	public Integer getCheckType() {
+		return this.checkType;
+	}
+
+	/**
+	 * @param checkType the checkType to set
+	 */
+	public void setCheckType(final Integer checkType) {
+		this.checkType = checkType;
+	}
+
+	/**
+	 * @return the groupGid
+	 */
+	public Integer getGroupId() {
+		return this.groupId;
+	}
+
+	/**
+	 * @param groupId the groupGid to set
+	 */
+	public void setGroupId(final Integer groupId) {
+		this.groupId = groupId;
+	}
+
+	/**
+	 * @return the stockIds
+	 */
+	public String getStockIds() {
+		return this.stockIds;
+	}
+
+	/**
+	 * @param stockIds the stockIds to set
+	 */
+	public void setStockIds(final String stockIds) {
+		this.stockIds = stockIds;
+	}
+
 	@Override
 	public boolean equals(final Object other) {
 		if (!(other instanceof StudyGermplasmDto)) {
@@ -142,15 +191,17 @@ public class StudyGermplasmDto {
 		}
 		final StudyGermplasmDto castOther = (StudyGermplasmDto) other;
 		return new EqualsBuilder().append(this.entryType, castOther.entryType).append(this.germplasmId, castOther.germplasmId)
-				.append(this.designation, castOther.designation).append(this.entryNumber, castOther.entryNumber)
-				.append(this.entryCode, castOther.entryCode).append(this.position, castOther.position).append(this.cross, castOther.cross)
-				.append(this.seedSource, castOther.seedSource).isEquals();
+			.append(this.designation, castOther.designation).append(this.entryNumber, castOther.entryNumber)
+			.append(this.entryCode, castOther.entryCode).append(this.position, castOther.position).append(this.cross, castOther.cross)
+			.append(this.seedSource, castOther.seedSource).append(this.checkType, castOther.checkType)
+			.append(this.groupId, castOther.groupId).append(this.stockIds, castOther.stockIds).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(this.entryType).append(this.germplasmId).append(this.designation).append(this.entryNumber)
-				.append(this.entryCode).append(this.position).append(this.cross).append(this.seedSource).toHashCode();
+			.append(this.entryCode).append(this.position).append(this.cross).append(this.seedSource).append(this.checkType)
+			.append(this.groupId).append(this.stockIds).toHashCode();
 	}
 
 }

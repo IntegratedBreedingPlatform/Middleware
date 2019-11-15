@@ -227,9 +227,29 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 		final List<String> germplasmDescriptors = this.projectPropDao.getGermplasmDescriptors(this.study.getProjectId());
 		Assert.assertNotNull(germplasmDescriptors);
-		Assert.assertTrue(germplasmDescriptors.size() == 2);
+		Assert.assertEquals(2, germplasmDescriptors.size());
 		Assert.assertTrue(germplasmDescriptors.contains(variable1.getName()));
 		Assert.assertTrue(germplasmDescriptors.contains(variable3.getName()));
+	}
+
+	@Test
+	public void testGetByStudyAndStandardVariableIds() {
+		final DmsProject plotDataset = this.saveDataset(DatasetTypeEnum.PLOT_DATA);
+		final CVTerm variable1 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
+		this.cvTermDao.save(variable1);
+		final ProjectProperty projectProperty = this.saveProjectVariable(plotDataset, variable1, 1, VariableType.TRAIT);
+		final List<ProjectProperty> projectProperties = this.projectPropDao.getByStudyAndStandardVariableIds(study.getProjectId(), Arrays.asList(variable1.getCvTermId()));
+		Assert.assertTrue(projectProperties.contains(projectProperty));
+	}
+
+	@Test
+	public void testGetByProjectIdAndVariableIds() {
+		final DmsProject plotDataset = this.saveDataset(DatasetTypeEnum.PLOT_DATA);
+		final CVTerm variable1 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
+		this.cvTermDao.save(variable1);
+		final ProjectProperty projectProperty = this.saveProjectVariable(plotDataset, variable1, 1, VariableType.TRAIT);
+		final List<ProjectProperty> projectProperties = this.projectPropDao.getByProjectIdAndVariableIds(plotDataset.getProjectId(), Arrays.asList(variable1.getCvTermId()));
+		Assert.assertTrue(projectProperties.contains(projectProperty));
 	}
 
 	@Test
@@ -254,7 +274,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 		final List<String> designFactors = this.projectPropDao.getDesignFactors(this.study.getProjectId());
 		Assert.assertNotNull(designFactors);
-		Assert.assertTrue(designFactors.size() == 2);
+		Assert.assertEquals(2, designFactors.size());
 		Assert.assertTrue(designFactors.contains(variable4.getName()));
 		Assert.assertTrue(designFactors.contains(variable5.getName()));
 	}
@@ -300,14 +320,14 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		return dataset;
 	}
 
-	private void saveProjectVariable(final DmsProject project, final CVTerm variable, final int rank, final VariableType variableType) {
+	private ProjectProperty saveProjectVariable(final DmsProject project, final CVTerm variable, final int rank, final VariableType variableType) {
 		final ProjectProperty property1 = new ProjectProperty();
 		property1.setAlias(RandomStringUtils.randomAlphabetic(20));
 		property1.setRank(rank);
 		property1.setTypeId(variableType.getId());
 		property1.setProject(project);
 		property1.setVariableId(variable.getCvTermId());
-		this.projectPropDao.save(property1);
+		return this.projectPropDao.save(property1);
 	}
 
 	private List<Object[]> createObjectToConvert() {
@@ -334,9 +354,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, DataSetupTest.GERMPLSM_PREFIX,
 				parentGermplasm);
 
-		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix);
-
-		return nurseryId;
+		return this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix);
 	}
 
 }

@@ -14,9 +14,16 @@ public class ObservationUnitRow {
 
 	private String designation;
 
+	private Integer trialInstance;
+
+	private Integer entryNumber;
+
 	private String action;
 
 	private Map<String, ObservationUnitData> variables;
+
+	// Contains environment level variables (variables added in Environment Details and Environment Conditions)
+	private Map<String, ObservationUnitData> environmentVariables;
 
 	private String obsUnitId;
 
@@ -62,6 +69,15 @@ public class ObservationUnitRow {
 		return this.variables;
 	}
 
+	public Map<String, ObservationUnitData> getEnvironmentVariables() {
+		return this.environmentVariables;
+	}
+
+	public void setEnvironmentVariables(
+		final Map<String, ObservationUnitData> environmentVariables) {
+		this.environmentVariables = environmentVariables;
+	}
+
 	public void setObsUnitId(final String obsUnitId) {
 		this.obsUnitId = obsUnitId;
 	}
@@ -80,6 +96,22 @@ public class ObservationUnitRow {
 
 	public void setSamplesCount(final String samplesCount) {
 		this.samplesCount = samplesCount;
+	}
+
+	public Integer getTrialInstance() {
+		return trialInstance;
+	}
+
+	public void setTrialInstance(final Integer trialInstance) {
+		this.trialInstance = trialInstance;
+	}
+
+	public Integer getEntryNumber() {
+		return entryNumber;
+	}
+
+	public void setEntryNumber(final Integer entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	@Override

@@ -16,9 +16,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.Service;
@@ -95,8 +93,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private StudyDataManager studyDataManager;
 
-	private UserDataManager userDataManager;
-
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
 	private DaoFactory daoFactory;
@@ -114,8 +110,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 			this.getOntologyPropertyDataManager(), this.getOntologyScaleDataManager(), this.getFormulaService(), sessionProvider);
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
 		this.measurementVariableService = new MeasurementVariableServiceImpl(currentSession);
-
-		this.userDataManager = new UserDataManagerImpl(sessionProvider);
 
 		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {
 
@@ -235,6 +229,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
+	public boolean hasAdvancedOrCrossesList(final int studyId) {
+		return this.daoFactory.getGermplasmListDAO().hasAdvancedOrCrossesList(studyId);
+	}
+
+	@Override
 	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
 		try {
 			final SQLQuery query = this.getCurrentSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT
@@ -304,6 +303,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
+	public Integer getPlotDatasetId(final int studyId) {
+		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getProjectId();
+	}
+
+	@Override
+	public Integer getEnvironmentDatasetId(final int studyId) {
+		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getProjectId();
+	}
+
+	@Override
 	public List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier) {
 		final List<MeasurementVariableDto> traits =
 			this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
@@ -337,52 +346,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		} catch (final ExecutionException e) {
 			throw new MiddlewareQueryException(
 				"Unexpected error updating observations. Please contact support for " + "further assistence.", e);
-		}
-	}
-
-	@SuppressWarnings("rawtypes")
-	@Override
-	public List<StudyInstance> getStudyInstances(final int studyId) {
-
-		try {
-			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
-				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
-				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" +
-				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n" +
-				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
-				"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
-				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "    inner join project proj on proj.project_id = nde.project_id \n"
-				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
-				+ " where \n"
-				+ "    proj.study_id = :studyId and proj.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId() + " \n"
-				+ "    group by geoloc.nd_geolocation_id \n" + "    order by (1 * geoloc.description) asc ";
-
-			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
-			query.setParameter("studyId", studyId);
-			query.addScalar("INSTANCE_DBID", new IntegerType());
-			query.addScalar("LOCATION_NAME", new StringType());
-			query.addScalar("LOCATION_ABBR", new StringType());
-			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
-			query.addScalar("FIELDMAP_BLOCK", new StringType());
-			query.addScalar("INSTANCE_NUMBER", new IntegerType());
-
-			final List queryResults = query.list();
-			final List<StudyInstance> instances = new ArrayList<>();
-			for (final Object result : queryResults) {
-				final Object[] row = (Object[]) result;
-				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[4]);
-				final StudyInstance instance =
-					new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[5], (String) row[3], hasFieldmap);
-				instances.add(instance);
-			}
-			return instances;
-		} catch (final HibernateException he) {
-			throw new MiddlewareQueryException(
-				"Unexpected error in executing getStudyInstances(studyId = " + studyId + ") query: " + he.getMessage(), he);
 		}
 	}
 
@@ -539,9 +502,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 				studyDetailsDto.setMetadata(studyMetadata);
 				final List<UserDto> users = new ArrayList<>();
 				final Map<String, String> properties = new HashMap<>();
-
-				users.addAll(this.userDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
-				users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
+				users.addAll(this.studyDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
+				users.addAll(this.studyDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
 				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(geolocationId));
 				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
 				studyDetailsDto.setContacts(users);
@@ -586,10 +548,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
-	}
-
-	public void setUserDataManager(final UserDataManager userDataManager) {
-		this.userDataManager = userDataManager;
 	}
 
 	String getYearFromStudy(final int studyIdentifier) {

@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.hibernate.Criteria;
@@ -24,7 +25,9 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,22 +55,6 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-	public String getGeolocationPropValue(final int stdVarId, final int studyId) {
-		try {
-			final StringBuilder sql =
-				new StringBuilder().append("SELECT value ").append("FROM nd_experiment e ")
-					.append("INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id ")
-					.append("WHERE e.project_id = :projectId AND gp.type_id = :stdVarId ORDER BY e.nd_geolocation_id ");
-			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-			query.setParameter("projectId", studyId);
-			query.setParameter("stdVarId", stdVarId);
-			return (String) query.uniqueResult();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error at getGeolocationPropValue=" + stdVarId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	public String getValueOfTrialInstance(final int datasetId, final int typeId, final String trialInstance) {
 		try {
@@ -87,33 +74,39 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-	public void deleteGeolocationPropertyValueInProject(final int studyId, final int termId) {
-		try {
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
-			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-			// statement
-			this.getSession().flush();
-
-			this.deleteValues(studyId, termId);
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at deleteGeolocationPropertyValueInProject=" + studyId + ", " + termId
-				+ " query on GeolocationPropertyDao: " + e.getMessage(), e);
-		}
+	public void deletePropertiesInDataset(final int datasetId, final List<Integer> variableIds) {
+		this.deleteValues(datasetId, Collections.<Integer>emptyList(), variableIds);
 	}
 
-	private void deleteValues(final int studyId,final int termId) {
+	public void deletePropertiesInDatasetInstances(final int datasetId, final List<Integer> instanceNumbers, final List<Integer> variableIds) {
+		this.deleteValues(datasetId, instanceNumbers, variableIds);
+	}
+
+	private void deleteValues(final int projectId, final List<Integer> instanceNumbers, final List<Integer> variableIds) {
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+		// statement
+		this.getSession().flush();
+
 		final StringBuilder sql1 = new StringBuilder().append("Delete ngp.* FROM nd_geolocationprop ngp "
-				+ "INNER JOIN nd_experiment e ON ngp.nd_geolocation_id = e.nd_geolocation_id AND ngp.type_id = :termId "
+				+ "INNER JOIN nd_geolocation g on g.nd_geolocation_id = ngp.nd_geolocation_id "
+				+ "INNER JOIN nd_experiment e ON ngp.nd_geolocation_id = g.nd_geolocation_id "
 				+ "INNER JOIN project p ON p.project_id = e.project_id "
-				+ "WHERE (p.study_id = :studyId OR p.project_id = :studyId)");
+				+ "WHERE (p.study_id = :datasetId OR p.project_id = :datasetId) AND ngp.type_id IN (:variableIds) ");
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			sql1.append(" AND g.description IN (:instanceNumbers)");
+		}
 
 		final SQLQuery sqlQuery1 = this.getSession().createSQLQuery(sql1.toString());
-		sqlQuery1.setParameter("studyId", studyId);
-		sqlQuery1.setParameter("termId", termId);
-
+		sqlQuery1.setParameter("datasetId", projectId);
+		sqlQuery1.setParameterList("variableIds", variableIds);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			sqlQuery1.setParameterList("instanceNumbers", instanceNumbers);
+		}
 		sqlQuery1.executeUpdate();
 	}
+
+
 
 	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer geolocationId) {
 		Preconditions.checkNotNull(geolocationId);
@@ -134,6 +127,30 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			return geoProperties;
 		} catch (final MiddlewareQueryException e) {
 			final String message = "Error with getGeolocationPropsAndValuesByGeolocation() query from geolocationId: " + geolocationId;
+			GeolocationPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public Map<Integer, String> getInstanceIdLocationIdMap(final List<Integer> instanceIds) {
+		Map<Integer, String> instanceIdLocationIdMap = new HashMap<>();
+		final StringBuilder sql =
+			new StringBuilder().append("SELECT  ").append("    geo.nd_geolocation_id as instanceId, geo.value as value ").append("FROM ")
+				.append(" nd_geolocationprop geo ").append("WHERE ").append("    geo.nd_geolocation_id in (:geolocationIds) ")
+				.append("        AND geo.type_id = :locationVariableId");
+
+		try {
+			final Query query =
+				this.getSession().createSQLQuery(sql.toString()).addScalar("instanceId").addScalar("value")
+					.setParameterList("geolocationIds", instanceIds).setParameter("locationVariableId", TermId.LOCATION_ID.getId());
+			final List<Object> results = query.list();
+			for (final Object obj : results) {
+				final Object[] row = (Object[]) obj;
+				instanceIdLocationIdMap.put((Integer) row[0], (String) row[1]);
+			}
+			return instanceIdLocationIdMap;
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with getInstanceIdLocationIdMap() query from instanceIds: " + instanceIds;
 			GeolocationPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -164,5 +181,11 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			geoProperties.put(variableId, value);
 		}
 		return geoProperties;
+	}
+
+	public List<GeolocationProperty> getByGeolocation(final Integer geolocationId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("geolocation.locationId", geolocationId));
+		return criteria.list();
 	}
 }

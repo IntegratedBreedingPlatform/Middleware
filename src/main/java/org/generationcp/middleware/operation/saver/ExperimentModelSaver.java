@@ -10,10 +10,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -34,6 +30,10 @@ import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImpl;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Transactional
 public class ExperimentModelSaver {
 	
@@ -49,12 +49,13 @@ public class ExperimentModelSaver {
 		this.stockModelBuilder = new StockModelBuilder(sessionProvider);
 	}
 
-	public void addExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
-		final TermId myExperimentType = this.mapExperimentType(experimentType);
-		final ExperimentModel experimentModel = this.create(crop, projectId, values, myExperimentType);
+	public ExperimentModel addExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
+		final ExperimentModel experimentModel = this.create(crop, projectId, values, experimentType);
 
 		this.daoFactory.getExperimentDao().save(experimentModel);
 		this.phenotypeSaver.savePhenotypes(experimentModel, values.getVariableList());
+
+		return experimentModel;
 	}
 
 	public void addOrUpdateExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
@@ -70,44 +71,20 @@ public class ExperimentModelSaver {
 				}
 			}
 		} else {
-			TermId myExperimentType = null;
-			if (values instanceof StudyValues) {
-				myExperimentType = TermId.STUDY_EXPERIMENT;
-			} else {
-				myExperimentType = this.mapExperimentType(experimentType);
-			}
-
-			final ExperimentModel experimentModel = this.create(crop, projectId, values, myExperimentType);
+			final ExperimentType type = values instanceof StudyValues ? ExperimentType.STUDY_INFORMATION : experimentType;
+			final ExperimentModel experimentModel = this.create(crop, projectId, values, type);
 
 			this.daoFactory.getExperimentDao().save(experimentModel);
 			this.phenotypeSaver.savePhenotypes(experimentModel, values.getVariableList());
 		}
 	}
 
-	private TermId mapExperimentType(final ExperimentType experimentType) {
-		switch (experimentType) {
-			case PLOT:
-				return TermId.PLOT_EXPERIMENT;
-			case AVERAGE:
-				return TermId.AVERAGE_EXPERIMENT;
-			case SUMMARY:
-				return TermId.SUMMARY_EXPERIMENT;
-			case SAMPLE:
-				return TermId.SAMPLE_EXPERIMENT;
-			case STUDY_INFORMATION:
-				return TermId.STUDY_INFORMATION;
-			case TRIAL_ENVIRONMENT:
-				return TermId.TRIAL_ENVIRONMENT_EXPERIMENT;
-		}
-		return null;
-	}
-
-	private ExperimentModel create(final CropType crop, final int projectId, final Values values, final TermId expType) {
+	private ExperimentModel create(final CropType crop, final int projectId, final Values values, final ExperimentType expType) {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final DmsProject project = new DmsProject();
 		project.setProjectId(projectId);
 		experimentModel.setProject(project);
-		experimentModel.setTypeId(expType.getId());
+		experimentModel.setTypeId(expType.getTermId());
 		experimentModel.setProperties(this.createTrialDesignExperimentProperties(experimentModel, values.getVariableList()));
 
 		if (values.getLocationId() == null && values instanceof StudyValues) {

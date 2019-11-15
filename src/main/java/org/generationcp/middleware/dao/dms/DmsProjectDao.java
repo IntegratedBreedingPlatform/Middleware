@@ -51,6 +51,7 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.BooleanType;
 import org.hibernate.type.DoubleType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -60,6 +61,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,11 +118,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "    subject.program_uuid AS program_uuid, "
 			+ "    st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, "
 			+ "st.visible as visible, st.cvterm_id as cvtermId, subject.locked as isLocked, "
-			+ "u.userId as ownerId, CONCAT(fname, ' ', lname) as ownerName "
+			+ "subject.created_by "
 			+ "  FROM project subject "
 			+ "  LEFT JOIN study_type st ON subject.study_type_id = st.study_type_id "
-			+ "  LEFT JOIN users u ON u.userid = subject.created_by "
-			+ "  LEFT JOIN persons p ON p.personid = u.personid "
 			+ " LEFT JOIN project parent ON subject.parent_project_id = parent.project_id "
 			+ " WHERE subject.parent_project_id = :folderId "
 			+ "   AND parent.study_type_id IS NULL "
@@ -135,18 +135,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "pr.name AS name,  pr.description AS description, pr.program_uuid AS program_uuid, "
 			+ "st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, "
 			+ "st.visible as visible, st.cvterm_id as cvtermId, pr.locked as isLocked, "
-			+ "u.userId as ownerId, CONCAT(fname, ' ', lname) as ownerName "
+			+ "pr.created_by "
 			+ "  FROM project pr "
 			+ "  LEFT JOIN study_type st ON pr.study_type_id = st.study_type_id "
-			+ "  LEFT JOIN users u ON u.userid = pr.created_by "
-			+ "  LEFT JOIN persons p ON p.personid = u.personid "
 			+ " WHERE pr.project_id = :studyId and pr.deleted != " + DELETED_STUDY;
-
-	private static final String GET_STUDIES_OF_FOLDER =
-		"SELECT DISTINCT p.project_id "
-			+ "FROM project p "
-			+ "WHERE p.parent_project_id = :folderId AND p.study_type_id IS NOT NULL AND p.deleted != " + DELETED_STUDY + " "
-			+ "ORDER BY p.name ";
 
 	private static final String GET_ALL_FOLDERS =
 		" SELECT p.parent_project_id, p.project_id, p.name, p.description FROM project p "
@@ -160,7 +152,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ " AND p.deleted != " + DELETED_STUDY
 			+ " AND p.program_uuid = :program_uuid ";
 
-	static final String GET_STUDY_METADATA_BY_GEOLOCATION_ID = " SELECT  "
+	private static final String GET_STUDY_METADATA_BY_GEOLOCATION_ID = " SELECT  "
 		+ "     geoloc.nd_geolocation_id AS studyDbId, "
 		+ "     pmain.project_id AS trialOrNurseryId, "
 		+ "		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS studyName, "
@@ -262,8 +254,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				final Boolean isLocked = (Boolean) row[10];
 				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
 				final Integer ownerId = (Integer) row[11];
-				final String ownerName = (String) row[12];
-				childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, ownerId, ownerName));
+				childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, ownerId));
 			} else {
 				childrenNodes.add(new FolderReference(id, name, description, projectUUID));
 			}
@@ -337,51 +328,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException("Error in getByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyNodes;
-	}
-
-	public List<DmsProject> getProjectsByFolder(final Integer folderId, final int start, final int numOfRows) {
-		List<DmsProject> projects = new ArrayList<>();
-		if (folderId == null) {
-			return projects;
-		}
-
-		try {
-			// Get projects by folder
-			final Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDIES_OF_FOLDER);
-			query.setParameter("folderId", folderId);
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-			final List<Integer> projectIds = query.list();
-			projects = this.getByIds(projectIds);
-
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error with getProjectsByFolder query from Project: " + e.getMessage(), e);
-		}
-
-		return projects;
-	}
-
-	public long countProjectsByFolder(final Integer folderId) {
-		long count = 0;
-		if (folderId == null) {
-			return count;
-		}
-
-		try {
-			final Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDIES_OF_FOLDER);
-			query.setParameter("folderId", folderId);
-			final List<Object[]> list = query.list();
-			count = list.size();
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException(
-				"Error in countProjectsByFolder(" + folderId + ") query in DmsProjectDao: " + e.getMessage(),
-				e);
-		}
-
-		return count;
-
 	}
 
 	public List<StudyDetails> getAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {
@@ -921,8 +867,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER).addScalar("project_id").addScalar("name")
 					.addScalar("description").addScalar("is_study", new IntegerType()).addScalar("program_uuid").addScalar("studyType")
 					.addScalar("label")
-					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("ownerId")
-					.addScalar("ownerName");
+					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked")
+					.addScalar("created_by", new IntegerType());
 			query.setParameter("folderId", folderId);
 			query.setParameter("studyTypeId", studyType);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
@@ -946,8 +892,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Query query =
 				this.getSession().createSQLQuery(DmsProjectDao.STUDY_REFERENCE_SQL).addScalar("project_id").addScalar("name")
 					.addScalar("description").addScalar("program_uuid").addScalar("studyType").addScalar("label")
-					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("ownerId")
-					.addScalar("ownerName");
+					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("created_by");
 			query.setParameter("studyId", studyId);
 
 			final List<Object[]> list = query.list();
@@ -964,9 +909,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final Integer cvtermId = (Integer) row[8];
 					final Boolean isLocked = (Boolean) row[9];
 					final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
-					final Integer ownerId = (Integer) row[10];
-					final String ownerName = (String) row[11];
-					studyReference = new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, ownerId, ownerName);
+					final String ownerId = (String) row[10];
+					studyReference =
+						new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, Integer.valueOf(ownerId));
 				}
 			}
 
@@ -980,6 +925,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<MeasurementVariable> getObservationSetVariables(final Integer observationSetId, final List<Integer> variableTypes) {
+		return this.getObservationSetVariables(Collections.singletonList(observationSetId), variableTypes);
+	}
+
+	public List<MeasurementVariable> getObservationSetVariables(final List<Integer> observationSetIds, final List<Integer> variableTypes) {
 
 		try {
 			final String query = " SELECT distinct "  //
@@ -1032,12 +981,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   LEFT JOIN cvtermprop cropOntology ON cropOntology.cvterm_id = variable.cvterm_id" //
 				+ "        AND cropOntology.type_id = " + TermId.CROP_ONTOLOGY_ID.getId()
 				+ " WHERE " //
-				+ "   dataset.project_id = :observationSetId " //
+				+ "   dataset.project_id in (:observationSetIds) " //
 				+ "   AND pp.type_id in (:variableTypes) "
 				+ " ORDER BY pp.rank ";
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
-			sqlQuery.setParameter("observationSetId", observationSetId);
+			sqlQuery.setParameterList("observationSetIds", observationSetIds);
 			sqlQuery.setParameterList("variableTypes", variableTypes);
 			sqlQuery
 				.addScalar(OBS_SET_VARIABLE_ID)
@@ -1144,7 +1093,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return new ArrayList<>(variables.values());
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error getting datasets variables for dataset=" + observationSetId + ": " + e.getMessage(), e);
+				"Error getting datasets variables for dataset=" + observationSetIds + ": " + e.getMessage(), e);
 		}
 	}
 
@@ -1160,7 +1109,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public List<DatasetDTO> getDatasets(final Integer parentId) {
+	public List<DatasetDTO> getDatasets(final Integer studyId) {
 		final List<DatasetDTO> datasetDTOS;
 		try {
 
@@ -1173,13 +1122,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
 			criteria.createAlias("project.datasetType", "dt");
 			criteria.createAlias("project.study", "study");
-			criteria.add(Restrictions.eq("study.projectId", parentId));
+			criteria.add(Restrictions.eq("study.projectId", studyId));
 			criteria.setProjection(projectionList);
 			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
 			datasetDTOS = criteria.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error getting getDatasets for studyId=" + parentId + ":" + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error getting getDatasets for studyId=" + studyId + ":" + e.getMessage(), e);
 		}
 		return datasetDTOS;
 
@@ -1188,14 +1137,35 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<StudyInstance> getDatasetInstances(final int datasetId) {
 
 		try {
-			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
-				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
-				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" +
+			final String sql = "select \n" + "	geoloc.nd_geolocation_id as instanceDbId, \n"
+				+ "	nde.nd_experiment_id as experimentId, \n"
+				+ " geoloc.description as instanceNumber, \n"
+				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as locationId, \n"  // 8190 = cvterm for LOCATION_ID
+				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as locationName, \n" +
+				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as locationAbbreviation, \n" + // 8189 = cvterm for LOCATION_ABBR
+				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as customLocationAbbreviation, \n" +
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n" +
+				"	case when max(if(geoprop.type_id = 8583, geoprop.value, null)) is null then 0 else 1 end as hasFieldmap, \n"
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
-				"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
+
+				// If study has any plot experiments, hasExperimentalDesign flag = true
+				+ "  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
+				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
+
+				// If study has sub-observations or samples, canBeDeleted = false
+				+ "  case when (select count(1) from sample s "
+				+ "  inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 or (select count(1) from nd_experiment exp \n"
+				+ " INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 \n"
+				+ " INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0"
+				+ " then 0 else 1 end as canBeDeleted, "
+
+				// if study has any pending or accepted plot observations, hasMeasurements = true
+				+ "  case when (select count(1) from phenotype ph "
+				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
+				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
+				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) > 0 then 1 else 0 end as hasMeasurements "
+				+ "    from	nd_geolocation geoloc \n"
 				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 				+ "    inner join project proj on proj.project_id = nde.project_id \n"
 				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
@@ -1205,23 +1175,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("datasetId", datasetId);
-			query.addScalar("INSTANCE_DBID", new IntegerType());
-			query.addScalar("LOCATION_NAME", new StringType());
-			query.addScalar("LOCATION_ABBR", new StringType());
-			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
-			query.addScalar("FIELDMAP_BLOCK", new StringType());
-			query.addScalar("INSTANCE_NUMBER", new IntegerType());
 
-			final List queryResults = query.list();
-			final List<StudyInstance> instances = new ArrayList<>();
-			for (final Object result : queryResults) {
-				final Object[] row = (Object[]) result;
-				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[4]);
-				final StudyInstance instance =
-					new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[5], (String) row[3], hasFieldmap);
-				instances.add(instance);
-			}
-			return instances;
+			query.addScalar("instanceDbId", new IntegerType());
+			query.addScalar("experimentId", new IntegerType());
+			query.addScalar("locationId", new IntegerType());
+			query.addScalar("locationName", new StringType());
+			query.addScalar("locationAbbreviation", new StringType());
+			query.addScalar("customLocationAbbreviation", new StringType());
+			query.addScalar("hasFieldmap", new BooleanType());
+			query.addScalar("instanceNumber", new IntegerType());
+			query.addScalar("hasExperimentalDesign", new BooleanType());
+			query.addScalar("canBeDeleted", new BooleanType());
+			query.addScalar("hasMeasurements", new BooleanType());
+			query.setResultTransformer(Transformers.aliasToBean(StudyInstance.class));
+			return query.list();
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
 				"Unexpected error in executing getDatasetInstances(datasetId = " + datasetId + ") query: " + he.getMessage(), he);
@@ -1340,9 +1307,57 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			criteria.add(Restrictions.eq("dt.datasetTypeId", datasetTypeId));
 			return criteria.list();
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error getting getDatasetsByTypeForStudy for datasetTypeId =" + datasetTypeId + ":" + e.getMessage();
+			final String errorMessage =
+				"Error getting getDatasetsByTypeForStudy for datasetTypeId =" + datasetTypeId + ":" + e.getMessage();
 			DmsProjectDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
+
+	public List<Integer> getPersonIdsAssociatedToStudy(final Integer studyId) {
+		Preconditions.checkNotNull(studyId);
+		try {
+			final Query query =
+				this.getSession().createSQLQuery("SELECT DISTINCT pp.value AS personId \n"
+					+ "FROM   cvterm scale \n"
+					+ "       INNER JOIN cvterm_relationship r \n"
+					+ "               ON ( r.object_id = scale.cvterm_id ) \n"
+					+ "       INNER JOIN cvterm variable \n"
+					+ "               ON ( r.subject_id = variable.cvterm_id ) \n"
+					+ "       INNER JOIN projectprop pp \n"
+					+ "               ON ( pp.variable_id = variable.cvterm_id ) \n"
+					+ "WHERE  pp.project_id = :studyId \n"
+					+ "       AND r.object_id = 1901; ").addScalar("personId", new IntegerType());
+			query.setParameter("studyId", studyId);
+			return query.list();
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with getPersonsAssociatedToStudy() query from studyId: " + studyId;
+			DmsProjectDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<Integer> getPersonIdsAssociatedToEnvironment(final Integer instanceId) {
+		Preconditions.checkNotNull(instanceId);
+		try {
+			final Query query =
+				this.getSession().createSQLQuery("SELECT DISTINCT pp.value AS personId \n"
+					+ "FROM   cvterm scale \n"
+					+ "       INNER JOIN cvterm_relationship r \n"
+					+ "               ON ( r.object_id = scale.cvterm_id ) \n"
+					+ "       INNER JOIN cvterm variable \n"
+					+ "               ON ( r.subject_id = variable.cvterm_id ) \n"
+					+ "       INNER JOIN nd_geolocationprop pp \n"
+					+ "               ON ( pp.type_id = variable.cvterm_id ) \n"
+					+ "WHERE  pp.nd_geolocation_id = :instanceId \n"
+					+ "       AND r.object_id = 1901; ").addScalar("personId", new IntegerType());
+			query.setParameter("instanceId", instanceId);
+			return query.list();
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with getPersonIdsAssociatedToEnvironment() query from instanceId: " + instanceId;
+			DmsProjectDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 }

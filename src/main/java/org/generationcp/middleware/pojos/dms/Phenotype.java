@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos.dms;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -118,6 +120,9 @@ public class Phenotype implements Serializable {
 	@Transient
 	private boolean changed = false;
 
+	@Transient
+	private Boolean isDerivedTrait;
+
 	public Phenotype() {
 	}
 
@@ -134,6 +139,12 @@ public class Phenotype implements Serializable {
 		this.assayId = assayId;
 		this.draftCValueId = draftCValueId;
 		this.draftValue = draftValue;
+	}
+
+	public Phenotype(final Integer observableId, final String value, final ExperimentModel experiment) {
+		this.observableId = observableId;
+		this.value = value;
+		this.experiment = experiment;
 	}
 
 	public Integer getPhenotypeId() {
@@ -244,6 +255,14 @@ public class Phenotype implements Serializable {
 		this.draftCValueId = draftCValueId;
 	}
 
+	public Boolean isDerivedTrait() {
+		return this.isDerivedTrait;
+	}
+
+	public void setDerivedTrait(final Boolean derivedTrait) {
+		this.isDerivedTrait = derivedTrait;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o)
@@ -282,26 +301,25 @@ public class Phenotype implements Serializable {
 			this.getDraftCValueId());
 	}
 
-
-
 	@Override
 	public String toString() {
-		return "Phenotype{" +
-			"phenotypeId=" + this.phenotypeId +
-			", uniqueName='" + this.uniqueName + '\'' +
-			", name='" + this.name + '\'' +
-			", observableId=" + this.observableId +
-			", attributeId=" + this.attributeId +
-			", value='" + this.value + '\'' +
-			", cValueId=" + this.cValueId +
-			", valueStatus=" + this.valueStatus +
-			", assayId=" + this.assayId +
-			", experiment=" + this.experiment +
-			", createdDate=" + this.createdDate +
-			", updatedDate=" + this.updatedDate +
-			", draftValue='" + this.draftValue + '\'' +
-			", draftCValueId=" + this.draftCValueId +
-			", changed=" + this.changed +
-			'}';
+		return new ToStringBuilder(this)
+			.append("phenotypeId", this.phenotypeId)
+			.append("uniqueName", this.uniqueName)
+			.append("name", this.name)
+			.append("observableId", this.observableId)
+			.append("attributeId", this.attributeId)
+			.append("value", this.value)
+			.append("cValueId", this.cValueId)
+			.append("valueStatus", this.valueStatus)
+			.append("assayId", this.assayId)
+			.append("experiment", this.experiment)
+			.append("createdDate", this.createdDate)
+			.append("updatedDate", this.updatedDate)
+			.append("draftValue", this.draftValue)
+			.append("draftCValueId", this.draftCValueId)
+			.append("changed", this.changed)
+			.append("isDerivedTrait", this.isDerivedTrait)
+			.toString();
 	}
 }

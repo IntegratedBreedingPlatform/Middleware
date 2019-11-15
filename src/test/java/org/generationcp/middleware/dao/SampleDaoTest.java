@@ -12,7 +12,6 @@ import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
-import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -21,12 +20,13 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +53,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 	private static final String SAMPLE_LIST_NAME_FOR_SUBOBSERVATION_DATA = "SubObsSampleList";
 
 	private SampleListDao sampleListDao;
-	private UserDAO userDao;
 	private SampleDao sampleDao;
 	private ExperimentDao experimentDao;
 	private GeolocationDao geolocationDao;
@@ -62,12 +61,13 @@ public class SampleDaoTest extends IntegrationTestBase {
 	private DmsProjectDao dmsProjectDao;
 	private GermplasmDAO germplasmDao;
 	private ProjectPropertyDao projectPropertyDao;
+	private IntegrationTestDataInitializer testDataInitializer;
 
 	private DaoFactory daoFactory;
 
 	private Integer ndExperimentId;
 
-	private User user;
+	private WorkbenchUser workbenchUser;
 
 	private DmsProject study;
 
@@ -76,7 +76,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 
 		this.sampleListDao = this.daoFactory.getSampleListDao();
-		this.userDao = this.daoFactory.getUserDao();
 		this.sampleDao = this.daoFactory.getSampleDao();
 
 		this.experimentDao = new ExperimentDao();
@@ -100,7 +99,9 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.projectPropertyDao = new ProjectPropertyDao();
 		this.projectPropertyDao.setSession(this.sessionProvder.getSession());
 
-		this.user = this.createUserForTesting();
+		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
+
+		this.workbenchUser = this.testDataInitializer.createUserForTesting();
 
 		this.study = this.createDmsProject(STUDY_NAME, STUDY_DESCRIPTION, null, this.dmsProjectDao.getById(1), null);
 
@@ -109,7 +110,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 	@Test
 	public void testCountFilter() {
 
-		final Integer listId = this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		final Integer listId =
+			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final Long countAllSample = this.sampleDao.countFilter(null, listId);
 
@@ -120,7 +122,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 	@Test
 	public void testCountFilterWithObsUnitId() {
 
-		final Integer listId = this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		final Integer listId =
+			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final Long countAllSample = this.sampleDao.countFilter(this.ndExperimentId, listId);
 
@@ -134,7 +137,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 		final Pageable pageable = Mockito.mock(Pageable.class);
 		Mockito.when(pageable.getPageSize()).thenReturn(10);
 
-		final Integer listId = this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		final Integer listId =
+			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		// Page 1
 		Mockito.when(pageable.getPageNumber()).thenReturn(0);
@@ -159,7 +163,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Mockito.when(pageable.getPageSize()).thenReturn(10);
 		Mockito.when(pageable.getPageNumber()).thenReturn(0);
 
-		final Integer listId = this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		final Integer listId =
+			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final List<SampleDTO> result = this.sampleDao.filter(this.ndExperimentId, listId, pageable);
 		Assert.assertEquals(1, result.size());
@@ -171,7 +176,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Mockito.when(pageable.getPageSize()).thenReturn(10);
 		Mockito.when(pageable.getPageNumber()).thenReturn(0);
 
-		final Integer listId = this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		final Integer listId =
+			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final List<SampleDTO> result = this.sampleDao.filter(this.ndExperimentId, listId, pageable);
 		Assert.assertEquals(1, result.size());
@@ -189,7 +195,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull(sample.getStudyId());
 		Assert.assertNotNull(STUDY_NAME, sample.getStudyName());
 		Assert.assertEquals("PLOT", sample.getDatasetType());
-		Assert.assertNotNull(USER_FIRST_NAME + " " + USER_LAST_NAME, sample.getTakenBy());
+		Assert.assertEquals(this.workbenchUser.getUserid(), sample.getTakenByUserId());
 		Assert.assertNotNull(sample.getEnumerator());
 	}
 
@@ -200,7 +206,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Mockito.when(pageable.getPageNumber()).thenReturn(0);
 
 		final Integer listId =
-			this.createStudyWithPlotAndSubObservation(this.study, this.user, SAMPLE_LIST_NAME_FOR_SUBOBSERVATION_DATA, TEST_SAMPLE_RECORD_COUNT);
+			this.createStudyWithPlotAndSubObservation(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_SUBOBSERVATION_DATA,
+				TEST_SAMPLE_RECORD_COUNT);
 
 		final List<SampleDTO> result = this.sampleDao.filter(this.ndExperimentId, listId, pageable);
 		Assert.assertEquals(1, result.size());
@@ -218,14 +225,15 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull(sample.getStudyId());
 		Assert.assertNotNull(STUDY_NAME, sample.getStudyName());
 		Assert.assertEquals("PLANT", sample.getDatasetType());
-		Assert.assertNotNull(USER_FIRST_NAME + " " + USER_LAST_NAME, sample.getTakenBy());
+		Assert.assertEquals(this.workbenchUser.getUserid(), sample.getTakenByUserId());
 		Assert.assertNotNull(sample.getEnumerator());
 	}
 
 	@Test
 	public void testFilterSortAscending() {
 
-		final Integer listId = this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		final Integer listId =
+			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final Pageable pageable = Mockito.mock(Pageable.class);
 		Mockito.when(pageable.getPageSize()).thenReturn(TEST_SAMPLE_RECORD_COUNT);
@@ -248,7 +256,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 	@Test
 	public void testFilterSortDescending() {
 
-		final Integer listId = this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		final Integer listId =
+			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final Pageable pageable = Mockito.mock(Pageable.class);
 		Mockito.when(pageable.getPageSize()).thenReturn(TEST_SAMPLE_RECORD_COUNT);
@@ -271,7 +280,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 	@Test
 	public void testCountBySampleUIDs() {
 
-		final Integer listId = this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		final Integer listId =
+			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final Set<String> sampleUIDs = new HashSet<>();
 		for (int i = 1; i < TEST_SAMPLE_RECORD_COUNT + 1; i++) {
@@ -286,7 +296,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetBySampleBks() {
 
-		final Integer listId = this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		final Integer listId =
+			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final Set<String> sampleUIDs = new HashSet<>();
 		for (int i = 1; i < TEST_SAMPLE_RECORD_COUNT + 1; i++) {
@@ -310,7 +321,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertNull(sample.getStudyId());
 		Assert.assertNull(sample.getStudyName());
 		Assert.assertNull(sample.getDatasetType());
-		Assert.assertNotNull(USER_FIRST_NAME + " " + USER_LAST_NAME, sample.getTakenBy());
+		Assert.assertEquals(this.workbenchUser.getUserid(), sample.getTakenByUserId());
 		Assert.assertNull(sample.getEnumerator());
 		Assert.assertNull(sample.getObservationUnitId());
 		Assert.assertNotNull(sample.getSamplingDate());
@@ -320,7 +331,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetMaxSequenceNumber() {
 
-		this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final ExperimentModel experimentModel = this.experimentDao.getById(this.ndExperimentId);
 		final Integer gid = experimentModel.getStock().getGermplasm().getGid();
@@ -333,7 +344,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetMaxSampleNumber() {
 
-		this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final Map<Integer, Integer> result = this.sampleDao.getMaxSampleNumber(Arrays.asList(this.ndExperimentId));
 		Assert.assertFalse(result.isEmpty());
@@ -344,7 +355,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetExperimentSampleMap() {
 
-		this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 		final Map<Integer, String> experimentSampleMap = this.sampleDao.getExperimentSampleMap(this.study.getProjectId());
 
 		Assert.assertEquals(TEST_SAMPLE_RECORD_COUNT, Integer.valueOf(experimentSampleMap.size()));
@@ -358,30 +369,34 @@ public class SampleDaoTest extends IntegrationTestBase {
 	@Test
 	public void testHasSamples() {
 
-		this.createStudyWithPlot(this.study, this.user, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 		Assert.assertTrue(this.sampleDao.hasSamples(this.study.getProjectId()));
 
-		final DmsProject studyWithoutExperimentAndSamples = this.createDmsProject("Any Name", "Any Description", null, this.dmsProjectDao.getById(1), null);
+		final DmsProject studyWithoutExperimentAndSamples =
+			this.createDmsProject("Any Name", "Any Description", null, this.dmsProjectDao.getById(1), null);
 		Assert.assertFalse(this.sampleDao.hasSamples(studyWithoutExperimentAndSamples.getProjectId()));
 
 	}
 
-	private Integer createStudyWithPlot(final DmsProject study, final User user, final String listName, final int sampleSize) {
+	private Integer createStudyWithPlot(final DmsProject study, final WorkbenchUser user, final String listName, final int sampleSize) {
 		this.ndExperimentId = null;
 
-
-		final DmsProject plotDataset = this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetTypeEnum.PLOT_DATA.getId(), study, study);
+		final DmsProject plotDataset =
+			this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetTypeEnum.PLOT_DATA.getId(), study, study);
 		final SampleList sampleListForPlotDataset =
 			this.createExperimentsWithSampleList(listName, plotDataset, user, sampleSize);
 
 		return sampleListForPlotDataset.getId();
 	}
 
-	private Integer createStudyWithPlotAndSubObservation(final DmsProject study, final User user, final String listName, final int sampleSize) {
+	private Integer createStudyWithPlotAndSubObservation(final DmsProject study, final WorkbenchUser user, final String listName,
+		final int sampleSize) {
 		this.ndExperimentId = null;
-		final DmsProject plotDataset = this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetTypeEnum.PLOT_DATA.getId(), study, study);
+		final DmsProject plotDataset =
+			this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetTypeEnum.PLOT_DATA.getId(), study, study);
 		final DmsProject subObservationDataset =
-			this.createDmsProject("SUB-OBSERVATION DATASET", "UB-OBSERVATION DATASET", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), plotDataset, study);
+			this.createDmsProject("SUB-OBSERVATION DATASET", "UB-OBSERVATION DATASET", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(),
+				plotDataset, study);
 		final SampleList sampleListForSubObservation =
 			this.createExperimentsWithSampleList(listName, subObservationDataset, user, sampleSize);
 
@@ -401,14 +416,13 @@ public class SampleDaoTest extends IntegrationTestBase {
 		}
 		this.dmsProjectDao.save(dmsProject);
 
-
 		return dmsProject;
 	}
 
 	private SampleList createExperimentsWithSampleList(
-		final String listName, final DmsProject dmsProject, final User user, final int sampleSize) {
+		final String listName, final DmsProject dmsProject, final WorkbenchUser user, final int sampleSize) {
 
-		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user);
+		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user.getUserid());
 		sampleList.setListName(listName);
 		sampleList.setDescription("DESCRIPTION-" + listName);
 		this.sampleListDao.saveOrUpdate(sampleList);
@@ -440,7 +454,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 				this.ndExperimentId = savedExperiment.getNdExperimentId();
 			}
 
-			final Sample sample = SampleTestDataInitializer.createSample(sampleList, user);
+			final Sample sample = SampleTestDataInitializer.createSample(sampleList, user.getUserid());
 			sample.setSampleName("SAMPLE-" + sampleList.getListName() + ":" + i);
 			sample.setSampleBusinessKey("BUSINESS-KEY-" + sampleList.getListName() + i);
 			sample.setEntryNumber(i);
@@ -453,21 +467,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 		}
 
 		return sampleList;
-
-	}
-
-	private User createUserForTesting() {
-
-		final Person person = PersonTestDataInitializer.createPerson(SampleDaoTest.USER_FIRST_NAME, SampleDaoTest.USER_LAST_NAME);
-		this.personDAO.saveOrUpdate(person);
-
-		final User user = UserTestDataInitializer.createUser();
-		user.setName(USER_NAME);
-		user.setUserid(null);
-		user.setPersonid(person.getId());
-		this.userDao.saveOrUpdate(user);
-
-		return user;
 
 	}
 

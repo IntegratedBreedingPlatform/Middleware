@@ -11,9 +11,9 @@
 
 package org.generationcp.middleware.pojos.ims;
 
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.domain.inventory.LotAggregateData;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -25,10 +25,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.domain.inventory.LotAggregateData;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * POJO for ims_lot table.
@@ -79,6 +79,12 @@ public class Lot implements Serializable {
 	@Column(name = "comments")
 	private String comments;
 
+	@Column(name = "created_date")
+	private Date createdDate;
+
+	@Column(name = "stock_id")
+	private String stockId;
+
 	@OneToMany(mappedBy = "lot")
 	private Set<Transaction> transactions = new HashSet<Transaction>();
 
@@ -86,16 +92,17 @@ public class Lot implements Serializable {
 	private LotAggregateData aggregateData;
 
 	public Lot() {
-
+		this.createdDate = new Date();
 	}
 
-	public Lot(Integer id) {
+	public Lot(final Integer id) {
 		super();
 		this.id = id;
 	}
 
-	public Lot(Integer id, Integer userId, String entityType, Integer entityId, Integer locationId, Integer scaleId, Integer status,
-			Integer sourceId, String comments) {
+	public Lot(
+		final Integer id, final Integer userId, final String entityType, final Integer entityId, final Integer locationId, final Integer scaleId, final Integer status,
+			final Integer sourceId, final String comments) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -106,10 +113,12 @@ public class Lot implements Serializable {
 		this.status = status;
 		this.sourceId = sourceId;
 		this.comments = comments;
+		this.createdDate = new Date();
 	}
 
-	public Lot(Integer id, Integer userId, String entityType, Integer entityId, Integer locationId, Integer scaleId, Integer status,
-			Integer sourceId, String comments, Set<Transaction> transactions) {
+	public Lot(
+		final Integer id, final Integer userId, final String entityType, final Integer entityId, final Integer locationId, final Integer scaleId, final Integer status,
+			final Integer sourceId, final String comments, final Set<Transaction> transactions) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -121,13 +130,14 @@ public class Lot implements Serializable {
 		this.sourceId = sourceId;
 		this.comments = comments;
 		this.transactions = transactions;
+		this.createdDate = new Date();
 	}
 
 	public Integer getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
@@ -135,7 +145,7 @@ public class Lot implements Serializable {
 		return this.userId;
 	}
 
-	public void setUserId(Integer userId) {
+	public void setUserId(final Integer userId) {
 		this.userId = userId;
 	}
 
@@ -143,7 +153,7 @@ public class Lot implements Serializable {
 		return this.entityType;
 	}
 
-	public void setEntityType(String entityType) {
+	public void setEntityType(final String entityType) {
 		this.entityType = entityType;
 	}
 
@@ -151,7 +161,7 @@ public class Lot implements Serializable {
 		return this.entityId;
 	}
 
-	public void setEntityId(Integer entityId) {
+	public void setEntityId(final Integer entityId) {
 		this.entityId = entityId;
 	}
 
@@ -159,7 +169,7 @@ public class Lot implements Serializable {
 		return this.locationId;
 	}
 
-	public void setLocationId(Integer locationId) {
+	public void setLocationId(final Integer locationId) {
 		this.locationId = locationId;
 	}
 
@@ -167,7 +177,7 @@ public class Lot implements Serializable {
 		return this.scaleId;
 	}
 
-	public void setScaleId(Integer scaleId) {
+	public void setScaleId(final Integer scaleId) {
 		this.scaleId = scaleId;
 	}
 
@@ -175,7 +185,7 @@ public class Lot implements Serializable {
 		return this.status;
 	}
 
-	public void setStatus(Integer status) {
+	public void setStatus(final Integer status) {
 		this.status = status;
 	}
 
@@ -183,7 +193,7 @@ public class Lot implements Serializable {
 		return this.sourceId;
 	}
 
-	public void setSource(Integer sourceId) {
+	public void setSource(final Integer sourceId) {
 		this.sourceId = sourceId;
 	}
 
@@ -191,7 +201,7 @@ public class Lot implements Serializable {
 		return this.comments;
 	}
 
-	public void setComments(String comments) {
+	public void setComments(final String comments) {
 		this.comments = comments;
 	}
 
@@ -199,7 +209,7 @@ public class Lot implements Serializable {
 		return this.transactions;
 	}
 
-	public void setTransactions(Set<Transaction> transactions) {
+	public void setTransactions(final Set<Transaction> transactions) {
 		this.transactions = transactions;
 	}
 
@@ -207,13 +217,29 @@ public class Lot implements Serializable {
 		return this.aggregateData;
 	}
 
-	public void setAggregateData(LotAggregateData aggregateData) {
+	public void setAggregateData(final LotAggregateData aggregateData) {
 		this.aggregateData = aggregateData;
+	}
+
+	public Date getCreatedDate() {
+		return this.createdDate;
+	}
+
+	public void setCreatedDate(final Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public String getStockId() {
+		return this.stockId;
+	}
+
+	public void setStockId(final String stockId) {
+		this.stockId = stockId;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Lot [id=");
 		builder.append(this.id);
 		builder.append(", userId=");
@@ -239,7 +265,7 @@ public class Lot implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -250,7 +276,7 @@ public class Lot implements Serializable {
 			return false;
 		}
 
-		Lot rhs = (Lot) obj;
+		final Lot rhs = (Lot) obj;
 		return new EqualsBuilder().append(this.id, rhs.id).isEquals();
 	}
 

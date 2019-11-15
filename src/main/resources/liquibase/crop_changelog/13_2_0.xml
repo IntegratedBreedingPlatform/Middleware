@@ -1,0 +1,568 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="clarissa" id="v13.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_soybean_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<comment>
+			Apply fix on soybean crop (Jira IBP-3011). Made variable, scale and property obsolete.  This is equivalent of ROOTKNOT_Est_1to5 cvtermId=25046.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE cvterm SET is_obsolete=1 WHERE cvterm_id=20016;
+			UPDATE cvterm SET is_obsolete=1 WHERE cvterm_id=22008;
+			UPDATE cvterm SET is_obsolete=1 WHERE cvterm_id=20006;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarissa" id="v13.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_rice_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<comment>
+			Apply fix on rice crop (Jira IBP-3011). Add sample categorical values, change some to text.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+			REPLACE INTO cv (cv_id,`name`,definition) VALUES
+			(20425,'30153','Categorical values for Name of COOP'),
+			(20426,'30177','Categorical values for Code of YLD_LOCAL'),
+			(20427,'30178','Categorical values for Code of YLD_NATL'),
+			(20428,'30179','Categorical values for Code of YLD_STATE'),
+			(20429,'30162','Categorical values for Code of LAND_INCLINATION'),
+			(20430,'30163','Categorical values for Name of OTHER_FERTI_USED'),
+			(20431,'30169','Categorical values for Growth stage of STAGE_MOIST'),
+			(20432,'30159','Categorical values for Code of H2O_SOURCE_TYPE'),
+			(20433,'30158','Categorical values for Code of H2O_LEVEL_TYPE'),
+			(20434,'22246','Categorical values for Growth stage'),
+			(20435,'30152','Categorical values for Code of BUNDED'),
+			(20436,'30161','Categorical values for Code of INSPROT'),
+			(20437,'30156','Categorical values for Code of DISPROT'),
+			(20438,'30155','Categorical values for Code of DEG_MOIST'),
+			(20439,'21674','Categorical values for IRGC Panicle Axis Code (Wild Rice)'),
+			(20440,'30165','Categorical values for Name of OUT_TRAIT'),
+			(20441,'30166','Categorical values for Name of PEST_NAME'),
+			(20442,'30157','Categorical values for Code of GENE_CONSERVE'),
+			(20443,'30164','Categorical values for Name of OTHER_PURPOSE'),
+			(20444,'30167','Categorical values for Name of SCREEN_STRESS'),
+			(20445,'30160','Categorical values for Name of HYBRID_TRAIT');
+
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES
+			(30208,20425,'1','1=Code 1',NULL,0,0),
+			(30209,20426,'1','1=Code 1',NULL,0,0),
+			(30210,20427,'1','1=Code 1',NULL,0,0),
+			(30211,20428,'1','1=Code 1',NULL,0,0),
+			(30212,20429,'1','1=Code 1',NULL,0,0),
+			(30213,20430,'1','1=Code 1',NULL,0,0),
+			(30214,20431,'1','1=Code 1',NULL,0,0),
+			(30215,20432,'1','1=Code 1',NULL,0,0),
+			(30216,20433,'1','1=Code 1',NULL,0,0),
+			(30217,20434,'1','1=Code 1',NULL,0,0),
+			(30218,20435,'1','1=Code 1',NULL,0,0),
+			(30219,20436,'1','1=Code 1',NULL,0,0),
+			(30220,20437,'1','1=Code 1',NULL,0,0),
+			(30221,20438,'1','1=Code 1',NULL,0,0),
+			(30222,20439,'1','1=Code 1',NULL,0,0),
+			(30223,20440,'1','1=Code 1',NULL,0,0),
+			(30224,20441,'1','1=Code 1',NULL,0,0),
+			(30225,20442,'1','1=Code 1',NULL,0,0),
+			(30226,20443,'1','1=Code 1',NULL,0,0),
+			(30227,20444,'1','1=Code 1',NULL,0,0),
+			(30228,20445,'1','1=Code 1',NULL,0,0);
+
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES
+			(37802,1190,30153,30208),
+			(37803,1190,30177,30209),
+			(37804,1190,30178,30210),
+			(37805,1190,30179,30211),
+			(37806,1190,30162,30212),
+			(37807,1190,30163,30213),
+			(37808,1190,30169,30214),
+			(37809,1190,30159,30215),
+			(37810,1190,30158,30216),
+			(37811,1190,22246,30217),
+			(37812,1190,30152,30218),
+			(37813,1190,30161,30219),
+			(37814,1190,30156,30220),
+			(37815,1190,30155,30221),
+			(37816,1190,21674,30222),
+			(37817,1190,30165,30223),
+			(37818,1190,30166,30224),
+			(37819,1190,30157,30225),
+			(37820,1190,30164,30226),
+			(37821,1190,30167,30227),
+			(37822,1190,30160,30228);
+
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES
+			(37480,1105,30170,1110),
+			(37481,1105,30171,1110),
+			(37482,1105,30172,1110),
+			(37483,1105,30173,1110),
+			(37484,1105,30174,1110),
+			(37485,1105,30175,1110),
+			(37486,1105,30176,1110);
+
+			UPDATE cvterm SET is_obsolete=1 WHERE cvterm_id=22529;
+			UPDATE cvterm SET is_obsolete=1 WHERE cvterm_id=30168;
+
+			UPDATE cvterm SET is_obsolete=1 WHERE cvterm_id=26581;
+			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarissa" id="v13.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_cowpea_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<comment>
+			Apply fix on cowpea crop (Jira IBP-3011).
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (28998,1105,24097,1120);
+
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23972,'23984','1-4 rating scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23973,'23983','1-9 rating scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23974,'23982','1-9 nodulation score');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (23975,'23940','1-9 visual score');
+
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24145,23972,'1','1=mild symptoms',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24146,23972,'2','2=moderate symptoms',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24147,23972,'3','3=heavy infestation',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24148,23972,'4','4=heavy devastating severity',NULL,0,0);
+
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24149,23973,'1','1=0-10% pod damage',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24150,23973,'2','2=11-20% pod damage',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24151,23973,'3','3=21-30% pod damage',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24152,23973,'4','4=31-40% pod damage',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24153,23973,'5','5=41-50% pod damage',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24154,23973,'6','6=51-60% pod damage',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24155,23973,'7','7=61-70% pod damage',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24156,23973,'8','8=71-80% pod damage',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24157,23973,'9','9=81-90% pod damage',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24158,23973,'10','10= 91-100% pod damage',NULL,0,0);
+
+
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24159,23974,'1','1=Low',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24160,23974,'2','2=',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24161,23974,'3','3=',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24162,23974,'4','4=',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24163,23974,'5','5=',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24164,23974,'6','6=',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24165,23974,'7','7=',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24166,23974,'8','8=',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24167,23974,'9','9=High',NULL,0,0);
+
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24168,23975,'1','1=very resistant',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24169,23975,'2','2=resistant',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24170,23975,'3','3= moderately resistant',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24171,23975,'4','4=',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24172,23975,'5','5= tolerant',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24173,23975,'6','6=',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24174,23975,'7','7=susceptible',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24175,23975,'8','8=',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (24176,23975,'9','9=very susceptible',NULL,0,0);
+
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29130,1190,23984,24145);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29131,1190,23984,24146);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29132,1190,23984,24147);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29133,1190,23984,24148);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29134,1190,23983,24149);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29135,1190,23983,24150);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29136,1190,23983,24151);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29137,1190,23983,24152);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29138,1190,23983,24153);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29139,1190,23983,24154);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29140,1190,23983,24155);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29141,1190,23983,24156);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29142,1190,23983,24157);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29143,1190,23983,24158);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29144,1190,23982,24159);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29145,1190,23982,24160);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29146,1190,23982,24161);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29147,1190,23982,24162);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29148,1190,23982,24163);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29149,1190,23982,24164);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29150,1190,23982,24165);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29151,1190,23982,24166);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29152,1190,23982,24167);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29153,1190,23940,24168);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29154,1190,23940,24169);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29155,1190,23940,24170);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29156,1190,23940,24171);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29157,1190,23940,24172);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29158,1190,23940,24173);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29159,1190,23940,24174);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29160,1190,23940,24175);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (29161,1190,23940,24176);
+
+			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarissa" id="v13.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_wheat_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<comment>
+			Apply fix on wheat crop (Jira IBP-3011).
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET FOREIGN_KEY_CHECKS=0;
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20699,'27034','0-5 TANSPOT field response scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (18010,'17040','Disease pressure - visual assessment (score)');
+
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (17040, 1030, 'Disease pressure - visual assessment (score)','Disease pressure - visual assessment (score)', NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (38720,20699,'0','0= No visible infection on plants',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (38721,20699,'R','R= Resistant, small dark brown to black spots without any surrounding chlorosis or tan necrosis',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (38722,20699,'MR','MR= Moderately-resistant, small dark brown to black spots with very little chlorosis or tan necrosis',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (38723,20699,'MR-MS','MR-MS= Moderately resistant to moderately susceptible, small dark brown to black spots completely surrounded by a distinct chlorotic or tan necrosis',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (38724,20699,'MS','MS= Moderately susceptible, small dark brown to black spots completely surrounded with chlorotic or tan necrostic zones; some of the lesions coalescing',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (38725,20699,'S','S= Susceptible, small dark brown to black centres may or may not be distinguishable; most lesions consist of coalescing chlorotic or tan necrotic zones',NULL,0,0);
+
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (41581,1190,27034,38720);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (41582,1190,27034,38721);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (41583,1190,27034,38722);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (41584,1190,27034,38723);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (41585,1190,27034,38724);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (41586,1190,27034,38725);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (41587,1105,17040,1130);
+
+			UPDATE cvterm SET is_obsolete = 1 WHERE cvterm_id = 27020;
+			SET FOREIGN_KEY_CHECKS=1;
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarissa" id="v13.2.0-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_pearlmillet_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<comment>
+			Apply fix on pearlmillet crop (Jira IBP-3011).
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE `cvterm_relationship` SET `object_id` = 1110 WHERE `subject_id` = 20564 AND `type_id` = 1105;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarissa" id="v13.2.0-6">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_tobacco_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<comment>
+			Apply fix on tobacco crop (Jira IBP-3011).
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+		    SET FOREIGN_KEY_CHECKS=0;
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20053,'20580','Cigarette aroma scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20054,'20584','Cigarette combustibility scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20055,'20588','Cigarette smoke flavour scale');
+			REPLACE INTO `cv` (`cv_id`,`name`,`definition`) VALUES (20056,'20608','Cured leaf color scale scale');
+
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (20737,20053,'1','1=Code 1',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (20738,20054,'1','1=Code 1',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (20739,20055,'1','1=Code 1',NULL,0,0);
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (20740,20056,'1','1=Code 1',NULL,0,0);
+
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (21091,1190,20580,20737);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (21092,1190,20584,20738);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (21093,1190,20588,20739);
+			REPLACE INTO `cvterm_relationship`(`cvterm_relationship_id`,`type_id`,`subject_id`,`object_id`) VALUES (21094,1190,20608,20740);
+			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v13.2.0-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm_relationship where type_id=1190 and subject_id=6050;
+			</sqlCheck>
+		</preConditions>
+		<comment> Create dummy category for categorical scale 6050 Code for Project. IBP-3019
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+
+			REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4012, '6050', 'Categorical values for Code for Project');
+
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3013, 4012, 'P1', 'Project 1', NULL, 0, 0);
+
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3000, 1190, 6050, 3013);
+
+		    SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v13.2.0-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm_relationship where type_id=1190 and subject_id=17278;
+			</sqlCheck>
+		</preConditions>
+		<comment> Create dummy category for categorical scale 17278 Name of Mega_Environment. IBP-3019
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+
+			REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4013, '17278', 'Categorical values for Name of Mega_Environment');
+
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3014, 4013, 'ME1', 'Mega_Environment 1', NULL, 0, 0);
+
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3010, 1190, 17278, 3014);
+
+			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v13.2.0-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm_relationship where type_id=1190 and subject_id=17279;
+			</sqlCheck>
+		</preConditions>
+		<comment> Create dummy category for categorical scale 17279 FB_Type. IBP-3019
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+			REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4014, '17279', 'Categorical values for Code of FB_Type');
+
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3015, 4014, 'FB1', 'FB_Type 1', NULL, 0, 0);
+
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3020, 1190, 17279, 3015);
+		    SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v13.2.0-10">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm_relationship where type_id=1190 and subject_id=17280;
+			</sqlCheck>
+		</preConditions>
+		<comment> Create dummy category for categorical scale 17280 Code of Trial_Type. IBP-3019
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+		    REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4015, '17280', 'Categorical values for Code of Trial_Type');
+
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3016, 4015, 'TT1', 'Trial_Type 1', NULL, 0, 0);
+
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3030, 1190, 17280, 3016);
+		    SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v13.2.0-11">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_cassava_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<comment>
+			Assign trait class to properties 15020 (Plant height),15120 (Harvest index)
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+		    SET FOREIGN_KEY_CHECKS=0;
+
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (19302, 1225, 15020, 1350);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (19313, 1225, 15120, 1340);
+
+			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v13.2.0-12">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_algodao_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT COUNT(*) > 0 FROM cvterm WHERE cv_id=1020 AND cvterm_id=20001 AND `name`="";</sqlCheck>
+		</preConditions>
+		<comment>
+			Set blank method name of 20001 to 'Estimativa'.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+		   REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`) VALUES (20001,1020,'Estimativa','Estimativa');
+		   UPDATE cvterm SET definition = REPLACE(definition,"BY  IN","::") WHERE cv_id=1040 AND definition LIKE '%BY  IN%';
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v13.2.0-13">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_maize_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+			<sqlCheck expectedResult="0">SELECT COUNT(*) > 1 FROM cvterm_relationship WHERE type_id=1190 AND subject_id=20201;</sqlCheck>
+		</preConditions>
+		<comment>
+			Create categories for maize scale 20201 "Score (1-5)"
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+		   SET FOREIGN_KEY_CHECKS=0;
+
+		   REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (60200, '20201', 'Categorical values for Score 1-5');
+
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62601, 60200, '1', '1=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62602, 60200, '2', '2=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62603, 60200, '3', '3=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62604, 60200, '4', '4=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62605, 60200, '5', '5=', NULL, 0, 0);
+
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40600, 1190, 20201, 62601);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40601, 1190, 20201, 62602);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40602, 1190, 20201, 62603);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40603, 1190, 20201, 62604);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40604, 1190, 20201, 62605);
+
+		   SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v13.2.0-14">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_maize_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+			<sqlCheck expectedResult="0">SELECT COUNT(*) > 1 FROM cvterm_relationship WHERE type_id=1190 AND subject_id=62182;</sqlCheck>
+		</preConditions>
+		<comment>
+			Create categories for maize scale 62182 1-5 Anthocyanin coloration scale
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+		   SET FOREIGN_KEY_CHECKS=0;
+
+		   REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (60201, '62182', 'Categorical values for 1-5 Anthocyanin coloration scale');
+
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62606, 60201, '1', '1=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62607, 60201, '2', '2=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62608, 60201, '3', '3=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62609, 60201, '4', '4=', NULL, 0, 0);
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (62610, 60201, '5', '5=', NULL, 0, 0);
+
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40605, 1190, 62182, 62606);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40606, 1190, 62182, 62607);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40607, 1190, 62182, 62608);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40608, 1190, 62182, 62609);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (40609, 1190, 62182, 62610);
+
+		   SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v13.2.0-15">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm_relationship where type_id=1190 and subject_id=17040;
+			</sqlCheck>
+		</preConditions>
+		<comment> Create dummy category for categorical scale 17040 Score. IBP-3019
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+		    REPLACE INTO `cv` (`cv_id`, `name`, `definition`) VALUES (4016, '17040', 'Categorical values for Score');
+
+			REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (3016, 4016, '1', '1=', NULL, 0, 0);
+
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (3040, 1190, 17040, 3016);
+		    SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+		<changeSet author="corina" id="v13.2.0-16">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_bean_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+			<sqlCheck expectedResult="0">SELECT COUNT(*) > 1 FROM cvterm_relationship WHERE type_id=1190 AND subject_id=22026;</sqlCheck>
+		</preConditions>
+		<comment>
+			Create categories for bean scale 22026 Testigo
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+		   SET FOREIGN_KEY_CHECKS=0;
+
+		   REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (70587, 20018, '0', '0=IS NOT a CHECK', NULL, 0, 0);
+		   REPLACE INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES (70588, 20018, '1', '1=IS a CHECK', NULL, 0, 0);
+
+		    REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (70851, 1190, 22026, 70587);
+			REPLACE INTO `cvterm_relationship` (`cvterm_relationship_id`, `type_id`, `subject_id`, `object_id`) VALUES (70852, 1190, 22026, 70588);
+
+		   SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v13.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<tableExists tableName="stock_id_bkp"></tableExists>
+				</not>
+				<columnExists tableName="ims_transaction" columnName="inventory_id"/>
+			</and>
+		</preConditions>
+		<comment>
+			Create stockId backup table and migrate inventory_id values for all inventory_ids except by the null ones
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE stock_id_bkp (
+			ims_lot INT(11) NOT NULL,
+			ims_transaction INT(11) NOT NULL,
+			stock_id VARCHAR(35) NOT NULL,
+			PRIMARY KEY (ims_lot, ims_transaction, stock_id));
+
+			INSERT INTO stock_id_bkp
+			SELECT
+			t.lotid, t.trnid, t.inventory_id
+			FROM
+			ims_transaction t
+			WHERE t.inventory_id IS NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v13.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="ims_lot" columnName="stock_id"/>
+			</not>
+		</preConditions>
+		<comment>
+			Add column stock_id to ims_lot table
+		</comment>
+		<addColumn tableName="ims_lot">
+			<column name="stock_id" type="VARCHAR(35)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="vanina" id="v13.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="ims_lot" columnName="stock_id"/>
+				<columnExists tableName="ims_transaction" columnName="inventory_id"/>
+			</and>
+		</preConditions>
+		<comment>
+			Update column stock_id with the lower stock_id
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_lot AS lot
+			INNER JOIN
+			(SELECT
+			trx.lotid, inventory_id, MIN(trnid)
+			FROM
+			ims_transaction trx
+			WHERE
+			trx.inventory_id IS NOT NULL
+			GROUP BY trx.lotid) AS t ON t.lotid = lot.lotid
+			SET lot.stock_id = t.inventory_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v13.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="ims_transaction" columnName="inventory_id"/>
+				<columnExists tableName="ims_lot" columnName="stock_id"/>
+			</and>
+		</preConditions>
+		<comment>Drop column inventory_id from ims_transaction table</comment>
+		<dropColumn columnName="inventory_id" tableName="ims_transaction"/>
+	</changeSet>
+
+</databaseChangeLog>

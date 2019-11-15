@@ -52,6 +52,9 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	/** The user id. */
 	Integer userId;
 
+	/** The person id. */
+	Integer personId;
+
 	/** The user name. */
 	String userName;
 
@@ -131,8 +134,8 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @param scaleId the scale id
 	 * @param scaleName the scale name
 	 */
-	public InventoryDetails(Integer gid, String germplasmName, Integer lotId, Integer locationId, String locationName, Integer userId,
-			Double amount, Integer sourceId, String sourceName, Integer scaleId, String scaleName, String comment) {
+	public InventoryDetails(final Integer gid, final String germplasmName, final Integer lotId, final Integer locationId, final String locationName, final Integer userId,
+			final Double amount, final Integer sourceId, final String sourceName, final Integer scaleId, final String scaleName, final String comment) {
 		this.gid = gid;
 		this.germplasmName = germplasmName;
 		this.lotId = lotId;
@@ -147,8 +150,8 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.comment = comment;
 	}
 
-	public InventoryDetails(Integer gid, String germplasmName, Integer locationId, Integer userId, Double amount, Integer sourceId,
-			Integer scaleId, Integer entryId) {
+	public InventoryDetails(final Integer gid, final String germplasmName, final Integer locationId, final Integer userId, final Double amount, final Integer sourceId,
+			final Integer scaleId, final Integer entryId) {
 		this.gid = gid;
 		this.germplasmName = germplasmName;
 		this.locationId = locationId;
@@ -159,8 +162,8 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.entryId = entryId;
 	}
 
-	public InventoryDetails(Integer entryId, String desig, Integer gid, String cross, String source, String entryCode, String stockId,
-			Double seedQuantity) {
+	public InventoryDetails(final Integer entryId, final String desig, final Integer gid, final String cross, final String source, final String entryCode, final String stockId,
+			final Double seedQuantity) {
 		this.entryId = entryId;
 		this.germplasmName = desig;
 		this.gid = gid;
@@ -203,7 +206,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param gid the new gid
 	 */
-	public void setGid(Integer gid) {
+	public void setGid(final Integer gid) {
 		this.gid = gid;
 	}
 
@@ -224,7 +227,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param germplasmName the new germplasm name
 	 */
-	public void setGermplasmName(String germplasmName) {
+	public void setGermplasmName(final String germplasmName) {
 		this.germplasmName = germplasmName;
 	}
 
@@ -242,7 +245,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param lotId the new lot id
 	 */
-	public void setLotId(Integer lotId) {
+	public void setLotId(final Integer lotId) {
 		this.lotId = lotId;
 	}
 
@@ -260,7 +263,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param locationId the new location id
 	 */
-	public void setLocationId(Integer locationId) {
+	public void setLocationId(final Integer locationId) {
 		this.locationId = locationId;
 	}
 
@@ -278,7 +281,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param locationName the new location name
 	 */
-	public void setLocationName(String locationName) {
+	public void setLocationName(final String locationName) {
 		this.locationName = locationName;
 	}
 
@@ -296,7 +299,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param userId the new user id
 	 */
-	public void setUserId(Integer userId) {
+	public void setUserId(final Integer userId) {
 		this.userId = userId;
 	}
 
@@ -314,7 +317,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param amount the new amount
 	 */
-	public void setAmount(Double amount) {
+	public void setAmount(final Double amount) {
 		this.amount = amount;
 	}
 
@@ -332,7 +335,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param sourceId the new source id
 	 */
-	public void setSourceId(Integer sourceId) {
+	public void setSourceId(final Integer sourceId) {
 		this.sourceId = sourceId;
 	}
 
@@ -350,7 +353,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param sourceName the new source name
 	 */
-	public void setSourceName(String sourceName) {
+	public void setSourceName(final String sourceName) {
 		this.sourceName = sourceName;
 	}
 
@@ -368,7 +371,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param scaleId the new scale id
 	 */
-	public void setScaleId(Integer scaleId) {
+	public void setScaleId(final Integer scaleId) {
 		this.scaleId = scaleId;
 	}
 
@@ -386,7 +389,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param scaleName the new scale name
 	 */
-	public void setScaleName(String scaleName) {
+	public void setScaleName(final String scaleName) {
 		this.scaleName = scaleName;
 	}
 
@@ -404,7 +407,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param index the new index
 	 */
-	public void setIndex(Integer index) {
+	public void setIndex(final Integer index) {
 		this.index = index;
 	}
 
@@ -422,7 +425,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 *
 	 * @param userName the new user name
 	 */
-	public void setUserName(String userName) {
+	public void setUserName(final String userName) {
 		this.userName = userName;
 	}
 
@@ -430,7 +433,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.comment;
 	}
 
-	public void setComment(String comment) {
+	public void setComment(final String comment) {
 		this.comment = comment;
 	}
 
@@ -438,7 +441,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.parentage;
 	}
 
-	public void setParentage(String parentage) {
+	public void setParentage(final String parentage) {
 		this.parentage = parentage;
 	}
 
@@ -446,7 +449,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.entryId;
 	}
 
-	public void setEntryId(Integer entryId) {
+	public void setEntryId(final Integer entryId) {
 		this.entryId = entryId;
 	}
 
@@ -454,7 +457,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.source;
 	}
 
-	public void setSource(String source) {
+	public void setSource(final String source) {
 		this.source = source;
 	}
 
@@ -462,8 +465,16 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.locationAbbr;
 	}
 
-	public void setLocationAbbr(String locationAbbr) {
+	public void setLocationAbbr(final String locationAbbr) {
 		this.locationAbbr = locationAbbr;
+	}
+
+	public Integer getPersonId() {
+		return this.personId;
+	}
+
+	public void setPersonId(final Integer personId) {
+		this.personId = personId;
 	}
 
 	@Override
@@ -491,7 +502,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -501,7 +512,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		InventoryDetails other = (InventoryDetails) obj;
+		final InventoryDetails other = (InventoryDetails) obj;
 		if (this.amount == null) {
 			if (other.amount != null) {
 				return false;
@@ -626,7 +637,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("InventoryDetails [index=");
 		builder.append(this.index);
 		builder.append(", gid=");
@@ -672,7 +683,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	@Override
-	public int compareTo(InventoryDetails o) {
+	public int compareTo(final InventoryDetails o) {
 		if (this.gid != null && o != null) {
 
 			return this.entryId.compareTo(o.entryId);
@@ -691,7 +702,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.isBulkingCompleted() && this.sourceRecordId.equals(this.stockSourceRecordId);
 	}
 
-	public void setInventoryID(String inventoryID) {
+	public void setInventoryID(final String inventoryID) {
 		this.inventoryID = inventoryID;
 	}
 
@@ -699,7 +710,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.entryCode;
 	}
 
-	public void setEntryCode(String entryCode) {
+	public void setEntryCode(final String entryCode) {
 		this.entryCode = entryCode;
 	}
 
@@ -707,11 +718,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.cross;
 	}
 
-	public void setCross(String cross) {
+	public void setCross(final String cross) {
 		this.cross = cross;
 	}
 
-	public void copyFromGermplasmListData(GermplasmListData datum) {
+	public void copyFromGermplasmListData(final GermplasmListData datum) {
 		this.gid = datum.getGid();
 		this.setGermplasmName(datum.getDesignation());
 		this.setEntryId(datum.getEntryId());
@@ -723,7 +734,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.duplicate;
 	}
 
-	public void setDuplicate(String duplicate) {
+	public void setDuplicate(final String duplicate) {
 		this.duplicate = duplicate;
 	}
 
@@ -731,7 +742,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.bulkWith;
 	}
 
-	public void setBulkWith(String bulkWith) {
+	public void setBulkWith(final String bulkWith) {
 		this.bulkWith = bulkWith;
 		this.bulkWithStockIds = new ArrayList<>();
 	}
@@ -740,7 +751,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.bulkCompl;
 	}
 
-	public void setBulkCompl(String bulkCompl) {
+	public void setBulkCompl(final String bulkCompl) {
 		this.bulkCompl = bulkCompl;
 	}
 
@@ -748,7 +759,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.listDataProjectId;
 	}
 
-	public void setListDataProjectId(Integer listDataProjectId) {
+	public void setListDataProjectId(final Integer listDataProjectId) {
 		this.listDataProjectId = listDataProjectId;
 	}
 
@@ -756,7 +767,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.trnId;
 	}
 
-	public void setTrnId(Integer trnId) {
+	public void setTrnId(final Integer trnId) {
 		this.trnId = trnId;
 	}
 
@@ -764,7 +775,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.sourceRecordId;
 	}
 
-	public void setSourceRecordId(Integer sourceRecordId) {
+	public void setSourceRecordId(final Integer sourceRecordId) {
 		this.sourceRecordId = sourceRecordId;
 	}
 
@@ -772,11 +783,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.lotGid;
 	}
 
-	public void setLotGid(Integer lotGid) {
+	public void setLotGid(final Integer lotGid) {
 		this.lotGid = lotGid;
 	}
 
-	public void addBulkWith(String bulkWith) {
+	public void addBulkWith(final String bulkWith) {
 		if (bulkWith.equals(this.inventoryID)) {
 			return;
 		}
@@ -798,31 +809,31 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.stockSourceRecordId;
 	}
 
-	public void setStockSourceRecordId(Integer stockSourceRecordId) {
+	public void setStockSourceRecordId(final Integer stockSourceRecordId) {
 		this.stockSourceRecordId = stockSourceRecordId;
 	}
 
 	public Integer getInstanceNumber() {
-		return instanceNumber;
+		return this.instanceNumber;
 	}
 
-	public void setInstanceNumber(Integer instanceNumber) {
+	public void setInstanceNumber(final Integer instanceNumber) {
 		this.instanceNumber = instanceNumber;
 	}
 
 	public Integer getPlotNumber() {
-		return plotNumber;
+		return this.plotNumber;
 	}
 
-	public void setPlotNumber(Integer plotNumber) {
+	public void setPlotNumber(final Integer plotNumber) {
 		this.plotNumber = plotNumber;
 	}
 
 	public Integer getReplicationNumber() {
-		return replicationNumber;
+		return this.replicationNumber;
 	}
 
-	public void setReplicationNumber(Integer replicationNumber) {
+	public void setReplicationNumber(final Integer replicationNumber) {
 		this.replicationNumber = replicationNumber;
 	}
 
@@ -831,10 +842,10 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public Integer getGroupId() {
-		return groupId;
+		return this.groupId;
 	}
 
-	public void setGroupId(Integer groupId) {
+	public void setGroupId(final Integer groupId) {
 		this.groupId = groupId;
 	}
 }

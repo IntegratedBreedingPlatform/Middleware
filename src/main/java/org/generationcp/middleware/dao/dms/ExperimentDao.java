@@ -40,12 +40,15 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +62,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
 	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
-	public static final String SQL_GET_SAMPLED_OBSERVATION_BY_STUDY = " SELECT " +
+	static final String SQL_GET_SAMPLED_OBSERVATION_BY_STUDY = " SELECT " +
 		" experiment.nd_experiment_id, " +
 		" sample.sample_id," +
 		" sample.sample_no " +
@@ -245,36 +248,55 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public void deleteExperimentsByStudy(final int datasetId) {
+	public void deleteExperimentsForDataset(final int datasetId) {
+		this.deleteExperimentsForDatasetInstances(datasetId, Collections.<Integer>emptyList());
 
-		try {
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
-			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-			// statement
-			this.getSession().flush();
+	}
 
-			// Delete phenotypes first because the foreign key with nd_experiment
-			Query statement =
-				this.getSession()
-					.createSQLQuery("DELETE pheno FROM nd_experiment e"
-						+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
-						+ "  WHERE e.project_id = :datasetId ");
-			statement.setParameter("datasetId", datasetId);
-			statement.executeUpdate();
+	public void deleteExperimentsForDatasetInstances(final int datasetId, final List<Integer> instanceNumbers) {
 
-			// Delete experiments
-			statement =
-				this.getSession()
-					.createSQLQuery("DELETE e, eprop " + "FROM nd_experiment e "
-						+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
-						+ "WHERE e.project_id = :datasetId ");
-			statement.setParameter("datasetId", datasetId);
-			statement.executeUpdate();
-		} catch (final HibernateException e) {
-			final String message = "Error at deleteExperimentsByStudy=" + datasetId + " query at ExperimentDao: " + e.getMessage();
-			ExperimentDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
+
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+		// statement
+		this.getSession().flush();
+
+		// Delete phenotypes first because the foreign key with nd_experiment
+		String queryString = "DELETE pheno FROM nd_experiment e"
+			+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
+			+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
+			+ "  WHERE e.project_id = :datasetId ";
+		StringBuilder sb = new StringBuilder(queryString);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			sb.append(" AND g.description IN (:instanceNumbers)");
 		}
+		Query statement =
+			this.getSession()
+				.createSQLQuery(sb.toString());
+		statement.setParameter("datasetId", datasetId);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			statement.setParameterList("instanceNumbers", instanceNumbers);
+		}
+		statement.executeUpdate();
+
+
+		// Delete experiments
+		queryString = "DELETE e, eprop " + "FROM nd_experiment e "
+			+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
+			+ "  LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
+			+ "  WHERE e.project_id = :datasetId ";
+		sb = new StringBuilder(queryString);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			sb.append(" AND g.description IN (:instanceNumbers)");
+		}
+		statement =
+			this.getSession()
+				.createSQLQuery(sb.toString());
+		statement.setParameter("datasetId", datasetId);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			statement.setParameterList("instanceNumbers", instanceNumbers);
+		}
+		statement.executeUpdate();
 	}
 
 	public void deleteTrialExperimentsOfStudy(final int datasetId) {
@@ -454,7 +476,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			if (returnVal == null) {
 				return 0;
 			} else {
-				return returnVal.intValue();
+				return returnVal;
 			}
 
 		} catch (final HibernateException e) {
@@ -649,6 +671,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
 				datasetId,
 				measurementVariableDtos, observationUnitIds);
+
 			return this.mapResultsToMap(results, measurementVariableDtos);
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation";
@@ -657,6 +680,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	// TODO unnecessary indirection, inline code into getObservationUnitsAsMap
 	private List<Map<String, Object>> getObservationUnitsQueryResult(
 		final int datasetId, final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> observationUnitIds) {
 
@@ -677,19 +701,23 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	// TODO unnecessary indirection, inline code into getObservationUnitsAsMap
 	private SQLQuery createQueryAndAddScalar(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final String observationUnitTableQuery) {
 		final SQLQuery query = this.getSession().createSQLQuery(observationUnitTableQuery);
 		query.addScalar(ExperimentDao.OBS_UNIT_ID, new StringType());
+		query.addScalar(ExperimentDao.ND_EXPERIMENT_ID);
 		this.addScalarForTraits(selectionMethodsAndTraits, query, true);
 		return query;
 	}
 
+	// TODO unnecessary indirection, inline code into getObservationUnitsAsMap
 	private String getObservationUnitsQuery(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits) {
 		{
 
-			final StringBuilder sql = new StringBuilder("SELECT nde.obs_unit_id as OBS_UNIT_ID,  ");
+			final StringBuilder sql = new StringBuilder("SELECT nde.obs_unit_id as OBS_UNIT_ID,"
+				+ "  nde.nd_experiment_id as " + ND_EXPERIMENT_ID + ", ");
 
 			final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'," //
 				+ " MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s'," //
@@ -757,6 +785,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 				final String obsUnitId = (String) row.get(OBS_UNIT_ID);
 				observationUnitRow.setObsUnitId(obsUnitId);
+				observationUnitRow.setObservationUnitId((Integer) row.get(ND_EXPERIMENT_ID));
 				observationUnitRow.setVariables(variables);
 				observationUnitRows.put(obsUnitId, observationUnitRow);
 			}
@@ -870,6 +899,62 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public Map<Integer, Map<String, List<Object>>> getValuesFromObservations(final int studyId, final List<Integer> datasetTypeIds,
+		final Map<Integer, Integer> inputVariableDatasetMap) {
+
+		final StringBuilder queryString = new StringBuilder("SELECT \n"
+			+ "CASE WHEN e.parent_id IS NULL THEN e.nd_experiment_id ELSE e.parent_id END as `experimentId`,\n"
+			+ "p.observable_id as `variableId`, \n"
+			+ "p.value \n"
+			+ "FROM nd_experiment e \n"
+			+ "INNER JOIN project proj ON proj.project_id = e.project_id AND proj.study_id = :studyId \n"
+			+ "INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id \n"
+			+ "WHERE proj.dataset_type_id IN (:datasetTypeIds) ");
+
+		if (!inputVariableDatasetMap.isEmpty()) {
+			queryString.append("AND (");
+			final Iterator<Map.Entry<Integer, Integer>> iterator = inputVariableDatasetMap.entrySet().iterator();
+			while (iterator.hasNext()) {
+				final Map.Entry<Integer, Integer> entry = iterator.next();
+				queryString.append(String.format("(p.observable_id = %s AND e.project_id = %s %n)", entry.getKey(), entry.getValue()));
+				if (iterator.hasNext()) {
+					queryString.append(" OR ");
+				} else {
+					queryString.append(") \n");
+				}
+			}
+		}
+
+		queryString.append("ORDER BY `experimentId`, `variableId` ;");
+
+		final SQLQuery q = this.getSession().createSQLQuery(queryString.toString());
+		q.addScalar("experimentId", new IntegerType());
+		q.addScalar("variableId", new StringType());
+		q.addScalar("value", new StringType());
+		q.setParameter("studyId", studyId);
+		q.setParameterList("datasetTypeIds", datasetTypeIds);
+		q.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+		final List<Map<String, Object>> results = q.list();
+
+		final Map<Integer, Map<String, List<Object>>> map = new HashMap<>();
+
+		for (final Map<String, Object> row : results) {
+			final Integer experimentId = (Integer) row.get("experimentId");
+			final String variableId = (String) row.get("variableId");
+			final Object value = row.get("value");
+			if (!map.containsKey(experimentId)) {
+				map.put(experimentId, new HashMap<String, List<Object>>());
+			}
+			if (!map.get(experimentId).containsKey(variableId)) {
+				map.get(experimentId).put(variableId, new ArrayList<Object>());
+			}
+			// Group values per variable and experimentId.
+			map.get(experimentId).get(variableId).add(value);
+		}
+
+		return map;
 	}
 
 }

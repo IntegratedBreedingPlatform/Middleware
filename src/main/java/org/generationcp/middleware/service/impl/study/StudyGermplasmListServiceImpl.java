@@ -1,15 +1,16 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StudyGermplasmListServiceImpl implements StudyGermplasmListService {
 
@@ -23,10 +24,11 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 	public List<StudyGermplasmDto> getGermplasmList(final int studyBusinessIdentifier) {
 
 		final Criteria listDataCriteria =
-				this.currentSession.createCriteria(ListDataProject.class).createAlias("list", "l")
+			this.currentSession.createCriteria(ListDataProject.class).createAlias("list", "l")
 				.add(Restrictions.eq("l.projectId", studyBusinessIdentifier));
+		listDataCriteria.add(Restrictions.eq("l.type", GermplasmListType.STUDY.name()));
 		final List<ListDataProject> list = listDataCriteria.list();
-		final List<StudyGermplasmDto> studyGermplasmDtos = new ArrayList<StudyGermplasmDto>();
+		final List<StudyGermplasmDto> studyGermplasmDtos = new ArrayList<>();
 		Integer index = 0;
 		for (final ListDataProject listDataProject : list) {
 			final StudyGermplasmDto studyGermplasmDto = new StudyGermplasmDto();
@@ -39,6 +41,9 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 			studyGermplasmDto.setPosition(index.toString());
 			studyGermplasmDto.setSeedSource(listDataProject.getSeedSource());
 			studyGermplasmDto.setEntryType(listDataProject.getList().getType());
+			studyGermplasmDto.setCheckType(listDataProject.getCheckType());
+			studyGermplasmDto.setStockIds(listDataProject.getStockIDs());
+			studyGermplasmDto.setGroupId(listDataProject.getGroupId());
 			studyGermplasmDtos.add(studyGermplasmDto);
 		}
 		return studyGermplasmDtos;

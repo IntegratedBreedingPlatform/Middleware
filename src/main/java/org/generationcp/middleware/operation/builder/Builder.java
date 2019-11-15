@@ -42,16 +42,16 @@ import org.generationcp.middleware.util.DatabaseBroker;
  */
 public abstract class Builder extends DatabaseBroker {
 
+	public Builder() {
+
+	}
+
 	public Builder(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 
 	protected final StudyBuilder getStudyBuilder() {
 		return new StudyBuilder(this.sessionProvider);
-	}
-
-	protected final DataSetBuilder getDataSetBuilder() {
-		return new DataSetBuilder(this.sessionProvider);
 	}
 
 	protected final StudyVariableBuilder getStudyVariableBuilder() {
@@ -102,10 +102,6 @@ public abstract class Builder extends DatabaseBroker {
 		return new CvTermRelationshipSaver(this.sessionProvider);
 	}
 
-	public StudyDataManager getStudyDataManager() {
-		return new StudyDataManagerImpl(this.sessionProvider);
-	}
-
 	protected final MeasurementVariableTransformer getMeasurementVariableTransformer() {
 		return new MeasurementVariableTransformer(this.sessionProvider);
 	}
@@ -118,9 +114,6 @@ public abstract class Builder extends DatabaseBroker {
 		return new OntologyDataManagerImpl(this.sessionProvider);
 	}
 
-	protected final WorkbookBuilder getWorkbookBuilder() {
-		return new WorkbookBuilder(this.sessionProvider);
-	}
 	
 	protected final OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),

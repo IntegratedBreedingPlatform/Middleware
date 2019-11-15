@@ -5,14 +5,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,7 +20,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
@@ -51,10 +48,9 @@ public class Sample implements Serializable {
 	@Column(name = "sample_name")
 	private String sampleName;
 
-	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "taken_by")
-	@NotFound(action = NotFoundAction.IGNORE)
-	private User takenBy;
+	@Basic(optional = false)
+	@Column(name = "taken_by")
+	private Integer takenBy;
 
 	@Column(name = "sampling_date")
 	private Date samplingDate;
@@ -77,10 +73,9 @@ public class Sample implements Serializable {
 	@JoinColumn(name = "sample_list")
 	private SampleList sampleList;
 
-	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "created_by")
-	@NotFound(action = NotFoundAction.IGNORE)
-	private User createdBy;
+	@Basic(optional = false)
+	@Column(name = "created_by")
+	private Integer createdBy;
 
 	@OneToMany(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sample_id")
@@ -103,11 +98,11 @@ public class Sample implements Serializable {
 
 	}
 
-	public User getCreatedBy() {
+	public Integer getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(final User createdBy) {
+	public void setCreatedBy(final Integer createdBy) {
 		this.createdBy = createdBy;
 	}
 
@@ -143,11 +138,11 @@ public class Sample implements Serializable {
 		this.sampleName = sampleName;
 	}
 
-	public User getTakenBy() {
+	public Integer getTakenBy() {
 		return this.takenBy;
 	}
 
-	public void setTakenBy(final User takenBy) {
+	public void setTakenBy(final Integer takenBy) {
 		this.takenBy = takenBy;
 	}
 

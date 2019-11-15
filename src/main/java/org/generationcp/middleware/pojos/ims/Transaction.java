@@ -11,7 +11,8 @@
 
 package org.generationcp.middleware.pojos.ims;
 
-import java.io.Serializable;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -24,9 +25,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * POJO for ims_transaction table.
@@ -45,8 +45,6 @@ public class Transaction implements Serializable {
 	private static final long serialVersionUID = 77866453513905521L;
 	public static final String GET_EMPTY_LOT = "getEmptyLot";
 	public static final String GET_LOT_WITH_MINIMUM_AMOUNT = "getLotWithMinimumAmount";
-	public static final String GET_INVENTORY_ID_WITH_IDENTIFIER_QUERY = "select inventory_id FROM ims_transaction WHERE inventory_id "
-			+ "RLIKE '^:identifier[0-9][0-9]*.*'";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,7 +62,7 @@ public class Transaction implements Serializable {
 
 	@Basic(optional = false)
 	@Column(name = "trndate")
-	private Integer transactionDate;
+	private Date transactionDate;
 
 	@Basic(optional = false)
 	@Column(name = "trnstat")
@@ -96,9 +94,6 @@ public class Transaction implements Serializable {
 	@Column(name = "personid")
 	private Integer personId;
 
-	@Column(name = "inventory_id")
-	private String inventoryID;
-
 	@Column(name = "bulk_with")
 	private String bulkWith;
 
@@ -108,14 +103,14 @@ public class Transaction implements Serializable {
 	public Transaction() {
 	}
 
-	public Transaction(Integer id) {
+	public Transaction(final Integer id) {
 		super();
 		this.id = id;
 	}
 
-	public Transaction(Integer id, Integer userId, Lot lot, Integer transactionDate, Integer status, Double quantity, String comments,
-			Integer commitmentDate, String sourceType, Integer sourceId, Integer sourceRecordId, Double previousAmount, Integer personId,
-			String inventoryID) {
+	public Transaction(final Integer id, final Integer userId, final Lot lot, final Date transactionDate, final Integer status, final Double quantity, final String comments,
+			final Integer commitmentDate, final String sourceType, final Integer sourceId, final Integer sourceRecordId, final Double previousAmount, final Integer personId,
+			final String inventoryID) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -130,14 +125,17 @@ public class Transaction implements Serializable {
 		this.sourceRecordId = sourceRecordId;
 		this.previousAmount = previousAmount;
 		this.personId = personId;
-		this.inventoryID = inventoryID;
+
+		if (this.lot != null) {
+			this.lot.setStockId(inventoryID);
+		}
 	}
 
 	public Integer getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
@@ -145,7 +143,7 @@ public class Transaction implements Serializable {
 		return this.userId;
 	}
 
-	public void setUserId(Integer userId) {
+	public void setUserId(final Integer userId) {
 		this.userId = userId;
 	}
 
@@ -153,15 +151,15 @@ public class Transaction implements Serializable {
 		return this.lot;
 	}
 
-	public void setLot(Lot lot) {
+	public void setLot(final Lot lot) {
 		this.lot = lot;
 	}
 
-	public Integer getTransactionDate() {
+	public Date getTransactionDate() {
 		return this.transactionDate;
 	}
 
-	public void setTransactionDate(Integer transactionDate) {
+	public void setTransactionDate(final Date transactionDate) {
 		this.transactionDate = transactionDate;
 	}
 
@@ -169,7 +167,7 @@ public class Transaction implements Serializable {
 		return this.status;
 	}
 
-	public void setStatus(Integer status) {
+	public void setStatus(final Integer status) {
 		this.status = status;
 	}
 
@@ -177,7 +175,7 @@ public class Transaction implements Serializable {
 		return this.quantity;
 	}
 
-	public void setQuantity(Double quantity) {
+	public void setQuantity(final Double quantity) {
 		this.quantity = quantity;
 	}
 
@@ -185,7 +183,7 @@ public class Transaction implements Serializable {
 		return this.comments;
 	}
 
-	public void setComments(String comments) {
+	public void setComments(final String comments) {
 		this.comments = comments;
 	}
 
@@ -193,7 +191,7 @@ public class Transaction implements Serializable {
 		return this.commitmentDate;
 	}
 
-	public void setCommitmentDate(Integer commitmentDate) {
+	public void setCommitmentDate(final Integer commitmentDate) {
 		this.commitmentDate = commitmentDate;
 	}
 
@@ -201,7 +199,7 @@ public class Transaction implements Serializable {
 		return this.sourceType;
 	}
 
-	public void setSourceType(String sourceType) {
+	public void setSourceType(final String sourceType) {
 		this.sourceType = sourceType;
 	}
 
@@ -209,7 +207,7 @@ public class Transaction implements Serializable {
 		return this.sourceId;
 	}
 
-	public void setSourceId(Integer sourceId) {
+	public void setSourceId(final Integer sourceId) {
 		this.sourceId = sourceId;
 	}
 
@@ -217,7 +215,7 @@ public class Transaction implements Serializable {
 		return this.sourceRecordId;
 	}
 
-	public void setSourceRecordId(Integer sourceRecordId) {
+	public void setSourceRecordId(final Integer sourceRecordId) {
 		this.sourceRecordId = sourceRecordId;
 	}
 
@@ -225,7 +223,7 @@ public class Transaction implements Serializable {
 		return this.previousAmount;
 	}
 
-	public void setPreviousAmount(Double previousAmount) {
+	public void setPreviousAmount(final Double previousAmount) {
 		this.previousAmount = previousAmount;
 	}
 
@@ -233,13 +231,13 @@ public class Transaction implements Serializable {
 		return this.personId;
 	}
 
-	public void setPersonId(Integer personId) {
+	public void setPersonId(final Integer personId) {
 		this.personId = personId;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Transaction [id=");
 		builder.append(this.id);
 		builder.append(", userId=");
@@ -269,7 +267,7 @@ public class Transaction implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -280,7 +278,7 @@ public class Transaction implements Serializable {
 			return false;
 		}
 
-		Transaction rhs = (Transaction) obj;
+		final Transaction rhs = (Transaction) obj;
 		return new EqualsBuilder().append(this.id, rhs.id).isEquals();
 	}
 
@@ -289,19 +287,11 @@ public class Transaction implements Serializable {
 		return new HashCodeBuilder(17, 37).append(this.id).toHashCode();
 	}
 
-	public String getInventoryID() {
-		return this.inventoryID;
-	}
-
-	public void setInventoryID(String inventoryID) {
-		this.inventoryID = inventoryID;
-	}
-
 	public String getBulkWith() {
 		return this.bulkWith;
 	}
 
-	public void setBulkWith(String bulkWith) {
+	public void setBulkWith(final String bulkWith) {
 		this.bulkWith = bulkWith;
 	}
 
@@ -309,7 +299,7 @@ public class Transaction implements Serializable {
 		return this.bulkCompl;
 	}
 
-	public void setBulkCompl(String bulkCompl) {
+	public void setBulkCompl(final String bulkCompl) {
 		this.bulkCompl = bulkCompl;
 	}
 

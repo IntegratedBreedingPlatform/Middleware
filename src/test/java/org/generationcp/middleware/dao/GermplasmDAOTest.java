@@ -52,7 +52,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 
@@ -127,7 +126,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final List<Transaction> transactions = this.inventoryDM.getAllTransactions(0, 1);
 		if (transactions != null && !transactions.isEmpty()) {
 			final Transaction transaction = transactions.get(0);
-			transaction.setInventoryID(GermplasmDAOTest.DUMMY_STOCK_ID);
+			transaction.getLot().setStockId(GermplasmDAOTest.DUMMY_STOCK_ID);
 			this.inventoryDM.updateTransaction(transaction);
 		}
 	}

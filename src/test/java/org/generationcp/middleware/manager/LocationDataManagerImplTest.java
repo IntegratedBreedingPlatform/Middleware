@@ -49,17 +49,18 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
-	private Project commonTestProject;
+	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
+	private Project commonTestProject;
+
 	private final static Integer COUNTRY_LTYPEID = 405;
 	private final static Integer PHILIPPINES_CNTRYID = 171;
 
 	@Before
 	public void setUp() throws Exception {
-		if (this.workbenchTestDataUtil == null) {
-			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
-			this.workbenchTestDataUtil.setUpWorkbench();
-		}
+
+		this.workbenchTestDataUtil.setUpWorkbench();
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();

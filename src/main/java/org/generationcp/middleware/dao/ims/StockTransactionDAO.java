@@ -1,10 +1,6 @@
 
 package org.generationcp.middleware.dao.ims;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
@@ -13,6 +9,10 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Daniel Villafuerte on 5/5/2015.
@@ -61,7 +61,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 		final String sql =
 				"select lot.lotid, lot.locid, lot.scaleid, lot.userid, "
 						+ "d.germplasm_id, d.entry_id, d.seed_source, d.designation, d.group_name, "
-						+ "loc.lname, loc.labbr, scale.name, tran.trnqty, tran.comments,tran.inventory_id, tran.sourceid, "
+						+ "loc.lname, loc.labbr, scale.name, tran.trnqty, tran.comments,lot.stock_id, tran.sourceid, "
 						+ "d.duplicate_notes, tran.bulk_with, tran.bulk_compl, "
 						+ "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid, ist.recordid as stockSourceRecordId, "
 						+ "instanceattr.aval as instanceNumber, plotattr.aval as plotNumber, repattr.aval as repNumber,  "
@@ -107,7 +107,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 		final String sql =
 				"select lot.lotid, lot.locid, summed.scaleid, lot.userid, "
 						+ "d.germplasm_id, d.entry_id, d.seed_source, d.designation, d.group_name, "
-						+ "loc.lname, loc.labbr, scale.name, summed.total as trnqty, tran.comments,tran.inventory_id, tran.sourceid, "
+						+ "loc.lname, loc.labbr, scale.name, summed.total as trnqty, tran.comments,lot.stock_id, tran.sourceid, "
 						+ "d.duplicate_notes, tran.bulk_with, tran.bulk_compl, "
 						+ "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid, ist.recordid as stockSourceRecordId, "
 						+ "instanceattr.aval as instanceNumber, plotattr.aval as plotNumber, repattr.aval as repNumber,  "
@@ -149,7 +149,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 		return this.getSession().createSQLQuery(querySQL).addScalar("lotId").addScalar("locid").addScalar("scaleid").addScalar("userid")
 				.addScalar("germplasm_id").addScalar("entry_id").addScalar("seed_source").addScalar("designation").addScalar("group_name")
 				.addScalar("lname").addScalar("labbr").addScalar("name").addScalar("trnqty").addScalar("comments")
-				.addScalar("inventory_id").addScalar("sourceid").addScalar("duplicate_notes").addScalar("bulk_with")
+				.addScalar("stock_id").addScalar("sourceid").addScalar("duplicate_notes").addScalar("bulk_with")
 				.addScalar("bulk_compl").addScalar("listdata_project_id").addScalar("trnid").addScalar("recordid").addScalar("eid")
 				.addScalar("stockSourceRecordId").addScalar("instanceNumber").addScalar("plotNumber").addScalar("repNumber").addScalar("mgid");
 	}

@@ -11,24 +11,31 @@
 
 package org.generationcp.middleware.dao;
 
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.CropPerson;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Person;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Person}.
  *
  */
 public class PersonDAO extends GenericDAO<Person, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(PersonDAO.class);
 
 	public boolean isPersonExists(final String firstName, final String lastName) throws MiddlewareQueryException {
 		try {
@@ -136,49 +143,17 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		return map;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Map<Integer, String> getPersonNamesByUserIds(final List<Integer> userIds) throws MiddlewareQueryException {
-		final Map<Integer, String> map = new HashMap<Integer, String>();
+	public List<Person> getPersonsByCrop(final CropType cropType) {
 		try {
-			final StringBuffer sqlString = new StringBuffer()
-					.append("SELECT DISTINCT users.userid, persons.fname, persons.ioname, persons.lname ")
-					.append("FROM persons JOIN users ON persons.personid = users.personid ").append("WHERE users.userid = :userIds ");
-
-			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
-			query.setParameterList("userIds", userIds);
-
-			final List<Object[]> results = query.list();
-
-			for (final Object[] row : results) {
-				final Integer userId = (Integer) row[0];
-				final String firstName = (String) row[1];
-				final String middleName = (String) row[2];
-				final String lastName = (String) row[3];
-
-				map.put(userId, new Person(firstName, middleName, lastName).getDisplayName());
-			}
-
+			final Criteria criteria = this.getSession().createCriteria(CropPerson.class);
+			criteria.add(Restrictions.eq("cropType.cropName", cropType.getCropName()));
+			criteria.setProjection(Projections.property("person"));
+			return criteria.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException(String.format("Error with getPersonNamesByUserIds(id=[%s])", StringUtils.join(userIds, ",")), e);
+			final String message = "Error with getPersonsByCrop(cropType=" + cropType + "";
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message,
+				e);
 		}
-		return map;
-	}
-
-	public Person getPersonByName(final String firstName, final String middleName, final String lastName) {
-		Person person = null;
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Person.class);
-			criteria.add(Restrictions.eq("firstName", firstName));
-			criteria.add(Restrictions.eq("lastName", lastName));
-			criteria.add(Restrictions.eq("middleName", middleName));
-
-			person = (Person) criteria.uniqueResult();
-
-		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					String.format("Error with getPersonByName(firstName=[%s],middleName=[%s],lastName)", firstName, middleName, lastName),
-					e);
-		}
-		return person;
 	}
 }

@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -38,9 +39,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final String OBSERVATION_UNIT_ID = "observationUnitId";
 	protected static final String LOCATION_ID = "LOCATION_ID";
 	protected static final String EXPT_DESIGN = "EXPT_DESIGN";
-	protected static final String FIELD_MAP_COLUMN = "FIELDMAP COLUMN";
+	static final String FIELD_MAP_COLUMN = "FIELDMAP COLUMN";
 	protected static final String OBS_UNIT_ID = "OBS_UNIT_ID";
-	protected static final String PARENT_OBS_UNIT_ID = "PARENT_OBS_UNIT_ID";
+	static final String PARENT_OBS_UNIT_ID = "PARENT_OBS_UNIT_ID";
 	protected static final String COL = "COL";
 	protected static final String ROW = "ROW";
 	protected static final String BLOCK_NO = "BLOCK_NO";
@@ -52,10 +53,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	protected static final String GID = "GID";
 	protected static final String ENTRY_TYPE = "ENTRY_TYPE";
 	protected static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	protected static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
-	public static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
-	protected static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
+	static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
+	private static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
+	private static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
+	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
+	private static final List<String> EXP_PROPS_VAR_TYPES = Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.name(), VariableType.TREATMENT_FACTOR.name());
 
 	static {
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
@@ -85,6 +88,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "    inner join project p on p.project_id = nde.project_id " //
 				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 				+ "    inner join stock s ON s.stock_id = nde.stock_id " //
+				// FIXME won't work for sub-sub-obs
+				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) " //
 				+ " where " //
 				+ "	p.project_id = :datasetId ");
 
@@ -371,11 +376,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			query.addScalar(designFactor, new StringType());
 		}
 
-		for (final String envFactor : searchDto.getEnvironmentDetails()) {
-			query.addScalar(envFactor, new StringType());
+		for (final MeasurementVariableDto envFactor : searchDto.getEnvironmentDetails()) {
+			query.addScalar(this.getEnvironmentColumnName(envFactor.getName()), new StringType());
 		}
-		for (final String envCondition : searchDto.getEnvironmentConditions()) {
-			query.addScalar(envCondition, new StringType());
+		for (final MeasurementVariableDto envCondition : searchDto.getEnvironmentConditions()) {
+			query.addScalar(this.getEnvironmentColumnName(envCondition.getName()), new StringType());
 		}
 
 		query.addScalar(ObservationUnitsSearchDao.OBSERVATION_UNIT_NO, new StringType());
@@ -425,8 +430,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  "
 			+ "    nde.obs_unit_id as OBS_UNIT_ID,  " //
 			+ "    parent.obs_unit_id as PARENT_OBS_UNIT_ID,  " //
-			+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM sample AS sp "
-			+ "		INNER JOIN nd_experiment sp_nde ON sp.nd_experiment_id = sp_nde.nd_experiment_id WHERE sp_nde.nd_experiment_id = nde.nd_experiment_id OR sp_nde.parent_id = nde.nd_experiment_id) 'SUM_OF_SAMPLES',");
+			+ "    coalesce(nullif((SELECT count(sp.sample_id) " //
+			+ "        FROM sample sp " //
+			+ "        WHERE sp.nd_experiment_id = nde.nd_experiment_id) " //
+			+ "         + coalesce(child_sample_count.count, 0), 0), '-') 'SUM_OF_SAMPLES', ");
 
 		final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'," //
 			+ " MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s'," //
@@ -475,12 +482,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s',  ";
 			final String geolocEnvFactorFormat =
 				" %s AS '%s',  ";
-			for (final String envFactor : searchDto.getEnvironmentDetails()) {
-				if (geolocSpecialFactorsMap.containsKey(envFactor)) {
-					final String column = geolocSpecialFactorsMap.get(envFactor);
-					sql.append(String.format(geolocEnvFactorFormat, column, envFactor));
+			for (final MeasurementVariableDto envFactor : searchDto.getEnvironmentDetails()) {
+				if (geolocSpecialFactorsMap.containsKey(envFactor.getName())) {
+					final String column = geolocSpecialFactorsMap.get(envFactor.getName());
+					sql.append(String.format(geolocEnvFactorFormat, column, this.getEnvironmentColumnName(envFactor.getName())));
 				} else {
-					sql.append(String.format(envFactorFormat, envFactor, envFactor));
+					sql.append(String.format(envFactorFormat, envFactor.getName(), this.getEnvironmentColumnName(envFactor.getName())));
 				}
 			}
 		}
@@ -491,8 +498,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.name = '%s' "
 					+ "		INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id AND envnde.project_id = :datasetEnvironmentId "
 					+ "		WHERE envnde.nd_geolocation_id = gl.nd_geolocation_id) '%s',  ";
-			for (final String envCondition : searchDto.getEnvironmentConditions()) {
-				sql.append(String.format(envConditionFormat, envCondition, envCondition));
+			for (final MeasurementVariableDto envCondition : searchDto.getEnvironmentConditions()) {
+				sql.append(String.format(envConditionFormat, envCondition.getName(), this.getEnvironmentColumnName(envCondition.getName())));
 			}
 		}
 
@@ -509,6 +516,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
 			+ " LEFT JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id " //
+			// Count samples for child dataset (sub-obs)
+			+ " LEFT JOIN (SELECT parent.nd_experiment_id, " //
+			+ "       nullif(count(child_sample.sample_id), 0) AS count " //
+			+ "     FROM nd_experiment child " // start the join with child to avoid parent_id full index scan
+			+ "            LEFT JOIN sample child_sample ON child.nd_experiment_id = child_sample.nd_experiment_id " //
+			+ "            INNER JOIN nd_experiment parent ON child.parent_id = parent.nd_experiment_id " //
+			+ "     GROUP BY parent.nd_experiment_id) child_sample_count ON child_sample_count.nd_experiment_id = nde.nd_experiment_id " //
 			// FIXME won't work for sub-sub-obs
 			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) " //
 			+ " WHERE p.project_id = :datasetId "); //
@@ -660,9 +674,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "          ) " //
 			+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId() //
 			// get the numericals whose value is not within bounds
-			+ "          then ph2." + filterByDraftOrValue + " < scaleMinRange.value or ph2." + filterByDraftOrValue
-			+ " > scaleMaxRange.value " //
-			+ "            or ph2." + filterByDraftOrValue + " < vo.expected_min or ph2." + filterByDraftOrValue + " > vo.expected_max "
+			+ "          then cast(ph2." + filterByDraftOrValue + " as unsigned) < scaleMinRange.value or cast(ph2." + filterByDraftOrValue
+			+ " as unsigned) > scaleMaxRange.value " //
+			+ "            or cast(ph2." + filterByDraftOrValue + " as unsigned) < vo.expected_min or cast(ph2." + filterByDraftOrValue + " as unsigned) > vo.expected_max "
 			//
 			+ "        else false " //
 			+ "        end " //
@@ -710,13 +724,15 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		// Otherwise, look in "props" tables
 		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
-		if (VariableType.EXPERIMENTAL_DESIGN.name().equals(variableType)) {
+		if (EXP_PROPS_VAR_TYPES.contains(variableType)) {
 			sql.append(" AND EXISTS ( SELECT 1 FROM nd_experimentprop xp "
-				+ "WHERE xp.nd_experiment_id = nde.parent_id AND xp.type_id = :" + variableId
+				+ "WHERE xp.nd_experiment_id = plot.nd_experiment_id AND xp.type_id = :" + variableId
 				+ "_Id AND value ").append(matchClause).append(" )");
 
 		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
-			// IF searching by list of values, search for the values in 1)cvterm.name or 2)perform IN operation on stockprop.value
+			// IF searching by list of values, search for the values in:
+			// 1)cvterm.name (for categorical variables) or
+			// 2)perform IN operation on stockprop.value
 			// Otherwise, search the value like a text by LIKE operation
 			final String stockMatchClause = performLikeOperation ? "sp.value LIKE :" + variableId + "_text " :
 				" (cvt.name IN (:" + variableId + "_values) OR sp.value IN (:" + variableId + "_values ))";
@@ -724,7 +740,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "LEFT JOIN cvterm cvt ON cvt.cvterm_id = sp.value "
 				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
 				+ "_Id AND ").append(stockMatchClause).append(" )");
-			;
 		}
 	}
 
@@ -860,7 +875,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	private ObservationUnitRow getObservationUnitRow(final ObservationUnitsSearchDTO searchDto, final String observationVariableName,
 		final Map<String, Object> row) {
-		final Map<String, ObservationUnitData> variables = new HashMap<>();
+		final Map<String, ObservationUnitData> environmentVariables = new HashMap<>();
+		final Map<String, ObservationUnitData> observationVariables = new HashMap<>();
 
 		for (final MeasurementVariableDto variable : searchDto.getSelectionMethodsAndTraits()) {
 			final String status = (String) row.get(variable.getName() + "_Status");
@@ -873,7 +889,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			observationUnitData.setDraftValue((String) row.get(variable.getName() + "_DraftValue"));
 			observationUnitData.setDraftCategoricalValueId((Integer) row.get(variable.getName() + "_DraftCvalueId"));
 
-			variables.put(variable.getName(), observationUnitData);
+			observationVariables.put(variable.getName(), observationUnitData);
 		}
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 
@@ -883,43 +899,70 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		observationUnitRow.setSamplesCount((String) row.get(SUM_OF_SAMPLES));
 		final Integer gid = (Integer) row.get(GID);
 		observationUnitRow.setGid(gid);
-		variables.put(GID, new ObservationUnitData(gid.toString()));
+		observationVariables.put(GID, new ObservationUnitData(gid.toString()));
 
 		final String designation = (String) row.get(DESIGNATION);
 		observationUnitRow.setDesignation(designation);
-		variables.put(DESIGNATION, new ObservationUnitData(designation));
+		observationVariables.put(DESIGNATION, new ObservationUnitData(designation));
 
-		variables.put(TRIAL_INSTANCE, new ObservationUnitData((String) row.get(TRIAL_INSTANCE)));
-		variables.put(ENTRY_TYPE, new ObservationUnitData((String) row.get(ENTRY_TYPE)));
-		variables.put(ENTRY_NO, new ObservationUnitData((String) row.get(ENTRY_NO)));
-		variables.put(ENTRY_CODE, new ObservationUnitData((String) row.get(ENTRY_CODE)));
-		variables.put(REP_NO, new ObservationUnitData((String) row.get(REP_NO)));
-		variables.put(PLOT_NO, new ObservationUnitData((String) row.get(PLOT_NO)));
-		variables.put(BLOCK_NO, new ObservationUnitData((String) row.get(BLOCK_NO)));
-		variables.put(ROW, new ObservationUnitData((String) row.get(ROW)));
-		variables.put(COL, new ObservationUnitData((String) row.get(COL)));
-		variables.put(OBS_UNIT_ID, new ObservationUnitData((String) row.get(OBS_UNIT_ID)));
-		variables.put(PARENT_OBS_UNIT_ID, new ObservationUnitData((String) row.get(PARENT_OBS_UNIT_ID)));
-		variables.put(FIELD_MAP_COLUMN, new ObservationUnitData((String) row.get(FIELD_MAP_COLUMN)));
-		variables.put(FIELD_MAP_RANGE, new ObservationUnitData((String) row.get(FIELD_MAP_RANGE)));
-		variables.put(LOCATION_ID, new ObservationUnitData((String) row.get(LOCATION_ID)));
-		variables.put(EXPT_DESIGN, new ObservationUnitData((String) row.get(EXPT_DESIGN)));
-		variables.put(observationVariableName,new ObservationUnitData((String)row.get(OBSERVATION_UNIT_NO)));
+		final String trialInstance = (String) row.get(TRIAL_INSTANCE);
+		if (NumberUtils.isDigits(trialInstance)) {
+			observationUnitRow.setTrialInstance(Integer.valueOf(trialInstance));
+		}
+		observationVariables.put(TRIAL_INSTANCE, new ObservationUnitData(trialInstance));
+
+		final String entryNumber = (String) row.get(ENTRY_NO);
+		if (NumberUtils.isDigits(trialInstance)) {
+			observationUnitRow.setEntryNumber(Integer.valueOf(entryNumber));
+		}
+		observationVariables.put(ENTRY_NO, new ObservationUnitData(entryNumber));
+
+		observationVariables.put(ENTRY_TYPE, new ObservationUnitData((String) row.get(ENTRY_TYPE)));
+		observationVariables.put(ENTRY_CODE, new ObservationUnitData((String) row.get(ENTRY_CODE)));
+		observationVariables.put(REP_NO, new ObservationUnitData((String) row.get(REP_NO)));
+		observationVariables.put(PLOT_NO, new ObservationUnitData((String) row.get(PLOT_NO)));
+		observationVariables.put(BLOCK_NO, new ObservationUnitData((String) row.get(BLOCK_NO)));
+		observationVariables.put(ROW, new ObservationUnitData((String) row.get(ROW)));
+		observationVariables.put(COL, new ObservationUnitData((String) row.get(COL)));
+		observationVariables.put(OBS_UNIT_ID, new ObservationUnitData((String) row.get(OBS_UNIT_ID)));
+		observationVariables.put(PARENT_OBS_UNIT_ID, new ObservationUnitData((String) row.get(PARENT_OBS_UNIT_ID)));
+		observationVariables.put(FIELD_MAP_COLUMN, new ObservationUnitData((String) row.get(FIELD_MAP_COLUMN)));
+		observationVariables.put(FIELD_MAP_RANGE, new ObservationUnitData((String) row.get(FIELD_MAP_RANGE)));
+		observationVariables.put(LOCATION_ID, new ObservationUnitData((String) row.get(LOCATION_ID)));
+		observationVariables.put(EXPT_DESIGN, new ObservationUnitData((String) row.get(EXPT_DESIGN)));
+		observationVariables.put(observationVariableName,new ObservationUnitData((String)row.get(OBSERVATION_UNIT_NO)));
 
 		for (final String gpDesc : searchDto.getGenericGermplasmDescriptors()) {
-			variables.put(gpDesc, new ObservationUnitData((String) row.get(gpDesc)));
+			observationVariables.put(gpDesc, new ObservationUnitData((String) row.get(gpDesc)));
 		}
 		for (final String designFactor : searchDto.getAdditionalDesignFactors()) {
-			variables.put(designFactor, new ObservationUnitData((String) row.get(designFactor)));
-		}
-		for (final String envFactor : searchDto.getEnvironmentDetails()) {
-			variables.put(envFactor, new ObservationUnitData((String) row.get(envFactor)));
-		}
-		for (final String envCondition : searchDto.getEnvironmentConditions()) {
-			variables.put(envCondition, new ObservationUnitData((String) row.get(envCondition)));
+			observationVariables.put(designFactor, new ObservationUnitData((String) row.get(designFactor)));
 		}
 
-		observationUnitRow.setVariables(variables);
+		// Variables retrieved from Environment Details/Conditions are loaded in a separate Map object to ensure that no duplicate variables are
+		// added to a map. Because it's possible that a variable exists in both environment and observation/subobservation
+		// levels.
+		for (final MeasurementVariableDto envFactor : searchDto.getEnvironmentDetails()) {
+			final ObservationUnitData observationUnitData = new ObservationUnitData();
+			final String environmentFactorColumnName = this.getEnvironmentColumnName(envFactor.getName());
+			observationUnitData.setVariableId(envFactor.getId());
+			observationUnitData.setValue((String) row.get(environmentFactorColumnName));
+			environmentVariables.put(envFactor.getName(), observationUnitData);
+		}
+		for (final MeasurementVariableDto envCondition : searchDto.getEnvironmentConditions()) {
+			final ObservationUnitData observationUnitData = new ObservationUnitData();
+			final String environmentConditionColumnName = this.getEnvironmentColumnName(envCondition.getName());
+			observationUnitData.setVariableId(envCondition.getId());
+			observationUnitData.setValue((String) row.get(environmentConditionColumnName));
+			environmentVariables.put(envCondition.getName(), observationUnitData);
+		}
+
+		observationUnitRow.setVariables(observationVariables);
+		observationUnitRow.setEnvironmentVariables(environmentVariables);
 		return observationUnitRow;
+	}
+
+	private String getEnvironmentColumnName(final String variableName) {
+		return variableName + ENVIRONMENT_COLUMN_NAME_SUFFIX;
 	}
 }

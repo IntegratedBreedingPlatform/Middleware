@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -22,6 +23,8 @@ import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ListDataProjectSaverTest {
@@ -40,9 +43,6 @@ public class ListDataProjectSaverTest {
 	public static final int STATUS = 101;
 
 	@Mock
-	private Saver saver;
-
-	@Mock
 	private DaoFactory daoFactory;
 
 	@Mock
@@ -54,7 +54,8 @@ public class ListDataProjectSaverTest {
 	@Mock
 	private ListDataProjectDAO listDataProjectDAO;
 
-	private ListDataProjectSaver listDataProjectSaver;
+	@InjectMocks
+	private ListDataProjectSaver listDataProjectSaver = new ListDataProjectSaver();
 
 	@Before
 	public void init() {
@@ -75,30 +76,25 @@ public class ListDataProjectSaverTest {
 		germplasmList.setProgramUUID(ORIGINAL_LIST_PROGRAM_UUID);
 		germplasmList.setStatus(STATUS);
 
-		this.listDataProjectSaver = new ListDataProjectSaver();
-		listDataProjectSaver.setSaver(saver);
-		listDataProjectSaver.setDaoFactory(daoFactory);
-
-		Mockito.when(this.saver.getStudyDataManager()).thenReturn(studyDataManager);
-		Mockito.when(this.daoFactory.getGermplasmListDAO()).thenReturn(germplasmListDAO);
-		Mockito.when(this.saver.getListDataProjectDAO()).thenReturn(listDataProjectDAO);
-		Mockito.when(this.studyDataManager.getProject(PROJECT_ID)).thenReturn(project);
-		Mockito.when(this.germplasmListDAO.getById(ORIGINAL_GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+		this.listDataProjectSaver.setDaoFactory(this.daoFactory);
+		when(this.daoFactory.getGermplasmListDAO()).thenReturn(this.germplasmListDAO);
+		when(this.daoFactory.getListDataProjectDAO()).thenReturn(this.listDataProjectDAO);
+		when(this.studyDataManager.getProject(PROJECT_ID)).thenReturn(project);
+		when(this.germplasmListDAO.getById(ORIGINAL_GERMPLASM_LIST_ID)).thenReturn(germplasmList);
 
 	}
 
 	@Test
 	public void testUpdateGermlasmListInfoStudy() throws MiddlewareQueryException {
 		final ListDataProjectSaver listDataProjectSaver = new ListDataProjectSaver();
-		listDataProjectSaver.setDaoFactory(daoFactory);
-		listDataProjectSaver.setSaver(saver);
+		listDataProjectSaver.setDaoFactory(this.daoFactory);
 		final ListDataProjectSaver dataSaver = Mockito.spy(listDataProjectSaver);
 		final GermplasmList crossesList = new GermplasmList();
 		final GermplasmListDAO germplasmListDao = Mockito.mock(GermplasmListDAO.class);
 		final Integer crossesListId = 5;
-		Mockito.when(this.daoFactory.getGermplasmListDAO()).thenReturn(germplasmListDao);
+		when(this.daoFactory.getGermplasmListDAO()).thenReturn(germplasmListDao);
 
-		Mockito.when(germplasmListDao.getById(crossesListId)).thenReturn(crossesList);
+		when(germplasmListDao.getById(crossesListId)).thenReturn(crossesList);
 
 		final Integer studyId = 15;
 		dataSaver.updateGermlasmListInfoStudy(crossesListId, studyId);
@@ -108,12 +104,7 @@ public class ListDataProjectSaverTest {
 
 	@Test
 	public void testPerformListDataProjectEntriesDeletion() {
-		final ListDataProjectSaver listDataProjectSaver = new ListDataProjectSaver();
-		listDataProjectSaver.setDaoFactory(daoFactory);
-		listDataProjectSaver.setSaver(saver);
-		final ListDataProjectSaver dataSaver = Mockito.spy(listDataProjectSaver);
 
-		final ListDataProjectDAO listDataProjectDAO = Mockito.mock(ListDataProjectDAO.class);
 		final List<Integer> germplasmList = new ArrayList<>();
 		germplasmList.add(1);
 		final Integer listId = 5;
@@ -126,15 +117,13 @@ public class ListDataProjectSaverTest {
 		final List<ListDataProject> listDataProjects = new ArrayList<>();
 		listDataProjects.add(listDataProject2);
 
-		Mockito.when(listDataProjectDAO.getByListIdAndGid(listId, 1)).thenReturn(listDataProject1);
+		when(this.listDataProjectDAO.getByListIdAndGid(listId, 1)).thenReturn(listDataProject1);
 
-		Mockito.when(listDataProjectDAO.getByListId(listId)).thenReturn(listDataProjects);
+		when(this.listDataProjectDAO.getByListId(listId)).thenReturn(listDataProjects);
 
-		Mockito.when(saver.getListDataProjectDAO()).thenReturn(listDataProjectDAO);
+		when(this.listDataProjectDAO.saveOrUpdate(listDataProject2)).thenReturn(listDataProject2);
 
-		Mockito.when(listDataProjectDAO.saveOrUpdate(listDataProject2)).thenReturn(listDataProject2);
-
-		dataSaver.performListDataProjectEntriesDeletion(germplasmList, listId);
+		this.listDataProjectSaver.performListDataProjectEntriesDeletion(germplasmList, listId);
 
 		Assert.assertEquals("The new entry for list listDataProject2 should be 1", (Integer) 1, listDataProject2.getEntryId());
 
@@ -172,14 +161,14 @@ public class ListDataProjectSaverTest {
 				germplasmList.setId(newGermplasmListId);
 				return null;
 			}
-		}).when(germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
+		}).when(this.germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
 
 		this.listDataProjectSaver
 				.saveOrUpdateListDataProject(PROJECT_ID, GermplasmListType.ADVANCED, originalGermplasmListId, listDataProjectList, userId);
 
 		final ArgumentCaptor<GermplasmList> captor = ArgumentCaptor.forClass(GermplasmList.class);
-		Mockito.verify(germplasmListDAO).saveOrUpdate(captor.capture());
-		Mockito.verify(listDataProjectDAO).save(listDataProject);
+		Mockito.verify(this.germplasmListDAO).saveOrUpdate(captor.capture());
+		Mockito.verify(this.listDataProjectDAO).save(listDataProject);
 
 		final GermplasmList snapshotGermplasmList = captor.getValue();
 
@@ -215,14 +204,14 @@ public class ListDataProjectSaverTest {
 				germplasmList.setId(newGermplasmListId);
 				return null;
 			}
-		}).when(germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
+		}).when(this.germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
 
 		this.listDataProjectSaver
 				.saveOrUpdateListDataProject(PROJECT_ID, GermplasmListType.CROSSES, originalGermplasmListId, listDataProjectList, userId);
 
 		final ArgumentCaptor<GermplasmList> captor = ArgumentCaptor.forClass(GermplasmList.class);
-		Mockito.verify(germplasmListDAO).saveOrUpdate(captor.capture());
-		Mockito.verify(listDataProjectDAO).save(listDataProject);
+		Mockito.verify(this.germplasmListDAO).saveOrUpdate(captor.capture());
+		Mockito.verify(this.listDataProjectDAO).save(listDataProject);
 
 		final GermplasmList snapshotGermplasmList = captor.getValue();
 
@@ -256,14 +245,14 @@ public class ListDataProjectSaverTest {
 				germplasmList.setId(newGermplasmListId);
 				return null;
 			}
-		}).when(germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
+		}).when(this.germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
 
 		this.listDataProjectSaver
 				.saveOrUpdateListDataProject(PROJECT_ID, GermplasmListType.ADVANCED, originalGermplasmListId, listDataProjectList, userId);
 
 		final ArgumentCaptor<GermplasmList> captor = ArgumentCaptor.forClass(GermplasmList.class);
-		Mockito.verify(germplasmListDAO).saveOrUpdate(captor.capture());
-		Mockito.verify(listDataProjectDAO, Mockito.never()).save(Mockito.any(ListDataProject.class));
+		Mockito.verify(this.germplasmListDAO).saveOrUpdate(captor.capture());
+		Mockito.verify(this.listDataProjectDAO, Mockito.never()).save(Mockito.any(ListDataProject.class));
 
 		final GermplasmList snapshotGermplasmList = captor.getValue();
 
@@ -300,17 +289,17 @@ public class ListDataProjectSaverTest {
 				germplasmList.setId(snapShotListId);
 				return null;
 			}
-		}).when(germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
+		}).when(this.germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
 
-		Mockito.when(germplasmListDAO.getByProjectIdAndType(projectId, GermplasmListType.LST)).thenReturn(null);
+		when(this.germplasmListDAO.getByProjectIdAndType(projectId, GermplasmListType.LST)).thenReturn(null);
 
 		this.listDataProjectSaver
 				.saveOrUpdateListDataProject(projectId, GermplasmListType.LST, originalGermplasmListId, listDataProjectList, USER_ID);
 
 		final ArgumentCaptor<GermplasmList> captor = ArgumentCaptor.forClass(GermplasmList.class);
 
-		Mockito.verify(germplasmListDAO).saveOrUpdate(captor.capture());
-		Mockito.verify(listDataProjectDAO).save(listDataProject);
+		Mockito.verify(this.germplasmListDAO).saveOrUpdate(captor.capture());
+		Mockito.verify(this.listDataProjectDAO).save(listDataProject);
 
 		final GermplasmList snapshotGermplasmList = captor.getValue();
 
@@ -344,21 +333,21 @@ public class ListDataProjectSaverTest {
 				germplasmList.setId(snapShotListId);
 				return null;
 			}
-		}).when(germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
+		}).when(this.germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
 
 		final List<GermplasmList> tempList = new ArrayList<>();
 		final GermplasmList snapList = new GermplasmList();
 		snapList.setId(snapShotListId);
 		tempList.add(snapList);
 
-		Mockito.when(germplasmListDAO.getByProjectIdAndType(projectId, GermplasmListType.LST)).thenReturn(tempList);
+		when(this.germplasmListDAO.getByProjectIdAndType(projectId, GermplasmListType.LST)).thenReturn(tempList);
 
 		this.listDataProjectSaver
 				.saveOrUpdateListDataProject(projectId, GermplasmListType.LST, originalGermplasmListId, listDataProjectList, userId);
 
-		Mockito.verify(listDataProjectDAO).deleteByListId(snapShotListId);
-		Mockito.verify(germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
-		Mockito.verify(listDataProjectDAO).save(listDataProject);
+		Mockito.verify(this.listDataProjectDAO).deleteByListId(snapShotListId);
+		Mockito.verify(this.germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
+		Mockito.verify(this.listDataProjectDAO).save(listDataProject);
 
 	}
 }

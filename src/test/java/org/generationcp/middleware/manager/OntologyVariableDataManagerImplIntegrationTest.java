@@ -71,6 +71,9 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
 	
 	private FormulaDAO formulaDAO;
 	private CVTermDao cvTermDAO;
@@ -99,8 +102,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.formulaDAO = daoFactory.getFormulaDAO();
 		this.cvTermDAO = daoFactory.getCvTermDao();
-		final WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
-		this.testProject = instance.createTestProjectData();
+		this.testProject = workbenchTestDataUtil.createTestProjectData();
 		ContextHolder.setCurrentProgram(this.testProject.getUniqueID());
 
 		this.testMethod = new org.generationcp.middleware.domain.ontology.Method();

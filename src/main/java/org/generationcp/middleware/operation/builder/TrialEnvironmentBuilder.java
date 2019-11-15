@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,13 +38,20 @@ import java.util.Set;
 
 public class TrialEnvironmentBuilder extends Builder {
 
+	@Resource
+	private DataSetBuilder dataSetBuilder;
+
+	public TrialEnvironmentBuilder() {
+
+	}
+
 	public TrialEnvironmentBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
 	public TrialEnvironments getTrialEnvironmentsInDataset(final int studyId, final int datasetId) {
-		final DmsProject project = this.getDataSetBuilder().getTrialDataset(studyId);
-		final DataSet dataSet = this.getDataSetBuilder().build(project.getProjectId());
+		final DmsProject project = this.dataSetBuilder.getTrialDataset(studyId);
+		final DataSet dataSet = this.dataSetBuilder.build(project.getProjectId());
 		final Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
 
 		final VariableTypeList trialEnvironmentVariableTypes = this.getTrialEnvironmentVariableTypes(study, dataSet);

@@ -13,17 +13,6 @@
 package org.generationcp.middleware.service;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
@@ -41,12 +30,26 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.InventoryService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- * This is the API for inventory management system.
- * 
+ * This is the API for inventory management syste
+ *
  */
 
 @Transactional
@@ -60,6 +63,9 @@ public class InventoryServiceImpl implements InventoryService {
 
 	}
 
+	@Resource
+	private UserService userService;
+
 	public InventoryServiceImpl(final HibernateSessionProvider sessionProvider) {
 
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -69,13 +75,12 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public List<InventoryDetails> getInventoryDetailsByGermplasmList(final Integer listId) throws MiddlewareQueryException {
+	public List<InventoryDetails> getInventoryDetailsByGermplasmList(final Integer listId) {
 		return this.getInventoryDetailsByGermplasmList(listId, GermplasmListType.ADVANCED.name());
 	}
 
 	@Override
-	public List<InventoryDetails> getInventoryDetailsByGermplasmList(final Integer listId, final String germplasmListType)
-			throws MiddlewareQueryException {
+	public List<InventoryDetails> getInventoryDetailsByGermplasmList(final Integer listId, final String germplasmListType) {
 		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
 		final List<GermplasmListData> listData = this.getGermplasmListData(germplasmList, germplasmListType);
 		return this.getInventoryDetailsList(germplasmList, listData);
@@ -112,7 +117,7 @@ public class InventoryServiceImpl implements InventoryService {
 
 		final Map<Integer, String> usersMap = new HashMap<Integer, String>();
 		if (!userIds.isEmpty()) {
-			usersMap.putAll(this.daoFactory.getPersonDAO().getPersonNamesByUserIds(new ArrayList<>(userIds)));
+			usersMap.putAll(this.userService.getUserIDFullNameMap(new ArrayList<>(userIds)));
 		}
 
 		// set scale details of the inventory
@@ -183,7 +188,7 @@ public class InventoryServiceImpl implements InventoryService {
 		final Map<Integer, List<InventoryDetails>> listDataIdToInventoryDetailsMap = new HashMap<>();
 
 		for (final InventoryDetails inventoryDetails : detailList) {
-		    Integer recordId = inventoryDetails.getSourceRecordId();
+		    final Integer recordId = inventoryDetails.getSourceRecordId();
 		  if (!listDataIdToInventoryDetailsMap.containsKey(recordId)) {
 			listDataIdToInventoryDetailsMap.put(recordId, Lists.<InventoryDetails>newArrayList());
 		  }
@@ -193,7 +198,7 @@ public class InventoryServiceImpl implements InventoryService {
 		for (final GermplasmListData germplasmListData : dataList) {
 			final List<InventoryDetails> inventoryDetails = listDataIdToInventoryDetailsMap.get(germplasmListData.getId());
 			if (inventoryDetails != null) {
-			  for(InventoryDetails inventoryDetailsList: inventoryDetails) {
+			  for(final InventoryDetails inventoryDetailsList: inventoryDetails) {
 				inventoryDetailsList.copyFromGermplasmListData(germplasmListData);
 				inventoryDetailsList.setSourceId(germplasmList.getId());
 				inventoryDetailsList.setSourceName(germplasmList.getName());
@@ -228,9 +233,9 @@ public class InventoryServiceImpl implements InventoryService {
 	 * existing stock IDs with matching breeder identifier, 0 is returned.
 	 */
 	@Override
-	public Integer getCurrentNotationNumberForBreederIdentifier(final String breederIdentifier) throws MiddlewareQueryException {
+	public Integer getCurrentNotationNumberForBreederIdentifier(final String breederIdentifier) {
 		final List<String> inventoryIDs =
-				this.daoFactory.getTransactionDAO().getInventoryIDsWithBreederIdentifier(breederIdentifier);
+				this.daoFactory.getLotDao().getInventoryIDsWithBreederIdentifier(breederIdentifier);
 
 		if (inventoryIDs == null || inventoryIDs.isEmpty()) {
 			return 0;
@@ -266,11 +271,10 @@ public class InventoryServiceImpl implements InventoryService {
 	 * inventory transaction tracks anticipated transactions (Deposit or Reserved), committed transactions (Stored or Retrieved) and
 	 * cancelled transactions made on inventory lots. On the other hand, an stock transaction tracks the inventory transaction made on
 	 * generated seed stock of a nursery/trial
-	 * 
+	 *
 	 */
 	@Override
-	public void addLotAndTransaction(final InventoryDetails details, final GermplasmListData listData, final ListDataProject listDataProject)
-			throws MiddlewareQueryException {
+	public void addLotAndTransaction(final InventoryDetails details, final GermplasmListData listData, final ListDataProject listDataProject) {
 		final Lot existingLot =
 				this.getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(EntityType.GERMPLSM.name(), details.getGid(),
 						details.getLocationId(), details.getScaleId());
@@ -279,6 +283,8 @@ public class InventoryServiceImpl implements InventoryService {
 			throw new MiddlewareQueryException("A lot with the same entity id, location id, and scale id already exists");
 		}
 
+		final WorkbenchUser workbenchUser = this.userService.getUserById(details.getUserId());
+
 		final Lot lot =
 				this.lotBuilder.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(),
 						details.getUserId());
@@ -286,7 +292,7 @@ public class InventoryServiceImpl implements InventoryService {
 		this.daoFactory.getLotDao().saveOrUpdate(lot);
 
 		final Transaction transaction =
-				this.transactionBuilder.buildForAdd(lot, listData == null ? 0 : listData.getId(), details.getAmount(), details.getUserId(),
+				this.transactionBuilder.buildForAdd(lot, listData == null ? 0 : listData.getId(), details.getAmount(), workbenchUser.getUserid(), workbenchUser.getPerson().getId(),
 						details.getComment(), details.getSourceId(), details.getInventoryID(), details.getBulkWith(),
 						details.getBulkCompl());
 		this.daoFactory.getTransactionDAO().saveOrUpdate(transaction);
@@ -309,20 +315,19 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public List<InventoryDetails> getInventoryListByListDataProjectListId(final Integer listDataProjectListId)
-			throws MiddlewareQueryException {
+	public List<InventoryDetails> getInventoryListByListDataProjectListId(final Integer listDataProjectListId) {
 		return this.daoFactory.getStockTransactionDAO().retrieveInventoryDetailsForListDataProjectListId(listDataProjectListId);
 	}
 
 	@Override
 	public List<InventoryDetails> getSummedInventoryListByListDataProjectListId(final Integer listDataProjectListId,
-			final GermplasmListType type) throws MiddlewareQueryException {
+			final GermplasmListType type) {
 		return this.daoFactory.getStockTransactionDAO().retrieveSummedInventoryDetailsForListDataProjectListId(
 				listDataProjectListId, type);
 	}
 
 	@Override
-	public boolean stockHasCompletedBulking(final Integer listId) throws MiddlewareQueryException {
+	public boolean stockHasCompletedBulking(final Integer listId) {
 		return this.daoFactory.getStockTransactionDAO().stockHasCompletedBulking(listId);
 	}
 

@@ -51,17 +51,4 @@ public class IMSPojosSimpleTest extends IntegrationTestBase {
 		}
 	}
 
-	@Test
-	public void testPerson() throws Exception {
-		Query query = this.sessionProvder.getSession().createQuery("FROM Person");
-		query.setMaxResults(5);
-		List results = query.list();
-
-		for (Object obj : results) {
-			Assert.assertTrue(obj instanceof Person);
-			Assert.assertTrue(obj != null);
-			Person holder = (Person) obj;
-			Debug.println(IntegrationTestBase.INDENT, holder);
-		}
-	}
 }

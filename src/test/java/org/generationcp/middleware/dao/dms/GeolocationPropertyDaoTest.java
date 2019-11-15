@@ -17,6 +17,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +86,26 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(2, propertiesMap.size());
 		Assert.assertNotNull(propertiesMap.get(this.variable1.getDefinition()));
 		Assert.assertNotNull(propertiesMap.get(this.variable2.getDefinition()));
+	}
+
+	@Test
+	public void testGetInstanceIdLocationIdMap() {
+		final DmsProject dataset =
+			this.createDataset(RandomStringUtils.randomAlphabetic(20), DatasetTypeEnum.SUMMARY_DATA.getId(), this.study);
+		final Integer geolocationId =
+			this.createEnvironmentData(dataset, new ArrayList<Integer>());
+
+		final GeolocationProperty prop = new GeolocationProperty();
+		prop.setType(TermId.LOCATION_ID.getId());
+		final Geolocation geolocation = new Geolocation(geolocationId);
+		prop.setGeolocation(geolocation);
+		prop.setRank(1);
+		prop.setValue("1001");
+		this.geolocationPropDao.save(prop);
+
+		final Map<Integer, String> instanceIdLocationIdMap = this.geolocationPropDao.getInstanceIdLocationIdMap(Arrays.asList(geolocationId));
+		Assert.assertEquals(1, instanceIdLocationIdMap.size());
+		Assert.assertEquals("1001", instanceIdLocationIdMap.get(geolocationId));
 	}
 
 	@Test

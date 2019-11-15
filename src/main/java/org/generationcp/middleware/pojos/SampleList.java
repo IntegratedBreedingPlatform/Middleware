@@ -23,6 +23,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -62,10 +63,9 @@ public class SampleList implements Serializable {
 	@Column(name = "notes")
 	private String notes;
 
-	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "created_by")
-	@NotFound(action = NotFoundAction.IGNORE)
-	private User createdBy;
+	@Basic(optional = false)
+	@Column(name = "created_by")
+	private Integer createdByUserId;
 
 	@OneToMany(mappedBy = "sampleList", cascade = CascadeType.ALL)
 	private List<Sample> samples;
@@ -79,6 +79,9 @@ public class SampleList implements Serializable {
 
 	@Column(name = "program_uuid")
 	private String programUUID;
+
+	@Transient
+	private String createdBy;
 
 	@Column(name = "gobii_project_id")
 	private Integer gobiiProjectId;
@@ -147,12 +150,12 @@ public class SampleList implements Serializable {
 		this.notes = notes;
 	}
 
-	public User getCreatedBy() {
-		return this.createdBy;
+	public Integer getCreatedByUserId() {
+		return this.createdByUserId;
 	}
 
-	public void setCreatedBy(final User createdBy) {
-		this.createdBy = createdBy;
+	public void setCreatedByUserId(final Integer createdByUserId) {
+		this.createdByUserId = createdByUserId;
 	}
 
 	public List<SampleList> getChildren() {
@@ -202,5 +205,13 @@ public class SampleList implements Serializable {
 
 	public void setProgramUUID(String programUUID) {
 		this.programUUID = programUUID;
+	}
+
+	public String getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public void setCreatedBy(final String createdBy) {
+		this.createdBy = createdBy;
 	}
 }

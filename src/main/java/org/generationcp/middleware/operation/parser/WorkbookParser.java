@@ -29,7 +29,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
-import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.PoiUtil;
 import org.generationcp.middleware.util.Util;
@@ -60,20 +59,17 @@ public class WorkbookParser {
 
 	public static final int STUDY_NAME_ROW_INDEX = 0;
 	public static final int STUDY_TITLE_ROW_INDEX = 1;
-	public static final int PMKEY_ROW_INDEX = 2;
-	public static final int OBJECTIVE_ROW_INDEX = 3;
-	public static final int START_DATE_ROW_INDEX = 4;
-	public static final int END_DATE_ROW_INDEX = 5;
-	public static final int STUDY_TYPE_ROW_INDEX = 6;
+	public static final int OBJECTIVE_ROW_INDEX = 2;
+	public static final int START_DATE_ROW_INDEX = 3;
+	public static final int END_DATE_ROW_INDEX = 4;
+	public static final int STUDY_TYPE_ROW_INDEX = 5;
 
-	public static final int STUDY_DETAILS_LABEL_COLUMN_INDEX = 0;
 	public static final int STUDY_DETAILS_VALUE_COLUMN_INDEX = 1;
-	public static final String PMKEY_LABEL = "PMKEY";
 
 	private static final String DESCRIPTION = "DESCRIPTION";
+	private static final String ONTOLOGY_ID = "ONTOLOGY ID";
 	private static final String PROPERTY = "PROPERTY";
-	private static final String SAMPLE_LEVEL = "SAMPLE LEVEL";
-	private static final String LABEL = "LABEL";
+	private static final String DATASET = "DATASET";
 	private static final String VALUE = "VALUE";
 	private static final String DATA_TYPE = "DATA TYPE";
 	private static final String METHOD = "METHOD";
@@ -81,39 +77,60 @@ public class WorkbookParser {
 	private static final String DESCRIPTION_SHEET_NAME = "Description";
 	private static final String OBSERVATION_SHEET_NAME = "Observation";
 
+	private static final int NUMBER_OF_COLUMNS = 9;
+
 	public static final int DEFAULT_MAX_ROW_LIMIT = 10000;
 
-	private int currentRowZeroBased;
+	private int rowIndex;
 
 	private List<Message> errorMessages = new ArrayList<>();
 	protected boolean hasIncorrectDatatypeValue = false;
 	private int maxRowLimit = DEFAULT_MAX_ROW_LIMIT;
 
-	private org.generationcp.middleware.domain.etl.Workbook currentWorkbook;
-	protected static final String[] DEFAULT_EXPECTED_VARIABLE_HEADERS =
-			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
-					WorkbookParser.DATA_TYPE, WorkbookParser.VALUE, WorkbookParser.LABEL};
-	protected static final String[] EXPECTED_VARIATE_HEADERS =
-			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
-					WorkbookParser.DATA_TYPE, "", WorkbookParser.SAMPLE_LEVEL};
-	protected static final String[] EXPECTED_VARIATE_HEADERS_2 =
-			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
-					WorkbookParser.DATA_TYPE, WorkbookParser.VALUE, WorkbookParser.SAMPLE_LEVEL};
-	protected static final String[] EXPECTED_CONSTANT_HEADERS =
-			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
-					WorkbookParser.DATA_TYPE, WorkbookParser.VALUE, WorkbookParser.SAMPLE_LEVEL};
-	protected static final String[] EXPECTED_CONSTANT_HEADERS_2 =
-			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
-					WorkbookParser.DATA_TYPE, WorkbookParser.VALUE, ""};
-	protected static final String[] EXPECTED_FACTOR_HEADERS =
-			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
-					WorkbookParser.DATA_TYPE, "NESTED IN", WorkbookParser.LABEL};
-	protected static final String[] EXPECTED_FACTOR_HEADERS_2 =
-			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
-					WorkbookParser.DATA_TYPE, "", WorkbookParser.LABEL};
+	protected static final String[] EXPECTED_VARIABLE_HEADERS =
+		new String[] {
+			WorkbookParser.DESCRIPTION, WorkbookParser.ONTOLOGY_ID, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
+			WorkbookParser.DATA_TYPE, WorkbookParser.VALUE, WorkbookParser.DATASET};
+
 
 	public enum Section {
-		CONDITION, FACTOR, CONSTANT, VARIATE
+		STUDY_DETAILS("STUDY DETAILS", PhenotypicType.STUDY, PhenotypicType.STUDY.getLabelList().get(0), VariableType.STUDY_DETAIL),
+		EXPERIMENTAL_DESIGN("EXPERIMENTAL DESIGN", PhenotypicType.TRIAL_DESIGN, PhenotypicType.TRIAL_DESIGN.getLabelList().get(0), VariableType.EXPERIMENTAL_DESIGN),
+		ENVIRONMENT_DETAILS("ENVIRONMENT DETAILS", PhenotypicType.TRIAL_ENVIRONMENT, PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), VariableType.ENVIRONMENT_DETAIL),
+		ENVIRONMENTAL_CONDITIONS("ENVIRONMENTAL CONDITIONS", PhenotypicType.TRIAL_ENVIRONMENT, PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), VariableType.STUDY_CONDITION),
+		GERMPLASM_DECRIPTORS("GERMPLASM DESCRIPTORS", PhenotypicType.GERMPLASM, PhenotypicType.GERMPLASM.getLabelList().get(0), VariableType.GERMPLASM_DESCRIPTOR),
+		OBSERVATION_UNIT("OBSERVATION UNIT", PhenotypicType.TRIAL_DESIGN, PhenotypicType.TRIAL_DESIGN.getLabelList().get(1), VariableType.EXPERIMENTAL_DESIGN),
+		TRAIT("TRAITS", PhenotypicType.VARIATE, PhenotypicType.VARIATE.getLabelList().get(1), VariableType.TRAIT),
+		SELECTIONS("SELECTIONS", PhenotypicType.VARIATE, PhenotypicType.VARIATE.getLabelList().get(1), VariableType.SELECTION_METHOD);
+
+		private final String name;
+
+		public PhenotypicType getRole() {
+			return role;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public VariableType getVariableType() {
+			return variableType;
+		}
+
+		private final PhenotypicType role;
+		private final String label;
+		private final VariableType variableType;
+
+		Section(final String name, final PhenotypicType role, final String label, final VariableType variableType) {
+			this.name = name;
+			this.role = role;
+			this.label = label;
+			this.variableType = variableType;
+		}
+
+		public String getName() {
+			return this.name;
+		}
 	}
 
 	public WorkbookParser() {
@@ -136,7 +153,7 @@ public class WorkbookParser {
 		final Workbook excelWorkbook;
 
 		try {
-			excelWorkbook = convertExcelFileToProperFormat(file);
+			excelWorkbook = this.convertExcelFileToProperFormat(file);
 		} catch (final FileNotFoundException e) {
 			throw new WorkbookParserException("File not found " + e.getMessage(), e);
 		} catch (final IOException e) {
@@ -145,11 +162,11 @@ public class WorkbookParser {
 
 		if (excelWorkbook instanceof XSSFWorkbook) {
 			final int maxLimit = 65000;
-			final Boolean overLimit = PoiUtil.isAnySheetRowsOverMaxLimit(file.getAbsolutePath(), maxLimit);
+			final boolean overLimit = PoiUtil.isAnySheetRowsOverMaxLimit(file.getAbsolutePath(), maxLimit);
 			if (overLimit) {
 				final WorkbookParserException workbookParserException = new WorkbookParserException("");
 				workbookParserException
-						.addMessage(new Message("error.file.is.too.large", new DecimalFormat("###,###,###").format(maxLimit)));
+					.addMessage(new Message("error.file.is.too.large", new DecimalFormat("###,###,###").format(maxLimit)));
 				throw workbookParserException;
 			}
 		}
@@ -177,28 +194,25 @@ public class WorkbookParser {
 	}
 
 	public org.generationcp.middleware.domain.etl.Workbook parseFile(final Workbook excelWorkbook, final boolean performValidation, final
-		String createdBy)
-			throws WorkbookParserException {
+	String createdBy)
+		throws WorkbookParserException {
 		return this.parseFile(excelWorkbook, performValidation, true, createdBy);
 	}
 
 	/**
 	 * Parses given file and transforms it into a Workbook
 	 *
-	 * @param file
 	 * @param createdBy
 	 * @return workbook
 	 * @throws org.generationcp.middleware.exceptions.WorkbookParserException
 	 */
 	public org.generationcp.middleware.domain.etl.Workbook parseFile(final Workbook excelWorkbook, final boolean performValidation,
-		final boolean isReadVariate, final String createdBy) throws WorkbookParserException {
+		final boolean isReadTraits, final String createdBy) throws WorkbookParserException {
 
-		this.currentWorkbook = new org.generationcp.middleware.domain.etl.Workbook();
-		this.currentRowZeroBased = 0;
+		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
+
 		this.errorMessages = new LinkedList<>();
 		this.setHasIncorrectDatatypeValue(false);
-
-		// validation Descriptin and Observation Sheets
 		this.validateExistenceOfSheets(excelWorkbook);
 
 		// throw an exception here if
@@ -206,24 +220,51 @@ public class WorkbookParser {
 			throw new WorkbookParserException(this.errorMessages);
 		}
 
-		this.currentWorkbook.setStudyDetails(this.readStudyDetails(excelWorkbook, createdBy));
-		this.currentWorkbook.setConditions(this.readMeasurementVariables(excelWorkbook, Section.CONDITION.toString()));
-		this.currentWorkbook.setFactors(this.readMeasurementVariables(excelWorkbook, Section.FACTOR.toString()));
-		this.currentWorkbook.setConstants(this.readMeasurementVariables(excelWorkbook, Section.CONSTANT.toString()));
-		if (isReadVariate) {
-			this.currentWorkbook.setVariates(this.readMeasurementVariables(excelWorkbook, Section.VARIATE.toString()));
+		final List<MeasurementVariable> factors = new ArrayList<>();
+		final List<MeasurementVariable> conditions = new ArrayList<>();
+		final List<MeasurementVariable> constants = new ArrayList<>();
+		final List<MeasurementVariable> traits = new ArrayList<>();
+
+
+		// Read the study details (metadata: name, objective, start/end date etc..)
+		// The first 7 rows are reserved from study details
+		workbook.setStudyDetails(this.readStudyDetails(excelWorkbook, createdBy));
+
+		// Assumes the first section Study Details (aka "Study Settings") is in row 8
+		this.rowIndex = 7;
+		conditions.addAll(this.readMeasurementVariables(excelWorkbook, Section.STUDY_DETAILS));
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
+		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.EXPERIMENTAL_DESIGN));
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
+		conditions.addAll(this.readMeasurementVariables(excelWorkbook, Section.ENVIRONMENT_DETAILS));
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
+		constants.addAll(this.readMeasurementVariables(excelWorkbook, Section.ENVIRONMENTAL_CONDITIONS));
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
+		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.GERMPLASM_DECRIPTORS));
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
+		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.OBSERVATION_UNIT));
+
+		if (isReadTraits) {
+			this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
+			traits.addAll(this.readMeasurementVariables(excelWorkbook, Section.TRAIT));
+			this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
+			traits.addAll(this.readMeasurementVariables(excelWorkbook, Section.SELECTIONS));
 		}
+
+		workbook.setFactors(factors);
+		workbook.setConditions(conditions);
+		workbook.setVariates(traits);
+		workbook.setConstants(constants);
 
 		if (!this.errorMessages.isEmpty() && performValidation) {
 			throw new WorkbookParserException(this.errorMessages);
 		}
 
-		return this.currentWorkbook;
+		return workbook;
 	}
 
-	protected boolean isDescriptionSheetExists(final Workbook wb) throws WorkbookParserException {
+	protected boolean isDescriptionSheetExists(final Workbook wb) {
 		final Sheet sheet1 = wb.getSheetAt(WorkbookParser.DESCRIPTION_SHEET);
-
 		if (sheet1 == null || sheet1.getSheetName() == null || !WorkbookParser.DESCRIPTION_SHEET_NAME.equals(sheet1.getSheetName())) {
 			return false;
 		}
@@ -259,15 +300,15 @@ public class WorkbookParser {
 	}
 
 	public void parseAndSetObservationRows(final Workbook excelWorkbook, final org.generationcp.middleware.domain.etl.Workbook workbook,
-			final boolean discardInvalidValues) throws WorkbookParserException {
+		final boolean discardInvalidValues) throws WorkbookParserException {
 
-		this.currentRowZeroBased = 0;
+		this.rowIndex = 0;
 		workbook.setObservations(this.readObservations(excelWorkbook, workbook, discardInvalidValues));
 
 	}
 
 	public void removeObsoleteColumnsInExcelWorkbook(final org.apache.poi.ss.usermodel.Workbook excelWorkbook,
-			final List<String> obsoleteVariableNames) {
+		final List<String> obsoleteVariableNames) {
 
 		// Get the Observation sheet
 		final Sheet observationSheet = excelWorkbook.getSheetAt(WorkbookParser.OBSERVATION_SHEET);
@@ -295,25 +336,20 @@ public class WorkbookParser {
 
 		// get study details
 		final String study = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_NAME_ROW_INDEX,
+			WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
+		final String description =
+			WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TITLE_ROW_INDEX,
 				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-		final String description = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TITLE_ROW_INDEX,
-				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-		final String pmKeyLabel = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.PMKEY_ROW_INDEX,
-				WorkbookParser.STUDY_DETAILS_LABEL_COLUMN_INDEX);
-		int rowAdjustMent = 0;
-		if (pmKeyLabel != null && !pmKeyLabel.trim().equals(WorkbookParser.PMKEY_LABEL)) {
-			rowAdjustMent++;
-		}
 		final String objective = WorkbookParser
-				.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.OBJECTIVE_ROW_INDEX - rowAdjustMent,
-						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
+			.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.OBJECTIVE_ROW_INDEX,
+				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
 		final String startDateStr = WorkbookParser
-				.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.START_DATE_ROW_INDEX - rowAdjustMent,
-						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
+			.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.START_DATE_ROW_INDEX,
+				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
 		final String endDateStr = WorkbookParser
-				.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.END_DATE_ROW_INDEX - rowAdjustMent,
-						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-		final StudyTypeDto studyTypeValue = determineStudyType(wb, rowAdjustMent);
+			.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.END_DATE_ROW_INDEX,
+				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
+		final StudyTypeDto studyTypeValue = this.determineStudyType(wb);
 
 		// GCP-6991 and GCP-6992
 		if (study == null || StringUtils.isEmpty(study)) {
@@ -342,20 +378,17 @@ public class WorkbookParser {
 
 		// Study is not locked by default
 		final StudyDetails studyDetails =
-				new StudyDetails(study, description, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null, Util
-					.getCurrentDateAsStringValue(), createdBy, false);
+			new StudyDetails(study, description, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null, Util
+				.getCurrentDateAsStringValue(), createdBy, false);
 
-		while (!WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
-			this.currentRowZeroBased++;
-		}
 		return studyDetails;
 	}
 
-	StudyTypeDto determineStudyType(final Workbook wb, final int rowAdjustMent) {
-		final String studyTypeName = WorkbookParser
-				.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TYPE_ROW_INDEX - rowAdjustMent,
-						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-		return new StudyTypeDto(StringUtils.isEmpty(studyTypeName)? StudyTypeDto.NURSERY_NAME: studyTypeName);
+	StudyTypeDto determineStudyType(final Workbook wb) {
+		final String studyTypeLabel = WorkbookParser
+			.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TYPE_ROW_INDEX,
+				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
+		return new StudyTypeDto(StudyTypeDto.TRIAL_LABEL.equals(studyTypeLabel) ? StudyTypeDto.TRIAL_NAME : StudyTypeDto.NURSERY_NAME);
 	}
 
 	protected Date validateDate(final String dateString, final boolean isStartDate, final Message errorMessage) {
@@ -366,7 +399,7 @@ public class WorkbookParser {
 		} else {
 			try {
 				if (dateString != null && !"".equals(dateString)) {
-					date  = dateFormat.parse(dateString);
+					date = dateFormat.parse(dateString);
 				}
 				if (isStartDate && date == null) {
 					this.errorMessages.add(new Message("error.start.date.is.empty"));
@@ -378,63 +411,25 @@ public class WorkbookParser {
 		return date;
 	}
 
-	protected List<MeasurementVariable> readMeasurementVariables(final Workbook wb, final String name) throws WorkbookParserException {
+	protected List<MeasurementVariable> readMeasurementVariables(final Workbook wb, final Section section) throws WorkbookParserException {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
 		try {
 
 			// Skip checking description sheet if it is not present in file
-			if(!this.isDescriptionSheetExists(wb)){
-				return Collections.<MeasurementVariable>emptyList();
-			}
-
-			// Cannot have more than one empty row in the description worksheet.
-			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
-				this.currentRowZeroBased++;
-			}
-
-			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
-				this.errorMessages.add(new Message("error.to.many.empty.rows", name, Integer.toString(this.currentRowZeroBased - 1),
-						Integer.toString(this.currentRowZeroBased)));
+			if (!this.isDescriptionSheetExists(wb)) {
 				return Collections.<MeasurementVariable>emptyList();
 			}
 
 			// Check if headers are correct
-
-			final String[] expectedHeaders;
-			String[] expectedHeaders2 = null;
-
-			if (Section.FACTOR.toString().equals(name)) {
-				expectedHeaders = WorkbookParser.EXPECTED_FACTOR_HEADERS;
-				expectedHeaders2 = WorkbookParser.EXPECTED_FACTOR_HEADERS_2;
-
-			} else if (Section.VARIATE.toString().equals(name)) {
-				expectedHeaders = WorkbookParser.EXPECTED_VARIATE_HEADERS;
-				expectedHeaders2 = WorkbookParser.EXPECTED_VARIATE_HEADERS_2;
-
-			} else if (Section.CONSTANT.toString().equals(name)) {
-				expectedHeaders = WorkbookParser.EXPECTED_CONSTANT_HEADERS;
-				expectedHeaders2 = WorkbookParser.EXPECTED_CONSTANT_HEADERS_2;
-
-			} else {
-				expectedHeaders = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
-			}
-
-			boolean valid = this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, expectedHeaders);
-			if (!valid && expectedHeaders2 != null) {
-				valid = this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, expectedHeaders2);
-			}
-			if (!valid && !Arrays.equals(expectedHeaders, WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS)) {
-				valid = this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased,
-						WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS);
-			}
+			final boolean valid = this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex);
 
 			if (!valid) {
-				throw new WorkbookParserException("Incorrect headers for " + name);
+				throw new WorkbookParserException("Incorrect headers for " + section.getName());
 			}
 
 			// If file is still valid (after checking headers), proceed
-			this.extractMeasurementVariablesForSection(wb, name, measurementVariables);
+			this.extractMeasurementVariablesForSection(wb, section, measurementVariables);
 
 			return measurementVariables;
 		} catch (final Exception e) {
@@ -442,25 +437,20 @@ public class WorkbookParser {
 		}
 	}
 
-	protected void extractMeasurementVariablesForSection(final Workbook workbook, final String sectionName,
-			final List<MeasurementVariable> measurementVariables) {
+	protected void extractMeasurementVariablesForSection(final Workbook workbook, final Section currentSection,
+		final List<MeasurementVariable> measurementVariables) {
 
 		// Moving to the next line is necessary as at this point one is on the previous row.
-		this.currentRowZeroBased++;
+		this.rowIndex++;
 
-		// Cannot have more than one empty row in the description worksheet.
-		if (WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
-			this.currentRowZeroBased++;
-		}
-
-		if (WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
-			this.errorMessages.add(new Message("error.to.many.empty.rows", sectionName, Integer.toString(this.currentRowZeroBased - 1),
-					Integer.toString(this.currentRowZeroBased)));
+		if (WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, NUMBER_OF_COLUMNS)) {
+			this.errorMessages.add(new Message("error.to.many.empty.rows", currentSection.getName(), Integer.toString(this.rowIndex - 1),
+				Integer.toString(this.rowIndex)));
 			return;
 		}
 
 		// capture empty sections, and return to avoid spillover
-		final String value = WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 0);
+		final String value = WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 0);
 
 		for (final Section section : Section.values()) {
 			if (value.equalsIgnoreCase(section.toString())) {
@@ -468,80 +458,45 @@ public class WorkbookParser {
 			}
 		}
 
-		while (!WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
+		while (!WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, NUMBER_OF_COLUMNS)) {
 
-			final Integer displayRowNumber = this.currentRowZeroBased + 1;
+			final Integer displayRowNumber = this.rowIndex + 1;
 
-			// GCP-5802
-			final MeasurementVariable measurementVariableFromParsedData = new MeasurementVariable(
-					WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 0),
-					WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 1),
-					WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 3),
-					WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 4),
-					WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 2),
-					WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 5),
-					WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 6),
-					WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 7));
-
-			this.validateRequiredFields(measurementVariableFromParsedData, displayRowNumber);
-			this.validateDataTypeIfNecessary(measurementVariableFromParsedData, displayRowNumber);
-			this.validateRequiredFieldsForNonVariateVariables(sectionName, measurementVariableFromParsedData, displayRowNumber);
-			this.validateLabelBasedOnSection(sectionName, measurementVariableFromParsedData, displayRowNumber);
-			this.assignRoleBasedOnSectionName(sectionName, measurementVariableFromParsedData, displayRowNumber);
-			this.assignVariableType(sectionName, measurementVariableFromParsedData, this.currentWorkbook);
-
-			measurementVariables.add(measurementVariableFromParsedData);
-
-			this.currentRowZeroBased++;
-		}
-	}
-
-	protected void assignVariableType(final String name, final MeasurementVariable measurementVariable,
-			final org.generationcp.middleware.domain.etl.Workbook workbook) {
-
-		// NOTE: Explicitly setting variable type
-		if (Section.CONSTANT.toString().equals(name) && workbook != null) {
-			final StudyTypeDto studyType = workbook.getStudyDetails().getStudyType();
-			measurementVariable.setVariableType(VariableType.STUDY_CONDITION);
-		} else {
+			final MeasurementVariable measurementVariable = new MeasurementVariable();
 			measurementVariable
-					.setVariableType(OntologyDataHelper.mapFromPhenotype(measurementVariable.getRole(), measurementVariable.getProperty()));
-		}
+				.setName(WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 0));
+			measurementVariable
+				.setDescription(WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 1));
+			measurementVariable.setCropOntology(
+				WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 2));
+			measurementVariable
+				.setProperty(WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 3));
+			measurementVariable
+				.setScale(WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 4));
+			measurementVariable
+				.setMethod(WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 5));
+			measurementVariable
+				.setDataType(WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 6));
+			measurementVariable
+				.setValue(WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 7));
 
+			this.validateRequiredFields(measurementVariable, displayRowNumber);
+			this.validateDataTypeIfNecessary(measurementVariable, displayRowNumber);
+			this.assignVariableTypeAndRoleBasedOnSectionName(currentSection, measurementVariable);
+
+			measurementVariables.add(measurementVariable);
+
+			this.rowIndex++;
+		}
 	}
 
-	protected void assignRoleBasedOnSectionName(final String sectionName, final MeasurementVariable measurementVariable,
-			final Integer rowNumber) {
-
-		if (Section.VARIATE.toString().equals(sectionName) || Section.CONSTANT.toString().equals(sectionName)) {
-			measurementVariable.setRole(PhenotypicType.VARIATE);
-		} else {
-			measurementVariable.setRole(PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()));
+	protected void assignVariableTypeAndRoleBasedOnSectionName(final Section section, final MeasurementVariable measurementVariable) {
+		// Import of sub-observations not yet supported
+		if (!Section.OBSERVATION_UNIT.equals(section)) {
+			measurementVariable.setRole(section.getRole());
+			measurementVariable.setLabel(section.getLabel());
+			measurementVariable.setVariableType(section.getVariableType());
 		}
-
-	}
-
-	protected void validateLabelBasedOnSection(final String sectionName, final MeasurementVariable measurementVariable,
-			final Integer rowNumber) {
-
-		if (Section.FACTOR.toString().equals(sectionName) || Section.CONDITION.toString().equals(sectionName)) {
-			final PhenotypicType role = PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel());
-			if (role == null || role == PhenotypicType.VARIATE) {
-				this.errorMessages.add(new Message("error.invalid.field.label", Integer.toString(rowNumber)));
-			}
-
-		}
-
-	}
-
-	protected void validateRequiredFieldsForNonVariateVariables(final String sectionName, final MeasurementVariable measurementVariable,
-			final Integer rowNumber) {
-
-		// The Label of measurementVariable is required if it's in Factor, Condition and Constants section
-		if (!Section.VARIATE.toString().equals(sectionName) && StringUtils.isEmpty(measurementVariable.getLabel())) {
-			this.errorMessages.add(new Message("error.missing.field.label", Integer.toString(rowNumber)));
-		}
-
 	}
 
 	protected void validateRequiredFields(final MeasurementVariable measurementVariable, final Integer rowNumber) {
@@ -570,8 +525,8 @@ public class WorkbookParser {
 
 	protected void validateDataTypeIfNecessary(final MeasurementVariable measurementVariable, final Integer rowNumber) {
 
-		if (!hasIncorrectDatatypeValue()) {
-			validateDataType(measurementVariable, rowNumber);
+		if (!this.hasIncorrectDatatypeValue()) {
+			this.validateDataType(measurementVariable, rowNumber);
 		}
 
 	}
@@ -580,10 +535,10 @@ public class WorkbookParser {
 
 		if (StringUtils.isEmpty(measurementVariable.getDataType())) {
 			this.errorMessages.add(new Message("error.missing.field.datatype", Integer.toString(rowNumber)));
-			setHasIncorrectDatatypeValue(true);
+			this.setHasIncorrectDatatypeValue(true);
 		} else if (DataType.getByCode(measurementVariable.getDataType()) == null) {
 			this.errorMessages.add(new Message("error.unsupported.datatype"));
-			setHasIncorrectDatatypeValue(true);
+			this.setHasIncorrectDatatypeValue(true);
 		}
 
 	}
@@ -620,7 +575,7 @@ public class WorkbookParser {
 		if (lastRowNum > this.getMaxRowLimit()) {
 			final List<Message> messages = new ArrayList<>();
 			final Message message =
-					new Message("error.observation.over.maximum.limit", new DecimalFormat("###,###,###").format(this.getMaxRowLimit()));
+				new Message("error.observation.over.maximum.limit", new DecimalFormat("###,###,###").format(this.getMaxRowLimit()));
 			messages.add(message);
 			throw new WorkbookParserException(messages);
 		}
@@ -650,7 +605,7 @@ public class WorkbookParser {
 	 * @throws WorkbookParserException
 	 */
 	protected List<MeasurementVariable> checkIfWorkbookVariablesMatchedTheHeadersInObservation(final Workbook excelWorkbook,
-			final org.generationcp.middleware.domain.etl.Workbook workbook) throws WorkbookParserException {
+		final org.generationcp.middleware.domain.etl.Workbook workbook) throws WorkbookParserException {
 
 		final List<MeasurementVariable> variables = new ArrayList<>();
 
@@ -660,7 +615,7 @@ public class WorkbookParser {
 
 		for (int col = 0; col < factors.size() + variates.size(); col++) {
 			final String columnName =
-					WorkbookParser.getCellStringValue(excelWorkbook, WorkbookParser.OBSERVATION_SHEET, this.currentRowZeroBased, col);
+				WorkbookParser.getCellStringValue(excelWorkbook, WorkbookParser.OBSERVATION_SHEET, this.rowIndex, col);
 			if (col < factors.size()) {
 
 				if (!factors.get(col).getName().equalsIgnoreCase(columnName)) {
@@ -693,8 +648,8 @@ public class WorkbookParser {
 	 * @throws WorkbookParserException
 	 */
 	protected List<MeasurementRow> readObservations(final Workbook excelWorkbook,
-			final org.generationcp.middleware.domain.etl.Workbook workbook, final boolean discardInvalidValues)
-			throws WorkbookParserException {
+		final org.generationcp.middleware.domain.etl.Workbook workbook, final boolean discardInvalidValues)
+		throws WorkbookParserException {
 		final List<MeasurementRow> observations = new ArrayList<>();
 
 		this.validateExistenceOfObservationRecords(excelWorkbook);
@@ -705,27 +660,27 @@ public class WorkbookParser {
 		try {
 
 			final List<MeasurementVariable> variables =
-					this.checkIfWorkbookVariablesMatchedTheHeadersInObservation(excelWorkbook, workbook);
+				this.checkIfWorkbookVariablesMatchedTheHeadersInObservation(excelWorkbook, workbook);
 
-			this.currentRowZeroBased++;
+			this.rowIndex++;
 
-			while (this.currentRowZeroBased <= lastRowNum) {
+			while (this.rowIndex <= lastRowNum) {
 
 				// skip over blank rows in the observation sheet
 				if (WorkbookParser
-						.rowIsEmpty(excelWorkbook, WorkbookParser.OBSERVATION_SHEET, this.currentRowZeroBased, variables.size())) {
-					this.currentRowZeroBased++;
+					.rowIsEmpty(excelWorkbook, WorkbookParser.OBSERVATION_SHEET, this.rowIndex, variables.size())) {
+					this.rowIndex++;
 					continue;
 				}
 
 				final List<MeasurementData> dataList =
-						this.convertSheetRowToDataList(this.currentRowZeroBased, excelWorkbook, discardInvalidValues, variables);
+					this.convertSheetRowToDataList(this.rowIndex, excelWorkbook, discardInvalidValues, variables);
 
 				// danielv -- made use of new constructor to make it clear that only the measurement data is needed at this point. The other
 				// values are computed later on in the process
 				observations.add(new MeasurementRow(dataList));
 
-				this.currentRowZeroBased++;
+				this.rowIndex++;
 			}
 
 			return observations;
@@ -745,7 +700,7 @@ public class WorkbookParser {
 	 * @return
 	 */
 	protected List<MeasurementData> convertSheetRowToDataList(final int rowNumber, final Workbook excelWorkbook,
-			final boolean discardInvalidValues, final List<MeasurementVariable> variables) {
+		final boolean discardInvalidValues, final List<MeasurementVariable> variables) {
 		final List<MeasurementData> dataList = new ArrayList<>();
 
 		for (int col = 0; col < variables.size(); col++) {
@@ -756,7 +711,7 @@ public class WorkbookParser {
 			measurementData.setMeasurementVariable(measurementVariable);
 
 			if (discardInvalidValues && !measurementData.isCategoricalValueValid()
-					&& measurementVariable.getRole() == PhenotypicType.VARIATE) {
+				&& measurementVariable.getRole() == PhenotypicType.VARIATE) {
 				measurementData.setValue("");
 			}
 
@@ -766,7 +721,7 @@ public class WorkbookParser {
 	}
 
 	protected static String getCellStringValue(final Workbook wb, final Integer sheetNumber, final Integer rowNumber,
-			final Integer columnNumber) {
+		final Integer columnNumber) {
 		final Sheet sheet = wb.getSheetAt(sheetNumber);
 		if (sheet != null) {
 			final Row row = sheet.getRow(rowNumber);
@@ -779,14 +734,14 @@ public class WorkbookParser {
 	}
 
 	// GCP-5815
-	protected boolean checkHeadersValid(final Workbook workbook, final int sheetNumber, final int row, final String[] expectedHeaders) {
+	protected boolean checkHeadersValid(final Workbook workbook, final int sheetNumber, final int row) {
 
-		for (int i = 0; i < expectedHeaders.length; i++) {
+		for (int i = 0; i < EXPECTED_VARIABLE_HEADERS.length; i++) {
 			// a plus is added to the column count, since the first column is the name of the group; e.g., FACTOR, CONDITION, ETC
 			final String cellValue = WorkbookParser.getCellStringValue(workbook, sheetNumber, row, i + 1);
-			if (StringUtils.isEmpty(cellValue) && !StringUtils.isEmpty(expectedHeaders[i])) {
+			if (StringUtils.isEmpty(cellValue) && !StringUtils.isEmpty(EXPECTED_VARIABLE_HEADERS[i])) {
 				return false;
-			} else if (!StringUtils.isEmpty(cellValue) && !expectedHeaders[i].equals(cellValue)) {
+			} else if (!StringUtils.isEmpty(cellValue) && !EXPECTED_VARIABLE_HEADERS[i].equals(cellValue)) {
 				return false;
 			}
 		}
@@ -794,7 +749,13 @@ public class WorkbookParser {
 		return true;
 	}
 
-	private static Boolean rowIsEmpty(final Workbook wb, final Integer sheet, final Integer row, final int len) {
+	private void incrementDescriptionSheetRowIndex(final Workbook workbook) {
+		while (WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, NUMBER_OF_COLUMNS)) {
+			this.rowIndex++;
+		}
+	}
+
+	private static boolean rowIsEmpty(final Workbook wb, final Integer sheet, final Integer row, final int len) {
 		Integer col;
 		for (col = 0; col < len; col++) {
 			final String value = WorkbookParser.getCellStringValue(wb, sheet, row, col);
@@ -832,7 +793,7 @@ public class WorkbookParser {
 	}
 
 	public boolean hasIncorrectDatatypeValue() {
-		return hasIncorrectDatatypeValue;
+		return this.hasIncorrectDatatypeValue;
 	}
 
 	public void setHasIncorrectDatatypeValue(final boolean hasIncorrectDatatypeValue) {

@@ -40,6 +40,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -49,7 +50,9 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -77,7 +80,17 @@ public class WorkbookBuilder extends Builder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbookBuilder.class);
 
-	private final DaoFactory daoFactory;
+	@Resource
+	private StudyDataManager studyDataManager;
+
+	@Resource
+	private DataSetBuilder dataSetBuilder;
+
+	private DaoFactory daoFactory;
+
+	public WorkbookBuilder() {
+
+	}
 
 	public WorkbookBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
@@ -99,9 +112,9 @@ public class WorkbookBuilder extends Builder {
 	 * before using this method.
 	 */
 	public void loadAllObservations(final Workbook workbook) {
-		final VariableTypeList variables = this.getDataSetBuilder().getVariableTypes(workbook.getMeasurementDatesetId());
+		final VariableTypeList variables = this.dataSetBuilder.getVariableTypes(workbook.getMeasurementDatesetId());
 		final List<Experiment> experiments =
-			this.getStudyDataManager().getExperiments(workbook.getMeasurementDatesetId(), 0, Integer.MAX_VALUE, variables);
+			this.studyDataManager.getExperiments(workbook.getMeasurementDatesetId(), 0, Integer.MAX_VALUE, variables);
 		final Map<Integer, String> samples = this.getExperimentSampleMap(workbook.getStudyDetails().getId());
 		workbook.setObservations(this.buildObservations(experiments, variables.getVariates(), workbook.getFactors(), workbook.getVariates(),
 			workbook.getConditions(), samples));
@@ -124,7 +137,7 @@ public class WorkbookBuilder extends Builder {
 		 */
 
 		// DA
-		final StudyDetails studyDetails = this.getStudyDataManager().getStudyDetails(id);
+		final StudyDetails studyDetails = this.studyDataManager.getStudyDetails(id);
 
 		// DA getDMSProject
 		final Study study = this.getStudyBuilder().createStudy(id);
@@ -137,11 +150,11 @@ public class WorkbookBuilder extends Builder {
 		workbook.setMeasurementDatesetId(dataSetId);
 
 		// Variables required to get Experiments (?)
-		VariableTypeList variables = this.getDataSetBuilder().getVariableTypes(dataSetId);
+		VariableTypeList variables = this.dataSetBuilder.getVariableTypes(dataSetId);
 
 		// FIXME : this heavy id fetch pattern needs changing
-		final DmsProject trialDataSetProject = this.getDataSetBuilder().getTrialDataset(study.getId());
-		final DataSet trialDataSet = this.getDataSetBuilder().build(trialDataSetProject.getProjectId());
+		final DmsProject trialDataSetProject = this.dataSetBuilder.getTrialDataset(study.getId());
+		final DataSet trialDataSet = this.dataSetBuilder.build(trialDataSetProject.getProjectId());
 		workbook.setTrialDatasetId(trialDataSet.getId());
 
 		final VariableList conditionVariables = study.getConditions();
@@ -185,8 +198,7 @@ public class WorkbookBuilder extends Builder {
 			if (varType != null) {
 				stdVariable.setPhenotypicType(varType.getRole());
 
-				// DA geolocation prop access for value
-				final String value = this.getStudyDataManager().getGeolocationPropValue(stdVariableId, id);
+				final String value = projectProperty.getValue();
 
 				if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
 
@@ -270,7 +282,7 @@ public class WorkbookBuilder extends Builder {
 
 	private List<MeasurementRow> getTrialObservations(final Workbook workbook) {
 		final List<MeasurementRow> trialObservations;
-		trialObservations = this.getDataSetBuilder().buildCompleteDataset(workbook.getTrialDatasetId()).getObservations();
+		trialObservations = this.dataSetBuilder.buildCompleteDataset(workbook.getTrialDatasetId()).getObservations();
 		return trialObservations;
 	}
 
@@ -311,15 +323,15 @@ public class WorkbookBuilder extends Builder {
 		final Study study = this.getStudyBuilder().createStudy(id);
 		Integer dataSetId = null, trialDatasetId = null;
 
-		final StudyDetails studyDetails = this.getStudyDataManager().getStudyDetails(id);
+		final StudyDetails studyDetails = this.studyDataManager.getStudyDetails(id);
 		workbook.setStudyDetails(studyDetails);
 
-		final DataSet plotDataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetTypeEnum.PLOT_DATA.getId());
+		final DataSet plotDataset = this.studyDataManager.findOneDataSetByType(id, DatasetTypeEnum.PLOT_DATA.getId());
 		if (plotDataset != null) {
 			dataSetId = plotDataset.getId();
 		}
 
-		final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetTypeEnum.SUMMARY_DATA.getId());
+		final DataSet dataset = this.studyDataManager.findOneDataSetByType(id, DatasetTypeEnum.SUMMARY_DATA.getId());
 		if (dataset != null) {
 			trialDatasetId = dataset.getId();
 		}
@@ -331,9 +343,9 @@ public class WorkbookBuilder extends Builder {
 
 		VariableTypeList variables = null;
 		if (dataSetId != null) {
-			variables = this.getDataSetBuilder().getVariableTypes(dataSetId);
+			variables = this.dataSetBuilder.getVariableTypes(dataSetId);
 			// variable type roles are being set inside getexperiment
-			this.getStudyDataManager().getExperiments(dataSetId, 0, Integer.MAX_VALUE, variables);
+			this.studyDataManager.getExperiments(dataSetId, 0, Integer.MAX_VALUE, variables);
 		}
 
 		final List<MeasurementVariable> factors = this.buildFactors(variables);
@@ -344,7 +356,7 @@ public class WorkbookBuilder extends Builder {
 		if (dataSetId != null) {
 			this.setTreatmentFactorValues(treatmentFactors, dataSetId);
 		}
-		final DmsProject dmsProject = this.getDataSetBuilder().getTrialDataset(id);
+		final DmsProject dmsProject = this.dataSetBuilder.getTrialDataset(id);
 		final List<MeasurementVariable> experimentalDesignVariables = new ArrayList<>();
 		final List<ProjectProperty> projectProperties = dmsProject != null ? dmsProject.getProperties()
 			: new ArrayList<ProjectProperty>();
@@ -375,7 +387,7 @@ public class WorkbookBuilder extends Builder {
 
 					String value = null;
 					if (PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
-						value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
+						value = projectProperty.getValue();
 						if (value == null) {
 							value = StringUtils.EMPTY;
 						}
@@ -558,7 +570,7 @@ public class WorkbookBuilder extends Builder {
 	 * @return
 	 */
 	private Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
-		return this.getStudyDataManager().getExperimentSampleMap(studyDbId);
+		return this.studyDataManager.getExperimentSampleMap(studyDbId);
 	}
 
 	protected void populateMeasurementData(
@@ -842,8 +854,8 @@ public class WorkbookBuilder extends Builder {
 		final int trialDatasetId,
 		final List<MeasurementVariable> factorList, final List<MeasurementVariable> variateList) {
 
-		final int totalRows = (int) this.getStudyDataManager().countExperiments(trialDatasetId);
-		final List<Experiment> experiments = this.getStudyDataManager().getExperiments(trialDatasetId, 0, totalRows);
+		final int totalRows = (int) this.studyDataManager.countExperiments(trialDatasetId);
+		final List<Experiment> experiments = this.studyDataManager.getExperiments(trialDatasetId, 0, totalRows);
 
 		final List<MeasurementRow> rows = new ArrayList<>();
 		if (experiments != null) {
@@ -933,7 +945,7 @@ public class WorkbookBuilder extends Builder {
 
 	public int getMeasurementDataSetId(final int studyId) {
 		// Get dataset reference by dataset type
-		final DatasetReference datasetRef = this.getStudyDataManager().findOneDataSetReferenceByType(
+		final DatasetReference datasetRef = this.studyDataManager.findOneDataSetReferenceByType(
 			studyId,
 			DatasetTypeEnum.PLOT_DATA.getId());
 		if (datasetRef != null) {
@@ -944,7 +956,7 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	public int getTrialDataSetId(final int studyId) {
-		final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
+		final DataSet dataset = this.studyDataManager.findOneDataSetByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		if (dataset != null) {
 			return dataset.getId();
 		} else {

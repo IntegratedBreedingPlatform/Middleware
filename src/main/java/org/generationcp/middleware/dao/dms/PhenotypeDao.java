@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
@@ -40,8 +41,10 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.BooleanType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
@@ -1142,16 +1145,31 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final BigInteger result = (BigInteger) query.uniqueResult();
 		return result.intValue() > 0;
 	}
-	
-	public void updateOutOfSyncPhenotypes(final Integer experimentId, final List<Integer> targetVariableIds) {
-		final String sql = "UPDATE phenotype pheno "
-				+ "SET pheno.status = :status "
-				+ " WHERE pheno.nd_experiment_id = :experimentId " 
-				+ " AND pheno.observable_id in (:variableIds) ";
+
+	public void updateOutOfSyncPhenotypes(final Set<Integer> experimentIds, final Set<Integer> targetVariableIds) {
+		final String sql = "UPDATE nd_experiment experiment\n"
+			+ "LEFT JOIN nd_experiment experimentParent ON experimentParent.nd_experiment_id = experiment.parent_id\n"
+			+ "INNER JOIN phenotype pheno ON  pheno.nd_experiment_id = experimentParent.nd_experiment_id OR pheno.nd_experiment_id = experiment.nd_experiment_id\n"
+			+ "SET pheno.status = :status \n"
+			+ "WHERE experiment.nd_experiment_id in (:experimentIds)  AND pheno.observable_id in (:variableIds) ;";
 
 		final SQLQuery statement = this.getSession().createSQLQuery(sql);
 		statement.setParameter("status", Phenotype.ValueStatus.OUT_OF_SYNC.getName());
-		statement.setParameter("experimentId", experimentId);
+		statement.setParameterList("experimentIds", experimentIds);
+		statement.setParameterList("variableIds", targetVariableIds);
+		statement.executeUpdate();
+	}
+
+	public void updateOutOfSyncPhenotypesByGeolocation(final int geoLocationId, final Set<Integer> targetVariableIds) {
+		final String sql = "UPDATE nd_experiment experiment\n"
+			+ "LEFT JOIN nd_experiment experimentParent ON experimentParent.nd_experiment_id = experiment.parent_id\n"
+			+ "INNER JOIN phenotype pheno ON  pheno.nd_experiment_id = experimentParent.nd_experiment_id OR pheno.nd_experiment_id = experiment.nd_experiment_id\n"
+			+ "SET pheno.status = :status \n"
+			+ "WHERE experiment.nd_geolocation_id = :geoLocationId  AND pheno.observable_id in (:variableIds) ;";
+
+		final SQLQuery statement = this.getSession().createSQLQuery(sql);
+		statement.setParameter("status", Phenotype.ValueStatus.OUT_OF_SYNC.getName());
+		statement.setParameter("geoLocationId", geoLocationId);
 		statement.setParameterList("variableIds", targetVariableIds);
 		statement.executeUpdate();
 	}
@@ -1200,15 +1218,52 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return count;
 	}
 
-	public List<Phenotype> getDatasetDraftData(final Integer datasetId) {
+	public Map<Integer, Long> countOutOfSyncDataOfDatasetsInStudy(final Integer studyId) {
+		final Map<Integer, Long> countOutOfSyncPerProjectMap = new HashMap<>();
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.createAlias("experiment", "experiment");
-		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
-		final Criterion draftValue = Restrictions.isNotNull("draftValue");
-		final Criterion draftCValueId = Restrictions.isNotNull("draftCValueId");
-		criteria.add(Restrictions.or(draftValue, draftCValueId));
-		criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-		return criteria.list();
+		criteria.createAlias("experiment.project", "project");
+		criteria.createAlias("project.study", "study");
+		criteria.add(Restrictions.eq("study.projectId", studyId));
+		criteria.add(Restrictions.eq("valueStatus", ValueStatus.OUT_OF_SYNC));
+		final ProjectionList projectionList = Projections.projectionList();
+		projectionList.add(Projections.groupProperty("project.projectId"))
+			.add(Projections.rowCount());
+		criteria.setProjection(projectionList);
+		final List<Object[]> results = criteria.list();
+		for (final Object[] row : results) {
+			countOutOfSyncPerProjectMap.put((Integer) row[0], (Long) row[1]);
+		}
+		return countOutOfSyncPerProjectMap;
+	}
+
+	public List<Phenotype> getDatasetDraftData(final Integer datasetId) {
+		final List<Map<String, Object>> results = this.getSession().createSQLQuery("select {ph.*}, {e.*}, "
+			+ " (select exists( "
+			+ "     select 1 from formula where target_variable_id = ph.observable_id and active = 1"
+			+ " )) as isDerivedTrait "
+			+ " from phenotype ph"
+			+ " inner join nd_experiment e on ph.nd_experiment_id = e.nd_experiment_id"
+			+ " inner join project p on e.project_id = p.project_id "
+			+ " where p.project_id = :datasetId "
+			+ " and (ph.draft_value is not null or ph.draft_cvalue_id is not null)")
+			.addEntity("ph", Phenotype.class)
+			.addEntity("e", ExperimentModel.class)
+			.addScalar("isDerivedTrait", new BooleanType())
+			.setParameter("datasetId", datasetId)
+			.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+			.list();
+
+		final List<Phenotype> phenotypes = new ArrayList<>();
+
+		for (final Map<String, Object> result : results) {
+			final Phenotype phenotype = (Phenotype) result.get("ph");
+			final ExperimentModel experimentModel = (ExperimentModel) result.get("e");
+			phenotype.setExperiment(experimentModel);
+			phenotype.setDerivedTrait((Boolean) result.get("isDerivedTrait"));
+			phenotypes.add(phenotype);
+		}
+		return phenotypes;
 	}
 
 	public List<Phenotype> getPhenotypes(final Integer datasetId) {
