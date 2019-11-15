@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
+import org.generationcp.middleware.pojos.workbench.CropType;
 
 import java.util.List;
 import java.util.Map;
@@ -545,4 +546,5 @@ public interface InventoryDataManager {
 	 */
 	Map<Integer, String> retrieveStockIds(List<Integer> gids);
 
+	void generateLotIds(final CropType crop, final List<Lot> lots);
 }

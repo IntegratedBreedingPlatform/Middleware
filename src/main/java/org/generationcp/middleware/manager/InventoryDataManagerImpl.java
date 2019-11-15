@@ -12,7 +12,9 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -35,12 +37,14 @@ import org.generationcp.middleware.pojos.ims.ReservedInventoryKey;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
@@ -48,6 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Implementation of the InventoryDataManager interface. Most of the functions in this class only use the connection to the local instance,
@@ -58,6 +63,9 @@ import java.util.Set;
  */
 @Transactional
 public class InventoryDataManagerImpl extends DataManager implements InventoryDataManager {
+
+	public static final String MID_STRING = "L";
+	public static final int SUFFIX_LENGTH = 8;
 
 	@Resource
 	private UserService userService;
@@ -664,4 +672,22 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		return this.daoFactory.getTransactionDAO().retrieveStockIds(gids);
 	}
 
+	@Override
+	public void generateLotIds(final CropType crop, final List<Lot> lots) {
+		Preconditions.checkNotNull(crop);
+		Preconditions.checkState(!CollectionUtils.isEmpty(lots));
+
+		final boolean doUseUUID = crop.isUseUUID();
+		for (final Lot lot : lots) {
+			if (lot.getLotUuId() == null) {
+				if (doUseUUID) {
+					lot.setLotUuId(UUID.randomUUID().toString());
+				} else {
+					final String cropPrefix = crop.getPlotCodePrefix();
+					lot.setLotUuId(cropPrefix + MID_STRING
+						+ RandomStringUtils.randomAlphanumeric(SUFFIX_LENGTH));
+				}
+			}
+		}
+	}
 }

@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
@@ -114,6 +115,9 @@ public class InventoryServiceImplTest {
 	@InjectMocks
 	private final InventoryServiceImpl inventoryServiceImpl = new InventoryServiceImpl();
 
+	@Mock
+	private CropType cropType;
+
 	@Before
 	public void setup() {
 
@@ -131,7 +135,6 @@ public class InventoryServiceImplTest {
 		workbenchUser.setUserid(USER_ID);
 		workbenchUser.setPerson(person);
 		when(this.userService.getUserById(USER_ID)).thenReturn(workbenchUser);
-
 	}
 
 	@Test
@@ -193,7 +196,7 @@ public class InventoryServiceImplTest {
 				.getByEntityTypeEntityIdsLocationIdAndScaleId(Mockito.anyString(), Matchers.anyListOf(Integer.class), Mockito.anyInt(),
 						Mockito.anyInt());
 
-		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject);
+		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject, this.cropType);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -210,7 +213,8 @@ public class InventoryServiceImplTest {
 		final Lot lot = this.createLotTestData(details);
 		Mockito.doReturn(lot)
 				.when(this.lotBuilder)
-				.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId());
+				.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId(),
+					this.cropType);
 		final Lot savedLot = new Lot();
 		savedLot.setId(1);
 		Mockito.doReturn(savedLot).when(this.lotDAO).saveOrUpdate(lot);
@@ -224,7 +228,7 @@ public class InventoryServiceImplTest {
 		savedTransaction.setId(1);
 		Mockito.doReturn(savedTransaction).when(this.transactionDAO).saveOrUpdate(transaction);
 
-		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject);
+		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject, this.cropType);
 
 		try {
 			Mockito.verify(this.lotDAO).saveOrUpdate(lot);
@@ -249,7 +253,8 @@ public class InventoryServiceImplTest {
 		final Lot lot = this.createLotTestData(details);
 		Mockito.doReturn(lot)
 				.when(this.lotBuilder)
-				.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId());
+				.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId(),
+					this.cropType);
 		final Lot savedLot = new Lot();
 		savedLot.setId(1);
 		Mockito.doReturn(savedLot).when(this.lotDAO).saveOrUpdate(lot);
@@ -263,7 +268,7 @@ public class InventoryServiceImplTest {
 		savedTransaction.setId(1);
 		Mockito.doReturn(savedTransaction).when(this.transactionDAO).saveOrUpdate(transaction);
 
-		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject);
+		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject, this.cropType);
 
 		try {
 			Mockito.verify(this.lotDAO).saveOrUpdate(lot);
