@@ -24,6 +24,18 @@ public class StudyInstance {
 
 	}
 
+	public StudyInstance(final int instanceDbId, final int experimentId, final int instanceNumber, final boolean hasFieldmap,
+		final Boolean hasExperimentalDesign,
+		final Boolean hasMeasurements, final Boolean canBeDeleted) {
+		this.instanceDbId = instanceDbId;
+		this.experimentId = experimentId;
+		this.instanceNumber = instanceNumber;
+		this.hasFieldmap = hasFieldmap;
+		this.hasExperimentalDesign = hasExperimentalDesign;
+		this.hasMeasurements = hasMeasurements;
+		this.canBeDeleted = canBeDeleted;
+	}
+
 	public StudyInstance(final int instanceDbId, final Integer experimentId, final Integer locationId, final String locationName,
 		final String locationAbbreviation,
 		final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldMap) {

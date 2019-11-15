@@ -29,14 +29,12 @@ public class GeolocationGenerator {
 	public Geolocation createGeolocation(final List<MeasurementVariable> measurementVariables, final int instanceNumber,
 		final Integer locationId) {
 		final Geolocation geolocation = new Geolocation();
+		geolocation.setDescription(String.valueOf(instanceNumber));
 		geolocation.setProperties(new ArrayList<GeolocationProperty>());
 
 		int rank = 1;
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
-			final int variableId = measurementVariable.getTermId();
-			if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variableId) {
-				geolocation.setDescription(String.valueOf(instanceNumber));
-			} else if (VariableType.ENVIRONMENT_DETAIL == measurementVariable.getVariableType()) {
+			if (VariableType.ENVIRONMENT_DETAIL == measurementVariable.getVariableType()) {
 				String value = "";
 				if (measurementVariable.getTermId() == TermId.LOCATION_ID.getId()) {
 					value = String.valueOf(locationId);
