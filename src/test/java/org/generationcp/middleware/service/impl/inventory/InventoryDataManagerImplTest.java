@@ -15,7 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class LotIDGeneratorTest {
+public class InventoryDataManagerImplTest {
 
 	public static final String UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
 	private static final int CROP_PREFIX_LENGTH = 10;
