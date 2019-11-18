@@ -57,6 +57,7 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -1134,7 +1135,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<StudyInstance> getDatasetInstances(final int datasetId) {
+	public List<StudyInstance> getDatasetInstances(final int datasetId, final List<Integer> instanceIds) {
 
 		try {
 			final String sql = "select \n" + "	geoloc.nd_geolocation_id as instanceDbId, \n"
@@ -1170,12 +1171,19 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "    inner join project proj on proj.project_id = nde.project_id \n"
 				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
-				+ " where proj.project_id = :datasetId \n"
-				+ "    group by geoloc.nd_geolocation_id \n" + "    order by (1 * geoloc.description) asc ";
+				+ " where proj.project_id = :datasetId \n";
+			final StringBuilder sb = new StringBuilder(sql);
+			if (!CollectionUtils.isEmpty(instanceIds)) {
+				sb.append(" AND geoloc.nd_geolocation_id IN (:locationIds) \n");
+			}
+			sb.append("    group by geoloc.nd_geolocation_id \n" );
+			sb.append("    order by (1 * geoloc.description) asc ");
 
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 			query.setParameter("datasetId", datasetId);
-
+			if (!CollectionUtils.isEmpty(instanceIds)) {
+				query.setParameterList("locationIds", instanceIds);
+			}
 			query.addScalar("instanceDbId", new IntegerType());
 			query.addScalar("experimentId", new IntegerType());
 			query.addScalar("locationId", new IntegerType());
