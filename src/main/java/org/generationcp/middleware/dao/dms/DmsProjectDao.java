@@ -1135,6 +1135,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
+	public List<StudyInstance> getDatasetInstances(final int datasetId) {
+		return this.getDatasetInstances(datasetId, Collections.<Integer>emptyList());
+	}
+
 	public List<StudyInstance> getDatasetInstances(final int datasetId, final List<Integer> instanceIds) {
 
 		try {
