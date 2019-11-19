@@ -13,7 +13,7 @@ public class RPackage {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id_package", nullable = false)
+	@Column(name = "package_id", nullable = false)
 	private Integer id;
 
 	@Column(name = "description")

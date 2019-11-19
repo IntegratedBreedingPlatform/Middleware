@@ -21,19 +21,19 @@ public class RCall {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id_call", nullable = false)
+	@Column(name = "call_id", nullable = false)
 	private Integer id;
 
 	@Column(name = "description")
 	private String description;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_package")
+	@JoinColumn(name = "package_id")
 	private RPackage rPackage;
 
 	@Fetch(FetchMode.SUBSELECT)
 	@OneToMany(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_call")
+	@JoinColumn(name = "call_id")
 	private List<RCallParameter> rCallParameters;
 
 	public Integer getId() {

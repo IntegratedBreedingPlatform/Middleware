@@ -13,15 +13,17 @@ public class RCallParameter {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id_call_parameter", nullable = false)
+	@Column(name = "call_parameter_id", nullable = false)
 	private Integer id;
 
-	@Column(name = "key")
+	@Column(name = "parameter_key")
 	private String key;
 
 	@Column(name = "value")
 	private String value;
 
+	@Column(name = "call_id")
+	private Integer callId;
 
 	public RCallParameter() {
 
@@ -55,6 +57,14 @@ public class RCallParameter {
 
 	public void setValue(final String value) {
 		this.value = value;
+	}
+
+	public Integer getCallId() {
+		return this.callId;
+	}
+
+	public void setCallId(final Integer callId) {
+		this.callId = callId;
 	}
 
 }

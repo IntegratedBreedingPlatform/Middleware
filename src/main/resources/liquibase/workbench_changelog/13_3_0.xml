@@ -15,10 +15,10 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `r_package` (
-			  `id_package` int(11) NOT NULL AUTO_INCREMENT,
+			  `package_id` int(11) NOT NULL AUTO_INCREMENT,
 			  `description` varchar(255) DEFAULT NULL,
 			  `endpoint` varchar(500) DEFAULT NULL,
-			  PRIMARY KEY (`id_package`)
+			  PRIMARY KEY (`package_id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 			INSERT INTO `r_package` VALUES
@@ -38,12 +38,12 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `r_call` (
-			  `id_call` int(11) NOT NULL AUTO_INCREMENT,
+			  `call_id` int(11) NOT NULL AUTO_INCREMENT,
 			  `description` varchar(255) DEFAULT NULL,
-			  `id_package` int(11) DEFAULT NULL,
-			  PRIMARY KEY (`id_call`),
-			  KEY `FK_id_package_idx` (`id_package`),
-			  CONSTRAINT `FK_id_package` FOREIGN KEY (`id_package`) REFERENCES `r_package` (`id_package`) ON DELETE NO ACTION ON UPDATE NO ACTION
+			  `package_id` int(11) DEFAULT NULL,
+			  PRIMARY KEY (`call_id`),
+			  KEY `FK_package_id_idx` (`package_id`),
+			  CONSTRAINT `FK_package_id` FOREIGN KEY (`package_id`) REFERENCES `r_package` (`package_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 			INSERT INTO `r_call` VALUES
@@ -64,13 +64,13 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `r_call_parameter` (
-			  `id_call_parameter` int(11) NOT NULL AUTO_INCREMENT,
-			  `key` varchar(45) DEFAULT NULL,
+			  `call_parameter_id` int(11) NOT NULL AUTO_INCREMENT,
+			  `parameter_key` varchar(45) DEFAULT NULL,
 			  `value` varchar(500) DEFAULT NULL,
-			  `id_call` int(11) DEFAULT NULL,
-			  PRIMARY KEY (`id_call_parameter`),
-			  KEY `FK_rcall_idx` (`id_call`),
-			  CONSTRAINT `FK_rcall` FOREIGN KEY (`id_call`) REFERENCES `r_call` (`id_call`) ON DELETE NO ACTION ON UPDATE NO ACTION
+			  `call_id` int(11) DEFAULT NULL,
+			  PRIMARY KEY (`call_parameter_id`),
+			  KEY `FK_rcall_idx` (`call_id`),
+			  CONSTRAINT `FK_rcall` FOREIGN KEY (`call_id`) REFERENCES `r_call` (`call_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 			INSERT INTO `r_call_parameter` VALUES
