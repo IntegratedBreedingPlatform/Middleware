@@ -14,7 +14,6 @@ import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.RCall;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -87,9 +86,8 @@ public interface WorkbenchDataManager {
 	/**
 	 * Gets the list of Projects that the specified User is associated with.
 	 *
-	 * @param user - the User associated with the projects to be retrieved
+	 * @param user     - the User associated with the projects to be retrieved
 	 * @param cropName - the Crop Name associated with the projects to be retrieved
-
 	 * @return the projects which the specified user is involved
 	 */
 	List<Project> getProjectsByUser(final WorkbenchUser user, final String cropName);
@@ -98,7 +96,6 @@ public interface WorkbenchDataManager {
 	 * Gets the list of Projects that the specified User is associated with.
 	 *
 	 * @param cropName - the Crop Name associated with the projects to be retrieved
-
 	 * @return the projects which the specified user is involved
 	 */
 	List<Project> getProjectsByCropName(final String cropName);
@@ -350,6 +347,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Get standard preset
+	 *
 	 * @param presetId
 	 * @return StandardPreset
 	 */
@@ -359,6 +357,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Get role type
+	 *
 	 * @param id
 	 * @return ROle Type
 	 */
@@ -366,6 +365,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Get sidebar links by category
+	 *
 	 * @param workbenchSidebarCategoryLink
 	 * @return
 	 */
@@ -373,12 +373,14 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Save or update role
+	 *
 	 * @param userRole
 	 */
 	void saveOrUpdateUserRole(UserRole userRole);
 
 	/**
 	 * Save role
+	 *
 	 * @param role
 	 * @return Role
 	 */
@@ -386,6 +388,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Get role by name
+	 *
 	 * @param name
 	 * @return Role
 	 */
@@ -393,13 +396,13 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Get role by id
+	 *
 	 * @param id
 	 * @return Role
 	 */
 	Role getRoleById(Integer id);
 
 	/**
-	 *
 	 * @param workbenchUserId
 	 * @return Crops for which user has permissions to add a program
 	 */
