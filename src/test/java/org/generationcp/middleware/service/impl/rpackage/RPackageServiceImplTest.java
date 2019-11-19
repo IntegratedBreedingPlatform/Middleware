@@ -3,6 +3,8 @@ package org.generationcp.middleware.service.impl.rpackage;
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.domain.rpackage.RCallDTO;
+import org.generationcp.middleware.domain.rpackage.RPackageDTO;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.RCall;
 import org.generationcp.middleware.pojos.workbench.RCallParameter;
@@ -12,7 +14,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RPackageServiceImplTest extends IntegrationTestBase {
@@ -28,14 +30,6 @@ public class RPackageServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllRCalls() {
-
-		final List<RCall> rCalls = this.rPackageService.getAllRCalls();
-		Assert.assertFalse(rCalls.isEmpty());
-
-	}
-
-	@Test
 	public void testGetRCallsByPackageId() {
 
 		final RPackage rPackage = new RPackage();
@@ -46,15 +40,19 @@ public class RPackageServiceImplTest extends IntegrationTestBase {
 		final RCall rCall = new RCall();
 		rCall.setrPackage(rPackage);
 		rCall.setDescription(RandomStringUtils.randomAlphanumeric(BOUND));
-		rCall.setrCallParameters(new ArrayList<RCallParameter>());
+		final RCallParameter rCallParameter = new RCallParameter();
+		rCallParameter.setKey(RandomStringUtils.randomAlphanumeric(BOUND));
+		rCallParameter.setValue(RandomStringUtils.randomAlphanumeric(BOUND));
+		rCall.setrCallParameters(Arrays.asList(rCallParameter));
 		this.workbenchDaoFactory.getRCallDao().save(rCall);
 
-		final List<RCall> rCalls = this.rPackageService.getRCallsByPackageId(rPackage.getId());
+		final List<RCallDTO> rCalls = this.rPackageService.getRCallsByPackageId(rPackage.getId());
 
 		Assert.assertEquals(1, rCalls.size());
-		final RCall savedRCall = rCalls.get(0);
+		final RCallDTO savedRCall = rCalls.get(0);
+		Assert.assertEquals(rCall.getrPackage().getEndpoint(), savedRCall.getEndpoint());
 		Assert.assertEquals(rCall.getDescription(), savedRCall.getDescription());
-		Assert.assertEquals(rCall.getrPackage(), savedRCall.getrPackage());
+		Assert.assertEquals(rCallParameter.getValue(), savedRCall.getParameters().get(rCallParameter.getKey()));
 
 	}
 
@@ -66,9 +64,11 @@ public class RPackageServiceImplTest extends IntegrationTestBase {
 		rPackage.setDescription(RandomStringUtils.randomAlphanumeric(BOUND));
 		this.workbenchDaoFactory.getRPackageDao().save(rPackage);
 
-		final Optional<RPackage> result = this.rPackageService.getRPackageById(rPackage.getId());
+		final Optional<RPackageDTO> result = this.rPackageService.getRPackageById(rPackage.getId());
 
 		Assert.assertTrue(result.isPresent());
+		Assert.assertEquals(rPackage.getDescription(), result.get().getDescription());
+		Assert.assertEquals(rPackage.getEndpoint(), result.get().getEndpoint());
 
 	}
 
