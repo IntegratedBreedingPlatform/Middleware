@@ -63,7 +63,6 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	public ExperimentDesignServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.experimentGenerator = new ExperimentModelGenerator(sessionProvider);
-		this.studyService = new StudyServiceImpl(sessionProvider);
 	}
 
 	@Override
