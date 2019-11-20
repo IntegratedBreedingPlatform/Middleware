@@ -13,6 +13,7 @@ public class PhenotypeQuery {
 		+ "  NULL AS plantNumber, " // Until we have plant level observation
 		+ "  s.dbxref_id AS germplasmDbId, " //
 		+ "  s.name AS germplasmName, " //
+		+ "  gl.description AS instanceNumber, " //
 		+ "  gl.nd_geolocation_id AS studyDbId, " //
 		+ "  p.name AS studyName, " //
 		+ "  wp.project_name AS programName, " //

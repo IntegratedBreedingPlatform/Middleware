@@ -24,7 +24,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
-import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -63,7 +62,6 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	public ExperimentDesignServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.experimentGenerator = new ExperimentModelGenerator(sessionProvider);
-		this.studyService = new StudyServiceImpl(sessionProvider);
 	}
 
 	@Override
@@ -234,4 +232,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		this.daoFactory.getExperimentDao().deleteExperimentsForDataset(plotDatasetId);
 	}
 
+	void setStudyService(final StudyService studyService) {
+		this.studyService = studyService;
+	}
 }
