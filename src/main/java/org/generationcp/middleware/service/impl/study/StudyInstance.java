@@ -9,18 +9,35 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class StudyInstance {
 
 	private int instanceDbId;
+	private int experimentId;
 	private Integer locationId;
 	private String locationName;
 	private String locationAbbreviation;
 	private String customLocationAbbreviation;
 	private int instanceNumber;
 	private boolean hasFieldmap;
+	private Boolean hasExperimentalDesign;
+	private Boolean hasMeasurements;
+	private Boolean canBeDeleted;
 
 	public StudyInstance() {
 
 	}
 
-	public StudyInstance(final int instanceDbId, final Integer locationId, final String locationName, final String locationAbbreviation,
+	public StudyInstance(final int instanceDbId, final int experimentId, final int instanceNumber, final boolean hasFieldmap,
+		final Boolean hasExperimentalDesign,
+		final Boolean hasMeasurements, final Boolean canBeDeleted) {
+		this.instanceDbId = instanceDbId;
+		this.experimentId = experimentId;
+		this.instanceNumber = instanceNumber;
+		this.hasFieldmap = hasFieldmap;
+		this.hasExperimentalDesign = hasExperimentalDesign;
+		this.hasMeasurements = hasMeasurements;
+		this.canBeDeleted = canBeDeleted;
+	}
+
+	public StudyInstance(final int instanceDbId, final Integer experimentId, final Integer locationId, final String locationName,
+		final String locationAbbreviation,
 		final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldMap) {
 		this.instanceDbId = instanceDbId;
 		this.locationId = locationId;
@@ -29,6 +46,7 @@ public class StudyInstance {
 		this.instanceNumber = instanceNumber;
 		this.customLocationAbbreviation = customLocationAbbreviation;
 		this.hasFieldmap = hasFieldMap;
+		this.experimentId = experimentId;
 	}
 
 	public int getInstanceDbId() {
@@ -72,7 +90,7 @@ public class StudyInstance {
 	}
 
 	public String getCustomLocationAbbreviation() {
-		return customLocationAbbreviation;
+		return this.customLocationAbbreviation;
 	}
 
 	public void setCustomLocationAbbreviation(final String customLocationAbbreviation) {
@@ -80,11 +98,44 @@ public class StudyInstance {
 	}
 
 	public boolean isHasFieldmap() {
-		return hasFieldmap;
+		return this.hasFieldmap;
 	}
 
-	public void setHasFieldmap(boolean hasFieldmap) {
+	public void setHasFieldmap(final boolean hasFieldmap) {
 		this.hasFieldmap = hasFieldmap;
+	}
+
+	public Boolean isHasExperimentalDesign() {
+		return this.hasExperimentalDesign;
+	}
+
+	public void setHasExperimentalDesign(final Boolean hasExperimentalDesign) {
+		this.hasExperimentalDesign = hasExperimentalDesign;
+	}
+
+	public Boolean isHasMeasurements() {
+		return this.hasMeasurements;
+	}
+
+	public void setHasMeasurements(final Boolean hasMeasurements) {
+		this.hasMeasurements = hasMeasurements;
+	}
+
+	public Boolean getCanBeDeleted() {
+		return canBeDeleted;
+	}
+
+	public void setCanBeDeleted(final Boolean canBeDeleted) {
+		this.canBeDeleted = canBeDeleted;
+	}
+
+	public int getExperimentId() {
+		return this.experimentId;
+	}
+
+	public void setExperimentId(final int experimentId) {
+		this.experimentId = experimentId;
+
 	}
 
 	@Override

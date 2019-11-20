@@ -11,9 +11,11 @@ public interface StudyService {
 
 	List<StudySummary> search(final StudySearchParameters serchParameters);
 
-	public boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId);
+	boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId);
 
-	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
+	boolean hasAdvancedOrCrossesList(final int studyId);
+
+	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
 
 	List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize,
 			final String sortBy, final String sortOrder);
@@ -25,8 +27,6 @@ public interface StudyService {
 	List<StudyGermplasmDto> getStudyGermplasmList(Integer studyIdentifer);
 
 	String getProgramUUID(Integer studyIdentifier);
-
-	List<StudyInstance> getStudyInstances(int studyId);
 
 	TrialObservationTable getTrialObservationTable(int studyIdentifier);
 
@@ -73,4 +73,8 @@ public interface StudyService {
 	List<String> getGenericGermplasmDescriptors(final int studyIdentifier);
 
 	List<String> getAdditionalDesignFactors(final int studyIdentifier);
+
+	Integer getPlotDatasetId(final int studyId);
+
+	Integer getEnvironmentDatasetId(final int studyId);
 }

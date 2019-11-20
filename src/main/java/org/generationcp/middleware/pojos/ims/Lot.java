@@ -85,6 +85,9 @@ public class Lot implements Serializable {
 	@Column(name = "stock_id")
 	private String stockId;
 
+	@Column(name = "lot_uuid")
+	private String lotUuId;
+
 	@OneToMany(mappedBy = "lot")
 	private Set<Transaction> transactions = new HashSet<Transaction>();
 
@@ -113,23 +116,6 @@ public class Lot implements Serializable {
 		this.status = status;
 		this.sourceId = sourceId;
 		this.comments = comments;
-		this.createdDate = new Date();
-	}
-
-	public Lot(
-		final Integer id, final Integer userId, final String entityType, final Integer entityId, final Integer locationId, final Integer scaleId, final Integer status,
-			final Integer sourceId, final String comments, final Set<Transaction> transactions) {
-		super();
-		this.id = id;
-		this.userId = userId;
-		this.entityType = entityType;
-		this.entityId = entityId;
-		this.locationId = locationId;
-		this.scaleId = scaleId;
-		this.status = status;
-		this.sourceId = sourceId;
-		this.comments = comments;
-		this.transactions = transactions;
 		this.createdDate = new Date();
 	}
 
@@ -235,6 +221,14 @@ public class Lot implements Serializable {
 
 	public void setStockId(final String stockId) {
 		this.stockId = stockId;
+	}
+
+	public String getLotUuId() {
+		return this.lotUuId;
+	}
+
+	public void setLotUuId(final String lotUuId) {
+		this.lotUuId = lotUuId;
 	}
 
 	@Override

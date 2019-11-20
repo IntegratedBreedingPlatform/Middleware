@@ -25,4 +25,117 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="vanina" id="v13.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="ims_lot" columnName="lot_uuid"/>
+			</not>
+		</preConditions>
+		<comment>
+			Add column lot_uuid to ims_lot table
+		</comment>
+		<addColumn tableName="ims_lot">
+			<column name="lot_uuid" type="VARCHAR(36)">
+				<constraints nullable="true" unique="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="vanina" id="v13.3.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'upgrade_lot_id';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE upgrade_lot_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v13.3.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'upgrade_lot_id';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			CREATE PROCEDURE upgrade_lot_id()
+			BEGIN
+
+			DECLARE useUuid INT DEFAULT 1;
+
+			SELECT use_uuid
+			INTO useUuid
+			FROM workbench.workbench_crop
+			WHERE db_name = DATABASE();
+
+			IF useUuid = 0
+			THEN
+
+			UPDATE ims_lot il
+			SET lot_uuid = CONCAT((SELECT plot_code_prefix
+			FROM workbench.workbench_crop wc
+			WHERE db_name = DATABASE()),
+			'L',
+			left(sha1(CONCAT(uuid(), il.lotid)), 8))
+			WHERE il.lot_uuid IS NULL;
+
+			ELSE
+
+			UPDATE ims_lot il
+			SET lot_uuid = uuid()
+			WHERE il.lot_uuid IS NULL;
+
+			END IF;
+
+			END;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v13.3.0-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'upgrade_lot_id';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			call upgrade_lot_id();
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v13.3.0-6">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'upgrade_lot_id';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE upgrade_lot_id;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
