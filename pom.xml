@@ -12,7 +12,7 @@
 		<itext.version>2.1.7</itext.version>
 		<reflections.version>0.9.9</reflections.version>
 		<atomikos.version>3.9.3</atomikos.version>
-		<spring.version>3.2.11.RELEASE</spring.version>
+		<spring.version>5.2.1.RELEASE</spring.version>
 		<envConfig>${user.name}</envConfig>
 	</properties>
 
