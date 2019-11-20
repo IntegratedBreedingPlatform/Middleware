@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.workbench.CropType;
 
 import java.util.List;
 
@@ -48,7 +49,9 @@ public interface InventoryService {
 	 */
 	Integer getCurrentNotationNumberForBreederIdentifier(String breederIdentifier);
 
-	void addLotAndTransaction(InventoryDetails details, GermplasmListData listData, ListDataProject listDataProject);
+	void addLotAndTransaction(
+		InventoryDetails details, GermplasmListData listData, ListDataProject listDataProject,
+		final CropType cropType);
 
 	List<InventoryDetails> getInventoryListByListDataProjectListId(Integer listDataProjectListId);
 

@@ -9,11 +9,13 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +37,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.studyService = new StudyServiceImpl(this.sessionProvder);
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
+
 		this.plot = this.testDataInitializer
 			.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
 		this.testTrait = this.testDataInitializer.createTrait("SomeTrait");
@@ -77,42 +80,20 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyInstances() {
-
-		final DmsProject someStudy =
-			this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
-		final DmsProject someSummary =
+	public void testGetStudyDetailsForGeolocation() {
+		final DmsProject environmentDataset =
 			this.testDataInitializer
-				.createDmsProject("Summary Dataset", "Summary Dataset-Description", someStudy, someStudy, DatasetTypeEnum.SUMMARY_DATA);
+				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
 
-		final Geolocation instance1 = this.testDataInitializer.createTestGeolocation("1", 1);
-		final Geolocation instance2 = this.testDataInitializer.createTestGeolocation("2", 2);
-
-		this.testDataInitializer.createTestExperiment(someSummary, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
-		this.testDataInitializer.createTestExperiment(someSummary, instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
-
-		final List<StudyInstance> studyInstances = this.studyService.getStudyInstances(someStudy.getProjectId());
-
-		Assert.assertEquals(2, studyInstances.size());
-
-		final StudyInstance studyInstance1 = studyInstances.get(0);
-
-		Assert.assertEquals(instance1.getLocationId().intValue(), studyInstance1.getInstanceDbId());
-		Assert.assertEquals(1, studyInstance1.getInstanceNumber());
-		Assert.assertNull(studyInstance1.getCustomLocationAbbreviation());
-		Assert.assertEquals("AFG", studyInstance1.getLocationAbbreviation());
-		Assert.assertEquals("Afghanistan", studyInstance1.getLocationName());
-		Assert.assertFalse(studyInstance1.isHasFieldmap());
-
-		final StudyInstance studyInstance2 = studyInstances.get(1);
-
-		Assert.assertEquals(instance2.getLocationId().intValue(), studyInstance2.getInstanceDbId());
-		Assert.assertEquals(2, studyInstance2.getInstanceNumber());
-		Assert.assertNull(studyInstance2.getCustomLocationAbbreviation());
-		Assert.assertEquals("ALB", studyInstance2.getLocationAbbreviation());
-		Assert.assertEquals("Albania", studyInstance2.getLocationName());
-		Assert.assertFalse(studyInstance2.isHasFieldmap());
-
+		final int locationId = 101;
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
+		this.testDataInitializer.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
+		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
+		Assert.assertTrue(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
+		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
+		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
+		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
+		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
 	}
 
 }

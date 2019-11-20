@@ -375,7 +375,7 @@ public class ProjectPropertySaver {
 				this.saver.getGeolocationSaver().setGeolocation(geolocation, termId, null);
 				this.saver.getGeolocationDao().saveOrUpdate(geolocation);
 			} else {
-				this.saver.getGeolocationPropertyDao().deleteGeolocationPropertiesInProject(project.getProjectId(), Collections.singletonList(termId));
+				this.saver.getGeolocationPropertyDao().deletePropertiesInDataset(project.getProjectId(), Collections.singletonList(termId));
 			}
 
 		} else if (PhenotypicType.VARIATE == role) {

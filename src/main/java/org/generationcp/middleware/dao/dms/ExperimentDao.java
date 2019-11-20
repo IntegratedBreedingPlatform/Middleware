@@ -14,7 +14,9 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.fest.util.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -22,9 +24,9 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -41,10 +43,12 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -142,6 +146,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return null;
+	}
+
+	public ExperimentModel getExperimentByProjectIdAndGeoLocationAndType(final Integer projectId, final Integer geolocationId, final Integer typeId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("project.projectId", projectId));
+		criteria.add(Restrictions.eq("geoLocation.locationId", geolocationId));
+		criteria.add(Restrictions.eq("typeId", typeId));
+		return (ExperimentModel) criteria.uniqueResult();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -248,35 +260,58 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	public void deleteExperimentsForDataset(final int datasetId) {
+		this.deleteExperimentsForDatasetInstances(datasetId, Collections.<Integer>emptyList());
 
-		try {
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
-			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-			// statement
-			this.getSession().flush();
+	}
 
-			// Delete phenotypes first because the foreign key with nd_experiment
-			Query statement =
-				this.getSession()
-					.createSQLQuery("DELETE pheno FROM nd_experiment e"
-						+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
-						+ "  WHERE e.project_id = :datasetId ");
-			statement.setParameter("datasetId", datasetId);
-			statement.executeUpdate();
+	public void deleteExperimentsForDatasets(final List<Integer> datasetIds, final List<Integer> instanceNumbers) {
 
-			// Delete experiments
-			statement =
-				this.getSession()
-					.createSQLQuery("DELETE e, eprop " + "FROM nd_experiment e "
-						+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
-						+ "WHERE e.project_id = :datasetId ");
-			statement.setParameter("datasetId", datasetId);
-			statement.executeUpdate();
-		} catch (final HibernateException e) {
-			final String message = "Error at deleteExperimentsForDataset=" + datasetId + " query at ExperimentDao: " + e.getMessage();
-			ExperimentDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
+
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+		// statement
+		this.getSession().flush();
+
+		// Delete phenotypes first because the foreign key with nd_experiment
+		String queryString = "DELETE pheno FROM nd_experiment e"
+			+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
+			+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
+			+ "  WHERE e.project_id IN (:datasetIds) ";
+		StringBuilder sb = new StringBuilder(queryString);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			sb.append(" AND g.description IN (:instanceNumbers)");
 		}
+		Query statement =
+			this.getSession()
+				.createSQLQuery(sb.toString());
+		statement.setParameterList("datasetIds", datasetIds);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			statement.setParameterList("instanceNumbers", instanceNumbers);
+		}
+		statement.executeUpdate();
+
+
+		// Delete experiments
+		queryString = "DELETE e, eprop " + "FROM nd_experiment e "
+			+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
+			+ "  LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
+			+ "  WHERE e.project_id IN (:datasetIds) ";
+		sb = new StringBuilder(queryString);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			sb.append(" AND g.description IN (:instanceNumbers)");
+		}
+		statement =
+			this.getSession()
+				.createSQLQuery(sb.toString());
+		statement.setParameterList("datasetIds", datasetIds);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			statement.setParameterList("instanceNumbers", instanceNumbers);
+		}
+		statement.executeUpdate();
+	}
+
+	public void deleteExperimentsForDatasetInstances(final int datasetId, final List<Integer> instanceNumbers) {
+		this.deleteExperimentsForDatasets(Collections.singletonList(datasetId), instanceNumbers);
 	}
 
 	public void deleteTrialExperimentsOfStudy(final int datasetId) {
@@ -433,7 +468,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	public long count(final int dataSetId) {
 		try {
-			return (Long) this.getSession().createQuery("select count(*) from ExperimentModel where project_id = " + dataSetId)
+			return (Long) this.getSession().createQuery("select count(*) from 	ExperimentModel where project_id = " + dataSetId)
 				.uniqueResult();
 		} catch (final HibernateException e) {
 			final String message = "Error at countExperiments=" + dataSetId;
@@ -935,6 +970,34 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		return map;
+	}
+
+	// Update study experiment if the Geolocation ID to be the one is the one used by the study experiment
+	public void updateStudyExperimentGeolocationIfNecessary(final Integer studyId, final Integer geolocationId) {
+		final ExperimentModel studyExperiment = this.getExperimentByProjectIdAndGeoLocationAndType(studyId, geolocationId,
+			ExperimentType.STUDY_INFORMATION.getTermId());
+
+		if (studyExperiment != null) {
+			// Query the next available Geolocation ID from environments that will remain
+			final String queryString = "select min(if (e.nd_geolocation_id != :geolocationId, nd_geolocation_id, null))\n"
+				+ "from nd_experiment e "
+				+ "inner join project p on e.project_id = p.project_id "
+				+ "WHERE p.study_id = :studyId or p.project_id = :studyId";
+			final StringBuilder sb = new StringBuilder(queryString);
+			final SQLQuery statement = this.getSession().createSQLQuery(sb.toString());
+			statement.setParameter("studyId", studyId);
+			statement.setParameter("geolocationId", geolocationId);
+			final BigInteger nextGeolocationId = (BigInteger) statement.uniqueResult();
+
+			if (nextGeolocationId != null) {
+				studyExperiment.setGeoLocation(new Geolocation(nextGeolocationId.intValue()));
+				this.update(studyExperiment);
+			} else {
+				throw new MiddlewareQueryException("Cannot update GeolocationID=" + geolocationId + " for Study=" + studyId
+					+ " as no other environments will remain for the study.");
+			}
+
+		}
 	}
 
 }

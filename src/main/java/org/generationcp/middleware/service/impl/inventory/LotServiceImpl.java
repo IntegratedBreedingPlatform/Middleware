@@ -1,7 +1,7 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory_new.LotDto;
+import org.generationcp.middleware.domain.inventory_new.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -40,29 +40,37 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public Integer saveLot(final LotDto lotDto) {
+	public Integer saveLot(final LotGeneratorInputDto lotDto) {
+		String stockId = lotDto.getStockId();
+		if (lotDto.getGenerateStock()) {
+			//Code to generate stockId
+		}
 		final Lot lot = new Lot();
-		lot.setUserId(1);
+		lot.setUserId(lotDto.getUserId());
 		lot.setComments(lotDto.getComments());
 		lot.setCreatedDate(new Date());
 		lot.setEntityId(lotDto.getGid());
 		lot.setEntityType("GERMPLSM");
 		lot.setLocationId(lotDto.getLocationId());
-		lot.setStockId(lotDto.getStockId());
+		lot.setStockId(stockId);
 		lot.setStatus(0);
 		lot.setSource(0);
 		lot.setScaleId(lotDto.getScaleId());
 
-		if (lotDto.getTransactions().size() == 1) {
-			Transaction transaction = new Transaction();
-			transaction.setStatus(TransactionStatus.COMMITTED.getIntValue());
-			transaction.setLot(lot);
-			transaction.setPersonId(1);
-			transaction.setTransactionDate(new Date());
-			transaction.setQuantity(lotDto.getTransactions().get(0).getAmount());
-			lot.getTransactions().add(transaction);
-		}
+		this.daoFactory.getLotDao().save(lot);
 
-		return this.daoFactory.getLotDao().save(lot).getId();
+		Transaction transaction = new Transaction();
+		transaction.setStatus(TransactionStatus.COMMITTED.getIntValue());
+		transaction.setLot(lot);
+		transaction.setPersonId(lotDto.getUserId());
+		transaction.setUserId(lotDto.getUserId());
+		transaction.setTransactionDate(new Date());
+		transaction.setQuantity(lotDto.getInitialBalanceAmount());
+		transaction.setPreviousAmount(0D);
+		transaction.setCommitmentDate(0);
+
+		this.daoFactory.getTransactionDAO().save(transaction);
+
+		return lot.getId();
 	}
 }

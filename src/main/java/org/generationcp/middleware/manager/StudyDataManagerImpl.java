@@ -80,6 +80,7 @@ import org.generationcp.middleware.util.PlotUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
@@ -1317,13 +1318,19 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) {
 		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToStudy(studyId);
-		return this.userService.getUsersByPersonIds(personIds);
+		if (!CollectionUtils.isEmpty(personIds)){
+			return this.userService.getUsersByPersonIds(personIds);
+		}
+		return Collections.emptyList();
 	}
 
 	@Override
 	public List<UserDto> getUsersForEnvironment(final Integer instanceId) {
 		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToEnvironment(instanceId);
-		return this.userService.getUsersByPersonIds(personIds);
+		if (!CollectionUtils.isEmpty(personIds)){
+			return this.userService.getUsersByPersonIds(personIds);
+		}
+		return Collections.emptyList();
 	}
 
 	void setDataSetBuilder(final DataSetBuilder dataSetBuilder) {
