@@ -42,9 +42,7 @@ public class LotServiceImpl implements LotService {
 	@Override
 	public Integer saveLot(final LotGeneratorInputDto lotDto) {
 		String stockId = lotDto.getStockId();
-		if (lotDto.getGenerateStock()) {
-			//Code to generate stockId
-		}
+
 		final Lot lot = new Lot();
 		lot.setUserId(lotDto.getUserId());
 		lot.setComments(lotDto.getComments());
