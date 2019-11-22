@@ -13,12 +13,10 @@ public class LotGeneratorInputDto extends LotDto {
 
 	private String stockPrefix;
 
-	private Double initialBalanceAmount;
-
 	private Integer userId;
 
 	public Boolean getGenerateStock() {
-		return generateStock;
+		return this.generateStock;
 	}
 
 	public void setGenerateStock(final Boolean generateStock) {
@@ -26,23 +24,15 @@ public class LotGeneratorInputDto extends LotDto {
 	}
 
 	public String getStockPrefix() {
-		return stockPrefix;
+		return this.stockPrefix;
 	}
 
 	public void setStockPrefix(final String stockPrefix) {
 		this.stockPrefix = stockPrefix;
 	}
 
-	public Double getInitialBalanceAmount() {
-		return initialBalanceAmount;
-	}
-
-	public void setInitialBalanceAmount(final Double initialBalanceAmount) {
-		this.initialBalanceAmount = initialBalanceAmount;
-	}
-
 	public Integer getUserId() {
-		return userId;
+		return this.userId;
 	}
 
 	public void setUserId(final Integer userId) {
@@ -60,7 +50,7 @@ public class LotGeneratorInputDto extends LotDto {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
 
