@@ -484,4 +484,14 @@ public interface LocationDataManager {
 	 * @return
 	 */
 	long countByLocationAbbreviation(final String locationAbbreviation);
+
+
+	/**
+	 * Gets the favorite project location ids.
+	 *
+	 * @param programUUID
+	 *            - unique id of program
+	 * @return the favorite project location ids
+	 */
+	List<Integer> getFavoriteProjectLocationIds(final String programUUID);
 }
