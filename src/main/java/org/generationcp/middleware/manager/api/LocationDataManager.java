@@ -23,6 +23,7 @@ import org.generationcp.middleware.service.api.location.LocationFilters;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This is the API for managing Location information.
@@ -208,6 +209,28 @@ public interface LocationDataManager {
 	 * @return List of Location POJOs
 	 */
 	List<Location> getLocationsByType(Integer type);
+
+	/**
+	 * Returns the Location records with type matching the given parameter. The
+	 * data is retrieved from both local and central databases.
+	 *
+	 * @param types - search set for the types of locations
+	 * @param programUUID - unique id of the current program.
+	 *
+  	 * @return List of Location POJOs
+	 */
+	List<Location> getLocationsByTypes(final Set<Integer> types, final String programUUID);
+
+	/**
+	 * Returns the Location records with type matching the given parameter. The
+	 * data is retrieved from both local and central databases.
+	 *
+	 * @param types - search set for the types of locations
+	 * @param locIds - List of favorite LocIds of the current program
+	 *
+	 * @return List of Location POJOs
+	 */
+	List<Location> getFavoriteLocationsByTypes(final Set<Integer> types, final List<Integer> locIds);
 
 	/**
 	 * Returns the Location records with type matching the given parameter. The

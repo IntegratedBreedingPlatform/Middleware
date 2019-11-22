@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Location}.
@@ -279,6 +280,46 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 							LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 		return new ArrayList<>();
+	}
+
+	public List<Location> getByTypes(final Set<Integer> types, final String programUUID) {
+		final List<Location> locations;
+		try {
+
+			final Criteria criteria = this.getSession().createCriteria(Location.class);
+			if (types != null && !types.isEmpty()) {
+				criteria.add(Restrictions.in(LocationDAO.LTYPE, types));
+			}
+			criteria.add(
+				Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID), Restrictions.isNull(LocationDAO.UNIQUE_ID)));
+			criteria.addOrder(Order.asc(LocationDAO.LNAME));
+			locations = criteria.list();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage(LocationDAO.GET_BY_TYPE, "types", String.valueOf(types), e.getMessage(),
+					LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+		return locations;
+	}
+
+	public List<Location> getFavoriteLocationsByTypes(final Set<Integer> types, final List<Integer> locIds) {
+		final List<Location> locations;
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Location.class);
+			if(types != null && !types.isEmpty()) {
+				criteria.add(Restrictions.in(LocationDAO.LTYPE, types));
+			}
+			criteria.add(Restrictions.in(LocationDAO.LOCID, locIds));
+			criteria.addOrder(Order.asc(LocationDAO.LNAME));
+			locations = criteria.list();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage(LocationDAO.GET_BY_TYPE, "types", String.valueOf(types), e.getMessage(),
+					LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+		return locations;
 	}
 
 	public List<Location> getByType(final Integer type, final String programUUID) {
