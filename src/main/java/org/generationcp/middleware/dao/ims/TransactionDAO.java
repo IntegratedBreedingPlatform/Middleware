@@ -749,13 +749,13 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	}
 
 
-	public Transaction saveTransaction(final TransactionDto transactionDto, final Lot lot) {
+	public Transaction saveTransaction(final TransactionDto transactionDto, final Lot lot, final TransactionStatus transactionStatus) {
 		final Transaction transaction = new Transaction();
-		transaction.setStatus(TransactionStatus.COMMITTED.getIntValue());
+		transaction.setStatus(transactionStatus.getIntValue());
 		transaction.setLot(lot);
 		transaction.setPersonId(Integer.valueOf(transactionDto.getUser()));
 		transaction.setUserId(Integer.valueOf(transactionDto.getUser()));
-		transaction.setTransactionDate(new Date());
+		transaction.setTransactionDate(transactionDto.getTransactionDate());
 		transaction.setQuantity(transactionDto.getAmount());
 		transaction.setPreviousAmount(0D);
 		transaction.setCommitmentDate(0);

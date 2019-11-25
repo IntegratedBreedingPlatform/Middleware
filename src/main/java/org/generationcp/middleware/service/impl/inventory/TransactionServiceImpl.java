@@ -4,6 +4,7 @@ import org.generationcp.middleware.domain.inventory_new.TransactionDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,8 +36,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Integer saveTransaction(final TransactionDto transactionDto) {
+	public Integer saveTransaction(final TransactionDto transactionDto, final TransactionStatus transactionStatus) {
 		return this.daoFactory.getTransactionDAO()
-			.saveTransaction(transactionDto, this.daoFactory.getLotDao().getById(transactionDto.getLot().getLotId())).getId();
+			.saveTransaction(transactionDto, this.daoFactory.getLotDao().getById(transactionDto.getLot().getLotId()),
+				transactionStatus).getId();
 	}
 }
