@@ -12,4 +12,5 @@ public interface TransactionService {
 
 	long countSearchTransactions(TransactionsSearchDto transactionsSearchDto);
 
+	Integer saveTransaction(TransactionDto transactionDto);
 }

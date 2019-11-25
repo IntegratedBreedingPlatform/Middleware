@@ -33,4 +33,10 @@ public class TransactionServiceImpl implements TransactionService {
 	public long countSearchTransactions(final TransactionsSearchDto transactionsSearchDto) {
 		return this.daoFactory.getTransactionDAO().countSearchTransactions(transactionsSearchDto);
 	}
+
+	@Override
+	public Integer saveTransaction(final TransactionDto transactionDto) {
+		return this.daoFactory.getTransactionDAO()
+			.saveTransaction(transactionDto, this.daoFactory.getLotDao().getById(transactionDto.getLot().getLotId())).getId();
+	}
 }
