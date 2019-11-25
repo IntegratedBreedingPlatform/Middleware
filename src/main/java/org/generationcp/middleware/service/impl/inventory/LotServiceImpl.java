@@ -6,8 +6,6 @@ import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.ims.Transaction;
-import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -41,10 +39,8 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public Integer saveLot(final LotGeneratorInputDto lotDto) {
-		String stockId = lotDto.getStockId();
-		if (lotDto.getGenerateStock()) {
-			//Code to generate stockId
-		}
+		final String stockId = lotDto.getStockId();
+
 		final Lot lot = new Lot();
 		lot.setUserId(lotDto.getUserId());
 		lot.setComments(lotDto.getComments());
@@ -58,18 +54,6 @@ public class LotServiceImpl implements LotService {
 		lot.setScaleId(lotDto.getScaleId());
 
 		this.daoFactory.getLotDao().save(lot);
-
-		Transaction transaction = new Transaction();
-		transaction.setStatus(TransactionStatus.COMMITTED.getIntValue());
-		transaction.setLot(lot);
-		transaction.setPersonId(lotDto.getUserId());
-		transaction.setUserId(lotDto.getUserId());
-		transaction.setTransactionDate(new Date());
-		transaction.setQuantity(lotDto.getInitialBalanceAmount());
-		transaction.setPreviousAmount(0D);
-		transaction.setCommitmentDate(0);
-
-		this.daoFactory.getTransactionDAO().save(transaction);
 
 		return lot.getId();
 	}
