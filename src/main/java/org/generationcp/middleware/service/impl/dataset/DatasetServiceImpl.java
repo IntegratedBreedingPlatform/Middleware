@@ -573,6 +573,15 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
 	}
 
+	@Override
+	public List<Map<String, Object>> getObservationUnitRowsAsListMap(
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final List<String> variables) {
+
+		this.fillSearchDTO(studyId, datasetId, searchDTO);
+
+		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitRowsAsListMap(searchDTO, variables);
+	}
+
 	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
 		if (searchDTO.getSortedRequest() != null && searchDTO.getSortedRequest().getSortBy() != null) {
 			final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(searchDTO.getSortedRequest().getSortBy()));

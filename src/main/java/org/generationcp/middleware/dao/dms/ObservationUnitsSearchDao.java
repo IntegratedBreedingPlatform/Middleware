@@ -312,10 +312,26 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
 				searchDto,
 				observationVariableName);
-			return this.mapResults(results, searchDto, observationVariableName);
+			return this.convertToObservationUnitRows(results, searchDto, observationVariableName);
 		} catch (final Exception e) {
 			ObservationUnitsSearchDao.LOG.error(e.getMessage());
 			final String error = "An internal error has ocurred when trying to retrieve observation unit rows " + e.getMessage();
+			throw new MiddlewareException(error, e);
+		}
+	}
+
+	public List<Map<String, Object>> getObservationUnitRowsAsListMap(final ObservationUnitsSearchDTO searchDto,
+		final List<String> variables) {
+		try {
+			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
+			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
+				searchDto,
+				observationVariableName);
+			return this.convertObservationUnitRowsResultToListMap(results, searchDto, variables);
+		} catch (final Exception e) {
+			ObservationUnitsSearchDao.LOG.error(e.getMessage());
+			final String error =
+				"An internal error has ocurred when trying to retrieve observation unit rows as list of map" + e.getMessage();
 			throw new MiddlewareException(error, e);
 		}
 	}
@@ -859,7 +875,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	private List<ObservationUnitRow> mapResults(final List<Map<String, Object>> results, final ObservationUnitsSearchDTO searchDto,
+	private List<ObservationUnitRow> convertToObservationUnitRows(final List<Map<String, Object>> results,
+		final ObservationUnitsSearchDTO searchDto,
 		final String observationVariableName) {
 		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
 
@@ -960,6 +977,37 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		observationUnitRow.setVariables(observationVariables);
 		observationUnitRow.setEnvironmentVariables(environmentVariables);
 		return observationUnitRow;
+	}
+
+	private List<Map<String, Object>> convertObservationUnitRowsResultToListMap(final List<Map<String, Object>> results,
+		final ObservationUnitsSearchDTO searchDto,
+		final List<String> variables) {
+		final List<Map<String, Object>> transformedResult = new ArrayList<>();
+		if (results != null && !results.isEmpty()) {
+			for (final Map<String, Object> row : results) {
+				transformedResult.add(this.getObservationUnitRowMap(searchDto, variables, row));
+			}
+		}
+		return transformedResult;
+	}
+
+	private Map<String, Object> getObservationUnitRowMap(final ObservationUnitsSearchDTO searchDto, final List<String> variables,
+		final Map<String, Object> row) {
+		final Map<String, Object> newRowMap = new HashMap<>();
+
+		// Filter the variables to be included in the new map of row data. This is to make sure that only
+		// variables (columns) specified in the list are returned.
+		for (final String name : variables) {
+			newRowMap.put(name, row.containsKey(name) ? row.get(name) : null);
+		}
+
+		// If the variable is a trait and the view is in draft mode. Get the data from the draft value.
+		for (final MeasurementVariableDto measurementVariableDto : searchDto.getSelectionMethodsAndTraits()) {
+			if (variables.contains(measurementVariableDto.getName()) && searchDto.getDraftMode()) {
+				newRowMap.put(measurementVariableDto.getName(), row.get(measurementVariableDto.getName() + "_DraftValue"));
+			}
+		}
+		return newRowMap;
 	}
 
 	private String getEnvironmentColumnName(final String variableName) {
