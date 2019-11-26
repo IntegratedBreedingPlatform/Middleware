@@ -575,11 +575,11 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Map<String, Object>> getObservationUnitRowsAsListMap(
-		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final List<String> variables) {
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
 
 		this.fillSearchDTO(studyId, datasetId, searchDTO);
 
-		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitRowsAsListMap(searchDTO, variables);
+		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitRowsAsListMap(searchDTO);
 	}
 
 	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {

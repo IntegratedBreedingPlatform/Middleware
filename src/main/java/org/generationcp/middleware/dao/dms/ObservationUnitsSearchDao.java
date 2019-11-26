@@ -320,14 +320,16 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	public List<Map<String, Object>> getObservationUnitRowsAsListMap(final ObservationUnitsSearchDTO searchDto,
-		final List<String> variables) {
+	public List<Map<String, Object>> getObservationUnitRowsAsListMap(final ObservationUnitsSearchDTO searchDto) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
+
+			// TODO: Find a way to optimize the query so that only the columns requested (ObservationUnitsSearchDTO.filter.filterColumns) are
+			// selected and returned from the DB.
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
 				searchDto,
 				observationVariableName);
-			return this.convertObservationUnitRowsResultToListMap(results, searchDto, variables);
+			return this.convertObservationUnitRowsResultToListMap(results, searchDto);
 		} catch (final Exception e) {
 			ObservationUnitsSearchDao.LOG.error(e.getMessage());
 			final String error =
@@ -980,30 +982,30 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private List<Map<String, Object>> convertObservationUnitRowsResultToListMap(final List<Map<String, Object>> results,
-		final ObservationUnitsSearchDTO searchDto,
-		final List<String> variables) {
+		final ObservationUnitsSearchDTO searchDto) {
 		final List<Map<String, Object>> transformedResult = new ArrayList<>();
 		if (results != null && !results.isEmpty()) {
 			for (final Map<String, Object> row : results) {
-				transformedResult.add(this.getObservationUnitRowMap(searchDto, variables, row));
+				transformedResult.add(this.getObservationUnitRowMap(searchDto, row));
 			}
 		}
 		return transformedResult;
 	}
 
-	private Map<String, Object> getObservationUnitRowMap(final ObservationUnitsSearchDTO searchDto, final List<String> variables,
+	private Map<String, Object> getObservationUnitRowMap(final ObservationUnitsSearchDTO searchDto,
 		final Map<String, Object> row) {
 		final Map<String, Object> newRowMap = new HashMap<>();
+		final List<String> filterColumns = searchDto.getFilter().getFilterColumns();
 
-		// Filter the variables to be included in the new map of row data. This is to make sure that only
+		// Filter the columns to be included in the new map of row data. This is to make sure that only
 		// variables (columns) specified in the list are returned.
-		for (final String name : variables) {
+		for (final String name : filterColumns) {
 			newRowMap.put(name, row.containsKey(name) ? row.get(name) : null);
 		}
 
 		// If the variable is a trait and the view is in draft mode. Get the data from the draft value.
 		for (final MeasurementVariableDto measurementVariableDto : searchDto.getSelectionMethodsAndTraits()) {
-			if (variables.contains(measurementVariableDto.getName()) && searchDto.getDraftMode()) {
+			if (filterColumns.contains(measurementVariableDto.getName()) && searchDto.getDraftMode()) {
 				newRowMap.put(measurementVariableDto.getName(), row.get(measurementVariableDto.getName() + "_DraftValue"));
 			}
 		}
