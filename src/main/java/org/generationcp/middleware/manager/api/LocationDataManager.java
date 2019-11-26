@@ -216,21 +216,11 @@ public interface LocationDataManager {
 	 *
 	 * @param types - search set for the types of locations
 	 * @param programUUID - unique id of the current program.
+	 * @param locationIds - List of favorite LocIds of the current program
 	 *
   	 * @return List of Location POJOs
 	 */
-	List<Location> getLocationsByTypes(final Set<Integer> types, final String programUUID);
-
-	/**
-	 * Returns the Location records with type matching the given parameter. The
-	 * data is retrieved from both local and central databases.
-	 *
-	 * @param types - search set for the types of locations
-	 * @param locIds - List of favorite LocIds of the current program
-	 *
-	 * @return List of Location POJOs
-	 */
-	List<Location> getFavoriteLocationsByTypes(final Set<Integer> types, final List<Integer> locIds);
+	List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final String programUUID);
 
 	/**
 	 * Returns the Location records with type matching the given parameter. The
