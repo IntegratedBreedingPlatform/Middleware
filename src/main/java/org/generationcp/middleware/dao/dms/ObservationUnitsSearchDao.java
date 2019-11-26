@@ -1336,7 +1336,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "                AND ispcvt.name = 'PLOT_NO') AS plotNumber,     "
 				+ "             p.program_uuid AS programDbId,             "
 				+ "            gl.nd_geolocation_id as studyDbId, "
-				+ "             p.name +  gl.description as studyName, "
+				+ "             concat(p.name, gl.description) as studyName,"
 				+ "             p.project_id as trialDbId, "
 				+ "            p.name as trialName  " //
 				+ "FROM "
@@ -1380,7 +1380,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
-				"Unexpected error in executing countObservationUnitDTOs" + he.getMessage(),
+				"Unexpected error in executing searchObservationUnitDTOs" + he.getMessage(),
 				he);
 		}
 	}
