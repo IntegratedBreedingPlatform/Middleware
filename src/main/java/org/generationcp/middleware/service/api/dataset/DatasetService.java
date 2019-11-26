@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.search_request.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -342,4 +343,9 @@ public interface DatasetService {
 	 * @param studyId
 	 */
 	void setValueToVariable(Integer datasetId, ObservationUnitsParamDTO searchDTO, Integer studyId);
+
+	long countObservationUnitDTOs(ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto);
+
+	List<ObservationUnitDto> searchObservationUnitDTOs(
+		ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto, Integer finalPageNumber, Integer finalPageSize);
 }

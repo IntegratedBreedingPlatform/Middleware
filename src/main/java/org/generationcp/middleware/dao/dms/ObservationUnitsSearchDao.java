@@ -1,17 +1,21 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.search_request.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitDto;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitDto.ObservationUnitPosition;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -964,5 +968,459 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	private String getEnvironmentColumnName(final String variableName) {
 		return variableName + ENVIRONMENT_COLUMN_NAME_SUFFIX;
+	}
+
+	private String getObservationUnitsQuery(
+		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
+
+		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
+		//  same for columns -> DatasetServiceImpl.getSubObservationSetColumns
+
+		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT  " //
+			+ "    nde.nd_experiment_id as observationUnitId, " //
+			+ "    gl.description AS TRIAL_INSTANCE, " //
+			+ "    (SELECT loc.lname FROM nd_geolocationprop gprop INNER JOIN location loc on loc.locid = gprop.value WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = 8190) 'LOCATION_ID', "
+			+ "    (SELECT edesign.name FROM nd_geolocationprop gprop INNER JOIN cvterm edesign on edesign.cvterm_id = gprop.value WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = 8135) 'EXPT_DESIGN',  "
+			+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,  "
+			+ "    s.dbxref_id AS GID, " //
+			+ "    s.name DESIGNATION, " //
+			+ "    s.uniquename ENTRY_NO, " //
+			+ "    s.value as ENTRY_CODE, " //
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO,  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO,  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO,  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'ROW') ROW,  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'COL') COL,  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  "
+			+ "    nde.obs_unit_id as OBS_UNIT_ID,  " //
+			+ "    parent.obs_unit_id as PARENT_OBS_UNIT_ID,  " //
+			+ "    coalesce(nullif((SELECT count(sp.sample_id) " //
+			+ "        FROM sample sp " //
+			+ "        WHERE sp.nd_experiment_id = nde.nd_experiment_id) " //
+			+ "         + coalesce(child_sample_count.count, 0), 0), '-') 'SUM_OF_SAMPLES', ");
+
+		final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'," //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s'," //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s'," //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', " //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS '%s'," //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_cvalue_id, NULL)) AS '%s', " //
+			;
+
+		for (final MeasurementVariableDto measurementVariable : searchDto.getSelectionMethodsAndTraits()) {
+			sql.append(String.format( //
+				traitClauseFormat, //
+				measurementVariable.getName(), //
+				measurementVariable.getName(), // Value
+				measurementVariable.getName(), //
+				measurementVariable.getName() + "_PhenotypeId", //
+				measurementVariable.getName(), //
+				measurementVariable.getName() + "_Status", //
+				measurementVariable.getName(), //
+				measurementVariable.getName() + "_CvalueId", //
+				measurementVariable.getName(), //
+				measurementVariable.getName() + "_DraftValue", //
+				measurementVariable.getName(), //
+				measurementVariable.getName() + "_DraftCvalueId" //
+			));
+		}
+
+		if (!CollectionUtils.isEmpty(searchDto.getGenericGermplasmDescriptors())) {
+			final String germplasmDescriptorClauseFormat =
+				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') '%s',  ";
+			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
+				sql.append(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
+			}
+		}
+
+		if (!CollectionUtils.isEmpty(searchDto.getAdditionalDesignFactors())) {
+			final String designFactorClauseFormat =
+				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = plot.nd_experiment_id AND xpropcvt.name = '%s') '%s',  ";
+			for (final String designFactor : searchDto.getAdditionalDesignFactors()) {
+				sql.append(String.format(designFactorClauseFormat, designFactor, designFactor));
+			}
+		}
+
+		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentDetails())) {
+			final String envFactorFormat =
+				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s',  ";
+			final String geolocEnvFactorFormat =
+				" %s AS '%s',  ";
+			for (final MeasurementVariableDto envFactor : searchDto.getEnvironmentDetails()) {
+				if (geolocSpecialFactorsMap.containsKey(envFactor.getName())) {
+					final String column = geolocSpecialFactorsMap.get(envFactor.getName());
+					sql.append(String.format(geolocEnvFactorFormat, column, this.getEnvironmentColumnName(envFactor.getName())));
+				} else {
+					sql.append(String.format(envFactorFormat, envFactor.getName(), this.getEnvironmentColumnName(envFactor.getName())));
+				}
+			}
+		}
+
+		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())) {
+			final String envConditionFormat =
+				"    (SELECT pheno.value from phenotype pheno "
+					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.name = '%s' "
+					+ "		INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id AND envnde.project_id = :datasetEnvironmentId "
+					+ "		WHERE envnde.nd_geolocation_id = gl.nd_geolocation_id) '%s',  ";
+			for (final MeasurementVariableDto envCondition : searchDto.getEnvironmentConditions()) {
+				sql.append(String.format(envConditionFormat, envCondition.getName(), this.getEnvironmentColumnName(envCondition.getName())));
+			}
+		}
+
+		// TODO move PLOT_NO to nd_exp
+		sql.append(" COALESCE(nde.observation_unit_no, ("
+			+ "		SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO' "
+			+ " )) AS OBSERVATION_UNIT_NO ");
+
+		sql.append(" FROM " //
+			+ "	project p " //
+			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
+			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
+			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
+			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
+			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
+			+ " LEFT JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id " //
+			// Count samples for child dataset (sub-obs)
+			+ " LEFT JOIN (SELECT parent.nd_experiment_id, " //
+			+ "       nullif(count(child_sample.sample_id), 0) AS count " //
+			+ "     FROM nd_experiment child " // start the join with child to avoid parent_id full index scan
+			+ "            LEFT JOIN sample child_sample ON child.nd_experiment_id = child_sample.nd_experiment_id " //
+			+ "            INNER JOIN nd_experiment parent ON child.parent_id = parent.nd_experiment_id " //
+			+ "     GROUP BY parent.nd_experiment_id) child_sample_count ON child_sample_count.nd_experiment_id = nde.nd_experiment_id " //
+			// FIXME won't work for sub-sub-obs
+			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) " //
+			+ " WHERE p.project_id = :datasetId "); //
+
+		if (searchDto.getInstanceId() != null) {
+			sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
+		}
+
+		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
+			sql.append(" AND (ph.draft_value is not null or ph.draft_cvalue_id is not null) "); //
+		}
+
+		final ObservationUnitsSearchDTO.Filter filter = searchDto.getFilter();
+		this.addFilters(sql, filter, searchDto.getDraftMode());
+
+		sql.append(" GROUP BY observationUnitId "); //
+
+		String orderColumn;
+		final String sortBy = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortBy() : "";
+		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)) {
+			orderColumn = ObservationUnitsSearchDao.OBSERVATION_UNIT_NO;
+		} else if (SUM_OF_SAMPLES_ID.equals(sortBy)) {
+			orderColumn = ObservationUnitsSearchDao.SUM_OF_SAMPLES;
+		} else {
+			orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : "PLOT_NO";
+		}
+
+		final String sortOrder = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortOrder() : "";
+		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
+
+		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
+			for (final MeasurementVariableDto selectionMethodsAndTrait : searchDto.getSelectionMethodsAndTraits()) {
+				if (orderColumn.equals(selectionMethodsAndTrait.getName())) {
+					orderColumn = orderColumn + "_DraftValue";
+					break;
+				}
+			}
+		}
+
+		/**
+		 * Since we are using MAX(IF(, NULL)) to group the different phenotypes
+		 * we can't order by these colunms
+		 * https://bugs.mysql.com/bug.php?id=80802
+		 * Workaround: use a derived table and order the outer one
+		 * 		select * from (...) T order by ...
+		 *
+		 * Sort first numeric data casting string values to numbers
+		 * and then text data (which casts to 0)
+		 */
+		sql.append(" ) T ORDER BY " + "(1 * `" + orderColumn + "`) " + direction
+			+ ", `" + orderColumn + "` " + direction);
+
+		return sql.toString();
+	}
+
+	public long countObservationUnitDTOs(final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto) {
+		try {
+			final StringBuilder sql = new StringBuilder("select count(*) as totalObservationUnits " //
+				+ "FROM "
+				+ "  project p   "
+				+ "  LEFT JOIN dataset_type dt ON dt.dataset_type_id = p.dataset_type_id "
+				+ "        INNER JOIN "
+				+ "            nd_experiment nde  "
+				+ "                ON nde.project_id = p.project_id   "
+				+ "        INNER JOIN "
+				+ "            nd_geolocation gl  "
+				+ "                ON nde.nd_geolocation_id = gl.nd_geolocation_id   "
+				+ "        INNER JOIN "
+				+ "            stock s  "
+				+ "                ON s.stock_id = nde.stock_id   "
+				+ "        LEFT JOIN "
+				+ "            phenotype ph  "
+				+ "                ON nde.nd_experiment_id = ph.nd_experiment_id   "
+				+ "        LEFT JOIN "
+				+ "            cvterm cvterm_variable  "
+				+ "                ON cvterm_variable.cvterm_id = ph.observable_id   "
+				+ "        LEFT JOIN "
+				+ "            nd_experiment parent  "
+				+ "                ON parent.nd_experiment_id = nde.parent_id   "
+				+ "        INNER JOIN "
+				+ "            nd_experiment plot  "
+				+ "                ON plot.nd_experiment_id = nde.parent_id  "
+				+ "                OR ( "
+				+ "                    plot.nd_experiment_id = nde.nd_experiment_id  "
+				+ "                    and nde.parent_id is null  "
+				+ "                )   "
+				+ "        INNER JOIN nd_geolocationprop gprop ON gprop.nd_geolocation_id = gl.nd_geolocation_id  "
+				+ "        INNER JOIN location loc  on loc.locid = gprop.value "
+				+ "        WHERE gprop.type_id = 8190 ");
+
+			final SQLQuery query = this.getObservationUnitsFiltering(observationUnitsSearchRequestDto, sql);
+
+			query.addScalar("totalObservationUnits", new IntegerType());
+			return (Integer) query.uniqueResult();
+
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				"Unexpected error in executing countObservationUnitDTOs" + he.getMessage(),
+				he);
+		}
+	}
+
+	private SQLQuery getObservationUnitsFiltering(
+		final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto, final StringBuilder sql) {
+		if (observationUnitsSearchRequestDto.getGermplasmDbIds() != null && !observationUnitsSearchRequestDto.getGermplasmDbIds()
+			.isEmpty()) {
+			sql.append(" and s.dbxref_id in (:germplasmDbIds) ");
+		}
+		if (observationUnitsSearchRequestDto.getLocationDbIds() != null && !observationUnitsSearchRequestDto.getLocationDbIds().isEmpty()) {
+			sql.append(" AND loc.locid in (:locationDbIds) ");
+		}
+		if (observationUnitsSearchRequestDto.getObservationUnitDbIds() != null && !observationUnitsSearchRequestDto
+			.getObservationUnitDbIds().isEmpty()) {
+			sql.append(" and nde.nd_experiment_id in (:observationUnitDbIds) ");
+		}
+		if (observationUnitsSearchRequestDto.getProgramDbIds() != null && !observationUnitsSearchRequestDto.getProgramDbIds().isEmpty()) {
+			sql.append(" and p.program_uuid in (:programDbIds) ");
+		}
+		if (observationUnitsSearchRequestDto.getStudyDbIds() != null && !observationUnitsSearchRequestDto.getStudyDbIds().isEmpty()) {
+			sql.append(" and gl.nd_geolocation_id in (:studyDbIds) ");
+		}
+		if (observationUnitsSearchRequestDto.getTrialDbIds() != null && !observationUnitsSearchRequestDto.getTrialDbIds().isEmpty()) {
+			sql.append(" and p.project_id in (:trialDbIds) ");
+		}
+		if (observationUnitsSearchRequestDto.getObservationLevel() != null && !observationUnitsSearchRequestDto.getObservationLevel()
+			.isEmpty()) {
+			sql.append(" and dt.name = ':observationLevel' ");
+		}
+
+		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+
+		if (observationUnitsSearchRequestDto.getGermplasmDbIds() != null && !observationUnitsSearchRequestDto.getGermplasmDbIds()
+			.isEmpty()) {
+			query.setParameterList("germplasmDbIds", observationUnitsSearchRequestDto.getGermplasmDbIds());
+		}
+		if (observationUnitsSearchRequestDto.getLocationDbIds() != null && !observationUnitsSearchRequestDto.getLocationDbIds().isEmpty()) {
+			query.setParameterList("locationDbIds", observationUnitsSearchRequestDto.getLocationDbIds());
+		}
+		if (observationUnitsSearchRequestDto.getObservationUnitDbIds() != null && !observationUnitsSearchRequestDto
+			.getObservationUnitDbIds().isEmpty()) {
+			query.setParameterList("observationUnitDbIds", observationUnitsSearchRequestDto.getObservationUnitDbIds());
+		}
+		if (observationUnitsSearchRequestDto.getProgramDbIds() != null && !observationUnitsSearchRequestDto.getProgramDbIds().isEmpty()) {
+			query.setParameterList("programDbIds", observationUnitsSearchRequestDto.getProgramDbIds());
+		}
+		if (observationUnitsSearchRequestDto.getStudyDbIds() != null && !observationUnitsSearchRequestDto.getStudyDbIds().isEmpty()) {
+			query.setParameterList("studyDbIds", observationUnitsSearchRequestDto.getStudyDbIds());
+		}
+		if (observationUnitsSearchRequestDto.getTrialDbIds() != null && !observationUnitsSearchRequestDto.getTrialDbIds().isEmpty()) {
+			query.setParameterList("trialDbIds", observationUnitsSearchRequestDto.getTrialDbIds());
+		}
+		if (observationUnitsSearchRequestDto.getObservationLevel() != null && !observationUnitsSearchRequestDto.getObservationLevel()
+			.isEmpty()) {
+			query.setParameter("observationLevel", observationUnitsSearchRequestDto.getObservationLevel());
+		}
+		return query;
+	}
+
+	public List<ObservationUnitDto> searchObservationUnitDTOs(
+		final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto, final Integer page,
+		final Integer pageSize) {
+		try {
+			final StringBuilder sql = new StringBuilder(" select  s.dbxref_id AS germplasmDbId, "
+				+ "   s.name AS germplasmName, "
+				+ "   loc.locid AS locationDbId, "
+				+ "   loc.lname  AS locationName, "
+				+ "   dt.name as observationLevel, "
+				+ "   nde.nd_experiment_id as observationUnitDbId, "
+				+ "   '' AS observationUnitName, "
+				+ "   (SELECT "
+				+ "                ndep.value  "
+				+ "            FROM "
+				+ "                nd_experimentprop ndep  "
+				+ "            INNER JOIN "
+				+ "                cvterm ispcvt  "
+				+ "                    ON ispcvt.cvterm_id = ndep.type_id  "
+				+ "            WHERE "
+				+ "                ndep.nd_experiment_id = plot.nd_experiment_id  "
+				+ "                AND ispcvt.name = 'BLOCK_NO') AS blockNumber, "
+				+ "   s.uniquename as entryNumber, "
+				+ "   (SELECT "
+				+ "                iispcvt.definition  "
+				+ "            FROM "
+				+ "                stockprop isp  "
+				+ "            INNER JOIN "
+				+ "                cvterm ispcvt  "
+				+ "                    ON ispcvt.cvterm_id = isp.type_id  "
+				+ "            INNER JOIN "
+				+ "                cvterm iispcvt  "
+				+ "                    ON iispcvt.cvterm_id = isp.value  "
+				+ "            WHERE "
+				+ "                isp.stock_id = s.stock_id  "
+				+ "                AND ispcvt.name = 'ENTRY_TYPE') AS entryType, "
+				+ "   (SELECT "
+				+ "                ndep.value  "
+				+ "            FROM "
+				+ "                nd_experimentprop ndep  "
+				+ "            INNER JOIN "
+				+ "                cvterm ispcvt  "
+				+ "                    ON ispcvt.cvterm_id = ndep.type_id  "
+				+ "            WHERE "
+				+ "                ndep.nd_experiment_id = plot.nd_experiment_id  "
+				+ "                AND ispcvt.name = 'ROW') AS positionCoordinateX, "
+				+ "   'GRID_COL' AS positionCoordinateXType, "
+				+ "            (SELECT "
+				+ "                ndep.value  "
+				+ "            FROM "
+				+ "                nd_experimentprop ndep  "
+				+ "            INNER JOIN "
+				+ "                cvterm ispcvt  "
+				+ "                    ON ispcvt.cvterm_id = ndep.type_id  "
+				+ "            WHERE "
+				+ "                ndep.nd_experiment_id = plot.nd_experiment_id  "
+				+ "                AND ispcvt.name = 'COL') AS positionCoordinateY,  "
+				+ "   'GRID_ROW' AS positionCoordinateYType, "
+				+ "   (SELECT "
+				+ "                ndep.value  "
+				+ "            FROM "
+				+ "                nd_experimentprop ndep  "
+				+ "            INNER JOIN "
+				+ "                cvterm ispcvt  "
+				+ "                    ON ispcvt.cvterm_id = ndep.type_id  "
+				+ "            WHERE "
+				+ "                ndep.nd_experiment_id = plot.nd_experiment_id  "
+				+ "                AND ispcvt.name = 'REP_NO') AS replicate, "
+				+ "   COALESCE(nde.observation_unit_no, "
+				+ "            (  SELECT "
+				+ "                ndep.value  "
+				+ "            FROM "
+				+ "                nd_experimentprop ndep  "
+				+ "            INNER JOIN "
+				+ "                cvterm ispcvt  "
+				+ "                    ON ispcvt.cvterm_id = ndep.type_id  "
+				+ "            WHERE "
+				+ "                ndep.nd_experiment_id = plot.nd_experiment_id  "
+				+ "                AND ispcvt.name = 'PLOT_NO'  )) AS plantNumber,  "
+				+ "   (SELECT "
+				+ "                ndep.value  "
+				+ "            FROM "
+				+ "                nd_experimentprop ndep  "
+				+ "            INNER JOIN "
+				+ "                cvterm ispcvt  "
+				+ "                    ON ispcvt.cvterm_id = ndep.type_id  "
+				+ "            WHERE "
+				+ "                ndep.nd_experiment_id = plot.nd_experiment_id  "
+				+ "                AND ispcvt.name = 'PLOT_NO') AS plotNumber,     "
+				+ "             p.program_uuid AS programDbId,             "
+				+ "            gl.nd_geolocation_id as studyDbId, "
+				+ "             p.name +  gl.description as studyName, "
+				+ "             p.project_id as trialDbId, "
+				+ "            p.name as trialName  " //
+				+ "FROM "
+				+ "  project p   "
+				+ "  LEFT JOIN dataset_type dt ON dt.dataset_type_id = p.dataset_type_id "
+				+ "        INNER JOIN "
+				+ "            nd_experiment nde  "
+				+ "                ON nde.project_id = p.project_id   "
+				+ "        INNER JOIN "
+				+ "            nd_geolocation gl  "
+				+ "                ON nde.nd_geolocation_id = gl.nd_geolocation_id   "
+				+ "        INNER JOIN "
+				+ "            stock s  "
+				+ "                ON s.stock_id = nde.stock_id   "
+				+ "        LEFT JOIN "
+				+ "            phenotype ph  "
+				+ "                ON nde.nd_experiment_id = ph.nd_experiment_id   "
+				+ "        LEFT JOIN "
+				+ "            cvterm cvterm_variable  "
+				+ "                ON cvterm_variable.cvterm_id = ph.observable_id   "
+				+ "        LEFT JOIN "
+				+ "            nd_experiment parent  "
+				+ "                ON parent.nd_experiment_id = nde.parent_id   "
+				+ "        INNER JOIN "
+				+ "            nd_experiment plot  "
+				+ "                ON plot.nd_experiment_id = nde.parent_id  "
+				+ "                OR ( "
+				+ "                    plot.nd_experiment_id = nde.nd_experiment_id  "
+				+ "                    and nde.parent_id is null  "
+				+ "                )   "
+				+ "        INNER JOIN nd_geolocationprop gprop ON gprop.nd_geolocation_id = gl.nd_geolocation_id "
+				+ "        INNER JOIN location loc  on loc.locid = gprop.value "
+				+ "        WHERE gprop.type_id = 8190 ");
+
+			final SQLQuery query = this.getObservationUnitsFiltering(observationUnitsSearchRequestDto, sql);
+			if (page != null && pageSize != null) {
+				query.setFirstResult(pageSize * page);
+				query.setMaxResults(pageSize);
+			}
+			return mapToObservationUnitDto(query.list());
+
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				"Unexpected error in executing countObservationUnitDTOs" + he.getMessage(),
+				he);
+		}
+	}
+
+	private List<ObservationUnitDto> mapToObservationUnitDto(final List<Map<String, Object>> results) {
+		final List<ObservationUnitDto> observationUnitRows = new ArrayList<>();
+
+		if (results != null && !results.isEmpty()) {
+			for (final Map<String, Object> row : results) {
+				final ObservationUnitDto observationUnitRow = new ObservationUnitDto();
+				observationUnitRow.setGermplasmDbId((String) row.get("germplasmDbId"));
+				observationUnitRow.setGermplasmName((String) row.get("germplasmName"));
+				observationUnitRow.setLocationDbId((String) row.get("locationDbId"));
+				observationUnitRow.setObservationLevel((String) row.get("observationLevel"));
+				observationUnitRow.setLocationName((String) row.get("locationName"));
+				observationUnitRow.setObservationUnitDbId((String) row.get("observationUnitDbId"));
+				observationUnitRow.setObservationUnitName((String) row.get("observationUnitName"));
+				observationUnitRow.setPlantNumber((String) row.get("plantNumber"));
+				observationUnitRow.setPlotNumber((String) row.get("plotNumber"));
+				observationUnitRow.setProgramDbId((String) row.get("programDbId"));
+				observationUnitRow.setProgramName((String) row.get("programName"));
+				observationUnitRow.setStudyDbId((String) row.get("studyDbId"));
+				observationUnitRow.setStudyName((String) row.get("studyName"));
+				observationUnitRow.setTrialDbId((String) row.get("trialDbId"));
+				observationUnitRow.setTrialName((String) row.get("trialName"));
+				final ObservationUnitPosition position;
+				position = new ObservationUnitPosition();
+				position.setBlockNumber((String) row.get("blockNumber"));
+				position.setEntryNumber((String) row.get("entryNumber"));
+				position.setEntryType(Lists.newArrayList((String) row.get("entryType")));
+				position.setPositionCoordinateX((String) row.get("positionCoordinateX"));
+				position.setPositionCoordinateXType((String) row.get("positionCoordinateXType"));
+				position.setPositionCoordinateY((String) row.get("positionCoordinateY"));
+				position.setPositionCoordinateYType((String) row.get("positionCoordinateYType"));
+				position.setReplicate((String) row.get("replicate"));
+				observationUnitRow.setObservationUnitPosition(position);
+				observationUnitRows.add(observationUnitRow);
+			}
+		}
+
+		return observationUnitRows;
 	}
 }
