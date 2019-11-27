@@ -15,7 +15,7 @@ public class PhenotypeQuery {
 		+ "  s.name AS germplasmName, " //
 		+ "  gl.description AS instanceNumber, " //
 		+ "  gl.nd_geolocation_id AS studyDbId, " //
-		+ "  p.name AS studyName, " //
+		+ "  concat(p.name, '_', gl.description) AS studyName, " //
 		+ "  wp.project_name AS programName, " //
 		+ "  FieldMapRow.value AS FieldMapRow, " //
 		+ "  FieldMapCol.value AS FieldMapCol, " //

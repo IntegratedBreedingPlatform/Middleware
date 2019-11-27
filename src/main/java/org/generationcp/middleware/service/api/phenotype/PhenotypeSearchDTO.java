@@ -106,7 +106,7 @@ public class PhenotypeSearchDTO {
 		public ObservationUnitPosition() {
 		}
 
-		protected class GeooCordinates {
+		protected static class GeooCordinates {
 			private GeooCordinates.Geometry geometry;
 			private String type;
 
@@ -223,7 +223,7 @@ public class PhenotypeSearchDTO {
 		}
 	}
 
-	protected class ObservationUnitXRef {
+	protected static class ObservationUnitXRef {
 		private String id;
 		private String source;
 
@@ -266,138 +266,138 @@ public class PhenotypeSearchDTO {
 	}
 
 	public String getObservationUnitDbId() {
-		return observationUnitDbId;
+		return this.observationUnitDbId;
 	}
 
-	public void setObservationUnitDbId(String observationUnitDbId) {
+	public void setObservationUnitDbId(final String observationUnitDbId) {
 		this.observationUnitDbId = observationUnitDbId;
 	}
 
 	public String getObservationLevel() {
-		return observationLevel;
+		return this.observationLevel;
 	}
 
-	public void setObservationLevel(String observationLevel) {
+	public void setObservationLevel(final String observationLevel) {
 		this.observationLevel = observationLevel;
 	}
 
 	public String getObservationLevels() {
-		return observationLevels;
+		return this.observationLevels;
 	}
 
-	public void setObservationLevels(String observationLevels) {
+	public void setObservationLevels(final String observationLevels) {
 		this.observationLevels = observationLevels;
 	}
 
 	public String getPlotNumber() {
-		return plotNumber;
+		return this.plotNumber;
 	}
 
-	public void setPlotNumber(String plotNumber) {
+	public void setPlotNumber(final String plotNumber) {
 		this.plotNumber = plotNumber;
 	}
 
 	public String getPlantNumber() {
-		return plantNumber;
+		return this.plantNumber;
 	}
 
-	public void setPlantNumber(String plantNumber) {
+	public void setPlantNumber(final String plantNumber) {
 		this.plantNumber = plantNumber;
 	}
 
 	public String getBlockNumber() {
-		return blockNumber;
+		return this.blockNumber;
 	}
 
-	public void setBlockNumber(String blockNumber) {
+	public void setBlockNumber(final String blockNumber) {
 		this.blockNumber = blockNumber;
 	}
 
 	public String getReplicate() {
-		return replicate;
+		return this.replicate;
 	}
 
-	public void setReplicate(String replicate) {
+	public void setReplicate(final String replicate) {
 		this.replicate = replicate;
 	}
 
 	public String getGermplasmDbId() {
-		return germplasmDbId;
+		return this.germplasmDbId;
 	}
 
-	public void setGermplasmDbId(String germplasmDbId) {
+	public void setGermplasmDbId(final String germplasmDbId) {
 		this.germplasmDbId = germplasmDbId;
 	}
 
 	public String getGermplasmName() {
-		return germplasmName;
+		return this.germplasmName;
 	}
 
-	public void setGermplasmName(String germplasmName) {
+	public void setGermplasmName(final String germplasmName) {
 		this.germplasmName = germplasmName;
 	}
 
 	public String getStudyDbId() {
-		return studyDbId;
+		return this.studyDbId;
 	}
 
-	public void setStudyDbId(String studyDbId) {
+	public void setStudyDbId(final String studyDbId) {
 		this.studyDbId = studyDbId;
 	}
 
 	public String getStudyName() {
-		return studyName;
+		return this.studyName;
 	}
 
-	public void setStudyName(String studyName) {
+	public void setStudyName(final String studyName) {
 		this.studyName = studyName;
 	}
 
 	public String getStudyLocationDbId() {
-		return studyLocationDbId;
+		return this.studyLocationDbId;
 	}
 
-	public void setStudyLocationDbId(String studyLocationDbId) {
+	public void setStudyLocationDbId(final String studyLocationDbId) {
 		this.studyLocationDbId = studyLocationDbId;
 	}
 
 	public String getStudyLocation() {
-		return studyLocation;
+		return this.studyLocation;
 	}
 
-	public void setStudyLocation(String studyLocation) {
+	public void setStudyLocation(final String studyLocation) {
 		this.studyLocation = studyLocation;
 	}
 
 	public String getProgramName() {
-		return programName;
+		return this.programName;
 	}
 
-	public void setProgramName(String programName) {
+	public void setProgramName(final String programName) {
 		this.programName = programName;
 	}
 
 	public String getX() {
-		return x;
+		return this.x;
 	}
 
-	public void setX(String x) {
+	public void setX(final String x) {
 		this.x = x;
 	}
 
 	public String getY() {
-		return y;
+		return this.y;
 	}
 
-	public void setY(String y) {
+	public void setY(final String y) {
 		this.y = y;
 	}
 
 	public String getEntryType() {
-		return entryType;
+		return this.entryType;
 	}
 
-	public void setEntryType(String entryType) {
+	public void setEntryType(final String entryType) {
 		this.entryType = entryType;
 	}
 
@@ -405,26 +405,26 @@ public class PhenotypeSearchDTO {
 		if (this.observations == null) {
 			this.observations = new ArrayList<>();
 		}
-		return observations;
+		return this.observations;
 	}
 
-	public void setObservations(List<PhenotypeSearchObservationDTO> observations) {
+	public void setObservations(final List<PhenotypeSearchObservationDTO> observations) {
 		this.observations = observations;
 	}
 
 	public String getEntryNumber() {
-		return entryNumber;
+		return this.entryNumber;
 	}
 
-	public void setEntryNumber(String entryNumber) {
+	public void setEntryNumber(final String entryNumber) {
 		this.entryNumber = entryNumber;
 	}
 
 	public String getObservationUnitName() {
-		return observationUnitName;
+		return this.observationUnitName;
 	}
 
-	public void setObservationUnitName(String observationUnitName) {
+	public void setObservationUnitName(final String observationUnitName) {
 		this.observationUnitName = observationUnitName;
 	}
 

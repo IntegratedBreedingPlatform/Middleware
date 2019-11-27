@@ -27,7 +27,7 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	}
 
 	public String getObservationLevel() {
-		return observationLevel;
+		return this.observationLevel;
 	}
 
 	public void setObservationLevel(final String observationLevel) {
@@ -35,15 +35,15 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	}
 
 	public List<String> getObservationVariableDbIds() {
-		return observationVariableDbIds;
+		return this.observationVariableDbIds;
 	}
 
-	public void setObservationVariableDbIds(List<String> observationVariableDbIds) {
+	public void setObservationVariableDbIds(final List<String> observationVariableDbIds) {
 		this.observationVariableDbIds = observationVariableDbIds;
 	}
 
 	public Integer getPage() {
-		return page;
+		return this.page;
 	}
 
 	public void setPage(final Integer page) {
@@ -51,7 +51,7 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	}
 
 	public Integer getPageSize() {
-		return pageSize;
+		return this.pageSize;
 	}
 
 	public void setPageSize(final Integer pageSize) {
@@ -59,7 +59,7 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	}
 
 	public List<String> getStudyDbIds() {
-		return studyDbIds;
+		return this.studyDbIds;
 	}
 
 	public void setStudyDbIds(final List<String> studyDbIds) {
@@ -67,7 +67,7 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	}
 
 	public List<String> getLocationDbIds() {
-		return locationDbIds;
+		return this.locationDbIds;
 	}
 
 	public void setLocationDbIds(final List<String> locationDbIds) {
@@ -75,7 +75,7 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	}
 
 	public List<String> getGermplasmDbIds() {
-		return germplasmDbIds;
+		return this.germplasmDbIds;
 	}
 
 	public void setGermplasmDbIds(final List<String> germplasmDbIds) {
@@ -83,7 +83,7 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	}
 
 	public String getObservationTimeStampRangeStart() {
-		return observationTimeStampRangeStart;
+		return this.observationTimeStampRangeStart;
 	}
 
 	public void setObservationTimeStampRangeStart(final String observationTimeStampRangeStart) {
@@ -91,7 +91,7 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	}
 
 	public String getObservationTimeStampRangeEnd() {
-		return observationTimeStampRangeEnd;
+		return this.observationTimeStampRangeEnd;
 	}
 
 	public void setObservationTimeStampRangeEnd(final String observationTimeStampRangeEnd) {
@@ -99,7 +99,7 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	}
 
 	public List<String> getProgramDbIds() {
-		return programDbIds;
+		return this.programDbIds;
 	}
 
 	public void setProgramDbIds(final List<String> programDbIds) {
@@ -107,7 +107,7 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	}
 
 	public List<String> getTrialDbIds() {
-		return trialDbIds;
+		return this.trialDbIds;
 	}
 
 	public void setTrialDbIds(final List<String> trialDbIds) {

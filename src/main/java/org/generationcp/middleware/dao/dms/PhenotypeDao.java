@@ -955,7 +955,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setLocationDbId(observationUnit.getStudyLocationDbId());
 				observationUnit.setLocationName(observationUnit.getStudyLocation());
 				observationUnit.setObservationUnitPUI("");
-				PhenotypeSearchDTO.ObservationUnitPosition observationUnitPosition = new PhenotypeSearchDTO.ObservationUnitPosition();
+				final PhenotypeSearchDTO.ObservationUnitPosition observationUnitPosition = new PhenotypeSearchDTO.ObservationUnitPosition();
 				observationUnitPosition.setBlockNumber(observationUnit.getBlockNumber());
 				observationUnitPosition.setEntryNumber(observationUnit.getEntryNumber());
 				observationUnitPosition.setEntryType(Lists.newArrayList(observationUnit.getEntryType()));
@@ -1009,7 +1009,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final String factor = (String) result[0];
 				final String modality = (String) result[1];
 				final Integer ndExperimentId = (Integer) result[2];
-				PhenotypeSearchDTO.Treatment treatment = new PhenotypeSearchDTO.Treatment();
+				final PhenotypeSearchDTO.Treatment treatment = new PhenotypeSearchDTO.Treatment();
 				treatment.setFactor(factor);
 				treatment.setModality(modality);
 				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
