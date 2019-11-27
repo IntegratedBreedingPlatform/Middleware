@@ -1250,7 +1250,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto, final Integer page,
 		final Integer pageSize) {
 		try {
-			final StringBuilder sql = new StringBuilder(" select  s.dbxref_id AS germplasmDbId, "
+			final StringBuilder sql = new StringBuilder(" select s.dbxref_id AS germplasmDbId, "
 				+ "   s.name AS germplasmName, "
 				+ "   loc.locid AS locationDbId, "
 				+ "   loc.lname  AS locationName, "
@@ -1372,6 +1372,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "        WHERE gprop.type_id = 8190 ");
 
 			final SQLQuery query = this.getObservationUnitsFiltering(observationUnitsSearchRequestDto, sql);
+			query.addScalar("germplasmDbId", new StringType());
 			if (page != null && pageSize != null) {
 				query.setFirstResult(pageSize * page);
 				query.setMaxResults(pageSize);
