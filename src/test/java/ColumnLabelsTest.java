@@ -23,8 +23,8 @@ public class ColumnLabelsTest {
 			ColumnLabels.PREFERRED_NAME.getName(), ColumnLabels.GERMPLASM_DATE.getName(), ColumnLabels.GERMPLASM_LOCATION.getName(),
 			ColumnLabels.BREEDING_METHOD_NAME.getName(), ColumnLabels.BREEDING_METHOD_ABBREVIATION.getName(),
 			ColumnLabels.BREEDING_METHOD_NUMBER.getName(), ColumnLabels.BREEDING_METHOD_GROUP.getName(),
-			ColumnLabels.CROSS_FEMALE_GID.getName(), ColumnLabels.CROSS_FEMALE_PREFERRED_NAME.getName(),
-			ColumnLabels.CROSS_MALE_GID.getName(), ColumnLabels.CROSS_MALE_PREFERRED_NAME.getName(),
+			ColumnLabels.FGID.getName(), ColumnLabels.CROSS_FEMALE_PREFERRED_NAME.getName(),
+			ColumnLabels.MGID.getName(), ColumnLabels.CROSS_MALE_PREFERRED_NAME.getName(),
 			ColumnLabels.GROUP_SOURCE_GID.getName(),ColumnLabels.GROUP_SOURCE_PREFERRED_NAME.getName(),
 			ColumnLabels.IMMEDIATE_SOURCE_GID.getName(),ColumnLabels.IMMEDIATE_SOURCE_PREFERRED_NAME.getName());
 
