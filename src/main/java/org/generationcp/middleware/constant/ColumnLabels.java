@@ -98,9 +98,9 @@ public enum ColumnLabels {
 		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.BREEDING_METHOD_ABBREVIATION.getName());
 		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.BREEDING_METHOD_NUMBER.getName());
 		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.BREEDING_METHOD_GROUP.getName());
-		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.CROSS_FEMALE_GID.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.FGID.getName());
 		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.CROSS_FEMALE_PREFERRED_NAME.getName());
-		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.CROSS_MALE_GID.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.MGID.getName());
 		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.CROSS_MALE_PREFERRED_NAME.getName());
 
 		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.GROUP_SOURCE_GID.getName());
