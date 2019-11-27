@@ -27,7 +27,9 @@ public class PhenotypeQuery {
 		+ "  l.locid AS studyLocationDbId, " //
 		+ "  l.lname AS studyLocation, " //
 		+ "  (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS entryType, " //
-		+ "  s.uniquename AS entryNumber " //
+		+ "  s.uniquename AS entryNumber,"
+		+ "  dataset.program_uuid as programDbId,"
+		+ "  p.project_id as trialDbId " //
 		+ " FROM " //
 		+ "  project dataset " //
 		+ "  INNER JOIN nd_experiment nde ON nde.project_id = dataset.project_id " //
@@ -75,5 +77,14 @@ public class PhenotypeQuery {
 		+ " WHERE ph.nd_experiment_id in (:ndExperimentIds) " //
 		;
 
-
+	public static final String TREATMENT_FACTORS_SEARCH_OBSERVATIONS = "SELECT DISTINCT "
+		+ "    CVT.NAME AS factor, pp.value AS modality, nde.nd_experiment_id as nd_experiment_id "
+		+ "FROM "
+		+ "    projectprop pp "
+		+ "        INNER JOIN "
+		+ "    CVTERM CVT ON PP.VARIABLE_ID = CVT.cvterm_id "
+		+ " INNER JOIN nd_experiment nde ON nde.project_id = pp.project_id"
+		+ " WHERE "
+		+ "    PP.type_id = " + TermId.MULTIFACTORIAL_INFO.getId()
+		+ " AND nde.nd_experiment_id in (:ndExperimentIds) ";
 }

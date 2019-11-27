@@ -16,6 +16,15 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	private List<String> studyDbIds;
 	private List<String> programDbIds;
 	private List<String> trialDbIds;
+	private List<String> observationUnitDbIds;
+
+	public List<String> getObservationUnitDbIds() {
+		return this.observationUnitDbIds;
+	}
+
+	public void setObservationUnitDbIds(final List<String> observationUnitDbIds) {
+		this.observationUnitDbIds = observationUnitDbIds;
+	}
 
 	public String getObservationLevel() {
 		return observationLevel;

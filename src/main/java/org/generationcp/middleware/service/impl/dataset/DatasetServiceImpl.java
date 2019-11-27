@@ -21,7 +21,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.search_request.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -42,7 +41,6 @@ import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitDto;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -936,20 +934,6 @@ public class DatasetServiceImpl implements DatasetService {
 		if (!draftMode) {
 			this.reorganizePhenotypesStatus(studyId, phenotypes);
 		}
-	}
-
-	@Override
-	public long countObservationUnitDTOs(
-		final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto) {
-		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitDTOs(observationUnitsSearchRequestDto);
-	}
-
-	@Override
-	public List<ObservationUnitDto> searchObservationUnitDTOs(
-		final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto, final Integer finalPageNumber,
-		final Integer finalPageSize) {
-		return this.daoFactory.getObservationUnitsSearchDAO()
-			.searchObservationUnitDTOs(observationUnitsSearchRequestDto, finalPageNumber, finalPageSize);
 	}
 
 	private void acceptDraftData(final Phenotype phenotype) {
