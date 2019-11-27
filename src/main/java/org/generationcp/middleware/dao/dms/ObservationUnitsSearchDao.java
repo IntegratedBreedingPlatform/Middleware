@@ -323,13 +323,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	public List<Map<String, Object>> getObservationUnitRowsAsListMap(final ObservationUnitsSearchDTO searchDto) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
-
-			// TODO: Find a way to optimize the query so that only the columns requested (ObservationUnitsSearchDTO.filter.filterColumns) are
-			// selected and returned from the DB.
-			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
+			return this.getObservationUnitTableWithColumnFilterResult(
 				searchDto,
 				observationVariableName);
-			return this.convertObservationUnitRowsResultToListMap(results, searchDto);
 		} catch (final Exception e) {
 			ObservationUnitsSearchDao.LOG.error(e.getMessage());
 			final String error =
@@ -344,34 +340,37 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 			final String observationUnitTableQuery = this.getObservationUnitTableQuery(searchDto, observationVariableName);
 			final SQLQuery query = this.createQueryAndAddScalar(searchDto, observationUnitTableQuery);
-			query.setParameter("datasetId", searchDto.getDatasetId());
-
-			if (searchDto.getInstanceId() != null) {
-				query.setParameter("instanceId", String.valueOf(searchDto.getInstanceId()));
-			}
-
-			if (!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())){
-				query.setParameter("datasetEnvironmentId", String.valueOf(searchDto.getEnvironmentDatasetId()));
-			}
-
-			addFilteredValueParams(query, searchDto.getFilter());
-
-			final Integer pageNumber = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageNumber() : null;
-			final Integer pageSize = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageSize() : null;
-			if (pageNumber != null && pageSize != null) {
-				query.setFirstResult(pageSize * (pageNumber - 1));
-				query.setMaxResults(pageSize);
-			}
-
-			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-			final List<Map<String, Object>> results = query.list();
-			return results;
+			this.setParameters(searchDto, query);
+			return query.list();
 
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation " + e.getMessage();
 			ObservationUnitsSearchDao.LOG.error(error);
 			throw new MiddlewareException(error, e);
 		}
+	}
+
+	private void setParameters(final ObservationUnitsSearchDTO searchDto, final SQLQuery query) {
+		query.setParameter("datasetId", searchDto.getDatasetId());
+
+		if (searchDto.getInstanceId() != null) {
+			query.setParameter("instanceId", String.valueOf(searchDto.getInstanceId()));
+		}
+
+		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())){
+			query.setParameter("datasetEnvironmentId", String.valueOf(searchDto.getEnvironmentDatasetId()));
+		}
+
+		addFilteredValueParams(query, searchDto.getFilter());
+
+		final Integer pageNumber = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageNumber() : null;
+		final Integer pageSize = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageSize() : null;
+		if (pageNumber != null && pageSize != null) {
+			query.setFirstResult(pageSize * (pageNumber - 1));
+			query.setMaxResults(pageSize);
+		}
+
+		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 	}
 
 	private SQLQuery createQueryAndAddScalar(
@@ -526,6 +525,21 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "		SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO' "
 			+ " )) AS OBSERVATION_UNIT_NO ");
 
+		this.addFromClause(sql, searchDto);
+
+		final ObservationUnitsSearchDTO.Filter filter = searchDto.getFilter();
+
+		this.addFilters(sql, filter, searchDto.getDraftMode());
+
+		sql.append(" GROUP BY observationUnitId "); //
+
+		this.addOrder(sql, searchDto, observationUnitNoName);
+
+		return sql.toString();
+	}
+
+	private void addFromClause(final StringBuilder sql, final ObservationUnitsSearchDTO searchDto) {
+
 		sql.append(" FROM " //
 			+ "	project p " //
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
@@ -552,48 +566,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
 			sql.append(" AND (ph.draft_value is not null or ph.draft_cvalue_id is not null) "); //
 		}
-
-		final ObservationUnitsSearchDTO.Filter filter = searchDto.getFilter();
-		this.addFilters(sql, filter, searchDto.getDraftMode());
-
-		sql.append(" GROUP BY observationUnitId "); //
-
-		String orderColumn;
-		final String sortBy = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortBy() : "";
-		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)) {
-			orderColumn = ObservationUnitsSearchDao.OBSERVATION_UNIT_NO;
-		} else if (SUM_OF_SAMPLES_ID.equals(sortBy)) {
-			orderColumn = ObservationUnitsSearchDao.SUM_OF_SAMPLES;
-		} else {
-			orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : "PLOT_NO";
-		}
-
-		final String sortOrder = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortOrder() : "";
-		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
-
-		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
-			for (final MeasurementVariableDto selectionMethodsAndTrait : searchDto.getSelectionMethodsAndTraits()) {
-				if (orderColumn.equals(selectionMethodsAndTrait.getName())) {
-					orderColumn = orderColumn + "_DraftValue";
-					break;
-				}
-			}
-		}
-
-		/**
-		 * Since we are using MAX(IF(, NULL)) to group the different phenotypes
-		 * we can't order by these colunms
-		 * https://bugs.mysql.com/bug.php?id=80802
-		 * Workaround: use a derived table and order the outer one
-		 * 		select * from (...) T order by ...
-		 *
-		 * Sort first numeric data casting string values to numbers
-		 * and then text data (which casts to 0)
-		 */
-		sql.append(" ) T ORDER BY " + "(1 * `" + orderColumn + "`) " + direction
-			+ ", `" + orderColumn + "` " + direction);
-
-		return sql.toString();
 	}
 
 	private void addFilters(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter, final Boolean draftMode) {
@@ -639,6 +611,45 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (Boolean.TRUE.equals(filter.getByMissing())) {
 			this.appendTraitStatusFilterToQuery(sql, filterByVariableSQL, " AND ph2.value =  '" + Phenotype.MISSING_VALUE + "'");
 		}
+
+	}
+
+	private void addOrder(final StringBuilder sql, final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
+
+		String orderColumn;
+		final String sortBy = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortBy() : "";
+		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy) && !ObservationUnitsSearchDao.PLOT_NO.equals(observationUnitNoName)) {
+			orderColumn = ObservationUnitsSearchDao.OBSERVATION_UNIT_NO;
+		} else if (SUM_OF_SAMPLES_ID.equals(sortBy)) {
+			orderColumn = ObservationUnitsSearchDao.SUM_OF_SAMPLES;
+		} else {
+			orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : ObservationUnitsSearchDao.PLOT_NO;
+		}
+
+		final String sortOrder = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortOrder() : "";
+		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
+
+		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
+			for (final MeasurementVariableDto selectionMethodsAndTrait : searchDto.getSelectionMethodsAndTraits()) {
+				if (orderColumn.equals(selectionMethodsAndTrait.getName())) {
+					orderColumn = orderColumn + "_DraftValue";
+					break;
+				}
+			}
+		}
+
+		/**
+		 * Since we are using MAX(IF(, NULL)) to group the different phenotypes
+		 * we can't order by these colunms
+		 * https://bugs.mysql.com/bug.php?id=80802
+		 * Workaround: use a derived table and order the outer one
+		 * 		select * from (...) T order by ...
+		 *
+		 * Sort first numeric data casting string values to numbers
+		 * and then text data (which casts to 0)
+		 */
+		sql.append(" ) T ORDER BY " + "(1 * `" + orderColumn + "`) " + direction
+			+ ", `" + orderColumn + "` " + direction);
 	}
 
 	private void appendVariableIdAndOperationToFilterQuery(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter,
@@ -981,38 +992,151 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return observationUnitRow;
 	}
 
-	private List<Map<String, Object>> convertObservationUnitRowsResultToListMap(final List<Map<String, Object>> results,
-		final ObservationUnitsSearchDTO searchDto) {
-		final List<Map<String, Object>> transformedResult = new ArrayList<>();
-		if (results != null && !results.isEmpty()) {
-			for (final Map<String, Object> row : results) {
-				transformedResult.add(this.getObservationUnitRowMap(searchDto, row));
-			}
-		}
-		return transformedResult;
-	}
-
-	private Map<String, Object> getObservationUnitRowMap(final ObservationUnitsSearchDTO searchDto,
-		final Map<String, Object> row) {
-		final Map<String, Object> newRowMap = new HashMap<>();
-		final List<String> filterColumns = searchDto.getFilter().getFilterColumns();
-
-		// Filter the columns to be included in the new map of row data. This is to make sure that only
-		// variables (columns) specified in the list are returned.
-		for (final String name : filterColumns) {
-			newRowMap.put(name, row.containsKey(name) ? row.get(name) : null);
-		}
-
-		// If the variable is a trait and the view is in draft mode. Get the data from the draft value.
-		for (final MeasurementVariableDto measurementVariableDto : searchDto.getSelectionMethodsAndTraits()) {
-			if (filterColumns.contains(measurementVariableDto.getName()) && searchDto.getDraftMode()) {
-				newRowMap.put(measurementVariableDto.getName(), row.get(measurementVariableDto.getName() + "_DraftValue"));
-			}
-		}
-		return newRowMap;
-	}
-
 	private String getEnvironmentColumnName(final String variableName) {
 		return variableName + ENVIRONMENT_COLUMN_NAME_SUFFIX;
 	}
+
+	private List<Map<String, Object>> getObservationUnitTableWithColumnFilterResult(final ObservationUnitsSearchDTO searchDto,
+		final String observationVariableName) {
+		try {
+
+			final String queryForVisualization = this.getObservationUnitTableWithColumnFilterQuery(searchDto, observationVariableName);
+			final SQLQuery query = this.getSession().createSQLQuery(queryForVisualization);
+
+			for (final String columnName : searchDto.getFilter().getFilterColumns()) {
+				query.addScalar(columnName);
+			}
+
+			this.setParameters(searchDto, query);
+			return query.list();
+
+		} catch (final Exception e) {
+			final String error = "An internal error has ocurred when trying to execute the operation " + e.getMessage();
+			ObservationUnitsSearchDao.LOG.error(error);
+			throw new MiddlewareException(error, e);
+		}
+	}
+
+	/**
+	 * Stripped-down version of {@Link ObservationUnitsSearchDao#getObservationUnitTableQuery}. It will only return the values (no metadata -- PhenotypeId, experimentId, etc) from factors and variates at Observation level.
+	 * The query is also optimized to exclude columns that are not specified in {@Link ObservationUnitsSearchDTO#filter#filterColumns} parameter, this is to reduce the number of subqueries and to ensure that the
+	 * query returns columns that are needed.
+	 * @param searchDto
+	 * @param observationUnitNoName
+	 * @return
+	 */
+	private String getObservationUnitTableWithColumnFilterQuery(
+		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
+		
+		final List<String> filterColumns = searchDto.getFilter().getFilterColumns();
+
+		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT  ");
+
+		if (filterColumns.contains(TRIAL_INSTANCE)) {
+			sql.append("    gl.description AS TRIAL_INSTANCE, ");
+		}
+		if (filterColumns.contains(ENTRY_TYPE)) {
+			sql.append("    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,  ");
+		}
+		if (filterColumns.contains(GID)) {
+			sql.append("    s.dbxref_id AS GID, ");
+		}
+		if (filterColumns.contains(DESIGNATION)) {
+			sql.append("    s.name DESIGNATION, ");
+		}
+		if (filterColumns.contains(ENTRY_NO)) {
+			sql.append("    s.uniquename ENTRY_NO, ");
+		}
+		if (filterColumns.contains(ENTRY_CODE)) {
+			sql.append("    s.value as ENTRY_CODE, ");
+		}
+		if (filterColumns.contains(REP_NO)) {
+			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO,  ");
+		}
+		if (filterColumns.contains(PLOT_NO)) {
+			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO,  ");
+		}
+		if (filterColumns.contains(BLOCK_NO)) {
+			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO,  ");
+		}
+		if (filterColumns.contains(ROW)) {
+			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'ROW') ROW,  ");
+		}
+		if (filterColumns.contains(COL)) {
+			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'COL') COL,  ");
+		}
+		if (filterColumns.contains(FIELD_MAP_COLUMN)) {
+			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  ");
+		}
+		if (filterColumns.contains(FIELD_MAP_RANGE)) {
+			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  ");
+		}
+		if (filterColumns.contains(SUM_OF_SAMPLES)) {
+			sql.append("    coalesce(nullif((SELECT count(sp.sample_id) " //
+				+ "        FROM sample sp " //
+				+ "        WHERE sp.nd_experiment_id = nde.nd_experiment_id) " //
+				+ "         + coalesce(child_sample_count.count, 0), 0), '-') 'SUM_OF_SAMPLES', ");
+		}
+
+		final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s',";
+		final String traitDraftClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS '%s',";
+
+		for (final MeasurementVariableDto measurementVariable : searchDto.getSelectionMethodsAndTraits()) {
+			if (filterColumns.contains(measurementVariable.getName())) {
+				sql.append(String.format(
+					Boolean.TRUE.equals(searchDto.getDraftMode()) ? traitDraftClauseFormat : traitClauseFormat,
+					measurementVariable.getName(),
+					measurementVariable.getName()));
+			}
+		}
+
+		if (!CollectionUtils.isEmpty(searchDto.getGenericGermplasmDescriptors())) {
+			final String germplasmDescriptorClauseFormat =
+				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') '%s',  ";
+			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
+				if (filterColumns.contains(gpFactor)) {
+					sql.append(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
+				}
+			}
+		}
+
+		if (!CollectionUtils.isEmpty(searchDto.getAdditionalDesignFactors())) {
+			final String designFactorClauseFormat =
+				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = plot.nd_experiment_id AND xpropcvt.name = '%s') '%s',  ";
+			for (final String designFactor : searchDto.getAdditionalDesignFactors()) {
+				if (filterColumns.contains(designFactor)) {
+					sql.append(String.format(designFactorClauseFormat, designFactor, designFactor));
+				}
+			}
+		}
+
+		// TODO move PLOT_NO to nd_exp
+		if (filterColumns.contains(observationUnitNoName)) {
+			sql.append(" COALESCE(nde.observation_unit_no, ("
+				+ "		SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO' "
+				+ " )) AS " + observationUnitNoName);
+		}
+
+		// Remove comma at the end if there's any.
+		final int index = sql.lastIndexOf(",");
+		if (index != -1){
+			sql.replace(index, index+1, "");
+		}
+
+		this.addFromClause(sql, searchDto);
+
+		this.addFilters(sql,  searchDto.getFilter(), searchDto.getDraftMode());
+
+		sql.append(" GROUP BY nde.nd_experiment_id "); //
+
+		final String sortBy = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortBy() : "";
+		if (filterColumns.contains(sortBy)) {
+			this.addOrder(sql, searchDto, observationUnitNoName);
+		} else {
+			sql.append(" ) T ");
+		}
+
+		return sql.toString();
+	}
+
 }
