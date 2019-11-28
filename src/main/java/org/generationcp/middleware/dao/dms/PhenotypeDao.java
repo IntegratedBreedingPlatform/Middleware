@@ -1065,7 +1065,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		if (requestDTO.getObservationUnitDbIds() != null && !requestDTO.getObservationUnitDbIds().isEmpty()) {
-			queryString.append(" AND nde.nd_experiment_id IN (:observationUnitDbIds) ");
+			queryString.append(" AND nde.obs_unit_id IN (:observationUnitDbIds) ");
 		}
 	}
 
