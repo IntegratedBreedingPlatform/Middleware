@@ -29,7 +29,8 @@ public class PhenotypeQuery {
 		+ "  (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS entryType, " //
 		+ "  s.uniquename AS entryNumber,"
 		+ "  dataset.program_uuid as programDbId,"
-		+ "  p.project_id as trialDbId " //
+		+ "  p.project_id as trialDbId, " //
+		+ "  p.name as trialDbName "
 		+ " FROM " //
 		+ "  project dataset " //
 		+ "  INNER JOIN nd_experiment nde ON nde.project_id = dataset.project_id " //

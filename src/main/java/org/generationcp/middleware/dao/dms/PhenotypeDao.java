@@ -910,7 +910,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.addScalar("FieldMapRow").addScalar("FieldMapCol").addScalar("plotNumber", new StringType())
 			.addScalar("blockNumber", new StringType()).addScalar("replicate", new StringType()).addScalar("COL").addScalar("ROW")
 			.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
-			.addScalar("entryNumber", new StringType()).addScalar("programDbId", new StringType()).addScalar("trialDbId", new StringType());
+			.addScalar("entryNumber", new StringType()).addScalar("programDbId", new StringType()).addScalar("trialDbId", new StringType())
+			.addScalar("trialDbName", new StringType());
 
 		// TODO get map with AliasToEntityMapResultTransformer.INSTANCE
 		final List<Object[]> results = sqlQuery.list();
@@ -960,14 +961,20 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnitPosition.setEntryNumber(observationUnit.getEntryNumber());
 				observationUnitPosition.setEntryType(Lists.newArrayList(observationUnit.getEntryType()));
 				observationUnitPosition.setPositionCoordinateX(x);
-				observationUnitPosition.setPositionCoordinateXType("GRID_COL");
+				if (x != null) {
+					observationUnitPosition.setPositionCoordinateXType("GRID_COL");
+				}
+
 				observationUnitPosition.setPositionCoordinateY(y);
-				observationUnitPosition.setPositionCoordinateYType("GRID_ROW");
+				if (y != null) {
+					observationUnitPosition.setPositionCoordinateYType("GRID_ROW");
+				}
+
 				observationUnitPosition.setReplicate(observationUnit.getReplicate());
 				observationUnit.setObservationUnitPosition(observationUnitPosition);
 				observationUnit.setProgramDbId((String) row[22]);
-				observationUnit.setTrialName(observationUnit.getStudyName());
 				observationUnit.setTrialDbId((String) row[23]);
+				observationUnit.setTrialName((String) row[24]);
 
 				observationUnitsByNdExpId.put(ndExperimentId, observationUnit);
 			}
