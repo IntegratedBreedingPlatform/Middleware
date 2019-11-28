@@ -194,12 +194,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			query.addScalar(GermplasmSearchDAO.LOCATION_NAME);
 
 			for (final String propertyId : germplasmSearchParameter.getAddedColumnsPropertyIds()) {
-				if(propertyId == GermplasmSearchDAO.MALE_PARENT_ID) {
-					query.addScalar(propertyId+"_COL");
-				}else {
-					query.addScalar(propertyId);
-				}
-
+				//Append _COL if MALE_PARENT_ID, to avoid duplicate column name on select and fetch the correct value for MGID
+				String scalar = propertyId.equals(GermplasmSearchDAO.MALE_PARENT_ID) ? propertyId +"_COL" : propertyId;
+				query.addScalar(scalar);
 			}
 
 			query.setFirstResult(startingRow);
