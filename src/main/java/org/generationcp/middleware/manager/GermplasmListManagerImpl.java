@@ -40,9 +40,9 @@ import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -503,6 +503,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return this.getGermpasmListMetadata(listIdsFromGermplasmList);
 	}
 
+	@Override
+	public Map<Integer, ListMetadata> getGermplasmListMetadataForAllElements(final List<GermplasmList> listIds) {
+		final List<Integer> listIdsFromGermplasmList = this.getListIdsFromGermplasmList(listIds);
+		return this.daoFactory.getGermplasmListDAO().getGermplasmListMetadata(listIdsFromGermplasmList);
+	}
+
 	private Map<Integer, GermplasmListMetadata> getGermpasmListMetadata(final List<Integer> listIdsFromGermplasmList) {
 		final Map<Integer, GermplasmListMetadata> listMetadata = new HashMap<>();
 
@@ -781,10 +787,18 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public List<GermplasmList> searchGermplasmLists(final String searchString, final boolean exactMatch, final String programUUID,
-		final Pageable pageable) {
-		final List<GermplasmList> germplasmLists =
-			this.daoFactory.getGermplasmListDAO().searchGermplasmLists(searchString, exactMatch, programUUID, pageable);
-		return germplasmLists;
+	public void populateGermplasmListCreatedByName(final List<GermplasmList> germplasmLists) {
+		final List<Integer> userIds = Lists.transform(germplasmLists, new Function<GermplasmList, Integer>() {
+
+			@Nullable
+			@Override
+			public Integer apply(@Nullable final GermplasmList input) {
+				return input.getUserId();
+			}
+		});
+		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
+		for (final GermplasmList germplasmList : germplasmLists) {
+			germplasmList.setCreatedBy(userIDFullNameMap.get(germplasmList.getUserId()));
+		}
 	}
 }
