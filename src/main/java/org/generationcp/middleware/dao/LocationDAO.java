@@ -282,14 +282,20 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<Location> getByTypes(final Set<Integer> types, final String programUUID) {
+	public List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final String programUUID) {
 		final List<Location> locations;
 		try {
 
 			final Criteria criteria = this.getSession().createCriteria(Location.class);
+
 			if (types != null && !types.isEmpty()) {
 				criteria.add(Restrictions.in(LocationDAO.LTYPE, types));
 			}
+
+			if (locationIds != null && !locationIds.isEmpty()) {
+				criteria.add(Restrictions.in(LocationDAO.LOCID, locationIds));
+			}
+
 			criteria.add(
 				Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID), Restrictions.isNull(LocationDAO.UNIQUE_ID)));
 			criteria.addOrder(Order.asc(LocationDAO.LNAME));
@@ -297,26 +303,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage(LocationDAO.GET_BY_TYPE, "types", String.valueOf(types), e.getMessage(),
-					LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-		return locations;
-	}
-
-	public List<Location> getFavoriteLocationsByTypes(final Set<Integer> types, final List<Integer> locIds) {
-		final List<Location> locations;
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Location.class);
-			if(types != null && !types.isEmpty()) {
-				criteria.add(Restrictions.in(LocationDAO.LTYPE, types));
-			}
-			criteria.add(Restrictions.in(LocationDAO.LOCID, locIds));
-			criteria.addOrder(Order.asc(LocationDAO.LNAME));
-			locations = criteria.list();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage(LocationDAO.GET_BY_TYPE, "types", String.valueOf(types), e.getMessage(),
+				this.getLogExceptionMessage("getFilteredLocations", "types,locationIds,programUUID", "", e.getMessage(),
 					LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 		return locations;
