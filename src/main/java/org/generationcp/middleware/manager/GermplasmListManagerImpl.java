@@ -504,9 +504,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	private List<Integer> getListIdsFromGermplasmList(final List<GermplasmList> germplasmListParent) {
 		final List<Integer> listIdsToRetrieveCount = new ArrayList<>();
 		for (final GermplasmList parentList : germplasmListParent) {
-			if (!parentList.isFolder()) {
-				listIdsToRetrieveCount.add(parentList.getId());
-			}
+			listIdsToRetrieveCount.add(parentList.getId());
 		}
 		return listIdsToRetrieveCount;
 	}

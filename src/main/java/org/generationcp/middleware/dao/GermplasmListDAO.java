@@ -801,7 +801,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error with getSampleListMetadata(folderIds=" + folderIds.toString() + ") query from germplasm_list: " + e.getMessage(),
+					"Error with getGermplasmListMetadata(folderIds=" + folderIds.toString() + ") query from listnms: " + e.getMessage(),
 					e);
 		}
 		return Maps.uniqueIndex(list, new Function<ListMetadata, Integer>() {
