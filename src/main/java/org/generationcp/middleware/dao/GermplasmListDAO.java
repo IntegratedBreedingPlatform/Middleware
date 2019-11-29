@@ -588,7 +588,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 			criteria.add(Restrictions.eq("projectId", studyId));
-			criteria.add(Restrictions.in("type", Arrays.asList(GermplasmListType.ADVANCED.name(), GermplasmListType.IMP_CROSS.name(), GermplasmListType.CRT_CROSS.name())));
+			criteria.add(Restrictions.in("type", Arrays.asList(GermplasmListType.ADVANCED.name(), GermplasmListType.IMP_CROSS.name(),
+					GermplasmListType.CRT_CROSS.name())));
 			criteria.add(Restrictions.ne(GermplasmListDAO.STATUS, GermplasmListDAO.STATUS_DELETED));
 
 			return ((Number)criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue() > 0;
@@ -699,6 +700,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		setResultTransformer.setResultTransformer(Transformers.aliasToBean(ListMetadata.class));
 		final List<ListMetadata> list = setResultTransformer.list();
 		return Maps.uniqueIndex(list, new Function<ListMetadata, Integer>() {
+
 			@Override
 			public Integer apply(final ListMetadata folderMetaData) {
 				return folderMetaData.getListId();
@@ -771,5 +773,43 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 
 		return stringBuilder.toString();
+	}
+
+	/**
+	 * @param folderIds a group of folder ids/germplasm lists for which we want to return metadata
+	 * @return the resultant map which contains the object meta data
+	 */
+	public Map<Integer, ListMetadata> getGermplasmListMetadata(final List<Integer> folderIds) {
+		final List<ListMetadata> list;
+		if (folderIds.isEmpty()) {
+			return Collections.emptyMap();
+		}
+
+		try {
+			final String folderMetaDataQuery = "SELECT parent.listid AS listId," + "  COUNT(child.listid) AS numberOfChildren, "
+					+ "  COUNT(s.gid) AS numberOfEntries " + " FROM listnms parent"
+					+ "   LEFT OUTER JOIN listnms child ON child.lhierarchy = parent.listid "
+					+ "   LEFT OUTER JOIN listdata s ON s.listid = parent.listid "
+					+ " WHERE parent.listid IN (:folderIds) GROUP BY parent.listid";
+			final SQLQuery setResultTransformer = this.getSession().createSQLQuery(folderMetaDataQuery);
+			setResultTransformer.setParameterList("folderIds", folderIds);
+			setResultTransformer.addScalar("listId", new IntegerType());
+			setResultTransformer.addScalar("numberOfChildren", new IntegerType());
+			setResultTransformer.addScalar("numberOfEntries", new IntegerType());
+			setResultTransformer.setResultTransformer(Transformers.aliasToBean(ListMetadata.class));
+			list = setResultTransformer.list();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+					"Error with getGermplasmListMetadata(folderIds=" + folderIds.toString() + ") query from listnms: " + e.getMessage(),
+					e);
+		}
+		return Maps.uniqueIndex(list, new Function<ListMetadata, Integer>() {
+
+			@Override
+			public Integer apply(final ListMetadata folderMetaData) {
+				return folderMetaData.getListId();
+			}
+		});
 	}
 }
