@@ -77,8 +77,9 @@ public interface DataImportService {
 	 *
 	 * @param file
 	 * @param programUUID
-	 * @param discardOutOfBoundsData
-	 * @param ontologyDataManger
+	 * @param discardInvalidValues
+	 * @param workbookParser
+	 * @param currentIbdbUserId
 	 * @return
 	 * @throws WorkbookParserException
 	 */
@@ -182,13 +183,13 @@ public interface DataImportService {
 	 * Populates the measurement variables with their possible values. Only the
 	 * categorical type variable will be populated.
 	 *
-	 * @param workbook
+	 * @param variates
 	 * @param programUUID
-	 * @param ontologyDataManager
 	 */
 	void populatePossibleValuesForCategoricalVariates(List<MeasurementVariable> variates, String programUUID);
 
 	Workbook parseWorkbookDescriptionSheet(org.apache.poi.ss.usermodel.Workbook excelWorkbook, final Integer currentIbdbUserId)
 			throws WorkbookParserException;
 
+	void processExperimentalDesign(Workbook workbook, String programUUID, String exptDesignValueFromObsSheet) throws WorkbookParserException;
 }

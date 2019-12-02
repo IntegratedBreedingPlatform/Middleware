@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.oms;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * The cvterm ID constants used in Middleware.
- * 
+ *
  */
 public enum TermId {
 
@@ -77,7 +77,7 @@ public enum TermId {
 	, ROW(8581), COL(8582), BLOCK_NAME(8221), COLUMNS_IN_BLOCK(32772), RANGES_IN_BLOCK(32773), PLANTING_ORDER(32774), ROWS_PER_PLOT(32780), FIELD_NAME(
 			32783), FIELDMAP_UUID(32785), MACHINE_ROW_CAPACITY(32787), BLOCK_ID(8583)// (77783)
 	, FIELDMAP_COLUMN(8400), FIELDMAP_RANGE(8410)
-	
+
 	// Experiment storage
 	, TRIAL_DESIGN_INFO_STORAGE(1030)
 
@@ -119,7 +119,7 @@ public enum TermId {
 	// Experimental Design Factor Possible Values
 	, RANDOMIZED_COMPLETE_BLOCK(10110), RESOLVABLE_INCOMPLETE_BLOCK(10130), RESOLVABLE_INCOMPLETE_ROW_COL(10145), RESOLVABLE_INCOMPLETE_BLOCK_LATIN(
 			10166), RESOLVABLE_INCOMPLETE_ROW_COL_LATIN(10167), OTHER_DESIGN(10168), EXPT_DESIGN_SOURCE(8165), AUGMENTED_RANDOMIZED_BLOCK(10160),
-		ENTRY_LIST_ORDER (10169), P_REP (10164)
+		ENTRY_LIST_ORDER (10169), P_REP (10164), EXTERNALLY_GENERATED(10168)
 
 	// Replications Map values
 	, REPS_IN_SINGLE_ROW(8143), REPS_IN_SINGLE_COL(8144), REPS_IN_ADJACENT_COLS(8145)
