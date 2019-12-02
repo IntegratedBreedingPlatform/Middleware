@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1008,7 +1009,21 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 
 			this.setParameters(searchDto, query);
-			return query.list();
+
+			final List<Map<String, Object>> result = query.list();
+			final Iterator<Map<String, Object>> iterator = result.iterator();
+			while (iterator.hasNext()) {
+				final Map<String, Object> rowMap = iterator.next();
+				for (final String name : searchDto.getFilter().getFilterColumns()) {
+					// Unfortunately, since the trait values (Numeric and Categorical) are stored and returned as String from the database,
+					// We have to manually convert them to numeric values (if possible) so that the data returned to the client will be properly processed
+					// when we send it to OpenCPU API.
+					final String value = String.valueOf(rowMap.get(name));
+					rowMap.put(name, NumberUtils.isNumber(value) ? NumberUtils.createBigDecimal(value) : value);
+				}
+			}
+
+			return result;
 
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation " + e.getMessage();
