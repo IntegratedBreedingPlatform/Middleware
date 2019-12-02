@@ -1018,8 +1018,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					// Unfortunately, since the trait values (Numeric and Categorical) are stored and returned as String from the database,
 					// We have to manually convert them to numeric values (if possible) so that the data returned to the client will be properly processed
 					// when we send it to OpenCPU API.
-					final String value = String.valueOf(rowMap.get(name));
-					rowMap.put(name, NumberUtils.isNumber(value) ? NumberUtils.createBigDecimal(value) : value);
+					final String columnValue = String.valueOf(rowMap.get(name));
+					rowMap.put(name, NumberUtils.isNumber(columnValue) ? NumberUtils.createBigDecimal(columnValue) : rowMap.get(name));
 				}
 			}
 
