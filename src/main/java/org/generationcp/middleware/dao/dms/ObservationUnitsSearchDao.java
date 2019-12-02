@@ -1127,14 +1127,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		this.addFilters(sql,  searchDto.getFilter(), searchDto.getDraftMode());
 
-		sql.append(" GROUP BY nde.nd_experiment_id "); //
-
-		final String sortBy = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortBy() : "";
-		if (filterColumns.contains(sortBy)) {
-			this.addOrder(sql, searchDto, observationUnitNoName);
-		} else {
-			sql.append(" ) T ");
-		}
+		sql.append(" GROUP BY nde.nd_experiment_id ) T ");
 
 		return sql.toString();
 	}
