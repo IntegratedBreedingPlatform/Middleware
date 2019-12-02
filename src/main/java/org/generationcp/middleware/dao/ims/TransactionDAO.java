@@ -755,7 +755,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		transaction.setLot(lot);
 		transaction.setPersonId(Integer.valueOf(transactionDto.getUser()));
 		transaction.setUserId(Integer.valueOf(transactionDto.getUser()));
-		transaction.setTransactionDate(transactionDto.getTransactionDate());
+		transaction.setTransactionDate(new Date());
 		transaction.setQuantity(transactionDto.getAmount());
 		transaction.setPreviousAmount(0D);
 		transaction.setCommitmentDate(0);
