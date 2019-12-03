@@ -19,6 +19,7 @@ import org.generationcp.middleware.service.impl.study.generation.ExperimentModel
 import org.generationcp.middleware.service.impl.study.generation.GeolocationGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -80,10 +81,14 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Override
 	public List<StudyInstance> getStudyInstances(final int studyId) {
+		return this.getStudyInstances(studyId, Collections.<Integer>emptyList());
+	}
+
+	private List<StudyInstance> getStudyInstances(final int studyId, final List<Integer> instanceIds) {
 		final int environmentDatasetId =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0)
 				.getProjectId();
-		final List<StudyInstance> instances = this.daoFactory.getDmsProjectDAO().getDatasetInstances(environmentDatasetId);
+		final List<StudyInstance> instances = this.daoFactory.getDmsProjectDAO().getDatasetInstances(environmentDatasetId, instanceIds);
 		// If study has advance or cross list and instance has experiment design, mark instance as cannot be deleted
 		final boolean hasAdvancedOrCrossesList = this.daoFactory.getGermplasmListDAO().hasAdvancedOrCrossesList(studyId);
 		if (hasAdvancedOrCrossesList) {
@@ -111,6 +116,15 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 		// Delete geolocation and geolocationprops
 		geolocationDao.makeTransient(geolocation);
+	}
+
+	@Override
+	public Optional<StudyInstance> getStudyInstance(final int studyId, final Integer instanceId) {
+		final List<StudyInstance> studyInstances = this.getStudyInstances(studyId, Collections.singletonList(instanceId));
+		if (!CollectionUtils.isEmpty(studyInstances)) {
+			return Optional.of(studyInstances.get(0));
+		}
+		return Optional.absent();
 	}
 
 	protected Optional<Location> getUnspecifiedLocation() {
