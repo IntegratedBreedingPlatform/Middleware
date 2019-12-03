@@ -117,7 +117,8 @@ public class GermplasmList implements Serializable {
 	@Transient
 	private String tabLabel;
 
-	
+	@Transient
+	private String createdBy;
 
 	public GermplasmList() {
 
@@ -423,4 +424,11 @@ public class GermplasmList implements Serializable {
 		this.tabLabel = tabLabel;
 	}
 
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(final String createdBy) {
+		this.createdBy = createdBy;
+	}
 }

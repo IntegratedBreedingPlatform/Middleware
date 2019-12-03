@@ -11,21 +11,18 @@
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is the API for retrieving information about Germplasm Lists.
@@ -394,22 +391,6 @@ public interface GermplasmListManager {
 
 	Integer retrieveDataListIDFromListDataProjectListID(Integer listDataProjectListID);
 
-	/**
-	 * Retrieves metadata (such as count of entries, list owner) in one go for lists ids provide.
-	 * This helps avoiding the need to query metadata in a loop for each list
-	 *
-	 * @param germplasmListParent ids for which we should retrieve metadata
-	 */
-	Map<Integer, GermplasmListMetadata> getGermplasmListMetadata(List<GermplasmList> germplasmListParent);
-
-	/**
-	 * Retrieves number of children in one go for lists ids provide. Note non folder list ids are filtered out.
-	 * This helps avoiding the need to query metadata in a loop for each folder
-	 *
-	 * @param germplasmLists lists for which we should retrieve metadata
-	 */
-	Map<Integer, ListMetadata> getGermplasmFolderMetadata(List<GermplasmList> germplasmLists);
-
 	List<GermplasmList> getAllGermplasmListsByProgramUUID(String currentProgramUUID);
 
 	/**
@@ -447,7 +428,8 @@ public interface GermplasmListManager {
 	 */
 	List<Integer> deleteGermplasms(final List<Integer> germplasms, final Integer listId);
 
-	List<GermplasmList> searchGermplasmLists(
-		String searchString, boolean exactMatch, String programUUID,
-		Pageable pageable);
+	void populateGermplasmListCreatedByName(List<GermplasmList> germplasmLists);
+
+	Map<Integer, ListMetadata> getGermplasmListMetadata(List<GermplasmList> listIds);
+
 }

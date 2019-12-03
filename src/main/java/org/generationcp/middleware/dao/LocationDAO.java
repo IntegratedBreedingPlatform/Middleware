@@ -302,6 +302,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			locations = criteria.list();
 
 		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("getFilteredLocations", "types,locationIds,programUUID", "", e.getMessage(),
 					LocationDAO.CLASS_NAME_LOCATION), e);

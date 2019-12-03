@@ -522,7 +522,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Integer> getFavoriteProjectLocationIds(final String programUUID) {
 		final List<ProgramFavorite> programFavorites =
-			this.getProgramFavoriteDao().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
+			this.daoFactory.getProgramFavoriteDao().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
 		final List<Integer> favoriteLocationIds = new ArrayList<>();
 		if (programFavorites != null && !programFavorites.isEmpty()) {
 			for (final ProgramFavorite programFavorite : programFavorites) {

@@ -220,7 +220,7 @@ public interface LocationDataManager {
 	 *
   	 * @return List of Location POJOs
 	 */
-	List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final String programUUID);
+	List<Location> getFilteredLocations(Set<Integer> types, List<Integer> locationIds, String programUUID);
 
 	/**
 	 * Returns the Location records with type matching the given parameter. The
@@ -506,5 +506,5 @@ public interface LocationDataManager {
 	 *            - unique id of program
 	 * @return the favorite project location ids
 	 */
-	List<Integer> getFavoriteProjectLocationIds(final String programUUID);
+	List<Integer> getFavoriteProjectLocationIds(String programUUID);
 }
