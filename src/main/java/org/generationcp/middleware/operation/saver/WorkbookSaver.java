@@ -535,6 +535,7 @@ public class WorkbookSaver extends Saver {
 		watch.restart("save geolocation");
 
 		this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(geolocation, this.daoFactory.getLocationDAO());
+		this.assignExptDesignValueWithEGDGNIfEmpty(geolocation);
 
 		final Geolocation g = this.getGeolocationSaver()
 			.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, null,
@@ -601,6 +602,7 @@ public class WorkbookSaver extends Saver {
 
 							this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
 								geolocation, this.daoFactory.getLocationDAO());
+							this.assignExptDesignValueWithEGDGNIfEmpty(geolocation);
 
 							final Geolocation g = this.getGeolocationSaver()
 								.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, row,
@@ -640,6 +642,16 @@ public class WorkbookSaver extends Saver {
 		}
 
 		return 0;
+	}
+
+	protected void assignExptDesignValueWithEGDGNIfEmpty(final VariableList variableList) {
+		final Variable exptDesignVariable = variableList.findById(TermId.EXPERIMENT_DESIGN_FACTOR);
+
+		if (exptDesignVariable != null) {
+			if (StringUtils.isEmpty(exptDesignVariable.getValue())) {
+				exptDesignVariable.setValue(String.valueOf(TermId.EXTERNALLY_GENERATED.getId()));
+			}
+		}
 	}
 
 	protected void assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(

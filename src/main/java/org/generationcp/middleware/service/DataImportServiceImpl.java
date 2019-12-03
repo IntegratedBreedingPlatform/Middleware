@@ -325,6 +325,25 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
+	public void addExptDesignVariableIfNotExists(
+		final Workbook workbook, final List<MeasurementVariable> measurementVariables,
+		final String programUUID) {
+
+		final List<MeasurementVariable> combinedVariables = new ArrayList<>();
+		combinedVariables.addAll(workbook.getConditions());
+		combinedVariables.addAll(workbook.getFactors());
+
+		final Optional<MeasurementVariable> exptDesignExists = this.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), combinedVariables);
+
+		if (!exptDesignExists.isPresent()) {
+			final MeasurementVariable exptDesignVar = this.createMeasurementVariable(TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+				String.valueOf(TermId.EXTERNALLY_GENERATED.getId()), Operation.ADD, PhenotypicType.TRIAL_ENVIRONMENT, programUUID);
+			this.asssignMeasurementVariableToEnvironmentDetail(exptDesignVar);
+			measurementVariables.add(exptDesignVar);
+		}
+	}
+
+	@Override
 	public void removeLocationNameVariableIfExists(final Workbook workbook) {
 
 		final List<MeasurementVariable> workbookConditions = workbook.getConditions();

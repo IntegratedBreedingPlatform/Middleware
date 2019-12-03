@@ -173,6 +173,8 @@ public interface DataImportService {
 
 	void addLocationIDVariableIfNotExists(Workbook workbook, List<MeasurementVariable> measurementVariables, String programUUID);
 
+	void addExptDesignVariableIfNotExists(Workbook workbook, List<MeasurementVariable> measurementVariables, String programUUID);
+
 	void removeLocationNameVariableIfExists(Workbook workbook);
 
 	void assignLocationVariableWithUnspecifiedLocationIfEmpty(List<MeasurementVariable> measurementVariables);
