@@ -1017,9 +1017,14 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				for (final String name : searchDto.getFilter().getFilterColumns()) {
 					// Unfortunately, since the trait values (Numeric and Categorical) are stored and returned as String from the database,
 					// We have to manually convert them to numeric values (if possible) so that the data returned to the client will be properly processed
-					// when we send it to OpenCPU API.
+					// when we send it to the OpenCPU API. Also, if the phenotype value is "missing", we should return it as a null value in order for
+					// R code to treat it as NA (Not applicable).
 					final String columnValue = String.valueOf(rowMap.get(name));
-					rowMap.put(name, NumberUtils.isNumber(columnValue) ? NumberUtils.createBigDecimal(columnValue) : rowMap.get(name));
+					if (Phenotype.MISSING_VALUE.equals(columnValue)) {
+						rowMap.put(name, null);
+					} else {
+						rowMap.put(name, NumberUtils.isNumber(columnValue) ? NumberUtils.createBigDecimal(columnValue) : rowMap.get(name));
+					}
 				}
 			}
 
@@ -1126,7 +1131,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		// TODO move PLOT_NO to nd_exp
-		if (filterColumns.contains(observationUnitNoName)) {
+		if (filterColumns.contains(observationUnitNoName) && !PLOT_NO.equals(observationUnitNoName)) {
 			sql.append(" COALESCE(nde.observation_unit_no, ("
 				+ "		SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO' "
 				+ " )) AS " + observationUnitNoName);
