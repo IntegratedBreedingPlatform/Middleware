@@ -748,16 +748,23 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
-
-	public Transaction saveTransaction(final TransactionDto transactionDto, final Lot lot, final TransactionStatus transactionStatus) {
+	public Transaction saveTransaction(final TransactionDto transactionDto) {
+		final Lot lot = new Lot();
+		lot.setId(transactionDto.getLot().getLotId());
 		final Transaction transaction = new Transaction();
-		transaction.setStatus(transactionStatus.getIntValue());
+		if (TransactionType.DEPOSIT.getValue().equalsIgnoreCase(transactionDto.getTransactionType()) || TransactionType.WITHDRAWAL
+			.getValue().equalsIgnoreCase(transactionDto.getTransactionType())) {
+			transaction.setStatus(TransactionStatus.COMMITTED.getIntValue());
+		} else {
+			transaction.setStatus(TransactionStatus.ANTICIPATED.getIntValue());
+		}
 		transaction.setLot(lot);
 		transaction.setPersonId(Integer.valueOf(transactionDto.getUser()));
 		transaction.setUserId(Integer.valueOf(transactionDto.getUser()));
 		transaction.setTransactionDate(new Date());
 		transaction.setQuantity(transactionDto.getAmount());
 		transaction.setPreviousAmount(0D);
+		//FIXME not so sure about commitment date always being 0, I guess it depends on the TransactionType
 		transaction.setCommitmentDate(0);
 		transaction.setComments(transactionDto.getNotes());
 
