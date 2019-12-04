@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.base.Optional;
+import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -13,19 +14,27 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.service.impl.study.generation.GeolocationGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Transactional
 public class StudyInstanceServiceImpl implements StudyInstanceService {
 
+	@Autowired
+	private StudyService studyService;
+
 	private ExperimentModelGenerator experimentModelGenerator;
 	private GeolocationGenerator geolocationGenerator;
 	private DaoFactory daoFactory;
+
 
 	public StudyInstanceServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -35,6 +44,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.experimentModelGenerator = new ExperimentModelGenerator(sessionProvider);
 		this.geolocationGenerator = new GeolocationGenerator(sessionProvider);
+		this.studyService = new StudyServiceImpl(sessionProvider);
 	}
 
 	@Override
@@ -58,10 +68,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 		this.daoFactory.getExperimentDao().save(experimentModel);
 
-		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(geolocation.getLocationId());
-		studyInstance.setInstanceNumber(instanceNumber);
-		studyInstance.setExperimentId(experimentModel.getNdExperimentId());
+		final StudyInstance studyInstance =
+			new StudyInstance(geolocation.getLocationId(), experimentModel.getNdExperimentId(), instanceNumber, false, false, false, true);
 		if (location.isPresent()) {
 			studyInstance.setLocationId(location.get().getLocid());
 			studyInstance.setLocationName(location.get().getLname());
@@ -73,10 +81,14 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Override
 	public List<StudyInstance> getStudyInstances(final int studyId) {
+		return this.getStudyInstances(studyId, Collections.<Integer>emptyList());
+	}
+
+	private List<StudyInstance> getStudyInstances(final int studyId, final List<Integer> instanceIds) {
 		final int environmentDatasetId =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0)
 				.getProjectId();
-		final List<StudyInstance> instances = this.daoFactory.getDmsProjectDAO().getDatasetInstances(environmentDatasetId);
+		final List<StudyInstance> instances = this.daoFactory.getDmsProjectDAO().getDatasetInstances(environmentDatasetId, instanceIds);
 		// If study has advance or cross list and instance has experiment design, mark instance as cannot be deleted
 		final boolean hasAdvancedOrCrossesList = this.daoFactory.getGermplasmListDAO().hasAdvancedOrCrossesList(studyId);
 		if (hasAdvancedOrCrossesList) {
@@ -87,6 +99,32 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			}
 		}
 		return instances;
+	}
+
+	@Override
+	public void deleteStudyInstance(final Integer studyId, final Integer instanceId) {
+		final GeolocationDao geolocationDao = this.daoFactory.getGeolocationDao();
+		final Geolocation geolocation = geolocationDao.getById(instanceId);
+		final Integer instanceNumber = Integer.valueOf(geolocation.getDescription());
+		this.daoFactory.getExperimentDao().updateStudyExperimentGeolocationIfNecessary(studyId, instanceId);
+
+		// Delete plot and environment experiments
+		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
+		this.daoFactory.getExperimentDao()
+			.deleteExperimentsForDatasets(Arrays.asList(this.studyService.getPlotDatasetId(studyId),
+				environmentDatasetId), Collections.singletonList(instanceNumber));
+
+		// Delete geolocation and geolocationprops
+		geolocationDao.makeTransient(geolocation);
+	}
+
+	@Override
+	public Optional<StudyInstance> getStudyInstance(final int studyId, final Integer instanceId) {
+		final List<StudyInstance> studyInstances = this.getStudyInstances(studyId, Collections.singletonList(instanceId));
+		if (!CollectionUtils.isEmpty(studyInstances)) {
+			return Optional.of(studyInstances.get(0));
+		}
+		return Optional.absent();
 	}
 
 	protected Optional<Location> getUnspecifiedLocation() {

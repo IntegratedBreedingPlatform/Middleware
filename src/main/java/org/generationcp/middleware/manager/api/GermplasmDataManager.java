@@ -11,10 +11,6 @@
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -38,6 +34,10 @@ import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This is the API for retrieving Germplasm information.
@@ -1188,4 +1188,7 @@ public interface GermplasmDataManager {
 
 	List<Integer> addOrUpdateGermplasm(final List<Germplasm> germplasms, final Operation operation);
 
+	long countGermplasmByStudy(Integer studyDbId);
+
+	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Integer pageNumber, Integer pageSize);
 }

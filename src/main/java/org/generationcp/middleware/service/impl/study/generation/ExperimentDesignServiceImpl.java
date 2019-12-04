@@ -12,8 +12,6 @@ import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -24,7 +22,9 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -37,6 +37,9 @@ import java.util.Set;
 
 @Transactional
 public class ExperimentDesignServiceImpl implements ExperimentDesignService {
+
+	@Autowired
+	private StudyService studyService;
 
 	private static final List<Integer> FIELDMAP_ENVT_VARIABLES = Collections.singletonList(TermId.BLOCK_ID.getId());
 
@@ -74,8 +77,8 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 		// Delete previous experiments from the specified instances (if any)
 		final List<Integer> instanceNumbers = Lists.newArrayList(instanceRowsMap.keySet());
-		final Integer plotDatasetId = this.getPlotDatasetId(studyId);
-		final Integer environmentDatasetId = getEnvironmentDatasetId(studyId);
+		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);
+		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
 		this.deleteTrialInstanceExperiments(plotDatasetId, environmentDatasetId, instanceNumbers);
 
 		// Save variables at trial and plot dataset level
@@ -90,7 +93,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 	@Override
 	public Optional<Integer> getStudyExperimentDesignTypeTermId(final int studyId) {
-		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
+		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
 		final ProjectProperty projectProp = this.daoFactory.getProjectPropertyDAO()
 			.getByStandardVariableId(new DmsProject(environmentDatasetId), TermId.EXPERIMENT_DESIGN_FACTOR.getId());
 		if (projectProp != null && projectProp.getValue() != null && NumberUtils.isDigits(projectProp.getValue())) {
@@ -198,24 +201,6 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		}
 	}
 
-	private Integer getPlotDatasetId(final int studyId) {
-		final List<DmsProject> plotDatasets =
-			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId());
-		if (CollectionUtils.isEmpty(plotDatasets)) {
-			throw new MiddlewareException("Study does not have a plot dataset associated to it");
-		}
-		return plotDatasets.get(0).getProjectId();
-	}
-
-	private Integer getEnvironmentDatasetId(final int studyId) {
-		final List<DmsProject> plotDatasets =
-			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
-		if (CollectionUtils.isEmpty(plotDatasets)) {
-			throw new MiddlewareException("Study does not have a trial environment dataset associated to it");
-		}
-		return plotDatasets.get(0).getProjectId();
-	}
-
 	private Optional<Geolocation> getGeolocation(final ImmutableMap<String, Geolocation> trialInstanceGeolocationMap, final Integer trialInstance) {
 		final Geolocation geolocation = trialInstanceGeolocationMap.get(trialInstance.toString());
 		if (geolocation != null) {
@@ -235,16 +220,19 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	public void deleteStudyExperimentDesign(final int studyId) {
 		// Delete environment variables related to experiment design and fieldmap
 		final List<Integer> geolocVariables = Lists.newArrayList(Iterables.concat(EXPERIMENTAL_DESIGN_VARIABLES, FIELDMAP_ENVT_VARIABLES));
-		final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyId);
+		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO()
 			.deleteProjectVariables(environmentDatasetId, geolocVariables);
 		this.daoFactory.getGeolocationPropertyDao().deletePropertiesInDataset(environmentDatasetId, geolocVariables);
 
 		// Delete variables related to experiment design and experiments of plot dataset
-		final Integer plotDatasetId = this.getPlotDatasetId(studyId);
+		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO().deleteDatasetVariablesByVariableTypes(plotDatasetId,
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), TermId.MULTIFACTORIAL_INFO.getId()));
 		this.daoFactory.getExperimentDao().deleteExperimentsForDataset(plotDatasetId);
 	}
 
+	void setStudyService(final StudyService studyService) {
+		this.studyService = studyService;
+	}
 }

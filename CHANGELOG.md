@@ -1,3 +1,10 @@
+## [13.2](https://github.com/IntegratedBreedingPlatform/Middleware/compare/13.0...13.2)
+### Added
+- r_package, r_call and r_call_parameter tables to store OpenCPU calls configuration [0fe6dcb](https://github.com/IntegratedBreedingPlatform/Middleware/commit/0fe6dcb632c9da917c2cc261b76adbf1ace671c3)
+
+### Changed
+### Removed
+
 # [13.0](https://github.com/IntegratedBreedingPlatform/Middleware/compare/12.0...13.0) 
 
 ## [12.5](https://github.com/IntegratedBreedingPlatform/Middleware/compare/12.4...12.5)

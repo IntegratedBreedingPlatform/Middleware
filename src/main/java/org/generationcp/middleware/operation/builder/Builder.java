@@ -13,11 +13,11 @@ package org.generationcp.middleware.operation.builder;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
+import org.generationcp.middleware.manager.InventoryDataManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
@@ -138,5 +138,9 @@ public abstract class Builder extends DatabaseBroker {
 
 	protected final FormulaService getFormulaService() {
 		return new FormulaServiceImpl(this.sessionProvider);
+	}
+
+	protected final InventoryDataManager getInventoryDataManager() {
+		return new InventoryDataManagerImpl(this.sessionProvider);
 	}
 }
