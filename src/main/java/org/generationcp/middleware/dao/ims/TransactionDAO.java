@@ -764,7 +764,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		transaction.setTransactionDate(new Date());
 		transaction.setQuantity(transactionDto.getAmount());
 		transaction.setPreviousAmount(0D);
-		//FIXME not so sure about commitment date always being 0, I guess it depends on the TransactionType
+		//FIXME check if commitment date always has to be 0
 		transaction.setCommitmentDate(0);
 		transaction.setComments(transactionDto.getNotes());
 

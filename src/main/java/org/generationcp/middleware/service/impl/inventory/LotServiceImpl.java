@@ -56,7 +56,7 @@ public class LotServiceImpl implements LotService {
 		lot.setLocationId(lotDto.getLocationId());
 		lot.setStockId(lotDto.getStockId());
 		lot.setStatus(0);
-		//FIXME we should be careful in the near future to set the right value here
+		//FIXME check if source has to be always 0
 		lot.setSource(0);
 		lot.setScaleId(lotDto.getScaleId());
 		this.inventoryDataManager.generateLotIds(cropType, Lists.newArrayList(lot));
