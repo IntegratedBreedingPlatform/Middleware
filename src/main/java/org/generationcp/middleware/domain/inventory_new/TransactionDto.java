@@ -20,10 +20,10 @@ public class TransactionDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	private Date transactionDate;
 
-	private LotDto lot;
+	private ExtendedLotDto lot;
 
 	public TransactionDto() {
-		this.lot = new LotDto();
+		this.lot = new ExtendedLotDto();
 	}
 
 	public TransactionDto(final Integer transactionId, final String user, final String transactionType, final Double amount,
@@ -36,7 +36,7 @@ public class TransactionDto {
 		this.amount = amount;
 		this.notes = notes;
 		this.transactionDate = transactionDate;
-		this.lot = new LotDto();
+		this.lot = new ExtendedLotDto();
 		this.lot.setLotId(lotId);
 		this.lot.setGid(gid);
 		this.lot.setDesignation(designation);
@@ -94,11 +94,11 @@ public class TransactionDto {
 		this.transactionDate = transactionDate;
 	}
 
-	public LotDto getLot() {
+	public ExtendedLotDto getLot() {
 		return lot;
 	}
 
-	public void setLot(final LotDto lot) {
+	public void setLot(final ExtendedLotDto lot) {
 		this.lot = lot;
 	}
 

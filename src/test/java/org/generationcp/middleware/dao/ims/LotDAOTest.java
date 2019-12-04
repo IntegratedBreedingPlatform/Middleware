@@ -9,7 +9,7 @@ import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitial
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
-import org.generationcp.middleware.domain.inventory_new.LotDto;
+import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -199,8 +199,8 @@ public class LotDAOTest extends IntegrationTestBase {
 	@Test
 	public void testSearchAllLots() {
 
-		final List<LotDto> lotDtos = lotDAO.searchLots(null, null);
-		Assert.assertTrue(lotDtos.size() >= 3);
+		final List<ExtendedLotDto> extendedLotDtos = lotDAO.searchLots(null, null);
+		Assert.assertTrue(extendedLotDtos.size() >= 3);
 
 	}
 
@@ -210,35 +210,35 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		lotsSearchDto.setLotIds(Lists.newArrayList(lot1.getId(), lot2.getId()));
 
-		final List<LotDto> lotDtos = lotDAO.searchLots(lotsSearchDto, null);
-		Assert.assertEquals(lotDtos.size(), 2);
+		final List<ExtendedLotDto> extendedLotDtos = lotDAO.searchLots(lotsSearchDto, null);
+		Assert.assertEquals(extendedLotDtos.size(), 2);
 	}
 
 	@Test
 	public void testSearchLotsByLocationIds() {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLocationIds(Lists.newArrayList(location.getLocid()));
-		final List<LotDto> lotDtos = lotDAO.searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = lotDAO.searchLots(lotsSearchDto, null);
 
-		Assert.assertEquals(lotDtos.size(), 1);
+		Assert.assertEquals(extendedLotDtos.size(), 1);
 	}
 
 	@Test
 	public void testSearchLotsByGids() {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setGids(Lists.newArrayList(germplasm1.getGid()));
-		final List<LotDto> lotDtos = lotDAO.searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = lotDAO.searchLots(lotsSearchDto, null);
 
-		Assert.assertEquals(lotDtos.size(), 2);
+		Assert.assertEquals(extendedLotDtos.size(), 2);
 	}
 
 	@Test
 	public void testSearchLotsByGermplasmListIds() {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setGermplasmListIds(Lists.newArrayList(germplasmList.getId()));
-		final List<LotDto> lotDtos = lotDAO.searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = lotDAO.searchLots(lotsSearchDto, null);
 
-		Assert.assertEquals(lotDtos.size(), 2);
+		Assert.assertEquals(extendedLotDtos.size(), 2);
 	}
 
 	private void createLocationForSearchLotTest() {

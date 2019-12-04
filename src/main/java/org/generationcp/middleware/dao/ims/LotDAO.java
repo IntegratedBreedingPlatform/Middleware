@@ -15,7 +15,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
-import org.generationcp.middleware.domain.inventory_new.LotDto;
+import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -831,7 +831,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		return lotsSearchQuery;
 	}
 
-	public List<LotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
+	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
 		try {
 			final String filterLotsQuery = addSortToSearchLotsQuery(buildSearchLotsQuery(lotsSearchDto), pageable);
 
@@ -856,16 +856,16 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("lastDepositDate", Hibernate.DATE);
 			query.addScalar("lastWithdrawalDate",Hibernate.DATE);
 
-			query.setResultTransformer(Transformers.aliasToBean(LotDto.class));
+			query.setResultTransformer(Transformers.aliasToBean(ExtendedLotDto.class));
 
 			if (pageable!= null) {
 				query.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
 				query.setMaxResults(pageable.getPageSize());
 			}
 
-			final List<LotDto> lotDtos = query.list();
+			final List<ExtendedLotDto> extendedLotDtos = query.list();
 
-			return lotDtos;
+			return extendedLotDtos;
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error at searchLots() query on LotDAO: " + e.getMessage(), e);
 		}

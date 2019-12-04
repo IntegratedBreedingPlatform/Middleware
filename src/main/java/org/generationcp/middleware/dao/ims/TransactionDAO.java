@@ -17,8 +17,10 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory_new.TransactionDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.Util;
@@ -741,8 +743,31 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		try {
 			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class,  Double.class,
 			 String.class, Date.class, Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class);
-		} catch (NoSuchMethodException ex) {
+		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+
+	public Transaction saveTransaction(final TransactionDto transactionDto) {
+		final Lot lot = new Lot();
+		lot.setId(transactionDto.getLot().getLotId());
+		final Transaction transaction = new Transaction();
+		if (TransactionType.DEPOSIT.getValue().equalsIgnoreCase(transactionDto.getTransactionType()) || TransactionType.WITHDRAWAL
+			.getValue().equalsIgnoreCase(transactionDto.getTransactionType())) {
+			transaction.setStatus(TransactionStatus.COMMITTED.getIntValue());
+		} else {
+			transaction.setStatus(TransactionStatus.ANTICIPATED.getIntValue());
+		}
+		transaction.setLot(lot);
+		transaction.setPersonId(Integer.valueOf(transactionDto.getUser()));
+		transaction.setUserId(Integer.valueOf(transactionDto.getUser()));
+		transaction.setTransactionDate(new Date());
+		transaction.setQuantity(transactionDto.getAmount());
+		transaction.setPreviousAmount(0D);
+		//FIXME check if commitment date always has to be 0
+		transaction.setCommitmentDate(0);
+		transaction.setComments(transactionDto.getNotes());
+
+		return this.saveOrUpdate(transaction);
 	}
 }

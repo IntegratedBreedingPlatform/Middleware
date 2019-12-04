@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Location}.
@@ -279,6 +280,34 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 							LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 		return new ArrayList<>();
+	}
+
+	public List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final String programUUID) {
+		final List<Location> locations;
+		try {
+
+			final Criteria criteria = this.getSession().createCriteria(Location.class);
+
+			if (types != null && !types.isEmpty()) {
+				criteria.add(Restrictions.in(LocationDAO.LTYPE, types));
+			}
+
+			if (locationIds != null && !locationIds.isEmpty()) {
+				criteria.add(Restrictions.in(LocationDAO.LOCID, locationIds));
+			}
+
+			criteria.add(
+				Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID), Restrictions.isNull(LocationDAO.UNIQUE_ID)));
+			criteria.addOrder(Order.asc(LocationDAO.LNAME));
+			locations = criteria.list();
+
+		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("getFilteredLocations", "types,locationIds,programUUID", "", e.getMessage(),
+					LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+		return locations;
 	}
 
 	public List<Location> getByType(final Integer type, final String programUUID) {
@@ -705,7 +734,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			locations = criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getByIds", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+					this.getLogExceptionMessage("getByUniqueID", "programUUID", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 		return locations;
 	}
