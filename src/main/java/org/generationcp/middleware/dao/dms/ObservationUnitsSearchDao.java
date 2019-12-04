@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integer> {
 
@@ -1047,63 +1048,66 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	 */
 	private String getObservationUnitTableWithColumnFilterQuery(
 		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
-		
+
+		// Only data from variables included in filterColumns will be returned.
 		final List<String> filterColumns = searchDto.getFilter().getFilterColumns();
 
-		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT  ");
+		final StringBuilder sqlMain = new StringBuilder("SELECT * FROM (SELECT  ");
+
+		final StringJoiner sqlColumns = new StringJoiner(", ");
 
 		if (filterColumns.contains(TRIAL_INSTANCE)) {
-			sql.append("    gl.description AS TRIAL_INSTANCE, ");
+			sqlColumns.add("    gl.description AS TRIAL_INSTANCE");
 		}
 		if (filterColumns.contains(ENTRY_TYPE)) {
-			sql.append("    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,  ");
+			sqlColumns.add("    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS ENTRY_TYPE");
 		}
 		if (filterColumns.contains(GID)) {
-			sql.append("    s.dbxref_id AS GID, ");
+			sqlColumns.add("    s.dbxref_id AS GID");
 		}
 		if (filterColumns.contains(DESIGNATION)) {
-			sql.append("    s.name DESIGNATION, ");
+			sqlColumns.add("    s.name AS DESIGNATION");
 		}
 		if (filterColumns.contains(ENTRY_NO)) {
-			sql.append("    s.uniquename ENTRY_NO, ");
+			sqlColumns.add("    s.uniquename AS ENTRY_NO");
 		}
 		if (filterColumns.contains(ENTRY_CODE)) {
-			sql.append("    s.value as ENTRY_CODE, ");
+			sqlColumns.add("    s.value AS ENTRY_CODE");
 		}
 		if (filterColumns.contains(REP_NO)) {
-			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO,  ");
+			sqlColumns.add("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'REP_NO') AS REP_NO");
 		}
 		if (filterColumns.contains(PLOT_NO)) {
-			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO,  ");
+			sqlColumns.add("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO') AS PLOT_NO");
 		}
 		if (filterColumns.contains(BLOCK_NO)) {
-			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO,  ");
+			sqlColumns.add("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') AS BLOCK_NO");
 		}
 		if (filterColumns.contains(ROW)) {
-			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'ROW') ROW,  ");
+			sqlColumns.add("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'ROW') AS ROW");
 		}
 		if (filterColumns.contains(COL)) {
-			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'COL') COL,  ");
+			sqlColumns.add("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'COL') AS COL");
 		}
 		if (filterColumns.contains(FIELD_MAP_COLUMN)) {
-			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  ");
+			sqlColumns.add("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') AS 'FIELDMAP COLUMN'");
 		}
 		if (filterColumns.contains(FIELD_MAP_RANGE)) {
-			sql.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  ");
+			sqlColumns.add("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') AS 'FIELDMAP RANGE'");
 		}
 		if (filterColumns.contains(SUM_OF_SAMPLES)) {
-			sql.append("    coalesce(nullif((SELECT count(sp.sample_id) " //
+			sqlColumns.add("    coalesce(nullif((SELECT count(sp.sample_id) " //
 				+ "        FROM sample sp " //
 				+ "        WHERE sp.nd_experiment_id = nde.nd_experiment_id) " //
-				+ "         + coalesce(child_sample_count.count, 0), 0), '-') 'SUM_OF_SAMPLES', ");
+				+ "         + coalesce(child_sample_count.count, 0), 0), '-') AS 'SUM_OF_SAMPLES'");
 		}
 
-		final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s',";
-		final String traitDraftClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS '%s',";
+		final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'";
+		final String traitDraftClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS '%s'";
 
 		for (final MeasurementVariableDto measurementVariable : searchDto.getSelectionMethodsAndTraits()) {
 			if (filterColumns.contains(measurementVariable.getName())) {
-				sql.append(String.format(
+				sqlColumns.add(String.format(
 					Boolean.TRUE.equals(searchDto.getDraftMode()) ? traitDraftClauseFormat : traitClauseFormat,
 					measurementVariable.getName(),
 					measurementVariable.getName()));
@@ -1112,44 +1116,40 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (!CollectionUtils.isEmpty(searchDto.getGenericGermplasmDescriptors())) {
 			final String germplasmDescriptorClauseFormat =
-				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') '%s',  ";
+				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') AS '%s'";
 			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
 				if (filterColumns.contains(gpFactor)) {
-					sql.append(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
+					sqlColumns.add(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
 				}
 			}
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getAdditionalDesignFactors())) {
 			final String designFactorClauseFormat =
-				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = plot.nd_experiment_id AND xpropcvt.name = '%s') '%s',  ";
+				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = plot.nd_experiment_id AND xpropcvt.name = '%s') AS '%s'";
 			for (final String designFactor : searchDto.getAdditionalDesignFactors()) {
 				if (filterColumns.contains(designFactor)) {
-					sql.append(String.format(designFactorClauseFormat, designFactor, designFactor));
+					sqlColumns.add(String.format(designFactorClauseFormat, designFactor, designFactor));
 				}
 			}
 		}
 
 		// TODO move PLOT_NO to nd_exp
 		if (filterColumns.contains(observationUnitNoName) && !PLOT_NO.equals(observationUnitNoName)) {
-			sql.append(" COALESCE(nde.observation_unit_no, ("
+			sqlColumns.add(" COALESCE(nde.observation_unit_no, ("
 				+ "		SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO' "
 				+ " )) AS " + observationUnitNoName);
 		}
 
-		// Remove comma at the end if there's any.
-		final int index = sql.lastIndexOf(",");
-		if (index != -1){
-			sql.replace(index, index+1, "");
-		}
+		sqlMain.append(sqlColumns);
 
-		this.addFromClause(sql, searchDto);
+		this.addFromClause(sqlMain, searchDto);
 
-		this.addFilters(sql,  searchDto.getFilter(), searchDto.getDraftMode());
+		this.addFilters(sqlMain,  searchDto.getFilter(), searchDto.getDraftMode());
 
-		sql.append(" GROUP BY nde.nd_experiment_id ) T ");
+		sqlMain.append(" GROUP BY nde.nd_experiment_id ) T ");
 
-		return sql.toString();
+		return sqlMain.toString();
 	}
 
 }
