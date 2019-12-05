@@ -112,6 +112,7 @@ public class DatasetServiceImpl implements DatasetService {
 		TermId.LOCATION_ID.getId(),
 		TermId.TRIAL_INSTANCE_FACTOR.getId(),
 		TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+	public static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
 
 	private DaoFactory daoFactory;
 
@@ -221,7 +222,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private MeasurementVariable buildSampleColumn() {
 		final MeasurementVariable sampleColumn = new MeasurementVariable();
-		sampleColumn.setName(TermId.SAMPLES.name());
+		// Set the the variable name of this virtual Sample Column to SUM_OF_SAMPLES, to match
+		// the Sample field name in observation query.
+		sampleColumn.setName(SUM_OF_SAMPLES);
 		sampleColumn.setAlias(TermId.SAMPLES.name());
 		sampleColumn.setTermId(TermId.SAMPLES.getId());
 		sampleColumn.setFactor(true);
