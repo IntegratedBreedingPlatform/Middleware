@@ -3,7 +3,11 @@ package org.generationcp.middleware.dao.dms;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.*;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
@@ -27,9 +31,15 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
@@ -529,7 +539,8 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
 
-		final List<Map<String, Object>> measurementRows = this.obsUnitSearchDao.getObservationUnitTableAsListOfMap(observationUnitsSearchDTO);
+		final List<Map<String, Object>> measurementRows =
+			this.obsUnitSearchDao.getObservationUnitTableAsListOfMap(observationUnitsSearchDTO);
 
 		assertEquals(noOfSubObservationExperiment, measurementRows.size());
 
@@ -559,7 +570,6 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testConvertSelectionAndTraitColumnsValueType() {
 
-
 		final MeasurementVariableDto trait1 = new MeasurementVariableDto(1, "Trait1");
 		final MeasurementVariableDto trait2 = new MeasurementVariableDto(2, "Trait2");
 		final MeasurementVariableDto trait3 = new MeasurementVariableDto(3, "Trait3");
@@ -574,7 +584,8 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 		final List<Map<String, Object>> listMap = Arrays.asList(dataMap);
 
-		final List<Map<String, Object>> result = this.obsUnitSearchDao.convertSelectionAndTraitColumnsValueType(listMap, selectionAndTraits);
+		final List<Map<String, Object>> result =
+			this.obsUnitSearchDao.convertSelectionAndTraitColumnsValueType(listMap, selectionAndTraits);
 
 		final Map<String, Object> resultDataMap = result.get(0);
 		assertEquals("1", resultDataMap.get(ObservationUnitsSearchDao.TRIAL_INSTANCE));

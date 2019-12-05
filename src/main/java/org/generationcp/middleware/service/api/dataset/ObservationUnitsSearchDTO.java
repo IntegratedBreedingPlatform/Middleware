@@ -32,6 +32,7 @@ public class ObservationUnitsSearchDTO {
 
 	private Filter filter;
 
+
 	public class Filter {
 
 		private Boolean byOutOfBound;
@@ -47,11 +48,12 @@ public class ObservationUnitsSearchDTO {
 		public Filter() {
 			this.byMissing = false;
 			this.byOutOfBound = false;
-			this.byOutOfSync =  false;
+			this.byOutOfSync = false;
 			this.byOverwritten = false;
 			this.filteredValues = new HashMap<>();
 			this.filteredTextValues = new HashMap<>();
 			this.variableId = null;
+			/** This is used by Visualization tool, to specify the columns that will included in the data returned from the server. **/
 			this.filterColumns = new ArrayList<>();
 		}
 
@@ -135,8 +137,9 @@ public class ObservationUnitsSearchDTO {
 		this.draftMode = false;
 	}
 
-	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors, final List<String> additionalDesignFactors,
-			final List<MeasurementVariableDto> selectionMethodsAndTraits) {
+	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors,
+		final List<String> additionalDesignFactors,
+		final List<MeasurementVariableDto> selectionMethodsAndTraits) {
 		this();
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;
 		this.additionalDesignFactors = additionalDesignFactors;
