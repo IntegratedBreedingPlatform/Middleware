@@ -1,8 +1,8 @@
 package org.generationcp.middleware.service.api.inventory;
 
-import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory_new.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.springframework.data.domain.Pageable;
 

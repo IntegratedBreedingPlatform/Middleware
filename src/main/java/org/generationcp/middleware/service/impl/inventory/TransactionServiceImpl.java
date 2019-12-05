@@ -1,7 +1,7 @@
 package org.generationcp.middleware.service.impl.inventory;
 
-import org.generationcp.middleware.domain.inventory_new.TransactionDto;
-import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.service.api.inventory.TransactionService;

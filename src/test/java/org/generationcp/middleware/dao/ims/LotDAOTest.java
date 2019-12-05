@@ -9,8 +9,8 @@ import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitial
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
-import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;

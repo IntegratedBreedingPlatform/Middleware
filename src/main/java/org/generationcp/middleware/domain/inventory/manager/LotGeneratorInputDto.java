@@ -1,4 +1,4 @@
-package org.generationcp.middleware.domain.inventory_new;
+package org.generationcp.middleware.domain.inventory.manager;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;

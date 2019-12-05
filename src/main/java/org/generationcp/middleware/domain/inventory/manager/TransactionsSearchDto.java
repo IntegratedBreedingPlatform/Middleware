@@ -1,4 +1,4 @@
-package org.generationcp.middleware.domain.inventory_new;
+package org.generationcp.middleware.domain.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
