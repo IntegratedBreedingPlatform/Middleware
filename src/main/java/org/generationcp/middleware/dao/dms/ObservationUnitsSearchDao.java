@@ -56,7 +56,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	protected static final String ENTRY_TYPE = "ENTRY_TYPE";
 	protected static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 	static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
-	private static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
+	protected static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
 	private static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
@@ -322,10 +322,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	public List<Map<String, Object>> getObservationUnitRowsAsListMap(final ObservationUnitsSearchDTO searchDto) {
+	public List<Map<String, Object>> getObservationUnitTableAsListOfMap(final ObservationUnitsSearchDTO searchDto) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
-			return this.getObservationUnitTableWithColumnFilterResult(
+			return this.getObservationUnitTableAsListOfMapResult(
 				searchDto,
 				observationVariableName);
 		} catch (final Exception e) {
@@ -998,38 +998,19 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return variableName + ENVIRONMENT_COLUMN_NAME_SUFFIX;
 	}
 
-	private List<Map<String, Object>> getObservationUnitTableWithColumnFilterResult(final ObservationUnitsSearchDTO searchDto,
+	private List<Map<String, Object>> getObservationUnitTableAsListOfMapResult(final ObservationUnitsSearchDTO searchDto,
 		final String observationVariableName) {
 		try {
 
-			final String queryForVisualization = this.getObservationUnitTableWithColumnFilterQuery(searchDto, observationVariableName);
-			final SQLQuery query = this.getSession().createSQLQuery(queryForVisualization);
+			final String sql = this.getObservationUnitTableAsListOfMapQuery(searchDto, observationVariableName);
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
 
 			for (final String columnName : searchDto.getFilter().getFilterColumns()) {
 				query.addScalar(columnName);
 			}
 
 			this.setParameters(searchDto, query);
-
-			final List<Map<String, Object>> result = query.list();
-			final Iterator<Map<String, Object>> iterator = result.iterator();
-			while (iterator.hasNext()) {
-				final Map<String, Object> rowMap = iterator.next();
-				for (final String name : searchDto.getFilter().getFilterColumns()) {
-					// Unfortunately, since the trait values (Numeric and Categorical) are stored and returned as String from the database,
-					// We have to manually convert them to numeric values (if possible) so that the data returned to the client will be properly processed
-					// when we send it to the OpenCPU API. Also, if the phenotype value is "missing", we should return it as a null value in order for
-					// R code to treat it as NA (Not applicable).
-					final String columnValue = String.valueOf(rowMap.get(name));
-					if (Phenotype.MISSING_VALUE.equals(columnValue)) {
-						rowMap.put(name, null);
-					} else {
-						rowMap.put(name, NumberUtils.isNumber(columnValue) ? NumberUtils.createBigDecimal(columnValue) : rowMap.get(name));
-					}
-				}
-			}
-
-			return result;
+			return this.convertSelectionAndTraitColumnsValueType(query.list(), searchDto.getSelectionMethodsAndTraits());
 
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation " + e.getMessage();
@@ -1038,15 +1019,38 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
+	protected List<Map<String, Object>> convertSelectionAndTraitColumnsValueType(final List<Map<String, Object>> result, final List<MeasurementVariableDto> selectionAndTraits) {
+		final Iterator<Map<String, Object>> iterator = result.iterator();
+		while (iterator.hasNext()) {
+			final Map<String, Object> rowMap = iterator.next();
+			for (final MeasurementVariableDto measurementVariableDto : selectionAndTraits) {
+				// Unfortunately, since the trait values (Numerical or Categorical with numeric code) are stored and returned as String from the database,
+				// We have to manually convert them to numeric data type (if possible) so that the data returned to the client will be properly processed
+				// when we send it to the OpenCPU API. Also, if a trait's value is "missing", we should return it as a null value in order for
+				// OpenCPU to recognize it as 'NA' (Not Available).
+				if (rowMap.containsKey(measurementVariableDto.getName())) {
+					final String stringValue = String.valueOf(rowMap.get(measurementVariableDto.getName()));
+					if (Phenotype.MISSING_VALUE.equals(stringValue)) {
+						rowMap.put(measurementVariableDto.getName(), null);
+					} else {
+						// Convert numeric sting to BigDecimal to support signed decimal number
+						rowMap.put(measurementVariableDto.getName(), NumberUtils.isNumber(stringValue) ? NumberUtils.createBigDecimal(stringValue) : rowMap.get(measurementVariableDto.getName()));
+					}
+				}
+			}
+		}
+		return result;
+	}
+
 	/**
-	 * Stripped-down version of {@Link ObservationUnitsSearchDao#getObservationUnitTableQuery}. It will only return the values (no metadata -- PhenotypeId, experimentId, etc) from factors and variates at Observation level.
-	 * The query is also optimized to exclude columns that are not specified in {@Link ObservationUnitsSearchDTO#filter#filterColumns} parameter, this is to reduce the number of subqueries and to ensure that the
-	 * query returns columns that are needed.
+	 * Stripped-down version of {@Link ObservationUnitsSearchDao#getObservationUnitTableQuery}. It will only return the values (no metadata -- PhenotypeId, experimentId, obs_unit_id, etc) from factors and variates at Observation level.
+	 * The query is also optimized to exclude columns that are not specified in {@Link ObservationUnitsSearchDTO#filter#filterColumns} parameter as to reduce the number of subqueries and ensure that the
+	 * query only returns columns that are needed per request.
 	 * @param searchDto
 	 * @param observationUnitNoName
 	 * @return
 	 */
-	private String getObservationUnitTableWithColumnFilterQuery(
+	private String getObservationUnitTableAsListOfMapQuery(
 		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
 
 		// Only data from variables included in filterColumns will be returned.

@@ -579,7 +579,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.fillSearchDTO(studyId, datasetId, searchDTO);
 
-		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitRowsAsListMap(searchDTO);
+		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTableAsListOfMap(searchDTO);
 	}
 
 	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
