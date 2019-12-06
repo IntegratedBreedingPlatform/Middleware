@@ -329,7 +329,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 			Assert.assertTrue(transactionDto.getTransactionDate().equals(date1));
 			Assert.assertTrue(transactionDto.getTransactionId().equals(depositTransaction.getId()));
 			Assert.assertTrue(transactionDto.getTransactionType().equalsIgnoreCase("Deposit"));
-			Assert.assertTrue(transactionDto.getUser().equalsIgnoreCase(user.getName()));
+			Assert.assertTrue(transactionDto.getCreatedByUsername().equalsIgnoreCase(user.getName()));
 		}
 	}
 }

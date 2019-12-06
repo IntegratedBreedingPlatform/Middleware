@@ -12,7 +12,7 @@ import java.util.Date;
 public class TransactionDto {
 
 	private Integer transactionId;
-	private String user;
+	private String createdByUsername;
 	private String transactionType;
 	private Double amount;
 	private String notes;
@@ -26,12 +26,12 @@ public class TransactionDto {
 		this.lot = new ExtendedLotDto();
 	}
 
-	public TransactionDto(final Integer transactionId, final String user, final String transactionType, final Double amount,
+	public TransactionDto(final Integer transactionId, final String createdByUsername, final String transactionType, final Double amount,
 		final String notes,
 		final Date transactionDate, final Integer lotId, final Integer gid, final String designation, final String stockId,
 		final Integer scaleId, final String scaleName, final String lotStatus) {
 		this.transactionId = transactionId;
-		this.user = user;
+		this.createdByUsername = createdByUsername;
 		this.transactionType = transactionType;
 		this.amount = amount;
 		this.notes = notes;
@@ -54,12 +54,12 @@ public class TransactionDto {
 		this.transactionId = transactionId;
 	}
 
-	public String getUser() {
-		return this.user;
+	public String getCreatedByUsername() {
+		return this.createdByUsername;
 	}
 
-	public void setUser(final String user) {
-		this.user = user;
+	public void setCreatedByUsername(final String createdByUsername) {
+		this.createdByUsername = createdByUsername;
 	}
 
 	public String getTransactionType() {
@@ -95,7 +95,7 @@ public class TransactionDto {
 	}
 
 	public ExtendedLotDto getLot() {
-		return lot;
+		return this.lot;
 	}
 
 	public void setLot(final ExtendedLotDto lot) {
