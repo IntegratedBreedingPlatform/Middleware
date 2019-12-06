@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.hibernate.Criteria;
@@ -650,7 +651,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "  lot.eid as gid, " //
 		+ "  g.mgid as mgid, " //
 		+ "  n.nval as designation, "
-		+ "  CASE WHEN lot.status = 0 then 'Active' else 'Closed' end as status, " //
+		+ "  CASE WHEN lot.status = 0 then '" + LotStatus.ACTIVE.name()  +"' else '"+ LotStatus.CLOSED.name()+ "' end as status, " //
 		+ "  lot.locid as locationId, " //
  		+ "  l.lname as locationName, " //
 		+ "  lot.scaleid as scaleId, " //
@@ -856,10 +857,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 			query.setResultTransformer(Transformers.aliasToBean(ExtendedLotDto.class));
 
-			if (pageable!= null) {
-				query.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
-				query.setMaxResults(pageable.getPageSize());
-			}
+			GenericDAO.addPaginationToSQLQuery(query, pageable);
 
 			final List<ExtendedLotDto> extendedLotDtos = query.list();
 

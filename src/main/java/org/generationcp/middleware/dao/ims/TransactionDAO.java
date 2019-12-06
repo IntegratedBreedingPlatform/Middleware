@@ -711,13 +711,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			query.addScalar("lotScaleName");
 			query.addScalar("lotStatus");
 
-
 			query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
 
-			if (pageable != null) {
-				query.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
-				query.setMaxResults(pageable.getPageSize());
-			}
+			GenericDAO.addPaginationToSQLQuery(query, pageable);
 
 			final List<TransactionDto> transactionDtos = query.list();
 
