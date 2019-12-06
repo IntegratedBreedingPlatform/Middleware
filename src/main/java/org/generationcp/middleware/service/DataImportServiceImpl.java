@@ -400,12 +400,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		if(exptDesignVarInConditions.isPresent()) {
 			final MeasurementVariable exptDesignVar = exptDesignVarInConditions.get();
 			if (exptDesignVar.getValue() != null && !exptDesignVar.getValue().isEmpty()) {
-				Term exptDesignValue = this.termDataManager.getTermByName(exptDesignVar.getValue());
-				if (exptDesignValue != null) {
-					exptDesignVar.setValue(String.valueOf(exptDesignValue.getId()));
-				} else {
-					throw new WorkbookParserException("Invalid value for Experimental Design");
-				}
+				exptDesignVar.setValue(this.getExperimentalDesignIdValue(exptDesignVar.getValue()));
 			} else {
 				exptDesignVar.setValue(this.getExperimentalDesignIdValue(exptDesignValueFromObsSheet));
 			}
