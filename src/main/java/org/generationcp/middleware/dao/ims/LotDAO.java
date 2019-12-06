@@ -39,7 +39,6 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -669,7 +668,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "       LEFT JOIN ims_transaction transaction ON transaction.lotid = lot.lotid AND transaction.trnstat <> 9 " //
 		+ "       INNER JOIN germplsm g on g.gid = lot.eid " //
 		+ "       INNER JOIN names n ON n.gid = lot.eid AND n.nstat = 1 " //
-			// location id and scale id are suppossed to be mandatory but they are not, left join should be replaced by inner join
 		+ "       LEFT JOIN location l on l.locid = lot.locid " //
 		+ "       LEFT join cvterm scale on scale.cvterm_id = lot.scaleid " //
 		+ "       INNER JOIN workbench.users users on users.userid = lot.userid " //
@@ -715,11 +713,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 
 			if(lotsSearchDto.getCreatedDateFrom() != null) {
-				query.append(" and DATE(lot.created_date) >= '").append(formatDate(lotsSearchDto.getCreatedDateFrom())).append("' ");
+				query.append(" and DATE(lot.created_date) >= '").append(format.format(lotsSearchDto.getCreatedDateFrom())).append("' ");
 			}
 
 			if(lotsSearchDto.getCreatedDateTo() != null) {
-				query.append(" and DATE(lot.created_date) <= '").append(formatDate(lotsSearchDto.getCreatedDateTo())).append("' ");
+				query.append(" and DATE(lot.created_date) <= '").append(format.format(lotsSearchDto.getCreatedDateTo())).append("' ");
 			}
 
 			if(lotsSearchDto.getCreatedByUsername() != null) {
@@ -791,24 +789,24 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				query.append(
 						" and DATE(MAX(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty > 0 THEN transaction.trndate ELSE null END)) >= '")
 						.
-								append(formatDate(lotsSearchDto.getLastDepositDateFrom())).append("' ");
+								append(format.format(lotsSearchDto.getLastDepositDateFrom())).append("' ");
 			}
 
 			if (lotsSearchDto.getLastDepositDateTo() != null) {
 				query.append(
 						" and DATE(MAX(CASE WHEN transaction.trnstat = 0 AND transaction.trnqty > 0 THEN transaction.trndate ELSE null END)) <= '")
 						.
-								append(formatDate(lotsSearchDto.getLastDepositDateTo())).append("' ");
+								append(format.format(lotsSearchDto.getLastDepositDateTo())).append("' ");
 			}
 
 			if (lotsSearchDto.getLastWithdrawalDateFrom() != null) {
 				query.append(" and DATE(MAX(CASE WHEN transaction.trnstat = 1 AND transaction.trnqty <= 0 THEN transaction.trndate ELSE null END)) >= '").
-						append(formatDate(lotsSearchDto.getLastWithdrawalDateFrom())).append("' ");
+						append(format.format(lotsSearchDto.getLastWithdrawalDateFrom())).append("' ");
 			}
 
 			if (lotsSearchDto.getLastWithdrawalDateTo() != null) {
 				query.append(" and DATE(MAX(CASE WHEN transaction.trnstat = 1 AND transaction.trnqty <= 0 THEN transaction.trndate ELSE null END)) <= '").
-						append(formatDate(lotsSearchDto.getLastWithdrawalDateTo())).append("' ");
+						append(format.format(lotsSearchDto.getLastWithdrawalDateTo())).append("' ");
 			}
 		}
 		return query.toString();
@@ -882,10 +880,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error at countSearchLots() query on LotDAO: " + e.getMessage(), e);
 		}
-	}
-
-	private String formatDate(final Date date){
-		return format.format(date);
 	}
 
 	public List<String> getInventoryIDsWithBreederIdentifier(final String identifier) {
