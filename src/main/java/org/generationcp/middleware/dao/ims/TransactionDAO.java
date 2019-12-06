@@ -561,7 +561,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	//New inventory functions, please locate them below this line to help cleaning in the near future.
 	private final String SEARCH_TRANSACTIONS_QUERY = "SELECT " //
 		+ "    act.trnid AS transactionId,"//
-		+ "    users.uname AS user,"//
+		+ "    users.uname AS createdByUsername,"//
 		+ "    (CASE"//
 		+ "        WHEN trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND trnqty >= 0 THEN '" + TransactionType.DEPOSIT
 		.getValue() + "'"//
@@ -698,7 +698,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(filterTransactionsQuery);
 			query.addScalar("transactionId");
-			query.addScalar("user");
+			query.addScalar("createdByUsername");
 			query.addScalar("transactionType");
 			query.addScalar("amount");
 			query.addScalar("notes");
