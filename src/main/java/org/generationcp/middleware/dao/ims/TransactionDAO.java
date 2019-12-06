@@ -563,9 +563,12 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "    act.trnid AS transactionId,"//
 		+ "    users.uname AS user,"//
 		+ "    (CASE"//
-		+ "        WHEN trnstat = 1 AND trnqty >= 0 THEN 'Deposit'"//
-		+ "        WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation'"//
-		+ "        WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal'"//
+		+ "        WHEN trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND trnqty >= 0 THEN '" + TransactionType.DEPOSIT
+		.getValue() + "'"//
+		+ "        WHEN trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() + " AND trnqty < 0 THEN '" + TransactionType.RESERVATION
+		.getValue() + "'"//
+		+ "        WHEN trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND trnqty < 0 THEN '" + TransactionType.WITHDRAWAL
+		.getValue() + "'"//
 		+ "    END) AS transactionType,"//
 		+ "    act.trnqty AS amount,"//
 		+ "    act.comments AS notes,"//
@@ -647,9 +650,12 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 			if (transactionsSearchDto.getTransactionType() != null) {
 				query.append("and (CASE"
-					+ "        WHEN trnstat = 1 AND trnqty >= 0 THEN 'Deposit'"
-					+ "        WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation'"
-					+ "        WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal'"
+					+ "        WHEN trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND trnqty >= 0 THEN '"
+					+ TransactionType.DEPOSIT.getValue() + "'"
+					+ "        WHEN trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() + " AND trnqty < 0 THEN '"
+					+ TransactionType.RESERVATION.getValue() + "'"
+					+ "        WHEN trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND trnqty < 0 THEN '"
+					+ TransactionType.WITHDRAWAL.getValue() + "'"
 					+ "    END) = '")
 					.append(transactionsSearchDto.getTransactionType()).append("' ");
 			}
