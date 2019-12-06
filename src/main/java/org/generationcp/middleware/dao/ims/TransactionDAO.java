@@ -624,11 +624,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			}
 
 			if (transactionsSearchDto.getTransactionDateFrom() != null) {
-				query.append(" and DATE(act.trndate) >= '").append(this.formatDate(transactionsSearchDto.getTransactionDateFrom())).append("' ");
+				query.append(" and DATE(act.trndate) >= '").append(format.format(transactionsSearchDto.getTransactionDateFrom())).append("' ");
 			}
 
 			if (transactionsSearchDto.getTransactionDateTo() != null) {
-				query.append(" and DATE(act.trndate) <= '").append(this.formatDate(transactionsSearchDto.getTransactionDateTo())).append("' ");
+				query.append(" and DATE(act.trndate) <= '").append(format.format(transactionsSearchDto.getTransactionDateTo())).append("' ");
 			}
 
 			if (transactionsSearchDto.getCreatedByUsername() != null) {
@@ -735,10 +735,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
-	private String formatDate(final Date date) {
-		return format.format(date);
-	}
-
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
 			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class,  Double.class,
@@ -764,7 +760,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		transaction.setTransactionDate(new Date());
 		transaction.setQuantity(transactionDto.getAmount());
 		transaction.setPreviousAmount(0D);
-		//FIXME check if commitment date always has to be 0
+		//FIXME Commitment date in some cases is not 0. For Deposits is always zero, but for other types it will be the current date
 		transaction.setCommitmentDate(0);
 		transaction.setComments(transactionDto.getNotes());
 
