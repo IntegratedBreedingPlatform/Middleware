@@ -34,18 +34,14 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -733,46 +729,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			resultMap.put((Integer) result[0], (String) result[1]);
 		}
 		return resultMap;
-	}
-
-	public List<GermplasmList> searchGermplasmLists(
-		final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
-
-		final SQLQuery query = this.getSession()
-			.createSQLQuery(this.addOrder(exactMatch ? SEARCH_GERMPLASM_LIST_EXACT_MATCH : SEARCH_GERMPLASM_LIST_CONTAINS, pageable));
-
-		query.setParameter("searchString", searchString + (exactMatch ? "" : "%"));
-		query.setParameter("listType", GermplasmList.LIST_TYPE.toString());
-		query.setParameter("program_uuid", programUUID);
-
-		query.addScalar("id", new IntegerType());
-		query.addScalar("name", new StringType());
-		query.addScalar("description", new StringType());
-		query.setResultTransformer(Transformers.aliasToBean(GermplasmList.class));
-
-		return query.list();
-
-	}
-
-	String addOrder(final String queryString, final Pageable pageable) {
-
-		final StringBuilder stringBuilder = new StringBuilder(queryString);
-
-		if (pageable == null || pageable.getSort() == null) {
-			return stringBuilder.toString();
-		}
-
-		stringBuilder.append("ORDER BY ");
-
-		final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
-		while (iterator.hasNext()) {
-			final Sort.Order order = iterator.next();
-			stringBuilder.append(order.getProperty() + " " + order.getDirection().name());
-			if (iterator.hasNext())
-				stringBuilder.append(",");
-		}
-
-		return stringBuilder.toString();
 	}
 
 	/**
