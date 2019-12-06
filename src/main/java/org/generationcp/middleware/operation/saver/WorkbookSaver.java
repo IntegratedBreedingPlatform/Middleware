@@ -51,7 +51,6 @@ import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -535,7 +534,7 @@ public class WorkbookSaver extends Saver {
 		watch.restart("save geolocation");
 
 		this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(geolocation, this.daoFactory.getLocationDAO());
-		this.assignExptDesignValueWithEGDGNIfEmpty(geolocation);
+		this.assignExptDesignAsExternallyGeneratedDesignIfEmpty(geolocation);
 
 		final Geolocation g = this.getGeolocationSaver()
 			.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, null,
@@ -602,7 +601,7 @@ public class WorkbookSaver extends Saver {
 
 							this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
 								geolocation, this.daoFactory.getLocationDAO());
-							this.assignExptDesignValueWithEGDGNIfEmpty(geolocation);
+							this.assignExptDesignAsExternallyGeneratedDesignIfEmpty(geolocation);
 
 							final Geolocation g = this.getGeolocationSaver()
 								.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, row,
@@ -644,7 +643,7 @@ public class WorkbookSaver extends Saver {
 		return 0;
 	}
 
-	protected void assignExptDesignValueWithEGDGNIfEmpty(final VariableList variableList) {
+	protected void assignExptDesignAsExternallyGeneratedDesignIfEmpty(final VariableList variableList) {
 		final Variable exptDesignVariable = variableList.findById(TermId.EXPERIMENT_DESIGN_FACTOR);
 
 		if (exptDesignVariable != null) {
