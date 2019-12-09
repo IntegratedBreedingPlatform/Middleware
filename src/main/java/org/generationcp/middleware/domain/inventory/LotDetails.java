@@ -1,9 +1,10 @@
 package org.generationcp.middleware.domain.inventory;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.pojos.Location;
+
+import java.io.Serializable;
+import java.util.Date;
 
 public class LotDetails implements Serializable {
 
@@ -18,6 +19,7 @@ public class LotDetails implements Serializable {
 	private String lotScaleMethodName;
 	private String commentOfLot;
 	private String lotStatus;
+	private Date createdDate;
 
 	// computed or looked up values
 	private Double actualLotBalance;
@@ -182,6 +184,14 @@ public class LotDetails implements Serializable {
 
 	public void setCommittedTotal(Double committedTotal) {
 		this.committedTotal = committedTotal;
+	}
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(final Date createdDate) {
+		this.createdDate = createdDate;
 	}
 
 	@Override

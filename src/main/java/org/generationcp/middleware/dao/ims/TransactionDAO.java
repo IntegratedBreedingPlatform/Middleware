@@ -445,10 +445,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final Map<Integer, String> gIdStockIdMap = new HashMap<>();
 
 		final String sql =
-				"SELECT a.gid,group_concat(distinct b.stock_id SEPARATOR ', ')  " + "FROM listdata a  "
-						+ "inner join ims_lot b ON a.gid = b.eid  "
-						+ "INNER JOIN ims_transaction c ON b.lotid = c.lotid and a.lrecid = c.recordid "
-						+ "WHERE a.gid in (:gIds) GROUP BY a.gid";
+				"SELECT b.eid ,group_concat(distinct b.stock_id SEPARATOR ', ')  " + "FROM "
+						+ "ims_lot b  "
+						+ "left JOIN ims_transaction c ON b.lotid = c.lotid  "
+						+ "WHERE cast(b.eid as UNSIGNED) in (:gIds) GROUP BY b.eid";
 
 		final Query query = this.getSession().createSQLQuery(sql).setParameterList("gIds", gIds);
 
@@ -503,8 +503,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					+ "(CASE WHEN trnstat = 1 AND trnqty >= 0 THEN '" + TransactionType.DEPOSIT.getValue()
 					+ "' WHEN trnstat = 0 AND trnqty < 0 THEN '" + TransactionType.RESERVATION.getValue()
 					+ "' WHEN trnstat = 1 AND trnqty < 0 THEN '" + TransactionType.WITHDRAWAL.getValue()
-					+ "' END) as trntype, "
-					+ "lot.created_date "
+					+ "' END) as trntype "
 					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
 					+ " INNER JOIN ims_lot lot ON lot.lotid = i.lotid "
 					+ "WHERE i.lotid = :lotId AND i.trnstat <> 9 ORDER BY i.trnid";
@@ -539,7 +538,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			final String listName = (String) row[6];
 			final String comments = (String) row[7];
 			final String lotStatus = (String) row[8];
-			final Date lotDate = (Date) row[9];
 
 			transaction = new TransactionReportRow();
 			transaction.setUserId(userId);
@@ -551,7 +549,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			transaction.setListName(listName);
 			transaction.setCommentOfLot(comments);
 			transaction.setLotStatus(lotStatus);
-			transaction.setLotDate(lotDate);
 
 			transactionReportRows.add(transaction);
 		}

@@ -40,6 +40,7 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -80,7 +81,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			+ "  SUM(CASE WHEN trnstat = 1 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS committed_amt, ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS =
-			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS + "  GROUP_CONCAT(DISTINCT stock_id SEPARATOR ', ') AS stockids ";
+			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS + "  GROUP_CONCAT(DISTINCT stock_id SEPARATOR ', ') AS stockids, created_date ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM_CONDITION =
 			"FROM ims_lot i " + "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
@@ -339,7 +340,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		try {
 			String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED), Count(DISTINCT lotid) "
 					+ ",sum(avail_bal), count(distinct scaleid), scaleid " + " FROM ( " + "SELECT i.lotid, i.eid AS entity_id, "
-					+ "   SUM(trnqty) AS avail_bal, i.scaleid as scaleid " + " FROM ims_lot i "
+					+ "   case when SUM(trnqty) is null then 0 when sum(trnqty) is not null then sum(trnqty) end AS avail_bal, i.scaleid as scaleid " + " FROM ims_lot i "
 					+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
 					+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
 					+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
@@ -564,6 +565,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				Double reservedTotal = (Double) row[8];
 				Double committedTotal = (Double) row[9];
 				String stockIds = (String) row[10];
+				Date createdDate = (Date) row[11];
 
 				lot = new Lot(lotId);
 				lot.setEntityId(entityId);
@@ -571,6 +573,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				lot.setScaleId(scaleId);
 				lot.setComments(comments);
 				lot.setStatus(lotStatus);
+				lot.setCreatedDate(createdDate);
 
 				LotAggregateData aggregateData = new LotAggregateData(lotId);
 				aggregateData.setActualBalance(actualBalance);
