@@ -90,7 +90,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 
 		final StringBuilder sql1 = new StringBuilder().append("Delete ngp.* FROM nd_geolocationprop ngp "
 				+ "INNER JOIN nd_geolocation g on g.nd_geolocation_id = ngp.nd_geolocation_id "
-				+ "INNER JOIN nd_experiment e ON ngp.nd_geolocation_id = g.nd_geolocation_id "
+				+ "INNER JOIN nd_experiment e ON e.nd_geolocation_id = g.nd_geolocation_id "
 				+ "INNER JOIN project p ON p.project_id = e.project_id "
 				+ "WHERE (p.study_id = :datasetId OR p.project_id = :datasetId) AND ngp.type_id IN (:variableIds) ");
 		if (!CollectionUtils.isEmpty(instanceNumbers)) {
