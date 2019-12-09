@@ -597,9 +597,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 
 			if (withReservationMap) {
-				Integer recordId = (Integer) row[11];
-				Double qty = (Double) row[12];
-				Integer transactionState = (Integer) row[13];
+				Integer recordId = (Integer) row[12];
+				Double qty = (Double) row[13];
+				Integer transactionState = (Integer) row[14];
 
 				// compute total reserved and committed for entry
 				if (recordId != null && qty != null && transactionState != null) {
@@ -628,8 +628,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 					reservationStatusMap.get(recordId).add(String.valueOf(transactionState));
 				}
 
-				if (row[14] != null) {
-					Integer transactionId = (Integer) row[14];
+				if (row[15] != null) {
+					Integer transactionId = (Integer) row[15];
 					lot.getAggregateData().setTransactionId(transactionId);
 				}
 
