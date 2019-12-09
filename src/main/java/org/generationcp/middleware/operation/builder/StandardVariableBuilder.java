@@ -69,6 +69,17 @@ public class StandardVariableBuilder extends Builder {
 		return this.getStandardVariableTransformer().transformVariable(variable);
 	}
 
+	public StandardVariable createStandardVariableWithAliasAsName(final int standardVariableId, final String programUUID) {
+
+		final Variable variable = this.getOntologyVariableDataManager().getVariable(programUUID, standardVariableId, false);
+
+		final StandardVariable standardVariable = this.getStandardVariableTransformer().transformVariable(variable);
+		if(variable.getAlias() != null && !variable.getName().isEmpty()) {
+			standardVariable.setName(variable.getAlias());
+		}
+		return standardVariable;
+	}
+
 	public List<StandardVariable> create(final List<Integer> standardVariableIds, final String programUUID) {
 		final List<StandardVariable> standardVariables = new ArrayList<>();
 		if (standardVariableIds != null && !standardVariableIds.isEmpty()) {
@@ -304,7 +315,7 @@ public class StandardVariableBuilder extends Builder {
 	public StandardVariable getByName(final String name, final String programUUID) {
 		final CVTerm cvTerm = daoFactory.getCvTermDao().getByNameAndCvId(name, CvId.VARIABLES.getId());
 		if (cvTerm != null && cvTerm.getCvTermId() != null) {
-			return this.getStandardVariableBuilder().create(cvTerm.getCvTermId(), programUUID);
+			return this.getStandardVariableBuilder().createStandardVariableWithAliasAsName(cvTerm.getCvTermId(), programUUID);
 		}
 		return null;
 	}
