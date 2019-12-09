@@ -1,0 +1,39 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+       
+       <changeSet author="corina" id="v13.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				select count(*) from cvtermprop where `value`='Study Detail' and type_id=1800 and cvterm_id=8135;
+			</sqlCheck>
+		</preConditions>
+		<comment> Remove Study Detail as default variable type for EXPT_DESIGN. IBP-2944
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+
+			DELETE FROM cvtermprop where `value`='Study Detail' and type_id=1800 and cvterm_id=8135;
+		       SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v13.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				select count(*) from cvtermprop where `value`='Study Detail' and type_id=1800 and cvterm_id=8165;
+			</sqlCheck>
+		</preConditions>
+		<comment> Remove Study Detail as default variable type for EXPT_DESIGN_SOURCE. IBP-2944
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+
+			DELETE FROM cvtermprop where `value`='Study Detail' and type_id=1800 and cvterm_id=8165;
+		       SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
