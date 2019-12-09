@@ -79,6 +79,21 @@ public class StandardVariableBuilder extends Builder {
 		return standardVariables;
 	}
 
+	public List<StandardVariable> createStandardVariableWithAliasAsName(final List<Integer> standardVariableIds, final String programUUID) {
+		final List<StandardVariable> standardVariables = new ArrayList<>();
+		if (standardVariableIds != null && !standardVariableIds.isEmpty()) {
+			for (final Integer id : standardVariableIds) {
+				final Variable variable = this.getOntologyVariableDataManager().getVariable(programUUID, id, false);
+				final StandardVariable standardVariable = this.getStandardVariableTransformer().transformVariable(variable);
+				if(variable.getAlias() != null && !variable.getName().isEmpty()) {
+					standardVariable.setName(variable.getAlias());
+				}
+				standardVariables.add(standardVariable);
+			}
+		}
+		return standardVariables;
+	}
+
 	public StandardVariableSummary getStandardVariableSummary(final Integer standardVariableId) {
 		StandardVariableSummary summary = null;
 		if (standardVariableId != null) {
@@ -378,7 +393,7 @@ public class StandardVariableBuilder extends Builder {
 			List<StandardVariable> variables = new ArrayList<>();
 			if (varIdsWithType != null) {
 				final List<Integer> standardVariableIds = new ArrayList<>(varIdsWithType.keySet());
-				variables = this.create(standardVariableIds, programUUID);
+				variables = this.createStandardVariableWithAliasAsName(standardVariableIds, programUUID);
 				this.setRoleOfVariables(variables, varIdsWithType);
 			}
 			standardVariablesInProjects.put(entry.getKey(), variables);
