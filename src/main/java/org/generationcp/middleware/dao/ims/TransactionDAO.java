@@ -254,6 +254,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, BigInteger> countLotsWithReservationForListEntries(final List<Integer> listEntryIds) {
+		//FIXME delete because the value is never used. This query is wrong, should use gids instead of listEntryIds
 		final Map<Integer, BigInteger> lotCounts = new HashMap<>();
 
 		try {
