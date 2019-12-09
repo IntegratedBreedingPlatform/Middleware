@@ -1,5 +1,3 @@
-
-
 package org.generationcp.middleware.service.api.phenotype;
 
 import com.fasterxml.jackson.annotation.JsonView;

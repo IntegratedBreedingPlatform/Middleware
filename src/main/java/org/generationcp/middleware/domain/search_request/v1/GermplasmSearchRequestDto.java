@@ -1,7 +1,8 @@
-package org.generationcp.middleware.domain.search_request;
+package org.generationcp.middleware.domain.search_request.v1;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
