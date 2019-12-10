@@ -1,4 +1,4 @@
-package org.generationcp.middleware.domain.search_request.v1;
+package org.generationcp.middleware.domain.search_request.brapi.v1;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Lists;
