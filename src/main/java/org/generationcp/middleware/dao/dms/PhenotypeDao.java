@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
@@ -904,11 +905,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		sqlQuery.addScalar("nd_experiment_id").addScalar("observationUnitDbId", new StringType()).addScalar("observationUnitName")
 			.addScalar("observationLevel").addScalar("plantNumber", new IntegerType()).addScalar("germplasmDbId", new StringType())
-			.addScalar("germplasmName").addScalar("instanceNumber").addScalar("studyDbId", new StringType()).addScalar("studyName").addScalar("programName")
+			.addScalar("germplasmName").addScalar("instanceNumber").addScalar("studyDbId", new StringType()).addScalar("studyName")
+			.addScalar("programName")
 			.addScalar("FieldMapRow").addScalar("FieldMapCol").addScalar("plotNumber", new StringType())
 			.addScalar("blockNumber", new StringType()).addScalar("replicate", new StringType()).addScalar("COL").addScalar("ROW")
 			.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
-			.addScalar("entryNumber", new StringType());
+			.addScalar("entryNumber", new StringType()).addScalar("programDbId", new StringType()).addScalar("trialDbId", new StringType())
+			.addScalar("trialDbName", new StringType());
 
 		// TODO get map with AliasToEntityMapResultTransformer.INSTANCE
 		final List<Object[]> results = sqlQuery.list();
@@ -949,6 +952,30 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setEntryType((String) row[20]);
 				observationUnit.setEntryNumber((String) row[21]);
 
+				observationUnit.setAdditionalInfo("");
+				observationUnit.setLocationDbId(observationUnit.getStudyLocationDbId());
+				observationUnit.setLocationName(observationUnit.getStudyLocation());
+				observationUnit.setObservationUnitPUI("");
+				final PhenotypeSearchDTO.ObservationUnitPosition observationUnitPosition = new PhenotypeSearchDTO.ObservationUnitPosition();
+				observationUnitPosition.setBlockNumber(observationUnit.getBlockNumber());
+				observationUnitPosition.setEntryNumber(observationUnit.getEntryNumber());
+				observationUnitPosition.setEntryType(Lists.newArrayList(observationUnit.getEntryType()));
+				observationUnitPosition.setPositionCoordinateX(x);
+				if (x != null) {
+					observationUnitPosition.setPositionCoordinateXType("GRID_COL");
+				}
+
+				observationUnitPosition.setPositionCoordinateY(y);
+				if (y != null) {
+					observationUnitPosition.setPositionCoordinateYType("GRID_ROW");
+				}
+
+				observationUnitPosition.setReplicate(observationUnit.getReplicate());
+				observationUnit.setObservationUnitPosition(observationUnitPosition);
+				observationUnit.setProgramDbId((String) row[22]);
+				observationUnit.setTrialDbId((String) row[23]);
+				observationUnit.setTrialName((String) row[24]);
+
 				observationUnitsByNdExpId.put(ndExperimentId, observationUnit);
 			}
 
@@ -977,6 +1004,23 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
 				observationUnit.getObservations().add(observation);
+			}
+
+			// Get treatment factors
+			final SQLQuery treatmentFactorsQuery = this.getSession().createSQLQuery(PhenotypeQuery.TREATMENT_FACTORS_SEARCH_OBSERVATIONS);
+			treatmentFactorsQuery.setParameterList("ndExperimentIds", observationUnitsByNdExpId.keySet());
+			treatmentFactorsQuery.addScalar("factor").addScalar("modality").addScalar("nd_experiment_id");
+			final List<Object[]> treatmentFactorsResults = treatmentFactorsQuery.list();
+
+			for (final Object[] result : treatmentFactorsResults) {
+				final String factor = (String) result[0];
+				final String modality = (String) result[1];
+				final Integer ndExperimentId = (Integer) result[2];
+				final PhenotypeSearchDTO.Treatment treatment = new PhenotypeSearchDTO.Treatment();
+				treatment.setFactor(factor);
+				treatment.setModality(modality);
+				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
+				observationUnit.getTreatments().add(treatment);
 			}
 		}
 
@@ -1026,6 +1070,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		if (requestDTO.getTrialDbIds() != null && !requestDTO.getTrialDbIds().isEmpty()) {
 			queryString.append(" AND p.project_id IN (:trialDbIds) ");
 		}
+
+		if (requestDTO.getObservationUnitDbIds() != null && !requestDTO.getObservationUnitDbIds().isEmpty()) {
+			queryString.append(" AND nde.obs_unit_id IN (:observationUnitDbIds) ");
+		}
 	}
 
 	private static void addPhenotypeSearchQueryParams(final PhenotypeSearchRequestDTO requestDTO, final SQLQuery sqlQuery) {
@@ -1065,6 +1113,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		if (requestDTO.getTrialDbIds() != null && !requestDTO.getTrialDbIds().isEmpty()) {
 			sqlQuery.setParameterList("trialDbIds", requestDTO.getTrialDbIds());
+		}
+
+		if (requestDTO.getObservationUnitDbIds() != null && !requestDTO.getObservationUnitDbIds().isEmpty()) {
+			sqlQuery.setParameterList("observationUnitDbIds", requestDTO.getObservationUnitDbIds());
 		}
 	}
 
