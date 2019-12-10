@@ -516,7 +516,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
 		observationUnitsSearchDTO.setSelectionMethodsAndTraits(Collections.singletonList(measurementVariableDto));
 		observationUnitsSearchDTO.setFilter(observationUnitsSearchDTO.new Filter());
-		final List<String> filterColumns = observationUnitsSearchDTO.getFilter().getFilterColumns();
+		final List<String> filterColumns = observationUnitsSearchDTO.getFilterColumns();
 
 		// Add the columns we want the query to return.
 		filterColumns.add(ObservationUnitsSearchDao.TRIAL_INSTANCE);

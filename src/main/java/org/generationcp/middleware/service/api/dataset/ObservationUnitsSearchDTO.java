@@ -25,6 +25,9 @@ public class ObservationUnitsSearchDTO {
 	private Integer environmentDatasetId;
 	private Boolean draftMode;
 
+	/** This is used by Visualization tool, to specify the columns that will be included in the data returned from the server. **/
+	private List<String> filterColumns = new ArrayList<>();
+
 	/**
 	 * This is used by DataTables to ensure that the Ajax returns from server-side processing requests are drawn in sequence
 	 */
@@ -42,7 +45,6 @@ public class ObservationUnitsSearchDTO {
 		private Map<String, List<String>> filteredValues;
 		private Map<String, String> filteredTextValues;
 		private Map<String, String> variableTypeMap;
-		private List<String> filterColumns;
 		private Integer variableId;
 
 		public Filter() {
@@ -53,8 +55,6 @@ public class ObservationUnitsSearchDTO {
 			this.filteredValues = new HashMap<>();
 			this.filteredTextValues = new HashMap<>();
 			this.variableId = null;
-			/** This is used by Visualization tool, to specify the columns that will included in the data returned from the server. **/
-			this.filterColumns = new ArrayList<>();
 		}
 
 		public Map<String, String> getFilteredTextValues() {
@@ -121,13 +121,6 @@ public class ObservationUnitsSearchDTO {
 			this.variableTypeMap = variableTypeMap;
 		}
 
-		public List<String> getFilterColumns() {
-			return this.filterColumns;
-		}
-
-		public void setFilterColumns(final List<String> filterColumns) {
-			this.filterColumns = filterColumns;
-		}
 	}
 
 	public ObservationUnitsSearchDTO() {
@@ -242,6 +235,14 @@ public class ObservationUnitsSearchDTO {
 
 	public void setFilter(final Filter filter) {
 		this.filter = filter;
+	}
+
+	public List<String> getFilterColumns() {
+		return this.filterColumns;
+	}
+
+	public void setFilterColumns(final List<String> filterColumns) {
+		this.filterColumns = filterColumns;
 	}
 
 	@Override
