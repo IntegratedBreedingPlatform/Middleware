@@ -310,7 +310,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final Map<String, List<StandardVariable>> result =
 			this.standardVariableBuilder.getStandardVariablesInProjects(headers, dmsProject.getProgramUUID());
 
-		Assert.assertEquals(standardVariable.getName(), headerNameToMatch);
+		Assert.assertEquals(headerNameToMatch, result.get(headerNameToMatch.toUpperCase()).iterator().next().getName());
 
 	}
 
