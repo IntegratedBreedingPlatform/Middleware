@@ -10,7 +10,6 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import junit.framework.Assert;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
@@ -24,12 +23,12 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.operation.saver.ProjectPropertySaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -310,7 +309,8 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final Map<String, List<StandardVariable>> result =
 			this.standardVariableBuilder.getStandardVariablesInProjects(headers, dmsProject.getProgramUUID());
 
-		Assert.assertEquals(headerNameToMatch, result.get(headerNameToMatch.toUpperCase()).iterator().next().getName());
+		Assert.assertEquals(standardVariable.getName(), result.get(headerNameToMatch.toUpperCase()).iterator().next().getName());
+		Assert.assertEquals(headerNameToMatch, result.get(headerNameToMatch.toUpperCase()).iterator().next().getAlias());
 
 	}
 
