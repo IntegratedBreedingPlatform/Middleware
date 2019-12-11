@@ -76,18 +76,22 @@ public class BackcrossAncestryTree {
 
 		// Male traversal
 		if (otherParentFemaleParentGid != null && otherParentFemaleParentGid.equals(recurringParentGid)) {
-			final Germplasm maleGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentMaleParentGid)).get();
-			GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, maleGermplasm, recurringParentNode, level);
-			germplasmNode.setFemaleParent(recurringParentNode);
-			germplasmNode.setMaleParent(generateBackcrossTree);
+			if(this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentMaleParentGid)).isPresent()) {
+				final Germplasm maleGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentMaleParentGid)).get();
+				GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, maleGermplasm, recurringParentNode, level);
+				germplasmNode.setFemaleParent(recurringParentNode);
+				germplasmNode.setMaleParent(generateBackcrossTree);
+			}
 		}
 
 		// Female Traversal
 		if (otherParentMaleParentGid != null && otherParentMaleParentGid.equals(recurringParentGid)) {
-			final Germplasm female = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentFemaleParentGid)).get();
-			GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, female, recurringParentNode, level);
-			germplasmNode.setFemaleParent(generateBackcrossTree);
-			germplasmNode.setMaleParent(recurringParentNode);
+			if(this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentFemaleParentGid)).isPresent()) {
+				final Germplasm female = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentFemaleParentGid)).get();
+				GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, female, recurringParentNode, level);
+				germplasmNode.setFemaleParent(generateBackcrossTree);
+				germplasmNode.setMaleParent(recurringParentNode);
+			}
 		}
 
 		return germplasmNode;
