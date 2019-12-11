@@ -21,6 +21,7 @@ import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.dms.StudySearchDao;
@@ -225,5 +226,11 @@ public class DaoFactory {
 		final ListDataProjectDAO listDataProjectDAO = new ListDataProjectDAO();
 		listDataProjectDAO.setSession(this.sessionProvider.getSession());
 		return listDataProjectDAO;
+	}
+
+	public ProgramFavoriteDAO getProgramFavoriteDao() {
+		final ProgramFavoriteDAO programFavoriteDao = new ProgramFavoriteDAO();
+		programFavoriteDao.setSession(this.sessionProvider.getSession());
+		return programFavoriteDao;
 	}
 }

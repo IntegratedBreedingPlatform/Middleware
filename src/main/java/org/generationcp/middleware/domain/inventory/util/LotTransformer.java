@@ -1,11 +1,5 @@
 package org.generationcp.middleware.domain.inventory.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
@@ -13,6 +7,12 @@ import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class LotTransformer {
 
@@ -144,7 +144,7 @@ public class LotTransformer {
 				lotDetails.setEntityIdOfLot(lot.getEntityId());
 				lotDetails.setCommentOfLot(lot.getComments());
 				lotDetails.setLotStatus(lot.getStatus() == LotStatus.ACTIVE.getIntValue() ? LotStatus.ACTIVE.name() : LotStatus.CLOSED.name());
-
+				lotDetails.setCreatedDate(lot.getCreatedDate());
 
 				LotAggregateData aggregateData = lot.getAggregateData();
 				if (aggregateData != null) {
