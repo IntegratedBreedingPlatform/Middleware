@@ -3,7 +3,11 @@ package org.generationcp.middleware.dao.dms;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.*;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
@@ -13,6 +17,7 @@ import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariable
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
@@ -25,9 +30,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
@@ -38,7 +50,6 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 	private DmsProject study;
 	private DmsProject plot;
 	private DmsProject summary;
-
 
 	@Autowired
 	private OntologyMethodDataManager methodManager;
@@ -67,7 +78,6 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		this.summary = this.testDataInitializer
 			.createDmsProject("Environment Dataset", "Environment Dataset-Description", this.study, this.study,
 				DatasetTypeEnum.SUMMARY_DATA);
-
 
 	}
 
@@ -307,13 +317,13 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 		final String traitName = "MyTrait";
 
-
 		final int numberOfPlotExperiments = 3;
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, numberOfPlotExperiments);
+		final List<ExperimentModel> instance1Units =
+			this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, numberOfPlotExperiments);
 		final Geolocation geolocation2 = this.testDataInitializer.createTestGeolocation("2", 101);
-		final List<ExperimentModel> instance2Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation2, numberOfPlotExperiments);
-
+		final List<ExperimentModel> instance2Units =
+			this.testDataInitializer.createTestExperiments(this.plot, null, geolocation2, numberOfPlotExperiments);
 
 		// Only 2 experiments in first instance have observations
 		final CVTerm trait1 = this.testDataInitializer.createTrait(traitName);
@@ -472,8 +482,123 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		assertEquals(3, measurementRows.size());
 	}
 
+	@Test
+	public void testGetObservationUnitRowsAsMapList() {
+
+		final String traitName = "MyTrait";
+		final String observationUnitVariableName = "PLANT_NO";
+		final int noOfSubObservationExperiment = 3;
+
+		final CVTerm trait1 = this.testDataInitializer.createTrait(traitName);
+
+		final DmsProject plantSubObsDataset =
+			this.testDataInitializer.createDmsProject("Plant SubObs Dataset", "Plot Dataset-Description", this.study, this.plot,
+				DatasetTypeEnum.PLANT_SUBOBSERVATIONS);
+		this.testDataInitializer
+			.addProjectProp(plantSubObsDataset, 8206, observationUnitVariableName, VariableType.OBSERVATION_UNIT, "", 1);
+
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+
+		final ExperimentModel environmentExperimentModel =
+			this.testDataInitializer.createTestExperiment(this.summary, geolocation, TermId.SUMMARY_EXPERIMENT.getId(), null, null);
+		final ExperimentModel plotExperimentModel =
+			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), null, null);
+		final List<ExperimentModel> plantExperimentModels =
+			this.testDataInitializer
+				.createTestExperiments(plantSubObsDataset, plotExperimentModel, geolocation, noOfSubObservationExperiment);
+
+		this.testDataInitializer.addPhenotypes(plantExperimentModels, trait1.getCvTermId(), RandomStringUtils.randomNumeric(5));
+
+		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(trait1.getCvTermId(), trait1.getName());
+
+		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
+		observationUnitsSearchDTO.setDatasetId(plantSubObsDataset.getProjectId());
+		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
+		observationUnitsSearchDTO.setSelectionMethodsAndTraits(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setFilter(observationUnitsSearchDTO.new Filter());
+		final List<String> filterColumns = observationUnitsSearchDTO.getFilterColumns();
+
+		// Add the columns we want the query to return.
+		filterColumns.add(ObservationUnitsSearchDao.TRIAL_INSTANCE);
+		filterColumns.add(ObservationUnitsSearchDao.GID);
+		filterColumns.add(ObservationUnitsSearchDao.DESIGNATION);
+		filterColumns.add(ObservationUnitsSearchDao.ENTRY_TYPE);
+		filterColumns.add(ObservationUnitsSearchDao.ENTRY_CODE);
+		filterColumns.add(ObservationUnitsSearchDao.ENTRY_NO);
+		filterColumns.add(ObservationUnitsSearchDao.REP_NO);
+		filterColumns.add(ObservationUnitsSearchDao.PLOT_NO);
+		filterColumns.add(ObservationUnitsSearchDao.BLOCK_NO);
+		filterColumns.add(ObservationUnitsSearchDao.ROW);
+		filterColumns.add(ObservationUnitsSearchDao.COL);
+		filterColumns.add(ObservationUnitsSearchDao.SUM_OF_SAMPLES);
+		filterColumns.add(observationUnitVariableName);
+		filterColumns.add(ObservationUnitsSearchDao.FIELD_MAP_RANGE);
+		filterColumns.add(ObservationUnitsSearchDao.FIELD_MAP_COLUMN);
+		filterColumns.add(traitName);
+
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
+
+		final List<Map<String, Object>> measurementRows =
+			this.obsUnitSearchDao.getObservationUnitTableMapList(observationUnitsSearchDTO);
+
+		assertEquals(noOfSubObservationExperiment, measurementRows.size());
+
+		final Map<String, Object> dataMap = measurementRows.get(0);
+
+		final StockModel stock = plantExperimentModels.get(0).getStock();
+
+		assertEquals("1", dataMap.get(ObservationUnitsSearchDao.TRIAL_INSTANCE));
+		assertEquals(stock.getGermplasm().getGid(), dataMap.get(ObservationUnitsSearchDao.GID));
+		assertEquals(stock.getName(), dataMap.get(ObservationUnitsSearchDao.DESIGNATION));
+		assertNull(dataMap.get(ObservationUnitsSearchDao.ENTRY_TYPE));
+		assertNull(dataMap.get(ObservationUnitsSearchDao.ENTRY_CODE));
+		assertEquals("1", dataMap.get(ObservationUnitsSearchDao.ENTRY_NO));
+		assertNull(dataMap.get(ObservationUnitsSearchDao.REP_NO));
+		assertNull(dataMap.get(ObservationUnitsSearchDao.PLOT_NO));
+		assertNull(dataMap.get(ObservationUnitsSearchDao.BLOCK_NO));
+		assertNull(dataMap.get(ObservationUnitsSearchDao.ROW));
+		assertNull(dataMap.get(ObservationUnitsSearchDao.COL));
+		assertEquals("-", dataMap.get(ObservationUnitsSearchDao.SUM_OF_SAMPLES));
+		assertEquals("1", dataMap.get(observationUnitVariableName));
+		assertNull(dataMap.get(ObservationUnitsSearchDao.FIELD_MAP_RANGE));
+		assertNull(dataMap.get(ObservationUnitsSearchDao.FIELD_MAP_COLUMN));
+		assertNotNull(dataMap.get(traitName));
+
+	}
+
+	@Test
+	public void testConvertSelectionAndTraitColumnsValueType() {
+
+		final MeasurementVariableDto trait1 = new MeasurementVariableDto(1, "Trait1");
+		final MeasurementVariableDto trait2 = new MeasurementVariableDto(2, "Trait2");
+		final MeasurementVariableDto trait3 = new MeasurementVariableDto(3, "Trait3");
+		final List<MeasurementVariableDto> selectionAndTraits = Arrays.asList(trait1, trait2, trait3);
+
+		final Map<String, Object> dataMap = new HashMap<>();
+		dataMap.put(ObservationUnitsSearchDao.TRIAL_INSTANCE, "1");
+		dataMap.put(ObservationUnitsSearchDao.GID, 1);
+		dataMap.put(trait1.getName(), "1");
+		dataMap.put(trait2.getName(), "ABC");
+		dataMap.put(trait3.getName(), Phenotype.MISSING_VALUE);
+
+		final List<Map<String, Object>> listMap = Arrays.asList(dataMap);
+
+		final List<Map<String, Object>> result =
+			this.obsUnitSearchDao.convertSelectionAndTraitColumnsValueType(listMap, selectionAndTraits);
+
+		final Map<String, Object> resultDataMap = result.get(0);
+		assertEquals("1", resultDataMap.get(ObservationUnitsSearchDao.TRIAL_INSTANCE));
+		assertEquals(1, resultDataMap.get(ObservationUnitsSearchDao.GID));
+		assertEquals(BigDecimal.valueOf(1), resultDataMap.get(trait1.getName()));
+		assertEquals("ABC", resultDataMap.get(trait2.getName()));
+		assertEquals(null, resultDataMap.get(trait3.getName()));
+
+	}
+
 	/**
 	 * Properly Create Trait
+	 *
 	 * @param traitName
 	 * @return cvTermId
 	 */

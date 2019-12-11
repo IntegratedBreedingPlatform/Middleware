@@ -13,7 +13,7 @@ import java.util.Map;
 @SuppressWarnings("unused") // Used in POST body
 @AutoProperty
 public class ObservationUnitsSearchDTO {
-	
+
 	private List<MeasurementVariableDto> environmentDetails;
 	private List<MeasurementVariableDto> environmentConditions;
 	private List<String> genericGermplasmDescriptors;
@@ -25,12 +25,16 @@ public class ObservationUnitsSearchDTO {
 	private Integer environmentDatasetId;
 	private Boolean draftMode;
 
+	/** This is used by Visualization tool, to specify the columns that will be included in the data returned from the server. **/
+	private List<String> filterColumns = new ArrayList<>();
+
 	/**
 	 * This is used by DataTables to ensure that the Ajax returns from server-side processing requests are drawn in sequence
 	 */
 	private String draw;
 
 	private Filter filter;
+
 
 	public class Filter {
 
@@ -46,7 +50,7 @@ public class ObservationUnitsSearchDTO {
 		public Filter() {
 			this.byMissing = false;
 			this.byOutOfBound = false;
-			this.byOutOfSync =  false;
+			this.byOutOfSync = false;
 			this.byOverwritten = false;
 			this.filteredValues = new HashMap<>();
 			this.filteredTextValues = new HashMap<>();
@@ -116,6 +120,7 @@ public class ObservationUnitsSearchDTO {
 		public void setVariableTypeMap(final Map<String, String> variableTypeMap) {
 			this.variableTypeMap = variableTypeMap;
 		}
+
 	}
 
 	public ObservationUnitsSearchDTO() {
@@ -125,8 +130,9 @@ public class ObservationUnitsSearchDTO {
 		this.draftMode = false;
 	}
 
-	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors, final List<String> additionalDesignFactors,
-			final List<MeasurementVariableDto> selectionMethodsAndTraits) {
+	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors,
+		final List<String> additionalDesignFactors,
+		final List<MeasurementVariableDto> selectionMethodsAndTraits) {
 		this();
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;
 		this.additionalDesignFactors = additionalDesignFactors;
@@ -138,39 +144,39 @@ public class ObservationUnitsSearchDTO {
 	public List<MeasurementVariableDto> getEnvironmentDetails() {
 		return this.environmentDetails;
 	}
-	
+
 	public void setEnvironmentDetails(final List<MeasurementVariableDto> environmentFactors) {
 		this.environmentDetails = environmentFactors;
 	}
-	
+
 	public List<MeasurementVariableDto> getEnvironmentConditions() {
 		return this.environmentConditions;
 	}
-	
+
 	public void setEnvironmentConditions(final List<MeasurementVariableDto> environmentConditions) {
 		this.environmentConditions = environmentConditions;
 	}
-	
+
 	public List<String> getGenericGermplasmDescriptors() {
 		return this.genericGermplasmDescriptors;
 	}
-	
+
 	public void setGenericGermplasmDescriptors(final List<String> genericGermplasmDescriptors) {
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;
 	}
-	
+
 	public List<String> getAdditionalDesignFactors() {
 		return this.additionalDesignFactors;
 	}
-	
+
 	public void setAdditionalDesignFactors(final List<String> additionalDesignFactors) {
 		this.additionalDesignFactors = additionalDesignFactors;
 	}
-	
+
 	public List<MeasurementVariableDto> getSelectionMethodsAndTraits() {
 		return this.selectionMethodsAndTraits;
 	}
-	
+
 	public void setSelectionMethodsAndTraits(final List<MeasurementVariableDto> selectionMethodsAndTraits) {
 		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
 	}
@@ -178,23 +184,23 @@ public class ObservationUnitsSearchDTO {
 	public int getDatasetId() {
 		return this.datasetId;
 	}
-	
+
 	public void setDatasetId(final int datasetId) {
 		this.datasetId = datasetId;
 	}
-	
+
 	public Integer getInstanceId() {
 		return this.instanceId;
 	}
-	
+
 	public void setInstanceId(final Integer instanceId) {
 		this.instanceId = instanceId;
 	}
-	
+
 	public Integer getEnvironmentDatasetId() {
 		return this.environmentDatasetId;
 	}
-	
+
 	public void setEnvironmentDatasetId(final Integer environmentDatasetId) {
 		this.environmentDatasetId = environmentDatasetId;
 	}
@@ -202,7 +208,7 @@ public class ObservationUnitsSearchDTO {
 	public SortedPageRequest getSortedRequest() {
 		return this.sortedRequest;
 	}
-	
+
 	public void setSortedRequest(final SortedPageRequest sortedRequest) {
 		this.sortedRequest = sortedRequest;
 	}
@@ -229,6 +235,14 @@ public class ObservationUnitsSearchDTO {
 
 	public void setFilter(final Filter filter) {
 		this.filter = filter;
+	}
+
+	public List<String> getFilterColumns() {
+		return this.filterColumns;
+	}
+
+	public void setFilterColumns(final List<String> filterColumns) {
+		this.filterColumns = filterColumns;
 	}
 
 	@Override
