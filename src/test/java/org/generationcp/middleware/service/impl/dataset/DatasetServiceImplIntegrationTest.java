@@ -123,12 +123,12 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testGetObservationUnitRowsAsListMap() {
+    public void testGetObservationUnitRowsAsMapList() {
         final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO();
         searchDto.setInstanceId(this.instanceIds.get(0));
         searchDto.getFilterColumns().add("TRIAL_INSTANCE");
         searchDto.getFilterColumns().add(TRAIT_NAME);
-        final List<Map<String, Object>> rowsAsListMap = this.datasetService.getObservationUnitRowsAsListMap(this.studyId, this.subObsDatasetId,
+        final List<Map<String, Object>> rowsAsListMap = this.datasetService.getObservationUnitRowsAsMapList(this.studyId, this.subObsDatasetId,
             searchDto);
         Assert.assertNotNull(rowsAsListMap);
         Assert.assertEquals(40, rowsAsListMap.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)

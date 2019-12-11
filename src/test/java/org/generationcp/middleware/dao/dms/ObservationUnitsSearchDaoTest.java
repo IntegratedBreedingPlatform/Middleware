@@ -483,7 +483,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetObservationUnitRowsAsListMap() {
+	public void testGetObservationUnitRowsAsMapList() {
 
 		final String traitName = "MyTrait";
 		final String observationUnitVariableName = "PLANT_NO";
@@ -540,7 +540,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<Map<String, Object>> measurementRows =
-			this.obsUnitSearchDao.getObservationUnitTableAsListOfMap(observationUnitsSearchDTO);
+			this.obsUnitSearchDao.getObservationUnitTableMapList(observationUnitsSearchDTO);
 
 		assertEquals(noOfSubObservationExperiment, measurementRows.size());
 

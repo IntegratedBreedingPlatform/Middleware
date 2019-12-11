@@ -211,7 +211,7 @@ public interface DatasetService {
 	 * @param searchDTO
 	 * @return List of Variable (Column) Name and Value Map
 	 */
-	List<Map<String, Object>> getObservationUnitRowsAsListMap(
+	List<Map<String, Object>> getObservationUnitRowsAsMapList(
 		int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO);
 
 	/**

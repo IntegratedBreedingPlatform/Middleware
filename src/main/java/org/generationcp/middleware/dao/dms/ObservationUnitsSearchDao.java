@@ -360,10 +360,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	public List<Map<String, Object>> getObservationUnitTableAsListOfMap(final ObservationUnitsSearchDTO searchDto) {
+	public List<Map<String, Object>> getObservationUnitTableMapList(final ObservationUnitsSearchDTO searchDto) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
-			return this.getObservationUnitTableAsListOfMapResult(
+			return this.getObservationUnitTableAsMapListResult(
 				searchDto,
 				observationVariableName);
 		} catch (final Exception e) {
@@ -470,6 +470,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		// If filterColumns has values, we should only include the specified columns to the query. This is to optimize the query to only
 		// get the information it needs (reduce subqueries and minimize the amount of data returned to the client)
+		// ObservationUnitsSearchDTO is only applicable in Observation table, if filterColumns has values it means that the request is called
+		// for Visualization table
 		final List<String> filterColumns = searchDto.getFilterColumns();
 		final boolean noFilterVariables = CollectionUtils.isEmpty(filterColumns);
 		final List<String> columns = new ArrayList<>();
@@ -574,6 +576,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		// TODO move PLOT_NO to nd_exp
+		// If the request is for Observation/Sub-observation table (noFilterVariables is true), always add the OBSERVATION_UNIT_NO column.
+		// If the request is for Visualization (noFilterVariables is false) and dataset is sub-observation (observationUnitNoName with "PLOT_NO" value means the dataset is observation),
+		// we add the OBSERVATION_UNIT_NO column with the observationUnitNoName as its column alias.
 		if (noFilterVariables || (filterColumns.contains(observationUnitNoName) && !PLOT_NO.equals(observationUnitNoName))) {
 			columns.add(" COALESCE(nde.observation_unit_no, ("
 				+ "		SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO' "
@@ -1062,7 +1067,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return variableName + ENVIRONMENT_COLUMN_NAME_SUFFIX;
 	}
 
-	private List<Map<String, Object>> getObservationUnitTableAsListOfMapResult(final ObservationUnitsSearchDTO searchDto,
+	private List<Map<String, Object>> getObservationUnitTableAsMapListResult(final ObservationUnitsSearchDTO searchDto,
 		final String observationVariableName) {
 		try {
 
