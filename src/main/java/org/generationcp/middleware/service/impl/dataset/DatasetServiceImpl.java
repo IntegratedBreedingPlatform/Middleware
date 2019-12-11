@@ -94,10 +94,10 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.SELECTION_METHOD.getId());
 
 	protected static final List<Integer> PLOT_COLUMNS_FACTOR_VARIABLE_TYPES = Lists.newArrayList(
-			VariableType.GERMPLASM_DESCRIPTOR.getId(),
-			VariableType.EXPERIMENTAL_DESIGN.getId(),
-			VariableType.TREATMENT_FACTOR.getId(),
-			VariableType.OBSERVATION_UNIT.getId());
+		VariableType.GERMPLASM_DESCRIPTOR.getId(),
+		VariableType.EXPERIMENTAL_DESIGN.getId(),
+		VariableType.TREATMENT_FACTOR.getId(),
+		VariableType.OBSERVATION_UNIT.getId());
 
 	protected static final List<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.OBSERVATION_UNIT.getId(),
@@ -112,6 +112,7 @@ public class DatasetServiceImpl implements DatasetService {
 		TermId.LOCATION_ID.getId(),
 		TermId.TRIAL_INSTANCE_FACTOR.getId(),
 		TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+	public static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
 
 	private DaoFactory daoFactory;
 
@@ -173,7 +174,7 @@ public class DatasetServiceImpl implements DatasetService {
 			// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
 			factorColumns =
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(),
-						PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
+					PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
 		}
 
 		List<MeasurementVariable> variateColumns;
@@ -183,7 +184,7 @@ public class DatasetServiceImpl implements DatasetService {
 		} else {
 			//SUBOBS
 			variateColumns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
-					SUBOBS_COLUMNS_ALL_VARIABLE_TYPES);
+				SUBOBS_COLUMNS_ALL_VARIABLE_TYPES);
 		}
 
 		// Filter columns with draft data
@@ -221,7 +222,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private MeasurementVariable buildSampleColumn() {
 		final MeasurementVariable sampleColumn = new MeasurementVariable();
-		sampleColumn.setName(TermId.SAMPLES.name());
+		// Set the the variable name of this virtual Sample Column to SUM_OF_SAMPLES, to match
+		// the Sample field name in observation query.
+		sampleColumn.setName(SUM_OF_SAMPLES);
 		sampleColumn.setAlias(TermId.SAMPLES.name());
 		sampleColumn.setTermId(TermId.SAMPLES.getId());
 		sampleColumn.setFactor(true);
@@ -236,14 +239,15 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<MeasurementVariable> plotDataSetColumns;
 		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			plotDataSetColumns =
-					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetDTO.getDatasetId(), PLOT_COLUMNS_ALL_VARIABLE_TYPES);
+				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetDTO.getDatasetId(), PLOT_COLUMNS_ALL_VARIABLE_TYPES);
 
 		} else {
 			final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(observationSetId).getParent();
 			plotDataSetColumns =
-					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
+				this.daoFactory.getDmsProjectDAO()
+					.getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
 			final List<MeasurementVariable> subObservationSetColumns =
-					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, SUBOBS_COLUMNS_ALL_VARIABLE_TYPES);
+				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, SUBOBS_COLUMNS_ALL_VARIABLE_TYPES);
 			plotDataSetColumns.addAll(subObservationSetColumns);
 		}
 
@@ -261,7 +265,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 
-		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId());
+		final List<DmsProject> plotDatasets =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 
 		if (plotDatasets == null || plotDatasets.isEmpty()) {
 			throw new MiddlewareException("Study does not have a plot dataset associated to it");
@@ -571,6 +576,15 @@ public class DatasetServiceImpl implements DatasetService {
 		this.fillSearchDTO(studyId, datasetId, searchDTO);
 
 		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
+	}
+
+	@Override
+	public List<Map<String, Object>> getObservationUnitRowsAsMapList(
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
+
+		this.fillSearchDTO(studyId, datasetId, searchDTO);
+
+		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTableMapList(searchDTO);
 	}
 
 	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
@@ -907,7 +921,7 @@ public class DatasetServiceImpl implements DatasetService {
 					 *  Approach of IBP-2781 (getWithIsDerivedTrait) won't work here
 					 *  because the performance gain of not having to call formulaDao is lost
 					 *  with this query that is not as good as getById
- 					 */
+					 */
 					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
 				}
 
@@ -1065,7 +1079,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getDatasetMeasurementVariablesByVariableType(final Integer datasetId, final List<Integer> variableTypes) {
+	public List<MeasurementVariable> getDatasetMeasurementVariablesByVariableType(final Integer datasetId,
+		final List<Integer> variableTypes) {
 		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, variableTypes);
 	}
 
@@ -1094,7 +1109,8 @@ public class DatasetServiceImpl implements DatasetService {
 			searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 			searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
 
-			final List<ObservationUnitRow> observationUnits = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
+			final List<ObservationUnitRow> observationUnits =
+				this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
 			this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 			instanceMap.put(instanceId, observationUnits);
 		}
