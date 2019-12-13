@@ -140,8 +140,12 @@ public class PedigreeServiceImpl implements PedigreeService {
 			// the database for each germplasm required. It will occasionally go back to the DB in case it cannot find the required gid.
 			// This might happen in the case of backcross because we predetermine the number of crosses for a backcross. 
 			for (final Integer gid : gids) {
-				pedigreeStrings.put(gid,
-						buildPedigreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse));
+				try{
+					pedigreeStrings.put(gid,
+							buildPedigreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse));
+				}catch (MiddlewareException ex){
+					pedigreeStrings.put(gid, ex.getMessage());
+				}
 			}
 			return pedigreeStrings;
 		} finally {
@@ -206,7 +210,10 @@ public class PedigreeServiceImpl implements PedigreeService {
 			return pedigreeString.buildPedigreeString(gidAncestryTree, numberOfLevelsToTraverse,
 					new FixedLineNameResolver(crossExpansionProperties, pedigreeDataManagerFactory, nameTypeBasedCache, cropName), false)
 					.getPedigree();
-		} finally {
+		} catch (Exception ex) {
+			throw new MiddlewareException(String.format("Problem building pedigree string for gid '%d'.", gid));
+		}
+		finally {
 			monitor.stop();
 		}
 	}
