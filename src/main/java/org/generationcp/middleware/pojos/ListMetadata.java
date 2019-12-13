@@ -11,6 +11,15 @@ public class ListMetadata {
 	private Integer numberOfChildren;
 	private Integer numberOfEntries;
 
+	public ListMetadata(final Integer listId, final Integer numberOfChildren, final Integer numberOfEntries) {
+		this.listId = listId;
+		this.numberOfChildren = numberOfChildren;
+		this.numberOfEntries = numberOfEntries;
+	}
+
+	public ListMetadata() {
+	}
+
 	public Integer getListId() {
 		return listId;
 	}

@@ -56,6 +56,8 @@ public class StandardVariable implements Serializable {
 
 	private FormulaDto formula;
 
+	private String alias;
+
 	public StandardVariable() {
 	}
 
@@ -378,5 +380,13 @@ public class StandardVariable implements Serializable {
 
 	public FormulaDto getFormula() {
 		return this.formula;
+	}
+
+	public void setAlias(final String alias) {
+		this.alias = alias;
+	}
+
+	public String getAlias() {
+		return this.alias;
 	}
 }

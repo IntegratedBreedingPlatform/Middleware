@@ -24,6 +24,7 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.springframework.transaction.annotation.Transactional;
@@ -134,6 +135,11 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Location> getLocationsByType(final Integer type) {
 		return this.daoFactory.getLocationDAO().getByType(type);
+	}
+
+	@Override
+	public List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final String programUUID) {
+		return this.daoFactory.getLocationDAO().getFilteredLocations(types, locationIds, programUUID);
 	}
 
 	@Override
@@ -511,6 +517,20 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
 		}
 		return unspecifiedLocationId;
+	}
+
+	@Override
+	public List<Integer> getFavoriteProjectLocationIds(final String programUUID) {
+		final List<ProgramFavorite> programFavorites =
+			this.daoFactory.getProgramFavoriteDao().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
+		final List<Integer> favoriteLocationIds = new ArrayList<>();
+		if (programFavorites != null && !programFavorites.isEmpty()) {
+			for (final ProgramFavorite programFavorite : programFavorites) {
+				favoriteLocationIds.add(programFavorite.getEntityId());
+
+			}
+		}
+		return favoriteLocationIds;
 	}
 
 }
