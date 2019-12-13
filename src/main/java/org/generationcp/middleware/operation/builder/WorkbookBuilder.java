@@ -15,6 +15,7 @@ import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -50,7 +51,6 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -181,6 +181,7 @@ public class WorkbookBuilder extends Builder {
 		final Map<Integer, VariableType> projectPropRoleMapping = this
 			.generateProjectPropertyRoleMap(projectProperties);
 
+		final GeolocationPropertyDao geolocationPropertyDao = this.daoFactory.getGeolocationPropertyDao();
 		for (final ProjectProperty projectProperty : projectProperties) {
 			// FIXME DA IN A LOOP
 			final StandardVariable stdVariable = this.getStandardVariableBuilder()
@@ -198,9 +199,13 @@ public class WorkbookBuilder extends Builder {
 			if (varType != null) {
 				stdVariable.setPhenotypicType(varType.getRole());
 
-				final String value = projectProperty.getValue();
 
 				if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
+					String value = projectProperty.getValue();
+					// During import of study, experiment design values are not set in ProjectProperty so we resolve them from GeolocationProperty
+					if (value == null && VariableType.ENVIRONMENT_DETAIL.equals(varType)) {
+						value = geolocationPropertyDao.getGeolocationPropValue(stdVariableId, id);
+					}
 
 					final MeasurementVariable measurementVariable =
 						this.createMeasurementVariable(stdVariable, projectProperty, value, minRange, maxRange, varType);
