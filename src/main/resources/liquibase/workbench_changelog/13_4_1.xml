@@ -4,7 +4,7 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="corina" id="v13.4.0-1">
+	<changeSet author="corina" id="v13.4.1-1">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(*) FROM role_type_permission WHERE role_type_id=3 AND permission_id IN (8,9,10);
