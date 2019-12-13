@@ -183,6 +183,23 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		return geoProperties;
 	}
 
+	public String getGeolocationPropValue(final int stdVarId, final int datasetId) {
+		try {
+			final StringBuilder sql =
+				new StringBuilder().append("SELECT distinct value ").append("FROM nd_experiment e ")
+					.append("INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id ")
+					.append("WHERE e.project_id = :projectId AND gp.type_id = :stdVarId ORDER BY e.nd_geolocation_id ");
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			query.setParameter("projectId", datasetId);
+			query.setParameter("stdVarId", stdVarId);
+			return (String) query.uniqueResult();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error at getGeolocationPropValue=" + stdVarId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
+		}
+	}
+
+
 	public List<GeolocationProperty> getByGeolocation(final Integer geolocationId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("geolocation.locationId", geolocationId));
