@@ -111,16 +111,20 @@ public class BackcrossAncestryTree {
 	 *         found.
 	 */
 	private Optional<Germplasm> findRecurringParent(final Integer femaleParent, final Integer maleParent) {
-		final Germplasm femaleParentGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, femaleParent)).get();
-		final Germplasm maleParentGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, maleParent)).get();
 		Germplasm recurringParent = null;
-		if (maleParentGermplasm.getGnpgs() >= 2 && (femaleParentGermplasm.getGid().equals(maleParentGermplasm.getGpid1())
-				|| femaleParentGermplasm.getGid().equals(maleParentGermplasm.getGpid2()))) {
+		if(this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, femaleParent)).isPresent() &&
+				this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, maleParent)).isPresent()) {
+			final Germplasm femaleParentGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, femaleParent)).get();
+			final Germplasm maleParentGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, maleParent)).get();
 
-			recurringParent = femaleParentGermplasm;
-		} else if (femaleParentGermplasm.getGnpgs() >= 2 && (maleParentGermplasm.getGid().equals(femaleParentGermplasm.getGpid1())
-				|| maleParentGermplasm.getGid().equals(femaleParentGermplasm.getGpid2()))) {
-			recurringParent = maleParentGermplasm;
+			if (maleParentGermplasm.getGnpgs() >= 2 && (femaleParentGermplasm.getGid().equals(maleParentGermplasm.getGpid1())
+					|| femaleParentGermplasm.getGid().equals(maleParentGermplasm.getGpid2()))) {
+
+				recurringParent = femaleParentGermplasm;
+			} else if (femaleParentGermplasm.getGnpgs() >= 2 && (maleParentGermplasm.getGid().equals(femaleParentGermplasm.getGpid1())
+					|| maleParentGermplasm.getGid().equals(femaleParentGermplasm.getGpid2()))) {
+				recurringParent = maleParentGermplasm;
+			}
 		}
 		return Optional.fromNullable(recurringParent);
 	}
