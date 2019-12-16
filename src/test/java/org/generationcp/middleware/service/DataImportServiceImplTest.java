@@ -21,6 +21,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.util.Message;
@@ -83,6 +84,9 @@ public class DataImportServiceImplTest {
 	@Mock
 	private File file;
 
+	@Mock
+	private TermDataManager termDataManager;
+
 	private Workbook workbook;
 
 	@InjectMocks
@@ -123,10 +127,15 @@ public class DataImportServiceImplTest {
 		Mockito.when(this.locationDataManager.retrieveLocIdOfUnspecifiedLocation()).thenReturn(String.valueOf(UNSPECIFIED_LOCATION_LOCID));
 
 
-		final StandardVariable standardVariable = StandardVariableTestDataInitializer.createStandardVariable();
-		standardVariable.setId(TermId.LOCATION_ID.getId());
-		standardVariable.setName("LOCATION_ID");
-		Mockito.when(this.ontologyDataManager.getStandardVariable(TermId.LOCATION_ID.getId(), PROGRAM_UUID)).thenReturn(standardVariable);
+		final StandardVariable locationVariable = StandardVariableTestDataInitializer.createStandardVariable();
+		locationVariable.setId(TermId.LOCATION_ID.getId());
+		locationVariable.setName("LOCATION_ID");
+		Mockito.when(this.ontologyDataManager.getStandardVariable(TermId.LOCATION_ID.getId(), PROGRAM_UUID)).thenReturn(locationVariable);
+
+		final StandardVariable exptDesignVariable = StandardVariableTestDataInitializer.createStandardVariable();
+		exptDesignVariable.setId(TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		exptDesignVariable.setName("EXPERIMENT DESIGN");
+		Mockito.when(this.ontologyDataManager.getStandardVariable(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), PROGRAM_UUID)).thenReturn(exptDesignVariable);
 	}
 
 	protected void mockStandardVariable(final Integer termId, final String name, final String property, final String scale,
@@ -826,6 +835,105 @@ public class DataImportServiceImplTest {
 		Assert.assertEquals(PhenotypicType.TRIAL_ENVIRONMENT, locationIdFromFactors.get().getRole());
 		Assert.assertEquals(VariableType.ENVIRONMENT_DETAIL, locationIdFromFactors.get().getVariableType());
 
+	}
+
+	@Test
+	public void testAddExptDesignVariableIfNotExists() {
+		final Workbook trialWorkbook = WorkbookTestDataInitializer
+			.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+				true);
+
+		List<MeasurementVariable> measurementVariables = new ArrayList<>();
+
+		removeMeasurementVariableInList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions());
+		removeMeasurementVariableInList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getFactors());
+
+		this.dataImportService.addExptDesignVariableIfNotExists(trialWorkbook, measurementVariables, PROGRAM_UUID);
+
+		final Optional<MeasurementVariable> exptDesignVariable = this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), measurementVariables);
+		Assert.assertTrue(exptDesignVariable.isPresent());
+
+		measurementVariables = new ArrayList<>();
+		trialWorkbook.getConditions().add(exptDesignVariable.get());
+		Assert.assertFalse(this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), measurementVariables).isPresent());
+	}
+
+	@Test
+	public void testGetExperimentalDesignIdValueNull() throws WorkbookParserException{
+		Assert.assertEquals(String.valueOf(TermId.EXTERNALLY_GENERATED.getId()), this.dataImportService.getExperimentalDesignIdValue(""));
+	}
+
+	@Test
+	public void testGetExperimentalDesignIdValueWithError() {
+		final Term term = new Term(TermId.RANDOMIZED_COMPLETE_BLOCK.getId(), "RCBD", "RCBD");
+		try {
+			this.dataImportService.getExperimentalDesignIdValue(term.getName());
+			Assert.fail("Should Throw An Exception");
+		} catch (WorkbookParserException e){
+			Mockito.verify(this.termDataManager).getTermByName(term.getName());
+		}
+	}
+
+	@Test
+	public void processExperimentalDesignNotExisting() throws WorkbookParserException{
+		final Workbook trialWorkbook = WorkbookTestDataInitializer
+			.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+				true);
+
+		removeMeasurementVariableInList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions());
+		removeMeasurementVariableInList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getFactors());
+
+		this.dataImportService.processExperimentalDesign(trialWorkbook, PROGRAM_UUID, null);
+		final MeasurementVariable exptDesignVariable = this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions()).get();
+		Assert.assertEquals(String.valueOf(TermId.EXTERNALLY_GENERATED.getId()), exptDesignVariable.getValue());
+	}
+
+	@Test
+	public void processExperimentalDesignPresentInConditions() throws WorkbookParserException{
+		final Term term = new Term(TermId.RANDOMIZED_COMPLETE_BLOCK.getId(), "RCBD", "RCBD");
+		Mockito.when(this.termDataManager.getTermByName(term.getName())).thenReturn(term);
+		final Workbook trialWorkbook = WorkbookTestDataInitializer
+			.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+				true);
+		removeMeasurementVariableInList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getFactors());
+		this.dataImportService.addExptDesignVariableIfNotExists(trialWorkbook, trialWorkbook.getConditions(), PROGRAM_UUID);
+
+		MeasurementVariable exptDesignVariable = this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions()).get();
+		exptDesignVariable.setValue(null);
+
+		this.dataImportService.processExperimentalDesign(trialWorkbook, PROGRAM_UUID, term.getName());
+		exptDesignVariable = this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions()).get();
+		Assert.assertEquals(String.valueOf(term.getId()), exptDesignVariable.getValue());
+	}
+
+	@Test
+	public void processExperimentalDesignPresentInFactors() throws WorkbookParserException{
+		final Term term = new Term(TermId.RANDOMIZED_COMPLETE_BLOCK.getId(), "RCBD", "RCBD");
+		Mockito.when(this.termDataManager.getTermByName(term.getName())).thenReturn(term);
+		final Workbook trialWorkbook = WorkbookTestDataInitializer
+			.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+				true);
+		removeMeasurementVariableInList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions());
+		this.dataImportService.addExptDesignVariableIfNotExists(trialWorkbook, trialWorkbook.getFactors(), PROGRAM_UUID);
+
+		MeasurementVariable exptDesignVariable = this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getFactors()).get();
+		exptDesignVariable.setValue(null);
+
+		this.dataImportService.processExperimentalDesign(trialWorkbook, PROGRAM_UUID, term.getName());
+		exptDesignVariable = this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions()).get();
+		Assert.assertEquals(String.valueOf(term.getId()), exptDesignVariable.getValue());
+	}
+
+	@Test
+	public void testGetExperimentalDesignIdValueWithNoError() {
+		final Term term = new Term(TermId.RANDOMIZED_COMPLETE_BLOCK.getId(), "RCBD", "RCBD");
+		Mockito.when(this.termDataManager.getTermByName(term.getName())).thenReturn(term);
+		try {
+			this.dataImportService.getExperimentalDesignIdValue(term.getName());
+			Mockito.verify(this.termDataManager).getTermByName(term.getName());
+		} catch (WorkbookParserException e){
+			Assert.fail("Should NOT Throw An Exception");
+		}
 	}
 
 	private StandardVariable createTestCategoricalStandardVariable(final String name) {
