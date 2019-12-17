@@ -765,7 +765,6 @@ public class WorkbookParser {
 			if (value != null && !"".equals(value)) {
 				return false;
 			}
-			col++;
 		}
 		return true;
 	}
