@@ -36,8 +36,8 @@ public class BreedingMethodFactory {
 		} else if (methodName.contains("cross")) {
 			return new SimpleCrossProcessor();
 		}
-		// No crossing just an inbread
-		return new InbredProcessor();
+		//  Any method for which there is not cross expansion algorithm should be treated like a single cross
+		return new SingleCrossHybridProcessor();
 	}
 
 	private static String getMethodName(final GermplasmNode germplasmNode) {
