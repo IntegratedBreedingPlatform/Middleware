@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.pedigree;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -106,7 +107,12 @@ public class PedigreeServiceImplTest extends IntegrationTestBase {
         final Germplasm generateRandomGermplasm = this.generateRandomGermplasmRecurringMaleParent();
         Set<Integer> set = new HashSet<>();
         set.add(generateRandomGermplasm.getGid());
-        Map<Integer, String> map = this.pedigreeService.getCrossExpansions(set, 5, this.crossExpansionProperties);
-        Assert.assertTrue(map.containsValue("-"));
+        try{
+            this.pedigreeService.getCrossExpansions(set, 5, this.crossExpansionProperties);
+        }catch (MiddlewareException ex){
+            Assert.assertTrue(ex.getMessage().contains("Problem building pedigree string for gid"));
+        }
+
+
     }
 }
