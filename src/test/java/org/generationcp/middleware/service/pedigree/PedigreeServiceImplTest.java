@@ -54,10 +54,10 @@ public class PedigreeServiceImplTest extends IntegrationTestBase {
         }
     }
 
-    private Germplasm generateRandomGermplasmRecurringMaleParent(final int maxNumberOfNodes) {
+    private Germplasm generateRandomGermplasmRecurringMaleParent() {
         final Random randomGenerator = new Random();
-        final int femaleSideNodes = randomGenerator.nextInt(maxNumberOfNodes) + 1;
-        final int maleSideNodes = randomGenerator.nextInt(maxNumberOfNodes) + 1;
+        final int femaleSideNodes = randomGenerator.nextInt(5) + 1;
+        final int maleSideNodes = randomGenerator.nextInt(5) + 1;
 
         final Germplasm rootGermplasm = this.generateTestGermplasm(1, 1);
         this.generateTreeRecurring(rootGermplasm, femaleSideNodes, maleSideNodes, 5, this.randomNumbers.iterator());
@@ -103,7 +103,7 @@ public class PedigreeServiceImplTest extends IntegrationTestBase {
 
     @Test
     public void testGetCrossExpansions() {
-        final Germplasm generateRandomGermplasm = this.generateRandomGermplasmRecurringMaleParent(5);
+        final Germplasm generateRandomGermplasm = this.generateRandomGermplasmRecurringMaleParent();
         Set<Integer> set = new HashSet<>();
         set.add(generateRandomGermplasm.getGid());
         Map<Integer, String> map = this.pedigreeService.getCrossExpansions(set, 5, this.crossExpansionProperties);

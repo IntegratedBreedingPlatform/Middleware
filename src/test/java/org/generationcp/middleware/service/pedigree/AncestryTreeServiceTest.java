@@ -34,15 +34,15 @@ public class AncestryTreeServiceTest {
 	private Set<Integer> randomNumbers;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 
 		// Keep our generated germplasm in this map
-		this.germplasmMap = new HashMap<CropGermplasmKey, Germplasm>();
+		this.germplasmMap = new HashMap<>();
 
 		// Keep our generated methods in this map
-		this.methodsMap = new HashMap<CropMethodKey, Method>();
+		this.methodsMap = new HashMap<>();
 
-		this.randomNumbers = new LinkedHashSet<Integer>();
+		this.randomNumbers = new LinkedHashSet<>();
 
 		setUpGermplasmCache();
 
@@ -53,7 +53,7 @@ public class AncestryTreeServiceTest {
 	}
 
 	private void setUpMethodCache() {
-		this.methodCache = new FunctionBasedGuavaCacheLoader<CropMethodKey, Method>(
+		this.methodCache = new FunctionBasedGuavaCacheLoader<>(
 				CacheBuilder.newBuilder().maximumSize(100000).expireAfterWrite(100, TimeUnit.MINUTES).<CropMethodKey, Method>build(),
 				new Function<CropMethodKey, Method>() {
 
@@ -67,7 +67,7 @@ public class AncestryTreeServiceTest {
 	private void setUpGermplasmCache() {
 
 		FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm> functionBasedGuavaCacheLoader =
-				new FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm>(CacheBuilder.newBuilder().maximumSize(100000)
+				new FunctionBasedGuavaCacheLoader<>(CacheBuilder.newBuilder().maximumSize(100000)
 						.expireAfterWrite(100, TimeUnit.MINUTES).<CropGermplasmKey, Germplasm>build(),
 						new Function<CropGermplasmKey, Germplasm>() {
 
@@ -90,7 +90,7 @@ public class AncestryTreeServiceTest {
 	}
 
 	@Test
-	public void testPedigreeTreeGeneration() throws Exception {
+	public void testPedigreeTreeGeneration() {
 		final Germplasm generateRandomGermplasm = this.generateRandomGermplasm(2);
 
 		final AncestryTreeService pedigreeTree =
