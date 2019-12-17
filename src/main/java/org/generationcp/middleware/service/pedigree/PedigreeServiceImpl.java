@@ -43,9 +43,9 @@ public class PedigreeServiceImpl implements PedigreeService {
 
 	private PedigreeDataManagerFactory pedigreeDataManagerFactory;
 
-	private static Cache<CropMethodKey, Method> breedingMethodCache;
+	private static final Cache<CropMethodKey, Method> breedingMethodCache;
 
-	private static Cache<CropNameTypeKey, List<Integer>> nameTypeCache;
+	private static final Cache<CropNameTypeKey, List<Integer>> nameTypeCache;
 
 	private String cropName;
 
@@ -70,7 +70,7 @@ public class PedigreeServiceImpl implements PedigreeService {
 		this.pedigreeDataManagerFactory = new PedigreeDataManagerFactory(sessionProvider);
 		this.germplasmDataManager = this.pedigreeDataManagerFactory.getGermplasmDataManager();
 
-		methodCropBasedCache = new FunctionBasedGuavaCacheLoader<CropMethodKey, Method>(breedingMethodCache, new Function<CropMethodKey, Method>() {
+		methodCropBasedCache = new FunctionBasedGuavaCacheLoader<>(breedingMethodCache, new Function<CropMethodKey, Method>() {
 
 			@Override
 			public Method apply(CropMethodKey key) {
@@ -103,7 +103,7 @@ public class PedigreeServiceImpl implements PedigreeService {
 		};
 
 		nameTypeBasedCache =
-				new FunctionBasedGuavaCacheLoader<CropNameTypeKey, List<Integer>>(nameTypeCache,
+				new FunctionBasedGuavaCacheLoader<>(nameTypeCache,
 						nameTypeLoader);
 
 	}
