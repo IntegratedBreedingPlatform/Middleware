@@ -53,33 +53,33 @@ public class ThreeWayHybridProcessor implements BreedingMethodProcessor {
 				this.inbredProcessor.processGermplasmNode(maleParentNode, level - 1, fixedLineNameResolver, originatesFromComplexCross);
 		final PedigreeString pedigreeString = new PedigreeString();
 		pedigreeString.setNumberOfCrosses(1);
-		pedigreeString.setPedigree(PedigreeStringGeneratorUtil.gerneratePedigreeString(femalePedigreeString, malePedigreeString));
+		pedigreeString.setPedigree(PedigreeStringGeneratorUtil.generatePedigreeString(femalePedigreeString, malePedigreeString));
 		return pedigreeString;
 
 	}
 
-	private PedigreeString constructPedigreeString(final Boolean femaleIsCross, final GermplasmNode singleCrossHybrids, final GermplasmNode inbread,
+	private PedigreeString constructPedigreeString(final Boolean femaleIsCross, final GermplasmNode singleCrossHybrid, final GermplasmNode inbred,
 			final Integer level, final FixedLineNameResolver fixedLineNameResolver, final boolean originatesFromComplexCross) {
 
-		final GermplasmNode singleCrossHybridFemaleParent = singleCrossHybrids.getFemaleParent();
-		final GermplasmNode singleCrossHybridMaleParent = singleCrossHybrids.getMaleParent();
+		final GermplasmNode singleCrossHybridFemaleParent = singleCrossHybrid.getFemaleParent();
+		final GermplasmNode singleCrossHybridMaleParent = singleCrossHybrid.getMaleParent();
 
 		final PedigreeString singleCrossHybridFemaleParentPedigreeString = getPedigreeString(level, fixedLineNameResolver, singleCrossHybridFemaleParent, originatesFromComplexCross);
 		final PedigreeString singleCrossHybridMaleParentPedigreeString = getPedigreeString(level, fixedLineNameResolver, singleCrossHybridMaleParent, originatesFromComplexCross);
 
 		final PedigreeString singleCrossHybridPedigreeString = new PedigreeString();
 		singleCrossHybridPedigreeString.setNumberOfCrosses(singleCrossHybridFemaleParentPedigreeString.getNumberOfCrosses() + 1);
-		singleCrossHybridPedigreeString.setPedigree(PedigreeStringGeneratorUtil.gerneratePedigreeString(
+		singleCrossHybridPedigreeString.setPedigree(PedigreeStringGeneratorUtil.generatePedigreeString(
 				singleCrossHybridFemaleParentPedigreeString, singleCrossHybridMaleParentPedigreeString));
-
-		final PedigreeString inbreadPedigreeString = this.inbredProcessor.processGermplasmNode(inbread, level - 1, fixedLineNameResolver, originatesFromComplexCross);
+		final PedigreeString inbredPedigreeString = this.inbredProcessor.processGermplasmNode(inbred, level - 1, fixedLineNameResolver, originatesFromComplexCross);
 
 		final PedigreeString pedigreeString = new PedigreeString();
 		pedigreeString.setNumberOfCrosses(singleCrossHybridPedigreeString.getNumberOfCrosses() + 1);
+
 		// Female pedigree string always comes first
-		pedigreeString.setPedigree(femaleIsCross? PedigreeStringGeneratorUtil.gerneratePedigreeString(singleCrossHybridPedigreeString,
-				inbreadPedigreeString) : PedigreeStringGeneratorUtil.gerneratePedigreeString(inbreadPedigreeString,
-			singleCrossHybridMaleParentPedigreeString));
+		pedigreeString.setPedigree(femaleIsCross ? PedigreeStringGeneratorUtil.generatePedigreeString(femaleIsCross, singleCrossHybridPedigreeString,
+				inbredPedigreeString) : PedigreeStringGeneratorUtil.generatePedigreeString(femaleIsCross, inbredPedigreeString,
+				singleCrossHybridPedigreeString));
 		return pedigreeString;
 
 	}

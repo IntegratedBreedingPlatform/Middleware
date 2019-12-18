@@ -27,6 +27,16 @@ public class PedigreeStringGeneratorUtil {
 				+ malePedigreeString.getPedigree();
 	}
 
+	public static String generatePedigreeString(final boolean femaleIsCross, final PedigreeString femalePedigreeString, final PedigreeString malePedigreeString) {
+				+ ", malePedigreeString=" + malePedigreeString.getPedigree() + " , maleCrosses=" + malePedigreeString.getNumberOfCrosses());
+		final Integer numberOfCrosses = femaleIsCross ? femalePedigreeString.getNumberOfCrosses() : malePedigreeString.getNumberOfCrosses();
+		LOG.debug("Combining pedigree string. FemalePedigreeString '{}', MalePedigreeString '%s', Number of crosses - '{}'",
+				femalePedigreeString.toString(), malePedigreeString.toString(), numberOfCrosses);
+
+		return femalePedigreeString.getPedigree() + PedigreeStringGeneratorUtil.getSeparator(numberOfCrosses)
+				+ malePedigreeString.getPedigree();
+	}
+
 	public static String generateBackcrossPedigreeString(final PedigreeString donorParentString,
 														 final PedigreeString recurringParentString, final FixedLineNameResolver fixedLineNameResolver,
 														 final int numberOfRecurringParents, final boolean isFemaleRecurringParent) {
