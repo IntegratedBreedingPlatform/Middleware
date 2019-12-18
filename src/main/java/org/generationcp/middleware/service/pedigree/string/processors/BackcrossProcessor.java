@@ -72,7 +72,7 @@ public class BackcrossProcessor implements BreedingMethodProcessor {
 				this.inbredProcessor.processGermplasmNode(maleParent, level - 1, fixedLineNameResolver, originatesFromComplexCross);
 
 		final PedigreeString pedigreeString = new PedigreeString();
-		pedigreeString.setPedigree(PedigreeStringGeneratorUtil.gerneratePedigreeString(femaleLeafPedigreeString, maleLeafPedigreeString));
+		pedigreeString.setPedigree(PedigreeStringGeneratorUtil.generatePedigreeString(femaleLeafPedigreeString, maleLeafPedigreeString));
 		pedigreeString.setNumberOfCrosses(1);
 		return pedigreeString;
 
@@ -109,10 +109,10 @@ public class BackcrossProcessor implements BreedingMethodProcessor {
 			final FixedLineNameResolver fixedLineNameResolver) {
 		final PedigreeString backcrossPedigreeString = new PedigreeString();
 		if (recurringParent.get() == femaleParent) {
-			backcrossPedigreeString.setPedigree(PedigreeStringGeneratorUtil.gernerateBackcrossPedigreeString(nonRecurringParentString,
+			backcrossPedigreeString.setPedigree(PedigreeStringGeneratorUtil.generateBackcrossPedigreeString(nonRecurringParentString,
 					recurringParentString, fixedLineNameResolver, recurringParentCount, true));
 		} else {
-			backcrossPedigreeString.setPedigree(PedigreeStringGeneratorUtil.gernerateBackcrossPedigreeString(recurringParentString,
+			backcrossPedigreeString.setPedigree(PedigreeStringGeneratorUtil.generateBackcrossPedigreeString(recurringParentString,
 					nonRecurringParentString, fixedLineNameResolver, recurringParentCount, false));
 		}
 		return backcrossPedigreeString;
