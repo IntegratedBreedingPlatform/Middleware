@@ -103,6 +103,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		+ "            p.observable_id obs_id"
 		+ "    FROM"
 		+ "        phenotype p"
+		+ "  INNER JOIN nd_experiment n "
+		+ "  ON p.nd_experiment_id = n.nd_experiment_id WHERE n.project_id = :projectId"
 		+ "    GROUP BY p.nd_experiment_id , p.observable_id) ph ON (ph.id = pheno.phenotype_id"
 		+ "        AND ph.exp_id = pheno.nd_experiment_id"
 		+ "        AND ph.obs_id = pheno.observable_id)"
