@@ -560,12 +560,9 @@ public class DatasetServiceImplTest {
 		final CVTerm term2 = new CVTerm();
 		term2.setCvTermId(random.nextInt());
 		formula2.setTargetCVTerm(term2);
-		Mockito.doReturn(Arrays.asList(formula1, formula2)).when(this.formulaDao).getByInputId(observableId);
-
 
 		this.datasetService.deletePhenotype(phenotypeId);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotype);
-		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(observationUnitId)), new HashSet<>(Arrays.asList(term1.getCvTermId(), term2.getCvTermId())));
 	}
 
     @Test
@@ -639,10 +636,13 @@ public class DatasetServiceImplTest {
 		final Phenotype phenotypeArgumentCaptorValue = phenotypeArgumentCaptor.getValue();
 		Assert.assertEquals(phenotype.getValue(), phenotypeArgumentCaptorValue.getValue());
 		Assert.assertNull(phenotypeArgumentCaptorValue.getDraftValue());
+		Assert.assertTrue(phenotype.isChanged());
 	}
 
 	@Test
 	public void testDiscardDraftData() {
+
+		final Integer studyId = 1;
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
@@ -669,12 +669,14 @@ public class DatasetServiceImplTest {
 		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
 
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
-		this.datasetService.rejectDatasetDraftData(datasetId);
+		this.datasetService.rejectDatasetDraftData(studyId, datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).update(phenotypeArgumentCaptor.capture());
 		final Phenotype phenotypeArgumentCaptorValue = phenotypeArgumentCaptor.getValue();
 		Assert.assertEquals(phenotype.getValue(), phenotypeArgumentCaptorValue.getValue());
+		Assert.assertFalse(phenotype.isChanged());
+
 		Assert.assertNull(phenotypeArgumentCaptorValue.getDraftValue());
 	}
 
@@ -713,10 +715,13 @@ public class DatasetServiceImplTest {
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
+		Assert.assertTrue(phenotype.isChanged());
 	}
 
 	@Test
 	public void testDiscardDraftDataDeletingRow() {
+
+		final Integer studyId = 1;
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
@@ -744,14 +749,17 @@ public class DatasetServiceImplTest {
 
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
-		this.datasetService.rejectDatasetDraftData(datasetId);
+		this.datasetService.rejectDatasetDraftData(studyId, datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
+		Assert.assertTrue(phenotype.isChanged());
 	}
 
 	@Test
 	public void testDiscardDraftDataDeletingRowWithEmpty() {
+
+		final Integer studyId = 1;
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
@@ -779,10 +787,11 @@ public class DatasetServiceImplTest {
 
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
-		this.datasetService.rejectDatasetDraftData(datasetId);
+		this.datasetService.rejectDatasetDraftData(studyId, datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
+		Assert.assertTrue(phenotype.isChanged());
 	}
 
 	@Test
@@ -820,6 +829,7 @@ public class DatasetServiceImplTest {
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
+		Assert.assertTrue(phenotype.isChanged());
 	}
 
 	@Test
