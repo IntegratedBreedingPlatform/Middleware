@@ -268,23 +268,36 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				}
 			}
 
+			String selectQueryProgramUUIDDependant;
+			String leftJoinsProgramUUIDDependant = "";
+			if (variableFilter.getProgramUuid() == null) {
+				selectQueryProgramUUIDDependant = "'' g_alias, '' g_min_value, '' g_max_value, '' p_alias, '' p_min_value, '' p_max_value, '' fid ";
+			} else {
+				selectQueryProgramUUIDDependant = " vo.alias g_alias, vo.expected_min g_min_value, vo.expected_max g_max_value, vpo.alias p_alias, vpo.expected_min p_min_value, vpo.expected_max p_max_value, pf.id fid ";
+				leftJoinsProgramUUIDDependant = " left join variable_overrides vo on vo.cvterm_id = v.cvterm_id and vo.program_uuid is null "
+						+ "left join variable_overrides vpo on vpo.cvterm_id = v.cvterm_id and vpo.program_uuid = :programUuid "
+						+ "left join program_favorites pf on pf.entity_id = v.cvterm_id and pf.program_uuid = :programUuid and pf.entity_type = 'VARIABLES' ";
+			}
+
 			// this query will get variables using filter
 			final SQLQuery query = this.getActiveSession()
 					.createSQLQuery(
-							"select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, vo.alias g_alias, vo.expected_min g_min_value, vo.expected_max g_max_value, vpo.alias p_alias, vpo.expected_min p_min_value, vpo.expected_max p_max_value, pf.id fid from cvterm v "
+							"select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, "
+									+ selectQueryProgramUUIDDependant
+									+ "from cvterm v "
 									+ "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
 									+ "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
 									+ "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
-									+ "left join variable_overrides vo on vo.cvterm_id = v.cvterm_id and vo.program_uuid is null "
-									+ "left join variable_overrides vpo on vpo.cvterm_id = v.cvterm_id and vpo.program_uuid = :programUuid "
-									+ "left join program_favorites pf on pf.entity_id = v.cvterm_id and pf.program_uuid = :programUuid and pf.entity_type = 'VARIABLES' "
+									+ leftJoinsProgramUUIDDependant
 									+ "WHERE (v.cv_id = 1040) " + filterClause)
 					.addScalar("vid").addScalar("vn").addScalar("vd").addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid")
 					.addScalar("mn").addScalar("md").addScalar("sid").addScalar("sn").addScalar("sd").addScalar("g_alias")
 					.addScalar("g_min_value").addScalar("g_max_value").addScalar("p_alias").addScalar("p_min_value")
 					.addScalar("p_max_value").addScalar("fid");
 
-			query.setParameter("programUuid", variableFilter.getProgramUuid());
+			if (variableFilter.getProgramUuid() != null) {
+				query.setParameter("programUuid", variableFilter.getProgramUuid());
+			}
 
 			// get data from parameter map and apply parameter to query
 			for (final String lp : listParameters.keySet()) {

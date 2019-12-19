@@ -43,7 +43,8 @@ public enum ToolName {
 	TRAIT_DONOR_QUERY("trait_donor_query"),
 	TRIAL_MANAGER_FIELDBOOK_WEB("trial_manager_fieldbook_web"),
 	STUDY_MANAGER_FIELDBOOK_WEB("study_manager_fieldbook_web"),
-	MANAGE_PROGRAMS("manage_program");
+	MANAGE_PROGRAMS("manage_program"),
+	INVENTORY_MANAGEMENT("inventory_manager");
 
 	private final String name;
 

@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -33,6 +34,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -62,16 +64,16 @@ import java.util.Set;
 public class DataImportServiceImpl extends Service implements DataImportService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataImportServiceImpl.class);
-	public static final int MAX_VARIABLE_NAME_LENGTH = 32;
-	public static final String ERROR_MISSING_STUDY_CONDITION = "error.missing.study.condition";
-	public static final String ERROR_PLOT_DOESNT_EXIST = "error.plot.doesnt.exist";
-	public static final String ERROR_ENTRY_DOESNT_EXIST = "error.entry.doesnt.exist";
-	public static final String ERROR_GID_DOESNT_EXIST = "error.gid.doesnt.exist";
-	public static final String ERROR_DUPLICATE_STUDY_NAME = "error.duplicate.study.name";
-	public static final String ERROR_DUPLICATE_PSM = "error.duplicate.psm";
-	public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
-	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
-	public static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
+	private static final int MAX_VARIABLE_NAME_LENGTH = 32;
+	private static final String ERROR_MISSING_STUDY_CONDITION = "error.missing.study.condition";
+	private static final String ERROR_PLOT_DOESNT_EXIST = "error.plot.doesnt.exist";
+	private static final String ERROR_ENTRY_DOESNT_EXIST = "error.entry.doesnt.exist";
+	static final String ERROR_GID_DOESNT_EXIST = "error.gid.doesnt.exist";
+	private static final String ERROR_DUPLICATE_STUDY_NAME = "error.duplicate.study.name";
+	private static final String ERROR_DUPLICATE_PSM = "error.duplicate.psm";
+	static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
+	static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
+	static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
 	private static final String LOCATION_ID_DOESNT_EXISTS = "error.location.id.doesnt.exists";
 
 	private int maxRowLimit = WorkbookParser.DEFAULT_MAX_ROW_LIMIT;
@@ -84,6 +86,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Resource
 	private LocationDataManager locationDataManager;
+
+	@Resource
+	private TermDataManager termDataManager;
 
 	@Resource
 	private StudyDataManager studyDataManager;
@@ -320,6 +325,25 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
+	public void addExptDesignVariableIfNotExists(
+		final Workbook workbook, final List<MeasurementVariable> measurementVariables,
+		final String programUUID) {
+
+		final List<MeasurementVariable> combinedVariables = new ArrayList<>();
+		combinedVariables.addAll(workbook.getConditions());
+		combinedVariables.addAll(workbook.getFactors());
+
+		final Optional<MeasurementVariable> exptDesignExists = this.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), combinedVariables);
+
+		if (!exptDesignExists.isPresent()) {
+			final MeasurementVariable exptDesignVar = this.createMeasurementVariable(TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+				String.valueOf(TermId.EXTERNALLY_GENERATED.getId()), Operation.ADD, PhenotypicType.TRIAL_ENVIRONMENT, programUUID);
+			this.asssignMeasurementVariableToEnvironmentDetail(exptDesignVar);
+			measurementVariables.add(exptDesignVar);
+		}
+	}
+
+	@Override
 	public void removeLocationNameVariableIfExists(final Workbook workbook) {
 
 		final List<MeasurementVariable> workbookConditions = workbook.getConditions();
@@ -366,6 +390,52 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			this.asssignMeasurementVariableToEnvironmentDetail(locationIdVariableInConditions.get());
 		}
 
+	}
+
+	@Override
+	public void processExperimentalDesign(final Workbook workbook, final String programUUID, final String exptDesignValueFromObsSheet)
+		throws WorkbookParserException {
+		final Optional<MeasurementVariable> exptDesignVarInConditions =
+			this.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), workbook.getConditions());
+		if(exptDesignVarInConditions.isPresent()) {
+			final MeasurementVariable exptDesignVar = exptDesignVarInConditions.get();
+			if (exptDesignVar.getValue() != null && !exptDesignVar.getValue().isEmpty()) {
+				exptDesignVar.setValue(this.getExperimentalDesignIdValue(exptDesignVar.getValue()));
+			} else {
+				exptDesignVar.setValue(this.getExperimentalDesignIdValue(exptDesignValueFromObsSheet));
+			}
+		}
+
+		final Optional<MeasurementVariable> exptDesignVarInFactors =
+			this.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), workbook.getFactors());
+		if(exptDesignVarInFactors.isPresent()) {
+			final MeasurementVariable exptDesignVar = exptDesignVarInFactors.get();
+			if(!exptDesignVarInConditions.isPresent()) {
+				exptDesignVar.setValue(this.getExperimentalDesignIdValue(exptDesignValueFromObsSheet));
+				exptDesignVar.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+				workbook.getConditions().add(exptDesignVar);
+			}
+			workbook.getFactors().remove(exptDesignVarInFactors.get());
+		}
+
+		if(!exptDesignVarInConditions.isPresent() && !exptDesignVarInFactors.isPresent()) {
+			final MeasurementVariable exptDesignVar = this.createMeasurementVariable(TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+				String.valueOf(TermId.EXTERNALLY_GENERATED.getId()), Operation.ADD, PhenotypicType.TRIAL_ENVIRONMENT, programUUID);
+			exptDesignVar.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+			workbook.getConditions().add(exptDesignVar);
+		}
+
+	}
+
+	String getExperimentalDesignIdValue(final String experimentalDesign) throws WorkbookParserException{
+		if(experimentalDesign != null && !experimentalDesign.isEmpty()) {
+			Term exptDesignValue = this.termDataManager.getTermByName(experimentalDesign);
+			if(exptDesignValue != null) {
+				return String.valueOf(exptDesignValue.getId());
+			}
+			throw new WorkbookParserException("Invalid value for Experimental Design");
+		}
+		return String.valueOf(TermId.EXTERNALLY_GENERATED.getId());
 	}
 
 	protected void asssignMeasurementVariableToEnvironmentDetail(final MeasurementVariable measurementVariable) {

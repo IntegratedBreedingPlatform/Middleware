@@ -26,6 +26,7 @@ public class StandardVariableTransformer extends Transformer {
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(variable.getId());
 		standardVariable.setName(variable.getName());
+		standardVariable.setAlias(variable.getAlias());
 		standardVariable.setDescription(variable.getDefinition());
 		standardVariable.setProperty(variable.getProperty());
 		standardVariable.setScale(variable.getScale());

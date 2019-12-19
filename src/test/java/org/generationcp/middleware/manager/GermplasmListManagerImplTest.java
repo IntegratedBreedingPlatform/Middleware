@@ -29,10 +29,8 @@ import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -47,9 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.both;
@@ -312,8 +308,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.manager.deleteGermplasmListByListIdPhysically(germplasmListId);
 
 		Assert.assertTrue(
-			this.manager.getGermplasmListByName(TEST_LIST_1, GermplasmListManagerImplTest.PROGRAM_UUID, 0, 1, Operation.EQUAL).size()
-				== 0);
+				this.manager.getGermplasmListByName(TEST_LIST_1, GermplasmListManagerImplTest.PROGRAM_UUID, 0, 1, Operation.EQUAL).size()
+						== 0);
 	}
 
 	@Test
@@ -601,20 +597,4 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		Assert.assertTrue(result.contains(gid1.getGid()));
 	}
 
-	@Test
-	public void testGetGermpasmListMetadata() {
-		final GermplasmList gList = this.manager.getGermplasmListById(this.listId);
-		final Map<Integer, GermplasmListMetadata> resultsMap =
-			this.manager.getGermplasmListMetadata(Collections.singletonList(gList));
-		Assert.assertNotNull(resultsMap);
-		Assert.assertEquals(1, resultsMap.size());
-		final GermplasmListMetadata germplasmListMetadata = resultsMap.get(this.listId);
-		Assert.assertNotNull(germplasmListMetadata);
-		Assert.assertEquals(this.listId, germplasmListMetadata.getListId());
-		Assert.assertEquals(Integer.valueOf(1), germplasmListMetadata.getNumberOfEntries());
-		Assert.assertEquals(GermplasmListManagerImplTest.OWNER_ID, germplasmListMetadata.getOwnerId());
-		final WorkbenchUser workbenchUser = this.userService.getUserById(germplasmListMetadata.getOwnerId());
-		Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), germplasmListMetadata.getOwnerName());
-
-	}
 }

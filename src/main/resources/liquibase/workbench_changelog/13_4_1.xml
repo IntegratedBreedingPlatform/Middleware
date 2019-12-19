@@ -1,0 +1,54 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="corina" id="v13.4.1-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM role_type_permission WHERE role_type_id=3 AND permission_id IN (8,9,10);
+			</sqlCheck>
+		</preConditions>
+		<comment> Make Manage Ontologies,Import Germplasm,Manage Genotyping visible for program role. IBP-1345
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO `role_type_permission` (role_type_id,permission_id,selectable) VALUES (3,8,1);
+
+			INSERT INTO `role_type_permission` (role_type_id,permission_id,selectable) VALUES (3,9,1);
+
+			INSERT INTO `role_type_permission` (role_type_id,permission_id,selectable) VALUES (3,10,1);
+		</sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v13.4.1-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM r_call WHERE call_id IN (7, 8, 9, 10);
+			</sqlCheck>
+		</preConditions>
+		<comment> Change the shipped OpenCPU dataset transformations.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM r_call_parameter WHERE call_id in (1, 2);
+			DELETE FROM r_call WHERE call_id in (1, 2);
+
+			INSERT INTO r_call VALUES
+			(7, 'None', 1),
+			(8, 'Overall average', 1),
+			(9, 'Average by instance', 1),
+			(10, 'Data over instances and reps (for replicated data only)', 1);
+
+			INSERT INTO r_call_parameter (parameter_key, value, call_id) VALUES
+			('na.rm', 'TRUE', 3),
+			('formula', 'studyName+observationLevel+observationUnitDbId+entryType+entryNumber+germplasmDbId+germplasmName+studyLocation~variable', 7),
+			('formula', 'germplasmDbId+germplasmName~variable', 8),
+			('fun.aggregate', 'mean', 8),
+			('formula', 'germplasmDbId+germplasmName~variable+studyName+studyLocation', 9),
+			('fun.aggregate', 'mean', 9),
+			('formula', 'germplasmDbId+germplasmName~variable+studyName+studyLocation+replicate', 10),
+			('fun.aggregate', 'mean', 10);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
