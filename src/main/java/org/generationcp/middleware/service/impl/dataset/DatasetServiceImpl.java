@@ -676,14 +676,27 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void deletePhenotype(final Integer phenotypeId) {
+		this.deletePhenotype(phenotypeId, true);
+	}
+
+	// Delete transaction might be part of a batch action so provide the option to not update dependent phenotypes right away (ie. do it in batch later)
+	private void deletePhenotype(final Integer phenotypeId, final boolean updateDependentPhenotypes) {
 		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(phenotypeId);
 		final ExperimentModel experiment = phenotype.getExperiment();
+
 		final List<Phenotype> experimentPhenotypes = experiment.getPhenotypes();
 		experimentPhenotypes.remove(phenotype);
 		experiment.setPhenotypes(experimentPhenotypes);
 		this.daoFactory.getExperimentDao().merge(experiment);
 
 		this.daoFactory.getPhenotypeDAO().makeTransient(phenotype);
+
+		// Also update the status of phenotypes of the same observation unit for variables using the trait as input variable
+		if (updateDependentPhenotypes) {
+			final Integer observableId = phenotype.getObservableId();
+			final Integer observationUnitId = experiment.getNdExperimentId();
+			this.updateDependentPhenotypesAsOutOfSync(observableId, observationUnitId);
+		}
 	}
 
 	@Override
@@ -716,7 +729,7 @@ public class DatasetServiceImpl implements DatasetService {
 			if (StringUtils.isEmpty(phenotype.getValue())) {
 				// Set isChanged to true so that the derived traits that depend on it will be tagged as OUT_OF_SYNC later.
 				phenotype.setChanged(true);
-				this.deletePhenotype(phenotype.getPhenotypeId());
+				this.deletePhenotype(phenotype.getPhenotypeId(), false);
 			} else {
 				this.updatePhenotype(phenotype, phenotype.getcValueId(), phenotype.getValue(), null, null, true);
 			}
@@ -728,7 +741,7 @@ public class DatasetServiceImpl implements DatasetService {
 	private void reorganizePhenotypesStatus(
 		final Integer studyId, final List<Phenotype> inputPhenotypes) {
 		final List<MeasurementVariable> measurementVariableList =
-			new ArrayList<MeasurementVariable>(this.derivedVariableService.createVariableIdMeasurementVariableMapInStudy(studyId).values());
+			new ArrayList<>(this.derivedVariableService.createVariableIdMeasurementVariableMapInStudy(studyId).values());
 
 		if (!measurementVariableList.isEmpty()) {
 			final Map<Integer, List<Integer>> formulasMap = this.getTargetsByInput(measurementVariableList);
@@ -797,7 +810,7 @@ public class DatasetServiceImpl implements DatasetService {
 				if (StringUtils.isEmpty(phenotype.getDraftValue())) {
 					// Set isChanged to true so that the derived traits that depend on it will be tagged as OUT_OF_SYNC later.
 					phenotype.setChanged(true);
-					this.deletePhenotype(phenotype.getPhenotypeId());
+					this.deletePhenotype(phenotype.getPhenotypeId(), false);
 				} else {
 					this.updatePhenotype(
 						phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), null, null, false);
@@ -888,7 +901,7 @@ public class DatasetServiceImpl implements DatasetService {
 					if (StringUtils.isEmpty(phenotype.getDraftValue())) {
 						// Set isChanged to true so that the derived traits that depend on it will be tagged as OUT_OF_SYNC later.
 						phenotype.setChanged(true);
-						this.deletePhenotype(phenotype.getPhenotypeId());
+						this.deletePhenotype(phenotype.getPhenotypeId(), false);
 					} else {
 						this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), null, null, false);
 					}
@@ -956,7 +969,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (StringUtils.isEmpty(phenotype.getDraftValue())) {
 			// Set isChanged to true so that the derived traits that depend on it will be tagged as OUT_OF_SYNC later.
 			phenotype.setChanged(true);
-			this.deletePhenotype(phenotype.getPhenotypeId());
+			this.deletePhenotype(phenotype.getPhenotypeId(), false);
 		} else {
 			this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), null, null, false);
 		}
