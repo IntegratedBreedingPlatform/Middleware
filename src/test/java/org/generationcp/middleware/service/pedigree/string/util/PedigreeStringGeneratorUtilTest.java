@@ -9,7 +9,6 @@ import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeDataManagerFactory;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
 import org.generationcp.middleware.service.pedigree.cache.keys.CropNameTypeKey;
-import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGeneratorUtil;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.junit.Assert;
@@ -45,7 +44,7 @@ public class PedigreeStringGeneratorUtilTest {
 	public void testGerneratePedigreeStringWithSingleCross() throws Exception {
 		femalePedigreeString.setPedigree("A");
 		malePedigreeString.setPedigree("B");
-		final String resultantPedigree = PedigreeStringGeneratorUtil.gerneratePedigreeString(femalePedigreeString, malePedigreeString);
+		final String resultantPedigree = PedigreeStringGeneratorUtil.generatePedigreeString(femalePedigreeString, malePedigreeString);
 		Assert.assertEquals("A/B", resultantPedigree);
 	}
 
@@ -54,7 +53,7 @@ public class PedigreeStringGeneratorUtilTest {
 		femalePedigreeString.setPedigree("A/B");
 		femalePedigreeString.setNumberOfCrosses(1);
 		malePedigreeString.setPedigree("C");
-		final String resultantPedigree = PedigreeStringGeneratorUtil.gerneratePedigreeString(femalePedigreeString, malePedigreeString);
+		final String resultantPedigree = PedigreeStringGeneratorUtil.generatePedigreeString(femalePedigreeString, malePedigreeString);
 		Assert.assertEquals("A/B//C", resultantPedigree);
 	}
 
@@ -63,7 +62,7 @@ public class PedigreeStringGeneratorUtilTest {
 		femalePedigreeString.setPedigree("A/B//C");
 		femalePedigreeString.setNumberOfCrosses(2);
 		malePedigreeString.setPedigree("D");
-		final String resultantPedigree = PedigreeStringGeneratorUtil.gerneratePedigreeString(femalePedigreeString, malePedigreeString);
+		final String resultantPedigree = PedigreeStringGeneratorUtil.generatePedigreeString(femalePedigreeString, malePedigreeString);
 		Assert.assertEquals("A/B//C///D", resultantPedigree);
 	}
 
@@ -72,7 +71,7 @@ public class PedigreeStringGeneratorUtilTest {
 		femalePedigreeString.setPedigree("A/B//C///D");
 		femalePedigreeString.setNumberOfCrosses(3);
 		malePedigreeString.setPedigree("E");
-		final String resultantPedigree = PedigreeStringGeneratorUtil.gerneratePedigreeString(femalePedigreeString, malePedigreeString);
+		final String resultantPedigree = PedigreeStringGeneratorUtil.generatePedigreeString(femalePedigreeString, malePedigreeString);
 		Assert.assertEquals("A/B//C///D/4/E", resultantPedigree);
 	}
 
@@ -123,7 +122,7 @@ public class PedigreeStringGeneratorUtilTest {
 				new FixedLineNameResolver(mockCrossExpansionProperties, Mockito.mock(PedigreeDataManagerFactory.class),
 						(FunctionBasedGuavaCacheLoader<CropNameTypeKey, List<Integer>>) Mockito.mock(FunctionBasedGuavaCacheLoader.class), CROP_NAME);
 		final String gernerateBackcrossPedigreeString =
-				PedigreeStringGeneratorUtil.gernerateBackcrossPedigreeString(donorParent, recurringParent, fixedLineNameResolver, 5,
+				PedigreeStringGeneratorUtil.generateBackcrossPedigreeString(donorParent, recurringParent, fixedLineNameResolver, 5,
 						isFemaleRecurringParent);
 		return gernerateBackcrossPedigreeString;
 	}

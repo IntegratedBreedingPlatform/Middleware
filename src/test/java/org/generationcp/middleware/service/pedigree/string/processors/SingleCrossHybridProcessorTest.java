@@ -30,7 +30,7 @@ public class SingleCrossHybridProcessorTest {
 	}
 
 	@Test
-	public void testCreationOfAStandardSingleCross() throws Exception {
+	public void testCreationOfAStandardSingleCross() {
 		final SingleCrossHybridProcessor singleCrossHybridProcessor = new SingleCrossHybridProcessor();
 		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createSingleCrossTestGermplasmTree();
 
@@ -43,7 +43,7 @@ public class SingleCrossHybridProcessorTest {
 
 
 	@Test
-	public void testCreationOfAStandardSingleCrossWithParentsThatOnlyHaveGids() throws Exception {
+	public void testCreationOfAStandardSingleCrossWithParentsThatOnlyHaveGids() {
 		final SingleCrossHybridProcessor singleCrossHybridProcessor = new SingleCrossHybridProcessor();
 		final GermplasmNode parentGermplasmNode =
 				PedigreeStringTestUtil.createGermplasmNode(1, "A", PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,
@@ -63,7 +63,7 @@ public class SingleCrossHybridProcessorTest {
 	}
 
 	@Test
-	public void testCreationOfAStandardSingleCrossWithoutAnyParents() throws Exception {
+	public void testCreationOfAStandardSingleCrossWithoutAnyParents() {
 		final SingleCrossHybridProcessor singleCrossHybridProcessor = new SingleCrossHybridProcessor();
 		final GermplasmNode parentGermplasmNode =
 				PedigreeStringTestUtil.createGermplasmNode(1, "A", PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,
@@ -77,7 +77,7 @@ public class SingleCrossHybridProcessorTest {
 	}
 
 	@Test
-	public void testCreationOfAStandardSingleCrossWithUnpopulatedParents() throws Exception {
+	public void testCreationOfAStandardSingleCrossWithUnpopulatedParents() {
 		final SingleCrossHybridProcessor singleCrossHybridProcessor = new SingleCrossHybridProcessor();
 		final GermplasmNode parentGermplasmNode =
 				PedigreeStringTestUtil.createGermplasmNode(1, "A", PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,

@@ -21,6 +21,10 @@ public class BreedingMethodFactory {
 
 		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
 			LOG.debug("Germplasm with GID '{}' has a method name '{}'", germplasmNode.getGermplasm().getGid(), methodName);
+
+		// If germplasm node is null or has no GID, return inbred processor by default
+		} else {
+			return new InbredProcessor();
 		}
 
 		if (methodName.contains("single cross")) {
@@ -36,8 +40,9 @@ public class BreedingMethodFactory {
 		} else if (methodName.contains("cross")) {
 			return new SimpleCrossProcessor();
 		}
-		// No crossing just an inbread
-		return new InbredProcessor();
+
+		//  Any method for which there is not cross expansion algorithm should be treated like a single cross
+		return new SingleCrossHybridProcessor();
 	}
 
 	private static String getMethodName(final GermplasmNode germplasmNode) {
