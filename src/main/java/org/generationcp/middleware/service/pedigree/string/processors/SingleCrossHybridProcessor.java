@@ -62,7 +62,7 @@ public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 
 		final PedigreeString pedigreeString = new PedigreeString();
 		pedigreeString.setNumberOfCrosses(femalePedigreeString.getNumberOfCrosses() + 1);
-		pedigreeString.setPedigree(PedigreeStringGeneratorUtil.gerneratePedigreeString(femalePedigreeString, malePedigreeString));
+		pedigreeString.setPedigree(PedigreeStringGeneratorUtil.generatePedigreeString(femalePedigreeString, malePedigreeString));
 		return pedigreeString;
 	}
 

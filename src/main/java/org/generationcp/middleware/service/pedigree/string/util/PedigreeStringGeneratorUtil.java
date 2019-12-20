@@ -18,24 +18,33 @@ public class PedigreeStringGeneratorUtil {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PedigreeStringGeneratorUtil.class);
 
-	public static String gerneratePedigreeString(final PedigreeString femalePedigreeString, final PedigreeString malePedigreeString) {
+	public static String generatePedigreeString(final PedigreeString femalePedigreeString, final PedigreeString malePedigreeString) {
 
 		LOG.debug("Combining pedigree string. FemalePedigreeString '{}', MalePedigreeString '%s', Number of crosses - '{}'",
 				femalePedigreeString.toString(), malePedigreeString.toString(), femalePedigreeString.getNumberOfCrosses());
 
-		return femalePedigreeString.getPedigree() + PedigreeStringGeneratorUtil.getSeperator(femalePedigreeString.getNumberOfCrosses())
+		return femalePedigreeString.getPedigree() + PedigreeStringGeneratorUtil.getSeparator(femalePedigreeString.getNumberOfCrosses())
 				+ malePedigreeString.getPedigree();
 	}
 
-	public static String gernerateBackcrossPedigreeString(final PedigreeString donorParentString,
-			final PedigreeString recurringParentString, final FixedLineNameResolver fixedLineNameResolver,
-			final int numberOfRecurringParents, final boolean isFemaleRecurringParent) {
+	public static String generatePedigreeString(final boolean femaleIsCross, final PedigreeString femalePedigreeString, final PedigreeString malePedigreeString) {
+		final Integer numberOfCrosses = femaleIsCross ? femalePedigreeString.getNumberOfCrosses() : malePedigreeString.getNumberOfCrosses();
+		LOG.debug("Combining pedigree string. FemalePedigreeString '{}', MalePedigreeString '%s', Number of crosses - '{}'",
+				femalePedigreeString.toString(), malePedigreeString.toString(), numberOfCrosses);
+
+		return femalePedigreeString.getPedigree() + PedigreeStringGeneratorUtil.getSeparator(numberOfCrosses)
+				+ malePedigreeString.getPedigree();
+	}
+
+	public static String generateBackcrossPedigreeString(final PedigreeString donorParentString,
+														 final PedigreeString recurringParentString, final FixedLineNameResolver fixedLineNameResolver,
+														 final int numberOfRecurringParents, final boolean isFemaleRecurringParent) {
 
 		LOG.debug("Combining pedigree string. Donor Parent String - '%s', Recurring Parent String - '{}', Number of Recurrsions - '{}'",
 				donorParentString.toString(), recurringParentString.toString(), numberOfRecurringParents);
 
 		return recurringParentString.getPedigree()
-				+ PedigreeStringGeneratorUtil.getSeperator(isFemaleRecurringParent, numberOfRecurringParents, fixedLineNameResolver)
+				+ PedigreeStringGeneratorUtil.getSeparator(isFemaleRecurringParent, numberOfRecurringParents, fixedLineNameResolver)
 				+ donorParentString.getPedigree();
 	}
 
@@ -55,8 +64,8 @@ public class PedigreeStringGeneratorUtil {
 		return Optional.fromNullable(null);
 	}
 
-	private static String getSeperator(final boolean isFemaleRecurringParent, final int numberOfCrosses,
-			final FixedLineNameResolver fixedLineNameResolver) {
+	private static String getSeparator(final boolean isFemaleRecurringParent, final int numberOfCrosses,
+									   final FixedLineNameResolver fixedLineNameResolver) {
 
 		final CrossExpansionProperties crossExpansionProperties = fixedLineNameResolver.getCrossExpansionProperties();
 		final ImmutablePair<String, String> backcrossNotation =
@@ -69,7 +78,7 @@ public class PedigreeStringGeneratorUtil {
 		}
 	}
 
-	private static String getSeperator(final int numberOfPreviousCrosses) {
+	private static String getSeparator(final int numberOfPreviousCrosses) {
 		// number of crosses made determines the slashes in a pedigree string
 		if (numberOfPreviousCrosses == 0) {
 			return "/";

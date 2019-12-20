@@ -18,12 +18,8 @@ import org.junit.Test;
 
 public class BreedingMethodFactoryTest {
 
-	@Before
-	public void setUp() throws Exception {
-	}
-
 	@Test
-	public void testFactoryReturnsSingleCrossHybridProcessor() throws Exception {
+	public void testFactoryReturnsSingleCrossHybridProcessor() {
 		GermplasmNode germplasmNode = getGermplasmNodeWithMethodName("Single cross");
 		BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
 		Assert.assertTrue(methodProcessor instanceof SingleCrossHybridProcessor);
@@ -32,7 +28,7 @@ public class BreedingMethodFactoryTest {
 	}
 
 	@Test
-	public void testFactoryReturnsComplexCrossHybridProcessor() throws Exception {
+	public void testFactoryReturnsComplexCrossHybridProcessor() {
 		GermplasmNode germplasmNode = getGermplasmNodeWithMethodName("complex cross");
 		BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
 		Assert.assertTrue("Complex cross is processed by a single cross processor.", methodProcessor instanceof SingleCrossHybridProcessor);
@@ -41,36 +37,44 @@ public class BreedingMethodFactoryTest {
 	}
 
 	@Test
-	public void testFactoryReturnsDoubleCrossProcessor() throws Exception {
+	public void testFactoryReturnsDoubleCrossProcessor(){
 		GermplasmNode germplasmNode = getGermplasmNodeWithMethodName("double cross");
 		BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
 		Assert.assertTrue( methodProcessor instanceof DoubleCrossProcessor);
 	}
 
 	@Test
-	public void testFactoryReturnsBackcrossProcessor() throws Exception {
+	public void testFactoryReturnsBackcrossProcessor() {
 		GermplasmNode germplasmNode = getGermplasmNodeWithMethodName("three-way cross");
 		BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
 		Assert.assertTrue( methodProcessor instanceof ThreeWayHybridProcessor);
 	}
 
 	@Test
-	public void testFactoryReturnsThreewayCrossProcessor() throws Exception {
+	public void testFactoryReturnsThreewayCrossProcessor() {
 		GermplasmNode germplasmNode = getGermplasmNodeWithMethodName("backcross");
 		BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
 		Assert.assertTrue( methodProcessor instanceof BackcrossProcessor);
 	}
 
 	@Test
-	public void testFactoryReturnsNormalCrossProcessor() throws Exception {
+	public void testFactoryReturnsNormalCrossProcessor() {
 		GermplasmNode germplasmNode = getGermplasmNodeWithMethodName("cross");
 		BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
 		Assert.assertTrue( methodProcessor instanceof SimpleCrossProcessor);
 	}
 
 	@Test
-	public void testFactoryReturnsInbreadProcessor() throws Exception {
+	public void testFactoryReturnsDefaultProcessorWhenGermplasmNotNull(){
 		GermplasmNode germplasmNode = getGermplasmNodeWithMethodName("");
+		BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
+		Assert.assertTrue( methodProcessor instanceof SingleCrossHybridProcessor);
+	}
+
+	@Test
+	public void testFactoryReturnsDefaultProcessorWhenGermplasmIsNull(){
+		GermplasmNode germplasmNode = getGermplasmNodeWithMethodName("");
+		germplasmNode.setGermplasm(null);
 		BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
 		Assert.assertTrue( methodProcessor instanceof InbredProcessor);
 	}

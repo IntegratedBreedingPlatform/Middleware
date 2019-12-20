@@ -48,7 +48,7 @@ public class DoubleCrossProcessor implements BreedingMethodProcessor {
 
 		final PedigreeString doubleCrossPedigreeString = new PedigreeString();
 		doubleCrossPedigreeString.setNumberOfCrosses(femaleSingleCrossHybridPedigreeString.getNumberOfCrosses() + 1);
-		doubleCrossPedigreeString.setPedigree(PedigreeStringGeneratorUtil.gerneratePedigreeString(femaleSingleCrossHybridPedigreeString,
+		doubleCrossPedigreeString.setPedigree(PedigreeStringGeneratorUtil.generatePedigreeString(femaleSingleCrossHybridPedigreeString,
 				maleSingleCrossHybridPedigreeString));
 		return doubleCrossPedigreeString;
 	}
@@ -69,7 +69,7 @@ public class DoubleCrossProcessor implements BreedingMethodProcessor {
 		femaleCrossPedigreeString.setNumberOfCrosses(femalePedigreeString.getNumberOfCrosses() + malePedigreeString.getNumberOfCrosses()
 					+ 1);
 		femaleCrossPedigreeString
-		.setPedigree(PedigreeStringGeneratorUtil.gerneratePedigreeString(femalePedigreeString, malePedigreeString));
+		.setPedigree(PedigreeStringGeneratorUtil.generatePedigreeString(femalePedigreeString, malePedigreeString));
 		return femaleCrossPedigreeString;
 	}
 
