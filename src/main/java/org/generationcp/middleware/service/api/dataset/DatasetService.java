@@ -333,10 +333,9 @@ public interface DatasetService {
 	/**
 	 * It will reject all the draft data for a dataset
 	 *
-	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset
 	 */
-	void rejectDatasetDraftData(Integer studyId, Integer datasetId);
+	void rejectDatasetDraftData(Integer datasetId);
 
 	/**
 	 * @param datasetId Id of the dataset

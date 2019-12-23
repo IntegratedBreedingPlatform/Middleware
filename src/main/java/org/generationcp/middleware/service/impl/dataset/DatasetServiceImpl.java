@@ -723,19 +723,15 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void rejectDatasetDraftData(final Integer studyId, final Integer datasetId) {
+	public void rejectDatasetDraftData(final Integer datasetId) {
 		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 		for (final Phenotype phenotype : phenotypes) {
 			if (StringUtils.isEmpty(phenotype.getValue())) {
-				// Set isChanged to true so that the derived traits that depend on it will be tagged as OUT_OF_SYNC later.
-				phenotype.setChanged(true);
 				this.deletePhenotype(phenotype.getPhenotypeId(), false);
 			} else {
 				this.updatePhenotype(phenotype, phenotype.getcValueId(), phenotype.getValue(), null, null, true);
 			}
 		}
-		// Update status of derived trait phenotypes to OUT_OF_SYNC in batch.
-		this.reorganizePhenotypesStatus(studyId, phenotypes);
 	}
 
 	private void reorganizePhenotypesStatus(

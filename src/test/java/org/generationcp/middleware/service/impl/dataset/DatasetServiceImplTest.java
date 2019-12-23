@@ -670,9 +670,7 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testDiscardDraftData() {
 
-		final Integer studyId = 1;
 		final Integer datasetId = 3;
-
 		final DmsProject project = new DmsProject();
 		project.setProjectId(datasetId);
 
@@ -697,7 +695,7 @@ public class DatasetServiceImplTest {
 		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
 
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
-		this.datasetService.rejectDatasetDraftData(studyId, datasetId);
+		this.datasetService.rejectDatasetDraftData(datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).update(phenotypeArgumentCaptor.capture());
@@ -753,9 +751,7 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testDiscardDraftDataDeletingRow() {
 
-		final Integer studyId = 1;
 		final Integer datasetId = 3;
-
 		final DmsProject project = new DmsProject();
 		project.setProjectId(datasetId);
 
@@ -781,19 +777,16 @@ public class DatasetServiceImplTest {
 
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
-		this.datasetService.rejectDatasetDraftData(studyId, datasetId);
+		this.datasetService.rejectDatasetDraftData(datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
-		Assert.assertTrue(phenotype.isChanged());
-		// Variable is not used as input to formula hence nothing to update as out of sync
 		Mockito.verify(this.phenotypeDao, Mockito.never()).updateOutOfSyncPhenotypes(ArgumentMatchers.<Integer>anySet(), ArgumentMatchers.<Integer>anySet());
 	}
 
 	@Test
 	public void testDiscardDraftDataDeletingRowWithEmpty() {
 
-		final Integer studyId = 1;
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
@@ -819,18 +812,13 @@ public class DatasetServiceImplTest {
 
 		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
 
-		// Setup formula variable with phenotype variable as input so dependent phenotypes should be set to out of sync
-		final Integer targetVariableId = new Random().nextInt();
-		this.setupTargetVariable(studyId, variableId, targetVariableId);
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
-		this.datasetService.rejectDatasetDraftData(studyId, datasetId);
+		this.datasetService.rejectDatasetDraftData( datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
-		Assert.assertTrue(phenotype.isChanged());
-		Mockito.verify(this.phenotypeDao)
-			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(observationUnitId)), new HashSet<>(Arrays.asList(targetVariableId)));
+		Mockito.verify(this.phenotypeDao, Mockito.never()).updateOutOfSyncPhenotypes(ArgumentMatchers.<Integer>anySet(), ArgumentMatchers.<Integer>anySet());
 	}
 
 	@Test
