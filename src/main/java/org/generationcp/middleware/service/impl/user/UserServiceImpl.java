@@ -464,7 +464,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void saveOrUpdateProjectUserInfo(final ProjectUserInfo projectUserInfo) {
-		this.workbenchDaoFactory.getProjectUserInfoDAO().saveOrUpdate(projectUserInfo);
+		this.workbenchDaoFactory.getProjectUserInfoDAO().merge(projectUserInfo);
 	}
 
 	@Override
