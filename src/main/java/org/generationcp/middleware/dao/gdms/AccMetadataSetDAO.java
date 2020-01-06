@@ -11,12 +11,6 @@
 
 package org.generationcp.middleware.dao.gdms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.SetOperation;
@@ -24,10 +18,16 @@ import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.IntegerType;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * DAO class for {@link AccMetadataSet}.
@@ -376,9 +376,9 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 		try {
 				SQLQuery query = this.getSession().createSQLQuery(AccMetadataSetDAO.GET_UNIQUE_ACC_METADATASET_BY_GIDS);
 				query.setParameterList("gids", gids);
-				query.addScalar("gid", Hibernate.INTEGER);
-				query.addScalar("nid", Hibernate.INTEGER);
-				query.addScalar("acc_sample_id", Hibernate.INTEGER);				
+				query.addScalar("gid", IntegerType.INSTANCE);
+				query.addScalar("nid", IntegerType.INSTANCE);
+				query.addScalar("acc_sample_id", IntegerType.INSTANCE);
 				return query.list();
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error with getUniqueAccMetaDatasetByGids(" + gids + ") query from AccMetadataSet: " + e.getMessage(), e);

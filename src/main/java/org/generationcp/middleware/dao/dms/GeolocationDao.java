@@ -22,11 +22,11 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -238,14 +238,14 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("locationIds", environmentIds);
-			query.addScalar("nd_geolocation_id", Hibernate.INTEGER);
-			query.addScalar("lname", Hibernate.STRING);
-			query.addScalar("value", Hibernate.INTEGER);
-			query.addScalar(GeolocationDao.PROJECT_ID, Hibernate.INTEGER);
-			query.addScalar("name", Hibernate.STRING);
-			query.addScalar(GeolocationDao.DESCRIPTION, Hibernate.STRING);
-			query.addScalar(GeolocationDao.PROVINCE_NAME, Hibernate.STRING);
-			query.addScalar(GeolocationDao.ISOABBR, Hibernate.STRING);
+			query.addScalar("nd_geolocation_id", IntegerType.INSTANCE);
+			query.addScalar("lname", StringType.INSTANCE);
+			query.addScalar("value", IntegerType.INSTANCE);
+			query.addScalar(GeolocationDao.PROJECT_ID, IntegerType.INSTANCE);
+			query.addScalar("name", StringType.INSTANCE);
+			query.addScalar(GeolocationDao.DESCRIPTION, StringType.INSTANCE);
+			query.addScalar(GeolocationDao.PROVINCE_NAME, StringType.INSTANCE);
+			query.addScalar(GeolocationDao.ISOABBR, StringType.INSTANCE);
 			final List<Integer> locIds = new ArrayList<>();
 
 			final List<Object[]> result = query.list();

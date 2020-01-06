@@ -28,7 +28,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.TableGenerator;
 import java.io.Serializable;
 import java.util.List;
 /**
@@ -55,9 +54,7 @@ public class ExperimentModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@TableGenerator(name = "ndExperimentIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
-	pkColumnValue = "nd_experiment", allocationSize = 500)
-	@GeneratedValue(strategy = GenerationType.TABLE, generator = "ndExperimentIdGenerator")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_id")
 	private Integer ndExperimentId;

@@ -1,20 +1,18 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.LinkedList;
-import java.util.List;
-
+import com.beust.jcommander.internal.Lists;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.hibernate.jdbc.util.BasicFormatterImpl;
+import org.hibernate.engine.jdbc.internal.BasicFormatterImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.beust.jcommander.internal.Lists;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * The class <code>QueryTest</code> contains tests for the class <code>{@link ObservationQuery}</code>.

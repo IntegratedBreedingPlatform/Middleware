@@ -43,7 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -427,10 +426,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	public List<UserDefinedField> getGermplasmListTypes() {
 		try {
 			// Get the database url. This is how we will cache the UDFLDS across crops.
-			final String url = this.getActiveSession().connection().getMetaData().getURL();
+			final String url = this.getActiveSession().doReturningWork(connection -> connection.getMetaData().getURL());
+
 			return this.functionBasedGermplasmListTypeGuavaCacheLoader.get(url).get();
 
-		} catch (final HibernateException | SQLException e) {
+		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Problems connecting to the database. P"
 				+ "lease contact administrator for assistance.", e);
 		}

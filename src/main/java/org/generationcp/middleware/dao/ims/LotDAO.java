@@ -24,13 +24,13 @@ import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.DateType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -854,9 +854,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("withdrawalTotal");
 			query.addScalar("comments");
 			query.addScalar("createdByUsername");
-			query.addScalar("createdDate", Hibernate.DATE);
-			query.addScalar("lastDepositDate", Hibernate.DATE);
-			query.addScalar("lastWithdrawalDate",Hibernate.DATE);
+			query.addScalar("createdDate", DateType.INSTANCE);
+			query.addScalar("lastDepositDate", DateType.INSTANCE);
+			query.addScalar("lastWithdrawalDate",DateType.INSTANCE);
 
 			query.setResultTransformer(Transformers.aliasToBean(ExtendedLotDto.class));
 

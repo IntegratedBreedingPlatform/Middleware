@@ -1,16 +1,6 @@
 
 package org.generationcp.middleware.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
 import org.generationcp.middleware.pojos.KeySequenceRegister;
@@ -24,11 +14,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 /**
@@ -135,8 +134,7 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 					@Override
 					public Integer doInTransaction(final TransactionStatus status) {
 						final KeySequenceRegisterService keySequenceRegisterService =
-								new KeySequenceRegisterServiceImpl(SessionFactoryUtils.getSession(
-									KeySequenceRegisterServiceImplIntegrationTest.this.sessionFactory, false));
+								new KeySequenceRegisterServiceImpl(sessionFactory.getCurrentSession());
 						return keySequenceRegisterService.incrementAndGetNextSequence("CML");
 					}
 				});
