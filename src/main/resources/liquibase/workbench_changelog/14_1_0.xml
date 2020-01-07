@@ -4,6 +4,9 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 <changeSet author="aldrin" id="v14.1.0-2">
+	<preConditions onFail="MARK_RAN">
+		<tableExists tableName="workbench_ibdb_user_map_bkp"/>
+	</preConditions>
 	<comment> Drop Table workbench_ibdb_user_map_bkp if exists.
 	</comment>
 	<sql dbms="mysql" splitStatements="true">
