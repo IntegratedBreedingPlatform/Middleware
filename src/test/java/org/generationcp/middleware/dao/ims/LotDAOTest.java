@@ -273,15 +273,16 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		lot3 = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId2, 1, 8267, 0, 1, "Comments", "InventoryId");
 
-		transaction1 = InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot1, 1, 1, 1, LIST);
+		transaction1 = InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot1, 1,
+				1, 1, LIST);
 
 		transaction2 = InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot2, 1, 1, 1, LIST);
 
 		transaction3 = InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot3, 1, 1, 1, LIST);
 
-		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction1, transaction2, transaction3));
-
 		this.inventoryDataManager.addLots(Lists.newArrayList(lot1, lot2, lot3));
+
+		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction1, transaction2, transaction3));
 
 		germplasmList = germplasmListDAO.save(GermplasmListTestDataInitializer
 				.createGermplasmListTestData(RandomStringUtils.randomAlphabetic(6), RandomStringUtils.randomAlphabetic(6), 20141103, LST, 9999, 0,
