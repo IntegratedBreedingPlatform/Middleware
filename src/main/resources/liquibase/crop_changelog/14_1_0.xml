@@ -138,7 +138,7 @@
     </changeSet>
     <changeSet author="gelli" id="v14.1.0-14">
         <preConditions onFail="MARK_RAN">
-            <columnExists tableName="germuid_bkp" columnName="germplsm"/>
+            <columnExists tableName="germplsm" columnName="germuid_bkp"/>
         </preConditions>
         <comment>Drop Column germuid_bkp if exists from table germplsm.
         </comment>
@@ -148,7 +148,7 @@
     </changeSet>
     <changeSet author="gelli" id="v14.1.0-15">
         <preConditions onFail="MARK_RAN">
-            <columnExists tableName="duid_bkp" columnName="locdes"/>
+            <columnExists tableName="locdes" columnName="duid_bkp"/>
         </preConditions>
         <comment>Drop Column duid_bkp if exists from table locdes.
         </comment>
