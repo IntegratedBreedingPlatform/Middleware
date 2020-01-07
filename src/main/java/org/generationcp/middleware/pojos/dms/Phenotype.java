@@ -24,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
@@ -64,7 +65,8 @@ public class Phenotype implements Serializable {
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@TableGenerator(name = "phenotypeIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value", pkColumnValue = "phenotype", allocationSize = 500)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "phenotypeIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "phenotype_id")
 	private Integer phenotypeId;
