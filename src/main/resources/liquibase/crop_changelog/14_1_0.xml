@@ -57,12 +57,12 @@
     </changeSet>
     <changeSet author="gelli" id="v14.1.0-6">
         <preConditions onFail="MARK_RAN">
-            <columnExists tableName="gmds_track_data" columnName="userid_bkp"/>
+            <columnExists tableName="gmds_track_data" columnName="user_id_bkp"/>
         </preConditions>
-        <comment>Drop Column userid_bkp if exists from table gmds_track_data.
+        <comment>Drop Column user_id_bkp if exists from table gmds_track_data.
         </comment>
         <sql dbms="mysql" splitStatements="true">
-            ALTER TABLE gmds_track_data DROP COLUMN userid_bkp;
+            ALTER TABLE gmds_track_data DROP COLUMN user_id_bkp;
         </sql>
     </changeSet>
     <changeSet author="gelli" id="v14.1.0-7">
