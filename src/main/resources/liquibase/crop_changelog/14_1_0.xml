@@ -198,22 +198,22 @@
     </changeSet>
     <changeSet author="gelli" id="v14.1.0-20">
         <preConditions onFail="MARK_RAN">
-            <columnExists tableName="projectprop" columnName="projectprop_users_bkp"/>
+            <tableExists tableName="projectprop_users_bkp"/>
         </preConditions>
-        <comment>Drop Column projectprop_users_bkp if exists from table projectprop.
+        <comment>Drop Table projectprop_users_bkp if exists.
         </comment>
         <sql dbms="mysql" splitStatements="true">
-            ALTER TABLE projectprop DROP COLUMN projectprop_users_bkp;
+          DROP TABLE projectprop_users_bkp;
         </sql>
     </changeSet>
     <changeSet author="gelli" id="v14.1.0-21">
         <preConditions onFail="MARK_RAN">
-            <columnExists tableName="nd_geolocationprop" columnName="nd_geolocationprop_users_bkp"/>
+            <tableExists tableName="nd_geolocationprop_users_bkp"/>
         </preConditions>
-        <comment>Drop Column nd_geolocationprop_users_bkp if exists from table nd_geolocationprop.
+        <comment>Drop Table nd_geolocationprop_users_bkp if exists.
         </comment>
         <sql dbms="mysql" splitStatements="true">
-            ALTER TABLE nd_geolocationprop DROP COLUMN nd_geolocationprop_users_bkp;
+            DROP TABLE nd_geolocationprop_users_bkp;
         </sql>
     </changeSet>
     <changeSet author="gelli" id="v14.1.0-22">
