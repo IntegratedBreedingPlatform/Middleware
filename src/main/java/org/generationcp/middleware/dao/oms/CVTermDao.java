@@ -11,13 +11,6 @@
 
 package org.generationcp.middleware.dao.oms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -41,6 +34,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link CVTerm}.
@@ -384,7 +386,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(
-					"SELECT cvt_categorical.cvterm_id, cvt_categorical.name, cvt_categorical.definition, cvr_value.object_id, cvt_value.name "
+					"SELECT cvt_categorical.cvterm_id as variableId, cvt_categorical.name as variableName, cvt_categorical.definition as variableDescription, cvr_value.object_id as valueId, cvt_value.name as valueName igual"
 							+ "FROM cvterm_relationship cvr_categorical  "
 							+ "INNER JOIN cvterm cvt_categorical ON cvr_categorical.subject_id = cvt_categorical.cvterm_id "
 							+ "INNER JOIN cvterm_relationship cvr_scale ON cvr_categorical.subject_id = cvr_scale.subject_id "
@@ -395,6 +397,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 							+ "    AND cvt_categorical.cvterm_id in (:traitIds) ");
 
 			query.setParameterList("traitIds", traitIds);
+
+			query.addScalar("variableId", IntegerType.INSTANCE);
+			query.addScalar("variableName", StringType.INSTANCE);
+			query.addScalar("variableDescription", StringType.INSTANCE);
+			query.addScalar("valueId", IntegerType.INSTANCE);
+			query.addScalar("valueName", StringType.INSTANCE);
 
 			List<Object[]> list = query.list();
 
