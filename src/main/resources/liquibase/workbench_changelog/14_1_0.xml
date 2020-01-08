@@ -10,7 +10,7 @@
 	<comment> Drop Table workbench_ibdb_user_map_bkp if exists.
 	</comment>
 	<sql dbms="mysql" splitStatements="true">
-		DROP TABLE IF EXISTS workbench_ibdb_user_map_bkp;
+		DROP TABLE workbench_ibdb_user_map_bkp;
 	</sql>
 </changeSet>
 </databaseChangeLog>

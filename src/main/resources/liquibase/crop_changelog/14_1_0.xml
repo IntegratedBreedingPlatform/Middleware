@@ -223,7 +223,7 @@
         <comment>Drop Table users_bkp if exists.
         </comment>
         <sql dbms="mysql" splitStatements="true">
-            DROP TABLE IF EXISTS users_bkp;
+            DROP TABLE users_bkp;
         </sql>
     </changeSet>
     <changeSet author="gelli" id="v14.1.0-23">
@@ -233,7 +233,7 @@
         <comment>Drop Table persons_bkp if exists.
         </comment>
         <sql dbms="mysql" splitStatements="true">
-            DROP TABLE IF EXISTS persons_bkp;
+            DROP TABLE persons_bkp;
         </sql>
     </changeSet>
 </databaseChangeLog>
