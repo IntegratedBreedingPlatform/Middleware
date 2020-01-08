@@ -746,12 +746,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "   year(str_to_date(g.gdate, '%Y%m%d')) as crossingYear," //
 				+ "   femaleParent.gid as parent1DbId," //
 				+ "   femaleParentName.nval as parent1Name," //
-				+ "   CASE WHEN femaleParent.gid is not null AND m.mtype = 'GEN' THEN '" + ParentType.FEMALE.name() + "' "
-				+ "	  WHEN femaleParent.gid is not null AND m.mtype in ('DER','MAN') THEN '" + ParentType.POPULATION.name() + "' ELSE NULL END as parent1Type," //
+				// If germplasmDbId is a cross (gnpgs > 0), the parents' type should be FEMALE and MALE
+				// If germplasmDbId is advanced (gnpgs < 0), the parents type should be POPULATION and SELF
+				+ "   CASE WHEN femaleParent.gid is not null AND g.gnpgs > 0 THEN '" + ParentType.FEMALE.name() + "' "
+				+ "	  WHEN femaleParent.gid is not null AND g.gnpgs < 0 THEN '" + ParentType.POPULATION.name() + "' ELSE NULL END as parent1Type," //
 				+ "   maleParent.gid as parent2DbId," //
 				+ "   maleParentName.nval as parent2Name," //
-				+ "   CASE WHEN maleParent.gid is not null AND m.mtype = 'GEN' THEN '" + ParentType.MALE.name() + "' "
-				+ "	  WHEN maleParent.gid is not null AND m.mtype in ('DER','MAN') THEN '" + ParentType.SELF.name() + "' ELSE NULL END as parent2Type" //
+				+ "   CASE WHEN maleParent.gid is not null AND g.gnpgs > 0 THEN '" + ParentType.MALE.name() + "' "
+				+ "	  WHEN maleParent.gid is not null AND g.gnpgs < 0  THEN '" + ParentType.SELF.name() + "' ELSE NULL END as parent2Type" //
 				+ " FROM germplsm g" //
 				+ "   LEFT JOIN methods m ON m.mid = g.methn" //
 				+ "   LEFT JOIN germplsm femaleParent ON g.gpid1 = femaleParent.gid" //
