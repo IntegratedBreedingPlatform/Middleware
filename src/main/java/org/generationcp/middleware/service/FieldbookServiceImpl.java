@@ -67,6 +67,7 @@ import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
+import org.generationcp.middleware.pojos.germplasm.ImportedCrossParent;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -1260,6 +1261,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			return Optional.of(this.studyDataManager.getStudyReference(studyId));
 		}
 		return Optional.absent();
+	}
+
+	@Override
+	public Map<Integer, ImportedCrossParent> getPlotNoToImportedCrossParentMap(final Integer studyId, final Set<Integer> plotNos) {
+		return this.getGermplasmDao().getPlotNoToImportedGermplasmParentMap(studyId, plotNos);
 	}
 
 	void setUserService(final UserService userService) {

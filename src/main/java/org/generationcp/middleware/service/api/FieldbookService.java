@@ -38,9 +38,9 @@ import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.germplasm.ImportedCrossParent;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
@@ -948,9 +948,9 @@ public interface FieldbookService {
 	List<Method> getAllGenerativeNoBulkingMethods(final String programUUID);
 
 	Workbook getStudyDataSet(int studyID);
-	
+
 	Workbook getStudyByNameAndProgramUUID(String studyName, String programUUID);
-	
+
 	Optional<StudyReference> getStudyReferenceByNameAndProgramUUID(String studyName, String programUUID);
 
 	Boolean hasOutOfSyncObservations(Integer id);
@@ -984,4 +984,13 @@ public interface FieldbookService {
 	 * @param programUUID
 	 */
 	void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID);
+
+	/**
+	 * Retrieves the Plot Number to Imported Cross Parent Map
+	 *
+	 * @param studyId  - the Study Id
+	 * @param plotNos - the set of Plot Numbers
+	 * @return
+	 */
+	Map<Integer, ImportedCrossParent> getPlotNoToImportedCrossParentMap(Integer studyId, Set<Integer> plotNos);
 }
