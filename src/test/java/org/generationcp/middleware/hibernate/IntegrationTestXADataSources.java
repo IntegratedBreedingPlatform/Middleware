@@ -43,9 +43,7 @@ public class IntegrationTestXADataSources implements BeanDefinitionRegistryPostP
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(final BeanDefinitionRegistry registry) throws BeansException {
-		final DriverManagerDataSource singleConnectionDataSource =
-				this.xaDatasourceUtilities.getWorkbenchDataSource(this.xaDataSourceProperties);
-		this.xaBeanDefinition.createAllXARelatedBeans(singleConnectionDataSource, registry, this.xaDataSourceProperties, this.cropDbname);
+		this.xaBeanDefinition.createAllXARelatedBeans(registry, this.xaDataSourceProperties, this.cropDbname);
 	}
 
 	@Override
