@@ -32,7 +32,7 @@ public class IntegrationTestXADataSources implements BeanDefinitionRegistryPostP
 			final Resource resource = new ClassPathResource("/database.properties");
 			final Properties props = PropertiesLoaderUtils.loadProperties(resource);
 			this.xaDataSourceProperties = new DataSourceProperties(props);
-			this.cropDbname = cropDbname;
+			this.cropDbname = cropDbname == null ? "ibdbv2_maize_merged" : cropDbname;
 		} catch (final IOException e) {
 			throw new IllegalStateException(
 					"Unable to get the list of database that we need to register. Please contact your administrator for further assistance.",
