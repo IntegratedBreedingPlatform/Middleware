@@ -7,13 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import static org.generationcp.middleware.hibernate.DatasourceUtilities.*;
 
 public class IntegrationTestXABeanDefinition {
 
@@ -28,8 +28,6 @@ public class IntegrationTestXABeanDefinition {
 	static final String DATA_SOURCE_ATTRIBUTE = "dataSource";
 
 	static final String DATA_SOURCE = "DataSource";
-
-	static final String SESSION_FACTORY = "_SessionFactory";
 
 	static final String PIN_GLOBAL_TX_TO_PHYSICAL_CONNECTION = "pinGlobalTxToPhysicalConnection";
 
@@ -61,7 +59,7 @@ public class IntegrationTestXABeanDefinition {
 
 	static final String UNIQUE_RESOURCE_NAME = "uniqueResourceName";
 
-	private DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
+	private DatasourceUtilities xaDatasourceUtilities;
 
 	private static final Logger LOG = LoggerFactory.getLogger(DatasourceUtilities.class);
 
@@ -72,18 +70,13 @@ public class IntegrationTestXABeanDefinition {
 
 	}
 
-	public IntegrationTestXABeanDefinition(final DatasourceUtilities xaDatasourceUtilities) {
-		this.xaDatasourceUtilities = xaDatasourceUtilities;
-	}
-
 	/**
 	 * Create all XA related beans for applicable database i.e. workbench + all applicable cropdatabases
 	 * 
-	 * @param workbenchDataSource JDBC connection to the workbench database.
 	 * @param registry interface to register the data source and session factory bean
 	 * @param xaDataSourceProperties applicable xaDataSource properties
 	 */
-	void createAllXARelatedBeans(final DriverManagerDataSource workbenchDataSource, final BeanDefinitionRegistry registry,
+	void createAllXARelatedBeans(final BeanDefinitionRegistry registry,
 			final DataSourceProperties xaDataSourceProperties, final String cropName) {
 		LOG.debug("Creating datasource and session factory related beans.");
 		this.createXAConnectionBeans(registry, xaDataSourceProperties.getWorkbenchDbName(), xaDataSourceProperties);
@@ -105,7 +98,7 @@ public class IntegrationTestXABeanDefinition {
 			final DataSourceProperties xaDataSourceProperties) {
 
 		final RootBeanDefinition dataSourceBeanDefinition =
-				this.xaDatasourceUtilities.createRootBeanDefinition(AtomikosDataSourceBean.class, ImmutableMap.<String, Object>of(
+				this.xaDatasourceUtilities.createRootBeanDefinition(AtomikosDataSourceBean.class, ImmutableMap.of(
 						"init-method", "init", "destroy-method", "close", "depends-on", "transactionManager"), this
 						.getDataSourceBeanDefinitionProperties(cropDatabaseName, xaDataSourceProperties));
 		final String beanName = cropDatabaseName.toUpperCase() + IntegrationTestXABeanDefinition.DATA_SOURCE;
@@ -114,13 +107,13 @@ public class IntegrationTestXABeanDefinition {
 		LOG.debug(String.format("Created data source bean defintion for database '%s' with bean name '%s'.", cropDatabaseName, beanName));
 
 		final ImmutableMap<String, Object> sessionFactoryBeanDefinitionProperties =
-				ImmutableMap.<String, Object>of(IntegrationTestXABeanDefinition.DATA_SOURCE_ATTRIBUTE, dataSourceBeanDefinition, "configLocation",
+				ImmutableMap.of(IntegrationTestXABeanDefinition.DATA_SOURCE_ATTRIBUTE, dataSourceBeanDefinition, "configLocation",
 						xaDataSourceProperties.getHibernateConfigurationLocation(), "configurationClass",
 						org.hibernate.cfg.AnnotationConfiguration.class);
 		final RootBeanDefinition createRootBeanDefinition =
-				this.xaDatasourceUtilities.createRootBeanDefinition(AnnotationSessionFactoryBean.class, ImmutableMap.<String, Object>of(),
+				this.xaDatasourceUtilities.createRootBeanDefinition(AnnotationSessionFactoryBean.class, ImmutableMap.of(),
 						sessionFactoryBeanDefinitionProperties);
-		final String sessionFactoryBeanName = this.xaDatasourceUtilities.computeSessionFactoryName(cropDatabaseName);
+		final String sessionFactoryBeanName = computeSessionFactoryName(cropDatabaseName);
 		registry.registerBeanDefinition(sessionFactoryBeanName, createRootBeanDefinition);
 
 		LOG.debug(String.format("Created session factory bean defintion for database '%s' with bean name '%s'.", cropDatabaseName, sessionFactoryBeanName));
@@ -136,7 +129,7 @@ public class IntegrationTestXABeanDefinition {
 	 */
 	Map<String, Object> getDataSourceBeanDefinitionProperties(final String cropDatabaseName,
 			final DataSourceProperties xaDataSourceProperties) {
-		final Map<String, Object> dataSourceBeanDefinitionProperties = new HashMap<String, Object>();
+		final Map<String, Object> dataSourceBeanDefinitionProperties = new HashMap<>();
 
 		dataSourceBeanDefinitionProperties.put(IntegrationTestXABeanDefinition.UNIQUE_RESOURCE_NAME,
 				IntegrationTestXABeanDefinition.XA_PREFIX + cropDatabaseName.toUpperCase() + "_" + System.currentTimeMillis());

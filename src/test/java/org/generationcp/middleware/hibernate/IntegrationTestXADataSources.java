@@ -35,7 +35,7 @@ public class IntegrationTestXADataSources implements BeanDefinitionRegistryPostP
 			this.cropDbname = cropDbname;
 		} catch (final IOException e) {
 			throw new IllegalStateException(
-					"Unable to get the list of database that we need to register. Please contanct your administrator for further assistance.",
+					"Unable to get the list of database that we need to register. Please contact your administrator for further assistance.",
 					e);
 		}
 	}
