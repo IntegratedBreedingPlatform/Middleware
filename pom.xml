@@ -13,6 +13,7 @@
 		<reflections.version>0.9.9</reflections.version>
 		<atomikos.version>3.9.3</atomikos.version>
 		<spring.version>3.2.11.RELEASE</spring.version>
+		<liquibase.version>3.6.1</liquibase.version>
 		<envConfig>${user.name}</envConfig>
 	</properties>
 
@@ -289,7 +290,7 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>3.5.0</version>
+			<version>${liquibase.version}</version>
 		</dependency>
 
 		<dependency>
@@ -448,4 +449,66 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>fixture-db</id>
+			<build>
+				<defaultGoal>process-resources</defaultGoal>
+				<plugins>
+					<plugin>
+						<groupId>org.liquibase</groupId>
+						<artifactId>liquibase-maven-plugin</artifactId>
+						<version>${liquibase.version}</version>
+						<executions>
+							<!-- TODO -->
+							<!--
+							<execution>
+								<id>setup-fixture-db</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>update</goal>
+								</goals>
+								<configuration>
+									<driver>com.mysql.jdbc.Driver</driver>
+									<username>${db.username}</username>
+									<password>${db.password}</password>
+									<changeLogFile>${basedir}/src/main/resources/liquibase/fixture-db/fixture-db.xml</changeLogFile>
+									<url>jdbc:mysql://${db.host}:${db.port}/workbench?createDatabaseIfNotExist=true&amp;allowMultiQueries=true</url>
+								</configuration>
+							</execution>
+							<execution>
+								<id>run workbench changelog</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>update</goal>
+								</goals>
+								<configuration>
+									<driver>com.mysql.jdbc.Driver</driver>
+									<username>${db.username}</username>
+									<password>${db.password}</password>
+									<changeLogFile>${basedir}/src/main/resources/liquibase/workbench_master.xml</changeLogFile>
+									<url>jdbc:mysql://${db.host}:${db.port}/workbench</url>
+								</configuration>
+							</execution>
+							<execution>
+								<id>run generic changelog</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>update</goal>
+								</goals>
+								<configuration>
+									<driver>com.mysql.jdbc.Driver</driver>
+									<username>${db.username}</username>
+									<password>${db.password}</password>
+									<changeLogFile>${basedir}/src/main/resources/liquibase/crop_master.xml</changeLogFile>
+									<url>jdbc:mysql://${db.host}:${db.port}/ibdbv2_generic_merged</url>
+								</configuration>
+							</execution>
+							-->
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
