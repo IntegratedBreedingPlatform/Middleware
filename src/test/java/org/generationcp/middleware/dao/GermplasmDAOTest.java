@@ -13,6 +13,8 @@ package org.generationcp.middleware.dao;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.DataSetupTest;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -23,6 +25,7 @@ import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -32,7 +35,10 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.generationcp.middleware.pojos.germplasm.ImportedCrossParent;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -74,12 +80,23 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	private UserDefinedFieldDAO userDefinedFieldDao;
 	private ProgenitorDAO progenitorDao;
 	private GermplasmListDataDAO germplasmListDataDAO;
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
+	private DataSetupTest dataSetupTest;
 
 	@Autowired
 	private InventoryDataManager inventoryDM;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataDM;
+
+	@Autowired
+	private DataImportService dataImportService;
+
+	@Autowired
+	private GermplasmListManager germplasmListManager;
+
+	@Autowired
+	private FieldbookService middlewareFieldbookService;
 
 	@Before
 	public void setUp() throws Exception {
@@ -113,6 +130,13 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 			this.germplasmListDataDAO = new GermplasmListDataDAO();
 			this.germplasmListDataDAO.setSession(this.sessionProvder.getSession());
+
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataDM);
+
+			this.dataSetupTest = new DataSetupTest();
+			this.dataSetupTest.setDataImportService(this.dataImportService);
+			this.dataSetupTest.setGermplasmListManager(this.germplasmListManager);
+			this.dataSetupTest.setMiddlewareFieldbookService(this.middlewareFieldbookService);
 		}
 
 		if (!this.testDataSetup) {
@@ -808,6 +832,33 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final GermplasmParent cross2progenitor3FromDB = cross2Progenitors.get(2);
 		Assert.assertEquals(cross2progenitor3ID, cross2progenitor3FromDB.getGid());
 		Assert.assertEquals(cross2progenitor3Name, cross2progenitor3FromDB.getDesignation());
+	}
+
+	@Test
+	public void testGetPlotNoToImportedGermplasmParentMap() {
+		final String programUUID = "884fefcc-1cbd-4e0f-9186-ceeef3aa3b78";
+		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+
+		final Integer[] gids = this.germplasmTestDataGenerator
+			.createChildrenGermplasm(
+				DataSetupTest.NUMBER_OF_GERMPLASM, "prefix",
+				parentGermplasm);
+
+		final int studyId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, "ABCD");
+
+		Map<Integer, ImportedCrossParent> importedCrossParentMap = this.dao.getPlotNoToImportedGermplasmParentMap(studyId, new HashSet<>(Arrays.asList(1, 2, 3, 4, 5)));
+
+		List<Integer> gidsList = Arrays.asList(gids);
+		for (Map.Entry<Integer,ImportedCrossParent> entry : importedCrossParentMap.entrySet()) {
+			Assert.assertEquals(DataSetupTest.GERMPLSM_PREFIX + entry.getKey(), entry.getValue().getDesignation());
+			Assert.assertEquals( entry.getKey(), entry.getValue().getPlotNo());
+			Assert.assertTrue(gidsList.contains(entry.getValue().getGid()));
+		}
+
+		//Retrieve non existent plots in study
+		importedCrossParentMap = this.dao.getPlotNoToImportedGermplasmParentMap(studyId, new HashSet<>(Arrays.asList(51, 49)));
+		Assert.assertTrue(importedCrossParentMap.isEmpty());
+
 	}
 
 	private Integer insertGermplasmWithName(final String existingGermplasmNameWithPrefix, final boolean isDeleted) {
