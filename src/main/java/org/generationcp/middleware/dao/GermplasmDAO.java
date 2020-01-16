@@ -67,7 +67,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String QUERY_FROM_GERMPLASM = ") query from Germplasm: ";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
-	public static final String SEARCH_GERMPLASM_BY_STUDYDBID =
+	private static final String SEARCH_GERMPLASM_BY_STUDYDBID =
 		"SELECT DISTINCT convert(g.gid, char) AS germplasmDbId, reference.btable AS germplasmPUI, " //
 			+ "  (SELECT n.nval FROM names n " //
 			+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'ACCNO' AND u.fldno = n.ntype)" //

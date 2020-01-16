@@ -50,6 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -156,7 +157,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetDerivativeChildren() throws Exception {
+	public void testGetDerivativeChildren() {
 		final Germplasm parentGermplsm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 1, -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(parentGermplsm, parentGermplsm.getPreferredName());
@@ -171,7 +172,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetMaintenanceChildren() throws Exception {
+	public void testGetMaintenanceChildren() {
 		final Germplasm parentGermplsm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 1, -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(parentGermplsm, parentGermplsm.getPreferredName());
@@ -200,7 +201,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		// Germplasm list
 		final GermplasmList germplasmList =
-				new GermplasmList(null, "Test Germplasm List " + 1, Long.valueOf(20141014), "LST", Integer.valueOf(1),
+				new GermplasmList(null, "Test Germplasm List " + 1, Long.valueOf(20141014), "LST", 1,
 						"Test Germplasm List", null, 1);
 		germplasmList.setProjectId(GermplasmDAOTest.TEST_PROJECT_ID);
 		this.germplasmListDAO.save(germplasmList);
@@ -344,7 +345,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetProgeny() throws ParseException {
+	public void testGetProgeny() {
 		final Germplasm femaleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Germplasm maleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		this.dao.save(femaleParent);
@@ -531,9 +532,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 						"LocationName");
 		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
 
-		Assert.assertTrue(this.dao.getGermplasmOffspringByGIDs(Arrays.asList(mParentGID)).size() > 0);
-		Assert.assertTrue(this.dao.getGermplasmOffspringByGIDs(Arrays.asList(fParentGID)).size() > 0);
-		Assert.assertFalse(this.dao.getGermplasmOffspringByGIDs(Arrays.asList(gid)).size() > 0);
+		Assert.assertTrue(this.dao.getGermplasmOffspringByGIDs(Collections.singletonList(mParentGID)).size() > 0);
+		Assert.assertTrue(this.dao.getGermplasmOffspringByGIDs(Collections.singletonList(fParentGID)).size() > 0);
+		Assert.assertFalse(this.dao.getGermplasmOffspringByGIDs(Collections.singletonList(gid)).size() > 0);
 	}
 
 	@Test
