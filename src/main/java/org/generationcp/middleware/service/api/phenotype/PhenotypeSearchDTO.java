@@ -8,6 +8,7 @@ import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @AutoProperty
 public class PhenotypeSearchDTO {
@@ -84,7 +85,7 @@ public class PhenotypeSearchDTO {
 		private String blockNumber;
 		private String entryNumber;
 		private List<String> entryType;
-		private GeooCordinates geoCoordinates;
+		private Map<String, Object> geoCoordinates;
 		private String positionCoordinateX;
 		private String positionCoordinateXType;
 		private String positionCoordinateY;
@@ -92,49 +93,6 @@ public class PhenotypeSearchDTO {
 		private String replicate;
 
 		public ObservationUnitPosition() {
-		}
-
-		protected static class GeooCordinates {
-			private GeooCordinates.Geometry geometry;
-			private String type;
-
-			protected class Geometry {
-				private List<Integer> coordinates;
-				private String type;
-
-				public List<Integer> getCoordinates() {
-					return this.coordinates;
-				}
-
-				public void setCoordinates(final List<Integer> coordinates) {
-					this.coordinates = coordinates;
-				}
-
-				public String getType() {
-					return this.type;
-				}
-
-				public void setType(final String type) {
-					this.type = type;
-				}
-			}
-
-			public GeooCordinates.Geometry getGeometry() {
-				return this.geometry;
-			}
-
-			public void setGeometry(
-				final GeooCordinates.Geometry geometry) {
-				this.geometry = geometry;
-			}
-
-			public String getType() {
-				return this.type;
-			}
-
-			public void setType(final String type) {
-				this.type = type;
-			}
 		}
 
 		public String getBlockNumber() {
@@ -161,12 +119,11 @@ public class PhenotypeSearchDTO {
 			this.entryType = entryType;
 		}
 
-		public GeooCordinates getGeoCoordinates() {
+		public Map<String, Object> getGeoCoordinates() {
 			return this.geoCoordinates;
 		}
 
-		public void setGeoCoordinates(
-			final GeooCordinates geoCoordinates) {
+		public void setGeoCoordinates(final Map<String, Object> geoCoordinates) {
 			this.geoCoordinates = geoCoordinates;
 		}
 

@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -51,6 +52,7 @@ import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -913,7 +915,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.addScalar("blockNumber", new StringType()).addScalar("replicate", new StringType()).addScalar("COL").addScalar("ROW")
 			.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
 			.addScalar("entryNumber", new StringType()).addScalar("programDbId", new StringType()).addScalar("trialDbId", new StringType())
-			.addScalar("trialDbName", new StringType());
+			.addScalar("trialDbName", new StringType()).addScalar("prop");
 
 		// TODO get map with AliasToEntityMapResultTransformer.INSTANCE
 		final List<Object[]> results = sqlQuery.list();
@@ -971,9 +973,15 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				if (y != null) {
 					observationUnitPosition.setPositionCoordinateYType("GRID_ROW");
 				}
-
+				try {
+					final HashMap prop = new ObjectMapper().readValue((String) row[25], HashMap.class);
+					observationUnitPosition.setGeoCoordinates((Map<String, Object>) prop.get("geoCoordinates"));
+				} catch (IOException e) {
+					LOG.error("couldn't parse prop column for nd_experiment_id=" + ndExperimentId, e);
+				}
 				observationUnitPosition.setReplicate(observationUnit.getReplicate());
 				observationUnit.setObservationUnitPosition(observationUnitPosition);
+
 				observationUnit.setProgramDbId((String) row[22]);
 				observationUnit.setTrialDbId((String) row[23]);
 				observationUnit.setTrialName((String) row[24]);
