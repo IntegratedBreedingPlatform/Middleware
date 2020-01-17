@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.phenotype;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -11,22 +12,11 @@ import java.util.List;
 @AutoProperty
 public class PhenotypeSearchDTO {
 
-	public static class View {
-
-		public static class PhenotypeBrapiV2 {
-
-		}
-
-		public static class PhenotypeBrapiV1_2 {
-
-		}
-	}
-
 	private String observationUnitDbId;
 	private String observationUnitName;
 	private String observationLevel;
 
-	@JsonView(View.PhenotypeBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String observationLevels;
 
 	private String plotNumber;
@@ -39,55 +29,55 @@ public class PhenotypeSearchDTO {
 
 	private String studyName;
 
-	@JsonView(View.PhenotypeBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String studyLocationDbId;
 
-	@JsonView(View.PhenotypeBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String studyLocation;
 	private String programName;
 
-	@JsonView(View.PhenotypeBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String x;
 
-	@JsonView(View.PhenotypeBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String y;
 	private String entryType;
 	private String entryNumber;
 
-	@JsonView(View.PhenotypeBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private List<PhenotypeSearchObservationDTO> observations;
 
-	@JsonView(View.PhenotypeBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String instanceNumber;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private String additionalInfo;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private String locationDbId;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private String locationName;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private String observationUnitPUI;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private ObservationUnitPosition observationUnitPosition;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private List<ObservationUnitXRef> observationUnitXRef;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private String programDbId;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private List<Treatment> treatments;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private String trialDbId;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private String trialName;
 
 	public static class ObservationUnitPosition {
