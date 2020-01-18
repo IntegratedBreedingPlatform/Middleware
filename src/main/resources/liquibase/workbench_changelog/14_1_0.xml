@@ -1,61 +1,61 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-<changeSet author="gelli" id="v14.1.0-2">
-	<preConditions onFail="MARK_RAN">
-		<tableExists tableName="workbench_ibdb_user_map_bkp"/>
-	</preConditions>
-	<comment> Drop Table workbench_ibdb_user_map_bkp if exists.
-	</comment>
-	<sql dbms="mysql" splitStatements="true">
-		DROP TABLE workbench_ibdb_user_map_bkp;
-	</sql>
-</changeSet>
+    <changeSet author="gelli" id="v14.1.0-2">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="workbench_ibdb_user_map_bkp"/>
+        </preConditions>
+        <comment>Drop Table workbench_ibdb_user_map_bkp if exists.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE workbench_ibdb_user_map_bkp;
+        </sql>
+    </changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-1">
-		<preConditions onFail="MARK_RAN">
-			<tableExists tableName="migration_identity_map"></tableExists>
-		</preConditions>
-		<comment> Remove unused table migration_identity_map
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			DROP TABLE migration_identity_map;
-		</sql>
-	</changeSet>
+    <changeSet author="vanina" id="v14.1.0-1">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="migration_identity_map"></tableExists>
+        </preConditions>
+        <comment>Remove unused table migration_identity_map
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE migration_identity_map;
+        </sql>
+    </changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-2">
-		<preConditions onFail="MARK_RAN">
-			<tableExists tableName="migration_report"></tableExists>
-		</preConditions>
-		<comment> Remove unused table migration_report
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			DROP TABLE migration_report;
-		</sql>
-	</changeSet>
+    <changeSet author="vanina" id="v14.1.0-2">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="migration_report"></tableExists>
+        </preConditions>
+        <comment>Remove unused table migration_report
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE migration_report;
+        </sql>
+    </changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-3">
-		<preConditions onFail="MARK_RAN">
-			<tableExists tableName="migration_status"></tableExists>
-		</preConditions>
-		<comment> Remove unused table migration_status
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			DROP TABLE migration_status;
-		</sql>
-	</changeSet>
+    <changeSet author="vanina" id="v14.1.0-3">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="migration_status"></tableExists>
+        </preConditions>
+        <comment>Remove unused table migration_status
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE migration_status;
+        </sql>
+    </changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-4">
-		<preConditions onFail="MARK_RAN">
-			<tableExists tableName="users_roles_bkp"></tableExists>
-		</preConditions>
-		<comment> Remove unused table users_roles_bkp
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			DROP TABLE users_roles_bkp;
-		</sql>
-	</changeSet>
+    <changeSet author="vanina" id="v14.1.0-4">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="users_roles_bkp"></tableExists>
+        </preConditions>
+        <comment>Remove unused table users_roles_bkp
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE users_roles_bkp;
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>
