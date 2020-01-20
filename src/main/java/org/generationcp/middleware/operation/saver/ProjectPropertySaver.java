@@ -36,6 +36,7 @@ import org.hibernate.Hibernate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -188,7 +189,8 @@ public class ProjectPropertySaver {
 		if (variables != null) {
 
 			int rank = this.getNextRank(study);
-			final Set<Integer> geoIds = this.saver.getGeolocationDao().getLocationIds(study.getProjectId());
+			final List<Integer> environmentIds = this.daoFactory.getEnvironmentDao().getEnvironmentIds(study.getProjectId());
+			final Set<Integer> geoIds = new HashSet<>(environmentIds);
 			final Geolocation geolocation = this.saver.getGeolocationDao().getById(geoIds.iterator().next());
 			Hibernate.initialize(geolocation.getProperties());
 

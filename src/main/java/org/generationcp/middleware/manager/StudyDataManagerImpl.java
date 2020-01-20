@@ -77,8 +77,6 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -94,7 +92,6 @@ import java.util.Set;
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
-	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;

@@ -221,7 +221,7 @@ public class GeolocationSaver {
 			}
 			// check if existing
 			Integer locationId =
-					this.daoFactory.getGeolocationDao().getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName, trialInstanceNumber,
+					this.daoFactory.getEnvironmentDao().getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(studyName, Integer.valueOf(trialInstanceNumber),
 							programUUID);
 			if (isDeleteTrialObservations) {
 				locationId = null;

@@ -108,19 +108,6 @@ public interface DataImportService {
 	boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException;
 
 	/**
-	 * Checks if the experiment is already existing given the project name and
-	 * location description
-	 *
-	 * @param projectName
-	 * @param locationDescription
-	 * @param programUUID
-	 * @return nd_geolocation_id
-	 * @throws MiddlewareQueryException
-	 */
-	Integer getLocationIdByProjectNameAndDescriptionAndProgramUUID(String projectName, String locationDescription,
-			String programUUID) throws MiddlewareQueryException;
-
-	/**
 	 * Validate the project ontology from the Workbook and return the list of
 	 * errors
 	 *

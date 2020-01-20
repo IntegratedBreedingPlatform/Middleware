@@ -2,7 +2,6 @@ package org.generationcp.middleware.dao.dms;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
@@ -12,12 +11,12 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
@@ -58,7 +57,13 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 	public List<ExperimentModel> getEnvironmentsByDataset(final Integer datasetId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("project.projectId", datasetId));
-		criteria.add(Restrictions.eq("typeId", ExperimentType.TRIAL_ENVIRONMENT.getTermId()));
+		return criteria.list();
+	}
+
+	public List<Integer> getEnvironmentIds(final Integer datasetId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("project.projectId", datasetId));
+		criteria.setProjection(Projections.distinct(Projections.property("ndExperimentId")));
 		return criteria.list();
 	}
 
@@ -386,9 +391,37 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 		return returnList;
 	}
 
-
 	public List<ExperimentModel> getEnvironments(final Integer studyId) {
 		return this.getEnvironmentsForInstances(studyId, Collections.<Integer>emptyList());
+	}
+
+	@SuppressWarnings("unchecked")
+	public Integer getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(
+		final String projectName,
+		final Integer instanceNumber, final String programUUID) {
+		try {
+			final String sql = "SELECT DISTINCT e.nd_experiment_id"
+				+ " FROM nd_experiment e "
+				+ " INNER JOIN project p ON e.project_id = p.project_id "
+				+ " INNER JOIN project st ON st.project_id = p.study_id "
+				+ " WHERE st.name = :projectName"
+				+ "   and st.program_uuid = :programUUID" + "   and e.observation_unit_no = :instanceNumber";
+			final Query query = this.getSession().createSQLQuery(sql);
+			query.setParameter("projectName", projectName);
+			query.setParameter("instanceNumber", instanceNumber);
+			query.setParameter("programUUID", programUUID);
+			final List<Integer> list = query.list();
+			if (list != null && !list.isEmpty()) {
+				return list.get(0);
+			}
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error at getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID with project name ="
+				+ projectName + " and instance number = " + instanceNumber + e.getMessage();
+			EnvironmentDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+		return null;
 	}
 
 
