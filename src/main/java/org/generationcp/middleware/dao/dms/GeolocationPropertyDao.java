@@ -156,33 +156,6 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-	public Map<Integer, String> getGeoLocationPropertyByVariableId(final Integer datasetId, final Integer instanceDbId) {
-		Preconditions.checkNotNull(datasetId);
-		final String sql = "SELECT "
-			+ "    gp.type_id as variableId, "
-			+ "	   gp.value as value "
-			+ "FROM "
-			+ "    nd_experiment e "
-			+ "        INNER JOIN "
-			+ "    nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id "
-			+ "WHERE "
-			+ "		e.project_id = :datasetId "
-			+ "		and e.nd_geolocation_id = :instanceDbId";
-
-		final SQLQuery query = this.getSession().createSQLQuery(sql);
-		query.addScalar("variableId").addScalar("value").setParameter("datasetId", datasetId).setParameter("instanceDbId", instanceDbId);
-		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-
-		final List<Map<String, Object>> results = query.list();
-		final Map<Integer, String> geoProperties = new HashMap<>();
-		for (final Map<String, Object> result : results) {
-			final Integer variableId = (Integer) result.get("variableId");
-			final String value = (String) result.get("value");
-			geoProperties.put(variableId, value);
-		}
-		return geoProperties;
-	}
-
 	public String getGeolocationPropValue(final int stdVarId, final int datasetId) {
 		try {
 			final StringBuilder sql =

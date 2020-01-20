@@ -972,32 +972,4 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return map;
 	}
 
-	// Update study experiment if the Geolocation ID to be the one is the one used by the study experiment
-	public void updateStudyExperimentGeolocationIfNecessary(final Integer studyId, final Integer geolocationId) {
-		final ExperimentModel studyExperiment = this.getExperimentByProjectIdAndGeoLocationAndType(studyId, geolocationId,
-			ExperimentType.STUDY_INFORMATION.getTermId());
-
-		if (studyExperiment != null) {
-			// Query the next available Geolocation ID from environments that will remain
-			final String queryString = "select min(if (e.nd_geolocation_id != :geolocationId, nd_geolocation_id, null))\n"
-				+ "from nd_experiment e "
-				+ "inner join project p on e.project_id = p.project_id "
-				+ "WHERE p.study_id = :studyId or p.project_id = :studyId";
-			final StringBuilder sb = new StringBuilder(queryString);
-			final SQLQuery statement = this.getSession().createSQLQuery(sb.toString());
-			statement.setParameter("studyId", studyId);
-			statement.setParameter("geolocationId", geolocationId);
-			final BigInteger nextGeolocationId = (BigInteger) statement.uniqueResult();
-
-			if (nextGeolocationId != null) {
-				studyExperiment.setGeoLocation(new Geolocation(nextGeolocationId.intValue()));
-				this.update(studyExperiment);
-			} else {
-				throw new MiddlewareQueryException("Cannot update GeolocationID=" + geolocationId + " for Study=" + studyId
-					+ " as no other environments will remain for the study.");
-			}
-
-		}
-	}
-
 }

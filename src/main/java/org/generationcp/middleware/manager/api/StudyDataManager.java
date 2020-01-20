@@ -618,14 +618,6 @@ public interface StudyDataManager {
 	void updateVariableOrdering(int datasetId, List<Integer> variableIds);
 
 	/**
-	 * Retrieves the trial instance number by geolocation id
-	 *
-	 * @param geolocationId
-	 * @return trial instance number
-	 */
-	public String getTrialInstanceNumberByGeolocationId(int geolocationId);
-
-	/**
 	 * Retrieves all DMS project names with no program uuid.
 	 *
 	 * @return list of DMS project names with no programUUID
@@ -698,7 +690,7 @@ public interface StudyDataManager {
 	boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(
 		final String variableId, final String variableValue, final String programUUID);
 
-	Map<String, Integer> getInstanceGeolocationIdsMap(final Integer studyId);
+	Map<Integer, Integer> getInstanceNumberEnvironmentIdMap(final Integer studyId);
 
 	List<StudyTypeDto> getAllStudyTypes();
 
@@ -745,7 +737,7 @@ public interface StudyDataManager {
 
 	Boolean existInstances(final Set<Integer> instanceIds);
 
-	Map<Integer, String> getGeolocationByVariableId(final Integer datasetId, final Integer instanceDbId);
+	Map<Integer, String> getEnvironmentVariableValues(final Integer datasetId, final Integer instanceDbId);
 
 	Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId);
 

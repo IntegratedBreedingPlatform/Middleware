@@ -569,7 +569,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		this.updateFieldMapWithBlockInformation(fieldMapInfos, true);
 		final Map<Integer, String> pedigreeStringMap = new HashMap<>();
-		//		 Filter those belonging to the given geolocationId
+		//		 Filter those belonging to the given environmentId
 		for (final FieldMapInfo fieldMapInfo : fieldMapInfos) {
 			final List<FieldMapDatasetInfo> datasetInfoList = fieldMapInfo.getDatasets();
 			if (datasetInfoList != null) {
@@ -1016,15 +1016,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public String getTrialInstanceNumberByGeolocationId(final int geolocationId) {
-		final Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
-		if (geolocation != null) {
-			return geolocation.getDescription();
-		}
-		return null;
-	}
-
-	@Override
 	public List<String> getAllSharedProjectNames() {
 		return this.getDmsProjectDao().getAllSharedProjectNames();
 	}
@@ -1094,11 +1085,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
-		return this.getGeolocationDao().getInstanceMetadata(studyId, new ArrayList<Integer>());
+		return this.daoFactory.getEnvironmentDao().getInstanceMetadata(studyId, Collections.emptyList());
 	}
 
 	List<InstanceMetadata> getInstanceMetadata(final int studyId, final List<Integer> locationIds) {
-		return this.getGeolocationDao().getInstanceMetadata(studyId, locationIds);
+		return this.daoFactory.getEnvironmentDao().getInstanceMetadata(studyId, locationIds);
 	}
 
 	@Override
@@ -1137,11 +1128,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Map<String, Integer> getInstanceGeolocationIdsMap(final Integer studyId) {
-		final List<Geolocation> geolocations = this.getGeolocationDao().getEnvironmentGeolocations(studyId);
-		final Map<String, Integer> map = new HashMap<>();
-		for (final Geolocation geolocation : geolocations) {
-			map.put(geolocation.getDescription(), geolocation.getLocationId());
+	public Map<Integer, Integer> getInstanceNumberEnvironmentIdMap(final Integer studyId) {
+		final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao().getEnvironments(studyId);
+		final Map<Integer, Integer> map = new HashMap<>();
+		for (final ExperimentModel environment : environments) {
+			map.put(environment.getObservationUnitNo(), environment.getNdExperimentId());
 		}
 		return map;
 	}
@@ -1276,31 +1267,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	public Boolean existInstances(final Set<Integer> instanceIds) {
-		return this.getGeolocationDao().existInstances(instanceIds);
+		return this.daoFactory.getEnvironmentDao().existInstances(instanceIds);
 	}
 
 	@Override
-	public Map<Integer, String> getGeolocationByVariableId(final Integer datasetId, final Integer instanceDbId) {
-		final Geolocation geoLocation = this.getGeolocationDao().getById(instanceDbId);
+	public Map<Integer, String> getEnvironmentVariableValues(final Integer datasetId, final Integer instanceDbId) {
+		final ExperimentModel environment = this.daoFactory.getEnvironmentDao().getById(instanceDbId);
 		final Map<Integer, String> geoLocationMap =
-			this.getGeolocationPropertyDao().getGeoLocationPropertyByVariableId(datasetId, instanceDbId);
+			this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariablesMap(datasetId, instanceDbId);
 
-		geoLocationMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), geoLocation.getDescription());
-		if (geoLocation.getLatitude() != null) {
-			geoLocationMap.put(TermId.LATITUDE.getId(), geoLocation.getLatitude().toString());
-		}
-
-		if (geoLocation.getLongitude() != null) {
-			geoLocationMap.put(TermId.LONGITUDE.getId(), geoLocation.getLongitude().toString());
-		}
-
-		if (geoLocation.getGeodeticDatum() != null) {
-			geoLocationMap.put(TermId.GEODETIC_DATUM.getId(), geoLocation.getGeodeticDatum());
-		}
-
-		if (geoLocation.getAltitude() != null) {
-			geoLocationMap.put(TermId.ALTITUDE.getId(), geoLocation.getAltitude().toString());
-		}
+		geoLocationMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(environment.getObservationUnitNo()));
 
 		return geoLocationMap;
 	}

@@ -32,6 +32,7 @@ import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
+import org.generationcp.middleware.domain.dms.EnvironmentPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class DaoFactory {
@@ -239,5 +240,11 @@ public class DaoFactory {
 		final EnvironmentDao environmentDao = new EnvironmentDao();
 		environmentDao.setSession(this.sessionProvider.getSession());
 		return environmentDao;
+	}
+
+	public EnvironmentPropertyDao getEnvironmentPropertyDao() {
+		final EnvironmentPropertyDao environmentPropertyDao = new EnvironmentPropertyDao();
+		environmentPropertyDao.setSession(this.sessionProvider.getSession());
+		return environmentPropertyDao;
 	}
 }

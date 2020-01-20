@@ -1,7 +1,7 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.base.Optional;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
+import org.generationcp.middleware.dao.dms.EnvironmentDao;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -55,7 +55,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final List<MeasurementVariable> measurementVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId,
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
 
-		final int instanceNumber = this.daoFactory.getGeolocationDao().getNextInstanceNumber(datasetId);
+		final int instanceNumber = this.daoFactory.getEnvironmentDao().getNextInstanceNumber(datasetId);
 
 		// The default value of an instance's location name is "Unspecified Location"
 		final Optional<Location> location = this.getUnspecifiedLocation();
@@ -81,7 +81,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Override
 	public List<StudyInstance> getStudyInstances(final int studyId) {
-		return this.getStudyInstances(studyId, Collections.<Integer>emptyList());
+		return this.getStudyInstances(studyId, Collections.emptyList());
 	}
 
 	private List<StudyInstance> getStudyInstances(final int studyId, final List<Integer> instanceIds) {
@@ -103,19 +103,15 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Override
 	public void deleteStudyInstance(final Integer studyId, final Integer instanceId) {
-		final GeolocationDao geolocationDao = this.daoFactory.getGeolocationDao();
-		final Geolocation geolocation = geolocationDao.getById(instanceId);
-		final Integer instanceNumber = Integer.valueOf(geolocation.getDescription());
-		this.daoFactory.getExperimentDao().updateStudyExperimentGeolocationIfNecessary(studyId, instanceId);
+		final EnvironmentDao environmentDao = this.daoFactory.getEnvironmentDao();
+		final ExperimentModel geolocation = environmentDao.getById(instanceId);
+		final Integer instanceNumber = geolocation.getObservationUnitNo();
 
 		// Delete plot and environment experiments
 		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
 		this.daoFactory.getExperimentDao()
 			.deleteExperimentsForDatasets(Arrays.asList(this.studyService.getPlotDatasetId(studyId),
 				environmentDatasetId), Collections.singletonList(instanceNumber));
-
-		// Delete geolocation and geolocationprops
-		geolocationDao.makeTransient(geolocation);
 	}
 
 	@Override
