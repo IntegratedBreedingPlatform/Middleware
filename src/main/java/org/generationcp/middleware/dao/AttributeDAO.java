@@ -94,7 +94,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
 	public List<AttributeDTO> getAttributesByGidAndAttributeIds(
 		final String gid, final List<String> attributeIds, final Integer pageSize, final Integer pageNumber) {
-		List<AttributeDTO> attributes = Lists.newArrayList();
+		final List<AttributeDTO> attributes = Lists.newArrayList();
 		try {
 			String sql = "SELECT "
 				+ "    u.fcode AS attributeCode,"
@@ -127,7 +127,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 				query.setMaxResults(pageSize);
 			}
 
-			List<Object> results = query.list();
+			final List<Object> results = query.list();
 
 			for (final Object o : results) {
 				final Object[] result = (Object[]) o;

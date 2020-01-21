@@ -53,7 +53,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 			if (existingAttributeTypes != null && !existingAttributeTypes.isEmpty()) {
 				this.previousAttributeTypesCount = existingAttributeTypes.size();
 			}
-			setupTestData();
+			this.setupTestData();
 		}
 	}
 	
@@ -76,19 +76,19 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		this.userDefinedFieldDao.save(attributeType2);
 		this.userDefinedFieldDao.save(attributeType3);
 		this.testAttributeTypes = Arrays.asList(attributeType1, attributeType2, attributeType3);
-		
-		attribute1 = new Attribute(null, germplasm1.getGid(), attributeType1.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
-		attribute2 = new Attribute(null, germplasm1.getGid(), attributeType2.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
-		attribute3 = new Attribute(null, germplasm2.getGid(), attributeType1.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
 
-		this.attributeDao.save(attribute1);
-		this.attributeDao.save(attribute2);
-		this.attributeDao.save(attribute3);
+		this.attribute1 = new Attribute(null, germplasm1.getGid(), attributeType1.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
+		this.attribute2 = new Attribute(null, germplasm1.getGid(), attributeType2.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
+		this.attribute3 = new Attribute(null, germplasm2.getGid(), attributeType1.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
+
+		this.attributeDao.save(this.attribute1);
+		this.attributeDao.save(this.attribute2);
+		this.attributeDao.save(this.attribute3);
 	}
 	
 	@Test
 	public void testGetAttributeTypes() {
-		List<UserDefinedField> attributeTypes = this.attributeDao.getAttributeTypes();
+		final List<UserDefinedField> attributeTypes = this.attributeDao.getAttributeTypes();
 		Assert.assertNotNull(attributeTypes);
 		Assert.assertEquals(this.previousAttributeTypesCount + this.testAttributeTypes.size(), attributeTypes.size());
 	}
@@ -133,9 +133,9 @@ public class AttributeDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAttributesByGidAndAttributeIds() {
-		List<AttributeDTO> attributes = this.attributeDao
+		final List<AttributeDTO> attributes = this.attributeDao
 			.getAttributesByGidAndAttributeIds(
-				String.valueOf(this.gids.get(0)), Lists.newArrayList(String.valueOf(attribute1.getTypeId())), null, null);
+				String.valueOf(this.gids.get(0)), Lists.newArrayList(String.valueOf(this.attribute1.getTypeId())), null, null);
 		Assert.assertNotNull(attributes);
 		Assert.assertEquals(1, attributes.size());
 	}
