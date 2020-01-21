@@ -248,7 +248,6 @@ public class WorkbookSaver extends Saver {
 
 			final ExperimentModel studyExperiment =
 				this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
-			studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
 			this.getExperimentDao().saveOrUpdate(studyExperiment);
 
 			// delete trial observations
@@ -325,7 +324,6 @@ public class WorkbookSaver extends Saver {
 
 		final ExperimentModel studyExperiment =
 			this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
-		studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
 		this.getExperimentDao().saveOrUpdate(studyExperiment);
 
 		// delete trial observations
@@ -372,7 +370,6 @@ public class WorkbookSaver extends Saver {
 
 		final ExperimentModel studyExperiment =
 			this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(studyId)).get(0);
-		studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
 		this.getExperimentDao().saveOrUpdate(studyExperiment);
 
 		// delete trial observations

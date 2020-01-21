@@ -10,7 +10,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StudyValues;
@@ -24,7 +23,6 @@ import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImpl;
@@ -39,13 +37,11 @@ public class ExperimentModelSaver {
 	
 	private DaoFactory daoFactory;
 	private PhenotypeSaver phenotypeSaver;
-	private GeolocationSaver geolocationSaver;
 	private StockModelBuilder stockModelBuilder;
 
 	public ExperimentModelSaver(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.phenotypeSaver = new PhenotypeSaver(sessionProvider);
-		this.geolocationSaver = new GeolocationSaver(sessionProvider);
 		this.stockModelBuilder = new StockModelBuilder(sessionProvider);
 	}
 
@@ -87,25 +83,12 @@ public class ExperimentModelSaver {
 		experimentModel.setTypeId(expType.getTermId());
 		experimentModel.setProperties(this.createTrialDesignExperimentProperties(experimentModel, values.getVariableList()));
 
-		if (values.getLocationId() == null && values instanceof StudyValues) {
-			experimentModel.setGeoLocation(this.createNewGeoLocation());
-		} else if (values.getLocationId() != null) {
-			experimentModel.setGeoLocation(this.daoFactory.getGeolocationDao().getById(values.getLocationId()));
-		}
 		if (values.getGermplasmId() != null) {
 			experimentModel.setStock(this.stockModelBuilder.get(values.getGermplasmId()));
 		}
 		final ObservationUnitIDGenerator observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl();
 		observationUnitIDGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
 		return experimentModel;
-	}
-
-	// GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
-	public Geolocation createNewGeoLocation() {
-		final Geolocation location = new Geolocation();
-		location.setDescription("1");
-		this.daoFactory.getGeolocationDao().save(location);
-		return location;
 	}
 
 	protected List<ExperimentProperty> createTrialDesignExperimentProperties(final ExperimentModel experimentModel, final VariableList factors) {
@@ -141,27 +124,4 @@ public class ExperimentModelSaver {
 		return experimentProperty;
 	}
 
-	public int moveStudyToNewGeolocation(final int studyId) {
-		final List<DatasetReference> datasets = this.daoFactory.getDmsProjectDAO().getDirectChildDatasetsOfStudy(studyId);
-		final List<Integer> ids = new ArrayList<>();
-		ids.add(studyId);
-		if (datasets != null) {
-			for (final DatasetReference dataset : datasets) {
-				ids.add(dataset.getId());
-			}
-		}
-
-		final Geolocation location = this.geolocationSaver.createMinimumGeolocation();
-		final List<ExperimentModel> experiments = this.daoFactory.getExperimentDao().getExperimentsByProjectIds(ids);
-		if (experiments != null && !experiments.isEmpty()) {
-			for (final ExperimentModel experiment : experiments) {
-				if (experiment.getGeoLocation().getLocationId().intValue() == 1) {
-					experiment.setGeoLocation(location);
-					this.daoFactory.getExperimentDao().update(experiment);
-				}
-			}
-		}
-
-		return location.getLocationId();
-	}
 }

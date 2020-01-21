@@ -26,7 +26,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import java.io.Serializable;
@@ -61,11 +60,6 @@ public class ExperimentModel implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_id")
 	private Integer ndExperimentId;
-
-	// Geolocation
-	@OneToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "nd_geolocation_id")
-	private Geolocation geoLocation;
 
 	// References cvterm
 	@Column(name = "type_id")
@@ -107,16 +101,14 @@ public class ExperimentModel implements Serializable {
 		this.ndExperimentId = ndExperimentId;
 	}
 
-	public ExperimentModel(final Integer ndExperimentId, final Geolocation geoLocation, final Integer typeId) {
+	public ExperimentModel(final Integer ndExperimentId, final Integer typeId) {
 		super();
 		this.ndExperimentId = ndExperimentId;
-		this.geoLocation = geoLocation;
 		this.typeId = typeId;
 	}
 
-	public ExperimentModel(final Geolocation geoLocation, final Integer typeId, final DmsProject project, final StockModel stock,
+	public ExperimentModel(final Integer typeId, final DmsProject project, final StockModel stock,
 			final ExperimentModel parent, final Integer observationUnitNo) {
-		this.geoLocation = geoLocation;
 		this.typeId = typeId;
 		this.project = project;
 		this.stock = stock;
@@ -130,14 +122,6 @@ public class ExperimentModel implements Serializable {
 
 	public void setNdExperimentId(final Integer ndExperimentId) {
 		this.ndExperimentId = ndExperimentId;
-	}
-
-	public Geolocation getGeoLocation() {
-		return this.geoLocation;
-	}
-
-	public void setGeoLocation(final Geolocation geoLocation) {
-		this.geoLocation = geoLocation;
 	}
 
 	public Integer getTypeId() {
@@ -208,7 +192,6 @@ public class ExperimentModel implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (this.geoLocation == null ? 0 : this.geoLocation.hashCode());
 		result = prime * result + (this.ndExperimentId == null ? 0 : this.ndExperimentId.hashCode());
 		result = prime * result + (this.typeId == null ? 0 : this.typeId.hashCode());
 		return result;
@@ -226,13 +209,6 @@ public class ExperimentModel implements Serializable {
 			return false;
 		}
 		final ExperimentModel other = (ExperimentModel) obj;
-		if (this.geoLocation == null) {
-			if (other.geoLocation != null) {
-				return false;
-			}
-		} else if (!this.geoLocation.equals(other.geoLocation)) {
-			return false;
-		}
 		if (this.ndExperimentId == null) {
 			if (other.ndExperimentId != null) {
 				return false;
@@ -254,7 +230,6 @@ public class ExperimentModel implements Serializable {
 	public String toString() {
 		return "ExperimentModel{" +
 			"ndExperimentId=" + ndExperimentId +
-			", geoLocation=" + geoLocation +
 			", typeId=" + typeId +
 			", obsUnitId='" + obsUnitId + '\'' +
 			", properties=" + properties +

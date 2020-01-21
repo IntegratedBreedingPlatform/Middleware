@@ -20,7 +20,6 @@ import org.generationcp.middleware.operation.builder.MethodBuilder;
 import org.generationcp.middleware.operation.builder.NameBuilder;
 import org.generationcp.middleware.operation.builder.NameSynonymBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
-import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.StudyBuilder;
 import org.generationcp.middleware.operation.builder.StudyFactorBuilder;
 import org.generationcp.middleware.operation.builder.StudyReferenceBuilder;
@@ -29,17 +28,15 @@ import org.generationcp.middleware.operation.builder.StudyVariateBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.TraitBuilder;
 import org.generationcp.middleware.operation.builder.TraitGroupBuilder;
-import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
 import org.generationcp.middleware.operation.saver.CvTermSaver;
 import org.generationcp.middleware.operation.saver.DatasetProjectSaver;
+import org.generationcp.middleware.operation.saver.EnvironmentPropertySaver;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
-import org.generationcp.middleware.operation.saver.GeolocationPropertySaver;
-import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.ListDataPropertySaver;
 import org.generationcp.middleware.operation.saver.LocdesSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
@@ -315,8 +312,8 @@ public abstract class DataManager extends DatabaseBroker {
 		return new LocdesSaver(this.sessionProvider);
 	}
 
-	protected final GeolocationPropertySaver getGeolocationPropertySaver() {
-		return new GeolocationPropertySaver(this.sessionProvider);
+	protected final EnvironmentPropertySaver getGeolocationPropertySaver() {
+		return new EnvironmentPropertySaver(this.sessionProvider);
 	}
 
 	protected final ListInventoryBuilder getListInventoryBuilder() {

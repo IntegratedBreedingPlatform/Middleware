@@ -12,14 +12,11 @@
 package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
-import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.transformer.etl.DatasetValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
@@ -127,8 +124,8 @@ public class Saver extends DatabaseBroker {
 		return new ListDataPropertySaver(this.sessionProvider);
 	}
 
-	protected final GeolocationPropertySaver getGeolocationPropertySaver() {
-		return new GeolocationPropertySaver(this.sessionProvider);
+	protected final EnvironmentPropertySaver getGeolocationPropertySaver() {
+		return new EnvironmentPropertySaver(this.sessionProvider);
 	}
 
 	protected final ExperimentDestroyer getExperimentDestroyer() {

@@ -19,12 +19,10 @@ import java.util.Objects;
 import java.util.Random;
 
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.pojos.dms.Geolocation;
