@@ -765,10 +765,4 @@ public interface StudyDataManager {
 	 */
 	List<UserDto> getUsersForEnvironment(final Integer instanceId);
 
-	/**
-	 * Returns the instance id to location id map
-	 * @param instanceIds
-	 * @return
-	 */
-	Map<Integer, String> getInstanceIdLocationIdMap(final List<Integer> instanceIds);
 }
