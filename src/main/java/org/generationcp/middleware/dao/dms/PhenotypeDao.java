@@ -977,7 +977,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					final HashMap prop = new ObjectMapper().readValue((String) row[25], HashMap.class);
 					observationUnitPosition.setGeoCoordinates((Map<String, Object>) prop.get("geoCoordinates"));
 				} catch (IOException e) {
-					LOG.error("couldn't parse prop column for nd_experiment_id=" + ndExperimentId, e);
+					LOG.error("couldn't parse prop column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
 				}
 				observationUnitPosition.setReplicate(observationUnit.getReplicate());
 				observationUnit.setObservationUnitPosition(observationUnitPosition);
