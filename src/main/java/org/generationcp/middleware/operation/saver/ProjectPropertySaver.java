@@ -28,7 +28,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Hibernate;
@@ -191,8 +191,8 @@ public class ProjectPropertySaver {
 			int rank = this.getNextRank(study);
 			final List<Integer> environmentIds = this.daoFactory.getEnvironmentDao().getEnvironmentIds(study.getProjectId());
 			final Set<Integer> geoIds = new HashSet<>(environmentIds);
-			final Geolocation geolocation = this.saver.getGeolocationDao().getById(geoIds.iterator().next());
-			Hibernate.initialize(geolocation.getProperties());
+			final ExperimentModel environment = this.daoFactory.getEnvironmentDao().getById(geoIds.iterator().next());
+			Hibernate.initialize(environment.getProperties());
 
 			for (final MeasurementVariable variable : variables) {
 				final Operation operation = variable.getOperation();
@@ -201,14 +201,14 @@ public class ProjectPropertySaver {
 				}
 				switch (operation) {
 					case DELETE:
-						this.deleteVariable(study, trialDataset, measurementDataset, variable.getRole(), variable.getTermId(), geolocation);
+						this.deleteVariable(study, trialDataset, measurementDataset, variable.getRole(), variable.getTermId());
 						break;
 					case ADD:
-						this.insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant, geolocation);
+						this.insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant, environment);
 						rank++;
 						break;
 					case UPDATE:
-						this.updateVariable(study, trialDataset, measurementDataset, variable, isConstant, geolocation);
+						this.updateVariable(study, trialDataset, measurementDataset, variable, isConstant, environment);
 						break;
 					default:
 						break;
@@ -229,13 +229,8 @@ public class ProjectPropertySaver {
 		return nextRank;
 	}
 
-	private boolean isInGeolocation(final int termId) {
-		return TermId.TRIAL_INSTANCE_FACTOR.getId() == termId || TermId.LATITUDE.getId() == termId || TermId.LONGITUDE.getId() == termId
-				|| TermId.GEODETIC_DATUM.getId() == termId || TermId.ALTITUDE.getId() == termId;
-	}
-
 	private void insertVariable(final DmsProject project, final DmsProject trialDataset, final DmsProject measurementDataset,
-			final MeasurementVariable variable, final int rank, final boolean isConstant, final Geolocation geolocation) {
+			final MeasurementVariable variable, final int rank, final boolean isConstant, final ExperimentModel environment) {
 
 		if (PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
 			final int datasetRank = this.getNextRank(trialDataset);
@@ -247,12 +242,9 @@ public class ProjectPropertySaver {
 			if (variable.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 				this.insertVariable(measurementDataset, variable, measurementRank);
 			}
-			if (this.isInGeolocation(variable.getTermId())) {
-				this.saver.getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getValue());
-				this.saver.getGeolocationDao().saveOrUpdate(geolocation);
-			} else {
-				this.saver.getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
-			}
+
+			this.saver.getGeolocationPropertySaver().saveOrUpdate(environment, variable.getTermId(), variable.getValue());
+
 
 		} else if (PhenotypicType.VARIATE == variable.getRole()) {
 
@@ -281,7 +273,7 @@ public class ProjectPropertySaver {
 
 	protected void insertVariable(final DmsProject project, final MeasurementVariable variable, final int rank) {
 		if (project.getProperties() == null) {
-			project.setProperties(new ArrayList<ProjectProperty>());
+			project.setProperties(new ArrayList<>());
 		}
 		this.saveVariableType(project, this.createVariableType(variable, rank), variable.getValue());
 	}
@@ -311,7 +303,7 @@ public class ProjectPropertySaver {
 	}
 
 	private void updateVariable(final DmsProject project, final DmsProject trialDataset, final DmsProject measurementDataset,
-		final MeasurementVariable variable, final boolean isConstant, final Geolocation geolocation) {
+		final MeasurementVariable variable, final boolean isConstant, final ExperimentModel environment) {
 		if (TermId.TRIAL_INSTANCE_FACTOR.getId() != variable.getTermId()) {
 
 			if (PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
@@ -319,12 +311,7 @@ public class ProjectPropertySaver {
 				this.updateVariable(trialDataset, variable);
 				this.updateVariable(measurementDataset, variable);
 
-				if (this.isInGeolocation(variable.getTermId())) {
-					this.saver.getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getValue());
-					this.saver.getGeolocationDao().saveOrUpdate(geolocation);
-				} else {
-					this.saver.getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
-				}
+				this.saver.getGeolocationPropertySaver().saveOrUpdate(environment, variable.getTermId(), variable.getValue());
 
 			} else if (PhenotypicType.VARIATE == variable.getRole()) {
 
@@ -367,18 +354,14 @@ public class ProjectPropertySaver {
 	}
 
 	private void deleteVariable(final DmsProject project, final DmsProject trialDataset, final DmsProject measurementDataset,
-			final PhenotypicType role, final int termId, final Geolocation geolocation) {
+			final PhenotypicType role, final int termId) {
 
 		if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
 			this.deleteVariable(trialDataset, termId);
 			this.deleteVariable(measurementDataset, termId);
 
-			if (this.isInGeolocation(termId)) {
-				this.saver.getGeolocationSaver().setGeolocation(geolocation, termId, null);
-				this.saver.getGeolocationDao().saveOrUpdate(geolocation);
-			} else {
-				this.saver.getGeolocationPropertyDao().deletePropertiesInDataset(project.getProjectId(), Collections.singletonList(termId));
-			}
+			this.saver.getGeolocationPropertyDao().deletePropertiesInDataset(project.getProjectId(), Collections.singletonList(termId));
+
 
 		} else if (PhenotypicType.VARIATE == role) {
 			// for constants

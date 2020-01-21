@@ -251,15 +251,6 @@ public interface StudyDataManager {
 	void addOrUpdateExperiment(final CropType crop, int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues);
 
 	/**
-	 * Adds a Trial Environment. Accepts a variable list and sets up the trial environment data in the local database. It will throw an
-	 * exception if the variable in the variable list passed is not recognized for trial environment.
-	 *
-	 * @param variableList the variable list
-	 * @return ID of the trial environment data created.
-	 */
-	int addTrialEnvironment(VariableList variableList);
-
-	/**
 	 * Adds a Stock entry. Accepts a variable list and sets up the stock data in the local database. It will throw an exception if the
 	 * variable in the variable list is not a stock variable.
 	 *

@@ -63,7 +63,6 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -345,20 +344,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("error in addOrUpdateExperiment " + e.getMessage(), e);
 		}
 
-	}
-
-	@Override
-	public int addTrialEnvironment(final VariableList variableList) {
-
-		try {
-
-			final Geolocation geolocation = this.getGeolocationSaver().saveGeolocation(variableList, null);
-			return geolocation.getLocationId();
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in addTrialEnvironment " + e.getMessage(), e);
-		}
 	}
 
 	@Override
