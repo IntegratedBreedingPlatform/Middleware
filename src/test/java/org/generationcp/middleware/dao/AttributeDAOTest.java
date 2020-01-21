@@ -1,11 +1,10 @@
 package org.generationcp.middleware.dao;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -13,6 +12,9 @@ import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 public class AttributeDAOTest extends IntegrationTestBase {
@@ -23,6 +25,9 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	private List<Integer> gids;
 	private List<UserDefinedField> testAttributeTypes;
 	private Integer previousAttributeTypesCount = 0;
+	private Attribute attribute1;
+	private Attribute attribute2;
+	private Attribute attribute3;
 	
 	@Before
 	public void setup() {
@@ -72,9 +77,10 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		this.userDefinedFieldDao.save(attributeType3);
 		this.testAttributeTypes = Arrays.asList(attributeType1, attributeType2, attributeType3);
 		
-		final Attribute attribute1 = new Attribute(null, germplasm1.getGid(), attributeType1.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
-		final Attribute attribute2 = new Attribute(null, germplasm1.getGid(), attributeType2.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
-		final Attribute attribute3 = new Attribute(null, germplasm2.getGid(), attributeType1.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
+		attribute1 = new Attribute(null, germplasm1.getGid(), attributeType1.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
+		attribute2 = new Attribute(null, germplasm1.getGid(), attributeType2.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
+		attribute3 = new Attribute(null, germplasm2.getGid(), attributeType1.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
+
 		this.attributeDao.save(attribute1);
 		this.attributeDao.save(attribute2);
 		this.attributeDao.save(attribute3);
@@ -125,4 +131,12 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		Assert.assertNull(this.attributeDao.getAttribute(this.gids.get(2), fcode));
 	}
 
+	@Test
+	public void testGetAttributesByGidAndAttributeIds() {
+		List<AttributeDTO> attributes = this.attributeDao
+			.getAttributesByGidAndAttributeIds(
+				String.valueOf(this.gids.get(0)), Lists.newArrayList(String.valueOf(attribute1.getTypeId())), null, null);
+		Assert.assertNotNull(attributes);
+		Assert.assertEquals(1, attributes.size());
+	}
 }

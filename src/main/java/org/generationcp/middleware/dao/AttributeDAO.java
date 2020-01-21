@@ -11,9 +11,8 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -22,6 +21,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DAO class for {@link Attribute}.
@@ -87,5 +90,84 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			throw new MiddlewareQueryException("Error with getAttribute(gidList=" + gid + ", " + attributeName + "): " + e.getMessage(), e);
 		}
 		return attribute;
+	}
+
+	public List<AttributeDTO> getAttributesByGidAndAttributeIds(
+		final String gid, final List<String> attributeIds, final Integer pageSize, final Integer pageNumber) {
+		List<AttributeDTO> attributes = Lists.newArrayList();
+		try {
+			String sql = "SELECT "
+				+ "    u.fcode AS attributeCode,"
+				+ "    u.fldno AS attributeDbId,"
+				+ "    u.fname AS attributeName,"
+				+ "    a.adate AS determinedDate,"
+				+ "    a.aval AS value "
+				+ " FROM"
+				+ "    atributs a"
+				+ "        INNER JOIN"
+				+ "    udflds u ON a.atype = u.fldno "
+				+ " WHERE"
+				+ "    a.gid = :gid AND u.ftable = 'ATRIBUTS'";
+
+			if (attributeIds != null && !attributeIds.isEmpty()) {
+				sql = sql + " AND u.fldno IN ( :attributs )";
+			}
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addScalar("attributeCode").addScalar("attributeDbId").addScalar("attributeName").addScalar("determinedDate")
+				.addScalar("value");
+			query.setParameter("gid", gid);
+
+			if (attributeIds != null && !attributeIds.isEmpty()) {
+				query.setParameterList("attributs", attributeIds);
+			}
+
+			if (pageNumber != null && pageSize != null) {
+				query.setFirstResult(pageSize * (pageNumber - 1));
+				query.setMaxResults(pageSize);
+			}
+
+			List<Object> results = query.list();
+
+			for (final Object o : results) {
+				final Object[] result = (Object[]) o;
+				if (result != null) {
+					final AttributeDTO attributeDTO = new AttributeDTO();
+					attributeDTO.setAttributeCode((String) result[0]);
+					attributeDTO.setAttributeDbId((Integer) result[1]);
+					attributeDTO.setAttributeName((String) result[2]);
+					attributeDTO.setDeterminedDate((Integer) result[3]);
+					attributeDTO.setValue((String) result[4]);
+
+					attributes.add(attributeDTO);
+				}
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getAttributesByGid(gidList=" + gid + "): " + e.getMessage(), e);
+		}
+		return attributes;
+	}
+
+	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
+		String sql = "SELECT COUNT(1) "
+			+ " FROM"
+			+ "    atributs a"
+			+ "        INNER JOIN"
+			+ "    udflds u ON a.atype = u.fldno"
+			+ " WHERE"
+			+ "    a.gid = :gid AND u.ftable = 'ATRIBUTS' ";
+
+		if (attributeDbIds != null && !attributeDbIds.isEmpty()) {
+			sql = sql + " AND u.fldno IN ( :attributs )";
+		}
+
+		final SQLQuery query = this.getSession().createSQLQuery(sql);
+		query.setParameter("gid", gid);
+
+		if (attributeDbIds != null && !attributeDbIds.isEmpty()) {
+			query.setParameterList("attributs", attributeDbIds);
+		}
+
+		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 }

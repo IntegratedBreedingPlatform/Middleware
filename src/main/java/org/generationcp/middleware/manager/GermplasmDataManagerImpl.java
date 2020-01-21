@@ -22,6 +22,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
+import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -1571,6 +1572,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		preferredName.setNval(Name.UNKNOWN);
 		germplasm.setPreferredName(preferredName);
 		return germplasm;
+	}
+
+	@Override
+	public List<AttributeDTO> getAttributesByGid(
+		final String gid, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
+		return this.getAttributeDao().getAttributesByGidAndAttributeIds(gid, attributeDbIds, pageSize, pageNumber);
+	}
+
+	@Override
+	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
+		return this.getAttributeDao().countAttributesByGid(gid, attributeDbIds);
 	}
 
 }
