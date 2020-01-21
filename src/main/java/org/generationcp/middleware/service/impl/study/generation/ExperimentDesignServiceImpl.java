@@ -1,7 +1,6 @@
 package org.generationcp.middleware.service.impl.study.generation;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -16,8 +15,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -33,6 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Transactional
@@ -61,7 +60,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 	public ExperimentDesignServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
-		this.experimentGenerator = new ExperimentModelGenerator(sessionProvider);
+		this.experimentGenerator = new ExperimentModelGenerator();
 	}
 
 	@Override
@@ -82,12 +81,12 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		this.deleteTrialInstanceExperiments(plotDatasetId, environmentDatasetId, instanceNumbers);
 
 		// Save variables at trial and plot dataset level
-		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao()
-			.getEnvironmentGeolocationsForInstances(studyId, instanceNumbers);
-		this.saveVariables(variables, plotDatasetId, environmentDatasetId, geolocations);
+		final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao()
+			.getEnvironmentsForInstances(studyId, instanceNumbers);
+		this.saveVariables(variables, plotDatasetId, environmentDatasetId, environments);
 
 		// Save experiments and stocks (if applicable) in plot dataset
-		this.saveObservationUnitRows(crop, plotDatasetId, variables, instanceRowsMap, geolocations);
+		this.saveObservationUnitRows(crop, plotDatasetId, variables, instanceRowsMap, environments);
 
 	}
 
@@ -99,10 +98,10 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		if (projectProp != null && projectProp.getValue() != null && NumberUtils.isDigits(projectProp.getValue())) {
 			return Optional.of(Integer.valueOf(projectProp.getValue()));
 		}
-		return Optional.absent();
+		return Optional.empty();
 	}
 
-	private void saveVariables(final List<MeasurementVariable> variables, final Integer plotDatasetId, final Integer environmentDatasetId,  final List<Geolocation> geolocations) {
+	private void saveVariables(final List<MeasurementVariable> variables, final Integer plotDatasetId, final Integer environmentDatasetId,  final List<ExperimentModel> environments) {
 		int plotDatasetNextRank = this.daoFactory.getProjectPropertyDAO().getNextRank(plotDatasetId);
 		final List<Integer> plotVariableIds = this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(plotDatasetId);
 
@@ -139,11 +138,11 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 				this.daoFactory.getProjectPropertyDAO().save(property);
 			}
 
-			// FIXME Undo this duplicate saving in nd_geolocationprop (logged as part of IBP-3150)
+			// FIXME Undo this duplicate saving in nd_experimentprop (logged as part of IBP-3150)
 			if (isEnvironmentVariable && EXPERIMENTAL_DESIGN_VARIABLES.contains(variableId)) {
-				for (final Geolocation geolocation : geolocations) {
-					final GeolocationProperty geolocationProperty = new GeolocationProperty(geolocation, value, rank, variableId);
-					this.daoFactory.getGeolocationPropertyDao().save(geolocationProperty);
+				for (final ExperimentModel environment : environments) {
+					final ExperimentProperty environmentProperty = new ExperimentProperty(environment, value, rank, variableId);
+					this.daoFactory.getEnvironmentPropertyDao().save(environmentProperty);
 				}
 			}
 
@@ -155,16 +154,15 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	}
 
 	private void saveObservationUnitRows(final CropType crop, final Integer plotDatasetId,
-		final List<MeasurementVariable> variables, 	final Map<Integer, List<ObservationUnitRow>> instanceRowsMap, final List<Geolocation> geolocations) {
+		final List<MeasurementVariable> variables, 	final Map<Integer, List<ObservationUnitRow>> instanceRowsMap, final List<ExperimentModel> environments) {
 
 		// Retrieved any previously saved stocks. We are not using Immutable map for the case of no stocks yet
 		final Set<StockModel> stocks = this.daoFactory.getStockDao().findInDataSet(plotDatasetId);
-		final ImmutableMap<String, Geolocation> trialInstanceGeolocationMap =
-			Maps.uniqueIndex(geolocations, new Function<Geolocation, String>() {
-
+		final ImmutableMap<Integer, ExperimentModel> trialInstanceEnvironmentMap =
+			Maps.uniqueIndex(environments, new Function<ExperimentModel, Integer>() {
 				@Override
-				public String apply(final Geolocation geolocation) {
-					return geolocation.getDescription();
+				public Integer apply(final ExperimentModel environment) {
+					return environment.getObservationUnitNo();
 				}
 			});
 
@@ -184,10 +182,9 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 		for (final Map.Entry<Integer, List<ObservationUnitRow>> instanceRows : instanceRowsMap.entrySet()) {
 			final Integer trialInstance = instanceRows.getKey();
-			final Optional<Geolocation> geolocation = this.getGeolocation(trialInstanceGeolocationMap, trialInstance);
 			for (final ObservationUnitRow row:  instanceRowsMap.get(trialInstance)) {
 				final ExperimentModel
-					experimentModel = this.experimentGenerator.generate(crop, plotDatasetId, row, ExperimentType.PLOT, geolocation, variablesMap);
+					experimentModel = this.experimentGenerator.generate(crop, plotDatasetId, row, ExperimentType.PLOT, variablesMap);
 				final String entryNumber = String.valueOf(row.getEntryNumber());
 				StockModel stockModel = stocksMap.get(entryNumber);
 				if (stockModel == null) {
@@ -196,34 +193,30 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 					stocksMap.put(entryNumber, stockModel);
 				}
 				experimentModel.setStock(stockModel);
+				final ExperimentModel environment = trialInstanceEnvironmentMap.get(trialInstance);
+				if (environment != null) {
+					experimentModel.setParent(environment);
+				}
 				this.daoFactory.getExperimentDao().save(experimentModel);
 			}
 		}
 	}
 
-	private Optional<Geolocation> getGeolocation(final ImmutableMap<String, Geolocation> trialInstanceGeolocationMap, final Integer trialInstance) {
-		final Geolocation geolocation = trialInstanceGeolocationMap.get(trialInstance.toString());
-		if (geolocation != null) {
-			return Optional.of(geolocation);
-		}
-		return Optional.absent();
-	}
-
 	private void deleteTrialInstanceExperiments(final Integer plotDatasetId, final Integer environmentDatasetId, final List<Integer> instanceNumbers) {
 		this.daoFactory.getExperimentDao().deleteExperimentsForDatasetInstances(plotDatasetId, instanceNumbers);
-		final List<Integer> geolocVariables = Lists.newArrayList(Iterables.concat(EXPERIMENTAL_DESIGN_VARIABLES, FIELDMAP_ENVT_VARIABLES));
-		this.daoFactory.getGeolocationPropertyDao().deletePropertiesInDatasetInstances(environmentDatasetId, instanceNumbers, geolocVariables);
+		final List<Integer> environmentVariables = Lists.newArrayList(Iterables.concat(EXPERIMENTAL_DESIGN_VARIABLES, FIELDMAP_ENVT_VARIABLES));
+		this.daoFactory.getEnvironmentPropertyDao().deletePropertiesInDatasetInstances(environmentDatasetId, instanceNumbers, environmentVariables);
 	}
 
 
 	@Override
 	public void deleteStudyExperimentDesign(final int studyId) {
 		// Delete environment variables related to experiment design and fieldmap
-		final List<Integer> geolocVariables = Lists.newArrayList(Iterables.concat(EXPERIMENTAL_DESIGN_VARIABLES, FIELDMAP_ENVT_VARIABLES));
+		final List<Integer> environmentVariables = Lists.newArrayList(Iterables.concat(EXPERIMENTAL_DESIGN_VARIABLES, FIELDMAP_ENVT_VARIABLES));
 		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO()
-			.deleteProjectVariables(environmentDatasetId, geolocVariables);
-		this.daoFactory.getGeolocationPropertyDao().deletePropertiesInDataset(environmentDatasetId, geolocVariables);
+			.deleteProjectVariables(environmentDatasetId, environmentVariables);
+		this.daoFactory.getEnvironmentPropertyDao().deletePropertiesInDataset(environmentDatasetId, environmentVariables);
 
 		// Delete variables related to experiment design and experiments of plot dataset
 		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);

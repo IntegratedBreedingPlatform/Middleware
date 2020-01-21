@@ -157,12 +157,6 @@ public class DaoFactory {
 
 	}
 
-	public GeolocationPropertyDao getGeolocationPropertyDao() {
-		final GeolocationPropertyDao geolocationPropertyDao = new GeolocationPropertyDao();
-		geolocationPropertyDao.setSession(this.sessionProvider.getSession());
-		return geolocationPropertyDao;
-	}
-
 	public ProgramPresetDAO getProgramPresetDAO() {
 		final ProgramPresetDAO programPresetDAO = new ProgramPresetDAO();
 		programPresetDAO.setSession(this.sessionProvider.getSession());

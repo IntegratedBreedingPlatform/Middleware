@@ -883,8 +883,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public String getBlockId(final int datasetId, final String trialInstance) {
-		return this.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+	public String getBlockId(final int datasetId, final Integer trialInstance) {
+		return this.studyDataManager.getBlockId(datasetId, trialInstance);
 	}
 
 	@Override

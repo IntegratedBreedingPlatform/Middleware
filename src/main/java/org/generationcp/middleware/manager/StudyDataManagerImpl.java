@@ -1085,13 +1085,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Map<Integer, String> getInstanceIdLocationIdMap(final List<Integer> instanceIds) {
-		return this.getGeolocationPropertyDao().getInstanceIdLocationIdMap(instanceIds);
-	}
-
-	@Override
-	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer studyId) {
-		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByGeolocation(studyId);
+	public Map<String, String> getEnvironmentVariableNameValuesMap(final Integer environmentId) {
+		return this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariableNameValuesMap(environmentId);
 	}
 
 	@Override
@@ -1231,8 +1226,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public String getBlockId(final int datasetId, final String trialInstance) {
-		return this.daoFactory.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+	public String getBlockId(final int datasetId, final Integer trialInstance) {
+		return this.daoFactory.getEnvironmentPropertyDao().getVariableValueForTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
 
 	}
 

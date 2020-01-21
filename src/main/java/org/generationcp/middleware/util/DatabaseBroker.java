@@ -169,12 +169,6 @@ public class DatabaseBroker {
 		return dao;
 	}
 
-	public GeolocationPropertyDao getGeolocationPropertyDao() {
-		final GeolocationPropertyDao geolocationPropertyDao = new GeolocationPropertyDao();
-		geolocationPropertyDao.setSession(this.getActiveSession());
-		return geolocationPropertyDao;
-	}
-
 	public ExperimentDao getExperimentDao() {
 		final ExperimentDao experimentDao = new ExperimentDao();
 		experimentDao.setSession(this.getActiveSession());

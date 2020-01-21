@@ -360,7 +360,7 @@ public class ProjectPropertySaver {
 			this.deleteVariable(trialDataset, termId);
 			this.deleteVariable(measurementDataset, termId);
 
-			this.saver.getGeolocationPropertyDao().deletePropertiesInDataset(project.getProjectId(), Collections.singletonList(termId));
+			this.daoFactory.getEnvironmentPropertyDao().deletePropertiesInDataset(project.getProjectId(), Collections.singletonList(termId));
 
 
 		} else if (PhenotypicType.VARIATE == role) {

@@ -650,7 +650,7 @@ public interface StudyDataManager {
 
 	StudyMetadata getStudyMetadataForGeolocationId(Integer geolocationId);
 
-	Map<String, String> getGeolocationPropsAndValuesByGeolocation(Integer geolocationId);
+	Map<String, String> getEnvironmentVariableNameValuesMap(Integer environmentId);
 
 	Map<String, String> getProjectPropsAndValuesByStudy(Integer studyId);
 
@@ -722,7 +722,7 @@ public interface StudyDataManager {
 
 	boolean areAllInstancesExistInDataset(final Integer datasetId, final Set<Integer> instanceIds);
 
-	String getBlockId(int datasetId, String trialInstance);
+	String getBlockId(int datasetId, Integer trialInstance);
 
 	FieldmapBlockInfo getBlockInformation(int blockId);
 
@@ -748,10 +748,4 @@ public interface StudyDataManager {
 	 */
 	List<UserDto> getUsersForEnvironment(final Integer instanceId);
 
-	/**
-	 * Returns the instance id to location id map
-	 * @param instanceIds
-	 * @return
-	 */
-	Map<Integer, String> getInstanceIdLocationIdMap(final List<Integer> instanceIds);
 }

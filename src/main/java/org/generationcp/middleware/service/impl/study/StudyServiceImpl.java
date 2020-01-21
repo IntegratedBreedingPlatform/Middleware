@@ -504,7 +504,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final Map<String, String> properties = new HashMap<>();
 				users.addAll(this.studyDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
 				users.addAll(this.studyDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
-				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(geolocationId));
+				properties.putAll(this.studyDataManager.getEnvironmentVariableNameValuesMap(geolocationId));
 				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
 				studyDetailsDto.setContacts(users);
 				studyDetailsDto.setAdditionalInfo(properties);
