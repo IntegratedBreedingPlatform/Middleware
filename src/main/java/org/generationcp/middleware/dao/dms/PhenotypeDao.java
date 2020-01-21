@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.dms;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
@@ -960,7 +961,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setLocationDbId(observationUnit.getStudyLocationDbId());
 				observationUnit.setLocationName(observationUnit.getStudyLocation());
 				observationUnit.setObservationUnitPUI("");
-				final PhenotypeSearchDTO.ObservationUnitPosition observationUnitPosition = new PhenotypeSearchDTO.ObservationUnitPosition();
+				final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
 				observationUnitPosition.setBlockNumber(observationUnit.getBlockNumber());
 				observationUnitPosition.setEntryNumber(observationUnit.getEntryNumber());
 				observationUnitPosition.setEntryType(Lists.newArrayList(observationUnit.getEntryType()));
