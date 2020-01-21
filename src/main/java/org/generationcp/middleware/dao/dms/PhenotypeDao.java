@@ -915,7 +915,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.addScalar("blockNumber", new StringType()).addScalar("replicate", new StringType()).addScalar("COL").addScalar("ROW")
 			.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
 			.addScalar("entryNumber", new StringType()).addScalar("programDbId", new StringType()).addScalar("trialDbId", new StringType())
-			.addScalar("trialDbName", new StringType()).addScalar("prop");
+			.addScalar("trialDbName", new StringType()).addScalar("props");
 
 		// TODO get map with AliasToEntityMapResultTransformer.INSTANCE
 		final List<Object[]> results = sqlQuery.list();
