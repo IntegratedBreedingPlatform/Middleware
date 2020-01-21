@@ -45,7 +45,6 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -181,7 +180,7 @@ public class WorkbookBuilder extends Builder {
 		final Map<Integer, VariableType> projectPropRoleMapping = this
 			.generateProjectPropertyRoleMap(projectProperties);
 
-		final EnvironmentPropertyDao geolocationPropertyDao = this.daoFactory.getEnvironmentPropertyDao();
+		final EnvironmentPropertyDao environmentPropertyDao = this.daoFactory.getEnvironmentPropertyDao();
 		for (final ProjectProperty projectProperty : projectProperties) {
 			// FIXME DA IN A LOOP
 			final StandardVariable stdVariable = this.getStandardVariableBuilder()
@@ -202,9 +201,9 @@ public class WorkbookBuilder extends Builder {
 
 				if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
 					String value = projectProperty.getValue();
-					// During import of study, experiment design values are not set in ProjectProperty so we resolve them from GeolocationProperty
+					// During import of study, experiment design values are not set in ProjectProperty so we resolve them from ExperimentProperty
 					if (value == null && VariableType.ENVIRONMENT_DETAIL.equals(varType)) {
-						value = geolocationPropertyDao.getVariableValue(stdVariableId, id);
+						value = environmentPropertyDao.getVariableValue(stdVariableId, id);
 					}
 
 					final MeasurementVariable measurementVariable =
@@ -229,28 +228,6 @@ public class WorkbookBuilder extends Builder {
 		WorkbookBuilder.LOG.debug(StringUtils.EMPTY + monitor.stop() + ". This instance was for studyId: " + id);
 
 		return workbook;
-	}
-
-	private String getVariableValueFromGeolocation(final int stdVariableId, final String value, final Geolocation geolocation) {
-
-		if (geolocation != null) {
-			if (TermId.TRIAL_INSTANCE_FACTOR.getId() == stdVariableId) {
-				return geolocation.getDescription();
-
-			} else if (TermId.LATITUDE.getId() == stdVariableId && geolocation.getLatitude() != null) {
-				return geolocation.getLatitude().toString();
-
-			} else if (TermId.LONGITUDE.getId() == stdVariableId && geolocation.getLongitude() != null) {
-				return geolocation.getLongitude().toString();
-
-			} else if (TermId.GEODETIC_DATUM.getId() == stdVariableId && geolocation.getGeodeticDatum() != null) {
-				geolocation.setGeodeticDatum(value);
-
-			} else if (TermId.ALTITUDE.getId() == stdVariableId && geolocation.getAltitude() != null) {
-				return geolocation.getAltitude().toString();
-			}
-		}
-		return value;
 	}
 
 	private void populateBreedingMethodPossibleValues(final List<MeasurementVariable> variates) {
@@ -364,7 +341,7 @@ public class WorkbookBuilder extends Builder {
 		final DmsProject dmsProject = this.dataSetBuilder.getTrialDataset(id);
 		final List<MeasurementVariable> experimentalDesignVariables = new ArrayList<>();
 		final List<ProjectProperty> projectProperties = dmsProject != null ? dmsProject.getProperties()
-			: new ArrayList<ProjectProperty>();
+			: new ArrayList<>();
 		final Map<Integer, VariableType> projectPropRoleMapping = this
 			.generateProjectPropertyRoleMap(projectProperties);
 

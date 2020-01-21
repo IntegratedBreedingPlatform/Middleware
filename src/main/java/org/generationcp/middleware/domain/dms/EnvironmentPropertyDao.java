@@ -60,7 +60,7 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error at getVariableValueForTrialInstance=" + datasetId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
+				"Error at getVariableValueForTrialInstance=" + datasetId + " query on EnvironmentPropertyDao: " + e.getMessage(), e);
 		}
 	}
 
@@ -80,7 +80,7 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error at getVariableValueForTrialInstance=" + datasetId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
+				"Error at getVariableValueForTrialInstance=" + datasetId + " query on EnvironmentPropertyDao: " + e.getMessage(), e);
 		}
 	}
 
@@ -96,7 +96,7 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 			return (String) query.uniqueResult();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error at getGeolocationPropValue=" + stdVarId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
+				"Error at getGeolocationPropValue=" + stdVarId + " query on EnvironmentPropertyDao: " + e.getMessage(), e);
 		}
 	}
 

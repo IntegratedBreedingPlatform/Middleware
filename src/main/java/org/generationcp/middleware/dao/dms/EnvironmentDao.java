@@ -275,7 +275,7 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error at getEnvironmentForTraits at GeolocationDao: " + e.getMessage();
+			final String errorMessage = "Error at getEnvironmentForTraits at EnvironmentDao: " + e.getMessage();
 			EnvironmentDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
