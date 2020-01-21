@@ -68,7 +68,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		this.daoFactory.getExperimentDao().save(experimentModel);
 
 		final StudyInstance studyInstance =
-			new StudyInstance(experimentModel.getNdExperimentId(), experimentModel.getNdExperimentId(), instanceNumber, false, false, false, true);
+			new StudyInstance(experimentModel.getNdExperimentId(), instanceNumber, false, false, false, true);
 		if (locationPresent) {
 			studyInstance.setLocationId(location.get().getLocid());
 			studyInstance.setLocationName(location.get().getLname());

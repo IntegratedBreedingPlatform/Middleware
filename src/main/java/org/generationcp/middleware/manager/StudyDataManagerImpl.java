@@ -86,6 +86,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Transactional
@@ -733,7 +734,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<StudyDetails> getStudyDetails(
 		final StudyTypeDto studyType, final String programUUID, final int start,
 		final int numOfRows) {
-		final List<StudyDetails> details = this.getDmsProjectDao().getAllStudyDetails(studyType, programUUID, start, numOfRows);
+		final List<StudyDetails> details = this.getDmsProjectDao().getAllStudyDetails(Optional.of(studyType), programUUID, start, numOfRows);
 		this.populateSiteAndPersonIfNecessary(details);
 		return details;
 	}
@@ -1081,7 +1082,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyMetadata getStudyMetadataForGeolocationId(final Integer geolocationId) {
-		return this.getDmsProjectDao().getStudyMetadataForGeolocationId(geolocationId);
+		return this.getDmsProjectDao().getStudyMetadataForEnvironmentId(geolocationId);
 	}
 
 	@Override
