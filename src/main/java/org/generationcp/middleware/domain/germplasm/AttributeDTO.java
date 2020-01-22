@@ -1,5 +1,7 @@
 package org.generationcp.middleware.domain.germplasm;
 
+import org.pojomatic.Pojomatic;
+
 public class AttributeDTO {
 
 	private String attributeCode;
@@ -46,5 +48,20 @@ public class AttributeDTO {
 
 	public void setValue(final String value) {
 		this.value = value;
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
 	}
 }
