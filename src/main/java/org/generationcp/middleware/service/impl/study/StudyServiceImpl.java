@@ -25,6 +25,7 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestD
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.ObservationVariableDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
@@ -39,7 +40,6 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -304,12 +304,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public Integer getPlotDatasetId(final int studyId) {
-		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getProjectId();
+		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0)
+			.getProjectId();
 	}
 
 	@Override
 	public Integer getEnvironmentDatasetId(final int studyId) {
-		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getProjectId();
+		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0)
+			.getProjectId();
 	}
 
 	@Override
@@ -544,6 +546,17 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
 		return this.getPhenotypeDao().countPhenotypes(requestDTO);
+	}
+
+	@Override
+	public List<ObservationVariableDto> getObservationVariables(final Integer pageSize, final Integer pageNumber,
+		final int studyId, final List<Integer> variableTypes) {
+		return this.daoFactory.getDmsProjectDAO().getObservationVariables(pageSize, pageNumber, studyId, variableTypes);
+	}
+
+	@Override
+	public long countObservationVariables(final int studyId, final List<Integer> variableTypes) {
+		return this.daoFactory.getDmsProjectDAO().countObservationVariables(studyId, variableTypes);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {

@@ -77,4 +77,9 @@ public interface StudyService {
 	Integer getPlotDatasetId(final int studyId);
 
 	Integer getEnvironmentDatasetId(final int studyId);
+
+	List<ObservationVariableDto> getObservationVariables(final Integer pageSize, final Integer pageNumber,
+		int studyId, final List<Integer> variableTypes);
+
+	long countObservationVariables(int studyId, final List<Integer> variableTypes);
 }
