@@ -262,25 +262,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		final List<String> usedCategories = this.cvtermRelationshipDao.getScaleCategoriesUsedAsTrialDesignFactors(this.scale.getCvTermId());
 		assertEquals(0, usedCategories.size());
 	}
-	
-	@Test
-	public void testgetScaleCategoriesUsedAsEnvironmentFactors() {
-		this.createEnvironmentFactor();
-		final List<String> usedCategories = this.cvtermRelationshipDao.getScaleCategoriesUsedAsEnvironmentFactors(this.scale.getCvTermId());
-		assertEquals(1, usedCategories.size());
-		assertEquals(this.categories.get(5).getName(), usedCategories.get(0));
-	}
-	
-	@Test
-	public void testgetScaleCategoriesUsedAsEnvironmentFactorsWithStudyDeleted() {
-		this.markTestStudyAsDeleted();
-		this.createEnvironmentFactor();
-		// For some reason, need to flush to be able to get the latest state of test study as deleted
-		this.sessionProvder.getSession().flush();
-		final List<String> usedCategories = this.cvtermRelationshipDao.getScaleCategoriesUsedAsEnvironmentFactors(this.scale.getCvTermId());
-		assertEquals(0, usedCategories.size());
-	}
-	
+
 	private void createObservations() {
 		final ExperimentModel experiment1 = new ExperimentModel();
 		experiment1.setGeoLocation(getGeolocation());

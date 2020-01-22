@@ -287,17 +287,6 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testDeletePhenotypesByProjectIdAndLocationId() {
-		final Integer locationId = this.createEnvironmentData(1, true);
-		final List<Integer> traitIds =Collections.singletonList(this.trait.getCvTermId());
-		final Integer projectId = this.study.getProjectId();
-		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
-
-		this.phenotypeDao.deletePhenotypesByProjectIdAndLocationId(projectId, locationId);
-		Assert.assertEquals(0, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
-	}
-
-	@Test
 	public void testUpdateOutOfSyncPhenotypes() {
 		this.createEnvironmentData(1, true);
 		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
@@ -319,7 +308,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final Integer variableId = this.trait.getCvTermId();
 		final Integer datasetId = this.study.getProjectId();
 		Assert.assertFalse(this.phenotypeDao.hasOutOfSync(datasetId));
-		this.phenotypeDao.updateOutOfSyncPhenotypesByGeolocation(geolocationId, new HashSet<>(Arrays.asList(variableId)));
+		this.phenotypeDao.updateOutOfSyncPhenotypesByEnvironment(geolocationId, new HashSet<>(Arrays.asList(variableId)));
 		Assert.assertTrue(this.phenotypeDao.hasOutOfSync(datasetId));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experimentId, variableId);
 		Assert.assertEquals(Phenotype.ValueStatus.OUT_OF_SYNC, phenotype.getValueStatus());

@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
@@ -175,11 +176,13 @@ public class TraitBuilder extends Builder {
 		// error for large DBs
 		if (environmentIds.size() > 1000) {
 			for (final NumericTraitInfo traitInfo : numericTraitInfoList) {
-				traitValues.putAll(this.getPhenotypeDao().getNumericTraitInfoValues(environmentIds, traitInfo.getId()));
+				traitValues.putAll(this.getPhenotypeDao().getNumericTraitInfoValues(environmentIds, Collections.singletonList(traitInfo.getId())));
 				this.getMedianValue(traitValues, traitInfo);
 			}
 		} else {
-			traitValues.putAll(this.getPhenotypeDao().getNumericTraitInfoValues(environmentIds, numericTraitInfoList));
+			traitValues.putAll(
+				this.getPhenotypeDao().getNumericTraitInfoValues(environmentIds, numericTraitInfoList.stream().map(t -> t.getId()).collect(
+				Collectors.toList())));
 			for (final NumericTraitInfo traitInfo : numericTraitInfoList) {
 				this.getMedianValue(traitValues, traitInfo);
 			}

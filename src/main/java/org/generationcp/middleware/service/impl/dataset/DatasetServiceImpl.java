@@ -547,7 +547,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			});
 			this.daoFactory.getPhenotypeDAO()
-				.updateOutOfSyncPhenotypesByGeolocation(geolocation, Sets.newHashSet(targetVariableIds));
+				.updateOutOfSyncPhenotypesByEnvironment(geolocation, Sets.newHashSet(targetVariableIds));
 		}
 	}
 
