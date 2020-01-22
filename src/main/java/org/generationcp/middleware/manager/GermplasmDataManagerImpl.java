@@ -1585,4 +1585,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.getAttributeDao().countAttributesByGid(gid, attributeDbIds);
 	}
 
+	@Override
+	public List<Attribute> getAttributeByIds(final List<Integer> ids) {
+		return this.getAttributeDao().getByIDs(ids);
+	}
+
 }

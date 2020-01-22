@@ -1197,4 +1197,6 @@ public interface GermplasmDataManager {
 		final String gid, final List<String> attributeDbIds, final Integer pageSize, Integer pageNumber);
 
 	long countAttributesByGid(String gid, final List<String> attributeDbIds);
+
+	List<Attribute> getAttributeByIds(List<Integer> ids);
 }

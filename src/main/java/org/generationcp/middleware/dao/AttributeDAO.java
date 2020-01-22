@@ -170,4 +170,22 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
+
+	@SuppressWarnings("unchecked")
+	public List<Attribute> getByIDs(final List<Integer> ids) {
+		List<Attribute> toReturn = new ArrayList<>();
+		try {
+			if (ids != null) {
+				final String sql = "SELECT {a.*} FROM atributs a "
+					+ " WHERE a.aid IN ( :ids ) ";
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
+				query.addEntity("a", Attribute.class);
+				query.setParameterList("ids", ids);
+				toReturn = query.list();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getByIDs(ids=" + ids + ") query from Attributes: " + e.getMessage(), e);
+		}
+		return toReturn;
+	}
 }
