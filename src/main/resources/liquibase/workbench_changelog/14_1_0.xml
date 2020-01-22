@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-   <changeSet author="diego" id="v13.2.0-1">
+   <changeSet author="diego" id="v14.1.0-1">
       <preConditions onFail="MARK_RAN">
          <sqlCheck expectedResult="0">SELECT COUNT(*) FROM workbench_tool where group_name="inventory_manager";</sqlCheck>
       </preConditions>
@@ -11,7 +11,7 @@
 			VALUES ('inventory_manager', 'inventory_manager', 'Manage Inventory', '13.1', 'WEB', 'inventory-manager/#/');</sql>
    </changeSet>
 
-   <changeSet author="diego" id="v13.2.0-2">
+   <changeSet author="diego" id="v14.1.0-2">
       <preConditions onFail="MARK_RAN">
          <sqlCheck expectedResult="0">
 			 SELECT COUNT(*) FROM workbench_sidebar_category where sidebar_category_name="inventory_manager";</sqlCheck>
@@ -22,7 +22,7 @@
 			VALUES ('inventory_manager', 'Inventory Manager');</sql>
    </changeSet>
 
-   <changeSet author="diego" id="v13.2.0-3">
+   <changeSet author="diego" id="v14.1.0-3">
       <preConditions onFail="MARK_RAN">
          <sqlCheck expectedResult="0">SELECT COUNT(*) FROM workbench_sidebar_category_link where tool_name="inventory_manager";</sqlCheck>
       </preConditions>
@@ -33,7 +33,7 @@
 	  </sql>
    </changeSet>
 
-   <changeSet author="diego" id="v13.2.0-4">
+   <changeSet author="diego" id="v14.1.0-4">
       <preConditions onFail="MARK_RAN">
          <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name ='MANAGE_INVENTORY'</sqlCheck>
       </preConditions>
@@ -43,7 +43,7 @@
 	  </sql>
    </changeSet>
 
-   <changeSet author="diego" id="v13.2.0-5">
+   <changeSet author="diego" id="v14.1.0-5">
       <preConditions onFail="MARK_RAN">
          <sqlCheck expectedResult="0">select count(1)
 				from role_type_permission where permission_id = (SELECT permission_id FROM permission where name ='MANAGE_INVENTORY');</sqlCheck>
