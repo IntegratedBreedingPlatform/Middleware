@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.dao;
 
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
@@ -21,6 +20,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -94,7 +94,8 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
 	public List<AttributeDTO> getAttributesByGidAndAttributeIds(
 		final String gid, final List<String> attributeIds, final Integer pageSize, final Integer pageNumber) {
-		final List<AttributeDTO> attributes = Lists.newArrayList();
+
+		List<AttributeDTO> attributes;
 		try {
 			String sql = "SELECT "
 				+ "    u.fcode AS attributeCode,"
@@ -127,21 +128,10 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 				query.setMaxResults(pageSize);
 			}
 
-			final List<Object> results = query.list();
+			query.setResultTransformer(Transformers.aliasToBean(AttributeDTO.class));
 
-			for (final Object o : results) {
-				final Object[] result = (Object[]) o;
-				if (result != null) {
-					final AttributeDTO attributeDTO = new AttributeDTO();
-					attributeDTO.setAttributeCode((String) result[0]);
-					attributeDTO.setAttributeDbId((Integer) result[1]);
-					attributeDTO.setAttributeName((String) result[2]);
-					attributeDTO.setDeterminedDate((Integer) result[3]);
-					attributeDTO.setValue((String) result[4]);
+			attributes = query.list();
 
-					attributes.add(attributeDTO);
-				}
-			}
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error with getAttributesByGid(gidList=" + gid + "): " + e.getMessage(), e);
 		}
