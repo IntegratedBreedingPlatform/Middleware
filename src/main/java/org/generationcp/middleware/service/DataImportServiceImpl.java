@@ -64,16 +64,16 @@ import java.util.Set;
 public class DataImportServiceImpl extends Service implements DataImportService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataImportServiceImpl.class);
-	public static final int MAX_VARIABLE_NAME_LENGTH = 32;
-	public static final String ERROR_MISSING_STUDY_CONDITION = "error.missing.study.condition";
-	public static final String ERROR_PLOT_DOESNT_EXIST = "error.plot.doesnt.exist";
-	public static final String ERROR_ENTRY_DOESNT_EXIST = "error.entry.doesnt.exist";
-	public static final String ERROR_GID_DOESNT_EXIST = "error.gid.doesnt.exist";
-	public static final String ERROR_DUPLICATE_STUDY_NAME = "error.duplicate.study.name";
-	public static final String ERROR_DUPLICATE_PSM = "error.duplicate.psm";
-	public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
-	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
-	public static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
+	private static final int MAX_VARIABLE_NAME_LENGTH = 32;
+	private static final String ERROR_MISSING_STUDY_CONDITION = "error.missing.study.condition";
+	private static final String ERROR_PLOT_DOESNT_EXIST = "error.plot.doesnt.exist";
+	private static final String ERROR_ENTRY_DOESNT_EXIST = "error.entry.doesnt.exist";
+	static final String ERROR_GID_DOESNT_EXIST = "error.gid.doesnt.exist";
+	private static final String ERROR_DUPLICATE_STUDY_NAME = "error.duplicate.study.name";
+	private static final String ERROR_DUPLICATE_PSM = "error.duplicate.psm";
+	static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
+	static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
+	static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
 	private static final String LOCATION_ID_DOESNT_EXISTS = "error.location.id.doesnt.exists";
 
 	private int maxRowLimit = WorkbookParser.DEFAULT_MAX_ROW_LIMIT;
