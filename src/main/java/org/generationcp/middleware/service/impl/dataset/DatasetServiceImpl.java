@@ -316,8 +316,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final ObservationUnitIDGenerator observationUnitIdGenerator = new ObservationUnitIDGeneratorImpl();
 		for (final ExperimentModel plotObservationUnit : plotObservationUnits) {
 			for (int i = 1; i <= numberOfSubObservationUnits; i++) {
-				final ExperimentModel experimentModel = new ExperimentModel(plotObservationUnit.getGeoLocation(),
-					plotObservationUnit.getTypeId(), subObservationDataset, plotObservationUnit.getStock(), plotObservationUnit, i);
+				final ExperimentModel experimentModel = new ExperimentModel(plotObservationUnit.getTypeId(), subObservationDataset, plotObservationUnit.getStock(), plotObservationUnit, i);
 				observationUnitIdGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
 				this.daoFactory.getExperimentDao().save(experimentModel);
 			}

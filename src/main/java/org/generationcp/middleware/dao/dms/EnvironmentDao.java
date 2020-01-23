@@ -43,7 +43,7 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 
 
 	private static final String GET_ALL_ENVIRONMENTS_QUERY =
-		"SELECT DISTINCT gp.nd_geolocation_id as envtId, l.lname AS locationName, prov.lname AS provinceName, "
+		"SELECT DISTINCT e.nd_experiment_id as envtId, l.lname AS locationName, prov.lname AS provinceName, "
 			+ "       c.isoabbr, p.project_id, p.name, gp.value AS locationId, p.description AS description "
 			+ "  FROM nd_experimentprop xp "
 			+ " INNER JOIN nd_experiment e on e.nd_experiment_id = xp.nd_experiment_id AND e.type_id = 1020 "
@@ -185,7 +185,7 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			// Get location name, study id and study name
 			final String sql =
-				"SELECT DISTINCT e.nd_geolocation_id, l.lname, gp.value, p.project_id, p.name, p.description, prov.lname as provinceName, c.isoabbr "
+				"SELECT DISTINCT e.nd_experiment_id as environmentId, l.lname, gp.value, p.project_id, p.name, p.description, prov.lname as provinceName, c.isoabbr "
 					+ "FROM nd_experiment e "
 					+ "	LEFT JOIN nd_experimentprop xp ON e.nd_experiment_id = xp.nd_experiment_id"
 					+ "	AND xp.type_id =  " + TermId.LOCATION_ID.getId()
@@ -198,7 +198,7 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("locationIds", environmentIds);
-			query.addScalar("nd_geolocation_id", Hibernate.INTEGER);
+			query.addScalar("environmentId", Hibernate.INTEGER);
 			query.addScalar("lname", Hibernate.STRING);
 			query.addScalar("value", Hibernate.INTEGER);
 			query.addScalar(EnvironmentDao.PROJECT_ID, Hibernate.INTEGER);
