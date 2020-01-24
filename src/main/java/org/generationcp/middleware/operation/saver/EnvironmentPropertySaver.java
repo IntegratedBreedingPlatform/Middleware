@@ -26,7 +26,7 @@ public class EnvironmentPropertySaver {
 			for (final FieldMapDatasetInfo dataset : info.getDatasets()) {
 				for (final FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
 					// GCP-8093 handle old data saved using the default location, default location is no longer used
-					int locationId = trial.getGeolocationId();
+					int locationId = trial.getEnvironmentId();
 					if (trial.getLocationId() != null) {
 						this.saveOrUpdate(locationId, TermId.LOCATION_ID.getId(), trial.getLocationId().toString());
 					}

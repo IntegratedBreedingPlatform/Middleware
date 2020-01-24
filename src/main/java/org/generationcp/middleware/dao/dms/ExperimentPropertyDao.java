@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +77,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" SELECT ")
 							.append(" nde.project_id AS datasetId ")
 							.append(" , proj.name AS datasetName ")
-							.append(" , geo.nd_geolocation_id AS geolocationId ")
+							.append(" , env.nd_experiment_id AS environmentId ")
 							.append(" , site.value AS siteName ")
 							.append(" , nde.nd_experiment_id AS experimentId ")
 							.append(" , s.uniqueName AS entryNumber ")
@@ -88,17 +87,15 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" , row.value AS row ")
 							.append(" , col.value AS col ")
 							.append(" , blk.value AS block_id ")
-							.append(" , inst.description AS trialInstance ")
-                            //Casting inst.description to signed for natural sort
-                            .append(" , CAST(inst.description as SIGNED) AS casted_trialInstance")
+							.append(" , env.observation_unit_no AS trialInstance ")
 							.append(" , st.name AS studyName ")
 							.append(" , s.dbxref_id AS gid ")
 							.append(" , st.start_date as startDate ")
-							.append(" , gpSeason.value as season ")
+							.append(" , season.value as season ")
 							.append(" , siteId.value AS siteId")
 							.append(" , epropBlock.value AS blockNo ")
 							.append(" , ldp.group_name AS pedigree ")
-							.append (" , geo.obs_unit_id as obsUnitId ")
+							.append (" , nde.obs_unit_id as obsUnitId ")
 							.append(" FROM ")
 							.append(" nd_experiment nde ")
 							.append(" INNER JOIN project proj on proj.project_id = nde.project_id ")
@@ -116,30 +113,29 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("       AND epropPlot.type_id IN (" + TermId.PLOT_NO.getId() + ", " + TermId.PLOT_NNO.getId() + ")  ")
 							// 8200, 8380
 							.append("       AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' ")
-							.append(" INNER JOIN nd_experiment geo ON nde.nd_experiment_id = geo.nd_experiment_id ")
-							.append("       AND geo.type_id = ").append(TermId.PLOT_EXPERIMENT.getId())
-							.append(" INNER JOIN nd_geolocation inst ON geo.nd_geolocation_id = inst.nd_geolocation_id ")
-							.append(" LEFT JOIN nd_geolocationprop site ON geo.nd_geolocation_id = site.nd_geolocation_id ")
+							.append(" INNER JOIN nd_experiment env ON nde.parent_id = env.nd_experiment_id ")
+							.append("       AND env.type_id = ").append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId())
+							.append(" LEFT JOIN nd_experimentprop site ON env.nd_experiment_id = site.nd_experiment_id ")
 							.append("       AND site.type_id = ").append(TermId.TRIAL_LOCATION.getId())
-							.append("  LEFT JOIN nd_geolocationprop siteId ON siteId.nd_geolocation_id = geo.nd_geolocation_id ")
+							.append("  LEFT JOIN nd_experimentprop siteId ON env.nd_experiment_id = siteId.nd_experiment_id ")
 							.append("    AND siteId.type_id = ").append(TermId.LOCATION_ID.getId())
-							.append(" LEFT JOIN nd_geolocationprop blk ON blk.nd_geolocation_id = geo.nd_geolocation_id ")
+							.append(" LEFT JOIN nd_experimentprop blk ON env.nd_experiment_id = blk.nd_experiment_id")
 							.append("       AND blk.type_id = ").append(TermId.BLOCK_ID.getId())
 							.append(" LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = nde.nd_experiment_id ")
 							.append("       AND row.type_id = ").append(TermId.RANGE_NO.getId())
 							.append(" LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = nde.nd_experiment_id ")
 							.append("       AND col.type_id = ").append(TermId.COLUMN_NO.getId())
-							.append(" LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
-							.append("       AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
+							.append(" LEFT JOIN nd_experimentprop season ON env.nd_experiment_id = season.nd_experiment_id ")
+							.append("       AND season.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
 							.append(" LEFT JOIN listnms lnms ON lnms.projectid = st.project_id AND lnms.listtype in ('STUDY')")
 							.append(" LEFT JOIN listdata_project ldp on ldp.list_id = lnms.listid AND ldp.entry_id = s.uniqueName AND ldp.germplasm_id  = s.dbxref_id")
 							.append(" WHERE st.project_id = :studyId")
-							.append(" ORDER BY casted_trialInstance, inst.description, nde.nd_experiment_id ").append(order);
+							.append(" ORDER BY env.observation_unit_no, nde.nd_experiment_id ").append(order);
 
 			final SQLQuery query =
 					this.getSession().createSQLQuery(sql.toString());
 					query.addScalar("datasetId").addScalar("datasetName")
-							.addScalar("geolocationId").addScalar("siteName").addScalar("experimentId").addScalar("entryNumber")
+							.addScalar("environmentId").addScalar("siteName").addScalar("experimentId").addScalar("entryNumber")
 							.addScalar("germplasmName").addScalar("rep").addScalar("plotNo").addScalar("row").addScalar("col")
 							.addScalar("block_id").addScalar("trialInstance").addScalar("studyName").addScalar("gid")
 							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("pedigree").addScalar("obsUnitId", Hibernate.STRING);
@@ -159,27 +155,25 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId, final Integer blockId)
+	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int instanceId, final Integer blockId)
 			{
 		List<FieldMapInfo> fieldmaps = new ArrayList<>();
 
 		try {
-			final String order = geolocationId > 0 ? "ASC" : "DESC";
+			final String order = instanceId > 0 ? "ASC" : "DESC";
 			final StringBuilder sql =
 					new StringBuilder().append(" SELECT ").append(" p.project_id AS datasetId ").append(" , p.name AS datasetName ")
-							.append(" , st.name AS studyName ").append(" , e.nd_geolocation_id AS geolocationId ")
+							.append(" , st.name AS studyName ").append(" , env.nd_experiment_id AS instanceId ")
 							.append(" , site.value AS siteName ").append(" , siteId.value AS siteId")
 							.append(" , e.nd_experiment_id AS experimentId ").append(" , s.uniqueName AS entryNumber ")
 							.append(" , s.name AS germplasmName ").append(" , epropRep.value AS rep ")
 							.append(" , epropPlot.value AS plotNo ").append(" , row.value AS row ").append(" , col.value AS col ")
 							.append(" , blk.value AS blockId ").append(" , st.project_id AS studyId ")
-							.append(" , geo.description AS trialInstance ").append(" , s.dbxref_id AS gid ")
-							.append(" , st.start_date as startDate ").append(" , gpSeason.value as season ")
+							.append(" , env.observation_unit_no AS trialInstance ").append(" , s.dbxref_id AS gid ")
+							.append(" , st.start_date as startDate ").append(" , season.value as season ")
 							.append(" , epropBlock.value AS blockNo ")
 							.append(" , e.obs_unit_id as obsUnitId ")
-							.append(" FROM ").append("  nd_geolocationprop blk ")
-							.append("  INNER JOIN nd_experiment e ON e.nd_geolocation_id = blk.nd_geolocation_id ")
-							.append("  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id ")
+							.append(" FROM nd_experiment e ")
 							.append("  INNER JOIN project p ON p.project_id = e.project_id ")
 							.append("  INNER JOIN project st ON st.project_id = p.study_id ")
 							.append("  INNER JOIN stock s ON e.stock_id = s.stock_id ")
@@ -190,24 +184,27 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("  INNER JOIN nd_experimentprop epropPlot ON epropPlot.nd_experiment_id = e.nd_experiment_id ")
 							.append("    AND epropPlot.type_id IN (").append(TermId.PLOT_NO.getId()).append(", ")
 							.append(TermId.PLOT_NNO.getId()).append(") ").append(" AND epropPlot.value <> '' ")
-							.append("  LEFT JOIN nd_geolocationprop site ON site.nd_geolocation_id = e.nd_geolocation_id ")
+							.append(" INNER JOIN nd_experiment env ON e.parent_id = env.nd_experiment_id ")
+							.append("       AND env.type_id = ").append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId())
+							.append("  LEFT JOIN nd_experimentprop site ON site.nd_experiment_id = env.nd_experiment_id ")
 							.append("    AND site.type_id = ").append(TermId.TRIAL_LOCATION.getId())
-							.append("  LEFT JOIN nd_geolocationprop siteId ON siteId.nd_geolocation_id = e.nd_geolocation_id ")
+							.append("  LEFT JOIN nd_experimentprop siteId ON siteId.nd_experiment_id = env.nd_experiment_id ")
 							.append("    AND siteId.type_id = ").append(TermId.LOCATION_ID.getId())
 							.append("  LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = e.nd_experiment_id ")
 							.append("    AND row.type_id = ").append(TermId.RANGE_NO.getId())
 							.append("  LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = e.nd_experiment_id ")
 							.append("    AND col.type_id = ").append(TermId.COLUMN_NO.getId())
-							.append("  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
-							.append("     AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
-							.append(" WHERE blk.type_id = ").append(TermId.BLOCK_ID.getId());
+							.append("  LEFT JOIN nd_experimentprop season ON season.nd_experiment_id = env.nd_experiment_id ")
+							.append("     AND season.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
+							.append(" LEFT JOIN nd_experimentprop blk on blk.nd_experiment_id = env.nd_experiment_id AND blk.type_id = ")
+							.append(TermId.BLOCK_ID.getId());
 
 			if (blockId != null) {
 				sql.append(" AND blk.value = :blockId ");
 			} else {
-				sql.append(" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval ")
-						.append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
-						.append(" AND bexp.nd_geolocation_id = :geolocationId ")
+				sql.append(" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_experimentprop bval ")
+						.append(" INNER JOIN nd_experiment bexp ON bexp.parent_id = bval.nd_experiment_id ")
+						.append(" AND bexp.parent_id = :instanceId ")
 						.append(" AND bexp.project_id = :datasetId ").append(" WHERE bval.type_id = ").append(TermId.BLOCK_ID.getId())
 						.append(")");
 			}
@@ -216,7 +213,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			final SQLQuery query =
 					this.getSession().createSQLQuery(sql.toString());
 					query.addScalar("datasetId").addScalar("datasetName").addScalar("studyName")
-							.addScalar("geolocationId").addScalar("siteName").addScalar("siteId").addScalar("experimentId").addScalar("entryNumber").addScalar("germplasmName").addScalar(
+							.addScalar("instanceId").addScalar("siteName").addScalar("siteId").addScalar("experimentId").addScalar("entryNumber").addScalar("germplasmName").addScalar(
 							"rep").addScalar("plotNo").addScalar("row")
 							.addScalar("col").addScalar("blockId").addScalar("studyId").addScalar("trialInstance").addScalar("gid")
 							.addScalar("startDate").addScalar("season").addScalar("blockNo").addScalar("obsUnitId", Hibernate.STRING);
@@ -225,7 +222,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 				query.setParameter("blockId", blockId);
 			} else {
 				query.setParameter("datasetId", datasetId);
-				query.setParameter("geolocationId", geolocationId);
+				query.setParameter("instanceId", instanceId);
 			}
 
 			final List<Object[]> list = query.list();
@@ -235,7 +232,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			}
 
 		} catch (final HibernateException e) {
-			final String message = "Error at getAllFieldMapsInBlockByTrialInstanceId(" + geolocationId + ") at ExperimentPropertyDao: " + e.getMessage();
+			final String message = "Error at getAllFieldMapsInBlockByTrialInstanceId(" + instanceId + ") at ExperimentPropertyDao: " + e.getMessage();
 			ExperimentPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -250,20 +247,20 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		FieldMapTrialInstanceInfo trialInstance = null;
 		List<FieldMapLabel> labels = null;
 		Integer datasetId = null;
-		Integer geolocationId = null;
+		Integer environmentId = null;
 		String datasetName = null;
 		String siteName = null;
 		String trialInstanceNo = null;
 		Integer blockId = null;
 		Integer siteId = null;
 		for (final Object[] row : list) {
-			if (geolocationId == null) {
+			if (environmentId == null) {
 				trialInstance = new FieldMapTrialInstanceInfo();
 				labels = new ArrayList<>();
 			} else {
 				// if trial instance or dataset has changed, add previously saved trial instance
-				if (!geolocationId.equals(row[2]) || !datasetId.equals(row[0])) {
-					trialInstance.setGeolocationId(geolocationId);
+				if (!environmentId.equals(row[2]) || !datasetId.equals(row[0])) {
+					trialInstance.setEnvironmentId(environmentId);
 					trialInstance.setSiteName(siteName);
 					trialInstance.setLocationName(siteName);
 					trialInstance.setLocationId(siteId);
@@ -329,7 +326,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 			datasetId = (Integer) row[0];
 			datasetName = (String) row[1];
-			geolocationId = (Integer) row[2];
+			environmentId = (Integer) row[2];
 			siteName = (String) row[3];
 			if (row[17] != null && NumberUtils.isNumber((String) row[17])) {
 				siteId = Integer.valueOf((String) row[17]);
@@ -340,7 +337,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			blockId = row[11] != null ? Integer.valueOf((String) row[11]) : null;
 		}
 		// add last trial instance and dataset
-		trialInstance.setGeolocationId(geolocationId);
+		trialInstance.setEnvironmentId(environmentId);
 		trialInstance.setSiteName(siteName);
 		trialInstance.setLocationName(siteName);
 		trialInstance.setLocationId(siteId);
@@ -381,7 +378,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			label.setRange(this.getIntegerValue(row[11]));
 			label.setGermplasmName((String) row[8]);
 			label.setDatasetId((Integer) row[0]);
-			label.setGeolocationId((Integer) row[3]);
+			label.setEnvironmentId((Integer) row[3]);
 			label.setSiteName((String) row[4]);
 			label.setGid((Integer) row[16]);
 			label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
@@ -393,7 +390,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			FieldMapTrialInstanceInfo trial = trialMap.get(trialKey);
 			if (trial == null) {
 				trial = new FieldMapTrialInstanceInfo();
-				trial.setGeolocationId((Integer) row[3]);
+				trial.setEnvironmentId((Integer) row[3]);
 				trial.setSiteName((String) row[4]);
 				trial.setLocationName((String) row[4]);
 				if (row[5] != null && NumberUtils.isNumber((String) row[5])) {
@@ -430,7 +427,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			if (dataset.getTrialInstances() == null) {
 				dataset.setTrialInstances(new ArrayList<FieldMapTrialInstanceInfo>());
 			}
-			if (dataset.getTrialInstance(trial.getGeolocationId()) == null) {
+			if (dataset.getTrialInstance(trial.getEnvironmentId()) == null) {
 				dataset.getTrialInstances().add(trial);
 			}
 
