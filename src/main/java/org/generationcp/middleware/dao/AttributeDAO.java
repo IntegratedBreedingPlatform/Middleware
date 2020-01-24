@@ -32,19 +32,6 @@ import java.util.List;
  */
 public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
-	public static final String ATTRIBUTES_BY_GID_AND_ATTRIBUTE_IDS = "SELECT "
-		+ "    u.fcode AS attributeCode,"
-		+ "    u.fldno AS attributeDbId,"
-		+ "    u.fname AS attributeName,"
-		+ "    a.adate AS determinedDate,"
-		+ "    a.aval AS value "
-		+ " FROM"
-		+ "    atributs a"
-		+ "        INNER JOIN"
-		+ "    udflds u ON a.atype = u.fldno "
-		+ " WHERE"
-		+ "    a.gid = :gid AND u.ftable = 'ATRIBUTS'";
-
 	@SuppressWarnings("unchecked")
 	public List<Attribute> getByGID(final Integer gid) {
 		List<Attribute> toReturn = new ArrayList<>();
