@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
    <changeSet author="diego" id="v14.1.0-1">
       <preConditions onFail="MARK_RAN">
@@ -39,7 +40,7 @@
       </preConditions>
       <comment>INSERT INTO table permission for MANAGE_INVENTORY</comment>
       <sql dbms="mysql" splitStatements="true">INSERT INTO permission (name, description, parent_id, workbench_sidebar_category_link_id)
-			select 'MANAGE_INVENTORY', 'Manage Inventory', 3, (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name="inventory_manager");
+			values ('MANAGE_INVENTORY', 'Manage Inventory', 3, (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name="inventory_manager"));
 	  </sql>
    </changeSet>
 
@@ -50,8 +51,8 @@
       </preConditions>
       <comment>INSERT INTO table role_type_permission</comment>
       <sql dbms="mysql" splitStatements="true">
-		  INSERT INTO role_type_permission (role_type_id,permission_id,selectable) select 2,(SELECT permission_id FROM permission where name ='MANAGE_INVENTORY'),1;
-          INSERT INTO role_type_permission (role_type_id,permission_id,selectable) select 1,(SELECT permission_id FROM permission where name ='MANAGE_INVENTORY'),1;
+         INSERT INTO role_type_permission (role_type_id,permission_id,selectable) values (2,(SELECT permission_id FROM permission where name ='MANAGE_INVENTORY'),1);
+         INSERT INTO role_type_permission (role_type_id,permission_id,selectable) values (1,(SELECT permission_id FROM permission where name ='MANAGE_INVENTORY'),1);
 	  </sql>
    </changeSet>
 
