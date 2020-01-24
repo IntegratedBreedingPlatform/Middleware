@@ -110,11 +110,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
 		List<AttributeDTO> attributes;
 		try {
-			String sql = ATTRIBUTES_BY_GID_AND_ATTRIBUTE_IDS;
-
-			if (attributeIds != null && !attributeIds.isEmpty()) {
-				sql = sql + " AND u.fldno IN ( :attributs )";
-			}
+			String sql = this.buildQueryForAttributes(attributeIds);
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.addScalar("attributeCode").addScalar("attributeDbId").addScalar("attributeName").addScalar("determinedDate")
@@ -140,13 +136,30 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return attributes;
 	}
 
+	private String buildQueryForAttributes(final List<String> attributeIds) {
+		String sql = "SELECT "
+			+ "    u.fcode AS attributeCode,"
+			+ "    u.fldno AS attributeDbId,"
+			+ "    u.fname AS attributeName,"
+			+ "    a.adate AS determinedDate,"
+			+ "    a.aval AS value "
+			+ " FROM"
+			+ "    atributs a"
+			+ "        INNER JOIN"
+			+ "    udflds u ON a.atype = u.fldno "
+			+ " WHERE"
+			+ "    a.gid = :gid AND u.ftable = 'ATRIBUTS'";
+
+		if (attributeIds != null && !attributeIds.isEmpty()) {
+			sql = sql + " AND u.fldno IN ( :attributs )";
+		}
+		return sql;
+	}
+
 	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
 		String sql = "SELECT COUNT(1) "
 			+ " FROM ("
-			+ ATTRIBUTES_BY_GID_AND_ATTRIBUTE_IDS;
-		if (attributeDbIds != null && !attributeDbIds.isEmpty()) {
-			sql = sql + " AND u.fldno IN ( :attributs )";
-		}
+			+ this.buildQueryForAttributes(attributeDbIds);
 
 		sql = sql + " ) as result ";
 
