@@ -123,26 +123,6 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return attributes;
 	}
 
-	private String buildQueryForAttributes(final List<String> attributeIds) {
-		String sql = "SELECT "
-			+ "    u.fcode AS attributeCode,"
-			+ "    u.fldno AS attributeDbId,"
-			+ "    u.fname AS attributeName,"
-			+ "    a.adate AS determinedDate,"
-			+ "    a.aval AS value "
-			+ " FROM"
-			+ "    atributs a"
-			+ "        INNER JOIN"
-			+ "    udflds u ON a.atype = u.fldno "
-			+ " WHERE"
-			+ "    a.gid = :gid AND u.ftable = 'ATRIBUTS'";
-
-		if (attributeIds != null && !attributeIds.isEmpty()) {
-			sql = sql + " AND u.fldno IN ( :attributs )";
-		}
-		return sql;
-	}
-
 	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
 		String sql = "SELECT COUNT(1) "
 			+ " FROM ("
@@ -164,7 +144,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	public List<Attribute> getByIDs(final List<Integer> ids) {
 		List<Attribute> toReturn = new ArrayList<>();
 		try {
-			if (ids != null) {
+			if (ids != null && !ids.isEmpty()) {
 				final String sql = "SELECT {a.*} FROM atributs a "
 					+ " WHERE a.aid IN ( :ids ) ";
 				final SQLQuery query = this.getSession().createSQLQuery(sql);
@@ -176,5 +156,25 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			throw new MiddlewareQueryException("Error with getByIDs(ids=" + ids + ") query from Attributes: " + e.getMessage(), e);
 		}
 		return toReturn;
+	}
+
+	private String buildQueryForAttributes(final List<String> attributeIds) {
+		String sql = "SELECT "
+			+ "    u.fcode AS attributeCode,"
+			+ "    u.fldno AS attributeDbId,"
+			+ "    u.fname AS attributeName,"
+			+ "    a.adate AS determinedDate,"
+			+ "    a.aval AS value "
+			+ " FROM"
+			+ "    atributs a"
+			+ "        INNER JOIN"
+			+ "    udflds u ON a.atype = u.fldno "
+			+ " WHERE"
+			+ "    a.gid = :gid AND u.ftable = 'ATRIBUTS'";
+
+		if (attributeIds != null && !attributeIds.isEmpty()) {
+			sql = sql + " AND u.fldno IN ( :attributs )";
+		}
+		return sql;
 	}
 }
