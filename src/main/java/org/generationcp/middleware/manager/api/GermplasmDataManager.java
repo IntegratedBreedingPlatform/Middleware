@@ -1194,9 +1194,9 @@ public interface GermplasmDataManager {
 	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Integer pageNumber, Integer pageSize);
 
 	List<AttributeDTO> getAttributesByGid(
-		final String gid, final List<String> attributeDbIds, final Integer pageSize, Integer pageNumber);
+		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNumber);
 
-	long countAttributesByGid(String gid, final List<String> attributeDbIds);
+	long countAttributesByGid(String gid, List<String> attributeDbIds);
 
 	List<Attribute> getAttributeByIds(List<Integer> ids);
 }

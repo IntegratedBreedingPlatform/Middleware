@@ -1,7 +1,9 @@
 package org.generationcp.middleware.domain.germplasm;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
+@AutoProperty
 public class AttributeDTO {
 
 	private String attributeCode;
