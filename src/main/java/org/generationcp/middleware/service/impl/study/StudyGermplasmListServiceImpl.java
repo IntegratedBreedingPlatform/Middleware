@@ -7,6 +7,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 			this.currentSession.createCriteria(ListDataProject.class).createAlias("list", "l")
 				.add(Restrictions.eq("l.projectId", studyBusinessIdentifier));
 		listDataCriteria.add(Restrictions.eq("l.type", GermplasmListType.STUDY.name()));
+		listDataCriteria.addOrder(Order.asc("entryId"));
 		final List<ListDataProject> list = listDataCriteria.list();
 		final List<StudyGermplasmDto> studyGermplasmDtos = new ArrayList<>();
 		Integer index = 0;
