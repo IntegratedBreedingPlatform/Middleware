@@ -25,8 +25,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
@@ -149,7 +147,6 @@ public class ExperimentBuilder extends Builder {
 		experiment.setId(experimentModel.getNdExperimentId());
 		experiment.setFactors(this.getFactors(experimentModel, variableTypes, stockModelMap));
 		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
-		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
 		experiment.setObsUnitId(experimentModel.getObsUnitId());
 		return experiment;
 	}
@@ -160,7 +157,6 @@ public class ExperimentBuilder extends Builder {
 		experiment.setId(experimentModel.getNdExperimentId());
 		experiment.setFactors(this.getFactors(experimentModel, variableTypes, hasVariableType));
 		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
-		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
 		return experiment;
 	}
 
@@ -231,7 +227,7 @@ public class ExperimentBuilder extends Builder {
 	private void addLocationFactors(final ExperimentModel experimentModel, final VariableList factors, final VariableTypeList variableTypes) {
 		for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
 			if (PhenotypicType.TRIAL_ENVIRONMENT == variableType.getRole()) {
-				final Variable variable = this.createLocationFactor(experimentModel.getGeoLocation(), variableType);
+				final Variable variable = this.createLocationFactor(experimentModel, variableType);
 				if (variable != null) {
 					variable.getVariableType().setRole(PhenotypicType.TRIAL_ENVIRONMENT);
 					variable.getVariableType().getStandardVariable().setPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
@@ -241,34 +237,23 @@ public class ExperimentBuilder extends Builder {
 		}
 	}
 
-	protected Variable createLocationFactor(final Geolocation geoLocation, final DMSVariableType variableType) {
+	protected Variable createLocationFactor(final ExperimentModel experiment, final DMSVariableType variableType) {
 		final StandardVariable standardVariable = variableType.getStandardVariable();
 		
 		if (standardVariable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-			return new Variable(variableType, geoLocation.getDescription());
+			return new Variable(variableType, experiment.getObservationUnitNo());
 		}
-		if (standardVariable.getId() == TermId.LATITUDE.getId()) {
-			return new Variable(variableType, geoLocation.getLatitude());
-		}
-		if (standardVariable.getId() == TermId.LONGITUDE.getId()) {
-			return new Variable(variableType, geoLocation.getLongitude());
-		}
-		if (standardVariable.getId() == TermId.GEODETIC_DATUM.getId()) {
-			return new Variable(variableType, geoLocation.getGeodeticDatum());
-		}
-		if (standardVariable.getId() == TermId.ALTITUDE.getId()) {
-			return new Variable(variableType, geoLocation.getAltitude());
-		}
-		final String locVal = this.findLocationValue(variableType.getId(), geoLocation.getProperties());
+
+		final String locVal = this.findLocationValue(variableType.getId(), experiment.getProperties());
 		if (locVal != null) {
 			return new Variable(variableType, locVal);
 		}
 		return null;
 	}
 
-	private String findLocationValue(final int stdVariableId, final List<GeolocationProperty> properties) {
+	private String findLocationValue(final int stdVariableId, final List<ExperimentProperty> properties) {
 		if (properties != null) {
-			for (final GeolocationProperty property : properties) {
+			for (final ExperimentProperty property : properties) {
 				if (property.getTypeId().equals(stdVariableId)) {
 					return property.getValue();
 				}
@@ -407,7 +392,7 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	public boolean checkIfStudyHasFieldmap(final int studyId) {
-		final List<Integer> geolocationIdsOfStudy = this.getExperimentDao().getLocationIdsOfStudy(studyId);
+		final List<Integer> geolocationIdsOfStudy = this.getExperimentDao().getInstanceIds(studyId);
 		final List<Integer> geolocationIdsOfStudyWithFieldmap = this.getExperimentDao().getLocationIdsOfStudyWithFieldmap(studyId);
 		return geolocationIdsOfStudy.size() == geolocationIdsOfStudyWithFieldmap.size();
 	}

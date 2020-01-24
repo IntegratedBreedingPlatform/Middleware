@@ -1097,7 +1097,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ " FROM nd_experiment nde "
 				+ " INNER JOIN project proj ON proj.project_id = nde.project_id "
 				+ " INNER JOIN project env_ds ON env_ds.study_id = proj.study_id AND env_ds.dataset_type_id = 3 "
-				+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id "
+				+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 "
 				+ " LEFT OUTER JOIN nd_experimentprop xprop ON xprop.nd_experiment_id = env.nd_experiment_id "
 				+ " LEFT OUTER JOIN location loc on xprop.value = loc.locid and xprop.type_id = 8190 "
 				+ " WHERE nde.project_id = :datasetId \n";

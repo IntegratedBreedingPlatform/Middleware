@@ -55,9 +55,8 @@ public class ExperimentModelSaver {
 	}
 
 	public void addOrUpdateExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
-		final int experimentId =
-				this.daoFactory.getExperimentDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
-						values.getGermplasmId());
+		// Location id is Experiment ID of Environment-level Experiment
+		final int experimentId = values.getLocationId();
 		if(experimentId != 0 ) {
 			for (final Variable variable : values.getVariableList().getVariables()) {
 				final int val = this.daoFactory.getPhenotypeDAO()

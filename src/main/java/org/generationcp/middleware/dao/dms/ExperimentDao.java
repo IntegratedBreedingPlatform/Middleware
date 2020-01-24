@@ -14,9 +14,7 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.fest.util.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -26,7 +24,6 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -47,6 +44,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,6 +60,9 @@ import java.util.UUID;
  * DAO class for {@link ExperimentModel}.
  */
 public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
+
+	private static final List<Integer> EXPERIMENTPROP_VAR_TYPES = Arrays
+		.asList(VariableType.TREATMENT_FACTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.ENVIRONMENT_DETAIL.getId());
 
 	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
 	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
@@ -80,17 +81,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		+ "FROM nd_experiment e INNER JOIN projectprop pp ON pp.project_id = e.project_id "
 		+ "AND pp.value = :variableId";
 
-	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATION = "SELECT count(e.nd_experiment_id) "
-		+ "FROM nd_experiment e INNER JOIN nd_geolocation g ON g.nd_geolocation_id = e.nd_geolocation_id "
-		+ "WHERE (" + TermId.TRIAL_INSTANCE_FACTOR.getId() + " = :variableId AND g.description IS NOT NULL)  OR (" + TermId.LATITUDE.getId()
-		+ " = :variableId AND g.latitude IS NOT NULL) "
-		+ "OR (" + TermId.LONGITUDE.getId() + "= :variableId AND g.longitude IS NOT NULL) OR (" + TermId.GEODETIC_DATUM.getId()
-		+ " = :variableId AND g.geodetic_datum IS NOT NULL) "
-		+ "OR (" + TermId.ALTITUDE.getId() + " = :variableId AND g.altitude IS NOT NULL) ";
-
-	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATIONPROP = "SELECT count(e.nd_experiment_id) "
-		+ "FROM nd_experiment e INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id "
-		+ "WHERE gp.type_id = :variableId AND gp.value IS NOT NULL";
+	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_EXPERIMENT =
+		"SELECT count(e.nd_experiment_id) "
+		+ "FROM nd_experiment e "
+		+ "LEFT JOIN projectprop pp pp.project_id = e.project_ID and pp.type_id = " + VariableType.OBSERVATION_UNIT.getId()
+		+ "WHERE ( (e.type_id = 1020 AND " + TermId.TRIAL_INSTANCE_FACTOR.getId() + " = :variableId) OR (e.type_id = 1155 AND pp.variable_id = :variableId))"
+			+ "AND e.observation_unit_no IS NOT NULL)  ";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_EXPERIMENTPROP = "SELECT count(e.nd_experiment_id) "
 		+ "FROM nd_experiment e INNER JOIN nd_experimentprop ep ON ep.nd_experiment_id = e.nd_experiment_id "
@@ -189,20 +185,20 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	// Should be renamed to getInstanceIds
-	public List<Integer> getLocationIdsOfStudy(final int studyId) {
+	public List<Integer> getInstanceIds(final int studyId) {
 		try {
 			final String sql =
-				"SELECT DISTINCT e.nd_geolocation_id " + " FROM nd_experiment e "
+				"SELECT DISTINCT e.nd_experiment_id "
+					+ " FROM nd_experiment e "
 					+ " INNER JOIN project p ON p.project_id = e.project_id "
-					+ " WHERE p.study_id = :studyId ";
+					+ " WHERE e.type_id =  1020 and p.study_id = :studyId ";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("studyId", studyId);
 			return query.list();
 
 		} catch (final HibernateException e) {
-			final String message = "Error at getLocationIdsOfStudy=" + studyId + " query at ExperimentDao: " + e.getMessage();
+			final String message = "Error at getInstanceIds=" + studyId + " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -212,7 +208,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public List<Integer> getLocationIdsOfStudyWithFieldmap(final int studyId) {
 		try {
 			final String sql =
-				"SELECT DISTINCT e.nd_geolocation_id " + " FROM nd_experiment e "
+				"SELECT DISTINCT e.parent_id " + " FROM nd_experiment e "
 					+ " INNER JOIN project p ON p.project_id = e.project_id "
 					+ " WHERE p.study_id = :studyId "
 					+ " AND EXISTS (SELECT 1 FROM nd_experimentprop eprop " + "   WHERE eprop.type_id = "
@@ -274,12 +270,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		// Delete phenotypes first because the foreign key with nd_experiment
 		String queryString = "DELETE pheno FROM nd_experiment e"
-			+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
-			+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
+			+ "  INNER JOIN project pr ON pr.project_id = e.project_id "
+			+ "  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3 "
+			+ "  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 "
+			+ "  INNER JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
 			+ "  WHERE e.project_id IN (:datasetIds) ";
 		StringBuilder sb = new StringBuilder(queryString);
 		if (!CollectionUtils.isEmpty(instanceNumbers)) {
-			sb.append(" AND g.description IN (:instanceNumbers)");
+			sb.append(" AND env.observation_unit_no IN (:instanceNumbers)");
 		}
 		Query statement =
 			this.getSession()
@@ -293,12 +291,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		// Delete experiments
 		queryString = "DELETE e, eprop " + "FROM nd_experiment e "
-			+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
+			+ "  INNER JOIN project pr ON pr.project_id = e.project_id "
+			+ "  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3 "
+			+ "  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 "
 			+ "  LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
 			+ "  WHERE e.project_id IN (:datasetIds) ";
 		sb = new StringBuilder(queryString);
 		if (!CollectionUtils.isEmpty(instanceNumbers)) {
-			sb.append(" AND g.description IN (:instanceNumbers)");
+			sb.append(" AND env.observation_unit_no IN (:instanceNumbers)");
 		}
 		statement =
 			this.getSession()
@@ -314,49 +314,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		this.deleteExperimentsForDatasets(Collections.singletonList(datasetId), instanceNumbers);
 	}
 
-	public void deleteTrialExperimentsOfStudy(final int datasetId) {
-
-		try {
-
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
-			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-			// statement
-			this.getSession().flush();
-
-			// Delete phenotypes first because the foreign key with nd_experiment
-			Query statement =
-				this.getSession()
-					.createSQLQuery("DELETE pheno FROM nd_experiment e"
-						+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
-						+ "  WHERE e.project_id = :datasetId ");
-			statement.setParameter("datasetId", datasetId);
-			statement.executeUpdate();
-
-			// Delete experiments
-			statement =
-				this.getSession()
-					.createSQLQuery(
-						"DELETE g, gp, e, eprop " + "FROM nd_geolocation g "
-							+ "LEFT JOIN nd_geolocationprop gp on g.nd_geolocation_id = gp.nd_geolocation_id "
-							+ "LEFT join nd_experiment e on g.nd_geolocation_id = e.nd_geolocation_id "
-							+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
-							+ "WHERE e.project_id = :datasetId ");
-			statement.setParameter("datasetId", datasetId);
-
-			statement.executeUpdate();
-		} catch (final HibernateException e) {
-			final String message = "Error at deleteTrialExperimentsOfStudy=" + datasetId + " query at ExperimentDao: " + e.getMessage();
-			ExperimentDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	public boolean checkIfAnyLocationIDsExistInExperiments(final int dataSetId, final List<Integer> locationIds) {
 
 		try {
 			final String sql =
 				"SELECT count(*) FROM nd_experiment exp "
-					+ "WHERE exp.nd_geolocation_id in (:locationIds) " + "AND exp.project_id = :dataSetId ";
+					+ "WHERE exp.experiment_id in (:locationIds) AND e.type_id = 1020 AND exp.project_id = :dataSetId ";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("locationIds", locationIds);
@@ -477,29 +440,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public int getExperimentIdByLocationIdStockId(final int projectId, final Integer locationId, final Integer stockId) {
-		try {
-			final String sql =
-				"SELECT exp.nd_experiment_id " + "FROM nd_experiment exp "
-					+ " WHERE exp.project_id = " + projectId
-					+ " AND exp.nd_geolocation_id = " + locationId + " AND exp.type_id = 1170 " + " AND exp.stock_id = "
-					+ stockId;
-
-			final SQLQuery statement = this.getSession().createSQLQuery(sql);
-			final Integer returnVal = (Integer) statement.uniqueResult();
-
-			if (returnVal == null) {
-				return 0;
-			} else {
-				return returnVal;
-			}
-
-		} catch (final HibernateException e) {
-			final String message = "Error in getExperimentIdByLocationIdStockId=" + projectId;
-			ExperimentDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
 
 	@SuppressWarnings("unchecked")
 	public Integer getExperimentIdByProjectId(final int projectId) {
@@ -549,10 +489,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		for (final Integer gid : gids) {
-			germplasmEnvironments.put(gid, new HashSet<Integer>());
+			germplasmEnvironments.put(gid, new HashSet<>());
 		}
 
-		final String sql = "SELECT DISTINCT s.dbxref_id, e.nd_geolocation_id " + "FROM nd_experiment e "
+		// Plot experiment's parent is Environment Experiment
+		final String sql = "SELECT DISTINCT s.dbxref_id, e.parent_id "
+			+ "FROM nd_experiment e "
 			+ "     INNER JOIN stock s ON e.stock_id = s.stock_id AND s.dbxref_id IN (:gids) ";
 		final StringBuilder sb = new StringBuilder();
 		sb.append(sql);
@@ -620,8 +562,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public boolean areAllInstancesExistInDataset(final int datasetId, final Set<Integer> instanceIds) {
 
 		final StringBuilder sql = new StringBuilder();
-		sql.append("SELECT COUNT(DISTINCT e.nd_geolocation_id) FROM nd_experiment e ")
-			.append(" WHERE e.project_id = :datasetId and e.nd_geolocation_id in (:instanceIds)");
+		sql.append("SELECT COUNT(DISTINCT env.nd_experiment_id) FROM nd_experiment e ")
+			.append("  INNER JOIN project pr ON pr.project_id = e.project_id ")
+			.append("  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3 ")
+			.append("  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 ")
+			.append(" WHERE e.project_id = :datasetId and env.nd_experiment_id in (:instanceIds)");
 
 		try {
 
@@ -822,7 +767,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public long countByObservedVariable(final int variableId, final int variableTypeId) throws MiddlewareQueryException {
+	public long countByObservedVariable(final int variableId, final int variableTypeId) {
 		try {
 			String sql = null;
 			if (VariableType.STUDY_DETAIL.getId() == variableTypeId) {
@@ -830,11 +775,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			} else if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variableId || TermId.LATITUDE.getId() == variableId
 				|| TermId.LONGITUDE.getId() == variableId || TermId.GEODETIC_DATUM.getId() == variableId
 				|| TermId.ALTITUDE.getId() == variableId) {
-				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATION;
-			} else if (VariableType.ENVIRONMENT_DETAIL.getId() == variableTypeId) {
-				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATIONPROP;
-			} else if (VariableType.EXPERIMENTAL_DESIGN.getId() == variableTypeId
-				|| VariableType.TREATMENT_FACTOR.getId() == variableTypeId) {
+				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_EXPERIMENT;
+			} else if (EXPERIMENTPROP_VAR_TYPES.contains(variableTypeId)) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_EXPERIMENTPROP;
 			} else if (TermId.ENTRY_NO.getId() == variableId || TermId.GID.getId() == variableId || TermId.DESIG.getId() == variableId
 				|| TermId.ENTRY_CODE.getId() == variableId) {

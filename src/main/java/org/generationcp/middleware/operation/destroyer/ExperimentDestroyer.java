@@ -12,15 +12,8 @@ public class ExperimentDestroyer extends Destroyer {
 		super(sessionProviderForLocal);
 	}
 
-	public void deleteExperimentsByIds(List<Integer> experimentIds) throws MiddlewareQueryException {
-		this.getExperimentDao().deleteExperimentsByIds(experimentIds);
-	}
-
 	public void deleteExperimentsByStudy(int datasetId) throws MiddlewareQueryException {
 		this.getExperimentDao().deleteExperimentsForDataset(datasetId);
 	}
 
-	public void deleteTrialExperimentsOfStudy(int trialDatasetId) throws MiddlewareQueryException {
-		this.getExperimentDao().deleteTrialExperimentsOfStudy(trialDatasetId);
-	}
 }

@@ -251,7 +251,7 @@ public class WorkbookSaver extends Saver {
 			this.getExperimentDao().saveOrUpdate(studyExperiment);
 
 			// delete trial observations
-			this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
+			this.getExperimentDestroyer().deleteExperimentsByStudy(environmentDatasetId);
 		}
 
 		final int studyId;
@@ -327,7 +327,7 @@ public class WorkbookSaver extends Saver {
 		this.getExperimentDao().saveOrUpdate(studyExperiment);
 
 		// delete trial observations
-		this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
+		this.getExperimentDestroyer().deleteExperimentsByStudy(environmentDatasetId);
 
 		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId,
 			savedEnvironmentsCount,
@@ -373,7 +373,7 @@ public class WorkbookSaver extends Saver {
 		this.getExperimentDao().saveOrUpdate(studyExperiment);
 
 		// delete trial observations
-		this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
+		this.getExperimentDestroyer().deleteExperimentsByStudy(environmentDatasetId);
 
 		this.saveOrUpdateTrialObservations( crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId, savedEnvironmentsCount, true, programUUID);
 
