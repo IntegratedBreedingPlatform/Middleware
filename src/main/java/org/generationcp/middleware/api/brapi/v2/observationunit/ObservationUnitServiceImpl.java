@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.brapi.v2.observationunit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -31,6 +32,10 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 		final ExperimentDao experimentDao = this.daoFactory.getExperimentDao();
 		final ExperimentModel experimentModel = experimentDao.getByObsUnitId(observationUnitDbId);
+
+		if (experimentModel == null) {
+			throw new MiddlewareRequestException("", "invalid.observation.unit.id");
+		}
 
 		try {
 			final ObjectMapper mapper = new ObjectMapper();
