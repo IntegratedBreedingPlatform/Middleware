@@ -19,7 +19,7 @@ public class StudyMeasurements {
 
 	public static final String PROJECT_NAME = "PROJECT_NAME";
 	public static final String LOCATION_DB_ID = "locationDbId";
-	public static final String ND_GEOLOCATION_ID = "nd_geolocation_id";
+	public static final String ENVIRONMENT_ID = "environmentId";
 	public static final String FIELD_MAP_ROW = "FieldMapRow";
 	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
 	public static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
@@ -202,7 +202,7 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar(StudyMeasurements.LOCATION_ABBREVIATION);
 		createSQLQuery.addScalar(StudyMeasurements.FIELD_MAP_COLUMN);
 		createSQLQuery.addScalar(StudyMeasurements.FIELD_MAP_ROW);
-		createSQLQuery.addScalar(StudyMeasurements.ND_GEOLOCATION_ID);
+		createSQLQuery.addScalar(StudyMeasurements.ENVIRONMENT_ID);
 		createSQLQuery.addScalar(StudyMeasurements.LOCATION_DB_ID);
 		createSQLQuery.addScalar(StudyMeasurements.PROJECT_NAME);
 		this.addScalarForTraits(measurementVariables, createSQLQuery, false);
