@@ -1,0 +1,205 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+       
+	<changeSet author="vanina" id="v14.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="ims_transaction" columnName="trntype"/>
+			</not>
+		</preConditions>
+		<comment> Add trntype to ims_transaction table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			ADD COLUMN trntype INT(11) NULL DEFAULT '0';
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+						trnstat = 1
+					AND comments = 'Stock taking adjustment'
+					AND trntype = 3;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for commited Stock taking adjustment
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+				trntype = 3
+			WHERE
+				trnstat = 1
+			AND comments = 'Stock taking adjustment';
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+						trnstat = 1
+					AND comments != 'Stock taking adjustment'
+					AND trnqty > 0
+					AND trntype = 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for commited and not Stock taking adjustment, qty > 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+				trntype = 0
+			WHERE
+				trnstat = 1
+			AND comments != 'Stock taking adjustment'
+			AND trnqty > 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+						trnstat = 1
+					AND comments != 'Stock taking adjustment'
+					AND trnqty = 0
+					AND trntype = 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for commited and not Stock taking adjustment, qty = 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+				trntype = 0
+			WHERE
+				trnstat = 1
+			AND comments != 'Stock taking adjustment'
+			AND trnqty = 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-5">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+						trnid IN (SELECT
+									t.trnid
+								FROM
+									ims_transaction t
+								INNER JOIN
+									ims_lot l ON t.lotid = l.lotid
+								WHERE
+									t.trnstat = 1 AND l.status = 1
+								AND t.comments = 'Discard'
+								AND t.trnid >= (SELECT
+													MAX(trnid)
+												FROM
+													ims_transaction tr
+												WHERE
+													tr.lotid = l.lotid))
+					AND trnqty &lt; 0
+					AND trnstat = 1
+					AND trntype = 2;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for discard transaction when lot is closed
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+				trntype = 2
+			WHERE
+				trnid IN (SELECT
+							t.trnid
+						FROM
+							ims_transaction t
+						INNER JOIN
+							ims_lot l ON t.lotid = l.lotid
+						WHERE
+							t.trnstat = 1 AND l.status = 1
+						AND t.comments = 'Discard'
+						AND t.trnid >= (SELECT
+											MAX(trnid)
+										FROM
+											ims_transaction tr
+										WHERE
+											tr.lotid = l.lotid))
+			AND trnqty &lt; 0
+			AND trnstat = 1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+						trnstat = 0 AND trnqty &lt; 0
+					AND trntype = 1;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for cancelled transaction and qty &lt; 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+				trntype = 1
+			WHERE
+				trnstat = 0 AND trnqty &lt; 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-7">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+						trnstat = 9 AND trnqty >= 0
+					AND trntype = 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for cancelled transaction and qty >= 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+				trntype = 0
+			WHERE
+				trnstat = 9 AND trnqty >= 0;
+		</sql>
+	</changeSet>
+</databaseChangeLog>

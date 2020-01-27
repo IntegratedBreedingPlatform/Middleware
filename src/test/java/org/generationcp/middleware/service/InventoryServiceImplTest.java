@@ -288,7 +288,7 @@ public class InventoryServiceImplTest {
 	private Transaction createTransactionTestData(final Lot lot, final GermplasmListData listData, final InventoryDetails details) {
 		final Transaction transaction =
 				new Transaction(null, details.getUserId(), lot, Util.getCurrentDate(),
-						TransactionStatus.ANTICIPATED.getIntValue(),
+						TransactionStatus.PENDING.getIntValue(),
 						Double.valueOf(new DecimalFormat("#.000").format(details.getAmount())), details.getComment(), 0,
 						EntityType.LIST.name(), details.getSourceId(), listData == null ? 0 : listData.getId(), 0d, 1,
 						details.getInventoryID());
