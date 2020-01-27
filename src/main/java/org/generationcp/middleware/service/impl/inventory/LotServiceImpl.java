@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.inventory;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -63,5 +64,9 @@ public class LotServiceImpl implements LotService {
 		this.daoFactory.getLotDao().save(lot);
 
 		return lot.getId();
+	}
+
+	@Override
+	public void saveLotsWithInitialTransaction(final List<LotItemDto> lotItemDtos) {
 	}
 }
