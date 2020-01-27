@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.api;
 
 import org.apache.commons.lang3.tuple.Triple;
+import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -1191,4 +1192,11 @@ public interface GermplasmDataManager {
 	long countGermplasmByStudy(Integer studyDbId);
 
 	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Integer pageNumber, Integer pageSize);
+
+	List<AttributeDTO> getAttributesByGid(
+		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNumber);
+
+	long countAttributesByGid(String gid, List<String> attributeDbIds);
+
+	List<Attribute> getAttributeByIds(List<Integer> ids);
 }
