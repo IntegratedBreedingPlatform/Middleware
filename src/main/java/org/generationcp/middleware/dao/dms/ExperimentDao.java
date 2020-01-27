@@ -108,18 +108,18 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		+ "AND p.observable_id = :variableId AND (p.value IS NOT NULL  OR p.cvalue_id IS NOT NULL)";
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getExperimentIdsByGeolocationIds(final Collection<Integer> geolocationIds) {
+	public List<Integer> getExperimentIdsByEnvironmentIds(final Collection<Integer> environmentIds) {
 		try {
-			if (geolocationIds != null && !geolocationIds.isEmpty()) {
+			if (environmentIds != null && !environmentIds.isEmpty()) {
 				final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-				criteria.add(Restrictions.in("geoLocation.locationId", geolocationIds));
+				criteria.add(Restrictions.in("parent.ndExperimentId", environmentIds));
 				criteria.setProjection(Projections.property(ND_EXPERIMENT_ID));
 
 				return criteria.list();
 			}
 		} catch (final HibernateException e) {
 			final String message =
-				"Error at getExperimentIdsByGeolocationIds=" + geolocationIds + " query at ExperimentDao: " + e.getMessage();
+				"Error at getExperimentIdsByEnvironmentIds=" + environmentIds + " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -130,7 +130,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("project.projectId", projectId));
-			criteria.add(Restrictions.eq("geoLocation.locationId", locationId));
+			criteria.add(Restrictions.eq("parent.ndExperimentId", locationId));
 			final List<ExperimentModel> list = criteria.list();
 			if (list != null && !list.isEmpty()) {
 				return list.get(0);
@@ -142,14 +142,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return null;
-	}
-
-	public ExperimentModel getExperimentByProjectIdAndGeoLocationAndType(final Integer projectId, final Integer geolocationId, final Integer typeId) {
-		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-		criteria.add(Restrictions.eq("project.projectId", projectId));
-		criteria.add(Restrictions.eq("geoLocation.locationId", geolocationId));
-		criteria.add(Restrictions.eq("typeId", typeId));
-		return (ExperimentModel) criteria.uniqueResult();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -405,11 +397,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			queryString.append("left outer join exp.properties as plot with plot.typeId IN (8200,8380) ");
 			queryString.append("left outer join exp.properties as rep with rep.typeId = 8210 ");
 			queryString.append("left outer join exp.stock as st ");
+			queryString.append("inner join exp.parent as env ");
 			queryString.append("where exp.project.projectId =:p_id and exp.typeId in (:type_ids) ");
 			if (firstInstance) {
-				queryString.append("and exp.geoLocation.description = 1 ");
+				queryString.append("and env.observationUnitNo = 1 ");
 			}
-			queryString.append("order by (exp.geoLocation.description * 1) ASC, ");
+			queryString.append("order by env.observationUnitNo ASC, ");
 			queryString.append("(plot.value * 1) ASC, ");
 			queryString.append("(rep.value * 1) ASC, ");
 			queryString.append("(st.uniqueName * 1) ASC, ");
@@ -603,7 +596,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("project.projectId", projectId));
-			criteria.add(Restrictions.in("geoLocation.locationId", instanceIds));
+			criteria.add(Restrictions.in("parent.ndExperimentId", instanceIds));
 			return criteria.list();
 		} catch (final HibernateException e) {
 			final String message =
@@ -834,11 +827,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		try {
 			final ProjectionList projectionList = Projections.projectionList();
-			projectionList.add(Projections.groupProperty("g.description"))
+			projectionList.add(Projections.groupProperty("parent.observationUnitNo"))
 				.add(Projections.rowCount());
 
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.createAlias("geoLocation", "g");
+			criteria.createAlias("parent", "parent");
 			criteria.setProjection(projectionList);
 			criteria.add(Restrictions.eq("project.projectId", datasetId));
 			final List<Object[]> rows = criteria.list();

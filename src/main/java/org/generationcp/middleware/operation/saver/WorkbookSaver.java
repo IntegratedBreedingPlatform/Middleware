@@ -1207,7 +1207,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 	private boolean checkIfHasExistingExperiments(final List<Integer> locationIds) {
-		final List<Integer> experimentIds = this.getExperimentDao().getExperimentIdsByGeolocationIds(locationIds);
+		final List<Integer> experimentIds = this.getExperimentDao().getExperimentIdsByEnvironmentIds(locationIds);
 		return experimentIds != null && !experimentIds.isEmpty();
 	}
 
