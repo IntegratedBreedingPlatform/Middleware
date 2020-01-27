@@ -25,8 +25,7 @@
 					from ims_transaction it
 					WHERE
 						trnstat = 1
-					AND comments = 'Stock taking adjustment'
-					AND trntype = 3;
+					AND comments = 'Stock taking adjustment';
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -52,8 +51,7 @@
 					WHERE
 						trnstat = 1
 					AND comments != 'Stock taking adjustment'
-					AND trnqty > 0
-					AND trntype = 0;
+					AND trnqty > 0;
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -80,8 +78,34 @@
 					WHERE
 						trnstat = 1
 					AND comments != 'Stock taking adjustment'
-					AND trnqty = 0
-					AND trntype = 0;
+					AND trnqty &lt; 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for commited and not Stock taking adjustment, qty &lt; 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+				trntype = 1
+			WHERE
+				trnstat = 1
+			AND comments != 'Stock taking adjustment'
+			AND trnqty &lt; 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-5">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+						trnstat = 1
+					AND comments != 'Stock taking adjustment'
+					AND trnqty = 0;
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -99,7 +123,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-5">
+	<changeSet author="vanina" id="v14.1.0-6">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -122,8 +146,7 @@
 												WHERE
 													tr.lotid = l.lotid))
 					AND trnqty &lt; 0
-					AND trnstat = 1
-					AND trntype = 2;
+					AND trnstat = 1;
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -138,7 +161,7 @@
 				trnid IN (SELECT
 							t.trnid
 						FROM
-							ims_transaction t
+							(select * from ims_transaction) t
 						INNER JOIN
 							ims_lot l ON t.lotid = l.lotid
 						WHERE
@@ -147,35 +170,11 @@
 						AND t.trnid >= (SELECT
 											MAX(trnid)
 										FROM
-											ims_transaction tr
+											(select * from ims_transaction) as tr
 										WHERE
 											tr.lotid = l.lotid))
 			AND trnqty &lt; 0
 			AND trnstat = 1;
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v14.1.0-6">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<sqlCheck expectedResult="0">
-					select count(1)
-					from ims_transaction it
-					WHERE
-						trnstat = 0 AND trnqty &lt; 0
-					AND trntype = 1;
-				</sqlCheck>
-			</not>
-		</preConditions>
-		<comment>
-			Set transaction type for cancelled transaction and qty &lt; 0
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			UPDATE ims_transaction
-			SET
-				trntype = 1
-			WHERE
-				trnstat = 0 AND trnqty &lt; 0;
 		</sql>
 	</changeSet>
 
@@ -186,8 +185,53 @@
 					select count(1)
 					from ims_transaction it
 					WHERE
-						trnstat = 9 AND trnqty >= 0
-					AND trntype = 0;
+						trnstat = 0 AND trnqty &lt; 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for pending transaction and qty &lt; 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+				trntype = 1
+			WHERE
+				trnstat = 0 AND trnqty &lt; 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-8">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					trnstat = 0 AND trnqty >= 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for pending transaction and qty >=  0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 0
+			WHERE
+			trnstat = 0 AND trnqty >=  0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-9">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+						trnstat = 9 AND trnqty >= 0;
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -200,6 +244,29 @@
 				trntype = 0
 			WHERE
 				trnstat = 9 AND trnqty >= 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-10">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					trnstat = 9 AND trnqty &lt; 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for cancelled transaction and qty &lt; 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 1
+			WHERE
+			trnstat = 9 AND trnqty &lt; 0;
 		</sql>
 	</changeSet>
 </databaseChangeLog>

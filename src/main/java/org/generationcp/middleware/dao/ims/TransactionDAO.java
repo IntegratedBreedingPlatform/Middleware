@@ -500,10 +500,16 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 		final List<TransactionReportRow> transactions = new ArrayList<>();
 		try {
-			final String sql = "SELECT i.userid,i.lotid,i.trndate,i.trnstat,i.trnqty,i.sourceid,l.listname, i.comments,"
-					+ "(CASE WHEN trnstat = 1 AND trnqty >= 0 THEN '" + TransactionType.DEPOSIT.getValue()
-					+ "' WHEN trnstat = 0 AND trnqty < 0 THEN '" + TransactionType.WITHDRAWAL.getValue()
-					+ "' WHEN trnstat = 1 AND trnqty < 0 THEN '" + TransactionType.WITHDRAWAL.getValue()
+			final String sql = "SELECT i.userid,i.lotid,i.trndate,"
+					+ "(CASE WHEN trnstat = 0 THEN '" + TransactionStatus.PENDING.getValue()
+					+ "' WHEN trnstat = 1 THEN '" + TransactionStatus.CONFIRMED.getValue()
+					+ "' WHEN trnstat = 2 THEN '" + TransactionStatus.CANCELLED.getValue()
+					+ "' END) as trnStatus, "
+					+ " i.trnqty,i.sourceid,l.listname, i.comments,"
+					+ "(CASE WHEN trntype = 0 THEN '" + TransactionType.DEPOSIT.getValue()
+					+ "' WHEN trntype = 1 THEN '" + TransactionType.WITHDRAWAL.getValue()
+					+ "' WHEN trntype = 2 THEN '" + TransactionType.DISCARD.getValue()
+					+ "' WHEN trntype = 3 THEN '" + TransactionType.ADJUSTMENT.getValue()
 					+ "' END) as trntype "
 					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
 					+ " INNER JOIN ims_lot lot ON lot.lotid = i.lotid "
@@ -533,7 +539,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			final Integer userId = (Integer) row[0];
 			final Integer lotId = (Integer) row[1];
 			final Date trnDate = (Date) row[2];
-			final Integer trnState = (Integer) row[3];
+			final String trnStatus = (String) row[3];
 			final Double trnQty = (Double) row[4];
 			final Integer listId = (Integer) row[5];
 			final String listName = (String) row[6];
@@ -544,7 +550,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			transaction.setUserId(userId);
 			transaction.setLotId(lotId);
 			transaction.setDate(trnDate);
-			transaction.setTrnStatus(trnState);
+			transaction.setTrnStatus(trnStatus);
 			transaction.setQuantity(trnQty);
 			transaction.setListId(listId);
 			transaction.setListName(listName);

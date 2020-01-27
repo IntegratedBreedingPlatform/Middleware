@@ -3,18 +3,21 @@ package org.generationcp.middleware.pojos.ims;
 
 public enum TransactionStatus {
 
-	//  Transaction status: 0=Anticipated (Deposit or Reserved), 1=Confirmed (Stored or Retrieved), 9=Cancelled Transaction
+	PENDING(0, "Pending"), CONFIRMED(1, "Confirmed"), CANCELLED(9, "Cancelled");
 
-	PENDING(0), CONFIRMED(1), CANCELLED(9);
+	private int id;
+	private String status;
 
-	private int status;
-
-	private TransactionStatus(int status) {
+	private TransactionStatus(int id, String status) {
 		this.status = status;
+		this.id = id;
 	}
 
 	public int getIntValue() {
-		return this.status;
+		return this.id;
 	}
 
+	public String getValue() {
+		return this.status;
+	}
 }
