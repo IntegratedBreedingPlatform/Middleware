@@ -31,6 +31,7 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -308,6 +309,11 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetPedigree() throws ParseException {
+
+		final Method generativeMethod = this.methodDAO.getByCode("C2W");
+		final Method derivativeMethod = this.methodDAO.getByCode("UDM");
+		final Method maintenanceMethod = this.methodDAO.getByCode("SMP");
+
 		final Germplasm femaleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Germplasm maleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		this.dao.save(femaleParent);
@@ -317,31 +323,55 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		cross.setGpid1(femaleParent.getGid());
 		cross.setGpid2(maleParent.getGid());
 		cross.setGnpgs(2);
+		cross.setMethodId(generativeMethod.getMid());
 		this.dao.save(cross);
 
 		final Germplasm advance = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		advance.setGpid1(cross.getGid());
 		advance.setGpid2(cross.getGid());
 		advance.setGnpgs(-1);
+		advance.setMethodId(derivativeMethod.getMid());
 		this.dao.save(advance);
 
 		final Germplasm advance2 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		advance2.setGpid1(cross.getGid());
 		advance2.setGpid2(cross.getGid());
 		advance2.setGnpgs(-1);
+		advance2.setMethodId(maintenanceMethod.getMid());
 		this.dao.save(advance2);
 
-		final PedigreeDTO pedigree = this.dao.getPedigree(advance.getGid(), null, true);
+		final PedigreeDTO generativePedigree = this.dao.getPedigree(cross.getGid(), null, false);
+		final PedigreeDTO derivativePedigree = this.dao.getPedigree(advance.getGid(), null, true);
+		final PedigreeDTO maintenancePedigree = this.dao.getPedigree(advance2.getGid(), null, true);
 
-		Assert.assertThat(pedigree.getGermplasmDbId(), is(advance.getGid()));
-		Assert.assertThat(pedigree.getParent1DbId(), is(femaleParent.getGid()));
-		Assert.assertThat(pedigree.getParent2DbId(), is(maleParent.getGid()));
-		final Date gdate = Util.parseDate(String.valueOf(advance.getGdate()), Util.DATE_AS_NUMBER_FORMAT);
+		Assert.assertThat(generativePedigree.getGermplasmDbId(), is(cross.getGid()));
+		Assert.assertThat(generativePedigree.getParent1DbId(), is(femaleParent.getGid()));
+		Assert.assertThat(generativePedigree.getParent1Type(), is(ParentType.FEMALE.name()));
+		Assert.assertThat(generativePedigree.getParent2DbId(), is(maleParent.getGid()));
+		Assert.assertThat(generativePedigree.getParent2Type(), is(ParentType.MALE.name()));
+		Assert.assertThat(generativePedigree.getCrossingPlan(), is(generativeMethod.getMcode() + "|" + generativeMethod.getMname() + "|" + generativeMethod.getMtype()));
+		final Date gdate = Util.parseDate(String.valueOf(cross.getGdate()), Util.DATE_AS_NUMBER_FORMAT);
 		final Integer year = Integer.valueOf(Util.getSimpleDateFormat("yyyy").format(gdate));
-		Assert.assertThat(pedigree.getCrossingYear(), is(year));
+		Assert.assertThat(generativePedigree.getCrossingYear(), is(year));
+		Assert.assertThat(generativePedigree.getSiblings(), nullValue());
 
-		Assert.assertThat(pedigree.getSiblings(), hasSize(1));
-		Assert.assertThat(pedigree.getSiblings().get(0).getGermplasmDbId(), is(advance2.getGid()));
+		Assert.assertThat(derivativePedigree.getGermplasmDbId(), is(advance.getGid()));
+		Assert.assertThat(derivativePedigree.getParent1DbId(), is(cross.getGid()));
+		Assert.assertThat(derivativePedigree.getParent1Type(), is(ParentType.POPULATION.name()));
+		Assert.assertThat(derivativePedigree.getParent2DbId(), is(cross.getGid()));
+		Assert.assertThat(derivativePedigree.getParent2Type(), is(ParentType.SELF.name()));
+		Assert.assertThat(derivativePedigree.getCrossingPlan(), is(derivativeMethod.getMcode() + "|" + derivativeMethod.getMname() + "|" + derivativeMethod.getMtype()));
+		Assert.assertThat(derivativePedigree.getSiblings(), hasSize(1));
+		Assert.assertThat(derivativePedigree.getSiblings().get(0).getGermplasmDbId(), is(advance2.getGid()));
+
+		Assert.assertThat(maintenancePedigree.getGermplasmDbId(), is(advance2.getGid()));
+		Assert.assertThat(maintenancePedigree.getParent1DbId(), is(cross.getGid()));
+		Assert.assertThat(maintenancePedigree.getParent1Type(), is(ParentType.POPULATION.name()));
+		Assert.assertThat(maintenancePedigree.getParent2DbId(), is(cross.getGid()));
+		Assert.assertThat(maintenancePedigree.getParent2Type(), is(ParentType.SELF.name()));
+		Assert.assertThat(maintenancePedigree.getCrossingPlan(), is(maintenanceMethod.getMcode() + "|" + maintenanceMethod.getMname() + "|" + maintenanceMethod.getMtype()));
+		Assert.assertThat(maintenancePedigree.getSiblings(), hasSize(1));
+		Assert.assertThat(maintenancePedigree.getSiblings().get(0).getGermplasmDbId(), is(advance.getGid()));
 	}
 
 	@Test

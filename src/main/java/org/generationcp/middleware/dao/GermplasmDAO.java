@@ -743,24 +743,26 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		try {
-			final String query = "SELECT groupSource.gid," //
+			final String query = "SELECT "
 				+ "   g.gid as germplasmDbId," //
 				+ "   (select n.nval from names n where n.gid = g.gid AND n.nstat = 1) as defaultDisplayName," //
-				+ "   m.mname AS crossingPlan," //
+				+ "   CONCAT(m.mcode, '|', m.mname, '|', m.mtype) AS crossingPlan," //
 				+ "   year(str_to_date(g.gdate, '%Y%m%d')) as crossingYear," //
 				+ "   femaleParent.gid as parent1DbId," //
 				+ "   femaleParentName.nval as parent1Name," //
-				+ "   if(femaleParent.gid is not null, '" + ParentType.FEMALE.name() + "', null) as parent1Type," //
+				// If germplasmDbId is a cross (gnpgs > 0), the parents' type should be FEMALE and MALE
+				// If germplasmDbId is advanced (gnpgs < 0), the parents type should be POPULATION and SELF
+				+ "   CASE WHEN femaleParent.gid is not null AND g.gnpgs > 0 THEN '" + ParentType.FEMALE.name() + "' "
+				+ "	  WHEN femaleParent.gid is not null AND g.gnpgs < 0 THEN '" + ParentType.POPULATION.name() + "' ELSE NULL END as parent1Type," //
 				+ "   maleParent.gid as parent2DbId," //
 				+ "   maleParentName.nval as parent2Name," //
-				+ "   if(maleParent.gid is not null, '" + ParentType.MALE.name() + "', null) as parent2Type" //
+				+ "   CASE WHEN maleParent.gid is not null AND g.gnpgs > 0 THEN '" + ParentType.MALE.name() + "' "
+				+ "	  WHEN maleParent.gid is not null AND g.gnpgs < 0  THEN '" + ParentType.SELF.name() + "' ELSE NULL END as parent2Type" //
 				+ " FROM germplsm g" //
 				+ "   LEFT JOIN methods m ON m.mid = g.methn" //
-				//  considering groupSource itself in the generative case"
-				+ "   LEFT JOIN germplsm groupSource ON (g.gpid1 = groupSource.gid AND g.gnpgs = -1) OR (groupSource.gid = g.gid AND g.gnpgs >= 2)" //
-				+ "   LEFT JOIN germplsm femaleParent ON groupSource.gpid1 = femaleParent.gid" //
+				+ "   LEFT JOIN germplsm femaleParent ON g.gpid1 = femaleParent.gid" //
 				+ "   LEFT JOIN names femaleParentName ON femaleParent.gid = femaleParentName.gid AND femaleParentName.nstat = 1" //
-				+ "   LEFT JOIN germplsm maleParent ON groupSource.gpid2 = maleParent.gid" //
+				+ "   LEFT JOIN germplsm maleParent ON g.gpid2 = maleParent.gid" //
 				+ "   LEFT JOIN names maleParentName ON maleParent.gid = maleParentName.gid AND maleParentName.nstat = 1" //
 				+ " WHERE g.gid = :gid AND g.deleted = 0 AND g.grplce = 0";
 
