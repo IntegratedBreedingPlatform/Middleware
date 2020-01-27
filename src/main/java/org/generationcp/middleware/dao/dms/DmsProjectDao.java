@@ -214,7 +214,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   pmain.locked                   AS isLocked "
 		+ " FROM \n"
 		+ "   project p \n"
-		+ "   INNER JOIN pmain pmain.project_id = p.study_id "
+		+ "   INNER JOIN project pmain ON pmain.project_id = p.study_id "
 		+ "   INNER JOIN study_type stype on stype.study_type_id = pmain.study_type_id"
 		+ "   LEFT JOIN projectprop ppPI ON pmain.project_id = ppPI.project_id AND ppPI.variable_id = " + TermId.PI_NAME.getId() + " \n"
 		+ "   LEFT JOIN projectprop ppPIid ON pmain.project_id = ppPIid.project_id AND ppPIid.variable_id = " + TermId.PI_ID.getId() + " \n"
@@ -461,7 +461,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error in getTrialObservationTable() query in DmsProjectDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyDetails;
 	}
