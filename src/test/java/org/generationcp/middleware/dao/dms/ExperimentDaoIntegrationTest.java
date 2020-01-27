@@ -75,7 +75,6 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 
 		// Save a new experiment
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setGeoLocation(existingExperiment.getGeoLocation());
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(this.study);
 		experimentModel.setStock(existingExperiment.getStock());
@@ -97,7 +96,6 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 
 		// Save a new experiment
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setGeoLocation(existingExperiment.getGeoLocation());
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(this.study);
 		experimentModel.setStock(existingExperiment.getStock());
@@ -148,7 +146,6 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 
 		// Save a new experiment
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setGeoLocation(existingExperiment.getGeoLocation());
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(this.study);
 		experimentModel.setStock(existingExperiment.getStock());

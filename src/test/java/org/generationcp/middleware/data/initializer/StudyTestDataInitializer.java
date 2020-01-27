@@ -135,7 +135,6 @@ public class StudyTestDataInitializer {
 		studyValues.setVariableList(variableList);
 
 		final VariableList locationVariableList = this.createEnvironment("Description", "1.0", "2.0", "data", "3.0", "RCBD");
-		this.geolocationId = this.studyDataManager.addTrialEnvironment(locationVariableList);
 		studyValues.setLocationId(this.geolocationId);
 
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
@@ -281,8 +280,6 @@ public class StudyTestDataInitializer {
 		throws Exception {
 		final VariableList
 			locationVariableList = this.createEnvironmentWithLocationAndSeason(String.valueOf(trialInstance), "SOME SITE NAME", locationId, seasonId);
-		final int geolocationId = this.studyDataManager.addTrialEnvironment(locationVariableList);
-
 		final ExperimentValues experimentValue = new ExperimentValues();
 		experimentValue.setLocationId(geolocationId);
 		this.studyDataManager.addExperiment(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT, experimentValue);

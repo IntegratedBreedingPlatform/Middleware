@@ -51,7 +51,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 	private SampleListDao sampleListDao;
 	private SampleDao sampleDao;
 	private ExperimentDao experimentDao;
-	private GeolocationDao geolocationDao;
 	private StockDao stockDao;
 	private PersonDAO personDAO;
 	private DmsProjectDao dmsProjectDao;
@@ -76,9 +75,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 		this.experimentDao = new ExperimentDao();
 		this.experimentDao.setSession(this.sessionProvder.getSession());
-
-		this.geolocationDao = new GeolocationDao();
-		this.geolocationDao.setSession(this.sessionProvder.getSession());
 
 		this.stockDao = new StockDao();
 		this.stockDao.setSession(this.sessionProvder.getSession());
@@ -424,7 +420,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.sampleListDao.saveOrUpdate(sampleList);
 
 		final Geolocation geolocation = new Geolocation();
-		this.geolocationDao.saveOrUpdate(geolocation);
 
 		// Create one sample for each experiment.
 		for (int i = 1; i < sampleSize + 1; i++) {
@@ -440,7 +435,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 			this.stockDao.saveOrUpdate(stockModel);
 
 			final ExperimentModel experimentModel = new ExperimentModel();
-			experimentModel.setGeoLocation(geolocation);
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 			experimentModel.setProject(dmsProject);
 			experimentModel.setStock(stockModel);

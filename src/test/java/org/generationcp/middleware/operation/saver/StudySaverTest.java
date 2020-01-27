@@ -3,7 +3,6 @@ package org.generationcp.middleware.operation.saver;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -33,7 +32,6 @@ public class StudySaverTest extends IntegrationTestBase {
 	public void testSaveStudyExperiment() throws Exception {
 		final StudyValues values = new StudyValues();
 		values.setVariableList(new VariableList());
-		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 
 		//Save the experiment

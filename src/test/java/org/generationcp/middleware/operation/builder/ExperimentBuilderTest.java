@@ -1,6 +1,24 @@
 
 package org.generationcp.middleware.operation.builder;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,28 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-import org.apache.commons.lang.RandomStringUtils;
-import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Stock;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
-import org.generationcp.middleware.pojos.dms.StockModel;
-import org.generationcp.middleware.pojos.dms.StockProperty;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 public class ExperimentBuilderTest extends IntegrationTestBase {
 
@@ -59,50 +55,50 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testCreateLocationFactorThereIsMatching() {
-		final Geolocation geoLocation = new Geolocation();
-		final String description = "XXX";
-		geoLocation.setDescription(description);
+		final ExperimentModel geoLocation = new ExperimentModel();
+		final Integer instance = 3;
+		geoLocation.setObservationUnitNo(instance);
 		final DMSVariableType variableType = new DMSVariableType();
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		variableType.setStandardVariable(standardVariable);
 		final Variable variable = builder.createLocationFactor(geoLocation, variableType);
-		Assert.assertEquals("The variable description should be set properly since there is a mathcing variable", variable.getValue(),
-				description);
+		Assert.assertEquals("The variable instance should be set properly since there is a mathcing variable", variable.getValue(),
+				instance);
 	}
 
 	@Test
 	public void testCreateLocationFactorThereIsLocationValue() {
 		final int typeId = 1000;
-		final Geolocation geoLocation = new Geolocation();
-		final List<GeolocationProperty> properties = new ArrayList<GeolocationProperty>();
-		final GeolocationProperty e = new GeolocationProperty();
-		e.setType(typeId);
+		final ExperimentModel geoLocation = new ExperimentModel();
+		final List<ExperimentProperty> properties = new ArrayList<>();
+		final ExperimentProperty e = new ExperimentProperty();
+		e.setTypeId(typeId);
 		e.setValue("XXX");
 		properties.add(e);
 		geoLocation.setProperties(properties);
-		final String description = "XXX";
-		geoLocation.setDescription(description);
+		final Integer instance = 2;
+		geoLocation.setObservationUnitNo(instance);
 		final DMSVariableType variableType = new DMSVariableType();
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(typeId);
 		variableType.setStandardVariable(standardVariable);
 		final Variable variable = builder.createLocationFactor(geoLocation, variableType);
 		Assert.assertEquals("The variable description should be set properly since there is a mathcing variable", variable.getValue(),
-				description);
+				instance);
 	}
 
 	@Test
 	public void testCreateLocationFactorThereIsNoMatchingLocationValue() {
 		final int typeId = 1000;
-		final Geolocation geoLocation = new Geolocation();
-		final List<GeolocationProperty> properties = new ArrayList<GeolocationProperty>();
-		final GeolocationProperty e = new GeolocationProperty();
-		e.setType(typeId);
+		final ExperimentModel geoLocation = new ExperimentModel();
+		final List<ExperimentProperty> properties = new ArrayList<>();
+		final ExperimentProperty e = new ExperimentProperty();
+		e.setTypeId(typeId);
 		properties.add(e);
 		geoLocation.setProperties(properties);
-		final String description = "XXX";
-		geoLocation.setDescription(description);
+		final Integer instance = 4;
+		geoLocation.setObservationUnitNo(instance);
 		final DMSVariableType variableType = new DMSVariableType();
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(1001);

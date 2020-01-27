@@ -52,7 +52,6 @@ public class StockDaoTest extends IntegrationTestBase {
 	private DmsProjectDao dmsProjectDao;
 	private GermplasmDAO germplasmDao;
 	private ExperimentDao experimentDao;
-	private GeolocationDao geolocationDao;
 	private StockDao stockDao;
 	private StockPropertyDao stockPropertyDao;
 	private CVTermDao cvtermDao;
@@ -76,9 +75,6 @@ public class StockDaoTest extends IntegrationTestBase {
 
 		this.experimentDao = new ExperimentDao();
 		this.experimentDao.setSession(this.sessionProvder.getSession());
-
-		this.geolocationDao = new GeolocationDao();
-		this.geolocationDao.setSession(this.sessionProvder.getSession());
 
 		this.stockDao = new StockDao();
 		this.stockDao.setSession(this.sessionProvder.getSession());
@@ -271,7 +267,6 @@ public class StockDaoTest extends IntegrationTestBase {
 	private void createSampleStocks(final Integer count, final DmsProject study) {
 		// Save the experiments in the same instance
 		environment = new Geolocation();
-		geolocationDao.saveOrUpdate(environment);
 
 		for (int i = 0; i < count; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
@@ -300,7 +295,6 @@ public class StockDaoTest extends IntegrationTestBase {
 
 	private void createTestExperiment(final DmsProject study, final StockModel stockModel) {
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setGeoLocation(environment);
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(study);
 		experimentModel.setStock(stockModel);

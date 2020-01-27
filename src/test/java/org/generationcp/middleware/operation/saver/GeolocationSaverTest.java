@@ -84,7 +84,7 @@ public class GeolocationSaverTest {
 	@Before
 	public void setUp() throws MiddlewareQueryException {
 		this.geolocationSaver = Mockito.spy(new GeolocationSaver(Mockito.mock(HibernateSessionProvider.class)));
-		Mockito.doReturn(this.geolocation).when(this.geolocationSaver).getGeolocationById(1);
+//		Mockito.doReturn(this.geolocation).when(this.geolocationSaver).getGeolocationById(1);
 	}
 
 	@Test

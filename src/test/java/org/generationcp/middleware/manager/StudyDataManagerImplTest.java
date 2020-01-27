@@ -34,7 +34,6 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
 import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -651,20 +650,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetTrialInstanceNumberByGeolocationId() throws Exception {
-		final Integer studyId = this.studyReference.getId();
-		final Integer dataSetId = this.studyTDI.createEnvironmentDataset(this.crop, studyId, "1", "1");
-		final TrialEnvironments trialEnvironments = this.manager.getTrialEnvironmentsInDataset(dataSetId);
-		Assert.assertNotNull(trialEnvironments.getTrialEnvironments());
-		Assert.assertFalse(trialEnvironments.getTrialEnvironments().isEmpty());
-
-		final String trialInstanceNumberActual =
-			this.manager.getTrialInstanceNumberByGeolocationId(trialEnvironments.getTrialEnvironments().iterator().next().getId());
-		Assert.assertEquals("1", trialInstanceNumberActual);
-
-	}
-
-	@Test
 	public void testGetAllSharedProjectNames() {
 		final List<String> sharedProjectNames = this.manager.getAllSharedProjectNames();
 		Assert.assertNotNull("The shared project names should not be null", sharedProjectNames);
@@ -773,7 +758,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Create experiment record
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
-		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setProject(project);
 		this.manager.getExperimentDao().save(experimentModel);
 
@@ -812,7 +796,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Create experiment record
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
-		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setProject(project);
 		this.manager.getExperimentDao().save(experimentModel);
 
@@ -972,7 +955,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
 		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
-		values.setLocationId(this.manager.getExperimentModelSaver().createNewGeoLocation().getLocationId());
 		//Save the experiment
 		this.manager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.manager.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());

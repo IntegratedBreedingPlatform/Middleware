@@ -1,17 +1,11 @@
 package org.generationcp.middleware.dao.oms;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
-import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
@@ -36,6 +30,11 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+
 public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	
 	private static final int NO_OF_CATEGORIES = 12;
@@ -50,9 +49,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	private GermplasmDAO germplasmDao;
 	private StockDao stockDao;
 	private StockPropertyDao stockPropDao;
-	private GeolocationDao geolocationDao;
-	private GeolocationPropertyDao geolocPropDao;
-	
+
 	private DmsProject study;
 	private Geolocation geolocation;
 	private Germplasm germplasm;
@@ -113,16 +110,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 			this.stockPropDao.setSession(this.sessionProvder.getSession());
 		}
 		
-		if (this.geolocationDao == null) {			
-			this.geolocationDao = new GeolocationDao();
-			this.geolocationDao.setSession(this.sessionProvder.getSession());
-		}
-		
-		if (this.geolocPropDao == null) {			
-			this.geolocPropDao = new GeolocationPropertyDao();
-			this.geolocPropDao.setSession(this.sessionProvder.getSession());
-		}
-		
+
 		this.createTestStudy();
 		this.createTestOntologyData();
 		
@@ -265,7 +253,6 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 
 	private void createObservations() {
 		final ExperimentModel experiment1 = new ExperimentModel();
-		experiment1.setGeoLocation(getGeolocation());
 		experiment1.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experiment1.setProject(this.study);
 		experiment1.setStock(getStock());
@@ -280,7 +267,6 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		this.phenotypeDao.save(phenotype1);
 		
 		final ExperimentModel experiment2 = new ExperimentModel();
-		experiment2.setGeoLocation(getGeolocation());
 		experiment2.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experiment2.setProject(this.study);
 		experiment2.setStock(getStock());
@@ -300,7 +286,6 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	
 	private void createGermplasmDescriptor() {
 		final ExperimentModel experiment = new ExperimentModel();
-		experiment.setGeoLocation(getGeolocation());
 		experiment.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experiment.setProject(this.study);
 		experiment.setStock(getStock());
@@ -317,7 +302,6 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	
 	private void createTrialDesignFactor() {
 		final ExperimentModel experiment = new ExperimentModel();
-		experiment.setGeoLocation(getGeolocation());
 		experiment.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experiment.setProject(this.study);
 		experiment.setStock(getStock());
@@ -333,7 +317,6 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	
 	private void createEnvironmentFactor() {
 		final ExperimentModel experiment = new ExperimentModel();
-		experiment.setGeoLocation(getGeolocation());
 		experiment.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experiment.setProject(this.study);
 		experiment.setStock(getStock());
@@ -341,10 +324,8 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		
 		final GeolocationProperty prop = new GeolocationProperty();
 		prop.setRank(1);
-		prop.setGeolocation(getGeolocation());
 		prop.setType(this.variable.getCvTermId());
 		prop.setValue(String.valueOf(this.categories.get(5).getCvTermId()));
-		this.geolocPropDao.save(prop);
 	}
 
 	private StockModel getStock() {
@@ -367,14 +348,6 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 			this.germplasmDao.save(germplasm);
 		}
 		return germplasm;
-	}
-
-	private Geolocation getGeolocation() {
-		if (this.geolocation == null) {			
-			this.geolocation = new Geolocation();
-			this.geolocationDao.save(this.geolocation);
-		}
-		return this.geolocation;
 	}
 	
 	private void createStudyConstant() {
