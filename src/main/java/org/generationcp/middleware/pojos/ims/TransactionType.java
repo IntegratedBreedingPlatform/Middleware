@@ -7,15 +7,18 @@ public enum TransactionType {
 	DISCARD("Discard", 2), ADJUSTMENT("Adjustment", 3);
 
 	private final Integer id;
-	private String type;
+	private String value;
 
-	private TransactionType(String status, Integer id) {
-		this.type = status;
+	private TransactionType(String type, Integer id) {
+		this.value = type;
 		this.id = id;
 	}
 
 	public String getValue() {
-		return this.type;
+		return this.value;
 	}
 
+	public Integer getId() {
+		return this.id;
+	}
 }

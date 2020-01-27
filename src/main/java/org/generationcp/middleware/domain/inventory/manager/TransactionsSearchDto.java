@@ -18,6 +18,7 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	private List<Integer> transactionIds;
 	private String createdByUsername;
 	private String transactionType;
+	private String transactionStatus;
 	private String notes;
 	private List<Integer> lotIds;
 	private List<Integer> gids;
@@ -153,6 +154,14 @@ public class TransactionsSearchDto extends SearchRequestDto {
 
 	public void setLotStatus(final Integer lotStatus) {
 		this.lotStatus = lotStatus;
+	}
+
+	public String getTransactionStatus() {
+		return this.transactionStatus;
+	}
+
+	public void setTransactionStatus(final String transactionStatus) {
+		this.transactionStatus = transactionStatus;
 	}
 
 	@Override
