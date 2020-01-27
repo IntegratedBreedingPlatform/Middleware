@@ -311,15 +311,15 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "    nde.observation_unit_no as instanceNumber, \n" + "    pmain.project_id trialDbId, \n"
 			+ "    pmain.name as trialName, \n" + "    proj.name as instanceDatasetName, \n"
 			+ "    pmain.program_uuid as programDbId, \n"
-			+ "    max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n"
-			+ "    max(if(geoprop.type_id = 8190, geoprop.value, null)) as LOCATION_ID, \n"
-			+ "    max(if(geoprop.type_id = 8189, geoprop.value, null)) as LOCATION_ABBR, \n"
-			+ "    max(if(geoprop.type_id = 8370, geoprop.value, null)) as CROP_SEASON \n"
+			+ "    max(if(xprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n"
+			+ "    max(if(xprop.type_id = 8190, xprop.value, null)) as LOCATION_ID, \n"
+			+ "    max(if(xprop.type_id = 8189, xprop.value, null)) as LOCATION_ABBR, \n"
+			+ "    max(if(xprop.type_id = 8370, xprop.value, null)) as CROP_SEASON \n"
 			+ "    from nd_experiment nde \n"
 			+ "    inner join project proj on proj.project_id = nde.project_id \n"
 			+ "    inner join project pmain on pmain.project_id = proj.study_id \n"
-			+ "    left outer join nd_experimentprop xprop on xprop.nd_experiment_id = nde.nde_experiment_id \n"
-			+ "	   left outer join location loc on xprop.value = loc.locid and xprop.type_id = 8190 \n"
+			+ "    left join nd_experimentprop xprop on xprop.nd_experiment_id = nde.nd_experiment_id AND xprop.type_id = 8190\n"
+			+ "	   left join location loc on xprop.value = loc.locid  \n"
 			+ " where nde.type_id = 1020 and pmain.project_id = :studyId \n";
 
 		final StringBuilder strBuilder = new StringBuilder(queryString);
@@ -327,8 +327,8 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 		if (locationFilterSpecified) {
 			strBuilder.append("    and xprop.value in (:locationIds) ");
 		}
-		strBuilder.append("    group by nde.nde_experiment_id ");
-		strBuilder.append("    order by nde.nde_experiment_id asc \n");
+		strBuilder.append("    group by nde.nd_experiment_id ");
+		strBuilder.append("    order by nde.nd_experiment_id asc \n");
 		final SQLQuery query = this.getSession().createSQLQuery(strBuilder.toString());
 
 		query.setParameter("studyId", studyId);
