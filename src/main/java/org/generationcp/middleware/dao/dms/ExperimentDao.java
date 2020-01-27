@@ -383,7 +383,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ExperimentModel> getExperiments(final int projectId, final List<TermId> types, final int start, final int numOfRows,
+	public List<ExperimentModel> getExperiments(final int datasetId, final List<TermId> types, final int start, final int numOfRows,
 		final boolean firstInstance) {
 		try {
 
@@ -393,30 +393,33 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("select distinct exp from ExperimentModel as exp ");
-			queryString.append("left outer join exp.properties as plot with plot.typeId IN (8200,8380) ");
-			queryString.append("left outer join exp.properties as rep with rep.typeId = 8210 ");
-			queryString.append("left outer join exp.stock as st ");
-			queryString.append("inner join exp.parent as env ");
-			queryString.append("where exp.project.projectId =:p_id and exp.typeId in (:type_ids) ");
+			queryString.append("select distinct exp.* from nd_experiment exp ");
+			queryString.append("left join nd_experimentprop plot ON plot.nd_experiment_id = exp.nd_experiment_id and plot.type_id IN (8200,8380) ");
+			queryString.append("left join nd_experimentprop rep ON rep.nd_experiment_id = exp.nd_experiment_id and rep.type_id = 8210 ");
+			queryString.append("left join stock st on st.stock_id = exp.stock_id ");
+			queryString.append("inner join project pr on exp.project_id = pr.project_id ");
+			queryString.append("inner join project env_ds on env_ds.study_id = pr.study_id and env_ds.dataset_type_id = 3 ");
+			queryString.append("inner join nd_experiment env ON env_ds.project_id = env.project_id and env.type_id = 1020 ");
+			queryString.append("where exp.project_id =:p_id and exp.type_id in (:type_ids) ");
 			if (firstInstance) {
-				queryString.append("and env.observationUnitNo = 1 ");
+				queryString.append("and env.observation_unit_no = 1 ");
 			}
-			queryString.append("order by env.observationUnitNo ASC, ");
+			queryString.append("order by env.observation_unit_no ASC, ");
 			queryString.append("(plot.value * 1) ASC, ");
 			queryString.append("(rep.value * 1) ASC, ");
-			queryString.append("(st.uniqueName * 1) ASC, ");
-			queryString.append("exp.ndExperimentId ASC");
+			queryString.append("(st.uniquename * 1) ASC, ");
+			queryString.append("exp.nd_experiment_id ASC");
 
-			final Query q = this.getSession().createQuery(queryString.toString());
-			q.setParameter("p_id", projectId);
+			final SQLQuery q = this.getSession().createSQLQuery(queryString.toString());
+			q.addEntity(ExperimentModel.class);
+			q.setParameter("p_id", datasetId);
 			q.setParameterList("type_ids", lists);
 			q.setMaxResults(numOfRows);
 			q.setFirstResult(start);
 
 			return q.list();
 		} catch (final HibernateException e) {
-			final String message = "Error at getExperiments=" + projectId + ", " + types;
+			final String message = "Error at getExperiments=" + datasetId + ", " + types;
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
