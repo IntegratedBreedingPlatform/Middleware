@@ -916,7 +916,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.addScalar("blockNumber", new StringType()).addScalar("replicate", new StringType()).addScalar("COL").addScalar("ROW")
 			.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
 			.addScalar("entryNumber", new StringType()).addScalar("programDbId", new StringType()).addScalar("trialDbId", new StringType())
-			.addScalar("trialDbName", new StringType()).addScalar("props");
+			.addScalar("trialDbName", new StringType()).addScalar("jsonProps");
 
 		// TODO get map with AliasToEntityMapResultTransformer.INSTANCE
 		final List<Object[]> results = sqlQuery.list();
@@ -974,13 +974,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				if (y != null) {
 					observationUnitPosition.setPositionCoordinateYType("GRID_ROW");
 				}
-				final String props = (String) row[25];
-				if (props != null) {
+				final String jsonProps = (String) row[25];
+				if (jsonProps != null) {
 					try {
-						final HashMap prop = new ObjectMapper().readValue(props, HashMap.class);
-						observationUnitPosition.setGeoCoordinates((Map<String, Object>) prop.get("geoCoordinates"));
+						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
+						observationUnitPosition.setGeoCoordinates((Map<String, Object>) jsonProp.get("geoCoordinates"));
 					} catch (IOException e) {
-						LOG.error("couldn't parse prop column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
+						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
 					}
 				}
 				observationUnitPosition.setReplicate(observationUnit.getReplicate());

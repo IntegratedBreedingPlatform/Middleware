@@ -39,10 +39,10 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 		try {
 			final ObjectMapper mapper = new ObjectMapper();
-			final String props = experimentModel.getProps() != null ? experimentModel.getProps() : "{}";
+			final String props = experimentModel.getJsonProps() != null ? experimentModel.getJsonProps() : "{}";
 			final Map<String, Object> propsMap = mapper.readValue(props, HashMap.class);
 			propsMap.put("geoCoordinates", requestDTO.getObservationUnitPosition().getGeoCoordinates());
-			experimentModel.setProps(mapper.writeValueAsString(propsMap));
+			experimentModel.setJsonProps(mapper.writeValueAsString(propsMap));
 			experimentDao.save(experimentModel);
 		} catch (final Exception e) {
 			final String message = "couldn't parse prop column for observationUnitDbId=" + observationUnitDbId;

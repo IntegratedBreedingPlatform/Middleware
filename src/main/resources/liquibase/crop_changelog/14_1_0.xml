@@ -7,7 +7,7 @@
 	<changeSet author="nahuel" id="v14.1.0-1">
 		<preConditions>
 			<not>
-				<columnExists tableName="nd_experiment" columnName="props"/>
+				<columnExists tableName="nd_experiment" columnName="json_props"/>
 			</not>
 		</preConditions>
 		<comment>
@@ -15,7 +15,7 @@
 			Aimed to replace nd_experimentprop
 		</comment>
 		<addColumn tableName="nd_experiment">
-			<column name="props" type="CLOB" remarks="stores properties in json format" />
+			<column name="json_props" type="CLOB" />
 		</addColumn>
 	</changeSet>
 
