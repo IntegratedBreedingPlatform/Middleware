@@ -1455,7 +1455,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	/**
-	 * Gets the list of variables associated to a study. If studyId is not specified, it will return the list ALL variables in the system.
+	 * Gets the list of variables associated to a study filtered by variableTypes.
+	 * If studyId is not specified, it will return the list of ALL variables in the system filtered by variableTypes.
 	 *
 	 * @param pageSize
 	 * @param pageNumber
@@ -1504,7 +1505,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 		final List<Map<String, Object>> results = sqlQuery.list();
 
-		return this.convertToVariableDto(results, cropName, isFilterByStudyId);
+		return this.convertToVariableDTO(results, cropName, isFilterByStudyId);
 
 	}
 
@@ -1595,7 +1596,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	}
 
-	private List<VariableDTO> convertToVariableDto(final List<Map<String, Object>> results, final String cropName, final boolean isFilterByStudyId) {
+	private List<VariableDTO> convertToVariableDTO(final List<Map<String, Object>> results, final String cropName, final boolean isFilterByStudyId) {
 
 		final List<VariableDTO> variables = new ArrayList<>();
 
@@ -1646,7 +1647,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			scale.setDataType(this.convertDataTypeToVariableDtoScale((Integer) result.get(VARIABLE_DATA_TYPE_ID)));
 			scale.setDecimalPlaces(DataType.NUMERIC_VARIABLE.getId().equals((Integer) result.get(VARIABLE_DATA_TYPE_ID)) ? 4 : null);
 			final List<String> categories =
-				Arrays.asList(StringUtils.split(String.valueOf(result.get(VARIABLE_SCALE_CATEGORIES)), "|"));
+				Arrays.asList(result.get(VARIABLE_SCALE_CATEGORIES) != null ? StringUtils.split(String.valueOf(result.get(VARIABLE_SCALE_CATEGORIES)), "|") : null);
 			scale.getValidValues().setCategories(categories);
 
 			final VariableDTO.OntologyReference scaleOntologyReference =
