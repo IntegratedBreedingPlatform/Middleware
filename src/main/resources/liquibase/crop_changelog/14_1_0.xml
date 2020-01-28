@@ -292,7 +292,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-1">
+	<changeSet author="vanina" id="v14.1.0-6">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="ims_transaction" columnName="trntype"/>
@@ -305,7 +305,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-2">
+	<changeSet author="vanina" id="v14.1.0-7">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -330,7 +330,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-3">
+	<changeSet author="vanina" id="v14.1.0-8">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -357,7 +357,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-4">
+	<changeSet author="vanina" id="v14.1.0-9">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -384,7 +384,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-5">
+	<changeSet author="vanina" id="v14.1.0-10">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -411,7 +411,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-6">
+	<changeSet author="vanina" id="v14.1.0-11">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -466,7 +466,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-7">
+	<changeSet author="vanina" id="v14.1.0-12">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -489,7 +489,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-8">
+	<changeSet author="vanina" id="v14.1.0-13">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -512,7 +512,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-9">
+	<changeSet author="vanina" id="v14.1.0-14">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -535,7 +535,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-10">
+	<changeSet author="vanina" id="v14.1.0-15">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
