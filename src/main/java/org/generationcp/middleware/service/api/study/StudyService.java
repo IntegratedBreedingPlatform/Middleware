@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.api.study;
 
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 import java.util.List;
 
@@ -78,8 +77,13 @@ public interface StudyService {
 
 	Integer getEnvironmentDatasetId(final int studyId);
 
-	List<ObservationVariableDto> getObservationVariables(final Integer pageSize, final Integer pageNumber,
-		int studyId, final List<Integer> variableTypes);
+	List<VariableDto> getVariablesByStudyId(final Integer pageSize, final Integer pageNumber,
+		Integer studyId, final List<Integer> variableTypes, final String cropname);
 
-	long countObservationVariables(int studyId, final List<Integer> variableTypes);
+	long countVariablesByStudyId(Integer studyId, final List<Integer> variableTypes);
+
+	List<VariableDto> getVariables(Integer pageSize, Integer pageNumber, List<Integer> variableTypes,
+		String cropname);
+
+	long countVariables(List<Integer> variableTypes);
 }

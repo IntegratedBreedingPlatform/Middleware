@@ -25,7 +25,6 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestD
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.ObservationVariableDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
@@ -34,6 +33,7 @@ import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.generationcp.middleware.service.api.study.VariableDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -549,14 +549,25 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<ObservationVariableDto> getObservationVariables(final Integer pageSize, final Integer pageNumber,
-		final int studyId, final List<Integer> variableTypes) {
-		return this.daoFactory.getDmsProjectDAO().getObservationVariables(pageSize, pageNumber, studyId, variableTypes);
+	public List<VariableDto> getVariablesByStudyId(final Integer pageSize, final Integer pageNumber,
+		final Integer studyId, final List<Integer> variableTypes, final String cropname) {
+		return this.daoFactory.getCvTermDao().getVariables(pageSize, pageNumber, studyId, variableTypes, cropname);
 	}
 
 	@Override
-	public long countObservationVariables(final int studyId, final List<Integer> variableTypes) {
-		return this.daoFactory.getDmsProjectDAO().countObservationVariables(studyId, variableTypes);
+	public long countVariablesByStudyId(final Integer studyId, final List<Integer> variableTypes) {
+		return this.daoFactory.getCvTermDao().countObservationVariables(studyId, variableTypes);
+	}
+
+	@Override
+	public List<VariableDto> getVariables(final Integer pageSize, final Integer pageNumber, final List<Integer> variableTypes,
+		final String cropname) {
+		return this.daoFactory.getCvTermDao().getVariables(pageSize, pageNumber, null, variableTypes, cropname);
+	}
+
+	@Override
+	public long countVariables(final List<Integer> variableTypes) {
+		return this.daoFactory.getCvTermDao().countObservationVariables(null, variableTypes);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {

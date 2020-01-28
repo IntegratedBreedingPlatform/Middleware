@@ -33,7 +33,6 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.service.api.study.ObservationVariableDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -62,7 +61,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -96,17 +94,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String OBS_SET_VALUE = "value";
 	private static final String OBS_SET_VARIABLE_TYPE_ID = "variableTypeId";
 	private static final String OBS_SET_SCALE = "scale";
-	private static final String OBS_SET_SCALE_ID = "scaleId";
-	private static final String OBS_SET_SCALE_DESCRIPTION = "scaleDescription";
-	private static final String OBS_SET_SCALE_ONTOLOGY_ID = "scaleOntology";
 	private static final String OBS_SET_METHOD = "method";
-	private static final String OBS_SET_METHOD_ID = "methodId";
-	private static final String OBS_SET_METHOD_DESCRIPTION = "methodDescription";
-	private static final String OBS_SET_METHOD_ONTOLOGY_ID = "methodOntology";
 	private static final String OBS_SET_PROPERTY = "property";
-	private static final String OBS_SET_PROPERTY_ID = "propertyId";
-	private static final String OBS_SET_PROPERTY_DESCRIPTION = "propertyDescription";
-	private static final String OBS_SET_PROPERTY_ONTOLOGY_ID = "propertyOntology";
 	private static final String OBS_SET_DATA_TYPE_ID = "dataTypeId";
 	private static final String OBS_SET_CATEGORY_ID = "categoryId";
 	private static final String OBS_SET_CATEGORY_NAME = "categoryName";
@@ -118,9 +107,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String OBS_SET_EXPECTED_MAX = "expectedMax";
 	private static final String OBS_SET_CROP_ONTOLOGY_ID = "cropOntologyId";
 	private static final String OBS_SET_VARIABLE_VALUE = "variableValue";
-	private static final String OBS_SET_TRAIT_CLASS = "traitClass";
-	private static final String OBS_SET_VARIABLE_SYNONYM = "variableSynonym";
-	private static final String OBS_SET_PROPERTY_SYNONYM = "propertySynonym";
 
 	/**
 	 * Type of study is stored in project.study_type_id
@@ -1386,222 +1372,4 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public List<ObservationVariableDto> getObservationVariables(final Integer pageSize, final Integer pageNumber, final int studyId,
-		final List<Integer> variableTypes) {
-
-		// TODO: Modify the query so that if the studyId is not specified, this will return all observation variables (TRAIT variable type)
-		// in crop database
-		final String query = " SELECT DISTINCT "
-			+ "   pp.variable_id AS " + OBS_SET_VARIABLE_ID + ", "
-			+ "   variable.name AS " + OBS_SET_VARIABLE_NAME + ", "
-			+ "   variable.definition AS " + OBS_SET_DESCRIPTION + ", "
-			+ "   pp.alias AS " + OBS_SET_ALIAS + ", "
-			+ "   pp.value as " + OBS_SET_VALUE + ", "
-			+ "   variableType.cvterm_id AS " + OBS_SET_VARIABLE_TYPE_ID + ", "
-			+ "   scale.name AS " + OBS_SET_SCALE + ", "
-			+ "   scale.cvterm_id AS " + OBS_SET_SCALE_ID + ", "
-			+ "   scale.definition AS " + OBS_SET_SCALE_DESCRIPTION + ", "
-			+ "   scaleOntology.value AS " + OBS_SET_SCALE_ONTOLOGY_ID + ", "
-			+ "   method.name AS " + OBS_SET_METHOD + ", "
-			+ "   method.cvterm_id AS " + OBS_SET_METHOD_ID + ", "
-			+ "   method.definition AS " + OBS_SET_METHOD_DESCRIPTION + ", "
-			+ "   methodOntology.value AS " + OBS_SET_METHOD_ONTOLOGY_ID + ", "
-			+ "   property.name AS " + OBS_SET_PROPERTY + ", "
-			+ "   property.cvterm_id AS " + OBS_SET_PROPERTY_ID + ", "
-			+ "   property.definition AS " + OBS_SET_PROPERTY_DESCRIPTION + ", "
-			+ "   propertyOntology.value AS " + OBS_SET_PROPERTY_ONTOLOGY_ID + ", "
-			+ "   dataType.cvterm_id AS " + OBS_SET_DATA_TYPE_ID + ", "
-			+ "   (SELECT formula_id FROM formula WHERE target_variable_id = pp.variable_id and active = 1 LIMIT 1) AS "
-			+ OBS_SET_FORMULA_ID + ", "
-			+ "   scaleMinRange.value AS " + OBS_SET_SCALE_MIN_RANGE + ", "
-			+ "   scaleMaxRange.value AS " + OBS_SET_SCALE_MAX_RANGE + ", "
-			+ "   vo.expected_min AS " + OBS_SET_EXPECTED_MIN + ", "
-			+ "   vo.expected_max AS " + OBS_SET_EXPECTED_MAX + ", "
-			+ "   cropOntology.value AS " + OBS_SET_CROP_ONTOLOGY_ID + ","
-			+ "   pp.value as " + OBS_SET_VARIABLE_VALUE + ","
-			+ "   GROUP_CONCAT(DISTINCT category.name SEPARATOR '|') AS " + OBS_SET_CATEGORY_NAME + ","
-			+ "   GROUP_CONCAT(DISTINCT traitClass.name SEPARATOR ',') AS " + OBS_SET_TRAIT_CLASS + ","
-			+ "   GROUP_CONCAT(DISTINCT variableSynonym.synonym SEPARATOR '|') AS " + OBS_SET_VARIABLE_SYNONYM + ","
-			+ "   GROUP_CONCAT(DISTINCT propertySynonym.synonym SEPARATOR '|') AS " + OBS_SET_PROPERTY_SYNONYM
-			+ " FROM project dataset "
-			+ "   INNER JOIN projectprop pp ON dataset.project_id = pp.project_id "
-			+ "   INNER JOIN cvterm variable ON pp.variable_id = variable.cvterm_id "
-			+ "   INNER JOIN cvterm variableType ON pp.type_id = variableType.cvterm_id "
-			+ "   INNER JOIN cvterm_relationship cvtrscale ON variable.cvterm_id = cvtrscale.subject_id "
-			+ "                                            AND cvtrscale.type_id = " + TermId.HAS_SCALE.getId()
-			+ "   INNER JOIN cvterm scale ON cvtrscale.object_id = scale.cvterm_id "
-			+ "   INNER JOIN cvterm_relationship cvtrmethod ON variable.cvterm_id = cvtrmethod.subject_id "
-			+ "                                             AND cvtrmethod.type_id = " + TermId.HAS_METHOD.getId()
-			+ "   INNER JOIN cvterm method ON cvtrmethod.object_id = method.cvterm_id "
-			+ "   INNER JOIN cvterm_relationship cvtrproperty ON variable.cvterm_id = cvtrproperty.subject_id "
-			+ "                                               AND cvtrproperty.type_id = " + TermId.HAS_PROPERTY.getId()
-			+ "   INNER JOIN cvterm property ON cvtrproperty.object_id = property.cvterm_id "
-			+ "   INNER JOIN cvterm_relationship cvtrdataType ON scale.cvterm_id = cvtrdataType.subject_id "
-			+ "                                               AND cvtrdataType.type_id = " + TermId.HAS_TYPE.getId()
-			+ "   INNER JOIN cvterm dataType ON cvtrdataType.object_id = dataType.cvterm_id "
-			+ "   LEFT JOIN cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id "
-			+ "                                         AND scaleMaxRange.type_id = " + TermId.MAX_VALUE.getId()
-			+ "   LEFT JOIN cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id "
-			+ "                                         AND scaleMinRange.type_id = " + TermId.MIN_VALUE.getId()
-			+ "   LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id "
-			+ "                                      AND dataset.program_uuid = vo.program_uuid "
-			// Ontology ID for Variable
-			+ "   LEFT JOIN cvtermprop cropOntology ON cropOntology.cvterm_id = variable.cvterm_id"
-			+ "        AND cropOntology.type_id = " + TermId.CROP_ONTOLOGY_ID.getId()
-			// Ontology ID for Scale
-			+ "   LEFT JOIN cvtermprop scaleOntology ON scaleOntology.cvterm_id = scale.cvterm_id"
-			+ "        AND scaleOntology.type_id = " + TermId.CROP_ONTOLOGY_ID.getId()
-			// Ontology ID for Method
-			+ "   LEFT JOIN cvtermprop methodOntology ON methodOntology.cvterm_id = method.cvterm_id"
-			+ "        AND methodOntology.type_id = " + TermId.CROP_ONTOLOGY_ID.getId()
-			// Ontology ID for Property
-			+ "   LEFT JOIN cvtermprop propertyOntology ON propertyOntology.cvterm_id = property.cvterm_id"
-			+ "        AND propertyOntology.type_id = " + TermId.CROP_ONTOLOGY_ID.getId()
-			// Retrieve the Trait Classes of the variables' property
-			+ "   LEFT JOIN (select cvtr.subject_id propertyTermId, o.name "
-			+ "   from cvterm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = "
-			+ TermId.IS_A.getId() + ")" + " traitClass on traitClass.propertyTermId = property.cvterm_id "
-			// Retrieve the categories (valid values) of the variables' scale
-			+ "   LEFT JOIN (SELECT cvtrcategory.subject_id, o.name "
-			+ "	  FROM cvterm o inner JOIN cvterm_relationship cvtrcategory ON cvtrcategory.object_id = o.cvterm_id AND cvtrcategory.type_id = "
-			+ TermId.HAS_VALUE.getId() + ")" + " category on category.subject_id = scale.cvterm_id "
-			+ "   LEFT JOIN cvtermsynonym variableSynonym ON variableSynonym.cvterm_id = variable.cvterm_id "
-			+ "   LEFT JOIN cvtermsynonym propertySynonym ON propertySynonym.cvterm_id = property.cvterm_id "
-			+ " WHERE "
-			+ "   dataset.study_id = :studyId "
-			+ "   AND pp.type_id in (:variableTypes) "
-			+ "   group by pp.variable_id, traitClass.propertyTermId, scale.cvterm_id ";
-
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
-		sqlQuery.setParameter("studyId", studyId);
-		sqlQuery.setParameterList("variableTypes", variableTypes);
-		sqlQuery
-			.addScalar(OBS_SET_VARIABLE_ID)
-			.addScalar(OBS_SET_VARIABLE_NAME)
-			.addScalar(OBS_SET_DESCRIPTION)
-			.addScalar(OBS_SET_ALIAS)
-			.addScalar(OBS_SET_VALUE)
-			.addScalar(OBS_SET_VARIABLE_TYPE_ID)
-			.addScalar(OBS_SET_SCALE)
-			.addScalar(OBS_SET_SCALE_ID)
-			.addScalar(OBS_SET_SCALE_DESCRIPTION)
-			.addScalar(OBS_SET_METHOD)
-			.addScalar(OBS_SET_METHOD_ID)
-			.addScalar(OBS_SET_METHOD_DESCRIPTION)
-			.addScalar(OBS_SET_PROPERTY)
-			.addScalar(OBS_SET_PROPERTY_ID)
-			.addScalar(OBS_SET_PROPERTY_DESCRIPTION)
-			.addScalar(OBS_SET_DATA_TYPE_ID)
-			.addScalar(OBS_SET_CATEGORY_NAME)
-			.addScalar(OBS_SET_SCALE_MIN_RANGE, new DoubleType())
-			.addScalar(OBS_SET_SCALE_MAX_RANGE, new DoubleType())
-			.addScalar(OBS_SET_EXPECTED_MIN, new DoubleType())
-			.addScalar(OBS_SET_EXPECTED_MAX, new DoubleType())
-			.addScalar(OBS_SET_FORMULA_ID, new IntegerType())
-			.addScalar(OBS_SET_CROP_ONTOLOGY_ID)
-			.addScalar(OBS_SET_SCALE_ONTOLOGY_ID)
-			.addScalar(OBS_SET_METHOD_ONTOLOGY_ID)
-			.addScalar(OBS_SET_PROPERTY_ONTOLOGY_ID)
-			.addScalar(OBS_SET_VARIABLE_VALUE)
-			.addScalar(OBS_SET_TRAIT_CLASS)
-			.addScalar(OBS_SET_VARIABLE_SYNONYM)
-			.addScalar(OBS_SET_PROPERTY_SYNONYM);
-
-		if (pageNumber != null && pageSize != null) {
-			sqlQuery.setFirstResult(pageSize * (pageNumber - 1));
-			sqlQuery.setMaxResults(pageSize);
-		}
-
-		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-		final List<Map<String, Object>> results = sqlQuery.list();
-
-		final Map<Integer, ObservationVariableDto> variables = new LinkedHashMap<>();
-
-		for (final Map<String, Object> result : results) {
-			final Integer variableId = (Integer) result.get("variableId");
-			if (!variables.containsKey(variableId)) {
-				variables.put(variableId, new ObservationVariableDto());
-
-				final ObservationVariableDto observationVariableDto = variables.get(variableId);
-
-				observationVariableDto.setName(String.valueOf(result.get(OBS_SET_VARIABLE_NAME)));
-				observationVariableDto.setObservationVariableDbId(String.valueOf(variableId));
-				observationVariableDto.setObservationVariableName(String.valueOf(result.get(OBS_SET_VARIABLE_NAME)));
-				final List<String> variableSynonyms =
-					Arrays.asList(StringUtils.split(String.valueOf(result.get(OBS_SET_VARIABLE_SYNONYM)), "|"));
-				observationVariableDto.setSynonyms(variableSynonyms);
-
-				final ObservationVariableDto.OntologyReference variableOntologyReference = observationVariableDto.getOntologyReference();
-				variableOntologyReference.setOntologyDbId(String.valueOf(result.get(OBS_SET_CROP_ONTOLOGY_ID)));
-
-				final ObservationVariableDto.Trait trait = observationVariableDto.getTrait();
-				trait.setName(String.valueOf(result.get(OBS_SET_PROPERTY)));
-				trait.setTraitName(String.valueOf(result.get(OBS_SET_PROPERTY)));
-				trait.setTraitDbId(String.valueOf(result.get(OBS_SET_PROPERTY_ID)));
-				trait.setDescription(String.valueOf(result.get(OBS_SET_PROPERTY_DESCRIPTION)));
-				trait.setTraitClass(String.valueOf(result.get(OBS_SET_TRAIT_CLASS)));
-				final List<String> traitSynonyms =
-					Arrays.asList(StringUtils.split(String.valueOf(result.get(OBS_SET_PROPERTY_SYNONYM)), "|"));
-				trait.setSynonyms(traitSynonyms);
-
-				final ObservationVariableDto.OntologyReference traitOntologyReference =
-					observationVariableDto.getTrait().getOntologyReference();
-				traitOntologyReference.setOntologyDbId(String.valueOf(result.get(OBS_SET_PROPERTY_ONTOLOGY_ID)));
-				traitOntologyReference.setOntologyName(String.valueOf(result.get(OBS_SET_PROPERTY)));
-
-				final ObservationVariableDto.Scale scale = observationVariableDto.getScale();
-				scale.setName(String.valueOf(result.get(OBS_SET_SCALE)));
-				scale.setScaleName(String.valueOf(result.get(OBS_SET_SCALE)));
-				scale.setScaleDbId(String.valueOf(result.get(OBS_SET_SCALE_ID)));
-				scale.getValidValues().setMin((Double) result.get(OBS_SET_EXPECTED_MIN));
-				scale.getValidValues().setMax((Double) result.get(OBS_SET_EXPECTED_MAX));
-
-				final DataType dataType = DataType.getById((Integer) result.get(OBS_SET_DATA_TYPE_ID));
-				scale.setDataType(dataType != null ? dataType.getName() : null);
-				final List<String> categories = Arrays.asList(StringUtils.split(String.valueOf(result.get(OBS_SET_CATEGORY_NAME)), "|"));
-				scale.getValidValues().setCategories(categories);
-
-				final ObservationVariableDto.OntologyReference scaleOntologyReference =
-					observationVariableDto.getScale().getOntologyReference();
-				scaleOntologyReference.setOntologyDbId(String.valueOf(result.get(OBS_SET_SCALE_ONTOLOGY_ID)));
-				scaleOntologyReference.setOntologyName(String.valueOf(result.get(OBS_SET_SCALE)));
-
-				final ObservationVariableDto.Method method = observationVariableDto.getMethod();
-				method.setName(String.valueOf(result.get(OBS_SET_METHOD)));
-				method.setMethodName(String.valueOf(result.get(OBS_SET_METHOD)));
-				method.setMethodDbId(String.valueOf(result.get(OBS_SET_METHOD_ID)));
-				method.setDescription(String.valueOf(result.get(OBS_SET_METHOD_DESCRIPTION)));
-
-				final ObservationVariableDto.OntologyReference methodOntologyReference =
-					observationVariableDto.getMethod().getOntologyReference();
-				methodOntologyReference.setOntologyDbId(String.valueOf(result.get(OBS_SET_METHOD_ONTOLOGY_ID)));
-				methodOntologyReference.setOntologyName(String.valueOf(result.get(OBS_SET_METHOD)));
-
-			}
-		}
-
-		return new ArrayList<>(variables.values());
-
-	}
-
-	public long countObservationVariables(final int studyId, final List<Integer> variableTypes) {
-		try {
-			final String query = " SELECT COUNT(distinct pp.variable_id) "
-				+ " FROM project dataset "
-				+ "   INNER JOIN projectprop pp ON dataset.project_id = pp.project_id "
-				+ " WHERE "
-				+ "   dataset.study_id = :studyId "
-				+ "   AND pp.type_id in (:variableTypes) ";
-
-			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
-			sqlQuery.setParameter("studyId", studyId);
-			sqlQuery.setParameterList("variableTypes", variableTypes);
-
-			return ((BigInteger) sqlQuery.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error in countObservationVariables() query in DmsProjectDao: " + e.getMessage(), e);
-		}
-	}
 }

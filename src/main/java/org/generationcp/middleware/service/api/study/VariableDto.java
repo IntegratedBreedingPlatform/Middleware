@@ -1,11 +1,12 @@
 package org.generationcp.middleware.service.api.study;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class ObservationVariableDto {
+public class VariableDto {
 
-	private final List<String> contextOfUse = new ArrayList<>();
+	private List<String> contextOfUse = new ArrayList<>();
 	private String crop;
 	private String date;
 	private String defaultValue;
@@ -28,7 +29,9 @@ public class ObservationVariableDto {
 	private List<String> synonyms = new ArrayList<>();
 	private String xref;
 
-	// Getter Methods
+	public List<String> getContextOfUse() {
+		return this.contextOfUse;
+	}
 
 	public String getCrop() {
 		return this.crop;
@@ -111,6 +114,10 @@ public class ObservationVariableDto {
 	}
 
 	// Setter Methods
+
+	public void setContextOfUse(final List<String> contextOfUse) {
+		this.contextOfUse = contextOfUse;
+	}
 
 	public void setCrop(final String crop) {
 		this.crop = crop;
@@ -323,7 +330,7 @@ public class ObservationVariableDto {
 	public class Scale {
 
 		private String dataType;
-		private float decimalPlaces;
+		private Integer decimalPlaces;
 		private String name;
 		private OntologyReference ontologyReferenceObject = new OntologyReference();
 		private String scaleDbId;
@@ -337,7 +344,7 @@ public class ObservationVariableDto {
 			return this.dataType;
 		}
 
-		public float getDecimalPlaces() {
+		public Integer getDecimalPlaces() {
 			return this.decimalPlaces;
 		}
 
@@ -371,7 +378,7 @@ public class ObservationVariableDto {
 			this.dataType = dataType;
 		}
 
-		public void setDecimalPlaces(final float decimalPlaces) {
+		public void setDecimalPlaces(final Integer decimalPlaces) {
 			this.decimalPlaces = decimalPlaces;
 		}
 
@@ -519,7 +526,7 @@ public class ObservationVariableDto {
 
 	public class OntologyReference {
 
-		private final List<String> documentationLinks = new ArrayList<>();
+		private List<DocumentationLink> documentationLinks = Arrays.asList(new DocumentationLink());
 		private String ontologyDbId;
 		private String ontologyName;
 		private String version;
@@ -538,6 +545,10 @@ public class ObservationVariableDto {
 			return this.version;
 		}
 
+		public List<DocumentationLink> getDocumentationLinks() {
+			return this.documentationLinks;
+		}
+
 		// Setter Methods
 		public void setOntologyDbId(final String ontologyDbId) {
 			this.ontologyDbId = ontologyDbId;
@@ -549,6 +560,35 @@ public class ObservationVariableDto {
 
 		public void setVersion(final String version) {
 			this.version = version;
+		}
+
+		public void setDocumentationLinks(
+			final List<DocumentationLink> documentationLinks) {
+			this.documentationLinks = documentationLinks;
+		}
+
+		public class DocumentationLink {
+
+			// Default documentation link values
+			private String type = "WEBPAGE";
+			private String url = "https://cropontology.org";
+
+			public String getType() {
+				return this.type;
+			}
+
+			public void setType(final String type) {
+				this.type = type;
+			}
+
+			public String getUrl() {
+				return this.url;
+			}
+
+			public void setUrl(final String url) {
+				this.url = url;
+			}
+
 		}
 	}
 
