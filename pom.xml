@@ -13,6 +13,7 @@
 		<reflections.version>0.9.9</reflections.version>
 		<atomikos.version>3.9.3</atomikos.version>
 		<spring.version>3.2.11.RELEASE</spring.version>
+		<liquibase.version>3.6.1</liquibase.version>
 		<envConfig>${user.name}</envConfig>
 	</properties>
 
@@ -289,7 +290,7 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>3.5.0</version>
+			<version>${liquibase.version}</version>
 		</dependency>
 
 		<dependency>
