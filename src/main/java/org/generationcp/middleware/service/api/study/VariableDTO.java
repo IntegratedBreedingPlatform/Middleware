@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class VariableDto {
+public class VariableDTO {
 
 	private List<String> contextOfUse = new ArrayList<>();
 	private String crop;

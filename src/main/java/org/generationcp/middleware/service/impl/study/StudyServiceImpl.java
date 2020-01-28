@@ -33,7 +33,7 @@ import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.generationcp.middleware.service.api.study.VariableDto;
+import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -549,7 +549,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<VariableDto> getVariablesByStudyId(final Integer pageSize, final Integer pageNumber,
+	public List<VariableDTO> getVariablesByStudyId(final Integer pageSize, final Integer pageNumber,
 		final Integer studyId, final List<Integer> variableTypes, final String cropname) {
 		return this.daoFactory.getCvTermDao().getVariables(pageSize, pageNumber, studyId, variableTypes, cropname);
 	}
@@ -560,7 +560,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<VariableDto> getVariables(final Integer pageSize, final Integer pageNumber, final List<Integer> variableTypes,
+	public List<VariableDTO> getVariables(final Integer pageSize, final Integer pageNumber, final List<Integer> variableTypes,
 		final String cropname) {
 		return this.daoFactory.getCvTermDao().getVariables(pageSize, pageNumber, null, variableTypes, cropname);
 	}

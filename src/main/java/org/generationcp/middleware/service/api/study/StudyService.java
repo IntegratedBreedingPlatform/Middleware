@@ -77,12 +77,12 @@ public interface StudyService {
 
 	Integer getEnvironmentDatasetId(final int studyId);
 
-	List<VariableDto> getVariablesByStudyId(final Integer pageSize, final Integer pageNumber,
+	List<VariableDTO> getVariablesByStudyId(final Integer pageSize, final Integer pageNumber,
 		Integer studyId, final List<Integer> variableTypes, final String cropname);
 
 	long countVariablesByStudyId(Integer studyId, final List<Integer> variableTypes);
 
-	List<VariableDto> getVariables(Integer pageSize, Integer pageNumber, List<Integer> variableTypes,
+	List<VariableDTO> getVariables(Integer pageSize, Integer pageNumber, List<Integer> variableTypes,
 		String cropname);
 
 	long countVariables(List<Integer> variableTypes);
