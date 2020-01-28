@@ -58,6 +58,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	private static final String LNAME = "lname";
 	private static final String LOCID = "locid";
 	private static final String LTYPE = "ltype";
+	private static final String LABBREVIATION = "labbr";
 	private static final String NAME_OR_OPERATION = "name|operation";
 
 	private static final Logger LOG = LoggerFactory.getLogger(LocationDAO.class);
@@ -282,7 +283,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final String programUUID) {
+	public List<Location> filterLocations(final Set<Integer> types, final List<Integer> locationIds, final String programUUID, final List<String> locationAbbreviations) {
 		final List<Location> locations;
 		try {
 
@@ -294,6 +295,10 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 			if (locationIds != null && !locationIds.isEmpty()) {
 				criteria.add(Restrictions.in(LocationDAO.LOCID, locationIds));
+			}
+
+			if (locationAbbreviations!=null && !locationAbbreviations.isEmpty()){
+				criteria.add(Restrictions.in(LocationDAO.LABBREVIATION, locationAbbreviations));
 			}
 
 			criteria.add(
@@ -922,7 +927,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getFilteredLocations", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+					this.getLogExceptionMessage("getFilteredLocationsDetails", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 	}
 

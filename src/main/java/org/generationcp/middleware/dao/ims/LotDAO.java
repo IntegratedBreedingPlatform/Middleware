@@ -16,6 +16,7 @@ import com.google.common.collect.Sets;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -894,5 +895,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public List<LotDto> getLotsByStockIds(final List<String> stockIds) {
+		return null;
 	}
 }

@@ -217,10 +217,11 @@ public interface LocationDataManager {
 	 * @param types - search set for the types of locations
 	 * @param programUUID - unique id of the current program.
 	 * @param locationIds - List of favorite LocIds of the current program
+	 * @param locationAbbreviations - List of location abbreviations
 	 *
   	 * @return List of Location POJOs
 	 */
-	List<Location> getFilteredLocations(Set<Integer> types, List<Integer> locationIds, String programUUID);
+	List<Location> getFilteredLocations(Set<Integer> types, List<Integer> locationIds, String programUUID, List<String> locationAbbreviations);
 
 	/**
 	 * Returns the Location records with type matching the given parameter. The
@@ -454,7 +455,7 @@ public interface LocationDataManager {
 	 */
 	List<Location> getAllBreedingLocationsByUniqueID(String programUUID);
 
-	List<LocationDetails> getFilteredLocations(Integer countryId, Integer locationType, String locationName, String programUUID);
+	List<LocationDetails> getFilteredLocationsDetails(Integer countryId, Integer locationType, String locationName, String programUUID);
 
 	/**
 	 * Returns number of all Locations depending on the filters.
