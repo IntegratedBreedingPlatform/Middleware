@@ -329,6 +329,11 @@ public class VariableDto {
 
 	public class Scale {
 
+		public static final String NOMINAL = "Nominal";
+		public static final String ORDINAL = "Ordinal";
+		public static final String DATE = "Date";
+		public static final String NUMERICAL = "Numerical";
+
 		private String dataType;
 		private Integer decimalPlaces;
 		private String name;

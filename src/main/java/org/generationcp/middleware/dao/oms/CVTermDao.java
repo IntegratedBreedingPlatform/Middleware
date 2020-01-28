@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,6 +81,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	private static final String VARIABLE_SCALE_MAX_RANGE = "scaleMaxRange";
 	private static final String VARIABLE_EXPECTED_MIN = "expectedMin";
 	private static final String VARIABLE_EXPECTED_MAX = "expectedMax";
+	private static final String VARIABLE_CREATION_DATE = "variableCreationDate";
 	private static final String VARIABLE_TRAIT_CLASS = "traitClass";
 	private static final String VARIABLE_FORMULA_DEFINITION = "formulaDefinition";
 
@@ -1467,7 +1467,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	public List<VariableDto> getVariables(final Integer pageSize, final Integer pageNumber, final Integer studyId,
 		final List<Integer> variableTypes, final String cropName) {
 
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createVariableQuery(studyId));
+		final boolean isFilterByStudyId = studyId != null;
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createVariableQuery(isFilterByStudyId));
 		this.addParameters(studyId, variableTypes, sqlQuery);
 
 		sqlQuery
@@ -1491,6 +1492,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			.addScalar(VARIABLE_SCALE_MAX_RANGE, new DoubleType())
 			.addScalar(VARIABLE_EXPECTED_MIN, new DoubleType())
 			.addScalar(VARIABLE_EXPECTED_MAX, new DoubleType())
+			.addScalar(VARIABLE_CREATION_DATE)
 			.addScalar(VARIABLE_SCALE_CATEGORIES)
 			.addScalar(VARIABLE_TRAIT_CLASS);
 
@@ -1502,11 +1504,11 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 		final List<Map<String, Object>> results = sqlQuery.list();
 
-		return this.convertToVariableDto(results, cropName);
+		return this.convertToVariableDto(results, cropName, isFilterByStudyId);
 
 	}
 
-	private String createVariableQuery(final Integer studyId) {
+	private String createVariableQuery(final boolean isFilterByStudyId) {
 
 		final StringBuilder stringBuilder = new StringBuilder(" SELECT DISTINCT ");
 		stringBuilder.append("   pp.alias AS " + VARIABLE_ALIAS + ", ");
@@ -1529,6 +1531,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append("   scaleMaxRange.value AS " + VARIABLE_SCALE_MAX_RANGE + ", ");
 		stringBuilder.append("   vo.expected_min AS " + VARIABLE_EXPECTED_MIN + ", ");
 		stringBuilder.append("   vo.expected_max AS " + VARIABLE_EXPECTED_MAX + ", ");
+		stringBuilder.append("   variableDateCreated.value AS " + VARIABLE_CREATION_DATE + ", ");
 		stringBuilder.append("   GROUP_CONCAT(DISTINCT category.name SEPARATOR '|') AS " + VARIABLE_SCALE_CATEGORIES + ",");
 		stringBuilder.append("   GROUP_CONCAT(DISTINCT traitClass.name SEPARATOR ',') AS " + VARIABLE_TRAIT_CLASS);
 		// Standard Variable
@@ -1553,6 +1556,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append("   INNER JOIN cvtermprop variableType ");
 		stringBuilder.append("   ON variableType.cvterm_id = variable.cvterm_id AND variableType.type_id = " + TermId.VARIABLE_TYPE
 			.getId());
+		stringBuilder.append("   LEFT JOIN cvtermprop variableDateCreated on variable.cvterm_id = variableDateCreated.cvterm_id ");
+		stringBuilder.append("                                         AND variableDateCreated.type_id = " + TermId.CREATION_DATE.getId());
 		stringBuilder.append("   LEFT JOIN cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id ");
 		stringBuilder.append("                                         AND scaleMaxRange.type_id = " + TermId.MAX_VALUE.getId());
 		stringBuilder.append("   LEFT JOIN cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id ");
@@ -1579,7 +1584,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			"	  LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id AND dataset.program_uuid = vo.program_uuid");
 		stringBuilder.append(" WHERE variableType.value in (:variableTypeNames) ");
 
-		if (studyId != null) {
+		if (isFilterByStudyId) {
 			stringBuilder.append("   AND dataset.study_id = :studyId ");
 			stringBuilder.append("   AND pp.type_id in (:variableTypes) ");
 		}
@@ -1590,85 +1595,91 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	}
 
-	private List<VariableDto> convertToVariableDto(final List<Map<String, Object>> results, final String cropName) {
+	private List<VariableDto> convertToVariableDto(final List<Map<String, Object>> results, final String cropName, final boolean isFilterByStudyId) {
 
-		final Map<Integer, VariableDto> variables = new LinkedHashMap<>();
+		final List<VariableDto> variables = new ArrayList<>();
 
 		for (final Map<String, Object> result : results) {
-			final Integer variableId = (Integer) result.get("variableId");
-			if (!variables.containsKey(variableId)) {
-				variables.put(variableId, new VariableDto());
 
-				final VariableDto variableDto = variables.get(variableId);
+			final VariableDto variableDto = new VariableDto();
 
-				variableDto.setCrop(cropName);
+			variableDto.setCrop(cropName);
+			if (isFilterByStudyId) {
 				variableDto.getContextOfUse().add("PLOT");
+			}
 
-				final String observationVariableName = result.get(VARIABLE_ALIAS) != null ? String.valueOf(result.get(VARIABLE_ALIAS)) :
-					String.valueOf(result.get(VARIABLE_NAME));
+			final String observationVariableName = result.get(VARIABLE_ALIAS) != null ? String.valueOf(result.get(VARIABLE_ALIAS)) :
+				String.valueOf(result.get(VARIABLE_NAME));
 
-				variableDto.setName(observationVariableName);
-				variableDto.setObservationVariableDbId(String.valueOf(variableId));
-				variableDto.setObservationVariableName(observationVariableName);
+			variableDto.setName(observationVariableName);
+			variableDto.setObservationVariableDbId(String.valueOf(result.get(VARIABLE_ID)));
+			variableDto.setObservationVariableName(observationVariableName);
+			variableDto.setDate(result.get(VARIABLE_CREATION_DATE) != null ? String.valueOf(result.get(VARIABLE_CREATION_DATE)) : null);
 
-				final VariableDto.Trait trait = variableDto.getTrait();
-				trait.setName(String.valueOf(result.get(VARIABLE_PROPERTY)));
-				trait.setTraitName(String.valueOf(result.get(VARIABLE_PROPERTY)));
-				trait.setTraitDbId(String.valueOf(result.get(VARIABLE_PROPERTY_ID)));
-				trait.setDescription(String.valueOf(result.get(VARIABLE_PROPERTY_DESCRIPTION)));
-				trait.setTraitClass(String.valueOf(result.get(VARIABLE_TRAIT_CLASS)));
-				trait.setStatus("Active");
-				trait.setXref(String.valueOf(result.get(VARIABLE_PROPERTY_ONTOLOGY_ID)));
+			final VariableDto.Trait trait = variableDto.getTrait();
+			trait.setName(String.valueOf(result.get(VARIABLE_PROPERTY)));
+			trait.setTraitName(String.valueOf(result.get(VARIABLE_PROPERTY)));
+			trait.setTraitDbId(String.valueOf(result.get(VARIABLE_PROPERTY_ID)));
+			trait.setDescription(String.valueOf(result.get(VARIABLE_PROPERTY_DESCRIPTION)));
+			trait.setTraitClass(String.valueOf(result.get(VARIABLE_TRAIT_CLASS)));
+			trait.setStatus("Active");
+			trait.setXref(String.valueOf(result.get(VARIABLE_PROPERTY_ONTOLOGY_ID)));
 
-				final VariableDto.OntologyReference traitOntologyReference =
-					variableDto.getTrait().getOntologyReference();
-				traitOntologyReference.setOntologyDbId(String.valueOf(result.get(VARIABLE_PROPERTY_ONTOLOGY_ID)));
-				traitOntologyReference.setOntologyName(String.valueOf(result.get(VARIABLE_PROPERTY)));
+			final VariableDto.OntologyReference traitOntologyReference =
+				variableDto.getTrait().getOntologyReference();
+			traitOntologyReference.setOntologyDbId(String.valueOf(result.get(VARIABLE_PROPERTY_ONTOLOGY_ID)));
+			traitOntologyReference.setOntologyName(String.valueOf(result.get(VARIABLE_PROPERTY)));
 
-				final VariableDto.Scale scale = variableDto.getScale();
-				scale.setName(String.valueOf(result.get(VARIABLE_SCALE)));
-				scale.setScaleName(String.valueOf(result.get(VARIABLE_SCALE)));
-				scale.setScaleDbId(String.valueOf(result.get(VARIABLE_SCALE_ID)));
+			final VariableDto.Scale scale = variableDto.getScale();
+			scale.setName(String.valueOf(result.get(VARIABLE_SCALE)));
+			scale.setScaleName(String.valueOf(result.get(VARIABLE_SCALE)));
+			scale.setScaleDbId(String.valueOf(result.get(VARIABLE_SCALE_ID)));
+
+			if (result.get(VARIABLE_EXPECTED_MIN) != null && result.get(VARIABLE_EXPECTED_MAX) != null) {
 				scale.getValidValues().setMin((Double) result.get(VARIABLE_EXPECTED_MIN));
 				scale.getValidValues().setMax((Double) result.get(VARIABLE_EXPECTED_MAX));
-
-				scale.setDataType(this.convertDataType((Integer) result.get(VARIABLE_DATA_TYPE_ID)));
-				scale.setDecimalPlaces(DataType.NUMERIC_VARIABLE.getId().equals((Integer) result.get(VARIABLE_DATA_TYPE_ID)) ? 4 : null);
-				final List<String> categories =
-					Arrays.asList(StringUtils.split(String.valueOf(result.get(VARIABLE_SCALE_CATEGORIES)), "|"));
-				scale.getValidValues().setCategories(categories);
-
-				final VariableDto.OntologyReference scaleOntologyReference =
-					variableDto.getScale().getOntologyReference();
-				scaleOntologyReference.setOntologyName(String.valueOf(result.get(VARIABLE_SCALE)));
-
-				final VariableDto.Method method = variableDto.getMethod();
-				method.setName(String.valueOf(result.get(VARIABLE_METHOD)));
-				method.setMethodName(String.valueOf(result.get(VARIABLE_METHOD)));
-				method.setMethodDbId(String.valueOf(result.get(VARIABLE_METHOD_ID)));
-				method.setDescription(String.valueOf(result.get(VARIABLE_METHOD_DESCRIPTION)));
-				method.setFormula(String.valueOf(result.get(VARIABLE_FORMULA_DEFINITION)));
-
-				final VariableDto.OntologyReference methodOntologyReference =
-					variableDto.getMethod().getOntologyReference();
-				methodOntologyReference.setOntologyName(String.valueOf(result.get(VARIABLE_METHOD)));
-
+			} else {
+				scale.getValidValues().setMin((Double) result.get(VARIABLE_SCALE_MIN_RANGE));
+				scale.getValidValues().setMax((Double) result.get(VARIABLE_SCALE_MAX_RANGE));
 			}
+
+			scale.setDataType(this.convertDataTypeToVariableDtoScale((Integer) result.get(VARIABLE_DATA_TYPE_ID)));
+			scale.setDecimalPlaces(DataType.NUMERIC_VARIABLE.getId().equals((Integer) result.get(VARIABLE_DATA_TYPE_ID)) ? 4 : null);
+			final List<String> categories =
+				Arrays.asList(StringUtils.split(String.valueOf(result.get(VARIABLE_SCALE_CATEGORIES)), "|"));
+			scale.getValidValues().setCategories(categories);
+
+			final VariableDto.OntologyReference scaleOntologyReference =
+				variableDto.getScale().getOntologyReference();
+			scaleOntologyReference.setOntologyName(String.valueOf(result.get(VARIABLE_SCALE)));
+
+			final VariableDto.Method method = variableDto.getMethod();
+			method.setName(String.valueOf(result.get(VARIABLE_METHOD)));
+			method.setMethodName(String.valueOf(result.get(VARIABLE_METHOD)));
+			method.setMethodDbId(String.valueOf(result.get(VARIABLE_METHOD_ID)));
+			method.setDescription(String.valueOf(result.get(VARIABLE_METHOD_DESCRIPTION)));
+			method.setFormula(String.valueOf(result.get(VARIABLE_FORMULA_DEFINITION)));
+
+			final VariableDto.OntologyReference methodOntologyReference =
+				variableDto.getMethod().getOntologyReference();
+			methodOntologyReference.setOntologyName(String.valueOf(result.get(VARIABLE_METHOD)));
+
+			variables.add(variableDto);
 		}
 
-		return new ArrayList<>(variables.values());
+		return variables;
 
 	}
 
-	private String convertDataType(final Integer dataTypeId) {
+	private String convertDataTypeToVariableDtoScale(final Integer dataTypeId) {
 		if (DataType.CATEGORICAL_VARIABLE.getId().equals(dataTypeId)) {
-			return "Nominal";
+			return VariableDto.Scale.NOMINAL;
 		} else if (DataType.CHARACTER_VARIABLE.getId().equals(dataTypeId)) {
-			return "Ordinal";
+			return  VariableDto.Scale.ORDINAL;
 		} else if (DataType.DATE_TIME_VARIABLE.getId().equals(dataTypeId)) {
-			return "Date";
+			return  VariableDto.Scale.DATE;
 		} else if (DataType.NUMERIC_VARIABLE.getId().equals(dataTypeId)) {
-			return "Numerical";
+			return VariableDto.Scale.NUMERICAL;
 		} else {
 			return "";
 		}
