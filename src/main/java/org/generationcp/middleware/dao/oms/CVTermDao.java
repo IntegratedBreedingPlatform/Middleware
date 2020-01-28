@@ -1646,8 +1646,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			scale.setDataType(this.convertDataTypeToVariableDtoScale((Integer) result.get(VARIABLE_DATA_TYPE_ID)));
 			scale.setDecimalPlaces(DataType.NUMERIC_VARIABLE.getId().equals((Integer) result.get(VARIABLE_DATA_TYPE_ID)) ? 4 : null);
-			final List<String> categories =
-				Arrays.asList(result.get(VARIABLE_SCALE_CATEGORIES) != null ? StringUtils.split(String.valueOf(result.get(VARIABLE_SCALE_CATEGORIES)), "|") : null);
+			final List<String> categories = result.get(VARIABLE_SCALE_CATEGORIES) != null ?
+				Arrays.asList(StringUtils.split(String.valueOf(result.get(VARIABLE_SCALE_CATEGORIES)), "|")) : null;
 			scale.getValidValues().setCategories(categories);
 
 			final VariableDTO.OntologyReference scaleOntologyReference =
