@@ -45,7 +45,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.StudyResultSetByNameStartDateSeasonCountry;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
@@ -278,17 +277,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<Experiment> getExperiments(final int dataSetId, final int start, final int numRows) {
 		final VariableTypeList variableTypes = this.dataSetBuilder.getVariableTypes(dataSetId);
 		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
-	}
-
-	@Override
-	public List<Experiment> getExperimentsOfFirstInstance(final int dataSetId, final int start, final int numOfRows) {
-		final VariableTypeList variableTypes = this.dataSetBuilder.getVariableTypes(dataSetId);
-		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numOfRows, variableTypes, true);
-	}
-
-	@Override
-	public VariableTypeList getTreatmentFactorVariableTypes(final int dataSetId) {
-		return this.dataSetBuilder.getTreatmentFactorVariableTypes(dataSetId);
 	}
 
 	@Override
@@ -1076,11 +1064,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Phenotype getPhenotypeById(final int phenotypeId) {
-		return this.getPhenotypeDao().getById(phenotypeId);
-	}
-
-	@Override
 	public StudyMetadata getStudyMetadataForGeolocationId(final Integer geolocationId) {
 		return this.getDmsProjectDao().getStudyMetadataForEnvironmentId(geolocationId);
 	}
@@ -1101,32 +1084,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(final Integer studyId) {
-		return this.getExperimentDao().getExperimentSamplesDTOMap(studyId);
-	}
-
-	@Override
-	public Map<Integer, Integer> getInstanceNumberEnvironmentIdMap(final Integer studyId) {
-		final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao().getEnvironments(studyId);
-		final Map<Integer, Integer> map = new HashMap<>();
-		for (final ExperimentModel environment : environments) {
-			map.put(environment.getObservationUnitNo(), environment.getNdExperimentId());
-		}
-		return map;
-	}
-
-	@Override
 	public boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(
 		final String variableId, final String variableValue,
 		final String programUUID) {
 
 		return this.getDmsProjectDao().isVariableUsedInOtherPrograms(variableId, variableValue, programUUID);
 
-	}
-
-	@Override
-	public List<StudyTypeDto> getAllStudyTypes() {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getAll());
 	}
 
 	@Override
@@ -1246,17 +1209,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	public Boolean existInstances(final Set<Integer> instanceIds) {
 		return this.daoFactory.getEnvironmentDao().existInstances(instanceIds);
-	}
-
-	@Override
-	public Map<Integer, String> getEnvironmentVariableValues(final Integer datasetId, final Integer instanceDbId) {
-		final ExperimentModel environment = this.daoFactory.getEnvironmentDao().getById(instanceDbId);
-		final Map<Integer, String> geoLocationMap =
-			this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariablesMap(datasetId, instanceDbId);
-
-		geoLocationMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(environment.getObservationUnitNo()));
-
-		return geoLocationMap;
 	}
 
 	@Override

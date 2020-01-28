@@ -136,24 +136,6 @@ public interface StudyDataManager {
 	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList);
 
 	/**
-	 * Gets the experiments of the first Instance.
-	 *
-	 * @param dataSetId the data set id
-	 * @param start     the start
-	 * @param numOfRows the num of rows
-	 * @return the experiments
-	 */
-	List<Experiment> getExperimentsOfFirstInstance(final int dataSetId, final int start, final int numOfRows);
-
-	/**
-	 * Gets the treatment factor variables of the study
-	 *
-	 * @param dataSetId
-	 * @return
-	 */
-	VariableTypeList getTreatmentFactorVariableTypes(final int dataSetId);
-
-	/**
 	 * Get the number of experiments in a dataset. Retrieves from central if the given ID is positive, otherwise retrieves from local.
 	 *
 	 * @param dataSetId the data set id
@@ -646,8 +628,6 @@ public interface StudyDataManager {
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
 
-	Phenotype getPhenotypeById(int phenotypeId);
-
 	StudyMetadata getStudyMetadataForGeolocationId(Integer geolocationId);
 
 	Map<String, String> getEnvironmentVariableNameValuesMap(Integer environmentId);
@@ -665,12 +645,6 @@ public interface StudyDataManager {
 	Map<Integer, String> getExperimentSampleMap(final Integer studyDbId);
 
 	/**
-	 * @param studyId
-	 * @return a map of experiments ids with a list of it sampled plants
-	 */
-	Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(final Integer studyId);
-
-	/**
 	 * Detect the usage of the specified variable in any programs except for the specified programUUID.
 	 *
 	 * @param variableId    - The term id of the variable (e.g. 8190 to look for variable LOCATION_NAME_ID)
@@ -680,10 +654,6 @@ public interface StudyDataManager {
 	 */
 	boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(
 		final String variableId, final String variableValue, final String programUUID);
-
-	Map<Integer, Integer> getInstanceNumberEnvironmentIdMap(final Integer studyId);
-
-	List<StudyTypeDto> getAllStudyTypes();
 
 	StudyTypeDto getStudyTypeByName(String name);
 
@@ -727,8 +697,6 @@ public interface StudyDataManager {
 	FieldmapBlockInfo getBlockInformation(int blockId);
 
 	Boolean existInstances(final Set<Integer> instanceIds);
-
-	Map<Integer, String> getEnvironmentVariableValues(final Integer datasetId, final Integer instanceDbId);
 
 	Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId);
 
