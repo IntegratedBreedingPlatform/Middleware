@@ -1639,8 +1639,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				scale.getValidValues().setMin((Double) result.get(VARIABLE_EXPECTED_MIN));
 				scale.getValidValues().setMax((Double) result.get(VARIABLE_EXPECTED_MAX));
 			} else {
-				scale.getValidValues().setMin((Double) result.get(VARIABLE_SCALE_MIN_RANGE));
-				scale.getValidValues().setMax((Double) result.get(VARIABLE_SCALE_MAX_RANGE));
+				scale.getValidValues().setMin(result.get(VARIABLE_SCALE_MIN_RANGE) != null ? (Double) result.get(VARIABLE_SCALE_MIN_RANGE) : 0);
+				scale.getValidValues().setMax(result.get(VARIABLE_SCALE_MAX_RANGE) != null ? (Double) result.get(VARIABLE_SCALE_MAX_RANGE): 0);
 			}
 
 			scale.setDataType(this.convertDataTypeToVariableDtoScale((Integer) result.get(VARIABLE_DATA_TYPE_ID)));
