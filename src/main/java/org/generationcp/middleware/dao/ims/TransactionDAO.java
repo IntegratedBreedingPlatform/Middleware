@@ -771,11 +771,18 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final Lot lot = new Lot();
 		lot.setId(transactionDto.getLot().getLotId());
 		final Transaction transaction = new Transaction();
-		if (TransactionType.DEPOSIT.getValue().equalsIgnoreCase(transactionDto.getTransactionType()) || TransactionType.WITHDRAWAL
-			.getValue().equalsIgnoreCase(transactionDto.getTransactionType())) {
+		if (TransactionType.DEPOSIT.getValue().equalsIgnoreCase(transactionDto.getTransactionType())) {
 			transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
+			transaction.setType(TransactionType.DEPOSIT.getId());
+		} else if (TransactionType.WITHDRAWAL.getValue().equalsIgnoreCase(transactionDto.getTransactionType())) {
+			transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
+			transaction.setType(TransactionType.WITHDRAWAL.getId());
+		} else if (TransactionType.ADJUSTMENT.getValue().equalsIgnoreCase(transactionDto.getTransactionType())) {
+			transaction.setStatus(TransactionStatus.PENDING.getIntValue());
+			transaction.setType(TransactionType.ADJUSTMENT.getId());
 		} else {
 			transaction.setStatus(TransactionStatus.PENDING.getIntValue());
+			transaction.setType(TransactionType.DISCARD.getId());
 		}
 		transaction.setLot(lot);
 		transaction.setPersonId(Integer.valueOf(transactionDto.getCreatedByUsername()));
