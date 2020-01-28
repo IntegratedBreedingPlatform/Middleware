@@ -16,6 +16,7 @@ import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.util.Util;
 
 import java.text.DecimalFormat;
@@ -34,7 +35,7 @@ public class TransactionBuilder extends Builder {
 		final Transaction transaction =
 				new Transaction(null, userId, lot, this.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
 						this.formatAmount(amount), comment, TransactionBuilder.COMMITMENT_DATE_INDEFINITE, EntityType.LIST.name(),
-						sourceId, lRecordID, 0d, personId, inventoryID);
+						sourceId, lRecordID, 0d, personId, inventoryID, TransactionType.DEPOSIT.getId());
 
 		transaction.setBulkCompl(bulkComp);
 		transaction.setBulkWith(bulkWith);

@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -291,7 +292,7 @@ public class InventoryServiceImplTest {
 						TransactionStatus.PENDING.getIntValue(),
 						Double.valueOf(new DecimalFormat("#.000").format(details.getAmount())), details.getComment(), 0,
 						EntityType.LIST.name(), details.getSourceId(), listData == null ? 0 : listData.getId(), 0d, 1,
-						details.getInventoryID());
+						details.getInventoryID(), TransactionType.DEPOSIT.getId());
 
 		transaction.setBulkCompl(details.getBulkCompl());
 		transaction.setBulkWith(details.getBulkWith());

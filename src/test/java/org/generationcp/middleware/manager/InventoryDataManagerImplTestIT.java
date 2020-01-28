@@ -99,13 +99,13 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		this.lot.setId(this.lotId);
 
 		final List<Transaction> transactions = new ArrayList<Transaction>();
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140413)), 1, -1d, "sample added transaction 1", 0, null, null, null, 100d, 1, null));
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 1, -2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 0, -2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 0, 2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140413)), 1, -1d, "sample added transaction 1", 0, null, null, null, 100d, 1, null, TransactionType.DEPOSIT.getId()));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 1, -2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null, TransactionType.DEPOSIT.getId()));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 0, -2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null, TransactionType.DEPOSIT.getId()));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 0, 2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null, TransactionType.DEPOSIT.getId()));
 		transactions.add(new Transaction(null, 1, this.lot, new Date((20140413)), 1, -1d, "sample added transaction 1", 0, null, null,
-				null, 100d, 1, null));
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20120518)), 1, 2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+				null, 100d, 1, null, TransactionType.DEPOSIT.getId()));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20120518)), 1, 2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null, TransactionType.DEPOSIT.getId()));
 		final Set<Transaction> transactionSet = new HashSet<>();
 		transactionSet.add(transactions.get(4));
 		this.lot.setTransactions(transactionSet);
@@ -276,7 +276,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	public void testAddTransaction() {
 		final Transaction transaction =
 				new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0),
-					new Date((20140413)), 1, 200d, "sample added transaction", 0, null, null, null, 100d, 1, null);
+					new Date((20140413)), 1, 200d, "sample added transaction", 0, null, null, null, 100d, 1, null, TransactionType.DEPOSIT.getId());
 		this.manager.addTransaction(transaction);
 		Assert.assertNotNull(transaction.getId());
 		Debug.println(IntegrationTestBase.INDENT, "testAddTransaction() Added: " + transaction);
@@ -286,8 +286,8 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	public void testAddTransactions() {
 		// this test assumes there are existing lot records with entity type = GERMPLSM
 		final List<Transaction> transactions = new ArrayList<Transaction>();
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140413)), 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, 1, null));
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140413)), 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, 1, null, TransactionType.DEPOSIT.getId()));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, 1, null, TransactionType.DEPOSIT.getId()));
 		this.manager.addTransactions(transactions);
 		Assert.assertNotNull(transactions.get(0).getId());
 		Debug.printObjects(IntegrationTestBase.INDENT, transactions);
@@ -678,13 +678,13 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 
 		final List<Transaction> transactions = new ArrayList<Transaction>();
 		final Transaction transaction1 = new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0),
-			date1, 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, 1, null);
+			date1, 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, 1, null, TransactionType.DEPOSIT.getId());
 		transactions.add(transaction1);
 
 		final String sDate2 = "18/05/2014";
 		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
 		final Transaction transaction2 = new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0),
-			date2, 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, 1, null);
+			date2, 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, 1, null, TransactionType.DEPOSIT.getId());
 		transactions.add(transaction2);
 
 		this.manager.addTransactions(transactions);
