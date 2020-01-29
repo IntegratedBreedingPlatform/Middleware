@@ -25,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -422,6 +423,34 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return null;
+	}
+
+
+	public Map<Integer, Integer> getExperimentIdEnvironmentIdMap(final Integer datasetId) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("select e.nd_experiment_id, env.nd_experiment_id as environmentId ");
+		sb.append("from nd_experiment e ");
+		sb.append("inner join project pr ON pr.project_id = e.project_id ");
+		sb.append("inner join project env_ds ON pr.study_id = env_ds.study_id and env_ds.dataset_type_id = 3 ");
+		sb.append("inner join nd_experiment env ON env.project_id = env_ds.project_id and env.type_id = 1020 ");
+		sb.append("inner join nd_experiment plot ON (plot.nd_experiment_id = e.nd_experiment_id OR plot.nd_experiment_id = e.parent_id) ");
+		sb.append("  and plot.parent_id = env.nd_experiment_id and plot.type_id = 1155 ");
+		sb.append("where e.project_id = :datasetId ");
+
+		final SQLQuery createSQLQuery = this.getSession().createSQLQuery(sb.toString());
+		createSQLQuery.addScalar("nd_experiment_id", new IntegerType());
+		createSQLQuery.addScalar("environmentId", new IntegerType());
+		createSQLQuery.setParameter("datasetId", datasetId);
+
+		final List<Object[]> results = createSQLQuery.list();
+		final Map<Integer, Integer> map = new HashMap<>();
+		if (results != null && !results.isEmpty()) {
+			for (final Object[] row : results) {
+				map.put((Integer) row[0], (Integer) row[1]);
+			}
+		}
+		return map;
+
 	}
 
 

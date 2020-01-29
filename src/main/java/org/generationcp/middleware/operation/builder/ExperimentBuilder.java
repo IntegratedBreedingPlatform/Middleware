@@ -22,7 +22,10 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -32,31 +35,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public class ExperimentBuilder extends Builder {
+public class ExperimentBuilder {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentBuilder.class);
+	private final DaoFactory daoFactory;
 	
-	public ExperimentBuilder(final HibernateSessionProvider sessionProviderForLocal) {
-		super(sessionProviderForLocal);
+	public ExperimentBuilder(final HibernateSessionProvider sessionProvider) {
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public long count(final int dataSetId) {
-		return this.getExperimentDao().count(dataSetId);
+		return this.daoFactory.getExperimentDao().count(dataSetId);
 	}
 
 	public List<Experiment> build(final int projectId, final TermId type, final int start, final int numOfRows, final VariableTypeList variableTypes)
 			{
 		final List<Experiment> experiments = new ArrayList<>();
 		final List<ExperimentModel> experimentModels =
-				this.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
+				this.daoFactory.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
+
 		final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
-		for (final ExperimentModel experimentModel : experimentModels) {
-			experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap));
+				final Map<Integer, Integer> environmentIdMap = this.getEnvironmentIdMap(experimentModels, projectId);
+				for (final ExperimentModel experimentModel : experimentModels) {
+			experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap, environmentIdMap));
 		}
 		return experiments;
 	}
@@ -65,7 +73,7 @@ public class ExperimentBuilder extends Builder {
 			final boolean hasVariableType) {
 		final List<Experiment> experiments = new ArrayList<>();
 		final List<ExperimentModel> experimentModels =
-				this.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
+				this.daoFactory.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
 		for (final ExperimentModel experimentModel : experimentModels) {
 			experiments.add(this.createExperiment(experimentModel, variableTypes, hasVariableType));
 		}
@@ -91,17 +99,35 @@ public class ExperimentBuilder extends Builder {
 		try {
 			final List<Experiment> experiments = new ArrayList<>();
 			final List<ExperimentModel> experimentModels =
-					this.getExperimentDao().getExperiments(projectId, types, start, numOfRows, false);
+					this.daoFactory.getExperimentDao().getExperiments(projectId, types, start, numOfRows, false);
+
+
+
 			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
 			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
-
+			final Map<Integer, Integer> environmentIdsMap = this.getEnvironmentIdMap(experimentModels, projectId);
 			for (final ExperimentModel experimentModel : experimentModels) {
-				experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap));
+				experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap, environmentIdsMap));
 			}
 			return experiments;
 		} finally {
 			LOG.debug("" + monitor.stop());
 		}
+	}
+
+	private Map<Integer, Integer> getEnvironmentIdMap(final List<ExperimentModel> experimentModels, final Integer projectId) {
+		final DatasetType datasetType = this.daoFactory.getDmsProjectDAO().getById(projectId).getDatasetType();
+		if (datasetType != null) {
+			if (DatasetTypeEnum.PLOT_DATA.getId() == datasetType.getDatasetTypeId()) {
+				return experimentModels.stream().collect(Collectors.toMap(ExperimentModel::getNdExperimentId, e -> e.getParent().getNdExperimentId()));
+			} else if (datasetType.isSubObservationType()) {
+				return this.daoFactory.getEnvironmentDao().getExperimentIdEnvironmentIdMap(projectId);
+			}
+			// If environment dataset, the experiment id is the environment id
+			return experimentModels.stream().collect(Collectors.toMap(ExperimentModel::getNdExperimentId, ExperimentModel::getNdExperimentId));
+		}
+		// Experiment for the Study project record
+		return Collections.emptyMap();
 	}
 
 	public List<Experiment> build(final int projectId, final List<TermId> types, final int start, final int numOfRows,
@@ -111,12 +137,12 @@ public class ExperimentBuilder extends Builder {
 			final List<Experiment> experiments = new ArrayList<>();
 
 			final List<ExperimentModel> experimentModels =
-					this.getExperimentDao().getExperiments(projectId, types, start, numOfRows, firstInstance);
+					this.daoFactory.getExperimentDao().getExperiments(projectId, types, start, numOfRows, firstInstance);
 			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
 			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
-
+			final Map<Integer, Integer> environmentIdsMap = this.getEnvironmentIdMap(experimentModels, projectId);
 			for (final ExperimentModel experimentModel : experimentModels) {
-				experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap));
+				experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap, environmentIdsMap));
 			}
 			return experiments;
 		} finally {
@@ -142,9 +168,13 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private Experiment createExperiment(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
-			final Map<Integer, StockModel> stockModelMap) {
+			final Map<Integer, StockModel> stockModelMap, final Map<Integer, Integer> environmentIdMap) {
 		final Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
+		final Integer environmentId = environmentIdMap.get(experimentModel.getNdExperimentId());
+		if (environmentId != null) {
+			experiment.setLocationId(environmentId);
+		}
 		experiment.setFactors(this.getFactors(experimentModel, variableTypes, stockModelMap));
 		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
 		experiment.setObsUnitId(experimentModel.getObsUnitId());
@@ -293,7 +323,7 @@ public class ExperimentBuilder extends Builder {
 			if (stockModelMap != null && stockModelMap.get(stockId) != null) {
 				stockModel = stockModelMap.get(stockId);
 			} else {
-				stockModel = this.getStockBuilder().get(stockId);
+				stockModel = this.daoFactory.getStockDao().getById(stockId);
 			}
 			
 			for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
@@ -383,17 +413,13 @@ public class ExperimentBuilder extends Builder {
 		return variable;
 	}
 
-	public ExperimentModel getExperimentModel(final int experimentId) {
-		return this.getExperimentDao().getById(experimentId);
-	}
-
 	public boolean hasFieldmap(final int datasetId) {
-		return this.getExperimentDao().hasFieldmap(datasetId);
+		return this.daoFactory.getExperimentDao().hasFieldmap(datasetId);
 	}
 
 	public boolean checkIfStudyHasFieldmap(final int studyId) {
-		final List<Integer> geolocationIdsOfStudy = this.getExperimentDao().getInstanceIds(studyId);
-		final List<Integer> geolocationIdsOfStudyWithFieldmap = this.getExperimentDao().getLocationIdsOfStudyWithFieldmap(studyId);
+		final List<Integer> geolocationIdsOfStudy = this.daoFactory.getExperimentDao().getInstanceIds(studyId);
+		final List<Integer> geolocationIdsOfStudyWithFieldmap = this.daoFactory.getExperimentDao().getLocationIdsOfStudyWithFieldmap(studyId);
 		return geolocationIdsOfStudy.size() == geolocationIdsOfStudyWithFieldmap.size();
 	}
 }
