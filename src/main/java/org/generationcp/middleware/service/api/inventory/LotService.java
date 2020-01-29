@@ -18,7 +18,7 @@ public interface LotService {
 
 	Integer saveLot(LotGeneratorInputDto lotDto, final CropType cropType);
 
-	void saveLotsWithInitialTransaction(List<LotItemDto> lotItemDtos);
+	void saveLotsWithInitialTransaction(CropType cropType, Integer userId, List<LotItemDto> lotItemDtos);
 
 	List<LotDto> getLotsByStockIds(List<String> stockIds);
 
