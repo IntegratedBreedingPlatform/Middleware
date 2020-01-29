@@ -898,6 +898,40 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	}
 
 	public List<LotDto> getLotsByStockIds(final List<String> stockIds) {
-		return null;
+		try {
+			final String sql = "select l.lotid as lotId, " //
+				+ "  l.stock_id as stockId, " //
+				+ "  l.eid as gid, " //
+				+ "  l.locid as locationId, " //
+				+ "  l.scaleid as scaleId, " //
+				+ "  l.comments as comments, " //
+				+ "  u.uname as createdByUsername, " //
+				+ "  CASE WHEN l.status = 0 then 'Active' else 'Closed' end as status " //
+				+ "from ims_lot l " //
+				+ "       inner join workbench.users u on (u.userid = l.userid) " //
+				+ "where l.stock_id in (:stockIds)";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addScalar("lotId", Hibernate.INTEGER);
+			query.addScalar("stockId", Hibernate.STRING);
+			query.addScalar("gid", Hibernate.INTEGER);
+			query.addScalar("locationId", Hibernate.INTEGER);
+			query.addScalar("scaleId", Hibernate.INTEGER);
+			query.addScalar("comments", Hibernate.STRING);
+			query.addScalar("createdByUsername", Hibernate.STRING);
+			query.addScalar("status", Hibernate.STRING);
+
+			query.setParameterList("stockIds", stockIds);
+
+			query.setResultTransformer(Transformers.aliasToBean(LotDto.class));
+
+			return query.list();
+
+		} catch (final HibernateException e) {
+
+			final String message = "Error with getLotsByStockIds query on LotDAO: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 }
