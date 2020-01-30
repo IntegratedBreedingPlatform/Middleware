@@ -372,7 +372,7 @@ public class WorkbookBuilder extends Builder {
 		 * TODO Extract common code with
 		 * {@link WorkbookBuilder#create(int, StudyType)}
 		 */
-
+		final GeolocationPropertyDao geolocationPropertyDao = this.daoFactory.getGeolocationPropertyDao();
 		for (final ProjectProperty projectProperty : projectProperties) {
 			boolean isConstant = false;
 			final StandardVariable stdVariable = this.getStandardVariableBuilder()
@@ -406,6 +406,10 @@ public class WorkbookBuilder extends Builder {
 						final MeasurementVariable measurementVariable = this.createMeasurementVariable(stdVariable,
 							projectProperty, value, minRange, maxRange, varType);
 						if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
+							if(value.equals("") && VariableType.ENVIRONMENT_DETAIL.equals(varType)){
+								value = geolocationPropertyDao.getGeolocationPropValue(stdVariable.getId(), id);
+								measurementVariable.setValue(value);
+							}
 							experimentalDesignVariables.add(measurementVariable);
 						} else if (isConstant) {
 							constants.add(measurementVariable);
