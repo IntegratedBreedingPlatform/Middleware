@@ -6,6 +6,10 @@ public class BrapiView {
 
 	}
 
+	/**
+	 * Deprecated TODO merge with v1_3 into a v1 (no need to hide fields between minor versions)
+	 */
+	@Deprecated
 	public static class BrapiV1_2 {
 
 	}
