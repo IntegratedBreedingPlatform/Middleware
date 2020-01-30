@@ -659,14 +659,14 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
  		+ "  l.lname as locationName, " //
 		+ "  lot.scaleid as scaleId, " //
 		+ "  scale.name as scaleName, " //
-		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() +" AND transaction.trnqty > 0 THEN transaction.trnqty ELSE 0 END) AS actualBalance, " //
+		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty > 0 THEN transaction.trnqty ELSE 0 END) AS actualBalance, " //
 		+ "  CASE WHEN SUM(transaction.trnqty) is null THEN 0 ELSE SUM(transaction.trnqty) END AS availableBalance, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() + " AND transaction.trnqty <= 0 THEN transaction.trnqty * -1 ELSE 0 END) AS reservedTotal, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty <= 0 THEN transaction.trnqty * -1 ELSE 0 END) AS withdrawalTotal, " //
 		+ "  lot.comments as comments, " //
 		+ "  users.uname as createdByUsername, " //
 		+ "  lot.created_date as createdDate, " //
-		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() + " AND transaction.trnqty > 0 THEN transaction.trndate ELSE null END) AS lastDepositDate, " //
+		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND transaction.trnqty > 0 THEN transaction.trndate ELSE null END) AS lastDepositDate, " //
 		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND transaction.trnqty <= 0 THEN transaction.trndate ELSE null END) AS lastWithdrawalDate " //
 		+ "FROM ims_lot lot " //
 		+ "       LEFT JOIN ims_transaction transaction ON transaction.lotid = lot.lotid AND transaction.trnstat <> " + TransactionStatus.CANCELLED.getIntValue()  //
@@ -746,12 +746,12 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.append(" having 1=1 ");
 
 			if (lotsSearchDto.getMinActualBalance() != null) {
-				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() +" AND transaction.trnqty > 0 THEN transaction.trnqty ELSE 0 END) >= ")
+				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty > 0 THEN transaction.trnqty ELSE 0 END) >= ")
 						.append(lotsSearchDto.getMinActualBalance()).append(" ");
 			}
 
 			if (lotsSearchDto.getMaxActualBalance() != null) {
-				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() +" AND transaction.trnqty > 0 THEN transaction.trnqty ELSE 0 END) <= ")
+				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty > 0 THEN transaction.trnqty ELSE 0 END) <= ")
 						.append(lotsSearchDto.getMaxActualBalance()).append(" ");
 			}
 
@@ -791,14 +791,14 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 			if (lotsSearchDto.getLastDepositDateFrom() != null) {
 				query.append(
-						" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() +" AND transaction.trnqty > 0 THEN transaction.trndate ELSE null END)) >= '")
+						" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty > 0 THEN transaction.trndate ELSE null END)) >= '")
 						.
 								append(format.format(lotsSearchDto.getLastDepositDateFrom())).append("' ");
 			}
 
 			if (lotsSearchDto.getLastDepositDateTo() != null) {
 				query.append(
-						" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() +" AND transaction.trnqty > 0 THEN transaction.trndate ELSE null END)) <= '")
+						" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty > 0 THEN transaction.trndate ELSE null END)) <= '")
 						.
 								append(format.format(lotsSearchDto.getLastDepositDateTo())).append("' ");
 			}
