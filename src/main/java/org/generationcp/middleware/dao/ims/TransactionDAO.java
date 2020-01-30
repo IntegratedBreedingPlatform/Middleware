@@ -17,7 +17,6 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -767,33 +766,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
-	public Transaction saveTransaction(final TransactionDto transactionDto) {
-		final Lot lot = new Lot();
-		lot.setId(transactionDto.getLot().getLotId());
-		final Transaction transaction = new Transaction();
-		if (TransactionType.DEPOSIT.getValue().equalsIgnoreCase(transactionDto.getTransactionType())) {
-			transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
-			transaction.setType(TransactionType.DEPOSIT.getId());
-		} else if (TransactionType.WITHDRAWAL.getValue().equalsIgnoreCase(transactionDto.getTransactionType())) {
-			transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
-			transaction.setType(TransactionType.WITHDRAWAL.getId());
-		} else if (TransactionType.ADJUSTMENT.getValue().equalsIgnoreCase(transactionDto.getTransactionType())) {
-			transaction.setStatus(TransactionStatus.PENDING.getIntValue());
-			transaction.setType(TransactionType.ADJUSTMENT.getId());
-		} else {
-			transaction.setStatus(TransactionStatus.PENDING.getIntValue());
-			transaction.setType(TransactionType.DISCARD.getId());
-		}
-		transaction.setLot(lot);
-		transaction.setPersonId(Integer.valueOf(transactionDto.getCreatedByUsername()));
-		transaction.setUserId(Integer.valueOf(transactionDto.getCreatedByUsername()));
-		transaction.setTransactionDate(new Date());
-		transaction.setQuantity(transactionDto.getAmount());
-		transaction.setPreviousAmount(0D);
-		//FIXME Commitment date in some cases is not 0. For Deposits is always zero, but for other types it will be the current date
-		transaction.setCommitmentDate(0);
-		transaction.setComments(transactionDto.getNotes());
-
+	public Transaction saveTransaction(final Transaction transaction) {
 		return this.saveOrUpdate(transaction);
 	}
 }
