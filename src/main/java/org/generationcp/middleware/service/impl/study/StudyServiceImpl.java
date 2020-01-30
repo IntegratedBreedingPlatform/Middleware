@@ -551,23 +551,23 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<VariableDTO> getVariablesByStudyId(final Integer pageSize, final Integer pageNumber,
 		final Integer studyId, final List<Integer> variableTypes, final String cropname) {
-		return this.daoFactory.getCvTermDao().getVariables(pageSize, pageNumber, studyId, variableTypes, cropname);
+		return this.daoFactory.getCvTermDao().getVariablesByStudy(pageSize, pageNumber, studyId, variableTypes, cropname);
 	}
 
 	@Override
 	public long countVariablesByStudyId(final Integer studyId, final List<Integer> variableTypes) {
-		return this.daoFactory.getCvTermDao().countObservationVariables(studyId, variableTypes);
+		return this.daoFactory.getCvTermDao().countVariablesByStudy(studyId, variableTypes);
 	}
 
 	@Override
-	public List<VariableDTO> getVariables(final Integer pageSize, final Integer pageNumber, final List<Integer> variableTypes,
+	public List<VariableDTO> getAllVariables(final Integer pageSize, final Integer pageNumber, final List<Integer> variableTypes,
 		final String cropname) {
-		return this.daoFactory.getCvTermDao().getVariables(pageSize, pageNumber, null, variableTypes, cropname);
+		return this.daoFactory.getCvTermDao().getAllVariables(pageSize, pageNumber, variableTypes, cropname);
 	}
 
 	@Override
-	public long countVariables(final List<Integer> variableTypes) {
-		return this.daoFactory.getCvTermDao().countObservationVariables(null, variableTypes);
+	public long countAllVariables(final List<Integer> variableTypes) {
+		return this.daoFactory.getCvTermDao().countAllVariables(variableTypes);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
