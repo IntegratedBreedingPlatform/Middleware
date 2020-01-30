@@ -1436,7 +1436,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error in countObservationVariables() query in DmsProjectDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in countAllVariables() query in CVTermDao: " + e.getMessage(), e);
 		}
 	}
 
@@ -1461,7 +1461,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	/**
-	 * Count the variables in a study filtered by variableTypes.
+	 * Count the variables associated to a study filtered by variableTypes.
 	 *
 	 * @param studyId
 	 * @param variableTypes
@@ -1481,7 +1481,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error in countObservationVariables() query in DmsProjectDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in countVariablesByStudy() query in CVTermDao: " + e.getMessage(), e);
 		}
 	}
 
