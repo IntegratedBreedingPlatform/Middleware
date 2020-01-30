@@ -418,23 +418,21 @@
 					select count(1)
 					from ims_transaction it
 					WHERE
-					trnid IN (SELECT
-					t.trnid
-					FROM
-					ims_transaction t
-					INNER JOIN
-					ims_lot l ON t.lotid = l.lotid
-					WHERE
-					t.trnstat = 1 AND l.status = 1
-					AND t.comments = 'Discard'
-					AND t.trnid >= (SELECT
-					MAX(trnid)
-					FROM
-					ims_transaction tr
-					WHERE
-					tr.lotid = l.lotid))
-					AND trnqty &lt; 0
-					AND trnstat = 1;
+						trnid IN (SELECT
+									t.trnid
+								FROM
+									ims_transaction t
+								INNER JOIN
+									ims_lot l ON t.lotid = l.lotid
+								WHERE
+									t.trnstat = 1 AND l.status = 1 AND trnqty &lt; 0
+								AND t.comments = 'Discard'
+								AND t.trnid = (SELECT
+													MAX(trnid)
+												FROM
+													ims_transaction tr
+												WHERE
+													tr.lotid = l.lotid));
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -444,25 +442,23 @@
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
 			SET
-			trntype = 2
+				trntype = 2
 			WHERE
-			trnid IN (SELECT
-			t.trnid
-			FROM
-			(select * from ims_transaction) t
-			INNER JOIN
-			ims_lot l ON t.lotid = l.lotid
-			WHERE
-			t.trnstat = 1 AND l.status = 1
-			AND t.comments = 'Discard'
-			AND t.trnid >= (SELECT
-			MAX(trnid)
-			FROM
-			(select * from ims_transaction) as tr
-			WHERE
-			tr.lotid = l.lotid))
-			AND trnqty &lt; 0
-			AND trnstat = 1;
+				trnid IN (SELECT
+					t.trnid
+				FROM
+					(select * from ims_transaction) t
+				INNER JOIN
+					ims_lot l ON t.lotid = l.lotid
+				WHERE
+					t.trnstat = 1 AND l.status = 1 AND trnqty &lt; 0
+				AND t.comments = 'Discard'
+				AND t.trnid = (SELECT
+									MAX(trnid)
+								FROM
+									(select * from ims_transaction) as tr
+								WHERE
+									tr.lotid = l.lotid));
 		</sql>
 	</changeSet>
 
