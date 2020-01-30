@@ -300,8 +300,8 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		final int variableId1 = 20456;
 		// AleuCol_E_1to5
 		final int variableId2 = 51547;
-		// AnthesisGDU_C_day_MIN
-		final int variableId3 = 60702;
+		// ASI_Cmp_day
+		final int variableId3 = 20308;
 
 		final DmsProject study = this.createProject("Study " + UUID.randomUUID().toString(), UUID.randomUUID().toString());
 		final DmsProject plotDataset =
@@ -313,7 +313,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		this.testDataInitializer.addProjectProp(plotDataset, variableId1, "PH_M_cm", VariableType.TRAIT, "", 1);
 		this.testDataInitializer.addProjectProp(plantSubObsDataset, variableId2, "AleuCol_E_1to5", VariableType.TRAIT, "", 1);
 		this.testDataInitializer
-			.addProjectProp(plantSubObsDataset, variableId3, "AnthesisGDU_C_day_MIN", VariableType.OBSERVATION_UNIT, "", 2);
+			.addProjectProp(plantSubObsDataset, variableId3, "ASI_Cmp_day", VariableType.OBSERVATION_UNIT, "", 2);
 
 		final int traitCount = (int) dao.countVariablesByStudy(study.getProjectId(), Lists
 			.newArrayList(VariableType.TRAIT.getId()));
