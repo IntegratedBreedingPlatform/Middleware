@@ -62,9 +62,9 @@ public class ExperimentBuilder {
 				this.daoFactory.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
 
 		final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
-				final Map<Integer, Integer> environmentIdMap = this.getEnvironmentIdMap(experimentModels, projectId);
+				final Map<Integer, ExperimentModel> environmentsMap = this.getEnvironmentMap(experimentModels, projectId);
 				for (final ExperimentModel experimentModel : experimentModels) {
-			experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap, environmentIdMap));
+			experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap, environmentsMap));
 		}
 		return experiments;
 	}
@@ -74,8 +74,9 @@ public class ExperimentBuilder {
 		final List<Experiment> experiments = new ArrayList<>();
 		final List<ExperimentModel> experimentModels =
 				this.daoFactory.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
+		final Map<Integer, ExperimentModel> environmentsMap = this.getEnvironmentMap(experimentModels, projectId);
 		for (final ExperimentModel experimentModel : experimentModels) {
-			experiments.add(this.createExperiment(experimentModel, variableTypes, hasVariableType));
+			experiments.add(this.createExperiment(experimentModel, variableTypes, hasVariableType, environmentsMap));
 		}
 		return experiments;
 	}
@@ -105,9 +106,9 @@ public class ExperimentBuilder {
 
 			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
 			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
-			final Map<Integer, Integer> environmentIdsMap = this.getEnvironmentIdMap(experimentModels, projectId);
+			final Map<Integer, ExperimentModel> environmentsMap = this.getEnvironmentMap(experimentModels, projectId);
 			for (final ExperimentModel experimentModel : experimentModels) {
-				experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap, environmentIdsMap));
+				experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap, environmentsMap));
 			}
 			return experiments;
 		} finally {
@@ -115,16 +116,16 @@ public class ExperimentBuilder {
 		}
 	}
 
-	private Map<Integer, Integer> getEnvironmentIdMap(final List<ExperimentModel> experimentModels, final Integer projectId) {
+	private Map<Integer, ExperimentModel> getEnvironmentMap(final List<ExperimentModel> experimentModels, final Integer projectId) {
 		final DatasetType datasetType = this.daoFactory.getDmsProjectDAO().getById(projectId).getDatasetType();
 		if (datasetType != null) {
 			if (DatasetTypeEnum.PLOT_DATA.getId() == datasetType.getDatasetTypeId()) {
-				return experimentModels.stream().collect(Collectors.toMap(ExperimentModel::getNdExperimentId, e -> e.getParent().getNdExperimentId()));
+				return experimentModels.stream().collect(Collectors.toMap(ExperimentModel::getNdExperimentId, ExperimentModel::getParent));
 			} else if (datasetType.isSubObservationType()) {
-				return this.daoFactory.getEnvironmentDao().getExperimentIdEnvironmentIdMap(projectId);
+				return this.daoFactory.getEnvironmentDao().getExperimentIdEnvironmentMap(projectId);
 			}
 			// If environment dataset, the experiment id is the environment id
-			return experimentModels.stream().collect(Collectors.toMap(ExperimentModel::getNdExperimentId, ExperimentModel::getNdExperimentId));
+			return experimentModels.stream().collect(Collectors.toMap(ExperimentModel::getNdExperimentId, e -> e));
 		}
 		// Experiment for the Study project record
 		return Collections.emptyMap();
@@ -140,9 +141,9 @@ public class ExperimentBuilder {
 					this.daoFactory.getExperimentDao().getExperiments(projectId, types, start, numOfRows, firstInstance);
 			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
 			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
-			final Map<Integer, Integer> environmentIdsMap = this.getEnvironmentIdMap(experimentModels, projectId);
+			final Map<Integer, ExperimentModel> environmentsMap = this.getEnvironmentMap(experimentModels, projectId);
 			for (final ExperimentModel experimentModel : experimentModels) {
-				experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap, environmentIdsMap));
+				experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap, environmentsMap));
 			}
 			return experiments;
 		} finally {
@@ -168,24 +169,29 @@ public class ExperimentBuilder {
 	}
 
 	private Experiment createExperiment(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
-			final Map<Integer, StockModel> stockModelMap, final Map<Integer, Integer> environmentIdMap) {
+			final Map<Integer, StockModel> stockModelMap, final Map<Integer, ExperimentModel> environmentsMap) {
 		final Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
-		final Integer environmentId = environmentIdMap.get(experimentModel.getNdExperimentId());
-		if (environmentId != null) {
-			experiment.setLocationId(environmentId);
+		final ExperimentModel environment = environmentsMap.get(experimentModel.getNdExperimentId());
+		if (environment != null) {
+			experiment.setLocationId(environment.getNdExperimentId());
 		}
-		experiment.setFactors(this.getFactors(experimentModel, variableTypes, stockModelMap));
+		experiment.setFactors(this.getFactors(experimentModel, variableTypes, stockModelMap, environment));
 		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
 		experiment.setObsUnitId(experimentModel.getObsUnitId());
 		return experiment;
 	}
 
-	private Experiment createExperiment(final ExperimentModel experimentModel, final VariableTypeList variableTypes, final boolean hasVariableType)
+	private Experiment createExperiment(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
+		final boolean hasVariableType, final Map<Integer, ExperimentModel> environmentsMap)
 			{
 		final Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
-		experiment.setFactors(this.getFactors(experimentModel, variableTypes, hasVariableType));
+		final ExperimentModel environment = environmentsMap.get(experimentModel.getNdExperimentId());
+		if (environment != null) {
+			experiment.setLocationId(environment.getNdExperimentId());
+		}
+		experiment.setFactors(this.getFactors(experimentModel, variableTypes, hasVariableType, environment));
 		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
 		return experiment;
 	}
@@ -232,32 +238,32 @@ public class ExperimentBuilder {
 		}
 	}
 
-	private VariableList getFactors(final ExperimentModel experimentModel, final VariableTypeList variableTypes, final Map<Integer, StockModel> stockModelMap)
+	private VariableList getFactors(final ExperimentModel experimentModel, final VariableTypeList variableTypes, final Map<Integer, StockModel> stockModelMap, final ExperimentModel environment)
 			{
 		final VariableList factors = new VariableList();
 
 		this.addPlotExperimentFactors(factors, experimentModel, variableTypes, stockModelMap);
 
-		this.addLocationFactors(experimentModel, factors, variableTypes);
+		this.addEnvironmentFactors(experimentModel, factors, variableTypes, environment);
 
 		return factors.sort();
 	}
 
-	private VariableList getFactors(final ExperimentModel experimentModel, final VariableTypeList variableTypes, final boolean hasVariableType)
+	private VariableList getFactors(final ExperimentModel experimentModel, final VariableTypeList variableTypes, final boolean hasVariableType, final ExperimentModel environment)
 			{
 		final VariableList factors = new VariableList();
 
 		this.addPlotExperimentFactors(factors, experimentModel, variableTypes, hasVariableType);
 
-		this.addLocationFactors(experimentModel, factors, variableTypes);
+		this.addEnvironmentFactors(experimentModel, factors, variableTypes, environment);
 
 		return factors.sort();
 	}
 
-	private void addLocationFactors(final ExperimentModel experimentModel, final VariableList factors, final VariableTypeList variableTypes) {
+	private void addEnvironmentFactors(final ExperimentModel experimentModel, final VariableList factors, final VariableTypeList variableTypes, final ExperimentModel environment) {
 		for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
 			if (PhenotypicType.TRIAL_ENVIRONMENT == variableType.getRole()) {
-				final Variable variable = this.createLocationFactor(experimentModel, variableType);
+				final Variable variable = this.createLocationFactor(experimentModel, variableType, environment);
 				if (variable != null) {
 					variable.getVariableType().setRole(PhenotypicType.TRIAL_ENVIRONMENT);
 					variable.getVariableType().getStandardVariable().setPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
@@ -267,11 +273,12 @@ public class ExperimentBuilder {
 		}
 	}
 
-	protected Variable createLocationFactor(final ExperimentModel experiment, final DMSVariableType variableType) {
+	protected Variable createLocationFactor(final ExperimentModel experiment, final DMSVariableType variableType, final ExperimentModel environment) {
 		final StandardVariable standardVariable = variableType.getStandardVariable();
-		
-		if (standardVariable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-			return new Variable(variableType, experiment.getObservationUnitNo());
+
+		LOG.info("** Expt: " + experiment.getNdExperimentId() + " with envt " + environment != null? (environment.getNdExperimentId() + " :: " +environment.getObservationUnitNo()) : "NULL");
+		if (standardVariable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() && environment != null) {
+			return new Variable(variableType, environment.getObservationUnitNo());
 		}
 
 		final String locVal = this.findLocationValue(variableType.getId(), experiment.getProperties());

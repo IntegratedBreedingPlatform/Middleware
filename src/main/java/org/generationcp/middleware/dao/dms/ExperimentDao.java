@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link ExperimentModel}.
@@ -387,16 +388,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final boolean firstInstance) {
 		try {
 
-			final List<Integer> lists = new ArrayList<>();
-			for (final TermId termId : types) {
-				lists.add(termId.getId());
-			}
+			final List<Integer> typeIds = types.stream().map(t -> t.getId()).collect(Collectors.toList());
 
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("select distinct exp.* from nd_experiment exp ");
-			queryString.append("left join nd_experimentprop plot ON plot.nd_experiment_id = exp.nd_experiment_id and plot.type_id IN (8200,8380) ");
-			queryString.append("left join nd_experimentprop rep ON rep.nd_experiment_id = exp.nd_experiment_id and rep.type_id = 8210 ");
-			queryString.append("left join stock st on st.stock_id = exp.stock_id ");
 			queryString.append("inner join project pr on exp.project_id = pr.project_id ");
 			queryString.append("inner join project env_ds on env_ds.study_id = pr.study_id and env_ds.dataset_type_id = 3 ");
 			queryString.append("inner join nd_experiment env ON env_ds.project_id = env.project_id and env.type_id = 1020 ");
@@ -404,16 +399,13 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			if (firstInstance) {
 				queryString.append("and env.observation_unit_no = 1 ");
 			}
-			queryString.append("order by env.observation_unit_no ASC, ");
-			queryString.append("(plot.value * 1) ASC, ");
-			queryString.append("(rep.value * 1) ASC, ");
-			queryString.append("(st.uniquename * 1) ASC, ");
+			queryString.append("order by (env.observation_unit_no * 1) ASC, ");
 			queryString.append("exp.nd_experiment_id ASC");
 
 			final SQLQuery q = this.getSession().createSQLQuery(queryString.toString());
 			q.addEntity(ExperimentModel.class);
 			q.setParameter("p_id", datasetId);
-			q.setParameterList("type_ids", lists);
+			q.setParameterList("type_ids", typeIds);
 			q.setMaxResults(numOfRows);
 			q.setFirstResult(start);
 

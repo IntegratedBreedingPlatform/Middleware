@@ -62,7 +62,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		variableType.setStandardVariable(standardVariable);
-		final Variable variable = builder.createLocationFactor(geoLocation, variableType);
+		final Variable variable = builder.createLocationFactor(geoLocation, variableType, null);
 		Assert.assertEquals("The variable instance should be set properly since there is a mathcing variable", variable.getValue(),
 				instance);
 	}
@@ -83,7 +83,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(typeId);
 		variableType.setStandardVariable(standardVariable);
-		final Variable variable = builder.createLocationFactor(geoLocation, variableType);
+		final Variable variable = builder.createLocationFactor(geoLocation, variableType, null);
 		Assert.assertEquals("The variable description should be set properly since there is a mathcing variable", variable.getValue(),
 				instance);
 	}
@@ -103,7 +103,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(1001);
 		variableType.setStandardVariable(standardVariable);
-		final Variable variable = builder.createLocationFactor(geoLocation, variableType);
+		final Variable variable = builder.createLocationFactor(geoLocation, variableType, null);
 		Assert.assertNull("The variable be null", variable);
 	}
 

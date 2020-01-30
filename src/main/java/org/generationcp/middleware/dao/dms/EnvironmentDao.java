@@ -426,9 +426,9 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 
-	public Map<Integer, Integer> getExperimentIdEnvironmentIdMap(final Integer datasetId) {
+	public Map<Integer, ExperimentModel> getExperimentIdEnvironmentMap(final Integer datasetId) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("select e.nd_experiment_id, env.nd_experiment_id as environmentId ");
+		sb.append("select e.nd_experiment_id, env.nd_experiment_id as environmentId, env.observation_unit_no ");
 		sb.append("from nd_experiment e ");
 		sb.append("inner join project pr ON pr.project_id = e.project_id ");
 		sb.append("inner join project env_ds ON pr.study_id = env_ds.study_id and env_ds.dataset_type_id = 3 ");
@@ -440,13 +440,18 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 		final SQLQuery createSQLQuery = this.getSession().createSQLQuery(sb.toString());
 		createSQLQuery.addScalar("nd_experiment_id", new IntegerType());
 		createSQLQuery.addScalar("environmentId", new IntegerType());
+		createSQLQuery.addScalar("environmentId", new IntegerType());
 		createSQLQuery.setParameter("datasetId", datasetId);
 
 		final List<Object[]> results = createSQLQuery.list();
-		final Map<Integer, Integer> map = new HashMap<>();
+		final Map<Integer, ExperimentModel> map = new HashMap<>();
 		if (results != null && !results.isEmpty()) {
 			for (final Object[] row : results) {
-				map.put((Integer) row[0], (Integer) row[1]);
+				final Integer environmentId = (Integer) row[1];
+				final Integer instanceNumber = (Integer) row[2];
+				final ExperimentModel experimentModel = new ExperimentModel(environmentId);
+				experimentModel.setObservationUnitNo(instanceNumber);
+				map.put((Integer) row[0], experimentModel);
 			}
 		}
 		return map;
