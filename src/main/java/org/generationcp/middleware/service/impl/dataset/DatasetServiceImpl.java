@@ -303,8 +303,8 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.getDataset(dataset.getProjectId());
 	}
 
-	/*
-	 * Create sub-observation units for each plot observation unit
+	/**
+	 * Creates sub-observation units for each plot observation unit
 	 */
 	void saveSubObservationUnits(
 		final Integer studyId, final List<Integer> instanceIds, final Integer numberOfSubObservationUnits,
