@@ -75,7 +75,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
 			+ "        LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
 			+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
-			+ " WHERE p.study_id = :datasetId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
+			+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
 			+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
 
 	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES =
@@ -222,7 +222,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			return (int) query.uniqueResult() > 0;
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
-				String.format("Unexpected error in executing countTotalObservations(datasetId = %s, instanceNumber = %s) : ",
+				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
 					studyIdentifier, instanceId) + he.getMessage(),
 				he);
 		}
@@ -244,7 +244,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			return (int) query.uniqueResult();
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
-				String.format("Unexpected error in executing countTotalObservations(datasetId = %s, instanceNumber = %s) : ",
+				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
 					studyIdentifier, instanceId) + he.getMessage(),
 				he);
 		}
@@ -531,7 +531,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
-				"Unexpected error in executing hasMeasurementDataEntered(datasetId = " + studyId + ") query: " + he.getMessage(), he);
+				"Unexpected error in executing hasMeasurementDataEntered(studyId = " + studyId + ") query: " + he.getMessage(), he);
 		}
 
 		return !queryResults.isEmpty();
