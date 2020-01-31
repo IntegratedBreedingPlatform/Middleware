@@ -85,7 +85,7 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public void saveLotsWithInitialTransaction(final CropType cropType, final Integer userId, final List<LotItemDto> lotItemDtos) {
-		final List<Location> locations = this.daoFactory.getLocationDAO().filterLocations(STORAGE_LOCATION_TYPE, null, null, lotItemDtos.stream().map(LotItemDto::getStorageLocationAbbr).collect(
+		final List<Location> locations = this.daoFactory.getLocationDAO().filterLocations(STORAGE_LOCATION_TYPE,  null, lotItemDtos.stream().map(LotItemDto::getStorageLocationAbbr).collect(
 			Collectors.toList()));
 		final Map<String, Integer> locationsByAbbreviationMap = locations.stream().collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
 		final VariableFilter variableFilter = new VariableFilter();

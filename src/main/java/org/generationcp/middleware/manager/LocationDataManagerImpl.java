@@ -138,8 +138,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final String programUUID, final List<String> locationAbbreviations) {
-		return this.daoFactory.getLocationDAO().filterLocations(types, locationIds, programUUID, locationAbbreviations);
+	public List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final List<String> locationAbbreviations) {
+		return this.daoFactory.getLocationDAO().filterLocations(types, locationIds, locationAbbreviations);
 	}
 
 	@Override

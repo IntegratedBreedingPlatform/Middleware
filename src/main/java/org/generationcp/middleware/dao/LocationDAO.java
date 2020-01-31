@@ -283,7 +283,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<Location> filterLocations(final Set<Integer> types, final List<Integer> locationIds, final String programUUID, final List<String> locationAbbreviations) {
+	public List<Location> filterLocations(final Set<Integer> types, final List<Integer> locationIds, final List<String> locationAbbreviations) {
 		final List<Location> locations;
 		try {
 
@@ -301,8 +301,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				criteria.add(Restrictions.in(LocationDAO.LABBREVIATION, locationAbbreviations));
 			}
 
-			criteria.add(
-				Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID), Restrictions.isNull(LocationDAO.UNIQUE_ID)));
 			criteria.addOrder(Order.asc(LocationDAO.LNAME));
 			locations = criteria.list();
 
