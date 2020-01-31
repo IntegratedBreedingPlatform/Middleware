@@ -146,7 +146,7 @@ public class WorkbookBuilder extends Builder {
 		// FIXME : this heavy id fetch pattern needs changing
 		final int dataSetId = this.getMeasurementDataSetId(id);
 		// validation, bring inline
-		this.checkMeasurementDataset(Integer.valueOf(dataSetId));
+		this.checkMeasurementDataset(dataSetId);
 		workbook.setMeasurementDatesetId(dataSetId);
 
 		// Variables required to get Experiments (?)
@@ -364,7 +364,7 @@ public class WorkbookBuilder extends Builder {
 		final DmsProject dmsProject = this.dataSetBuilder.getTrialDataset(id);
 		final List<MeasurementVariable> experimentalDesignVariables = new ArrayList<>();
 		final List<ProjectProperty> projectProperties = dmsProject != null ? dmsProject.getProperties()
-			: new ArrayList<ProjectProperty>();
+			: new ArrayList<>();
 		final Map<Integer, VariableType> projectPropRoleMapping = this
 			.generateProjectPropertyRoleMap(projectProperties);
 
@@ -563,7 +563,7 @@ public class WorkbookBuilder extends Builder {
 		measurementVariable.setLabel(measurementVariable.getName());
 		measurementVariable.setFactor(true);
 		measurementVariable.setDataTypeId(DataType.CHARACTER_VARIABLE.getId());
-		measurementVariable.setPossibleValues(new ArrayList<ValueReference>());
+		measurementVariable.setPossibleValues(new ArrayList<>());
 		final String sampleValue = samplesMap.get(experimentId);
 		return new MeasurementData(String.valueOf(TermId.SAMPLES.getId()), sampleValue, false, "C",
 			measurementVariable);
@@ -635,17 +635,12 @@ public class WorkbookBuilder extends Builder {
 		final List<ValueReference> list = new ArrayList<>();
 		final List<Method> methodList = this.getGermplasmDataManager().getAllMethodsNotGenerative();
 
-		Collections.sort(methodList, new Comparator<Method>() {
+		Collections.sort(methodList, (o1, o2) -> {
+			final String methodName1 = o1.getMname().toUpperCase();
+			final String methodName2 = o2.getMname().toUpperCase();
 
-			@Override
-			public int compare(final Method o1, final Method o2) {
-				final String methodName1 = o1.getMname().toUpperCase();
-				final String methodName2 = o2.getMname().toUpperCase();
-
-				// ascending order
-				return methodName1.compareTo(methodName2);
-			}
-
+			// ascending order
+			return methodName1.compareTo(methodName2);
 		});
 
 		if (!methodList.isEmpty()) {
@@ -761,6 +756,7 @@ public class WorkbookBuilder extends Builder {
 					for (final MeasurementVariable constant : constants) {
 						if (variate.getTermId() == constant.getTermId()) {
 							found = true;
+							break;
 						}
 					}
 				}
@@ -837,7 +833,7 @@ public class WorkbookBuilder extends Builder {
 				return variable;
 			}
 		}
-		return var;
+		return null;
 	}
 
 	protected VariableList getTrialEnvironmentVariableList(final DataSet trialDataset) {
@@ -1045,7 +1041,7 @@ public class WorkbookBuilder extends Builder {
 			// is the ID and not the name
 			if (standardVariableDataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
 				&& standardVariable.getId() != TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
-				final Integer id = value != null && NumberUtils.isNumber(value) ? Integer.valueOf(value) : null;
+				final Integer id = NumberUtils.isNumber(value) ? Integer.valueOf(value) : null;
 				return new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
 					this.getDataType(standardVariableDataTypeId), id, factor);
 			}
