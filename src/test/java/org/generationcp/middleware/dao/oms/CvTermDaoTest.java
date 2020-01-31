@@ -295,7 +295,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetVariablesByStudy() {
+	public void testGetVariablesByDatasetId() {
 		// PH_M_cm
 		final int variableId1 = 20456;
 		// AleuCol_E_1to5
@@ -315,14 +315,13 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		this.testDataInitializer
 			.addProjectProp(plantSubObsDataset, variableId3, "ASI_Cmp_day", VariableType.OBSERVATION_UNIT, "", 2);
 
-		final int traitCount = (int) dao.countVariablesByStudy(study.getProjectId(), Lists
+		final int traitCount = (int) dao.countVariablesByDatasetId(plotDataset.getProjectId(), Lists
 			.newArrayList(VariableType.TRAIT.getId()));
-		final List<VariableDTO> variablesDTOs = dao.getVariablesByStudy(traitCount, 1, study.getProjectId(), Lists
+		final List<VariableDTO> variablesDTOs = dao.getVariablesByDatasetId(traitCount, 1, plotDataset.getProjectId(), Lists
 			.newArrayList(VariableType.TRAIT.getId()), MAIZE);
 		// Only return the TRAIT variables associated to a study
 		Assert.assertEquals(traitCount, variablesDTOs.size());
 		Assert.assertEquals(String.valueOf(variableId1), variablesDTOs.get(0).getObservationVariableDbId());
-		Assert.assertEquals(String.valueOf(variableId2), variablesDTOs.get(1).getObservationVariableDbId());
 	}
 
 	@Test

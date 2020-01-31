@@ -1372,4 +1372,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
+	public Integer getDatasetIdByStudyDbIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType) {
+		try {
+			final Query query = this.getSession().createSQLQuery("SELECT DISTINCT p.project_id"
+				+ " FROM project p "
+				+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id"
+				+ " WHERE nde.nd_geolocation_id = :studyDbId"
+				+ " AND p.dataset_type_id = " + datasetType.PLOT_DATA.getId());
+			query.setParameter("studyDbId", studyDbId);
+			return (Integer) query.uniqueResult();
+		} catch (final HibernateException e) {
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+	}
 }

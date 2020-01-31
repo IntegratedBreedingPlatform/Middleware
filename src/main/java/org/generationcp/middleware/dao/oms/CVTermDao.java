@@ -1363,7 +1363,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public List<CVTerm> getAllByCvId(final Integer cvId, final boolean filterObsolete) {
 
-		List<CVTerm> terms;
+		final List<CVTerm> terms;
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -1388,7 +1388,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public List<CVTerm> getAllByCvId(final List<Integer> termIds, final CvId cvId, final boolean filterObsolete) {
 
-		List<CVTerm> terms;
+		final List<CVTerm> terms;
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -1418,7 +1418,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return this.save(cvTerm);
 	}
 
-
 	/**
 	 * Count all variables in the database filtered by variableTypes.
 	 *
@@ -1442,6 +1441,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	/**
 	 * Gets the list of all variables in the database filtered by variableTypes.
+	 *
 	 * @param pageSize
 	 * @param pageNumber
 	 * @param variableTypes
@@ -1463,18 +1463,18 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	/**
 	 * Count the variables associated to a study filtered by variableTypes.
 	 *
-	 * @param studyId
+	 * @param datasetId
 	 * @param variableTypes
 	 * @return
 	 */
-	public long countVariablesByStudy(final Integer studyId, final List<Integer> variableTypes) {
+	public long countVariablesByDatasetId(final Integer datasetId, final List<Integer> variableTypes) {
 		try {
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createCountVariableQuery(true));
 			final List<String> variableTypeNames =
 				variableTypes.stream().map(i -> VariableType.getById(i).getName()).collect(Collectors.toList());
 			sqlQuery.setParameterList(VARIABLE_TYPE_NAMES, variableTypeNames);
-			sqlQuery.setParameter("studyId", studyId);
+			sqlQuery.setParameter("datasetId", datasetId);
 			sqlQuery.setParameterList("variableTypes", variableTypes);
 
 			return ((BigInteger) sqlQuery.uniqueResult()).longValue();
@@ -1495,7 +1495,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 * @param cropName
 	 * @return
 	 */
-	public List<VariableDTO> getVariablesByStudy(final Integer pageSize, final Integer pageNumber, final Integer studyId,
+	public List<VariableDTO> getVariablesByDatasetId(final Integer pageSize, final Integer pageNumber, final Integer datasetId,
 		final List<Integer> variableTypes, final String cropName) {
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createVariableQuery(true));
@@ -1504,7 +1504,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		final List<String> variableTypeNames =
 			variableTypes.stream().map(i -> VariableType.getById(i).getName()).collect(Collectors.toList());
 		sqlQuery.setParameterList(VARIABLE_TYPE_NAMES, variableTypeNames);
-		sqlQuery.setParameter("studyId", studyId);
+		sqlQuery.setParameter("datasetId", datasetId);
 		sqlQuery.setParameterList("variableTypes", variableTypes);
 
 		return this.convertToVariableDTO(this.getVariableQueryResult(pageSize, pageNumber, sqlQuery), cropName, true);
@@ -1532,7 +1532,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append(" WHERE variableType.value in (:variableTypeNames) ");
 
 		if (isFilterByStudyId) {
-			stringBuilder.append(" AND dataset.study_id = :studyId ");
+			stringBuilder.append(" AND dataset.project_id = :datasetId ");
 			stringBuilder.append(" AND pp.type_id in(:variableTypes)");
 		}
 
@@ -1615,7 +1615,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append(" WHERE variableType.value in (:variableTypeNames) ");
 
 		if (isFilterByStudyId) {
-			stringBuilder.append("   AND dataset.study_id = :studyId ");
+			stringBuilder.append("   AND dataset.project_id = :datasetId ");
 			stringBuilder.append("   AND pp.type_id in (:variableTypes) ");
 		}
 
@@ -1653,7 +1653,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	protected List<VariableDTO> convertToVariableDTO(final List<Map<String, Object>> results, final String cropName,
-		final boolean isFilterByStudyId) {
+		final boolean isFilterByDatasetId) {
 
 		final List<VariableDTO> variables = new ArrayList<>();
 
@@ -1662,7 +1662,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			final VariableDTO variableDto = new VariableDTO();
 
 			variableDto.setCrop(cropName);
-			if (isFilterByStudyId) {
+			if (isFilterByDatasetId) {
 				variableDto.getContextOfUse().add("PLOT");
 			}
 
