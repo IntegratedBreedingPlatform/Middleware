@@ -6,7 +6,6 @@ import com.google.common.collect.Maps;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ListMetadata;
@@ -15,7 +14,6 @@ import org.generationcp.middleware.util.projection.CustomProjections;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
@@ -221,8 +219,8 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 	}
 
 	/**
-	 * @param folderIds a group of folder ids for which we want to return children
-	 * @return the resultant map which contains the folder meta data
+	 * @param folderIds a group of folder ids/sample lists for which we want to return metadata
+	 * @return the resultant map which contains the object meta data
 	 */
 	public Map<Integer, ListMetadata> getSampleListMetadata(final List<Integer> folderIds) {
 		final List<ListMetadata> list;

@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>13.3</version>
+        <version>14.0.1</version>
 	<name>Middleware</name>
 
 	<properties>
@@ -13,6 +13,7 @@
 		<reflections.version>0.9.9</reflections.version>
 		<atomikos.version>3.9.3</atomikos.version>
 		<spring.version>3.2.11.RELEASE</spring.version>
+		<liquibase.version>3.6.1</liquibase.version>
 		<envConfig>${user.name}</envConfig>
 	</properties>
 
@@ -289,7 +290,7 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>3.5.0</version>
+			<version>${liquibase.version}</version>
 		</dependency>
 
 		<dependency>
@@ -392,8 +393,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -339,16 +339,16 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final String uniqueID = this.commonTestProject.getUniqueID();
 		final DmsProject plot =
 			this.createDataset(this.study.getName() + " - Plot Dataset", uniqueID, DatasetTypeEnum.PLOT_DATA.getId(),
-				study, study);
+				this.study, this.study);
 
-		final List<Integer> traitIds = Arrays.asList(trait.getCvTermId());
+		final List<Integer> traitIds = Arrays.asList(this.trait.getCvTermId());
 		this.createProjectProperties(plot, traitIds);
 		this.createEnvironmentData(plot, 1, traitIds);
 		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
 		final Integer variableId = this.trait.getCvTermId();
 		this.phenotypeDao
 			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(experimentId)), new HashSet<>(Arrays.asList(variableId)));
-		final Map<Integer, Long> outOfSyncMap = this.phenotypeDao.countOutOfSyncDataOfDatasetsInStudy(study.getProjectId());
+		final Map<Integer, Long> outOfSyncMap = this.phenotypeDao.countOutOfSyncDataOfDatasetsInStudy(this.study.getProjectId());
 		Assert.assertNotNull(outOfSyncMap.get(plot.getProjectId()));
 		Assert.assertEquals(new Long(1), outOfSyncMap.get(plot.getProjectId()));
 	}
@@ -359,10 +359,10 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final String uniqueID = this.commonTestProject.getUniqueID();
 		final DmsProject plot =
 			this.createDataset(this.study.getName() + " - Plot Dataset", uniqueID, DatasetTypeEnum.PLOT_DATA.getId(),
-				study, study);
+				this.study, this.study);
 		final CVTerm trait2 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
 		this.cvTermDao.save(trait2);
-		final List<Integer> traitIds = Arrays.asList(trait.getCvTermId(), trait2.getCvTermId());
+		final List<Integer> traitIds = Arrays.asList(this.trait.getCvTermId(), trait2.getCvTermId());
 		this.createProjectProperties(plot, traitIds);
 		final Integer environment1 = this.createEnvironmentData(plot, 1, traitIds);
 		final DmsProject study2 = this.createStudy();
@@ -381,15 +381,15 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		for (final PhenotypeSearchDTO result : results) {
 			Assert.assertEquals(2, result.getObservations().size());
 			for (final PhenotypeSearchObservationDTO observation : result.getObservations()) {
-				final boolean isFirstTrait = observation.getObservationVariableDbId().equals(trait.getCvTermId().toString());
-				Assert.assertEquals(isFirstTrait? trait.getCvTermId() : trait2.getCvTermId(), Integer.valueOf(observation.getObservationVariableDbId()));
-				Assert.assertEquals(isFirstTrait? trait.getName() : trait2.getName(), observation.getObservationVariableName());
+				final boolean isFirstTrait = observation.getObservationVariableDbId().equals(this.trait.getCvTermId().toString());
+				Assert.assertEquals(isFirstTrait? this.trait.getCvTermId() : trait2.getCvTermId(), Integer.valueOf(observation.getObservationVariableDbId()));
+				Assert.assertEquals(isFirstTrait? this.trait.getName() : trait2.getName(), observation.getObservationVariableName());
 				Assert.assertNotNull(observation.getObservationDbId());
 				Assert.assertNotNull(observation.getObservationTimeStamp());
 				Assert.assertNotNull(observation.getValue());
 			}
-			final boolean isFirstStudy = result.getStudyName().equals(this.study.getName());
-			Assert.assertEquals(isFirstStudy? this.study.getName() : study2.getName(), result.getStudyName());
+			final boolean isFirstStudy = result.getStudyName().equals(this.study.getName() + "_1");
+			Assert.assertEquals(isFirstStudy? this.study.getName() + "_1": study2.getName() + "_1", result.getStudyName());
 			Assert.assertNull(result.getPlantNumber());
 			final String obsUnitId = result.getObservationUnitDbId();
 			Assert.assertNotNull(obsUnitId);
@@ -443,7 +443,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
-		return createEnvironmentData(this.study, numberOfReps,
+		return this.createEnvironmentData(this.study, numberOfReps,
 			withPhenotype ? Collections.singletonList(this.trait.getCvTermId()) : Collections.<Integer>emptyList());
 	}
 
@@ -463,6 +463,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	private Integer createEnvironmentData(final DmsProject project, final Integer numberOfReps, final List<Integer> traitIds) {
 		this.phenotypes = new ArrayList<>();
 		final Geolocation geolocation = new Geolocation();
+		geolocation.setDescription("1");
 		this.geolocationDao.saveOrUpdate(geolocation);
 
 		for (final Germplasm germplasm : this.germplasm) {

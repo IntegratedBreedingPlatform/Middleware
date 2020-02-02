@@ -12,11 +12,11 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.util.DatabaseBroker;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -265,4 +265,16 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
+
+	/**
+	 * addPagination to criteria
+	 * @param pageable
+	 */
+	public static void addPaginationToSQLQuery(final SQLQuery query, final Pageable pageable) {
+		if (pageable == null || query == null) {
+			return;
+		}
+		query.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
+		query.setMaxResults(pageable.getPageSize());
+	}
 }

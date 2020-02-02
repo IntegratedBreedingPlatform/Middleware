@@ -11,22 +11,15 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListMetadata;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -44,8 +37,13 @@ import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link GermplasmList}.
@@ -97,6 +95,13 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			+ " AND liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
 			+ "      OR desig = :q OR listname = :q " + "      OR desig = :qNoSpaces "
 			+ "      OR desig = :qStandardized " + ")";
+
+	protected static final String SEARCH_GERMPLASM_LIST_CONTAINS =
+		"SELECT DISTINCT listnms.listid as id, listnms.listname as name, listnms.listdesc as description FROM listnms "
+			+ "WHERE listnms.listtype = :listType AND (listnms.program_uuid = :program_uuid OR listnms.program_uuid IS NULL) AND listnms.listname LIKE :searchString ";
+	protected static final String SEARCH_GERMPLASM_LIST_EXACT_MATCH =
+		"SELECT DISTINCT listnms.listid as id, listnms.listname as name, listnms.listdesc as description FROM listnms "
+			+ "WHERE listnms.listtype = :listType AND (listnms.program_uuid = :program_uuid OR listnms.program_uuid IS NULL) AND listnms.listname = :searchString ";
 
 	private static final String FILTER_BY_PROGRAM_UUID = " AND (program_uuid = :programUUID OR program_uuid IS NULL)";
 	
@@ -579,7 +584,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 			criteria.add(Restrictions.eq("projectId", studyId));
-			criteria.add(Restrictions.in("type", Arrays.asList(GermplasmListType.ADVANCED.name(), GermplasmListType.IMP_CROSS.name(), GermplasmListType.CRT_CROSS.name())));
+			criteria.add(Restrictions.in("type", Arrays.asList(GermplasmListType.ADVANCED.name(), GermplasmListType.IMP_CROSS.name(),
+					GermplasmListType.CRT_CROSS.name())));
 			criteria.add(Restrictions.ne(GermplasmListDAO.STATUS, GermplasmListDAO.STATUS_DELETED));
 
 			return ((Number)criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue() > 0;
@@ -690,6 +696,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		setResultTransformer.setResultTransformer(Transformers.aliasToBean(ListMetadata.class));
 		final List<ListMetadata> list = setResultTransformer.list();
 		return Maps.uniqueIndex(list, new Function<ListMetadata, Integer>() {
+
 			@Override
 			public Integer apply(final ListMetadata folderMetaData) {
 				return folderMetaData.getListId();
@@ -722,5 +729,43 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			resultMap.put((Integer) result[0], (String) result[1]);
 		}
 		return resultMap;
+	}
+
+	/**
+	 * @param folderIds a group of folder ids/germplasm lists for which we want to return metadata
+	 * @return the resultant map which contains the object meta data
+	 */
+	public Map<Integer, ListMetadata> getGermplasmListMetadata(final List<Integer> folderIds) {
+		final List<ListMetadata> list;
+		if (folderIds.isEmpty()) {
+			return Collections.emptyMap();
+		}
+
+		try {
+			final String folderMetaDataQuery = "SELECT parent.listid AS listId," + "  COUNT(child.listid) AS numberOfChildren, "
+					+ "  COUNT(s.gid) AS numberOfEntries " + " FROM listnms parent"
+					+ "   LEFT OUTER JOIN listnms child ON child.lhierarchy = parent.listid "
+					+ "   LEFT OUTER JOIN listdata s ON s.listid = parent.listid "
+					+ " WHERE parent.listid IN (:folderIds) GROUP BY parent.listid";
+			final SQLQuery setResultTransformer = this.getSession().createSQLQuery(folderMetaDataQuery);
+			setResultTransformer.setParameterList("folderIds", folderIds);
+			setResultTransformer.addScalar("listId", new IntegerType());
+			setResultTransformer.addScalar("numberOfChildren", new IntegerType());
+			setResultTransformer.addScalar("numberOfEntries", new IntegerType());
+			setResultTransformer.setResultTransformer(Transformers.aliasToBean(ListMetadata.class));
+			list = setResultTransformer.list();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+					"Error with getGermplasmListMetadata(folderIds=" + folderIds.toString() + ") query from listnms: " + e.getMessage(),
+					e);
+		}
+		return Maps.uniqueIndex(list, new Function<ListMetadata, Integer>() {
+
+			@Override
+			public Integer apply(final ListMetadata folderMetaData) {
+				return folderMetaData.getListId();
+			}
+		});
 	}
 }

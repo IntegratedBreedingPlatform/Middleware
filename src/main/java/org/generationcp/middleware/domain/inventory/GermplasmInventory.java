@@ -94,6 +94,7 @@ public class GermplasmInventory implements Serializable {
 	}
 
 	public Integer getReservedLotCount() {
+		//FIXME delete because the value is never used
 		return this.reservedLotCount;
 	}
 

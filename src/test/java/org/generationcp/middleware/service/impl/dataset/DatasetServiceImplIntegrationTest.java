@@ -122,6 +122,22 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         this.verifyObservationUnitRowValues(observationUnitRow);
     }
 
+    @Test
+    public void testGetObservationUnitRowsAsMapList() {
+        final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO();
+        searchDto.setInstanceId(this.instanceIds.get(0));
+        searchDto.getFilterColumns().add("TRIAL_INSTANCE");
+        searchDto.getFilterColumns().add(TRAIT_NAME);
+        final List<Map<String, Object>> rowsAsListMap = this.datasetService.getObservationUnitRowsAsMapList(this.studyId, this.subObsDatasetId,
+            searchDto);
+        Assert.assertNotNull(rowsAsListMap);
+        Assert.assertEquals(40, rowsAsListMap.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
+        final Map<String, Object> dataMap = rowsAsListMap.get(0);
+        Assert.assertEquals(searchDto.getFilterColumns().size(), dataMap.size());
+        Assert.assertNotNull(dataMap.get("TRIAL_INSTANCE"));
+        Assert.assertNull(dataMap.get(TRAIT_NAME));
+    }
+
     private void verifyObservationUnitRowValues(final ObservationUnitRow observationUnitRow) {
         Assert.assertNotNull(observationUnitRow.getVariables().get(TRAIT_NAME));
         Assert.assertNotNull(observationUnitRow.getVariables().get(SELECTION_NAME));

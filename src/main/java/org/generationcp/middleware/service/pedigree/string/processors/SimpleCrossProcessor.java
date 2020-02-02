@@ -32,7 +32,7 @@ public class SimpleCrossProcessor implements BreedingMethodProcessor {
 				this.inbredProcessor.processGermplasmNode(germplasmNode.getMaleParent(), level - 1, fixedLineNameResolver, originatesFromComplexCross);
 
 		final PedigreeString pedigreeString = new PedigreeString();
-		pedigreeString.setPedigree(PedigreeStringGeneratorUtil.gerneratePedigreeString(femaleLeafPedigreeString, maleLeafPedigreeString));
+		pedigreeString.setPedigree(PedigreeStringGeneratorUtil.generatePedigreeString(femaleLeafPedigreeString, maleLeafPedigreeString));
 		return pedigreeString;
 	}
 

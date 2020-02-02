@@ -21,6 +21,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.util.Message;
@@ -46,24 +47,24 @@ import java.util.Set;
 public class DataImportServiceImplTest {
 
 	private static final String PROGRAM_UUID = "123456789";
-	public static final int TEST_VARIABLE_TERM_ID = 1111;
-	public static final String TEST_PROPERTY_NAME = "test Property";
-	public static final String TEST_SCALE_NAME = "test Scale";
-	public static final String TEST_METHOD_NAME = "test Method";
-	public static final String TEST_VARIABLE_NAME = "test Variable";
+	private static final int TEST_VARIABLE_TERM_ID = 1111;
+	private static final String TEST_PROPERTY_NAME = "test Property";
+	private static final String TEST_SCALE_NAME = "test Scale";
+	private static final String TEST_METHOD_NAME = "test Method";
+	private static final String TEST_VARIABLE_NAME = "test Variable";
 	private static final String EARASP_1_5_PROPERTY = "Ear aspect";
 	private static final String EARASP_1_5_METHOD = "EARASP rating";
 	private static final String EARASP_1_5_SCALE = "1-5 rating scale";
 	private static final String EARASP_1_5_NAME = "EARASP_1_5";
 	private static final int EARASP_1_5_TERMID = 20314;
-	public static final int INVALID_VARIABLES_COUNT = 5;
-	public static final int VALID_VARIABLES_COUNT = 5;
+	private static final int INVALID_VARIABLES_COUNT = 5;
+	private static final int VALID_VARIABLES_COUNT = 5;
 
 	private static final String STUDY_NAME = "Study 1";
 	private static final int TRIAL_NO = 1;
 	private static final boolean IS_MULTIPLE_LOCATION = false;
-	public static final Integer CREATED_BY = 1;
-	public static final int UNSPECIFIED_LOCATION_LOCID = 9999;
+	private static final Integer CREATED_BY = 1;
+	private static final int UNSPECIFIED_LOCATION_LOCID = 9999;
 
 	@Mock
 	private WorkbookParser parser;
@@ -83,14 +84,17 @@ public class DataImportServiceImplTest {
 	@Mock
 	private File file;
 
+	@Mock
+	private TermDataManager termDataManager;
+
 	private Workbook workbook;
 
 	@InjectMocks
 	private final DataImportServiceImpl dataImportService = new DataImportServiceImpl();
 
-	public static final String[] STRINGS_WITH_INVALID_CHARACTERS = new String[] {"1234", "word@", "_+world=", "!!world!!", "&&&"};
+	private static final String[] STRINGS_WITH_INVALID_CHARACTERS = new String[] {"1234", "word@", "_+world=", "!!world!!", "&&&"};
 
-	public static final String[] STRINGS_WITH_VALID_CHARACTERS =
+	private static final String[] STRINGS_WITH_VALID_CHARACTERS =
 			new String[] {"i_am_groot", "hello123world", "%%bangbang", "something_something", "zawaruldoisbig"};
 
 	@Before
@@ -123,13 +127,18 @@ public class DataImportServiceImplTest {
 		Mockito.when(this.locationDataManager.retrieveLocIdOfUnspecifiedLocation()).thenReturn(String.valueOf(UNSPECIFIED_LOCATION_LOCID));
 
 
-		final StandardVariable standardVariable = StandardVariableTestDataInitializer.createStandardVariable();
-		standardVariable.setId(TermId.LOCATION_ID.getId());
-		standardVariable.setName("LOCATION_ID");
-		Mockito.when(this.ontologyDataManager.getStandardVariable(TermId.LOCATION_ID.getId(), PROGRAM_UUID)).thenReturn(standardVariable);
+		final StandardVariable locationVariable = StandardVariableTestDataInitializer.createStandardVariable();
+		locationVariable.setId(TermId.LOCATION_ID.getId());
+		locationVariable.setName("LOCATION_ID");
+		Mockito.when(this.ontologyDataManager.getStandardVariable(TermId.LOCATION_ID.getId(), PROGRAM_UUID)).thenReturn(locationVariable);
+
+		final StandardVariable exptDesignVariable = StandardVariableTestDataInitializer.createStandardVariable();
+		exptDesignVariable.setId(TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		exptDesignVariable.setName("EXPERIMENT DESIGN");
+		Mockito.when(this.ontologyDataManager.getStandardVariable(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), PROGRAM_UUID)).thenReturn(exptDesignVariable);
 	}
 
-	protected void mockStandardVariable(final Integer termId, final String name, final String property, final String scale,
+	private void mockStandardVariable(final Integer termId, final String name, final String property, final String scale,
 			final String method, final String programUUID) {
 
 		Mockito.when(this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(property, scale, method)).thenReturn(termId);
@@ -163,7 +172,7 @@ public class DataImportServiceImplTest {
 	}
 
 	@Test
-	public void testValidateMeasurementVariableNameLengths() throws Exception {
+	public void testValidateMeasurementVariableNameLengths() {
 		final List<MeasurementVariable> measurementVariables = this.initializeTestMeasurementVariables();
 
 		final List<Message> messages = this.dataImportService.validateMeasurmentVariableNameLengths(measurementVariables);
@@ -178,7 +187,7 @@ public class DataImportServiceImplTest {
 	}
 
 	@Test
-	public void testValidateMeasurementVariableNameLengthsAllShortNames() throws Exception {
+	public void testValidateMeasurementVariableNameLengthsAllShortNames() {
 		final List<MeasurementVariable> measurementVariables = this.getShortNamedMeasurementVariables();
 
 		final List<Message> messages = this.dataImportService.validateMeasurmentVariableNameLengths(measurementVariables);
@@ -187,7 +196,7 @@ public class DataImportServiceImplTest {
 	}
 
 	@Test
-	public void testValidateMeasurmentVariableNameCharacters() throws Exception {
+	public void testValidateMeasurmentVariableNameCharacters() {
 		final List<MeasurementVariable> measurementVariables = this.getValidNamedMeasurementVariables();
 		measurementVariables.addAll(this.getInvalidNamedMeasurementVariables());
 
@@ -828,6 +837,105 @@ public class DataImportServiceImplTest {
 
 	}
 
+	@Test
+	public void testAddExptDesignVariableIfNotExists() {
+		final Workbook trialWorkbook = WorkbookTestDataInitializer
+			.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+				true);
+
+		List<MeasurementVariable> measurementVariables = new ArrayList<>();
+
+		removeMeasurementVariableInList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions());
+		removeMeasurementVariableInList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getFactors());
+
+		this.dataImportService.addExptDesignVariableIfNotExists(trialWorkbook, measurementVariables, PROGRAM_UUID);
+
+		final Optional<MeasurementVariable> exptDesignVariable = this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), measurementVariables);
+		Assert.assertTrue(exptDesignVariable.isPresent());
+
+		measurementVariables = new ArrayList<>();
+		trialWorkbook.getConditions().add(exptDesignVariable.get());
+		Assert.assertFalse(this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), measurementVariables).isPresent());
+	}
+
+	@Test
+	public void testGetExperimentalDesignIdValueNull() throws WorkbookParserException{
+		Assert.assertEquals(String.valueOf(TermId.EXTERNALLY_GENERATED.getId()), this.dataImportService.getExperimentalDesignIdValue(""));
+	}
+
+	@Test
+	public void testGetExperimentalDesignIdValueWithError() {
+		final Term term = new Term(TermId.RANDOMIZED_COMPLETE_BLOCK.getId(), "RCBD", "RCBD");
+		try {
+			this.dataImportService.getExperimentalDesignIdValue(term.getName());
+			Assert.fail("Should Throw An Exception");
+		} catch (WorkbookParserException e){
+			Mockito.verify(this.termDataManager).getTermByName(term.getName());
+		}
+	}
+
+	@Test
+	public void processExperimentalDesignNotExisting() throws WorkbookParserException{
+		final Workbook trialWorkbook = WorkbookTestDataInitializer
+			.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+				true);
+
+		removeMeasurementVariableInList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions());
+		removeMeasurementVariableInList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getFactors());
+
+		this.dataImportService.processExperimentalDesign(trialWorkbook, PROGRAM_UUID, null);
+		final MeasurementVariable exptDesignVariable = this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions()).get();
+		Assert.assertEquals(String.valueOf(TermId.EXTERNALLY_GENERATED.getId()), exptDesignVariable.getValue());
+	}
+
+	@Test
+	public void processExperimentalDesignPresentInConditions() throws WorkbookParserException{
+		final Term term = new Term(TermId.RANDOMIZED_COMPLETE_BLOCK.getId(), "RCBD", "RCBD");
+		Mockito.when(this.termDataManager.getTermByName(term.getName())).thenReturn(term);
+		final Workbook trialWorkbook = WorkbookTestDataInitializer
+			.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+				true);
+		removeMeasurementVariableInList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getFactors());
+		this.dataImportService.addExptDesignVariableIfNotExists(trialWorkbook, trialWorkbook.getConditions(), PROGRAM_UUID);
+
+		MeasurementVariable exptDesignVariable = this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions()).get();
+		exptDesignVariable.setValue(null);
+
+		this.dataImportService.processExperimentalDesign(trialWorkbook, PROGRAM_UUID, term.getName());
+		exptDesignVariable = this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions()).get();
+		Assert.assertEquals(String.valueOf(term.getId()), exptDesignVariable.getValue());
+	}
+
+	@Test
+	public void processExperimentalDesignPresentInFactors() throws WorkbookParserException{
+		final Term term = new Term(TermId.RANDOMIZED_COMPLETE_BLOCK.getId(), "RCBD", "RCBD");
+		Mockito.when(this.termDataManager.getTermByName(term.getName())).thenReturn(term);
+		final Workbook trialWorkbook = WorkbookTestDataInitializer
+			.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+				true);
+		removeMeasurementVariableInList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions());
+		this.dataImportService.addExptDesignVariableIfNotExists(trialWorkbook, trialWorkbook.getFactors(), PROGRAM_UUID);
+
+		MeasurementVariable exptDesignVariable = this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getFactors()).get();
+		exptDesignVariable.setValue(null);
+
+		this.dataImportService.processExperimentalDesign(trialWorkbook, PROGRAM_UUID, term.getName());
+		exptDesignVariable = this.dataImportService.findMeasurementVariableByTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), trialWorkbook.getConditions()).get();
+		Assert.assertEquals(String.valueOf(term.getId()), exptDesignVariable.getValue());
+	}
+
+	@Test
+	public void testGetExperimentalDesignIdValueWithNoError() {
+		final Term term = new Term(TermId.RANDOMIZED_COMPLETE_BLOCK.getId(), "RCBD", "RCBD");
+		Mockito.when(this.termDataManager.getTermByName(term.getName())).thenReturn(term);
+		try {
+			this.dataImportService.getExperimentalDesignIdValue(term.getName());
+			Mockito.verify(this.termDataManager).getTermByName(term.getName());
+		} catch (WorkbookParserException e){
+			Assert.fail("Should NOT Throw An Exception");
+		}
+	}
+
 	private StandardVariable createTestCategoricalStandardVariable(final String name) {
 		final StandardVariable stdVar = new StandardVariable();
 		stdVar.setName(name);
@@ -844,13 +952,13 @@ public class DataImportServiceImplTest {
 
 		final Workbook testWorkbook = new Workbook();
 
-		testWorkbook.setFactors(new ArrayList<MeasurementVariable>(Arrays.asList(
+		testWorkbook.setFactors(new ArrayList<>(Arrays.asList(
 				new MeasurementVariable(TEST_VARIABLE_NAME, "", TEST_SCALE_NAME, TEST_METHOD_NAME, TEST_PROPERTY_NAME, "", "", ""))));
-		testWorkbook.setConditions(new ArrayList<MeasurementVariable>(Arrays.asList(
+		testWorkbook.setConditions(new ArrayList<>(Arrays.asList(
 				new MeasurementVariable(TEST_VARIABLE_NAME, "", TEST_SCALE_NAME, TEST_METHOD_NAME, TEST_PROPERTY_NAME, "", "", ""))));
-		testWorkbook.setConstants(new ArrayList<MeasurementVariable>(Arrays.asList(
+		testWorkbook.setConstants(new ArrayList<>(Arrays.asList(
 				new MeasurementVariable(TEST_VARIABLE_NAME, "", TEST_SCALE_NAME, TEST_METHOD_NAME, TEST_PROPERTY_NAME, "", "", ""))));
-		testWorkbook.setVariates(new ArrayList<MeasurementVariable>(Arrays.asList(
+		testWorkbook.setVariates(new ArrayList<>(Arrays.asList(
 				new MeasurementVariable(TEST_VARIABLE_NAME, "", TEST_SCALE_NAME, TEST_METHOD_NAME, TEST_PROPERTY_NAME, "", "", ""))));
 
 		final List<MeasurementRow> observations = new ArrayList<>();
@@ -874,7 +982,7 @@ public class DataImportServiceImplTest {
 
 	}
 
-	protected List<MeasurementVariable> initializeTestMeasurementVariables() {
+	private List<MeasurementVariable> initializeTestMeasurementVariables() {
 		final List<MeasurementVariable> measurementVariables = this.getShortNamedMeasurementVariables();
 
 		// 5 long names
@@ -904,7 +1012,7 @@ public class DataImportServiceImplTest {
 	}
 
 	private List<MeasurementVariable> getInvalidNamedMeasurementVariables() {
-		final List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
 		for (int i = 0; i < DataImportServiceImplTest.STRINGS_WITH_INVALID_CHARACTERS.length; i++) {
 			final MeasurementVariable mv = new MeasurementVariable();
@@ -915,7 +1023,7 @@ public class DataImportServiceImplTest {
 	}
 
 	private List<MeasurementVariable> getValidNamedMeasurementVariables() {
-		final List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
 		for (int i = 0; i < DataImportServiceImplTest.STRINGS_WITH_VALID_CHARACTERS.length; i++) {
 			final MeasurementVariable mv = new MeasurementVariable();

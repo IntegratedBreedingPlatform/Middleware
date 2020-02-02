@@ -132,29 +132,6 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-	public Map<Integer, String> getInstanceIdLocationIdMap(final List<Integer> instanceIds) {
-		Map<Integer, String> instanceIdLocationIdMap = new HashMap<>();
-		final StringBuilder sql =
-			new StringBuilder().append("SELECT  ").append("    geo.nd_geolocation_id as instanceId, geo.value as value ").append("FROM ")
-				.append(" nd_geolocationprop geo ").append("WHERE ").append("    geo.nd_geolocation_id in (:geolocationIds) ")
-				.append("        AND geo.type_id = :locationVariableId");
-
-		try {
-			final Query query =
-				this.getSession().createSQLQuery(sql.toString()).addScalar("instanceId").addScalar("value")
-					.setParameterList("geolocationIds", instanceIds).setParameter("locationVariableId", TermId.LOCATION_ID.getId());
-			final List<Object> results = query.list();
-			for (final Object obj : results) {
-				final Object[] row = (Object[]) obj;
-				instanceIdLocationIdMap.put((Integer) row[0], (String) row[1]);
-			}
-			return instanceIdLocationIdMap;
-		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getInstanceIdLocationIdMap() query from instanceIds: " + instanceIds;
-			GeolocationPropertyDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
 
 	public Map<Integer, String> getGeoLocationPropertyByVariableId(final Integer datasetId, final Integer instanceDbId) {
 		Preconditions.checkNotNull(datasetId);
@@ -182,6 +159,23 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 		return geoProperties;
 	}
+
+	public String getGeolocationPropValue(final int stdVarId, final int datasetId) {
+		try {
+			final StringBuilder sql =
+				new StringBuilder().append("SELECT distinct value ").append("FROM nd_experiment e ")
+					.append("INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id ")
+					.append("WHERE e.project_id = :projectId AND gp.type_id = :stdVarId ORDER BY e.nd_geolocation_id ");
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			query.setParameter("projectId", datasetId);
+			query.setParameter("stdVarId", stdVarId);
+			return (String) query.uniqueResult();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error at getGeolocationPropValue=" + stdVarId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
+		}
+	}
+
 
 	public List<GeolocationProperty> getByGeolocation(final Integer geolocationId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());

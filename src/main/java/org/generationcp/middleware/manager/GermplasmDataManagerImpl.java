@@ -22,13 +22,14 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
+import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -1571,6 +1572,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		preferredName.setNval(Name.UNKNOWN);
 		germplasm.setPreferredName(preferredName);
 		return germplasm;
+	}
+
+	@Override
+	public List<AttributeDTO> getAttributesByGid(
+		final String gid, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
+		return this.getAttributeDao().getAttributesByGidAndAttributeIds(gid, attributeDbIds, pageSize, pageNumber);
+	}
+
+	@Override
+	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
+		return this.getAttributeDao().countAttributesByGid(gid, attributeDbIds);
+	}
+
+	@Override
+	public List<Attribute> getAttributeByIds(final List<Integer> ids) {
+		return this.getAttributeDao().getByIDs(ids);
 	}
 
 }
