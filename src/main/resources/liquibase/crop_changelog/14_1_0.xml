@@ -329,12 +329,13 @@
 					from ims_transaction it
 					WHERE
 					trnstat = 1
+					AND trntype IS NULL
 					AND comments = 'Stock taking adjustment';
 				</sqlCheck>
 			</not>
 		</preConditions>
 		<comment>
-			Set transaction type for commited Stock taking adjustment
+			Set transaction type for committed Stock taking adjustment
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
@@ -342,6 +343,7 @@
 			trntype = 3
 			WHERE
 			trnstat = 1
+			AND trntype IS NULL
 			AND comments = 'Stock taking adjustment';
 		</sql>
 	</changeSet>
@@ -354,13 +356,14 @@
 					from ims_transaction it
 					WHERE
 					trnstat = 1
+					AND trntype IS NULL
 					AND (comments != 'Stock taking adjustment' OR comments IS NULL)
-					AND trnqty > 0;
+					AND trnqty >= 0;
 				</sqlCheck>
 			</not>
 		</preConditions>
 		<comment>
-			Set transaction type for commited and not Stock taking adjustment, qty > 0
+			Set transaction type for committed and not Stock taking adjustment, qty >= 0
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
@@ -368,8 +371,9 @@
 			trntype = 4
 			WHERE
 			trnstat = 1
+			AND trntype IS NULL
 			AND (comments != 'Stock taking adjustment' OR comments IS NULL)
-			AND trnqty > 0;
+			AND trnqty >= 0;
 		</sql>
 	</changeSet>
 
@@ -381,13 +385,14 @@
 					from ims_transaction it
 					WHERE
 					trnstat = 1
+					AND trntype IS NULL
 					AND (comments != 'Stock taking adjustment' OR comments IS NULL)
 					AND trnqty &lt; 0;
 				</sqlCheck>
 			</not>
 		</preConditions>
 		<comment>
-			Set transaction type for commited and not Stock taking adjustment, qty &lt; 0
+			Set transaction type for committed and not Stock taking adjustment, qty &lt; 0
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
@@ -395,39 +400,13 @@
 			trntype = 1
 			WHERE
 			trnstat = 1
+			AND trntype IS NULL
 			AND (comments != 'Stock taking adjustment' OR comments IS NULL)
 			AND trnqty &lt; 0;
 		</sql>
 	</changeSet>
 
 	<changeSet author="vanina" id="v14.1.0-10">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<sqlCheck expectedResult="0">
-					select count(1)
-					from ims_transaction it
-					WHERE
-					trnstat = 1
-					AND (comments != 'Stock taking adjustment' OR comments IS NULL)
-					AND trnqty = 0;
-				</sqlCheck>
-			</not>
-		</preConditions>
-		<comment>
-			Set transaction type for commited and not Stock taking adjustment, qty = 0
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			UPDATE ims_transaction
-			SET
-			trntype = 4
-			WHERE
-			trnstat = 1
-			AND (comments != 'Stock taking adjustment' OR comments IS NULL)
-			AND trnqty = 0;
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v14.1.0-11">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -478,6 +457,33 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="vanina" id="v14.1.0-11">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					(trnstat = 0 OR trnstat = 9)
+					AND trntype IS NULL
+					AND trnqty &lt; 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for pending or cancelled transaction and qty &lt; 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 1
+			WHERE
+			(trnstat = 0 OR trnstat = 9)
+			AND trntype IS NULL
+			AND trnqty &lt; 0;
+		</sql>
+	</changeSet>
+
 	<changeSet author="vanina" id="v14.1.0-12">
 		<preConditions onFail="MARK_RAN">
 			<not>
@@ -485,92 +491,27 @@
 					select count(1)
 					from ims_transaction it
 					WHERE
-					trnstat = 0 AND trnqty &lt; 0;
+					(trnstat = 0 OR trnstat = 9)
+					AND trntype IS NULL
+					AND trnqty >= 0;
 				</sqlCheck>
 			</not>
 		</preConditions>
 		<comment>
-			Set transaction type for pending transaction and qty &lt; 0
+			Set transaction type for pending or cancelled transaction and qty >=  0
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
 			SET
-			trntype = 1
+			trntype = 4
 			WHERE
-			trnstat = 0 AND trnqty &lt; 0;
+			(trnstat = 0 OR trnstat = 9)
+			AND trntype IS NULL
+			AND trnqty >=  0;
 		</sql>
 	</changeSet>
 
 	<changeSet author="vanina" id="v14.1.0-13">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<sqlCheck expectedResult="0">
-					select count(1)
-					from ims_transaction it
-					WHERE
-					trnstat = 0 AND trnqty >= 0;
-				</sqlCheck>
-			</not>
-		</preConditions>
-		<comment>
-			Set transaction type for pending transaction and qty >=  0
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			UPDATE ims_transaction
-			SET
-			trntype = 4
-			WHERE
-			trnstat = 0 AND trnqty >=  0;
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v14.1.0-14">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<sqlCheck expectedResult="0">
-					select count(1)
-					from ims_transaction it
-					WHERE
-					trnstat = 9 AND trnqty >= 0;
-				</sqlCheck>
-			</not>
-		</preConditions>
-		<comment>
-			Set transaction type for cancelled transaction and qty >= 0
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			UPDATE ims_transaction
-			SET
-			trntype = 4
-			WHERE
-			trnstat = 9 AND trnqty >= 0;
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v14.1.0-15">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<sqlCheck expectedResult="0">
-					select count(1)
-					from ims_transaction it
-					WHERE
-					trnstat = 9 AND trnqty &lt; 0;
-				</sqlCheck>
-			</not>
-		</preConditions>
-		<comment>
-			Set transaction type for cancelled transaction and qty &lt; 0
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			UPDATE ims_transaction
-			SET
-			trntype = 1
-			WHERE
-			trnstat = 9 AND trnqty &lt; 0;
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v14.1.0-16">
 		<preConditions onFail="CONTINUE">
 			<and>
 				<columnExists tableName="ims_transaction" columnName="trntype"/>
@@ -595,7 +536,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-17">
+	<changeSet author="vanina" id="v14.1.0-14">
 		<preConditions onFail="CONTINUE">
 			<and>
 				<columnExists tableName="ims_transaction" columnName="trnstat"/>
@@ -620,7 +561,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v14.1.0-18">
+	<changeSet author="vanina" id="v14.1.0-15">
 		<preConditions onFail="CONTINUE">
 			<and>
 				<columnExists tableName="ims_transaction" columnName="trnqty"/>
