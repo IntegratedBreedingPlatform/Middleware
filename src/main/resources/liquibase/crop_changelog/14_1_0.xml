@@ -354,7 +354,7 @@
 					from ims_transaction it
 					WHERE
 					trnstat = 1
-					AND comments != 'Stock taking adjustment'
+					AND (comments != 'Stock taking adjustment' OR comments IS NULL)
 					AND trnqty > 0;
 				</sqlCheck>
 			</not>
@@ -368,7 +368,7 @@
 			trntype = 0
 			WHERE
 			trnstat = 1
-			AND comments != 'Stock taking adjustment'
+			AND (comments != 'Stock taking adjustment' OR comments IS NULL)
 			AND trnqty > 0;
 		</sql>
 	</changeSet>
@@ -381,7 +381,7 @@
 					from ims_transaction it
 					WHERE
 					trnstat = 1
-					AND comments != 'Stock taking adjustment'
+					AND (comments != 'Stock taking adjustment' OR comments IS NULL)
 					AND trnqty &lt; 0;
 				</sqlCheck>
 			</not>
@@ -395,7 +395,7 @@
 			trntype = 1
 			WHERE
 			trnstat = 1
-			AND comments != 'Stock taking adjustment'
+			AND (comments != 'Stock taking adjustment' OR comments IS NULL)
 			AND trnqty &lt; 0;
 		</sql>
 	</changeSet>
@@ -408,7 +408,7 @@
 					from ims_transaction it
 					WHERE
 					trnstat = 1
-					AND comments != 'Stock taking adjustment'
+					AND (comments != 'Stock taking adjustment' OR comments IS NULL)
 					AND trnqty = 0;
 				</sqlCheck>
 			</not>
@@ -422,7 +422,7 @@
 			trntype = 0
 			WHERE
 			trnstat = 1
-			AND comments != 'Stock taking adjustment'
+			AND (comments != 'Stock taking adjustment' OR comments IS NULL)
 			AND trnqty = 0;
 		</sql>
 	</changeSet>
