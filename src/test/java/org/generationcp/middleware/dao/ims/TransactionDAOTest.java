@@ -285,6 +285,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Transaction depositTransaction =
 			InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, "Deposit", lot, 1,
 				1, 1, "LIST");
+		depositTransaction.setType(TransactionType.DEPOSIT.getId());
 		depositTransaction.setTransactionDate(date1);
 		depositTransaction.setUserId(user.getUserid());
 
@@ -293,6 +294,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Transaction closedTransaction =
 			InventoryDetailsTestDataInitializer.createReservationTransaction(-5.0, 1, "Discard", lot, 1,
 				1, 1, "LIST");
+		closedTransaction.setType(TransactionType.DISCARD.getId());
 		closedTransaction.setTransactionDate(date2);
 		closedTransaction.setUserId(user.getUserid());
 

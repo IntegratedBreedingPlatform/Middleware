@@ -11,6 +11,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 
 import java.text.ParseException;
@@ -156,6 +157,7 @@ public class InventoryDetailsTestDataInitializer {
 			transaction.setSourceType(LIST_SOURCE_TYPE);
 			transaction.setSourceRecordId(lotIdLrecIdMap.get(lot.getId()));
 			transaction.setSourceId(listId);
+			transaction.setType(TransactionType.DEPOSIT.getId());
 
 			transactions.add(transaction);
 		}
