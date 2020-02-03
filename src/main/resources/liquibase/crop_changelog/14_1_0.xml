@@ -363,7 +363,7 @@
 			</not>
 		</preConditions>
 		<comment>
-			Set transaction type for committed and not Stock taking adjustment, qty >= 0
+			Set transaction type for committed and not Stock taking adjustment, qty greater or equal than 0
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
@@ -392,7 +392,7 @@
 			</not>
 		</preConditions>
 		<comment>
-			Set transaction type for committed and not Stock taking adjustment, qty &lt; 0
+			Set transaction type for committed and not Stock taking adjustment, qty lower than 0
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
@@ -471,7 +471,7 @@
 			</not>
 		</preConditions>
 		<comment>
-			Set transaction type for pending or cancelled transaction and qty &lt; 0
+			Set transaction type for pending or cancelled transaction and qty lower than 0
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
@@ -498,7 +498,7 @@
 			</not>
 		</preConditions>
 		<comment>
-			Set transaction type for pending or cancelled transaction and qty >=  0
+			Set transaction type for pending or cancelled transaction and qty greater or equal  0
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
