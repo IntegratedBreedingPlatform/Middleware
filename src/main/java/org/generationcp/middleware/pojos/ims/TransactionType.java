@@ -1,6 +1,10 @@
 
 package org.generationcp.middleware.pojos.ims;
 
+import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public enum TransactionType {
 
 	WITHDRAWAL("Withdrawal", 1),
@@ -22,5 +26,10 @@ public enum TransactionType {
 
 	public Integer getId() {
 		return this.id;
+	}
+
+
+	public static List<TransactionType> getAll() {
+		return EnumSet.allOf(TransactionType.class).stream().collect(Collectors.toList());
 	}
 }
