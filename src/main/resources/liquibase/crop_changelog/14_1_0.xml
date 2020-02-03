@@ -530,6 +530,9 @@
 				</sqlCheck>
 			</and>
 		</preConditions>
+		<comment>
+			Set trntype as not nullable
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE ims_transaction
 			CHANGE COLUMN trntype trntype INT(11) NOT NULL;
@@ -555,6 +558,9 @@
 				</sqlCheck>
 			</and>
 		</preConditions>
+		<comment>
+			Set trnstat as not nullable
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE ims_transaction
 			CHANGE COLUMN trnstat trnstat INT(11) NOT NULL;
@@ -580,6 +586,9 @@
 				</sqlCheck>
 			</and>
 		</preConditions>
+		<comment>
+			Set trnqty as not nullable
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE ims_transaction
 			CHANGE COLUMN trnqty trnqty DOUBLE NOT NULL;
