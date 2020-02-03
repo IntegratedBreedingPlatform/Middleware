@@ -365,7 +365,7 @@
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
 			SET
-			trntype = 0
+			trntype = 4
 			WHERE
 			trnstat = 1
 			AND (comments != 'Stock taking adjustment' OR comments IS NULL)
@@ -419,7 +419,7 @@
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
 			SET
-			trntype = 0
+			trntype = 4
 			WHERE
 			trnstat = 1
 			AND (comments != 'Stock taking adjustment' OR comments IS NULL)
@@ -518,7 +518,7 @@
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
 			SET
-			trntype = 0
+			trntype = 4
 			WHERE
 			trnstat = 0 AND trnqty >=  0;
 		</sql>
@@ -541,7 +541,7 @@
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
 			SET
-			trntype = 0
+			trntype = 4
 			WHERE
 			trnstat = 9 AND trnqty >= 0;
 		</sql>
