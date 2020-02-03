@@ -317,7 +317,7 @@
 		<comment> Add trntype to ims_transaction table </comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE ims_transaction
-			ADD COLUMN trntype INT(11) NULL DEFAULT '0';
+			ADD COLUMN trntype INT(11) NULL;
 		</sql>
 	</changeSet>
 
@@ -567,6 +567,81 @@
 			trntype = 1
 			WHERE
 			trnstat = 9 AND trnqty &lt; 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-16">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="ims_transaction" columnName="trntype"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM ims_transaction
+					WHERE trntype is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'ims_transaction'
+					AND COLUMN_NAME = 'trntype'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			CHANGE COLUMN trntype trntype INT(11) NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-17">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="ims_transaction" columnName="trnstat"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM ims_transaction
+					WHERE trnstat is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'ims_transaction'
+					AND COLUMN_NAME = 'trnstat'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			CHANGE COLUMN trnstat trnstat INT(11) NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-18">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="ims_transaction" columnName="trnqty"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM ims_transaction
+					WHERE trnqty is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'ims_transaction'
+					AND COLUMN_NAME = 'trnqty'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			CHANGE COLUMN trnqty trnqty DOUBLE NOT NULL;
 		</sql>
 	</changeSet>
 </databaseChangeLog>
