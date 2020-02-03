@@ -464,7 +464,7 @@
 					select count(1)
 					from ims_transaction it
 					WHERE
-					(trnstat = 0 OR trnstat = 9)
+					trnstat IN (0, 9)
 					AND trntype IS NULL
 					AND trnqty &lt; 0;
 				</sqlCheck>
@@ -478,7 +478,7 @@
 			SET
 			trntype = 1
 			WHERE
-			(trnstat = 0 OR trnstat = 9)
+			trnstat IN (0, 9)
 			AND trntype IS NULL
 			AND trnqty &lt; 0;
 		</sql>
@@ -491,7 +491,7 @@
 					select count(1)
 					from ims_transaction it
 					WHERE
-					(trnstat = 0 OR trnstat = 9)
+					trnstat IN (0, 9)
 					AND trntype IS NULL
 					AND trnqty >= 0;
 				</sqlCheck>
@@ -505,7 +505,7 @@
 			SET
 			trntype = 4
 			WHERE
-			(trnstat = 0 OR trnstat = 9)
+			trnstat IN (0, 9)
 			AND trntype IS NULL
 			AND trnqty >=  0;
 		</sql>
