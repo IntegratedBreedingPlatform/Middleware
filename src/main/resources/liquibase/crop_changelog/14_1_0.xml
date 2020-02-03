@@ -535,7 +535,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE ims_transaction
-			CHANGE COLUMN trntype trntype INT(11) NOT NULL;
+			MODIFY COLUMN trntype INT(11) NOT NULL;
 		</sql>
 	</changeSet>
 
@@ -563,7 +563,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE ims_transaction
-			CHANGE COLUMN trnstat trnstat INT(11) NOT NULL;
+			MODIFY COLUMN trnstat INT(11) NOT NULL;
 		</sql>
 	</changeSet>
 
@@ -591,7 +591,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE ims_transaction
-			CHANGE COLUMN trnqty trnqty DOUBLE NOT NULL;
+			MODIFY COLUMN trnqty DOUBLE NOT NULL;
 		</sql>
 	</changeSet>
 </databaseChangeLog>
