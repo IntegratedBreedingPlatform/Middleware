@@ -292,6 +292,22 @@
         </sql>
     </changeSet>
 
+	<changeSet author="nahuel" id="v14.1.0-1">
+		<preConditions>
+			<not>
+				<columnExists tableName="nd_experiment" columnName="json_props"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create column to store properties in json format.
+			Aimed to replace nd_experimentprop
+		</comment>
+		<addColumn tableName="nd_experiment">
+			<column name="json_props" type="CLOB" />
+		</addColumn>
+	</changeSet>
+
+
 	<changeSet author="vanina" id="v14.1.0-6">
 		<preConditions onFail="MARK_RAN">
 			<not>
