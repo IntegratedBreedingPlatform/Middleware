@@ -565,10 +565,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	private final String SEARCH_TRANSACTIONS_QUERY = "SELECT " //
 		+ "    act.trnid AS transactionId,"//
 		+ "    users.uname AS createdByUsername,"//
-		+ "(CASE WHEN trntype = 0 THEN '" + TransactionType.DEPOSIT.getValue()
-		+ "' WHEN trntype = 1 THEN '" + TransactionType.WITHDRAWAL.getValue()
-		+ "' WHEN trntype = 2 THEN '" + TransactionType.DISCARD.getValue()
-		+ "' WHEN trntype = 3 THEN '" + TransactionType.ADJUSTMENT.getValue()
+		+ "(CASE WHEN trntype = " + TransactionType.DEPOSIT.getId() + " THEN '" + TransactionType.DEPOSIT.getValue()
+		+ "' WHEN trntype = " + TransactionType.WITHDRAWAL.getId() + "  THEN '" + TransactionType.WITHDRAWAL.getValue()
+		+ "' WHEN trntype = " + TransactionType.DISCARD.getId() + "  THEN '" + TransactionType.DISCARD.getValue()
+		+ "' WHEN trntype = " + TransactionType.ADJUSTMENT.getId() + "  THEN '" + TransactionType.ADJUSTMENT.getValue()
 		+ "' END) AS transactionType,"//
 		+ "    act.trnqty AS amount,"//
 		+ "    act.comments AS notes,"//
@@ -580,9 +580,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "    scaleid AS lotScaleId,"//
 		+ "    scale.name AS lotScaleName," //
 		+ "    (CASE WHEN i.status = 0 THEN 'Active' WHEN i.status = 1 THEN 'Closed' END) AS lotStatus, "
-		+ "   (CASE WHEN trnstat = 0 THEN '" + TransactionStatus.PENDING.getValue()
-		+ "' WHEN trnstat = 1 THEN '" + TransactionStatus.CONFIRMED.getValue()
-		+ "' WHEN trnstat = 2 THEN '" + TransactionStatus.CANCELLED.getValue()
+		+ "   (CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
+		+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
+		+ "' WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '" + TransactionStatus.CANCELLED.getValue()
 		+ "' END) as transactionStatus"
 		+ " FROM"//
 		+ "   ims_transaction act "//
