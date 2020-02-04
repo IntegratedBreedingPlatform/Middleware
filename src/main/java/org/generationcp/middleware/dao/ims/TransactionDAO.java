@@ -500,15 +500,15 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final List<TransactionReportRow> transactions = new ArrayList<>();
 		try {
 			final String sql = "SELECT i.userid,i.lotid,i.trndate,"
-					+ "(CASE WHEN trnstat = 0 THEN '" + TransactionStatus.PENDING.getValue()
-					+ "' WHEN trnstat = 1 THEN '" + TransactionStatus.CONFIRMED.getValue()
-					+ "' WHEN trnstat = 2 THEN '" + TransactionStatus.CANCELLED.getValue()
+					+ "(CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
+					+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
+					+ "' WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '" + TransactionStatus.CANCELLED.getValue()
 					+ "' END) as trnStatus, "
 					+ " i.trnqty,i.sourceid,l.listname, i.comments,"
-					+ "(CASE WHEN trntype = 0 THEN '" + TransactionType.DEPOSIT.getValue()
-					+ "' WHEN trntype = 1 THEN '" + TransactionType.WITHDRAWAL.getValue()
-					+ "' WHEN trntype = 2 THEN '" + TransactionType.DISCARD.getValue()
-					+ "' WHEN trntype = 3 THEN '" + TransactionType.ADJUSTMENT.getValue()
+					+ "(CASE WHEN trntype = " + TransactionType.DEPOSIT.getId() + " THEN '" + TransactionType.DEPOSIT.getValue()
+					+ "' WHEN trntype = " + TransactionType.WITHDRAWAL.getId() + " THEN '" + TransactionType.WITHDRAWAL.getValue()
+					+ "' WHEN trntype = " + TransactionType.DISCARD.getId() + " THEN '" + TransactionType.DISCARD.getValue()
+					+ "' WHEN trntype = " + TransactionType.ADJUSTMENT.getId() + " THEN '" + TransactionType.ADJUSTMENT.getValue()
 					+ "' END) as trntype "
 					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
 					+ " INNER JOIN ims_lot lot ON lot.lotid = i.lotid "

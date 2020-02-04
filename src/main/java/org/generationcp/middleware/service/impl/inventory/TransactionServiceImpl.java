@@ -74,6 +74,6 @@ public class TransactionServiceImpl implements TransactionService {
 		//FIXME Commitment date in some cases is not 0. For Deposits is always zero, but for other types it will be the current date
 		transaction.setCommitmentDate(0);
 		transaction.setComments(transactionDto.getNotes());
-		return this.daoFactory.getTransactionDAO().saveTransaction(transaction).getId();
+		return this.daoFactory.getTransactionDAO().saveOrUpdate(transaction).getId();
 	}
 }

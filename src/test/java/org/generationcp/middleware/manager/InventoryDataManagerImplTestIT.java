@@ -708,7 +708,8 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		this.manager.addLots(Lists.<Lot>newArrayList(lot));
 
 		final Transaction transaction = InventoryDetailsTestDataInitializer
-				.createReservationTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST");
+			.createReservationTransaction(
+				2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
 		this.manager.addTransactions(Lists.<Transaction>newArrayList(transaction));
 
 		final List<Germplasm> availableBalanceForGermplasms =

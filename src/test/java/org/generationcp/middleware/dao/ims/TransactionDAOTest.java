@@ -228,14 +228,17 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final String sDate1 = "01/01/2015";
 		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
 		final Transaction depositTransaction =
-				InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST");
+			InventoryDetailsTestDataInitializer
+				.createReservationTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST",
+					TransactionType.DEPOSIT.getId());
 		depositTransaction.setTransactionDate(date1);
 		depositTransaction.setUserId(user.getUserid());
 
 		final String sDate2 = "10/10/2015";
 		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate2);
 		final Transaction closedTransaction =
-				InventoryDetailsTestDataInitializer.createReservationTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST");
+			InventoryDetailsTestDataInitializer
+				.createReservationTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
 		closedTransaction.setTransactionDate(date2);
 		closedTransaction.setUserId(user.getUserid());
 
@@ -284,7 +287,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
 		final Transaction depositTransaction =
 			InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, "Deposit", lot, 1,
-				1, 1, "LIST");
+				1, 1, "LIST", TransactionType.DEPOSIT.getId());
 		depositTransaction.setType(TransactionType.DEPOSIT.getId());
 		depositTransaction.setTransactionDate(date1);
 		depositTransaction.setUserId(user.getUserid());
@@ -293,7 +296,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate2);
 		final Transaction closedTransaction =
 			InventoryDetailsTestDataInitializer.createReservationTransaction(-5.0, 1, "Discard", lot, 1,
-				1, 1, "LIST");
+				1, 1, "LIST", TransactionType.DEPOSIT.getId());
 		closedTransaction.setType(TransactionType.DISCARD.getId());
 		closedTransaction.setTransactionDate(date2);
 		closedTransaction.setUserId(user.getUserid());
@@ -314,7 +317,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		transactionsSearchDto.setTransactionDateFrom(date1);
 		transactionsSearchDto.setTransactionDateTo(date1);
 		transactionsSearchDto.setTransactionIds(Lists.newArrayList(depositTransaction.getId(), closedTransaction.getId()));
-		transactionsSearchDto.setTransactionType("Deposit");
+		transactionsSearchDto.setTransactionType(TransactionType.DEPOSIT.getId());
 		transactionsSearchDto.setCreatedByUsername(user.getName());
 
 		final List<TransactionDto> transactionDtos = this.dao.searchTransactions(transactionsSearchDto, null);

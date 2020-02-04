@@ -293,7 +293,7 @@
     </changeSet>
 
 	<changeSet author="nahuel" id="v14.1.0-1">
-		<preConditions onFail="MARK_RAN">
+		<preConditions>
 			<not>
 				<columnExists tableName="nd_experiment" columnName="json_props"/>
 			</not>
