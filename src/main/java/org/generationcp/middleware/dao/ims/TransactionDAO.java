@@ -653,29 +653,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			}
 
 			if (transactionsSearchDto.getTransactionType() != null) {
-				query.append("and (CASE"
-					+ "        WHEN trntype = " + TransactionType.DEPOSIT.getId() + " THEN '"
-					+ TransactionType.DEPOSIT.getValue() + "'"
-					+ "        WHEN trntype = " + TransactionType.WITHDRAWAL.getId() + " THEN '"
-					+ TransactionType.WITHDRAWAL.getValue() + "'"
-					+ "        WHEN trntype = " + TransactionType.DISCARD.getId() + " THEN '"
-					+ TransactionType.DISCARD.getValue() + "'"
-					+ "        WHEN trntype = " + TransactionType.ADJUSTMENT.getId() + " THEN '"
-					+ TransactionType.ADJUSTMENT.getValue() + "'"
-					+ "    END) = '")
-					.append(transactionsSearchDto.getTransactionType()).append("' ");
+				query.append(" and trntype = ").append(transactionsSearchDto.getTransactionType());
 			}
 
 			if (transactionsSearchDto.getTransactionStatus() != null) {
-				query.append("and (CASE"
-					+ "        WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '"
-					+ TransactionStatus.PENDING.getValue() + "'"
-					+ "        WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '"
-					+ TransactionStatus.CONFIRMED.getValue() + "'"
-					+ "        WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '"
-					+ TransactionStatus.CANCELLED.getValue() + "'"
-					+ "    END) = '")
-					.append(transactionsSearchDto.getTransactionStatus()).append("' ");
+				query.append(" and trnstat = ").append(transactionsSearchDto.getTransactionStatus());
 			}
 
 			if (transactionsSearchDto.getStatusIds() != null && !transactionsSearchDto.getStatusIds().isEmpty()) {
@@ -764,9 +746,5 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
 		}
-	}
-
-	public Transaction saveTransaction(final Transaction transaction) {
-		return this.saveOrUpdate(transaction);
 	}
 }
