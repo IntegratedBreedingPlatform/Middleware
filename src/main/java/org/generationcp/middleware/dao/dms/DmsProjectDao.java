@@ -357,7 +357,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("           AND siteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
 			.append("   LEFT JOIN nd_experimentprop siteId ON e.nd_experiment_id = siteId.nd_experiment_id ")
 			.append("           AND siteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
-			.append("	LEFT JOIN study_type st.study_type_id = pmain.study_type_id ")
+			.append("	LEFT JOIN study_type st ON st.study_type_id = pmain.study_type_id ")
 			.append(" WHERE pmain.deleted != " + DELETED_STUDY + " ");
 		if (studyType.isPresent()) {
 			sqlString.append(" AND pmain.study_type_id = '" + studyType.get().getId() + "'");
