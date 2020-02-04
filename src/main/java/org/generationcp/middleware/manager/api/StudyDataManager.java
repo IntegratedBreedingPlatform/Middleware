@@ -655,6 +655,8 @@ public interface StudyDataManager {
 	boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(
 		final String variableId, final String variableValue, final String programUUID);
 
+	List<StudyTypeDto> getAllStudyTypes();
+
 	StudyTypeDto getStudyTypeByName(String name);
 
 	StudyTypeDto getStudyTypeByLabel(String label);

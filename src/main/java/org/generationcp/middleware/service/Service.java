@@ -35,16 +35,12 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
-import org.generationcp.middleware.operation.builder.LotBuilder;
-import org.generationcp.middleware.operation.builder.NameBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
-import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
 import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
-import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeOutlierSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
@@ -131,16 +127,8 @@ public abstract class Service extends DatabaseBroker {
 		return new ValueReferenceBuilder(this.sessionProvider);
 	}
 
-	protected final GeolocationSaver getGeolocationSaver() {
-		return new GeolocationSaver(this.sessionProvider);
-	}
-
 	protected final StandardVariableBuilder getStandardVariableBuilder() {
 		return new StandardVariableBuilder(this.sessionProvider);
-	}
-
-	protected final LotBuilder getLotBuilder() {
-		return new LotBuilder(this.sessionProvider);
 	}
 
 	protected final ExperimentBuilder getExperimentBuilder() {
@@ -149,10 +137,6 @@ public abstract class Service extends DatabaseBroker {
 
 	protected final ExperimentDestroyer getExperimentDestroyer() {
 		return new ExperimentDestroyer(this.sessionProvider);
-	}
-
-	protected final TransactionBuilder getTransactionBuilder() {
-		return new TransactionBuilder(this.sessionProvider);
 	}
 
 	protected final MeasurementVariableTransformer getMeasurementVariableTransformer() {
@@ -165,10 +149,6 @@ public abstract class Service extends DatabaseBroker {
 
 	protected final StudyDestroyer getStudyDestroyer() {
 		return new StudyDestroyer(this.sessionProvider);
-	}
-
-	protected final NameBuilder getNameBuilder() {
-		return new NameBuilder(this.sessionProvider);
 	}
 
 	protected void setLocationDataManager(LocationDataManager locationDataManager) {

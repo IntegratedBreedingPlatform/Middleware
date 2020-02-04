@@ -1093,6 +1093,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public List<StudyTypeDto> getAllStudyTypes() {
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getAll());
+	}
+
+	@Override
 	public StudyTypeDto getStudyTypeByName(final String name) {
 		final StudyType studyTypeByName = this.getStudyTypeDao().getStudyTypeByName(name);
 		if (studyTypeByName != null) {

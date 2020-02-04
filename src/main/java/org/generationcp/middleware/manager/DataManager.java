@@ -268,10 +268,6 @@ public abstract class DataManager extends DatabaseBroker {
 		return new PhenotypeSaver(this.sessionProvider);
 	}
 
-	protected final GeolocationSaver getGeolocationSaver() {
-		return new GeolocationSaver(this.sessionProvider);
-	}
-
 	protected final ProjectSaver getProjectSaver() {
 		return new ProjectSaver(this.sessionProvider);
 	}

@@ -10,6 +10,7 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StudyValues;
@@ -29,7 +30,7 @@ import org.generationcp.middleware.service.impl.study.ObservationUnitIDGenerator
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Transactional
@@ -82,11 +83,19 @@ public class ExperimentModelSaver {
 		experimentModel.setTypeId(expType.getTermId());
 		experimentModel.setProperties(this.createTrialDesignExperimentProperties(experimentModel, values.getVariableList()));
 
+		if (values.getLocationId() != null) {
+			experimentModel.setParent(new ExperimentModel(values.getLocationId()));
+		}
+
+		if (values.getObservationUnitNo() != null) {
+			experimentModel.setObservationUnitNo(values.getObservationUnitNo());
+		}
+
 		if (values.getGermplasmId() != null) {
 			experimentModel.setStock(this.stockModelBuilder.get(values.getGermplasmId()));
 		}
 		final ObservationUnitIDGenerator observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl();
-		observationUnitIDGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
+		observationUnitIDGenerator.generateObservationUnitIds(crop, Collections.singletonList(experimentModel));
 		return experimentModel;
 	}
 
@@ -96,7 +105,9 @@ public class ExperimentModelSaver {
 
 		if (factors != null && factors.getVariables() != null && !factors.getVariables().isEmpty()) {
 			for (final Variable variable : factors.getVariables()) {
-				if (PhenotypicType.TRIAL_DESIGN == variable.getVariableType().getRole()) {
+				final DMSVariableType var = variable.getVariableType();
+				if (TermId.TRIAL_INSTANCE_FACTOR.getId() != var.getId() && (PhenotypicType.TRIAL_DESIGN == var.getRole()
+					|| PhenotypicType.TRIAL_ENVIRONMENT == var.getRole())) {
 					experimentProperties.add(this.createTrialDesignProperty(experimentModel, variable));
 				}
 			}

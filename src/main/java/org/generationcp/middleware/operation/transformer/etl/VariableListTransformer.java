@@ -198,7 +198,7 @@ public class VariableListTransformer extends Transformer {
 	}
 
 	public VariableList transformTrialEnvironment(final List<MeasurementVariable> measurementVariableList,
-			final VariableTypeList variableTypeList) throws MiddlewareQueryException {
+			final VariableTypeList variableTypeList) {
 		final VariableList variableList = new VariableList();
 
 		if (measurementVariableList == null && variableTypeList == null) {
@@ -224,37 +224,5 @@ public class VariableListTransformer extends Transformer {
 		return variableList;
 	}
 
-	private int addVariableIfNecessary(final VariableList variables, final VariableTypeList variableTypeList,
-			final TermId termId, final String localName, final String localDescription, final String value,
-			final int rank, final String programUUID, final PhenotypicType role) throws MiddlewareException {
 
-		Variable variable = null;
-
-		boolean found = false;
-		if (variableTypeList != null && variableTypeList.getVariableTypes() != null
-				&& !variableTypeList.getVariableTypes().isEmpty()) {
-			for (final DMSVariableType variableType : variableTypeList.getVariableTypes()) {
-				if (variableType.getStandardVariable() != null) {
-					final StandardVariable standardVariable = variableType.getStandardVariable();
-					if (standardVariable.getId() == termId.getId()) {
-						found = true;
-						break;
-					}
-				}
-			}
-
-		}
-		if (!found) {
-			final StandardVariable standardVariable = this.getStandardVariableBuilder().create(termId.getId(),
-					programUUID);
-			standardVariable.setPhenotypicType(role);
-			final DMSVariableType variableType = new DMSVariableType(localName, localDescription, standardVariable,
-					rank);
-			variable = new Variable(variableType, value);
-			variableType.setRole(role);
-			variables.add(variable);
-			return rank + 1;
-		}
-		return rank;
-	}
 }

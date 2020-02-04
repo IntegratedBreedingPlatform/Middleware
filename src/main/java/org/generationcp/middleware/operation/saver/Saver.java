@@ -12,11 +12,9 @@
 package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
-import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.transformer.etl.DatasetValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
@@ -54,10 +52,6 @@ public class Saver extends DatabaseBroker {
 
 	protected final ProjectPropertySaver getProjectPropertySaver() {
 		return new ProjectPropertySaver(this.sessionProvider);
-	}
-
-	protected final GeolocationSaver getGeolocationSaver() {
-		return new GeolocationSaver(this.sessionProvider);
 	}
 
 	protected final StockSaver getStockSaver() {
@@ -100,28 +94,12 @@ public class Saver extends DatabaseBroker {
 		return new DatasetProjectSaver(this.sessionProvider);
 	}
 
-	protected final VariableTypeBuilder getVariableTypeBuilder() {
-		return new VariableTypeBuilder(this.sessionProvider);
-	}
-
 	protected final StockModelBuilder getStockModelBuilder() {
 		return new StockModelBuilder(this.sessionProvider);
 	}
 
 	protected final TermBuilder getTermBuilder() {
 		return new TermBuilder(this.sessionProvider);
-	}
-
-	protected final ExperimentBuilder getExperimentBuilder() {
-		return new ExperimentBuilder(this.sessionProvider);
-	}
-
-	protected final ExperimentPropertySaver getExperimentPropertySaver() {
-		return new ExperimentPropertySaver(this.sessionProvider);
-	}
-
-	protected final ListDataPropertySaver getListDataPropertySaver() {
-		return new ListDataPropertySaver(this.sessionProvider);
 	}
 
 	protected final EnvironmentPropertySaver getGeolocationPropertySaver() {

@@ -1,8 +1,6 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -10,55 +8,68 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
+import java.util.List;
+import java.util.Map;
+
 public class ExperimentValuesTransformer extends Transformer {
 
-	public ExperimentValuesTransformer(HibernateSessionProvider sessionProviderForLocal) {
+	public ExperimentValuesTransformer(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
-	public ExperimentValues transform(MeasurementRow mRow, VariableTypeList varTypeList, List<String> trialHeaders)
-			throws MiddlewareQueryException {
-		ExperimentValues experimentValues = new ExperimentValues();
+	public ExperimentValues transform(final MeasurementRow mRow, final VariableTypeList varTypeList, final List<String> trialHeaders, final Map<Integer, Integer> instanceNumberEnvironmentIdMap) {
+		final ExperimentValues experimentValues = new ExperimentValues();
 		if (mRow == null) {
 			return experimentValues;
 		}
-		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
+		final List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
 		if (nonTrialMD != null && varTypeList != null && varTypeList.getVariableTypes() != null) {
 			if (nonTrialMD.size() == varTypeList.getVariableTypes().size()) {
-				Integer locationId = Integer.parseInt(String.valueOf(mRow.getLocationId()));
-				Integer germplasmId = Integer.parseInt(String.valueOf(mRow.getStockId()));
-				VariableList variableList = new VariableList();
+				final Integer germplasmId = Integer.parseInt(String.valueOf(mRow.getStockId()));
+				final VariableList variableList = new VariableList();
 
-				List<DMSVariableType> varTypes = varTypeList.getVariableTypes();
+				final List<DMSVariableType> varTypes = varTypeList.getVariableTypes();
 
 				for (int i = 0, l = varTypes.size(); i < l; i++) {
-					DMSVariableType varType = varTypes.get(i);
+					final DMSVariableType varType = varTypes.get(i);
 					String value = null;
-					for (MeasurementData data : nonTrialMD) {
+					for (final MeasurementData data : nonTrialMD) {
 						if (data.getMeasurementVariable().getTermId() == varTypes.get(i).getId()) {
 							if (data.getcValueId() != null) {
 								value = data.getcValueId();
 							} else {
 								value = data.getValue();
 							}
-							Variable variable = new Variable(varType, value);
+							final Variable variable = new Variable(varType, value);
 							variableList.add(variable);
 							data.setVariable(variable);
 						}
 					}
 				}
-
+				final Integer instanceNumber = this.getTrialInstanceNumber(mRow);
+				if (instanceNumberEnvironmentIdMap.get(instanceNumber) != null) {
+					experimentValues.setLocationId(instanceNumberEnvironmentIdMap.get(instanceNumber));
+				}
 				experimentValues.setVariableList(variableList);
 				experimentValues.setGermplasmId(germplasmId);
-				experimentValues.setLocationId(locationId);
 			} else {
 				throw new MiddlewareQueryException("Variables did not match the Measurements Row.");
 			}
 		}
 
 		return experimentValues;
+	}
+
+	private Integer getTrialInstanceNumber(final MeasurementRow row) {
+		for (final MeasurementData data : row.getDataList()) {
+			if (data.getMeasurementVariable().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+				return Integer.valueOf(data.getValue());
+			}
+		}
+		return null;
 	}
 }
