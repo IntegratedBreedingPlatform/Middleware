@@ -359,13 +359,17 @@ public class WorkbookSaver extends Saver {
 	public void saveOrUpdateTrialObservations(
 		final CropType crop, final int trialDatasetId, final Workbook workbook) {
 
-		for (final MeasurementRow row : workbook.getTrialObservations()) {
+		final Map<Integer, Integer> instanceNumberEnvironmentIdsMap = new HashMap<>();
+		// Extract the trial environments from plot observations
+		for (final MeasurementRow row : workbook.getObservations()) {
 			final Integer instanceNumber = this.getTrialInstanceNumber(row);
-			// TODO IBP-3389 handle environment conditions (last parameter)
-			this.createTrialExperiment(crop, trialDatasetId, instanceNumber, new VariableList());
+			if (!instanceNumberEnvironmentIdsMap.containsKey(instanceNumber)) {
+				// TODO IBP-3389 handle environment conditions (last parameter)
+				final Integer environmentId = this.createTrialExperiment(crop, trialDatasetId, instanceNumber, new VariableList());
+				instanceNumberEnvironmentIdsMap.put(instanceNumber, environmentId);
+			}
+			row.setLocationId(instanceNumberEnvironmentIdsMap.get(instanceNumber));
 		}
-
-
 	}
 
 
@@ -559,13 +563,15 @@ public class WorkbookSaver extends Saver {
 		return datasetId;
 	}
 
-	private void createTrialExperiment(
+	private Integer createTrialExperiment(
 		final CropType crop, final int trialProjectId, final Integer instanceNumber, final VariableList trialVariates) {
 		final TimerWatch watch = new TimerWatch("save trial experiments");
 		final ExperimentValues trialDatasetValues = this.createTrialExperimentValues(trialVariates, instanceNumber);
 		// TODO IBP-3389 Add logic for default experiment design and unspecified location id
-		this.getExperimentModelSaver().addExperiment(crop, trialProjectId, ExperimentType.TRIAL_ENVIRONMENT, trialDatasetValues);
+		final ExperimentModel experimentModel =
+			this.getExperimentModelSaver().addExperiment(crop, trialProjectId, ExperimentType.TRIAL_ENVIRONMENT, trialDatasetValues);
 		watch.stop();
+		return experimentModel.getNdExperimentId();
 	}
 
 	private int createPlotDatasetIfNecessary(
