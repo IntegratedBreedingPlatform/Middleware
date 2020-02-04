@@ -213,7 +213,7 @@ public class WorkbookSaver extends Saver {
 		}
 		final Integer environmentDatasetId = this.createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables, programUUID);
 
-		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook);
+		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook, trialVariables, trialHeaders);
 
 		final Integer plotDatasetId =
 			this.createPlotDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables, programUUID);
@@ -274,7 +274,7 @@ public class WorkbookSaver extends Saver {
 //		// delete trial observations
 //		this.getExperimentDestroyer().deleteExperimentsByStudy(environmentDatasetId);
 
-		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook);
+		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook, trialVariables, trialHeaders);
 
 		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
 		this.createMeasurementEffectExperiments(crop, plotDatasetId, environmentDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
@@ -357,15 +357,22 @@ public class WorkbookSaver extends Saver {
 	}
 
 	public void saveOrUpdateTrialObservations(
-		final CropType crop, final int trialDatasetId, final Workbook workbook) {
+		final CropType crop, final int trialDatasetId, final Workbook workbook, final VariableTypeList trialVariables, final List<String> trialHeaders) {
 
 		final Map<Integer, Integer> instanceNumberEnvironmentIdsMap = new HashMap<>();
+		final List<Location> locations = daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 		// Extract the trial environments from plot observations
 		for (final MeasurementRow row : workbook.getObservations()) {
 			final Integer instanceNumber = this.getTrialInstanceNumber(row);
 			if (!instanceNumberEnvironmentIdsMap.containsKey(instanceNumber)) {
-				// TODO IBP-3389 handle environment conditions (last parameter)
-				final Integer environmentId = this.createTrialExperiment(crop, trialDatasetId, instanceNumber, new VariableList());
+				final VariableList environmentVariables =
+					this.getVariableListTransformer().transformTrialEnvironment(row, trialVariables, trialHeaders);
+				this.setVariableListValues(environmentVariables, workbook.getConditions());
+				this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
+					environmentVariables, locations);
+				this.assignExptDesignAsExternallyGeneratedDesignIfEmpty(environmentVariables);
+
+				final Integer environmentId = this.createTrialExperiment(crop, trialDatasetId, instanceNumber, environmentVariables);
 				instanceNumberEnvironmentIdsMap.put(instanceNumber, environmentId);
 			}
 			row.setLocationId(instanceNumberEnvironmentIdsMap.get(instanceNumber));
@@ -567,7 +574,6 @@ public class WorkbookSaver extends Saver {
 		final CropType crop, final int trialProjectId, final Integer instanceNumber, final VariableList trialVariates) {
 		final TimerWatch watch = new TimerWatch("save trial experiments");
 		final ExperimentValues trialDatasetValues = this.createTrialExperimentValues(trialVariates, instanceNumber);
-		// TODO IBP-3389 Add logic for default experiment design and unspecified location id
 		final ExperimentModel experimentModel =
 			this.getExperimentModelSaver().addExperiment(crop, trialProjectId, ExperimentType.TRIAL_ENVIRONMENT, trialDatasetValues);
 		watch.stop();
@@ -885,7 +891,7 @@ public class WorkbookSaver extends Saver {
 		// create trial experiments if not yet existing
 		if (!hasExistingTrialExperiments) {
 			// 2. trial experiments
-			this.saveOrUpdateTrialObservations(crop, trialDatasetId, workbook);
+			this.saveOrUpdateTrialObservations(crop, trialDatasetId, workbook, trialVariables, trialHeaders);
 		}
 		if (isMeansDataImport) {
 			// 3. means experiments
