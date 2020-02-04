@@ -17,8 +17,8 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	private String stockId;
 	private List<Integer> transactionIds;
 	private String createdByUsername;
-	private String transactionType;
-	private String transactionStatus;
+	private Integer transactionType;
+	private Integer transactionStatus;
 	private String notes;
 	private List<Integer> lotIds;
 	private List<Integer> gids;
@@ -68,11 +68,11 @@ public class TransactionsSearchDto extends SearchRequestDto {
 		this.transactionIds = transactionIds;
 	}
 
-	public String getTransactionType() {
+	public Integer getTransactionType() {
 		return this.transactionType;
 	}
 
-	public void setTransactionType(final String transactionType) {
+	public void setTransactionType(final Integer transactionType) {
 		this.transactionType = transactionType;
 	}
 
@@ -156,11 +156,11 @@ public class TransactionsSearchDto extends SearchRequestDto {
 		this.lotStatus = lotStatus;
 	}
 
-	public String getTransactionStatus() {
+	public Integer getTransactionStatus() {
 		return this.transactionStatus;
 	}
 
-	public void setTransactionStatus(final String transactionStatus) {
+	public void setTransactionStatus(final Integer transactionStatus) {
 		this.transactionStatus = transactionStatus;
 	}
 
