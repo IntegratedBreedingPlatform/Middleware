@@ -1,9 +1,11 @@
 package org.generationcp.middleware.service.impl.study;
 
+import net.bytebuddy.asm.Advice;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -15,6 +17,7 @@ import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
@@ -28,6 +31,9 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	private DmsProject study;
 	private DmsProject plot;
 	private CVTerm testTrait;
+
+	@Autowired
+	private StudyService bmsapiStudyServiceMock;
 
 	@Before
 	public void setUp() {
@@ -90,6 +96,42 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.testDataInitializer.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
 		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
 		Assert.assertTrue(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
+		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
+		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
+		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
+		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testGetStudyDetailsForGeolocationNull() {
+		final DmsProject environmentDataset =
+				this.testDataInitializer
+						.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
+
+		final int locationId = 101;
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
+		this.testDataInitializer.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
+		this.testDataInitializer.addProjectProp(study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, "1", 6);
+		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
+		Assert.assertTrue(!CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
+		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
+		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
+		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
+		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
+	}
+
+	@Test
+	public void testGetStudyDetailsForGeolocationNotNull() {
+		final DmsProject environmentDataset =
+				this.testDataInitializer
+						.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
+
+		final int locationId = 101;
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
+		this.testDataInitializer.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
+		this.testDataInitializer.addProjectProp(study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, "1", 6);
+		final StudyDetailsDto studyDetailsDto = this.bmsapiStudyServiceMock.getStudyDetailsForGeolocation(geolocation.getLocationId());
+		Assert.assertTrue(!CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
 		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());

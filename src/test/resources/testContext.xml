@@ -122,9 +122,9 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
-    <bean id="studyDataManager" class="org.generationcp.middleware.manager.StudyDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
-    </bean>
+<!--    <bean id="studyDataManager" class="org.generationcp.middleware.manager.StudyDataManagerImpl">-->
+<!--        <property name="sessionProvider" ref="cropSessionProvider"/>-->
+<!--    </bean>-->
 
     <bean id="userProgramStateDataManager" class="org.generationcp.middleware.manager.UserProgramStateDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
@@ -187,6 +187,12 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+    <bean id="studyServiceImpl" class="org.generationcp.middleware.service.impl.study.StudyServiceImpl">
+    </bean>
+
+    <bean id="bmsapiStudyServiceMock" class="org.generationcp.middleware.service.impl.study.BMSAPIStudyServiceMock">
+    </bean>
+
     <bean id="cropSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
         <property name="sessionFactory" ref="IBDBV2_MAIZE_MERGED_SessionFactory"/>
         <aop:scoped-proxy proxy-target-class="false"/>
@@ -220,6 +226,9 @@
 		<aop:scoped-proxy />
 	</bean>
 
+    <bean id="studyDataManager" factory-bean="managerFactory"
+          factory-method="getStudyDataManager">
+    </bean>
 
 
 </beans>
