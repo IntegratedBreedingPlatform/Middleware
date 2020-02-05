@@ -15,7 +15,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
-import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.transformer.etl.DatasetValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StudyValuesTransformer;
@@ -106,7 +105,4 @@ public class Saver extends DatabaseBroker {
 		return new TermBuilder(this.sessionProvider);
 	}
 
-	protected final ExperimentDestroyer getExperimentDestroyer() {
-		return new ExperimentDestroyer(this.sessionProvider);
-	}
 }

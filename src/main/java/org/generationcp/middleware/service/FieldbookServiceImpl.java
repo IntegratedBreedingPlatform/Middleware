@@ -786,7 +786,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public void deleteObservationsOfStudy(final int datasetId) {
 		try {
-			this.getExperimentDestroyer().deleteExperimentsByStudy(datasetId);
+			this.getExperimentDao().deleteExperimentsForDataset(datasetId);
 		} catch (final Exception e) {
 
 			this.logAndThrowException("Error encountered with deleteObservationsOfStudy(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
