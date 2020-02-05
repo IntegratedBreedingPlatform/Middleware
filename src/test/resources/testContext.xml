@@ -122,10 +122,6 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
-<!--    <bean id="studyDataManager" class="org.generationcp.middleware.manager.StudyDataManagerImpl">-->
-<!--        <property name="sessionProvider" ref="cropSessionProvider"/>-->
-<!--    </bean>-->
-
     <bean id="userProgramStateDataManager" class="org.generationcp.middleware.manager.UserProgramStateDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
