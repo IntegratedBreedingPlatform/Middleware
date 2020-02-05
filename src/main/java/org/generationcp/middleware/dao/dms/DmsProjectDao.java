@@ -33,8 +33,10 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.service.api.study.StudyDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.FormulaUtils;
 import org.generationcp.middleware.util.Util;
@@ -107,6 +109,23 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String OBS_SET_EXPECTED_MAX = "expectedMax";
 	private static final String OBS_SET_CROP_ONTOLOGY_ID = "cropOntologyId";
 	private static final String OBS_SET_VARIABLE_VALUE = "variableValue";
+
+	// Study DTO fields
+	public static final String ACTIVE = "active";
+	public static final String PROGRAM_DB_ID = "programDbId";
+	public static final String STUDY_DB_ID = "studyDbId";
+	public static final String STUDY_NAME = "studyName";
+	public static final String TRIAL_DB_ID = "trialDbId";
+	public static final String TRIAL_NAME = "trialName";
+	public static final String STUDY_TYPE_DB_ID = "studyTypeDbId";
+	public static final String STUDY_TYPE_NAME = "studyTypeName";
+	public static final String SEASON_DB_ID = "seasonDbId";
+	public static final String SEASON = "season";
+	public static final String YEAR = "year";
+	public static final String START_DATE = "startDate";
+	public static final String END_DATE = "endDate";
+	public static final String LOCATION_DB_ID = "locationDbId";
+	public static final String LOCATION_NAME = "locationName";
 
 	/**
 	 * Type of study is stored in project.study_type_id
@@ -1180,7 +1199,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			if (!CollectionUtils.isEmpty(instanceIds)) {
 				sb.append(" AND geoloc.nd_geolocation_id IN (:locationIds) \n");
 			}
-			sb.append("    group by geoloc.nd_geolocation_id \n" );
+			sb.append("    group by geoloc.nd_geolocation_id \n");
 			sb.append("    order by (1 * geoloc.description) asc ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
@@ -1369,6 +1388,180 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final String message = "Error with getPersonIdsAssociatedToEnvironment() query from instanceId: " + instanceId;
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public long countStudyDTOs(final StudySearchFilter studySearchFilter) {
+		final SQLQuery sqlQuery =
+			this.getSession().createSQLQuery(this.createCountStudyQueryString(studySearchFilter));
+		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	public List<StudyDto> getStudyDTOs(final StudySearchFilter studySearchFilter) {
+
+		// TODO: Check if we can reuse this query/method in getStudyMetadataForGeolocationId()
+		final SQLQuery sqlQuery =
+			this.getSession().createSQLQuery(this.createStudySummaryQueryString(studySearchFilter));
+
+		sqlQuery.addScalar(STUDY_DB_ID);
+		sqlQuery.addScalar(STUDY_NAME);
+		sqlQuery.addScalar(TRIAL_DB_ID);
+		sqlQuery.addScalar(TRIAL_NAME);
+		sqlQuery.addScalar(STUDY_TYPE_DB_ID);
+		sqlQuery.addScalar(STUDY_TYPE_NAME);
+		sqlQuery.addScalar(SEASON_DB_ID);
+		sqlQuery.addScalar(SEASON);
+		sqlQuery.addScalar(START_DATE);
+		sqlQuery.addScalar(END_DATE);
+		sqlQuery.addScalar(ACTIVE);
+		sqlQuery.addScalar(LOCATION_DB_ID);
+
+		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
+
+		final Integer pageSize = studySearchFilter.getSortedRequest().getPageSize();
+		final Integer pageNumber = studySearchFilter.getSortedRequest().getPageNumber();
+
+		if (pageNumber != null && pageSize != null) {
+			sqlQuery.setFirstResult(pageSize * (pageNumber - 1));
+			sqlQuery.setMaxResults(pageSize);
+		}
+
+		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+		final List<Map<String, Object>> results = sqlQuery.list();
+
+		final List<StudyDto> studyDtoList = new ArrayList<>();
+		for (final Map<String, Object> result : results) {
+			final StudyDto studyDto = new StudyDto();
+			studyDto.setCommonCropName(studySearchFilter.getCommonCropName());
+			studyDto.setStudyDbId(String.valueOf(result.get(STUDY_DB_ID)));
+			studyDto.setStudyName(String.valueOf(result.get(STUDY_NAME)));
+			studyDto.setTrialDbId(String.valueOf(result.get(TRIAL_DB_ID)));
+			studyDto.setTrialName(String.valueOf(result.get(TRIAL_NAME)));
+			studyDto.setStudyTypeDbId(String.valueOf(result.get(STUDY_TYPE_DB_ID)));
+			studyDto.setStudyTypeName(String.valueOf(result.get(STUDY_TYPE_NAME)));
+
+			// TODO: Populate the seasons.
+			studyDto.setSeasons(new ArrayList<>());
+
+			// TODO: Cornvert datae to ISO8601 format (2020-01-01).
+			//studyDto.setStartDate(String.valueOf(result.get(START_DATE)));
+			//studyDto.setEndDate(String.valueOf(result.get(END_DATE)));
+
+			// TODO: Populate program details.
+
+			studyDto
+				.setActive(((Integer) result.get(ACTIVE)) == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
+			studyDtoList.add(studyDto);
+		}
+		return studyDtoList;
+	}
+
+	private void addstudySearchFilterParameters(final SQLQuery sqlQuery, final StudySearchFilter studySearchFilter) {
+
+		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
+			sqlQuery.setParameter(STUDY_DB_ID, studySearchFilter.getStudyDbId());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
+			sqlQuery.setParameter(LOCATION_DB_ID, studySearchFilter.getLocationDbId());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getProgramDbId())) {
+			sqlQuery.setParameter(PROGRAM_DB_ID, studySearchFilter.getProgramDbId());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getSeasonDbId())) {
+			sqlQuery.setParameter(SEASON_DB_ID, studySearchFilter.getSeasonDbId());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getStudyTypeDbId())) {
+			sqlQuery.setParameter(STUDY_TYPE_DB_ID, studySearchFilter.getStudyTypeDbId());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getTrialDbId())) {
+			sqlQuery.setParameter(TRIAL_DB_ID, studySearchFilter.getTrialDbId());
+		}
+		if (studySearchFilter.getActive() != null) {
+			sqlQuery.setParameter(ACTIVE, (studySearchFilter.getActive().booleanValue() ? 0 : 1));
+		}
+
+	}
+
+	private String createCountStudyQueryString(final StudySearchFilter studySearchFilter) {
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT geoloc.nd_geolocation_id) ");
+		this.appendStudySummaryFromQuery(sql);
+		this.appendStudySearchFilter(sql, studySearchFilter);
+		return sql.toString();
+	}
+
+	private String createStudySummaryQueryString(final StudySearchFilter studySearchFilter) {
+		final StringBuilder sql = new StringBuilder(" SELECT  ");
+		sql.append("     geoloc.nd_geolocation_id AS " + STUDY_DB_ID + ", ");
+		sql.append("		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS " + STUDY_NAME + ", ");
+		sql.append("     pmain.study_type_id AS " + STUDY_TYPE_DB_ID + ", ");
+		sql.append("     studyType.label AS " + STUDY_TYPE_NAME + ", ");
+		sql.append("     MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR.getId() + ", ");
+		sql.append("                 geoprop.value, ");
+		sql.append("                 NULL)) AS " + SEASON_DB_ID + ", ");
+		sql.append("     MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR_TEXT.getId() + ", ");
+		sql.append("                 geoprop.value, ");
+		sql.append("                 NULL)) AS " + SEASON + ", ");
+		sql.append("     pmain.project_id AS " + TRIAL_DB_ID + ", ");
+		sql.append(" 	 pmain.name AS " + TRIAL_NAME + ", ");
+		sql.append("     MAX(pmain.start_date) AS " + START_DATE + ", ");
+		sql.append("     MAX(pmain.end_date) AS " + END_DATE + ", ");
+		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS " + ACTIVE + ", ");
+		sql.append("     MAX(IF(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", ");
+		sql.append("                 geoprop.value, ");
+		sql.append("                 NULL)) ");
+		sql.append("     AS " + LOCATION_DB_ID);
+		this.appendStudySummaryFromQuery(sql);
+		this.appendStudySearchFilter(sql, studySearchFilter);
+		sql.append(" GROUP BY geoloc.nd_geolocation_id ");
+		if (!StringUtils.isEmpty(studySearchFilter.getSortedRequest().getSortBy()) && StringUtils
+			.isEmpty(studySearchFilter.getSortedRequest().getSortOrder())) {
+			sql.append(
+				" ORDER BY " + studySearchFilter.getSortedRequest().getSortBy() + studySearchFilter.getSortedRequest().getSortOrder());
+		}
+		return sql.toString();
+	}
+
+	private void appendStudySummaryFromQuery(final StringBuilder sql) {
+		sql.append(" FROM ");
+		sql.append("     nd_geolocation geoloc ");
+		sql.append("         INNER JOIN ");
+		sql.append("     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id ");
+		sql.append("         INNER JOIN ");
+		sql.append("     project proj ON proj.project_id = nde.project_id ");
+		sql.append("         INNER JOIN ");
+		sql.append("     project pmain ON pmain.project_id = proj.study_id ");
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id ");
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     projectprop pProp ON pmain.project_id = pProp.project_id ");
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     study_type studyType ON studyType.study_type_id = pmain.study_type_id ");
+		sql.append(" WHERE ");
+		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+	}
+
+	private void appendStudySearchFilter(final StringBuilder sql, final StudySearchFilter studySearchFilter) {
+		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
+			sql.append("AND geoloc.nd_geolocation_id = :studyDbId ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
+			sql.append("AND locationId = :locationDbId ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getProgramDbId())) {
+			sql.append("AND pmain.program_uuid = :programDbId ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getSeasonDbId())) {
+			sql.append("AND seasonDbId = :seasonDbId ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getStudyTypeDbId())) {
+			sql.append("AND studyTypeDbId = :studyTypeDbId ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getTrialDbId())) {
+			sql.append("AND trialDbId = :trialDbId ");
+		}
+		if (studySearchFilter.getActive() != null) {
+			sql.append("AND pmain.deleted = :active ");
 		}
 	}
 

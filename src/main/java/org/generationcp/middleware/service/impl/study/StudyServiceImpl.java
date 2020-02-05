@@ -32,6 +32,8 @@ import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
+import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
@@ -39,7 +41,6 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -544,6 +545,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
 		return this.getPhenotypeDao().countPhenotypes(requestDTO);
+	}
+
+	@Override
+	public List<StudyDto> getStudyDTOs(final StudySearchFilter studySearchFilter) {
+		return this.daoFactory.getDmsProjectDAO().getStudyDTOs(studySearchFilter);
+	}
+
+	@Override
+	public long countStudyDTOs(final StudySearchFilter studySearchFilter) {
+		return this.daoFactory.getDmsProjectDAO().countStudyDTOs(studySearchFilter);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {

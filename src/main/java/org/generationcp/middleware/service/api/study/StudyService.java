@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.api.study;
 
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 import java.util.List;
 
@@ -77,4 +76,8 @@ public interface StudyService {
 	Integer getPlotDatasetId(final int studyId);
 
 	Integer getEnvironmentDatasetId(final int studyId);
+
+	List<StudyDto> getStudyDTOs(StudySearchFilter studySearchFilter);
+
+	long countStudyDTOs(StudySearchFilter studySearchFilter);
 }
