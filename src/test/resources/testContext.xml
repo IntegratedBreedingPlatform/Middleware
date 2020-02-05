@@ -224,6 +224,7 @@
 
     <bean id="studyDataManager" factory-bean="managerFactory"
           factory-method="getStudyDataManager">
+        <aop:scoped-proxy />
     </bean>
 
 
