@@ -31,9 +31,6 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	private DmsProject plot;
 	private CVTerm testTrait;
 
-	@Autowired
-	private StudyService bmsapiStudyServiceMock;
-
 	@Before
 	public void setUp() {
 
@@ -112,7 +109,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
 		this.testDataInitializer.addProjectProp(study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, "1", 6);
-		final StudyDetailsDto studyDetailsDto = this.bmsapiStudyServiceMock.getStudyDetailsForGeolocation(geolocation.getLocationId());
+		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
 		Assert.assertFalse(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
