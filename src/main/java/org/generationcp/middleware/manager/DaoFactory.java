@@ -17,6 +17,7 @@ import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.EnvironmentDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
@@ -153,6 +154,13 @@ public class DaoFactory {
 		final ExperimentDao experimentDao = new ExperimentDao();
 		experimentDao.setSession(this.sessionProvider.getSession());
 		return experimentDao;
+
+	}
+
+	public ExperimentPropertyDao getExperimentPropertyDao() {
+		final ExperimentPropertyDao experimentPropDao = new ExperimentPropertyDao();
+		experimentPropDao.setSession(this.sessionProvider.getSession());
+		return experimentPropDao;
 
 	}
 

@@ -484,7 +484,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				} else {
 					this.getLocdesSaver().updateDeletedPlots(info, userId);
 				}
-				this.getGeolocationPropertySaver().saveFieldmapProperties(info);
 				this.getExperimentPropertySaver().saveFieldmapProperties(info);
 
 			} catch (final Exception e) {
@@ -741,6 +740,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return list;
 	}
 
+	// TODO IBP-3389 Optimize, no need to retrieve per study type from ETLServiceImpl
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
 	public List<StudyDetails> getAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {

@@ -34,7 +34,6 @@ import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
 import org.generationcp.middleware.operation.saver.CvTermSaver;
 import org.generationcp.middleware.operation.saver.DatasetProjectSaver;
-import org.generationcp.middleware.operation.saver.EnvironmentPropertySaver;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.ListDataPropertySaver;
@@ -306,10 +305,6 @@ public abstract class DataManager extends DatabaseBroker {
 
 	protected final LocdesSaver getLocdesSaver() {
 		return new LocdesSaver(this.sessionProvider);
-	}
-
-	protected final EnvironmentPropertySaver getGeolocationPropertySaver() {
-		return new EnvironmentPropertySaver(this.sessionProvider);
 	}
 
 	protected final ListInventoryBuilder getListInventoryBuilder() {

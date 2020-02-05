@@ -66,6 +66,10 @@ public class Saver extends DatabaseBroker {
 		return new ExperimentModelSaver(this.sessionProvider);
 	}
 
+	protected final ExperimentPropertySaver getExperimentPropertySaver() {
+		return new ExperimentPropertySaver(this.sessionProvider);
+	}
+
 	protected final StandardVariableBuilder getStandardVariableBuilder() {
 		return new StandardVariableBuilder(this.sessionProvider);
 	}
@@ -100,10 +104,6 @@ public class Saver extends DatabaseBroker {
 
 	protected final TermBuilder getTermBuilder() {
 		return new TermBuilder(this.sessionProvider);
-	}
-
-	protected final EnvironmentPropertySaver getGeolocationPropertySaver() {
-		return new EnvironmentPropertySaver(this.sessionProvider);
 	}
 
 	protected final ExperimentDestroyer getExperimentDestroyer() {
