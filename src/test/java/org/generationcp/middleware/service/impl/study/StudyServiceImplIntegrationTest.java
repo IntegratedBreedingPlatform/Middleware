@@ -24,6 +24,7 @@ import java.util.List;
 
 public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
+	@Autowired
 	private StudyService studyService;
 	private IntegrationTestDataInitializer testDataInitializer;
 	private DmsProject study;
@@ -38,7 +39,6 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		DmsProjectDao dmsProjectDao = new DmsProjectDao();
 		dmsProjectDao.setSession(this.sessionProvder.getSession());
-		this.studyService = new StudyServiceImpl(this.sessionProvder);
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, dmsProjectDao.getById(1), null);
 
@@ -101,27 +101,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
 	}
 
-	@Test(expected = NullPointerException.class)
-	public void testGetStudyDetailsForGeolocationNull() {
-		final DmsProject environmentDataset =
-			this.testDataInitializer
-				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
-
-		final int locationId = 101;
-		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
-		this.testDataInitializer
-			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
-		this.testDataInitializer.addProjectProp(study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, "1", 6);
-		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
-		Assert.assertFalse(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
-		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
-		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
-		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
-		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
-	}
-
 	@Test
-	public void testGetStudyDetailsForGeolocationNotNull() {
+	public void testGetStudyDetailsForGeolocationWithPI_ID() {
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
