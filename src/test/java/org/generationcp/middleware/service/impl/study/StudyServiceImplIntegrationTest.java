@@ -25,115 +25,118 @@ import java.util.List;
 public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private StudyService studyService;
-    private IntegrationTestDataInitializer testDataInitializer;
-    private DmsProject study;
-    private DmsProject plot;
-    private CVTerm testTrait;
+	private IntegrationTestDataInitializer testDataInitializer;
+	private DmsProject study;
+	private DmsProject plot;
+	private CVTerm testTrait;
 
-    @Autowired
-    private StudyService bmsapiStudyServiceMock;
+	@Autowired
+	private StudyService bmsapiStudyServiceMock;
 
-    @Before
-    public void setUp() {
+	@Before
+	public void setUp() {
 
 		DmsProjectDao dmsProjectDao = new DmsProjectDao();
-        dmsProjectDao.setSession(this.sessionProvder.getSession());
-        this.studyService = new StudyServiceImpl(this.sessionProvder);
-        this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
-        this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, dmsProjectDao.getById(1), null);
+		dmsProjectDao.setSession(this.sessionProvder.getSession());
+		this.studyService = new StudyServiceImpl(this.sessionProvder);
+		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
+		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, dmsProjectDao.getById(1), null);
 
-        this.plot = this.testDataInitializer
-                .createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
-        this.testTrait = this.testDataInitializer.createTrait("SomeTrait");
-    }
+		this.plot = this.testDataInitializer
+			.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
+		this.testTrait = this.testDataInitializer.createTrait("SomeTrait");
+	}
 
-    @Test
-    public void testCountTotalObservationUnits() {
+	@Test
+	public void testCountTotalObservationUnits() {
 
-        final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-        this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 5);
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 5);
 
-        Assert.assertEquals(5, this.studyService.countTotalObservationUnits(this.study.getProjectId(), geolocation.getLocationId()));
-    }
+		Assert.assertEquals(5, this.studyService.countTotalObservationUnits(this.study.getProjectId(), geolocation.getLocationId()));
+	}
 
-    @Test
-    public void testHasMeasurementDataEntered() {
-        final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-        final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 5);
+	@Test
+	public void testHasMeasurementDataEntered() {
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 5);
 
-        Assert.assertFalse(
-                this.studyService.hasMeasurementDataEntered(Collections.singletonList(this.testTrait.getCvTermId()), this.study.getProjectId()));
+		Assert.assertFalse(
+			this.studyService.hasMeasurementDataEntered(Collections.singletonList(this.testTrait.getCvTermId()), this.study.getProjectId()));
 
-        this.testDataInitializer.addPhenotypes(experimentModels, this.testTrait.getCvTermId(), RandomStringUtils.randomNumeric(5));
-        // Need to flush session to sync with underlying database before querying
-        this.sessionProvder.getSession().flush();
-        Assert.assertTrue(
-                this.studyService.hasMeasurementDataEntered(Collections.singletonList(this.testTrait.getCvTermId()), this.study.getProjectId()));
-    }
+		this.testDataInitializer.addPhenotypes(experimentModels, this.testTrait.getCvTermId(), RandomStringUtils.randomNumeric(5));
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
+		Assert.assertTrue(
+			this.studyService.hasMeasurementDataEntered(Collections.singletonList(this.testTrait.getCvTermId()), this.study.getProjectId()));
+	}
 
-    @Test
-    public void testHasMeasurementDataOnEnvironment() {
-        final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-        final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 5);
-        Assert.assertFalse(this.studyService.hasMeasurementDataOnEnvironment(this.study.getProjectId(), geolocation.getLocationId()));
+	@Test
+	public void testHasMeasurementDataOnEnvironment() {
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 5);
+		Assert.assertFalse(this.studyService.hasMeasurementDataOnEnvironment(this.study.getProjectId(), geolocation.getLocationId()));
 
-        this.testDataInitializer.addPhenotypes(experimentModels, this.testTrait.getCvTermId(), RandomStringUtils.randomNumeric(5));
-        // Need to flush session to sync with underlying database before querying
-        this.sessionProvder.getSession().flush();
-        Assert.assertTrue(this.studyService.hasMeasurementDataOnEnvironment(this.study.getProjectId(), geolocation.getLocationId()));
-    }
+		this.testDataInitializer.addPhenotypes(experimentModels, this.testTrait.getCvTermId(), RandomStringUtils.randomNumeric(5));
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
+		Assert.assertTrue(this.studyService.hasMeasurementDataOnEnvironment(this.study.getProjectId(), geolocation.getLocationId()));
+	}
 
-    @Test
-    public void testGetStudyDetailsForGeolocation() {
-        final DmsProject environmentDataset =
-                this.testDataInitializer
-                        .createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
+	@Test
+	public void testGetStudyDetailsForGeolocation() {
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
 
-        final int locationId = 101;
-        final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
-        this.testDataInitializer.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
-        final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
-        Assert.assertTrue(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
-        Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
-        Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
-        Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
-        Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
-    }
+		final int locationId = 101;
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
+		this.testDataInitializer
+			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
+		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
+		Assert.assertTrue(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
+		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
+		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
+		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
+		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
+	}
 
-    @Test(expected = NullPointerException.class)
-    public void testGetStudyDetailsForGeolocationNull() {
-        final DmsProject environmentDataset =
-                this.testDataInitializer
-                        .createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
+	@Test(expected = NullPointerException.class)
+	public void testGetStudyDetailsForGeolocationNull() {
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
 
-        final int locationId = 101;
-        final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
-        this.testDataInitializer.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
-        this.testDataInitializer.addProjectProp(study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, "1", 6);
-        final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
+		final int locationId = 101;
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
+		this.testDataInitializer
+			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
+		this.testDataInitializer.addProjectProp(study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, "1", 6);
+		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
 		Assert.assertFalse(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
-        Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
-        Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
-        Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
-        Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
-    }
+		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
+		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
+		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
+		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
+	}
 
-    @Test
-    public void testGetStudyDetailsForGeolocationNotNull() {
-        final DmsProject environmentDataset =
-                this.testDataInitializer
-                        .createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
+	@Test
+	public void testGetStudyDetailsForGeolocationNotNull() {
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
 
-        final int locationId = 101;
-        final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
-        this.testDataInitializer.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
-        this.testDataInitializer.addProjectProp(study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, "1", 6);
-        final StudyDetailsDto studyDetailsDto = this.bmsapiStudyServiceMock.getStudyDetailsForGeolocation(geolocation.getLocationId());
+		final int locationId = 101;
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
+		this.testDataInitializer
+			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
+		this.testDataInitializer.addProjectProp(study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, "1", 6);
+		final StudyDetailsDto studyDetailsDto = this.bmsapiStudyServiceMock.getStudyDetailsForGeolocation(geolocation.getLocationId());
 		Assert.assertFalse(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
-        Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
-        Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
-        Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
-        Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
-    }
+		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
+		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
+		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
+		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
+	}
 
 }
