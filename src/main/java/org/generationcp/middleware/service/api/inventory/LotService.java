@@ -14,6 +14,6 @@ public interface LotService {
 
 	long countSearchLots(LotsSearchDto lotsSearchDto);
 
-	Integer saveLot(LotGeneratorInputDto lotDto, final CropType cropType);
+	Integer saveLot(CropType cropType, Integer userId, LotGeneratorInputDto lotDto);
 
 }
