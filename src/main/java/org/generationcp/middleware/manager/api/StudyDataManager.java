@@ -452,7 +452,7 @@ public interface StudyDataManager {
 	 * @param datasetType
 	 * @return
 	 */
-	Integer getDatasetIdByStudyDbIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType);
+	Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType);
 
 
 	/**

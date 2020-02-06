@@ -549,9 +549,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<VariableDTO> getVariablesByDatasetId(final Integer pageSize, final Integer pageNumber,
-		final Integer datasetId, final List<Integer> variableTypes, final String cropname) {
-		return this.daoFactory.getCvTermDao().getVariablesByDatasetId(pageSize, pageNumber, datasetId, variableTypes, cropname);
+	public List<VariableDTO> getVariablesByDatasetId(
+		final Integer datasetId, final List<Integer> variableTypes, final String cropname, final Integer pageSize, final Integer pageNumber) {
+		return this.daoFactory.getCvTermDao().getVariablesByDatasetId(cropname, datasetId, variableTypes, pageSize, pageNumber);
 	}
 
 	@Override
@@ -560,9 +560,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<VariableDTO> getAllVariables(final Integer pageSize, final Integer pageNumber, final List<Integer> variableTypes,
-		final String cropname) {
-		return this.daoFactory.getCvTermDao().getAllVariables(pageSize, pageNumber, variableTypes, cropname);
+	public List<VariableDTO> getAllVariables(final List<Integer> variableTypes,
+		final String cropname, final Integer pageSize, final Integer pageNumber) {
+		return this.daoFactory.getCvTermDao().getAllVariables(variableTypes, cropname, pageSize, pageNumber);
 	}
 
 	@Override

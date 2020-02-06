@@ -1427,10 +1427,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	public long countAllVariables(final List<Integer> variableTypes) {
 		try {
 
-			final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createCountVariableQuery(false));
-			final List<String> variableTypeNames =
-				variableTypes.stream().map(i -> VariableType.getById(i).getName()).collect(Collectors.toList());
-			sqlQuery.setParameterList(VARIABLE_TYPE_NAMES, variableTypeNames);
+			final SQLQuery sqlQuery = this.createCountVariableQuery(null, variableTypes);
 			return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
@@ -1442,21 +1439,18 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	/**
 	 * Gets the list of all variables in the database filtered by variableTypes.
 	 *
-	 * @param pageSize
-	 * @param pageNumber
 	 * @param variableTypes
 	 * @param cropName
+	 * @param pageSize
+	 * @param pageNumber
 	 * @return
 	 */
-	public List<VariableDTO> getAllVariables(final Integer pageSize, final Integer pageNumber, final List<Integer> variableTypes,
-		final String cropName) {
+	public List<VariableDTO> getAllVariables(final List<Integer> variableTypes,
+		final String cropName, final Integer pageSize, final Integer pageNumber) {
 
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createVariableQuery(false));
+		final SQLQuery sqlQuery = this.createVariableQuery(null, variableTypes);
 		this.appendGetVariablesScalar(sqlQuery);
-		final List<String> variableTypeNames =
-			variableTypes.stream().map(i -> VariableType.getById(i).getName()).collect(Collectors.toList());
-		sqlQuery.setParameterList(VARIABLE_TYPE_NAMES, variableTypeNames);
-		return this.convertToVariableDTO(this.getVariableQueryResult(pageSize, pageNumber, sqlQuery), cropName, false);
+		return this.convertToVariableDTO(this.getVariableQueryResult(sqlQuery, pageSize, pageNumber), cropName, false);
 
 	}
 
@@ -1469,16 +1463,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 */
 	public long countVariablesByDatasetId(final Integer datasetId, final List<Integer> variableTypes) {
 		try {
-
-			final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createCountVariableQuery(true));
-			final List<String> variableTypeNames =
-				variableTypes.stream().map(i -> VariableType.getById(i).getName()).collect(Collectors.toList());
-			sqlQuery.setParameterList(VARIABLE_TYPE_NAMES, variableTypeNames);
-			sqlQuery.setParameter("datasetId", datasetId);
-			sqlQuery.setParameterList("variableTypes", variableTypes);
-
+			final SQLQuery sqlQuery = this.createCountVariableQuery(datasetId, variableTypes);
 			return ((BigInteger) sqlQuery.uniqueResult()).longValue();
-
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException("Error in countVariablesByStudy() query in CVTermDao: " + e.getMessage(), e);
@@ -1488,30 +1474,23 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	/**
 	 * Gets the list of variables associated to a study filtered by variableTypes.
 	 *
+	 * @param cropName
+	 * @param datasetId
+	 * @param variableTypes
 	 * @param pageSize
 	 * @param pageNumber
-	 * @param studyId
-	 * @param variableTypes
-	 * @param cropName
 	 * @return
 	 */
-	public List<VariableDTO> getVariablesByDatasetId(final Integer pageSize, final Integer pageNumber, final Integer datasetId,
-		final List<Integer> variableTypes, final String cropName) {
+	public List<VariableDTO> getVariablesByDatasetId(final String cropName, final Integer datasetId,
+		final List<Integer> variableTypes, final Integer pageSize, final Integer pageNumber) {
 
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createVariableQuery(true));
+		final SQLQuery sqlQuery = this.createVariableQuery(datasetId, variableTypes);
 		this.appendGetVariablesScalar(sqlQuery);
-
-		final List<String> variableTypeNames =
-			variableTypes.stream().map(i -> VariableType.getById(i).getName()).collect(Collectors.toList());
-		sqlQuery.setParameterList(VARIABLE_TYPE_NAMES, variableTypeNames);
-		sqlQuery.setParameter("datasetId", datasetId);
-		sqlQuery.setParameterList("variableTypes", variableTypes);
-
-		return this.convertToVariableDTO(this.getVariableQueryResult(pageSize, pageNumber, sqlQuery), cropName, true);
+		return this.convertToVariableDTO(this.getVariableQueryResult(sqlQuery, pageSize, pageNumber), cropName, true);
 
 	}
 
-	public List<Map<String, Object>> getVariableQueryResult(final Integer pageSize, final Integer pageNumber, final SQLQuery sqlQuery) {
+	public List<Map<String, Object>> getVariableQueryResult(final SQLQuery sqlQuery, final Integer pageSize, final Integer pageNumber) {
 		if (pageNumber != null && pageSize != null) {
 			sqlQuery.setFirstResult(pageSize * (pageNumber - 1));
 			sqlQuery.setMaxResults(pageSize);
@@ -1520,7 +1499,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return sqlQuery.list();
 	}
 
-	private String createCountVariableQuery(final boolean isFilterByStudyId) {
+	private SQLQuery createCountVariableQuery(final Integer datasetId, final List<Integer> variableTypes) {
 
 		final StringBuilder stringBuilder = new StringBuilder(" SELECT COUNT(DISTINCT variable.cvterm_id) ");
 		stringBuilder.append(" FROM cvterm variable  ");
@@ -1531,16 +1510,26 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append("	  LEFT JOIN project dataset ON dataset.project_id = pp.project_id");
 		stringBuilder.append(" WHERE variableType.value in (:variableTypeNames) ");
 
-		if (isFilterByStudyId) {
+		if (datasetId != null) {
 			stringBuilder.append(" AND dataset.project_id = :datasetId ");
 			stringBuilder.append(" AND pp.type_id in(:variableTypes)");
 		}
 
-		return stringBuilder.toString();
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(stringBuilder.toString());
+		final List<String> variableTypeNames =
+			variableTypes.stream().map(i -> VariableType.getById(i).getName()).collect(Collectors.toList());
+		sqlQuery.setParameterList(VARIABLE_TYPE_NAMES, variableTypeNames);
+
+		if (datasetId != null) {
+			sqlQuery.setParameter("datasetId", datasetId);
+			sqlQuery.setParameterList("variableTypes", variableTypes);
+		}
+
+		return sqlQuery;
 
 	}
 
-	private String createVariableQuery(final boolean isFilterByStudyId) {
+	private SQLQuery createVariableQuery(final Integer datasetId, final List<Integer> variableTypes) {
 
 		final StringBuilder stringBuilder = new StringBuilder(" SELECT DISTINCT ");
 		stringBuilder.append("   pp.alias AS " + VARIABLE_ALIAS + ", ");
@@ -1614,14 +1603,24 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			"	  LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id AND dataset.program_uuid = vo.program_uuid");
 		stringBuilder.append(" WHERE variableType.value in (:variableTypeNames) ");
 
-		if (isFilterByStudyId) {
+		if (datasetId != null) {
 			stringBuilder.append("   AND dataset.project_id = :datasetId ");
 			stringBuilder.append("   AND pp.type_id in (:variableTypes) ");
 		}
 
 		stringBuilder.append("   GROUP BY variable.cvterm_id, traitClass.propertyTermId, scale.cvterm_id ");
 
-		return stringBuilder.toString();
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(stringBuilder.toString());
+		final List<String> variableTypeNames =
+			variableTypes.stream().map(i -> VariableType.getById(i).getName()).collect(Collectors.toList());
+		sqlQuery.setParameterList(VARIABLE_TYPE_NAMES, variableTypeNames);
+
+		if (datasetId != null) {
+			sqlQuery.setParameter("datasetId", datasetId);
+			sqlQuery.setParameterList("variableTypes", variableTypes);
+		}
+
+		return sqlQuery;
 
 	}
 
