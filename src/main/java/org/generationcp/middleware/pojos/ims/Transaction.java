@@ -113,8 +113,7 @@ public class Transaction implements Serializable {
 	}
 
 	public Transaction(final Integer id, final Integer userId, final Lot lot, final Date transactionDate, final Integer status, final Double quantity, final String comments,
-			final Integer commitmentDate, final String sourceType, final Integer sourceId, final Integer sourceRecordId, final Double previousAmount, final Integer personId,
-			final String inventoryID, final Integer type) {
+			final Integer commitmentDate, final String sourceType, final Integer sourceId, final Integer sourceRecordId, final Double previousAmount, final Integer personId, final Integer type) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -131,9 +130,6 @@ public class Transaction implements Serializable {
 		this.personId = personId;
 		this.type = type;
 
-		if (this.lot != null) {
-			this.lot.setStockId(inventoryID);
-		}
 	}
 
 	public Integer getId() {

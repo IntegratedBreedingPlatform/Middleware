@@ -307,6 +307,45 @@
 		</addColumn>
 	</changeSet>
 
+    <changeSet author="clarysabel" id="v14.1.0-1">
+        <preConditions onFail="CONTINUE">
+            <and>
+                <columnExists tableName="ims_lot" columnName="stock_id"/>
+                <sqlCheck expectedResult="YES">
+                    SELECT IS_NULLABLE
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE table_name = 'ims_lot' and column_name='stock_id' and table_schema = DATABASE();
+                </sqlCheck>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM ims_lot WHERE stock_id IS NULL;
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <comment>Add not null restriction to ims_table.stock_id</comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE ims_lot MODIFY stock_id VARCHAR(35) NOT NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet author="clarysabel" id="v14.1.0-2">
+        <preConditions onFail="CONTINUE">
+            <and>
+                <columnExists tableName="ims_lot" columnName="stock_id"/>
+				<not>
+					<indexExists tableName="ims_lot" indexName="ims_lot_stock_id_unique"/>
+				</not>
+                <sqlCheck expectedResult="0">
+                    select count(*) from
+                        (select stock_id, count(*) from ims_lot group by stock_id having  count(*)&gt;1) count_by_stock_id
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <comment>Add stock_id unique index to ims_lot</comment>
+		<createIndex indexName="ims_lot_stock_id_unique" tableName="ims_lot" unique="true">
+			<column name="stock_id" type="varchar(35)"/>
+		</createIndex>
+    </changeSet>
+
 
 	<changeSet author="vanina" id="v14.1.0-6">
 		<preConditions onFail="MARK_RAN">

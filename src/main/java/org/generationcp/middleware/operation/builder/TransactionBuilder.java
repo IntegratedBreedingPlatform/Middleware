@@ -31,11 +31,11 @@ public class TransactionBuilder extends Builder {
 	}
 
 	public Transaction buildForAdd(final Lot lot, final Integer lRecordID, final Double amount, final Integer userId, final Integer personId, final String comment, final Integer sourceId,
-			final String inventoryID, final String bulkWith, final String bulkComp) {
+			final String bulkWith, final String bulkComp) {
 		final Transaction transaction =
 				new Transaction(null, userId, lot, this.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
 						this.formatAmount(amount), comment, TransactionBuilder.COMMITMENT_DATE_INDEFINITE, EntityType.LIST.name(),
-						sourceId, lRecordID, 0d, personId, inventoryID, TransactionType.DEPOSIT.getId());
+						sourceId, lRecordID, 0d, personId, TransactionType.DEPOSIT.getId());
 
 		transaction.setBulkCompl(bulkComp);
 		transaction.setBulkWith(bulkWith);

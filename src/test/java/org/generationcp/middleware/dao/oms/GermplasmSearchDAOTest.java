@@ -12,6 +12,11 @@ package org.generationcp.middleware.dao.oms;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -1306,6 +1311,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		lot.setScaleId(TermId.SEED_AMOUNT_G.getId());
 		lot.setEntityId(germplasmGID);
 		lot.setStatus(0);
+		lot.setStockId(RandomStringUtils.randomAlphabetic(35));
 		this.inventoryDataManager.addLot(lot);
 
 		final Transaction transaction = new Transaction();
