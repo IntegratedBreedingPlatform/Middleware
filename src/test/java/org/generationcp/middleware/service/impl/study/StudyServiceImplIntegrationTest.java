@@ -10,6 +10,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
@@ -103,14 +104,19 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
-
+		WorkbenchUser user = this.testDataInitializer.createUserForTesting();
 		final int locationId = 101;
+
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
-		this.testDataInitializer.addProjectProp(study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, "1", 6);
+		this.testDataInitializer.addProjectProp(study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, user.getUserid().toString(), 6);
+
+
 		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
+
 		Assert.assertFalse(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
+		Assert.assertEquals(user.getUserid(), studyDetailsDto.getContacts().get(0).getUserId());
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
 		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
