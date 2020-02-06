@@ -290,13 +290,13 @@ public class InventoryServiceImpl implements InventoryService {
 
 		final Lot lot =
 				this.lotBuilder.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(),
-						details.getUserId(), cropType);
+						details.getUserId(), cropType, details.getInventoryID());
 
 		this.daoFactory.getLotDao().saveOrUpdate(lot);
 
 		final Transaction transaction =
 				this.transactionBuilder.buildForAdd(lot, listData == null ? 0 : listData.getId(), details.getAmount(), workbenchUser.getUserid(), workbenchUser.getPerson().getId(),
-						details.getComment(), details.getSourceId(), details.getInventoryID(), details.getBulkWith(),
+						details.getComment(), details.getSourceId(), details.getBulkWith(),
 						details.getBulkCompl());
 		this.daoFactory.getTransactionDAO().saveOrUpdate(transaction);
 
