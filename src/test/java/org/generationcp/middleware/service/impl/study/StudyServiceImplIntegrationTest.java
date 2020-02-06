@@ -35,7 +35,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 
-		DmsProjectDao dmsProjectDao = new DmsProjectDao();
+		final DmsProjectDao dmsProjectDao = new DmsProjectDao();
 		dmsProjectDao.setSession(this.sessionProvder.getSession());
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, dmsProjectDao.getById(1), null);
@@ -85,7 +85,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testGetStudyDetailsForGeolocation() {
 		final DmsProject environmentDataset =
 			this.testDataInitializer
-				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
+				.createDmsProject("Summary Dataset", "Summary Dataset-Description", this.study, this.study, DatasetTypeEnum.SUMMARY_DATA);
 
 		final int locationId = 101;
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
@@ -103,14 +103,14 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testGetStudyDetailsForGeolocationWithPI_ID() {
 		final DmsProject environmentDataset =
 			this.testDataInitializer
-				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
-		WorkbenchUser user = this.testDataInitializer.createUserForTesting();
+				.createDmsProject("Summary Dataset", "Summary Dataset-Description", this.study, this.study, DatasetTypeEnum.SUMMARY_DATA);
+		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
 		final int locationId = 101;
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
-		this.testDataInitializer.addProjectProp(study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, user.getUserid().toString(), 6);
+		this.testDataInitializer.addProjectProp(this.study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, user.getUserid().toString(), 6);
 
 
 		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
