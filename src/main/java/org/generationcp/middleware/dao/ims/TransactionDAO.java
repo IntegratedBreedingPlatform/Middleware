@@ -512,7 +512,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					+ "' END) as trntype "
 					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
 					+ " INNER JOIN ims_lot lot ON lot.lotid = i.lotid "
-					+ "WHERE i.lotid = :lotId AND i.trnstat <> 9 ORDER BY i.trnid";
+					+ "WHERE i.lotid = :lotId ORDER BY i.trnid";
 
 			final Query query = this.getSession().createSQLQuery(sql);
 
