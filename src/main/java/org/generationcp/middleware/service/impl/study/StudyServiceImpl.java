@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -91,6 +92,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
+	@Resource
 	private StudyDataManager studyDataManager;
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
