@@ -62,9 +62,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -795,8 +797,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				studyMetadata.setTrialDbId(
 					(row[5] instanceof Integer) ? (Integer) row[5] : null);
 				studyMetadata.setTrialName((row[6] instanceof String) ? (String) row[6] : null);
-				studyMetadata.setStartDate((row[7] instanceof String) ? (String) row[7] : null);
-				studyMetadata.setEndDate((row[8] instanceof String) ? (String) row[8] : null);
+				studyMetadata.setStartDate(this.parseDate((String) row[7]));
+				studyMetadata.setEndDate(this.parseDate((String) row[8]));
 				studyMetadata.setActive(Boolean.FALSE.equals(row[9]));
 				studyMetadata.setLocationId((row[10] instanceof String) ? Integer.parseInt((String) row[10]) : null);
 				return studyMetadata;
@@ -1440,13 +1442,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyDto.setTrialName(String.valueOf(result.get(TRIAL_NAME)));
 			studyDto.setStudyTypeDbId(String.valueOf(result.get(STUDY_TYPE_DB_ID)));
 			studyDto.setStudyTypeName(String.valueOf(result.get(STUDY_TYPE_NAME)));
+			studyDto.setStartDate(this.parseDate((String) result.get(START_DATE)));
+			studyDto.setEndDate(this.parseDate((String) result.get(END_DATE)));
 
 			// TODO: Populate the seasons.
 			studyDto.setSeasons(new ArrayList<>());
-
-			// TODO: Cornvert datae to ISO8601 format (2020-01-01).
-			//studyDto.setStartDate(String.valueOf(result.get(START_DATE)));
-			//studyDto.setEndDate(String.valueOf(result.get(END_DATE)));
 
 			// TODO: Populate program details.
 
@@ -1563,6 +1563,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (studySearchFilter.getActive() != null) {
 			sql.append("AND pmain.deleted = :active ");
 		}
+	}
+
+	private Date parseDate(final String date) {
+		try {
+			return Util.parseDate(date, Util.DATE_AS_NUMBER_FORMAT);
+		} catch (ParseException e) {
+		}
+		return null;
 	}
 
 }

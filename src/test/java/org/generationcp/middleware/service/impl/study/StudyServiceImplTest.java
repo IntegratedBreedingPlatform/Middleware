@@ -42,6 +42,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -246,8 +247,12 @@ public class StudyServiceImplTest {
 	public void testGetStudyDetailsForANursery() {
 		final List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
+
+		final Date startDate = new Date("2016-01-01");
+		final Date endDate = new Date("2017-01-01");
+
 		final StudyMetadata metadata =
-			new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyTypeDto.NURSERY_NAME,
+			new StudyMetadata(2, 2, 4, Boolean.TRUE, startDate, endDate, 8, seasons, "trialName", StudyTypeDto.NURSERY_NAME,
 				"studyName");
 
 		final UserDto user = new UserDto();
@@ -294,8 +299,12 @@ public class StudyServiceImplTest {
 	public void testGetStudyDetailsForAStudy() {
 		final List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
+
+		final Date startDate = new Date("2016-01-01");
+		final Date endDate = new Date("2017-01-01");
+
 		final StudyMetadata metadata =
-			new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "studyName", StudyTypeDto.TRIAL_NAME,
+			new StudyMetadata(2, 2, 4, Boolean.TRUE, startDate, endDate, 8, seasons, "studyName", StudyTypeDto.TRIAL_NAME,
 				"studyName");
 
 		final UserDto user = new UserDto();

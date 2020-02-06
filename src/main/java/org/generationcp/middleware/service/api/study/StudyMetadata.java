@@ -4,6 +4,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class StudyMetadata {
@@ -22,9 +23,9 @@ public class StudyMetadata {
 
 	private String trialName;
 
-	private String startDate;
+	private Date startDate;
 
-	private String endDate;
+	private Date endDate;
 
 	private Boolean active;
 
@@ -36,7 +37,7 @@ public class StudyMetadata {
 	}
 
 	public StudyMetadata(final Integer nurseryOrTrialId, final Integer studyDbId, final Integer locationId, final Boolean active,
-			final String endDate, final String startDate, final Integer trialDbId, final List<String> seasons, final String trialName,
+			final Date endDate, final Date startDate, final Integer trialDbId, final List<String> seasons, final String trialName,
 			final String studyType, final String studyName) {
 		this.nurseryOrTrialId = nurseryOrTrialId;
 		this.studyDbId = studyDbId;
@@ -114,20 +115,20 @@ public class StudyMetadata {
 		return this;
 	}
 
-	public String getStartDate() {
+	public Date getStartDate() {
 		return startDate;
 	}
 
-	public StudyMetadata setStartDate(final String startDate) {
+	public StudyMetadata setStartDate(final Date startDate) {
 		this.startDate = startDate;
 		return this;
 	}
 
-	public String getEndDate() {
+	public Date getEndDate() {
 		return endDate;
 	}
 
-	public StudyMetadata setEndDate(final String endDate) {
+	public StudyMetadata setEndDate(final Date endDate) {
 		this.endDate = endDate;
 		return this;
 	}

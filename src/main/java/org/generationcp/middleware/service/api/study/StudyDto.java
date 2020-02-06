@@ -1,9 +1,11 @@
 package org.generationcp.middleware.service.api.study;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +19,11 @@ public class StudyDto {
 
 	private String documentationURL;
 
-	private String startDate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date startDate;
 
-	private String endDate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date endDate;
 
 	private String studyDbId;
 
@@ -71,19 +75,19 @@ public class StudyDto {
 		this.documentationURL = documentationURL;
 	}
 
-	public String getEndDate() {
+	public Date getEndDate() {
 		return this.endDate;
 	}
 
-	public void setEndDate(final String endDate) {
+	public void setEndDate(final Date endDate) {
 		this.endDate = endDate;
 	}
 
-	public String getStartDate() {
+	public Date getStartDate() {
 		return this.startDate;
 	}
 
-	public void setStartDate(final String startDate) {
+	public void setStartDate(final Date startDate) {
 		this.startDate = startDate;
 	}
 
