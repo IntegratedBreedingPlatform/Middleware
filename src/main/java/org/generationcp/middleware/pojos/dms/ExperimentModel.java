@@ -74,6 +74,12 @@ public class ExperimentModel implements Serializable {
 	@BatchSize(size = 5000)
 	private List<ExperimentProperty> properties;
 
+	// TODO
+	//  - Migrate nd_experimentprop
+	//  - use @Convert and Map<String, Object> in jpa 2.1 (hibernate > 4.3)
+	@Column(name = "json_props")
+	private String jsonProps;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project_id")
 	private DmsProject project;
@@ -134,6 +140,14 @@ public class ExperimentModel implements Serializable {
 
 	public List<ExperimentProperty> getProperties() {
 		return this.properties;
+	}
+
+	public String getJsonProps() {
+		return jsonProps;
+	}
+
+	public void setJsonProps(final String props) {
+		this.jsonProps = props;
 	}
 
 	public void setProperties(final List<ExperimentProperty> properties) {

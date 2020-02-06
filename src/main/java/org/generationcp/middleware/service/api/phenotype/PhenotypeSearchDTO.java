@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.phenotype;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -80,136 +81,6 @@ public class PhenotypeSearchDTO {
 	@JsonView(BrapiView.BrapiV2.class)
 	private String trialName;
 
-	public static class ObservationUnitPosition {
-		private String blockNumber;
-		private String entryNumber;
-		private List<String> entryType;
-		private GeooCordinates geoCoordinates;
-		private String positionCoordinateX;
-		private String positionCoordinateXType;
-		private String positionCoordinateY;
-		private String positionCoordinateYType;
-		private String replicate;
-
-		public ObservationUnitPosition() {
-		}
-
-		protected static class GeooCordinates {
-			private GeooCordinates.Geometry geometry;
-			private String type;
-
-			protected class Geometry {
-				private List<Integer> coordinates;
-				private String type;
-
-				public List<Integer> getCoordinates() {
-					return this.coordinates;
-				}
-
-				public void setCoordinates(final List<Integer> coordinates) {
-					this.coordinates = coordinates;
-				}
-
-				public String getType() {
-					return this.type;
-				}
-
-				public void setType(final String type) {
-					this.type = type;
-				}
-			}
-
-			public GeooCordinates.Geometry getGeometry() {
-				return this.geometry;
-			}
-
-			public void setGeometry(
-				final GeooCordinates.Geometry geometry) {
-				this.geometry = geometry;
-			}
-
-			public String getType() {
-				return this.type;
-			}
-
-			public void setType(final String type) {
-				this.type = type;
-			}
-		}
-
-		public String getBlockNumber() {
-			return this.blockNumber;
-		}
-
-		public void setBlockNumber(final String blockNumber) {
-			this.blockNumber = blockNumber;
-		}
-
-		public String getEntryNumber() {
-			return this.entryNumber;
-		}
-
-		public void setEntryNumber(final String entryNumber) {
-			this.entryNumber = entryNumber;
-		}
-
-		public List<String> getEntryType() {
-			return this.entryType;
-		}
-
-		public void setEntryType(final List<String> entryType) {
-			this.entryType = entryType;
-		}
-
-		public GeooCordinates getGeoCoordinates() {
-			return this.geoCoordinates;
-		}
-
-		public void setGeoCoordinates(
-			final GeooCordinates geoCoordinates) {
-			this.geoCoordinates = geoCoordinates;
-		}
-
-		public String getPositionCoordinateX() {
-			return this.positionCoordinateX;
-		}
-
-		public void setPositionCoordinateX(final String positionCoordinateX) {
-			this.positionCoordinateX = positionCoordinateX;
-		}
-
-		public String getPositionCoordinateXType() {
-			return this.positionCoordinateXType;
-		}
-
-		public void setPositionCoordinateXType(final String positionCoordinateXType) {
-			this.positionCoordinateXType = positionCoordinateXType;
-		}
-
-		public String getPositionCoordinateY() {
-			return this.positionCoordinateY;
-		}
-
-		public void setPositionCoordinateY(final String positionCoordinateY) {
-			this.positionCoordinateY = positionCoordinateY;
-		}
-
-		public String getPositionCoordinateYType() {
-			return this.positionCoordinateYType;
-		}
-
-		public void setPositionCoordinateYType(final String positionCoordinateYType) {
-			this.positionCoordinateYType = positionCoordinateYType;
-		}
-
-		public String getReplicate() {
-			return this.replicate;
-		}
-
-		public void setReplicate(final String replicate) {
-			this.replicate = replicate;
-		}
-	}
 
 	protected static class ObservationUnitXRef {
 		private String id;

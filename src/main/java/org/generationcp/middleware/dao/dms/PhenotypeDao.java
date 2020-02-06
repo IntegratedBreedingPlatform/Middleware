@@ -11,8 +11,10 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
@@ -51,6 +53,7 @@ import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -894,7 +897,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.addScalar("blockNumber", new StringType()).addScalar("replicate", new StringType()).addScalar("COL").addScalar("ROW")
 			.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
 			.addScalar("entryNumber", new StringType()).addScalar("programDbId", new StringType()).addScalar("trialDbId", new StringType())
-			.addScalar("trialDbName", new StringType());
+			.addScalar("trialDbName", new StringType()).addScalar("jsonProps");
 
 		// TODO get map with AliasToEntityMapResultTransformer.INSTANCE
 		final List<Object[]> results = sqlQuery.list();
@@ -939,7 +942,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setLocationDbId(observationUnit.getStudyLocationDbId());
 				observationUnit.setLocationName(observationUnit.getStudyLocation());
 				observationUnit.setObservationUnitPUI("");
-				final PhenotypeSearchDTO.ObservationUnitPosition observationUnitPosition = new PhenotypeSearchDTO.ObservationUnitPosition();
+				final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
 				observationUnitPosition.setBlockNumber(observationUnit.getBlockNumber());
 				observationUnitPosition.setEntryNumber(observationUnit.getEntryNumber());
 				observationUnitPosition.setEntryType(Lists.newArrayList(observationUnit.getEntryType()));
@@ -952,9 +955,18 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				if (y != null) {
 					observationUnitPosition.setPositionCoordinateYType("GRID_ROW");
 				}
-
+				final String jsonProps = (String) row[25];
+				if (jsonProps != null) {
+					try {
+						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
+						observationUnitPosition.setGeoCoordinates((Map<String, Object>) jsonProp.get("geoCoordinates"));
+					} catch (IOException e) {
+						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
+					}
+				}
 				observationUnitPosition.setReplicate(observationUnit.getReplicate());
 				observationUnit.setObservationUnitPosition(observationUnitPosition);
+
 				observationUnit.setProgramDbId((String) row[22]);
 				observationUnit.setTrialDbId((String) row[23]);
 				observationUnit.setTrialName((String) row[24]);
