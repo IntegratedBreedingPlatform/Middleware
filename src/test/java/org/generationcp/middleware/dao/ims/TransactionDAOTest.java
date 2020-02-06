@@ -238,7 +238,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate2);
 		final Transaction closedTransaction =
 			InventoryDetailsTestDataInitializer
-				.createReservationTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
+				.createReservationTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST", TransactionType.DISCARD.getId());
 		closedTransaction.setTransactionDate(date2);
 		closedTransaction.setUserId(user.getUserid());
 
