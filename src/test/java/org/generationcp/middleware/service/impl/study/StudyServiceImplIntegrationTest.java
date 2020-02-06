@@ -16,6 +16,7 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -99,6 +100,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
 	}
 
+	@Ignore
 	@Test
 	public void testGetStudyDetailsForGeolocationWithPI_ID() {
 		final DmsProject environmentDataset =
