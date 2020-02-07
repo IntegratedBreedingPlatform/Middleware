@@ -73,7 +73,7 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 		}
 	}
 
-	@Test
+	/*@Test
 	public void testGetGeolocationPropsAndValuesByGeolocation() {
 		final DmsProject dataset =
 			this.createDataset(RandomStringUtils.randomAlphabetic(20), DatasetTypeEnum.SUMMARY_DATA.getId(), this.study);
@@ -86,9 +86,9 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(2, propertiesMap.size());
 		Assert.assertNotNull(propertiesMap.get(this.variable1.getDefinition()));
 		Assert.assertNotNull(propertiesMap.get(this.variable2.getDefinition()));
-	}
+	}*/
 
-	@Test
+	/*@Test
 	public void testDeleteGeolocationPropertyValueInProject() {
 		final Integer geolocationIdMain =
 			this.createEnvironmentData(this.study, Arrays.asList(this.variable1.getCvTermId(), this.variable2.getCvTermId()));
@@ -106,7 +106,7 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationIdDataset);
 		Assert.assertNotNull(datasetProperties);
 		Assert.assertFalse(datasetProperties.isEmpty());
-	}
+	}*/
 
 	private DmsProject createStudy(final String name) {
 		final DmsProject project = new DmsProject();

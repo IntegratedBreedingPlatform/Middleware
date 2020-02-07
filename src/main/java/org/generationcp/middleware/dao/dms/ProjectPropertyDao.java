@@ -223,48 +223,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return list;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId) {
-		Preconditions.checkNotNull(studyId);
-		final Map<String, String> geoProperties = new HashMap<>();
-		final String sql = " SELECT  "
-			+ "     cvterm.definition AS name, pp.value AS value "
-			+ " FROM "
-			+ "     projectprop pp "
-			+ "         INNER JOIN "
-			+ "     cvterm cvterm ON cvterm.cvterm_id = pp.variable_id "
-			+ " WHERE "
-			+ "     pp.project_id = :studyId "
-			+ "         AND pp.variable_id NOT IN ("
-			+ TermId.SEASON_VAR.getId() + ", "
-			+ TermId.LOCATION_ID.getId() + ") "
-			+ "         AND pp.variable_id NOT IN (SELECT  "
-			+ "             variable.cvterm_id "
-			+ "         FROM "
-			+ "             cvterm scale "
-			+ "                 INNER JOIN "
-			+ "             cvterm_relationship r ON (r.object_id = scale.cvterm_id) "
-			+ "                 INNER JOIN "
-			+ "             cvterm variable ON (r.subject_id = variable.cvterm_id) "
-			+ "         WHERE "
-			+ "             object_id = 1901) ";
-
-		try {
-			final Query query =
-					this.getSession().createSQLQuery(sql).addScalar("name").addScalar("value").setParameter("studyId", studyId);
-			final List<Object> results = query.list();
-			for (final Object obj : results) {
-				final Object[] row = (Object[]) obj;
-				geoProperties.put((String) row[0], (String) row[1]);
-			}
-			return geoProperties;
-		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getProjectPropsAndValuesByStudy() query from studyId: " + studyId;
-			ProjectPropertyDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId, final List<Integer> excludedVariableIds) {
 		Preconditions.checkNotNull(studyId);
 		final Map<String, String> geoProperties = new HashMap<>();

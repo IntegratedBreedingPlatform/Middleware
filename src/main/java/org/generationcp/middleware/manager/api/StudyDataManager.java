@@ -668,11 +668,7 @@ public interface StudyDataManager {
 
 	StudyMetadata getStudyMetadataForGeolocationId(Integer geolocationId);
 
-	Map<String, String> getGeolocationPropsAndValuesByGeolocation(Integer geolocationId);
-
 	Map<String, String> getGeolocationPropsAndValuesByGeolocation(Integer geolocationId, List<Integer> excludedVariableIds);
-
-	Map<String, String> getProjectPropsAndValuesByStudy(Integer studyId);
 
 	Map<String, String> getProjectPropsAndValuesByStudy(Integer studyId, List<Integer> excludedVariableIds);
 

@@ -43,13 +43,6 @@ public interface StudyService {
 	 * @param geolocationId
 	 * @return StudyDetailsDto
 	 */
-	StudyDetailsDto getStudyDetailsForGeolocation(Integer geolocationId);
-
-	/**
-	 *
-	 * @param geolocationId
-	 * @return StudyDetailsDto
-	 */
 	StudyDetailsDto getStudyDetailsByGeolocation(Integer geolocationId);
 
 	/**

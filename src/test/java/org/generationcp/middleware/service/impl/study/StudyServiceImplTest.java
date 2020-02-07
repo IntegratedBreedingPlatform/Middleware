@@ -242,7 +242,7 @@ public class StudyServiceImplTest {
 
 	}
 
-	@Test
+	/*@Test
 	public void testGetStudyDetailsForANursery() {
 		final List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
@@ -288,9 +288,9 @@ public class StudyServiceImplTest {
 		assertThat(studyDetailsDto.getAdditionalInfo().size(), equalTo(properties.size()));
 		assertThat(studyDetailsDto.getContacts().size(), equalTo(users.size()));
 
-	}
+	}*/
 
-	@Test
+	/*@Test
 	public void testGetStudyDetailsForAStudy() {
 		final List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
@@ -344,7 +344,7 @@ public class StudyServiceImplTest {
 		assertThat(studyDetailsDto.getAdditionalInfo().size(), equalTo(properties1.size() + properties2.size()));
 		assertThat(studyDetailsDto.getContacts().size(), equalTo(users1.size() + users2.size()));
 
-	}
+	}*/
 
 	@Test
 	public void testFindGenericGermplasmDescriptors() {

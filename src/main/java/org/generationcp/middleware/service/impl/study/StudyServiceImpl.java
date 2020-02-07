@@ -500,31 +500,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetailsForGeolocation(final Integer geolocationId) {
-		try {
-			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadataForGeolocationId(geolocationId);
-			if (studyMetadata != null) {
-				final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
-				studyDetailsDto.setMetadata(studyMetadata);
-				final List<UserDto> users = new ArrayList<>();
-				final Map<String, String> properties = new HashMap<>();
-				users.addAll(this.studyDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
-				users.addAll(this.studyDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
-				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(geolocationId));
-				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
-				studyDetailsDto.setContacts(users);
-				studyDetailsDto.setAdditionalInfo(properties);
-				return studyDetailsDto;
-			}
-			return null;
-		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getStudyDetailsForGeolocation() query with geolocationId: " + geolocationId;
-			StudyServiceImpl.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@Override
 	public StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId) {
 		try {
 			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadataForGeolocationId(geolocationId);
@@ -541,14 +516,20 @@ public class StudyServiceImpl extends Service implements StudyService {
 					this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyMetadata.getTrialDbId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 				final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
 					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.<Integer>newArrayList(VariableType.STUDY_CONDITION.getId()));
-				List<Integer> variableIds = environmentConditions.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
 				final List<MeasurementVariable> environmentParameters = new ArrayList<>();
-				environmentParameters.addAll(this.studyDataManager.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
-
+				List<Integer> variableIds = environmentConditions.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
+				if(!variableIds.isEmpty()) {
+					environmentParameters.addAll(
+						this.studyDataManager.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
+				}
 				final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
 					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.<Integer>newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
 				variableIds = environmentDetails.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
-				environmentParameters.addAll(this.studyDataManager.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
+				if(!variableIds.isEmpty()) {
+					environmentParameters.addAll(
+						this.studyDataManager.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
+				}
+
 
 				final List<MeasurementVariable> environmentVariables = new ArrayList<>(environmentConditions);
 				environmentVariables.addAll(environmentDetails);
