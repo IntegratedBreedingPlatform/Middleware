@@ -17,8 +17,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -80,15 +80,15 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 		final Integer geolocationId =
 			this.createEnvironmentData(dataset, Arrays.asList(this.variable1.getCvTermId(), this.variable2.getCvTermId()));
 
-		/*final Map<String, String> propertiesMap =
-			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationId);
+		final Map<String, String> propertiesMap =
+			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationId, Collections.emptyList());
 		Assert.assertNotNull(propertiesMap);
 		Assert.assertEquals(2, propertiesMap.size());
 		Assert.assertNotNull(propertiesMap.get(this.variable1.getDefinition()));
-		Assert.assertNotNull(propertiesMap.get(this.variable2.getDefinition()));*/
+		Assert.assertNotNull(propertiesMap.get(this.variable2.getDefinition()));
 	}
 
-	/*@Test
+	@Test
 	public void testDeleteGeolocationPropertyValueInProject() {
 		final Integer geolocationIdMain =
 			this.createEnvironmentData(this.study, Arrays.asList(this.variable1.getCvTermId(), this.variable2.getCvTermId()));
@@ -99,14 +99,14 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 
 		// Verify that geolocation props exist before deletion
 		final Map<String, String> studyProperties =
-			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationIdMain);
+			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationIdMain, Collections.emptyList());
 		Assert.assertNotNull(studyProperties);
 		Assert.assertFalse(studyProperties.isEmpty());
 		final Map<String, String> datasetProperties =
-			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationIdDataset);
+			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationIdDataset, Collections.emptyList());
 		Assert.assertNotNull(datasetProperties);
 		Assert.assertFalse(datasetProperties.isEmpty());
-	}*/
+	}
 
 	private DmsProject createStudy(final String name) {
 		final DmsProject project = new DmsProject();

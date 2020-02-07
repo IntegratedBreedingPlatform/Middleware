@@ -81,7 +81,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(this.studyService.hasMeasurementDataOnEnvironment(this.study.getProjectId(), geolocation.getLocationId()));
 	}
 
-	/*@Test
+	@Test
 	public void testGetStudyDetailsForGeolocation() {
 		final DmsProject environmentDataset =
 			this.testDataInitializer
@@ -91,15 +91,15 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
-		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
+		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsByGeolocation(geolocation.getLocationId());
 		Assert.assertTrue(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
 		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
 		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
-	}*/
+	}
 
-	/*@Test
+	@Test
 	public void testGetStudyDetailsForGeolocationWithPI_ID() {
 		final DmsProject environmentDataset =
 			this.testDataInitializer
@@ -113,7 +113,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.testDataInitializer.addProjectProp(this.study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, user.getUserid().toString(), 6);
 
 
-		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsForGeolocation(geolocation.getLocationId());
+		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsByGeolocation(geolocation.getLocationId());
 
 		Assert.assertFalse(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
 		Assert.assertEquals(user.getUserid(), studyDetailsDto.getContacts().get(0).getUserId());
@@ -121,6 +121,6 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
 		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
 		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
-	}*/
+	}
 
 }
