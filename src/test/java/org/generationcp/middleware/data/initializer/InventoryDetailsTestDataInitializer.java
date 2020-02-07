@@ -2,6 +2,7 @@
 package org.generationcp.middleware.data.initializer;
 
 import com.beust.jcommander.internal.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
@@ -90,7 +91,7 @@ public class InventoryDetailsTestDataInitializer {
 			lot.setStatus(0);
 			lot.setSource(listId);
 			lot.setComments("Lot for gid: " + gid);
-
+			lot.setStockId(RandomStringUtils.randomAlphabetic(35));
 			lots.add(lot);
 		}
 

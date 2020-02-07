@@ -105,7 +105,7 @@ public class Lot implements Serializable {
 
 	public Lot(
 		final Integer id, final Integer userId, final String entityType, final Integer entityId, final Integer locationId, final Integer scaleId, final Integer status,
-			final Integer sourceId, final String comments) {
+			final Integer sourceId, final String comments, final String stockId) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -117,6 +117,7 @@ public class Lot implements Serializable {
 		this.sourceId = sourceId;
 		this.comments = comments;
 		this.createdDate = new Date();
+		this.stockId = stockId;
 	}
 
 	public Integer getId() {
