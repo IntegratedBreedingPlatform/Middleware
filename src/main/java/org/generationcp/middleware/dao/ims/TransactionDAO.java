@@ -652,12 +652,12 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					.append(transactionsSearchDto.getMaxAmount()).append(" ");
 			}
 
-			if (transactionsSearchDto.getTransactionType() != null) {
-				query.append(" and trntype = ").append(transactionsSearchDto.getTransactionType());
+			if (transactionsSearchDto.getTransactionTypes() != null && !transactionsSearchDto.getTransactionTypes().isEmpty()) {
+				query.append(" and trntype IN ( ").append(Joiner.on(",").join(transactionsSearchDto.getTransactionTypes())).append(") ");
 			}
 
-			if (transactionsSearchDto.getTransactionStatus() != null) {
-				query.append(" and trnstat = ").append(transactionsSearchDto.getTransactionStatus());
+			if (transactionsSearchDto.getTransactionStatus() != null && !transactionsSearchDto.getTransactionStatus().isEmpty()) {
+				query.append(" and trnstat IN ( ").append(Joiner.on(",").join(transactionsSearchDto.getTransactionStatus())).append(") ");
 			}
 
 			if (transactionsSearchDto.getStatusIds() != null && !transactionsSearchDto.getStatusIds().isEmpty()) {

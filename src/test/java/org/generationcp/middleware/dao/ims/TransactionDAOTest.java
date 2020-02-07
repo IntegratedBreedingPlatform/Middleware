@@ -317,7 +317,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		transactionsSearchDto.setTransactionDateFrom(date1);
 		transactionsSearchDto.setTransactionDateTo(date1);
 		transactionsSearchDto.setTransactionIds(Lists.newArrayList(depositTransaction.getId(), closedTransaction.getId()));
-		transactionsSearchDto.setTransactionType(TransactionType.DEPOSIT.getId());
+		transactionsSearchDto.setTransactionTypes(Lists.newArrayList(TransactionType.DEPOSIT.getId()));
 		transactionsSearchDto.setCreatedByUsername(user.getName());
 
 		final List<TransactionDto> transactionDtos = this.dao.searchTransactions(transactionsSearchDto, null);
