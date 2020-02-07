@@ -12,7 +12,9 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -24,6 +26,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -189,4 +192,48 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		criteria.add(Restrictions.eq("geolocation.locationId", geolocationId));
 		return criteria.list();
 	}
+
+	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
+		List<MeasurementVariable> studyVariables = new ArrayList<>();
+		final List<Integer> standardEnvironmentFactors = Lists.newArrayList(
+			TermId.LOCATION_ID.getId(),
+			TermId.TRIAL_INSTANCE_FACTOR.getId(),
+			TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		try{
+			final SQLQuery query =
+				this.getSession().createSQLQuery("SELECT ispcvt.name as name, ispcvt.definition as definition, "
+					+ "		cvt_scale.name AS scaleName, gprop.value AS value FROM nd_geolocationprop gprop "
+					+ "		INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.cvterm_id in (:variableIds) "
+					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = ispcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
+					+ "		INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id "
+					+ "		INNER JOIN nd_geolocation gl ON gprop.nd_geolocation_id = gl.nd_geolocation_id "
+					+ "	    WHERE gl.nd_geolocation_id = :geolocationId AND ispcvt.cvterm_id NOT IN (:standardEnvironmentFactors) ;");
+			query.addScalar("name", new StringType());
+			query.addScalar("definition", new StringType());
+			query.addScalar("scaleName", new StringType());
+			query.addScalar("value", new StringType());
+			query.setParameterList("variableIds", variableIds);
+			query.setParameter("geolocationId", geolocationId);
+			query.setParameterList("standardEnvironmentFactors", standardEnvironmentFactors);
+
+			final List<Object> results = query.list();
+			for(Object result: results) {
+
+				final Object[] row = (Object[]) result;
+				final MeasurementVariable measurementVariable = new MeasurementVariable();
+				measurementVariable.setName((row[0] instanceof String) ? (String) row[0] : null);
+				measurementVariable.setDescription((row[1] instanceof String) ? (String) row[1] : null);
+				measurementVariable.setScale((row[2] instanceof String) ? (String) row[2] : null);
+				measurementVariable.setValue((row[3] instanceof String) ? (String) row[3] : null);
+				studyVariables.add(measurementVariable);
+			}
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationId: " + geolocationId
+				+ " and variableIds: " + variableIds;
+			GeolocationPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return studyVariables;
+	}
+
 }
