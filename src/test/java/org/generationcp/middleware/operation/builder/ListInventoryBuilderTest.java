@@ -80,8 +80,8 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		this.inventoryDataManager.addLots(lots);
 
 		final Transaction reservationTransaction = this.inventoryDetailsTestDataInitializer
-				.createReservationTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
-						"LIST");
+			.createReservationTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
+				"LIST", TransactionType.WITHDRAWAL.getId());
 
 		this.inventoryDataManager.addTransaction(reservationTransaction);
 
@@ -119,7 +119,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 		final Transaction reservationTransaction = this.inventoryDetailsTestDataInitializer
 				.createReservationTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
-						"LIST");
+						"LIST", TransactionType.WITHDRAWAL.getId());
 
 		this.inventoryDataManager.addTransaction(reservationTransaction);
 
@@ -149,8 +149,8 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		this.inventoryDataManager.addLots(lots);
 
 		final Transaction reservationTransaction = this.inventoryDetailsTestDataInitializer
-				.createReservationTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
-						"LIST");
+			.createReservationTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
+				"LIST", TransactionType.WITHDRAWAL.getId());
 
 		this.inventoryDataManager.addTransaction(reservationTransaction);
 
@@ -178,12 +178,12 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		this.inventoryDataManager.addLots(lots);
 
 		final Transaction initialTransaction = this.inventoryDetailsTestDataInitializer
-				.createReservationTransaction(5.0, 0, "Initial inventory", lots.get(0), 1, this.germplasmList.getId(),
-						listEntries.get(0).getId(), "LIST");
+			.createReservationTransaction(5.0, 0, "Initial inventory", lots.get(0), 1, this.germplasmList.getId(),
+				listEntries.get(0).getId(), "LIST", TransactionType.DEPOSIT.getId());
 
 		final Transaction reservationTransaction = this.inventoryDetailsTestDataInitializer
-				.createReservationTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
-						"LIST");
+			.createReservationTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
+				"LIST", TransactionType.DEPOSIT.getId());
 
 		this.inventoryDataManager.addTransaction(initialTransaction);
 		this.inventoryDataManager.addTransaction(reservationTransaction);
@@ -211,7 +211,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
 
 		final Transaction transaction = InventoryDetailsTestDataInitializer
-				.createReservationTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST");
+				.createReservationTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
 		this.inventoryDataManager.addTransactions(com.google.common.collect.Lists.<Transaction>newArrayList(transaction));
 
 		final List<Germplasm> germplasmList = Lists.newArrayList(germplasm);

@@ -17,7 +17,6 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -500,14 +499,20 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 		final List<TransactionReportRow> transactions = new ArrayList<>();
 		try {
-			final String sql = "SELECT i.userid,i.lotid,i.trndate,i.trnstat,i.trnqty,i.sourceid,l.listname, i.comments,"
-					+ "(CASE WHEN trnstat = 1 AND trnqty >= 0 THEN '" + TransactionType.DEPOSIT.getValue()
-					+ "' WHEN trnstat = 0 AND trnqty < 0 THEN '" + TransactionType.RESERVATION.getValue()
-					+ "' WHEN trnstat = 1 AND trnqty < 0 THEN '" + TransactionType.WITHDRAWAL.getValue()
+			final String sql = "SELECT i.userid,i.lotid,i.trndate,"
+					+ "(CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
+					+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
+					+ "' WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '" + TransactionStatus.CANCELLED.getValue()
+					+ "' END) as trnStatus, "
+					+ " i.trnqty,i.sourceid,l.listname, i.comments,"
+					+ "(CASE WHEN trntype = " + TransactionType.DEPOSIT.getId() + " THEN '" + TransactionType.DEPOSIT.getValue()
+					+ "' WHEN trntype = " + TransactionType.WITHDRAWAL.getId() + " THEN '" + TransactionType.WITHDRAWAL.getValue()
+					+ "' WHEN trntype = " + TransactionType.DISCARD.getId() + " THEN '" + TransactionType.DISCARD.getValue()
+					+ "' WHEN trntype = " + TransactionType.ADJUSTMENT.getId() + " THEN '" + TransactionType.ADJUSTMENT.getValue()
 					+ "' END) as trntype "
 					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
 					+ " INNER JOIN ims_lot lot ON lot.lotid = i.lotid "
-					+ "WHERE i.lotid = :lotId AND i.trnstat <> 9 ORDER BY i.trnid";
+					+ "WHERE i.lotid = :lotId ORDER BY i.trnid";
 
 			final Query query = this.getSession().createSQLQuery(sql);
 
@@ -533,7 +538,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			final Integer userId = (Integer) row[0];
 			final Integer lotId = (Integer) row[1];
 			final Date trnDate = (Date) row[2];
-			final Integer trnState = (Integer) row[3];
+			final String trnStatus = (String) row[3];
 			final Double trnQty = (Double) row[4];
 			final Integer listId = (Integer) row[5];
 			final String listName = (String) row[6];
@@ -544,7 +549,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			transaction.setUserId(userId);
 			transaction.setLotId(lotId);
 			transaction.setDate(trnDate);
-			transaction.setTrnStatus(trnState);
+			transaction.setTrnStatus(trnStatus);
 			transaction.setQuantity(trnQty);
 			transaction.setListId(listId);
 			transaction.setListName(listName);
@@ -560,14 +565,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	private final String SEARCH_TRANSACTIONS_QUERY = "SELECT " //
 		+ "    act.trnid AS transactionId,"//
 		+ "    users.uname AS createdByUsername,"//
-		+ "    (CASE"//
-		+ "        WHEN trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND trnqty >= 0 THEN '" + TransactionType.DEPOSIT
-		.getValue() + "'"//
-		+ "        WHEN trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() + " AND trnqty < 0 THEN '" + TransactionType.RESERVATION
-		.getValue() + "'"//
-		+ "        WHEN trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND trnqty < 0 THEN '" + TransactionType.WITHDRAWAL
-		.getValue() + "'"//
-		+ "    END) AS transactionType,"//
+		+ "(CASE WHEN trntype = " + TransactionType.DEPOSIT.getId() + " THEN '" + TransactionType.DEPOSIT.getValue()
+		+ "' WHEN trntype = " + TransactionType.WITHDRAWAL.getId() + "  THEN '" + TransactionType.WITHDRAWAL.getValue()
+		+ "' WHEN trntype = " + TransactionType.DISCARD.getId() + "  THEN '" + TransactionType.DISCARD.getValue()
+		+ "' WHEN trntype = " + TransactionType.ADJUSTMENT.getId() + "  THEN '" + TransactionType.ADJUSTMENT.getValue()
+		+ "' END) AS transactionType,"//
 		+ "    act.trnqty AS amount,"//
 		+ "    act.comments AS notes,"//
 		+ "    act.trndate as transactionDate, "//
@@ -577,7 +579,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "    i.stock_id AS lotStockId,"//
 		+ "    scaleid AS lotScaleId,"//
 		+ "    scale.name AS lotScaleName," //
-		+ "    (CASE WHEN i.status = 0 THEN 'Active' WHEN i.status = 1 THEN 'Closed' END) AS lotStatus "
+		+ "    (CASE WHEN i.status = 0 THEN 'Active' WHEN i.status = 1 THEN 'Closed' END) AS lotStatus, "
+		+ "   (CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
+		+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
+		+ "' WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '" + TransactionStatus.CANCELLED.getValue()
+		+ "' END) as transactionStatus"
 		+ " FROM"//
 		+ "   ims_transaction act "//
 		+ "        INNER JOIN"//
@@ -646,16 +652,12 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					.append(transactionsSearchDto.getMaxAmount()).append(" ");
 			}
 
-			if (transactionsSearchDto.getTransactionType() != null) {
-				query.append("and (CASE"
-					+ "        WHEN trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND trnqty >= 0 THEN '"
-					+ TransactionType.DEPOSIT.getValue() + "'"
-					+ "        WHEN trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() + " AND trnqty < 0 THEN '"
-					+ TransactionType.RESERVATION.getValue() + "'"
-					+ "        WHEN trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND trnqty < 0 THEN '"
-					+ TransactionType.WITHDRAWAL.getValue() + "'"
-					+ "    END) = '")
-					.append(transactionsSearchDto.getTransactionType()).append("' ");
+			if (transactionsSearchDto.getTransactionTypes() != null && !transactionsSearchDto.getTransactionTypes().isEmpty()) {
+				query.append(" and trntype IN ( ").append(Joiner.on(",").join(transactionsSearchDto.getTransactionTypes())).append(") ");
+			}
+
+			if (transactionsSearchDto.getTransactionStatus() != null && !transactionsSearchDto.getTransactionStatus().isEmpty()) {
+				query.append(" and trnstat IN ( ").append(Joiner.on(",").join(transactionsSearchDto.getTransactionStatus())).append(") ");
 			}
 
 			if (transactionsSearchDto.getStatusIds() != null && !transactionsSearchDto.getStatusIds().isEmpty()) {
@@ -708,6 +710,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			query.addScalar("lotScaleId");
 			query.addScalar("lotScaleName");
 			query.addScalar("lotStatus");
+			query.addScalar("transactionStatus");
 
 			query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
 
@@ -737,33 +740,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
-			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class,  Double.class,
-			 String.class, Date.class, Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class);
+			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class, Double.class,
+				String.class, Date.class, Integer.class, Integer.class, String.class, String.class, Integer.class, String.class,
+				String.class, String.class);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
 		}
-	}
-
-	public Transaction saveTransaction(final TransactionDto transactionDto) {
-		final Lot lot = new Lot();
-		lot.setId(transactionDto.getLot().getLotId());
-		final Transaction transaction = new Transaction();
-		if (TransactionType.DEPOSIT.getValue().equalsIgnoreCase(transactionDto.getTransactionType()) || TransactionType.WITHDRAWAL
-			.getValue().equalsIgnoreCase(transactionDto.getTransactionType())) {
-			transaction.setStatus(TransactionStatus.COMMITTED.getIntValue());
-		} else {
-			transaction.setStatus(TransactionStatus.ANTICIPATED.getIntValue());
-		}
-		transaction.setLot(lot);
-		transaction.setPersonId(Integer.valueOf(transactionDto.getCreatedByUsername()));
-		transaction.setUserId(Integer.valueOf(transactionDto.getCreatedByUsername()));
-		transaction.setTransactionDate(new Date());
-		transaction.setQuantity(transactionDto.getAmount());
-		transaction.setPreviousAmount(0D);
-		//FIXME Commitment date in some cases is not 0. For Deposits is always zero, but for other types it will be the current date
-		transaction.setCommitmentDate(0);
-		transaction.setComments(transactionDto.getNotes());
-
-		return this.saveOrUpdate(transaction);
 	}
 }
