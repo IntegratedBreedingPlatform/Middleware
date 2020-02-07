@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -127,6 +129,37 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			return geoProperties;
 		} catch (final MiddlewareQueryException e) {
 			final String message = "Error with getGeolocationPropsAndValuesByGeolocation() query from geolocationId: " + geolocationId;
+			GeolocationPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer geolocationId, final List<Integer> excludedVariableIds) {
+		Preconditions.checkNotNull(geolocationId);
+		final Map<String, String> geoProperties = new HashMap<>();
+		final List<Integer> excludedIds = new ArrayList<>(excludedVariableIds);
+		excludedIds.add(TermId.NO_OF_COLS_IN_REPS.getId());
+		excludedIds.add(TermId.LOCATION_ID.getId());
+		excludedIds.add(TermId.TRIAL_LOCATION.getId());
+
+		final StringBuilder sql =
+			new StringBuilder().append("SELECT  ").append("    cv.definition as name, geo.value as value ").append("FROM ")
+				.append("    nd_geolocationprop geo ").append("        INNER JOIN ")
+				.append("    cvterm cv ON (cv.cvterm_id = geo.type_id) ").append("WHERE ").append("    geo.nd_geolocation_id = :geolocationId ")
+				.append("        AND geo.type_id NOT IN (:excludedIds) ");
+		try {
+			final Query query =
+				this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").setParameter("geolocationId", geolocationId)
+					.setParameterList("excludedIds", excludedIds);
+			final List<Object> results = query.list();
+			for (final Object obj : results) {
+				final Object[] row = (Object[]) obj;
+				geoProperties.put((String) row[0], (String) row[1]);
+			}
+			return geoProperties;
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with getGeolocationPropsAndValuesByGeolocation() query from geolocationId: " + geolocationId
+				+ " and excludedIds: " + excludedIds;
 			GeolocationPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

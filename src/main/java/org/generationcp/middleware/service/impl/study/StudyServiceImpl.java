@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -19,6 +20,8 @@ import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -39,7 +42,6 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +56,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -520,6 +524,81 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 	}
 
+	@Override
+	public StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId) {
+		try {
+			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadataForGeolocationId(geolocationId);
+			if (studyMetadata != null) {
+				final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
+				studyDetailsDto.setMetadata(studyMetadata);
+
+				final List<UserDto> users = new ArrayList<>();
+				users.addAll(this.studyDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
+				users.addAll(this.studyDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
+				studyDetailsDto.setContacts(users);
+
+				final DmsProject environmentDataset =
+					this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyMetadata.getTrialDbId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
+				final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
+					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.<Integer>newArrayList(VariableType.STUDY_CONDITION.getId()));
+				List<Integer> variableIds = environmentConditions.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
+				final List<MeasurementVariable> environmentParameters = new ArrayList<>();
+				environmentParameters.addAll(this.studyDataManager.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
+
+				final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
+					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.<Integer>newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
+				variableIds = environmentDetails.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
+				environmentParameters.addAll(this.studyDataManager.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
+
+				final List<MeasurementVariable> environmentVariables = new ArrayList<>(environmentConditions);
+				environmentVariables.addAll(environmentDetails);
+				environmentParameters.addAll(createGeolocationVariables(environmentVariables, geolocationId));
+				studyDetailsDto.setEnvironmentParameters(environmentParameters);
+
+				final Map<String, String> properties = new HashMap<>();
+				variableIds = environmentVariables.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
+				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(geolocationId, variableIds));
+				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId(), variableIds));
+				studyDetailsDto.setAdditionalInfo(properties);
+				return studyDetailsDto;
+			}
+			return null;
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with getStudyDetailsForGeolocation() query with geolocationId: " + geolocationId;
+			StudyServiceImpl.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+
+	private List<MeasurementVariable> createGeolocationVariables(final List<MeasurementVariable> measurementVariables, final Integer geolocationId) {
+		final List<MeasurementVariable> geolocationVariables = new ArrayList<>();
+		final List<Integer> variableIds = measurementVariables.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
+		if(variableIds.contains(TermId.ALTITUDE.getId()) || variableIds.contains(TermId.LATITUDE.getId())
+			|| variableIds.contains(TermId.LONGITUDE.getId()) || variableIds.contains(TermId.GEODETIC_DATUM.getId())) {
+			final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(geolocationId);
+			Map<Integer, MeasurementVariable> variableMap = measurementVariables.stream().collect(
+				Collectors.toMap(MeasurementVariable::getTermId, Function.identity()));
+			if(variableIds.contains(TermId.ALTITUDE.getId())) {
+				variableMap.get(TermId.ALTITUDE.getId()).setValue(geolocation.getAltitude().toString());
+				geolocationVariables.add(variableMap.get(TermId.ALTITUDE.getId()));
+			}
+			if(variableIds.contains(TermId.LATITUDE.getId())) {
+				variableMap.get(TermId.LATITUDE.getId()).setValue(geolocation.getLatitude().toString());
+				geolocationVariables.add(variableMap.get(TermId.LATITUDE.getId()));
+			}
+			if(variableIds.contains(TermId.LONGITUDE.getId())) {
+				variableMap.get(TermId.LONGITUDE.getId()).setValue(geolocation.getLongitude().toString());
+				geolocationVariables.add(variableMap.get(TermId.LONGITUDE.getId()));
+			}
+			if(variableIds.contains(TermId.GEODETIC_DATUM.getId())) {
+				variableMap.get(TermId.GEODETIC_DATUM.getId()).setValue(geolocation.getGeodeticDatum());
+				geolocationVariables.add(variableMap.get(TermId.GEODETIC_DATUM.getId()));
+			}
+
+		}
+		return geolocationVariables;
+	}
 	@Override
 	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {
 		final List queryResults;

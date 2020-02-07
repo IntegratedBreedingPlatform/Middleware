@@ -248,7 +248,7 @@ public class StudyServiceImplTest {
 		seasons.add("WET");
 		final StudyMetadata metadata =
 			new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyTypeDto.NURSERY_NAME,
-				"studyName");
+				"studyName", "studyDescription", "Entry list order", "20170101");
 
 		final UserDto user = new UserDto();
 		user.setEmail(RandomStringUtils.randomAlphabetic(10) + "@gmail.com");
@@ -296,7 +296,7 @@ public class StudyServiceImplTest {
 		seasons.add("WET");
 		final StudyMetadata metadata =
 			new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "studyName", StudyTypeDto.TRIAL_NAME,
-				"studyName");
+				"studyName", "studyDescription", "Entry list order", "20170101");
 
 		final UserDto user = new UserDto();
 		user.setEmail("a@a.com");

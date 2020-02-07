@@ -38,6 +38,7 @@ import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -1117,7 +1118,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer studyId, final List<Integer> excludedIds) {
+		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByGeolocation(studyId, excludedIds);
+	}
+
+	@Override
 	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId) {
+		return this.getProjectPropertyDao().getProjectPropsAndValuesByStudy(studyId);
+	}
+
+	@Override
+	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId, final List<Integer> excludedVariableIds) {
 		return this.getProjectPropertyDao().getProjectPropsAndValuesByStudy(studyId);
 	}
 
@@ -1326,6 +1337,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			return this.userService.getUsersByPersonIds(personIds);
 		}
 		return Collections.emptyList();
+	}
+
+	@Override
+	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
+		return this.daoFactory.getDmsProjectDAO().getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
+	}
+
+	@Override
+	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
+		return this.daoFactory.getDmsProjectDAO().getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
 	}
 
 	void setDataSetBuilder(final DataSetBuilder dataSetBuilder) {
