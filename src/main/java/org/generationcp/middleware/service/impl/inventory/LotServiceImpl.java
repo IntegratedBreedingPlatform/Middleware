@@ -64,10 +64,10 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public Integer saveLot(final LotGeneratorInputDto lotDto, final CropType cropType) {
+	public Integer saveLot(final CropType cropType, final Integer userId, final LotGeneratorInputDto lotDto) {
 
 		final Lot lot = new Lot();
-		lot.setUserId(lotDto.getUserId());
+		lot.setUserId(userId);
 		lot.setComments(lotDto.getComments());
 		lot.setCreatedDate(new Date());
 		lot.setEntityId(lotDto.getGid());

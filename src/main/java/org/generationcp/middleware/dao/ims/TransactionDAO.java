@@ -583,7 +583,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "   (CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '" + TransactionStatus.CANCELLED.getValue()
-		+ "' END) as transactionStatus"
+		+ "' END) as transactionStatus, " 
+		+ " i.locid as lotLocationId, "
+		+ " i.comments as lotComments "
 		+ " FROM"//
 		+ "   ims_transaction act "//
 		+ "        INNER JOIN"//
@@ -711,6 +713,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			query.addScalar("lotScaleName");
 			query.addScalar("lotStatus");
 			query.addScalar("transactionStatus");
+			query.addScalar("lotLocationId");
+			query.addScalar("lotComments");
 
 			query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
 
@@ -740,9 +744,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
-			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class, Double.class,
-				String.class, Date.class, Integer.class, Integer.class, String.class, String.class, Integer.class, String.class,
-				String.class, String.class);
+			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class, Double.class, String.class, Date.class,
+					Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class, String.class, Integer.class, String.class);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
 		}
