@@ -1271,8 +1271,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return studyReference;
 	}
 
-	public Boolean existInstances(final Set<Integer> instanceIds) {
-		return this.getGeolocationDao().existInstances(instanceIds);
+	public Boolean instanceExists(final Set<Integer> instanceIds) {
+		return this.getGeolocationDao().instanceExists(instanceIds);
 	}
 
 	@Override
