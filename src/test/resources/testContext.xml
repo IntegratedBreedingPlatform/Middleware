@@ -183,8 +183,13 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
-    <bean id="studyService" class="org.generationcp.middleware.service.impl.study.StudyServiceImpl">
+	<bean id="daoFactory" class="org.generationcp.middleware.manager.DaoFactory">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
+	 <bean id="studyService" class="org.generationcp.middleware.service.impl.study.StudyServiceImpl">
 		<property name="sessionProvider" ref="cropSessionProvider"/>
+		<property name="daoFactory" ref="daoFactory"/>
     </bean>
 
 
