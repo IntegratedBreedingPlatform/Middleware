@@ -30,6 +30,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -222,10 +223,12 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return list;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId) {
+	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId, final List<Integer> excludedVariableIds) {
 		Preconditions.checkNotNull(studyId);
 		final Map<String, String> geoProperties = new HashMap<>();
+		final List<Integer> excludedIds = new ArrayList<>(excludedVariableIds);
+		excludedIds.add(TermId.SEASON_VAR.getId());
+		excludedIds.add(TermId.LOCATION_ID.getId());
 		final String sql = " SELECT  "
 			+ "     cvterm.definition AS name, pp.value AS value "
 			+ " FROM "
@@ -234,9 +237,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			+ "     cvterm cvterm ON cvterm.cvterm_id = pp.variable_id "
 			+ " WHERE "
 			+ "     pp.project_id = :studyId "
-			+ "         AND pp.variable_id NOT IN ("
-			+ TermId.SEASON_VAR.getId() + ", "
-			+ TermId.LOCATION_ID.getId() + ") "
+			+ "         AND pp.variable_id NOT IN (:excludedIds) "
 			+ "         AND pp.variable_id NOT IN (SELECT  "
 			+ "             variable.cvterm_id "
 			+ "         FROM "
@@ -250,7 +251,8 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		try {
 			final Query query =
-					this.getSession().createSQLQuery(sql).addScalar("name").addScalar("value").setParameter("studyId", studyId);
+				this.getSession().createSQLQuery(sql).addScalar("name").addScalar("value").setParameter("studyId", studyId)
+				.setParameterList("excludedIds", excludedIds);
 			final List<Object> results = query.list();
 			for (final Object obj : results) {
 				final Object[] row = (Object[]) obj;

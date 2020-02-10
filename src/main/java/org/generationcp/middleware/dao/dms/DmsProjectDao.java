@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -169,7 +170,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     MAX(IF(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", "
 		+ "                 geoprop.value, "
 		+ "                 NULL)) "
-		+ "     AS locationId "
+		+ "     AS locationId,"
+		+ "		pmain.description AS studyDescription, "
+		+ "     (Select definition from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId() + ", "
+		+ "			geoprop.value, "
+		+ "			NULL)))) "
+		+ "     AS experimentalDesign,"
+		+ "		pmain.study_update AS lastUpdate"
 		+ " FROM "
 		+ "     nd_geolocation geoloc "
 		+ "         INNER JOIN "
@@ -761,6 +768,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("endDate");
 			query.addScalar("deleted");
 			query.addScalar("locationID");
+			query.addScalar("studyDescription");
+			query.addScalar("experimentalDesign");
+			query.addScalar("lastUpdate");
 			query.setParameter("geolocationId", geolocationId);
 			final Object result = query.uniqueResult();
 			if (result != null) {
@@ -780,6 +790,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				studyMetadata.setEndDate((row[8] instanceof String) ? (String) row[8] : null);
 				studyMetadata.setActive(Boolean.FALSE.equals(row[9]));
 				studyMetadata.setLocationId((row[10] instanceof String) ? Integer.parseInt((String) row[10]) : null);
+				studyMetadata.setStudyDescription((row[11] instanceof String) ? (String) row[11] : null);
+				studyMetadata.setExperimentalDesign((row[12] instanceof String) ? (String) row[12] : null);
+				studyMetadata.setLastUpdate((row[13] instanceof String) ? (String) row[13] : null);
 				return studyMetadata;
 			} else {
 				return null;

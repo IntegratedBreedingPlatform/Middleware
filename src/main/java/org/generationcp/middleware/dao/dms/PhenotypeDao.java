@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
@@ -1240,7 +1241,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		statement.setParameterList("variableIds", targetVariableIds);
 		statement.executeUpdate();
 	}
-	
+
 	public Phenotype getPhenotype(final Integer experimentId, final Integer phenotypeId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("phenotypeId", phenotypeId));
@@ -1340,4 +1341,43 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 		return criteria.list();
 	}
+
+	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
+		List<MeasurementVariable> studyVariables = new ArrayList<>();
+
+		try{
+			final SQLQuery query =
+				this.getSession().createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, "
+					+ "		cvt_scale.name AS scaleName, pheno.value AS value from phenotype pheno "
+					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.cvterm_id IN (:variableIds) "
+					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
+					+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
+					+ "     INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id\n"
+					+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id = :geolocationId ;");
+			query.addScalar("name", new StringType());
+			query.addScalar("definition", new StringType());
+			query.addScalar("scaleName", new StringType());
+			query.addScalar("value", new StringType());
+			query.setParameterList("variableIds", variableIds);
+			query.setParameter("geolocationId", geolocationId);
+
+			final List<Object> results = query.list();
+			for(Object result: results) {
+				final Object[] row = (Object[]) result;
+				final MeasurementVariable measurementVariable = new MeasurementVariable();
+				measurementVariable.setName((row[0] instanceof String) ? (String) row[0] : null);
+				measurementVariable.setDescription((row[1] instanceof String) ? (String) row[1] : null);
+				measurementVariable.setScale((row[2] instanceof String) ? (String) row[2] : null);
+				measurementVariable.setValue((row[3] instanceof String) ? (String) row[3] : null);
+				studyVariables.add(measurementVariable);
+			}
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationId: " + geolocationId
+				+ " and variableIds: " + variableIds;
+			PhenotypeDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return studyVariables;
+	}
+
 }
