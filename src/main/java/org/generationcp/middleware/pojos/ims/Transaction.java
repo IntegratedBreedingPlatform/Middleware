@@ -100,6 +100,10 @@ public class Transaction implements Serializable {
 	@Column(name = "bulk_compl")
 	private String bulkCompl;
 
+	@Basic(optional = false)
+	@Column(name = "trntype")
+	private Integer type;
+
 	public Transaction() {
 	}
 
@@ -109,7 +113,7 @@ public class Transaction implements Serializable {
 	}
 
 	public Transaction(final Integer id, final Integer userId, final Lot lot, final Date transactionDate, final Integer status, final Double quantity, final String comments,
-			final Integer commitmentDate, final String sourceType, final Integer sourceId, final Integer sourceRecordId, final Double previousAmount, final Integer personId) {
+			final Integer commitmentDate, final String sourceType, final Integer sourceId, final Integer sourceRecordId, final Double previousAmount, final Integer personId, final Integer type) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -124,6 +128,8 @@ public class Transaction implements Serializable {
 		this.sourceRecordId = sourceRecordId;
 		this.previousAmount = previousAmount;
 		this.personId = personId;
+		this.type = type;
+
 	}
 
 	public Integer getId() {
@@ -228,6 +234,14 @@ public class Transaction implements Serializable {
 
 	public void setPersonId(final Integer personId) {
 		this.personId = personId;
+	}
+
+	public Integer getType() {
+		return this.type;
+	}
+
+	public void setType(final Integer type) {
+		this.type = type;
 	}
 
 	@Override

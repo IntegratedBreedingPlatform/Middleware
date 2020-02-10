@@ -10,6 +10,8 @@
 
 package org.generationcp.middleware.dao.oms;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,14 +34,16 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
@@ -1314,6 +1318,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		transaction.setQuantity(100.0);
 		transaction.setStatus(0);
 		transaction.setLot(lot);
+		transaction.setType(TransactionType.DEPOSIT.getId());
 		this.inventoryDataManager.addTransaction(transaction);
 
 		final Germplasm mgMember = GermplasmTestDataInitializer

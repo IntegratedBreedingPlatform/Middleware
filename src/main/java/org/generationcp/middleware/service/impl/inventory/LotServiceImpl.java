@@ -16,6 +16,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,10 +64,10 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public Integer saveLot(final LotGeneratorInputDto lotDto, final CropType cropType) {
+	public Integer saveLot(final CropType cropType, final Integer userId, final LotGeneratorInputDto lotDto) {
 
 		final Lot lot = new Lot();
-		lot.setUserId(lotDto.getUserId());
+		lot.setUserId(userId);
 		lot.setComments(lotDto.getComments());
 		lot.setCreatedDate(new Date());
 		lot.setEntityId(lotDto.getGid());
@@ -108,8 +109,8 @@ public class LotServiceImpl implements LotService {
 			this.daoFactory.getLotDao().save(lot);
 
 			final Transaction transaction = new Transaction();
-			transaction.setStatus(TransactionStatus.COMMITTED.getIntValue());
-
+			transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
+			transaction.setType(TransactionType.DEPOSIT.getId());
 			transaction.setLot(lot);
 			transaction.setPersonId(userId);
 			transaction.setUserId(userId);

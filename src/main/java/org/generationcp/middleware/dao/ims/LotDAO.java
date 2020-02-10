@@ -449,7 +449,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.setParameterList("gids", gids);
 			query.setParameter("listId", listId);
 			List<Integer> statusList = Lists.newArrayList();
-			statusList.add(TransactionStatus.ANTICIPATED.getIntValue());
+			statusList.add(TransactionStatus.PENDING.getIntValue());
 			query.setParameterList("statusList", statusList);
 			query.setParameter("includeCloseLots", 0);
 
@@ -606,14 +606,14 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				if (recordId != null && qty != null && transactionState != null) {
 					Double prevValue = null;
 					Double prevTotal = null;
-					if(TransactionStatus.ANTICIPATED.getIntValue() == transactionState && (qty * -1) < 0.0) {
+					if(TransactionStatus.PENDING.getIntValue() == transactionState && (qty * -1) < 0.0) {
 						prevValue = reservationMap.get(recordId);
 						prevTotal = prevValue == null ? 0d : prevValue;
 
 						reservationMap.put(recordId, prevTotal + qty);
 					}
 
-					if(TransactionStatus.COMMITTED.getIntValue() == transactionState) {
+					if(TransactionStatus.CONFIRMED.getIntValue() == transactionState) {
 						prevValue = committedMap.get(recordId);
 						prevTotal = prevValue == null ? 0d : prevValue;
 
@@ -660,15 +660,15 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
  		+ "  l.lname as locationName, " //
 		+ "  lot.scaleid as scaleId, " //
 		+ "  scale.name as scaleName, " //
-		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) AS actualBalance, " //
+		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) AS actualBalance, " //
 		+ "  CASE WHEN SUM(transaction.trnqty) is null THEN 0 ELSE SUM(transaction.trnqty) END AS availableBalance, " //
-		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() + " AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) AS reservedTotal, " //
-		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) AS withdrawalTotal, " //
+		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) AS reservedTotal, " //
+		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) AS withdrawalTotal, " //
 		+ "  lot.comments as comments, " //
 		+ "  users.uname as createdByUsername, " //
 		+ "  lot.created_date as createdDate, " //
-		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END) AS lastDepositDate, " //
-		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() + " AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END) AS lastWithdrawalDate " //
+		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END) AS lastDepositDate, " //
+		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END) AS lastWithdrawalDate " //
 		+ "FROM ims_lot lot " //
 		+ "       LEFT JOIN ims_transaction transaction ON transaction.lotid = lot.lotid AND transaction.trnstat <> " + TransactionStatus.CANCELLED.getIntValue()  //
 		+ "       INNER JOIN germplsm g on g.gid = lot.eid " //
@@ -747,12 +747,12 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.append(" having 1=1 ");
 
 			if (lotsSearchDto.getMinActualBalance() != null) {
-				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) >= ")
+				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) >= ")
 						.append(lotsSearchDto.getMinActualBalance()).append(" ");
 			}
 
 			if (lotsSearchDto.getMaxActualBalance() != null) {
-				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) <= ")
+				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) <= ")
 						.append(lotsSearchDto.getMaxActualBalance()).append(" ");
 			}
 
@@ -768,49 +768,49 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 			if (lotsSearchDto.getMinReservedTotal() != null) {
 				query.append(
-						"and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) >= ")
+						"and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) >= ")
 						.append(lotsSearchDto.getMinReservedTotal()).append(" ");
 			}
 
 			if (lotsSearchDto.getMaxReservedTotal() != null) {
 				query.append(
-						"and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.ANTICIPATED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) <= ")
+						"and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) <= ")
 						.append(lotsSearchDto.getMaxReservedTotal()).append(" ");
 			}
 
 			if (lotsSearchDto.getMinWithdrawalTotal() != null) {
 				query.append(
-						"and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) >= ")
+						"and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) >= ")
 						.append(lotsSearchDto.getMinWithdrawalTotal()).append(" ");
 			}
 
 			if (lotsSearchDto.getMaxWithdrawalTotal() != null) {
 				query.append(
-						"and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) <= ")
+						"and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) <= ")
 						.append(lotsSearchDto.getMaxWithdrawalTotal()).append(" ");
 			}
 
 			if (lotsSearchDto.getLastDepositDateFrom() != null) {
 				query.append(
-						" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END)) >= '")
+						" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END)) >= '")
 						.
 								append(format.format(lotsSearchDto.getLastDepositDateFrom())).append("' ");
 			}
 
 			if (lotsSearchDto.getLastDepositDateTo() != null) {
 				query.append(
-						" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END)) <= '")
+						" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END)) <= '")
 						.
 								append(format.format(lotsSearchDto.getLastDepositDateTo())).append("' ");
 			}
 
 			if (lotsSearchDto.getLastWithdrawalDateFrom() != null) {
-				query.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END)) >= '").
+				query.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END)) >= '").
 						append(format.format(lotsSearchDto.getLastWithdrawalDateFrom())).append("' ");
 			}
 
 			if (lotsSearchDto.getLastWithdrawalDateTo() != null) {
-				query.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.COMMITTED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END)) <= '").
+				query.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END)) <= '").
 						append(format.format(lotsSearchDto.getLastWithdrawalDateTo())).append("' ");
 			}
 		}
