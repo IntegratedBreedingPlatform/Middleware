@@ -15,7 +15,6 @@ public class LotDto {
 	private Integer locationId;
 	private Integer scaleId;
 	private String comments;
-	private String createdByUsername;
 	private String status;
 
 	public Integer getLotId() {
@@ -64,14 +63,6 @@ public class LotDto {
 
 	public void setComments(final String comments) {
 		this.comments = comments;
-	}
-
-	public String getCreatedByUsername() {
-		return createdByUsername;
-	}
-
-	public void setCreatedByUsername(final String createdByUsername) {
-		this.createdByUsername = createdByUsername;
 	}
 
 	public String getStatus() {

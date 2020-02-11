@@ -41,6 +41,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -302,6 +303,11 @@ public class IntegrationTestDataInitializer {
 
 		this.userService.addPerson(person);
 
+		final Role role =new Role(1, "Admin");
+		final RoleType roleType = new RoleType("INSTANCE");
+		roleType.setId(1);
+		role.setRoleType(roleType);
+
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setInstalid(1);
 		workbenchUser.setStatus(1);
@@ -312,7 +318,7 @@ public class IntegrationTestDataInitializer {
 		workbenchUser.setPerson(person);
 		workbenchUser.setAssignDate(20150101);
 		workbenchUser.setCloseDate(20150101);
-		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, new Role(1, "Admin"))));
+		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, role)));
 		final List<CropType> crops = new ArrayList<>();
 		crops.add(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
 		this.userService.addUser(workbenchUser);

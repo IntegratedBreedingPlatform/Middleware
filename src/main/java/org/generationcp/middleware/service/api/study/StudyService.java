@@ -40,8 +40,8 @@ public interface StudyService {
 	 * @param geolocationId
 	 * @return StudyDetailsDto
 	 */
-	StudyDetailsDto getStudyDetailsForGeolocation(Integer geolocationId);
-
+	StudyDetailsDto getStudyDetailsByGeolocation(Integer geolocationId);
+	
 	/**
 	 * @param ids     of the variables that i need to check data
 	 * @param studyId id for the study (Nursery / Trial)
