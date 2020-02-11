@@ -1193,7 +1193,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			if (!CollectionUtils.isEmpty(instanceIds)) {
 				sb.append(" AND geoloc.nd_geolocation_id IN (:locationIds) \n");
 			}
-			sb.append("    group by geoloc.nd_geolocation_id \n" );
+			sb.append("    group by geoloc.nd_geolocation_id \n");
 			sb.append("    order by (1 * geoloc.description) asc ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
@@ -1385,4 +1385,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
+	public Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType) {
+		try {
+			final Query query = this.getSession().createSQLQuery("SELECT DISTINCT p.project_id"
+				+ " FROM project p "
+				+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id"
+				+ " INNER JOIN project study ON p.study_id = study.project_id AND study.deleted != " + DELETED_STUDY
+				+ " WHERE nde.nd_geolocation_id = :environmentId"
+				+ " AND p.dataset_type_id = :datasetTypeId");
+			query.setParameter("environmentId", environmentId);
+			query.setParameter("datasetTypeId", datasetType.getId());
+			return (Integer) query.uniqueResult();
+		} catch (final HibernateException e) {
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+	}
 }
