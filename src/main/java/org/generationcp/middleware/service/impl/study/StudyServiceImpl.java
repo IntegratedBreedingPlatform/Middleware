@@ -310,12 +310,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public Integer getPlotDatasetId(final int studyId) {
-		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getProjectId();
+		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0)
+			.getProjectId();
 	}
 
 	@Override
 	public Integer getEnvironmentDatasetId(final int studyId) {
-		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getProjectId();
+		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0)
+			.getProjectId();
 	}
 
 	@Override

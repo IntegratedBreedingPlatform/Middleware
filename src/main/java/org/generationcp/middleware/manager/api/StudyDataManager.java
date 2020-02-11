@@ -37,6 +37,8 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
@@ -443,6 +445,16 @@ public interface StudyDataManager {
 	 * @return ID of the folder created
 	 */
 	DmsProject getParentFolder(int id);
+
+	/**
+	 * Returns the datasetId of dataset to which the studyDbId (nd_geolocation_id) belongs to.
+	 * In Brapi, studyDbId is the environment/instance (nd_geolocation_id)
+	 * @param studyDbId
+	 * @param datasetType
+	 * @return
+	 */
+	Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType);
+
 
 	/**
 	 * Returns the dms project. Accepts a project id.
