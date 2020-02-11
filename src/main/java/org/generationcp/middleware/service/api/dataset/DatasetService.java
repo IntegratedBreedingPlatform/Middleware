@@ -169,6 +169,11 @@ public interface DatasetService {
 	DatasetDTO getDataset(Integer datasetId);
 
 	/**
+	 * Get dataset that observationUnitDbId belongs to
+	 */
+	DatasetDTO getDatasetByObsUnitDbId(String observationUnitDbId);
+
+	/**
 	 * Count all observation units for a dataset (draftMode = FALSE to count all of them, draftMode = TRUE to count only observation
 	 * units with at least one draft observation)
 	 *

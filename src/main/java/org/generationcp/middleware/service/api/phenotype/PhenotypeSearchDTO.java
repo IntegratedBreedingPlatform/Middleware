@@ -10,6 +10,9 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * TODO Rename to ObservationUnitDto
+ */
 @AutoProperty
 public class PhenotypeSearchDTO {
 
