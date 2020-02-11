@@ -36,7 +36,6 @@ import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
