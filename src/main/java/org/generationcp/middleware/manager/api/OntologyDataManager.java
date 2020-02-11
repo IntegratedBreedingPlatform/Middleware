@@ -28,6 +28,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.service.api.study.VariableDTO;
 
 import java.util.List;
 import java.util.Map;

@@ -40,6 +40,7 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.StringUtil;
@@ -1023,5 +1024,27 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			final Integer variableId = iterator.next();
 			VariableCache.removeFromCache(variableId);
 		}
+	}
+
+	@Override
+	public List<VariableDTO> getVariablesByDatasetId(
+		final Integer datasetId, final List<Integer> variableTypes, final Integer pageSize, final Integer pageNumber) {
+		return this.daoFactory.getCvTermDao().getVariablesByDatasetId(datasetId, variableTypes, pageSize, pageNumber);
+	}
+
+	@Override
+	public long countVariablesByDatasetId(final Integer datasetId, final List<Integer> variableTypes) {
+		return this.daoFactory.getCvTermDao().countVariablesByDatasetId(datasetId, variableTypes);
+	}
+
+	@Override
+	public List<VariableDTO> getAllVariables(final List<Integer> variableTypes,
+		final String cropname, final Integer pageSize, final Integer pageNumber) {
+		return this.daoFactory.getCvTermDao().getAllVariables(variableTypes, cropname, pageSize, pageNumber);
+	}
+
+	@Override
+	public long countAllVariables(final List<Integer> variableTypes) {
+		return this.daoFactory.getCvTermDao().countAllVariables(variableTypes);
 	}
 }

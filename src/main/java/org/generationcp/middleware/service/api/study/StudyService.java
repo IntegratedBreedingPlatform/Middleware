@@ -41,7 +41,7 @@ public interface StudyService {
 	 * @return StudyDetailsDto
 	 */
 	StudyDetailsDto getStudyDetailsByGeolocation(Integer geolocationId);
-	
+
 	/**
 	 * @param ids     of the variables that i need to check data
 	 * @param studyId id for the study (Nursery / Trial)
@@ -75,14 +75,4 @@ public interface StudyService {
 	Integer getPlotDatasetId(final int studyId);
 
 	Integer getEnvironmentDatasetId(final int studyId);
-
-	List<VariableDTO> getVariablesByDatasetId(final Integer datasetId, final List<Integer> variableTypes, final String cropname,
-		final Integer pageSize, final Integer pageNumber);
-
-	long countVariablesByDatasetId(Integer datasetId, final List<Integer> variableTypes);
-
-	List<VariableDTO> getAllVariables(List<Integer> variableTypes,
-		String cropname, Integer pageSize, Integer pageNumber);
-
-	long countAllVariables(List<Integer> variableTypes);
 }

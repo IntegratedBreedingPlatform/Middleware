@@ -611,28 +611,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return this.getPhenotypeDao().countPhenotypes(requestDTO);
 	}
 
-	@Override
-	public List<VariableDTO> getVariablesByDatasetId(
-		final Integer datasetId, final List<Integer> variableTypes, final String cropname, final Integer pageSize, final Integer pageNumber) {
-		return this.daoFactory.getCvTermDao().getVariablesByDatasetId(cropname, datasetId, variableTypes, pageSize, pageNumber);
-	}
-
-	@Override
-	public long countVariablesByDatasetId(final Integer datasetId, final List<Integer> variableTypes) {
-		return this.daoFactory.getCvTermDao().countVariablesByDatasetId(datasetId, variableTypes);
-	}
-
-	@Override
-	public List<VariableDTO> getAllVariables(final List<Integer> variableTypes,
-		final String cropname, final Integer pageSize, final Integer pageNumber) {
-		return this.daoFactory.getCvTermDao().getAllVariables(variableTypes, cropname, pageSize, pageNumber);
-	}
-
-	@Override
-	public long countAllVariables(final List<Integer> variableTypes) {
-		return this.daoFactory.getCvTermDao().countAllVariables(variableTypes);
-	}
-
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
 	}

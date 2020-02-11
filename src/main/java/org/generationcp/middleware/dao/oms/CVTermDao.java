@@ -1450,7 +1450,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		final SQLQuery sqlQuery = this.createVariableQuery(null, variableTypes);
 		this.appendGetVariablesScalar(sqlQuery);
-		return this.convertToVariableDTO(this.getVariableQueryResult(sqlQuery, pageSize, pageNumber), cropName, false);
+		return this.convertToVariableDTO(this.getVariableQueryResult(sqlQuery, pageSize, pageNumber), false);
 
 	}
 
@@ -1474,19 +1474,18 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	/**
 	 * Gets the list of variables associated to a study filtered by variableTypes.
 	 *
-	 * @param cropName
 	 * @param datasetId
 	 * @param variableTypes
 	 * @param pageSize
 	 * @param pageNumber
 	 * @return
 	 */
-	public List<VariableDTO> getVariablesByDatasetId(final String cropName, final Integer datasetId,
+	public List<VariableDTO> getVariablesByDatasetId(final Integer datasetId,
 		final List<Integer> variableTypes, final Integer pageSize, final Integer pageNumber) {
 
 		final SQLQuery sqlQuery = this.createVariableQuery(datasetId, variableTypes);
 		this.appendGetVariablesScalar(sqlQuery);
-		return this.convertToVariableDTO(this.getVariableQueryResult(sqlQuery, pageSize, pageNumber), cropName, true);
+		return this.convertToVariableDTO(this.getVariableQueryResult(sqlQuery, pageSize, pageNumber), true);
 
 	}
 
@@ -1651,7 +1650,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	}
 
-	protected List<VariableDTO> convertToVariableDTO(final List<Map<String, Object>> results, final String cropName,
+	protected List<VariableDTO> convertToVariableDTO(final List<Map<String, Object>> results,
 		final boolean isFilterByDatasetId) {
 
 		final List<VariableDTO> variables = new ArrayList<>();
@@ -1660,7 +1659,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			final VariableDTO variableDto = new VariableDTO();
 
-			variableDto.setCrop(cropName);
 			if (isFilterByDatasetId) {
 				variableDto.getContextOfUse().add("PLOT");
 			}

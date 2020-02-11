@@ -317,7 +317,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 
 		final int traitCount = (int) dao.countVariablesByDatasetId(plotDataset.getProjectId(), Lists
 			.newArrayList(VariableType.TRAIT.getId()));
-		final List<VariableDTO> variablesDTOs = dao.getVariablesByDatasetId(MAIZE, plotDataset.getProjectId(), Lists
+		final List<VariableDTO> variablesDTOs = dao.getVariablesByDatasetId(plotDataset.getProjectId(), Lists
 			.newArrayList(VariableType.TRAIT.getId()), traitCount,1);
 		// Only return the TRAIT variables associated to a study
 		Assert.assertEquals(traitCount, variablesDTOs.size());
@@ -360,7 +360,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		map.put(CVTermDao.VARIABLE_TRAIT_CLASS, "traitClass");
 		map.put(CVTermDao.VARIABLE_FORMULA_DEFINITION, "formulaDefinition");
 
-		final List<VariableDTO> variableDTOs = dao.convertToVariableDTO(Lists.newArrayList(map), MAIZE, filterByStudyId);
+		final List<VariableDTO> variableDTOs = dao.convertToVariableDTO(Lists.newArrayList(map), filterByStudyId);
 		final VariableDTO variableDTO = variableDTOs.get(0);
 
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_ID), variableDTO.getObservationVariableDbId());
