@@ -57,7 +57,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -517,14 +516,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
 					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.<Integer>newArrayList(VariableType.STUDY_CONDITION.getId()));
 				final List<MeasurementVariable> environmentParameters = new ArrayList<>();
-				List<Integer> variableIds = environmentConditions.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
+				List<Integer> variableIds = this.getVariableIds(environmentConditions);
 				if(!variableIds.isEmpty()) {
 					environmentParameters.addAll(
 						this.studyDataManager.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
 				}
 				final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
 					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.<Integer>newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
-				variableIds = environmentDetails.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
+				variableIds = this.getVariableIds(environmentDetails);
 				if(!variableIds.isEmpty()) {
 					environmentParameters.addAll(
 						this.studyDataManager.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
@@ -537,7 +536,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				studyDetailsDto.setEnvironmentParameters(environmentParameters);
 
 				final Map<String, String> properties = new HashMap<>();
-				variableIds = environmentVariables.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
+				variableIds = this.getVariableIds(environmentVariables);
 				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(geolocationId, variableIds));
 				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId(), variableIds));
 				studyDetailsDto.setAdditionalInfo(properties);
@@ -551,15 +550,25 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 	}
 
+	private List<Integer> getVariableIds(final List<MeasurementVariable> measurementVariables) {
+		final List<Integer> varIds =  new ArrayList<>();
+		for(final MeasurementVariable mvar: measurementVariables){
+			varIds.add(mvar.getTermId());
+		}
+		return varIds;
+	}
+
 
 	private List<MeasurementVariable> createGeolocationVariables(final List<MeasurementVariable> measurementVariables, final Integer geolocationId) {
 		final List<MeasurementVariable> geolocationVariables = new ArrayList<>();
-		final List<Integer> variableIds = measurementVariables.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
+		final List<Integer> variableIds = this.getVariableIds(measurementVariables);
 		if(variableIds.contains(TermId.ALTITUDE.getId()) || variableIds.contains(TermId.LATITUDE.getId())
 			|| variableIds.contains(TermId.LONGITUDE.getId()) || variableIds.contains(TermId.GEODETIC_DATUM.getId())) {
 			final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(geolocationId);
-			Map<Integer, MeasurementVariable> variableMap = measurementVariables.stream().collect(
-				Collectors.toMap(MeasurementVariable::getTermId, Function.identity()));
+			Map<Integer, MeasurementVariable> variableMap = new HashMap<>();
+			for(MeasurementVariable mvar: measurementVariables) {
+				variableMap.put(mvar.getTermId(), mvar);
+			}
 			if(variableIds.contains(TermId.ALTITUDE.getId())) {
 				variableMap.get(TermId.ALTITUDE.getId()).setValue(geolocation.getAltitude().toString());
 				geolocationVariables.add(variableMap.get(TermId.ALTITUDE.getId()));
