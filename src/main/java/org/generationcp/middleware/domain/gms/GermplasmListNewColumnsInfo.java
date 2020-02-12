@@ -16,6 +16,7 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 
 	private Integer listId;
 	private Map<String, List<ListDataColumnValues>> columnValuesMap; // key = column name
+	private List<String> addedColumnCurrentSort;
 
 	public GermplasmListNewColumnsInfo(Integer listId, Map<String, List<ListDataColumnValues>> columnValuesMap) {
 		super();
@@ -119,4 +120,11 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 		return new HashSet<>();
 	}
 
+	public List<String> getAddedColumnCurrentSort() {
+		return this.addedColumnCurrentSort;
+	}
+
+	public void setAddedColumnCurrentSort(final List<String> addedColumnCurrentSort) {
+		this.addedColumnCurrentSort = addedColumnCurrentSort;
+	}
 }
