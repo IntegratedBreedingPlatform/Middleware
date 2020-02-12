@@ -14,6 +14,8 @@ public class StudyMetadata {
 
 	private String studyName;
 
+	private String studyDescription;
+
 	private String studyType;
 
 	private List<String> seasons = new ArrayList<>();
@@ -30,6 +32,10 @@ public class StudyMetadata {
 
 	private Integer locationId;
 
+	private String experimentalDesign;
+
+	private String lastUpdate;
+
 	private transient int hashCode;
 
 	public StudyMetadata() {
@@ -37,7 +43,8 @@ public class StudyMetadata {
 
 	public StudyMetadata(final Integer nurseryOrTrialId, final Integer studyDbId, final Integer locationId, final Boolean active,
 			final String endDate, final String startDate, final Integer trialDbId, final List<String> seasons, final String trialName,
-			final String studyType, final String studyName) {
+			final String studyType, final String studyName, final String studyDescription, final String experimentalDesign,
+		final String lastUpdate) {
 		this.nurseryOrTrialId = nurseryOrTrialId;
 		this.studyDbId = studyDbId;
 		this.locationId = locationId;
@@ -49,6 +56,9 @@ public class StudyMetadata {
 		this.trialName = trialName;
 		this.studyType = studyType;
 		this.studyName = studyName;
+		this.studyDescription = studyDescription;
+		this.experimentalDesign = experimentalDesign;
+		this.lastUpdate = lastUpdate;
 	}
 
 	public Integer getNurseryOrTrialId() {
@@ -150,8 +160,35 @@ public class StudyMetadata {
 		return this;
 	}
 
+	public String getStudyDescription() {
+		return studyDescription;
+	}
+
+	public StudyMetadata setStudyDescription(final String studyDescription) {
+		this.studyDescription = studyDescription;
+		return this;
+	}
+
 	public void addSeason(String season) {
 		this.seasons.add(season);
+	}
+
+	public String getExperimentalDesign() {
+		return this.experimentalDesign;
+	}
+
+	public StudyMetadata setExperimentalDesign(final String experimentalDesign) {
+		this.experimentalDesign = experimentalDesign;
+		return this;
+	}
+
+	public String getLastUpdate() {
+		return this.lastUpdate;
+	}
+
+	public StudyMetadata setLastUpdate(final String lastUpdate) {
+		this.lastUpdate = lastUpdate;
+		return this;
 	}
 
 	@Override public boolean equals(final Object other) {
@@ -160,6 +197,8 @@ public class StudyMetadata {
 		StudyMetadata castOther = (StudyMetadata) other;
 		return new EqualsBuilder().append(this.nurseryOrTrialId, castOther.getNurseryOrTrialId())
 				.append(this.studyDbId, castOther.getStudyDbId()).append(this.studyName, castOther.getStudyName())
+				.append(this.studyDescription, castOther.getStudyDescription())
+				.append(this.experimentalDesign, castOther.getExperimentalDesign())
 				.append(this.studyType, castOther.getStudyType()).append(this.seasons, castOther.getSeasons())
 				.append(this.trialDbId, castOther.getTrialDbId()).append(this.trialName, castOther.getTrialName())
 				.append(this.startDate, castOther.getStartDate()).append(this.endDate, castOther.getEndDate())

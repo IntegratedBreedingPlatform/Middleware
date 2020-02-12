@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -169,7 +170,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     MAX(IF(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", "
 		+ "                 geoprop.value, "
 		+ "                 NULL)) "
-		+ "     AS locationId "
+		+ "     AS locationId,"
+		+ "		pmain.description AS studyDescription, "
+		+ "     (Select definition from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId() + ", "
+		+ "			geoprop.value, "
+		+ "			NULL)))) "
+		+ "     AS experimentalDesign,"
+		+ "		pmain.study_update AS lastUpdate"
 		+ " FROM "
 		+ "     nd_geolocation geoloc "
 		+ "         INNER JOIN "
@@ -761,6 +768,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("endDate");
 			query.addScalar("deleted");
 			query.addScalar("locationID");
+			query.addScalar("studyDescription");
+			query.addScalar("experimentalDesign");
+			query.addScalar("lastUpdate");
 			query.setParameter("geolocationId", geolocationId);
 			final Object result = query.uniqueResult();
 			if (result != null) {
@@ -780,6 +790,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				studyMetadata.setEndDate((row[8] instanceof String) ? (String) row[8] : null);
 				studyMetadata.setActive(Boolean.FALSE.equals(row[9]));
 				studyMetadata.setLocationId((row[10] instanceof String) ? Integer.parseInt((String) row[10]) : null);
+				studyMetadata.setStudyDescription((row[11] instanceof String) ? (String) row[11] : null);
+				studyMetadata.setExperimentalDesign((row[12] instanceof String) ? (String) row[12] : null);
+				studyMetadata.setLastUpdate((row[13] instanceof String) ? (String) row[13] : null);
 				return studyMetadata;
 			} else {
 				return null;
@@ -1180,7 +1193,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			if (!CollectionUtils.isEmpty(instanceIds)) {
 				sb.append(" AND geoloc.nd_geolocation_id IN (:locationIds) \n");
 			}
-			sb.append("    group by geoloc.nd_geolocation_id \n" );
+			sb.append("    group by geoloc.nd_geolocation_id \n");
 			sb.append("    order by (1 * geoloc.description) asc ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
@@ -1278,6 +1291,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
+	public DatasetDTO getDatasetByObsUnitDbId(final String observationUnitDbId) {
+		return (DatasetDTO) this.getSession().createQuery("select p.projectId as datasetId, "
+			+ " p.datasetType.datasetTypeId as datasetTypeId,"
+			+ " p.name as name,"
+			+ " p.parent.projectId as parentDatasetId"
+			+ " from DmsProject p "
+			+ "where exists ("
+			+ "   select 1 from ExperimentModel e "
+			+ "   where e.project.projectId = p.projectId"
+			+ "   and e.obsUnitId = :observationUnitDbId)")
+			.setParameter("observationUnitDbId", observationUnitDbId)
+			.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class))
+			.uniqueResult();
+	}
+
 	public DatasetDTO getDatasetOfSampleList(final Integer sampleListId) {
 
 		final DatasetDTO datasetDTO;
@@ -1372,4 +1400,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
+	public Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType) {
+		try {
+			final Query query = this.getSession().createSQLQuery("SELECT DISTINCT p.project_id"
+				+ " FROM project p "
+				+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id"
+				+ " INNER JOIN project study ON p.study_id = study.project_id AND study.deleted != " + DELETED_STUDY
+				+ " WHERE nde.nd_geolocation_id = :environmentId"
+				+ " AND p.dataset_type_id = :datasetTypeId");
+			query.setParameter("environmentId", environmentId);
+			query.setParameter("datasetTypeId", datasetType.getId());
+			return (Integer) query.uniqueResult();
+		} catch (final HibernateException e) {
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+	}
 }
