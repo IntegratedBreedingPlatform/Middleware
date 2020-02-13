@@ -446,7 +446,12 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return this.getEnvironmentGeolocationsForInstances(studyId, Collections.<Integer>emptyList());
 	}
 
-	public Boolean existInstances(final Set<Integer> instanceIds) {
+	/**
+	 * FIXME IBP-3472: make a single query
+	 *
+	 * @return TRUE if all of the instanceIds exists. Otherwise FALSE
+	 */
+	public Boolean instanceExists(final Set<Integer> instanceIds) {
 		for (final Integer instanceId : instanceIds) {
 			if (this.getById(instanceId) == null) {
 				return Boolean.FALSE;

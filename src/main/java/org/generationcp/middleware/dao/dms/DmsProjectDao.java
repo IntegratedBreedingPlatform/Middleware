@@ -1291,6 +1291,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
+	public DatasetDTO getDatasetByObsUnitDbId(final String observationUnitDbId) {
+		return (DatasetDTO) this.getSession().createQuery("select p.projectId as datasetId, "
+			+ " p.datasetType.datasetTypeId as datasetTypeId,"
+			+ " p.name as name,"
+			+ " p.parent.projectId as parentDatasetId"
+			+ " from DmsProject p "
+			+ "where exists ("
+			+ "   select 1 from ExperimentModel e "
+			+ "   where e.project.projectId = p.projectId"
+			+ "   and e.obsUnitId = :observationUnitDbId)")
+			.setParameter("observationUnitDbId", observationUnitDbId)
+			.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class))
+			.uniqueResult();
+	}
+
 	public DatasetDTO getDatasetOfSampleList(final Integer sampleListId) {
 
 		final DatasetDTO datasetDTO;
