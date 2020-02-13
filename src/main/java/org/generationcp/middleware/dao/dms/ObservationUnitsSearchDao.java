@@ -68,18 +68,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		factorsFilterMap.put(String.valueOf(TermId.DESIG.getId()), "s.name");
 		factorsFilterMap.put(String.valueOf(TermId.ENTRY_NO.getId()), "s.uniquename");
 		factorsFilterMap.put(String.valueOf(TermId.ENTRY_CODE.getId()), "s.value");
-		factorsFilterMap.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), "gl.description");
+		factorsFilterMap.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), "env.observation_unit_no");
 		factorsFilterMap.put(SUM_OF_SAMPLES_ID,
 			"EXISTS ( SELECT 1 FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id HAVING count(sample_id)");
-	}
-
-	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
-
-	static {
-		geolocSpecialFactorsMap.put("SITE_LAT", "gl.latitude");
-		geolocSpecialFactorsMap.put("SITE_LONG", "gl.longitude");
-		geolocSpecialFactorsMap.put("SITE_ALT", "gl.altitude");
-		geolocSpecialFactorsMap.put("SITE_DATUM", "gl.geodetic_datum");
 	}
 
 	private static final Map<String, String> mainVariablesMap = new HashMap<>();
@@ -87,11 +78,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	static {
 
 		mainVariablesMap.put(OBSERVATION_UNIT_ID, "    nde.nd_experiment_id as observationUnitId");
-		mainVariablesMap.put(TRIAL_INSTANCE, "    gl.description AS TRIAL_INSTANCE");
+		mainVariablesMap.put(TRIAL_INSTANCE, "    env.observation_unit_no AS TRIAL_INSTANCE");
 		mainVariablesMap.put(LOCATION_ID,
-			"    (SELECT loc.lname FROM nd_geolocationprop gprop INNER JOIN location loc on loc.locid = gprop.value WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = 8190) 'LOCATION_ID'");
+			"    (SELECT loc.lname FROM nd_experimentprop xprop INNER JOIN location loc on loc.locid = xprop.value WHERE xprop.nd_experiment_id = env.nd_experiment_id and xprop.type_id = 8190) 'LOCATION_ID'");
 		mainVariablesMap.put(EXPT_DESIGN,
-			"    (SELECT edesign.name FROM nd_geolocationprop gprop INNER JOIN cvterm edesign on edesign.cvterm_id = gprop.value WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = 8135) 'EXPT_DESIGN'");
+			"    (SELECT edesign.name FROM nd_experimentprop xprop INNER JOIN cvterm edesign on edesign.cvterm_id = xprop.value WHERE xprop.nd_experiment_id = env.nd_experiment_id and xprop.type_id = 8135) 'EXPT_DESIGN'");
 		mainVariablesMap.put(ENTRY_TYPE,
 			"    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS ENTRY_TYPE");
 		mainVariablesMap.put(GID, "    s.dbxref_id AS GID");
@@ -128,16 +119,15 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			final StringBuilder sql = new StringBuilder("select count(*) as totalObservationUnits from " //
 				+ "nd_experiment nde " //
 				+ "    inner join project p on p.project_id = nde.project_id " //
-				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 				+ "    inner join stock s ON s.stock_id = nde.stock_id " //
 				// FIXME won't work for sub-sub-obs
-				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) "
+				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id) AND plot.type_id = 1155 "
+				+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = 1020 "
 				//
-				+ " where " //
-				+ "	p.project_id = :datasetId ");
+				+ " where p.project_id = :datasetId ");
 
 			if (instanceId != null) {
-				sql.append(" and gl.nd_geolocation_id = :instanceId ");
+				sql.append(" and env.nd_experiment_id = :instanceId ");
 			}
 
 			if (Boolean.TRUE.equals(draftMode)) {
@@ -180,15 +170,16 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		try {
 			final StringBuilder sql = new StringBuilder(
-				"select count(*) as totalObservationUnits, count(distinct(gl.nd_geolocation_id)) as totalInstances from " //
+				"select count(*) as totalObservationUnits, count(distinct(env.nd_experiment_id)) as totalInstances from " //
 					+ "nd_experiment nde " //
 					+ "    inner join project p on p.project_id = nde.project_id " //
-					+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
+					+ " INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = 3 "
+					+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 "
 					+ " where " //
 					+ "	p.project_id = :datasetId ");
 
 			if (observationUnitsSearchDTO.getInstanceId() != null) {
-				sql.append(" and gl.nd_geolocation_id = :instanceId ");
+				sql.append(" and env.nd_experiment_id = :instanceId ");
 			}
 
 			final String filterByVariableSQL =
@@ -300,14 +291,14 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		sql.append(" 1 FROM " //
 			+ "	project p " //
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
-			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
+			+ "	INNER JOIN nd_experiment env ON nde.parent_id = env.nd_experiment_id AND env.type_id = 1020 " //
 			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
 			+ " WHERE p.project_id = :datasetId "); //
 
 		if (searchDto.getInstanceId() != null) {
-			sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
+			sql.append(" AND env.nd_experiment_id = :instanceId"); //
 		}
 
 		final ObservationUnitsSearchDTO.Filter filter = searchDto.getFilter();
@@ -549,16 +540,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		// Only variables at observation level are supported in filtering columns. Variables at environment level are automatically excluded if filterColumns has values.
 		if (noFilterVariables && !CollectionUtils.isEmpty(searchDto.getEnvironmentDetails())) {
 			final String envFactorFormat =
-				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s'";
-			final String geolocEnvFactorFormat =
-				" %s AS '%s'";
+				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = xprop.type_id AND ispcvt.name = '%s' WHERE xprop.nd_experiment_id = env.nd_experiment_id ) '%s'";
 			for (final MeasurementVariableDto envFactor : searchDto.getEnvironmentDetails()) {
-				if (geolocSpecialFactorsMap.containsKey(envFactor.getName())) {
-					final String column = geolocSpecialFactorsMap.get(envFactor.getName());
-					columns.add(String.format(geolocEnvFactorFormat, column, this.getEnvironmentColumnName(envFactor.getName())));
-				} else {
-					columns.add(String.format(envFactorFormat, envFactor.getName(), this.getEnvironmentColumnName(envFactor.getName())));
-				}
+				columns.add(String.format(envFactorFormat, envFactor.getName(), this.getEnvironmentColumnName(envFactor.getName())));
 			}
 		}
 
@@ -567,8 +551,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			final String envConditionFormat =
 				"    (SELECT pheno.value from phenotype pheno "
 					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.name = '%s' "
-					+ "		INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id AND envnde.project_id = :datasetEnvironmentId "
-					+ "		WHERE envnde.nd_geolocation_id = gl.nd_geolocation_id) '%s'";
+					+ "		WHERE pheno.nd_experiment_id = env.nd_experiment_id) '%s'";
 			for (final MeasurementVariableDto envCondition : searchDto.getEnvironmentConditions()) {
 				columns.add(
 					String.format(envConditionFormat, envCondition.getName(), this.getEnvironmentColumnName(envCondition.getName())));
@@ -609,7 +592,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		sql.append(" FROM " //
 			+ "	project p " //
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
-			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
@@ -622,12 +604,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "            INNER JOIN nd_experiment parent ON child.parent_id = parent.nd_experiment_id " //
 			+ "     GROUP BY parent.nd_experiment_id) child_sample_count ON child_sample_count.nd_experiment_id = nde.nd_experiment_id " //
 			// FIXME won't work for sub-sub-obs
-			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) "
+			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR (plot.nd_experiment_id = nde.nd_experiment_id) AND plot.type_id = 1155 "
+			+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = 1020 "
 			//
 			+ " WHERE p.project_id = :datasetId "); //
 
 		if (searchDto.getInstanceId() != null) {
-			sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
+			sql.append(" AND env.nd_experiment_id = :instanceId"); //
 		}
 
 		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
@@ -805,7 +788,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType,
 		final boolean performLikeOperation) {
-		// Check if the variable to be filtered is in one of the columns in stock, nd_experiment, geolocation or sum of samples
+		// Check if the variable to be filtered is in one of the columns in stock, nd_experiment, or sum of samples
 		final String observationUnitClause = VariableType.OBSERVATION_UNIT.name().equals(variableType) ? "nde.observation_unit_no" : null;
 		final String filterClause = factorsFilterMap.get(variableId);
 		// Sum of Samples, whose Id is -2, will cause an error as query parameter. Remove the "-" from the ID as workaround

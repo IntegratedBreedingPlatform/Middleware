@@ -63,7 +63,6 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 			DMSVariableTestDataInitializer.createVariable(1002, "Value", DataType.NUMERIC_VARIABLE.getId(), VariableType.TREATMENT_FACTOR));
 		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
-		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 		//Save the experiment
 		this.experimentModelSaver.addOrUpdateExperiment(new CropType(), 1, ExperimentType.STUDY_INFORMATION, values);

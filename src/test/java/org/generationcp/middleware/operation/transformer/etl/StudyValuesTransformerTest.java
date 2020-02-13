@@ -42,14 +42,12 @@ public class StudyValuesTransformerTest extends IntegrationTestBase {
 	@Test
 	public void testTransform() throws Exception {
 
-		final Integer germplasmId = Integer.valueOf(1);
-		final Integer locationId = Integer.valueOf(1);
 		final StudyDetails studyDetails = this.createStudyDetailsTestData();
 		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableListTestData();
 		final VariableTypeList varTypeList = this.createVariableTypeListTestData();
 
 		final StudyValues studyVal =
-				StudyValuesTransformerTest.transformer.transform(germplasmId, locationId, measurementVariables, varTypeList);
+				StudyValuesTransformerTest.transformer.transform(measurementVariables, varTypeList);
 
 		final VariableList result = studyVal.getVariableList();
 

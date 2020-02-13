@@ -54,7 +54,6 @@ public class PhenotypeSaverTest extends IntegrationTestBase {
 		final VariableList factors = new VariableList();
 		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
-		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 
 		//Save the experiment

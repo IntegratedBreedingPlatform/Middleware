@@ -16,7 +16,6 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.SampleService;
@@ -164,14 +163,14 @@ public class SampleServiceImpl implements SampleService {
 
 		this.fillPlotNoByExperimentProperty(experiment.getProperties(), samplesDetailsDto);
 		this.fillProjectProperties(study.getProperties(), samplesDetailsDto);
-		this.fillLocationByGeoLocationProperties(experiment.getGeoLocation().getProperties(), samplesDetailsDto);
+		this.fillLocationByGeoLocationProperties(experiment.getParent().getProperties(), samplesDetailsDto);
 
 		return samplesDetailsDto;
 	}
 
-	private void fillLocationByGeoLocationProperties(final List<GeolocationProperty> geolocationProperties,
+	private void fillLocationByGeoLocationProperties(final List<ExperimentProperty> experimentProperties,
 		final SampleDetailsDTO samplesDetailsDto) {
-		for (final GeolocationProperty properties : geolocationProperties) {
+		for (final ExperimentProperty properties : experimentProperties) {
 			if (properties.getTypeId().equals(TermId.TRIAL_LOCATION.getId()) && StringUtils.isNotBlank(properties.getValue())) {
 				samplesDetailsDto.setLocationName(properties.getValue());
 			} else if (properties.getTypeId().equals(TermId.LOCATION_ID.getId()) && StringUtils.isNotBlank(properties.getValue())) {

@@ -12,7 +12,7 @@
 package org.generationcp.middleware.domain.dms;
 
 /**
- * This class is used to store variable list, germplasmId and locationId to Experiment.
+ * This class is used to store variable list, germplasmId, locationId, and observationUnitNo to Experiment.
  *
  */
 public abstract class Values {
@@ -20,6 +20,7 @@ public abstract class Values {
 	private VariableList variableList;
 	private Integer germplasmId;
 	private Integer locationId;
+	private Integer observationUnitNo;
 
 	public Values() {
 
@@ -100,6 +101,14 @@ public abstract class Values {
 			return false;
 		}
 		return true;
+	}
+
+	public Integer getObservationUnitNo() {
+		return observationUnitNo;
+	}
+
+	public void setObservationUnitNo(final Integer observationUnitNo) {
+		this.observationUnitNo = observationUnitNo;
 	}
 
 	@Override

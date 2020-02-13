@@ -29,6 +29,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -91,10 +92,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	private TermDataManager termDataManager;
 
 	@Resource
-	private StudyDataManager studyDataManager;
-
-	@Resource
 	private WorkbookSaver workbookSaver;
+
+	private DaoFactory daoFactory;
 
 	public DataImportServiceImpl() {
 
@@ -102,6 +102,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	public DataImportServiceImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	/**
@@ -674,7 +675,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		final String studyName = workbook.getStudyDetails().getStudyName();
 		final String locationDescription = this.getLocationDescription(workbook);
-		final Integer locationId = this.getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName, locationDescription, programUUID);
+		final Integer locationId = this.getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(studyName, locationDescription, programUUID);
 
 		// same location and study
 		if (locationId != null) {
@@ -1003,12 +1004,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(name, programUUID);
 	}
 
-	@Override
-	public Integer getLocationIdByProjectNameAndDescriptionAndProgramUUID(
-		final String projectName, final String locationDescription,
+	private Integer getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(
+		final String projectName, final String instanceNumber,
 		final String programUUID) {
-		return this.getGeolocationDao()
-			.getLocationIdByProjectNameAndDescriptionAndProgramUUID(projectName, locationDescription, programUUID);
+		return this.daoFactory.getEnvironmentDao()
+			.getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(projectName, Integer.valueOf(instanceNumber), programUUID);
 	}
 
 	@Override
@@ -1157,7 +1157,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader);
 			if (locationIds.add(trialInstanceNumber)) {
 				final Integer locationId =
-					this.getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName, trialInstanceNumber, programUUID);
+					this.getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(studyName, trialInstanceNumber, programUUID);
 				// same location and study
 				if (locationId != null) {
 					duplicateTrialInstances.add(trialInstanceNumber);

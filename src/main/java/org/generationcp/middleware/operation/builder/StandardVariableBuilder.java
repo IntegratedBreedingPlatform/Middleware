@@ -473,9 +473,7 @@ public class StandardVariableBuilder extends Builder {
 			return !this.isExistsPropertyByTypeAndValue(standardVariableId, value);
 		} else if (storedInId == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
 			return !this.isExistsStocksByTypeAndValue(standardVariableId, value);
-		} else if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-			return !this.isExistsGeolocationByTypeAndValue(standardVariableId, value);
-		} else if (storedInId == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
+		} else if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() || storedInId == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
 			return !this.isExistsExperimentsByTypeAndValue(standardVariableId, value);
 		} else if (storedInId == TermId.CATEGORICAL_VARIATE.getId()) {
 			return !this.isExistsPhenotypeByTypeAndValue(standardVariableId, value, true);
@@ -484,11 +482,6 @@ public class StandardVariableBuilder extends Builder {
 		}
 	}
 
-	private boolean isExistsGeolocationByTypeAndValue(final int factorId, final String value) {
-		final Set<Integer> geolocationIds =
-			new HashSet<>(this.getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
-		return !geolocationIds.isEmpty();
-	}
 
 	private boolean isExistsStocksByTypeAndValue(final Integer factorId, final String value) {
 		final Set<Integer> stockIds = new HashSet<>(this.getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));

@@ -21,7 +21,6 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -56,7 +55,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -500,6 +498,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return dto;
 	}
 
+	// TODO IBP-3305 Rename method and parameter
 	@Override
 	public StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId) {
 		try {
@@ -534,12 +533,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 				final List<MeasurementVariable> environmentVariables = new ArrayList<>(environmentConditions);
 				environmentVariables.addAll(environmentDetails);
-				environmentParameters.addAll(createGeolocationVariables(environmentVariables, geolocationId));
+				environmentParameters.addAll(environmentVariables);
 				studyDetailsDto.setEnvironmentParameters(environmentParameters);
 
 				final Map<String, String> properties = new HashMap<>();
 				variableIds = this.getVariableIds(environmentVariables);
-				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(geolocationId, variableIds));
+				properties.putAll(this.studyDataManager.getEnvironmentVariableNameValuesMap(geolocationId, variableIds));
 				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId(), variableIds));
 				studyDetailsDto.setAdditionalInfo(properties);
 				return studyDetailsDto;
@@ -560,37 +559,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return varIds;
 	}
 
-
-	private List<MeasurementVariable> createGeolocationVariables(final List<MeasurementVariable> measurementVariables, final Integer geolocationId) {
-		final List<MeasurementVariable> geolocationVariables = new ArrayList<>();
-		final List<Integer> variableIds = this.getVariableIds(measurementVariables);
-		if(variableIds.contains(TermId.ALTITUDE.getId()) || variableIds.contains(TermId.LATITUDE.getId())
-			|| variableIds.contains(TermId.LONGITUDE.getId()) || variableIds.contains(TermId.GEODETIC_DATUM.getId())) {
-			final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(geolocationId);
-			Map<Integer, MeasurementVariable> variableMap = new HashMap<>();
-			for(MeasurementVariable mvar: measurementVariables) {
-				variableMap.put(mvar.getTermId(), mvar);
-			}
-			if(variableIds.contains(TermId.ALTITUDE.getId())) {
-				variableMap.get(TermId.ALTITUDE.getId()).setValue(geolocation.getAltitude().toString());
-				geolocationVariables.add(variableMap.get(TermId.ALTITUDE.getId()));
-			}
-			if(variableIds.contains(TermId.LATITUDE.getId())) {
-				variableMap.get(TermId.LATITUDE.getId()).setValue(geolocation.getLatitude().toString());
-				geolocationVariables.add(variableMap.get(TermId.LATITUDE.getId()));
-			}
-			if(variableIds.contains(TermId.LONGITUDE.getId())) {
-				variableMap.get(TermId.LONGITUDE.getId()).setValue(geolocation.getLongitude().toString());
-				geolocationVariables.add(variableMap.get(TermId.LONGITUDE.getId()));
-			}
-			if(variableIds.contains(TermId.GEODETIC_DATUM.getId())) {
-				variableMap.get(TermId.GEODETIC_DATUM.getId()).setValue(geolocation.getGeodeticDatum());
-				geolocationVariables.add(variableMap.get(TermId.GEODETIC_DATUM.getId()));
-			}
-
-		}
-		return geolocationVariables;
-	}
 	@Override
 	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {
 		final List queryResults;

@@ -17,13 +17,11 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -44,7 +42,6 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
@@ -105,9 +102,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
-
-	@Resource
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Resource
 	private UserService userService;
@@ -217,16 +211,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return this.studyDataManager.getDatasetReferences(studyId);
 	}
 
-	@Override
-	public Integer getGermplasmIdByName(final String name) {
-
-		final List<Germplasm> germplasmList = this.getGermplasmDataManager().getGermplasmByName(name, 0, 1, Operation.EQUAL);
-		Integer gid = null;
-		if (germplasmList != null && !germplasmList.isEmpty()) {
-			gid = germplasmList.get(0).getGid();
-		}
-		return gid;
-	}
 
 	@Override
 	public Integer getStandardVariableIdByPropertyScaleMethodRole(final String property, final String scale, final String method,
@@ -263,9 +247,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			this.workbookSaver.saveWorkbookVariables(workbook);
 			this.workbookSaver.removeDeletedVariablesAndObservations(workbook);
 
-			// save trial observations
-			this.workbookSaver.saveTrialObservations(workbook, programUUID);
-
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
 		}
@@ -286,24 +267,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			final Map<String, ?> variableMap = this.workbookSaver.saveVariables(workbook, programUUID);
 			this.workbookSaver.savePlotDataset(workbook, variableMap, programUUID, crop);
 
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
-		} finally {
-			timerWatch.stop();
-		}
-	}
-
-	@Override
-	public void deleteExperimentalDesign(
-		final Workbook workbook, final String programUUID, final CropType crop) {
-		final TimerWatch timerWatch = new TimerWatch("deleteExperimentalDesign (grand total)");
-		try {
-
-			this.workbookSaver.saveProjectProperties(workbook);
-			this.workbookSaver.removeDeletedVariablesAndObservations(workbook);
-			final Map<String, ?> variableMap = this.workbookSaver.saveVariables(workbook, programUUID);
-
-			this.workbookSaver.deleteExperimentalDesign(workbook, variableMap, programUUID, crop);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
 		} finally {
@@ -525,15 +488,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	}
 
-	@Override
-	public String getCimmytWheatGermplasmNameByGid(final int gid) {
-		List<Name> names = this.getByGidAndNtype(gid, GermplasmNameType.CIMMYT_SELECTION_HISTORY);
-		if (names == null || names.isEmpty()) {
-			names = this.getByGidAndNtype(gid, GermplasmNameType.UNRESOLVED_NAME);
-		}
-		return names != null && !names.isEmpty() ? names.get(0).getNval() : null;
-	}
-
 	private List<Name> getByGidAndNtype(final int gid, final GermplasmNameType nType) {
 		return this.getNameDao().getByGIDWithFilters(gid, null, nType);
 	}
@@ -558,48 +512,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<ValueReference> getDistinctStandardVariableValues(final int stdVarId) {
-		return this.getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
-	}
-
-	@Override
-	public List<ValueReference> getDistinctStandardVariableValues(final String property, final String scale, final String method,
-			final PhenotypicType role) {
-
-		final Integer stdVarId = this.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
-		if (stdVarId != null) {
-			return this.getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
-		}
-		return new ArrayList<>();
-	}
-
-	@Override
-	public Set<StandardVariable> getAllStandardVariables(final String programUUID) {
-		return this.getOntologyDataManager().getAllStandardVariables(programUUID);
-	}
-
-	@Override
 	public StandardVariable getStandardVariable(final int id, final String programUUID) {
 		return this.getOntologyDataManager().getStandardVariable(id, programUUID);
-	}
-
-	@Override
-	public List<ValueReference> getAllNurseryTypes(final String programUUID) {
-
-		final List<ValueReference> nurseryTypes = new ArrayList<>();
-
-		final StandardVariable stdVar = this.getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId(), programUUID);
-		final List<Enumeration> validValues = stdVar.getEnumerations();
-
-		if (validValues != null) {
-			for (final Enumeration value : validValues) {
-				if (value != null) {
-					nurseryTypes.add(new ValueReference(value.getId(), value.getName(), value.getDescription()));
-				}
-			}
-		}
-
-		return nurseryTypes;
 	}
 
 	@Override
@@ -810,39 +724,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Integer updateGermplasmList(final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList) {
-		final GermplasmListDAO germplasmListDao = this.daoFactory.getGermplasmListDAO();
-
-		final long startTime = System.currentTimeMillis();
-
-		try {
-
-			germplasmListDao.update(germplasmList);
-
-			// Save germplasms, names, list data
-			for (final Pair<Germplasm, GermplasmListData> pair : listDataItems) {
-
-				final Germplasm germplasm = pair.getLeft();
-				final GermplasmListData germplasmListData = pair.getRight();
-
-				germplasmListData.setGid(germplasm.getGid());
-				germplasmListData.setList(germplasmList);
-				this.daoFactory.getGermplasmListDataDAO().update(germplasmListData);
-			}
-
-		} catch (final MiddlewareQueryException e) {
-			FieldbookServiceImpl.LOG
-					.error("Error encountered with FieldbookService.updateNurseryCrossesGermplasmList(germplasmList=" + germplasmList
-							+ "): " + e.getMessage());
-			throw e;
-		}
-
-		FieldbookServiceImpl.LOG.debug("========== updateGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
-
-		return germplasmList.getId();
-	}
-
-	@Override
 	public int getMeasurementDatasetId(final int studyId) {
 		return this.workbookBuilder.getMeasurementDataSetId(studyId);
 	}
@@ -883,18 +764,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public String getBlockId(final int datasetId, final String trialInstance) {
-		return this.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+	public String getBlockId(final int datasetId, final Integer trialInstance) {
+		return this.studyDataManager.getBlockId(datasetId, trialInstance);
 	}
 
 	@Override
 	public String getFolderNameById(final Integer folderId) {
 		return this.studyDataManager.getFolderNameById(folderId);
-	}
-
-	@Override
-	public boolean checkIfStudyHasFieldmap(final int studyId) {
-		return this.getExperimentBuilder().checkIfStudyHasFieldmap(studyId);
 	}
 
 	@Override
@@ -910,7 +786,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public void deleteObservationsOfStudy(final int datasetId) {
 		try {
-			this.getExperimentDestroyer().deleteExperimentsByStudy(datasetId);
+			this.getExperimentDao().deleteExperimentsForDataset(datasetId);
 		} catch (final Exception e) {
 
 			this.logAndThrowException("Error encountered with deleteObservationsOfStudy(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
@@ -918,21 +794,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<MeasurementRow> buildTrialObservations(final int trialDatasetId, final List<MeasurementVariable> factorList,
-			final List<MeasurementVariable> variateList) {
-		return this.workbookBuilder.buildTrialObservations(trialDatasetId, factorList, variateList);
-	}
-
-	@Override
 	public List<Integer> getGermplasmIdsByName(final String name) {
 		return this.getNameDao().getGidsByName(name);
-	}
-
-	@Override
-	public Integer addGermplasmName(final String nameValue, final int gid, final int userId, final int nameTypeId, final int locationId,
-			final Integer date) {
-		final Name name = new Name(null, gid, nameTypeId, 0, userId, nameValue, locationId, date, 0);
-		return this.getGermplasmDataManager().addGermplasmName(name);
 	}
 
 	@Override
@@ -1094,11 +957,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public ListDataProject getListDataProjectByListIdAndEntryNo(final int listId, final int entryNo) {
-		return this.getListDataProjectDAO().getByListIdAndEntryNo(listId, entryNo);
-	}
-
-	@Override
 	public void deleteListDataProjects(final int projectId, final GermplasmListType type) {
 		// when used in advanced, it will delete all the advance lists (list
 		// data projects)
@@ -1167,20 +1025,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void addListDataProjectList(final List<ListDataProject> listDataProjectList) {
-
-		try {
-			for (final ListDataProject listDataProject : listDataProjectList) {
-				listDataProject.setList(this.getGermplasmListById(listDataProject.getList().getId()));
-				this.getListDataProjectDAO().save(listDataProject);
-			}
-		} catch (final Exception e) {
-			FieldbookServiceImpl.LOG.error(e.getMessage(), e);
-			this.logAndThrowException("Error encountered with addListDataProjectList(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
-		}
-	}
-
-	@Override
 	public StandardVariable getStandardVariableByName(final String name, final String programUUID) {
 		return this.getStandardVariableBuilder().getByName(name, programUUID);
 	}
@@ -1191,27 +1035,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	void setGermplasmGroupingService(final GermplasmGroupingService germplasmGroupingService) {
 		this.germplasmGroupingService = germplasmGroupingService;
-	}
-
-	@Override
-	public String getPlotCodePrefix(final String cropName) {
-		return this.getWorkbenchDataManager().getCropTypeByName(cropName).getPlotCodePrefix();
-	}
-
-	@Override
-	public List<GermplasmList> appendTabLabelToList(final List<GermplasmList> germplasmCrossesList) {
-		for (final Iterator<GermplasmList> iterator = germplasmCrossesList.iterator(); iterator.hasNext(); ) {
-			final GermplasmList germplasmList = iterator.next();
-
-			if (GermplasmListType.IMP_CROSS.toString().equals(germplasmList.getType())) {
-				germplasmList.setTabLabel(GermplasmList.IMP_CROSS);
-			} else if (GermplasmListType.CRT_CROSS.toString().equals(germplasmList.getType())) {
-				germplasmList.setTabLabel(GermplasmList.CRT_CROSS);
-			} else {
-				germplasmList.setTabLabel(GermplasmList.CROSSES);
-			}
-		}
-		return germplasmCrossesList;
 	}
 
 	@Override

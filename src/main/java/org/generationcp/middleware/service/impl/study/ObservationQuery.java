@@ -18,19 +18,19 @@ class ObservationQuery {
 	public static final String DEFAULT_SORT_ORDER = "asc";
 	public static final String PHENOTYPE_ID = "_PhenotypeId";
 	public static final String STATUS = "_Status";
-	public static final String INSTANCE_NUMBER_CLAUSE = " AND gl.nd_geolocation_id = :instanceId  ";
+	public static final String INSTANCE_NUMBER_CLAUSE = " AND env.nd_experiment_id = :instanceId  ";
 	public static final String GROUPING_CLAUSE = " GROUP BY nde.nd_experiment_id ";
 	public static final String OBSERVATIONS_FOR_SAMPLES = "SELECT  " + "    nde.nd_experiment_id as nd_experiment_id, "
 		+ "    (select na.nval from names na where na.gid = s.dbxref_id and na.nstat = 1 limit 1) as preferred_name, " + "    ph.value"
 		+ " as value, s.dbxref_id as gid"
 		+ " FROM  " + "    project p  "
 		+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id  "
-		+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id  "
+		+ "        INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = 1020 "
 		+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id  "
 		+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id  "
 		+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id  " + " WHERE  "
 		+ " p.project_id = :datasetId "
-		+ " AND gl.description IN (:instanceIds)  "
+		+ " AND env.observation_unit_no IN (:instanceIds)  "
 		+ " and cvterm_variable.cvterm_id = :selectionVariableId " + " GROUP BY nde.nd_experiment_id";
 
 	String getAllObservationsQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
@@ -55,14 +55,14 @@ class ObservationQuery {
 		String whereText = " WHERE p.study_id = :projectId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n";
 
 		if (instanceId != null) {
-			whereText += " AND gl.nd_geolocation_id = :instanceId ";
+			whereText += " AND env.nd_experiment_id = :instanceId ";
 		}
 
 		return " SELECT " //
 			+ "   nde.nd_experiment_id, " //
-			+ "   gl.description AS TRIAL_INSTANCE, " //
+			+ "   env.observation_unit_no AS TRIAL_INSTANCE, " //
 			+ "   proj.name AS PROJECT_NAME, " //
-			+ "   gl.nd_geolocation_id, " //
+			+ "   env.nd_experiment_id as environmentId " //
 			+ "   (SELECT iispcvt.definition " //
 			+ " 	FROM " //
 			+ "      stockprop isp " //
@@ -135,7 +135,7 @@ class ObservationQuery {
 			+ " FROM Project p " //
 			+ "    INNER JOIN project proj ON proj.project_id =  p.study_id " //
 			+ "    INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
-			+ "    INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
+			+ "    INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = 1020 "
 			+ "    INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	   LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	   LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
@@ -176,7 +176,7 @@ class ObservationQuery {
 
 		sqlBuilder.append("SELECT  ")
 			.append("    nde.nd_experiment_id, ")
-			.append("    gl.description AS TRIAL_INSTANCE, ")
+			.append("    env.nd_experiment_id AS TRIAL_INSTANCE, ")
 			.append("    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,  ")
 			.append("    s.dbxref_id AS GID, ")
 			.append("    s.name DESIGNATION, ")
@@ -225,7 +225,7 @@ class ObservationQuery {
 		sqlBuilder.append(" 1=1 FROM  ")
 			.append("	project p  ")
 			.append("	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id  ")
-			.append("	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id  ")
+			.append("	INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = 1020  ")
 			.append("	INNER JOIN stock s ON s.stock_id = nde.stock_id  ")
 			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id  ")
 			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id  ")

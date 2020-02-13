@@ -19,8 +19,8 @@ public class StudyValuesTransformer extends Transformer {
 		super(sessionProviderForLocal);
 	}
 
-	public StudyValues transform(Integer germplasmId, Integer locationId, List<MeasurementVariable> measurementVariables,
-		VariableTypeList variableTypeList) throws MiddlewareException {
+	public StudyValues transform(final List<MeasurementVariable> measurementVariables,
+		final VariableTypeList variableTypeList) {
 
 		StudyValues studyValues = new StudyValues();
 		VariableList variableList = new VariableList();
@@ -41,8 +41,6 @@ public class StudyValuesTransformer extends Transformer {
 		}
 
 		studyValues.setVariableList(variableList);
-		studyValues.setGermplasmId(germplasmId);
-		studyValues.setLocationId(locationId);
 
 		return studyValues;
 	}

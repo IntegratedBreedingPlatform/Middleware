@@ -5,7 +5,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -59,7 +58,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	private PersonDAO personDAO;
 	private SampleDao sampleDao;
 	private ExperimentDao experimentDao;
-	private GeolocationDao geolocationDao;
 	private DmsProjectDao dmsProjectDao;
 	private StockDao stockDao;
 	private ExperimentPropertyDao experimentPropertyDao;
@@ -90,9 +88,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		this.experimentPropertyDao = new ExperimentPropertyDao();
 		this.experimentPropertyDao.setSession(this.sessionProvder.getSession());
-
-		this.geolocationDao = new GeolocationDao();
-		this.geolocationDao.setSession(this.sessionProvder.getSession());
 
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
@@ -352,10 +347,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	private ExperimentModel createTestExperiment(final DmsProject project) {
 
 		final ExperimentModel experimentModel = new ExperimentModel();
-		final Geolocation geolocation = new Geolocation();
-		this.geolocationDao.saveOrUpdate(geolocation);
-
-		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(project);
 		experimentModel.setObservationUnitNo(1);

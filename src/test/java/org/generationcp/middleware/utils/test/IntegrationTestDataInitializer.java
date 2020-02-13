@@ -7,8 +7,6 @@ import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
-import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
@@ -58,8 +56,6 @@ public class IntegrationTestDataInitializer {
 
 	private ExperimentDao experimentDao;
 	private ExperimentPropertyDao experimentPropertyDao;
-	private GeolocationDao geolocationDao;
-	private GeolocationPropertyDao geolocationPropertyDao;
 	private StockDao stockDao;
 	private DmsProjectDao dmsProjectDao;
 	private GermplasmDAO germplasmDao;
@@ -77,8 +73,6 @@ public class IntegrationTestDataInitializer {
 		final HibernateSessionProvider workbenchSessionProvider) {
 		this.daoFactory = new DaoFactory(hibernateSessionProvider);
 		this.experimentDao = this.daoFactory.getExperimentDao();
-		this.geolocationDao = this.daoFactory.getGeolocationDao();
-		this.geolocationPropertyDao = this.daoFactory.getGeolocationPropertyDao();
 		this.stockDao = this.daoFactory.getStockDao();
 		this.dmsProjectDao = this.daoFactory.getDmsProjectDAO();
 		this.germplasmDao = this.daoFactory.getGermplasmDao();
@@ -108,6 +102,8 @@ public class IntegrationTestDataInitializer {
 		return dmsProject;
 	}
 
+	// TODO IBP-3390
+	@Deprecated
 	public Geolocation createTestGeolocation(final String trialNumber, final int locationId) {
 
 		final Geolocation geolocation = new Geolocation();
@@ -120,8 +116,6 @@ public class IntegrationTestDataInitializer {
 
 		geolocation.setProperties(Arrays.asList(geolocationPropertyLocationId));
 		geolocation.setDescription(trialNumber);
-		this.geolocationDao.saveOrUpdate(geolocation);
-		this.geolocationDao.refresh(geolocation);
 
 		return geolocation;
 
@@ -147,7 +141,6 @@ public class IntegrationTestDataInitializer {
 		final String value, final ExperimentModel parent) {
 
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setTypeId(experimentType);
 		experimentModel.setProject(project);
 		experimentModel.setObservationUnitNo(1);
@@ -250,6 +243,8 @@ public class IntegrationTestDataInitializer {
 
 	}
 
+	//  TODO IBP-3389
+	@Deprecated
 	public void addGeolocationProp(final Geolocation geolocation, final int type, final String value, final int rank) {
 
 		final GeolocationProperty geolocationProperty = new GeolocationProperty();
@@ -257,8 +252,6 @@ public class IntegrationTestDataInitializer {
 		geolocationProperty.setRank(rank);
 		geolocationProperty.setType(type);
 		geolocationProperty.setGeolocation(geolocation);
-		this.geolocationPropertyDao.save(geolocationProperty);
-		this.geolocationPropertyDao.refresh(geolocationProperty);
 
 	}
 

@@ -192,22 +192,6 @@ public class ExperimentDaoTest {
 	}
 
 	@Test
-	public void testGetExperimentIdByLocationIdStockId() {
-		final int expectedValue = 1111;
-		Mockito.doReturn(expectedValue).when(this.mockQuery).uniqueResult();
-		final int projectId = 2022;
-		final int locationId = 3033;
-		final int stockId = 4044;
-		final int experimentId = this.experimentDao.getExperimentIdByLocationIdStockId(projectId, locationId, stockId);
-		final String expectedSql = "SELECT exp.nd_experiment_id " + "FROM nd_experiment exp " + " WHERE exp.project_id = " + projectId
-				+ " AND exp.nd_geolocation_id = " + locationId + " AND exp.type_id = 1170 " + " AND exp.stock_id = " + stockId;
-		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
-		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-		Assert.assertEquals(expectedValue, experimentId);
-	}
-
-	@Test
 	public void testDeleteExperimentsByIds() {
 		final List<Integer> experimentIds = Arrays.asList(11, 22, 33);
 		this.experimentDao.deleteExperimentsByIds(experimentIds);
@@ -251,7 +235,7 @@ public class ExperimentDaoTest {
 	@Test
 	public void testDeleteTrialExperimentsOfStudy() {
 		final int studyId = 1234;
-		this.experimentDao.deleteTrialExperimentsOfStudy(studyId);
+		this.experimentDao.deleteExperimentsForDataset(studyId);
 
 		Mockito.verify(this.mockSession).flush();
 		final String deletePhenotypeSql = "DELETE pheno FROM nd_experiment e"

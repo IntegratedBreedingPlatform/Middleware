@@ -16,8 +16,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
-import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
@@ -65,10 +63,6 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
 	private ExperimentDao experimentDao;
 
-	private GeolocationDao geolocationDao;
-
-	private GeolocationPropertyDao geolocationPropertyDao;
-
 	private StockDao stockDao;
 
 	private GermplasmDAO germplasmDao;
@@ -81,21 +75,6 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-
-		if (this.geolocationDao == null) {
-			this.geolocationDao = new GeolocationDao();
-			this.geolocationDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.geolocationDao == null) {
-			this.geolocationDao = new GeolocationDao();
-			this.geolocationDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.geolocationPropertyDao == null) {
-			this.geolocationPropertyDao = new GeolocationPropertyDao();
-			this.geolocationPropertyDao.setSession(this.sessionProvder.getSession());
-		}
 
 		if (this.germplasmDao == null) {
 			this.germplasmDao = new GermplasmDAO();
@@ -274,14 +253,12 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription("1");
-		this.geolocationDao.saveOrUpdate(geolocation);
 
 		final GeolocationProperty geolocationProperty = new GeolocationProperty();
 		geolocationProperty.setGeolocation(geolocation);
 		geolocationProperty.setType(TermId.LOCATION_ID.getId());
 		geolocationProperty.setRank(1);
 		geolocationProperty.setValue(locationId);
-		this.geolocationPropertyDao.save(geolocationProperty);
 
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		germplasm.setGid(null);
@@ -296,7 +273,6 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		this.stockDao.saveOrUpdate(stockModel);
 
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(plot);
 		experimentModel.setStock(stockModel);

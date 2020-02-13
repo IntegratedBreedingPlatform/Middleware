@@ -28,7 +28,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Hibernate;
@@ -36,6 +36,7 @@ import org.hibernate.Hibernate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -69,7 +70,7 @@ public class ProjectPropertySaver {
 
 	public void saveProjectProperties(final DmsProject project, final VariableTypeList variableTypeList, final VariableList variableList) {
 		final List<ProjectProperty> properties = this.create(project, variableTypeList, variableList);
-		final ProjectPropertyDao projectPropertyDao = this.saver.getProjectPropertyDao();
+		final ProjectPropertyDao projectPropertyDao = this.daoFactory.getProjectPropertyDAO();
 		for (final ProjectProperty property : properties) {
 			property.setProject(project);
 			projectPropertyDao.save(property);
@@ -158,14 +159,14 @@ public class ProjectPropertySaver {
 		property.setProject(project);
 		property.setVariableId(variableId);
 		property.setAlias(alias);
-		this.saver.getProjectPropertyDao().save(property);
+		this.daoFactory.getProjectPropertyDAO().save(property);
 		project.addProperty(property);
 	}
 
-	public void createProjectPropertyIfNecessary(final DmsProject project, final TermId termId, final PhenotypicType role) {
-		final ProjectProperty property = this.saver.getProjectPropertyDao().getByStandardVariableId(project, termId.getId());
+	void createProjectPropertyIfNecessary(final DmsProject project, final TermId termId, final PhenotypicType role) {
+		final ProjectProperty property = this.daoFactory.getProjectPropertyDAO().getByStandardVariableId(project, termId.getId());
 		if (property == null) {
-			final int rank = this.saver.getProjectPropertyDao().getNextRank(project.getProjectId());
+			final int rank = this.daoFactory.getProjectPropertyDAO().getNextRank(project.getProjectId());
 			final StandardVariable stdvar = new StandardVariable();
 			stdvar.setId(termId.getId());
 			stdvar.setPhenotypicType(role);
@@ -182,15 +183,16 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	public void saveProjectProperties(final DmsProject study, final DmsProject trialDataset, final DmsProject measurementDataset,
+	void saveProjectProperties(final DmsProject study, final DmsProject trialDataset, final DmsProject measurementDataset,
 			final List<MeasurementVariable> variables, final boolean isConstant) {
 
 		if (variables != null) {
 
 			int rank = this.getNextRank(study);
-			final Set<Integer> geoIds = this.saver.getGeolocationDao().getLocationIds(study.getProjectId());
-			final Geolocation geolocation = this.saver.getGeolocationDao().getById(geoIds.iterator().next());
-			Hibernate.initialize(geolocation.getProperties());
+			final List<Integer> environmentIds = this.daoFactory.getEnvironmentDao().getEnvironmentIds(study.getProjectId());
+			final Set<Integer> geoIds = new HashSet<>(environmentIds);
+			final ExperimentModel environment = this.daoFactory.getEnvironmentDao().getById(geoIds.iterator().next());
+			Hibernate.initialize(environment.getProperties());
 
 			for (final MeasurementVariable variable : variables) {
 				final Operation operation = variable.getOperation();
@@ -199,14 +201,14 @@ public class ProjectPropertySaver {
 				}
 				switch (operation) {
 					case DELETE:
-						this.deleteVariable(study, trialDataset, measurementDataset, variable.getRole(), variable.getTermId(), geolocation);
+						this.deleteVariable(study, trialDataset, measurementDataset, variable.getRole(), variable.getTermId());
 						break;
 					case ADD:
-						this.insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant, geolocation);
+						this.insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant, environment);
 						rank++;
 						break;
 					case UPDATE:
-						this.updateVariable(study, trialDataset, measurementDataset, variable, isConstant, geolocation);
+						this.updateVariable(study, trialDataset, measurementDataset, variable, isConstant, environment);
 						break;
 					default:
 						break;
@@ -227,13 +229,8 @@ public class ProjectPropertySaver {
 		return nextRank;
 	}
 
-	private boolean isInGeolocation(final int termId) {
-		return TermId.TRIAL_INSTANCE_FACTOR.getId() == termId || TermId.LATITUDE.getId() == termId || TermId.LONGITUDE.getId() == termId
-				|| TermId.GEODETIC_DATUM.getId() == termId || TermId.ALTITUDE.getId() == termId;
-	}
-
 	private void insertVariable(final DmsProject project, final DmsProject trialDataset, final DmsProject measurementDataset,
-			final MeasurementVariable variable, final int rank, final boolean isConstant, final Geolocation geolocation) {
+			final MeasurementVariable variable, final int rank, final boolean isConstant, final ExperimentModel environment) {
 
 		if (PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
 			final int datasetRank = this.getNextRank(trialDataset);
@@ -245,12 +242,9 @@ public class ProjectPropertySaver {
 			if (variable.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 				this.insertVariable(measurementDataset, variable, measurementRank);
 			}
-			if (this.isInGeolocation(variable.getTermId())) {
-				this.saver.getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getValue());
-				this.saver.getGeolocationDao().saveOrUpdate(geolocation);
-			} else {
-				this.saver.getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
-			}
+
+			this.saver.getExperimentPropertySaver().saveOrUpdateProperty(environment, variable.getTermId(), variable.getValue());
+
 
 		} else if (PhenotypicType.VARIATE == variable.getRole()) {
 
@@ -277,14 +271,14 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	protected void insertVariable(final DmsProject project, final MeasurementVariable variable, final int rank) {
+	void insertVariable(final DmsProject project, final MeasurementVariable variable, final int rank) {
 		if (project.getProperties() == null) {
-			project.setProperties(new ArrayList<ProjectProperty>());
+			project.setProperties(new ArrayList<>());
 		}
 		this.saveVariableType(project, this.createVariableType(variable, rank), variable.getValue());
 	}
 
-	protected DMSVariableType createVariableType(final MeasurementVariable variable, final int rank) {
+	DMSVariableType createVariableType(final MeasurementVariable variable, final int rank) {
 		final DMSVariableType varType = new DMSVariableType();
 		final StandardVariable stdVariable = new StandardVariable();
 
@@ -309,7 +303,7 @@ public class ProjectPropertySaver {
 	}
 
 	private void updateVariable(final DmsProject project, final DmsProject trialDataset, final DmsProject measurementDataset,
-		final MeasurementVariable variable, final boolean isConstant, final Geolocation geolocation) {
+		final MeasurementVariable variable, final boolean isConstant, final ExperimentModel environment) {
 		if (TermId.TRIAL_INSTANCE_FACTOR.getId() != variable.getTermId()) {
 
 			if (PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
@@ -317,12 +311,7 @@ public class ProjectPropertySaver {
 				this.updateVariable(trialDataset, variable);
 				this.updateVariable(measurementDataset, variable);
 
-				if (this.isInGeolocation(variable.getTermId())) {
-					this.saver.getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getValue());
-					this.saver.getGeolocationDao().saveOrUpdate(geolocation);
-				} else {
-					this.saver.getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
-				}
+				this.saver.getExperimentPropertySaver().saveOrUpdateProperty(environment, variable.getTermId(), variable.getValue());
 
 			} else if (PhenotypicType.VARIATE == variable.getRole()) {
 
@@ -357,7 +346,7 @@ public class ProjectPropertySaver {
 				if (property.getVariableId().equals(variable.getTermId())) {
 					property.setValue(variable.getValue());
 					property.setAlias(variable.getName());
-					this.saver.getProjectPropertyDao().update(property);
+					this.daoFactory.getProjectPropertyDAO().update(property);
 					break;
 				}
 			}
@@ -365,18 +354,14 @@ public class ProjectPropertySaver {
 	}
 
 	private void deleteVariable(final DmsProject project, final DmsProject trialDataset, final DmsProject measurementDataset,
-			final PhenotypicType role, final int termId, final Geolocation geolocation) {
+			final PhenotypicType role, final int termId) {
 
 		if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
 			this.deleteVariable(trialDataset, termId);
 			this.deleteVariable(measurementDataset, termId);
 
-			if (this.isInGeolocation(termId)) {
-				this.saver.getGeolocationSaver().setGeolocation(geolocation, termId, null);
-				this.saver.getGeolocationDao().saveOrUpdate(geolocation);
-			} else {
-				this.saver.getGeolocationPropertyDao().deletePropertiesInDataset(project.getProjectId(), Collections.singletonList(termId));
-			}
+			this.daoFactory.getEnvironmentPropertyDao().deletePropertiesInDataset(project.getProjectId(), Collections.singletonList(termId));
+
 
 		} else if (PhenotypicType.VARIATE == role) {
 			// for constants
@@ -399,7 +384,7 @@ public class ProjectPropertySaver {
 			final List<ProjectProperty> deletedProjectProperties = new ArrayList<>();
 			for (final ProjectProperty property : project.getProperties()) {
 				if (property.getVariableId().equals(termId)) {
-					this.saver.getProjectPropertyDao().makeTransient(property);
+					this.daoFactory.getProjectPropertyDAO().makeTransient(property);
 					deletedProjectProperties.add(property);
 				}
 			}
@@ -417,7 +402,7 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	public void saveFactors(final DmsProject measurementDataset, final List<MeasurementVariable> variables) {
+	void saveFactors(final DmsProject measurementDataset, final List<MeasurementVariable> variables) {
 		if (variables != null && !variables.isEmpty()) {
 			for (final MeasurementVariable variable : variables) {
 				final Operation operation = variable.getOperation();
@@ -443,8 +428,8 @@ public class ProjectPropertySaver {
 	}
 
 	public void updateVariablesRanking(final int datasetId, final List<Integer> variableIds) {
-		int rank = this.saver.getProjectPropertyDao().getNextRank(datasetId);
-		final List<ProjectProperty> projectProperties =  this.saver.getProjectPropertyDao().getByProjectId(datasetId);
+		int rank = this.daoFactory.getProjectPropertyDAO().getNextRank(datasetId);
+		final List<ProjectProperty> projectProperties =  this.daoFactory.getProjectPropertyDAO().getByProjectId(datasetId);
 
 		rank = this.updateVariableRank(variableIds, rank, projectProperties);
 
@@ -455,7 +440,7 @@ public class ProjectPropertySaver {
 		storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
 
 		final List<Integer> germplasmPlotVariateIds =
-				this.saver.getProjectPropertyDao().getDatasetVariableIdsForVariableTypeIds(datasetId, storedInIds, variableIds);
+				this.daoFactory.getProjectPropertyDAO().getDatasetVariableIdsForVariableTypeIds(datasetId, storedInIds, variableIds);
 		this.updateVariableRank(germplasmPlotVariateIds, rank, projectProperties);
 	}
 
@@ -467,7 +452,7 @@ public class ProjectPropertySaver {
 			for (final ProjectProperty pp: projectProperties) {
 				if (pp.getVariableId().equals(variableId)) {
 					pp.setRank(rank);
-					this.saver.getProjectPropertyDao().saveOrUpdate(pp);
+					this.daoFactory.getProjectPropertyDAO().saveOrUpdate(pp);
 					rank++;
 				}
 			}

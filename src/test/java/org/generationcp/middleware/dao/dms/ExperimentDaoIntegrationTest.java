@@ -75,7 +75,6 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 
 		// Save a new experiment
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setGeoLocation(existingExperiment.getGeoLocation());
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(this.study);
 		experimentModel.setStock(existingExperiment.getStock());
@@ -97,7 +96,6 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 
 		// Save a new experiment
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setGeoLocation(existingExperiment.getGeoLocation());
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(this.study);
 		experimentModel.setStock(existingExperiment.getStock());
@@ -148,7 +146,6 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 
 		// Save a new experiment
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setGeoLocation(existingExperiment.getGeoLocation());
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(this.study);
 		experimentModel.setStock(existingExperiment.getStock());
@@ -215,7 +212,7 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 		this.testDataInitializer.createTestExperiment(someSummary, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "1", null);
 		this.testDataInitializer.createTestExperiment(someSummary, instance2, TermId.SUMMARY_EXPERIMENT.getId(), "2", null);
 
-		final List<Integer> instanceIds = this.experimentDao.getLocationIdsOfStudy(someStudy.getProjectId());
+		final List<Integer> instanceIds = this.experimentDao.getInstanceIds(someStudy.getProjectId());
 		Assert.assertTrue(instanceIds.contains(instance1.getLocationId()));
 		Assert.assertTrue(instanceIds.contains(instance2.getLocationId()));
 

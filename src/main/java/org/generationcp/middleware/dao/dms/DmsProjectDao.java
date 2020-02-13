@@ -68,6 +68,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -154,21 +155,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ " AND p.deleted != " + DELETED_STUDY
 			+ " AND p.program_uuid = :program_uuid ";
 
-	private static final String GET_STUDY_METADATA_BY_GEOLOCATION_ID = " SELECT  "
-		+ "     geoloc.nd_geolocation_id AS studyDbId, "
+	private static final String GET_STUDY_METADATA_BY_ENVIRONMENT_ID = " SELECT  "
+		+ "     nde.nd_experiment_id_id AS studyDbId, "
 		+ "     pmain.project_id AS trialOrNurseryId, "
-		+ "		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS studyName, "
+		+ "		CONCAT(pmain.name, ' Environment Number ', nde.observation_unit_no) AS studyName, "
 		+ "     pmain.study_type_id AS studyType, "
-		+ "     MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR.getId() + ", "
-		+ "                 geoprop.value, "
+		+ "     MAX(IF(xprop.type_id = " + TermId.SEASON_VAR.getId() + ", "
+		+ "                 xprop.value, "
 		+ "                 NULL)) AS seasonId, "
 		+ "     pmain.project_id AS trialDbId, "
 		+ " 	pmain.name AS trialName, "
 		+ "     MAX(pmain.start_date) AS startDate, "
 		+ "     MAX(pmain.end_date) AS endDate, "
 		+ "     pmain.deleted, "
-		+ "     MAX(IF(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", "
-		+ "                 geoprop.value, "
+		+ "     MAX(IF(xprop.type_id = " + TermId.LOCATION_ID.getId() + ", "
+		+ "                 xprop.value, "
 		+ "                 NULL)) "
 		+ "     AS locationId,"
 		+ "		pmain.description AS studyDescription, "
@@ -178,59 +179,58 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     AS experimentalDesign,"
 		+ "		pmain.study_update AS lastUpdate"
 		+ " FROM "
-		+ "     nd_geolocation geoloc "
-		+ "         INNER JOIN "
-		+ "     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id "
+		+ "     nd_experiment nde "
 		+ "         INNER JOIN "
 		+ "     project proj ON proj.project_id = nde.project_id "
 		+ "         INNER JOIN "
 		+ "     project pmain ON pmain.project_id = proj.study_id "
 		+ "         LEFT OUTER JOIN "
-		+ "     nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id "
+		+ "     nd_experimentprop xprop ON xprop.nd_experiment_id = nde.nd_experiment_id "
 		+ "         LEFT OUTER JOIN "
 		+ "     projectprop pProp ON pmain.project_id = pProp.project_id "
 		+ " WHERE "
 		+ "     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
-		+ "         AND geoloc.nd_geolocation_id = :geolocationId "
-		+ " GROUP BY geoloc.nd_geolocation_id ";
+		+ "         AND nde.nd_experiment_id = :environmentId "
+		+ " GROUP BY nde.nd_experiment_id ";
 
 	private static final String GET_PROJECTID_BY_STUDYDBID =
 		"SELECT DISTINCT p.study_id"
 			+ " FROM project p "
 			+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id"
-			+ " WHERE nde.nd_geolocation_id = :studyDbId"
+			+ " WHERE nde.nd_experiment_id = :studyDbId"
 			+ " AND p.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId();
 
 	private static final String STUDY_DETAILS_SQL = " SELECT DISTINCT \n"
-		+ "   p.name                     AS name, \n"
-		+ "   p.description              AS title, \n"
-		+ "   p.objective                AS objective, \n"
-		+ "   p.start_date      		 AS startDate, \n"
-		+ "   p.end_date		         AS endDate, \n"
+		+ "   pmain.name                     AS name, \n"
+		+ "   pmain.description              AS title, \n"
+		+ "   pmain.objective                AS objective, \n"
+		+ "   pmain.start_date      		 AS startDate, \n"
+		+ "   pmain.end_date		         AS endDate, \n"
 		+ "   stype.study_type_id        AS studyTypeId, \n"
 		+ "   stype.label                AS studyTypeLabel, \n"
 		+ "   stype.name                 AS studyTypeName, \n"
 		+ "   ppPI.value                 AS piName, \n"
-		+ "   gpSiteName.value           AS siteName, \n"
-		+ "   p.project_id               AS id, \n"
+		+ "   siteName.value           AS siteName, \n"
+		+ "   pmain.project_id               AS id, \n"
 		+ "   ppPIid.value               AS piId, \n"
-		+ "   gpSiteId.value             AS siteId, \n"
-		+ "   p.parent_project_id 		 AS folderId, \n"
-		+ "   p.program_uuid             AS programUUID, \n"
-		+ "	  p.study_update 			 AS studyUpdate, \n"
-		+ "	  p.created_by               AS createdBy, \n"
-		+ "   p.locked                   AS isLocked "
+		+ "   siteId.value             AS siteId, \n"
+		+ "   pmain.parent_project_id 		 AS folderId, \n"
+		+ "   pmain.program_uuid             AS programUUID, \n"
+		+ "	  pmain.study_update 			 AS studyUpdate, \n"
+		+ "	  pmain.created_by               AS createdBy, \n"
+		+ "   pmain.locked                   AS isLocked "
 		+ " FROM \n"
 		+ "   project p \n"
-		+ "   INNER JOIN study_type stype on stype.study_type_id = p.study_type_id"
-		+ "   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.variable_id = " + TermId.PI_NAME.getId() + " \n"
-		+ "   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id AND ppPIid.variable_id = " + TermId.PI_ID.getId() + " \n"
-		+ "   LEFT JOIN nd_experiment e ON e.project_id = p.project_id \n"
-		+ "   LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id AND gpSiteName.type_id = "
+		+ "   INNER JOIN project pmain ON pmain.project_id = p.study_id "
+		+ "   INNER JOIN study_type stype on stype.study_type_id = pmain.study_type_id"
+		+ "   LEFT JOIN projectprop ppPI ON pmain.project_id = ppPI.project_id AND ppPI.variable_id = " + TermId.PI_NAME.getId() + " \n"
+		+ "   LEFT JOIN projectprop ppPIid ON pmain.project_id = ppPIid.project_id AND ppPIid.variable_id = " + TermId.PI_ID.getId() + " \n"
+		+ "   LEFT JOIN nd_experiment e ON e.project_id = p.project_id \n AND e.type_id = 1020 "
+		+ "   LEFT JOIN nd_experimentprop siteName ON e.nd_experiment_id = siteName.nd_experiment_id AND siteName.type_id = "
 		+ TermId.TRIAL_LOCATION.getId() + " \n"
-		+ "   LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id AND gpSiteId.type_id = "
+		+ "   LEFT JOIN nd_experimentprop siteId ON e.nd_experiment_id = siteId.nd_experiment_id AND siteId.type_id = "
 		+ TermId.LOCATION_ID.getId() + " \n"
-		+ " WHERE p.project_id = :studyId \n";
+		+ " WHERE p.study_id = :studyId \n";
 
 	private static final String COUNT_PROJECTS_WITH_VARIABLE =
 		"SELECT count(pp.project_id)  FROM projectprop pp inner join project p on (p.project_id = pp.project_id)\n"
@@ -339,32 +339,38 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<StudyDetails> getAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {
-		return this.getAllStudyDetails(studyType, programUUID, -1, -1);
+		return this.getAllStudyDetails(Optional.of(studyType), programUUID, -1, -1);
 	}
 
 	public List<StudyDetails> getAllStudyDetails(
-		final StudyTypeDto studyType, final String programUUID, final int start,
+		final Optional<StudyTypeDto> studyType, final String programUUID, final int start,
 		final int numOfRows) {
 		final List<StudyDetails> studyDetails = new ArrayList<>();
 
+		// Location-related information comes from first instance
 		final StringBuilder sqlString = new StringBuilder().append(
-			"SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
-			.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
-			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy, p.locked as isLocked ")
-			.append("FROM project p ")
-			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
+			"SELECT DISTINCT pmain.name AS name, pmain.description AS title, pmain.objective AS objective, pmain.start_date AS startDate, ")
+			.append("pmain.end_date AS endDate, st.study_type_id AS studyTypeId, st.label as studyTypelabel, st.name as studyTypeName, ")
+			.append(" ppPI.value AS piName, siteName.value AS siteName, pmain.project_id AS id ")
+			.append(", ppPIid.value AS piId, siteId.value AS siteId, pmain.created_by as createdBy, pmain.locked as isLocked ")
+			.append(" FROM project p ")
+			.append(" INNER JOIN project pmain ON pmain.project_id = p.study_id ")
+			.append("   LEFT JOIN projectprop ppPI ON pmain.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
-			.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
+			.append("   LEFT JOIN projectprop ppPIid ON pmain.project_id = ppPIid.project_id ")
 			.append("                   AND ppPIid.variable_id =  ").append(TermId.PI_ID.getId()).append(" ")
-			.append("       LEFT JOIN nd_experiment e ON p.project_id = e.project_id ")
-			.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
-			.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
-			.append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
-			.append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
-			.append(" WHERE p.deleted != " + DELETED_STUDY + " ")
-			.append(" AND p.study_type_id = '" + studyType.getId() + "'")
-			.append(" AND (p.program_uuid = :" + DmsProjectDao.PROGRAM_UUID + " ").append("OR p.program_uuid IS NULL) ")
-			.append(" ORDER BY p.name ");
+			.append("   LEFT JOIN nd_experiment e ON p.project_id = e.project_id AND e.type_id = 1020 and e.observation_unit_no = 1")
+			.append("   LEFT JOIN nd_experimentprop siteName ON e.nd_experiment_id = siteName.nd_experiment_id ")
+			.append("           AND siteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
+			.append("   LEFT JOIN nd_experimentprop siteId ON e.nd_experiment_id = siteId.nd_experiment_id ")
+			.append("           AND siteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
+			.append("	LEFT JOIN study_type st ON st.study_type_id = pmain.study_type_id ")
+			.append(" WHERE pmain.deleted != " + DELETED_STUDY + " ");
+		if (studyType.isPresent()) {
+			sqlString.append(" AND pmain.study_type_id = '" + studyType.get().getId() + "'");
+		}
+		sqlString.append(" AND (pmain.program_uuid = :" + DmsProjectDao.PROGRAM_UUID + " ").append("OR pmain.program_uuid IS NULL) ")
+			.append(" ORDER BY pmain.name ");
 		if (start > 0 && numOfRows > 0) {
 			sqlString.append(" LIMIT " + start + "," + numOfRows);
 		}
@@ -374,7 +380,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			final Query query =
 				this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
-					.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
+					.addScalar("startDate").addScalar("endDate").addScalar("studyTypeId").addScalar("studyTypeLabel")
+					.addScalar("studyTypeName").addScalar("piName").addScalar("siteName").addScalar("id")
 					.addScalar("piId").addScalar("siteId").addScalar("createdBy").addScalar("isLocked").setParameter(
 					DmsProjectDao.PROGRAM_UUID,
 					programUUID);
@@ -393,16 +400,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final String objective = (String) row[2];
 			final String startDate = (String) row[3];
 			final String endDate = (String) row[4];
-			final String piName = (String) row[5];
-			final String siteName = (String) row[6];
-			final Integer id = (Integer) row[7];
-			final String piId = (String) row[8];
-			final String siteId = (String) row[9];
-			final String createdBy = (String) row[10];
-			final Boolean isLocked = (Boolean) row[11];
+			final Integer studyTypeId = (Integer) row[5];
+			final String studyTypeLabel = (String) row[6];
+			final String studyTypeName = (String) row[7];
+			final String piName = (String) row[8];
+			final String siteName = (String) row[9];
+			final Integer id = (Integer) row[10];
+			final String piId = (String) row[11];
+			final String siteId = (String) row[12];
+			final String createdBy = (String) row[13];
+			final Boolean isLocked = (Boolean) row[14];
 
+			final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, studyTypeLabel, studyTypeName);
 			final StudyDetails study =
-				new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId, Util
+				new StudyDetails(id, name, title, objective, startDate, endDate, studyTypeDto, piName, siteName, piId, siteId, Util
 					.getCurrentDateAsStringValue(), createdBy, isLocked);
 			studyDetails.add(study);
 		}
@@ -457,7 +468,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error in getTrialObservationTable() query in DmsProjectDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyDetails;
 	}
@@ -467,13 +478,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final StringBuilder sqlString =
 				new StringBuilder()
 					.append("SELECT COUNT(1) ").append("FROM project p ")
-					.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
-					.append("                   AND ppPI.variable_id =  ")
-					.append(TermId.PI_NAME.getId())
-					.append(" ")
-					.append("       LEFT JOIN nd_experiment e ON p.project_id = e.project_id ")
-					.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
-					.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
 					.append("WHERE p.deleted != " + DELETED_STUDY + " ")
 					.append(" AND p.study_type_id = '" + studyType.getId())
 					.append("'   AND (p.").append(DmsProjectDao.PROGRAM_UUID)
@@ -493,78 +497,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<StudyDetails> getAllStudyDetails(final String programUUID, final int start, final int numOfRows) {
-		final List<StudyDetails> studyDetails = new ArrayList<>();
-		try {
-
-			final StringBuilder sqlString = new StringBuilder()
-				.append("SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
-				.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, st"
-					+ ".study_type_id AS "
-					+ "studyType , st.label as label, st.name as studyTypeName, st.visible as visible, st.cvterm_id as cvtermId ")
-				.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy, p.locked as isLocked ")
-				.append("FROM project p ")
-				.append(" LEFT JOIN projectprop  ppPI ON p.project_id = ppPI.project_id ").append(" AND ppPI.variable_id =  ")
-				.append(TermId.PI_NAME.getId()).append(" ")
-				// 8100
-				.append(" LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
-				.append(" AND ppPIid.variable_id =  ").append(TermId.PI_ID.getId()).append(" ")
-				.append(" INNER JOIN nd_experiment e ON e.project_id = p.project_id ")
-				.append(" LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
-				.append(" AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
-				// 8180
-				.append(" LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
-				.append(" AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
-				.append(" LEFT JOIN study_type st ON p.study_type_id = st.study_type_id ")
-				.append(" WHERE p.deleted != " + DELETED_STUDY + " ")
-				.append(" AND p.study_type_id IS NOT NULL ")
-				.append(" AND (p.program_uuid = :" + DmsProjectDao.PROGRAM_UUID + " ").append("OR p.program_uuid IS NULL) ")
-				.append(" ORDER BY p.name ");
-			if (start > 0 && numOfRows > 0) {
-				sqlString.append(" LIMIT " + start + "," + numOfRows);
-			}
-
-			final Query query =
-				this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
-					.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
-					.addScalar("studyType").addScalar("label").addScalar("studyTypeName").addScalar("visible").addScalar("cvTermId")
-					.addScalar("piId").addScalar("siteId").addScalar("createdBy").addScalar("isLocked")
-					.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
-
-			final List<Object[]> list = query.list();
-
-			if (list != null && !list.isEmpty()) {
-				for (final Object[] row : list) {
-					final String name = (String) row[0];
-					final String title = (String) row[1];
-					final String objective = (String) row[2];
-					final String startDate = (String) row[3];
-					final String endDate = (String) row[4];
-					final String piName = (String) row[5];
-					final String siteName = (String) row[6];
-					final Integer id = (Integer) row[7];
-					final Integer studyTypeId = (Integer) row[8];
-					final String label = (String) row[9];
-					final String studyTypeName = (String) row[10];
-					final boolean visible = ((Byte) row[11]) == 1;
-					final Integer cvTermId = (Integer) row[12];
-					final String piId = (String) row[13];
-					final String siteId = (String) row[14];
-					final String createdBy = (String) row[15];
-					final Boolean isLocked = (Boolean) row[16];
-
-					final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvTermId, visible);
-					studyDetails.add(
-						new StudyDetails(id, name, title, objective, startDate, endDate, studyTypeDto, piName, siteName, piId, siteId,
-							Util.getCurrentDateAsStringValue(), createdBy, isLocked));
-				}
-			}
-
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error in getAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
-		}
-		return studyDetails;
-
+		return this.getAllStudyDetails(Optional.empty(), programUUID, start, numOfRows);
 	}
 
 	public long countAllStudyDetails(final String programUUID) {
@@ -573,18 +506,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final StringBuilder sqlString =
 				new StringBuilder()
 					.append("SELECT COUNT(1) ").append("FROM project p ")
-					.append(" ")
-					.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
-					.append("                   AND ppPI.variable_id =  ")
-					.append(TermId.PI_NAME.getId())
-					.append(" ")
-					// 8100
-					.append("       INNER JOIN nd_experiment e ON e.project_id = p.project_id ")
-					.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
-					.append("           AND gpSiteName.type_id =  ")
-					.append(TermId.TRIAL_LOCATION.getId())
-					.append(" ")
-					// 8180
 					.append("WHERE p.deleted != " + DELETED_STUDY + " ")
 					.append(" AND p.study_type_id IS NOT NULL ")
 					.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID).append(" = :").append(DmsProjectDao.PROGRAM_UUID)
@@ -735,16 +656,15 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 
 		if (parameters.containsKey(StudyFilters.LOCATION_ID)) {
-			// Find environments with specified location (saved in GeolocationProperty)
+			// Find environments with specified location
 			final DetachedCriteria locationCriteria = DetachedCriteria.forClass(ExperimentModel.class);
 			locationCriteria.add(Restrictions.eq("typeId", TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()));
-			locationCriteria.createAlias("geoLocation", "g");
-			locationCriteria.createAlias("g.properties", "gp");
+			locationCriteria.createAlias("properties", "xp");
 			locationCriteria.createAlias("project", "p");
 			locationCriteria.createAlias("p.study", "st");
 			locationCriteria.add(Restrictions.and(
-				Restrictions.eq("gp.typeId", DmsProjectDao.LOCATION_ID),
-				Restrictions.eq("gp.value", parameters.get(StudyFilters.LOCATION_ID))));
+				Restrictions.eq("xp.typeId", DmsProjectDao.LOCATION_ID),
+				Restrictions.eq("xp.value", parameters.get(StudyFilters.LOCATION_ID))));
 			locationCriteria.setProjection(Projections.property("st.projectId"));
 			criteria.add(Property.forName("projectId").in(locationCriteria));
 		}
@@ -753,10 +673,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return criteria;
 	}
 
-	public StudyMetadata getStudyMetadataForGeolocationId(final Integer geolocationId) {
-		Preconditions.checkNotNull(geolocationId);
+	public StudyMetadata getStudyMetadataForEnvironmentId(final Integer environmentId) {
+		Preconditions.checkNotNull(environmentId);
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_GEOLOCATION_ID);
+			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ENVIRONMENT_ID);
 			query.addScalar("studyDbId");
 			query.addScalar("trialOrNurseryId");
 			query.addScalar("studyName");
@@ -771,12 +691,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("studyDescription");
 			query.addScalar("experimentalDesign");
 			query.addScalar("lastUpdate");
-			query.setParameter("geolocationId", geolocationId);
+			query.setParameter("environmentId", environmentId);
 			final Object result = query.uniqueResult();
 			if (result != null) {
 				final Object[] row = (Object[]) result;
 				final StudyMetadata studyMetadata = new StudyMetadata();
-				studyMetadata.setStudyDbId(geolocationId);
+				studyMetadata.setStudyDbId(environmentId);
 				studyMetadata.setNurseryOrTrialId((row[1] instanceof Integer) ? (Integer) row[1] : null);
 				studyMetadata.setStudyName((row[2] instanceof String) ? (String) row[2] : null);
 				studyMetadata.setStudyType((row[3] instanceof Integer) ? ((Integer) row[3]).toString() : null);
@@ -798,7 +718,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				return null;
 			}
 		} catch (final HibernateException e) {
-			final String message = "Error with getStudyMetadataForGeolocationId() query from study with geoloCationId: " + geolocationId;
+			final String message = "Error with getStudyMetadataForEnvironmentId() query from study with environment id: " + environmentId;
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -826,9 +746,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "                        INNER JOIN\n"
 				+ "                    nd_experiment ON nd_experiment.project_id = project.project_id\n"
 				+ "                        INNER JOIN\n"
-				+ "                    nd_geolocationprop ON nd_experiment.nd_geolocation_id = nd_geolocationprop.nd_geolocation_id"
-				+ "                WHERE nd_geolocationprop.type_id = :variableId\n"
-				+ "                        AND nd_geolocationprop.value = :variableValue\n"
+				+ "                    nd_experimentprop xp ON nd_experiment.nd_experiment_id = xp.nd_experiment_id"
+				+ "                WHERE xp.type_id = :variableId\n"
+				+ "                        AND xp.value = :variableValue\n"
 				+ "                        AND project.program_uuid <> :programUUID AND project.deleted = 0)) = 1 THEN 1 ELSE 0\n"
 				+ "    END;");
 		query.setParameter("variableId", variableId);
@@ -1155,53 +1075,57 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<StudyInstance> getDatasetInstances(final int datasetId, final List<Integer> instanceIds) {
 
 		try {
-			final String sql = "select \n" + "	geoloc.nd_geolocation_id as instanceDbId, \n"
-				+ "	nde.nd_experiment_id as experimentId, \n"
-				+ " geoloc.description as instanceNumber, \n"
-				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as locationId, \n"  // 8190 = cvterm for LOCATION_ID
-				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as locationName, \n" +
-				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as locationAbbreviation, \n" + // 8189 = cvterm for LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as customLocationAbbreviation, \n" +
+			final String sql = "select \n"
+				+ "	env.nd_experiment_id as experimentId, \n"
+				+ " env.observation_unit_no as instanceNumber, \n"
+				+ "	max(if(xprop.type_id = 8190, loc.locid, null)) as locationId, \n"  // 8190 = cvterm for LOCATION_ID
+				+ "	max(if(xprop.type_id = 8190, loc.lname, null)) as locationName, \n" +
+				"	max(if(xprop.type_id = 8190, loc.labbr, null)) as locationAbbreviation, \n" + // 8189 = cvterm for LOCATION_ABBR
+				"	max(if(xprop.type_id = 8189, xprop.value, null)) as customLocationAbbreviation, \n" +
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
-				"	case when max(if(geoprop.type_id = 8583, geoprop.value, null)) is null then 0 else 1 end as hasFieldmap, \n"
+				"	case when max(if(xprop.type_id = 8583, xprop.value, null)) is null then 0 else 1 end as hasFieldmap, \n"
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
 
 				// If study has any plot experiments, hasExperimentalDesign flag = true
 				+ "  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
-				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
+				+ "  AND exp.parent_id = env.nd_experiment_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
 
 				// If study has sub-observations or samples, canBeDeleted = false
 				+ "  case when (select count(1) from sample s "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 or (select count(1) from nd_experiment exp \n"
+				+ "  inner join project p on p.project_id = exp.project_id "
+				+ "  where p.study_id = env_ds.study_id) > 0 or (select count(1) from nd_experiment exp \n"
 				+ " INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 \n"
-				+ " INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0"
+				+ " INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 where pr.study_id = env_ds.study_id) > 0"
 				+ " then 0 else 1 end as canBeDeleted, "
 
 				// if study has any pending or accepted plot observations, hasMeasurements = true
 				+ "  case when (select count(1) from phenotype ph "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
+				+ "  inner join project p on p.project_id = exp.project_id "
+				+ "  where p.study_id = env_ds.study_id and "
 				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) > 0 then 1 else 0 end as hasMeasurements "
-				+ "    from	nd_geolocation geoloc \n"
-				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "    inner join project proj on proj.project_id = nde.project_id \n"
-				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
-				+ " where proj.project_id = :datasetId \n";
+
+				// Query tables
+				+ " FROM nd_experiment nde "
+				+ " INNER JOIN project proj ON proj.project_id = nde.project_id "
+				+ " INNER JOIN project env_ds ON env_ds.study_id = proj.study_id AND env_ds.dataset_type_id = 3 "
+				+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 "
+				+ " LEFT OUTER JOIN nd_experimentprop xprop ON xprop.nd_experiment_id = env.nd_experiment_id "
+				+ " LEFT OUTER JOIN location loc on xprop.value = loc.locid and xprop.type_id = 8190 "
+				+ " WHERE nde.project_id = :datasetId \n";
 			final StringBuilder sb = new StringBuilder(sql);
 			if (!CollectionUtils.isEmpty(instanceIds)) {
-				sb.append(" AND geoloc.nd_geolocation_id IN (:locationIds) \n");
+				sb.append(" AND env.nd_experiment_id IN (:locationIds) \n");
 			}
-			sb.append("    group by geoloc.nd_geolocation_id \n");
-			sb.append("    order by (1 * geoloc.description) asc ");
+			sb.append("    group by env.nd_experiment_id \n" );
+			sb.append("    order by env.observation_unit_no asc ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 			query.setParameter("datasetId", datasetId);
 			if (!CollectionUtils.isEmpty(instanceIds)) {
 				query.setParameterList("locationIds", instanceIds);
 			}
-			query.addScalar("instanceDbId", new IntegerType());
 			query.addScalar("experimentId", new IntegerType());
 			query.addScalar("locationId", new IntegerType());
 			query.addScalar("locationName", new StringType());
@@ -1387,9 +1311,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					+ "               ON ( r.object_id = scale.cvterm_id ) \n"
 					+ "       INNER JOIN cvterm variable \n"
 					+ "               ON ( r.subject_id = variable.cvterm_id ) \n"
-					+ "       INNER JOIN nd_geolocationprop pp \n"
+					+ "       INNER JOIN nd_experimentprop pp \n"
 					+ "               ON ( pp.type_id = variable.cvterm_id ) \n"
-					+ "WHERE  pp.nd_geolocation_id = :instanceId \n"
+					+ "WHERE  pp.nd_experiment_id = :instanceId \n"
 					+ "       AND r.object_id = 1901; ").addScalar("personId", new IntegerType());
 			query.setParameter("instanceId", instanceId);
 			return query.list();

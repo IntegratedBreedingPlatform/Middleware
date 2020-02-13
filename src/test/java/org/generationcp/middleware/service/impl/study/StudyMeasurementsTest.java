@@ -220,7 +220,7 @@ public class StudyMeasurementsTest {
 		}
 		Mockito.verify(query).addScalar(StudyMeasurements.PROJECT_NAME);
 		Mockito.verify(query).addScalar(StudyMeasurements.LOCATION_DB_ID);
-		Mockito.verify(query).addScalar(StudyMeasurements.ND_GEOLOCATION_ID);
+		Mockito.verify(query).addScalar(StudyMeasurements.ENVIRONMENT_ID);
 		Mockito.verify(query).addScalar(StudyMeasurements.FIELD_MAP_ROW);
 		Mockito.verify(query).addScalar(StudyMeasurements.FIELD_MAP_COLUMN);
 		Mockito.verify(query).addScalar(StudyMeasurements.LOCATION_ABBREVIATION);

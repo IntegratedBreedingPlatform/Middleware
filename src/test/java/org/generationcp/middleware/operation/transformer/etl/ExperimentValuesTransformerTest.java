@@ -43,7 +43,7 @@ public class ExperimentValuesTransformerTest extends TestOutputFormatter {
 		MeasurementRow mRow = this.createMeasurementRowTestData();
 		VariableTypeList varTypeList = this.createVariableTypeListTestData();
 
-		ExperimentValues expVal = ExperimentValuesTransformerTest.transformer.transform(mRow, varTypeList, null);
+		ExperimentValues expVal = ExperimentValuesTransformerTest.transformer.transform(mRow, varTypeList, null, null);
 
 		Assert.assertNotNull(expVal);
 		Debug.println(TestOutputFormatter.INDENT, expVal.toString());

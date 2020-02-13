@@ -4,20 +4,16 @@ import com.google.common.collect.Ordering;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
-import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -55,7 +51,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 	private SampleListDao sampleListDao;
 	private SampleDao sampleDao;
 	private ExperimentDao experimentDao;
-	private GeolocationDao geolocationDao;
 	private StockDao stockDao;
 	private PersonDAO personDAO;
 	private DmsProjectDao dmsProjectDao;
@@ -80,9 +75,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 		this.experimentDao = new ExperimentDao();
 		this.experimentDao.setSession(this.sessionProvder.getSession());
-
-		this.geolocationDao = new GeolocationDao();
-		this.geolocationDao.setSession(this.sessionProvder.getSession());
 
 		this.stockDao = new StockDao();
 		this.stockDao.setSession(this.sessionProvder.getSession());
@@ -428,7 +420,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.sampleListDao.saveOrUpdate(sampleList);
 
 		final Geolocation geolocation = new Geolocation();
-		this.geolocationDao.saveOrUpdate(geolocation);
 
 		// Create one sample for each experiment.
 		for (int i = 1; i < sampleSize + 1; i++) {
@@ -444,7 +435,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 			this.stockDao.saveOrUpdate(stockModel);
 
 			final ExperimentModel experimentModel = new ExperimentModel();
-			experimentModel.setGeoLocation(geolocation);
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 			experimentModel.setProject(dmsProject);
 			experimentModel.setStock(stockModel);

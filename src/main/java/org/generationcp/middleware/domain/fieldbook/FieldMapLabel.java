@@ -63,8 +63,8 @@ public class FieldMapLabel implements Serializable {
 	/** The dataset id. */
 	private Integer datasetId;
 
-	/** The geolocation id. */
-	private Integer geolocationId;
+	/** The Environment id. */
+	private Integer environmentId;
 
 	/** The site name. */
 	private String siteName;
@@ -286,19 +286,19 @@ public class FieldMapLabel implements Serializable {
 	/**
 	 * Gets the geolocation id.
 	 *
-	 * @return the geolocationId
+	 * @return the environmentId
 	 */
-	public Integer getGeolocationId() {
-		return this.geolocationId;
+	public Integer getEnvironmentId() {
+		return this.environmentId;
 	}
 
 	/**
 	 * Sets the geolocation id.
 	 *
-	 * @param geolocationId the geolocationId to set
+	 * @param environmentId the environmentId to set
 	 */
-	public void setGeolocationId(final Integer geolocationId) {
-		this.geolocationId = geolocationId;
+	public void setEnvironmentId(final Integer environmentId) {
+		this.environmentId = environmentId;
 	}
 
 	/**
@@ -428,8 +428,8 @@ public class FieldMapLabel implements Serializable {
 		builder.append(this.studyName);
 		builder.append(", datasetId=");
 		builder.append(this.datasetId);
-		builder.append(", geolocationId=");
-		builder.append(this.geolocationId);
+		builder.append(", environmentId=");
+		builder.append(this.environmentId);
 		builder.append(", siteName=");
 		builder.append(this.siteName);
 		builder.append(", gid=");
@@ -461,7 +461,7 @@ public class FieldMapLabel implements Serializable {
 		Debug.println(indent, "Range = " + this.range);
 		Debug.println(indent, "Study Name = " + this.studyName);
 		Debug.println(indent, "Dataset ID = " + this.datasetId);
-		Debug.println(indent, "Geolocation ID = " + this.geolocationId);
+		Debug.println(indent, "Geolocation ID = " + this.environmentId);
 		Debug.println(indent, "Site Name = " + this.siteName);
 		Debug.println(indent, "GID = " + this.gid);
 		Debug.println(indent, "Season = " + this.season);
