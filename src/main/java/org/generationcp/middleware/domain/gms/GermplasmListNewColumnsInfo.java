@@ -2,6 +2,8 @@
 package org.generationcp.middleware.domain.gms;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -121,6 +123,15 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 	}
 
 	public List<String> getAddedColumnCurrentSort() {
+		if(this.addedColumnCurrentSort == null) {
+			List<String> list = new ArrayList<>();
+			Set<String> cols = getColumns();
+			for(String column : cols){
+				list.add(column);
+				column = null;
+			}
+			return list;
+		}
 		return this.addedColumnCurrentSort;
 	}
 
