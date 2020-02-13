@@ -21,36 +21,36 @@
 			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
 			values ('MANAGE_LOTS', 'Manage Lots', @manage_inventory_id, @sidebar_category_link_id);
 			set @manage_lots_id = (select last_insert_id());
-			set @last_id = (select last_insert_id());
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_id, 1);
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_id, 1);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
 			
 			
 			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
 			values ('VIEW_LOTS', 'View Lots', @manage_lots_id, @sidebar_category_link_id);
-			set @last_id = (select last_insert_id());
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_id, 1);
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_id, 1);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
 			
 			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
 			values ('CREATE_LOTS', 'Create Lots', @manage_lots_id, @sidebar_category_link_id);
-			set @last_id = (select last_insert_id());
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_id, 1);
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_id, 1);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
 			
 			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
 			values ('IMPORT_LOTS', 'Import Lots', @manage_lots_id, @sidebar_category_link_id);
-			set @last_id = (select last_insert_id());
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_id, 1);
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_id, 1);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
 			
 			# Manage Transactions Permissions
 			
 			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
 			values ('MANAGE_TRANSACTIONS', 'Manage Transactions', @manage_inventory_id, @sidebar_category_link_id);
-			set @last_id = (select last_insert_id());
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_id, 1);
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_id, 1);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
         </sql>
     </changeSet>
 </databaseChangeLog>
