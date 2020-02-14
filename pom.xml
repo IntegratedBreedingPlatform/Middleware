@@ -38,6 +38,11 @@
 			<artifactId>hibernate-cglib-repack</artifactId>
 			<version>2.1_3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.1.0.Final</version>
+		</dependency>
 		<!-- EHCache Core APIs -->
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
@@ -148,8 +153,8 @@
 		<!-- Servlet API Dependency -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
 			<scope>provided</scope>
 		</dependency>
 
