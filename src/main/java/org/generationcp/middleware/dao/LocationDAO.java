@@ -58,6 +58,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	private static final String LNAME = "lname";
 	private static final String LOCID = "locid";
 	private static final String LTYPE = "ltype";
+	private static final String LABBREVIATION = "labbr";
 	private static final String NAME_OR_OPERATION = "name|operation";
 
 	private static final Logger LOG = LoggerFactory.getLogger(LocationDAO.class);
@@ -282,7 +283,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final String programUUID) {
+	public List<Location> filterLocations(final Set<Integer> types, final List<Integer> locationIds, final List<String> locationAbbreviations) {
 		final List<Location> locations;
 		try {
 
@@ -296,15 +297,17 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				criteria.add(Restrictions.in(LocationDAO.LOCID, locationIds));
 			}
 
-			criteria.add(
-				Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID), Restrictions.isNull(LocationDAO.UNIQUE_ID)));
+			if (locationAbbreviations!=null && !locationAbbreviations.isEmpty()){
+				criteria.add(Restrictions.in(LocationDAO.LABBREVIATION, locationAbbreviations));
+			}
+
 			criteria.addOrder(Order.asc(LocationDAO.LNAME));
 			locations = criteria.list();
 
 		} catch (final HibernateException e) {
 			LocationDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getFilteredLocations", "types,locationIds,programUUID", "", e.getMessage(),
+				this.getLogExceptionMessage("filterLocations", "types,locationIds,locationAbbreviations", "", e.getMessage(),
 					LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 		return locations;
@@ -922,7 +925,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getFilteredLocations", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+					this.getLogExceptionMessage("getFilteredLocationsDetails", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 	}
 

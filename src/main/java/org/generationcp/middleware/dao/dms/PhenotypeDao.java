@@ -11,10 +11,13 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
@@ -50,6 +53,7 @@ import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -912,7 +916,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.addScalar("blockNumber", new StringType()).addScalar("replicate", new StringType()).addScalar("COL").addScalar("ROW")
 			.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
 			.addScalar("entryNumber", new StringType()).addScalar("programDbId", new StringType()).addScalar("trialDbId", new StringType())
-			.addScalar("trialDbName", new StringType());
+			.addScalar("trialDbName", new StringType()).addScalar("jsonProps");
 
 		// TODO get map with AliasToEntityMapResultTransformer.INSTANCE
 		final List<Object[]> results = sqlQuery.list();
@@ -957,7 +961,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setLocationDbId(observationUnit.getStudyLocationDbId());
 				observationUnit.setLocationName(observationUnit.getStudyLocation());
 				observationUnit.setObservationUnitPUI("");
-				final PhenotypeSearchDTO.ObservationUnitPosition observationUnitPosition = new PhenotypeSearchDTO.ObservationUnitPosition();
+				final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
 				observationUnitPosition.setBlockNumber(observationUnit.getBlockNumber());
 				observationUnitPosition.setEntryNumber(observationUnit.getEntryNumber());
 				observationUnitPosition.setEntryType(Lists.newArrayList(observationUnit.getEntryType()));
@@ -970,9 +974,18 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				if (y != null) {
 					observationUnitPosition.setPositionCoordinateYType("GRID_ROW");
 				}
-
+				final String jsonProps = (String) row[25];
+				if (jsonProps != null) {
+					try {
+						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
+						observationUnitPosition.setGeoCoordinates((Map<String, Object>) jsonProp.get("geoCoordinates"));
+					} catch (IOException e) {
+						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
+					}
+				}
 				observationUnitPosition.setReplicate(observationUnit.getReplicate());
 				observationUnit.setObservationUnitPosition(observationUnitPosition);
+
 				observationUnit.setProgramDbId((String) row[22]);
 				observationUnit.setTrialDbId((String) row[23]);
 				observationUnit.setTrialName((String) row[24]);
@@ -1227,7 +1240,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		statement.setParameterList("variableIds", targetVariableIds);
 		statement.executeUpdate();
 	}
-	
+
 	public Phenotype getPhenotype(final Integer experimentId, final Integer phenotypeId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("phenotypeId", phenotypeId));
@@ -1327,4 +1340,43 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 		return criteria.list();
 	}
+
+	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
+		List<MeasurementVariable> studyVariables = new ArrayList<>();
+
+		try{
+			final SQLQuery query =
+				this.getSession().createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, "
+					+ "		cvt_scale.name AS scaleName, pheno.value AS value from phenotype pheno "
+					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.cvterm_id IN (:variableIds) "
+					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
+					+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
+					+ "     INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id\n"
+					+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id = :geolocationId ;");
+			query.addScalar("name", new StringType());
+			query.addScalar("definition", new StringType());
+			query.addScalar("scaleName", new StringType());
+			query.addScalar("value", new StringType());
+			query.setParameterList("variableIds", variableIds);
+			query.setParameter("geolocationId", geolocationId);
+
+			final List<Object> results = query.list();
+			for(Object result: results) {
+				final Object[] row = (Object[]) result;
+				final MeasurementVariable measurementVariable = new MeasurementVariable();
+				measurementVariable.setName((row[0] instanceof String) ? (String) row[0] : null);
+				measurementVariable.setDescription((row[1] instanceof String) ? (String) row[1] : null);
+				measurementVariable.setScale((row[2] instanceof String) ? (String) row[2] : null);
+				measurementVariable.setValue((row[3] instanceof String) ? (String) row[3] : null);
+				studyVariables.add(measurementVariable);
+			}
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationId: " + geolocationId
+				+ " and variableIds: " + variableIds;
+			PhenotypeDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return studyVariables;
+	}
+
 }

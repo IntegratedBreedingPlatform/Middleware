@@ -291,4 +291,346 @@
             DROP TABLE ims_label_otherinfo;
         </sql>
     </changeSet>
+
+	<changeSet author="nahuel" id="v14.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="nd_experiment" columnName="json_props"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create column to store properties in json format.
+			Aimed to replace nd_experimentprop
+		</comment>
+		<addColumn tableName="nd_experiment">
+			<column name="json_props" type="CLOB" />
+		</addColumn>
+	</changeSet>
+
+    <changeSet author="clarysabel" id="v14.1.0-1">
+        <preConditions onFail="CONTINUE">
+            <and>
+                <columnExists tableName="ims_lot" columnName="stock_id"/>
+                <sqlCheck expectedResult="YES">
+                    SELECT IS_NULLABLE
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE table_name = 'ims_lot' and column_name='stock_id' and table_schema = DATABASE();
+                </sqlCheck>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM ims_lot WHERE stock_id IS NULL;
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <comment>Add not null restriction to ims_table.stock_id</comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE ims_lot MODIFY stock_id VARCHAR(35) NOT NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet author="clarysabel" id="v14.1.0-2">
+        <preConditions onFail="CONTINUE">
+            <and>
+                <columnExists tableName="ims_lot" columnName="stock_id"/>
+				<not>
+					<indexExists tableName="ims_lot" indexName="ims_lot_stock_id_unique"/>
+				</not>
+                <sqlCheck expectedResult="0">
+                    select count(*) from
+                        (select stock_id, count(*) from ims_lot group by stock_id having  count(*)&gt;1) count_by_stock_id
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <comment>Add stock_id unique index to ims_lot</comment>
+		<createIndex indexName="ims_lot_stock_id_unique" tableName="ims_lot" unique="true">
+			<column name="stock_id" type="varchar(35)"/>
+		</createIndex>
+    </changeSet>
+
+
+	<changeSet author="vanina" id="v14.1.0-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="ims_transaction" columnName="trntype"/>
+			</not>
+		</preConditions>
+		<comment> Add trntype to ims_transaction table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			ADD COLUMN trntype INT(11) NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-7">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					trnstat = 1
+					AND trntype IS NULL
+					AND comments = 'Stock taking adjustment';
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for committed Stock taking adjustment
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 3
+			WHERE
+			trnstat = 1
+			AND trntype IS NULL
+			AND comments = 'Stock taking adjustment';
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-8">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					trnstat = 1
+					AND trntype IS NULL
+					AND (comments != 'Stock taking adjustment' OR comments IS NULL)
+					AND trnqty >= 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for committed and not Stock taking adjustment, qty greater or equal than 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 4
+			WHERE
+			trnstat = 1
+			AND trntype IS NULL
+			AND (comments != 'Stock taking adjustment' OR comments IS NULL)
+			AND trnqty >= 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-9">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					trnstat = 1
+					AND trntype IS NULL
+					AND (comments != 'Stock taking adjustment' OR comments IS NULL)
+					AND trnqty &lt; 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for committed and not Stock taking adjustment, qty lower than 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 1
+			WHERE
+			trnstat = 1
+			AND trntype IS NULL
+			AND (comments != 'Stock taking adjustment' OR comments IS NULL)
+			AND trnqty &lt; 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-10">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+						trnid IN (SELECT
+									t.trnid
+								FROM
+									ims_transaction t
+								INNER JOIN
+									ims_lot l ON t.lotid = l.lotid
+								WHERE
+									t.trnstat = 1 AND l.status = 1 AND trnqty &lt; 0
+								AND t.comments = 'Discard'
+								AND t.trnid = (SELECT
+													MAX(trnid)
+												FROM
+													ims_transaction tr
+												WHERE
+													tr.lotid = l.lotid));
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for discard transaction when lot is closed
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+				trntype = 2
+			WHERE
+				trnid IN (SELECT
+					t.trnid
+				FROM
+					(select * from ims_transaction) t
+				INNER JOIN
+					ims_lot l ON t.lotid = l.lotid
+				WHERE
+					t.trnstat = 1 AND l.status = 1 AND trnqty &lt; 0
+				AND t.comments = 'Discard'
+				AND t.trnid = (SELECT
+									MAX(trnid)
+								FROM
+									(select * from ims_transaction) as tr
+								WHERE
+									tr.lotid = l.lotid));
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-11">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					trnstat IN (0, 9)
+					AND trntype IS NULL
+					AND trnqty &lt; 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for pending or cancelled transaction and qty lower than 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 1
+			WHERE
+			trnstat IN (0, 9)
+			AND trntype IS NULL
+			AND trnqty &lt; 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-12">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					trnstat IN (0, 9)
+					AND trntype IS NULL
+					AND trnqty >= 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for pending or cancelled transaction and qty greater or equal  0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 4
+			WHERE
+			trnstat IN (0, 9)
+			AND trntype IS NULL
+			AND trnqty >=  0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-13">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="ims_transaction" columnName="trntype"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM ims_transaction
+					WHERE trntype is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'ims_transaction'
+					AND COLUMN_NAME = 'trntype'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Set trntype as not nullable
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			MODIFY COLUMN trntype INT(11) NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-14">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="ims_transaction" columnName="trnstat"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM ims_transaction
+					WHERE trnstat is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'ims_transaction'
+					AND COLUMN_NAME = 'trnstat'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Set trnstat as not nullable
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			MODIFY COLUMN trnstat INT(11) NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-15">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="ims_transaction" columnName="trnqty"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM ims_transaction
+					WHERE trnqty is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'ims_transaction'
+					AND COLUMN_NAME = 'trnqty'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Set trnqty as not nullable
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			MODIFY COLUMN trnqty DOUBLE NOT NULL;
+		</sql>
+	</changeSet>
 </databaseChangeLog>
