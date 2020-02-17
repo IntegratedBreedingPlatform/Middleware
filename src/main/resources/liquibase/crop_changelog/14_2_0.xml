@@ -14,8 +14,8 @@
             Create sequence entry for nd_experimentprop table generator
         </comment>
         <sql dbms="mysql" splitStatements="true">
-            insert into sequence(sequence_name, sequence_value)
-            select 'nd_experimentprop', ceil(max(nd_experimentprop_id) / 500) from nd_experimentprop;
+			insert into sequence(sequence_name, sequence_value)
+			select 'nd_experimentprop', coalesce(ceil(max(nd_experimentprop_id) / 500), 1) from nd_experimentprop;
         </sql>
     </changeSet>
 
@@ -30,7 +30,7 @@
         </comment>
         <sql dbms="mysql" splitStatements="true">
 			insert into sequence(sequence_name, sequence_value)
-			select 'stock', ceil(max(stock_id) / 500) from stock;
+			select 'stock', coalesce(ceil(max(stock_id) / 500), 1) from stock;
         </sql>
     </changeSet>
 
@@ -45,7 +45,7 @@
         </comment>
         <sql dbms="mysql" splitStatements="true">
 			insert into sequence(sequence_name, sequence_value)
-			select 'stockprop', ceil(max(stockprop_id) / 500) from stockprop;
+			select 'stockprop', coalesce(ceil(max(stockprop_id) / 500), 1) from stockprop;
         </sql>
     </changeSet>
 
