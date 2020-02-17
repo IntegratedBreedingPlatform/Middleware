@@ -30,7 +30,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
-import org.generationcp.middleware.pojos.germplasm.ImportedCrossParent;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -1651,10 +1651,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public Map<Integer, ImportedCrossParent> getPlotNoToImportedGermplasmParentMap(final Integer studyId, final Set<Integer> plotNos) {
-		final Map<Integer, ImportedCrossParent> plotNoToImportedGermplasmParentMap = new HashMap<>();
+	public Map<Integer, StudyGermplasmDto> getPlotNoToStudyGermplasmDtoMap(final Integer studyId, final Set<Integer> plotNos) {
+		final Map<Integer, StudyGermplasmDto> plotNoToImportedGermplasmParentMap = new HashMap<>();
 
-		String queryString = "select  distinct(nd_ep.value) AS plotNo, s.name AS designation, s.dbxref_id AS gid "
+		String queryString = "select  distinct(nd_ep.value) AS position, s.name AS designation, s.dbxref_id AS germplasmId "
 			+ " FROM nd_experiment e "
 			+ " INNER JOIN nd_experimentprop nd_ep ON e.nd_experiment_id = nd_ep.nd_experiment_id "
 			+ " INNER JOIN stock s ON s.stock_id = e.stock_id "
@@ -1671,13 +1671,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
 		query.setParameterList("PLOT_NO_TERM_IDS",
 			new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
-		query.addScalar("plotNo", new IntegerType());
+		query.addScalar("position", new StringType());
 		query.addScalar("designation", new StringType());
-		query.addScalar("gid", new IntegerType());
-		query.setResultTransformer(Transformers.aliasToBean(ImportedCrossParent.class));
-		final List<ImportedCrossParent> result = query.list();
-		for(ImportedCrossParent parent: result) {
-			plotNoToImportedGermplasmParentMap.put(parent.getPlotNo(), parent);
+		query.addScalar("germplasmId", new IntegerType());
+		query.setResultTransformer(Transformers.aliasToBean(StudyGermplasmDto.class));
+		final List<StudyGermplasmDto> result = query.list();
+		for(StudyGermplasmDto parent: result) {
+			plotNoToImportedGermplasmParentMap.put(Integer.valueOf(parent.getPosition()), parent);
 		}
 		return plotNoToImportedGermplasmParentMap;
 	}

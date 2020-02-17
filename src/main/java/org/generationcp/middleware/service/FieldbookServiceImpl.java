@@ -67,12 +67,12 @@ import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
-import org.generationcp.middleware.pojos.germplasm.ImportedCrossParent;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.FieldbookListUtil;
@@ -1264,8 +1264,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Map<Integer, ImportedCrossParent> getPlotNoToImportedCrossParentMap(final Integer studyId, final Set<Integer> plotNos) {
-		return this.getGermplasmDao().getPlotNoToImportedGermplasmParentMap(studyId, plotNos);
+	public Map<Integer, StudyGermplasmDto> getPlotNoToStudyGermplasmDtoMap(final Integer studyId, final Set<Integer> plotNos) {
+		return this.getGermplasmDao().getPlotNoToStudyGermplasmDtoMap(studyId, plotNos);
 	}
 
 	void setUserService(final UserService userService) {

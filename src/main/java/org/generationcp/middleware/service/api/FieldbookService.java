@@ -40,8 +40,8 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.germplasm.ImportedCrossParent;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
@@ -992,5 +992,5 @@ public interface FieldbookService {
 	 * @param plotNos - the set of Plot Numbers
 	 * @return
 	 */
-	Map<Integer, ImportedCrossParent> getPlotNoToImportedCrossParentMap(Integer studyId, Set<Integer> plotNos);
+	Map<Integer, StudyGermplasmDto> getPlotNoToStudyGermplasmDtoMap(Integer studyId, Set<Integer> plotNos);
 }

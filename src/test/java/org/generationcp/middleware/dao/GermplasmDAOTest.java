@@ -36,10 +36,10 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
-import org.generationcp.middleware.pojos.germplasm.ImportedCrossParent;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -877,17 +877,17 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final int studyId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, "ABCD");
 
-		Map<Integer, ImportedCrossParent> importedCrossParentMap = this.dao.getPlotNoToImportedGermplasmParentMap(studyId, new HashSet<>(Arrays.asList(1, 2, 3, 4, 5)));
+		Map<Integer, StudyGermplasmDto> importedCrossParentMap = this.dao.getPlotNoToStudyGermplasmDtoMap(studyId, new HashSet<>(Arrays.asList(1, 2, 3, 4, 5)));
 
 		List<Integer> gidsList = Arrays.asList(gids);
-		for (Map.Entry<Integer,ImportedCrossParent> entry : importedCrossParentMap.entrySet()) {
+		for (Map.Entry<Integer,StudyGermplasmDto> entry : importedCrossParentMap.entrySet()) {
 			Assert.assertEquals(DataSetupTest.GERMPLSM_PREFIX + entry.getKey(), entry.getValue().getDesignation());
-			Assert.assertEquals( entry.getKey(), entry.getValue().getPlotNo());
-			Assert.assertTrue(gidsList.contains(entry.getValue().getGid()));
+			Assert.assertEquals( entry.getKey().toString(), entry.getValue().getPosition());
+			Assert.assertTrue(gidsList.contains(entry.getValue().getGermplasmId()));
 		}
 
 		//Retrieve non existent plots in study
-		importedCrossParentMap = this.dao.getPlotNoToImportedGermplasmParentMap(studyId, new HashSet<>(Arrays.asList(51, 49)));
+		importedCrossParentMap = this.dao.getPlotNoToStudyGermplasmDtoMap(studyId, new HashSet<>(Arrays.asList(51, 49)));
 		Assert.assertTrue(importedCrossParentMap.isEmpty());
 
 	}
