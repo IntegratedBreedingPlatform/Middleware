@@ -168,7 +168,7 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 					+ "		cvt_scale.name AS scaleName, xprop.value AS value "
 					+ "		FROM nd_experimentprop xprop "
 					+ "		INNER JOIN nd_experiment exp ON exp.nd_experiment_id = xprop.nd_experiment_id AND exp.type_id = 1020 "
-					+ "		INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.cvterm_id in (:variableIds) "
+					+ "		INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = xprop.type_id "
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = ispcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "		INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id "
 					+ "	    WHERE exp.nd_experiment_id = :environmentId AND ispcvt.cvterm_id NOT IN (:excludedVariableIds) ;");

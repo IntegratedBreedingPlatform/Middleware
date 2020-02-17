@@ -156,7 +156,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ " AND p.program_uuid = :program_uuid ";
 
 	private static final String GET_STUDY_METADATA_BY_ENVIRONMENT_ID = " SELECT  "
-		+ "     nde.nd_experiment_id_id AS studyDbId, "
+		+ "     nde.nd_experiment_id AS studyDbId, "
 		+ "     pmain.project_id AS trialOrNurseryId, "
 		+ "		CONCAT(pmain.name, ' Environment Number ', nde.observation_unit_no) AS studyName, "
 		+ "     pmain.study_type_id AS studyType, "
@@ -173,8 +173,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "                 NULL)) "
 		+ "     AS locationId,"
 		+ "		pmain.description AS studyDescription, "
-		+ "     (Select definition from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId() + ", "
-		+ "			geoprop.value, "
+		+ "     (Select definition from cvterm where cvterm_id = (MAX(IF(xprop.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId() + ", "
+		+ "			xprop.value, "
 		+ "			NULL)))) "
 		+ "     AS experimentalDesign,"
 		+ "		pmain.study_update AS lastUpdate"

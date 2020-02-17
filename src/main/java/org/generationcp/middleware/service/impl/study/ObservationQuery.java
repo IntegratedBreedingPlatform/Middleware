@@ -62,7 +62,7 @@ class ObservationQuery {
 			+ "   nde.nd_experiment_id, " //
 			+ "   env.observation_unit_no AS TRIAL_INSTANCE, " //
 			+ "   proj.name AS PROJECT_NAME, " //
-			+ "   env.nd_experiment_id as environmentId " //
+			+ "   env.nd_experiment_id as environmentId, " //
 			+ "   (SELECT iispcvt.definition " //
 			+ " 	FROM " //
 			+ "      stockprop isp " //
@@ -116,19 +116,19 @@ class ObservationQuery {
 			+ "   INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id" //
 			+ "   WHERE ndep.nd_experiment_id = nde.nd_experiment_id  AND ispcvt.name = 'COL') AS COL, " //
 			+ "	 (SELECT l.locid  " //
-			+ " 	FROM nd_geolocationprop gp " //
-			+ "     INNER JOIN location l ON l.locid = gp.value  " //
-			+ "		WHERE  gp.type_id = " + TermId.LOCATION_ID.getId() //
-			+ "     AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS locationDbId, " //
+			+ " 	FROM nd_experimentprop xp " //
+			+ "     INNER JOIN location l ON l.locid = xp.value  " //
+			+ "		WHERE  xp.type_id = " + TermId.LOCATION_ID.getId() //
+			+ "     AND xp.nd_experiment_id = env.nd_experiment_id) AS locationDbId, " //
 			+ "(SELECT l.lname " //
-			+ "	FROM nd_geolocationprop gp " //
-			+ "	INNER JOIN location l ON l.locid = gp.value " //
-			+ "	WHERE gp.type_id = " + TermId.LOCATION_ID.getId() //
-			+ " AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationName, " //
-			+ "(SELECT  gp.value  " //
-			+ " FROM nd_geolocationprop gp " //
-			+ " WHERE gp.type_id = " + TermId.LOCATION_ABBR.getId() //
-			+ " AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationAbbreviation, " //
+			+ "	FROM nd_experimentprop xp " //
+			+ "	INNER JOIN location l ON l.locid = xp.value " //
+			+ "	WHERE xp.type_id = " + TermId.LOCATION_ID.getId() //
+			+ " AND xp.nd_experiment_id = env.nd_experiment_id) AS LocationName, " //
+			+ "(SELECT  xp.value  " //
+			+ " FROM nd_experimentprop xp " //
+			+ " WHERE xp.type_id = " + TermId.LOCATION_ABBR.getId() //
+			+ " AND xp.nd_experiment_id = env.nd_experiment_id) AS LocationAbbreviation, " //
 			+ "FieldMapCol.value AS FieldMapColumn, " //
 			+ "FieldMapRow.value AS FieldMapRow, " //
 			+ 	getColumnNamesFromTraitNames(measurementVariables) //
