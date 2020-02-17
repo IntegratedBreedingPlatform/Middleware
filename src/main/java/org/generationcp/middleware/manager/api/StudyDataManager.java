@@ -34,6 +34,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -123,6 +124,11 @@ public interface StudyDataManager {
 	 * @return List of Experiments associated to the dataset ID or empty list if none found
 	 */
 	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows);
+
+	List<Experiment> getExperimentsOfFirstInstance(int dataSetId, int start, int numOfRows);
+
+	VariableTypeList getTreatmentFactorVariableTypes(int dataSetId);
+
 
 	/**
 	 * Gets the experiments.
@@ -652,6 +658,8 @@ public interface StudyDataManager {
 	 * @return
 	 */
 	Map<Integer, String> getExperimentSampleMap(final Integer studyDbId);
+
+	Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(Integer studyId);
 
 	/**
 	 * Detect the usage of the specified variable in any programs except for the specified programUUID.
