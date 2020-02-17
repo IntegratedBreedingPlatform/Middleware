@@ -15,13 +15,13 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 	private Integer listId;
 	private LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap; // key = column name
 
-	public GermplasmListNewColumnsInfo(Integer listId, LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap) {
+	public GermplasmListNewColumnsInfo(final Integer listId, final LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap) {
 		super();
 		this.listId = listId;
 		this.columnValuesMap = columnValuesMap;
 	}
 
-	public GermplasmListNewColumnsInfo(Integer listId) {
+	public GermplasmListNewColumnsInfo(final Integer listId) {
 		super();
 		this.listId = listId;
 	}
@@ -30,7 +30,7 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 		return this.listId;
 	}
 
-	public void setListId(Integer listId) {
+	public void setListId(final Integer listId) {
 		this.listId = listId;
 	}
 
@@ -38,7 +38,7 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 		return this.columnValuesMap;
 	}
 
-	public void setColumnValuesMap(LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap) {
+	public void setColumnValuesMap(final LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap) {
 		this.columnValuesMap = columnValuesMap;
 	}
 
@@ -52,7 +52,7 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -62,7 +62,7 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		GermplasmListNewColumnsInfo other = (GermplasmListNewColumnsInfo) obj;
+		final GermplasmListNewColumnsInfo other = (GermplasmListNewColumnsInfo) obj;
 		if (this.columnValuesMap == null) {
 			if (other.columnValuesMap != null) {
 				return false;
@@ -82,7 +82,7 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("GermplasmListNewColumnsInfo [listId=");
 		builder.append(this.listId);
 		builder.append(", columnValuesMap=");
@@ -91,18 +91,18 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 		return builder.toString();
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 
 		if (this.columnValuesMap != null) {
 			if (this.columnValuesMap.keySet() != null) {
 				Debug.println(indent, "New Columns for List " + this.listId + ", # of Columns = " + this.columnValuesMap.keySet().size());
 			}
 
-			Set<Entry<String, List<ListDataColumnValues>>> entrySet = this.columnValuesMap.entrySet();
-			for (Entry<String, List<ListDataColumnValues>> entry : entrySet) {
+			final Set<Entry<String, List<ListDataColumnValues>>> entrySet = this.columnValuesMap.entrySet();
+			for (final Entry<String, List<ListDataColumnValues>> entry : entrySet) {
 				Debug.println(indent + 3, "COLUMN : " + entry.getKey());
 
-				for (ListDataColumnValues columnValues : entry.getValue()) {
+				for (final ListDataColumnValues columnValues : entry.getValue()) {
 					Debug.println(indent + 6, "ListData ID=" + columnValues.getListDataId() + ", value=" + columnValues.getValue());
 				}
 			}
