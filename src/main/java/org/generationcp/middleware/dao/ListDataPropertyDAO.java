@@ -57,7 +57,7 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 		String sql =
 				" SELECT DISTINCT column_name,  listdata_id, value" + " FROM listdataprops p "
 						+ " INNER JOIN listdata d ON d.lrecid = p.listdata_id " + " WHERE d.listid = :listId "
-						+ " ORDER BY p.column_name,p.listdataprop_id DESC";
+						+ " ORDER BY p.listdataprop_id ASC";
 
 		GermplasmListNewColumnsInfo listInfo = new GermplasmListNewColumnsInfo(listId);
 		try {
@@ -66,32 +66,22 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 			query.setParameter("listId", listId);
 			List<Object[]> recordList = query.list();
 
-			Map<String, List<ListDataColumnValues>> columnValuesMap = new LinkedHashMap<String, List<ListDataColumnValues>>();
-			List<ListDataColumnValues> columnValues = new ArrayList<ListDataColumnValues>();
-			String lastColumn = null;
+			LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap = new LinkedHashMap<String, List<ListDataColumnValues>>();
 
 			for (Object[] record : recordList) {
+				List<ListDataColumnValues> columnValues = new ArrayList<ListDataColumnValues>();
+
 				String column = (String) record[0];
 				Integer listDataId = (Integer) record[1];
 				String value = (String) record[2];
 
-				if (lastColumn == null) {
-					lastColumn = column;
-				}
-				// reset list of values for next column
-				if (!lastColumn.equals(column)) {
-					columnValuesMap.put(lastColumn, columnValues);
-					columnValues = new ArrayList<ListDataColumnValues>();
-					lastColumn = column;
+				if(columnValuesMap.containsKey(column)) {
+					columnValues = columnValuesMap.get(column);
 				}
 				columnValues.add(new ListDataColumnValues(column, listDataId, value));
-			}
+				columnValuesMap.put(column, columnValues);
 
-			// insert to map last column data
-			if (!columnValues.isEmpty()) {
-				columnValuesMap.put(lastColumn, columnValues);
 			}
-
 			listInfo.setColumnValuesMap(columnValuesMap);
 
 		} catch (HibernateException e) {

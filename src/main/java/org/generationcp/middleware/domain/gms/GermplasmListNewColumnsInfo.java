@@ -3,12 +3,8 @@ package org.generationcp.middleware.domain.gms;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.generationcp.middleware.util.Debug;
 
@@ -17,10 +13,9 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 	private static final long serialVersionUID = 5475025243020285738L;
 
 	private Integer listId;
-	private Map<String, List<ListDataColumnValues>> columnValuesMap; // key = column name
-	private List<String> addedColumnCurrentSort;
+	private LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap; // key = column name
 
-	public GermplasmListNewColumnsInfo(Integer listId, Map<String, List<ListDataColumnValues>> columnValuesMap) {
+	public GermplasmListNewColumnsInfo(Integer listId, LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap) {
 		super();
 		this.listId = listId;
 		this.columnValuesMap = columnValuesMap;
@@ -39,11 +34,11 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 		this.listId = listId;
 	}
 
-	public Map<String, List<ListDataColumnValues>> getColumnValuesMap() {
+	public LinkedHashMap<String, List<ListDataColumnValues>> getColumnValuesMap() {
 		return this.columnValuesMap;
 	}
 
-	public void setColumnValuesMap(Map<String, List<ListDataColumnValues>> columnValuesMap) {
+	public void setColumnValuesMap(LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap) {
 		this.columnValuesMap = columnValuesMap;
 	}
 
@@ -120,22 +115,5 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 			return this.columnValuesMap.keySet();
 		}
 		return new HashSet<>();
-	}
-
-	public List<String> getAddedColumnCurrentSort() {
-		if(this.addedColumnCurrentSort == null) {
-			List<String> list = new ArrayList<>();
-			Set<String> cols = getColumns();
-			for(String column : cols){
-				list.add(column);
-				column = null;
-			}
-			return list;
-		}
-		return this.addedColumnCurrentSort;
-	}
-
-	public void setAddedColumnCurrentSort(final List<String> addedColumnCurrentSort) {
-		this.addedColumnCurrentSort = addedColumnCurrentSort;
 	}
 }
