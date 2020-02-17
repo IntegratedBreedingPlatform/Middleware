@@ -884,6 +884,33 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 	}
 
+	public Map<String, BigInteger> getLotsCountPerScaleName(final LotsSearchDto lotsSearchDto) {
+		try {
+			final Map<String, BigInteger> lotsCountPerScaleName = new HashMap<>();
+
+			final String filterLotsQuery = buildSearchLotsQuery(lotsSearchDto);
+
+			final String countQuery = "SELECT scale.name, count(*) from ("  //
+			+ filterLotsQuery + ") as lot left join cvterm scale on (scale.cvterm_id = lot.scaleid) " //
+				+ "group by  scale.name "; //
+
+			final SQLQuery query = this.getSession().createSQLQuery(countQuery);
+
+			List<Object[]> result = query.list();
+			for (Object[] row : result) {
+				final String scaleName = (row[0]== null)?"NULL_VALUES":(String) row[0];
+				final BigInteger count = (BigInteger) row[1];
+
+				lotsCountPerScaleName.put(scaleName, count);
+			}
+
+			return lotsCountPerScaleName;
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getLotsCountPerScaleName() query on LotDAO: " + e.getMessage(), e);
+		}
+	}
+
 	public List<String> getInventoryIDsWithBreederIdentifier(final String identifier) {
 		try {
 			final String queryString = "select stock_id FROM ims_lot WHERE stock_id "

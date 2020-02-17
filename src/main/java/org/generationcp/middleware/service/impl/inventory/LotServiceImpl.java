@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -127,5 +128,10 @@ public class LotServiceImpl implements LotService {
 	@Override
 	public List<LotDto> getLotsByStockIds(final List<String> stockIds) {
 		return daoFactory.getLotDao().getLotsByStockIds(stockIds);
+	}
+
+	@Override
+	public Map<String, BigInteger> getLotSearchMetadata(final LotsSearchDto lotsSearchDto) {
+		return daoFactory.getLotDao().getLotsCountPerScaleName(lotsSearchDto);
 	}
 }
