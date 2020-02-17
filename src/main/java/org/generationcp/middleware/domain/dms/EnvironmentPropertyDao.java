@@ -1,7 +1,6 @@
 package org.generationcp.middleware.domain.dms;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -160,29 +159,25 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 		}
 	}
 
-	// TODO: IBP-3305 Remove references to nd_geolocation. Review if MeasurementVariable is really needed to be returned or just variable id-value
-	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
+	public List<MeasurementVariable> getEnvironmentDetailVariablesExcludeVariableIds(final Integer environmentId, final List<Integer> excludedVariableIds) {
 		List<MeasurementVariable> studyVariables = new ArrayList<>();
-		final List<Integer> standardEnvironmentFactors = Lists.newArrayList(
-			TermId.LOCATION_ID.getId(),
-			TermId.TRIAL_INSTANCE_FACTOR.getId(),
-			TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+
 		try{
 			final SQLQuery query =
 				this.getSession().createSQLQuery("SELECT ispcvt.name as name, ispcvt.definition as definition, "
-					+ "		cvt_scale.name AS scaleName, gprop.value AS value FROM nd_geolocationprop gprop "
+					+ "		cvt_scale.name AS scaleName, xprop.value AS value "
+					+ "		FROM nd_experimentprop xprop "
+					+ "		INNER JOIN nd_experiment exp ON exp.nd_experiment_id = xprop.nd_experiment_id AND exp.type_id = 1020 "
 					+ "		INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.cvterm_id in (:variableIds) "
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = ispcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "		INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id "
-					+ "		INNER JOIN nd_geolocation gl ON gprop.nd_geolocation_id = gl.nd_geolocation_id "
-					+ "	    WHERE gl.nd_geolocation_id = :geolocationId AND ispcvt.cvterm_id NOT IN (:standardEnvironmentFactors) ;");
+					+ "	    WHERE exp.nd_experiment_id = :environmentId AND ispcvt.cvterm_id NOT IN (:excludedVariableIds) ;");
 			query.addScalar("name", new StringType());
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());
 			query.addScalar("value", new StringType());
-			query.setParameterList("variableIds", variableIds);
-			query.setParameter("geolocationId", geolocationId);
-			query.setParameterList("standardEnvironmentFactors", standardEnvironmentFactors);
+			query.setParameter("environmentId", environmentId);
+			query.setParameterList("excludedVariableIds", excludedVariableIds);
 
 			final List<Object> results = query.list();
 			for(Object result: results) {
@@ -196,8 +191,8 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 				studyVariables.add(measurementVariable);
 			}
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationId: " + geolocationId
-				+ " and variableIds: " + variableIds;
+			final String message = "Error with getEnvironmentDetailVariablesExcludeVariableIds() query from environmentId: " + environmentId
+				+ " and excluded variableIds: " + excludedVariableIds;
 			throw new MiddlewareQueryException(message, e);
 		}
 		return studyVariables;

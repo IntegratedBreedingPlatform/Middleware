@@ -1343,24 +1343,24 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return criteria.list();
 	}
 
-	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
+	public List<MeasurementVariable> getEnvironmentConditionVariables(final Integer environmentId) {
 		List<MeasurementVariable> studyVariables = new ArrayList<>();
 
 		try{
 			final SQLQuery query =
 				this.getSession().createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, "
-					+ "		cvt_scale.name AS scaleName, pheno.value AS value from phenotype pheno "
+					+ "		cvt_scale.name AS scaleName, pheno.value AS value "
+					+ "     FROM phenotype pheno "
 					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.cvterm_id IN (:variableIds) "
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
-					+ "     INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id\n"
-					+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id = :geolocationId ;");
+					+ "     INNER JOIN nd_experiment env ON  pheno.nd_experiment_id = env.nd_experiment_id\n"
+					+ "		WHERE env.nd_experiment_id = :environmentId AND env.type_id = 1020 ;");
 			query.addScalar("name", new StringType());
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());
 			query.addScalar("value", new StringType());
-			query.setParameterList("variableIds", variableIds);
-			query.setParameter("geolocationId", geolocationId);
+			query.setParameter("environmentId", environmentId);
 
 			final List<Object> results = query.list();
 			for(Object result: results) {
@@ -1373,8 +1373,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				studyVariables.add(measurementVariable);
 			}
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationId: " + geolocationId
-				+ " and variableIds: " + variableIds;
+			final String message = "Error with getEnvironmentConditionVariables() query from environmentId: " + environmentId;
 			PhenotypeDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

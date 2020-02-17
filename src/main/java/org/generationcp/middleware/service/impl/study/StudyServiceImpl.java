@@ -20,7 +20,6 @@ import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -48,6 +47,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -498,11 +498,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return dto;
 	}
 
-	// TODO IBP-3305 Rename method and parameter
 	@Override
-	public StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId) {
+	public StudyDetailsDto getStudyDetailsByEnvironment(final Integer environmentId) {
 		try {
-			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadataForGeolocationId(geolocationId);
+			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadataForEnvironmentId(environmentId);
 			if (studyMetadata != null) {
 				final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
 				studyDetailsDto.setMetadata(studyMetadata);
@@ -512,40 +511,24 @@ public class StudyServiceImpl extends Service implements StudyService {
 				users.addAll(this.studyDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
 				studyDetailsDto.setContacts(users);
 
-				final DmsProject environmentDataset =
-					this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyMetadata.getTrialDbId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
-				final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
-					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.<Integer>newArrayList(VariableType.STUDY_CONDITION.getId()));
 				final List<MeasurementVariable> environmentParameters = new ArrayList<>();
-				List<Integer> variableIds = this.getVariableIds(environmentConditions);
-				if(!variableIds.isEmpty()) {
-					environmentParameters.addAll(
-						this.studyDataManager.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
-				}
-				final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
-					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.<Integer>newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
-				variableIds = this.getVariableIds(environmentDetails);
-				if(!variableIds.isEmpty()) {
-					environmentParameters.addAll(
-						this.studyDataManager.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
-				}
-
-
-				final List<MeasurementVariable> environmentVariables = new ArrayList<>(environmentConditions);
-				environmentVariables.addAll(environmentDetails);
+				environmentParameters.addAll(this.daoFactory.getPhenotypeDAO().getEnvironmentConditionVariables(environmentId));
+				// Exclude trial instance, location and experiment design as environment parameters as they have their own field in DTO
+				final List<MeasurementVariable> environmentVariables =
+					this.daoFactory.getEnvironmentPropertyDao().getEnvironmentDetailVariablesExcludeVariableIds(environmentId,
+						Arrays.asList(TermId.LOCATION_ID.getId(), TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+							TermId.TRIAL_INSTANCE_FACTOR.getId()));
 				environmentParameters.addAll(environmentVariables);
 				studyDetailsDto.setEnvironmentParameters(environmentParameters);
 
 				final Map<String, String> properties = new HashMap<>();
-				variableIds = this.getVariableIds(environmentVariables);
-				properties.putAll(this.studyDataManager.getEnvironmentVariableNameValuesMap(geolocationId, variableIds));
-				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId(), variableIds));
+				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId(), this.getVariableIds(environmentParameters)));
 				studyDetailsDto.setAdditionalInfo(properties);
 				return studyDetailsDto;
 			}
 			return null;
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getStudyDetailsForGeolocation() query with geolocationId: " + geolocationId;
+			final String message = "Error with getStudyDetailsByEnvironments() query with environmentId: " + environmentId;
 			StudyServiceImpl.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

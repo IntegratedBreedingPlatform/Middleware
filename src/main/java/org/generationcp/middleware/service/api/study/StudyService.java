@@ -37,10 +37,10 @@ public interface StudyService {
 	TrialObservationTable getTrialObservationTable(int studyIdentifier, Integer instanceDbId);
 
 	/**
-	 * @param geolocationId
+	 * @param environmentId
 	 * @return StudyDetailsDto
 	 */
-	StudyDetailsDto getStudyDetailsByGeolocation(Integer geolocationId);
+	StudyDetailsDto getStudyDetailsByEnvironment(Integer environmentId);
 
 	/**
 	 * @param ids     of the variables that i need to check data

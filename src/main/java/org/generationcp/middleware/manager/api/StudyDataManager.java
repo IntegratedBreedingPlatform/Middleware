@@ -354,11 +354,11 @@ public interface StudyDataManager {
 	 * Retrieve all field map labels in the block of the specified trial instance id.
 	 *
 	 * @param datasetId     the dataset id
-	 * @param geolocationId the geolocation id
+	 * @param environmentId the environment id
 	 * @return the all field maps in block by trial instance id
 	 */
 	List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(
-		int datasetId, int geolocationId,
+		int datasetId, int environmentId,
 		CrossExpansionProperties crossExpansionProperties);
 
 	/**
@@ -417,13 +417,12 @@ public interface StudyDataManager {
 	DmsProject getParentFolder(int id);
 
 	/**
-	 * Returns the datasetId of dataset to which the studyDbId (nd_geolocation_id) belongs to.
-	 * In Brapi, studyDbId is the environment/instance (nd_geolocation_id)
-	 * @param studyDbId
+	 * Returns the datasetId of dataset to which the environment id belongs to.
+	 * @param environmentId
 	 * @param datasetType
 	 * @return
 	 */
-	Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType);
+	Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType);
 
 
 	/**
@@ -638,9 +637,7 @@ public interface StudyDataManager {
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
 
-	StudyMetadata getStudyMetadataForGeolocationId(Integer geolocationId);
-
-	Map<String, String> getEnvironmentVariableNameValuesMap(Integer environmentId, List<Integer> excludedVariableIds);
+	StudyMetadata getStudyMetadataForEnvironmentId(Integer environmentId);
 
 	Map<Integer, String> getEnvironmentVariableIdValuesMap(Integer datasetId, Integer environmentId);
 
@@ -729,9 +726,5 @@ public interface StudyDataManager {
 	 * @return
 	 */
 	List<UserDto> getUsersForEnvironment(final Integer instanceId);
-
-	List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
-
-	List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
 
 }
