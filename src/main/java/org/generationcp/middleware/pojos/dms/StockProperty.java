@@ -22,6 +22,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import javax.persistence.UniqueConstraint;
 
 /**
@@ -41,7 +42,9 @@ public class StockProperty implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@TableGenerator(name = "stockPropIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
+		pkColumnValue = "stockprop", allocationSize = 500)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "stockPropIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "stockprop_id")
 	private Integer stockPropId;
