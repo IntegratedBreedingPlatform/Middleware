@@ -99,24 +99,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	}
 
-	public ListDataProject getByListIdAndEntryNo(final int listId, final int entryNo) {
-		ListDataProject result = null;
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
-			criteria.add(Restrictions.eq("list", new GermplasmList(listId)));
-			criteria.add(Restrictions.eq(ListDataProjectDAO.ENTRY_ID, entryNo));
-			criteria.addOrder(Order.asc(ListDataProjectDAO.ENTRY_ID));
-			result = (ListDataProject) criteria.uniqueResult();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getByListIdAndEntryNo(listId=" + listId
-				+ ") query from ListDataProjectDAO: " + e.getMessage(), e);
-		}
-		return result;
-	}
-
-	public List<ListDataProject> getByStudy(
+	List<ListDataProject> getByStudy(
 		final int studyId, final GermplasmListType listType, final List<Integer> plotNumbers, final String instanceNumber) {
 		try {
 

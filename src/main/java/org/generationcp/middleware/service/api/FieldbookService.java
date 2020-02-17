@@ -44,6 +44,7 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This is the API for Fieldbook requirements.
@@ -523,14 +524,6 @@ public interface FieldbookService {
 	int countVariatesWithData(int datasetId, List<Integer> variateIds);
 
 	/**
-	 * Delete observations of study.
-	 *
-	 * @param datasetId
-	 *            the dataset id
-	 */
-	void deleteObservationsOfStudy(int datasetId);
-
-	/**
 	 * Get germplasms by name.
 	 *
 	 * @param name
@@ -746,9 +739,6 @@ public interface FieldbookService {
 	 * @return
 	 */
 	long countListDataProjectByListIdAndEntryTypeIds(int listId, List<Integer> systemDefinedEntryTypeIds);
-
-	List<ListDataProject> getListDataProjectByStudy(int projectId, GermplasmListType type, List<Integer> plotNumbers, final String instanceNumber);
-
 
 	/**
 	 * Deletes a list data project given the project_id and the type.

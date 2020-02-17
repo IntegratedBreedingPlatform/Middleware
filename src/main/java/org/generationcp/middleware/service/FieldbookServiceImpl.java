@@ -489,10 +489,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	}
 
-	private List<Name> getByGidAndNtype(final int gid, final GermplasmNameType nType) {
-		return this.getNameDao().getByGIDWithFilters(gid, null, nType);
-	}
-
 	@Override
 	public GermplasmList getGermplasmListByName(final String name, final String programUUID) {
 		final List<GermplasmList> germplasmLists = this.germplasmListManager.getGermplasmListByName(name, programUUID, 0, 1, Operation.EQUAL);
@@ -785,16 +781,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void deleteObservationsOfStudy(final int datasetId) {
-		try {
-			this.getExperimentDao().deleteExperimentsForDataset(datasetId);
-		} catch (final Exception e) {
-
-			this.logAndThrowException("Error encountered with deleteObservationsOfStudy(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
-		}
-	}
-
-	@Override
 	public List<Integer> getGermplasmIdsByName(final String name) {
 		return this.getNameDao().getGidsByName(name);
 	}
@@ -949,12 +935,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public long countListDataProjectByListIdAndEntryTypeIds(final int listId, final List<Integer> systemDefinedEntryTypeIds) {
 		return this.getListDataProjectDAO().countByListIdAndEntryType(listId, systemDefinedEntryTypeIds);
-	}
-
-	@Override
-	public List<ListDataProject> getListDataProjectByStudy(final int projectId, final GermplasmListType type, final List<Integer> plotNumbers,
-			final String instanceNumber) {
-		return this.getListDataProjectDAO().getByStudy(projectId, type, plotNumbers, instanceNumber);
 	}
 
 	@Override
