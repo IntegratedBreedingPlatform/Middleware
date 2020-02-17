@@ -11,7 +11,7 @@
 		<jasper.version>6.0.0</jasper.version>
 		<itext.version>2.1.7</itext.version>
 		<reflections.version>0.9.9</reflections.version>
-		<atomikos.version>3.9.3</atomikos.version>
+		<atomikos.version>4.0.6</atomikos.version>
 		<spring.version>3.2.11.RELEASE</spring.version>
 		<liquibase.version>3.6.1</liquibase.version>
 		<envConfig>${user.name}</envConfig>
