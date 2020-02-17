@@ -1,5 +1,8 @@
 package org.generationcp.middleware.domain.inventory.manager;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.generationcp.middleware.util.serializer.MapNullKeySerializer;
+import org.generationcp.middleware.util.serializer.NullKeyReplacement;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -9,6 +12,8 @@ import java.util.Map;
 @AutoProperty
 public class LotSearchMetadata {
 
+	@JsonSerialize(using = MapNullKeySerializer.class)
+	@NullKeyReplacement("NULL_VALUES")
 	private Map<String, BigInteger> lotsCountByScaleName;
 
 	public LotSearchMetadata() {

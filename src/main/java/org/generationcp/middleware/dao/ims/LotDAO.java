@@ -898,7 +898,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 			List<Object[]> result = query.list();
 			for (Object[] row : result) {
-				final String scaleName = (row[0]== null)?"NULL_VALUES":(String) row[0];
+				final String scaleName = (String) row[0];
+
 				final BigInteger count = (BigInteger) row[1];
 
 				lotsCountPerScaleName.put(scaleName, count);
