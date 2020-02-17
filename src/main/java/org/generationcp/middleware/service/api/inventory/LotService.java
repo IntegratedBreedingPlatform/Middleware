@@ -4,13 +4,12 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
+import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 
 public interface LotService {
 
@@ -24,6 +23,6 @@ public interface LotService {
 
 	List<LotDto> getLotsByStockIds(List<String> stockIds);
 
-	Map<String, BigInteger> getLotSearchMetadata(LotsSearchDto lotsSearchDto);
+	LotSearchMetadata getLotSearchMetadata(LotsSearchDto lotsSearchDto);
 
 }

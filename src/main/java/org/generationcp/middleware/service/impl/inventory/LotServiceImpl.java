@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
+import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -24,7 +25,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -131,7 +131,7 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public Map<String, BigInteger> getLotSearchMetadata(final LotsSearchDto lotsSearchDto) {
-		return daoFactory.getLotDao().getLotsCountPerScaleName(lotsSearchDto);
+	public LotSearchMetadata getLotSearchMetadata(final LotsSearchDto lotsSearchDto) {
+		return new LotSearchMetadata(daoFactory.getLotDao().getLotsCountPerScaleName(lotsSearchDto));
 	}
 }
