@@ -229,7 +229,7 @@
 			</not>
 		</preConditions>
 		<comment>
-			Temporary for testing: Backup then drop ND_GEOLOCATIONPROP table
+			Temporary for testing: Backup then delete contents of ND_GEOLOCATIONPROP table
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `nd_geolocationprop_bkp` (
@@ -247,7 +247,7 @@
 			INSERT INTO nd_geolocationprop_bkp
 			SELECT * FROM nd_geolocationprop;
 
-			DROP TABLE nd_geolocationprop_bkp;
+			DELETE FROM nd_geolocationprop;
 		</sql>
 	</changeSet>
 
@@ -259,7 +259,7 @@
 			</not>
 		</preConditions>
 		<comment>
-			Temporary for testing: Backup then drop ND_GEOLOCATION table
+			Temporary for testing: Backup then delete contents of ND_GEOLOCATION table
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `nd_geolocation_bkp` (
@@ -275,7 +275,7 @@
 			INSERT INTO nd_geolocation_bkp
 			SELECT * FROM nd_geolocation;
 
-			DROP TABLE nd_geolocation;
+			DELETE FROM nd_geolocation;
 		</sql>
 	</changeSet>
 
