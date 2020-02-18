@@ -1,6 +1,5 @@
 package org.generationcp.middleware.service.impl.study;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -141,7 +141,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		if (!CollectionUtils.isEmpty(studyInstances)) {
 			return Optional.of(studyInstances.get(0));
 		}
-		return Optional.absent();
+		return Optional.empty();
 	}
 
 	protected Optional<Location> getUnspecifiedLocation() {
@@ -149,7 +149,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		if (!locations.isEmpty()) {
 			return Optional.of(locations.get(0));
 		}
-		return Optional.absent();
+		return Optional.empty();
 	}
 
 }
