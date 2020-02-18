@@ -8,12 +8,12 @@ import java.util.List;
 
 public interface StudyInstanceService {
 
-	StudyInstance createStudyInstance(final CropType crop, final int studyId, final int datasetId);
+	List<StudyInstance> createStudyInstances(CropType crop, int studyId, int datasetId, Integer numberOfInstancesToGenerate);
 
 	List<StudyInstance> getStudyInstances(int studyId);
 
-	void deleteStudyInstance(final Integer studyId, final Integer instanceId);
+	void deleteStudyInstance(Integer studyId, Integer instanceId);
 
-	Optional<StudyInstance> getStudyInstance(final int studyId, final Integer instanceId);
+	Optional<StudyInstance> getStudyInstance(int studyId, Integer instanceId);
 
 }

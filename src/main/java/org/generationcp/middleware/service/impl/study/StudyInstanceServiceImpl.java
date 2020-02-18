@@ -1,11 +1,9 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.base.Optional;
-import org.generationcp.middleware.dao.dms.EnvironmentDao;
+import com.google.common.base.Preconditions;
 import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -16,20 +14,26 @@ import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Transactional
 public class StudyInstanceServiceImpl implements StudyInstanceService {
 
-	@Autowired
+	@Resource
 	private StudyService studyService;
+
+	@Resource
+	private ExperimentDesignService experimentDesignService;
 
 	private ExperimentModelGenerator experimentModelGenerator;
 	private DaoFactory daoFactory;
@@ -46,37 +50,55 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public StudyInstance createStudyInstance(final CropType crop, final int studyId, final int datasetId) {
+	public List<StudyInstance> createStudyInstances(final CropType crop, final int studyId, final int datasetId, final Integer numberOfInstancesToGenerate) {
+		Preconditions.checkArgument(numberOfInstancesToGenerate > 0);
 
-		// Get the existing environment dataset variables.
-		// Since we are creating a new study instance, the values of these variables are just blank.
-		final List<MeasurementVariable> measurementVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId,
-			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
+		// Retrieve existing study instances
+		final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(datasetId);
+		final List<Integer> instanceNumbers = environments.stream().map(ExperimentModel::getObservationUnitNo).collect(Collectors.toList());
 
-		final int instanceNumber = this.daoFactory.getEnvironmentDao().getNextInstanceNumber(datasetId);
+		final List<StudyInstance> studyInstances = new ArrayList<>();
+		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
+		int instancesGenerated = 0;
+		while (instancesGenerated < numberOfInstancesToGenerate) {
+			// If design is generated, increment last instance number. Otherwise, attempt to find  "gap" instance number first (if any)
+			Integer instanceNumber = Collections.max(instanceNumbers) + 1;
+			if (!hasExperimentalDesign) {
+				instanceNumber = 1;
+				while (instanceNumbers.contains(instanceNumber)) {
+					instanceNumber++;
+				}
+			}
 
-		// The default value of an instance's location name is "Unspecified Location"
-		final Optional<Location> location = this.getUnspecifiedLocation();
+			// The default value of an instance's location name is "Unspecified Location"
+			final Optional<Location> location = this.getUnspecifiedLocation();
 
-		final ExperimentModel experimentModel =
-			this.experimentModelGenerator.generate(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT);
-		experimentModel.setObservationUnitNo(instanceNumber);
-		final boolean locationPresent = location.isPresent();
-		if (locationPresent) {
-			experimentModel.setProperties(Collections.singletonList(
-				new ExperimentProperty(experimentModel, String.valueOf(location.get().getLocid()), 1, TermId.LOCATION_ID.getId())));
+			final ExperimentModel experimentModel =
+				this.experimentModelGenerator.generate(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT);
+			experimentModel.setObservationUnitNo(instanceNumber);
+			final boolean locationPresent = location.isPresent();
+			if (locationPresent) {
+				experimentModel.setProperties(Collections.singletonList(
+					new ExperimentProperty(experimentModel, String.valueOf(location.get().getLocid()), 1, TermId.LOCATION_ID.getId())));
+			}
+			this.daoFactory.getExperimentDao().save(experimentModel);
+
+			final StudyInstance studyInstance =
+				new StudyInstance(experimentModel.getNdExperimentId(), instanceNumber, false, false, false, true);
+			if (locationPresent) {
+				studyInstance.setLocationId(location.get().getLocid());
+				studyInstance.setLocationName(location.get().getLname());
+				studyInstance.setLocationAbbreviation(location.get().getLabbr());
+			}
+
+			instanceNumbers.add(instanceNumber);
+			studyInstances.add(studyInstance);
+			instancesGenerated++;
 		}
-		this.daoFactory.getExperimentDao().save(experimentModel);
 
-		final StudyInstance studyInstance =
-			new StudyInstance(experimentModel.getNdExperimentId(), instanceNumber, false, false, false, true);
-		if (locationPresent) {
-			studyInstance.setLocationId(location.get().getLocid());
-			studyInstance.setLocationName(location.get().getLname());
-			studyInstance.setLocationAbbreviation(location.get().getLabbr());
-		}
 
-		return studyInstance;
+
+		return studyInstances;
 	}
 
 	@Override

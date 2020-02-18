@@ -129,14 +129,15 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreateStudyInstance() {
+	public void testCreateStudyInstances() {
 
 		// Create instance 1
 		final Integer studyId = this.studyReference.getId();
-		final StudyInstance studyInstance1 =
-			this.studyInstanceService.createStudyInstance(this.cropType, studyId, this.environmentDataset.getId());
+		final List<StudyInstance> studyInstances =
+			this.studyInstanceService.createStudyInstances(this.cropType, studyId, this.environmentDataset.getId(), 2);
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
+		final StudyInstance studyInstance1 = studyInstances.get(0);
 		assertEquals(1, studyInstance1.getInstanceNumber());
 		assertNotNull(studyInstance1.getExperimentId());
 		assertNotNull(studyInstance1.getLocationId());
@@ -148,11 +149,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertFalse(studyInstance1.isHasMeasurements());
 		assertFalse(studyInstance1.isHasExperimentalDesign());
 
-		// Create instance 2
-		final StudyInstance studyInstance2 =
-			this.studyInstanceService.createStudyInstance(this.cropType, studyId, this.environmentDataset.getId());
-		// Need to flush session to sync with underlying database before querying
-		this.sessionProvder.getSession().flush();
+		final StudyInstance studyInstance2 = studyInstances.get(1);
 		assertEquals(2, studyInstance2.getInstanceNumber());
 		assertNotNull(studyInstance2.getExperimentId());
 		assertNotNull(studyInstance2.getLocationId());
@@ -164,9 +161,9 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertFalse(studyInstance2.isHasMeasurements());
 		assertFalse(studyInstance2.isHasExperimentalDesign());
 
-		final List<ExperimentModel> studyInstances =
+		final List<ExperimentModel> retrievedStudyInstances =
 			this.daoFactory.getEnvironmentDao().getEnvironments(studyId);
-		Assert.assertEquals(2, studyInstances.size());
+		Assert.assertEquals(2, retrievedStudyInstances.size());
 	}
 
 	@Test
