@@ -289,7 +289,7 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 		sb.append(" WHERE e.project_id = :datasetId and e.type_id = 1020" );
 		final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 		query.setParameter("datasetId", datasetId);
-		final BigInteger maxInstanceNumber = (BigInteger) query.uniqueResult();
+		final Integer maxInstanceNumber = (Integer) query.uniqueResult();
 		if (maxInstanceNumber != null) {
 			return maxInstanceNumber.intValue() + 1;
 		}

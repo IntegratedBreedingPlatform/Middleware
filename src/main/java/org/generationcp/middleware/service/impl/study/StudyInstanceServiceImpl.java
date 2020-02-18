@@ -60,10 +60,11 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 		final ExperimentModel experimentModel =
 			this.experimentModelGenerator.generate(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT);
+		experimentModel.setObservationUnitNo(instanceNumber);
 		final boolean locationPresent = location.isPresent();
 		if (locationPresent) {
-			experimentModel.getProperties()
-				.add(new ExperimentProperty(experimentModel, String.valueOf(location.get().getLocid()), 1, TermId.LOCATION_ID.getId()));
+			experimentModel.setProperties(Collections.singletonList(
+				new ExperimentProperty(experimentModel, String.valueOf(location.get().getLocid()), 1, TermId.LOCATION_ID.getId())));
 		}
 		this.daoFactory.getExperimentDao().save(experimentModel);
 
