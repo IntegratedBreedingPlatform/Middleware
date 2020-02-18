@@ -933,7 +933,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				+ "  l.locid as locationId, " //
 				+ "  l.scaleid as scaleId, " //
 				+ "  l.comments as comments, " //
-				+ "  u.uname as createdByUsername, " //
 				+ "  CASE WHEN l.status = 0 then 'Active' else 'Closed' end as status " //
 				+ "from ims_lot l " //
 				+ "       inner join workbench.users u on (u.userid = l.userid) " //
@@ -946,7 +945,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("locationId", Hibernate.INTEGER);
 			query.addScalar("scaleId", Hibernate.INTEGER);
 			query.addScalar("comments", Hibernate.STRING);
-			query.addScalar("createdByUsername", Hibernate.STRING);
 			query.addScalar("status", Hibernate.STRING);
 
 			query.setParameterList("stockIds", stockIds);
