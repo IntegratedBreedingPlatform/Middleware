@@ -18,7 +18,9 @@ import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -28,6 +30,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -37,6 +40,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -63,7 +67,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String QUERY_FROM_GERMPLASM = ") query from Germplasm: ";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
-	public static final String SEARCH_GERMPLASM_BY_STUDYDBID =
+	private static final String SEARCH_GERMPLASM_BY_STUDYDBID =
 		"SELECT DISTINCT convert(g.gid, char) AS germplasmDbId, reference.btable AS germplasmPUI, " //
 			+ "  (SELECT n.nval FROM names n " //
 			+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'ACCNO' AND u.fldno = n.ntype)" //
@@ -1645,5 +1649,36 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public Map<Integer, StudyGermplasmDto> getPlotNoToStudyGermplasmDtoMap(final Integer studyId, final Set<Integer> plotNos) {
+		final Map<Integer, StudyGermplasmDto> plotNoToImportedGermplasmParentMap = new HashMap<>();
+
+		String queryString = "select  distinct(nd_ep.value) AS position, s.name AS designation, s.dbxref_id AS germplasmId "
+			+ " FROM nd_experiment e "
+			+ " INNER JOIN nd_experimentprop nd_ep ON e.nd_experiment_id = nd_ep.nd_experiment_id "
+			+ " INNER JOIN stock s ON s.stock_id = e.stock_id "
+			+ " INNER JOIN project p ON e.project_id = p.project_id "
+			+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS) "
+			+ " AND p.dataset_type_id = :DATASET_TYPE "
+			+ " AND p.study_id = :STUDY_ID "
+			+ " AND nd_ep.value in (:PLOT_NOS) "
+			+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id";
+
+		final SQLQuery query = this.getSession().createSQLQuery(queryString);
+		query.setParameter("STUDY_ID", studyId);
+		query.setParameterList("PLOT_NOS", plotNos);
+		query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
+		query.setParameterList("PLOT_NO_TERM_IDS",
+			new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
+		query.addScalar("position", new StringType());
+		query.addScalar("designation", new StringType());
+		query.addScalar("germplasmId", new IntegerType());
+		query.setResultTransformer(Transformers.aliasToBean(StudyGermplasmDto.class));
+		final List<StudyGermplasmDto> result = query.list();
+		for(StudyGermplasmDto parent: result) {
+			plotNoToImportedGermplasmParentMap.put(Integer.valueOf(parent.getPosition()), parent);
+		}
+		return plotNoToImportedGermplasmParentMap;
 	}
 }

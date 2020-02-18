@@ -907,7 +907,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				+ "  l.locid as locationId, " //
 				+ "  l.scaleid as scaleId, " //
 				+ "  l.comments as comments, " //
-				+ "  u.uname as createdByUsername, " //
 				+ "  CASE WHEN l.status = 0 then 'Active' else 'Closed' end as status " //
 				+ "from ims_lot l " //
 				+ "       inner join workbench.users u on (u.userid = l.userid) " //
@@ -920,7 +919,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("locationId", IntegerType.INSTANCE);
 			query.addScalar("scaleId", IntegerType.INSTANCE);
 			query.addScalar("comments", StringType.INSTANCE);
-			query.addScalar("createdByUsername", StringType.INSTANCE);
 			query.addScalar("status", StringType.INSTANCE);
 
 			query.setParameterList("stockIds", stockIds);
