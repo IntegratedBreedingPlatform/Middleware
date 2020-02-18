@@ -103,15 +103,14 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Override
 	public void deleteStudyInstance(final Integer studyId, final Integer instanceId) {
-		final EnvironmentDao environmentDao = this.daoFactory.getEnvironmentDao();
-		final ExperimentModel geolocation = environmentDao.getById(instanceId);
+		final ExperimentModel geolocation = this.daoFactory.getEnvironmentDao().getById(instanceId);
 		final Integer instanceNumber = geolocation.getObservationUnitNo();
 
 		// Delete plot and environment experiments
 		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
+		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);
 		this.daoFactory.getExperimentDao()
-			.deleteExperimentsForDatasets(Arrays.asList(this.studyService.getPlotDatasetId(studyId),
-				environmentDatasetId), Collections.singletonList(instanceNumber));
+			.deleteExperimentsForDatasets(Arrays.asList(plotDatasetId, environmentDatasetId), Collections.singletonList(instanceNumber));
 	}
 
 	@Override
