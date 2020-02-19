@@ -12,7 +12,7 @@ public interface StudyInstanceService {
 
 	List<StudyInstance> getStudyInstances(int studyId);
 
-	void deleteStudyInstance(Integer studyId, Integer instanceId);
+	void deleteStudyInstances(Integer studyId, List<Integer> instanceIds);
 
 	Optional<StudyInstance> getStudyInstance(int studyId, Integer instanceId);
 

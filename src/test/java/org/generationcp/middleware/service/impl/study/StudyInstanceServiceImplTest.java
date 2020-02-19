@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -297,7 +298,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testDeleteEnvironment() {
+	public void testDeleteEnvironments() {
 		final DmsProject study =
 			this.testDataInitializer
 				.createDmsProject("Study1", "Study-Description", null, this.daoFactory.getDmsProjectDAO().getById(1), null);
@@ -321,14 +322,14 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		final Integer studyExperimentId = this.createTestExperiments(study, environmentDataset, plotDataset, instance1, instance2, instance3);
 		final Integer studyId = study.getProjectId();
 
-		// Delete Instance 2
+		// Delete Instances 1 and 2
+		final Integer instance1LocationId = instance1.getLocationId();
 		final Integer instance2LocationId = instance2.getLocationId();
-		this.studyInstanceService.deleteStudyInstance(studyId, instance2LocationId);
+		this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance1LocationId, instance2LocationId));
 
 		List<StudyInstance> studyInstances =
 			this.studyInstanceService.getStudyInstances(studyId);
 		Assert.assertEquals(2, studyInstances.size());
-		final Integer instance1LocationId = instance1.getLocationId();
 		Assert.assertEquals(instance1LocationId, this.daoFactory.getExperimentDao().getById(studyExperimentId).getNdExperimentId());
 		for (final StudyInstance instance : studyInstances) {
 			Assert.assertNotEquals(2, instance.getInstanceNumber());
@@ -339,8 +340,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariableNameValuesMap(instance2LocationId)));
 
 
-		// Delete Instance 1 - study experiment Geolocation ID will be updated to next available geolocation
-		this.studyInstanceService.deleteStudyInstance(studyId, instance1LocationId);
 		this.sessionProvder.getSession().flush();
 
 		studyInstances =
@@ -357,7 +356,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		// Delete Instance 3 - should throw exception
 		try {
-			this.studyInstanceService.deleteStudyInstance(studyId, instance3LocationId);
+			this.studyInstanceService.deleteStudyInstances(studyId, Collections.singletonList(instance3LocationId));
 			Assert.fail("Should have thrown exception when attempting to delete last environment.");
 		} catch (final MiddlewareQueryException e) {
 			// Perform assertions outside

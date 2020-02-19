@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.base.Preconditions;
+import org.generationcp.middleware.dao.dms.EnvironmentDao;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -124,15 +125,37 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public void deleteStudyInstance(final Integer studyId, final Integer instanceId) {
-		final ExperimentModel geolocation = this.daoFactory.getEnvironmentDao().getById(instanceId);
-		final Integer instanceNumber = geolocation.getObservationUnitNo();
+	public void deleteStudyInstances(final Integer studyId, final List<Integer> instanceIds) {
+		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
+		final EnvironmentDao environmentDao = this.daoFactory.getEnvironmentDao();
+		final List<ExperimentModel> allEnvironments = environmentDao.getEnvironmentsByDataset(environmentDatasetId);
+		final List<ExperimentModel> environmentsToDelete = allEnvironments.stream()
+			.filter(instance -> instanceIds.contains(instance.getNdExperimentId())).collect(
+				Collectors.toList());
+		final List<Integer> instanceNumbersToDelete = environmentsToDelete.stream().map(ExperimentModel::getObservationUnitNo).collect(Collectors.toList());
 
 		// Delete plot and environment experiments
-		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
 		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);
 		this.daoFactory.getExperimentDao()
-			.deleteExperimentsForDatasets(Arrays.asList(plotDatasetId, environmentDatasetId), Collections.singletonList(instanceNumber));
+			.deleteExperimentsForDatasets(Arrays.asList(plotDatasetId, environmentDatasetId), instanceNumbersToDelete);
+
+		// IF experimental design is not yet generated, re-number succeeding trial instances
+		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
+		if (!hasExperimentalDesign) {
+			final Integer startingInstanceNumber = Collections.min(instanceNumbersToDelete);
+			final List<ExperimentModel> instancesToUpdate =
+				allEnvironments.stream().filter(instance -> !instanceNumbersToDelete.contains(instance.getObservationUnitNo())
+					&& instance.getObservationUnitNo() > startingInstanceNumber).collect(
+					Collectors.toList());
+			// Unfortunately, not possible in MySQL 5 to do batch update as row_number function is only available in MySQL 8
+			// Also tried using MySQL variable assignment like @instance_number:=@instance_number + 1 but it causes Hibernate error
+			// as it's being treated as named parameter. Hopefully can be optimized when we upgrade Hibernate and/or MySQL version
+			Integer instanceNumber = startingInstanceNumber;
+			for (final ExperimentModel instance : instancesToUpdate) {
+				instance.setObservationUnitNo(instanceNumber++);
+				this.daoFactory.getExperimentDao().saveOrUpdate(instance);
+			}
+		}
 	}
 
 	@Override

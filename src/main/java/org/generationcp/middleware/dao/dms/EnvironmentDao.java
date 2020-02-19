@@ -16,6 +16,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
@@ -57,6 +58,7 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 	public List<ExperimentModel> getEnvironmentsByDataset(final Integer datasetId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("project.projectId", datasetId));
+		criteria.addOrder(Order.asc("observationUnitNo"));
 		return criteria.list();
 	}
 
@@ -377,8 +379,9 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 				" WHERE envdataset.study_id = :studyId and envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId();
 			final StringBuilder sb = new StringBuilder(sql);
 			if (!CollectionUtils.isEmpty(instanceNumbers)) {
-				sb.append(" AND exp.observation_unit_no IN (:instanceNumbers)");
+				sb.append(" AND exp.observation_unit_no IN (:instanceNumbers) ");
 			}
+			sb.append(" ORDER by exp.observation_unit_no ASC");
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 			query.addEntity("exp", ExperimentModel.class);
 			query.setParameter("studyId", studyId);
@@ -470,7 +473,5 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 		return map;
 
 	}
-
-
 
 }
