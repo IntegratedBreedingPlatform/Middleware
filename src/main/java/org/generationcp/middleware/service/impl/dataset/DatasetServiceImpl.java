@@ -420,6 +420,11 @@ public class DatasetServiceImpl implements DatasetService {
 	public void removeDatasetVariables(final Integer datasetId, final List<Integer> variableIds) {
 		this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(datasetId, variableIds);
 		this.daoFactory.getPhenotypeDAO().deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
+		// For environment dataset, remove from environment properties too
+		final DatasetType datasetType = this.daoFactory.getDmsProjectDAO().getById(datasetId).getDatasetType();
+		if (DatasetTypeEnum.SUMMARY_DATA.getId() == datasetType.getDatasetTypeId()) {
+			this.daoFactory.getEnvironmentPropertyDao().deletePropertiesInDataset(datasetId, variableIds);
+		}
 	}
 
 	@Override
