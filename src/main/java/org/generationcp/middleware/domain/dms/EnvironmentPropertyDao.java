@@ -121,7 +121,7 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 		final StringBuilder sql1 = new StringBuilder().append("Delete xp.* FROM nd_experimentprop xp "
 			+ "INNER JOIN nd_experiment e ON e.nd_experiment_id = xp.nd_experiment_id "
 			+ "INNER JOIN project p ON p.project_id = e.project_id "
-			+ "WHERE (p.study_id = :datasetId OR p.project_id = :datasetId) AND ngp.type_id IN (:variableIds) ");
+			+ "WHERE (p.study_id = :datasetId OR p.project_id = :datasetId) AND xp.type_id IN (:variableIds) ");
 		if (!CollectionUtils.isEmpty(instanceNumbers)) {
 			sql1.append(" AND e.observation_unit_no IN (:instanceNumbers)");
 		}

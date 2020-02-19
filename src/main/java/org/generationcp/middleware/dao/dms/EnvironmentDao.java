@@ -374,8 +374,8 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 		List<ExperimentModel> returnList = new ArrayList<>();
 		if (studyId != null) {
 			final String sql = "SELECT DISTINCT exp.* " + //
-				" INNER JOIN nd_experiment exp " + //
-				" INNER JOIN project envdataset on (envdataset.project_id = exp.project_ID) " + //
+				" FROM nd_experiment exp " + //
+				" INNER JOIN project envdataset on (envdataset.project_id = exp.project_id) " + //
 				" WHERE envdataset.study_id = :studyId and envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId();
 			final StringBuilder sb = new StringBuilder(sql);
 			if (!CollectionUtils.isEmpty(instanceNumbers)) {

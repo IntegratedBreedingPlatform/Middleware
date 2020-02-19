@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 // ASsumptions - can be added to validations
@@ -360,23 +361,43 @@ public class WorkbookSaver extends Saver {
 		final CropType crop, final int trialDatasetId, final Workbook workbook, final VariableTypeList trialVariables, final List<String> trialHeaders) {
 
 		final Map<Integer, Integer> instanceNumberEnvironmentIdsMap = new HashMap<>();
-		final List<Location> locations = daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
-		// Extract the trial environments from plot observations
-		for (final MeasurementRow row : workbook.getObservations()) {
-			final Integer instanceNumber = this.getTrialInstanceNumber(row);
-			if (!instanceNumberEnvironmentIdsMap.containsKey(instanceNumber)) {
-				final VariableList environmentVariables =
-					this.getVariableListTransformer().transformTrialEnvironment(row, trialVariables, trialHeaders);
-				this.setVariableListValues(environmentVariables, workbook.getConditions());
-				this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
-					environmentVariables, locations);
-				this.assignExptDesignAsExternallyGeneratedDesignIfEmpty(environmentVariables);
+		final List<Location> locations = this.daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 
-				final Integer environmentId = this.createTrialExperiment(crop, trialDatasetId, instanceNumber, environmentVariables);
-				instanceNumberEnvironmentIdsMap.put(instanceNumber, environmentId);
+		if (!workbook.getTrialObservations().isEmpty()) {
+			// If a study is created from Study Manager, extract the trial environments from workbook.getTrialObservations().
+			for (final MeasurementRow row : workbook.getTrialObservations()) {
+				final Integer instanceNumber = this.getTrialInstanceNumber(row);
+				if (row.getExperimentId() <= 0) {
+					final VariableList environmentVariables =
+						this.getVariableListTransformer().transformTrialEnvironment(row, trialVariables);
+					this.setVariableListValues(environmentVariables, workbook.getConditions());
+					this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
+						environmentVariables, locations);
+					this.createTrialExperiment(crop, trialDatasetId, instanceNumber, environmentVariables);
+				} else {
+					// TODO: Update the trial environment variables if it is already existing.
+				}
 			}
-			row.setLocationId(instanceNumberEnvironmentIdsMap.get(instanceNumber));
+		} else {
+			// workbook.getTrialObservations() is empty when a study is created from Dataset Importer.
+			// In this case, extract the trial environments from plot observations
+			for (final MeasurementRow row : workbook.getObservations()) {
+				final Integer instanceNumber = this.getTrialInstanceNumber(row);
+				if (!instanceNumberEnvironmentIdsMap.containsKey(instanceNumber)) {
+					final VariableList environmentVariables =
+						this.getVariableListTransformer().transformTrialEnvironment(row, trialVariables, trialHeaders);
+					this.setVariableListValues(environmentVariables, workbook.getConditions());
+					this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
+						environmentVariables, locations);
+					this.assignExptDesignAsExternallyGeneratedDesignIfEmpty(environmentVariables);
+
+					final Integer environmentId = this.createTrialExperiment(crop, trialDatasetId, instanceNumber, environmentVariables);
+					instanceNumberEnvironmentIdsMap.put(instanceNumber, environmentId);
+				}
+				row.setLocationId(instanceNumberEnvironmentIdsMap.get(instanceNumber));
+			}
 		}
+
 	}
 
 

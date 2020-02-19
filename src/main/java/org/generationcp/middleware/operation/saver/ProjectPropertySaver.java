@@ -189,7 +189,7 @@ public class ProjectPropertySaver {
 		if (variables != null) {
 
 			int rank = this.getNextRank(study);
-			final List<Integer> environmentIds = this.daoFactory.getEnvironmentDao().getEnvironmentIds(study.getProjectId());
+			final List<Integer> environmentIds = this.daoFactory.getEnvironmentDao().getEnvironmentIds(trialDataset.getProjectId());
 			final Set<Integer> geoIds = new HashSet<>(environmentIds);
 			final ExperimentModel environment = this.daoFactory.getEnvironmentDao().getById(geoIds.iterator().next());
 			Hibernate.initialize(environment.getProperties());
