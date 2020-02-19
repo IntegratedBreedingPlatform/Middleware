@@ -148,7 +148,7 @@ public class LotTransformer {
 
 				LotAggregateData aggregateData = lot.getAggregateData();
 				if (aggregateData != null) {
-					lotDetails.setActualLotBalance(aggregateData.getAvailableBalance() + aggregateData.getReservedTotal());
+					lotDetails.setActualLotBalance(aggregateData.getActualBalance());
 					lotDetails.setAvailableLotBalance(aggregateData.getAvailableBalance());
 					lotDetails.setReservedTotal(aggregateData.getReservedTotal());
 					lotDetails.setStockIds(aggregateData.getStockIds());

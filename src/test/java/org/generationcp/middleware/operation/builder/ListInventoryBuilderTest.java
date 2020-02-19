@@ -178,12 +178,12 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		this.inventoryDataManager.addLots(lots);
 
 		final Transaction initialTransaction = this.inventoryDetailsTestDataInitializer
-			.createReservationTransaction(5.0, 0, "Initial inventory", lots.get(0), 1, this.germplasmList.getId(),
+			.createReservationTransaction(5.0, 1, "Initial inventory", lots.get(0), 1, this.germplasmList.getId(),
 				listEntries.get(0).getId(), "LIST", TransactionType.DEPOSIT.getId());
 
 		final Transaction reservationTransaction = this.inventoryDetailsTestDataInitializer
 			.createReservationTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
-				"LIST", TransactionType.DEPOSIT.getId());
+				"LIST", TransactionType.WITHDRAWAL.getId());
 
 		this.inventoryDataManager.addTransaction(initialTransaction);
 		this.inventoryDataManager.addTransaction(reservationTransaction);

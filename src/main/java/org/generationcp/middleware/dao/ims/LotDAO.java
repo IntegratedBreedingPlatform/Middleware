@@ -24,6 +24,7 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -76,8 +77,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	 * as required by BMS-1052
 	 */
 	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS = "SELECT i.lotid, i.eid, " + "  locid, scaleid, i.comments, i.status,"
-			+ "  SUM(CASE WHEN trnstat = 0 AND trnqty > 0 THEN trnqty ELSE 0 END) AS actual_balance, "
-			+ "  CASE WHEN SUM(trnqty) is null THEN 0 ELSE SUM(trnqty) END AS available_balance, "
+			+ "  SUM(CASE WHEN trnstat = 1 THEN trnqty ELSE 0 END) AS actual_balance, "
+			+ "  SUM(CASE WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND trntype = " + TransactionType.WITHDRAWAL.getId()
+			+ ") THEN trnqty ELSE 0 END) AS available_balance, "
 			+ "  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt, "
 			+ "  SUM(CASE WHEN trnstat = 1 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS committed_amt, ";
 
@@ -341,7 +343,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		try {
 			String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED), Count(DISTINCT lotid) "
 					+ ",sum(avail_bal), count(distinct scaleid), scaleid " + " FROM ( " + "SELECT i.lotid, i.eid AS entity_id, "
-					+ "   case when SUM(trnqty) is null then 0 when sum(trnqty) is not null then sum(trnqty) end AS avail_bal, i.scaleid as scaleid " + " FROM ims_lot i "
+					+ "  SUM(CASE WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND trntype = " + TransactionType.WITHDRAWAL.getId()
+					+ ") THEN trnqty ELSE 0 END) AS avail_bal, "
+					+ "i.scaleid as scaleid " + " FROM ims_lot i "
 					+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
 					+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
 					+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
@@ -661,7 +665,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "  lot.scaleid as scaleId, " //
 		+ "  scale.name as scaleName, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) AS actualBalance, " //
-		+ "  CASE WHEN SUM(transaction.trnqty) is null THEN 0 ELSE SUM(transaction.trnqty) END AS availableBalance, " //
+		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
+		+ ") THEN transaction.trnqty ELSE 0 END) AS availableBalance, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) AS reservedTotal, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) AS withdrawalTotal, " //
 		+ "  lot.comments as comments, " //
@@ -757,13 +762,15 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 
 			if (lotsSearchDto.getMinAvailableBalance() != null) {
-				query.append("and CASE WHEN SUM(transaction.trnqty) is null THEN 0 ELSE SUM(transaction.trnqty) END >= ")
+				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
+					+ ") THEN transaction.trnqty ELSE 0 END) >= ")
 						.append(lotsSearchDto.getMinAvailableBalance()).append(" ");
 			}
 
 			if (lotsSearchDto.getMaxAvailableBalance() != null) {
-				query.append("and CASE WHEN SUM(transaction.trnqty) is null THEN 0 ELSE SUM(transaction.trnqty) END <= ")
-						.append(lotsSearchDto.getMaxAvailableBalance()).append(" ");
+				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
+					+ ") THEN transaction.trnqty ELSE 0 END) <= ")
+					.append(lotsSearchDto.getMaxAvailableBalance()).append(" ");
 			}
 
 			if (lotsSearchDto.getMinReservedTotal() != null) {
