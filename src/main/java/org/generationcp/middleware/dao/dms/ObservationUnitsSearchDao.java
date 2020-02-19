@@ -989,14 +989,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		observationUnitRow.setDesignation(designation);
 		observationVariables.put(DESIGNATION, new ObservationUnitData(designation));
 
-		final String trialInstance = (String) row.get(TRIAL_INSTANCE);
-		if (NumberUtils.isDigits(trialInstance)) {
-			observationUnitRow.setTrialInstance(Integer.valueOf(trialInstance));
-		}
-		observationVariables.put(TRIAL_INSTANCE, new ObservationUnitData(trialInstance));
+		final Integer trialInstance = (Integer) row.get(TRIAL_INSTANCE);
+		observationUnitRow.setTrialInstance(trialInstance);
+
+		observationVariables.put(TRIAL_INSTANCE, new ObservationUnitData(String.valueOf(trialInstance)));
 
 		final String entryNumber = (String) row.get(ENTRY_NO);
-		if (NumberUtils.isDigits(trialInstance)) {
+		if (trialInstance != null) {
 			observationUnitRow.setEntryNumber(Integer.valueOf(entryNumber));
 		}
 		observationVariables.put(ENTRY_NO, new ObservationUnitData(entryNumber));
