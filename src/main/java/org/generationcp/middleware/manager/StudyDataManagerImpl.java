@@ -725,8 +725,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType) {
-		return this.getDmsProjectDao().getDatasetIdByEnvironmentIdAndDatasetType(environmentId, datasetType);
+	public Integer getDatasetIdByStudyDbIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType) {
+		return this.getDmsProjectDao().getDatasetIdByExperimentIdAndDatasetType(studyDbId, datasetType);
 	}
 
 	@Override

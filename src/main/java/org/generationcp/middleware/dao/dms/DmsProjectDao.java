@@ -1324,15 +1324,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType) {
+	public Integer getDatasetIdByExperimentIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType) {
 		try {
-			final Query query = this.getSession().createSQLQuery("SELECT DISTINCT p.project_id"
-				+ " FROM project p "
-				+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id"
-				+ " INNER JOIN project study ON p.study_id = study.project_id AND study.deleted != " + DELETED_STUDY
-				+ " WHERE nde.nd_geolocation_id = :environmentId"
-				+ " AND p.dataset_type_id = :datasetTypeId");
-			query.setParameter("environmentId", environmentId);
+			final Query query = this.getSession().createSQLQuery("SELECT DISTINCT p.project_id "
+				+ "		FROM project p "
+				+ "		INNER JOIN project study ON study.study_id = p.study_id AND study.deleted != " + DELETED_STUDY
+				+ "		INNER JOIN nd_experiment nde ON nde.project_id = study.project_id "
+				+ "		WHERE nde.nd_experiment_id = :studyDbId AND p.dataset_type_id = :datasetTypeId");
+			query.setParameter("studyDbId", studyDbId);
 			query.setParameter("datasetTypeId", datasetType.getId());
 			return (Integer) query.uniqueResult();
 		} catch (final HibernateException e) {
