@@ -14,22 +14,22 @@ public class LotSearchMetadata {
 
 	@JsonSerialize(using = MapNullKeySerializer.class)
 	@NullKeyReplacement("NULL_VALUES")
-	private Map<String, BigInteger> lotsCountByScaleName;
+	private Map<String, BigInteger> lotsCountByUnitName;
 
 	public LotSearchMetadata() {
 	}
 
-	public LotSearchMetadata(final Map<String, BigInteger> lotsCountByScaleName) {
-		this.lotsCountByScaleName = lotsCountByScaleName;
+	public LotSearchMetadata(final Map<String, BigInteger> lotsCountByUnitName) {
+		this.lotsCountByUnitName = lotsCountByUnitName;
 	}
 
-	public Map<String, BigInteger> getLotsCountByScaleName() {
-		return lotsCountByScaleName;
+	public Map<String, BigInteger> getLotsCountByUnitName() {
+		return lotsCountByUnitName;
 	}
 
 
-	public void setLotsCountByScaleName(final Map<String, BigInteger> lotsCountByScaleName) {
-		this.lotsCountByScaleName = lotsCountByScaleName;
+	public void setLotsCountByUnitName(final Map<String, BigInteger> lotsCountByUnitName) {
+		this.lotsCountByUnitName = lotsCountByUnitName;
 	}
 
 	@Override
