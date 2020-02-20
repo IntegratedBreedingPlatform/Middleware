@@ -159,7 +159,7 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 	}
 
 	@Override
-	public Optional<StudyInstance> getStudyEnvironments(final int studyId, final Integer environmentId) {
+	public Optional<StudyInstance> getStudyEnvironment(final int studyId, final Integer environmentId) {
 		final List<StudyInstance> studyInstances = this.getStudyInstances(studyId, Collections.singletonList(environmentId));
 		if (!CollectionUtils.isEmpty(studyInstances)) {
 			return Optional.of(studyInstances.get(0));

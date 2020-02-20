@@ -217,7 +217,7 @@ public class StudyEnvironmentServiceImplTest extends IntegrationTestBase {
 
 		final DmsProject study = this.createTestStudy();
 
-		final StudyInstance studyInstance1 = this.studyEnvironmentService.getStudyEnvironments(study.getProjectId(), instance1.getLocationId()).get();
+		final StudyInstance studyInstance1 = this.studyEnvironmentService.getStudyEnvironment(study.getProjectId(), instance1.getLocationId()).get();
 		Assert.assertEquals(instance1.getLocationId().intValue(), studyInstance1.getExperimentId());
 		Assert.assertEquals(1, studyInstance1.getInstanceNumber());
 		Assert.assertNull(studyInstance1.getCustomLocationAbbreviation());
@@ -229,7 +229,7 @@ public class StudyEnvironmentServiceImplTest extends IntegrationTestBase {
 		Assert.assertFalse(studyInstance1.getCanBeDeleted());
 		Assert.assertTrue(studyInstance1.isHasMeasurements());
 
-		final StudyInstance studyInstance2 = this.studyEnvironmentService.getStudyEnvironments(study.getProjectId(), instance2.getLocationId()).get();
+		final StudyInstance studyInstance2 = this.studyEnvironmentService.getStudyEnvironment(study.getProjectId(), instance2.getLocationId()).get();
 		Assert.assertEquals(instance2.getLocationId().intValue(), studyInstance2.getExperimentId());
 		Assert.assertEquals(2, studyInstance2.getInstanceNumber());
 		Assert.assertNull(studyInstance2.getCustomLocationAbbreviation());
@@ -241,7 +241,7 @@ public class StudyEnvironmentServiceImplTest extends IntegrationTestBase {
 		Assert.assertFalse(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 
-		final StudyInstance studyInstance3 = this.studyEnvironmentService.getStudyEnvironments(study.getProjectId(), instance3.getLocationId()).get();
+		final StudyInstance studyInstance3 = this.studyEnvironmentService.getStudyEnvironment(study.getProjectId(), instance3.getLocationId()).get();
 		Assert.assertEquals(instance3.getLocationId().intValue(), studyInstance3.getExperimentId());
 		Assert.assertEquals(3, studyInstance3.getInstanceNumber());
 		Assert.assertNull(studyInstance3.getCustomLocationAbbreviation());

@@ -14,6 +14,6 @@ public interface StudyEnvironmentService {
 
 	void deleteStudyEnvironments(Integer studyId, List<Integer> environmentIds);
 
-	Optional<StudyInstance> getStudyEnvironments(int studyId, Integer environmentId);
+	Optional<StudyInstance> getStudyEnvironment(int studyId, Integer environmentId);
 
 }
