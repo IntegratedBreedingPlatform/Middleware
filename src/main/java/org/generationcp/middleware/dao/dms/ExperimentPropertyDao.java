@@ -250,7 +250,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		Integer environmentId = null;
 		String datasetName = null;
 		String siteName = null;
-		String trialInstanceNo = null;
+		Integer trialInstanceNo = null;
 		Integer blockId = null;
 		Integer siteId = null;
 		for (final Object[] row : list) {
@@ -264,7 +264,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					trialInstance.setSiteName(siteName);
 					trialInstance.setLocationName(siteName);
 					trialInstance.setLocationId(siteId);
-					trialInstance.setTrialInstanceNo(trialInstanceNo);
+					trialInstance.setTrialInstanceNo(String.valueOf(trialInstanceNo));
 					trialInstance.setBlockId(blockId);
 					trialInstance.setFieldMapLabels(labels);
 					if (blockId != null) {
@@ -333,7 +333,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			} else {
 				siteId = null;
 			}
-			trialInstanceNo = (String) row[12];
+			trialInstanceNo = (Integer) row[12];
 			blockId = row[11] != null ? Integer.valueOf((String) row[11]) : null;
 		}
 		// add last trial instance and dataset
@@ -342,7 +342,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		trialInstance.setLocationName(siteName);
 		trialInstance.setLocationId(siteId);
 		trialInstance.setBlockId(blockId);
-		trialInstance.setTrialInstanceNo(trialInstanceNo);
+		trialInstance.setTrialInstanceNo(String.valueOf(trialInstanceNo));
 		trialInstance.setFieldMapLabels(labels);
 
 		if (blockId != null) {
