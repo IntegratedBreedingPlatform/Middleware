@@ -702,8 +702,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				query.append("and lot.locid IN (").append(Joiner.on(",").join(lotsSearchDto.getLocationIds())).append(") ");
 			}
 
-			if (lotsSearchDto.getScaleIds() != null && !lotsSearchDto.getScaleIds().isEmpty()) {
-				query.append("and lot.scaleid IN (").append(Joiner.on(",").join(lotsSearchDto.getScaleIds())).append(") ");
+			if (lotsSearchDto.getUnitIds() != null && !lotsSearchDto.getUnitIds().isEmpty()) {
+				query.append("and lot.scaleid IN (").append(Joiner.on(",").join(lotsSearchDto.getUnitIds())).append(") ");
 			}
 
 			if (lotsSearchDto.getDesignation()!=null) {

@@ -312,7 +312,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		transactionsSearchDto.setMaxAmount(10.0);
 		transactionsSearchDto.setMinAmount(-10.0);
 		transactionsSearchDto.setNotes("Deposit");
-		transactionsSearchDto.setScaleIds(Lists.newArrayList(8264));
+		transactionsSearchDto.setUnitIds(Lists.newArrayList(8264));
 		transactionsSearchDto.setStockId("ABC-1");
 		transactionsSearchDto.setTransactionDateFrom(date1);
 		transactionsSearchDto.setTransactionDateTo(date1);

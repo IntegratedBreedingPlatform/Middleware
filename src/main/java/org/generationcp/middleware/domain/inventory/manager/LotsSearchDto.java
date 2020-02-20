@@ -27,7 +27,7 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private List<Integer> locationIds;
 
-	private List<Integer> scaleIds;
+	private List<Integer> unitIds;
 
 	private Double minActualBalance;
 
@@ -127,12 +127,12 @@ public class LotsSearchDto extends SearchRequestDto {
 		this.locationIds = locationIds;
 	}
 
-	public List<Integer> getScaleIds() {
-		return scaleIds;
+	public List<Integer> getUnitIds() {
+		return unitIds;
 	}
 
-	public void setScaleIds(final List<Integer> scaleIds) {
-		this.scaleIds = scaleIds;
+	public void setUnitIds(final List<Integer> unitIds) {
+		this.unitIds = unitIds;
 	}
 
 	public Double getMinActualBalance() {

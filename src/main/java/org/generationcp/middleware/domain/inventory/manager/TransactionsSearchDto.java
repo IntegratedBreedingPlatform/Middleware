@@ -22,7 +22,7 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	private String notes;
 	private List<Integer> lotIds;
 	private List<Integer> gids;
-	private List<Integer> scaleIds;
+	private List<Integer> unitIds;
 	private Double minAmount;
 	private Double maxAmount;
 
@@ -92,12 +92,12 @@ public class TransactionsSearchDto extends SearchRequestDto {
 		this.gids = gids;
 	}
 
-	public List<Integer> getScaleIds() {
-		return this.scaleIds;
+	public List<Integer> getUnitIds() {
+		return this.unitIds;
 	}
 
-	public void setScaleIds(final List<Integer> scaleIds) {
-		this.scaleIds = scaleIds;
+	public void setUnitIds(final List<Integer> unitIds) {
+		this.unitIds = unitIds;
 	}
 
 	public Double getMinAmount() {
