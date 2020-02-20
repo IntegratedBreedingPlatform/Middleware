@@ -44,6 +44,7 @@ public class PermissionServiceImpl implements PermissionService {
 
 	private void getLinks(final Set<PermissionDto> permissionDtoList, final PermissionDto permissionDto ) {
 		final List<PermissionDto> children = this.workbenchDaoFactory.getPermissionDAO().getChildrenOfPermission(permissionDto);
+		permissionDtoList.add(permissionDto);
 		if (children.size() != 0) {
 			for (final PermissionDto dto : children) {
 				if (dto.getWorkbenchCategoryLinkId() != null) {
@@ -51,9 +52,6 @@ public class PermissionServiceImpl implements PermissionService {
 				}
 				this.getLinks(permissionDtoList, dto);
 			}
-		}
-		else {
-			permissionDtoList.add(permissionDto);
 		}
 	}
 
