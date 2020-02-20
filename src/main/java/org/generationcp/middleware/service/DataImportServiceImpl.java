@@ -1164,24 +1164,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				}
 			}
 		}
-		boolean hasDuplicateTrialInstances = false;
 		if (!duplicateTrialInstances.isEmpty() && workbook.getStudyDetails().getId() != null) {
-			// check import type first
-			final List<Integer> variateIds = new ArrayList<>();
-			// check all variates
-			for (final MeasurementVariable mvar : workbook.getVariates()) {
-				variateIds.add(mvar.getTermId());
-			}
-
-			final int numberOfVariatesData = this.getPhenotypeDao()
-				.countVariatesDataOfStudy(
-					isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId(),
-					variateIds);
-			if (numberOfVariatesData > 0) {
-				hasDuplicateTrialInstances = true;
-			}
-		}
-		if (hasDuplicateTrialInstances) {
 			this.initializeIfNull(errors, Constants.GLOBAL);
 			final StringBuilder trialInstanceNumbers = new StringBuilder();
 			for (final String trialInstanceNo : duplicateTrialInstances) {
