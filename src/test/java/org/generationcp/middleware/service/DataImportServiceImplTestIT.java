@@ -438,7 +438,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 		final Map<String, List<Message>> errors = this.dataImportService.validateProjectData(workbook,
 				DataImportServiceImplTestIT.PROGRAM_UUID);
-		Assert.assertNotNull(errors);
+		Assert.assertNull(errors);
 		Debug.println(IntegrationTestBase.INDENT, "Errors Identified: ");
 		for (final Map.Entry<String, List<Message>> e : errors.entrySet()) {
 			Debug.println(IntegrationTestBase.INDENT + 2, e.getKey());
