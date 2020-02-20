@@ -189,6 +189,8 @@ public class ProjectPropertySaver {
 		if (variables != null) {
 
 			int rank = this.getNextRank(study);
+
+			// TODO: IBP-3303, check if this is still relevant
 			final List<Integer> environmentIds = this.daoFactory.getEnvironmentDao().getEnvironmentIds(trialDataset.getProjectId());
 			final Set<Integer> geoIds = new HashSet<>(environmentIds);
 			final ExperimentModel environment = this.daoFactory.getEnvironmentDao().getById(geoIds.iterator().next());
@@ -311,7 +313,8 @@ public class ProjectPropertySaver {
 				this.updateVariable(trialDataset, variable);
 				this.updateVariable(measurementDataset, variable);
 
-				this.saver.getExperimentPropertySaver().saveOrUpdateProperty(environment, variable.getTermId(), variable.getValue());
+				// TODO: IBP-3303, check if this is still relevant
+				//this.saver.getExperimentPropertySaver().saveOrUpdateProperty(environment, variable.getTermId(), variable.getValue());
 
 			} else if (PhenotypicType.VARIATE == variable.getRole()) {
 
