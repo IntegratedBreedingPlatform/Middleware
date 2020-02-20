@@ -42,7 +42,7 @@ public class TransactionDto {
 		this.lot.setLotId(lotId);
 		this.lot.setGid(gid);
 		this.lot.setStockId(stockId);
-		this.lot.setScaleId(scaleId);
+		this.lot.setUnitId(scaleId);
 		this.lot.setStatus(lotStatus);
 		this.lot.setLocationId(locationId);
 		this.lot.setComments(comments);

@@ -662,7 +662,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "  CASE WHEN lot.status = 0 then '" + LotStatus.ACTIVE.name()  +"' else '"+ LotStatus.CLOSED.name()+ "' end as status, " //
 		+ "  lot.locid as locationId, " //
  		+ "  l.lname as locationName, " //
-		+ "  lot.scaleid as scaleId, " //
+		+ "  lot.scaleid as unitId, " //
 		+ "  scale.name as scaleName, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) AS actualBalance, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
@@ -714,8 +714,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				query.append(" and lot.status = ").append(lotsSearchDto.getStatus());
 			}
 
-			if (lotsSearchDto.getCommentContainsString() != null) {
-				query.append(" and lot.comments like '%").append(lotsSearchDto.getCommentContainsString()).append("%' ");
+			if (lotsSearchDto.getNotesContainsString() != null) {
+				query.append(" and lot.comments like '%").append(lotsSearchDto.getNotesContainsString()).append("%' ");
 			}
 
 			if (lotsSearchDto.getLocationNameContainsString() != null) {
@@ -854,7 +854,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("status");
 			query.addScalar("locationId");
 			query.addScalar("locationName");
-			query.addScalar("scaleId");
+			query.addScalar("unitId");
 			query.addScalar("scaleName");
 			query.addScalar("actualBalance");
 			query.addScalar("availableBalance");

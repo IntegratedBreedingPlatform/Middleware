@@ -13,7 +13,7 @@ public class LotDto {
 	private String stockId;
 	private Integer gid;
 	private Integer locationId;
-	private Integer scaleId;
+	private Integer unitId;
 	private String comments;
 	private String status;
 
@@ -49,12 +49,12 @@ public class LotDto {
 		this.locationId = locationId;
 	}
 
-	public Integer getScaleId() {
-		return scaleId;
+	public Integer getUnitId() {
+		return unitId;
 	}
 
-	public void setScaleId(final Integer scaleId) {
-		this.scaleId = scaleId;
+	public void setUnitId(final Integer unitId) {
+		this.unitId = unitId;
 	}
 
 	public String getComments() {

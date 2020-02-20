@@ -78,7 +78,7 @@ public class LotServiceImpl implements LotService {
 		lot.setStatus(0);
 		//FIXME check if source has to be always 0
 		lot.setSource(0);
-		lot.setScaleId(lotDto.getScaleId());
+		lot.setScaleId(lotDto.getUnitId());
 		this.inventoryDataManager.generateLotIds(cropType, Lists.newArrayList(lot));
 		this.daoFactory.getLotDao().save(lot);
 
