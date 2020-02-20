@@ -36,6 +36,7 @@ import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DataImportServiceImplTestIT extends IntegrationTestBase {
@@ -407,6 +408,34 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		workbook.print(IntegrationTestBase.INDENT);
 		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID,
 				this.cropType);
+		final Map<String, List<Message>> errors = this.dataImportService.validateProjectData(workbook,
+				DataImportServiceImplTestIT.PROGRAM_UUID);
+		Assert.assertNotNull(errors);
+		Debug.println(IntegrationTestBase.INDENT, "Errors Identified: ");
+		for (final Map.Entry<String, List<Message>> e : errors.entrySet()) {
+			Debug.println(IntegrationTestBase.INDENT + 2, e.getKey());
+			for (final Message m : e.getValue()) {
+				if (m.getMessageParams() != null) {
+					Debug.println(IntegrationTestBase.INDENT + 4,
+							"Key: " + m.getMessageKey() + " Params: " + Arrays.asList(m.getMessageParams()));
+				} else {
+					Debug.println(IntegrationTestBase.INDENT + 4, "Key: " + m.getMessageKey());
+				}
+			}
+		}
+	}
+
+	@Test
+	public void testValidateProjectDataWithError() {
+		final String studyName = "validateProjectData_" + new Random().nextInt(10000);
+		final int studyNo = 1;
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbookForWizard(studyName, studyNo);
+		workbook.print(IntegrationTestBase.INDENT);
+		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID,
+				this.cropType);
+
+		Mockito.when(this.dataImportService.getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName, "1", DataImportServiceImplTestIT.PROGRAM_UUID)).thenReturn(1);
+
 		final Map<String, List<Message>> errors = this.dataImportService.validateProjectData(workbook,
 				DataImportServiceImplTestIT.PROGRAM_UUID);
 		Assert.assertNotNull(errors);
