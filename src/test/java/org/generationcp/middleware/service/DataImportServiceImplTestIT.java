@@ -443,13 +443,11 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		for (final Map.Entry<String, List<Message>> e : errors.entrySet()) {
 			Debug.println(IntegrationTestBase.INDENT + 2, e.getKey());
 			for (final Message m : e.getValue()) {
-				if (m.getMessageParams() != null) {
-					Debug.println(IntegrationTestBase.INDENT + 4,
-							"Key: " + m.getMessageKey() + " Params: " + Arrays.asList(m.getMessageParams()));
-				} else {
-					Debug.println(IntegrationTestBase.INDENT + 4, "Key: " + m.getMessageKey());
-				}
+				Assert.assertEquals(m.getMessageKey(), "error.duplicate.trial.instance");
+				Assert.assertNotNull(m.getMessageParams());
+				Assert.assertEquals(1, m.getMessageParams()[0].toString());
 			}
 		}
+
 	}
 }
