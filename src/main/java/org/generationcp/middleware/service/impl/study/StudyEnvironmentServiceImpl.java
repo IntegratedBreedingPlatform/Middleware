@@ -12,7 +12,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.study.StudyInstanceService;
+import org.generationcp.middleware.service.api.study.StudyEnvironmentService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
@@ -28,7 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Transactional
-public class StudyInstanceServiceImpl implements StudyInstanceService {
+public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 
 	@Resource
 	private StudyService studyService;
@@ -40,19 +40,19 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private DaoFactory daoFactory;
 
 
-	public StudyInstanceServiceImpl() {
+	public StudyEnvironmentServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
 
-	public StudyInstanceServiceImpl(final HibernateSessionProvider sessionProvider) {
+	public StudyEnvironmentServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.experimentModelGenerator = new ExperimentModelGenerator();
 		this.studyService = new StudyServiceImpl(sessionProvider);
 	}
 
 	@Override
-	public List<StudyInstance> createStudyInstances(final CropType crop, final int studyId, final int datasetId, final Integer numberOfInstancesToGenerate) {
-		Preconditions.checkArgument(numberOfInstancesToGenerate > 0);
+	public List<StudyInstance> createStudyEnvironments(final CropType crop, final int studyId, final int datasetId, final Integer numberOfEnvironmentsToGenerate) {
+		Preconditions.checkArgument(numberOfEnvironmentsToGenerate > 0);
 
 		// Retrieve existing study instances
 		final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(datasetId);
@@ -61,7 +61,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final List<StudyInstance> studyInstances = new ArrayList<>();
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
 		int instancesGenerated = 0;
-		while (instancesGenerated < numberOfInstancesToGenerate) {
+		while (instancesGenerated < numberOfEnvironmentsToGenerate) {
 			// If design is generated, increment last instance number. Otherwise, attempt to find  "gap" instance number first (if any)
 			Integer instanceNumber = Collections.max(instanceNumbers) + 1;
 			if (!hasExperimentalDesign) {
@@ -103,7 +103,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public List<StudyInstance> getStudyInstances(final int studyId) {
+	public List<StudyInstance> getStudyEnvironments(final int studyId) {
 		return this.getStudyInstances(studyId, Collections.emptyList());
 	}
 
@@ -125,12 +125,12 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public void deleteStudyInstances(final Integer studyId, final List<Integer> instanceIds) {
+	public void deleteStudyEnvironments(final Integer studyId, final List<Integer> environmentIds) {
 		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
 		final EnvironmentDao environmentDao = this.daoFactory.getEnvironmentDao();
 		final List<ExperimentModel> allEnvironments = environmentDao.getEnvironmentsByDataset(environmentDatasetId);
 		final List<ExperimentModel> environmentsToDelete = allEnvironments.stream()
-			.filter(instance -> instanceIds.contains(instance.getNdExperimentId())).collect(
+			.filter(instance -> environmentIds.contains(instance.getNdExperimentId())).collect(
 				Collectors.toList());
 		final List<Integer> instanceNumbersToDelete = environmentsToDelete.stream().map(ExperimentModel::getObservationUnitNo).collect(Collectors.toList());
 
@@ -159,8 +159,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public Optional<StudyInstance> getStudyInstance(final int studyId, final Integer instanceId) {
-		final List<StudyInstance> studyInstances = this.getStudyInstances(studyId, Collections.singletonList(instanceId));
+	public Optional<StudyInstance> getStudyEnvironments(final int studyId, final Integer environmentId) {
+		final List<StudyInstance> studyInstances = this.getStudyInstances(studyId, Collections.singletonList(environmentId));
 		if (!CollectionUtils.isEmpty(studyInstances)) {
 			return Optional.of(studyInstances.get(0));
 		}
