@@ -663,7 +663,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "  lot.locid as locationId, " //
  		+ "  l.lname as locationName, " //
 		+ "  lot.scaleid as unitId, " //
-		+ "  scale.name as scaleName, " //
+		+ "  scale.name as unitName, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) AS actualBalance, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
 		+ ") THEN transaction.trnqty ELSE 0 END) AS availableBalance, " //
@@ -855,7 +855,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("locationId");
 			query.addScalar("locationName");
 			query.addScalar("unitId");
-			query.addScalar("scaleName");
+			query.addScalar("unitName");
 			query.addScalar("actualBalance");
 			query.addScalar("availableBalance");
 			query.addScalar("reservedTotal");
@@ -898,7 +898,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			final String filterLotsQuery = buildSearchLotsQuery(lotsSearchDto);
 
 			final String countQuery = "SELECT scale.name, count(*) from ("  //
-			+ filterLotsQuery + ") as lot left join cvterm scale on (scale.cvterm_id = lot.scaleid) " //
+			+ filterLotsQuery + ") as lot left join cvterm scale on (scale.cvterm_id = lot.unitId) " //
 				+ "group by  scale.name "; //
 
 			final SQLQuery query = this.getSession().createSQLQuery(countQuery);
@@ -938,7 +938,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				+ "  l.stock_id as stockId, " //
 				+ "  l.eid as gid, " //
 				+ "  l.locid as locationId, " //
-				+ "  l.scaleid as scaleId, " //
+				+ "  l.scaleid as unitId, " //
 				+ "  l.comments as comments, " //
 				+ "  CASE WHEN l.status = 0 then 'Active' else 'Closed' end as status " //
 				+ "from ims_lot l " //
@@ -950,7 +950,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("stockId", Hibernate.STRING);
 			query.addScalar("gid", Hibernate.INTEGER);
 			query.addScalar("locationId", Hibernate.INTEGER);
-			query.addScalar("scaleId", Hibernate.INTEGER);
+			query.addScalar("unitId", Hibernate.INTEGER);
 			query.addScalar("comments", Hibernate.STRING);
 			query.addScalar("status", Hibernate.STRING);
 

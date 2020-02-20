@@ -46,7 +46,7 @@ public class TransactionDto {
 		this.lot.setStatus(lotStatus);
 		this.lot.setLocationId(locationId);
 		this.lot.setComments(comments);
-		this.lot.setScaleName(scaleName);
+		this.lot.setUnitName(scaleName);
 		this.lot.setDesignation(designation);
 	}
 
