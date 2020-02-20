@@ -423,12 +423,12 @@ public interface StudyDataManager {
 	DmsProject getParentFolder(int id);
 
 	/**
-	 * Returns the datasetId of dataset to which the study db id belongs to.
-	 * @param studyDbId
+	 * Returns the datasetId of dataset to which the environment id belongs to.
+	 * @param environmentId
 	 * @param datasetType
 	 * @return
 	 */
-	Integer getDatasetIdByStudyDbIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType);
+	Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType);
 
 
 	/**
