@@ -2,6 +2,9 @@ package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.dms.EnvironmentDao;
+import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
+import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.domain.dms.EnvironmentData;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -11,6 +14,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyEnvironmentService;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -23,6 +27,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -165,6 +170,65 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 			return Optional.of(studyInstances.get(0));
 		}
 		return Optional.empty();
+	}
+
+	@Override
+	public EnvironmentData addEnvironmentData(final EnvironmentData environmentData) {
+		Preconditions.checkNotNull(environmentData.getEnvironmentId());
+		final Integer variableId = environmentData.getVariableId();
+		Preconditions.checkNotNull(variableId);
+		Preconditions.checkNotNull(environmentData.getValue());
+		final Boolean isEnvironmentalCondition = environmentData.getVariableIsEnvironmentalCondition();
+		// Environment oonditions are stored in phenotype. Other environment details are saved in nd_experimentprop
+		if (isEnvironmentalCondition) {
+			final Phenotype phenotype = new Phenotype(variableId, environmentData.getValue(), new ExperimentModel(environmentData.getEnvironmentId()));
+			phenotype.setCreatedDate(new Date());
+			phenotype.setUpdatedDate(new Date());
+			phenotype.setcValue(environmentData.getCategoricalValueId());
+			phenotype.setName(String.valueOf(variableId));
+
+			this.daoFactory.getPhenotypeDAO().save(phenotype);
+			environmentData.setEnvironmentDataId(phenotype.getPhenotypeId());
+		} else {
+			final String value = this.getEnvironmentDataValue(environmentData);
+			final ExperimentProperty property =
+				new ExperimentProperty(new ExperimentModel(environmentData.getEnvironmentId()), value, 1, environmentData.getVariableId());
+			this.daoFactory.getExperimentPropertyDao().save(property);
+			environmentData.setEnvironmentDataId(property.getNdExperimentpropId());
+		}
+
+		return environmentData;
+	}
+
+	private String getEnvironmentDataValue(final EnvironmentData environmentData) {
+		return (environmentData.getCategoricalValueId() != null && environmentData.getCategoricalValueId() > 0) ? String.valueOf(environmentData.getCategoricalValueId()) :
+			environmentData.getValue();
+	}
+
+	@Override
+	public EnvironmentData updateEnvironmentData(final EnvironmentData environmentData) {
+		Preconditions.checkNotNull(environmentData.getEnvironmentDataId());
+		Preconditions.checkNotNull(environmentData.getEnvironmentId());
+		Preconditions.checkNotNull(environmentData.getVariableId());
+		Preconditions.checkNotNull(environmentData.getValue());
+		final Boolean isEnvironmentalCondition = environmentData.getVariableIsEnvironmentalCondition();
+		// Environment oonditions are stored in phenotype. Other environment details are saved in nd_experimentprop
+		if (isEnvironmentalCondition) {
+			final PhenotypeDao phenotypeDAO = this.daoFactory.getPhenotypeDAO();
+			final Phenotype phenotype = phenotypeDAO.getById(environmentData.getEnvironmentDataId());
+			Preconditions.checkNotNull(phenotype);
+			phenotype.setValue(environmentData.getValue());
+			phenotype.setcValue(environmentData.getCategoricalValueId());
+			phenotype.setUpdatedDate(new Date());
+			phenotypeDAO.update(phenotype);
+		} else {
+			final ExperimentPropertyDao propertyDao = this.daoFactory.getExperimentPropertyDao();
+			final ExperimentProperty property = propertyDao.getById(environmentData.getEnvironmentDataId());
+			Preconditions.checkNotNull(property);
+			property.setValue(this.getEnvironmentDataValue(environmentData));
+			propertyDao.update(property);
+		}
+		return environmentData;
 	}
 
 	protected Optional<Location> getUnspecifiedLocation() {

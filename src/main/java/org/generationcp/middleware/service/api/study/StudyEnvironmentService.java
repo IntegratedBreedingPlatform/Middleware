@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.study;
 
+import org.generationcp.middleware.domain.dms.EnvironmentData;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 
@@ -15,5 +16,10 @@ public interface StudyEnvironmentService {
 	void deleteStudyEnvironments(Integer studyId, List<Integer> environmentIds);
 
 	Optional<StudyInstance> getStudyEnvironment(int studyId, Integer environmentId);
+
+	EnvironmentData addEnvironmentData(EnvironmentData environmentData);
+
+	EnvironmentData updateEnvironmentData(EnvironmentData environmentData);
+
 
 }
