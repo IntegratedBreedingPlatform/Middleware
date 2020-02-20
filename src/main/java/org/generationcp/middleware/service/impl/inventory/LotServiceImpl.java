@@ -69,7 +69,7 @@ public class LotServiceImpl implements LotService {
 
 		final Lot lot = new Lot();
 		lot.setUserId(userId);
-		lot.setComments(lotDto.getComments());
+		lot.setComments(lotDto.getNotes());
 		lot.setCreatedDate(new Date());
 		lot.setEntityId(lotDto.getGid());
 		lot.setEntityType("GERMPLSM");

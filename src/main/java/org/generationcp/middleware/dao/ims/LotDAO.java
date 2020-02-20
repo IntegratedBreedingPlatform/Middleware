@@ -669,7 +669,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ ") THEN transaction.trnqty ELSE 0 END) AS availableBalance, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) AS reservedTotal, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) AS withdrawalTotal, " //
-		+ "  lot.comments as comments, " //
+		+ "  lot.comments as notes, " //
 		+ "  users.uname as createdByUsername, " //
 		+ "  lot.created_date as createdDate, " //
 		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END) AS lastDepositDate, " //
@@ -860,7 +860,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("availableBalance");
 			query.addScalar("reservedTotal");
 			query.addScalar("withdrawalTotal");
-			query.addScalar("comments");
+			query.addScalar("notes");
 			query.addScalar("createdByUsername");
 			query.addScalar("createdDate", Hibernate.DATE);
 			query.addScalar("lastDepositDate", Hibernate.DATE);
@@ -939,7 +939,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				+ "  l.eid as gid, " //
 				+ "  l.locid as locationId, " //
 				+ "  l.scaleid as unitId, " //
-				+ "  l.comments as comments, " //
+				+ "  l.comments as notes, " //
 				+ "  CASE WHEN l.status = 0 then 'Active' else 'Closed' end as status " //
 				+ "from ims_lot l " //
 				+ "       inner join workbench.users u on (u.userid = l.userid) " //
@@ -951,7 +951,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("gid", Hibernate.INTEGER);
 			query.addScalar("locationId", Hibernate.INTEGER);
 			query.addScalar("unitId", Hibernate.INTEGER);
-			query.addScalar("comments", Hibernate.STRING);
+			query.addScalar("notes", Hibernate.STRING);
 			query.addScalar("status", Hibernate.STRING);
 
 			query.setParameterList("stockIds", stockIds);

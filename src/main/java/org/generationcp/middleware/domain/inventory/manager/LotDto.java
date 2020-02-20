@@ -14,7 +14,7 @@ public class LotDto {
 	private Integer gid;
 	private Integer locationId;
 	private Integer unitId;
-	private String comments;
+	private String notes;
 	private String status;
 
 	public Integer getLotId() {
@@ -57,12 +57,12 @@ public class LotDto {
 		this.unitId = unitId;
 	}
 
-	public String getComments() {
-		return comments;
+	public String getNotes() {
+		return notes;
 	}
 
-	public void setComments(final String comments) {
-		this.comments = comments;
+	public void setNotes(final String notes) {
+		this.notes = notes;
 	}
 
 	public String getStatus() {
