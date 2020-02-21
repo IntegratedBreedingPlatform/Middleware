@@ -11,12 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
@@ -37,6 +31,12 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link ExperimentProperty}.
@@ -517,6 +517,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			ExperimentPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public ExperimentProperty getExperimentProperty(final Integer experimentId, final Integer experimentPropertyId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("ndExperimentpropId", experimentPropertyId));
+		criteria.add(Restrictions.eq("experiment.ndExperimentId", experimentId));
+		return (ExperimentProperty) criteria.uniqueResult();
 	}
 
 }

@@ -231,6 +231,24 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 		return environmentData;
 	}
 
+	@Override
+	public Optional<EnvironmentData> getEnvironmentData(final Integer environmentId, final Integer environmentDataId, final boolean isEnvironmentCondition) {
+		if (isEnvironmentCondition){
+			final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotype(environmentId, environmentDataId);
+			if (phenotype != null) {
+				return Optional.of(new EnvironmentData(phenotype.getExperiment().getNdExperimentId(), environmentDataId, phenotype.getObservableId(),
+					phenotype.getValue(), phenotype.getcValueId()));
+			}
+		} else {
+			final ExperimentProperty property = this.daoFactory.getExperimentPropertyDao().getExperimentProperty(environmentId, environmentDataId);
+			if (property != null) {
+				return Optional.of(new EnvironmentData(property.getExperiment().getNdExperimentId(), environmentDataId, property.getTypeId(),
+					property.getValue(), null));
+			}
+		}
+		return Optional.empty();
+	}
+
 	protected Optional<Location> getUnspecifiedLocation() {
 		final List<Location> locations = this.daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 		if (!locations.isEmpty()) {

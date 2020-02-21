@@ -21,5 +21,7 @@ public interface StudyEnvironmentService {
 
 	EnvironmentData updateEnvironmentData(EnvironmentData environmentData, boolean isEnvironmentCondition);
 
+	Optional<EnvironmentData> getEnvironmentData(Integer environmentId, final Integer environmentDataId, boolean isEnvironmentCondition);
+
 
 }
