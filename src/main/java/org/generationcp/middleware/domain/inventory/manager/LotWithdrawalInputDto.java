@@ -12,10 +12,18 @@ import java.util.Map;
 public class LotWithdrawalInputDto {
 
 	@AutoProperty
-	private class WithdrawalAmountInstruction{
+	public static class WithdrawalAmountInstruction{
 		private boolean reserveAllAvailableBalance;
 
 		private Double withdrawalAmount;
+
+		public WithdrawalAmountInstruction() {
+		}
+
+		public WithdrawalAmountInstruction(final boolean reserveAllAvailableBalance, final Double withdrawalAmount) {
+			this.reserveAllAvailableBalance = reserveAllAvailableBalance;
+			this.withdrawalAmount = withdrawalAmount;
+		}
 
 		public boolean isReserveAllAvailableBalance() {
 			return reserveAllAvailableBalance;
