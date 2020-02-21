@@ -173,14 +173,14 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 	}
 
 	@Override
-	public EnvironmentData addEnvironmentData(final EnvironmentData environmentData) {
+	public EnvironmentData addEnvironmentData(final EnvironmentData environmentData, final boolean isEnvironmentCondition) {
 		Preconditions.checkNotNull(environmentData.getEnvironmentId());
 		final Integer variableId = environmentData.getVariableId();
 		Preconditions.checkNotNull(variableId);
 		Preconditions.checkNotNull(environmentData.getValue());
-		final Boolean isEnvironmentalCondition = environmentData.getVariableIsEnvironmentalCondition();
+
 		// Environment oonditions are stored in phenotype. Other environment details are saved in nd_experimentprop
-		if (isEnvironmentalCondition) {
+		if (isEnvironmentCondition) {
 			final Phenotype phenotype = new Phenotype(variableId, environmentData.getValue(), new ExperimentModel(environmentData.getEnvironmentId()));
 			phenotype.setCreatedDate(new Date());
 			phenotype.setUpdatedDate(new Date());
@@ -206,14 +206,14 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 	}
 
 	@Override
-	public EnvironmentData updateEnvironmentData(final EnvironmentData environmentData) {
+	public EnvironmentData updateEnvironmentData(final EnvironmentData environmentData, final boolean isEnvironmentCondition) {
 		Preconditions.checkNotNull(environmentData.getEnvironmentDataId());
 		Preconditions.checkNotNull(environmentData.getEnvironmentId());
 		Preconditions.checkNotNull(environmentData.getVariableId());
 		Preconditions.checkNotNull(environmentData.getValue());
-		final Boolean isEnvironmentalCondition = environmentData.getVariableIsEnvironmentalCondition();
+
 		// Environment oonditions are stored in phenotype. Other environment details are saved in nd_experimentprop
-		if (isEnvironmentalCondition) {
+		if (isEnvironmentCondition) {
 			final PhenotypeDao phenotypeDAO = this.daoFactory.getPhenotypeDAO();
 			final Phenotype phenotype = phenotypeDAO.getById(environmentData.getEnvironmentDataId());
 			Preconditions.checkNotNull(phenotype);

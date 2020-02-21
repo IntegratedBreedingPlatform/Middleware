@@ -15,20 +15,18 @@ public class EnvironmentData {
 	private Integer variableId;
 	private String value;
 	private Integer categoricalValueId;
-	private Boolean variableIsEnvironmentalCondition;
 
 	public EnvironmentData() {
 		// Empty constructor is needed to be able to map JSON from request
 	}
 
 	public EnvironmentData(final Integer environmentId, final Integer environmentDataId, final Integer variableId, final String value,
-		final Integer categoricalValueId, final Boolean variableIsEnvironmentalCondition) {
+		final Integer categoricalValueId) {
 		this.environmentId = environmentId;
 		this.environmentDataId = environmentDataId;
 		this.variableId = variableId;
 		this.value = value;
 		this.categoricalValueId = categoricalValueId;
-		this.variableIsEnvironmentalCondition = variableIsEnvironmentalCondition;
 	}
 
 	public Integer getEnvironmentId() {
@@ -69,14 +67,6 @@ public class EnvironmentData {
 
 	public void setCategoricalValueId(final Integer categoricalValueId) {
 		this.categoricalValueId = categoricalValueId;
-	}
-
-	public Boolean getVariableIsEnvironmentalCondition() {
-		return variableIsEnvironmentalCondition;
-	}
-
-	public void setVariableIsEnvironmentalCondition(final Boolean variableIsEnvironmentalCondition) {
-		this.variableIsEnvironmentalCondition = variableIsEnvironmentalCondition;
 	}
 
 	@Override

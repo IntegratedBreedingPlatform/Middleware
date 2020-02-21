@@ -17,9 +17,9 @@ public interface StudyEnvironmentService {
 
 	Optional<StudyInstance> getStudyEnvironment(int studyId, Integer environmentId);
 
-	EnvironmentData addEnvironmentData(EnvironmentData environmentData);
+	EnvironmentData addEnvironmentData(EnvironmentData environmentData, boolean isEnvironmentCondition);
 
-	EnvironmentData updateEnvironmentData(EnvironmentData environmentData);
+	EnvironmentData updateEnvironmentData(EnvironmentData environmentData, boolean isEnvironmentCondition);
 
 
 }
