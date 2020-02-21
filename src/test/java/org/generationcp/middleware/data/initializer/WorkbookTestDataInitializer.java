@@ -952,52 +952,6 @@ public class WorkbookTestDataInitializer {
 		workbook.setTrialObservations(observations);
 	}
 
-	public static void createBasicObservations(final Workbook workbook, final int noOfObservations, final boolean withStudy, final int studyNo,
-										  final boolean isForMeansDataSet) {
-		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
-
-		MeasurementRow row;
-		List<MeasurementData> dataList;
-		final Random random = new Random();
-		final DecimalFormat fmt = new DecimalFormat("#.##");
-
-		// Create n number of observation rows
-		for (int i = 0; i < noOfObservations; i++) {
-			row = new MeasurementRow();
-			dataList = new ArrayList<>();
-			if (withStudy) {
-				dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.TRIAL, String.valueOf(studyNo),
-						TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getFactors()));
-			}
-
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.ENTRY, String.valueOf(i),
-					TermId.ENTRY_NO.getId(), workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.GID,
-					WorkbookTestDataInitializer.computeGID(i), TermId.GID.getId(), workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.DESIG,
-					WorkbookTestDataInitializer.G_NAMES[i], TermId.DESIG.getId(), workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.CROSS, "-", TermId.CROSS.getId(),
-					workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.SOURCE, "-",
-					TermId.SEED_SOURCE.getId(), workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.PLOT, String.valueOf(i),
-					TermId.PLOT_NO.getId(), workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.OBS_UNIT_ID, "PLOT010203P"+ i,
-					TermId.OBS_UNIT_ID.getId(), workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.BLOCK, "", TermId.BLOCK_NO.getId(),
-					workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.REP, "", TermId.REP_NO.getId(),
-					workbook.getFactors()));
-
-
-			row.setDataList(dataList);
-			observations.add(row);
-		}
-
-		workbook.setObservations(observations);
-	}
-
-
 	public Workbook setUpWorkbook(final String studyName, final int studyNo) {
 		// Create a study (workbook) in database.
 		final Workbook workbook = new Workbook();
@@ -1094,7 +1048,6 @@ public class WorkbookTestDataInitializer {
 			dataList.add(variateData);
 
 			row.setDataList(dataList);
-			row.setLocationId(WorkbookTestDataInitializer.LOCATION_ID_1);
 			observations.add(row);
 		}
 		workbook.setObservations(observations);
