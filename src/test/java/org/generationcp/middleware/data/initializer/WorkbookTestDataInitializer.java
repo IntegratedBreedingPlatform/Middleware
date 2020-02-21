@@ -960,14 +960,16 @@ public class WorkbookTestDataInitializer {
 		// Conditions
 		final List<MeasurementVariable> conditions = new ArrayList<>();
 		final MeasurementVariable conditionFactor =WorkbookTestDataInitializer.createTrialInstanceMeasurementVariable(studyNo);
+		final MeasurementVariable conditionFactor1 = WorkbookTestDataInitializer.createMeasurementVariable(TermId.LOCATION_ID.getId(), "SITE ID", "TRIAL SITE ID",
+				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.LOCATION,
+				WorkbookTestDataInitializer.NUMERIC, String.valueOf(WorkbookTestDataInitializer.LOCATION_ID_1), WorkbookTestDataInitializer.TRIAL,
+				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT, false);
 		conditions.add(conditionFactor);
+		conditions.add(conditionFactor1);
 		workbook.setConditions(conditions);
 
 		// Constants
 		final ArrayList<MeasurementVariable> constants = new ArrayList<>();
-		constants
-				.add(this.createMeasurementVariable(8270, "SITE_SOIL_PH", "Soil acidity - ph meter (pH)", "Soil acidity", "Ph meter", "pH",
-						WorkbookTestDataInitializer.NUMERIC, "7", WorkbookTestDataInitializer.STUDY, PhenotypicType.VARIATE, false));
 		workbook.setConstants(constants);
 
 		// Factors
@@ -1046,7 +1048,7 @@ public class WorkbookTestDataInitializer {
 			final MeasurementData variateData = new MeasurementData(variate.getLabel(), String.valueOf(new Random().nextInt(100)));
 			variateData.setMeasurementVariable(variate);
 			dataList.add(variateData);
-			row.setLocationId(WorkbookTestDataInitializer.LOCATION_ID_1);
+//			row.setLocationId(WorkbookTestDataInitializer.LOCATION_ID_1);
 			row.setDataList(dataList);
 			observations.add(row);
 		}
