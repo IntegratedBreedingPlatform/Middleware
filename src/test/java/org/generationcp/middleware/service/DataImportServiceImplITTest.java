@@ -464,8 +464,8 @@ public class DataImportServiceImplITTest extends IntegrationTestBase {
 		final WorkbookTestDataInitializer testData = new WorkbookTestDataInitializer();
 		testData.setGermplasmDao(this.germplasmDAO);
 
-		for(Location location : testData.createLocationData()) {
-			locationDAO.saveOrUpdate(location);
+		for(final Location location : testData.createLocationData()) {
+			this.locationDAO.saveOrUpdate(location);
 		}
 
 		final Workbook workbook = testData.setUpWorkbook(studyName, studyNo);
