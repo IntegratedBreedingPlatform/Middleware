@@ -20,6 +20,7 @@ import java.util.Random;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -27,6 +28,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
@@ -57,6 +59,8 @@ public class DataImportServiceImplITTest extends IntegrationTestBase {
 	private CropType cropType;
 	private GermplasmDAO germplasmDAO;
 
+	private LocationDAO locationDAO;
+
 	@Before
 	public void setUp() {
 		this.geolocationDao = new GeolocationDao();
@@ -67,6 +71,9 @@ public class DataImportServiceImplITTest extends IntegrationTestBase {
 
 		this.germplasmDAO = new GermplasmDAO();
 		this.germplasmDAO.setSession(this.sessionProvder.getSession());
+
+		this.locationDAO = new LocationDAO();
+		this.locationDAO.setSession(this.sessionProvder.getSession());
 	}
 
 	@Ignore
@@ -456,6 +463,10 @@ public class DataImportServiceImplITTest extends IntegrationTestBase {
 		final int studyNo = 1;
 		final WorkbookTestDataInitializer testData = new WorkbookTestDataInitializer();
 		testData.setGermplasmDao(this.germplasmDAO);
+
+		for(Location location : testData.createLocationData()) {
+			locationDAO.saveOrUpdate(location);
+		}
 
 		final Workbook workbook = testData.setUpWorkbook(studyName, studyNo);
 		workbook.print(IntegrationTestBase.INDENT);

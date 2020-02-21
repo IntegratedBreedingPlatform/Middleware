@@ -1046,7 +1046,7 @@ public class WorkbookTestDataInitializer {
 			final MeasurementData variateData = new MeasurementData(variate.getLabel(), String.valueOf(new Random().nextInt(100)));
 			variateData.setMeasurementVariable(variate);
 			dataList.add(variateData);
-
+			row.setLocationId(WorkbookTestDataInitializer.LOCATION_ID_1);
 			row.setDataList(dataList);
 			observations.add(row);
 		}
