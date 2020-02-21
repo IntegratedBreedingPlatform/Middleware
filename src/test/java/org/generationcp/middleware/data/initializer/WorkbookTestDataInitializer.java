@@ -162,7 +162,7 @@ public class WorkbookTestDataInitializer {
 	private static final String CREATED_BY = "1";
 	private GermplasmDAO germplasmDao;
 
-	public void setGermplasmDao(GermplasmDAO germplasmDao){
+	public void setGermplasmDao(final GermplasmDAO germplasmDao){
 		this.germplasmDao = germplasmDao;
 	}
 
@@ -507,7 +507,7 @@ public class WorkbookTestDataInitializer {
 					TermId.SEED_SOURCE.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.PLOT, String.valueOf(i),
 					TermId.PLOT_NO.getId(), workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.OBS_UNIT_ID, "PLOT010203P"+String.valueOf(i),
+			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.OBS_UNIT_ID, "PLOT010203P"+ i,
 				TermId.OBS_UNIT_ID.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.BLOCK, "", TermId.BLOCK_NO.getId(),
 					workbook.getFactors()));
@@ -982,7 +982,7 @@ public class WorkbookTestDataInitializer {
 					TermId.SEED_SOURCE.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.PLOT, String.valueOf(i),
 					TermId.PLOT_NO.getId(), workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.OBS_UNIT_ID, "PLOT010203P"+String.valueOf(i),
+			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.OBS_UNIT_ID, "PLOT010203P"+ i,
 					TermId.OBS_UNIT_ID.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.BLOCK, "", TermId.BLOCK_NO.getId(),
 					workbook.getFactors()));
@@ -1010,7 +1010,7 @@ public class WorkbookTestDataInitializer {
 		workbook.setConditions(conditions);
 
 		// Constants
-		ArrayList<MeasurementVariable> constants = new ArrayList<>();
+		final ArrayList<MeasurementVariable> constants = new ArrayList<>();
 		constants
 				.add(this.createMeasurementVariable(8270, "SITE_SOIL_PH", "Soil acidity - ph meter (pH)", "Soil acidity", "Ph meter", "pH",
 						WorkbookTestDataInitializer.NUMERIC, "7", WorkbookTestDataInitializer.STUDY, PhenotypicType.VARIATE, false));
@@ -1047,7 +1047,7 @@ public class WorkbookTestDataInitializer {
 		workbook.setFactors(factors);
 
 		// Variates
-		ArrayList<MeasurementVariable> variates = new ArrayList<>();
+		final ArrayList<MeasurementVariable> variates = new ArrayList<>();
 		final MeasurementVariable variate =
 				this.createMeasurementVariable(51570, "GY_Adj_kgha", "Grain yield BY Adjusted GY - Computation IN Kg/ha",
 						WorkbookTestDataInitializer.GRAIN_YIELD, WorkbookTestDataInitializer.DRY_AND_WEIGH,

@@ -429,7 +429,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	String getExperimentalDesignIdValue(final String experimentalDesign) throws WorkbookParserException{
 		if(experimentalDesign != null && !experimentalDesign.isEmpty()) {
-			Term exptDesignValue = this.termDataManager.getTermByName(experimentalDesign);
+			final Term exptDesignValue = this.termDataManager.getTermByName(experimentalDesign);
 			if(exptDesignValue != null) {
 				return String.valueOf(exptDesignValue.getId());
 			}
@@ -1179,7 +1179,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	public int getMaxRowLimit() {
-		return maxRowLimit;
+		return this.maxRowLimit;
 	}
 
 	public void setMaxRowLimit(final int maxRowLimit) {
