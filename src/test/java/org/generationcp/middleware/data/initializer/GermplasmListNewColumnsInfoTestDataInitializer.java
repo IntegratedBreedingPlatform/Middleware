@@ -18,6 +18,7 @@ public class GermplasmListNewColumnsInfoTestDataInitializer {
 		listDataColumnValues.add(new ListDataColumnValues(columnHeader, 1, columnValue));
 		columnValuesMap.put(columnHeader, listDataColumnValues);
 		germplasmListNewColumnsInfo.setColumnValuesMap(columnValuesMap);
+		germplasmListNewColumnsInfo.addColumn(columnHeader);
 		return germplasmListNewColumnsInfo;
 	}
 }
