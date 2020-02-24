@@ -1125,7 +1125,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	private void checkForExistingTrialInstance(final Workbook workbook, final Map<String, List<Message>> errors, final String programUUID) {
 
 		final String studyName = workbook.getStudyDetails().getStudyName();
-		String trialInstanceNumber;
+		String trialInstanceNumber = null;
 
 		// get local variable name of the trial instance number
 		String trialInstanceHeader = null;
@@ -1164,7 +1164,31 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				}
 			}
 		}
+		boolean hasDuplicateTrialInstances = false;
 		if (!duplicateTrialInstances.isEmpty() && workbook.getStudyDetails().getId() != null) {
+			Map<String, Long> countObservation = this.getExperimentDao().countObservationsPerInstance(isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId());
+			if(countObservation != null && !countObservation.isEmpty() && trialInstanceNumber!=null){
+				if(countObservation.containsKey(trialInstanceNumber)){
+					hasDuplicateTrialInstances = countObservation.get(trialInstanceNumber) > 0;
+				}
+			}
+
+//			// check import type first
+//			final List<Integer> variateIds = new ArrayList<>();
+//			// check all variates
+//			for (final MeasurementVariable mvar : workbook.getVariates()) {
+//				variateIds.add(mvar.getTermId());
+//			}
+//
+//			final int numberOfVariatesData = this.getPhenotypeDao()
+//					.countVariatesDataOfStudy(
+//							isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId(),
+//							variateIds);
+//			if (numberOfVariatesData > 0) {
+//				hasDuplicateTrialInstances = true;
+//			}
+		}
+		if (hasDuplicateTrialInstances) {
 			this.initializeIfNull(errors, Constants.GLOBAL);
 			final StringBuilder trialInstanceNumbers = new StringBuilder();
 			for (final String trialInstanceNo : duplicateTrialInstances) {
