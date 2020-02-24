@@ -1,11 +1,6 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataColumnValues;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -14,6 +9,11 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for ListDataProperty POJO
@@ -33,9 +33,8 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 	 * @param listDataId
 	 * @param columnName
 	 * @return null if no record found for given parameters
-	 * @throws MiddlewareQueryException
 	 */
-	public ListDataProperty getByListDataIDAndColumnName(final Integer listDataId, final String columnName) throws MiddlewareQueryException {
+	public ListDataProperty getByListDataIDAndColumnName(final Integer listDataId, final String columnName) {
 		try {
 			if (listDataId != null && columnName != null && !columnName.isEmpty()) {
 				final Criteria criteria = this.getSession().createCriteria(ListDataProperty.class);
@@ -46,14 +45,14 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByListDataIDAndColumnName(listdata ID=" + listDataId + ", column= " + columnName
-					+ ") " + "query from ListDataProperty " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getByListDataIDAndColumnName(listdata ID=" + listDataId + ", column= " + columnName
+				+ ") " + "query from ListDataProperty " + e.getMessage(), e);
 		}
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
-	public GermplasmListNewColumnsInfo getPropertiesForList(final Integer listId) throws MiddlewareQueryException {
+	public GermplasmListNewColumnsInfo getPropertiesForList(final Integer listId) {
 		final String sql =
 				" SELECT DISTINCT column_name,  listdata_id, value" + " FROM listdataprops p "
 						+ " INNER JOIN listdata d ON d.lrecid = p.listdata_id " + " WHERE d.listid = :listId "
@@ -66,26 +65,22 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 			query.setParameter("listId", listId);
 			final List<Object[]> recordList = query.list();
 
-			final LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap = new LinkedHashMap<String, List<ListDataColumnValues>>();
+			final Map<String, List<ListDataColumnValues>> columnValuesMap = new LinkedHashMap<>();
 
 			for (final Object[] record : recordList) {
-				List<ListDataColumnValues> columnValues = new ArrayList<ListDataColumnValues>();
 
 				final String column = (String) record[0];
 				final Integer listDataId = (Integer) record[1];
 				final String value = (String) record[2];
 
-				if(columnValuesMap.containsKey(column)) {
-					columnValues = columnValuesMap.get(column);
-				}
-				columnValues.add(new ListDataColumnValues(column, listDataId, value));
-				columnValuesMap.put(column, columnValues);
-
+				columnValuesMap.putIfAbsent(column, new ArrayList<>());
+				columnValuesMap.get(column).add(new ListDataColumnValues(column, listDataId, value));
+				listInfo.addColumn(column);
 			}
 			listInfo.setColumnValuesMap(columnValuesMap);
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getColumnNamesForList method for List : " + listId + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getColumnNamesForList method for List : " + listId + e.getMessage(), e);
 		}
 
 		return listInfo;

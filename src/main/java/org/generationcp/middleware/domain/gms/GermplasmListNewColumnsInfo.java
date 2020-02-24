@@ -1,25 +1,25 @@
 
 package org.generationcp.middleware.domain.gms;
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.Map.Entry;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class GermplasmListNewColumnsInfo implements Serializable {
 
 	private static final long serialVersionUID = 5475025243020285738L;
 
 	private Integer listId;
-	private LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap; // key = column name
-
-	public GermplasmListNewColumnsInfo(final Integer listId, final LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap) {
-		super();
-		this.listId = listId;
-		this.columnValuesMap = columnValuesMap;
-	}
+	private Map<String, List<ListDataColumnValues>> columnValuesMap; // key = column name
+	// These are just basically the map keys, but in order that they should be displayed.
+	// We used list instead of getting map keys as set because order is important
+	private List<String> columns = new ArrayList<>();
 
 	public GermplasmListNewColumnsInfo(final Integer listId) {
 		super();
@@ -34,11 +34,11 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 		this.listId = listId;
 	}
 
-	public LinkedHashMap<String, List<ListDataColumnValues>> getColumnValuesMap() {
+	public Map<String, List<ListDataColumnValues>> getColumnValuesMap() {
 		return this.columnValuesMap;
 	}
 
-	public void setColumnValuesMap(final LinkedHashMap<String, List<ListDataColumnValues>> columnValuesMap) {
+	public void setColumnValuesMap(final Map<String, List<ListDataColumnValues>> columnValuesMap) {
 		this.columnValuesMap = columnValuesMap;
 	}
 
@@ -110,10 +110,13 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 
 	}
 	
-	public Set<String> getColumns() {
-		if (this.columnValuesMap != null) {
-			return this.columnValuesMap.keySet();
+	public List<String> getColumns() {
+		return this.columns;
+	}
+
+	public void addColumn(final String column) {
+		if (this.columns.contains(column)) {
+			this.columns.add(column);
 		}
-		return new HashSet<>();
 	}
 }
