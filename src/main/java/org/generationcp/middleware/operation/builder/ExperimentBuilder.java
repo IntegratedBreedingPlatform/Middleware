@@ -385,7 +385,10 @@ public class ExperimentBuilder {
 			{
 		if (experimentModel.getProperties() != null) {
 			for (final ExperimentProperty property : experimentModel.getProperties()) {
-				variables.add(this.createVariable(property, variableTypes, PhenotypicType.TRIAL_DESIGN));
+				// Exclude the BLOCK_ID experiment property because it is not expected to included in the dataset variable list.
+				if (!property.getTypeId().equals(TermId.BLOCK_ID.getId())) {
+					variables.add(this.createVariable(property, variableTypes, PhenotypicType.TRIAL_DESIGN));
+				}
 			}
 		}
 	}
@@ -394,9 +397,12 @@ public class ExperimentBuilder {
 			final boolean hasVariableType) {
 		if (experimentModel.getProperties() != null) {
 			for (final ExperimentProperty property : experimentModel.getProperties()) {
-				final Variable var = this.createVariable(property, variableTypes, hasVariableType, PhenotypicType.TRIAL_DESIGN);
-				if (var.getVariableType() != null) {
-					variables.add(var);
+				// Exclude the BLOCK_ID experiment property because it is not expected to included in the dataset variable list.
+				if (!property.getTypeId().equals(TermId.BLOCK_ID.getId())) {
+					final Variable var = this.createVariable(property, variableTypes, hasVariableType, PhenotypicType.TRIAL_DESIGN);
+					if (var.getVariableType() != null) {
+						variables.add(var);
+					}
 				}
 			}
 		}
