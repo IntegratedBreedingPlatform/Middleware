@@ -1125,7 +1125,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	private void checkForExistingTrialInstance(final Workbook workbook, final Map<String, List<Message>> errors, final String programUUID) {
 
 		final String studyName = workbook.getStudyDetails().getStudyName();
-		String trialInstanceNumber = null;
 
 		// get local variable name of the trial instance number
 		String trialInstanceHeader = null;
@@ -1142,48 +1141,43 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				}
 			}
 		}
-		// get and check if trialInstanceNumber already exists
-		final Set<String> locationIds = new LinkedHashSet<>();
-
+		final Set<String> instancesFromWorkbook = new LinkedHashSet<>();
 		int maxNumOfIterations = 100000;
 		final int observationCount = workbook.getObservations().size();
 		if (observationCount < maxNumOfIterations) {
 			maxNumOfIterations = observationCount;
 		}
-		final List<String> duplicateTrialInstances = new ArrayList<>();
-		final boolean isMeansDataImport = workbook.getImportType() != null && workbook.getImportType() == DatasetTypeEnum.MEANS_DATA.getId();
+		final List<String> existingInstances = new ArrayList<>();
 		for (int i = 0; i < maxNumOfIterations; i++) {
 			final MeasurementRow row = workbook.getObservations().get(i);
-			trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader);
-			if (locationIds.add(trialInstanceNumber)) {
+			final String trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader);
+			if (instancesFromWorkbook.add(trialInstanceNumber)) {
 				final Integer locationId =
 					this.getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName, trialInstanceNumber, programUUID);
 				// same location and study
 				if (locationId != null) {
-					duplicateTrialInstances.add(trialInstanceNumber);
+					existingInstances.add(trialInstanceNumber);
 				}
 			}
 		}
-		boolean hasDuplicateTrialInstances = false;
-		if (!duplicateTrialInstances.isEmpty() && workbook.getStudyDetails().getId() != null) {
-			final Map<String, Long> countObservation = this.getExperimentDao().countObservationsPerInstance(isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId());
-			if(countObservation != null && !countObservation.isEmpty() && trialInstanceNumber!=null){
-				if(countObservation.containsKey(trialInstanceNumber)){
-					hasDuplicateTrialInstances = countObservation.get(trialInstanceNumber) > 0;
+		// Raise error if any of the instances to be imported already has experiments for given dataset type
+		if (!existingInstances.isEmpty() && workbook.getStudyDetails().getId() != null) {
+			final List<String> instancesWithExperiments = new ArrayList<>();
+			final boolean isMeansDataImport = workbook.getImportType() != null && workbook.getImportType() == DatasetTypeEnum.MEANS_DATA.getId();
+			final Map<String, Long> instanceExperimentsMap = this.getExperimentDao()
+				.countObservationsPerInstance(isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId());
+			for (final String existingInstance : existingInstances) {
+				if (instanceExperimentsMap.containsKey(existingInstance) && instanceExperimentsMap.get(existingInstance) > 0) {
+					instancesWithExperiments.add(existingInstance);
 				}
 			}
 
-		}
-		if (hasDuplicateTrialInstances) {
-			this.initializeIfNull(errors, Constants.GLOBAL);
-			final StringBuilder trialInstanceNumbers = new StringBuilder();
-			for (final String trialInstanceNo : duplicateTrialInstances) {
-				trialInstanceNumbers.append(trialInstanceNo);
-				trialInstanceNumbers.append(",");
+			if (!instancesWithExperiments.isEmpty()) {
+				this.initializeIfNull(errors, Constants.GLOBAL);
+				errors.get(Constants.GLOBAL).add(new Message(
+					"error.duplicate.trial.instance",
+					StringUtils.join(instancesWithExperiments, ",")));
 			}
-			errors.get(Constants.GLOBAL).add(new Message(
-				"error.duplicate.trial.instance",
-				trialInstanceNumbers.toString().substring(0, trialInstanceNumbers.toString().length() - 1)));
 		}
 
 	}
