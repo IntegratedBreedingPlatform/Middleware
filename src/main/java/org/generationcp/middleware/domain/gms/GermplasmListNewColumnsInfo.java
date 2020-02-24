@@ -115,7 +115,7 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 	}
 
 	public void addColumn(final String column) {
-		if (this.columns.contains(column)) {
+		if (!this.columns.contains(column)) {
 			this.columns.add(column);
 		}
 	}
