@@ -814,7 +814,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			final Map<String, Long> results = new LinkedHashMap<>();
 			for (final Object[] row : rows) {
-				results.put((String) row[0], (Long) row[1]);
+				results.put(String.valueOf(row[0]), (Long) row[1]);
 			}
 			return results;
 
