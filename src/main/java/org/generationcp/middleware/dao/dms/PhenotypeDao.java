@@ -1140,7 +1140,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final Query query =
 			this.getSession()
 				.createSQLQuery(
-					"select count(p.*) "
+					"SELECT COUNT(DISTINCT p.phenotype_id) "
 						+ " from phenotype p "
 						+ " INNER JOIN nd_experiment e ON p.nd_experiment_id = e.nd_experiment_id "
 						+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
@@ -1150,7 +1150,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		query.setParameter("projectId", datasetId);
 		query.setParameter("environmentId", instanceId);
 
-		return (Long) query.uniqueResult();
+		return ((BigInteger) query.uniqueResult()).longValue();
 
 	}
 
