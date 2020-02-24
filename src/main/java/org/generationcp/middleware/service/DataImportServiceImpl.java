@@ -1166,7 +1166,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 		boolean hasDuplicateTrialInstances = false;
 		if (!duplicateTrialInstances.isEmpty() && workbook.getStudyDetails().getId() != null) {
-			Map<String, Long> countObservation = this.getExperimentDao().countObservationsPerInstance(isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId());
+			final Map<String, Long> countObservation = this.getExperimentDao().countObservationsPerInstance(isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId());
 			if(countObservation != null && !countObservation.isEmpty() && trialInstanceNumber!=null){
 				if(countObservation.containsKey(trialInstanceNumber)){
 					hasDuplicateTrialInstances = countObservation.get(trialInstanceNumber) > 0;
