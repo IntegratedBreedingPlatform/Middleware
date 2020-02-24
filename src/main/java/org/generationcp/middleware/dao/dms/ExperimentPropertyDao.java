@@ -399,7 +399,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 				if (row[13] != null && NumberUtils.isNumber((String) row[13])) {
 					trial.setBlockId(Integer.valueOf((String) row[13]));
 				}
-				trial.setTrialInstanceNo((String) row[15]);
+				trial.setTrialInstanceNo(String.valueOf((Integer) row[15]));
 				trialMap.put(trialKey, trial);
 			}
 
