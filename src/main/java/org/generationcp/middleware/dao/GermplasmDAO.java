@@ -107,7 +107,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			+ " INNER JOIN nd_experiment e ON e.stock_id = s.stock_id "//
 			+ " INNER JOIN project p ON e.project_id = p.project_id "//
 			+ " WHERE g.deleted = 0 AND g.grplce = 0 "//
-			+ " AND e.nd_experiment_id = :studyDbId "
+			+ " AND e.parent_id = :studyDbId "
 			+ " ORDER BY CAST(s.uniquename as SIGNED INTEGER) ";
 
 	@Override
