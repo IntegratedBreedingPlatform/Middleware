@@ -912,32 +912,32 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final PhenotypeSearchDTO observationUnit = new PhenotypeSearchDTO();
 
 				final Integer ndExperimentId = (Integer) row[0];
-				observationUnit.setObservationUnitDbId((String) row[1]); // OBS_UNIT_ID
-				observationUnit.setObservationUnitName((String) row[2]);
-				observationUnit.setObservationLevel((String) row[3]);
+				observationUnit.setObservationUnitDbId(String.valueOf(row[1])); // OBS_UNIT_ID
+				observationUnit.setObservationUnitName(String.valueOf(row[2]));
+				observationUnit.setObservationLevel(String.valueOf(row[3]));
 				observationUnit.setObservationLevels("1");
-				observationUnit.setPlantNumber((String) row[4]);
-				observationUnit.setGermplasmDbId((String) row[5]);
-				observationUnit.setGermplasmName((String) row[6]);
-				observationUnit.setInstanceNumber((String) row[7]);
-				observationUnit.setStudyDbId((String) row[8]);
-				observationUnit.setStudyName((String) row[9]);
-				observationUnit.setProgramName((String) row[10]);
-				String x = (String) row[16]; // ROW
-				String y = (String) row[17]; // COL
+				observationUnit.setPlantNumber(String.valueOf(row[4]));
+				observationUnit.setGermplasmDbId(String.valueOf(row[5]));
+				observationUnit.setGermplasmName(String.valueOf(row[6]));
+				observationUnit.setInstanceNumber(String.valueOf(row[7]));
+				observationUnit.setStudyDbId(String.valueOf(row[8]));
+				observationUnit.setStudyName(String.valueOf(row[9]));
+				observationUnit.setProgramName(String.valueOf(row[10]));
+				String x = String.valueOf(row[16]); // ROW
+				String y = String.valueOf(row[17]); // COL
 				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-					x = (String) row[11]; // fieldMapRow
-					y = (String) row[12]; // fieldMapCol
+					x = String.valueOf(row[11]); // fieldMapRow
+					y = String.valueOf(row[12]); // fieldMapCol
 				}
 				observationUnit.setX(x);
 				observationUnit.setY(y);
-				observationUnit.setPlotNumber((String) row[13]);
-				observationUnit.setBlockNumber((String) row[14]);
-				observationUnit.setReplicate((String) row[15]);
-				observationUnit.setStudyLocationDbId((String) row[18]);
-				observationUnit.setStudyLocation((String) row[19]);
-				observationUnit.setEntryType((String) row[20]);
-				observationUnit.setEntryNumber((String) row[21]);
+				observationUnit.setPlotNumber(String.valueOf(row[13]));
+				observationUnit.setBlockNumber(String.valueOf(row[14]));
+				observationUnit.setReplicate(String.valueOf(row[15]));
+				observationUnit.setStudyLocationDbId(String.valueOf(row[18]));
+				observationUnit.setStudyLocation(String.valueOf(row[19]));
+				observationUnit.setEntryType(String.valueOf(row[20]));
+				observationUnit.setEntryNumber(String.valueOf(row[21]));
 
 				observationUnit.setAdditionalInfo("");
 				observationUnit.setLocationDbId(observationUnit.getStudyLocationDbId());
@@ -968,9 +968,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnitPosition.setReplicate(observationUnit.getReplicate());
 				observationUnit.setObservationUnitPosition(observationUnitPosition);
 
-				observationUnit.setProgramDbId((String) row[22]);
-				observationUnit.setTrialDbId((String) row[23]);
-				observationUnit.setTrialName((String) row[24]);
+				observationUnit.setProgramDbId(String.valueOf(row[22]));
+				observationUnit.setTrialDbId(String.valueOf(row[23]));
+				observationUnit.setTrialName(String.valueOf(row[24]));
 
 				observationUnitsByNdExpId.put(ndExperimentId, observationUnit);
 			}
@@ -988,11 +988,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 				final PhenotypeSearchObservationDTO observation = new PhenotypeSearchObservationDTO();
 				final String variableId =
-					(result[5] != null && !((String) result[5]).isEmpty()) ? (String) result[5] : String.valueOf(result[2]);
+					(result[5] != null && !(String.valueOf(result[5])).isEmpty()) ? String.valueOf(result[5]) : String.valueOf(result[2]);
 				observation.setObservationVariableDbId(variableId);
-				observation.setObservationVariableName((String) result[3]);
+				observation.setObservationVariableName(String.valueOf(result[3]));
 				observation.setObservationDbId((Integer) result[1]);
-				observation.setValue((String) result[4]);
+				observation.setValue(String.valueOf(result[4]));
 				observation.setObservationTimeStamp(Util.formatDateAsStringValue((Date) result[6], Util.FRONTEND_TIMESTAMP_FORMAT));
 				// TODO
 				observation.setSeason(StringUtils.EMPTY);
@@ -1009,8 +1009,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			final List<Object[]> treatmentFactorsResults = treatmentFactorsQuery.list();
 
 			for (final Object[] result : treatmentFactorsResults) {
-				final String factor = (String) result[0];
-				final String modality = (String) result[1];
+				final String factor = String.valueOf(result[0]);
+				final String modality = String.valueOf(result[1]);
 				final Integer ndExperimentId = (Integer) result[2];
 				final PhenotypeSearchDTO.Treatment treatment = new PhenotypeSearchDTO.Treatment();
 				treatment.setFactor(factor);

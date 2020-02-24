@@ -14,9 +14,9 @@ public class PhenotypeQuery {
 		+ "  NULL AS plantNumber, " // Until we have plant level observation
 		+ "  s.dbxref_id AS germplasmDbId, " //
 		+ "  s.name AS germplasmName, " //
-		+ "  gl.description AS instanceNumber, " //
-		+ "  gl.nd_geolocation_id AS studyDbId, " //
-		+ "  concat(p.name, '_', gl.description) AS studyName, " //
+		+ "  env_experiment.observation_unit_no AS instanceNumber, " //
+		+ "  nde.parent_id AS studyDbId, " //
+		+ "  concat(p.name, '_', env_experiment.observation_unit_no) AS studyName, " //
 		+ "  wp.project_name AS programName, " //
 		+ "  FieldMapRow.value AS FieldMapRow, " //
 		+ "  FieldMapCol.value AS FieldMapCol, " //
@@ -35,19 +35,19 @@ public class PhenotypeQuery {
 		+ " FROM " //
 		+ "  project dataset " //
 		+ "  INNER JOIN nd_experiment nde ON nde.project_id = dataset.project_id " //
-		+ "  INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
+		+ "  INNER JOIN nd_experiment env_experiment ON nde.parent_id = env_experiment.nd_experiment_id " //
 		+ "  INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 		+ "  INNER JOIN project p ON p.project_id = dataset.study_id " //
 		+ "  LEFT JOIN workbench.workbench_project wp ON p.program_uuid = wp.project_uuid " //
 		+ "  LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = " + TermId.FIELDMAP_RANGE.getId() //
 		+ "  LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = " + TermId.FIELDMAP_COLUMN.getId() //
 		+ "  LEFT JOIN dataset_type ON dataset_type.dataset_type_id = dataset.dataset_type_id " //
-		+ "  LEFT JOIN nd_geolocationprop gp ON gl.nd_geolocation_id = gp.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId() + " AND gp.nd_geolocation_id = gl.nd_geolocation_id " //
-		+ "  LEFT JOIN location l ON l.locid = gp.value " //
+		+ "  LEFT JOIN nd_experimentprop loc_prop ON loc_prop.nd_experiment_id = env_experiment.nd_experiment_id AND loc_prop.type_id = " + TermId.LOCATION_ID.getId()//
+		+ "  LEFT JOIN location l ON l.locid = loc_prop.value " //
 		+ " WHERE 1 = 1" //
 		; //
 
-	public static final String PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER = " AND gl.nd_geolocation_id in (:studyDbIds) ";
+	public static final String PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER = " AND nde.parent_id in (:studyDbIds) ";
 
 	public static final String PHENOTYPE_SEARCH_OBSERVATION_FILTER = " AND exists(SELECT 1 " //
 		+ " FROM phenotype ph " //
