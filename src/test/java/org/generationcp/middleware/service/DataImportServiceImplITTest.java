@@ -483,8 +483,6 @@ public class DataImportServiceImplITTest extends IntegrationTestBase {
 		for (final Map.Entry<String, List<Message>> e : errors.entrySet()) {
 			Debug.println(IntegrationTestBase.INDENT + 2, e.getKey());
 			for (final Message m : e.getValue()) {
-				System.out.println(m.getMessageKey());
-				System.out.println(Arrays.asList(m.getMessageParams()));
 				Debug.println(IntegrationTestBase.INDENT + 4,
 						"Key: " + m.getMessageKey() + " Params: " + Arrays.asList(m.getMessageParams()));
 				Assert.assertEquals(m.getMessageKey(), "error.duplicate.trial.instance");
