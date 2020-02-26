@@ -703,7 +703,7 @@ public class WorkbookSaver extends Saver {
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
 		final Session activeSession = this.getActiveSession();
 		final FlushMode existingFlushMode = activeSession.getFlushMode();
-		final Map<Integer, Integer> instanceNumberEnvironmentIdMap = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(environmentDatasetId).stream()
+		final Map<Integer, Integer> instanceNumberEnvironmentIdMap = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(environmentDatasetId, true).stream()
 			.collect(Collectors.toMap(ExperimentModel::getObservationUnitNo, ExperimentModel::getNdExperimentId));
 		try {
 			activeSession.setFlushMode(FlushMode.MANUAL);
@@ -1094,7 +1094,7 @@ public class WorkbookSaver extends Saver {
 		final ExperimentValuesTransformer experimentValuesTransformer = this.getExperimentValuesTransformer();
 		final ExperimentModelSaver experimentModelSaver = this.getExperimentModelSaver();
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
-		final Map<Integer, Integer> instanceNumberEnvironmentIdMap = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(environmentDatasetId).stream()
+		final Map<Integer, Integer> instanceNumberEnvironmentIdMap = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(environmentDatasetId, true).stream()
 			.collect(Collectors.toMap(ExperimentModel::getObservationUnitNo, ExperimentModel::getNdExperimentId));
 		if (observations != null) {
 			for (final MeasurementRow row : observations) {

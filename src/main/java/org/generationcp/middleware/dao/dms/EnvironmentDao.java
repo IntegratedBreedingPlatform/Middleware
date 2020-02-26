@@ -16,8 +16,11 @@ import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,9 +57,17 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 
 
 
-	public List<ExperimentModel> getEnvironmentsByDataset(final Integer datasetId) {
-		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-		criteria.add(Restrictions.eq("project.projectId", datasetId));
+	public List<ExperimentModel> getEnvironmentsByDataset(final Integer datasetId, final boolean isEnvironmentDataset) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass(), "environment");
+
+		if (isEnvironmentDataset) {
+			criteria.add(Restrictions.eq("project.projectId", datasetId));
+		} else {
+			final DetachedCriteria childExperimentsCriteria = DetachedCriteria.forClass(ExperimentModel.class, "childExperiment");
+			childExperimentsCriteria.add(Restrictions.eq("childExperiment.project.projectId", datasetId));
+			childExperimentsCriteria.add(Property.forName("environment.ndExperimentId").eqProperty("childExperiment.parent.ndExperimentId"));
+			criteria.add(Subqueries.exists(childExperimentsCriteria.setProjection(Projections.property("childExperiment.ndExperimentId"))));
+		}
 		return criteria.list();
 	}
 
