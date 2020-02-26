@@ -254,13 +254,31 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	public void deleteExperimentsForDatasets(final List<Integer> datasetIds, final List<Integer> instanceNumbers) {
-		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
-		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-		// statement
-		this.getSession().flush();
+		// Delete any phenotypes first because its FK to experiment is not DELETE CASCADE
+		String queryString = "DELETE pheno " + " FROM phenotype pheno"
+			+ "  INNER JOIN nd_experiment e ON pheno.nd_experiment_id = e.nd_experiment_id"
+			+ "  LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id "
+			+ "  INNER JOIN project pr ON pr.project_id = e.project_id "
+			+ "  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3 "
+			+ "  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 "
+			// handle cases for with/without plot and with/without sub-observations
+			+ " AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id or e.nd_experiment_id = env.nd_experiment_id)"
+			+ "  WHERE e.project_id IN (:datasetIds) ";
+		StringBuilder sb = new StringBuilder(queryString);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			sb.append(" AND env.observation_unit_no IN (:instanceNumbers)");
+		}
+		SQLQuery statement =
+			this.getSession()
+				.createSQLQuery(sb.toString());
+		statement.setParameterList("datasetIds", datasetIds);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			statement.setParameterList("instanceNumbers", instanceNumbers);
+		}
+		statement.executeUpdate();
 
-		// Delete experiments
-		final String queryString = "DELETE eprop, pheno, e " + " FROM nd_experiment e "
+		// Delete experiments and experiment properties
+		queryString = "DELETE eprop, e " + " FROM nd_experiment e "
 			+ "  LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id "
 			+ "  INNER JOIN project pr ON pr.project_id = e.project_id "
 			+ "  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3 "
@@ -268,13 +286,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			// handle cases for with/without plot and with/without sub-observations
 			+ " AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id or e.nd_experiment_id = env.nd_experiment_id)"
 			+ "  LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
-			+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
 			+ "  WHERE e.project_id IN (:datasetIds) ";
-		final StringBuilder sb = new StringBuilder(queryString);
+		sb = new StringBuilder(queryString);
 		if (!CollectionUtils.isEmpty(instanceNumbers)) {
 			sb.append(" AND env.observation_unit_no IN (:instanceNumbers)");
 		}
-		final SQLQuery statement =
+		statement =
 			this.getSession()
 				.createSQLQuery(sb.toString());
 		statement.setParameterList("datasetIds", datasetIds);
