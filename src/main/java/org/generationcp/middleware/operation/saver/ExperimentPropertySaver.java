@@ -17,7 +17,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -221,20 +220,24 @@ public class ExperimentPropertySaver {
 		return  experimentPropertyMap;
 	}
 
-	private void saveOrUpdateEnvironmentProperty(final int environmentId, final int typeId, final String value) throws MiddlewareQueryException {
+	private void saveOrUpdateEnvironmentProperty(final int environmentId, final int typeId, final String value) {
 		final ExperimentModel environment = this.daoFactory.getEnvironmentDao().getById(environmentId);
-		ExperimentProperty property = null;
+		final List<ExperimentProperty> experimentProperties = environment.getProperties();
+
+		ExperimentProperty experimentProperty = null;
 		if (environment.getProperties() != null && !environment.getProperties().isEmpty()) {
-			property = this.getExperimentProperty(environment, typeId);
+			experimentProperty = this.getExperimentProperty(environment, typeId);
 		}
-		if (property == null) {
-			property = new ExperimentProperty();
-			property.setRank(this.getMaxRank(environment.getProperties()));
-			property.setExperiment(environment);
-			property.setTypeId(typeId);
+		if (experimentProperty == null) {
+			experimentProperty = new ExperimentProperty();
+			experimentProperty.setRank(this.getMaxRank(environment.getProperties()));
+			experimentProperty.setExperiment(environment);
+			experimentProperty.setTypeId(typeId);
 		}
-		property.setValue(value);
-		this.daoFactory.getEnvironmentPropertyDao().saveOrUpdate(property);
+		experimentProperty.setValue(value);
+		experimentProperties.add(experimentProperty);
+		this.daoFactory.getExperimentDao().saveOrUpdate(environment);
+
 	}
 
 	private int getMaxRank(final List<ExperimentProperty> properties) {
