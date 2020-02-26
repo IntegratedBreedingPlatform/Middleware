@@ -140,6 +140,7 @@ public class LotServiceImpl implements LotService {
 		return new LotSearchMetadata(daoFactory.getLotDao().getLotsCountPerScaleName(lotsSearchDto));
 	}
 
+	@Override
 	public void withdrawLots(final Integer userId, final Set<Integer> lotIds, final LotWithdrawalInputDto lotWithdrawalInputDto,
 		final TransactionStatus transactionStatus) {
 
