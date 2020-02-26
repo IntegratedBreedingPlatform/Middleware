@@ -6,8 +6,10 @@ import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
+import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -20,9 +22,11 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.inventory.LotService;
+import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -34,8 +38,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Transactional
 @Service
+@Transactional(propagation = Propagation.REQUIRED)
 public class LotServiceImpl implements LotService {
 
 	private DaoFactory daoFactory;
@@ -135,4 +139,47 @@ public class LotServiceImpl implements LotService {
 	public LotSearchMetadata getLotSearchMetadata(final LotsSearchDto lotsSearchDto) {
 		return new LotSearchMetadata(daoFactory.getLotDao().getLotsCountPerScaleName(lotsSearchDto));
 	}
+
+	public void withdrawLots(final Integer userId, final Set<Integer> lotIds, final LotWithdrawalInputDto lotWithdrawalInputDto,
+		final TransactionStatus transactionStatus) {
+
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
+		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+
+		for (final ExtendedLotDto lotDto : lots) {
+			boolean withdrawAll = lotWithdrawalInputDto.getWithdrawalsPerUnit().get(lotDto.getUnitName()).isReserveAllAvailableBalance();
+			final Double amount = lotWithdrawalInputDto.getWithdrawalsPerUnit().get(lotDto.getUnitName()).getWithdrawalAmount();
+
+			final Double amountToWithdraw = (withdrawAll) ? lotDto.getAvailableBalance() : amount;
+
+			if (lotDto.getAvailableBalance().equals(0D)) {
+				throw new MiddlewareException("One of the selected lots does not have enough available inventory to perform a withdrawal. Please review.");
+			}
+
+			if (lotDto.getAvailableBalance() < amountToWithdraw) {
+				throw new MiddlewareException("One of the selected lots does not have enough available inventory to perform the withdrawal. Please review the amount");
+			}
+
+			final Transaction transaction = new Transaction();
+			transaction.setStatus(transactionStatus.getIntValue());
+			transaction.setType(TransactionType.WITHDRAWAL.getId());
+			transaction.setLot(new Lot(lotDto.getLotId()));
+			transaction.setPersonId(userId);
+			transaction.setUserId(userId);
+			transaction.setTransactionDate(new Date());
+			transaction.setQuantity(-1 * amountToWithdraw);
+			transaction.setComments(lotWithdrawalInputDto.getNotes());
+			//Always zero for new transactions
+			transaction.setPreviousAmount(0D);
+			if (transactionStatus.equals(TransactionStatus.CONFIRMED)) {
+				transaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
+			} else {
+				transaction.setCommitmentDate(0);
+			}
+			daoFactory.getTransactionDAO().save(transaction);
+
+		}
+	}
+
 }
