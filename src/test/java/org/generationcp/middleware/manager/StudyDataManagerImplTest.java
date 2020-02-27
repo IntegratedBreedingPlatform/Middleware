@@ -957,7 +957,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		values.setVariableList(factors);
 		//Save the experiment
 		this.manager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.manager.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		final ExperimentModel experiment = this.manager.getExperimentDao().getById(values.getLocationId());
 		Phenotype updatedPhenotype =
 			this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", updatedPhenotype.getValue());
@@ -969,7 +969,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		values.getVariableList().add(
 			DMSVariableTestDataInitializer.createVariable(1002, "1000", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
 
-		this.manager.updateExperimentValues(Arrays.asList(values), 1);
+		this.manager.updateExperimentValues(Arrays.asList(values));
 
 		updatedPhenotype = this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		final Phenotype savedPhenotype =

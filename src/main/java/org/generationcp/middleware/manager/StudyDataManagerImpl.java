@@ -517,7 +517,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, null);
 			}
 			if (experimentValues != null && !experimentValues.isEmpty()) {
-				this.updateExperimentValues(experimentValues, project.getProjectId());
+				this.updateExperimentValues(experimentValues);
 			}
 
 		} catch (final Exception e) {
@@ -526,11 +526,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 	}
 
-	void updateExperimentValues(final List<ExperimentValues> experimentValues, final Integer projectId) {
+	void updateExperimentValues(final List<ExperimentValues> experimentValues) {
 		for (final ExperimentValues exp : experimentValues) {
 			if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
-				final ExperimentModel experimentModel =
-					this.getExperimentDao().getExperimentByProjectIdAndLocation(projectId, exp.getLocationId());
+				// The location id is the environment's experiment id
+				final ExperimentModel experimentModel = this.getExperimentDao().getById(exp.getLocationId());
 				for (final Variable variable : exp.getVariableList().getVariables()) {
 					final int val = this.getPhenotypeDao().updatePhenotypesByExperimentIdAndObervableId(experimentModel.getNdExperimentId(),
 						variable.getVariableType().getId(), variable.getValue());
