@@ -57,8 +57,7 @@
 	<changeSet author="clarysabel" id="v14.2.0-1">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                SELECT count(*) FROM permission
-                where name = (select permission_id from permission where name = 'WITHDRAW_INVENTORY')
+                SELECT count(*) FROM permission where name = 'WITHDRAW_INVENTORY'
             </sqlCheck>
         </preConditions>
         <comment>WITHDRAW_INVENTORY granular permissions</comment>
