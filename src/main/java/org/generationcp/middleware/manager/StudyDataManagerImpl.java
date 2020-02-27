@@ -1009,19 +1009,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public boolean checkIfAnyLocationIDsExistInExperiments(
+	public Long countExperimentsByDatasetTypeAndEnvironments(
 		final int studyId, final int datasetTypeId,
-		final List<Integer> locationIds) {
+		final List<Integer> environmentIds) {
 
 		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getDatasetsByTypeForStudy(studyId, datasetTypeId);
 
 		if (!datasetProjects.isEmpty()) {
 			final int dataSetId = datasetProjects.get(0).getProjectId();
-			return this.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(dataSetId, locationIds);
-		} else {
-			return false;
+			return this.daoFactory.getExperimentDao().countExperimentsByDatasetAndEnvironmentIds(dataSetId, environmentIds);
 		}
-
+		return 0L;
 	}
 
 	@Override

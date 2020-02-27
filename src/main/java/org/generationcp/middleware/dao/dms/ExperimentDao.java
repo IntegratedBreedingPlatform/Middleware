@@ -289,34 +289,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		this.deleteExperimentsForDatasets(Collections.singletonList(datasetId), instanceNumbers);
 	}
 
-	public boolean checkIfAnyLocationIDsExistInExperiments(final int dataSetId, final List<Integer> locationIds) {
-
-		try {
-			final String sql =
-				"SELECT count(*) FROM nd_experiment exp "
-					+ "WHERE exp.experiment_id in (:locationIds) AND e.type_id = 1020 AND exp.project_id = :dataSetId ";
-
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			query.setParameterList("locationIds", locationIds);
-			query.setParameter("dataSetId", dataSetId);
-
-			long count = 0L;
-			final Object obj = query.uniqueResult();
-			if (obj != null) {
-				count = ((Number) obj).longValue();
-			}
-
-			return count != 0;
-
-		} catch (final HibernateException e) {
-			final String message = "Error at checkIfLocationIDsExistInExperiments=" + locationIds + "," + dataSetId + ","
-				+ " query at ExperimentDao: " + e.getMessage();
-			ExperimentDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-	}
-
 	public Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(final Integer studyId) {
 		final Map<Integer, List<SampleDTO>> map = new HashMap<>();
 		try {
@@ -895,6 +867,24 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			return Optional.of(list.get(0));
 		} else {
 			return Optional.empty();
+		}
+	}
+
+	public Long countExperimentsByDatasetAndEnvironmentIds(final Integer datasetId, final List<Integer> environmentIds) {
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("project.projectId", datasetId));
+			criteria.add(Restrictions.in("parent.ndExperimentId", environmentIds));
+			criteria.setProjection(Projections.rowCount());
+			return (Long) criteria.uniqueResult();
+
+		} catch (final HibernateException e) {
+			final String message =
+				"Error at countExperimentsByDatasetAndEnvironmentIds for dataset=" + datasetId + ", environmentIds=" + environmentIds
+					+ " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
