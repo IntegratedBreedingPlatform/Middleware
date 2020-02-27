@@ -58,6 +58,8 @@ public class LotWithdrawalInputDto {
 
 	}
 
+	private Integer lotsSearchId;
+
 	private Map<String, WithdrawalAmountInstruction> withdrawalsPerUnit;
 
 	private String notes;
@@ -68,6 +70,14 @@ public class LotWithdrawalInputDto {
 
 	public void setWithdrawalsPerUnit(final Map<String, WithdrawalAmountInstruction> withdrawalsPerUnit) {
 		this.withdrawalsPerUnit = withdrawalsPerUnit;
+	}
+
+	public Integer getLotsSearchId() {
+		return lotsSearchId;
+	}
+
+	public void setLotsSearchId(final Integer lotsSearchId) {
+		this.lotsSearchId = lotsSearchId;
 	}
 
 	public String getNotes() {
