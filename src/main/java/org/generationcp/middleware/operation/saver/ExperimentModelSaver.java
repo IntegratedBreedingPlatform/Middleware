@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 public class ExperimentModelSaver {
@@ -56,14 +57,15 @@ public class ExperimentModelSaver {
 	}
 
 	public void addOrUpdateExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
-		// Location id is Experiment ID of Environment-level Experiment
-		final int experimentId = values.getLocationId();
-		if(experimentId != 0 ) {
+		final Optional<Integer> experimentId =
+			this.daoFactory.getExperimentDao().getExperimentIdByEnvironmentIdStockId(projectId, values.getLocationId(),
+				values.getGermplasmId());
+		if(experimentId.isPresent()) {
 			for (final Variable variable : values.getVariableList().getVariables()) {
 				final int val = this.daoFactory.getPhenotypeDAO()
-						.updatePhenotypesByExperimentIdAndObervableId(experimentId, variable.getVariableType().getId(), variable.getValue());
+						.updatePhenotypesByExperimentIdAndObervableId(experimentId.get(), variable.getVariableType().getId(), variable.getValue());
 				if (val == 0) {
-					this.phenotypeSaver.save(experimentId, variable);
+					this.phenotypeSaver.save(experimentId.get(), variable);
 				}
 			}
 		} else {

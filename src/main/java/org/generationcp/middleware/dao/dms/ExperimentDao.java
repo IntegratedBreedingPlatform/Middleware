@@ -53,6 +53,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -881,6 +882,20 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		return map;
+	}
+
+	public Optional<Integer> getExperimentIdByEnvironmentIdStockId(final int datasetId, final Integer environmentId, final Integer stockId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("project.projectId", datasetId));
+		criteria.add(Restrictions.eq("stock.stockId", stockId));
+		criteria.add(Restrictions.eq("parent.ndExperimentId", environmentId));
+		criteria.setProjection(Projections.distinct(Projections.property("ndExperimentId")));
+		final List<Integer> list = criteria.list();
+		if (list != null && !list.isEmpty()) {
+			return Optional.of(list.get(0));
+		} else {
+			return Optional.empty();
+		}
 	}
 
 }
