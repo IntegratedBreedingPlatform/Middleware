@@ -119,7 +119,7 @@ public class ExperimentBuilder {
 	private Map<Integer, ExperimentModel> getEnvironmentMap(final List<ExperimentModel> experimentModels, final Integer projectId) {
 		final DatasetType datasetType = this.daoFactory.getDmsProjectDAO().getById(projectId).getDatasetType();
 		if (datasetType != null) {
-			if (DatasetTypeEnum.PLOT_DATA.getId() == datasetType.getDatasetTypeId()) {
+			if (DatasetTypeEnum.PLOT_DATA.getId() == datasetType.getDatasetTypeId() || DatasetTypeEnum.MEANS_DATA.getId() == datasetType.getDatasetTypeId()) {
 				return experimentModels.stream().collect(Collectors.toMap(ExperimentModel::getNdExperimentId, ExperimentModel::getParent));
 			} else if (datasetType.isSubObservationType()) {
 				return this.daoFactory.getEnvironmentDao().getExperimentIdEnvironmentMap(projectId);
