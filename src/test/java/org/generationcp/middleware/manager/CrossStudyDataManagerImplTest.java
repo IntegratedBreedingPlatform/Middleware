@@ -36,6 +36,7 @@ import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -59,52 +60,13 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private CrossStudyDataManager crossStudyDataManager;
 
-	private DmsProjectDao dmsProjectDao;
-
-	private ExperimentDao experimentDao;
-
-	private StockDao stockDao;
-
-	private GermplasmDAO germplasmDao;
-
-	private PhenotypeDao phenotypeDao;
-
-	private CVTermDao cvTermDao;
-
+	private DaoFactory daoFactory;
 	private int trait;
 
 	@Before
 	public void setUp() throws Exception {
 
-		if (this.germplasmDao == null) {
-			this.germplasmDao = new GermplasmDAO();
-			this.germplasmDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.experimentDao == null) {
-			this.experimentDao = new ExperimentDao();
-			this.experimentDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.stockDao == null) {
-			this.stockDao = new StockDao();
-			this.stockDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.dmsProjectDao == null) {
-			this.dmsProjectDao = new DmsProjectDao();
-			this.dmsProjectDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.phenotypeDao == null) {
-			this.phenotypeDao = new PhenotypeDao();
-			this.phenotypeDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.cvTermDao == null) {
-			this.cvTermDao = new CVTermDao();
-			this.cvTermDao.setSession(this.sessionProvder.getSession());
-		}
+		this.daoFactory = new DaoFactory(this.sessionProvder);
 
 	}
 
@@ -241,7 +203,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		study.setName(studyName);
 		study.setDescription(studyName);
 		study.setProgramUUID(programUUID);
-		this.dmsProjectDao.save(study);
+		this.daoFactory.getDmsProjectDAO().save(study);
 
 		final DmsProject plot = new DmsProject();
 		plot.setName(studyName + " - Plot Dataset");
@@ -249,20 +211,11 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		plot.setProgramUUID(programUUID);
 		plot.setParent(study);
 		plot.setStudy(study);
-		this.dmsProjectDao.save(plot);
-
-		final Geolocation geolocation = new Geolocation();
-		geolocation.setDescription("1");
-
-		final GeolocationProperty geolocationProperty = new GeolocationProperty();
-		geolocationProperty.setGeolocation(geolocation);
-		geolocationProperty.setType(TermId.LOCATION_ID.getId());
-		geolocationProperty.setRank(1);
-		geolocationProperty.setValue(locationId);
+		this.daoFactory.getDmsProjectDAO().save(plot);
 
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		germplasm.setGid(null);
-		this.germplasmDao.save(germplasm);
+		this.daoFactory.getGermplasmDao().save(germplasm);
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setName("Germplasm 1");
@@ -270,7 +223,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		stockModel.setUniqueName("1");
 		stockModel.setGermplasm(germplasm);
-		this.stockDao.saveOrUpdate(stockModel);
+		this.daoFactory.getStockDao().saveOrUpdate(stockModel);
 
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
@@ -278,16 +231,23 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		experimentModel.setStock(stockModel);
 		final String customUnitID = RandomStringUtils.randomAlphabetic(10);
 		experimentModel.setObsUnitId(customUnitID);
-		this.experimentDao.saveOrUpdate(experimentModel);
+		this.daoFactory.getExperimentDao().saveOrUpdate(experimentModel);
+
+		final ExperimentProperty experimentProperty = new ExperimentProperty();
+		experimentProperty.setExperiment(experimentModel);
+		experimentProperty.setTypeId(TermId.LOCATION_ID.getId());
+		experimentProperty.setRank(1);
+		experimentProperty.setValue(locationId);
+		this.daoFactory.getExperimentPropertyDao().saveOrUpdate(experimentProperty);
 
 		final CVTerm trait = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
-		this.cvTermDao.save(trait);
+		this.daoFactory.getCvTermDao().save(trait);
 
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setObservableId(trait.getCvTermId());
 		phenotype.setExperiment(experimentModel);
 		phenotype.setValue("data");
-		this.phenotypeDao.save(phenotype);
+		this.daoFactory.getPhenotypeDAO().save(phenotype);
 
 		return trait.getCvTermId();
 
