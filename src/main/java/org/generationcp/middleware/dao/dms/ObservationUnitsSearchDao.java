@@ -236,10 +236,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				query.setParameter("instanceId", String.valueOf(params.getInstanceId()));
 			}
 
-			if (!CollectionUtils.isEmpty(params.getEnvironmentConditions())) {
-				query.setParameter("datasetEnvironmentId", String.valueOf(params.getEnvironmentDatasetId()));
-			}
-
 			addFilteredValueParams(query, params.getFilter());
 
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
@@ -386,10 +382,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (searchDto.getInstanceId() != null) {
 			query.setParameter("instanceId", String.valueOf(searchDto.getInstanceId()));
-		}
-
-		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())) {
-			query.setParameter("datasetEnvironmentId", String.valueOf(searchDto.getEnvironmentDatasetId()));
 		}
 
 		addFilteredValueParams(query, searchDto.getFilter());
