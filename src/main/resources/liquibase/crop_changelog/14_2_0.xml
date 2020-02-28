@@ -33,17 +33,17 @@
 					SELECT COUNT(1)
         			FROM nd_experiment e
         			INNER JOIN nd_experiment env ON e.nd_geolocation_id = env.nd_geolocation_id AND env.type_id = 1020
-        			WHERE e.type_id = 1155 AND e.parent_id is null;
+        			WHERE e.type_id in (1155 and 1170) AND e.parent_id is null;
 				</sqlCheck>
 			</not>
 		</preConditions>
-		<comment> Update Environment experiments as parent of Plot Experiments
+		<comment> Update Environment experiments as parent of Plot and Means Experiments
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE nd_experiment e
         	INNER JOIN nd_experiment env ON e.nd_geolocation_id = env.nd_geolocation_id AND env.type_id = 1020
         	SET e.parent_id = env.nd_experiment_id
-        	WHERE e.type_id = 1155 AND e.parent_id is null;
+        	WHERE e.type_id in (1155 and 1170) AND e.parent_id is null;
 		</sql>
 	</changeSet>
 
