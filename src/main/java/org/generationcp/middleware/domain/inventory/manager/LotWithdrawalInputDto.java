@@ -4,6 +4,7 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by clarysabel on 2/20/20.
@@ -60,6 +61,8 @@ public class LotWithdrawalInputDto {
 
 	private Integer lotsSearchId;
 
+	private Set<Integer> lotIds;
+
 	private Map<String, WithdrawalAmountInstruction> withdrawalsPerUnit;
 
 	private String notes;
@@ -86,6 +89,14 @@ public class LotWithdrawalInputDto {
 
 	public void setNotes(final String notes) {
 		this.notes = notes;
+	}
+
+	public Set<Integer> getLotIds() {
+		return lotIds;
+	}
+
+	public void setLotIds(final Set<Integer> lotIds) {
+		this.lotIds = lotIds;
 	}
 
 	@Override
