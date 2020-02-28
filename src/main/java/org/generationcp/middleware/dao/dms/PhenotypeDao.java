@@ -95,7 +95,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		"SELECT COUNT(*) " + "FROM nd_experiment e "
 			+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
 			+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id "
-			+ " INNER JOIN project pr ON p.project_id = e.project_id  "
+			+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
 			+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
 			+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 			+ "WHERE plot.parent_id IN (:environmentIds) "
@@ -136,8 +136,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "IF (MIN(p.value * 1) IS NULL, 0, MIN(p.value * 1))  AS min_value, "
 					+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ " INNER JOIN project p ON p.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = p.study_id and plot_ds.dataset_type_id = 4 "
+					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
+					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
 					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ " INNER JOIN stock s ON e.stock_id = s.stock_id "
 					+ "  WHERE plot.parent_id IN (:environmentIds) "
@@ -181,8 +181,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id "
-					+ " INNER JOIN project p ON p.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = p.study_id and plot_ds.dataset_type_id = 4 "
+					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
+					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
 					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ "WHERE plot.parent_id IN (:environmentIds) "
 					+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id ");
@@ -221,7 +221,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id "
-					+ " INNER JOIN project pr ON p.project_id = e.project_id  "
+					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
 					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
 					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ "WHERE plot.parent_id IN (:environmentIds) "
@@ -257,7 +257,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				.createSQLQuery("SELECT p.observable_id, p.value * 1 "
 					+ "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ " INNER JOIN project pr ON p.project_id = e.project_id  "
+					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
 					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
 					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ "WHERE plot.parent_id IN (:environmentIds) "
@@ -312,7 +312,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				.createSQLQuery("SELECT DISTINCT p.observable_id, p.value "
 					+ "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ " INNER JOIN project pr ON p.project_id = e.project_id  "
+					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
 					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
 					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ "WHERE plot.parent_id IN (:environmentIds) "
@@ -362,7 +362,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				.createSQLQuery("SELECT p.observable_id, p.cvalue_id, COUNT(p.phenotype_id) AS valuesCount "
 					+ "FROM phenotype p "
 					+ "INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ " INNER JOIN project pr ON p.project_id = e.project_id  "
+					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
 					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
 					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ "WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) "
@@ -488,7 +488,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append("SELECT p.observable_id, p.value, s.dbxref_id, e.nd_experiment_id, l.lname, xp.value as locationId ");
 			queryString.append("FROM phenotype p ");
 			queryString.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ");
-			queryString.append("INNER JOIN project pr ON p.project_id = e.project_id  ");
+			queryString.append("INNER JOIN project pr ON pr.project_id = e.project_id  ");
 			queryString.append("INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 ");
 			queryString.append("INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id ");
 			queryString.append("INNER JOIN nd_experimentprop xp ON xp.nd_experiment_id = plot.parent_id AND xp.type_id = "
