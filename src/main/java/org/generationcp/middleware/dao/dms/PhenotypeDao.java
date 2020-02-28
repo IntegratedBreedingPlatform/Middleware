@@ -547,7 +547,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.append("	FROM phenotype p ")
 			.append(
 				"	INNER JOIN nd_experiment e ON p.nd_experiment_id = e.nd_experiment_id  AND e.type_id in (:experimentTypes)")
-			.append("INNER JOIN project pr ON p.project_id = e.project_id  ")
+			.append("INNER JOIN project pr ON pr.project_id = e.project_id  ")
 			.append("INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 ")
 			.append("INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id ")
 			.append("	LEFT JOIN cvterm_relationship cr_scale ON p.observable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")

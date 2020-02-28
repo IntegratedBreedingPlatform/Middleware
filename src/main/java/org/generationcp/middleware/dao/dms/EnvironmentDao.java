@@ -47,12 +47,12 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String GET_ALL_ENVIRONMENTS_QUERY =
 		"SELECT DISTINCT e.nd_experiment_id as envtId, l.lname AS locationName, prov.lname AS provinceName, "
-			+ "       c.isoabbr, p.project_id, p.name, gp.value AS locationId, p.description AS description "
+			+ "       c.isoabbr, p.project_id, p.name, xp.value AS locationId, p.description AS description "
 			+ "  FROM nd_experimentprop xp "
 			+ " INNER JOIN nd_experiment e on e.nd_experiment_id = xp.nd_experiment_id AND e.type_id = 1020 "
 			+ " INNER JOIN project ds ON ds.project_id = e.project_id "
 			+ " INNER JOIN project p ON p.project_id = ds.study_id "
-			+ "  LEFT JOIN location l ON l.locid = gp.value " + "  LEFT JOIN location prov ON prov.locid = l.snl1id "
+			+ "  LEFT JOIN location l ON l.locid = xp.value " + "  LEFT JOIN location prov ON prov.locid = l.snl1id "
 			+ "  LEFT JOIN cntry c ON c.cntryid = l.cntryid " + " WHERE xp.type_id = " + TermId.LOCATION_ID.getId();
 
 
@@ -135,11 +135,11 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 			// Else, get the value as it's stored in nd_experimentprop
 			final String sql = "SELECT DISTINCT xp.type_id, cvt.name, cvt.definition, nd_experiment_id, "
 				+ "CASE WHEN (v.name IS NOT NULL AND cvr.cvterm_relationship_id IS NOT NULL) THEN v.definition "
-				+ " ELSE gp.value END AS propvalue " + " FROM nd_experimentprop xp"
+				+ " ELSE xp.value END AS propvalue " + " FROM nd_experimentprop xp"
 				+ " LEFT JOIN cvterm cvt ON xp.type_id = cvt.cvterm_id"
-				+ " LEFT JOIN cvterm v ON v.cvterm_id = gp.value"
-				+ " LEFT JOIN cvterm_relationship cvr ON cvr.subject_id = gp.type_id AND cvr.type_id = " + TermId.HAS_SCALE.getId()
-				+ " WHERE nd_experiment_id IN (:environmentIds)" + " ORDER BY gp.type_id, nd_experiment_id";
+				+ " LEFT JOIN cvterm v ON v.cvterm_id = xp.value"
+				+ " LEFT JOIN cvterm_relationship cvr ON cvr.subject_id = xp.type_id AND cvr.type_id = " + TermId.HAS_SCALE.getId()
+				+ " WHERE nd_experiment_id IN (:environmentIds)" + " ORDER BY xp.type_id, nd_experiment_id";
 			final Query query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("environmentIds", environmentIds);
 
@@ -196,7 +196,7 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			// Get location name, study id and study name
 			final String sql =
-				"SELECT DISTINCT e.nd_experiment_id as environmentId, l.lname, gp.value, p.project_id, p.name, p.description, prov.lname as provinceName, c.isoabbr "
+				"SELECT DISTINCT e.nd_experiment_id as environmentId, l.lname, xp.value, p.project_id, p.name, p.description, prov.lname as provinceName, c.isoabbr "
 					+ "FROM nd_experiment e "
 					+ "	LEFT JOIN nd_experimentprop xp ON e.nd_experiment_id = xp.nd_experiment_id"
 					+ "	AND xp.type_id =  " + TermId.LOCATION_ID.getId()
@@ -253,14 +253,14 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 		final TrialEnvironments environments = new TrialEnvironments();
 		try {
 			final String sql =
-				"SELECT DISTINCT xp.nd_experiment_id as envtId, l.lname as locationName, prov.lname as provinceName, c.isoabbr, p.project_id, p.name, gp.value as locationId"
+				"SELECT DISTINCT xp.nd_experiment_id as envtId, l.lname as locationName, prov.lname as provinceName, c.isoabbr, p.project_id, p.name, xp.value as locationId"
 					+ " FROM nd_experiment e "
 					+ " INNER JOIN project ds ON ds.project_id = e.project_id "
 					+ " INNER JOIN project p ON p.project_id = ds.study_id "
 					+ " INNER JOIN phenotype ph ON ph.nd_experiment_id = e.nd_experiment_id"
 					+ " INNER JOIN nd_experimentprop xp ON xp.nd_experiment_id = e.nd_experiment_id AND xp.type_id = "
 					+ TermId.LOCATION_ID.getId()
-					+ " LEFT JOIN location l ON l.locid = gp.value"
+					+ " LEFT JOIN location l ON l.locid = xp.value"
 					+ " LEFT JOIN location prov ON prov.locid = l.snl1id"
 					+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
 					+ " WHERE ph.observable_id IN (:traitIds) AND p.program_uuid = :programUUID ;";
