@@ -87,4 +87,34 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="nahuel" id="v14.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from permission
+					where name in (
+					               'CREATE_LOTS',
+					               'IMPORT_LOTS',
+					               'WITHDRAW_INVENTORY',
+					               'CREATE_PENDING_WITHDRAWALS',
+					               'CREATE_CONFIRMED_WITHDRAWALS'
+					  ) and workbench_sidebar_category_link_id is not null;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Remove link from some permissions. Explicit VIEW permission are needed now to access IM</comment>
+		<sql dbms="mysql" splitStatements="true">
+			update permission
+			set workbench_sidebar_category_link_id = null
+			where name in (
+			               'CREATE_LOTS',
+			               'IMPORT_LOTS',
+			               'WITHDRAW_INVENTORY',
+			               'CREATE_PENDING_WITHDRAWALS',
+			               'CREATE_CONFIRMED_WITHDRAWALS'
+			  );
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
