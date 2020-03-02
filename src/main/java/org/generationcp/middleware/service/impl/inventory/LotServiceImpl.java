@@ -23,7 +23,6 @@ import org.generationcp.middleware.service.api.inventory.LotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
@@ -35,7 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRED)
+@Transactional
 public class LotServiceImpl implements LotService {
 
 	private DaoFactory daoFactory;
