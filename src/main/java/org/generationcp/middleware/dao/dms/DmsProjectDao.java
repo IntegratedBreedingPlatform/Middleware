@@ -362,7 +362,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("   LEFT JOIN nd_experiment e ON p.project_id = e.project_id AND e.type_id = 1020 and e.observation_unit_no = 1")
 			.append("   LEFT JOIN nd_experimentprop siteName ON e.nd_experiment_id = siteName.nd_experiment_id ")
 			.append("           AND siteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
-			.append("   LEFT JOIN nd_experimentprop siteId ON e.nd_experiment_id = siteId.nd_experiment_id ")
+			.append("   INNER JOIN nd_experimentprop siteId ON e.nd_experiment_id = siteId.nd_experiment_id ")
 			.append("           AND siteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
 			.append("	LEFT JOIN study_type st ON st.study_type_id = pmain.study_type_id ")
 			.append(" WHERE pmain.deleted != " + DELETED_STUDY + " ");
