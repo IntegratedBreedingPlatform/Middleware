@@ -360,7 +360,6 @@ public class WorkbookSaver extends Saver {
 	public void saveOrUpdateTrialObservations(
 		final CropType crop, final int trialDatasetId, final Workbook workbook, final VariableTypeList trialVariables, final List<String> trialHeaders) {
 
-		final Map<Integer, Integer> instanceNumberEnvironmentIdsMap = new HashMap<>();
 		final List<Location> locations = this.daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 
 		if (!workbook.getTrialObservations().isEmpty()) {
@@ -381,6 +380,9 @@ public class WorkbookSaver extends Saver {
 		} else {
 			// workbook.getTrialObservations() is empty when a study is created from Dataset Importer.
 			// In this case, extract the trial environments from plot observations
+			final Map<Integer, Integer> instanceNumberEnvironmentIdsMap = this.daoFactory.getExperimentDao()
+				.getInstanceNumberEnvironmentIdsMap(trialDatasetId);
+
 			for (final MeasurementRow row : workbook.getObservations()) {
 				final Integer instanceNumber = this.getTrialInstanceNumber(row);
 				if (!instanceNumberEnvironmentIdsMap.containsKey(instanceNumber)) {
@@ -903,17 +905,13 @@ public class WorkbookSaver extends Saver {
 
 		// create trial experiments if not yet existing
 		final boolean hasExistingStudyExperiment = this.checkIfHasExistingStudyExperiment(studyId);
-		final boolean hasExistingTrialExperiments = this.checkIfHasExistingExperiments(trialDatasetId);
 		if (!hasExistingStudyExperiment) {
 			// 1. study experiment
 			final StudyValues values = new StudyValues();
 			this.getStudySaver().saveStudyExperiment(crop, studyId, values);
 		}
-		// create trial experiments if not yet existing
-		if (!hasExistingTrialExperiments) {
-			// 2. trial experiments
-			this.saveOrUpdateTrialObservations(crop, trialDatasetId, workbook, trialVariables, trialHeaders);
-		}
+		// 2. trial experiments
+		this.saveOrUpdateTrialObservations(crop, trialDatasetId, workbook, trialVariables, trialHeaders);
 		if (isMeansDataImport) {
 			// 3. means experiments
 			this.createMeansExperiments(crop, meansDatasetId, trialDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
@@ -948,12 +946,7 @@ public class WorkbookSaver extends Saver {
 		final Integer experimentId = this.getExperimentDao().getExperimentIdByProjectId(studyId);
 		return experimentId != null;
 	}
-
-	private boolean checkIfHasExistingExperiments(final Integer projectId) {
-		final List<Integer> experimentIds = this.daoFactory.getEnvironmentDao().getEnvironmentIds(projectId);
-		return experimentIds != null && !experimentIds.isEmpty();
-	}
-
+	
 	private VariableList createDefaultEnvironmentVariableList(final String programUUID) {
 		final VariableList list = new VariableList();
 

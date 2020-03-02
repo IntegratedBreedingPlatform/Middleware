@@ -181,6 +181,28 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	public Map<Integer, Integer> getInstanceNumberEnvironmentIdsMap(final int trialDatasetId) {
+		try {
+			final String sql = "SELECT DISTINCT nd_experiment_id as environmentId, observation_unit_no as instanceNumber "
+						+ "		FROM nd_experiment WHERE type_id =  1020 and project_id = :trialDatasetId";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("trialDatasetId", trialDatasetId);
+			query.addScalar("environmentId");
+			query.addScalar("instanceNumber");
+			final List<Object[]> list = query.list();
+			final Map<Integer, Integer> instanceNumberEnvironmentIdsMap = new HashMap<>();
+			for (final Object[] row : list) {
+				instanceNumberEnvironmentIdsMap.put((Integer) row[1], (Integer) row[0]);
+			}
+			return instanceNumberEnvironmentIdsMap;
+		} catch (final HibernateException e) {
+			final String message = "Error at getinstanceNumberEnvironmentIdsMap=" + trialDatasetId + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<Integer> getLocationIdsOfStudyWithFieldmap(final int studyId) {
 		try {
