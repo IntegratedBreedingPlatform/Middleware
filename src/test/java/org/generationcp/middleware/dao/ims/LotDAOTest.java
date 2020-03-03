@@ -103,7 +103,7 @@ public class LotDAOTest extends IntegrationTestBase {
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.inventoryDataManager.addLots(Lists.newArrayList(lot));
 
-		final Transaction transaction = InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0,
+		final Transaction transaction = InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 1,
 			TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
 		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction));
 
@@ -132,7 +132,7 @@ public class LotDAOTest extends IntegrationTestBase {
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
 
 		Transaction transaction =
-				InventoryDetailsTestDataInitializer.createDepositTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, LIST, "InventoryId");
+				InventoryDetailsTestDataInitializer.createDepositTransaction(5.0, 1, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, LIST, "InventoryId");
 		transaction.setType(TransactionType.DEPOSIT.getId());
 		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction));
 
