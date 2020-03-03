@@ -41,7 +41,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>5.1.0.Final</version>
+			<version>5.2.4.Final</version>
 		</dependency>
 		<!-- EHCache Core APIs -->
 		<dependency>
@@ -156,12 +156,10 @@
 			<version>1.1.2</version>
 		</dependency>
 
-		<!-- For testing -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>3.1.0</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- Used for Workbook Parser -->
