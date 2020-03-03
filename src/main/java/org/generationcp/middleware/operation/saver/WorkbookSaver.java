@@ -235,7 +235,7 @@ public class WorkbookSaver extends Saver {
 			workbook.setMeasurementDatesetId(plotDatasetId);
 		}
 
-		this.createMeasurementEffectExperiments(crop, plotDatasetId, environmentDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
+		this.createExperiments(crop, plotDatasetId, environmentDatasetId, effectVariables, workbook.getObservations(), trialHeaders, ExperimentType.PLOT);
 
 		return studyId;
 	}
@@ -278,7 +278,7 @@ public class WorkbookSaver extends Saver {
 		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook, trialVariables, trialHeaders);
 
 		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
-		this.createMeasurementEffectExperiments(crop, plotDatasetId, environmentDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
+		this.createExperiments(crop, plotDatasetId, environmentDatasetId, effectVariables, workbook.getObservations(), trialHeaders, ExperimentType.PLOT);
 
 	}
 
@@ -690,67 +690,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 	// TODO IBP-3389 See if this can be consolidated with createMeansExperiments
-	private void createMeasurementEffectExperiments(
-		final CropType crop, final int plotDatasetId, final Integer environmentDatasetId, final VariableTypeList effectVariables,
-		final List<MeasurementRow> observations, final List<String> trialHeaders) {
 
-		final TimerWatch watch = new TimerWatch("saving stocks and measurement effect data (total)");
-		final TimerWatch rowWatch = new TimerWatch("for each row");
-
-		// observation values start at row 2
-		int i = 2;
-
-		final ExperimentValuesTransformer experimentValuesTransformer = this.getExperimentValuesTransformer();
-		final ExperimentModelSaver experimentModelSaver = this.getExperimentModelSaver();
-		Map<Integer, PhenotypeExceptionDto> exceptions = null;
-		final Session activeSession = this.getActiveSession();
-		final FlushMode existingFlushMode = activeSession.getFlushMode();
-		final Map<Integer, Integer> instanceNumberEnvironmentIdMap = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(environmentDatasetId, true).stream()
-			.collect(Collectors.toMap(ExperimentModel::getObservationUnitNo, ExperimentModel::getNdExperimentId));
-		try {
-			activeSession.setFlushMode(FlushMode.MANUAL);
-			if (observations != null) {
-				for (final MeasurementRow row : observations) {
-					rowWatch.restart("saving row " + i++);
-					final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders, instanceNumberEnvironmentIdMap);
-					try {
-						experimentModelSaver.addExperiment(crop, plotDatasetId, ExperimentType.PLOT, experimentValues);
-					} catch (final PhenotypeException e) {
-						WorkbookSaver.LOG.error(e.getMessage(), e);
-						if (exceptions == null) {
-							exceptions = e.getExceptions();
-						} else {
-							for (final Integer standardVariableId : e.getExceptions().keySet()) {
-								final PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
-								if (exceptions.get(standardVariableId) == null) {
-									// add exception
-									exceptions.put(standardVariableId, exception);
-								} else {
-									// add invalid values to the existing map of
-									// exceptions for each phenotype
-									for (final String invalidValue : exception.getInvalidValues()) {
-										exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			activeSession.flush();
-		} finally {
-			if (existingFlushMode != null) {
-				activeSession.setFlushMode(existingFlushMode);
-			}
-		}
-
-		rowWatch.stop();
-		watch.stop();
-
-		if (exceptions != null) {
-			throw new PhenotypeException(exceptions);
-		}
-	}
 
 	private boolean isTrialFactorInDataset(final VariableTypeList list) {
 
@@ -914,10 +854,10 @@ public class WorkbookSaver extends Saver {
 		this.saveOrUpdateTrialObservations(crop, trialDatasetId, workbook, trialVariables, trialHeaders);
 		if (isMeansDataImport) {
 			// 3. means experiments
-			this.createMeansExperiments(crop, meansDatasetId, trialDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
+			this.createExperiments(crop, meansDatasetId, trialDatasetId, effectVariables, workbook.getObservations(), trialHeaders, ExperimentType.AVERAGE);
 		} else {
 			// 3. measurement experiments
-			this.createMeasurementEffectExperiments(crop, measurementDatasetId, trialDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
+			this.createExperiments(crop, measurementDatasetId, trialDatasetId, effectVariables, workbook.getObservations(), trialHeaders, ExperimentType.PLOT);
 		}
 	}
 
@@ -946,7 +886,7 @@ public class WorkbookSaver extends Saver {
 		final Integer experimentId = this.getExperimentDao().getExperimentIdByProjectId(studyId);
 		return experimentId != null;
 	}
-	
+
 	private VariableList createDefaultEnvironmentVariableList(final String programUUID) {
 		final VariableList list = new VariableList();
 
@@ -1073,12 +1013,11 @@ public class WorkbookSaver extends Saver {
 		return newList;
 	}
 
+	private void createExperiments(
+		final CropType crop, final int plotDatasetId, final Integer environmentDatasetId, final VariableTypeList effectVariables,
+		final List<MeasurementRow> observations, final List<String> trialHeaders, ExperimentType experimentType) {
 
-	private void createMeansExperiments(
-		final CropType crop, final int meansDatasetId, final Integer environmentDatasetId, final VariableTypeList effectVariables,
-		final List<MeasurementRow> observations, final List<String> trialHeaders) {
-
-		final TimerWatch watch = new TimerWatch("saving means data (total)");
+		final TimerWatch watch = new TimerWatch("saving experiments (total)");
 		final TimerWatch rowWatch = new TimerWatch("for each row");
 
 		// observation values start at row 2
@@ -1087,41 +1026,47 @@ public class WorkbookSaver extends Saver {
 		final ExperimentValuesTransformer experimentValuesTransformer = this.getExperimentValuesTransformer();
 		final ExperimentModelSaver experimentModelSaver = this.getExperimentModelSaver();
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
+		final Session activeSession = this.getActiveSession();
+		final FlushMode existingFlushMode = activeSession.getFlushMode();
 		final Map<Integer, Integer> instanceNumberEnvironmentIdMap = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(environmentDatasetId, true).stream()
 			.collect(Collectors.toMap(ExperimentModel::getObservationUnitNo, ExperimentModel::getNdExperimentId));
-		if (observations != null) {
-			for (final MeasurementRow row : observations) {
-				rowWatch.restart("saving row " + i++);
-				final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders, instanceNumberEnvironmentIdMap);
-				// TODO IBP-3389 See if below is relevant to means dataset
-//				final VariableList trialVariates = trialVariatesMap.get((int) row.getLocationId());
-//				if (trialVariates != null) {
-//					experimentValues.getVariableList().addAll(trialVariates);
-//				}
-				try {
-					experimentModelSaver.addExperiment(crop, meansDatasetId, ExperimentType.AVERAGE, experimentValues);
-				} catch (final PhenotypeException e) {
-					WorkbookSaver.LOG.error(e.getMessage(), e);
-					if (exceptions == null) {
-						exceptions = e.getExceptions();
-					} else {
-						for (final Integer standardVariableId : e.getExceptions().keySet()) {
-							final PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
-							if (exceptions.get(standardVariableId) == null) {
-								// add exception
-								exceptions.put(standardVariableId, exception);
-							} else {
-								// add invalid values to the existing map of
-								// exceptions for each phenotype
-								for (final String invalidValue : exception.getInvalidValues()) {
-									exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+		try {
+			activeSession.setFlushMode(FlushMode.MANUAL);
+			if (observations != null) {
+				for (final MeasurementRow row : observations) {
+					rowWatch.restart("saving row " + i++);
+					final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders, instanceNumberEnvironmentIdMap);
+					try {
+						experimentModelSaver.addExperiment(crop, plotDatasetId, experimentType, experimentValues);
+					} catch (final PhenotypeException e) {
+						WorkbookSaver.LOG.error(e.getMessage(), e);
+						if (exceptions == null) {
+							exceptions = e.getExceptions();
+						} else {
+							for (final Integer standardVariableId : e.getExceptions().keySet()) {
+								final PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
+								if (exceptions.get(standardVariableId) == null) {
+									// add exception
+									exceptions.put(standardVariableId, exception);
+								} else {
+									// add invalid values to the existing map of
+									// exceptions for each phenotype
+									for (final String invalidValue : exception.getInvalidValues()) {
+										exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+									}
 								}
 							}
 						}
 					}
 				}
 			}
+			activeSession.flush();
+		} finally {
+			if (existingFlushMode != null) {
+				activeSession.setFlushMode(existingFlushMode);
+			}
 		}
+
 		rowWatch.stop();
 		watch.stop();
 
