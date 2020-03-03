@@ -11,7 +11,7 @@ import java.util.Date;
 public class ExtendedLotDto extends LotDto {
 
 	private String designation;
-	private String scaleName;
+	private String unitName;
 
 	@JsonView({InventoryView.LotView.class})
 	private String createdByUsername;
@@ -128,12 +128,12 @@ public class ExtendedLotDto extends LotDto {
 		this.locationName = locationName;
 	}
 
-	public String getScaleName() {
-		return scaleName;
+	public String getUnitName() {
+		return unitName;
 	}
 
-	public void setScaleName(final String scaleName) {
-		this.scaleName = scaleName;
+	public void setUnitName(final String unitName) {
+		this.unitName = unitName;
 	}
 
 	public String getCreatedByUsername() {

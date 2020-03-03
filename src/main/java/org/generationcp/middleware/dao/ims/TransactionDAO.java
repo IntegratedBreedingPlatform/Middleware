@@ -597,7 +597,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "        LEFT JOIN"//
 		+ "    names n ON n.gid = i.eid AND n.nstat = 1"//
 		+ "        LEFT JOIN"//
-		+ "    workbench.users users ON users.userid = i.userid"//
+		+ "    workbench.users users ON users.userid = act.userid"//
 		+ " WHERE"//
 		+ "    i.etype = 'GERMPLSM' "; //
 
@@ -616,8 +616,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				query.append(" and i.eid IN (").append(Joiner.on(",").join(transactionsSearchDto.getGids())).append(") ");
 			}
 
-			if (transactionsSearchDto.getScaleIds() != null && !transactionsSearchDto.getScaleIds().isEmpty()) {
-				query.append(" and i.scaleid IN (").append(Joiner.on(",").join(transactionsSearchDto.getScaleIds())).append(") ");
+			if (transactionsSearchDto.getUnitIds() != null && !transactionsSearchDto.getUnitIds().isEmpty()) {
+				query.append(" and i.scaleid IN (").append(Joiner.on(",").join(transactionsSearchDto.getUnitIds())).append(") ");
 			}
 
 			if (transactionsSearchDto.getDesignation() != null) {

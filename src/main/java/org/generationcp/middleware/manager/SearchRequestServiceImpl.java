@@ -46,7 +46,7 @@ public class SearchRequestServiceImpl implements SearchRequestService {
 
 			return searchRequestDto;
 		} catch (final Exception e) {
-			throw new MiddlewareException("Error getting search request", e);
+			throw new MiddlewareException("Error when trying to get the search request. Id is null or does not exist");
 		}
 
 	}
