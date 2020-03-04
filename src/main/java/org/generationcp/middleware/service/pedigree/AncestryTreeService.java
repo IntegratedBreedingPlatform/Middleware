@@ -48,7 +48,10 @@ public class AncestryTreeService {
 			return rootGermplasmNode;
 		} catch (final ExecutionException e) {
 			throw new MiddlewareQueryException("Unable to create pedigree string", e);
-		} finally {
+		} catch (final NullPointerException e){
+			throw new MiddlewareQueryException("Invalid Germplasm", e);
+		}
+		finally {
 			monitor.stop();
 		}
 	}
@@ -61,14 +64,14 @@ public class AncestryTreeService {
 				final Optional<Method> method = this.breedingMethodCache.get(new CropMethodKey(this.cropName, germplasmNode.getGermplasm().getMethodId()));
 				if(method.isPresent()) {
 					germplasmNode.setMethod(method.get());
+					String mname = method.get().getMname();
+					if(StringUtils.isNotBlank(mname) && mname.toLowerCase().contains("backcross")) {
+						final BackcrossAncestryTree backcrossAncestryTree = new BackcrossAncestryTree(germplasmAncestryCache, breedingMethodCache, cropName);
+						return backcrossAncestryTree.generateBackcrossAncestryTree(germplasm.get(), level);
+					}
+					this.buildAncestoryTree(germplasmNode, level);
+					return germplasmNode;
 				}
-				String mname = method.get().getMname();
-				if(StringUtils.isNotBlank(mname) && mname.toLowerCase().contains("backcross")) {
-					final BackcrossAncestryTree backcrossAncestryTree = new BackcrossAncestryTree(germplasmAncestryCache, breedingMethodCache, cropName);
-					return backcrossAncestryTree.generateBackcrossAncestryTree(germplasm.get(), level);
-				}
-				this.buildAncestoryTree(germplasmNode, level);
-				return germplasmNode;
 			}
 
 		}
