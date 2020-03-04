@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -214,7 +215,7 @@ public class InventoryServiceImplTest {
 		Mockito.doReturn(lot)
 				.when(this.lotBuilder)
 				.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId(),
-					this.cropType);
+					this.cropType, details.getInventoryID());
 		final Lot savedLot = new Lot();
 		savedLot.setId(1);
 		Mockito.doReturn(savedLot).when(this.lotDAO).saveOrUpdate(lot);
@@ -223,7 +224,7 @@ public class InventoryServiceImplTest {
 		Mockito.doReturn(transaction)
 				.when(this.transactionBuilder)
 				.buildForAdd(lot, listData.getId(), details.getAmount(), details.getUserId(), details.getPersonId(), details.getComment(), details.getSourceId(),
-						details.getInventoryID(), details.getBulkWith(), details.getBulkCompl());
+						details.getBulkWith(), details.getBulkCompl());
 		final Transaction savedTransaction = new Transaction();
 		savedTransaction.setId(1);
 		Mockito.doReturn(savedTransaction).when(this.transactionDAO).saveOrUpdate(transaction);
@@ -254,7 +255,7 @@ public class InventoryServiceImplTest {
 		Mockito.doReturn(lot)
 				.when(this.lotBuilder)
 				.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId(),
-					this.cropType);
+					this.cropType, details.getInventoryID());
 		final Lot savedLot = new Lot();
 		savedLot.setId(1);
 		Mockito.doReturn(savedLot).when(this.lotDAO).saveOrUpdate(lot);
@@ -263,7 +264,7 @@ public class InventoryServiceImplTest {
 		Mockito.doReturn(transaction)
 				.when(this.transactionBuilder)
 				.buildForAdd(lot, 0, details.getAmount(), details.getUserId(), details.getPersonId(), details.getComment(), details.getSourceId(),
-						details.getInventoryID(), details.getBulkWith(), details.getBulkCompl());
+						details.getBulkWith(), details.getBulkCompl());
 		final Transaction savedTransaction = new Transaction();
 		savedTransaction.setId(1);
 		Mockito.doReturn(savedTransaction).when(this.transactionDAO).saveOrUpdate(transaction);
@@ -288,10 +289,10 @@ public class InventoryServiceImplTest {
 	private Transaction createTransactionTestData(final Lot lot, final GermplasmListData listData, final InventoryDetails details) {
 		final Transaction transaction =
 				new Transaction(null, details.getUserId(), lot, Util.getCurrentDate(),
-						TransactionStatus.ANTICIPATED.getIntValue(),
+						TransactionStatus.PENDING.getIntValue(),
 						Double.valueOf(new DecimalFormat("#.000").format(details.getAmount())), details.getComment(), 0,
 						EntityType.LIST.name(), details.getSourceId(), listData == null ? 0 : listData.getId(), 0d, 1,
-						details.getInventoryID());
+						TransactionType.DEPOSIT.getId());
 
 		transaction.setBulkCompl(details.getBulkCompl());
 		transaction.setBulkWith(details.getBulkWith());
@@ -301,7 +302,7 @@ public class InventoryServiceImplTest {
 
 	private Lot createLotTestData(final InventoryDetails details) {
 		return new Lot(null, details.getUserId(), EntityType.GERMPLSM.name(), details.getGid(), details.getLocationId(),
-				details.getScaleId(), LotStatus.ACTIVE.getIntValue(), 0, details.getComment());
+				details.getScaleId(), LotStatus.ACTIVE.getIntValue(), 0, details.getComment(), details.getInventoryID());
 	}
 
 	private ListDataProject createListDataProjectTestData() {

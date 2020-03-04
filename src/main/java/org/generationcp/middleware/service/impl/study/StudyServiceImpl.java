@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -19,6 +20,8 @@ import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -46,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -54,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -92,6 +97,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
+	@Resource
 	private StudyDataManager studyDataManager;
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
@@ -305,12 +311,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public Integer getPlotDatasetId(final int studyId) {
-		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getProjectId();
+		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0)
+			.getProjectId();
 	}
 
 	@Override
 	public Integer getEnvironmentDatasetId(final int studyId) {
-		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getProjectId();
+		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0)
+			.getProjectId();
 	}
 
 	@Override
@@ -495,19 +503,46 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetailsForGeolocation(final Integer geolocationId) {
+	public StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId) {
 		try {
 			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadataForGeolocationId(geolocationId);
 			if (studyMetadata != null) {
 				final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
 				studyDetailsDto.setMetadata(studyMetadata);
+
 				final List<UserDto> users = new ArrayList<>();
-				final Map<String, String> properties = new HashMap<>();
 				users.addAll(this.studyDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
 				users.addAll(this.studyDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
-				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(geolocationId));
-				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
 				studyDetailsDto.setContacts(users);
+
+				final DmsProject environmentDataset =
+					this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyMetadata.getTrialDbId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
+				final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
+					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.<Integer>newArrayList(VariableType.STUDY_CONDITION.getId()));
+				final List<MeasurementVariable> environmentParameters = new ArrayList<>();
+				List<Integer> variableIds = this.getVariableIds(environmentConditions);
+				if(!variableIds.isEmpty()) {
+					environmentParameters.addAll(
+						this.studyDataManager.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
+				}
+				final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
+					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.<Integer>newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
+				variableIds = this.getVariableIds(environmentDetails);
+				if(!variableIds.isEmpty()) {
+					environmentParameters.addAll(
+						this.studyDataManager.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
+				}
+
+
+				final List<MeasurementVariable> environmentVariables = new ArrayList<>(environmentConditions);
+				environmentVariables.addAll(environmentDetails);
+				environmentParameters.addAll(createGeolocationVariables(environmentVariables, geolocationId));
+				studyDetailsDto.setEnvironmentParameters(environmentParameters);
+
+				final Map<String, String> properties = new HashMap<>();
+				variableIds = this.getVariableIds(environmentVariables);
+				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(geolocationId, variableIds));
+				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId(), variableIds));
 				studyDetailsDto.setAdditionalInfo(properties);
 				return studyDetailsDto;
 			}
@@ -519,6 +554,45 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 	}
 
+	private List<Integer> getVariableIds(final List<MeasurementVariable> measurementVariables) {
+		final List<Integer> varIds =  new ArrayList<>();
+		for(final MeasurementVariable mvar: measurementVariables){
+			varIds.add(mvar.getTermId());
+		}
+		return varIds;
+	}
+
+
+	private List<MeasurementVariable> createGeolocationVariables(final List<MeasurementVariable> measurementVariables, final Integer geolocationId) {
+		final List<MeasurementVariable> geolocationVariables = new ArrayList<>();
+		final List<Integer> variableIds = this.getVariableIds(measurementVariables);
+		if(variableIds.contains(TermId.ALTITUDE.getId()) || variableIds.contains(TermId.LATITUDE.getId())
+			|| variableIds.contains(TermId.LONGITUDE.getId()) || variableIds.contains(TermId.GEODETIC_DATUM.getId())) {
+			final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(geolocationId);
+			Map<Integer, MeasurementVariable> variableMap = new HashMap<>();
+			for(MeasurementVariable mvar: measurementVariables) {
+				variableMap.put(mvar.getTermId(), mvar);
+			}
+			if(variableIds.contains(TermId.ALTITUDE.getId())) {
+				variableMap.get(TermId.ALTITUDE.getId()).setValue(geolocation.getAltitude().toString());
+				geolocationVariables.add(variableMap.get(TermId.ALTITUDE.getId()));
+			}
+			if(variableIds.contains(TermId.LATITUDE.getId())) {
+				variableMap.get(TermId.LATITUDE.getId()).setValue(geolocation.getLatitude().toString());
+				geolocationVariables.add(variableMap.get(TermId.LATITUDE.getId()));
+			}
+			if(variableIds.contains(TermId.LONGITUDE.getId())) {
+				variableMap.get(TermId.LONGITUDE.getId()).setValue(geolocation.getLongitude().toString());
+				geolocationVariables.add(variableMap.get(TermId.LONGITUDE.getId()));
+			}
+			if(variableIds.contains(TermId.GEODETIC_DATUM.getId())) {
+				variableMap.get(TermId.GEODETIC_DATUM.getId()).setValue(geolocation.getGeodeticDatum());
+				geolocationVariables.add(variableMap.get(TermId.GEODETIC_DATUM.getId()));
+			}
+
+		}
+		return geolocationVariables;
+	}
 	@Override
 	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {
 		final List queryResults;

@@ -1,6 +1,7 @@
 package org.generationcp.middleware.domain.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -9,22 +10,41 @@ import java.util.Date;
 @AutoProperty
 public class ExtendedLotDto extends LotDto {
 
-	private Integer mgid;
 	private String designation;
+	private String unitName;
+
+	@JsonView({InventoryView.LotView.class})
+	private String createdByUsername;
+
+	@JsonView({InventoryView.LotView.class})
+	private Integer mgid;
+
+	@JsonView({InventoryView.LotView.class})
 	private String locationName;
-	private String scaleName;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
+	@JsonView({InventoryView.LotView.class})
 	private Date createdDate;
 
 	//Aggregated Data
+	@JsonView({InventoryView.LotView.class})
 	private Double actualBalance;
+
+	@JsonView({InventoryView.LotView.class})
 	private Double availableBalance;
+
+	@JsonView({InventoryView.LotView.class})
 	private Double reservedTotal;
+
+	@JsonView({InventoryView.LotView.class})
 	private Double withdrawalTotal;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
+
+	@JsonView({InventoryView.LotView.class})
 	private Date lastDepositDate;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
+
+	@JsonView({InventoryView.LotView.class})
 	private Date lastWithdrawalDate;
 
 
@@ -108,12 +128,20 @@ public class ExtendedLotDto extends LotDto {
 		this.locationName = locationName;
 	}
 
-	public String getScaleName() {
-		return scaleName;
+	public String getUnitName() {
+		return unitName;
 	}
 
-	public void setScaleName(final String scaleName) {
-		this.scaleName = scaleName;
+	public void setUnitName(final String unitName) {
+		this.unitName = unitName;
+	}
+
+	public String getCreatedByUsername() {
+		return createdByUsername;
+	}
+
+	public void setCreatedByUsername(final String createdByUsername) {
+		this.createdByUsername = createdByUsername;
 	}
 
 	@Override

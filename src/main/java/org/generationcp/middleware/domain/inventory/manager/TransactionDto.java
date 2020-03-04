@@ -14,6 +14,7 @@ public class TransactionDto {
 	private Integer transactionId;
 	private String createdByUsername;
 	private String transactionType;
+	private String transactionStatus;
 	private Double amount;
 	private String notes;
 
@@ -29,21 +30,24 @@ public class TransactionDto {
 	public TransactionDto(final Integer transactionId, final String createdByUsername, final String transactionType, final Double amount,
 		final String notes,
 		final Date transactionDate, final Integer lotId, final Integer gid, final String designation, final String stockId,
-		final Integer scaleId, final String scaleName, final String lotStatus) {
+		final Integer scaleId, final String scaleName, final String lotStatus, final String transactionStatus, final Integer locationId, final String comments) {
 		this.transactionId = transactionId;
 		this.createdByUsername = createdByUsername;
 		this.transactionType = transactionType;
 		this.amount = amount;
 		this.notes = notes;
 		this.transactionDate = transactionDate;
+		this.transactionStatus = transactionStatus;
 		this.lot = new ExtendedLotDto();
 		this.lot.setLotId(lotId);
 		this.lot.setGid(gid);
-		this.lot.setDesignation(designation);
 		this.lot.setStockId(stockId);
-		this.lot.setScaleId(scaleId);
-		this.lot.setScaleName(scaleName);
+		this.lot.setUnitId(scaleId);
 		this.lot.setStatus(lotStatus);
+		this.lot.setLocationId(locationId);
+		this.lot.setNotes(comments);
+		this.lot.setUnitName(scaleName);
+		this.lot.setDesignation(designation);
 	}
 
 	public Integer getTransactionId() {
@@ -100,6 +104,14 @@ public class TransactionDto {
 
 	public void setLot(final ExtendedLotDto lot) {
 		this.lot = lot;
+	}
+
+	public String getTransactionStatus() {
+		return this.transactionStatus;
+	}
+
+	public void setTransactionStatus(final String transactionStatus) {
+		this.transactionStatus = transactionStatus;
 	}
 
 	@Override

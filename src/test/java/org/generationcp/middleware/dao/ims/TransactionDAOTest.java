@@ -45,7 +45,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	private static final int LIST_ID = 1;
 	private static final String STOCK_ID_PREFIX = "STOCK";
 	private static final int LOCATION_ID = 1;
-	private static final int SCALE_ID = 1;
+	private static final int UNIT_ID = 1;
 
 	private static final String LOT_DISCARD = "Discard" ;
 	private static final String LOT_DEPOSIT = TransactionType.DEPOSIT.getValue();
@@ -175,7 +175,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	private void initLotsAndTransactions(final Integer germplasmListId) {
 
 		final List<Lot> lots =
-				this.inventoryDetailsTestDataInitializer.createLots(new ArrayList<>(this.germplasmMap.keySet()), germplasmListId, SCALE_ID,
+				this.inventoryDetailsTestDataInitializer.createLots(new ArrayList<>(this.germplasmMap.keySet()), germplasmListId, UNIT_ID,
 						LOCATION_ID);
 
 		final List<Integer> lotIds = this.inventoryDataManager.addLots(lots);
@@ -228,14 +228,17 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final String sDate1 = "01/01/2015";
 		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
 		final Transaction depositTransaction =
-				InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST");
+			InventoryDetailsTestDataInitializer
+				.createReservationTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST",
+					TransactionType.DEPOSIT.getId());
 		depositTransaction.setTransactionDate(date1);
 		depositTransaction.setUserId(user.getUserid());
 
 		final String sDate2 = "10/10/2015";
 		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate2);
 		final Transaction closedTransaction =
-				InventoryDetailsTestDataInitializer.createReservationTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST");
+			InventoryDetailsTestDataInitializer
+				.createReservationTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST", TransactionType.DISCARD.getId());
 		closedTransaction.setTransactionDate(date2);
 		closedTransaction.setUserId(user.getUserid());
 
@@ -284,7 +287,8 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
 		final Transaction depositTransaction =
 			InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, "Deposit", lot, 1,
-				1, 1, "LIST");
+				1, 1, "LIST", TransactionType.DEPOSIT.getId());
+		depositTransaction.setType(TransactionType.DEPOSIT.getId());
 		depositTransaction.setTransactionDate(date1);
 		depositTransaction.setUserId(user.getUserid());
 
@@ -292,7 +296,8 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate2);
 		final Transaction closedTransaction =
 			InventoryDetailsTestDataInitializer.createReservationTransaction(-5.0, 1, "Discard", lot, 1,
-				1, 1, "LIST");
+				1, 1, "LIST", TransactionType.DEPOSIT.getId());
+		closedTransaction.setType(TransactionType.DISCARD.getId());
 		closedTransaction.setTransactionDate(date2);
 		closedTransaction.setUserId(user.getUserid());
 
@@ -307,12 +312,12 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		transactionsSearchDto.setMaxAmount(10.0);
 		transactionsSearchDto.setMinAmount(-10.0);
 		transactionsSearchDto.setNotes("Deposit");
-		transactionsSearchDto.setScaleIds(Lists.newArrayList(8264));
+		transactionsSearchDto.setUnitIds(Lists.newArrayList(8264));
 		transactionsSearchDto.setStockId("ABC-1");
 		transactionsSearchDto.setTransactionDateFrom(date1);
 		transactionsSearchDto.setTransactionDateTo(date1);
 		transactionsSearchDto.setTransactionIds(Lists.newArrayList(depositTransaction.getId(), closedTransaction.getId()));
-		transactionsSearchDto.setTransactionType("Deposit");
+		transactionsSearchDto.setTransactionTypes(Lists.newArrayList(TransactionType.DEPOSIT.getId()));
 		transactionsSearchDto.setCreatedByUsername(user.getName());
 
 		final List<TransactionDto> transactionDtos = this.dao.searchTransactions(transactionsSearchDto, null);
@@ -324,7 +329,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 			Assert.assertTrue(transactionDto.getAmount() <= 10.0);
 			Assert.assertTrue(transactionDto.getAmount() >= -10.0);
 			Assert.assertTrue(transactionDto.getNotes().equalsIgnoreCase("Deposit"));
-			Assert.assertTrue(transactionDto.getLot().getScaleId().equals(8264));
+			Assert.assertTrue(transactionDto.getLot().getUnitId().equals(8264));
 			Assert.assertTrue(transactionDto.getLot().getStockId().equalsIgnoreCase("ABC-1"));
 			Assert.assertTrue(transactionDto.getTransactionDate().equals(date1));
 			Assert.assertTrue(transactionDto.getTransactionId().equals(depositTransaction.getId()));
