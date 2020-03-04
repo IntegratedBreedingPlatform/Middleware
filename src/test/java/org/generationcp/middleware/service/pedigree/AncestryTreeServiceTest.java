@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.pedigree.cache.keys.CropGermplasmKey;
@@ -95,6 +96,17 @@ public class AncestryTreeServiceTest {
 
 		final AncestryTreeService pedigreeTree =
 				new AncestryTreeService(this.germplasmCache, this.methodCache, AncestryTreeServiceTest.MAIZE);
+		final GermplasmNode resultNode = pedigreeTree.buildAncestryTree(generateRandomGermplasm.getGid(), 10);
+		this.compareGeneratedNodes(generateRandomGermplasm, resultNode);
+	}
+
+	@Test(expected = MiddlewareQueryException.class)
+	public void testPedigreeTreeGenerationWithoutMethod() throws Exception {
+		final Germplasm generateRandomGermplasm = this.generateRandomGermplasm(2);
+		generateRandomGermplasm.setMethodId(0);
+		final AncestryTreeService pedigreeTree =
+				new AncestryTreeService(this.germplasmCache, this.methodCache, AncestryTreeServiceTest.MAIZE);
+
 		final GermplasmNode resultNode = pedigreeTree.buildAncestryTree(generateRandomGermplasm.getGid(), 10);
 		this.compareGeneratedNodes(generateRandomGermplasm, resultNode);
 	}
