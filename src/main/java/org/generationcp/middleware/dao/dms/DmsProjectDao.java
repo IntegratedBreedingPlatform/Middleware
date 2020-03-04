@@ -807,8 +807,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				studyMetadata.setTrialDbId(
 					(row[5] instanceof Integer) ? (Integer) row[5] : null);
 				studyMetadata.setTrialName((row[6] instanceof String) ? (String) row[6] : null);
-				studyMetadata.setStartDate(this.parseDate((String) row[7]));
-				studyMetadata.setEndDate(this.parseDate((String) row[8]));
+				studyMetadata.setStartDate(Util.tryParseDate((String) row[7]));
+				studyMetadata.setEndDate(Util.tryParseDate((String) row[8]));
 				studyMetadata.setActive(Boolean.FALSE.equals(row[9]));
 				studyMetadata.setLocationId((row[10] instanceof String) ? Integer.parseInt((String) row[10]) : null);
 				studyMetadata.setStudyDescription((row[11] instanceof String) ? (String) row[11] : null);
@@ -1470,8 +1470,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyDto.setTrialName(String.valueOf(result.get(TRIAL_NAME)));
 			studyDto.setStudyTypeDbId(String.valueOf(result.get(STUDY_TYPE_DB_ID)));
 			studyDto.setStudyTypeName(String.valueOf(result.get(STUDY_TYPE_NAME)));
-			studyDto.setStartDate(this.parseDate((String) result.get(START_DATE)));
-			studyDto.setEndDate(this.parseDate((String) result.get(END_DATE)));
+			studyDto.setStartDate(Util.tryParseDate((String) result.get(START_DATE)));
+			studyDto.setEndDate(Util.tryParseDate((String) result.get(END_DATE)));
 
 			// TODO: Populate the seasons.
 			studyDto.setSeasons(new ArrayList<>());
@@ -1591,14 +1591,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (studySearchFilter.getActive() != null) {
 			sql.append("AND pmain.deleted = :active ");
 		}
-	}
-
-	private Date parseDate(final String date) {
-		try {
-			return Util.parseDate(date, Util.DATE_AS_NUMBER_FORMAT);
-		} catch (ParseException e) {
-		}
-		return null;
 	}
 
 	public Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType) {
