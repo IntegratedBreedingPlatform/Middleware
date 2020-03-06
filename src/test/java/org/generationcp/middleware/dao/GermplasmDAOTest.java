@@ -594,7 +594,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	public void testGetNextSequenceNumberForCrossNameForMixedCasePrefix() {
 
 		final String crossNamePrefix = "aBcDeFg";
-		final Integer lastCodeForMixedCasePrefix = 29;
+		final int lastCodeForMixedCasePrefix = 29;
 		final String nameWithMixedCasePrefix = crossNamePrefix + lastCodeForMixedCasePrefix;
 		final int lastCodeForUppercasePrefix = 19;
 		final String nameWithUppercasePrefix = crossNamePrefix.toUpperCase() + lastCodeForUppercasePrefix;
@@ -879,8 +879,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		Map<Integer, StudyGermplasmDto> importedCrossParentMap = this.dao.getPlotNoToStudyGermplasmDtoMap(studyId, new HashSet<>(Arrays.asList(1, 2, 3, 4, 5)));
 
-		List<Integer> gidsList = Arrays.asList(gids);
-		for (Map.Entry<Integer,StudyGermplasmDto> entry : importedCrossParentMap.entrySet()) {
+		final List<Integer> gidsList = Arrays.asList(gids);
+		for (final Map.Entry<Integer,StudyGermplasmDto> entry : importedCrossParentMap.entrySet()) {
 			Assert.assertEquals(DataSetupTest.GERMPLSM_PREFIX + entry.getKey(), entry.getValue().getDesignation());
 			Assert.assertEquals( entry.getKey().toString(), entry.getValue().getPosition());
 			Assert.assertTrue(gidsList.contains(entry.getValue().getGermplasmId()));
