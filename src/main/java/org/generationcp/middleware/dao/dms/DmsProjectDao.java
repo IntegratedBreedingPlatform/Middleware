@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.api.study.StudyDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
@@ -116,6 +117,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	// Study DTO fields
 	public static final String ACTIVE = "active";
 	public static final String PROGRAM_DB_ID = "programDbId";
+	public static final String PROGRAM_NAME = "programDbId";
 	public static final String STUDY_DB_ID = "studyDbId";
 	public static final String STUDY_NAME = "studyName";
 	public static final String TRIAL_DB_ID = "trialDbId";
@@ -1446,6 +1448,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sqlQuery.addScalar(END_DATE);
 		sqlQuery.addScalar(ACTIVE);
 		sqlQuery.addScalar(LOCATION_DB_ID);
+		sqlQuery.addScalar(LOCATION_NAME);
+		sqlQuery.addScalar(PROGRAM_DB_ID);
+		sqlQuery.addScalar(PROGRAM_NAME);
 
 		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
 
@@ -1472,11 +1477,19 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyDto.setStudyTypeName(String.valueOf(result.get(STUDY_TYPE_NAME)));
 			studyDto.setStartDate(Util.tryParseDate((String) result.get(START_DATE)));
 			studyDto.setEndDate(Util.tryParseDate((String) result.get(END_DATE)));
+			studyDto.setLocationDbId(String.valueOf(result.get(LOCATION_DB_ID)));
+			studyDto.setLocationName(String.valueOf(result.get(LOCATION_NAME)));
+			studyDto.setProgramDbId(String.valueOf(result.get(PROGRAM_DB_ID)));
+			studyDto.setProgramName(String.valueOf(result.get(PROGRAM_NAME)));
 
-			// TODO: Populate the seasons.
-			studyDto.setSeasons(new ArrayList<>());
-
-			// TODO: Populate program details.
+			final List<SeasonDto> seasons = new ArrayList<>();
+			if (!StringUtils.isEmpty((String) result.get(SEASON_DB_ID))) {
+				final SeasonDto seasonDto = new SeasonDto();
+				seasonDto.setSeasonDbId(String.valueOf(result.get(SEASON_DB_ID)));
+				seasonDto.setSeason(String.valueOf(result.get(SEASON)));
+				seasons.add(seasonDto);
+			}
+			studyDto.setSeasons(seasons);
 
 			studyDto
 				.setActive(((Integer) result.get(ACTIVE)) == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
@@ -1524,21 +1537,17 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS " + STUDY_NAME + ", ");
 		sql.append("     pmain.study_type_id AS " + STUDY_TYPE_DB_ID + ", ");
 		sql.append("     studyType.label AS " + STUDY_TYPE_NAME + ", ");
-		sql.append("     MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR.getId() + ", ");
-		sql.append("                 geoprop.value, ");
-		sql.append("                 NULL)) AS " + SEASON_DB_ID + ", ");
-		sql.append("     MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR_TEXT.getId() + ", ");
-		sql.append("                 geoprop.value, ");
-		sql.append("                 NULL)) AS " + SEASON + ", ");
+		sql.append("     geopropSeason.value AS " + SEASON_DB_ID + ", ");
+		sql.append("     cvtermSeason.definition AS " + SEASON + ", ");
 		sql.append("     pmain.project_id AS " + TRIAL_DB_ID + ", ");
 		sql.append(" 	 pmain.name AS " + TRIAL_NAME + ", ");
 		sql.append("     MAX(pmain.start_date) AS " + START_DATE + ", ");
 		sql.append("     MAX(pmain.end_date) AS " + END_DATE + ", ");
 		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS " + ACTIVE + ", ");
-		sql.append("     MAX(IF(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", ");
-		sql.append("                 geoprop.value, ");
-		sql.append("                 NULL)) ");
-		sql.append("     AS " + LOCATION_DB_ID);
+		sql.append("     location.locid AS " + LOCATION_DB_ID + ", ");
+		sql.append("     location.lname AS " + LOCATION_NAME + ", ");
+		sql.append("     wp.project_name AS " + PROGRAM_NAME + ", ");
+		sql.append("     wp.project_uuid AS " + PROGRAM_DB_ID + " ");
 		this.appendStudySummaryFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
 		sql.append(" GROUP BY geoloc.nd_geolocation_id ");
@@ -1565,8 +1574,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     projectprop pProp ON pmain.project_id = pProp.project_id ");
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     study_type studyType ON studyType.study_type_id = pmain.study_type_id ");
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropSeason.type_id = " + TermId.SEASON_VAR.getId());
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = " + TermId.LOCATION_ID.getId());
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     location ON geopropLocation.value = location.locid");
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value");
 		sql.append(" WHERE ");
-		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()  + " ");
 	}
 
 	private void appendStudySearchFilter(final StringBuilder sql, final StudySearchFilter studySearchFilter) {
@@ -1574,19 +1593,19 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sql.append("AND geoloc.nd_geolocation_id = :studyDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
-			sql.append("AND locationId = :locationDbId ");
+			sql.append("AND geopropLocation.value = :locationDbId");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getProgramDbId())) {
 			sql.append("AND pmain.program_uuid = :programDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getSeasonDbId())) {
-			sql.append("AND seasonDbId = :seasonDbId ");
+			sql.append("AND cvtermSeason.cvterm_id = :seasonDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyTypeDbId())) {
-			sql.append("AND studyTypeDbId = :studyTypeDbId ");
+			sql.append("AND pmain.study_type_id = :studyTypeDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialDbId())) {
-			sql.append("AND trialDbId = :trialDbId ");
+			sql.append("AND pmain.project_id = :trialDbId ");
 		}
 		if (studySearchFilter.getActive() != null) {
 			sql.append("AND pmain.deleted = :active ");
