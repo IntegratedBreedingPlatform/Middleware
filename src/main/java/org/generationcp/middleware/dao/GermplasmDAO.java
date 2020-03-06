@@ -119,7 +119,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public Germplasm getById(final Integer gid) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT g.* FROM germplsm g WHERE g.deleted = 0 AND gid=:gid LIMIT 1");
+			queryString.append("SELECT g.* FROM germplsm g WHERE g.deleted = 0 AND g.grplce = 0 AND gid=:gid LIMIT 1");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter("gid", gid);
