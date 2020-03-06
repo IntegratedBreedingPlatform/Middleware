@@ -918,4 +918,16 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName());
 	}
 
+	@Test
+	public void testReplacedGermplasm(){
+		final Germplasm replacedGermplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.dao.save(replacedGermplasm);
+		final Germplasm validGermplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.dao.save(validGermplasm);
+		Assert.assertNotNull(replacedGermplasm.getGid());
+		Assert.assertNull("Replaced Germplasm will not be retrieve", this.dao.getById(replacedGermplasm.getGid()));
+		Assert.assertNotNull(validGermplasm.getGid());
+		Assert.assertNotNull("Valid Germplasm will be retrieve", this.dao.getById(validGermplasm.getGid()));
+	}
+
 }
