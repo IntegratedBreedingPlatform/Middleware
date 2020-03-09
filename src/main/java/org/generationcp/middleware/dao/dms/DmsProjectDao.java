@@ -12,7 +12,6 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -64,11 +63,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +114,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	// Study DTO fields
 	public static final String ACTIVE = "active";
 	public static final String PROGRAM_DB_ID = "programDbId";
-	public static final String PROGRAM_NAME = "programDbId";
+	public static final String PROGRAM_NAME = "programName";
 	public static final String STUDY_DB_ID = "studyDbId";
 	public static final String STUDY_NAME = "studyName";
 	public static final String TRIAL_DB_ID = "trialDbId";
@@ -195,7 +192,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "                 NULL)) "
 		+ "     AS locationId,"
 		+ "		pmain.description AS studyDescription, "
-		+ "     (Select definition from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId() + ", "
+		+ "     (Select definition from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId()
+		+ ", "
 		+ "			geoprop.value, "
 		+ "			NULL)))) "
 		+ "     AS experimentalDesign,"
@@ -1446,7 +1444,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sqlQuery.addScalar(SEASON);
 		sqlQuery.addScalar(START_DATE);
 		sqlQuery.addScalar(END_DATE);
-		sqlQuery.addScalar(ACTIVE);
+		sqlQuery.addScalar(ACTIVE, new IntegerType());
 		sqlQuery.addScalar(LOCATION_DB_ID);
 		sqlQuery.addScalar(LOCATION_NAME);
 		sqlQuery.addScalar(PROGRAM_DB_ID);
@@ -1575,9 +1573,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     study_type studyType ON studyType.study_type_id = pmain.study_type_id ");
 		sql.append("         LEFT OUTER JOIN ");
-		sql.append("     nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropSeason.type_id = " + TermId.SEASON_VAR.getId());
+		sql.append(
+			"     nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropSeason.type_id = "
+				+ TermId.SEASON_VAR.getId());
 		sql.append("         LEFT OUTER JOIN ");
-		sql.append("     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = " + TermId.LOCATION_ID.getId());
+		sql.append(
+			"     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = "
+				+ TermId.LOCATION_ID.getId());
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     location ON geopropLocation.value = location.locid");
 		sql.append("         LEFT OUTER JOIN ");
@@ -1585,7 +1587,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value");
 		sql.append(" WHERE ");
-		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()  + " ");
+		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
 	}
 
 	private void appendStudySearchFilter(final StringBuilder sql, final StudySearchFilter studySearchFilter) {
@@ -1593,7 +1595,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sql.append("AND geoloc.nd_geolocation_id = :studyDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
-			sql.append("AND geopropLocation.value = :locationDbId");
+			sql.append("AND geopropLocation.value = :locationDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getProgramDbId())) {
 			sql.append("AND pmain.program_uuid = :programDbId ");
