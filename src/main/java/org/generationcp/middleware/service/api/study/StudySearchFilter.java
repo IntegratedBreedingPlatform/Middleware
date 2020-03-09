@@ -3,7 +3,34 @@ package org.generationcp.middleware.service.api.study;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.pojomatic.Pojomatic;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class StudySearchFilter {
+
+	// Study DTO fields
+	public static final String ACTIVE = "active";
+	public static final String PROGRAM_DB_ID = "programDbId";
+	public static final String PROGRAM_NAME = "programName";
+	public static final String STUDY_DB_ID = "studyDbId";
+	public static final String STUDY_NAME = "studyName";
+	public static final String TRIAL_DB_ID = "trialDbId";
+	public static final String TRIAL_NAME = "trialName";
+	public static final String STUDY_TYPE_DB_ID = "studyTypeDbId";
+	public static final String STUDY_TYPE_NAME = "studyTypeName";
+	public static final String SEASON_DB_ID = "seasonDbId";
+	public static final String SEASON = "season";
+	public static final String YEAR = "year";
+	public static final String START_DATE = "startDate";
+	public static final String END_DATE = "endDate";
+	public static final String LOCATION_DB_ID = "locationDbId";
+	public static final String LOCATION_NAME = "locationName";
+	public static final String COMMON_CROP_NAME = "commonCropName";
+
+	public static final List<String> SORTABLE_FIELDS = Collections.unmodifiableList(Arrays
+		.asList(PROGRAM_DB_ID, PROGRAM_NAME, STUDY_DB_ID, STUDY_NAME, TRIAL_DB_ID, TRIAL_NAME, STUDY_TYPE_DB_ID, STUDY_TYPE_NAME,
+			SEASON_DB_ID, SEASON, START_DATE, END_DATE, LOCATION_DB_ID, LOCATION_NAME));
 
 	private String commonCropName;
 	private String studyTypeDbId;
