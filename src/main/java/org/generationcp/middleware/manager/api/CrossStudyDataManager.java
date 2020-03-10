@@ -11,8 +11,8 @@
 
 package org.generationcp.middleware.manager.api;
 
-import org.generationcp.middleware.domain.dms.TrialInstanceProperty;
-import org.generationcp.middleware.domain.dms.TrialInstances;
+import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmLocationInfo;
@@ -27,127 +27,127 @@ import java.util.Set;
 public interface CrossStudyDataManager {
 
 	/**
-	 * Retrieves a list of all trial instances.
+	 * Retrieves a list of all trial environments.
 	 *
-	 * @return TrialInstances
+	 * @return TrialEnvironments
 	 */
-	TrialInstances getAllTrialInstances();
+	TrialEnvironments getAllTrialEnvironments();
 
 	/**
-	 * Returns number of all central and local trial instances
+	 * Returns number of all central and local trial environments
 	 *
 	 * @return count
 	 */
-	long countAllTrialInstances();
+	long countAllTrialEnvironments();
 
 	/**
-	 * Get all instance properties given a list of instance.
+	 * Get all environment properties given a list of environments.
 	 *
-	 * @param instanceIds
-	 * @return a List of Instance Properties
+	 * @param trialEnvtIds
+	 * @return a List of Environment Properties
 	 */
-	List<TrialInstanceProperty> getPropertiesForTrialInstances(List<Integer> instanceIds);
+	List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> trialEnvtIds);
 
 	/**
-	 * Retrieves a set of standard variables (traits) used for the numeric variates observed in given list of instances. Numeric variates
+	 * Retrieves a set of standard variables (traits) used for the numeric variates observed in given list of environments. Numeric variates
 	 * are those with type "Numeric variable" (cvterm ID = 1110) or type "Date variable" (cvterm ID = 1117).
 	 *
-	 * @param instanceIds
+	 * @param environmentIds
 	 * @return List of NumericTraitInfo
 	 */
-	List<NumericTraitInfo> getTraitsForNumericVariates(List<Integer> instanceIds);
+	List<NumericTraitInfo> getTraitsForNumericVariates(List<Integer> environmentIds);
 
 	/**
-	 * Retrieves a set of standard variables (traits) used for the character variates observed in given list of instances. Character
+	 * Retrieves a set of standard variables (traits) used for the character variates observed in given list of environments. Character
 	 * variates are those with type "Character variable" (cvterm ID = 1120).
 	 *
-	 * @param instanceIds
+	 * @param environmentIds
 	 * @return List of CharacterTraitInfo
 	 */
-	List<CharacterTraitInfo> getTraitsForCharacterVariates(List<Integer> instanceIds);
+	List<CharacterTraitInfo> getTraitsForCharacterVariates(List<Integer> environmentIds);
 
 	/**
-	 * Retrieve a set of standard variables (traits) used for the categorical variables observed in given list of instances. Categorical
+	 * Retrieve a set of standard variables (traits) used for the categorical variables observed in given list of environments. Categorical
 	 * variables are those with type "Categorical variable" (cvterm ID = 1130).
 	 *
-	 * @param instanceIds
+	 * @param environmentIds
 	 * @return List of CategoricalTraitInfo
 	 */
-	List<CategoricalTraitInfo> getTraitsForCategoricalVariates(List<Integer> instanceIds);
+	List<CategoricalTraitInfo> getTraitsForCategoricalVariates(List<Integer> environmentIds);
 
 	/**
-	 * Given a list of pairs of GIDs, return all instances where any of the pair of GIDs have been observed. Both the GIDs in a pair must
-	 * have been used in an experiment in a specific instances for that instances to be included in the result, where a filter for
+	 * Given a list of pairs of GIDs, return all environments where any of the pair of GIDs have been observed. Both the GIDs in a pair must
+	 * have been used in an experiment in a specific environment for that environment to be included in the result, where a filter for
 	 * experiment types to include is applied affecting the traits that will be included (eg. for plot experiments, include traits. for
 	 * summary experiments, include analysis variables).
 	 *
 	 * @param germplasmPairs  List of germplasm pairs of GIDs
 	 * @param experimentTypes - List of experiment type IDs to be included in query (can be for plot and/or analysis types)
 	 * @param programUUID     - unique identifier for current program
-	 * @return List of TrialInstances corresponding to the list of Germplasm IDs
+	 * @return List of TrialEnvironments corresponding to the list of Germplasm IDs
 	 */
-	List<GermplasmPair> getInstancesForGermplasmPairs(
+	List<GermplasmPair> getEnvironmentsForGermplasmPairs(
 		final List<GermplasmPair> germplasmPairs, final List<Integer> experimentTypes,
 		final String programUUID);
 
 	/**
-	 * For each combination of trait, germplasm, and instance, the value observed is returned. If there was no observation for a
-	 * combination, null is returned. Information to return for each combination of trait, germplasm, instance: - trait id - germplasm id
-	 * - instance id - value observed (null if no observation)
+	 * For each combination of trait, germplasm, and environment, the value observed is returned. If there was no observation for a
+	 * combination, null is returned. Information to return for each combination of trait, germplasm, environment: - trait id - germplasm id
+	 * - environment id - value observed (null if no observation)
 	 *
 	 * @param traitIds
 	 * @param germplasmIds
-	 * @param instanceIds
+	 * @param environmentIds
 	 * @return list of observations for traits on germplasms
 	 */
-	List<Observation> getObservationsForTraitOnGermplasms(List<Integer> traitIds, List<Integer> germplasmIds, List<Integer> instanceIds);
+	List<Observation> getObservationsForTraitOnGermplasms(List<Integer> traitIds, List<Integer> germplasmIds, List<Integer> environmentIds);
 
 	/**
-	 * Given a list of traits and instances, return observed data for the list of traits in the given list of instances.
+	 * Given a list of traits and environments, return observed data for the list of traits in the given list of environments.
 	 * <p>
-	 * With each observation, we need the ff information: - trait - id of trait (standard variable) being observed - instance ID - GID-
+	 * With each observation, we need the ff information: - trait - id of trait (standard variable) being observed - environment ID - GID-
 	 * GID of germplasm related to observation (experiment) - observed value - phenotype.value
 	 *
 	 * @param traitIds
-	 * @param instanceIds
+	 * @param environmentIds
 	 * @return list of observations for traits
 	 */
-	List<Observation> getObservationsForTraits(List<Integer> traitIds, List<Integer> instanceIds);
+	List<Observation> getObservationsForTraits(List<Integer> traitIds, List<Integer> environmentIds);
 
 	/**
-	 * For each trait in given trial instances, the observed values from local and central databases are returned
+	 * For each trait in given trial environments, the observed values from local and central databases are returned
 	 *
 	 * @param traitId        - phenotype ID
-	 * @param instanceIds - List of instance Ids
+	 * @param environmentIds - List of environment Ids
 	 * @return list of trait observations
 	 */
-	List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> instanceIds);
+	List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds);
 
 	/**
-	 * Given list of trait (standard variable) IDs, return all instances where any of the traits has been observed. With each
-	 * instance, we need the ff information: - instance ID - nd_geolocation record ID - location - location name, province name and
-	 * country name of location associated with instance. - name of the study
+	 * Given list of trait (standard variable) IDs, return all environments where any of the traits has been observed. With each
+	 * environment, we need the ff information: - environment ID - nd_geolocation record ID - location - location name, province name and
+	 * country name of location associated with environment. - name of the study
 	 *
 	 * @param traitIds
 	 * @param programUUID
-	 * @return List of TrialInstances where any of the traits has been observed
+	 * @return List of TrialEnvironments where any of the traits has been observed
 	 */
-	TrialInstances getTrialInstancesForTraits(List<Integer> traitIds, final String programUUID);
+	TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds, final String programUUID);
 
 	/**
-	 * Retrieve a list of germplasm and location information matching a given set of trial instance ids. Empty list if no matches are
+	 * Retrieve a list of germplasm and location information matching a given set of trial environment ids. Empty list if no matches are
 	 * found. Never returns {@code null}.
 	 *
-	 * @param instanceIds
+	 * @param environmentIds
 	 * @return
 	 */
-	List<GermplasmLocationInfo> getGermplasmLocationInfoByInstanceIds(Set<Integer> instanceIds);
+	List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(Set<Integer> environmentIds);
 
 	/**
-	 * Retrieve the instance info for a list of Germplasm. Find out which experiments plants have been involved in.
+	 * Retrieve the environment info for a list of Germplasm. Find out which experiments plants have been involved in.
 	 *
 	 * @param gids : germplasm ids
-	 * @return envIds : instanceIds
+	 * @return envIds : environmentIds
 	 */
-	List<Integer> getTrialInstanceIdsForGermplasm(Set<Integer> gids);
+	List<Integer> getTrialEnvironmentIdsForGermplasm(Set<Integer> gids);
 }

@@ -13,11 +13,17 @@ package org.generationcp.middleware.manager;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.domain.dms.TrialInstance;
-import org.generationcp.middleware.domain.dms.TrialInstanceProperty;
-import org.generationcp.middleware.domain.dms.TrialInstances;
+import org.generationcp.middleware.domain.dms.TrialEnvironment;
+import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
@@ -31,6 +37,8 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -64,14 +72,14 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllStudyEnvironments() {
-		final TrialInstances environments = this.crossStudyDataManager.getAllTrialInstances();
+		final TrialEnvironments environments = this.crossStudyDataManager.getAllTrialEnvironments();
 		environments.print(IntegrationTestBase.INDENT);
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + environments.size());
 	}
 
 	@Test
 	public void testCountAllStudyEnvironments() {
-		final long count = this.crossStudyDataManager.countAllTrialInstances();
+		final long count = this.crossStudyDataManager.countAllTrialEnvironments();
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + count);
 	}
 
@@ -79,8 +87,8 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetPropertiesForStudyEnvironments() {
 		final List<Integer> environmentIds = Arrays.asList(5770, 10081, -1);
 		Debug.println("testGetPropertiesForStudyEnvironments = " + environmentIds);
-		final List<TrialInstanceProperty> properties = this.crossStudyDataManager.getPropertiesForTrialInstances(environmentIds);
-		for (final TrialInstanceProperty property : properties) {
+		final List<TrialEnvironmentProperty> properties = this.crossStudyDataManager.getPropertiesForTrialEnvironments(environmentIds);
+		for (final TrialEnvironmentProperty property : properties) {
 			property.print(0);
 		}
 		Debug.println("#RECORDS: " + properties.size());
@@ -124,7 +132,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
 		// Include both traits and analysis variables
 		final List<Integer> experimentTypes = Arrays.asList(TermId.PLOT_EXPERIMENT.getId(), TermId.AVERAGE_EXPERIMENT.getId());
-		final List<GermplasmPair> result = this.crossStudyDataManager.getInstancesForGermplasmPairs(pairs, experimentTypes, null);
+		final List<GermplasmPair> result = this.crossStudyDataManager.getEnvironmentsForGermplasmPairs(pairs, experimentTypes, null);
 		for (final GermplasmPair pair : result) {
 			pair.print(IntegrationTestBase.INDENT);
 		}
@@ -174,18 +182,18 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSessionFactory().getCurrentSession().flush();
 
-		final TrialInstances environments = this.crossStudyDataManager.getTrialInstancesForTraits(
+		final TrialEnvironments environments = this.crossStudyDataManager.getEnvironmentsForTraits(
 			Arrays.asList(trait1TermId, trait2TermId, trait3TermId),
 			firstProgramUUID);
 
-		final List<TrialInstance> trialInstances = new ArrayList<>(environments.getTrialInstances());
+		final List<TrialEnvironment> trialEnvironments = new ArrayList<>(environments.getTrialEnvironments());
 
 		// Only return environments with traits that belong to the specified program
 		Assert.assertEquals(2, environments.size());
-		Assert.assertEquals(study1, trialInstances.get(0).getStudy().getName());
-		Assert.assertEquals("Afghanistan", trialInstances.get(0).getLocation().getLocationName());
-		Assert.assertEquals(study2, trialInstances.get(1).getStudy().getName());
-		Assert.assertEquals("Albania", trialInstances.get(1).getLocation().getLocationName());
+		Assert.assertEquals(study1, trialEnvironments.get(0).getStudy().getName());
+		Assert.assertEquals("Afghanistan", trialEnvironments.get(0).getLocation().getLocationName());
+		Assert.assertEquals(study2, trialEnvironments.get(1).getStudy().getName());
+		Assert.assertEquals("Albania", trialEnvironments.get(1).getLocation().getLocationName());
 
 	}
 

@@ -157,7 +157,7 @@ public class ExperimentPropertySaver {
 				for (final FieldMapTrialInstanceInfo instanceInfo : dataset.getTrialInstances()) {
 					// Save BLOCK_ID at environment level
 					if (instanceInfo.getBlockId() != null) {
-						this.saveOrUpdateEnvironmentProperty(instanceInfo.getInstanceId(), TermId.BLOCK_ID.getId(), instanceInfo.getBlockId().toString());
+						this.saveOrUpdateEnvironmentProperty(instanceInfo.getEnvironmentId(), TermId.BLOCK_ID.getId(), instanceInfo.getBlockId().toString());
 					}
 
 					if (instanceInfo.getFieldMapLabels() != null) {
@@ -221,7 +221,7 @@ public class ExperimentPropertySaver {
 	}
 
 	private void saveOrUpdateEnvironmentProperty(final int environmentId, final int typeId, final String value) {
-		final ExperimentModel environment = this.daoFactory.getInstanceDao().getById(environmentId);
+		final ExperimentModel environment = this.daoFactory.getEnvironmentDao().getById(environmentId);
 		final List<ExperimentProperty> experimentProperties = environment.getProperties();
 
 		ExperimentProperty experimentProperty = null;

@@ -191,7 +191,7 @@ public class DatasetServiceImplTest {
 		when(this.formulaDao.getByInputIds(Arrays.asList(inputId))).thenReturn(Arrays.asList(formula));
 		this.datasetService.updateDependentPhenotypesStatusByGeolocation(1, Arrays.asList(inputId));
 		verify(this.formulaDao).getByInputIds(Arrays.asList(inputId));
-		verify(this.phenotypeDao).updateOutOfSyncPhenotypesByInstance(1, Sets.newHashSet(targetCVTerm.getCvTermId()));
+		verify(this.phenotypeDao).updateOutOfSyncPhenotypesByEnvironment(1, Sets.newHashSet(targetCVTerm.getCvTermId()));
 	}
 
 	@Test

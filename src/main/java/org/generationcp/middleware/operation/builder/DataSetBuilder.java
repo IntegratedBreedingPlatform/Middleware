@@ -119,7 +119,7 @@ public class DataSetBuilder extends Builder {
 	}
 
 	private Set<Integer> getLocationIds(final Integer projectId) {
-		return new HashSet<>(this.daoFactory.getInstanceDao().getInstanceIds(projectId));
+		return new HashSet<>(this.daoFactory.getEnvironmentDao().getEnvironmentIds(projectId));
 	}
 
 	private VariableTypeList getVariableTypes(final DmsProject project) {

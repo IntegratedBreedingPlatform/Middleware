@@ -21,7 +21,7 @@ public class ExperimentValuesTransformer extends Transformer {
 		super(sessionProviderForLocal);
 	}
 
-	public ExperimentValues transform(final MeasurementRow mRow, final VariableTypeList varTypeList, final List<String> trialHeaders, final Map<Integer, Integer> instanceNumberInstanceIdMap) {
+	public ExperimentValues transform(final MeasurementRow mRow, final VariableTypeList varTypeList, final List<String> trialHeaders, final Map<Integer, Integer> instanceNumberEnvironmentIdMap) {
 		final ExperimentValues experimentValues = new ExperimentValues();
 		if (mRow == null) {
 			return experimentValues;
@@ -51,8 +51,8 @@ public class ExperimentValuesTransformer extends Transformer {
 					}
 				}
 				final Integer instanceNumber = this.getTrialInstanceNumber(mRow);
-				if (instanceNumberInstanceIdMap.get(instanceNumber) != null) {
-					experimentValues.setLocationId(instanceNumberInstanceIdMap.get(instanceNumber));
+				if (instanceNumberEnvironmentIdMap.get(instanceNumber) != null) {
+					experimentValues.setLocationId(instanceNumberEnvironmentIdMap.get(instanceNumber));
 				}
 				experimentValues.setVariableList(variableList);
 				experimentValues.setGermplasmId(germplasmId);

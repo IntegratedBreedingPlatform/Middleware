@@ -35,7 +35,7 @@ import org.generationcp.middleware.operation.builder.StudyVariateBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.TraitBuilder;
 import org.generationcp.middleware.operation.builder.TraitGroupBuilder;
-import org.generationcp.middleware.operation.builder.TrialInstanceBuilder;
+import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.destroyer.DataSetDestroyer;
@@ -84,7 +84,7 @@ public abstract class DataManager extends DatabaseBroker {
 
 	/**
 	 * Gets the parameter types of given parameters. <br/>
-	 *
+	 * 
 	 * @param parameters
 	 * @return Class[] of parameter types
 	 */
@@ -128,7 +128,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * Calls the corresponding getXXX method as specified in the second value in the list of methods parameter. <br/>
 	 * <br/>
 	 * Sample usage:<br/>
-	 *
+	 * 
 	 * <pre>
 	 * <code>
 	 *      public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
@@ -530,7 +530,7 @@ public abstract class DataManager extends DatabaseBroker {
 
 	/**
 	 * Retrieves the positive ids from the given list of ids
-	 *
+	 * 
 	 *
 	 * @param ids The positive list of ids
 	 * @return the positive ids from the given list

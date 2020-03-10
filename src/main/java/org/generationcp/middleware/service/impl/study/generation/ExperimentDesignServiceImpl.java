@@ -81,8 +81,8 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		this.deleteTrialInstanceExperiments(plotDatasetId, environmentDatasetId, instanceNumbers);
 
 		// Save variables at trial and plot dataset level
-		final List<ExperimentModel> environments = this.daoFactory.getInstanceDao()
-			.getInstancesForInstanceNumbers(studyId, instanceNumbers);
+		final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao()
+			.getEnvironmentsForInstances(studyId, instanceNumbers);
 		this.saveVariables(variables, plotDatasetId, environmentDatasetId, environments);
 
 		// Save experiments and stocks (if applicable) in plot dataset
@@ -142,7 +142,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 			if (isEnvironmentVariable && EXPERIMENTAL_DESIGN_VARIABLES.contains(variableId)) {
 				for (final ExperimentModel environment : environments) {
 					final ExperimentProperty environmentProperty = new ExperimentProperty(environment, value, rank, variableId);
-					this.daoFactory.getInstancePropertyDao().save(environmentProperty);
+					this.daoFactory.getEnvironmentPropertyDao().save(environmentProperty);
 				}
 			}
 
@@ -205,7 +205,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	private void deleteTrialInstanceExperiments(final Integer plotDatasetId, final Integer environmentDatasetId, final List<Integer> instanceNumbers) {
 		this.daoFactory.getExperimentDao().deleteExperimentsForDatasetInstances(plotDatasetId, instanceNumbers);
 		final List<Integer> environmentVariables = Lists.newArrayList(Iterables.concat(EXPERIMENTAL_DESIGN_VARIABLES, FIELDMAP_ENVT_VARIABLES));
-		this.daoFactory.getInstancePropertyDao().deletePropertiesInDatasetInstances(environmentDatasetId, instanceNumbers, environmentVariables);
+		this.daoFactory.getEnvironmentPropertyDao().deletePropertiesInDatasetInstances(environmentDatasetId, instanceNumbers, environmentVariables);
 	}
 
 
@@ -216,7 +216,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO()
 			.deleteProjectVariables(environmentDatasetId, environmentVariables);
-		this.daoFactory.getInstancePropertyDao().deletePropertiesInDataset(environmentDatasetId, environmentVariables);
+		this.daoFactory.getEnvironmentPropertyDao().deletePropertiesInDataset(environmentDatasetId, environmentVariables);
 
 		// Delete variables related to experiment design and experiments of plot dataset
 		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);

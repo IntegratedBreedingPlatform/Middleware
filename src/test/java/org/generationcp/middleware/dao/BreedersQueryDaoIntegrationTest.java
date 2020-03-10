@@ -26,28 +26,28 @@ public class BreedersQueryDaoIntegrationTest extends IntegrationTestBase {
 	// assertions. Make me independent by setting up the data I need first, read
 	// that data, assert and then remove the data I created.
 	@Test
-	public void testGetGermplasmLocationInfoByInstanceIds() throws MiddlewareQueryException {
-		HashSet<Integer> instanceIds = new HashSet<Integer>();
-		instanceIds.add(5794);
-		instanceIds.add(5795);
-		instanceIds.add(5796);
-		instanceIds.add(5880);
+	public void testGetGermplasmLocationInfoByEnvironmentIds() throws MiddlewareQueryException {
+		HashSet<Integer> environmentIds = new HashSet<Integer>();
+		environmentIds.add(5794);
+		environmentIds.add(5795);
+		environmentIds.add(5796);
+		environmentIds.add(5880);
 
-		List<GermplasmLocationInfo> result = BreedersQueryDaoIntegrationTest.dao.getGermplasmLocationInfoByInstanceIds(instanceIds);
+		List<GermplasmLocationInfo> result = BreedersQueryDaoIntegrationTest.dao.getGermplasmLocationInfoByEnvironmentIds(environmentIds);
 		Assert.assertEquals(89, result.size());
 	}
 
 	@Test
-	public void testGetTrialInstanceIdsForGermplasm() throws MiddlewareQueryException {
+	public void testGetEnvironmentIdsForGermplasm() throws MiddlewareQueryException {
 		HashSet<Integer> gids = new HashSet<Integer>();
 		gids.add(2586617);
 
-		List<Integer> result = BreedersQueryDaoIntegrationTest.dao.getTrialInstanceIdsForGermplasm(gids);
+		List<Integer> result = BreedersQueryDaoIntegrationTest.dao.getTrialEnvironmentIdsForGermplasm(gids);
 		Assert.assertEquals(42, result.size());
 
 		gids = new HashSet<Integer>();
 
-		result = BreedersQueryDaoIntegrationTest.dao.getTrialInstanceIdsForGermplasm(gids);
+		result = BreedersQueryDaoIntegrationTest.dao.getTrialEnvironmentIdsForGermplasm(gids);
 		Assert.assertEquals(0, result.size());
 	}
 

@@ -23,17 +23,17 @@ public class ObservationKey {
 
 	private int germplasmId;
 
-	private int instanceId;
+	private int environmentId;
 
-	public ObservationKey(int traitId, int instanceId) {
+	public ObservationKey(int traitId, int environmentId) {
 		this.traitId = traitId;
-		this.instanceId = instanceId;
+		this.environmentId = environmentId;
 	}
 
-	public ObservationKey(int traitId, int germplasmId, int instanceId) {
+	public ObservationKey(int traitId, int germplasmId, int environmentId) {
 		this.traitId = traitId;
 		this.germplasmId = germplasmId;
-		this.instanceId = instanceId;
+		this.environmentId = environmentId;
 	}
 
 	public int getTraitId() {
@@ -52,19 +52,19 @@ public class ObservationKey {
 		this.germplasmId = germplasmId;
 	}
 
-	public int getInstanceId() {
-		return this.instanceId;
+	public int getEnvironmentId() {
+		return this.environmentId;
 	}
 
-	public void setInstanceId(int instanceId) {
-		this.instanceId = instanceId;
+	public void setEnvironmentId(int environmentId) {
+		this.environmentId = environmentId;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + this.instanceId;
+		result = prime * result + this.environmentId;
 		result = prime * result + this.germplasmId;
 		result = prime * result + this.traitId;
 		return result;
@@ -82,7 +82,7 @@ public class ObservationKey {
 			return false;
 		}
 		ObservationKey other = (ObservationKey) obj;
-		if (this.instanceId != other.instanceId) {
+		if (this.environmentId != other.environmentId) {
 			return false;
 		}
 		if (this.germplasmId != other.germplasmId) {
@@ -101,8 +101,8 @@ public class ObservationKey {
 		builder.append(this.traitId);
 		builder.append(", germplasmId=");
 		builder.append(this.germplasmId);
-		builder.append(", instanceId=");
-		builder.append(this.instanceId);
+		builder.append(", environmentId=");
+		builder.append(this.environmentId);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -111,7 +111,7 @@ public class ObservationKey {
 		Debug.println(indent, "Observation Key: ");
 		Debug.println(indent + 3, "Trait Id: " + this.getTraitId());
 		Debug.println(indent + 3, "Germplasm Id: " + this.getGermplasmId());
-		Debug.println(indent + 3, "Environment Id: " + this.getInstanceId());
+		Debug.println(indent + 3, "Environment Id: " + this.getEnvironmentId());
 	}
 
 }

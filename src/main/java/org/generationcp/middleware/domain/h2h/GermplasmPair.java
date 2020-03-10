@@ -11,8 +11,8 @@
 
 package org.generationcp.middleware.domain.h2h;
 
-import org.generationcp.middleware.domain.dms.TrialInstance;
-import org.generationcp.middleware.domain.dms.TrialInstances;
+import org.generationcp.middleware.domain.dms.TrialEnvironment;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.util.Debug;
 
 /**
@@ -25,7 +25,7 @@ public class GermplasmPair {
 
 	private int gid2;
 
-	private TrialInstances environments;
+	private TrialEnvironments environments;
 
 	public GermplasmPair(int gid1, int gid2) {
 		super();
@@ -33,7 +33,7 @@ public class GermplasmPair {
 		this.gid2 = gid2;
 	}
 
-	public GermplasmPair(int gid1, int gid2, TrialInstances environments) {
+	public GermplasmPair(int gid1, int gid2, TrialEnvironments environments) {
 		super();
 		this.gid1 = gid1;
 		this.gid2 = gid2;
@@ -56,11 +56,11 @@ public class GermplasmPair {
 		this.gid2 = gid2;
 	}
 
-	public TrialInstances getTrialEnvironments() {
+	public TrialEnvironments getTrialEnvironments() {
 		return this.environments;
 	}
 
-	public void setTrialInstances(TrialInstances environments) {
+	public void setTrialEnvironments(TrialEnvironments environments) {
 		this.environments = environments;
 	}
 
@@ -103,7 +103,7 @@ public class GermplasmPair {
 		builder.append(this.gid2);
 		builder.append(", environments=");
 		if (this.environments != null) {
-			for (TrialInstance env : this.environments.getTrialInstances()) {
+			for (TrialEnvironment env : this.environments.getTrialEnvironments()) {
 				builder.append(env.toString()).append(", ");
 			}
 		} else {

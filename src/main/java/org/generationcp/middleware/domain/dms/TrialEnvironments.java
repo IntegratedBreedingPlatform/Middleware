@@ -22,40 +22,40 @@ import java.util.Set;
 /**
  * Set of trial environments.
  */
-public class TrialInstances {
+public class TrialEnvironments {
 
-	private final Set<TrialInstance> trialInstances = new LinkedHashSet<TrialInstance>();
+	private final Set<TrialEnvironment> trialEnvironments = new LinkedHashSet<TrialEnvironment>();
 
-	public void add(TrialInstance trialInstance) {
-		if (trialInstance != null) {
-			this.trialInstances.add(trialInstance);
+	public void add(TrialEnvironment trialEnvironment) {
+		if (trialEnvironment != null) {
+			this.trialEnvironments.add(trialEnvironment);
 		}
 	}
 
-	public void addAll(Collection<TrialInstance> trialInstances) {
-		if (trialInstances != null) {
-			for (TrialInstance environment : trialInstances) {
+	public void addAll(Collection<TrialEnvironment> trialEnvironments) {
+		if (trialEnvironments != null) {
+			for (TrialEnvironment environment : trialEnvironments) {
 				this.add(environment);
 			}
 		}
 	}
 
-	public void addAll(TrialInstances trialInstances) {
-		if (trialInstances != null) {
-			for (TrialInstance environment : trialInstances.getTrialInstances()) {
+	public void addAll(TrialEnvironments trialEnvironments) {
+		if (trialEnvironments != null) {
+			for (TrialEnvironment environment : trialEnvironments.getTrialEnvironments()) {
 				this.add(environment);
 			}
 		}
 	}
 
-	public Set<TrialInstance> getTrialInstances() {
-		return this.trialInstances;
+	public Set<TrialEnvironment> getTrialEnvironments() {
+		return this.trialEnvironments;
 	}
 
 	public List<Variable> getVariablesByLocalName(String localName) {
 		List<Variable> vars = new ArrayList<Variable>();
-		for (TrialInstance trialInstance : this.trialInstances) {
-			Variable var = trialInstance.getVariables().findByLocalName(localName);
+		for (TrialEnvironment trialEnvironment : this.trialEnvironments) {
+			Variable var = trialEnvironment.getVariables().findByLocalName(localName);
 			if (var != null) {
 				vars.add(var);
 			}
@@ -84,12 +84,12 @@ public class TrialInstances {
 		return vars;
 	}
 
-	public TrialInstance findOnlyOneByLocalName(String localName, String value) {
-		TrialInstance found = null;
-		for (TrialInstance trialInstance : this.trialInstances) {
-			if (trialInstance.containsValueByLocalName(localName, value)) {
+	public TrialEnvironment findOnlyOneByLocalName(String localName, String value) {
+		TrialEnvironment found = null;
+		for (TrialEnvironment trialEnvironment : this.trialEnvironments) {
+			if (trialEnvironment.containsValueByLocalName(localName, value)) {
 				if (found == null) {
-					found = trialInstance;
+					found = trialEnvironment;
 				} else {
 					found = null;
 					break;
@@ -101,8 +101,8 @@ public class TrialInstances {
 
 	public int countByLocalName(String localName, String value) {
 		int count = 0;
-		for (TrialInstance trialInstance : this.trialInstances) {
-			if (trialInstance.containsValueByLocalName(localName, value)) {
+		for (TrialEnvironment trialEnvironment : this.trialEnvironments) {
+			if (trialEnvironment.containsValueByLocalName(localName, value)) {
 				count++;
 			}
 		}
@@ -110,12 +110,12 @@ public class TrialInstances {
 	}
 
 	public void print(int indent) {
-		for (TrialInstance trialInstance : this.trialInstances) {
-			trialInstance.print(indent);
+		for (TrialEnvironment trialEnvironment : this.trialEnvironments) {
+			trialEnvironment.print(indent);
 		}
 	}
 
 	public int size() {
-		return this.trialInstances != null ? this.trialInstances.size() : 0;
+		return this.trialEnvironments != null ? this.trialEnvironments.size() : 0;
 	}
 }

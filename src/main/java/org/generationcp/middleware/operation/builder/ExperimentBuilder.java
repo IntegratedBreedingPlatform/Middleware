@@ -43,10 +43,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ExperimentBuilder {
-
+	
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentBuilder.class);
 	private final DaoFactory daoFactory;
-
+	
 	public ExperimentBuilder(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
@@ -122,7 +122,7 @@ public class ExperimentBuilder {
 			if (DatasetTypeEnum.PLOT_DATA.getId() == datasetType.getDatasetTypeId() || DatasetTypeEnum.MEANS_DATA.getId() == datasetType.getDatasetTypeId()) {
 				return experimentModels.stream().collect(Collectors.toMap(ExperimentModel::getNdExperimentId, ExperimentModel::getParent));
 			} else if (datasetType.isSubObservationType()) {
-				return this.daoFactory.getInstanceDao().getExperimentIdInstanceMap(projectId);
+				return this.daoFactory.getEnvironmentDao().getExperimentIdEnvironmentMap(projectId);
 			}
 			// If environment dataset, the experiment id is the environment id
 			return experimentModels.stream().collect(Collectors.toMap(ExperimentModel::getNdExperimentId, e -> e));
@@ -220,12 +220,12 @@ public class ExperimentBuilder {
 				if (variableType != null) {
 					Variable var =  null;
 					if (variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());
+						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());						
 						if (phenotype.getcValueId() == null && phenotype.getValue() != null) {
 							var.setValue(phenotype.getValue());
 							var.setCustomValue(true);
 						}
-
+						
 						variates.add(var);
 					} else {
 						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue());
@@ -332,19 +332,19 @@ public class ExperimentBuilder {
 			} else {
 				stockModel = this.daoFactory.getStockDao().getById(stockId);
 			}
-
+			
 			for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
 				final Variable var = this.createGermplasmFactor(stockModel, variableType);
 				if(var != null){
 					factors.add(var);
-				}
+				}				
 			}
 		}
 	}
 
 	protected Variable createGermplasmFactor(final StockModel stockModel, final DMSVariableType variableType) {
 		final StandardVariable standardVariable = variableType.getStandardVariable();
-
+		
 		if (standardVariable.getId() == TermId.ENTRY_NO.getId()) {
 			return new Variable(variableType, stockModel.getUniqueName());
 		}
@@ -366,7 +366,7 @@ public class ExperimentBuilder {
 		if (val != null) {
 			return new Variable(variableType, val);
 		}
-
+		
 		return null;
 	}
 

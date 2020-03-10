@@ -18,7 +18,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.InstancePropertyDao;
+import org.generationcp.middleware.domain.dms.EnvironmentPropertyDao;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -180,7 +180,7 @@ public class WorkbookBuilder extends Builder {
 		final Map<Integer, VariableType> projectPropRoleMapping = this
 			.generateProjectPropertyRoleMap(projectProperties);
 
-		final InstancePropertyDao instancePropertyDao = this.daoFactory.getInstancePropertyDao();
+		final EnvironmentPropertyDao environmentPropertyDao = this.daoFactory.getEnvironmentPropertyDao();
 		for (final ProjectProperty projectProperty : projectProperties) {
 			// FIXME DA IN A LOOP
 			final StandardVariable stdVariable = this.getStandardVariableBuilder()
@@ -203,7 +203,7 @@ public class WorkbookBuilder extends Builder {
 					String value = projectProperty.getValue();
 					// During import of study, experiment design values are not set in ProjectProperty so we resolve them from ExperimentProperty
 					if (value == null && VariableType.ENVIRONMENT_DETAIL.equals(varType)) {
-						value = instancePropertyDao.getVariableValue(stdVariableId, id);
+						value = environmentPropertyDao.getVariableValue(stdVariableId, id);
 					}
 
 					final MeasurementVariable measurementVariable =

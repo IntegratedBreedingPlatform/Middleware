@@ -10,7 +10,7 @@ public interface StudyService {
 
 	List<StudySummary> search(final StudySearchParameters serchParameters);
 
-	boolean hasMeasurementDataOnInstance(final int studyIdentifier, final int instanceId);
+	boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId);
 
 	boolean hasAdvancedOrCrossesList(final int studyId);
 
@@ -37,10 +37,10 @@ public interface StudyService {
 	TrialObservationTable getTrialObservationTable(int studyIdentifier, Integer instanceDbId);
 
 	/**
-	 * @param instanceId
+	 * @param environmentId
 	 * @return StudyDetailsDto
 	 */
-	StudyDetailsDto getStudyDetailsByInstanceId(Integer instanceId);
+	StudyDetailsDto getStudyDetailsByEnvironment(Integer environmentId);
 
 	/**
 	 * @param ids     of the variables that i need to check data

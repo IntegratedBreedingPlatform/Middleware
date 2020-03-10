@@ -138,7 +138,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockModels;
 	}
 
-	public long countStocks(final int datasetId, final int triaInstanceId, final int variateStdVarId)  {
+	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId)  {
 		try {
 			// Dataset ID can be for means, plot or sub-obs dataset
 			final String sql = "select count(distinct plot.stock_id) "
@@ -147,10 +147,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					+ " inner join project p ON p.project_id = e.project_id  "
 					+ " inner join project plot_ds on plot_ds.study_id = p.study_id and plot_ds.dataset_type_id = 4 "
 					+ " inner join nd_experiment plot ON plot_ds.project_id = plot.project_id "
-					+ "  WHERE plot.parent_id = :instanceId  and p.observable_id = " + variateStdVarId
+					+ "  WHERE plot.parent_id = :environmentId  and p.observable_id = " + variateStdVarId
 					+ "  and e.project_id = :datasetId ";
 			final Query query = this.getSession().createSQLQuery(sql);
-			query.setParameter("instanceId", triaInstanceId);
+			query.setParameter("environmentId", trialEnvironmentId);
 			query.setParameter("datasetId", datasetId);
 
 

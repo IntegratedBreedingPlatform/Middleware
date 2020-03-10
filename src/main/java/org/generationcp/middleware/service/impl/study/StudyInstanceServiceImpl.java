@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.base.Optional;
+import org.generationcp.middleware.dao.dms.EnvironmentDao;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -52,7 +53,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final List<MeasurementVariable> measurementVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId,
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
 
-		final int instanceNumber = this.daoFactory.getInstanceDao().getNextInstanceNumber(datasetId);
+		final int instanceNumber = this.daoFactory.getEnvironmentDao().getNextInstanceNumber(datasetId);
 
 		// The default value of an instance's location name is "Unspecified Location"
 		final Optional<Location> location = this.getUnspecifiedLocation();
@@ -102,7 +103,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Override
 	public void deleteStudyInstance(final Integer studyId, final Integer instanceId) {
-		final ExperimentModel geolocation = this.daoFactory.getInstanceDao().getById(instanceId);
+		final ExperimentModel geolocation = this.daoFactory.getEnvironmentDao().getById(instanceId);
 		final Integer instanceNumber = geolocation.getObservationUnitNo();
 
 		// Delete plot and environment experiments

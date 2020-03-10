@@ -23,18 +23,18 @@ public class BreedersQueryDao {
 		this.session = session;
 	}
 
-	public List<GermplasmLocationInfo> getGermplasmLocationInfoByInstanceIds(Set<Integer> instanceIds)
+	public List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(Set<Integer> environmentIds)
 			throws MiddlewareQueryException {
 
 		List<GermplasmLocationInfo> result = new ArrayList<GermplasmLocationInfo>();
-		if (instanceIds != null && !instanceIds.isEmpty()) {
+		if (environmentIds != null && !environmentIds.isEmpty()) {
 			long startTime = System.nanoTime();
 			try {
 				SQLQuery query =
 						this.session.createSQLQuery("SELECT gtd.envt_id, gtd.gid, gtd.entry_designation, tsl.locationName, tsl.isoabbr "
 								+ " FROM germplasm_trial_details gtd " + " join trial_study_locations tsl on gtd.envt_id=tsl.envtId "
 								+ " where gtd.envt_id in (:envIds) GROUP BY (gid);");
-				query.setParameterList("envIds", instanceIds);
+				query.setParameterList("envIds", environmentIds);
 
 				@SuppressWarnings("rawtypes")
 				List queryResult = query.list();
@@ -54,7 +54,7 @@ public class BreedersQueryDao {
 		return result;
 	}
 
-	public List<Integer> getTrialInstanceIdsForGermplasm(Set<Integer> gids) throws MiddlewareQueryException {
+	public List<Integer> getTrialEnvironmentIdsForGermplasm(Set<Integer> gids) throws MiddlewareQueryException {
 		List<Integer> result = new ArrayList<Integer>();
 		if (gids != null && !gids.isEmpty()) {
 			long startTime = System.nanoTime();

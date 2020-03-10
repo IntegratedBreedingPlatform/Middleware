@@ -190,7 +190,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     projectprop pProp ON pmain.project_id = pProp.project_id "
 		+ " WHERE "
 		+ "     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
-		+ "         AND nde.nd_experiment_id = :instanceId "
+		+ "         AND nde.nd_experiment_id = :environmentId "
 		+ " GROUP BY nde.nd_experiment_id ";
 
 	private static final String GET_PROJECTID_BY_STUDYDBID =
@@ -674,8 +674,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return criteria;
 	}
 
-	public StudyMetadata getStudyMetadataForInstanceId(final Integer instanceId) {
-		Preconditions.checkNotNull(instanceId);
+	public StudyMetadata getStudyMetadataForEnvironmentId(final Integer environmentId) {
+		Preconditions.checkNotNull(environmentId);
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ENVIRONMENT_ID);
 			query.addScalar("studyDbId");
@@ -692,12 +692,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("studyDescription");
 			query.addScalar("experimentalDesign");
 			query.addScalar("lastUpdate");
-			query.setParameter("instanceId", instanceId);
+			query.setParameter("environmentId", environmentId);
 			final Object result = query.uniqueResult();
 			if (result != null) {
 				final Object[] row = (Object[]) result;
 				final StudyMetadata studyMetadata = new StudyMetadata();
-				studyMetadata.setStudyDbId(instanceId);
+				studyMetadata.setStudyDbId(environmentId);
 				studyMetadata.setNurseryOrTrialId((row[1] instanceof Integer) ? (Integer) row[1] : null);
 				studyMetadata.setStudyName((row[2] instanceof String) ? (String) row[2] : null);
 				studyMetadata.setStudyType((row[3] instanceof Integer) ? ((Integer) row[3]).toString() : null);
@@ -719,7 +719,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				return null;
 			}
 		} catch (final HibernateException e) {
-			final String message = "Error with getStudyMetadataForInstanceId() query from study with instance id: " + instanceId;
+			final String message = "Error with getStudyMetadataForEnvironmentId() query from study with environment id: " + environmentId;
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -1325,14 +1325,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public Integer getDatasetIdByInstanceIdAndDatasetType(final Integer instanceId, final DatasetTypeEnum datasetType) {
+	public Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType) {
 		try {
 			final Query query = this.getSession().createSQLQuery("SELECT p.project_id FROM project p "
 				+ "		INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = "
 							+ DatasetTypeEnum.SUMMARY_DATA.getId()
 				+ "		INNER JOIN nd_experiment nde ON nde.project_id = env_ds.project_id AND nde.type_id = 1020 "
-				+ "		WHERE nde.nd_experiment_id = :instanceId AND p.dataset_type_id = :datasetTypeId ");
-			query.setParameter("instanceId", instanceId);
+				+ "		WHERE nde.nd_experiment_id = :environmentId AND p.dataset_type_id = :datasetTypeId ");
+			query.setParameter("environmentId", environmentId);
 			query.setParameter("datasetTypeId", datasetType.getId());
 			return (Integer) query.uniqueResult();
 		} catch (final HibernateException e) {

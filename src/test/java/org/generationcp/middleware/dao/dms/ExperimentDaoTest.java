@@ -104,7 +104,7 @@ public class ExperimentDaoTest {
 		this.setupEnvironmentsOfGermplasmMocks();
 		final Set<Integer> gids = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5));
 		final Map<Integer, Set<Integer>> environmentsMap =
-				this.experimentDao.getInstancesOfGermplasms(gids, ExperimentDaoTest.PROGRAM_UUID);
+				this.experimentDao.getEnvironmentsOfGermplasms(gids, ExperimentDaoTest.PROGRAM_UUID);
 
 		final String expectedSql = "SELECT DISTINCT s.dbxref_id, e.nd_geolocation_id " + "FROM nd_experiment e "
 				+ "     INNER JOIN stock s ON e.stock_id = s.stock_id AND s.dbxref_id IN (:gids) "
@@ -125,7 +125,7 @@ public class ExperimentDaoTest {
 	public void testGetEnvironmentsOfGermplasmsWithNullProgramUUID() {
 		this.setupEnvironmentsOfGermplasmMocks();
 		final Set<Integer> gids = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5));
-		final Map<Integer, Set<Integer>> environmentsMap = this.experimentDao.getInstancesOfGermplasms(gids, null);
+		final Map<Integer, Set<Integer>> environmentsMap = this.experimentDao.getEnvironmentsOfGermplasms(gids, null);
 
 		final String expectedSql = "SELECT DISTINCT s.dbxref_id, e.nd_geolocation_id " + "FROM nd_experiment e "
 				+ "     INNER JOIN stock s ON e.stock_id = s.stock_id AND s.dbxref_id IN (:gids) " + " ORDER BY s.dbxref_id ";
@@ -162,7 +162,7 @@ public class ExperimentDaoTest {
 	public void testGetEnvironmentsOfGermplasmsWithNoGids() {
 		final Set<Integer> gids = new HashSet<>();
 		final Map<Integer, Set<Integer>> environmentsMap =
-				this.experimentDao.getInstancesOfGermplasms(gids, ExperimentDaoTest.PROGRAM_UUID);
+				this.experimentDao.getEnvironmentsOfGermplasms(gids, ExperimentDaoTest.PROGRAM_UUID);
 
 		Mockito.verify(this.mockSession, Mockito.never()).createSQLQuery(ArgumentMatchers.anyString());
 		Assert.assertTrue(environmentsMap.isEmpty());
@@ -276,7 +276,7 @@ public class ExperimentDaoTest {
 		Mockito.verify(query).setMaxResults(numOfRows);
 		Mockito.verify(query).setFirstResult(start);
 	}
-
+	
 	@Test
 	public void testGetExperiments_NotFirstInstance() {
 		final Query query = Mockito.mock(Query.class);

@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 // ASsumptions - can be added to validations
@@ -379,12 +380,12 @@ public class WorkbookSaver extends Saver {
 		} else {
 			// workbook.getTrialObservations() is empty when a study is created from Dataset Importer.
 			// In this case, extract the trial environments from plot observations
-			final Map<Integer, Integer> instanceNumberInstanceIdsMap = this.daoFactory.getExperimentDao()
-				.getInstanceNumberInstanceIdsMap(trialDatasetId);
+			final Map<Integer, Integer> instanceNumberEnvironmentIdsMap = this.daoFactory.getExperimentDao()
+				.getInstanceNumberEnvironmentIdsMap(trialDatasetId);
 
 			for (final MeasurementRow row : workbook.getObservations()) {
 				final Integer instanceNumber = this.getTrialInstanceNumber(row);
-				if (!instanceNumberInstanceIdsMap.containsKey(instanceNumber)) {
+				if (!instanceNumberEnvironmentIdsMap.containsKey(instanceNumber)) {
 					final VariableList environmentVariables =
 						this.getVariableListTransformer().transformTrialEnvironment(row, trialVariables, trialHeaders);
 					this.setVariableListValues(environmentVariables, workbook.getConditions());
@@ -392,10 +393,10 @@ public class WorkbookSaver extends Saver {
 						environmentVariables, locations);
 					this.assignExptDesignAsExternallyGeneratedDesignIfEmpty(environmentVariables);
 
-					final Integer instanceId = this.createTrialExperiment(crop, trialDatasetId, instanceNumber, environmentVariables);
-					instanceNumberInstanceIdsMap.put(instanceNumber, instanceId);
+					final Integer environmentId = this.createTrialExperiment(crop, trialDatasetId, instanceNumber, environmentVariables);
+					instanceNumberEnvironmentIdsMap.put(instanceNumber, environmentId);
 				}
-				row.setLocationId(instanceNumberInstanceIdsMap.get(instanceNumber));
+				row.setLocationId(instanceNumberEnvironmentIdsMap.get(instanceNumber));
 			}
 		}
 
@@ -1027,14 +1028,14 @@ public class WorkbookSaver extends Saver {
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
 		final Session activeSession = this.getActiveSession();
 		final FlushMode existingFlushMode = activeSession.getFlushMode();
-		final Map<Integer, Integer> instanceNumberInstanceIdMap = this.daoFactory.getInstanceDao().getInstancesByDataset(environmentDatasetId, true).stream()
+		final Map<Integer, Integer> instanceNumberEnvironmentIdMap = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(environmentDatasetId, true).stream()
 			.collect(Collectors.toMap(ExperimentModel::getObservationUnitNo, ExperimentModel::getNdExperimentId));
 		try {
 			activeSession.setFlushMode(FlushMode.MANUAL);
 			if (observations != null) {
 				for (final MeasurementRow row : observations) {
 					rowWatch.restart("saving row " + i++);
-					final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders, instanceNumberInstanceIdMap);
+					final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders, instanceNumberEnvironmentIdMap);
 					try {
 						experimentModelSaver.addExperiment(crop, plotDatasetId, experimentType, experimentValues);
 					} catch (final PhenotypeException e) {

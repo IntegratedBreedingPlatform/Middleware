@@ -27,9 +27,10 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.TrialInstances;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -263,7 +264,7 @@ public interface StudyDataManager {
 	 * @param datasetId the dataset id
 	 * @return The trial environments
 	 */
-	TrialInstances getTrialEnvironmentsInDataset(int datasetId);
+	TrialEnvironments getTrialEnvironmentsInDataset(int datasetId);
 
 	/**
 	 * Retrieves the stocks belonging to the given dataset. Retrieves from central if the given ID is positive, otherwise retrieves from
@@ -279,11 +280,11 @@ public interface StudyDataManager {
 	 * is positive, otherwise counts from local.
 	 *
 	 * @param datasetId          the dataset id
-	 * @param trialInstanceId the trial instance id
+	 * @param trialEnvironmentId the trial environment id
 	 * @param variateStdVarId    the variate std var id
 	 * @return The count
 	 */
-	long countStocks(int datasetId, int trialInstanceId, int variateStdVarId);
+	long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId);
 
 	/**
 	 * Returns a single dataset belonging to the study with the given type. If there is more than one matching dataset, only one is
@@ -359,11 +360,11 @@ public interface StudyDataManager {
 	 * Retrieve all field map labels in the block of the specified trial instance id.
 	 *
 	 * @param datasetId     the dataset id
-	 * @param instanceId the instance id
+	 * @param environmentId the environment id
 	 * @return the all field maps in block by trial instance id
 	 */
 	List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(
-		int datasetId, int instanceId,
+		int datasetId, int environmentId,
 		CrossExpansionProperties crossExpansionProperties);
 
 	/**
@@ -423,11 +424,11 @@ public interface StudyDataManager {
 
 	/**
 	 * Returns the datasetId of dataset to which the environment id belongs to.
-	 * @param instanceId
+	 * @param environmentId
 	 * @param datasetType
 	 * @return
 	 */
-	Integer getDatasetIdByInstanceIdAndDatasetType(final Integer instanceId, final DatasetTypeEnum datasetType);
+	Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType);
 
 
 	/**
@@ -617,10 +618,10 @@ public interface StudyDataManager {
 	 *
 	 * @param studyId
 	 * @param datasetTypeId
-	 * @param instanceIds
+	 * @param environmentIds
 	 * @return
 	 */
-	Long countExperimentsByDatasetTypeAndInstances(int studyId, int datasetTypeId, List<Integer> instanceIds);
+	Long countExperimentsByDatasetTypeAndEnvironments(int studyId, int datasetTypeId, List<Integer> environmentIds);
 
 	/**
 	 * Retrieves all the StudySummaries of the DMS Project that matches the conditions: SeasonDbId, LocationDbId and ProgramDbId
@@ -642,9 +643,9 @@ public interface StudyDataManager {
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
 
-	StudyMetadata getStudyMetadataForInstanceId(Integer instanceId);
+	StudyMetadata getStudyMetadataForEnvironmentId(Integer environmentId);
 
-	Map<Integer, String> getEnvironmentVariableIdValuesMap(Integer datasetId, Integer instanceId);
+	Map<Integer, String> getEnvironmentVariableIdValuesMap(Integer datasetId, Integer environmentId);
 
 	Map<String, String> getProjectPropsAndValuesByStudy(Integer studyId, List<Integer> excludedVariableIds);
 

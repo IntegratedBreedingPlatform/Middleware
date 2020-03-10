@@ -34,7 +34,7 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.TrialInstances;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -58,7 +58,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
-import org.generationcp.middleware.operation.builder.TrialInstanceBuilder;
+import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -106,7 +106,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private StockBuilder stockBuilder;
 
 	@Resource
-	private TrialInstanceBuilder trialInstanceBuilder;
+	private TrialEnvironmentBuilder trialEnvironmentBuilder;
 
 	public StudyDataManagerImpl() {
 	}
@@ -387,9 +387,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public TrialInstances getTrialEnvironmentsInDataset(final int datasetId) {
+	public TrialEnvironments getTrialEnvironmentsInDataset(final int datasetId) {
 		final DmsProject study = this.getDmsProjectDao().getById(datasetId).getStudy();
-		return this.trialInstanceBuilder.getTrialInstanceInDataset(study.getProjectId(), datasetId);
+		return this.trialEnvironmentBuilder.getTrialEnvironmentsInDataset(study.getProjectId(), datasetId);
 	}
 
 	@Override
@@ -398,8 +398,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public long countStocks(final int datasetId, final int trialInstanceId, final int variateStdVarId) {
-		return this.getStockDao().countStocks(datasetId, trialInstanceId, variateStdVarId);
+	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId) {
+		return this.getStockDao().countStocks(datasetId, trialEnvironmentId, variateStdVarId);
 	}
 
 	@Override
@@ -544,14 +544,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(
-		final int datasetId, final int instanceId,
+		final int datasetId, final int environmentId,
 		final CrossExpansionProperties crossExpansionProperties) {
 		final List<FieldMapInfo> fieldMapInfos =
-			this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, instanceId, null);
+			this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, environmentId, null);
 
 		this.updateFieldMapWithBlockInformation(fieldMapInfos, true);
 		final Map<Integer, String> pedigreeStringMap = new HashMap<>();
-		//		 Filter those belonging to the given instanceId
+		//		 Filter those belonging to the given environmentId
 		for (final FieldMapInfo fieldMapInfo : fieldMapInfos) {
 			final List<FieldMapDatasetInfo> datasetInfoList = fieldMapInfo.getDatasets();
 			if (datasetInfoList != null) {
@@ -725,8 +725,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Integer getDatasetIdByInstanceIdAndDatasetType(final Integer instanceId, final DatasetTypeEnum datasetType) {
-		return this.getDmsProjectDao().getDatasetIdByInstanceIdAndDatasetType(instanceId, datasetType);
+	public Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType) {
+		return this.getDmsProjectDao().getDatasetIdByEnvironmentIdAndDatasetType(environmentId, datasetType);
 	}
 
 	@Override
@@ -1009,15 +1009,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Long countExperimentsByDatasetTypeAndInstances(
+	public Long countExperimentsByDatasetTypeAndEnvironments(
 		final int studyId, final int datasetTypeId,
-		final List<Integer> instanceIds) {
+		final List<Integer> environmentIds) {
 
 		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getDatasetsByTypeForStudy(studyId, datasetTypeId);
 
 		if (!datasetProjects.isEmpty()) {
 			final int dataSetId = datasetProjects.get(0).getProjectId();
-			return this.daoFactory.getExperimentDao().countExperimentsByDatasetAndInstanceIds(dataSetId, instanceIds);
+			return this.daoFactory.getExperimentDao().countExperimentsByDatasetAndEnvironmentIds(dataSetId, environmentIds);
 		}
 		return 0L;
 	}
@@ -1071,16 +1071,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
-		return this.daoFactory.getInstanceDao().getInstanceMetadata(studyId, Collections.emptyList());
+		return this.daoFactory.getEnvironmentDao().getInstanceMetadata(studyId, Collections.emptyList());
 	}
 
 	List<InstanceMetadata> getInstanceMetadata(final int studyId, final List<Integer> locationIds) {
-		return this.daoFactory.getInstanceDao().getInstanceMetadata(studyId, locationIds);
+		return this.daoFactory.getEnvironmentDao().getInstanceMetadata(studyId, locationIds);
 	}
 
 	@Override
-	public StudyMetadata getStudyMetadataForInstanceId(final Integer instanceId) {
-		return this.getDmsProjectDao().getStudyMetadataForInstanceId(instanceId);
+	public StudyMetadata getStudyMetadataForEnvironmentId(final Integer environmentId) {
+		return this.getDmsProjectDao().getStudyMetadataForEnvironmentId(environmentId);
 	}
 
 	@Override
@@ -1211,7 +1211,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public String getBlockId(final int datasetId, final Integer trialInstance) {
-		return this.daoFactory.getInstancePropertyDao().getVariableValueForTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+		return this.daoFactory.getEnvironmentPropertyDao().getVariableValueForTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
 
 	}
 
@@ -1228,10 +1228,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Map<Integer, String> getEnvironmentVariableIdValuesMap(final Integer datasetId, final Integer instanceId) {
+	public Map<Integer, String> getEnvironmentVariableIdValuesMap(final Integer datasetId, final Integer environmentId) {
 		final Map<Integer, String> environmentVariablesMap =
-			this.daoFactory.getInstancePropertyDao().getInstanceVariablesMap(datasetId, instanceId);
-		final ExperimentModel environment = this.daoFactory.getInstanceDao().getById(instanceId);
+			this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariablesMap(datasetId, environmentId);
+		final ExperimentModel environment = this.daoFactory.getEnvironmentDao().getById(environmentId);
 
 		environmentVariablesMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(environment.getObservationUnitNo()));
 		return environmentVariablesMap;
@@ -1240,7 +1240,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	// TODO IBP-3305 Determine if this can be replaced with StudyDataManager#areAllInstancesExistInDataset
 	@Override
 	public Boolean instancesExist(final Set<Integer> instanceIds) {
-		return this.daoFactory.getInstanceDao().instancesExist(instanceIds);
+		return this.daoFactory.getEnvironmentDao().instancesExist(instanceIds);
 	}
 
 	@Override
@@ -1275,7 +1275,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		this.dataSetBuilder = dataSetBuilder;
 	}
 
-	void setTrialInstanceBuilder(final TrialInstanceBuilder trialInstanceBuilder) {
-		this.trialInstanceBuilder = trialInstanceBuilder;
+	void setTrialEnvironmentBuilder(final TrialEnvironmentBuilder trialEnvironmentBuilder) {
+		this.trialEnvironmentBuilder = trialEnvironmentBuilder;
 	}
 }

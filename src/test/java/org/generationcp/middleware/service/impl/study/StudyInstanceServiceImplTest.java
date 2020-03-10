@@ -165,7 +165,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertFalse(studyInstance2.isHasExperimentalDesign());
 
 		final List<ExperimentModel> studyInstances =
-			this.daoFactory.getInstanceDao().getInstances(studyId);
+			this.daoFactory.getEnvironmentDao().getEnvironments(studyId);
 		Assert.assertEquals(2, studyInstances.size());
 	}
 
@@ -338,8 +338,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			Assert.assertNotEquals(instance2LocationId.intValue(), instance.getExperimentId());
 		}
 		// Confirm geolocation and its properties have been deleted
-		Assert.assertNull(this.daoFactory.getInstanceDao().getById(instance2LocationId));
-		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getInstancePropertyDao().getInstanceVariableNameValuesMap(instance2LocationId)));
+		Assert.assertNull(this.daoFactory.getEnvironmentDao().getById(instance2LocationId));
+		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariableNameValuesMap(instance2LocationId)));
 
 
 		// Delete Instance 1 - study experiment Geolocation ID will be updated to next available geolocation
@@ -354,8 +354,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		final Integer instance3LocationId = instance3.getLocationId();
 		Assert.assertEquals(instance3LocationId, this.daoFactory.getExperimentDao().getById(studyExperimentId).getNdExperimentId());
 		// Confirm geolocation and its properties have been deleted
-		Assert.assertNull(this.daoFactory.getInstanceDao().getById(instance1LocationId));
-		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getInstancePropertyDao().getInstanceVariableNameValuesMap(instance1LocationId)));
+		Assert.assertNull(this.daoFactory.getEnvironmentDao().getById(instance1LocationId));
+		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariableNameValuesMap(instance1LocationId)));
 
 
 		// Delete Instance 3 - should throw exception
@@ -368,8 +368,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		studyInstances =
 			this.studyInstanceService.getStudyInstances(studyId);
 		Assert.assertEquals(1, studyInstances.size());
-		Assert.assertNotNull(this.daoFactory.getInstanceDao().getById(instance3LocationId));
-		Assert.assertFalse(CollectionUtils.isEmpty(this.daoFactory.getInstancePropertyDao().getInstanceVariableNameValuesMap(instance3LocationId)));
+		Assert.assertNotNull(this.daoFactory.getEnvironmentDao().getById(instance3LocationId));
+		Assert.assertFalse(CollectionUtils.isEmpty(this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariableNameValuesMap(instance3LocationId)));
 	}
 
 	private Integer createTestExperiments(final DmsProject study, final DmsProject environmentDataset, final DmsProject plotDataset,
