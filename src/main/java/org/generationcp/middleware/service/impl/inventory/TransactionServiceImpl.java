@@ -130,7 +130,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void confirmTransaction(final List<TransactionDto> confirmedTransactionDtos) {
+	public void confirmPendingTransaction(final List<TransactionDto> confirmedTransactionDtos) {
 		final List<Integer> listIds = confirmedTransactionDtos.stream().map(TransactionDto::getTransactionId).collect(
 			Collectors.toList());
 
