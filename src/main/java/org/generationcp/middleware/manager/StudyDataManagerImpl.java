@@ -387,7 +387,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public TrialInstances getTrialEnvironmentsInDataset(final int datasetId) {
+	public TrialInstances getTrialInstancesInDataset(final int datasetId) {
 		final DmsProject study = this.getDmsProjectDao().getById(datasetId).getStudy();
 		return this.trialInstanceBuilder.getTrialInstanceInDataset(study.getProjectId(), datasetId);
 	}
