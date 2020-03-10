@@ -201,7 +201,7 @@
 	<bean id="workbenchTestDataUtil" class="org.generationcp.middleware.WorkbenchTestDataUtil">
     </bean>
 
-	<bean id="trialInstanceBuilder" factory-bean="managerFactory"
+	<bean id="trialEnvironmentBuilder" factory-bean="managerFactory"
 	  factory-method="getTrialInstanceBuilder">
 		<aop:scoped-proxy />
 	</bean>
