@@ -43,7 +43,7 @@ public class StudyGermplasmListServiceImplTest extends IntegrationTestBase {
 
 	@Before
 	public void setup() {
-		this.service = new StudyGermplasmListServiceImpl(this.sessionProvder.getSession());
+		this.service = new StudyGermplasmListServiceImpl(this.sessionProvder);
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager);
 		}
@@ -55,7 +55,7 @@ public class StudyGermplasmListServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void test() {
+	public void testGetGermplasmList() {
 		final List<StudyGermplasmDto> germplasmList = this.service.getGermplasmList(STUDY_ID);
 		Assert.assertEquals(DataSetupTest.NUMBER_OF_GERMPLASM, germplasmList.size());
 		int index = 1;

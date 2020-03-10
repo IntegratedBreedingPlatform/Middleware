@@ -54,9 +54,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -110,7 +110,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		super(sessionProvider);
 		final Session currentSession = this.getCurrentSession();
 		this.studyMeasurements = new StudyMeasurements(currentSession);
-		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(currentSession);
+		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(sessionProvider);
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(),
 			this.getOntologyPropertyDataManager(), this.getOntologyScaleDataManager(), this.getFormulaService(), sessionProvider);
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
@@ -347,6 +347,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
+	public List<StudyGermplasmDto> getStudyGermplasmListWithPlotInformation(final Integer studyIdentifer, final Set<Integer> plotNos) {
+		return this.studyGermplasmListService.getGermplasmListFromPlots(studyIdentifer, plotNos);
+	}
+
+	@Override
 	public String getProgramUUID(final Integer studyIdentifier) {
 		try {
 			return StudyServiceImpl.studyIdToProgramIdCache.get(new StudyKey(studyIdentifier, ContextHolder.getCurrentCrop()));
@@ -516,7 +521,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final DmsProject environmentDataset =
 					this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyMetadata.getTrialDbId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 				final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
-					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.<Integer>newArrayList(VariableType.STUDY_CONDITION.getId()));
+					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.newArrayList(VariableType.STUDY_CONDITION.getId()));
 				final List<MeasurementVariable> environmentParameters = new ArrayList<>();
 				List<Integer> variableIds = this.getVariableIds(environmentConditions);
 				if(!variableIds.isEmpty()) {
@@ -524,7 +529,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 						this.studyDataManager.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
 				}
 				final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
-					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.<Integer>newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
+					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
 				variableIds = this.getVariableIds(environmentDetails);
 				if(!variableIds.isEmpty()) {
 					environmentParameters.addAll(

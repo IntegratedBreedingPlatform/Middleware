@@ -865,33 +865,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(cross2progenitor3Name, cross2progenitor3FromDB.getDesignation());
 	}
 
-	@Test
-	public void testGetPlotNoToImportedGermplasmParentMap() {
-		final String programUUID = "884fefcc-1cbd-4e0f-9186-ceeef3aa3b78";
-		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
-
-		final Integer[] gids = this.germplasmTestDataGenerator
-			.createChildrenGermplasm(
-				DataSetupTest.NUMBER_OF_GERMPLASM, "prefix",
-				parentGermplasm);
-
-		final int studyId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, "ABCD");
-
-		Map<Integer, StudyGermplasmDto> importedCrossParentMap = this.dao.getPlotNoToStudyGermplasmDtoMap(studyId, new HashSet<>(Arrays.asList(1, 2, 3, 4, 5)));
-
-		List<Integer> gidsList = Arrays.asList(gids);
-		for (Map.Entry<Integer,StudyGermplasmDto> entry : importedCrossParentMap.entrySet()) {
-			Assert.assertEquals(DataSetupTest.GERMPLSM_PREFIX + entry.getKey(), entry.getValue().getDesignation());
-			Assert.assertEquals( entry.getKey().toString(), entry.getValue().getPosition());
-			Assert.assertTrue(gidsList.contains(entry.getValue().getGermplasmId()));
-		}
-
-		//Retrieve non existent plots in study
-		importedCrossParentMap = this.dao.getPlotNoToStudyGermplasmDtoMap(studyId, new HashSet<>(Arrays.asList(51, 49)));
-		Assert.assertTrue(importedCrossParentMap.isEmpty());
-
-	}
-
 	private Integer insertGermplasmWithName(final String existingGermplasmNameWithPrefix, final boolean isDeleted) {
 		final Germplasm germplasm = GermplasmTestDataInitializer
 				.createGermplasmWithPreferredName(existingGermplasmNameWithPrefix);
