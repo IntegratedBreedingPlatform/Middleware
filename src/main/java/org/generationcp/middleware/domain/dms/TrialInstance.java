@@ -18,9 +18,9 @@ import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.util.Debug;
 
 /**
- * Contains the details of a trial environment - id and variables.
+ * Contains the details of a trial instance - id and variables.
  */
-public class TrialEnvironment {
+public class TrialInstance {
 
 	private final int id;
 	private VariableList variables;
@@ -28,22 +28,22 @@ public class TrialEnvironment {
 	private List<TraitInfo> traits;
 	private StudyReference study;
 
-	public TrialEnvironment(int id) {
+	public TrialInstance(int id) {
 		this.id = id;
 	}
 
-	public TrialEnvironment(int id, VariableList variables) {
+	public TrialInstance(int id, VariableList variables) {
 		this.id = id;
 		this.variables = variables;
 	}
 
-	public TrialEnvironment(int id, LocationDto location, StudyReference study) {
+	public TrialInstance(int id, LocationDto location, StudyReference study) {
 		this.id = id;
 		this.location = location;
 		this.study = study;
 	}
 
-	public TrialEnvironment(int id, LocationDto location, List<TraitInfo> traits, StudyReference study) {
+	public TrialInstance(int id, LocationDto location, List<TraitInfo> traits, StudyReference study) {
 		this.id = id;
 		this.traits = traits;
 		this.location = location;
@@ -109,7 +109,7 @@ public class TrialEnvironment {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		TrialEnvironment other = (TrialEnvironment) obj;
+		TrialInstance other = (TrialInstance) obj;
 		if (this.id != other.id) {
 			return false;
 		}
@@ -119,7 +119,7 @@ public class TrialEnvironment {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("TrialEnvironment [id=");
+		builder.append("TrialInstance [id=");
 		builder.append(this.id);
 		builder.append(", variables=");
 		builder.append(this.variables);

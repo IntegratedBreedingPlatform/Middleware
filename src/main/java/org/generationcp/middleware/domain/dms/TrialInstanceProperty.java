@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.generationcp.middleware.util.Debug;
 
-public class TrialEnvironmentProperty {
+public class TrialInstanceProperty {
 
 	private Integer id;
 	private String name;
@@ -13,7 +13,7 @@ public class TrialEnvironmentProperty {
 	private Map<Integer, String> environmentValuesMap;
 	private Integer numberOfEnvironments;
 
-	public TrialEnvironmentProperty(String name, String description, Map<Integer, String> environmentValuesMap) {
+	public TrialInstanceProperty(String name, String description, Map<Integer, String> environmentValuesMap) {
 		this.name = name;
 		this.description = description;
 		this.environmentValuesMap = environmentValuesMap;
@@ -22,7 +22,7 @@ public class TrialEnvironmentProperty {
 		}
 	}
 
-	public TrialEnvironmentProperty(Integer id, String name, String description, Map<Integer, String> environmentValuesMap) {
+	public TrialInstanceProperty(Integer id, String name, String description, Map<Integer, String> environmentValuesMap) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
@@ -73,7 +73,7 @@ public class TrialEnvironmentProperty {
 	}
 
 	public void print(int indent) {
-		Debug.println(indent, "TrialEnvironmentProperty[name=" + this.name + ", description=" + this.description + ", count="
+		Debug.println(indent, "TrialInstanceProperty[name=" + this.name + ", description=" + this.description + ", count="
 				+ this.numberOfEnvironments + "]");
 		Debug.println(indent + 3, "EnvironmentPropertyValues:");
 		for (Map.Entry<Integer, String> entry : this.environmentValuesMap.entrySet()) {
@@ -100,7 +100,7 @@ public class TrialEnvironmentProperty {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		TrialEnvironmentProperty other = (TrialEnvironmentProperty) obj;
+		TrialInstanceProperty other = (TrialInstanceProperty) obj;
 		if (this.id == null) {
 			if (other.id != null) {
 				return false;
@@ -114,7 +114,7 @@ public class TrialEnvironmentProperty {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("TrialEnvironmentProperty [id=");
+		builder.append("TrialInstanceProperty [id=");
 		builder.append(this.id);
 		builder.append(", name=");
 		builder.append(this.name);

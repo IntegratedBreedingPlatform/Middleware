@@ -2,7 +2,6 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.beust.jcommander.internal.Lists;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -20,15 +19,10 @@ import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
-import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.generationcp.middleware.service.api.user.RoleDto;
-import org.generationcp.middleware.service.api.user.UserDto;
-import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -42,9 +36,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -125,7 +117,7 @@ public class StudyServiceImplTest {
 			this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
 			.thenReturn(this.mockSqlQuery);
 
-		Assert.assertTrue(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
+		Assert.assertTrue(this.studyServiceImpl.hasMeasurementDataOnInstance(123, 4));
 	}
 
 	@Test
@@ -135,7 +127,7 @@ public class StudyServiceImplTest {
 			this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
 			.thenReturn(this.mockSqlQuery);
 
-		Assert.assertFalse(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
+		Assert.assertFalse(this.studyServiceImpl.hasMeasurementDataOnInstance(123, 4));
 	}
 
 	@Test

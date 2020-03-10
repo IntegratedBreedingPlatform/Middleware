@@ -34,7 +34,6 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
@@ -675,7 +674,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		final String studyName = workbook.getStudyDetails().getStudyName();
 		final String locationDescription = this.getLocationDescription(workbook);
-		final Integer locationId = this.getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(studyName, locationDescription, programUUID);
+		final Integer locationId = this.getInstanceIdByStudyNameAndInstanceNumberAndProgramUUID(studyName, locationDescription, programUUID);
 
 		// same location and study
 		if (locationId != null) {
@@ -1004,11 +1003,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(name, programUUID);
 	}
 
-	private Integer getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(
+	private Integer getInstanceIdByStudyNameAndInstanceNumberAndProgramUUID(
 		final String projectName, final String instanceNumber,
 		final String programUUID) {
-		return this.daoFactory.getEnvironmentDao()
-			.getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(projectName, Integer.valueOf(instanceNumber), programUUID);
+		return this.daoFactory.getInstanceDao()
+			.getInstanceIdByStudyNameAndInstanceNumberAndProgramUUID(projectName, Integer.valueOf(instanceNumber), programUUID);
 	}
 
 	@Override
@@ -1153,7 +1152,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			final String trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader);
 			if (instancesFromWorkbook.add(trialInstanceNumber)) {
 				final Integer locationId =
-					this.getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(studyName, trialInstanceNumber, programUUID);
+					this.getInstanceIdByStudyNameAndInstanceNumberAndProgramUUID(studyName, trialInstanceNumber, programUUID);
 				// same location and study
 				if (locationId != null) {
 					existingInstances.add(trialInstanceNumber);

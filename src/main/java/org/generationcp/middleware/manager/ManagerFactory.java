@@ -36,7 +36,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
-import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
+import org.generationcp.middleware.operation.builder.TrialInstanceBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
@@ -332,8 +332,8 @@ public class ManagerFactory implements Serializable {
 		return new ExperimentDesignServiceImpl(this.sessionProvider);
 	}
 
-	public TrialEnvironmentBuilder getTrialEnvironmentBuilder() {
-		return new TrialEnvironmentBuilder(this.sessionProvider);
+	public TrialInstanceBuilder getTrialEnvironmentBuilder() {
+		return new TrialInstanceBuilder(this.sessionProvider);
 	}
 
 	public DataSetBuilder getDataSetBuilder() {

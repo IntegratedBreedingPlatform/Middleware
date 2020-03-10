@@ -11,8 +11,8 @@
 
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.dms.TrialInstanceProperty;
+import org.generationcp.middleware.domain.dms.TrialInstances;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmLocationInfo;
@@ -23,7 +23,7 @@ import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
+import org.generationcp.middleware.operation.builder.TrialInstanceBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -42,8 +42,8 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	private StudyDataManager studyDataManager;
 
 	@Resource
-	private TrialEnvironmentBuilder trialEnvironmentBuilder;
-	
+	private TrialInstanceBuilder trialInstanceBuilder;
+
 	public CrossStudyDataManagerImpl() {
 	}
 
@@ -52,78 +52,78 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	}
 
 	@Override
-	public TrialEnvironments getAllTrialEnvironments() {
-		return this.trialEnvironmentBuilder.getAllTrialEnvironments();
+	public TrialInstances getAllTrialInstances() {
+		return this.trialInstanceBuilder.getAllTrialInstances();
 	}
 
 	@Override
-	public long countAllTrialEnvironments() {
-		return this.trialEnvironmentBuilder.countAllTrialEnvironments();
+	public long countAllTrialInstances() {
+		return this.trialInstanceBuilder.countAllTrialInstances();
 	}
 
 	@Override
-	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(final List<Integer> trialEnvtIds) {
-		return this.trialEnvironmentBuilder.getPropertiesForTrialEnvironments(trialEnvtIds);
+	public List<TrialInstanceProperty> getPropertiesForTrialInstances(final List<Integer> instanceIds) {
+		return this.trialInstanceBuilder.getPropertiesForTrialInstances(instanceIds);
 	}
 
 	@Override
-	public List<NumericTraitInfo> getTraitsForNumericVariates(final List<Integer> environmentIds) {
-		return this.getTraitBuilder().getTraitsForNumericVariates(environmentIds);
+	public List<NumericTraitInfo> getTraitsForNumericVariates(final List<Integer> instanceIds) {
+		return this.getTraitBuilder().getTraitsForNumericVariates(instanceIds);
 	}
 
 	@Override
-	public List<CharacterTraitInfo> getTraitsForCharacterVariates(final List<Integer> environmentIds) {
-		return this.getTraitBuilder().getTraitsForCharacterVariates(environmentIds);
+	public List<CharacterTraitInfo> getTraitsForCharacterVariates(final List<Integer> instanceIds) {
+		return this.getTraitBuilder().getTraitsForCharacterVariates(instanceIds);
 	}
 
 	@Override
-	public List<CategoricalTraitInfo> getTraitsForCategoricalVariates(final List<Integer> environmentIds) {
-		return this.getTraitBuilder().getTraitsForCategoricalVariates(environmentIds);
+	public List<CategoricalTraitInfo> getTraitsForCategoricalVariates(final List<Integer> instanceIds) {
+		return this.getTraitBuilder().getTraitsForCategoricalVariates(instanceIds);
 	}
 
 	@Override
-	public List<GermplasmPair> getEnvironmentsForGermplasmPairs(
+	public List<GermplasmPair> getInstancesForGermplasmPairs(
 		final List<GermplasmPair> germplasmPairs,
 		final List<Integer> experimentTypes, final String programUUID) {
-		return this.trialEnvironmentBuilder.getEnvironmentForGermplasmPairs(germplasmPairs, experimentTypes, programUUID);
+		return this.trialInstanceBuilder.getInstanceForGermplasmPairs(germplasmPairs, experimentTypes, programUUID);
 	}
 
 	@Override
 	public List<Observation> getObservationsForTraitOnGermplasms(
 		final List<Integer> traitIds, final List<Integer> germplasmIds,
-		final List<Integer> environmentIds) {
-		return this.getTraitBuilder().getObservationsForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
+		final List<Integer> instanceIds) {
+		return this.getTraitBuilder().getObservationsForTraitOnGermplasms(traitIds, germplasmIds, instanceIds);
 	}
 
 	@Override
-	public List<Observation> getObservationsForTraits(final List<Integer> traitIds, final List<Integer> environmentIds) {
-		return this.getTraitBuilder().getObservationsForTraits(traitIds, environmentIds);
+	public List<Observation> getObservationsForTraits(final List<Integer> traitIds, final List<Integer> instanceIds) {
+		return this.getTraitBuilder().getObservationsForTraits(traitIds, instanceIds);
 	}
 
 	@Override
-	public List<TraitObservation> getObservationsForTrait(final int traitId, final List<Integer> environmentIds) {
-		return this.getTraitBuilder().getObservationsForTrait(traitId, environmentIds);
+	public List<TraitObservation> getObservationsForTrait(final int traitId, final List<Integer> instanceIds) {
+		return this.getTraitBuilder().getObservationsForTrait(traitId, instanceIds);
 	}
 
 	@Override
-	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds, final String programUUID) {
-		return this.trialEnvironmentBuilder.getEnvironmentsForTraits(traitIds, programUUID);
+	public TrialInstances getTrialInstancesForTraits(final List<Integer> traitIds, final String programUUID) {
+		return this.trialInstanceBuilder.getInstancesForTraits(traitIds, programUUID);
 	}
 
 	@Override
-	public List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(final Set<Integer> environmentIds) {
+	public List<GermplasmLocationInfo> getGermplasmLocationInfoByInstanceIds(final Set<Integer> instanceIds) {
 		final List<GermplasmLocationInfo> result = new ArrayList<>();
-		if (environmentIds != null && !environmentIds.isEmpty()) {
-			result.addAll(this.getBreedersQueryDao().getGermplasmLocationInfoByEnvironmentIds(environmentIds));
+		if (instanceIds != null && !instanceIds.isEmpty()) {
+			result.addAll(this.getBreedersQueryDao().getGermplasmLocationInfoByInstanceIds(instanceIds));
 		}
 		return result;
 	}
 
 	@Override
-	public List<Integer> getTrialEnvironmentIdsForGermplasm(final Set<Integer> gids) {
+	public List<Integer> getTrialInstanceIdsForGermplasm(final Set<Integer> gids) {
 		final List<Integer> result = new ArrayList<>();
 		if (gids != null && !gids.isEmpty()) {
-			result.addAll(this.getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
+			result.addAll(this.getBreedersQueryDao().getTrialInstanceIdsForGermplasm(gids));
 		}
 		return result;
 	}

@@ -214,7 +214,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId) {
+	public boolean hasMeasurementDataOnInstance(final int studyIdentifier, final int instanceId) {
 		try {
 
 			final SQLQuery query =
@@ -499,9 +499,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetailsByEnvironment(final Integer environmentId) {
+	public StudyDetailsDto getStudyDetailsByInstanceId(final Integer instanceId) {
 		try {
-			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadataForEnvironmentId(environmentId);
+			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadataForInstanceId(instanceId);
 			if (studyMetadata != null) {
 				final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
 				studyDetailsDto.setMetadata(studyMetadata);
@@ -512,10 +512,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 				studyDetailsDto.setContacts(users);
 
 				final List<MeasurementVariable> environmentParameters = new ArrayList<>();
-				environmentParameters.addAll(this.daoFactory.getPhenotypeDAO().getEnvironmentConditionVariables(environmentId));
+				environmentParameters.addAll(this.daoFactory.getPhenotypeDAO().getEnvironmentConditionVariables(instanceId));
 				// Exclude trial instance, location and experiment design as environment parameters as they have their own field in DTO
 				final List<MeasurementVariable> environmentVariables =
-					this.daoFactory.getEnvironmentPropertyDao().getEnvironmentDetailVariablesExcludeVariableIds(environmentId,
+					this.daoFactory.getInstancePropertyDao().getInstanceDetailVariablesExcludeVariableIds(
+						instanceId,
 						Arrays.asList(TermId.LOCATION_ID.getId(), TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
 							TermId.TRIAL_INSTANCE_FACTOR.getId()));
 				environmentParameters.addAll(environmentVariables);
@@ -528,7 +529,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			}
 			return null;
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getStudyDetailsByEnvironments() query with environmentId: " + environmentId;
+			final String message = "Error with getStudyDetailsByInstanceId() query with instanceId: " + instanceId;
 			StudyServiceImpl.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

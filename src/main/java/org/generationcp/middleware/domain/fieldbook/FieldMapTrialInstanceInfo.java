@@ -29,8 +29,8 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
-	/** The Environment id. */
-	private Integer environmentId;
+	/** The Instance id. */
+	private Integer instanceId;
 
 	/** The site name. trial location id */
 	private String siteName;
@@ -112,12 +112,12 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	/**
 	 * Instantiates a new field map trial instance info.
 	 *
-	 * @param environmentId the geolocation id
+	 * @param instanceId the geolocation id
 	 * @param siteName the site name
 	 * @param labels the labels
 	 */
-	public FieldMapTrialInstanceInfo(Integer environmentId, String siteName, List<FieldMapLabel> labels) {
-		this.environmentId = environmentId;
+	public FieldMapTrialInstanceInfo(Integer instanceId, String siteName, List<FieldMapLabel> labels) {
+		this.instanceId = instanceId;
 		this.siteName = siteName;
 		this.labels = labels;
 	}
@@ -143,17 +143,17 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @return the geolocation id
 	 */
-	public Integer getEnvironmentId() {
-		return this.environmentId;
+	public Integer getInstanceId() {
+		return this.instanceId;
 	}
 
 	/**
 	 * Sets the geolocation id.
 	 *
-	 * @param environmentId the new geolocation id
+	 * @param instanceId the new geolocation id
 	 */
-	public void setEnvironmentId(Integer environmentId) {
-		this.environmentId = environmentId;
+	public void setInstanceId(Integer instanceId) {
+		this.instanceId = instanceId;
 	}
 
 	/**
@@ -400,14 +400,14 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("FieldMapTrialInstanceInfo [environmentId=");
-		builder.append(this.environmentId);
+		builder.append("FieldMapTrialInstanceInfo [instanceId=");
+		builder.append(this.instanceId);
 		builder.append(", siteName=");
 		builder.append(this.siteName);
 		builder.append(", labels=");
@@ -430,7 +430,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	public void print(int indent) {
 		Debug.println(indent, "FieldMapTrialInstanceInfo: ");
 		indent = indent + 3;
-		Debug.println(indent, "Geolocation Id = " + this.environmentId);
+		Debug.println(indent, "Geolocation Id = " + this.instanceId);
 		Debug.println(indent, "Site Name = " + this.siteName);
 		Debug.println(indent, "Labels = ");
 		for (FieldMapLabel label : this.labels) {

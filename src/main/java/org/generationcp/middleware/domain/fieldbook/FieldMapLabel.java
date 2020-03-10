@@ -63,8 +63,8 @@ public class FieldMapLabel implements Serializable {
 	/** The dataset id. */
 	private Integer datasetId;
 
-	/** The Environment id. */
-	private Integer environmentId;
+	/** The Instance id. */
+	private Integer instanceId;
 
 	/** The site name. */
 	private String siteName;
@@ -286,19 +286,19 @@ public class FieldMapLabel implements Serializable {
 	/**
 	 * Gets the geolocation id.
 	 *
-	 * @return the environmentId
+	 * @return the instanceId
 	 */
-	public Integer getEnvironmentId() {
-		return this.environmentId;
+	public Integer getInstanceId() {
+		return this.instanceId;
 	}
 
 	/**
 	 * Sets the geolocation id.
 	 *
-	 * @param environmentId the environmentId to set
+	 * @param instanceId the instanceId to set
 	 */
-	public void setEnvironmentId(final Integer environmentId) {
-		this.environmentId = environmentId;
+	public void setInstanceId(final Integer instanceId) {
+		this.instanceId = instanceId;
 	}
 
 	/**
@@ -404,7 +404,7 @@ public class FieldMapLabel implements Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -428,8 +428,8 @@ public class FieldMapLabel implements Serializable {
 		builder.append(this.studyName);
 		builder.append(", datasetId=");
 		builder.append(this.datasetId);
-		builder.append(", environmentId=");
-		builder.append(this.environmentId);
+		builder.append(", instanceId=");
+		builder.append(this.instanceId);
 		builder.append(", siteName=");
 		builder.append(this.siteName);
 		builder.append(", gid=");
@@ -461,7 +461,7 @@ public class FieldMapLabel implements Serializable {
 		Debug.println(indent, "Range = " + this.range);
 		Debug.println(indent, "Study Name = " + this.studyName);
 		Debug.println(indent, "Dataset ID = " + this.datasetId);
-		Debug.println(indent, "Geolocation ID = " + this.environmentId);
+		Debug.println(indent, "Geolocation ID = " + this.instanceId);
 		Debug.println(indent, "Site Name = " + this.siteName);
 		Debug.println(indent, "GID = " + this.gid);
 		Debug.println(indent, "Season = " + this.season);

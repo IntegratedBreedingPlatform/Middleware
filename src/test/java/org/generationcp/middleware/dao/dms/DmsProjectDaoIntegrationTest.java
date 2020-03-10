@@ -375,7 +375,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 				study, study);
 		final Integer locationId = 3;
 		final Integer envId = this.createEnvironmentData(plot, "1", locationId, Optional.<String>absent(), Optional.<Integer>absent());
-		final StudyMetadata studyMetadata = this.dmsProjectDao.getStudyMetadataForEnvironmentId(envId);
+		final StudyMetadata studyMetadata = this.dmsProjectDao.getStudyMetadataForInstanceId(envId);
 		Assert.assertNotNull(studyMetadata);
 		Assert.assertEquals(envId, studyMetadata.getStudyDbId());
 		Assert.assertEquals(locationId, studyMetadata.getLocationId());

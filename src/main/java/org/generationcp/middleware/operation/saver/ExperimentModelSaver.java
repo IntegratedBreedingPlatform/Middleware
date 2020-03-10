@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @Transactional
 public class ExperimentModelSaver {
-	
+
 	private DaoFactory daoFactory;
 	private PhenotypeSaver phenotypeSaver;
 	private StockModelBuilder stockModelBuilder;
@@ -58,7 +58,7 @@ public class ExperimentModelSaver {
 
 	public void addOrUpdateExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
 		final Optional<Integer> experimentId =
-			this.daoFactory.getExperimentDao().getExperimentIdByEnvironmentIdStockId(projectId, values.getLocationId(),
+			this.daoFactory.getExperimentDao().getExperimentIdByInstanceIdStockId(projectId, values.getLocationId(),
 				values.getGermplasmId());
 		if(experimentId.isPresent()) {
 			for (final Variable variable : values.getVariableList().getVariables()) {

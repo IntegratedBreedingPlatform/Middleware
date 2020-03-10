@@ -19,9 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integer> {
+public class InstancePropertyDao extends GenericDAO<ExperimentProperty, Integer> {
 
-	public Map<Integer, String> getEnvironmentVariablesMap(final Integer datasetId, final Integer instanceDbId) {
+	public Map<Integer, String> getInstanceVariablesMap(final Integer datasetId, final Integer instanceDbId) {
 		Preconditions.checkNotNull(datasetId);
 		final String sql = "SELECT "
 			+ "    xp.type_id as variableId, "
@@ -64,27 +64,7 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error at getVariableValueForTrialInstance=" + datasetId + " query on EnvironmentPropertyDao: " + e.getMessage(), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public String getVariableValueForEnvironment(final int datasetId, final int variableId, final Integer trialInstance) {
-		try {
-			final StringBuilder sql =
-				new StringBuilder().append("SELECT xp.value FROM nd_experimentprop xp ")
-					.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = xp.nd_experiment_id AND e.type_id = 1020 ")
-					.append(" WHERE e.observation_unit_no = :instanceNumber AND xp.type_id = :variableId  AND e.project_id = :datasetId");
-
-			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-			query.setParameter("instanceNumber", trialInstance);
-			query.setParameter("variableId", variableId);
-			query.setParameter("datasetId", datasetId);
-			return (String) query.uniqueResult();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error at getVariableValueForTrialInstance=" + datasetId + " query on EnvironmentPropertyDao: " + e.getMessage(), e);
+				"Error at getVariableValueForTrialInstance=" + datasetId + " query on InstancePropertyDao: " + e.getMessage(), e);
 		}
 	}
 
@@ -100,7 +80,7 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 			return (String) query.uniqueResult();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error at getGeolocationPropValue=" + stdVarId + " query on EnvironmentPropertyDao: " + e.getMessage(), e);
+				"Error at getGeolocationPropValue=" + stdVarId + " query on InstancePropertyDao: " + e.getMessage(), e);
 		}
 	}
 
@@ -135,18 +115,18 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 		sqlQuery1.executeUpdate();
 	}
 
-	public Map<String, String> getEnvironmentVariableNameValuesMap(final Integer environmentId) {
-		Preconditions.checkNotNull(environmentId);
+	public Map<String, String> getInstanceVariableNameValuesMap(final Integer instanceId) {
+		Preconditions.checkNotNull(instanceId);
 		final Map<String, String> geoProperties = new HashMap<>();
 		final StringBuilder sql =
 			new StringBuilder().append("SELECT  ").append("    cv.definition as name, xp.value as value ").append("FROM ")
 				.append("    nd_experimentprop xp ").append("        INNER JOIN ")
-				.append("    cvterm cv ON (cv.cvterm_id = xp.type_id) ").append("WHERE ").append("    xp.nd_experiment_id = :environmentId ")
+				.append("    cvterm cv ON (cv.cvterm_id = xp.type_id) ").append("WHERE ").append("    xp.nd_experiment_id = :instanceId ")
 				.append("        AND xp.type_id NOT IN (8371, 8190, 8070, 8180) ");
 		try {
 			final Query query =
-				this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").setParameter("environmentId",
-					environmentId);
+				this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").setParameter("instanceId",
+					instanceId);
 			final List<Object> results = query.list();
 			for (final Object obj : results) {
 				final Object[] row = (Object[]) obj;
@@ -154,12 +134,12 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 			}
 			return geoProperties;
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getEnvironmentVariableNameValuesMap() query from environmentId: " + environmentId;
+			final String message = "Error with getInstanceVariableNameValuesMap() query from instanceId: " + instanceId;
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public List<MeasurementVariable> getEnvironmentDetailVariablesExcludeVariableIds(final Integer environmentId, final List<Integer> excludedVariableIds) {
+	public List<MeasurementVariable> getInstanceDetailVariablesExcludeVariableIds(final Integer instanceId, final List<Integer> excludedVariableIds) {
 		List<MeasurementVariable> studyVariables = new ArrayList<>();
 
 		try{
@@ -171,12 +151,12 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 					+ "		INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = xprop.type_id "
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = ispcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "		INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id "
-					+ "	    WHERE exp.nd_experiment_id = :environmentId AND ispcvt.cvterm_id NOT IN (:excludedVariableIds) ;");
+					+ "	    WHERE exp.nd_experiment_id = :instanceId AND ispcvt.cvterm_id NOT IN (:excludedVariableIds) ;");
 			query.addScalar("name", new StringType());
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());
 			query.addScalar("value", new StringType());
-			query.setParameter("environmentId", environmentId);
+			query.setParameter("instanceId", instanceId);
 			query.setParameterList("excludedVariableIds", excludedVariableIds);
 
 			final List<Object> results = query.list();
@@ -191,7 +171,7 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 				studyVariables.add(measurementVariable);
 			}
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getEnvironmentDetailVariablesExcludeVariableIds() query from environmentId: " + environmentId
+			final String message = "Error with getInstanceDetailVariablesExcludeVariableIds() query from instanceId: " + instanceId
 				+ " and excluded variableIds: " + excludedVariableIds;
 			throw new MiddlewareQueryException(message, e);
 		}

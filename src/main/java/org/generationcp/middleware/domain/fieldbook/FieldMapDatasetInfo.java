@@ -127,7 +127,7 @@ public class FieldMapDatasetInfo implements Serializable {
 	 */
 	public FieldMapTrialInstanceInfo getTrialInstance(Integer geolocationId) {
 		for (FieldMapTrialInstanceInfo trialInstance : this.trialInstances) {
-			if (geolocationId.equals(trialInstance.getEnvironmentId())) {
+			if (geolocationId.equals(trialInstance.getInstanceId())) {
 				return trialInstance;
 			}
 		}
@@ -136,7 +136,7 @@ public class FieldMapDatasetInfo implements Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

@@ -15,7 +15,7 @@ import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.dao.dms.EnvironmentDao;
+import org.generationcp.middleware.dao.dms.InstanceDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
@@ -31,7 +31,7 @@ import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
-import org.generationcp.middleware.domain.dms.EnvironmentPropertyDao;
+import org.generationcp.middleware.domain.dms.InstancePropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class DaoFactory {
@@ -230,15 +230,15 @@ public class DaoFactory {
 		return programFavoriteDao;
 	}
 
-	public EnvironmentDao getEnvironmentDao() {
-		final EnvironmentDao environmentDao = new EnvironmentDao();
-		environmentDao.setSession(this.sessionProvider.getSession());
-		return environmentDao;
+	public InstanceDao getInstanceDao() {
+		final InstanceDao instanceDao = new InstanceDao();
+		instanceDao.setSession(this.sessionProvider.getSession());
+		return instanceDao;
 	}
 
-	public EnvironmentPropertyDao getEnvironmentPropertyDao() {
-		final EnvironmentPropertyDao environmentPropertyDao = new EnvironmentPropertyDao();
-		environmentPropertyDao.setSession(this.sessionProvider.getSession());
-		return environmentPropertyDao;
+	public InstancePropertyDao getInstancePropertyDao() {
+		final InstancePropertyDao instancePropertyDao = new InstancePropertyDao();
+		instancePropertyDao.setSession(this.sessionProvider.getSession());
+		return instancePropertyDao;
 	}
 }

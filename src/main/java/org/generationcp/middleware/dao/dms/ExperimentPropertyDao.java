@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.dms;
@@ -40,10 +40,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link ExperimentProperty}.
- * 
+ *
  */
 public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Integer> {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentPropertyDao.class);
 
 
@@ -77,7 +77,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" SELECT ")
 							.append(" nde.project_id AS datasetId ")
 							.append(" , proj.name AS datasetName ")
-							.append(" , env.nd_experiment_id AS environmentId ")
+							.append(" , env.nd_experiment_id AS instanceId ")
 							.append(" , site.value AS siteName ")
 							.append(" , nde.nd_experiment_id AS experimentId ")
 							.append(" , s.uniqueName AS entryNumber ")
@@ -135,7 +135,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			final SQLQuery query =
 					this.getSession().createSQLQuery(sql.toString());
 					query.addScalar("datasetId").addScalar("datasetName")
-							.addScalar("environmentId").addScalar("siteName").addScalar("experimentId").addScalar("entryNumber")
+							.addScalar("instanceId").addScalar("siteName").addScalar("experimentId").addScalar("entryNumber")
 							.addScalar("germplasmName").addScalar("rep").addScalar("plotNo").addScalar("row").addScalar("col")
 							.addScalar("block_id").addScalar("trialInstance").addScalar("studyName").addScalar("gid")
 							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("pedigree").addScalar("obsUnitId", Hibernate.STRING);
@@ -247,20 +247,20 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		FieldMapTrialInstanceInfo trialInstance = null;
 		List<FieldMapLabel> labels = null;
 		Integer datasetId = null;
-		Integer environmentId = null;
+		Integer instanceId = null;
 		String datasetName = null;
 		String siteName = null;
 		Integer trialInstanceNo = null;
 		Integer blockId = null;
 		Integer siteId = null;
 		for (final Object[] row : list) {
-			if (environmentId == null) {
+			if (instanceId == null) {
 				trialInstance = new FieldMapTrialInstanceInfo();
 				labels = new ArrayList<>();
 			} else {
 				// if trial instance or dataset has changed, add previously saved trial instance
-				if (!environmentId.equals(row[2]) || !datasetId.equals(row[0])) {
-					trialInstance.setEnvironmentId(environmentId);
+				if (!instanceId.equals(row[2]) || !datasetId.equals(row[0])) {
+					trialInstance.setInstanceId(instanceId);
 					trialInstance.setSiteName(siteName);
 					trialInstance.setLocationName(siteName);
 					trialInstance.setLocationId(siteId);
@@ -326,7 +326,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 			datasetId = (Integer) row[0];
 			datasetName = (String) row[1];
-			environmentId = (Integer) row[2];
+			instanceId = (Integer) row[2];
 			siteName = (String) row[3];
 			if (row[17] != null && NumberUtils.isNumber((String) row[17])) {
 				siteId = Integer.valueOf((String) row[17]);
@@ -337,7 +337,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			blockId = row[11] != null ? Integer.valueOf((String) row[11]) : null;
 		}
 		// add last trial instance and dataset
-		trialInstance.setEnvironmentId(environmentId);
+		trialInstance.setInstanceId(instanceId);
 		trialInstance.setSiteName(siteName);
 		trialInstance.setLocationName(siteName);
 		trialInstance.setLocationId(siteId);
@@ -378,7 +378,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			label.setRange(this.getIntegerValue(row[11]));
 			label.setGermplasmName((String) row[8]);
 			label.setDatasetId((Integer) row[0]);
-			label.setEnvironmentId((Integer) row[3]);
+			label.setInstanceId((Integer) row[3]);
 			label.setSiteName((String) row[4]);
 			label.setGid((Integer) row[16]);
 			label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
@@ -390,7 +390,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			FieldMapTrialInstanceInfo trial = trialMap.get(trialKey);
 			if (trial == null) {
 				trial = new FieldMapTrialInstanceInfo();
-				trial.setEnvironmentId((Integer) row[3]);
+				trial.setInstanceId((Integer) row[3]);
 				trial.setSiteName((String) row[4]);
 				trial.setLocationName((String) row[4]);
 				if (row[5] != null && NumberUtils.isNumber((String) row[5])) {
@@ -427,7 +427,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			if (dataset.getTrialInstances() == null) {
 				dataset.setTrialInstances(new ArrayList<FieldMapTrialInstanceInfo>());
 			}
-			if (dataset.getTrialInstance(trial.getEnvironmentId()) == null) {
+			if (dataset.getTrialInstance(trial.getInstanceId()) == null) {
 				dataset.getTrialInstances().add(trial);
 			}
 

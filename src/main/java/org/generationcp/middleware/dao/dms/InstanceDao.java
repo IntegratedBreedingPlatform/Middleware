@@ -4,9 +4,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.TrialEnvironment;
-import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.dms.TrialInstance;
+import org.generationcp.middleware.domain.dms.TrialInstanceProperty;
+import org.generationcp.middleware.domain.dms.TrialInstances;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
-	private static final Logger LOG = LoggerFactory.getLogger(EnvironmentDao.class);
+public class InstanceDao extends GenericDAO<ExperimentModel, Integer> {
+	private static final Logger LOG = LoggerFactory.getLogger(InstanceDao.class);
 	private static final String ENVT_ID = "envtId";
 	private static final String LOCATION_ID = "locationId";
 	private static final String PROJECT_ID = "project_id";
@@ -45,7 +45,7 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 	private static final String DESCRIPTION = "description";
 
 
-	private static final String GET_ALL_ENVIRONMENTS_QUERY =
+	private static final String GET_ALL_INSTANCES_QUERY =
 		"SELECT DISTINCT e.nd_experiment_id as envtId, l.lname AS locationName, prov.lname AS provinceName, "
 			+ "       c.isoabbr, p.project_id, p.name, xp.value AS locationId, p.description AS description "
 			+ "  FROM nd_experimentprop xp "
@@ -57,7 +57,7 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 
 
 
-	public List<ExperimentModel> getEnvironmentsByDataset(final Integer datasetId, final boolean isEnvironmentDataset) {
+	public List<ExperimentModel> getInstancesByDataset(final Integer datasetId, final boolean isEnvironmentDataset) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass(), "environment");
 
 		if (isEnvironmentDataset) {
@@ -71,7 +71,7 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 		return criteria.list();
 	}
 
-	public List<Integer> getEnvironmentIds(final Integer datasetId) {
+	public List<Integer> getInstanceIds(final Integer datasetId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("project.projectId", datasetId));
 		criteria.setProjection(Projections.distinct(Projections.property("ndExperimentId")));
@@ -80,23 +80,23 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 
 
 	@SuppressWarnings("unchecked")
-	public List<TrialEnvironment> getAllTrialEnvironments() {
-		final List<TrialEnvironment> environments = new ArrayList<>();
+	public List<TrialInstance> getAllTrialInstances() {
+		final List<TrialInstance> instances = new ArrayList<>();
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery(EnvironmentDao.GET_ALL_ENVIRONMENTS_QUERY);
-			query.addScalar(EnvironmentDao.ENVT_ID);
-			query.addScalar(EnvironmentDao.LOCATION_NAME);
-			query.addScalar(EnvironmentDao.PROVINCE_NAME);
-			query.addScalar(EnvironmentDao.ISOABBR);
-			query.addScalar(EnvironmentDao.PROJECT_ID);
+			final SQLQuery query = this.getSession().createSQLQuery(InstanceDao.GET_ALL_INSTANCES_QUERY);
+			query.addScalar(InstanceDao.ENVT_ID);
+			query.addScalar(InstanceDao.LOCATION_NAME);
+			query.addScalar(InstanceDao.PROVINCE_NAME);
+			query.addScalar(InstanceDao.ISOABBR);
+			query.addScalar(InstanceDao.PROJECT_ID);
 			query.addScalar("name");
-			query.addScalar(EnvironmentDao.LOCATION_ID);
-			query.addScalar(EnvironmentDao.DESCRIPTION);
+			query.addScalar(InstanceDao.LOCATION_ID);
+			query.addScalar(InstanceDao.DESCRIPTION);
 			final List<Object[]> list = query.list();
 			for (final Object[] row : list) {
 				// otherwise it's invalid data and should not be included
 				if (NumberUtils.isNumber((String) row[6])) {
-					environments.add(new TrialEnvironment(
+					instances.add(new TrialInstance(
 						(Integer) row[0],
 						new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2],
 							(String) row[3]),
@@ -105,14 +105,14 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error at getAllTrialEnvironments at EnvironmentDao: " + e.getMessage();
-			EnvironmentDao.LOG.error(errorMessage, e);
+			final String errorMessage = "Error at getAllTrialInstances at InstanceDao: " + e.getMessage();
+			InstanceDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
-		return environments;
+		return instances;
 	}
 
-	public long countAllTrialEnvironments() {
+	public long countAllTrialInstances() {
 		try {
 			final String sql = "SELECT COUNT(DISTINCT nd_experiment_id) " + " FROM nd_experimentprop WHERE type_id = "
 				+ TermId.LOCATION_ID.getId();
@@ -120,15 +120,15 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error at countAllTrialEnvironments at EnvironmentDao: " + e.getMessage();
-			EnvironmentDao.LOG.error(errorMessage, e);
+			final String errorMessage = "Error at countAllTrialInstances at InstanceDao: " + e.getMessage();
+			InstanceDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(final List<Integer> environmentIds) {
-		final List<TrialEnvironmentProperty> properties = new ArrayList<>();
+	public List<TrialInstanceProperty> getPropertiesForTrialInstances(final List<Integer> instanceIds) {
+		final List<TrialInstanceProperty> properties = new ArrayList<>();
 		try {
 			// if categorical value, get related cvterm.definition as property
 			// value.
@@ -139,14 +139,14 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 				+ " LEFT JOIN cvterm cvt ON xp.type_id = cvt.cvterm_id"
 				+ " LEFT JOIN cvterm v ON v.cvterm_id = xp.value"
 				+ " LEFT JOIN cvterm_relationship cvr ON cvr.subject_id = xp.type_id AND cvr.type_id = " + TermId.HAS_SCALE.getId()
-				+ " WHERE nd_experiment_id IN (:environmentIds)" + " ORDER BY xp.type_id, nd_experiment_id";
+				+ " WHERE nd_experiment_id IN (:instanceIds)" + " ORDER BY xp.type_id, nd_experiment_id";
 			final Query query = this.getSession().createSQLQuery(sql);
-			query.setParameterList("environmentIds", environmentIds);
+			query.setParameterList("instanceIds", instanceIds);
 
 			int lastId = 0;
 			String lastName = "";
 			String lastDescription = "";
-			Map<Integer, String> environmentValuesMap = new HashMap<>();
+			Map<Integer, String> instanceValuesMap = new HashMap<>();
 
 			final List<Object[]> result = query.list();
 			for (final Object[] row : result) {
@@ -158,26 +158,26 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 
 					if (lastId != 0) {
 						properties.add(
-							new TrialEnvironmentProperty(lastId, lastName, lastDescription, environmentValuesMap));
+							new TrialInstanceProperty(lastId, lastName, lastDescription, instanceValuesMap));
 					}
 
 					lastId = id;
 					lastName = name;
 					lastDescription = description;
-					environmentValuesMap = new HashMap<>();
+					instanceValuesMap = new HashMap<>();
 				}
 
-				environmentValuesMap.put((Integer) row[3], (String) row[4]);
+				instanceValuesMap.put((Integer) row[3], (String) row[4]);
 			}
 
 			if (lastId != 0) {
-				properties.add(new TrialEnvironmentProperty(lastId, lastName, lastDescription, environmentValuesMap));
+				properties.add(new TrialInstanceProperty(lastId, lastName, lastDescription, instanceValuesMap));
 			}
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error at getPropertiesForTrialEnvironments=" + environmentIds
-				+ " at EnvironmentDao: " + e.getMessage();
-			EnvironmentDao.LOG.error(errorMessage, e);
+			final String errorMessage = "Error at getPropertiesForTrialInstances=" + instanceIds
+				+ " at InstanceDao: " + e.getMessage();
+			InstanceDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return properties;
@@ -185,18 +185,18 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 
 
 	@SuppressWarnings("unchecked")
-	public List<TrialEnvironment> getTrialEnvironmentDetails(final Set<Integer> environmentIds) {
-		final List<TrialEnvironment> environmentDetails = new ArrayList<>();
+	public List<TrialInstance> getTrialInstanceDetails(final Set<Integer> instanceIds) {
+		final List<TrialInstance> trialInstances = new ArrayList<>();
 
-		if (environmentIds.isEmpty()) {
-			return environmentDetails;
+		if (instanceIds.isEmpty()) {
+			return trialInstances;
 		}
 
 		try {
 
 			// Get location name, study id and study name
 			final String sql =
-				"SELECT DISTINCT e.nd_experiment_id as environmentId, l.lname, xp.value, p.project_id, p.name, p.description, prov.lname as provinceName, c.isoabbr "
+				"SELECT DISTINCT e.nd_experiment_id as instanceId, l.lname, xp.value, p.project_id, p.name, p.description, prov.lname as provinceName, c.isoabbr "
 					+ "FROM nd_experiment e "
 					+ "	LEFT JOIN nd_experimentprop xp ON e.nd_experiment_id = xp.nd_experiment_id"
 					+ "	AND xp.type_id =  " + TermId.LOCATION_ID.getId()
@@ -208,21 +208,21 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ " WHERE e.nd_experiment_id IN (:locationIds) ";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			query.setParameterList("locationIds", environmentIds);
-			query.addScalar("environmentId", Hibernate.INTEGER);
+			query.setParameterList("locationIds", instanceIds);
+			query.addScalar("instanceId", Hibernate.INTEGER);
 			query.addScalar("lname", Hibernate.STRING);
 			query.addScalar("value", Hibernate.INTEGER);
-			query.addScalar(EnvironmentDao.PROJECT_ID, Hibernate.INTEGER);
+			query.addScalar(InstanceDao.PROJECT_ID, Hibernate.INTEGER);
 			query.addScalar("name", Hibernate.STRING);
-			query.addScalar(EnvironmentDao.DESCRIPTION, Hibernate.STRING);
-			query.addScalar(EnvironmentDao.PROVINCE_NAME, Hibernate.STRING);
-			query.addScalar(EnvironmentDao.ISOABBR, Hibernate.STRING);
+			query.addScalar(InstanceDao.DESCRIPTION, Hibernate.STRING);
+			query.addScalar(InstanceDao.PROVINCE_NAME, Hibernate.STRING);
+			query.addScalar(InstanceDao.ISOABBR, Hibernate.STRING);
 			final List<Integer> locIds = new ArrayList<>();
 
 			final List<Object[]> result = query.list();
 
 			for (final Object[] row : result) {
-				final Integer environmentId = (Integer) row[0];
+				final Integer instanceId = (Integer) row[0];
 				final String locationName = (String) row[1];
 				final Integer locId = (Integer) row[2];
 				final Integer studyId = (Integer) row[3];
@@ -231,26 +231,26 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 				final String provinceName = (String) row[6];
 				final String countryName = (String) row[7];
 
-				environmentDetails.add(new TrialEnvironment(
-					environmentId,
+				trialInstances.add(new TrialInstance(
+					instanceId,
 					new LocationDto(locId, locationName, provinceName, countryName),
 					new StudyReference(studyId, studyName, studyDescription)));
 				locIds.add(locId);
 			}
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error at getTrialEnvironmentDetails=" + environmentIds
-				+ " at EnvironmentDao: " + e.getMessage();
-			EnvironmentDao.LOG.error(errorMessage, e);
+			final String errorMessage = "Error at getTrialInstanceDetails=" + instanceIds
+				+ " at InstanceDao: " + e.getMessage();
+			InstanceDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 
-		return environmentDetails;
+		return trialInstances;
 	}
 
 	@SuppressWarnings("unchecked")
-	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds, final String programUUID) {
-		final TrialEnvironments environments = new TrialEnvironments();
+	public TrialInstances getInstancesForTraits(final List<Integer> traitIds, final String programUUID) {
+		final TrialInstances trialInstances = new TrialInstances();
 		try {
 			final String sql =
 				"SELECT DISTINCT xp.nd_experiment_id as envtId, l.lname as locationName, prov.lname as provinceName, c.isoabbr, p.project_id, p.name, xp.value as locationId"
@@ -265,20 +265,20 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
 					+ " WHERE ph.observable_id IN (:traitIds) AND p.program_uuid = :programUUID ;";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			query.addScalar(EnvironmentDao.ENVT_ID);
-			query.addScalar(EnvironmentDao.LOCATION_NAME);
-			query.addScalar(EnvironmentDao.PROVINCE_NAME);
-			query.addScalar(EnvironmentDao.ISOABBR);
-			query.addScalar(EnvironmentDao.PROJECT_ID);
+			query.addScalar(InstanceDao.ENVT_ID);
+			query.addScalar(InstanceDao.LOCATION_NAME);
+			query.addScalar(InstanceDao.PROVINCE_NAME);
+			query.addScalar(InstanceDao.ISOABBR);
+			query.addScalar(InstanceDao.PROJECT_ID);
 			query.addScalar("name");
-			query.addScalar(EnvironmentDao.LOCATION_ID);
+			query.addScalar(InstanceDao.LOCATION_ID);
 			query.setParameterList("traitIds", traitIds);
 			query.setParameter("programUUID", programUUID);
 			final List<Object[]> list = query.list();
 			for (final Object[] row : list) {
 				// otherwise it's invalid data and should not be included
 				if (NumberUtils.isNumber((String) row[6])) {
-					environments.add(new TrialEnvironment(
+					trialInstances.add(new TrialInstance(
 						(Integer) row[0], new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1],
 						(String) row[2], (String) row[3]),
 						new StudyReference((Integer) row[4], (String) row[5])));
@@ -286,11 +286,11 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error at getEnvironmentForTraits at EnvironmentDao: " + e.getMessage();
-			EnvironmentDao.LOG.error(errorMessage, e);
+			final String errorMessage = "Error at getInstancesForTraits at InstanceDao: " + e.getMessage();
+			InstanceDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
-		return environments;
+		return trialInstances;
 	}
 
 	public Integer getNextInstanceNumber(final Integer datasetId) {
@@ -379,7 +379,7 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 		return tiMetadata;
 	}
 
-	public List<ExperimentModel> getEnvironmentsForInstances(final Integer studyId, final List<Integer> instanceNumbers) {
+	public List<ExperimentModel> getInstancesForInstanceNumbers(final Integer studyId, final List<Integer> instanceNumbers) {
 		List<ExperimentModel> returnList = new ArrayList<>();
 		if (studyId != null) {
 			final String sql = "SELECT DISTINCT exp.* " + //
@@ -402,8 +402,8 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 		return returnList;
 	}
 
-	public List<ExperimentModel> getEnvironments(final Integer studyId) {
-		return this.getEnvironmentsForInstances(studyId, Collections.<Integer>emptyList());
+	public List<ExperimentModel> getInstances(final Integer studyId) {
+		return this.getInstancesForInstanceNumbers(studyId, Collections.<Integer>emptyList());
 	}
 
 	/**
@@ -421,7 +421,7 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Integer getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(
+	public Integer getInstanceIdByStudyNameAndInstanceNumberAndProgramUUID(
 		final String projectName,
 		final Integer instanceNumber, final String programUUID) {
 		try {
@@ -441,18 +441,18 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error at getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID with project name ="
+			final String errorMessage = "Error at getInstanceIdByStudyNameAndInstanceNumberAndProgramUUID with project name ="
 				+ projectName + " and instance number = " + instanceNumber + e.getMessage();
-			EnvironmentDao.LOG.error(errorMessage, e);
+			InstanceDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return null;
 	}
 
 
-	public Map<Integer, ExperimentModel> getExperimentIdEnvironmentMap(final Integer datasetId) {
+	public Map<Integer, ExperimentModel> getExperimentIdInstanceMap(final Integer datasetId) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("select e.nd_experiment_id, env.nd_experiment_id as environmentId, env.observation_unit_no ");
+		sb.append("select e.nd_experiment_id, env.nd_experiment_id as instanceId, env.observation_unit_no ");
 		sb.append("from nd_experiment e ");
 		sb.append("inner join project pr ON pr.project_id = e.project_id ");
 		sb.append("inner join project env_ds ON pr.study_id = env_ds.study_id and env_ds.dataset_type_id = 3 ");
@@ -463,17 +463,16 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		final SQLQuery createSQLQuery = this.getSession().createSQLQuery(sb.toString());
 		createSQLQuery.addScalar("nd_experiment_id", new IntegerType());
-		createSQLQuery.addScalar("environmentId", new IntegerType());
-		createSQLQuery.addScalar("environmentId", new IntegerType());
+		createSQLQuery.addScalar("instanceId", new IntegerType());
 		createSQLQuery.setParameter("datasetId", datasetId);
 
 		final List<Object[]> results = createSQLQuery.list();
 		final Map<Integer, ExperimentModel> map = new HashMap<>();
 		if (results != null && !results.isEmpty()) {
 			for (final Object[] row : results) {
-				final Integer environmentId = (Integer) row[1];
+				final Integer instanceId = (Integer) row[1];
 				final Integer instanceNumber = (Integer) row[2];
-				final ExperimentModel experimentModel = new ExperimentModel(environmentId);
+				final ExperimentModel experimentModel = new ExperimentModel(instanceId);
 				experimentModel.setObservationUnitNo(instanceNumber);
 				map.put((Integer) row[0], experimentModel);
 			}

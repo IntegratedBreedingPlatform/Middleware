@@ -54,7 +54,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
-import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
+import org.generationcp.middleware.operation.builder.TrialInstanceBuilder;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -118,7 +118,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private DataSetBuilder datasetBuilder;
 
 	@Autowired
-	private TrialEnvironmentBuilder trialEnvironmentBuilder;
+	private TrialInstanceBuilder trialInstanceBuilder;
 
 	private Project commonTestProject;
 
@@ -155,7 +155,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		studyType.setVisible(true);
 
 		this.manager.setDataSetBuilder(this.datasetBuilder);
-		this.manager.setTrialEnvironmentBuilder(this.trialEnvironmentBuilder);
+		this.manager.setTrialInstanceBuilder(this.trialInstanceBuilder);
 	}
 
 	@Test

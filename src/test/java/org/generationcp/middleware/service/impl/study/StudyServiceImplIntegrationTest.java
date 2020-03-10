@@ -73,12 +73,12 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testHasMeasurementDataOnEnvironment() {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 5);
-		Assert.assertFalse(this.studyService.hasMeasurementDataOnEnvironment(this.study.getProjectId(), geolocation.getLocationId()));
+		Assert.assertFalse(this.studyService.hasMeasurementDataOnInstance(this.study.getProjectId(), geolocation.getLocationId()));
 
 		this.testDataInitializer.addPhenotypes(experimentModels, this.testTrait.getCvTermId(), RandomStringUtils.randomNumeric(5));
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
-		Assert.assertTrue(this.studyService.hasMeasurementDataOnEnvironment(this.study.getProjectId(), geolocation.getLocationId()));
+		Assert.assertTrue(this.studyService.hasMeasurementDataOnInstance(this.study.getProjectId(), geolocation.getLocationId()));
 	}
 
 	@Test
@@ -91,7 +91,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
-		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsByEnvironment(geolocation.getLocationId());
+		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsByInstanceId(geolocation.getLocationId());
 		Assert.assertTrue(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
@@ -113,7 +113,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.testDataInitializer.addProjectProp(this.study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, String.valueOf(user.getPerson().getId()), 6);
 
 
-		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsByEnvironment(geolocation.getLocationId());
+		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsByInstanceId(geolocation.getLocationId());
 
 		Assert.assertFalse(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
 		Assert.assertEquals(user.getUserid(), studyDetailsDto.getContacts().get(0).getUserId());

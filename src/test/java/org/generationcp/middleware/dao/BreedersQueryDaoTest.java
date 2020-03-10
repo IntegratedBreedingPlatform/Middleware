@@ -32,10 +32,10 @@ public class BreedersQueryDaoTest {
 	}
 
 	@Test
-	public void testGetGermplasmLocationInfoByEnvironmentIds() throws MiddlewareQueryException {
-		HashSet<Integer> environmentIds = new HashSet<Integer>();
-		environmentIds.add(5794);
-		environmentIds.add(5880);
+	public void testGetGermplasmLocationInfoByInstanceIds() throws MiddlewareQueryException {
+		HashSet<Integer> instanceIds = new HashSet<Integer>();
+		instanceIds.add(5794);
+		instanceIds.add(5880);
 
 		SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
 		ArrayList<Object[]> mockQueryResult = new ArrayList<Object[]>();
@@ -51,16 +51,16 @@ public class BreedersQueryDaoTest {
 		Mockito.when(mockQuery.list()).thenReturn(mockQueryResult);
 		Mockito.when(BreedersQueryDaoTest.session.createSQLQuery(Matchers.anyString())).thenReturn(mockQuery);
 
-		List<GermplasmLocationInfo> result = BreedersQueryDaoTest.dao.getGermplasmLocationInfoByEnvironmentIds(environmentIds);
+		List<GermplasmLocationInfo> result = BreedersQueryDaoTest.dao.getGermplasmLocationInfoByInstanceIds(instanceIds);
 		Assert.assertEquals(2, result.size());
 
-		Assert.assertEquals(resultRow0[0], result.get(0).getEnvironmentId());
+		Assert.assertEquals(resultRow0[0], result.get(0).getInstanceId());
 		Assert.assertEquals(resultRow0[1], result.get(0).getGid());
 		Assert.assertEquals(resultRow0[2], result.get(0).getGermplasmName());
 		Assert.assertEquals(resultRow0[3], result.get(0).getLocationName());
 		Assert.assertEquals(resultRow0[4], result.get(0).getCountryName());
 
-		Assert.assertEquals(resultRow1[0], result.get(1).getEnvironmentId());
+		Assert.assertEquals(resultRow1[0], result.get(1).getInstanceId());
 		Assert.assertEquals(resultRow1[1], result.get(1).getGid());
 		Assert.assertEquals(resultRow1[2], result.get(1).getGermplasmName());
 		Assert.assertEquals(resultRow1[3], result.get(1).getLocationName());
