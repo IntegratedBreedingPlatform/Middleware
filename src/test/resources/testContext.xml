@@ -74,15 +74,15 @@
 
 	<bean id="germplasmGroupingService" class="org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl">
 	</bean>
-	
+
 	<bean id="dummyCrossExpansionProps" class="java.util.Properties">
 	</bean>
-	
+
 	<bean id="crossExpansionProperties"
 		class="org.generationcp.middleware.util.CrossExpansionProperties">
 		<constructor-arg ref="dummyCrossExpansionProps" />
 	</bean>
-	
+
     <bean id="oldPedigreeService" class="org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl">
         <constructor-arg ref="cropSessionProvider"/>
         <constructor-arg value="maize"/>
@@ -174,7 +174,7 @@
     <bean id="listDataProjectSaver" class="org.generationcp.middleware.operation.saver.ListDataProjectSaver">
         <constructor-arg ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="formulaService" class="org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
@@ -202,7 +202,7 @@
     </bean>
 
 	<bean id="trialEnvironmentBuilder" factory-bean="managerFactory"
-	  factory-method="getTrialEnvironmentBuilder">
+	  factory-method="getTrialInstanceBuilder">
 		<aop:scoped-proxy />
 	</bean>
 
