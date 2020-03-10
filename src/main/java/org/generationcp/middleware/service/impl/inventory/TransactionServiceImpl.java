@@ -137,6 +137,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final List<Transaction> transactions = daoFactory.getTransactionDAO().getByIds(listIds);
 		for (final Transaction transaction : transactions) {
 			transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
+			transaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
 			daoFactory.getTransactionDAO().save(transaction);
 		}
 	}
