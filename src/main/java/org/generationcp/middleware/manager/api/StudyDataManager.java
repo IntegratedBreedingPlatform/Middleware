@@ -257,13 +257,13 @@ public interface StudyDataManager {
 	List<DataSet> getDataSetsByType(int studyId, int datasetTypeId);
 
 	/**
-	 * Retrieves the trial instances belonging to the given dataset. Retrieves from central if the given ID is positive, otherwise
+	 * Retrieves the trial environments belonging to the given dataset. Retrieves from central if the given ID is positive, otherwise
 	 * retrieves from local.
 	 *
 	 * @param datasetId the dataset id
 	 * @return The trial environments
 	 */
-	TrialInstances getTrialInstancesInDataset(int datasetId);
+	TrialInstances getTrialEnvironmentsInDataset(int datasetId);
 
 	/**
 	 * Retrieves the stocks belonging to the given dataset. Retrieves from central if the given ID is positive, otherwise retrieves from
