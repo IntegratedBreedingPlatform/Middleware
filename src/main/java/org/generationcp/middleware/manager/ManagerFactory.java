@@ -332,7 +332,7 @@ public class ManagerFactory implements Serializable {
 		return new ExperimentDesignServiceImpl(this.sessionProvider);
 	}
 
-	public TrialInstanceBuilder getTrialInstanceBuilder() {
+	public TrialInstanceBuilder getTrialEnvironmentBuilder() {
 		return new TrialInstanceBuilder(this.sessionProvider);
 	}
 
