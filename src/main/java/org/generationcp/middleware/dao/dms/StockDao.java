@@ -195,7 +195,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		if (!CollectionUtils.isEmpty(plotNos)) {
 			sb.append(" AND nd_ep.value in (:PLOT_NOS) ");
 		}
-		final SQLQuery query = this.getSession().createSQLQuery(queryString);
+		final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 		query.setParameter("STUDY_ID", studyId);
 		if (!CollectionUtils.isEmpty(plotNos)) {
 			query.setParameterList("PLOT_NOS", plotNos);
