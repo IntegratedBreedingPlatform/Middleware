@@ -39,7 +39,7 @@ public class StudySaverTest extends IntegrationTestBase {
 		crop.setUseUUID(false);
 		crop.setPlotCodePrefix(CROP_PREFIX);
 		this.studySaver.saveStudyExperiment(crop, 1, values);
-		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		final ExperimentModel experiment = this.experimentDao.getById(values.getLocationId());
 		Assert.assertNotNull(experiment.getObsUnitId());
 		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
 		Assert.assertEquals(TermId.STUDY_INFORMATION.getId(), experiment.getTypeId().intValue());

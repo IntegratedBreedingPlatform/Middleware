@@ -5,8 +5,8 @@ package org.generationcp.middleware.domain.inventory.manager;
  */
 public class InventoryView {
 
-	public static class LotView {};
+	public static class LotView {}
 
-	public static class TransactionView {};
+	public static class TransactionView {}
 
 }

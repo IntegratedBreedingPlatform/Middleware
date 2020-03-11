@@ -614,14 +614,14 @@ public interface StudyDataManager {
 	public List<String> getAllSharedProjectNames();
 
 	/**
-	 * Checks whether the specified locationIds exist in a given dataset
+	 * Return counts of experiments for given dataset type and environment IDs
 	 *
 	 * @param studyId
 	 * @param datasetTypeId
-	 * @param locationIds
+	 * @param environmentIds
 	 * @return
 	 */
-	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, int datasetTypeId, List<Integer> locationIds);
+	Long countExperimentsByDatasetTypeAndEnvironments(int studyId, int datasetTypeId, List<Integer> environmentIds);
 
 	/**
 	 * Retrieves all the StudySummaries of the DMS Project that matches the conditions: SeasonDbId, LocationDbId and ProgramDbId

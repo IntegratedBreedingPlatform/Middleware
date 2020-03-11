@@ -271,20 +271,23 @@ public class StudyTestDataInitializer {
 		final DatasetReference dataSet =
 			this.studyDataManager.addDataSet(studyId, new VariableTypeList(), datasetValues, null, DatasetTypeEnum.SUMMARY_DATA.getId());
 
-		this.geolocationId = this.addEnvironmentToDataset(crop, dataSet.getId(), 1, locationId, seasonId);
+		this.addEnvironmentToDataset(crop, dataSet.getId(), 1, locationId, seasonId);
 
 		return dataSet.getId();
 	}
 
-	public Integer addEnvironmentToDataset(final CropType crop, final Integer datasetId, final Integer trialInstance, final String locationId, final String seasonId)
+	public void addEnvironmentToDataset(final CropType crop, final Integer datasetId, final Integer trialInstance, final String locationId, final String seasonId)
 		throws Exception {
 		final VariableList
 			locationVariableList = this.createEnvironmentWithLocationAndSeason(String.valueOf(trialInstance), "SOME SITE NAME", locationId, seasonId);
 		final ExperimentValues experimentValue = new ExperimentValues();
-		experimentValue.setLocationId(geolocationId);
+		final VariableList variableList = new VariableList();
+		final Variable variable = new Variable();
+		variable.setValue(locationId);
+		variable.setVariableType(this.createVariableType(TermId.LOCATION_ID.getId(), "LOCATION_ID", "", 1));
+		variableList.add(variable);
+		experimentValue.setVariableList(variableList);
 		this.studyDataManager.addExperiment(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
-
-		return geolocationId;
 	}
 
 	private DMSVariableType createVariableType(final int termId, final String name, final String description, final int rank)

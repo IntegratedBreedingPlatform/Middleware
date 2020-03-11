@@ -131,7 +131,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		crop.setUseUUID(false);
 		crop.setPlotCodePrefix(CROP_PREFIX);
 		this.experimentModelSaver.addOrUpdateExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		final ExperimentModel experiment = this.experimentDao.getById(values.getLocationId());
 		Assert.assertNotNull(experiment.getObsUnitId());
 		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
@@ -151,7 +151,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		crop.setUseUUID(false);
 		crop.setPlotCodePrefix(CROP_PREFIX);
 		this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		final ExperimentModel experiment = this.experimentDao.getById(values.getLocationId());
 		Assert.assertNotNull(experiment.getObsUnitId());
 		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);

@@ -196,7 +196,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("    AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 							.append("  LEFT JOIN nd_experimentprop season ON season.nd_experiment_id = env.nd_experiment_id ")
 							.append("     AND season.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
-							.append(" LEFT JOIN nd_experimentprop blk on blk.nd_experiment_id = env.nd_experiment_id AND blk.type_id = ")
+							.append(" INNER JOIN nd_experimentprop blk on blk.nd_experiment_id = env.nd_experiment_id AND blk.type_id = ")
 							.append(TermId.BLOCK_ID.getId());
 
 			if (blockId != null) {
@@ -399,7 +399,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 				if (row[13] != null && NumberUtils.isNumber((String) row[13])) {
 					trial.setBlockId(Integer.valueOf((String) row[13]));
 				}
-				trial.setTrialInstanceNo((String) row[15]);
+				trial.setTrialInstanceNo(String.valueOf((Integer) row[15]));
 				trialMap.put(trialKey, trial);
 			}
 

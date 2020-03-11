@@ -189,13 +189,6 @@ public class ProjectPropertySaver {
 		if (variables != null) {
 
 			int rank = this.getNextRank(study);
-
-			// TODO: IBP-3303, check if this is still relevant
-			final List<Integer> environmentIds = this.daoFactory.getEnvironmentDao().getEnvironmentIds(trialDataset.getProjectId());
-			final Set<Integer> geoIds = new HashSet<>(environmentIds);
-			final ExperimentModel environment = this.daoFactory.getEnvironmentDao().getById(geoIds.iterator().next());
-			Hibernate.initialize(environment.getProperties());
-
 			for (final MeasurementVariable variable : variables) {
 				final Operation operation = variable.getOperation();
 				if (operation == null) {
@@ -206,11 +199,11 @@ public class ProjectPropertySaver {
 						this.deleteVariable(study, trialDataset, measurementDataset, variable.getRole(), variable.getTermId());
 						break;
 					case ADD:
-						this.insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant, environment);
+						this.insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant);
 						rank++;
 						break;
 					case UPDATE:
-						this.updateVariable(study, trialDataset, measurementDataset, variable, isConstant, environment);
+						this.updateVariable(study, trialDataset, measurementDataset, variable, isConstant);
 						break;
 					default:
 						break;
@@ -231,8 +224,8 @@ public class ProjectPropertySaver {
 		return nextRank;
 	}
 
-	private void insertVariable(final DmsProject project, final DmsProject trialDataset, final DmsProject measurementDataset,
-			final MeasurementVariable variable, final int rank, final boolean isConstant, final ExperimentModel environment) {
+	private void insertVariable(final DmsProject study, final DmsProject trialDataset, final DmsProject measurementDataset,
+			final MeasurementVariable variable, final int rank, final boolean isConstant) {
 
 		if (PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
 			final int datasetRank = this.getNextRank(trialDataset);
@@ -245,8 +238,11 @@ public class ProjectPropertySaver {
 				this.insertVariable(measurementDataset, variable, measurementRank);
 			}
 
-			this.saver.getExperimentPropertySaver().saveOrUpdateProperty(environment, variable.getTermId(), variable.getValue());
-
+			final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao().getEnvironments(study.getProjectId());
+			for (final ExperimentModel environment : environments) {
+				Hibernate.initialize(environment.getProperties());
+				this.saver.getExperimentPropertySaver().saveOrUpdateProperty(environment, variable.getTermId(), variable.getValue());
+			}
 
 		} else if (PhenotypicType.VARIATE == variable.getRole()) {
 
@@ -259,8 +255,8 @@ public class ProjectPropertySaver {
 							variable.getValue(), variable.getDataTypeId());
 				} else {
 					// a study constant
-					this.insertVariable(project, variable, rank);
-					this.saver.getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(),
+					this.insertVariable(study, variable, rank);
+					this.saver.getPhenotypeSaver().saveOrUpdatePhenotypeValue(study.getProjectId(), variable.getTermId(),
 							variable.getValue(), variable.getDataTypeId());
 				}
 			} else {
@@ -269,7 +265,7 @@ public class ProjectPropertySaver {
 			}
 		} else {
 			// study
-			this.insertVariable(project, variable, rank);
+			this.insertVariable(study, variable, rank);
 		}
 	}
 
@@ -305,7 +301,7 @@ public class ProjectPropertySaver {
 	}
 
 	private void updateVariable(final DmsProject project, final DmsProject trialDataset, final DmsProject measurementDataset,
-		final MeasurementVariable variable, final boolean isConstant, final ExperimentModel environment) {
+		final MeasurementVariable variable, final boolean isConstant) {
 		if (TermId.TRIAL_INSTANCE_FACTOR.getId() != variable.getTermId()) {
 
 			if (PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {

@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
+import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -32,8 +33,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Transactional
 @Service
+@Transactional
 public class LotServiceImpl implements LotService {
 
 	private DaoFactory daoFactory;
@@ -68,7 +69,7 @@ public class LotServiceImpl implements LotService {
 
 		final Lot lot = new Lot();
 		lot.setUserId(userId);
-		lot.setComments(lotDto.getComments());
+		lot.setComments(lotDto.getNotes());
 		lot.setCreatedDate(new Date());
 		lot.setEntityId(lotDto.getGid());
 		lot.setEntityType("GERMPLSM");
@@ -77,7 +78,7 @@ public class LotServiceImpl implements LotService {
 		lot.setStatus(0);
 		//FIXME check if source has to be always 0
 		lot.setSource(0);
-		lot.setScaleId(lotDto.getScaleId());
+		lot.setScaleId(lotDto.getUnitId());
 		this.inventoryDataManager.generateLotIds(cropType, Lists.newArrayList(lot));
 		this.daoFactory.getLotDao().save(lot);
 
@@ -128,4 +129,10 @@ public class LotServiceImpl implements LotService {
 	public List<LotDto> getLotsByStockIds(final List<String> stockIds) {
 		return daoFactory.getLotDao().getLotsByStockIds(stockIds);
 	}
+
+	@Override
+	public LotSearchMetadata getLotSearchMetadata(final LotsSearchDto lotsSearchDto) {
+		return new LotSearchMetadata(daoFactory.getLotDao().getLotsCountPerScaleName(lotsSearchDto));
+	}
+
 }

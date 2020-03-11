@@ -55,11 +55,12 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	public TrialEnvironments getTrialEnvironmentsInDataset(final int studyId, final int datasetId) {
 		final DmsProject project = this.dataSetBuilder.getTrialDataset(studyId);
-		final DataSet dataSet = this.dataSetBuilder.build(project.getProjectId());
+		final Integer environmentDatasetId = project.getProjectId();
+		final DataSet dataSet = this.dataSetBuilder.build(environmentDatasetId);
 		final Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
 
 		final VariableTypeList trialEnvironmentVariableTypes = this.getTrialEnvironmentVariableTypes(study, dataSet);
-		final List<ExperimentModel> locations = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(datasetId);
+		final List<ExperimentModel> locations = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(datasetId, environmentDatasetId.equals(datasetId));
 
 		return this.buildTrialEnvironments(locations, trialEnvironmentVariableTypes);
 	}
