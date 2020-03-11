@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.inventory;
 
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.springframework.data.domain.Pageable;
@@ -30,4 +31,6 @@ public interface TransactionService {
 	 * @param transactionStatus
 	 */
 	void withdrawLots(Integer userId, Set<Integer> lotIds, LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus) ;
+
+	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
 }
