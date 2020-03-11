@@ -7,7 +7,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM permission
-                where parent_id = (select permission_id from permission where name = 'CONFIRM_TRANSACTIONS')
+                where parent_id = (select permission_id from permission where name in ( 'MANAGE_TRANSACTIONS'))
             </sqlCheck>
         </preConditions>
         <comment>CONFIRM_TRANSACTIONS in MANAGE_TRANSACTIONS granular permissions</comment>
