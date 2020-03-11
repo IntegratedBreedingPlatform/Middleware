@@ -60,7 +60,7 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 		Preconditions.checkArgument(numberOfEnvironmentsToGenerate > 0);
 
 		// Retrieve existing study instances
-		final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(datasetId);
+		final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(datasetId, true);
 		final List<Integer> instanceNumbers = environments.stream().map(ExperimentModel::getObservationUnitNo).collect(Collectors.toList());
 
 		final List<StudyInstance> studyInstances = new ArrayList<>();
@@ -133,7 +133,7 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 	public void deleteStudyEnvironments(final Integer studyId, final List<Integer> environmentIds) {
 		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
 		final EnvironmentDao environmentDao = this.daoFactory.getEnvironmentDao();
-		final List<ExperimentModel> allEnvironments = environmentDao.getEnvironmentsByDataset(environmentDatasetId);
+		final List<ExperimentModel> allEnvironments = environmentDao.getEnvironmentsByDataset(environmentDatasetId, true);
 		final List<ExperimentModel> environmentsToDelete = allEnvironments.stream()
 			.filter(instance -> environmentIds.contains(instance.getNdExperimentId())).collect(
 				Collectors.toList());
