@@ -20,9 +20,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -130,7 +133,64 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void updatePendingTransactions(final List<TransactionUpdateRequestDto> transactionUpdateInputDtos) {
+	public void updatePendingTransactions(final List<TransactionUpdateRequestDto> transactionUpdateRequestDtos) {
+
+		final Set<Integer> transactionIds =
+			transactionUpdateRequestDtos.stream().map(TransactionUpdateRequestDto::getTransactionId).collect(
+				Collectors.toSet());
+		final List<Transaction> transactions = this.daoFactory.getTransactionDAO().getByIds(transactionIds);
+		final Map<Integer, Transaction> transactionMap = transactions.stream().collect(Collectors.toMap(x -> x.getId(), x -> x));
+
+		for (final TransactionUpdateRequestDto updateRequestDto : transactionUpdateRequestDtos) {
+			final Transaction transaction = transactionMap.get(updateRequestDto.getTransactionId());
+			final List<Integer> lotIds = Arrays.asList(transaction.getLot().getId());
+			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+			lotsSearchDto.setLotIds(lotIds);
+
+			//Needs to be queried per transaction so we get the most recent available balance when editing transaction for the same lot.
+			final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
+
+			if (updateRequestDto.getNotes() != null) {
+				transaction.setComments(updateRequestDto.getNotes());
+			}
+
+			if (updateRequestDto.getAmount() != null) {
+				if (TransactionType.DEPOSIT.getId().equals(transaction.getType())) {
+					transaction.setQuantity(updateRequestDto.getAmount());
+				}
+
+				if (TransactionType.WITHDRAWAL.getId().equals(transaction.getType())) {
+					if (lotDto.getAvailableBalance() - transaction.getQuantity() - updateRequestDto.getAmount() < 0) {
+						throw new MiddlewareException("Update results in negative balance for transaction " + transaction.getId()
+							+ ", please review transactions and available balances. Please review");
+					} else {
+						transaction.setQuantity(-1 * updateRequestDto.getAmount());
+					}
+				}
+
+			} else if (updateRequestDto.getAvailableBalance() != null) {
+				if (TransactionType.DEPOSIT.getId().equals(transaction.getType())) {
+					if (updateRequestDto.getAvailableBalance() <= lotDto.getAvailableBalance()) {
+						throw new MiddlewareException("New available balance for the transaction:" + transaction.getId()
+							+ " can not be lower or equal than the actual available balance for the lot: " + lotDto.getLotId()
+							+ ". Please review");
+					} else {
+						transaction.setQuantity(updateRequestDto.getAvailableBalance() - lotDto.getAvailableBalance());
+					}
+				}
+
+				if (TransactionType.WITHDRAWAL.getId().equals(transaction.getType())) {
+					if (updateRequestDto.getAvailableBalance() >= lotDto.getAvailableBalance() - transaction.getQuantity()) {
+						throw new MiddlewareException("New balance would not produce a withdrawal for transaction " + transaction.getId()
+							+ ". Please adjust the balance accordingly");
+					} else {
+						transaction
+							.setQuantity(updateRequestDto.getAvailableBalance() - lotDto.getAvailableBalance() + transaction.getQuantity());
+					}
+				}
+			}
+			this.daoFactory.getTransactionDAO().update(transaction);
+		}
 
 	}
 }

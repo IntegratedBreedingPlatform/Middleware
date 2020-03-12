@@ -3,9 +3,6 @@ package org.generationcp.middleware.domain.inventory.manager;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-/**
- * Created by clarysabel on 3/10/20.
- */
 @AutoProperty
 public class TransactionUpdateRequestDto {
 
