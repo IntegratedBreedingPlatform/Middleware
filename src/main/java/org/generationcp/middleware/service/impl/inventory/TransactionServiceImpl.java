@@ -128,4 +128,8 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 	}
 
+	@Override
+	public List<TransactionDto> getAvailableBalanceTransactions(final Integer lotId) {
+		return this.daoFactory.getTransactionDAO().getAvailableBalanceTransactions(lotId);
+	}
 }

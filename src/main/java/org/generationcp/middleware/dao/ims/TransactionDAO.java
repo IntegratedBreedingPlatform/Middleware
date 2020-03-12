@@ -747,6 +747,47 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
+	public List<TransactionDto> getAvailableBalanceTransactions(final Integer lotId) {
+		try {
+
+			if (lotId != null) {
+				final StringBuilder sql = new StringBuilder(this.SEARCH_TRANSACTIONS_QUERY);
+				sql.append(" and (act.trnstat =").append(TransactionStatus.CONFIRMED.getIntValue()).append(" or (act.trnstat = ")
+					.append(TransactionStatus.PENDING.getIntValue()).
+					append(" and act.trntype = ").append(TransactionType.WITHDRAWAL.getId()).append(")) ");
+				sql.append(" and act.lotid = ").append(lotId).append(" ");
+				final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+				query.addScalar("transactionId");
+				query.addScalar("createdByUsername");
+				query.addScalar("transactionType");
+				query.addScalar("amount");
+				query.addScalar("notes");
+				query.addScalar("transactionDate", Hibernate.DATE);
+				query.addScalar("lotLotId");
+				query.addScalar("lotGid");
+				query.addScalar("lotDesignation");
+				query.addScalar("lotStockId");
+				query.addScalar("lotScaleId");
+				query.addScalar("lotScaleName");
+				query.addScalar("lotStatus");
+				query.addScalar("transactionStatus");
+				query.addScalar("lotLocationId");
+				query.addScalar("lotComments");
+
+				query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
+
+				final List<TransactionDto> transactionDtos = query.list();
+
+				return transactionDtos;
+			} else {
+				return new ArrayList<>();
+			}
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getAvailableBalanceTransactions() query on TransactionDAO: " + e.getMessage(), e);
+		}
+	}
+
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
 			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class, Double.class, String.class, Date.class,
