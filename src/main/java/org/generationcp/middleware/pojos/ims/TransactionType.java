@@ -1,9 +1,8 @@
 
 package org.generationcp.middleware.pojos.ims;
 
-import java.util.EnumSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public enum TransactionType {
 
@@ -15,7 +14,13 @@ public enum TransactionType {
 	private final Integer id;
 	private String value;
 
-	private TransactionType(String type, Integer id) {
+	private static final List<TransactionType> LIST;
+
+	static {
+		LIST = Arrays.asList(TransactionType.values());
+	}
+
+	TransactionType(String type, Integer id) {
 		this.value = type;
 		this.id = id;
 	}
@@ -28,8 +33,7 @@ public enum TransactionType {
 		return this.id;
 	}
 
-
 	public static List<TransactionType> getAll() {
-		return EnumSet.allOf(TransactionType.class).stream().collect(Collectors.toList());
+		return LIST;
 	}
 }
