@@ -689,6 +689,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				query.append(" and i.status = ").append(transactionsSearchDto.getLotStatus()).append(" ");
 			}
 
+			if (transactionsSearchDto.getGermplasmListIds() != null && !transactionsSearchDto.getGermplasmListIds().isEmpty()) {
+				query.append(" and i.eid in (select distinct (gid) from listdata where listid in (")
+					.append(Joiner.on(",").join(transactionsSearchDto.getGermplasmListIds())).
+					append(")) and i.etype = 'GERMPLSM' ");
+			}
 		}
 
 		return query.toString();
