@@ -23,9 +23,12 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GermplasmGroupingServiceImplTest {
 
@@ -392,7 +395,7 @@ public class GermplasmGroupingServiceImplTest {
 		crossGermplasm1.setMethodId(nonHybridMethodId);
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2, crossGermplasm2));
-		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1, crossGid2), false,
+		this.germplasmGroupingService.processGroupInheritanceForCrosses(this.getGermplasmIdMethodIdMap(Lists.newArrayList(crossGermplasm1, crossGermplasm2)), false,
 				GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
 		Assert.assertEquals("Expected new cross to be assigned MGID from previous cross.", previousCrossMGID, crossGermplasm1.getMgid());
@@ -440,7 +443,7 @@ public class GermplasmGroupingServiceImplTest {
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2, crossGermplasm2));
 
-		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1, crossGid2), false,
+		this.germplasmGroupingService.processGroupInheritanceForCrosses(this.getGermplasmIdMethodIdMap(Lists.newArrayList(crossGermplasm1, crossGermplasm2)), false,
 				GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
 		Assert.assertEquals("Expected new cross to be assigned MGID = GID of the cross when no previous crosses exist.", crossGid1,
@@ -478,7 +481,7 @@ public class GermplasmGroupingServiceImplTest {
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2));
 
 		this.germplasmGroupingService
-				.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1), false, GermplasmGroupingServiceImplTest.HYBRID_METHODS);
+				.processGroupInheritanceForCrosses(this.getGermplasmIdMethodIdMap(Collections.singletonList(crossGermplasm1)), false, GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
 		Assert.assertEquals("Expected no MGID change.", new Integer(0), crossGermplasm1.getMgid());
 		// Previous crosses should never be queried.
@@ -508,7 +511,7 @@ public class GermplasmGroupingServiceImplTest {
 				.thenReturn(ImmutableList.of(crossGermplasm1));
 
 		this.germplasmGroupingService
-				.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1), false, GermplasmGroupingServiceImplTest.HYBRID_METHODS);
+				.processGroupInheritanceForCrosses(this.getGermplasmIdMethodIdMap(Collections.singletonList(crossGermplasm1)), false, GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
 		Assert.assertEquals("Expected no MGID change.", new Integer(0), crossGermplasm1.getMgid());
 		// Previous crosses should never be queried.
@@ -556,7 +559,7 @@ public class GermplasmGroupingServiceImplTest {
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2));
 
 		this.germplasmGroupingService
-				.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1), true, GermplasmGroupingServiceImplTest.HYBRID_METHODS);
+				.processGroupInheritanceForCrosses(this.getGermplasmIdMethodIdMap(Collections.singletonList(crossGermplasm1)), true, GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
 		Assert.assertEquals("Expected new cross to be assigned MGID = GID as none of the previous crosses have MGID.", crossGid1,
 				crossGermplasm1.getMgid());
@@ -612,7 +615,7 @@ public class GermplasmGroupingServiceImplTest {
 		crossGermplasm1.setMethodId(nonHybridMethodId);
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2, crossGermplasm2));
-		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1, crossGid2), true,
+		this.germplasmGroupingService.processGroupInheritanceForCrosses(this.getGermplasmIdMethodIdMap(Lists.newArrayList(crossGermplasm1, crossGermplasm2)), true,
 				GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
 		Assert.assertEquals("Expected new cross to be assigned MGID from previous cross.", previousCrossMGID, crossGermplasm1.getMgid());
@@ -648,7 +651,7 @@ public class GermplasmGroupingServiceImplTest {
 			.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1));
 
 		this.germplasmGroupingService
-			.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1), false, GermplasmGroupingServiceImplTest.HYBRID_METHODS);
+			.processGroupInheritanceForCrosses(this.getGermplasmIdMethodIdMap(Collections.singletonList(crossGermplasm1)), false, GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
 		Assert.assertEquals("Expected no MGID change.", new Integer(0), crossGermplasm1.getMgid());
 		// Previous crosses should never be queried.
@@ -841,6 +844,10 @@ public class GermplasmGroupingServiceImplTest {
 		final List<Germplasm> groupMembers = new ArrayList<>();
 		Mockito.when(this.germplasmDAO.getManagementGroupMembers(gid)).thenReturn(groupMembers);
 		Assert.assertSame(groupMembers, germplasmGroupingService.getGroupMembers(gid));
+	}
+
+	private Map<Integer, Integer> getGermplasmIdMethodIdMap(final List<Germplasm> germplasm) {
+		return germplasm.stream().collect(Collectors.toMap(Germplasm::getGid, Germplasm::getMethodId));
 	}
 
 }

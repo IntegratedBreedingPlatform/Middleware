@@ -16,6 +16,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -490,28 +491,27 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 			germplasmListDao.save(germplasmList);
 
-			final List<Integer> germplasmGids = new ArrayList<>();
+			final Map<Integer, Integer> germplasmIdMethodIdMap = new HashMap<>();
 			// Save germplasms, names, list data
+			final GermplasmListDataDAO germplasmListDataDAO = this.daoFactory.getGermplasmListDataDAO();
 			for (final Pair<Germplasm, GermplasmListData> pair : listDataItems) {
 
 				final Germplasm germplasm = pair.getLeft();
-				germplasmGids.add(germplasm.getGid());
+				germplasmIdMethodIdMap.put(germplasm.getGid(), germplasm.getMethodId());
 				final GermplasmListData germplasmListData = pair.getRight();
 
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
-				this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+				germplasmListDataDAO.save(germplasmListData);
 			}
 
 			// For Management Group Settings Processing
-			// NOTE: The false boolean should be replace by the variable for
-			// "Apply grouping to new crosses only" option. See: BMS-3883
-			this.germplasmGroupingService.processGroupInheritanceForCrosses(germplasmGids, isApplyNewGroupToPreviousCrosses,
+			this.germplasmGroupingService.processGroupInheritanceForCrosses(germplasmIdMethodIdMap, isApplyNewGroupToPreviousCrosses,
 					this.crossExpansionProperties.getHybridBreedingMethods());
 
 		} catch (final Exception e) {
 			this.logAndThrowException(
-					"Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasmList=" + germplasmList + "): " + e
+					"Error encountered with FieldbookService.saveGermplasmList(germplasmList=" + germplasmList + "): " + e
 							.getMessage(), e, FieldbookServiceImpl.LOG);
 		}
 
