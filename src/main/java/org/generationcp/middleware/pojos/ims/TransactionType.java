@@ -1,9 +1,12 @@
 
 package org.generationcp.middleware.pojos.ims;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Arrays;
 import java.util.List;
 
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum TransactionType {
 
 	WITHDRAWAL("Withdrawal", 1),
