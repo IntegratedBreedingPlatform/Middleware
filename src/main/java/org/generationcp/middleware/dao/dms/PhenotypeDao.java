@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.h2h.ObservationKey;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -529,7 +530,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return traitObservationList;
 	}
 
-	public List<TrialEnvironment> getEnvironmentTraits(final Set<TrialEnvironment> trialEnvironments, final List<Integer> experimentTypes) {
+	public List<TrialEnvironment> getEnvironmentTraits(final Set<TrialEnvironment> trialEnvironments, final List<Integer> experimentTypes, final String programUUID) {
 		final List<TrialEnvironment> environmentDetails = new ArrayList<>();
 
 		if (trialEnvironments.isEmpty()) {
@@ -543,25 +544,29 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		final StringBuilder sql = new StringBuilder()
 			.append(
-				"SELECT DISTINCT plot.parent_id as environmentId, p.observable_id as observable_id, trait.name as name, property.name as property, trait.definition as definition, c_scale.name as scale, cr_type.object_id as object_id ")
-			.append("	FROM phenotype p ")
-			.append(
-				"	INNER JOIN nd_experiment e ON p.nd_experiment_id = e.nd_experiment_id  AND e.type_id in (:experimentTypes)")
-			.append("INNER JOIN project pr ON pr.project_id = e.project_id  ")
-			.append("INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 ")
-			.append("INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id ")
-			.append("	LEFT JOIN cvterm_relationship cr_scale ON p.observable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
+				"  SELECT DISTINCT env.nd_experiment_id as environmentId, pp.variable_id as observable_id, trait.name as name, property.name as property, trait.definition as definition, c_scale.name as scale, cr_type.object_id as object_id  ")
+			.append("	FROM nd_experiment e ")
+			.append("  LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id and plot.type_id = 1155 ")
+			.append("  INNER JOIN project pr ON pr.project_id = e.project_id ")
+			.append("  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3 ")
+			.append("  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 AND AND env.nd_experiment_id IN (:environmentIds) ")
+			.append("      AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) ")
+			.append("  INNER JOIN projectprop pp on e.project_id = pp.project_id and pp.type_id = " + VariableType.TRAIT.getId())
+				// handle cases for with/without plot and with/without sub-observations
+			.append("  AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id ) ")
+			.append("	LEFT JOIN cvterm_relationship cr_scale ON pp.variable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
 			.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.object_id  AND cr_type.type_id = 1105 ")
-			.append(
-				"	LEFT JOIN cvterm_relationship cr_property ON p.observable_id = cr_property.subject_id AND cr_property.type_id = 1200 ")
+			.append("	LEFT JOIN cvterm_relationship cr_property ON pp.variable_id = cr_property.subject_id AND cr_property.type_id = 1200 ")
 			.append("	LEFT JOIN cvterm c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
-			.append("	LEFT JOIN cvterm trait ON trait.cvterm_id = p.observable_id ")
+			.append("	LEFT JOIN cvterm trait ON trait.cvterm_id = pp.variable_id ")
 			.append("	LEFT JOIN cvterm property ON property.cvterm_id = cr_property.object_id ")
-			.append(" WHERE plot.parent_id IN (:environmentIds) ");
+			.append(" WHERE e.type_id IN (:experimentTypes) AND pr.program_uuid = :programUUID ")
+			.append("    AND EXISTS (select 1 from phenotype ph where ph.observable_id = pp.variable_id and ph.nd_experiment_id = e.nd_experiment_id) ");
 		try {
 
 			final Query query = this.getSession().createSQLQuery(sql.toString()).addScalar("environmentId").addScalar("observable_id")
 				.addScalar("name").addScalar("property").addScalar("definition").addScalar("scale").addScalar("object_id")
+				.setParameter("programUUID", programUUID)
 				.setParameterList("environmentIds", environmentIds).setParameterList("experimentTypes", experimentTypes);
 
 			final List<Object[]> result = query.list();

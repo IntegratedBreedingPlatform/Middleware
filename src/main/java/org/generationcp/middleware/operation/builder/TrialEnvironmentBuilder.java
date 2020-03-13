@@ -136,7 +136,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		}
 
 		// Step 1: Get Trial Environments for each GID
-		final Map<Integer, Set<Integer>> germplasmEnvironments = this.getExperimentDao().getEnvironmentsOfGermplasms(allGids, programUUID);
+		final Map<Integer, Set<Integer>> germplasmEnvironments = this.getExperimentDao().getStudyInstancesForGermplasm(allGids, programUUID);
 
 		// Step 2: Get the trial environment details
 		final Set<TrialEnvironment> trialEnvironmentDetails = new HashSet<>();
@@ -144,7 +144,7 @@ public class TrialEnvironmentBuilder extends Builder {
 
 		// Step 3: Get environment traits
 		final List<TrialEnvironment> localTrialEnvironments =
-				this.getPhenotypeDao().getEnvironmentTraits(trialEnvironmentDetails, experimentTypes);
+					this.getPhenotypeDao().getEnvironmentTraits(trialEnvironmentDetails, experimentTypes, programUUID);
 		trialEnvironments.addAll(localTrialEnvironments);
 
 		// Step 4: Build germplasm pairs. Get what's common between GID1 AND GID2
@@ -154,8 +154,8 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	private void getTrialEnvironmentDetails(final Map<Integer, Set<Integer>> germplasmEnvironments,
 			final Set<TrialEnvironment> trialEnvironmentDetails) {
-		final Set<Integer> localEnvironmentIds = this.getEnvironmentIdsFromMap(germplasmEnvironments);
-		trialEnvironmentDetails.addAll(this.daoFactory.getEnvironmentDao().getTrialEnvironmentDetails(localEnvironmentIds));
+		final Set<Integer> environmentIds = this.getEnvironmentIdsFromMap(germplasmEnvironments);
+		trialEnvironmentDetails.addAll(this.daoFactory.getEnvironmentDao().getTrialEnvironmentDetails(environmentIds));
 	}
 
 	private void buildGermplasmPairsBetweenGids(final List<GermplasmPair> germplasmPairs,
@@ -193,10 +193,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		final Set<Integer> idsToReturn = new HashSet<>();
 
 		for (final Entry<Integer, Set<Integer>> environmentIds : germplasmEnvironments.entrySet()) {
-			final Set<Integer> ids = environmentIds.getValue();
-			for (final Integer id : ids) {
-				idsToReturn.add(id);
-			}
+			idsToReturn.addAll(environmentIds.getValue());
 		}
 		return idsToReturn;
 
