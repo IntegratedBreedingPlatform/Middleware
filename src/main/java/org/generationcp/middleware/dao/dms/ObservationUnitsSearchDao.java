@@ -122,7 +122,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "    inner join stock s ON s.stock_id = nde.stock_id " //
 				// FIXME won't work for sub-sub-obs
 				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id) AND plot.type_id = 1155 "
-				+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = 1020 "
+				+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 				//
 				+ " where p.project_id = :datasetId ");
 
@@ -174,7 +174,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					+ "nd_experiment nde " //
 					+ "    inner join project p on p.project_id = nde.project_id " //
 					+ " INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = 3 "
-					+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 "
+					+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 					+ " where " //
 					+ "	p.project_id = :datasetId ");
 
@@ -287,7 +287,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		sql.append(" 1 FROM " //
 			+ "	project p " //
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
-			+ "	INNER JOIN nd_experiment env ON nde.parent_id = env.nd_experiment_id AND env.type_id = 1020 " //
+			+ "	INNER JOIN nd_experiment env ON nde.parent_id = env.nd_experiment_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
@@ -597,7 +597,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "     GROUP BY parent.nd_experiment_id) child_sample_count ON child_sample_count.nd_experiment_id = nde.nd_experiment_id " //
 			// FIXME won't work for sub-sub-obs
 			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR (plot.nd_experiment_id = nde.nd_experiment_id) AND plot.type_id = 1155 "
-			+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = 1020 "
+			+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			//
 			+ " WHERE p.project_id = :datasetId "); //
 

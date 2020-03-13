@@ -27,7 +27,8 @@ class ObservationQuery {
 		+ "   		LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id "
 		+ "  		INNER JOIN project p ON p.project_id = nde.project_id "
 		+ "  		INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = 3 "
-		+ "  		INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 "
+		+ "  		INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = "
+						+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 					// handle cases for plot and with/without sub-observations
 		+ " 		AND (nde.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id)"
 		+ "        	INNER JOIN stock s ON s.stock_id = nde.stock_id  "
@@ -139,7 +140,8 @@ class ObservationQuery {
 			+ " FROM Project p " //
 			+ "    INNER JOIN project proj ON proj.project_id =  p.study_id " //
 			+ "    INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
-			+ "    INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = 1020 "
+			+ "    INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = "
+					+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			+ "    INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	   LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	   LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
@@ -217,7 +219,7 @@ class ObservationQuery {
 				sqlBuilder.append(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
 			}
 		}
-		
+
 		if (!designFactors.isEmpty()) {
 			final String designFactorClauseFormat =
 					"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '%s') '%s',  ";
@@ -229,7 +231,8 @@ class ObservationQuery {
 		sqlBuilder.append(" 1=1 FROM  ")
 			.append("	project p  ")
 			.append("	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id  ")
-			.append("	INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = 1020  ")
+			.append("	INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = ")
+			.append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()).append(" ")
 			.append("	INNER JOIN stock s ON s.stock_id = nde.stock_id  ")
 			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id  ")
 			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id  ")

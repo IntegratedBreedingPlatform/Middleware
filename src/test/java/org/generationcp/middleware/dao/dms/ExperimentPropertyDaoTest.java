@@ -119,7 +119,8 @@ public class ExperimentPropertyDaoTest {
 		+ "  INNER JOIN nd_experimentprop epropPlot ON epropPlot.nd_experiment_id = e.nd_experiment_id "
 		+ "    AND epropPlot.type_id IN (" + TermId.PLOT_NO.getId()+ ", "
 		+ TermId.PLOT_NNO.getId() + ") AND epropPlot.value <> '' "
-		+ " INNER JOIN nd_experimentenv ON e.parent_id = env.nd_experiment_id AND env.type_id = 1020 "
+		+ " INNER JOIN nd_experimentenv ON e.parent_id = env.nd_experiment_id AND env.type_id = "
+		+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 		+ "  LEFT JOIN nd_experimentprop site ON site.nd_experiment_id=env.nd_experiment_id "
 		+ "    AND site.type_id = " + TermId.TRIAL_LOCATION.getId()
 		+ "  LEFT JOIN nd_experimentprop siteId ON siteId.nd_experiment_id = env.nd_experiment_id "

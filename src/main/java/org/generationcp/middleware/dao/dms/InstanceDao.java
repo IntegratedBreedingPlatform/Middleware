@@ -49,9 +49,10 @@ public class InstanceDao extends GenericDAO<ExperimentModel, Integer> {
 		"SELECT DISTINCT e.nd_experiment_id as envtId, l.lname AS locationName, prov.lname AS provinceName, "
 			+ "       c.isoabbr, p.project_id, p.name, xp.value AS locationId, p.description AS description "
 			+ "  FROM nd_experimentprop xp "
-			+ " INNER JOIN nd_experiment e on e.nd_experiment_id = xp.nd_experiment_id AND e.type_id = 1020 "
-			+ " INNER JOIN project ds ON ds.project_id = e.project_id "
-			+ " INNER JOIN project p ON p.project_id = ds.study_id "
+			+ "  INNER JOIN nd_experiment e on e.nd_experiment_id = xp.nd_experiment_id AND e.type_id = "
+					+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
+			+ "  INNER JOIN project ds ON ds.project_id = e.project_id "
+			+ "  INNER JOIN project p ON p.project_id = ds.study_id "
 			+ "  LEFT JOIN location l ON l.locid = xp.value " + "  LEFT JOIN location prov ON prov.locid = l.snl1id "
 			+ "  LEFT JOIN cntry c ON c.cntryid = l.cntryid " + " WHERE xp.type_id = " + TermId.LOCATION_ID.getId();
 
@@ -297,7 +298,8 @@ public class InstanceDao extends GenericDAO<ExperimentModel, Integer> {
 		final StringBuilder sb = new StringBuilder();
 		sb.append("SELECT max(observation_unit_no) ");
 		sb.append(" FROM nd_experiment e ");
-		sb.append(" WHERE e.project_id = :datasetId and e.type_id = 1020" );
+		sb.append(" WHERE e.project_id = :datasetId and e.type_id = " );
+		sb.append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 		query.setParameter("datasetId", datasetId);
 		final Integer maxInstanceNumber = (Integer) query.uniqueResult();
@@ -331,7 +333,7 @@ public class InstanceDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "    inner join project pmain on pmain.project_id = proj.study_id \n"
 			+ "    left join nd_experimentprop xprop on xprop.nd_experiment_id = nde.nd_experiment_id AND xprop.type_id = 8190\n"
 			+ "	   left join location loc on xprop.value = loc.locid  \n"
-			+ " where nde.type_id = 1020 and pmain.project_id = :studyId \n";
+			+ " where nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " and pmain.project_id = :studyId \n";
 
 		final StringBuilder strBuilder = new StringBuilder(queryString);
 		final boolean locationFilterSpecified = !CollectionUtils.isEmpty(locationIds);
@@ -443,7 +445,8 @@ public class InstanceDao extends GenericDAO<ExperimentModel, Integer> {
 		sb.append("from nd_experiment e ");
 		sb.append("inner join project pr ON pr.project_id = e.project_id ");
 		sb.append("inner join project env_ds ON pr.study_id = env_ds.study_id and env_ds.dataset_type_id = 3 ");
-		sb.append("inner join nd_experiment env ON env.project_id = env_ds.project_id and env.type_id = 1020 ");
+		sb.append("inner join nd_experiment env ON env.project_id = env_ds.project_id and env.type_id = ");
+		sb.append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()).append(" ");
 		sb.append("inner join nd_experiment plot ON (plot.nd_experiment_id = e.nd_experiment_id OR plot.nd_experiment_id = e.parent_id) ");
 		sb.append("  and plot.parent_id = env.nd_experiment_id and plot.type_id = 1155 ");
 		sb.append("where e.project_id = :datasetId ");

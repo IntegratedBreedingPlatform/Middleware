@@ -1355,7 +1355,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
 					+ "     INNER JOIN nd_experiment env ON  pheno.nd_experiment_id = env.nd_experiment_id\n"
-					+ "		WHERE env.nd_experiment_id = :environmentId AND env.type_id = 1020 ;");
+					+ "		WHERE env.nd_experiment_id = :environmentId AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ;");
 			query.addScalar("name", new StringType());
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());

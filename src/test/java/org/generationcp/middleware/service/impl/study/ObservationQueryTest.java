@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -73,7 +74,8 @@ public class ObservationQueryTest {
 			+ "		LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id "
 			+ "		INNER JOIN project p ON p.project_id = nde.project_id "
 			+ "		INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = 3 "
-			+ "		INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 AND (nde.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) "
+			+ "		INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = "
+			+		TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " AND (nde.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) "
 			+ "		INNER JOIN stock s ON s.stock_id = nde.stock_id "
 			+ "		LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
 			+ "		LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
@@ -119,7 +121,8 @@ public class ObservationQueryTest {
 			+ "		(SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = 'FACT1') 'FACT1', "
 			+ "		1=1 FROM project p "
 			+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
-			+ "		INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = 1020 "
+			+ "		INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = "
+			+ 		TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			+ "		INNER JOIN stock s ON s.stock_id = nde.stock_id  \tLEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
 			+ "		LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
 			+ "		WHERE p.study_id = :studyId AND p.dataset_type_id = 4 "
@@ -151,7 +154,8 @@ public class ObservationQueryTest {
 			+ "		(SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = 'FACT1') 'FACT1',"
 			+ " 	1=1 FROM  project p "
 			+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
-			+ "		INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = 1020 "
+			+ "		INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = "
+			+ 		TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			+ "		INNER JOIN stock s ON s.stock_id = nde.stock_id "
 			+ "		LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
 			+ "		LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
