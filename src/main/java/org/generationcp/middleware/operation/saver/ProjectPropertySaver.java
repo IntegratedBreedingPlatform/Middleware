@@ -36,9 +36,7 @@ import org.hibernate.Hibernate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ProjectPropertySaver {
 
@@ -238,7 +236,7 @@ public class ProjectPropertySaver {
 				this.insertVariable(measurementDataset, variable, measurementRank);
 			}
 
-			final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao().getEnvironments(study.getProjectId());
+			final List<ExperimentModel> environments = this.daoFactory.getInstanceDao().getEnvironments(study.getProjectId());
 			for (final ExperimentModel environment : environments) {
 				Hibernate.initialize(environment.getProperties());
 				this.saver.getExperimentPropertySaver().saveOrUpdateProperty(environment, variable.getTermId(), variable.getValue());

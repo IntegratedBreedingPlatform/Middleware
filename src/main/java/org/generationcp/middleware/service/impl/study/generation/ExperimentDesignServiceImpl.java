@@ -81,7 +81,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		this.deleteTrialInstanceExperiments(plotDatasetId, environmentDatasetId, instanceNumbers);
 
 		// Save variables at trial and plot dataset level
-		final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao()
+		final List<ExperimentModel> environments = this.daoFactory.getInstanceDao()
 			.getEnvironmentsForInstances(studyId, instanceNumbers);
 		this.saveVariables(variables, plotDatasetId, environmentDatasetId, environments);
 

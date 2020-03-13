@@ -34,7 +34,6 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
@@ -1007,7 +1006,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	private Integer getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(
 		final String projectName, final String instanceNumber,
 		final String programUUID) {
-		return this.daoFactory.getEnvironmentDao()
+		return this.daoFactory.getInstanceDao()
 			.getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(projectName, Integer.valueOf(instanceNumber), programUUID);
 	}
 

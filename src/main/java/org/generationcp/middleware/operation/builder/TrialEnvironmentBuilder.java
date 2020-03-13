@@ -60,7 +60,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		final Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
 
 		final VariableTypeList trialEnvironmentVariableTypes = this.getTrialEnvironmentVariableTypes(study, dataSet);
-		final List<ExperimentModel> locations = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(datasetId, environmentDatasetId.equals(datasetId));
+		final List<ExperimentModel> locations = this.daoFactory.getInstanceDao().getEnvironmentsByDataset(datasetId, environmentDatasetId.equals(datasetId));
 
 		return this.buildTrialEnvironments(locations, trialEnvironmentVariableTypes);
 	}
@@ -113,16 +113,16 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	public TrialEnvironments getAllTrialEnvironments() {
 		final TrialEnvironments environments = new TrialEnvironments();
-		environments.addAll(this.daoFactory.getEnvironmentDao().getAllTrialEnvironments());
+		environments.addAll(this.daoFactory.getInstanceDao().getAllTrialEnvironments());
 		return environments;
 	}
 
 	public long countAllTrialEnvironments() {
-		return this.daoFactory.getEnvironmentDao().countAllTrialEnvironments();
+		return this.daoFactory.getInstanceDao().countAllTrialEnvironments();
 	}
 
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(final List<Integer> environmentIds) {
-		return this.daoFactory.getEnvironmentDao().getPropertiesForTrialEnvironments(environmentIds);
+		return this.daoFactory.getInstanceDao().getPropertiesForTrialEnvironments(environmentIds);
 	}
 
 	public List<GermplasmPair> getEnvironmentForGermplasmPairs(final List<GermplasmPair> germplasmPairs,
@@ -155,7 +155,7 @@ public class TrialEnvironmentBuilder extends Builder {
 	private void getTrialEnvironmentDetails(final Map<Integer, Set<Integer>> germplasmEnvironments,
 			final Set<TrialEnvironment> trialEnvironmentDetails) {
 		final Set<Integer> localEnvironmentIds = this.getEnvironmentIdsFromMap(germplasmEnvironments);
-		trialEnvironmentDetails.addAll(this.daoFactory.getEnvironmentDao().getTrialEnvironmentDetails(localEnvironmentIds));
+		trialEnvironmentDetails.addAll(this.daoFactory.getInstanceDao().getTrialEnvironmentDetails(localEnvironmentIds));
 	}
 
 	private void buildGermplasmPairsBetweenGids(final List<GermplasmPair> germplasmPairs,
@@ -204,7 +204,7 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds, final String programUUID) {
 		final TrialEnvironments environments = new TrialEnvironments();
-		environments.addAll(this.daoFactory.getEnvironmentDao().getEnvironmentsForTraits(traitIds, programUUID));
+		environments.addAll(this.daoFactory.getInstanceDao().getEnvironmentsForTraits(traitIds, programUUID));
 		return environments;
 	}
 

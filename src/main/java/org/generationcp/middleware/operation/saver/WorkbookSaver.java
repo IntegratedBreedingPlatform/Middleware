@@ -58,7 +58,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 // ASsumptions - can be added to validations
@@ -1028,7 +1027,7 @@ public class WorkbookSaver extends Saver {
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
 		final Session activeSession = this.getActiveSession();
 		final FlushMode existingFlushMode = activeSession.getFlushMode();
-		final Map<Integer, Integer> instanceNumberEnvironmentIdMap = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(environmentDatasetId, true).stream()
+		final Map<Integer, Integer> instanceNumberEnvironmentIdMap = this.daoFactory.getInstanceDao().getEnvironmentsByDataset(environmentDatasetId, true).stream()
 			.collect(Collectors.toMap(ExperimentModel::getObservationUnitNo, ExperimentModel::getNdExperimentId));
 		try {
 			activeSession.setFlushMode(FlushMode.MANUAL);

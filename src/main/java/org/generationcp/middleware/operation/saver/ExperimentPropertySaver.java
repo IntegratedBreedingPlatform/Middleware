@@ -221,7 +221,7 @@ public class ExperimentPropertySaver {
 	}
 
 	private void saveOrUpdateEnvironmentProperty(final int environmentId, final int typeId, final String value) {
-		final ExperimentModel environment = this.daoFactory.getEnvironmentDao().getById(environmentId);
+		final ExperimentModel environment = this.daoFactory.getInstanceDao().getById(environmentId);
 		final List<ExperimentProperty> experimentProperties = environment.getProperties();
 
 		ExperimentProperty experimentProperty = null;

@@ -1071,11 +1071,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
-		return this.daoFactory.getEnvironmentDao().getInstanceMetadata(studyId, Collections.emptyList());
+		return this.daoFactory.getInstanceDao().getInstanceMetadata(studyId, Collections.emptyList());
 	}
 
 	List<InstanceMetadata> getInstanceMetadata(final int studyId, final List<Integer> locationIds) {
-		return this.daoFactory.getEnvironmentDao().getInstanceMetadata(studyId, locationIds);
+		return this.daoFactory.getInstanceDao().getInstanceMetadata(studyId, locationIds);
 	}
 
 	@Override
@@ -1231,7 +1231,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public Map<Integer, String> getEnvironmentVariableIdValuesMap(final Integer datasetId, final Integer environmentId) {
 		final Map<Integer, String> environmentVariablesMap =
 			this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariablesMap(datasetId, environmentId);
-		final ExperimentModel environment = this.daoFactory.getEnvironmentDao().getById(environmentId);
+		final ExperimentModel environment = this.daoFactory.getInstanceDao().getById(environmentId);
 
 		environmentVariablesMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(environment.getObservationUnitNo()));
 		return environmentVariablesMap;
@@ -1240,7 +1240,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	// TODO IBP-3305 Determine if this can be replaced with StudyDataManager#areAllInstancesExistInDataset
 	@Override
 	public Boolean instancesExist(final Set<Integer> instanceIds) {
-		return this.daoFactory.getEnvironmentDao().instancesExist(instanceIds);
+		return this.daoFactory.getInstanceDao().instancesExist(instanceIds);
 	}
 
 	@Override
