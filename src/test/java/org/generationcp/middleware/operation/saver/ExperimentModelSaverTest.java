@@ -28,7 +28,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 	private ExperimentModelSaver experimentModelSaver;
 	private ExperimentDao experimentDao;
 	private PhenotypeDao phenotypeDao;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
@@ -53,13 +53,14 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 
 		final List<ExperimentProperty> experimentProperties = experimentModelSaver.createTrialDesignExperimentProperties(experimentModel, factors);
 
-		Assert.assertEquals(4, experimentProperties.size());
+		Assert.assertEquals(5, experimentProperties.size());
 
 		// Verify that only Study Design Factors are created
 		Assert.assertEquals(Integer.valueOf(101), experimentProperties.get(0).getTypeId());
 		Assert.assertEquals(Integer.valueOf(102), experimentProperties.get(1).getTypeId());
 		Assert.assertEquals(Integer.valueOf(103), experimentProperties.get(2).getTypeId());
 		Assert.assertEquals(Integer.valueOf(104), experimentProperties.get(3).getTypeId());
+		Assert.assertEquals(Integer.valueOf(105), experimentProperties.get(4).getTypeId());
 
 	}
 
@@ -145,14 +146,15 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
 		values.setGermplasmId(1);
+		values.setObservationUnitNo(1);
 
 		//Save the experiment
 		final CropType crop = new CropType();
 		crop.setUseUUID(false);
 		crop.setPlotCodePrefix(CROP_PREFIX);
-		this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.experimentDao.getById(values.getLocationId());
-		Assert.assertNotNull(experiment.getObsUnitId());
+		final ExperimentModel createdExperiment = this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		final ExperimentModel experiment = this.experimentDao.getById(createdExperiment.getNdExperimentId());
+		Assert.assertEquals(values.getObservationUnitNo(), experiment.getObservationUnitNo());
 		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
