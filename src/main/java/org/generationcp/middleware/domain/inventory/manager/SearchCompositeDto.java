@@ -8,24 +8,24 @@ import java.util.Set;
 @AutoProperty
 public class SearchCompositeDto {
 
-	private Integer searchId;
+	private Integer searchRequestId;
 
-	private Set<Integer> listIds;
+	private Set<Integer> itemIds;
 
-	public Integer getSearchId() {
-		return searchId;
+	public Integer getSearchRequestId() {
+		return searchRequestId;
 	}
 
-	public void setSearchId(Integer searchId) {
-		this.searchId = searchId;
+	public void setSearchRequestId(Integer searchRequestId) {
+		this.searchRequestId = searchRequestId;
 	}
 
-	public Set<Integer> getListIds() {
-		return listIds;
+	public Set<Integer> getItemIds() {
+		return itemIds;
 	}
 
-	public void setListIds(Set<Integer> listIds) {
-		this.listIds = listIds;
+	public void setItemIds(Set<Integer> itemIds) {
+		this.itemIds = itemIds;
 	}
 
 	@Override
