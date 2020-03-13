@@ -134,8 +134,8 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public void confirmPendingTransactions(final List<TransactionDto> confirmedTransactionDtos) {
-		final List<Integer> transactionIds = confirmedTransactionDtos.stream().map(TransactionDto::getTransactionId).collect(
-			Collectors.toList());
+		final Set<Integer> transactionIds = confirmedTransactionDtos.stream().map(TransactionDto::getTransactionId).collect(
+			Collectors.toSet());
 
 		final List<Transaction> transactions = daoFactory.getTransactionDAO().getByIds(transactionIds);
 		for (final Transaction transaction : transactions) {

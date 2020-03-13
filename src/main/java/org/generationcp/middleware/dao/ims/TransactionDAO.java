@@ -380,25 +380,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	}
 
-	public List<Transaction> getByIds(final List<Integer> transactionIds) {
-		final List<Transaction> transactions = new ArrayList<>();
-
-		if (transactionIds == null || transactionIds.isEmpty()) {
-			return transactions;
-		}
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.in("id", transactionIds));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error getByIds() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-	}
-
 	public void cancelUnconfirmedTransactionsForListEntries(final List<Integer> listEntryIds) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
