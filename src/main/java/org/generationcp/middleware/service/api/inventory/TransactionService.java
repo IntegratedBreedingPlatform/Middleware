@@ -31,5 +31,8 @@ public interface TransactionService {
 	 */
 	void withdrawLots(Integer userId, Set<Integer> lotIds, LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus) ;
 
+	void confirmPendingTransactions(List<TransactionDto> confirmedTransactionDtoList);
+
 	List<TransactionDto> getAvailableBalanceTransactions(Integer lotId);
+
 }

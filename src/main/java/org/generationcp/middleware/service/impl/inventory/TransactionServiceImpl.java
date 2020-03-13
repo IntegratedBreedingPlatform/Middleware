@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -129,7 +130,21 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
+	public void confirmPendingTransactions(final List<TransactionDto> confirmedTransactionDtos) {
+		final List<Integer> transactionIds = confirmedTransactionDtos.stream().map(TransactionDto::getTransactionId).collect(
+			Collectors.toList());
+
+		final List<Transaction> transactions = daoFactory.getTransactionDAO().getByIds(transactionIds);
+		for (final Transaction transaction : transactions) {
+			transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
+			transaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
+			daoFactory.getTransactionDAO().update(transaction);
+		}
+	}
+
+	@Override
 	public List<TransactionDto> getAvailableBalanceTransactions(final Integer lotId) {
 		return this.daoFactory.getTransactionDAO().getAvailableBalanceTransactions(lotId);
 	}
+
 }
