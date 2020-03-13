@@ -406,19 +406,6 @@ public class InstanceDao extends GenericDAO<ExperimentModel, Integer> {
 		return this.getEnvironmentsForInstances(studyId, Collections.<Integer>emptyList());
 	}
 
-	/**
-	 * FIXME IBP-3472: make a single query
-	 *
-	 * @return TRUE if all of the instanceIds exists. Otherwise FALSE
-	 */
-	public Boolean instanceExists(final Set<Integer> instanceIds) {
-		for (final Integer instanceId : instanceIds) {
-			if (this.getById(instanceId) == null) {
-				return Boolean.FALSE;
-			}
-		}
-		return true;
-	}
 
 	@SuppressWarnings("unchecked")
 	public Integer getEnvironmentIdByStudyNameAndInstanceNumberAndProgramUUID(
