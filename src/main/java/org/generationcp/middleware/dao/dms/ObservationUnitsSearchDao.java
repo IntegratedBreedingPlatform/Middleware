@@ -7,6 +7,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -173,7 +174,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				"select count(*) as totalObservationUnits, count(distinct(env.nd_experiment_id)) as totalInstances from " //
 					+ "nd_experiment nde " //
 					+ "    inner join project p on p.project_id = nde.project_id " //
-					+ " INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = 3 "
+					+ " INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId()
 					+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 					+ " where " //
 					+ "	p.project_id = :datasetId ");

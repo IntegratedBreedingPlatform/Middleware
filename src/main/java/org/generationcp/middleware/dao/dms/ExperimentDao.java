@@ -267,7 +267,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "  INNER JOIN nd_experiment e ON pheno.nd_experiment_id = e.nd_experiment_id"
 			+ "  LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id "
 			+ "  INNER JOIN project pr ON pr.project_id = e.project_id "
-			+ "  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3 "
+			+ "  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId()
 			+ "  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = "
 					+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			// handle cases for with/without plot and with/without sub-observations
@@ -290,7 +290,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		queryString = "DELETE eprop, e " + " FROM nd_experiment e "
 			+ "  LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id "
 			+ "  INNER JOIN project pr ON pr.project_id = e.project_id "
-			+ "  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3 "
+			+ "  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId()
 			+ "  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = "
 					+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			// handle cases for with/without plot and with/without sub-observations
@@ -373,7 +373,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("select distinct exp.* from nd_experiment exp ");
 			queryString.append("inner join project pr on exp.project_id = pr.project_id ");
-			queryString.append("inner join project env_ds on env_ds.study_id = pr.study_id and env_ds.dataset_type_id = 3 ");
+			queryString.append("inner join project env_ds on env_ds.study_id = pr.study_id and env_ds.dataset_type_id = ");
+			queryString.append(DatasetTypeEnum.SUMMARY_DATA.getId()).append(" ");
 			queryString.append("inner join nd_experiment env ON env_ds.project_id = env.project_id and env.type_id = ");
 			queryString.append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()).append(" ");
 			queryString.append("where exp.project_id =:p_id and exp.type_id in (:type_ids) ");
@@ -533,7 +534,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final StringBuilder sql = new StringBuilder();
 		sql.append("SELECT COUNT(DISTINCT env.nd_experiment_id) FROM nd_experiment e ")
 			.append("  INNER JOIN project pr ON pr.project_id = e.project_id ")
-			.append("  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3 ")
+			.append("  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = ")
+			.append(DatasetTypeEnum.SUMMARY_DATA.getId()).append(" ")
 			.append("  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = ")
 			.append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()).append(" ")
 			.append(" WHERE e.project_id = :datasetId and env.nd_experiment_id in (:instanceIds)");

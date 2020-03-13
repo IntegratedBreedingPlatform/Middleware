@@ -26,7 +26,8 @@ class ObservationQuery {
 		+ " 	   	FROM nd_experiment nde "
 		+ "   		LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id "
 		+ "  		INNER JOIN project p ON p.project_id = nde.project_id "
-		+ "  		INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = 3 "
+		+ "  		INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = "
+						+ DatasetTypeEnum.SUMMARY_DATA.getId()
 		+ "  		INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = "
 						+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 					// handle cases for plot and with/without sub-observations

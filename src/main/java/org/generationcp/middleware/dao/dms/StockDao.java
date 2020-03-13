@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.dms;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.hibernate.Criteria;
@@ -145,7 +146,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					+ "from nd_experiment e "
 					+ " inner join phenotype p ON e.nd_experiment_id = p.nd_experiment_id "
 					+ " inner join project p ON p.project_id = e.project_id  "
-					+ " inner join project plot_ds on plot_ds.study_id = p.study_id and plot_ds.dataset_type_id = 4 "
+					+ " inner join project plot_ds on plot_ds.study_id = p.study_id and plot_ds.dataset_type_id = "
+					+ 	DatasetTypeEnum.PLOT_DATA.getId() + " "
 					+ " inner join nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ "  WHERE plot.parent_id = :environmentId  and p.observable_id = " + variateStdVarId
 					+ "  and e.project_id = :datasetId ";

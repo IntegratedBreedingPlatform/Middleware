@@ -73,7 +73,8 @@ public class ObservationQueryTest {
 			+ "		FROM nd_experiment nde "
 			+ "		LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id "
 			+ "		INNER JOIN project p ON p.project_id = nde.project_id "
-			+ "		INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = 3 "
+			+ "		INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = "
+			+ 		DatasetTypeEnum.SUMMARY_DATA.getId()
 			+ "		INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = "
 			+		TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " AND (nde.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) "
 			+ "		INNER JOIN stock s ON s.stock_id = nde.stock_id "
@@ -125,7 +126,7 @@ public class ObservationQueryTest {
 			+ 		TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			+ "		INNER JOIN stock s ON s.stock_id = nde.stock_id  \tLEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
 			+ "		LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
-			+ "		WHERE p.study_id = :studyId AND p.dataset_type_id = 4 "
+			+ "		WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 			+ " 	AND env.nd_experiment_id = :instanceId   GROUP BY nde.nd_experiment_id  ORDER BY (1 * PLOT_NO) asc ";
 	}
 
@@ -159,7 +160,7 @@ public class ObservationQueryTest {
 			+ "		INNER JOIN stock s ON s.stock_id = nde.stock_id "
 			+ "		LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
 			+ "		LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
-			+ "		WHERE p.study_id = :studyId AND p.dataset_type_id = 4 "
+			+ "		WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 			+ " AND nde.nd_experiment_id = :experiment_id  GROUP BY nde.nd_experiment_id ";
 
 	}

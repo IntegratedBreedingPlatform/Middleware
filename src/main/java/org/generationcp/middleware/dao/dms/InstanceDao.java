@@ -444,7 +444,8 @@ public class InstanceDao extends GenericDAO<ExperimentModel, Integer> {
 		sb.append("select e.nd_experiment_id, env.nd_experiment_id as environmentId, env.observation_unit_no ");
 		sb.append("from nd_experiment e ");
 		sb.append("inner join project pr ON pr.project_id = e.project_id ");
-		sb.append("inner join project env_ds ON pr.study_id = env_ds.study_id and env_ds.dataset_type_id = 3 ");
+		sb.append("inner join project env_ds ON pr.study_id = env_ds.study_id and env_ds.dataset_type_id = ");
+		sb.append(DatasetTypeEnum.SUMMARY_DATA.getId()).append(" ");
 		sb.append("inner join nd_experiment env ON env.project_id = env_ds.project_id and env.type_id = ");
 		sb.append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()).append(" ");
 		sb.append("inner join nd_experiment plot ON (plot.nd_experiment_id = e.nd_experiment_id OR plot.nd_experiment_id = e.parent_id) ");

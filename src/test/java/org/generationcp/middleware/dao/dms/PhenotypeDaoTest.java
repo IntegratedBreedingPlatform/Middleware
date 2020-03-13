@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -110,7 +111,8 @@ public class PhenotypeDaoTest {
 			+ "		INNER JOIN stock s ON e.stock_id = s.stock_id "
 			+ "		INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id  "
 			+ "		INNER JOIN project pr ON pr.project_id = e.project_id "
-			+ "		INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+			+ "		INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = "
+			+ 		DatasetTypeEnum.PLOT_DATA.getId()
 			+ "		INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 			+ "		WHERE plot.parent_id IN (:environmentIds) AND p.observable_id IN (:traitIds)";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -136,7 +138,8 @@ public class PhenotypeDaoTest {
 			+ "		FROM phenotype p "
 			+ "		INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 			+ "		INNER JOIN project pr ON pr.project_id = e.project_id "
-			+ "		INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+			+ "		INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = "
+			+ 		DatasetTypeEnum.PLOT_DATA.getId()
 			+ "		INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 			+ "		INNER JOIN stock s ON e.stock_id = s.stock_id "
 			+ "		WHERE plot.parent_id IN (:environmentIds) "
@@ -162,7 +165,8 @@ public class PhenotypeDaoTest {
 			+ "		INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 			+ "		INNER JOIN stock s ON e.stock_id = s.stock_id "
 			+ "		INNER JOIN project pr ON pr.project_id = e.project_id "
-			+ "		INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+			+ "		INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = "
+			+ 		DatasetTypeEnum.PLOT_DATA.getId()
 			+ "		INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 			+ "		WHERE plot.parent_id IN (:environmentIds) AND p.observable_id IN (:variableIds) GROUP by p.observable_id";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -184,7 +188,8 @@ public class PhenotypeDaoTest {
 			+ "		FROM phenotype p "
 			+ "		INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 			+ "		INNER JOIN stock s ON e.stock_id = s.stock_id  INNER JOIN project pr ON pr.project_id = e.project_id "
-			+ "		INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+			+ "		INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = "
+			+ 		DatasetTypeEnum.PLOT_DATA.getId()
 			+ "		INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 			+ "		WHERE plot.parent_id IN (:environmentIds) GROUP by p.observable_id";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -256,7 +261,18 @@ public class PhenotypeDaoTest {
 	}
 
 	private String getContainsAtLeast2CommonEntriesQuery(final String germplasmGroupBy) {
-		return " SELECT phenotype.observable_id,count(phenotype.observable_id)  FROM nd_experiment nd_exp  INNER JOIN stock ON nd_exp.stock_id = stock.stock_id  LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id  INNER JOIN project pr ON pr.project_id = nd_exp.project_id   INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4  INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id  where nd_exp.project_id = :projectId and plot.parent_id = :environmentId and ((phenotype.value <> '' and phenotype.value is not null) or  (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null))  group by plot.parent_id, " + germplasmGroupBy + " , phenotype.observable_id  having count(phenotype.observable_id) >= 2 LIMIT 1";
+		return " SELECT phenotype.observable_id, "
+			+ "	count(phenotype.observable_id) "
+			+ " FROM nd_experiment nd_exp "
+			+ " INNER JOIN stock ON nd_exp.stock_id = stock.stock_id "
+			+ "	LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id "
+			+ "	INNER JOIN project pr ON pr.project_id = nd_exp.project_id "
+			+ "	INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = "  + DatasetTypeEnum.PLOT_DATA.getId()
+			+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id  "
+			+ "	where nd_exp.project_id = :projectId and plot.parent_id = :environmentId "
+			+ "	and ((phenotype.value <> '' and phenotype.value is not null) or  (phenotype.cvalue_id <> '' "
+			+ "	and phenotype.cvalue_id is not null))  group by plot.parent_id, " + germplasmGroupBy + " , "
+			+ "	phenotype.observable_id  having count(phenotype.observable_id) >= 2 LIMIT 1";
 	}
 	private String getObservationsForTraitMainQuery() {
 		return "SELECT p.observable_id, "
@@ -265,7 +281,8 @@ public class PhenotypeDaoTest {
 			+ "		INNER JOIN stock s ON e.stock_id = s.stock_id "
 			+ "		INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id "
 			+ "		INNER JOIN project pr ON pr.project_id = e.project_id "
-			+ "		INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+			+ "		INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = "
+			+ 		DatasetTypeEnum.PLOT_DATA.getId()
 			+ "		INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 			+ "		WHERE plot.parent_id IN (:environmentIds) AND p.observable_id IN (:traitIds)";
 	}

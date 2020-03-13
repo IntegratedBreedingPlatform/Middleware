@@ -355,7 +355,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append(", ppPIid.value AS piId, siteId.value AS siteId, ")
 			.append("pmain.created_by as createdBy, pmain.locked as isLocked ")
 			.append("FROM project pmain ")
-			.append("INNER JOIN project env_ds ON pmain.project_id = env_ds.study_id AND env_ds.dataset_type_id = 3 ")
+			.append("INNER JOIN project env_ds ON pmain.project_id = env_ds.study_id AND env_ds.dataset_type_id = ")
+			.append(DatasetTypeEnum.SUMMARY_DATA.getId()).append(" ")
 			.append("LEFT JOIN projectprop ppPI ON pmain.project_id = ppPI.project_id ")
 			.append("			AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
 			.append("LEFT JOIN projectprop ppPIid ON pmain.project_id = ppPIid.project_id ")
@@ -1112,7 +1113,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				// Query tables
 				+ " FROM nd_experiment nde "
 				+ " INNER JOIN project proj ON proj.project_id = nde.project_id "
-				+ " INNER JOIN project env_ds ON env_ds.study_id = proj.study_id AND env_ds.dataset_type_id = 3 "
+				+ " INNER JOIN project env_ds ON env_ds.study_id = proj.study_id AND env_ds.dataset_type_id = "  + DatasetTypeEnum.SUMMARY_DATA.getId()
 				+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 				+ " LEFT OUTER JOIN nd_experimentprop xprop ON xprop.nd_experiment_id = env.nd_experiment_id "
 				+ " LEFT OUTER JOIN location loc on xprop.value = loc.locid and xprop.type_id = 8190 "
