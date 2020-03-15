@@ -42,6 +42,18 @@ public class StudySearchFilter {
 	private Boolean active;
 	private SortedPageRequest sortedRequest = new SortedPageRequest();
 
+	public StudySearchFilter(final String studyTypeDbId, final String programDbId, final String locationDbId, final String seasonDbId,
+		final String trialDbId, final String studyDbId, final Boolean active, final SortedPageRequest sortedPageRequest) {
+		this.studyTypeDbId = studyTypeDbId;
+		this.programDbId = programDbId;
+		this.locationDbId = locationDbId;
+		this.seasonDbId = seasonDbId;
+		this.trialDbId = trialDbId;
+		this.studyDbId = studyDbId;
+		this.active = active;
+		this.sortedRequest = sortedPageRequest;
+	}
+
 	public String getStudyTypeDbId() {
 		return this.studyTypeDbId;
 	}

@@ -5,7 +5,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.SampleDao;
@@ -21,7 +20,6 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
@@ -43,7 +41,6 @@ import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -455,8 +452,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		this.testDataInitializer.addGeolocationProp(instance1, TermId.SEASON_VAR.getId(), String.valueOf(TermId.SEASON_DRY.getId()), 1);
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		final Long count = (Long) this.dmsProjectDao.countStudyDTOs(studySearchFilter);
-		final List<StudyDto> studyDtos = this.dmsProjectDao.getStudyDTOs(studySearchFilter);
+		final Long count = (Long) this.dmsProjectDao.countStudies(studySearchFilter);
+		final List<StudyDto> studyDtos = this.dmsProjectDao.getStudies(studySearchFilter);
 		Assert.assertEquals(count.intValue(), studyDtos.size());
 
 	}
@@ -486,8 +483,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		studySearchFilter.setSeasonDbId(String.valueOf(TermId.SEASON_DRY.getId()));
 		studySearchFilter.setActive(true);
 
-		final Long count = (Long) this.dmsProjectDao.countStudyDTOs(studySearchFilter);
-		final List<StudyDto> studyDtos = this.dmsProjectDao.getStudyDTOs(studySearchFilter);
+		final Long count = (Long) this.dmsProjectDao.countStudies(studySearchFilter);
+		final List<StudyDto> studyDtos = this.dmsProjectDao.getStudies(studySearchFilter);
 
 		Assert.assertEquals(1, count.intValue());
 		Assert.assertEquals(1, studyDtos.size());

@@ -76,7 +76,7 @@ public interface StudyService {
 
 	Integer getEnvironmentDatasetId(final int studyId);
 
-	List<StudyDto> getStudyDTOs(StudySearchFilter studySearchFilter);
+	List<StudyDto> getStudies(StudySearchFilter studySearchFilter);
 
-	long countStudyDTOs(StudySearchFilter studySearchFilter);
+	long countStudies(StudySearchFilter studySearchFilter);
 }

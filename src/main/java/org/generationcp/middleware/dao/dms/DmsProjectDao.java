@@ -1403,14 +1403,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public long countStudyDTOs(final StudySearchFilter studySearchFilter) {
+	public long countStudies(final StudySearchFilter studySearchFilter) {
 		final SQLQuery sqlQuery =
 			this.getSession().createSQLQuery(this.createCountStudyQueryString(studySearchFilter));
 		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
-	public List<StudyDto> getStudyDTOs(final StudySearchFilter studySearchFilter) {
+	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
 
 		// TODO: Check if we can reuse this query/method in getStudyMetadataForGeolocationId()
 		final SQLQuery sqlQuery =
@@ -1464,10 +1464,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final List<SeasonDto> seasons = new ArrayList<>();
 			if (!StringUtils.isEmpty((String) result.get(StudySearchFilter.SEASON_DB_ID))) {
-				final SeasonDto seasonDto = new SeasonDto();
-				seasonDto.setSeasonDbId(String.valueOf(result.get(StudySearchFilter.SEASON_DB_ID)));
-				seasonDto.setSeason(String.valueOf(result.get(StudySearchFilter.SEASON)));
-				seasons.add(seasonDto);
+				seasons.add(new SeasonDto(String.valueOf(result.get(StudySearchFilter.SEASON_DB_ID)),
+					String.valueOf(result.get(StudySearchFilter.SEASON))));
 			}
 			studyDto.setSeasons(seasons);
 
@@ -1531,12 +1529,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		this.appendStudySummaryFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
 		sql.append(" GROUP BY geoloc.nd_geolocation_id ");
-		if (!StringUtils.isEmpty(studySearchFilter.getSortedRequest().getSortBy()) && StudySearchFilter.SORTABLE_FIELDS
-			.contains(studySearchFilter.getSortedRequest().getSortBy())) {
+
+		final String sortBy = studySearchFilter.getSortedRequest().getSortBy();
+		final String sortOrder = studySearchFilter.getSortedRequest().getSortOrder();
+
+		if (!StringUtils.isEmpty(sortBy) && StudySearchFilter.SORTABLE_FIELDS.contains(sortBy)) {
 			sql.append(
-				" ORDER BY " + studySearchFilter.getSortedRequest().getSortBy() + " " + (
-					studySearchFilter.getSortedRequest().getSortOrder() == null ? "ASC" :
-						studySearchFilter.getSortedRequest().getSortOrder()));
+				" ORDER BY " + sortBy + " " + (sortOrder == null ? "ASC" : sortOrder));
 		}
 		return sql.toString();
 	}
@@ -1550,10 +1549,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     project proj ON proj.project_id = nde.project_id ");
 		sql.append("         INNER JOIN ");
 		sql.append("     project pmain ON pmain.project_id = proj.study_id ");
-		sql.append("         LEFT OUTER JOIN ");
-		sql.append("     nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id ");
-		sql.append("         LEFT OUTER JOIN ");
-		sql.append("     projectprop pProp ON pmain.project_id = pProp.project_id ");
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     study_type studyType ON studyType.study_type_id = pmain.study_type_id ");
 		sql.append("         LEFT OUTER JOIN ");

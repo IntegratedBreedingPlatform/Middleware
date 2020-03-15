@@ -58,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -622,13 +621,13 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<StudyDto> getStudyDTOs(final StudySearchFilter studySearchFilter) {
-		return this.daoFactory.getDmsProjectDAO().getStudyDTOs(studySearchFilter);
+	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
+		return this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter);
 	}
 
 	@Override
-	public long countStudyDTOs(final StudySearchFilter studySearchFilter) {
-		return this.daoFactory.getDmsProjectDAO().countStudyDTOs(studySearchFilter);
+	public long countStudies(final StudySearchFilter studySearchFilter) {
+		return this.daoFactory.getDmsProjectDAO().countStudies(studySearchFilter);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
