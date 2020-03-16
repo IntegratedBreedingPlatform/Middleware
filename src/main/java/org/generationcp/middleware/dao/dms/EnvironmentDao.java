@@ -253,17 +253,22 @@ public class EnvironmentDao extends GenericDAO<ExperimentModel, Integer> {
 		final TrialEnvironments environments = new TrialEnvironments();
 		try {
 			final String sql =
-				"SELECT DISTINCT xp.nd_experiment_id as envtId, l.lname as locationName, prov.lname as provinceName, c.isoabbr, p.project_id, p.name, xp.value as locationId"
-					+ " FROM nd_experiment e "
-					+ " INNER JOIN project ds ON ds.project_id = e.project_id "
-					+ " INNER JOIN project p ON p.project_id = ds.study_id "
-					+ " INNER JOIN phenotype ph ON ph.nd_experiment_id = e.nd_experiment_id"
-					+ " INNER JOIN nd_experimentprop xp ON xp.nd_experiment_id = e.nd_experiment_id AND xp.type_id = "
-					+ TermId.LOCATION_ID.getId()
-					+ " LEFT JOIN location l ON l.locid = xp.value"
-					+ " LEFT JOIN location prov ON prov.locid = l.snl1id"
-					+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
-					+ " WHERE ph.observable_id IN (:traitIds) AND p.program_uuid = :programUUID ;";
+				" SELECT DISTINCT xp.nd_experiment_id as envtId, l.lname as locationName, prov.lname as provinceName, c.isoabbr, pmain.project_id, pmain.name, xp.value as locationId " +
+			" FROM nd_experiment e " +
+			" LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id and plot.type_id = " + TermId.PLOT_EXPERIMENT.getId() +
+			" INNER JOIN project pr ON pr.project_id = e.project_id " +
+			" INNER JOIN project pmain ON pmain.project_id = pr.study_id " +
+			" INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId() +
+			" INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() +
+			" AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) " +
+			" INNER JOIN projectprop pp on e.project_id = pp.project_id and pp.type_id = 1808 AND pp.variable_id in (:traitIds) " +
+			" INNER JOIN nd_experimentprop xp ON xp.nd_experiment_id = env.nd_experiment_id AND xp.type_id = " + TermId.LOCATION_ID.getId() +
+			" LEFT JOIN location l ON l.locid = xp.value " +
+			" LEFT JOIN location prov ON prov.locid = l.snl1id " +
+			" LEFT JOIN cntry c ON c.cntryid = l.cntryid " +
+			" WHERE pmain.program_uuid = :programUUID AND EXISTS ("
+					+ "  select 1 from phenotype ph where ph.observable_id = pp.variable_id and ph.nd_experiment_id = e.nd_experiment_id) "
+			;
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.addScalar(EnvironmentDao.ENVT_ID);
 			query.addScalar(EnvironmentDao.LOCATION_NAME);
