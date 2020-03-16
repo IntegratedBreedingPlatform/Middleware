@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -19,8 +20,7 @@ import com.beust.jcommander.internal.Lists;
 /**
  * The class <code>QueryTest</code> contains tests for the class <code>{@link ObservationQuery}</code>.
  *
- * @generatedBy CodePro at 17/04/15 3:08 PM
- * @author Akhil
+ *  @author Akhil
  * @version $Revision: 1.0 $
  */
 public class ObservationQueryTest {
@@ -29,9 +29,9 @@ public class ObservationQueryTest {
 	private static final String STOCK_ID = "STOCK_ID";
 	private static final String FACT1 = "FACT1";
 	final private BasicFormatterImpl formattedSQL = new BasicFormatterImpl();
-	final List<String> germplasmDescriptors = Lists.newArrayList(STOCK_ID);
-	final List<String> designFactors = Lists.newArrayList(FACT1);
-	List<MeasurementVariableDto> traitNames  = new LinkedList<>();
+	private final List<String> germplasmDescriptors = Lists.newArrayList(STOCK_ID);
+	private final List<String> designFactors = Lists.newArrayList(FACT1);
+	private List<MeasurementVariableDto> traitNames  = new LinkedList<>();
 
 	private ObservationQuery observationQuery;
 
@@ -45,19 +45,16 @@ public class ObservationQueryTest {
 	/**
 	 * Run the String generateQuery(String,List<String>) method test.
 	 *
-	 * @throws Exception
-	 *
-	 * @generatedBy CodePro at 17/04/15 3:08 PM
 	 */
 	@Test
-	public void testGetAllMeasurementsQueryGeneration() throws Exception {
+	public void testGetAllMeasurementsQueryGeneration() {
 		final String result = this.observationQuery.getAllObservationsQuery(this.traitNames, this.germplasmDescriptors, this.designFactors, null, null);
 		assertEquals("The generated query must match the expected query.", this.formatString(this.expectedQueryForAllMeasurements()),
 			this.formatString(result));
 	}
 
 	@Test
-	public void testGetSingleMeasurementQueryGeneration() throws Exception {
+	public void testGetSingleMeasurementQueryGeneration() {
 		final String result = this.observationQuery.getSingleObservationQuery(this.traitNames, this.germplasmDescriptors, this.designFactors);
 		assertEquals("The generated query must match the expected query.", this.formatString(this.expectedQueryForSingleMeasurement()),
 			this.formatString(result));
@@ -72,8 +69,10 @@ public class ObservationQueryTest {
 			+ "		FROM nd_experiment nde "
 			+ "		LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id "
 			+ "		INNER JOIN project p ON p.project_id = nde.project_id "
-			+ "		INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = 3 "
-			+ "		INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 AND (nde.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) "
+			+ "		INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = "
+			+ 		DatasetTypeEnum.SUMMARY_DATA.getId()
+			+ "		INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = "
+			+		TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " AND (nde.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) "
 			+ "		INNER JOIN stock s ON s.stock_id = nde.stock_id "
 			+ "		LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
 			+ "		LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
@@ -119,10 +118,11 @@ public class ObservationQueryTest {
 			+ "		(SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = 'FACT1') 'FACT1', "
 			+ "		1=1 FROM project p "
 			+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
-			+ "		INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = 1020 "
+			+ "		INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = "
+			+ 		TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			+ "		INNER JOIN stock s ON s.stock_id = nde.stock_id  \tLEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
 			+ "		LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
-			+ "		WHERE p.study_id = :studyId AND p.dataset_type_id = 4 "
+			+ "		WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 			+ " 	AND env.nd_experiment_id = :instanceId   GROUP BY nde.nd_experiment_id  ORDER BY (1 * PLOT_NO) asc ";
 	}
 
@@ -151,11 +151,12 @@ public class ObservationQueryTest {
 			+ "		(SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = 'FACT1') 'FACT1',"
 			+ " 	1=1 FROM  project p "
 			+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
-			+ "		INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = 1020 "
+			+ "		INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = "
+			+ 		TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			+ "		INNER JOIN stock s ON s.stock_id = nde.stock_id "
 			+ "		LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
 			+ "		LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
-			+ "		WHERE p.study_id = :studyId AND p.dataset_type_id = 4 "
+			+ "		WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 			+ " AND nde.nd_experiment_id = :experiment_id  GROUP BY nde.nd_experiment_id ";
 
 	}

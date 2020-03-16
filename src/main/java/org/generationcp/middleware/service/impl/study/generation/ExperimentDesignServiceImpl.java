@@ -81,7 +81,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		this.deleteTrialInstanceExperiments(plotDatasetId, environmentDatasetId, instanceNumbers);
 
 		// Save variables at trial and plot dataset level
-		final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao()
+		final List<ExperimentModel> environments = this.daoFactory.getInstanceDao()
 			.getEnvironmentsForInstances(studyId, instanceNumbers);
 		this.saveVariables(variables, plotDatasetId, environmentDatasetId, environments);
 
@@ -112,7 +112,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 			final int variableId = variable.getTermId();
 			final VariableType variableType = variable.getVariableType();
 			final boolean isEnvironmentVariable = VariableType.ENVIRONMENT_DETAIL.equals(variableType);
-			Integer rank = 1;
+			int rank = 1;
 			final String value = variable.getValue();
 			if (!this.variableExists(variableId, isEnvironmentVariable, envVariableIds, plotVariableIds)) {
 				Integer projectId = plotDatasetId;

@@ -58,7 +58,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 // ASsumptions - can be added to validations
@@ -114,11 +113,10 @@ public class WorkbookSaver extends Saver {
 	 * @return Map<String>, ?> : a map of 3 sub-maps containing
 	 * Strings(headers), VariableTypeLists and Lists of
 	 * MeasurementVariables
-	 * @throws Exception
 	 */
 
 	@SuppressWarnings("rawtypes")
-	public Map saveVariables(final Workbook workbook, final String programUUID) throws Exception {
+	public Map saveVariables(final Workbook workbook, final String programUUID) {
 		// make sure to reset all derived variables
 		workbook.reset();
 
@@ -216,7 +214,7 @@ public class WorkbookSaver extends Saver {
 
 		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook, trialVariables, trialHeaders);
 
-		final Integer plotDatasetId =
+		final int plotDatasetId =
 			this.createPlotDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables, programUUID);
 		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
 
@@ -260,8 +258,8 @@ public class WorkbookSaver extends Saver {
 		final List<String> trialHeaders = headerMap.get(WorkbookSaver.TRIALHEADERS);
 		final VariableTypeList effectVariables = variableTypeMap.get(WorkbookSaver.EFFECTVARIABLE);
 
-		final Integer environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
-		final Integer plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
+		final int environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
+		final int plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
 		final int studyId = workbook.getStudyDetails().getId();
 
 		// TODO: IBP-3389 Check if we can remove the code that resets/delete trial experiments
@@ -346,18 +344,7 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
-	public void resetTrialObservations(final List<MeasurementRow> trialObservations) {
-		for (final MeasurementRow row : trialObservations) {
-			row.setExperimentId(0);
-			row.setLocationId(0);
-			row.setStockId(0);
-			for (final MeasurementData data : row.getDataList()) {
-				data.setPhenotypeId(null);
-			}
-		}
-	}
-
-	public void saveOrUpdateTrialObservations(
+	private void saveOrUpdateTrialObservations(
 		final CropType crop, final int trialDatasetId, final Workbook workbook, final VariableTypeList trialVariables, final List<String> trialHeaders) {
 
 		final List<Location> locations = this.daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
@@ -403,7 +390,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 
-	protected void assignExptDesignAsExternallyGeneratedDesignIfEmpty(final VariableList variableList) {
+	private void assignExptDesignAsExternallyGeneratedDesignIfEmpty(final VariableList variableList) {
 		final Variable exptDesignVariable = variableList.findById(TermId.EXPERIMENT_DESIGN_FACTOR);
 
 		if (exptDesignVariable != null) {
@@ -413,7 +400,7 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
-	protected void assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
+	void assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
 		final VariableList variableList, final List<Location> locations) {
 		final Variable locationIdVariable = variableList.findById(TermId.LOCATION_ID);
 
@@ -423,7 +410,7 @@ public class WorkbookSaver extends Saver {
 
 			if (!StringUtils.isEmpty(locationIdVariable.getValue())) {
 				locationId.add(Integer.valueOf(locationIdVariable.getValue()));
-				locationIdExists = (daoFactory.getLocationDAO().getByIds(locationId).size() > 0) ? true : false;
+				locationIdExists = this.daoFactory.getLocationDAO().getByIds(locationId).size() > 0;
 			}
 			if (StringUtils.isEmpty(locationIdVariable.getValue()) || !locationIdExists) {
 				String unspecifiedLocationLocId = "";
@@ -480,18 +467,6 @@ public class WorkbookSaver extends Saver {
 			}
 		}
 		return null;
-	}
-
-	private String getTrialInstanceNumber(final VariableList trialVariables) {
-		if (trialVariables != null && trialVariables.getVariables() != null) {
-			for (final Variable variable : trialVariables.getVariables()) {
-				if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variable.getVariableType().getStandardVariable().getId()) {
-					return variable.getValue();
-				}
-			}
-		}
-		return null;
-
 	}
 
 	private String generateTrialDatasetName(final String studyName) {
@@ -646,7 +621,7 @@ public class WorkbookSaver extends Saver {
 		return datasetId;
 	}
 
-	public void createStocksIfNecessary(
+	private void createStocksIfNecessary(
 		final int datasetId, final Workbook workbook, final VariableTypeList effectVariables,
 		final List<String> trialHeaders) {
 		final Map<String, Integer> stockMap = this.getStockModelBuilder().getStockMapForDataset(datasetId);
@@ -703,7 +678,7 @@ public class WorkbookSaver extends Saver {
 
 	}
 
-	protected VariableTypeList propagateTrialFactorsIfNecessary(
+	VariableTypeList propagateTrialFactorsIfNecessary(
 		final VariableTypeList effectVariables,
 		final VariableTypeList trialVariables) {
 
@@ -829,10 +804,8 @@ public class WorkbookSaver extends Saver {
 
 		// unpack maps
 		final List<String> trialHeaders = headerMap.get(WorkbookSaver.TRIALHEADERS);
-		final VariableTypeList trialVariableTypeList = variableTypeMap.get(WorkbookSaver.TRIALVARIABLETYPELIST);
 		final VariableTypeList trialVariables = variableTypeMap.get(WorkbookSaver.TRIALVARIABLES);
 		final VariableTypeList effectVariables = variableTypeMap.get(WorkbookSaver.EFFECTVARIABLE);
-		final List<MeasurementVariable> trialMV = measurementVariableMap.get(WorkbookSaver.TRIALMV);
 		this.removeConstantsVariables(effectVariables, workbook.getConstants());
 
 
@@ -885,18 +858,6 @@ public class WorkbookSaver extends Saver {
 	private boolean checkIfHasExistingStudyExperiment(final int studyId) {
 		final Integer experimentId = this.getExperimentDao().getExperimentIdByProjectId(studyId);
 		return experimentId != null;
-	}
-
-	private VariableList createDefaultEnvironmentVariableList(final String programUUID) {
-		final VariableList list = new VariableList();
-
-		final DMSVariableType variableType = new DMSVariableType(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0),
-			PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0),
-			this.getStandardVariableBuilder().create(TermId.TRIAL_INSTANCE_FACTOR.getId(), programUUID), 1);
-		final Variable variable = new Variable(variableType, "1");
-		list.add(variable);
-
-		return list;
 	}
 
 	public void saveWorkbookVariables(final Workbook workbook) throws ParseException {
@@ -1015,7 +976,7 @@ public class WorkbookSaver extends Saver {
 
 	private void createExperiments(
 		final CropType crop, final int plotDatasetId, final Integer environmentDatasetId, final VariableTypeList effectVariables,
-		final List<MeasurementRow> observations, final List<String> trialHeaders, ExperimentType experimentType) {
+		final List<MeasurementRow> observations, final List<String> trialHeaders, final ExperimentType experimentType) {
 
 		final TimerWatch watch = new TimerWatch("saving experiments (total)");
 		final TimerWatch rowWatch = new TimerWatch("for each row");
@@ -1028,7 +989,7 @@ public class WorkbookSaver extends Saver {
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
 		final Session activeSession = this.getActiveSession();
 		final FlushMode existingFlushMode = activeSession.getFlushMode();
-		final Map<Integer, Integer> instanceNumberEnvironmentIdMap = this.daoFactory.getEnvironmentDao().getEnvironmentsByDataset(environmentDatasetId, true).stream()
+		final Map<Integer, Integer> instanceNumberEnvironmentIdMap = this.daoFactory.getInstanceDao().getEnvironmentsByDataset(environmentDatasetId, true).stream()
 			.collect(Collectors.toMap(ExperimentModel::getObservationUnitNo, ExperimentModel::getNdExperimentId));
 		try {
 			activeSession.setFlushMode(FlushMode.MANUAL);

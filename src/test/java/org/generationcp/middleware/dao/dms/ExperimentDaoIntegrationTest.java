@@ -131,7 +131,8 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 
 		this.sessionProvder.getSession().flush();
 
-		Map<Integer, Map<String, List<Object>>> map = this.experimentDao.getValuesFromObservations(study.getProjectId(), Lists.newArrayList(DatasetTypeEnum.PLOT_DATA.getId(), DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId()), inputVariableDatasetMap);
+		final Map<Integer, Map<String, List<Object>>> map = this.experimentDao.getValuesFromObservations(
+			this.study.getProjectId(), Lists.newArrayList(DatasetTypeEnum.PLOT_DATA.getId(), DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId()), inputVariableDatasetMap);
 
 		Assert.assertNotNull(map.get(plotExperimentModel.getNdExperimentId()));
 		Assert.assertNotNull(map.get(plotExperimentModel.getNdExperimentId()).get(trait1.getCvTermId().toString()));

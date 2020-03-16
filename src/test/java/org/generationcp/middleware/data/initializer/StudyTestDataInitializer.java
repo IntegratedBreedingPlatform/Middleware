@@ -36,7 +36,7 @@ public class StudyTestDataInitializer {
 	public static final String STUDY_NAME = "STUDY NAME";
 	public static final String STUDY_DESCRIPTION = "STUDY DESCRIPTION";
 	public static final Integer STUDY_ID = 10010;
-	public static final int PARENT_FOLDER_ID = 1;
+	private static final int PARENT_FOLDER_ID = 1;
 	private static final String TEST_FOLDER_NAME = "TEST_FOLDER_NAME";
 	private static final String TEST_FOLDER_DESC = "TEST_FOLDER_DESC";
 	public static final String DATASET_NAME = "DATA SET NAME";
@@ -147,7 +147,7 @@ public class StudyTestDataInitializer {
 		return studyValues;
 	}
 
-	private Variable createVariable(final int termId, final String value, final int rank, final PhenotypicType type) throws Exception {
+	private Variable createVariable(final int termId, final String value, final int rank, final PhenotypicType type) {
 		final StandardVariable stVar = this.ontologyManager.getStandardVariable(termId, this.commonTestProject.getUniqueID());
 
 		final DMSVariableType vtype = new DMSVariableType();
@@ -200,7 +200,7 @@ public class StudyTestDataInitializer {
 	}
 
 	public DmsProject createFolderTestData(final String uniqueId) {
-		return createFolderTestData(uniqueId, null);
+		return this.createFolderTestData(uniqueId, null);
 	}
 
 	public DmsProject createFolderTestData(final String uniqueId, final Integer parentId) {
@@ -243,7 +243,7 @@ public class StudyTestDataInitializer {
 		return this.studyDataManager.addDataSet(studyId, typeList, datasetValues, null, DatasetTypeEnum.MEANS_DATA.getId());
 	}
 
-	public DatasetReference addTestDataset(final int studyId, final int datasetTypeId) throws Exception {
+	public DatasetReference addTestDataset(final int studyId, final int datasetTypeId) {
 		final VariableTypeList typeList = new VariableTypeList();
 
 		final DatasetValues datasetValues = new DatasetValues();
@@ -290,8 +290,7 @@ public class StudyTestDataInitializer {
 		this.studyDataManager.addExperiment(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
 	}
 
-	private DMSVariableType createVariableType(final int termId, final String name, final String description, final int rank)
-		throws Exception {
+	private DMSVariableType createVariableType(final int termId, final String name, final String description, final int rank) {
 		final StandardVariable stdVar = this.ontologyManager.getStandardVariable(termId, this.commonTestProject.getUniqueID());
 		final DMSVariableType vtype = new DMSVariableType();
 		vtype.setLocalName(name);
@@ -308,11 +307,11 @@ public class StudyTestDataInitializer {
 	}
 
 	public Integer getStockId() {
-		return stockId;
+		return this.stockId;
 	}
 
 	public Integer getGeolocationId() {
-		return geolocationId;
+		return this.geolocationId;
 	}
 
 	public Integer addTestLocation(final String locationName) {

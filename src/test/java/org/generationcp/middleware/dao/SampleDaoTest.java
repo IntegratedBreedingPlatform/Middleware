@@ -42,9 +42,9 @@ public class SampleDaoTest extends IntegrationTestBase {
 	public static final String USER_NAME = "JohnDoe";
 	public static final String USER_FIRST_NAME = "John";
 	public static final String USER_LAST_NAME = "Doe";
-	public static final Integer TEST_SAMPLE_RECORD_COUNT = 23;
+	private static final Integer TEST_SAMPLE_RECORD_COUNT = 23;
 	public static final String STUDY_NAME = "Study1";
-	public static final String STUDY_DESCRIPTION = "Study Project";
+	private static final String STUDY_DESCRIPTION = "Study Project";
 	private static final String SAMPLE_LIST_NAME_FOR_PLOT_DATA = "PlotSampleList";
 	private static final String SAMPLE_LIST_NAME_FOR_SUBOBSERVATION_DATA = "SubObsSampleList";
 
@@ -288,8 +288,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetBySampleBks() {
 
-		final Integer listId =
-			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final Set<String> sampleUIDs = new HashSet<>();
 		for (int i = 1; i < TEST_SAMPLE_RECORD_COUNT + 1; i++) {
@@ -418,8 +417,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 		sampleList.setListName(listName);
 		sampleList.setDescription("DESCRIPTION-" + listName);
 		this.sampleListDao.saveOrUpdate(sampleList);
-
-		final Geolocation geolocation = new Geolocation();
 
 		// Create one sample for each experiment.
 		for (int i = 1; i < sampleSize + 1; i++) {

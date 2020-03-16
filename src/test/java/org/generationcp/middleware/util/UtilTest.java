@@ -7,6 +7,10 @@ import java.util.TreeSet;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
+
 public class UtilTest {
 
 	@Test
@@ -48,5 +52,13 @@ public class UtilTest {
 		String csv = "SID1-1, SID1-4";
 		String expectedValue = "SID1-1, SID1-2, SID1-4";
 		Assert.assertEquals("It should return " + expectedValue, expectedValue, Util.prependToCSVAndArrange(valueToPrepend, csv));
+	}
+
+	@Test
+	public void testTryParse() {
+		Assert.assertThat(Util.tryParseDate(null), is(nullValue()));
+		Assert.assertThat(Util.tryParseDate(null, Util.FRONTEND_DATE_FORMAT_2), is(nullValue()));
+		Assert.assertThat(Util.tryParseDate("2015-08-18", Util.FRONTEND_DATE_FORMAT), is(notNullValue()));
+		Assert.assertThat(Util.tryParseDate("20150818"), is(notNullValue()));
 	}
 }

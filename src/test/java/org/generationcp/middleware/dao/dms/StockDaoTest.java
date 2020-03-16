@@ -101,7 +101,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		this.testStocks = new ArrayList<>();
 		this.experiments = new ArrayList<>();
 
-		this.createSampleStocks(TEST_COUNT, project);
+		this.createSampleStocks(TEST_COUNT, this.project);
 
 
 	}
@@ -118,7 +118,7 @@ public class StockDaoTest extends IntegrationTestBase {
 			project.setParent(parent);
 			project.setStudy(parent);
 		}
-		dmsProjectDao.save(project);
+		this.dmsProjectDao.save(project);
 		return project;
 	}
 
@@ -180,13 +180,13 @@ public class StockDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountStocks() {
-		final CVTerm variateTerm = createVariate();
-		for (final ExperimentModel experiment : experiments) {
+		final CVTerm variateTerm = this.createVariate();
+		for (final ExperimentModel experiment : this.experiments) {
 			this.createTestObservations(experiment, variateTerm);
 		}
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
-		final long count = this.stockDao.countStocks(project.getProjectId(), environment.getLocationId(), variateTerm.getCvTermId());
+		final long count = this.stockDao.countStocks(this.project.getProjectId(), this.environment.getLocationId(), variateTerm.getCvTermId());
 		Assert.assertEquals(TEST_COUNT, count);
 	}
 
@@ -255,25 +255,25 @@ public class StockDaoTest extends IntegrationTestBase {
 		phenotype.setObservableId(variateTerm.getCvTermId());
 		phenotype.setValue(RandomStringUtils.randomNumeric(5));
 		phenotype.setExperiment(experiment);
-		phenotypeDao.save(phenotype);
+		this.phenotypeDao.save(phenotype);
 	}
 
 	private CVTerm createVariate() {
 		final CVTerm variateTerm = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
-		cvtermDao.save(variateTerm);
+		this.cvtermDao.save(variateTerm);
 		return variateTerm;
 	}
 
 	private void createSampleStocks(final Integer count, final DmsProject study) {
 		// Save the experiments in the same instance
-		environment = new Geolocation();
+		this.environment = new Geolocation();
 
 		for (int i = 0; i < count; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 			germplasm.setGid(null);
 			this.germplasmDao.save(germplasm);
 
-			final StockModel stockModel = createTestStock(germplasm);
+			final StockModel stockModel = this.createTestStock(germplasm);
 
 			this.createTestExperiment(study, stockModel);
 		}
@@ -298,7 +298,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(study);
 		experimentModel.setStock(stockModel);
-		experimentDao.saveOrUpdate(experimentModel);
+		this.experimentDao.saveOrUpdate(experimentModel);
 		this.experiments.add(experimentModel);
 	}
 }

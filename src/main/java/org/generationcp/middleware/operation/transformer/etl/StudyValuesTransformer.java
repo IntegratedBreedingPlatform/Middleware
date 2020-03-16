@@ -8,28 +8,27 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 import java.util.List;
 
 public class StudyValuesTransformer extends Transformer {
 
-	public StudyValuesTransformer(HibernateSessionProvider sessionProviderForLocal) {
+	public StudyValuesTransformer(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
 	public StudyValues transform(final List<MeasurementVariable> measurementVariables,
 		final VariableTypeList variableTypeList) {
 
-		StudyValues studyValues = new StudyValues();
-		VariableList variableList = new VariableList();
+		final StudyValues studyValues = new StudyValues();
+		final VariableList variableList = new VariableList();
 		if (variableTypeList != null) {
-			for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
+			for (final DMSVariableType variableType : variableTypeList.getVariableTypes()) {
 				if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.STUDY
 						|| variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {
 					String value = null;
-					for (MeasurementVariable var : measurementVariables) {
+					for (final MeasurementVariable var : measurementVariables) {
 						if (var.getTermId() == variableType.getId()) {
 							value = var.getValue();
 

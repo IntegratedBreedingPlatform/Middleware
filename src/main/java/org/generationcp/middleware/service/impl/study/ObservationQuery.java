@@ -14,20 +14,22 @@ import java.util.List;
 
 class ObservationQuery {
 
-	public static final String DEFAULT_SORT_COLUMN = "PLOT_NO";
-	public static final String DEFAULT_SORT_ORDER = "asc";
-	public static final String PHENOTYPE_ID = "_PhenotypeId";
+	static final String DEFAULT_SORT_COLUMN = "PLOT_NO";
+	static final String DEFAULT_SORT_ORDER = "asc";
+	private static final String PHENOTYPE_ID = "_PhenotypeId";
 	public static final String STATUS = "_Status";
-	public static final String INSTANCE_NUMBER_CLAUSE = " AND env.nd_experiment_id = :instanceId  ";
-	public static final String GROUPING_CLAUSE = " GROUP BY nde.nd_experiment_id ";
-	public static final String OBSERVATIONS_FOR_SAMPLES = "SELECT  " + "    nde.nd_experiment_id as nd_experiment_id, "
+	private static final String INSTANCE_NUMBER_CLAUSE = " AND env.nd_experiment_id = :instanceId  ";
+	private static final String GROUPING_CLAUSE = " GROUP BY nde.nd_experiment_id ";
+	private static final String OBSERVATIONS_FOR_SAMPLES = "SELECT  " + "    nde.nd_experiment_id as nd_experiment_id, "
 		+ "    (select na.nval from names na where na.gid = s.dbxref_id and na.nstat = 1 limit 1) as preferred_name, " + "    ph.value"
 		+ " as value, s.dbxref_id as gid "
 		+ " 	   	FROM nd_experiment nde "
 		+ "   		LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id "
 		+ "  		INNER JOIN project p ON p.project_id = nde.project_id "
-		+ "  		INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = 3 "
-		+ "  		INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 "
+		+ "  		INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = "
+						+ DatasetTypeEnum.SUMMARY_DATA.getId()
+		+ "  		INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = "
+						+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 					// handle cases for plot and with/without sub-observations
 		+ " 		AND (nde.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id)"
 		+ "        	INNER JOIN stock s ON s.stock_id = nde.stock_id  "
@@ -51,7 +53,7 @@ class ObservationQuery {
 	 * This query is used by BMSAPI and is very similar to {@link ObservationQuery#getObservationsMainQuery(List, List, List)}
 	 * which is used Trial and Nursery Manager
 	 */
-	public String getObservationQueryWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, final Integer instanceId) {
+	String getObservationQueryWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, final Integer instanceId) {
 		final String orderByMeasurementVariableId = getOrderByMeasurementVariableId(measurementVariables);
 		final String orderByText =
 			(null == measurementVariables || measurementVariables.isEmpty() ? "" : " ORDER BY " + orderByMeasurementVariableId);
@@ -139,7 +141,8 @@ class ObservationQuery {
 			+ " FROM Project p " //
 			+ "    INNER JOIN project proj ON proj.project_id =  p.study_id " //
 			+ "    INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
-			+ "    INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = 1020 "
+			+ "    INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = "
+					+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			+ "    INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	   LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	   LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
@@ -217,7 +220,7 @@ class ObservationQuery {
 				sqlBuilder.append(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
 			}
 		}
-		
+
 		if (!designFactors.isEmpty()) {
 			final String designFactorClauseFormat =
 					"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '%s') '%s',  ";
@@ -229,7 +232,8 @@ class ObservationQuery {
 		sqlBuilder.append(" 1=1 FROM  ")
 			.append("	project p  ")
 			.append("	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id  ")
-			.append("	INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = 1020  ")
+			.append("	INNER JOIN nd_experiment env ON env.nd_experiment_id = nde.parent_id AND env.type_id = ")
+			.append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()).append(" ")
 			.append("	INNER JOIN stock s ON s.stock_id = nde.stock_id  ")
 			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id  ")
 			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id  ")
@@ -243,7 +247,7 @@ class ObservationQuery {
 	}
 
 	String getOrderingClause(final String sortBy, final String sortOrder) {
-		String orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : DEFAULT_SORT_COLUMN;
+		final String orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : DEFAULT_SORT_COLUMN;
 		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : DEFAULT_SORT_ORDER;
 		/**
 		 * Values of these columns are numbers but the database stores it in string format (facepalm). Sorting on them requires multiplying

@@ -203,7 +203,7 @@ public abstract class DataManager extends DatabaseBroker {
 		return new TermBuilder(this.sessionProvider);
 	}
 
-	protected final MethodBuilder getMethodBuilder() {
+	final MethodBuilder getMethodBuilder() {
 		return new MethodBuilder(this.sessionProvider);
 	}
 
@@ -211,11 +211,11 @@ public abstract class DataManager extends DatabaseBroker {
 		return new StandardVariableBuilder(this.sessionProvider);
 	}
 
-	protected final StudyBuilder getStudyBuilder() {
+	final StudyBuilder getStudyBuilder() {
 		return new StudyBuilder(this.sessionProvider);
 	}
 
-	protected final StudyTypeBuilder getStudyTypeBuilder() {
+	final StudyTypeBuilder getStudyTypeBuilder() {
 		return new StudyTypeBuilder();
 	}
 

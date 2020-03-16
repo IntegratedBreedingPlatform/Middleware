@@ -51,7 +51,8 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		factors.add(DMSVariableTestDataInitializer.createVariable(104, "1", TermId.NUMERIC_VARIABLE.getId(), VariableType.EXPERIMENTAL_DESIGN));
 		factors.add(DMSVariableTestDataInitializer.createVariable(105, "Environment", TermId.CHARACTER_VARIABLE.getId(), VariableType.ENVIRONMENT_DETAIL));
 
-		final List<ExperimentProperty> experimentProperties = experimentModelSaver.createTrialDesignExperimentProperties(experimentModel, factors);
+		final List<ExperimentProperty> experimentProperties = this.experimentModelSaver
+			.createTrialDesignExperimentProperties(experimentModel, factors);
 
 		Assert.assertEquals(5, experimentProperties.size());
 
@@ -74,7 +75,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final Variable variable = DMSVariableTestDataInitializer.createVariable(variableId, variableValue, TermId.CATEGORICAL_VARIABLE.getId(), VariableType.TREATMENT_FACTOR);
 
-		final ExperimentProperty experimentProperty = experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
+		final ExperimentProperty experimentProperty = this.experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
 
 		Assert.assertEquals(String.valueOf(1234), experimentProperty.getValue());
 		Assert.assertSame(experimentModel, experimentProperty.getExperiment());
@@ -92,7 +93,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final Variable variable = DMSVariableTestDataInitializer.createVariable(variableId, variableValue, TermId.NUMERIC_VARIABLE.getId(), VariableType.TREATMENT_FACTOR);
 
-		final ExperimentProperty experimentProperty = experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
+		final ExperimentProperty experimentProperty = this.experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
 
 		Assert.assertEquals(variableValue, experimentProperty.getValue());
 		Assert.assertSame(experimentModel, experimentProperty.getExperiment());
@@ -110,7 +111,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final Variable variable = DMSVariableTestDataInitializer.createVariable(variableId, variableValue, TermId.CHARACTER_VARIABLE.getId(), VariableType.TREATMENT_FACTOR);
 
-		final ExperimentProperty experimentProperty = experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
+		final ExperimentProperty experimentProperty = this.experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
 
 		Assert.assertEquals(variableValue, experimentProperty.getValue());
 		Assert.assertSame(experimentModel, experimentProperty.getExperiment());

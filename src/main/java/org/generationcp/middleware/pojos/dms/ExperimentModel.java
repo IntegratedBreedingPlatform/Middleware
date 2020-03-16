@@ -143,7 +143,7 @@ public class ExperimentModel implements Serializable {
 	}
 
 	public String getJsonProps() {
-		return jsonProps;
+		return this.jsonProps;
 	}
 
 	public void setJsonProps(final String props) {
@@ -161,11 +161,11 @@ public class ExperimentModel implements Serializable {
 	public void setProject(final DmsProject project) {
 		this.project = project;
 	}
-	
+
 	public StockModel getStock() {
 		return this.stock;
 	}
-	
+
 	public void setStock(final StockModel stock) {
 		this.stock = stock;
 	}
@@ -243,15 +243,15 @@ public class ExperimentModel implements Serializable {
 	@Override
 	public String toString() {
 		return "ExperimentModel{" +
-			"ndExperimentId=" + ndExperimentId +
-			", typeId=" + typeId +
-			", obsUnitId='" + obsUnitId + '\'' +
-			", properties=" + properties +
-			", project=" + project +
-			", stock=" + stock +
-			", phenotypes=" + phenotypes +
-			", parent=" + parent +
-			", observationUnitNo=" + observationUnitNo +
+			"ndExperimentId=" + this.ndExperimentId +
+			", typeId=" + this.typeId +
+			", obsUnitId='" + this.obsUnitId + '\'' +
+			", properties=" + this.properties +
+			", project=" + this.project +
+			", stock=" + this.stock +
+			", phenotypes=" + this.phenotypes +
+			", parent=" + this.parent +
+			", observationUnitNo=" + this.observationUnitNo +
 			'}';
 	}
 }

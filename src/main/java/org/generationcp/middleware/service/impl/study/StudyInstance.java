@@ -111,7 +111,7 @@ public class StudyInstance {
 	}
 
 	public Boolean getCanBeDeleted() {
-		return canBeDeleted;
+		return this.canBeDeleted;
 	}
 
 	public void setCanBeDeleted(final Boolean canBeDeleted) {

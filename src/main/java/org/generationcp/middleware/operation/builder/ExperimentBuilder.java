@@ -43,10 +43,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ExperimentBuilder {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentBuilder.class);
 	private final DaoFactory daoFactory;
-	
+
 	public ExperimentBuilder(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
@@ -122,7 +122,7 @@ public class ExperimentBuilder {
 			if (DatasetTypeEnum.PLOT_DATA.getId() == datasetType.getDatasetTypeId() || DatasetTypeEnum.MEANS_DATA.getId() == datasetType.getDatasetTypeId()) {
 				return experimentModels.stream().collect(Collectors.toMap(ExperimentModel::getNdExperimentId, ExperimentModel::getParent));
 			} else if (datasetType.isSubObservationType()) {
-				return this.daoFactory.getEnvironmentDao().getExperimentIdEnvironmentMap(projectId);
+				return this.daoFactory.getInstanceDao().getExperimentIdEnvironmentMap(projectId);
 			}
 			// If environment dataset, the experiment id is the environment id
 			return experimentModels.stream().collect(Collectors.toMap(ExperimentModel::getNdExperimentId, e -> e));
@@ -151,7 +151,7 @@ public class ExperimentBuilder {
 		}
 	}
 
-	public Experiment buildOne(final int projectId, final TermId type, final VariableTypeList variableTypes) {
+	Experiment buildOne(final int projectId, final TermId type, final VariableTypeList variableTypes) {
 		final List<Experiment> experiments = this.build(projectId, type, 0, 1, variableTypes);
 		if (experiments != null && !experiments.isEmpty()) {
 			return experiments.get(0);
@@ -159,7 +159,7 @@ public class ExperimentBuilder {
 		return null;
 	}
 
-	public Experiment buildOne(final int projectId, final TermId type, final VariableTypeList variableTypes, final boolean hasVariableType)
+	Experiment buildOne(final int projectId, final TermId type, final VariableTypeList variableTypes, final boolean hasVariableType)
 			{
 		final List<Experiment> experiments = this.build(projectId, type, 0, 1, variableTypes, hasVariableType);
 		if (experiments != null && !experiments.isEmpty()) {
@@ -218,14 +218,14 @@ public class ExperimentBuilder {
 				// added this validation for now, to handle the said scenario, otherwise, and NPE is thrown
 				// in the future, trial constant will no longer be saved at the measurements level
 				if (variableType != null) {
-					Variable var =  null;
+					final Variable var;
 					if (variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());						
+						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());
 						if (phenotype.getcValueId() == null && phenotype.getValue() != null) {
 							var.setValue(phenotype.getValue());
 							var.setCustomValue(true);
 						}
-						
+
 						variates.add(var);
 					} else {
 						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue());
@@ -273,7 +273,7 @@ public class ExperimentBuilder {
 		}
 	}
 
-	protected Variable createLocationFactor(final ExperimentModel experiment, final DMSVariableType variableType, final ExperimentModel environment) {
+	Variable createLocationFactor(final ExperimentModel experiment, final DMSVariableType variableType, final ExperimentModel environment) {
 		final StandardVariable standardVariable = variableType.getStandardVariable();
 
 		LOG.info("** Expt: " + experiment.getNdExperimentId() + " with envt " + environment != null? (environment.getNdExperimentId() + " :: " +environment.getObservationUnitNo()) : "NULL");
@@ -332,19 +332,19 @@ public class ExperimentBuilder {
 			} else {
 				stockModel = this.daoFactory.getStockDao().getById(stockId);
 			}
-			
+
 			for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
 				final Variable var = this.createGermplasmFactor(stockModel, variableType);
 				if(var != null){
 					factors.add(var);
-				}				
+				}
 			}
 		}
 	}
 
 	protected Variable createGermplasmFactor(final StockModel stockModel, final DMSVariableType variableType) {
 		final StandardVariable standardVariable = variableType.getStandardVariable();
-		
+
 		if (standardVariable.getId() == TermId.ENTRY_NO.getId()) {
 			return new Variable(variableType, stockModel.getUniqueName());
 		}
@@ -366,7 +366,7 @@ public class ExperimentBuilder {
 		if (val != null) {
 			return new Variable(variableType, val);
 		}
-		
+
 		return null;
 	}
 
@@ -428,11 +428,5 @@ public class ExperimentBuilder {
 
 	public boolean hasFieldmap(final int datasetId) {
 		return this.daoFactory.getExperimentDao().hasFieldmap(datasetId);
-	}
-
-	public boolean checkIfStudyHasFieldmap(final int studyId) {
-		final List<Integer> geolocationIdsOfStudy = this.daoFactory.getExperimentDao().getInstanceIds(studyId);
-		final List<Integer> geolocationIdsOfStudyWithFieldmap = this.daoFactory.getExperimentDao().getLocationIdsOfStudyWithFieldmap(studyId);
-		return geolocationIdsOfStudy.size() == geolocationIdsOfStudyWithFieldmap.size();
 	}
 }

@@ -190,7 +190,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Test
-	public void testSaveVariables() throws Exception {
+	public void testSaveVariables() {
 
 		final String programUUID = "abc";
 		final String studyName = "nursery_1" + new Random().nextInt(10000);
@@ -255,9 +255,9 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		standardVariable.setName(measurementVariable.getName());
 		standardVariable.setDescription(measurementVariable.getDescription());
 
-		final Integer methodId = new Random().nextInt(10000);
-		final Integer propertyId = new Random().nextInt(10000);
-		final Integer scaleId = new Random().nextInt(10000);
+		final int methodId = new Random().nextInt(10000);
+		final int propertyId = new Random().nextInt(10000);
+		final int scaleId = new Random().nextInt(10000);
 
 		standardVariable.setMethod(new Method(new Term(methodId, measurementVariable.getMethod(), "Method Description")));
 		standardVariable.setProperty(new Property(new Term(propertyId, measurementVariable.getProperty(), "Property Description")));
@@ -329,7 +329,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final VariableList variableList = new VariableList();
 
 		// Set the LOCATION_ID variable value to empty
-		final Variable locationVariable = createLocationVariable();
+		final Variable locationVariable = this.createLocationVariable();
 		locationVariable.setValue(null);
 		variableList.add(locationVariable);
 
@@ -361,7 +361,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final LocationDAO locationDAO = Mockito.mock(LocationDAO.class);
 		final VariableList variableList = new VariableList();
 
-		final Variable locationVariable = createLocationVariable();
+		final Variable locationVariable = this.createLocationVariable();
 		// Set the value of LOCATION_ID variable
 		final String locationIdVariableValue = "999";
 		locationVariable.setValue(locationIdVariableValue);
@@ -399,14 +399,14 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	}
 
 	private List<MeasurementRow> createObservations(final int noOfTrialInstances, final Workbook workbook) {
-		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		final List<MeasurementRow> observations = new ArrayList<>();
 
 		MeasurementRow row;
 		List<MeasurementData> dataList;
 
 		for (int i = 0; i < noOfTrialInstances; i++) {
 			row = new MeasurementRow();
-			dataList = new ArrayList<MeasurementData>();
+			dataList = new ArrayList<>();
 
 			MeasurementData data = new MeasurementData();
 			data = new MeasurementData(WorkbookSaverTest.COOPERATOR, "COOPERATOR_NAME");

@@ -18,11 +18,11 @@ import org.hibernate.type.StringType;
 public class StudyMeasurements {
 
 	public static final String PROJECT_NAME = "PROJECT_NAME";
-	public static final String LOCATION_DB_ID = "locationDbId";
-	public static final String ENVIRONMENT_ID = "environmentId";
-	public static final String FIELD_MAP_ROW = "FieldMapRow";
-	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
-	public static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
+	static final String LOCATION_DB_ID = "locationDbId";
+	static final String ENVIRONMENT_ID = "environmentId";
+	static final String FIELD_MAP_ROW = "FieldMapRow";
+	static final String FIELD_MAP_COLUMN = "FieldMapColumn";
+	static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
 	public static final String LOCATION_NAME = "LocationName";
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 	public static final String COL = "COL";
@@ -36,7 +36,7 @@ public class StudyMeasurements {
 	public static final String GID = "GID";
 	public static final String ENTRY_TYPE = "ENTRY_TYPE";
 	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	public static final String ND_EXPERIMENT_ID = "nd_experiment_id";
+	static final String ND_EXPERIMENT_ID = "nd_experiment_id";
 
 	public static final String STUDY_ID = "studyId";
 
@@ -177,7 +177,7 @@ public class StudyMeasurements {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier,
+	List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier,
 			final List<MeasurementVariableDto> measurementVariables, final Integer instanceId) {
 		final String generateQuery = this.measurementQuery.getObservationQueryWithBlockRowCol(measurementVariables,
 				instanceId);

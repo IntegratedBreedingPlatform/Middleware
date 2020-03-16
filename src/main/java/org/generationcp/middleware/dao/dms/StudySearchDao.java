@@ -79,7 +79,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByName(final String name, final StudySearchMatchingOption studySearchMatchingOption,
+	List<StudyReference> getStudiesByName(final String name, final StudySearchMatchingOption studySearchMatchingOption,
 		final String programUUID) {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		if (name != null && !name.isEmpty()) {
@@ -175,7 +175,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesBySeason(final Season season, final String programUUID) {
+	List<StudyReference> getStudiesBySeason(final Season season, final String programUUID) {
 
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		if (season != null) {
@@ -229,7 +229,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByLocationIds(final List<Integer> locationIds, final String programUUID) {
+	List<StudyReference> getStudiesByLocationIds(final List<Integer> locationIds, final String programUUID) {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		if (!locationIds.isEmpty()) {
 			try {

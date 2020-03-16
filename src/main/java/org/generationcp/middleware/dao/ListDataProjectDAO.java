@@ -30,7 +30,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	private static final String ENTRY_ID = "entryId";
 
-	public static final String GET_GERMPLASM_USED_IN_ENTRY_LIST = " SELECT \n" + "   ldp.germplasm_id, \n"
+	private static final String GET_GERMPLASM_USED_IN_ENTRY_LIST = " SELECT \n" + "   ldp.germplasm_id, \n"
 		+ "   group_concat(p.name) \n" + " FROM listnms l \n"
 		+ "   INNER JOIN listdata_project ldp ON l.listid = ldp.list_id \n"
 		+ "   INNER JOIN project p ON l.projectid = p.project_id \n" + " WHERE ldp.germplasm_id IN (:gids) \n"
@@ -183,7 +183,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 				criteria.createAlias("list", "l");
 				criteria.add(Restrictions.eq("l.id", id));
 				criteria.setProjection(Projections.rowCount());
-				return ((Long) criteria.uniqueResult()).longValue(); // count
+				return ((Long) criteria.uniqueResult()); // count
 			}
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
@@ -201,7 +201,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 				criteria.add(Restrictions.eq("l.id", id));
 				criteria.add(Restrictions.in("checkType", systemDefinedEntryTypeIds));
 				criteria.setProjection(Projections.rowCount());
-				return ((Long) criteria.uniqueResult()).longValue(); // count
+				return ((Long) criteria.uniqueResult()); // count
 			}
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(

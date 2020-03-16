@@ -1,10 +1,13 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -83,6 +86,27 @@ public class LotServiceImpl implements LotService {
 		this.daoFactory.getLotDao().save(lot);
 
 		return lot.getId();
+	}
+
+	@Override
+	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest) {
+		final LotDAO lotDao = this.daoFactory.getLotDao();
+		for (final LotDto lotDto : lotDtos) {
+			final Lot lot = lotDao.getById(lotDto.getLotId());
+			if (lotRequest.getGid() != null) {
+				lot.setEntityId(lotRequest.getGid());
+			}
+			if (lotRequest.getLocationId() != null) {
+				lot.setLocationId(lotRequest.getLocationId());
+			}
+			if (lotRequest.getUnitId() != null) {
+				lot.setScaleId(lotRequest.getUnitId());
+			}
+			if (!StringUtils.isBlank(lotRequest.getNotes())) {
+				lot.setComments(lotRequest.getNotes());
+			}
+			lotDao.save(lot);
+		}
 	}
 
 	@Override

@@ -33,6 +33,8 @@ import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
+import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
@@ -61,16 +63,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyServiceImpl.class);
 
-	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT = "select count(*) as totalObservationUnits from "
+	private static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT = "select count(*) as totalObservationUnits from "
 		+ "nd_experiment nde \n"
 		+ "    inner join project proj on proj.project_id = nde.project_id \n"
 		+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n";
 
-	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE = " where \n"
+	private static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE = " where \n"
 		+ "	proj.study_id = :studyIdentifier AND proj.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
 		+ "    and gl.nd_geolocation_id = :instanceId ";
 
-	public static final String SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED =
+	static final String SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED =
 		"SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value) \n" + " FROM \n" + " project p \n"
 			+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
 			+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
@@ -80,7 +82,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
 			+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
 
-	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES =
+	static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES =
 		StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT
 			+ "		LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
 			+ StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE + " and ph.value is not null ";
@@ -478,7 +480,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					if (rowValue != null) {
 						entry.add(String.valueOf(rowValue));
 					} else {
-						entry.add((String) null);
+						entry.add(null);
 					}
 
 					// get every other column skipping over PhenotypeId column
@@ -521,8 +523,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				environmentParameters.addAll(environmentVariables);
 				studyDetailsDto.setEnvironmentParameters(environmentParameters);
 
-				final Map<String, String> properties = new HashMap<>();
-				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId(), this.getVariableIds(environmentParameters)));
+				final Map<String, String> properties = new HashMap<>(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId(), this.getVariableIds(environmentParameters)));
 				studyDetailsDto.setAdditionalInfo(properties);
 				return studyDetailsDto;
 			}
@@ -568,6 +569,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
 		return this.getPhenotypeDao().countPhenotypes(requestDTO);
+	}
+
+	@Override
+	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
+		return this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter);
+	}
+
+	@Override
+	public long countStudies(final StudySearchFilter studySearchFilter) {
+		return this.daoFactory.getDmsProjectDAO().countStudies(studySearchFilter);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {

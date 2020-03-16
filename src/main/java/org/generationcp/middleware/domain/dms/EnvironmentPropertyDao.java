@@ -31,7 +31,7 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 			+ "        INNER JOIN "
 			+ "    nd_experimentprop xp ON xp.nd_experiment_id = e.nd_experiment_id "
 			+ "WHERE "
-			+ "		e.project_id = :datasetId and e.type_id = 1020 "
+			+ "		e.project_id = :datasetId and e.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			+ "		and e.nd_experiment_id = :instanceDbId";
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
@@ -53,27 +53,8 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 		try {
 			final StringBuilder sql =
 				new StringBuilder().append("SELECT xp.value FROM nd_experimentprop xp ")
-					.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = xp.nd_experiment_id AND e.type_id = 1020 ")
-					.append(" WHERE e.observation_unit_no = :instanceNumber AND xp.type_id = :variableId  AND e.project_id = :datasetId");
-
-			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-			query.setParameter("instanceNumber", trialInstance);
-			query.setParameter("variableId", variableId);
-			query.setParameter("datasetId", datasetId);
-			return (String) query.uniqueResult();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error at getVariableValueForTrialInstance=" + datasetId + " query on EnvironmentPropertyDao: " + e.getMessage(), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public String getVariableValueForEnvironment(final int datasetId, final int variableId, final Integer trialInstance) {
-		try {
-			final StringBuilder sql =
-				new StringBuilder().append("SELECT xp.value FROM nd_experimentprop xp ")
-					.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = xp.nd_experiment_id AND e.type_id = 1020 ")
+					.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = xp.nd_experiment_id AND e.type_id = ")
+					.append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()).append(" ")
 					.append(" WHERE e.observation_unit_no = :instanceNumber AND xp.type_id = :variableId  AND e.project_id = :datasetId");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
@@ -160,14 +141,14 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 	}
 
 	public List<MeasurementVariable> getEnvironmentDetailVariablesExcludeVariableIds(final Integer environmentId, final List<Integer> excludedVariableIds) {
-		List<MeasurementVariable> studyVariables = new ArrayList<>();
+		final List<MeasurementVariable> studyVariables = new ArrayList<>();
 
 		try{
 			final SQLQuery query =
 				this.getSession().createSQLQuery("SELECT ispcvt.name as name, ispcvt.definition as definition, "
 					+ "		cvt_scale.name AS scaleName, xprop.value AS value "
 					+ "		FROM nd_experimentprop xprop "
-					+ "		INNER JOIN nd_experiment exp ON exp.nd_experiment_id = xprop.nd_experiment_id AND exp.type_id = 1020 "
+					+ "		INNER JOIN nd_experiment exp ON exp.nd_experiment_id = xprop.nd_experiment_id AND exp.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 					+ "		INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = xprop.type_id "
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = ispcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "		INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id "
@@ -180,7 +161,7 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 			query.setParameterList("excludedVariableIds", excludedVariableIds);
 
 			final List<Object> results = query.list();
-			for(Object result: results) {
+			for(final Object result: results) {
 
 				final Object[] row = (Object[]) result;
 				final MeasurementVariable measurementVariable = new MeasurementVariable();

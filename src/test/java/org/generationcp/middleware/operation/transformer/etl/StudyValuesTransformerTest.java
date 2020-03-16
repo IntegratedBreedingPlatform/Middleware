@@ -40,9 +40,9 @@ public class StudyValuesTransformerTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testTransform() throws Exception {
+	public void testTransform() {
 
-		final StudyDetails studyDetails = this.createStudyDetailsTestData();
+		this.createStudyDetailsTestData();
 		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableListTestData();
 		final VariableTypeList varTypeList = this.createVariableTypeListTestData();
 
@@ -70,7 +70,7 @@ public class StudyValuesTransformerTest extends IntegrationTestBase {
 	}
 
 	private List<MeasurementVariable> createMeasurementVariableListTestData() {
-		final List<MeasurementVariable> mVarList = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> mVarList = new ArrayList<>();
 
 		mVarList.add(new MeasurementVariable("STUDY1", "Name of Principal Investigator", "DBCV", "ASSIGNED", "PERSON", "C", "value0",
 				"STUDY"));
