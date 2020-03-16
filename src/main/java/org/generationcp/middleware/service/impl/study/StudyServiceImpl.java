@@ -33,6 +33,8 @@ import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
+import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
@@ -567,6 +569,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
 		return this.getPhenotypeDao().countPhenotypes(requestDTO);
+	}
+
+	@Override
+	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
+		return this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter);
+	}
+
+	@Override
+	public long countStudies(final StudySearchFilter studySearchFilter) {
+		return this.daoFactory.getDmsProjectDAO().countStudies(studySearchFilter);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
