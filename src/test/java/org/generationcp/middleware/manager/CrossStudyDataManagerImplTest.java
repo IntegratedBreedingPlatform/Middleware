@@ -61,7 +61,6 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	private CrossStudyDataManager crossStudyDataManager;
 
 	private DaoFactory daoFactory;
-	private int trait;
 
 	@Before
 	public void setUp() throws Exception {
@@ -197,7 +196,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
 	}
 
-	int createTestData(final String studyName, final String programUUID, final String locationId) {
+	private int createTestData(final String studyName, final String programUUID, final String locationId) {
 
 		final DmsProject study = new DmsProject();
 		study.setName(studyName);

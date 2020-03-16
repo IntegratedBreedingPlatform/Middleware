@@ -23,7 +23,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
@@ -36,9 +35,7 @@ import org.hibernate.Hibernate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ProjectPropertySaver {
 
@@ -136,7 +133,6 @@ public class ProjectPropertySaver {
 	 * @param project DMSProject
 	 * @param objDMSVariableType DMSVariableType
 	 * @param value the value of the measurement variable
-	 * @throws MiddlewareQueryException
 	 */
 	public void saveVariableType(final DmsProject project, final DMSVariableType objDMSVariableType, final String value) {
 		objDMSVariableType.setVariableTypeIfNull();
@@ -238,7 +234,7 @@ public class ProjectPropertySaver {
 				this.insertVariable(measurementDataset, variable, measurementRank);
 			}
 
-			final List<ExperimentModel> environments = this.daoFactory.getEnvironmentDao().getEnvironments(study.getProjectId());
+			final List<ExperimentModel> environments = this.daoFactory.getInstanceDao().getEnvironments(study.getProjectId());
 			for (final ExperimentModel environment : environments) {
 				Hibernate.initialize(environment.getProperties());
 				this.saver.getExperimentPropertySaver().saveOrUpdateProperty(environment, variable.getTermId(), variable.getValue());

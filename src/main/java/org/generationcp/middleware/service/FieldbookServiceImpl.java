@@ -687,8 +687,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			termIds.add(pair.getMethod().getId());
 		}
 
-		final List<CVTerm> terms = new ArrayList<>();
-		terms.addAll(this.daoFactory.getCvTermDao().getByIds(termIds));
+		final List<CVTerm> terms = new ArrayList<>(this.daoFactory.getCvTermDao().getByIds(termIds));
 
 		for (final CVTerm term : terms) {
 			termMap.put(term.getCvTermId(), term);

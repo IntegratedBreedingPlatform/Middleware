@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.dms;
@@ -29,6 +29,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,10 +41,10 @@ import java.util.Set;
 
 /**
  * DAO class for {@link ExperimentProperty}.
- * 
+ *
  */
 public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Integer> {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentPropertyDao.class);
 
 
@@ -216,7 +217,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.addScalar("instanceId").addScalar("siteName").addScalar("siteId").addScalar("experimentId").addScalar("entryNumber").addScalar("germplasmName").addScalar(
 							"rep").addScalar("plotNo").addScalar("row")
 							.addScalar("col").addScalar("blockId").addScalar("studyId").addScalar("trialInstance").addScalar("gid")
-							.addScalar("startDate").addScalar("season").addScalar("blockNo").addScalar("obsUnitId", Hibernate.STRING);
+							.addScalar("startDate").addScalar("season").addScalar("blockNo").addScalar("obsUnitId", new StringType());
 
 			if (blockId != null) {
 				query.setParameter("blockId", blockId);
@@ -399,7 +400,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 				if (row[13] != null && NumberUtils.isNumber((String) row[13])) {
 					trial.setBlockId(Integer.valueOf((String) row[13]));
 				}
-				trial.setTrialInstanceNo(String.valueOf((Integer) row[15]));
+				trial.setTrialInstanceNo(String.valueOf(row[15]));
 				trialMap.put(trialKey, trial);
 			}
 
@@ -418,21 +419,21 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					infoMap.put(study.getFieldbookId(), study);
 				}
 				if (study.getDatasets() == null) {
-					study.setDatasets(new ArrayList<FieldMapDatasetInfo>());
+					study.setDatasets(new ArrayList<>());
 				}
 				if (study.getDataSet(dataset.getDatasetId()) == null) {
 					study.getDatasets().add(dataset);
 				}
 			}
 			if (dataset.getTrialInstances() == null) {
-				dataset.setTrialInstances(new ArrayList<FieldMapTrialInstanceInfo>());
+				dataset.setTrialInstances(new ArrayList<>());
 			}
 			if (dataset.getTrialInstance(trial.getEnvironmentId()) == null) {
 				dataset.getTrialInstances().add(trial);
 			}
 
 			if (trial.getFieldMapLabels() == null) {
-				trial.setFieldMapLabels(new ArrayList<FieldMapLabel>());
+				trial.setFieldMapLabels(new ArrayList<>());
 			}
 			trial.getFieldMapLabels().add(label);
 		}

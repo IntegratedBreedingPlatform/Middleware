@@ -28,6 +28,7 @@ import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -39,7 +40,6 @@ import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -87,20 +87,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
 		+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id "
 		+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-		+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+		+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 		+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 		+ "WHERE plot.parent_id IN (:environmentIds) "
 		+ "AND p.observable_id IN (:traitIds) ";
-
-	private static final String COUNT_OBSERVATIONS =
-		"SELECT COUNT(*) " + "FROM nd_experiment e "
-			+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
-			+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id "
-			+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-			+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
-			+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-			+ "WHERE plot.parent_id IN (:environmentIds) "
-			+ "AND p.observable_id IN (:traitIds) ";
 
 	private static final String ORDER_BY_OBS = "ORDER BY p.observable_id, s.dbxref_id, plot.parent_id, p.value ";
 
@@ -138,7 +128,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ " INNER JOIN stock s ON e.stock_id = s.stock_id "
 					+ "  WHERE plot.parent_id IN (:environmentIds) "
@@ -183,7 +173,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id "
 					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ "WHERE plot.parent_id IN (:environmentIds) "
 					+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id ");
@@ -223,7 +213,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id "
 					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ "WHERE plot.parent_id IN (:environmentIds) "
 					+ "GROUP by p.observable_id ");
@@ -259,7 +249,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ "WHERE plot.parent_id IN (:environmentIds) "
 					+ "    AND p.observable_id IN (:traitIds) ");
@@ -314,7 +304,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ "WHERE plot.parent_id IN (:environmentIds) "
 					+ "    AND p.observable_id IN (:traitIds) "
@@ -364,7 +354,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "FROM phenotype p "
 					+ "INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 					+ "WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) "
 					+ "  AND plot.parent_id IN (:environmentIds) "
@@ -436,18 +426,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return observationFinal;
 	}
 
-	public long countObservationForTraits(final List<Integer> traitIds, final List<Integer> environmentIds) {
-
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery(PhenotypeDao.COUNT_OBSERVATIONS);
-			query.setParameterList(TRAIT_IDS, traitIds);
-			query.setParameterList("environmentIds", environmentIds);
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at countObservationForTraits() query on PhenotypeDao: " + e.getMessage(), e);
-		}
-	}
 
 	public List<Observation> getObservationForTraits(
 		final List<Integer> traitIds, final List<Integer> environmentIds, final int start,
@@ -490,7 +468,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append("FROM phenotype p ");
 			queryString.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ");
 			queryString.append("INNER JOIN project pr ON pr.project_id = e.project_id  ");
-			queryString.append("INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 ");
+			queryString.append("INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = ");
+			queryString.append(DatasetTypeEnum.PLOT_DATA.getId()).append(" ");
 			queryString.append("INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id ");
 			queryString.append("INNER JOIN nd_experimentprop xp ON xp.nd_experiment_id = plot.parent_id AND xp.type_id = "
 				+ TermId.LOCATION_ID.getId() + " ");
@@ -503,12 +482,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter("traitId", traitId).setParameterList("environmentIds", environmentIds);
-			query.addScalar("observable_id", Hibernate.INTEGER);
-			query.addScalar("value", Hibernate.STRING);
-			query.addScalar("dbxref_id", Hibernate.INTEGER);
-			query.addScalar("nd_experiment_id", Hibernate.INTEGER);
-			query.addScalar("lname", Hibernate.STRING);
-			query.addScalar("locationId", Hibernate.INTEGER);
+			query.addScalar("observable_id", new IntegerType());
+			query.addScalar("value", new StringType());
+			query.addScalar("dbxref_id", new IntegerType());
+			query.addScalar("nd_experiment_id", new IntegerType());
+			query.addScalar("lname", new StringType());
+			query.addScalar("locationId", new IntegerType());
 
 			final List<Object[]> list = query.list();
 
@@ -548,12 +527,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.append("	FROM nd_experiment e ")
 			.append("  LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id and plot.type_id = 1155 ")
 			.append("  INNER JOIN project pr ON pr.project_id = e.project_id ")
-			.append("  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3 ")
+			.append("  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = ")
+			.append(DatasetTypeEnum.SUMMARY_DATA.getId()).append(" ")
 			.append("  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 AND env.nd_experiment_id IN (:environmentIds) ")
+			// handle cases for with/without plot and with/without sub-observations
 			.append("      AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) ")
 			.append("  INNER JOIN projectprop pp on e.project_id = pp.project_id and pp.type_id = " + VariableType.TRAIT.getId())
-				// handle cases for with/without plot and with/without sub-observations
-			.append("  AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id ) ")
 			.append("	LEFT JOIN cvterm_relationship cr_scale ON pp.variable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
 			.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.object_id  AND cr_type.type_id = 1105 ")
 			.append("	LEFT JOIN cvterm_relationship cr_property ON pp.variable_id = cr_property.subject_id AND cr_property.type_id = 1200 ")
@@ -649,7 +628,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				+ "INNER JOIN nd_experimentprop expprop ON expprop.nd_experiment_id = exp.nd_experiment_id "
 				+ "INNER JOIN phenotype pheno ON exp.nd_experiment_id = pheno.nd_experiment_id "
 				+ " INNER JOIN project pr ON pr.project_id = exp.project_id  "
-				+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+				+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 				+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 				+ "WHERE exp.project_id = :projectId "
 				+ "AND plot.parent_id = :locationId " + "AND pheno.observable_id IN (:cvTermIds) "
@@ -863,7 +842,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.append(" INNER JOIN stock ON nd_exp.stock_id = stock.stock_id ")
 			.append(" LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id ")
 			.append(" INNER JOIN project pr ON pr.project_id = nd_exp.project_id  ")
-			.append(" INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 ")
+			.append(" INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = ")
+			.append(DatasetTypeEnum.PLOT_DATA.getId()).append(" ")
 			.append(" INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id ")
 			.append(" where nd_exp.project_id = :projectId")
 			.append(" and plot.parent_id = :environmentId")
@@ -966,7 +946,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					try {
 						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
 						observationUnitPosition.setGeoCoordinates((Map<String, Object>) jsonProp.get("geoCoordinates"));
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
 					}
 				}
@@ -1149,7 +1129,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 						+ " from phenotype p "
 						+ " INNER JOIN nd_experiment e ON p.nd_experiment_id = e.nd_experiment_id "
 						+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-						+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+						+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 						+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 						+ " WHERE e.project_id = :projectId AND plot.parent_id = :environmentId");
 		query.setParameter("projectId", datasetId);
@@ -1226,7 +1206,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			+ "LEFT JOIN nd_experiment experimentParent ON experimentParent.nd_experiment_id = experiment.parent_id\n"
 			+ "INNER JOIN phenotype pheno ON  pheno.nd_experiment_id = experimentParent.nd_experiment_id OR pheno.nd_experiment_id = experiment.nd_experiment_id\n"
 			+ " INNER JOIN project pr ON pr.project_id = exp.project_id OR pr.project_id =  experimentParent.project_id"
-			+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+			+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 			+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 			+ "SET pheno.status = :status \n"
 			+ "WHERE plot.parent_id = :environmentId  AND pheno.observable_id in (:variableIds) ;";
@@ -1253,7 +1233,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 						+ " from phenotype p "
 						+ " INNER JOIN nd_experiment e ON p.nd_experiment_id = e.nd_experiment_id "
 						+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-						+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
+						+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 						+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 						+ " WHERE e.project_id = :projectId AND plot.parent_id = :environmentId")
 				.addEntity(Phenotype.class);
@@ -1288,8 +1268,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final Criterion draftCValueId = Restrictions.isNotNull("draftCValueId");
 		criteria.add(Restrictions.or(draftValue, draftCValueId));
 		criteria.setProjection(Projections.rowCount());
-		final Long count = (Long) criteria.uniqueResult();
-		return count;
+		return (Long) criteria.uniqueResult();
 	}
 
 	public Map<Integer, Long> countOutOfSyncDataOfDatasetsInStudy(final Integer studyId) {
@@ -1349,7 +1328,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public List<MeasurementVariable> getEnvironmentConditionVariables(final Integer environmentId) {
-		List<MeasurementVariable> studyVariables = new ArrayList<>();
+		final List<MeasurementVariable> studyVariables = new ArrayList<>();
 
 		try{
 			final SQLQuery query =
@@ -1360,7 +1339,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
 					+ "     INNER JOIN nd_experiment env ON  pheno.nd_experiment_id = env.nd_experiment_id\n"
-					+ "		WHERE env.nd_experiment_id = :environmentId AND env.type_id = 1020 ;");
+					+ "		WHERE env.nd_experiment_id = :environmentId AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ;");
 			query.addScalar("name", new StringType());
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());
@@ -1368,7 +1347,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.setParameter("environmentId", environmentId);
 
 			final List<Object> results = query.list();
-			for(Object result: results) {
+			for(final Object result: results) {
 				final Object[] row = (Object[]) result;
 				final MeasurementVariable measurementVariable = new MeasurementVariable();
 				measurementVariable.setName((row[0] instanceof String) ? (String) row[0] : null);

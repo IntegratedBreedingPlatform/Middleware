@@ -7,6 +7,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -56,7 +57,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	protected static final String ENTRY_TYPE = "ENTRY_TYPE";
 	protected static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 	static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
-	protected static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
+	static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
 	private static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
@@ -122,7 +123,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "    inner join stock s ON s.stock_id = nde.stock_id " //
 				// FIXME won't work for sub-sub-obs
 				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id) AND plot.type_id = 1155 "
-				+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = 1020 "
+				+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 				//
 				+ " where p.project_id = :datasetId ");
 
@@ -173,8 +174,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				"select count(*) as totalObservationUnits, count(distinct(env.nd_experiment_id)) as totalInstances from " //
 					+ "nd_experiment nde " //
 					+ "    inner join project p on p.project_id = nde.project_id " //
-					+ " INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = 3 "
-					+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 "
+					+ " INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId()
+					+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 					+ " where " //
 					+ "	p.project_id = :datasetId ");
 
@@ -287,7 +288,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		sql.append(" 1 FROM " //
 			+ "	project p " //
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
-			+ "	INNER JOIN nd_experiment env ON nde.parent_id = env.nd_experiment_id AND env.type_id = 1020 " //
+			+ "	INNER JOIN nd_experiment env ON nde.parent_id = env.nd_experiment_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
@@ -597,7 +598,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "     GROUP BY parent.nd_experiment_id) child_sample_count ON child_sample_count.nd_experiment_id = nde.nd_experiment_id " //
 			// FIXME won't work for sub-sub-obs
 			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR (plot.nd_experiment_id = nde.nd_experiment_id) AND plot.type_id = 1155 "
-			+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = 1020 "
+			+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			//
 			+ " WHERE p.project_id = :datasetId "); //
 
@@ -1062,7 +1063,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	protected List<Map<String, Object>> convertSelectionAndTraitColumnsValueType(final List<Map<String, Object>> result,
+	List<Map<String, Object>> convertSelectionAndTraitColumnsValueType(final List<Map<String, Object>> result,
 		final List<MeasurementVariableDto> selectionAndTraits) {
 		final Iterator<Map<String, Object>> iterator = result.iterator();
 		while (iterator.hasNext()) {

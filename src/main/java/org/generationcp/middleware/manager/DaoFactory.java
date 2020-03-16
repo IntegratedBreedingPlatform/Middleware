@@ -15,7 +15,7 @@ import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.dao.dms.EnvironmentDao;
+import org.generationcp.middleware.dao.dms.InstanceDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
@@ -230,10 +230,10 @@ public class DaoFactory {
 		return programFavoriteDao;
 	}
 
-	public EnvironmentDao getEnvironmentDao() {
-		final EnvironmentDao environmentDao = new EnvironmentDao();
-		environmentDao.setSession(this.sessionProvider.getSession());
-		return environmentDao;
+	public InstanceDao getInstanceDao() {
+		final InstanceDao instanceDao = new InstanceDao();
+		instanceDao.setSession(this.sessionProvider.getSession());
+		return instanceDao;
 	}
 
 	public EnvironmentPropertyDao getEnvironmentPropertyDao() {

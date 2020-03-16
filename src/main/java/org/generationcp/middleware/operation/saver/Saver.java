@@ -37,7 +37,7 @@ public class Saver extends DatabaseBroker {
 	/**
 	 * Instantiates a new data manager given session providers for local and central.
 	 */
-	protected Saver(HibernateSessionProvider sessionProvider) {
+	protected Saver(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 

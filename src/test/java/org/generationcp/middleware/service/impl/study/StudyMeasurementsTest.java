@@ -20,7 +20,7 @@ import org.hibernate.type.StringType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -135,7 +135,7 @@ public class StudyMeasurementsTest {
 			StudyMeasurementsTest.FACT1_VALUE2,
 			StudyMeasurementsTest.FACT2_VALUE2};
 		this.singleMeasurement = Arrays.<Object[]>asList(this.testRow1);
-		this.allMeasurements = Arrays.<Object[]>asList(this.testRow1, this.testRow2);
+		this.allMeasurements = Arrays.asList(this.testRow1, this.testRow2);
 		Mockito.when(this.mockSqlQueryForAllMeasurements.list()).thenReturn(this.allMeasurements);
 		Mockito.when(this.mockSqlQueryForSingleMeasurement.list()).thenReturn(this.singleMeasurement);
 	}
@@ -146,7 +146,7 @@ public class StudyMeasurementsTest {
 	 *
 	 */
 	@Test
-	public void allPlotsMeasurementQueryRetrievesDataCorrectly() throws Exception {
+	public void allPlotsMeasurementQueryRetrievesDataCorrectly() {
 
 		Mockito.when(this.session.createSQLQuery(new ObservationQuery().getAllObservationsQuery(this.testTraits,
 				this.germplasmDescriptors, this.designFactors, null, null)))
@@ -160,10 +160,11 @@ public class StudyMeasurementsTest {
 				this.designFactors, instanceId, pageNumber, pageSize, null, null);
 
 		this.verifyScalarSetting(this.mockSqlQueryForAllMeasurements);
-		Mockito.verify(this.mockSqlQueryForAllMeasurements).setParameter(Matchers.eq("studyId"),
-				Matchers.eq(StudyMeasurementsTest.PROJECT_IDENTIFIER));
-		Mockito.verify(this.mockSqlQueryForAllMeasurements).setParameter(Matchers.eq("instanceId"),
-				Matchers.eq(String.valueOf(instanceId)));
+		Mockito.verify(this.mockSqlQueryForAllMeasurements).setParameter(
+			ArgumentMatchers.eq("studyId"),
+			ArgumentMatchers.eq(StudyMeasurementsTest.PROJECT_IDENTIFIER));
+		Mockito.verify(this.mockSqlQueryForAllMeasurements).setParameter(ArgumentMatchers.eq("instanceId"),
+			ArgumentMatchers.eq(String.valueOf(instanceId)));
 
 		Assert.assertEquals("Make sure that we have all measurements returned", this.allMeasurements.size(),
 				returnedMeasurements.size());
@@ -225,7 +226,7 @@ public class StudyMeasurementsTest {
 		Mockito.verify(query).addScalar(StudyMeasurements.FIELD_MAP_COLUMN);
 		Mockito.verify(query).addScalar(StudyMeasurements.LOCATION_ABBREVIATION);
 		Mockito.verify(query).addScalar(StudyMeasurements.LOCATION_NAME);
-		Mockito.verify(query).addScalar(Matchers.eq(StudyMeasurements.OBS_UNIT_ID), Matchers.any(StringType.class));
+		Mockito.verify(query).addScalar(ArgumentMatchers.eq(StudyMeasurements.OBS_UNIT_ID), ArgumentMatchers.any(StringType.class));
 		Mockito.verify(query).addScalar(StudyMeasurements.COL);
 		Mockito.verify(query).addScalar(StudyMeasurements.ROW);
 		Mockito.verify(query).addScalar(StudyMeasurements.BLOCK_NO);
@@ -239,8 +240,8 @@ public class StudyMeasurementsTest {
 		Mockito.verify(query).addScalar(StudyMeasurements.TRIAL_INSTANCE);
 		Mockito.verify(query).addScalar(StudyMeasurements.ND_EXPERIMENT_ID);
 		Mockito.verify(query).addScalar(TermId.ALTITUDE.name());
-		Mockito.verify(query).addScalar(Matchers.eq(TermId.ALTITUDE.name() + "_PhenotypeId"),
-				Matchers.any(IntegerType.class));
+		Mockito.verify(query).addScalar(ArgumentMatchers.eq(TermId.ALTITUDE.name() + "_PhenotypeId"),
+				ArgumentMatchers.any(IntegerType.class));
 	}
 
 	/**
@@ -249,7 +250,7 @@ public class StudyMeasurementsTest {
 	 *
 	 */
 	@Test
-	public void singlePlotMeasurementsQueryRetrievesDataCorrectly() throws Exception {
+	public void singlePlotMeasurementsQueryRetrievesDataCorrectly() {
 		Mockito.when(this.session.createSQLQuery(new ObservationQuery().getSingleObservationQuery(this.testTraits,
 				this.germplasmDescriptors, this.designFactors))).thenReturn(this.mockSqlQueryForSingleMeasurement);
 
@@ -258,10 +259,10 @@ public class StudyMeasurementsTest {
 				this.designFactors, StudyMeasurementsTest.OBS_UNIT_IDENTIFIER1);
 
 		this.verifyScalarSetting(this.mockSqlQueryForSingleMeasurement);
-		Mockito.verify(this.mockSqlQueryForSingleMeasurement).setParameter(Matchers.eq("studyId"),
-				Matchers.eq(StudyMeasurementsTest.PROJECT_IDENTIFIER));
-		Mockito.verify(this.mockSqlQueryForSingleMeasurement).setParameter(Matchers.eq("experiment_id"),
-				Matchers.eq(StudyMeasurementsTest.OBS_UNIT_IDENTIFIER1));
+		Mockito.verify(this.mockSqlQueryForSingleMeasurement).setParameter(ArgumentMatchers.eq("studyId"),
+			ArgumentMatchers.eq(StudyMeasurementsTest.PROJECT_IDENTIFIER));
+		Mockito.verify(this.mockSqlQueryForSingleMeasurement).setParameter(ArgumentMatchers.eq("experiment_id"),
+			ArgumentMatchers.eq(StudyMeasurementsTest.OBS_UNIT_IDENTIFIER1));
 
 		final ObservationDto measurement1 = returnedMeasurements.get(0);
 		this.verifyObservationValues(measurement1, StudyMeasurementsTest.OBS_UNIT_IDENTIFIER1, StudyMeasurementsTest.GID1,
@@ -337,7 +338,7 @@ public class StudyMeasurementsTest {
 	private void verifyScalarSetting(final SQLQuery query) {
 		// Fixed columns + Trait name - no type
 		Mockito.verify(query, Mockito.times(StudyMeasurementsTest.STRING_COLUMNS.size() + this.testTraits.size() + 2))
-				.addScalar(Matchers.anyString());
+				.addScalar(ArgumentMatchers.anyString());
 		for (final String column : StudyMeasurementsTest.STRING_COLUMNS) {
 			Mockito.verify(query).addScalar(column);
 		}
@@ -345,21 +346,21 @@ public class StudyMeasurementsTest {
 			Mockito.verify(query).addScalar(variable.getName());
 		}
 		// OBS_UNIT_ID with StringType
-		Mockito.verify(query).addScalar(Matchers.eq("OBS_UNIT_ID"), Matchers.any(StringType.class));
+		Mockito.verify(query).addScalar(ArgumentMatchers.eq("OBS_UNIT_ID"), ArgumentMatchers.any(StringType.class));
 
 		// Once for each non-fixed germplasm factor as StringType
 		for (final String gpDesc : this.germplasmDescriptors) {
-			Mockito.verify(query).addScalar(Matchers.eq(gpDesc), Matchers.any(StringType.class));
+			Mockito.verify(query).addScalar(ArgumentMatchers.eq(gpDesc), ArgumentMatchers.any(StringType.class));
 		}
 
 		// Once for each non-fixed design factor as StringType
 		for (final String designFactor : this.designFactors) {
-			Mockito.verify(query).addScalar(Matchers.eq(designFactor), Matchers.any(StringType.class));
+			Mockito.verify(query).addScalar(ArgumentMatchers.eq(designFactor), ArgumentMatchers.any(StringType.class));
 		}
 
 		// Trait PhenotypeIds as IntegerType for each trait
 		for (final MeasurementVariableDto t : this.testTraits) {
-			Mockito.verify(query).addScalar(Matchers.eq(t.getName() + "_PhenotypeId"), Matchers.any(IntegerType.class));
+			Mockito.verify(query).addScalar(ArgumentMatchers.eq(t.getName() + "_PhenotypeId"), ArgumentMatchers.any(IntegerType.class));
 		}
 	}
 }

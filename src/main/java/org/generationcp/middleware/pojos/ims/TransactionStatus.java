@@ -1,18 +1,26 @@
 
 package org.generationcp.middleware.pojos.ims;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.util.Arrays;
+import java.util.List;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum TransactionStatus {
 
 	PENDING(0, "Pending"), CONFIRMED(1, "Confirmed"), CANCELLED(9, "Cancelled");
 
+	private static final List<TransactionStatus> LIST;
+
+	static {
+		LIST = Arrays.asList(TransactionStatus.values());
+	}
+
 	private int id;
 	private String status;
 
-	private TransactionStatus(int id, String status) {
+	TransactionStatus(int id, String status) {
 		this.status = status;
 		this.id = id;
 	}
@@ -26,6 +34,6 @@ public enum TransactionStatus {
 	}
 
 	public static List<TransactionStatus> getAll() {
-		return EnumSet.allOf(TransactionStatus.class).stream().collect(Collectors.toList());
+		return LIST;
 	}
 }

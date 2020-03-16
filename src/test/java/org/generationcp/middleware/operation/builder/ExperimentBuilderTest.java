@@ -30,7 +30,7 @@ import java.util.Set;
 
 public class ExperimentBuilderTest extends IntegrationTestBase {
 
-	static ExperimentBuilder builder;
+	private static ExperimentBuilder builder;
 
 	@Before
 	public void setUp() throws Exception {
@@ -64,7 +64,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		variableType.setStandardVariable(standardVariable);
 		final Variable variable = builder.createLocationFactor(geoLocation, variableType, null);
 		Assert.assertEquals("The variable instance should be set properly since there is a mathcing variable", variable.getValue(),
-				instance);
+				instance.toString());
 	}
 
 	@Test
@@ -85,7 +85,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		variableType.setStandardVariable(standardVariable);
 		final Variable variable = builder.createLocationFactor(geoLocation, variableType, null);
 		Assert.assertEquals("The variable description should be set properly since there is a mathcing variable", variable.getValue(),
-				instance);
+				instance.toString());
 	}
 
 	@Test
@@ -178,13 +178,13 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 
 		Assert.assertNull(variable);
 	}
-	
+
 	@Test
 	public void testAddGermplasmFactors() {
 		final StockModel stockModel = this.createStockModel();
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setStock(stockModel);
-		final Map<Integer, StockModel> stockMap = new HashMap<Integer, StockModel>();
+		final Map<Integer, StockModel> stockMap = new HashMap<>();
 		stockMap.put(stockModel.getStockId(), stockModel);
 		final VariableTypeList variableTypes = new VariableTypeList();
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_NO));
@@ -192,24 +192,24 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		variableTypes.add(this.createDMSVariableType(TermId.DESIG));
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_CODE));
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_TYPE));
-		
+
 		final VariableList factors = new VariableList();
 		builder.addGermplasmFactors(factors, experimentModel, variableTypes, stockMap);
 		final List<Variable> variables = factors.getVariables();
 		Assert.assertEquals(5, variables.size());
 		final Iterator<Variable> iterator = variables.iterator();
-		verifyFactorVariable(iterator.next(), TermId.ENTRY_NO.getId(), stockModel.getUniqueName());
-		verifyFactorVariable(iterator.next(), TermId.GID.getId(), String.valueOf(stockModel.getGermplasm().getGid()));
-		verifyFactorVariable(iterator.next(), TermId.DESIG.getId(), stockModel.getName());
-		verifyFactorVariable(iterator.next(), TermId.ENTRY_CODE.getId(), stockModel.getValue());
-		verifyFactorVariable(iterator.next(), TermId.ENTRY_TYPE.getId(), stockModel.getProperties().iterator().next().getValue());
+		this.verifyFactorVariable(iterator.next(), TermId.ENTRY_NO.getId(), stockModel.getUniqueName());
+		this.verifyFactorVariable(iterator.next(), TermId.GID.getId(), String.valueOf(stockModel.getGermplasm().getGid()));
+		this.verifyFactorVariable(iterator.next(), TermId.DESIG.getId(), stockModel.getName());
+		this.verifyFactorVariable(iterator.next(), TermId.ENTRY_CODE.getId(), stockModel.getValue());
+		this.verifyFactorVariable(iterator.next(), TermId.ENTRY_TYPE.getId(), stockModel.getProperties().iterator().next().getValue());
 	}
-	
+
 	@Test
 	public void testAddGermplasmFactors_NoStock() {
 		final StockModel stockModel = this.createStockModel();
 		final ExperimentModel experimentModel = new ExperimentModel();
-		final Map<Integer, StockModel> stockMap = new HashMap<Integer, StockModel>();
+		final Map<Integer, StockModel> stockMap = new HashMap<>();
 		stockMap.put(stockModel.getStockId(), stockModel);
 		final VariableTypeList variableTypes = new VariableTypeList();
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_NO));
@@ -217,12 +217,12 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		variableTypes.add(this.createDMSVariableType(TermId.DESIG));
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_CODE));
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_TYPE));
-		
+
 		final VariableList factors = new VariableList();
 		builder.addGermplasmFactors(factors, experimentModel, variableTypes, stockMap);
 		Assert.assertTrue(factors.getVariables().isEmpty());
 	}
-	
+
 	private void verifyFactorVariable(final Variable variable, final int id, final String value) {
 		Assert.assertEquals(id, variable.getVariableType().getId());
 		Assert.assertEquals(value, variable.getValue());

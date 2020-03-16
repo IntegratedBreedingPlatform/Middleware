@@ -163,7 +163,7 @@ public class StudyEnvironmentServiceImplTest extends IntegrationTestBase {
 		assertFalse(studyInstance2.isHasExperimentalDesign());
 
 		final List<ExperimentModel> retrievedStudyInstances =
-			this.daoFactory.getEnvironmentDao().getEnvironments(studyId);
+			this.daoFactory.getInstanceDao().getEnvironments(studyId);
 		Assert.assertEquals(2, retrievedStudyInstances.size());
 	}
 
@@ -336,7 +336,7 @@ public class StudyEnvironmentServiceImplTest extends IntegrationTestBase {
 			Assert.assertNotEquals(instance2LocationId.intValue(), instance.getExperimentId());
 		}
 		// Confirm geolocation and its properties have been deleted
-		Assert.assertNull(this.daoFactory.getEnvironmentDao().getById(instance2LocationId));
+		Assert.assertNull(this.daoFactory.getInstanceDao().getById(instance2LocationId));
 		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariableNameValuesMap(instance2LocationId)));
 
 
@@ -350,7 +350,7 @@ public class StudyEnvironmentServiceImplTest extends IntegrationTestBase {
 		final Integer instance3LocationId = instance3.getLocationId();
 		Assert.assertEquals(instance3LocationId, this.daoFactory.getExperimentDao().getById(studyExperimentId).getNdExperimentId());
 		// Confirm geolocation and its properties have been deleted
-		Assert.assertNull(this.daoFactory.getEnvironmentDao().getById(instance1LocationId));
+		Assert.assertNull(this.daoFactory.getInstanceDao().getById(instance1LocationId));
 		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariableNameValuesMap(instance1LocationId)));
 
 
@@ -364,7 +364,7 @@ public class StudyEnvironmentServiceImplTest extends IntegrationTestBase {
 		studyInstances =
 			this.studyEnvironmentService.getStudyEnvironments(studyId);
 		Assert.assertEquals(1, studyInstances.size());
-		Assert.assertNotNull(this.daoFactory.getEnvironmentDao().getById(instance3LocationId));
+		Assert.assertNotNull(this.daoFactory.getInstanceDao().getById(instance3LocationId));
 		Assert.assertFalse(CollectionUtils.isEmpty(this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariableNameValuesMap(instance3LocationId)));
 	}
 

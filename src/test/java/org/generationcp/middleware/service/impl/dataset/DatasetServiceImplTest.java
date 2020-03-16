@@ -823,7 +823,7 @@ public class DatasetServiceImplTest {
 
 	@Test
 	public void testAcceptDraftDataDeletingRowWithEmpty() {
-		final Integer studyId = 2;
+		final int studyId = 2;
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
@@ -866,7 +866,7 @@ public class DatasetServiceImplTest {
 
 	@Test
 	public void testSetAsMissingDraftDataValidValue() {
-		final Integer studyId = 2;
+		final int studyId = 2;
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();

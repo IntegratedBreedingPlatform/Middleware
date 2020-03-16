@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.service;
@@ -54,15 +54,15 @@ public abstract class Service extends DatabaseBroker {
 	public Service() {
 	}
 
-	public Service(HibernateSessionProvider sessionProvider) {
+	public Service(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 
-	public Service(HibernateSessionProvider sessionProvider, String databaseName) {
+	public Service(final HibernateSessionProvider sessionProvider, final String databaseName) {
 		super(sessionProvider, databaseName);
 	}
 
-	protected void logAndThrowException(String message, Throwable e, Logger log) {
+	protected void logAndThrowException(final String message, final Throwable e, final Logger log) {
 		log.error(e.getMessage(), e);
 		if (e instanceof PhenotypeException) {
 			throw (PhenotypeException) e;
@@ -131,12 +131,12 @@ public abstract class Service extends DatabaseBroker {
 		return new StudyDestroyer(this.sessionProvider);
 	}
 
-	protected void setLocationDataManager(LocationDataManager locationDataManager) {
+	protected void setLocationDataManager(final LocationDataManager locationDataManager) {
 		this.locationDataManager = locationDataManager;
 	}
 
 	protected LocationDataManager getLocationDataManager() {
-		return locationDataManager;
+		return this.locationDataManager;
 	}
 
 	protected final SampleListService getSampleListService() {

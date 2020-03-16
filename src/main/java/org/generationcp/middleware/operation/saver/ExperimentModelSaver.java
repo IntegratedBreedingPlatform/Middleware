@@ -36,10 +36,10 @@ import java.util.Optional;
 
 @Transactional
 public class ExperimentModelSaver {
-	
-	private DaoFactory daoFactory;
-	private PhenotypeSaver phenotypeSaver;
-	private StockModelBuilder stockModelBuilder;
+
+	private final DaoFactory daoFactory;
+	private final PhenotypeSaver phenotypeSaver;
+	private final StockModelBuilder stockModelBuilder;
 
 	public ExperimentModelSaver(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);

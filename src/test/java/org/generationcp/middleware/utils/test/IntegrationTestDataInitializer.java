@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -38,39 +39,43 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 public class IntegrationTestDataInitializer {
 
-	private ExperimentDao experimentDao;
-	private ExperimentPropertyDao experimentPropertyDao;
-	private StockDao stockDao;
-	private DmsProjectDao dmsProjectDao;
-	private GermplasmDAO germplasmDao;
-	private PhenotypeDao phenotypeDao;
-	private CVTermDao cvTermDao;
-	private SampleDao sampleDao;
-	private SampleListDao sampleListDao;
-	private ProjectPropertyDao projectPropertyDao;
+	private final ExperimentDao experimentDao;
+	private final ExperimentPropertyDao experimentPropertyDao;
+	private final StockDao stockDao;
+	private final DmsProjectDao dmsProjectDao;
+	private final GermplasmDAO germplasmDao;
+	private final PhenotypeDao phenotypeDao;
+	private final CVTermDao cvTermDao;
+	private final SampleDao sampleDao;
+	private final SampleListDao sampleListDao;
+	private final ProjectPropertyDao projectPropertyDao;
 
-	private DaoFactory daoFactory;
-	private UserService userService;
-	private WorkbenchDataManager workbenchDataManager;
+	private final DaoFactory daoFactory;
+	private final UserService userService;
+	private final WorkbenchDataManager workbenchDataManager;
+	private WorkbenchDaoFactory workbenchDaoFactory;
 
 	public IntegrationTestDataInitializer(final HibernateSessionProvider hibernateSessionProvider,
 		final HibernateSessionProvider workbenchSessionProvider) {
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(workbenchSessionProvider);
 		this.daoFactory = new DaoFactory(hibernateSessionProvider);
 		this.experimentDao = this.daoFactory.getExperimentDao();
 		this.stockDao = this.daoFactory.getStockDao();
@@ -119,6 +124,12 @@ public class IntegrationTestDataInitializer {
 
 		return geolocation;
 
+	}
+
+	public Geolocation createInstance(final DmsProject dmsProject, final String trialNumber, final int locationId) {
+		final Geolocation geolocation = this.createTestGeolocation(trialNumber, locationId);
+		this.createExperimentModel(dmsProject, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), null);
+		return geolocation;
 	}
 
 	public List<ExperimentModel> createTestExperiments(final DmsProject project, final ExperimentModel parent,
@@ -267,13 +278,45 @@ public class IntegrationTestDataInitializer {
 
 	}
 
+	public ExperimentModel createExperimentModel(final DmsProject dmsProject, final Geolocation geolocation, final Integer typeId,
+		final StockModel stockModel) {
+
+		final ExperimentModel experimentModel = new ExperimentModel();
+		experimentModel.setTypeId(typeId);
+		experimentModel.setObsUnitId(RandomStringUtils.randomAlphabetic(13));
+		experimentModel.setProject(dmsProject);
+		experimentModel.setStock(stockModel);
+		this.experimentDao.saveOrUpdate(experimentModel);
+
+		return experimentModel;
+
+	}
+
 	public ObservationUnitsSearchDTO createTestObservationUnitsDTO() {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = new ObservationUnitsSearchDTO();
-		observationUnitsSearchDTO.setSelectionMethodsAndTraits(new ArrayList<MeasurementVariableDto>());
-		observationUnitsSearchDTO.setEnvironmentConditions(new ArrayList<MeasurementVariableDto>());
-		observationUnitsSearchDTO.setAdditionalDesignFactors(new ArrayList<String>());
-		observationUnitsSearchDTO.setGenericGermplasmDescriptors(new ArrayList<String>());
+		observationUnitsSearchDTO.setSelectionMethodsAndTraits(new ArrayList<>());
+		observationUnitsSearchDTO.setEnvironmentConditions(new ArrayList<>());
+		observationUnitsSearchDTO.setAdditionalDesignFactors(new ArrayList<>());
+		observationUnitsSearchDTO.setGenericGermplasmDescriptors(new ArrayList<>());
 		return observationUnitsSearchDTO;
+	}
+
+	public Project createWorkbenchProject() {
+
+		final String programUUID = UUID.randomUUID().toString();
+		final Project project = new Project();
+		project.setUserId(1);
+		project.setProjectName("Test Project " + programUUID);
+		project.setStartDate(new Date(System.currentTimeMillis()));
+		project.setCropType(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
+		project.setLastOpenDate(new Date(System.currentTimeMillis()));
+		project.setUniqueID(programUUID);
+
+		this.workbenchDaoFactory.getProjectDAO().saveOrUpdate(project);
+		this.workbenchDaoFactory.getProjectDAO().refresh(project);
+
+		return project;
+
 	}
 
 	public WorkbenchUser createUserForTesting() {
@@ -296,7 +339,7 @@ public class IntegrationTestDataInitializer {
 
 		this.userService.addPerson(person);
 
-		final Role role =new Role(1, "Admin");
+		final Role role = new Role(1, "Admin");
 		final RoleType roleType = new RoleType("INSTANCE");
 		roleType.setId(1);
 		role.setRoleType(roleType);
