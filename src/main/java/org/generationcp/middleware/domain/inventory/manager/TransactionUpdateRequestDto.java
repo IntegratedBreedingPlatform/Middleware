@@ -11,6 +11,9 @@ public class TransactionUpdateRequestDto {
 	private Double availableBalance;
 	private String notes;
 
+	public TransactionUpdateRequestDto() {
+	}
+
 	public TransactionUpdateRequestDto(final Integer transactionId, final Double amount, final Double availableBalance,
 		final String notes) {
 		this.transactionId = transactionId;
