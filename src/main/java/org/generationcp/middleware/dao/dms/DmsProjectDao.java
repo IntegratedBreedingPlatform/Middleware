@@ -12,7 +12,6 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -34,8 +33,11 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.service.api.study.SeasonDto;
+import org.generationcp.middleware.service.api.study.StudyDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.FormulaUtils;
 import org.generationcp.middleware.util.Util;
@@ -172,7 +174,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "                 NULL)) "
 		+ "     AS locationId,"
 		+ "		pmain.description AS studyDescription, "
-		+ "     (Select definition from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId() + ", "
+		+ "     (Select definition from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId()
+		+ ", "
 		+ "			geoprop.value, "
 		+ "			NULL)))) "
 		+ "     AS experimentalDesign,"
@@ -786,8 +789,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				studyMetadata.setTrialDbId(
 					(row[5] instanceof Integer) ? (Integer) row[5] : null);
 				studyMetadata.setTrialName((row[6] instanceof String) ? (String) row[6] : null);
-				studyMetadata.setStartDate((row[7] instanceof String) ? (String) row[7] : null);
-				studyMetadata.setEndDate((row[8] instanceof String) ? (String) row[8] : null);
+				studyMetadata.setStartDate(Util.tryParseDate((String) row[7]));
+				studyMetadata.setEndDate(Util.tryParseDate((String) row[8]));
 				studyMetadata.setActive(Boolean.FALSE.equals(row[9]));
 				studyMetadata.setLocationId((row[10] instanceof String) ? Integer.parseInt((String) row[10]) : null);
 				studyMetadata.setStudyDescription((row[11] instanceof String) ? (String) row[11] : null);
@@ -1397,6 +1400,196 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final String message = "Error with getPersonIdsAssociatedToEnvironment() query from instanceId: " + instanceId;
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public long countStudies(final StudySearchFilter studySearchFilter) {
+		final SQLQuery sqlQuery =
+			this.getSession().createSQLQuery(this.createCountStudyQueryString(studySearchFilter));
+		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
+
+		// TODO: Check if we can reuse this query/method in getStudyMetadataForGeolocationId()
+		final SQLQuery sqlQuery =
+			this.getSession().createSQLQuery(this.createStudySummaryQueryString(studySearchFilter));
+
+		sqlQuery.addScalar(StudySearchFilter.STUDY_DB_ID);
+		sqlQuery.addScalar(StudySearchFilter.STUDY_NAME);
+		sqlQuery.addScalar(StudySearchFilter.TRIAL_DB_ID);
+		sqlQuery.addScalar(StudySearchFilter.TRIAL_NAME);
+		sqlQuery.addScalar(StudySearchFilter.STUDY_TYPE_DB_ID);
+		sqlQuery.addScalar(StudySearchFilter.STUDY_TYPE_NAME);
+		sqlQuery.addScalar(StudySearchFilter.SEASON_DB_ID);
+		sqlQuery.addScalar(StudySearchFilter.SEASON);
+		sqlQuery.addScalar(StudySearchFilter.START_DATE);
+		sqlQuery.addScalar(StudySearchFilter.END_DATE);
+		sqlQuery.addScalar(StudySearchFilter.ACTIVE, new IntegerType());
+		sqlQuery.addScalar(StudySearchFilter.LOCATION_DB_ID);
+		sqlQuery.addScalar(StudySearchFilter.LOCATION_NAME);
+		sqlQuery.addScalar(StudySearchFilter.PROGRAM_DB_ID);
+		sqlQuery.addScalar(StudySearchFilter.PROGRAM_NAME);
+
+		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
+
+		final Integer pageSize = studySearchFilter.getSortedRequest().getPageSize();
+		final Integer pageNumber = studySearchFilter.getSortedRequest().getPageNumber();
+
+		if (pageNumber != null && pageSize != null) {
+			sqlQuery.setFirstResult(pageSize * (pageNumber - 1));
+			sqlQuery.setMaxResults(pageSize);
+		}
+
+		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+		final List<Map<String, Object>> results = sqlQuery.list();
+
+		final List<StudyDto> studyDtoList = new ArrayList<>();
+		for (final Map<String, Object> result : results) {
+			final StudyDto studyDto = new StudyDto();
+			studyDto.setCommonCropName(studySearchFilter.getCommonCropName());
+			studyDto.setStudyDbId(String.valueOf(result.get(StudySearchFilter.STUDY_DB_ID)));
+			studyDto.setStudyName(String.valueOf(result.get(StudySearchFilter.STUDY_NAME)));
+			studyDto.setTrialDbId(String.valueOf(result.get(StudySearchFilter.TRIAL_DB_ID)));
+			studyDto.setTrialName(String.valueOf(result.get(StudySearchFilter.TRIAL_NAME)));
+			studyDto.setStudyTypeDbId(String.valueOf(result.get(StudySearchFilter.STUDY_TYPE_DB_ID)));
+			studyDto.setStudyTypeName(String.valueOf(result.get(StudySearchFilter.STUDY_TYPE_NAME)));
+			studyDto.setStartDate(Util.tryParseDate((String) result.get(StudySearchFilter.START_DATE)));
+			studyDto.setEndDate(Util.tryParseDate((String) result.get(StudySearchFilter.END_DATE)));
+			studyDto.setLocationDbId(String.valueOf(result.get(StudySearchFilter.LOCATION_DB_ID)));
+			studyDto.setLocationName(String.valueOf(result.get(StudySearchFilter.LOCATION_NAME)));
+			studyDto.setProgramDbId(String.valueOf(result.get(StudySearchFilter.PROGRAM_DB_ID)));
+			studyDto.setProgramName(String.valueOf(result.get(StudySearchFilter.PROGRAM_NAME)));
+
+			final List<SeasonDto> seasons = new ArrayList<>();
+			if (!StringUtils.isEmpty((String) result.get(StudySearchFilter.SEASON_DB_ID))) {
+				seasons.add(new SeasonDto(String.valueOf(result.get(StudySearchFilter.SEASON)),
+					String.valueOf(result.get(StudySearchFilter.SEASON_DB_ID))));
+			}
+			studyDto.setSeasons(seasons);
+
+			studyDto
+				.setActive(((Integer) result.get(StudySearchFilter.ACTIVE)) == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
+			studyDtoList.add(studyDto);
+		}
+		return studyDtoList;
+	}
+
+	private void addstudySearchFilterParameters(final SQLQuery sqlQuery, final StudySearchFilter studySearchFilter) {
+
+		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
+			sqlQuery.setParameter(StudySearchFilter.STUDY_DB_ID, studySearchFilter.getStudyDbId());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
+			sqlQuery.setParameter(StudySearchFilter.LOCATION_DB_ID, studySearchFilter.getLocationDbId());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getProgramDbId())) {
+			sqlQuery.setParameter(StudySearchFilter.PROGRAM_DB_ID, studySearchFilter.getProgramDbId());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getSeasonDbId())) {
+			sqlQuery.setParameter(StudySearchFilter.SEASON_DB_ID, studySearchFilter.getSeasonDbId());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getStudyTypeDbId())) {
+			sqlQuery.setParameter(StudySearchFilter.STUDY_TYPE_DB_ID, studySearchFilter.getStudyTypeDbId());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getTrialDbId())) {
+			sqlQuery.setParameter(StudySearchFilter.TRIAL_DB_ID, studySearchFilter.getTrialDbId());
+		}
+		if (studySearchFilter.getActive() != null) {
+			sqlQuery.setParameter(StudySearchFilter.ACTIVE, (studySearchFilter.getActive().booleanValue() ? 0 : 1));
+		}
+
+	}
+
+	private String createCountStudyQueryString(final StudySearchFilter studySearchFilter) {
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT geoloc.nd_geolocation_id) ");
+		this.appendStudySummaryFromQuery(sql);
+		this.appendStudySearchFilter(sql, studySearchFilter);
+		return sql.toString();
+	}
+
+	private String createStudySummaryQueryString(final StudySearchFilter studySearchFilter) {
+		final StringBuilder sql = new StringBuilder(" SELECT  ");
+		sql.append("     geoloc.nd_geolocation_id AS " + StudySearchFilter.STUDY_DB_ID + ", ");
+		sql.append("		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS " + StudySearchFilter.STUDY_NAME + ", ");
+		sql.append("     pmain.study_type_id AS " + StudySearchFilter.STUDY_TYPE_DB_ID + ", ");
+		sql.append("     studyType.label AS " + StudySearchFilter.STUDY_TYPE_NAME + ", ");
+		sql.append("     geopropSeason.value AS " + StudySearchFilter.SEASON_DB_ID + ", ");
+		sql.append("     cvtermSeason.definition AS " + StudySearchFilter.SEASON + ", ");
+		sql.append("     pmain.project_id AS " + StudySearchFilter.TRIAL_DB_ID + ", ");
+		sql.append(" 	 pmain.name AS " + StudySearchFilter.TRIAL_NAME + ", ");
+		sql.append("     MAX(pmain.start_date) AS " + StudySearchFilter.START_DATE + ", ");
+		sql.append("     MAX(pmain.end_date) AS " + StudySearchFilter.END_DATE + ", ");
+		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS " + StudySearchFilter.ACTIVE + ", ");
+		sql.append("     location.locid AS " + StudySearchFilter.LOCATION_DB_ID + ", ");
+		sql.append("     location.lname AS " + StudySearchFilter.LOCATION_NAME + ", ");
+		sql.append("     wp.project_name AS " + StudySearchFilter.PROGRAM_NAME + ", ");
+		sql.append("     wp.project_uuid AS " + StudySearchFilter.PROGRAM_DB_ID + " ");
+		this.appendStudySummaryFromQuery(sql);
+		this.appendStudySearchFilter(sql, studySearchFilter);
+		sql.append(" GROUP BY geoloc.nd_geolocation_id ");
+
+		final String sortBy = studySearchFilter.getSortedRequest().getSortBy();
+		final String sortOrder = studySearchFilter.getSortedRequest().getSortOrder();
+
+		if (!StringUtils.isEmpty(sortBy) && StudySearchFilter.SORTABLE_FIELDS.contains(sortBy)) {
+			sql.append(
+				" ORDER BY " + sortBy + " " + (sortOrder == null ? "ASC" : sortOrder));
+		}
+		return sql.toString();
+	}
+
+	private void appendStudySummaryFromQuery(final StringBuilder sql) {
+		sql.append(" FROM ");
+		sql.append("     nd_geolocation geoloc ");
+		sql.append("         INNER JOIN ");
+		sql.append("     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id ");
+		sql.append("         INNER JOIN ");
+		sql.append("     project proj ON proj.project_id = nde.project_id ");
+		sql.append("         INNER JOIN ");
+		sql.append("     project pmain ON pmain.project_id = proj.study_id ");
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     study_type studyType ON studyType.study_type_id = pmain.study_type_id ");
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append(
+			"     nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropSeason.type_id = "
+				+ TermId.SEASON_VAR.getId());
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append(
+			"     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = "
+				+ TermId.LOCATION_ID.getId());
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     location ON geopropLocation.value = location.locid");
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value");
+		sql.append(" WHERE ");
+		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
+	}
+
+	private void appendStudySearchFilter(final StringBuilder sql, final StudySearchFilter studySearchFilter) {
+		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
+			sql.append("AND geoloc.nd_geolocation_id = :studyDbId ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
+			sql.append("AND geopropLocation.value = :locationDbId ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getProgramDbId())) {
+			sql.append("AND pmain.program_uuid = :programDbId ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getSeasonDbId())) {
+			sql.append("AND cvtermSeason.cvterm_id = :seasonDbId ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getStudyTypeDbId())) {
+			sql.append("AND pmain.study_type_id = :studyTypeDbId ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getTrialDbId())) {
+			sql.append("AND pmain.project_id = :trialDbId ");
+		}
+		if (studySearchFilter.getActive() != null) {
+			sql.append("AND pmain.deleted = :active ");
 		}
 	}
 
