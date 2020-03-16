@@ -1464,8 +1464,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final List<SeasonDto> seasons = new ArrayList<>();
 			if (!StringUtils.isEmpty((String) result.get(StudySearchFilter.SEASON_DB_ID))) {
-				seasons.add(new SeasonDto(String.valueOf(result.get(StudySearchFilter.SEASON_DB_ID)),
-					String.valueOf(result.get(StudySearchFilter.SEASON))));
+				seasons.add(new SeasonDto(String.valueOf(result.get(StudySearchFilter.SEASON)),
+					String.valueOf(result.get(StudySearchFilter.SEASON_DB_ID))));
 			}
 			studyDto.setSeasons(seasons);
 
