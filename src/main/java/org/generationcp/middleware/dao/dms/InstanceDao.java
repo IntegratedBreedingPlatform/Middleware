@@ -12,7 +12,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -22,6 +21,7 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -210,14 +210,14 @@ public class InstanceDao extends GenericDAO<ExperimentModel, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("locationIds", environmentIds);
-			query.addScalar("environmentId", Hibernate.INTEGER);
-			query.addScalar("lname", Hibernate.STRING);
-			query.addScalar("value", Hibernate.INTEGER);
-			query.addScalar(InstanceDao.PROJECT_ID, Hibernate.INTEGER);
-			query.addScalar("name", Hibernate.STRING);
-			query.addScalar(InstanceDao.DESCRIPTION, Hibernate.STRING);
-			query.addScalar(InstanceDao.PROVINCE_NAME, Hibernate.STRING);
-			query.addScalar(InstanceDao.ISOABBR, Hibernate.STRING);
+			query.addScalar("environmentId", new IntegerType());
+			query.addScalar("lname", new StringType());
+			query.addScalar("value",  new IntegerType());
+			query.addScalar(InstanceDao.PROJECT_ID, new IntegerType());
+			query.addScalar("name", new StringType());
+			query.addScalar(InstanceDao.DESCRIPTION, new StringType());
+			query.addScalar(InstanceDao.PROVINCE_NAME, new StringType());
+			query.addScalar(InstanceDao.ISOABBR, new StringType());
 			final List<Integer> locIds = new ArrayList<>();
 
 			final List<Object[]> result = query.list();
@@ -405,7 +405,7 @@ public class InstanceDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	public List<ExperimentModel> getEnvironments(final Integer studyId) {
-		return this.getEnvironmentsForInstances(studyId, Collections.<Integer>emptyList());
+		return this.getEnvironmentsForInstances(studyId, Collections.emptyList());
 	}
 
 

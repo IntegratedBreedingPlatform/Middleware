@@ -64,7 +64,7 @@ public class ExperimentPropertySaver {
 				new ProjectPropertySaver(this.sessionProvider).createProjectPropertyIfNecessary(experiment.getProject(), propertyType, PhenotypicType.TRIAL_DESIGN);
 				projectPropCreatedMap.put(projectPropKey, true);
 			}
-			createBatchInsertForExperimentProp(experiment.getNdExperimentId(), propertyType.getId(), 0, value);
+			this.createBatchInsertForExperimentProp(experiment.getNdExperimentId(), propertyType.getId(), 0, value);
 		}
 		else{
 			experimentProperty.setValue(value);
@@ -83,23 +83,23 @@ public class ExperimentPropertySaver {
 	 * @param value value of experiment prop
 	 */
 	private void createBatchInsertForExperimentProp(final int experimentId, final int typeId, final int rank, final String value){
-		if(batchExperimentPropInsertSql.length() == 0){
-			batchExperimentPropInsertSql = new StringBuilder();
-			batchExperimentPropInsertSql.append("insert into  nd_experimentprop (nd_experiment_id, type_id, value , rank) values ");
-			batchExperimentPropInsertSql.append("( ");
-			batchExperimentPropInsertSql.append(experimentId).append(" , ");
-			batchExperimentPropInsertSql.append(typeId).append(" , ");
-			batchExperimentPropInsertSql.append(value).append(" , ");
-			batchExperimentPropInsertSql.append(rank);
-			batchExperimentPropInsertSql.append(") ");
+		if(this.batchExperimentPropInsertSql.length() == 0){
+			this.batchExperimentPropInsertSql = new StringBuilder();
+			this.batchExperimentPropInsertSql.append("insert into  nd_experimentprop (nd_experiment_id, type_id, value , rank) values ");
+			this.batchExperimentPropInsertSql.append("( ");
+			this.batchExperimentPropInsertSql.append(experimentId).append(" , ");
+			this.batchExperimentPropInsertSql.append(typeId).append(" , ");
+			this.batchExperimentPropInsertSql.append(value).append(" , ");
+			this.batchExperimentPropInsertSql.append(rank);
+			this.batchExperimentPropInsertSql.append(") ");
 			return;
 		}
-		batchExperimentPropInsertSql.append(", ( ");
-		batchExperimentPropInsertSql.append(experimentId).append(" , ");
-		batchExperimentPropInsertSql.append(typeId).append(" , ");
-		batchExperimentPropInsertSql.append(value).append(" , ");
-		batchExperimentPropInsertSql.append(rank);
-		batchExperimentPropInsertSql.append(") ");
+		this.batchExperimentPropInsertSql.append(", ( ");
+		this.batchExperimentPropInsertSql.append(experimentId).append(" , ");
+		this.batchExperimentPropInsertSql.append(typeId).append(" , ");
+		this.batchExperimentPropInsertSql.append(value).append(" , ");
+		this.batchExperimentPropInsertSql.append(rank);
+		this.batchExperimentPropInsertSql.append(") ");
 	}
 
 	public void saveOrUpdateProperty(final ExperimentModel experiment, final int propertyType, final String value) {
@@ -142,14 +142,14 @@ public class ExperimentPropertySaver {
 	public void saveFieldmapProperties(final List<FieldMapInfo> infos) {
 
 		// create list of all experimentIds that will be used later to load all experiment and its properties at one go
-		final List<Integer> experimentIds = createExperimentIdsList(infos);
+		final List<Integer> experimentIds = this.createExperimentIdsList(infos);
 
 		// create experimentId wise experiment entity map
 		final Map<Integer, ExperimentModel> experimentMap = this.daoFactory.getExperimentDao().filterByColumnValues("ndExperimentId", experimentIds).stream().collect(
 			Collectors.toMap(ExperimentModel::getNdExperimentId, e -> e));
 
 		// create experimentId wise experiment properties map
-		final Map<Integer, List<ExperimentProperty>> experimentPropertyMap = createExperimentIdWisePropertiesMap(experimentIds);
+		final Map<Integer, List<ExperimentProperty>> experimentPropertyMap = this.createExperimentIdWisePropertiesMap(experimentIds);
 
 		final Map<String, Boolean> projectPropCreatedMap = new HashMap<>();
 		for (final FieldMapInfo info : infos) {
@@ -173,9 +173,9 @@ public class ExperimentPropertySaver {
 			}
 		}
 
-		if(batchExperimentPropInsertSql.length() != 0){
-			batchExperimentPropInsertSql.append(";");
-			final SQLQuery sqlQuery = this.sessionProvider.getSession().createSQLQuery(batchExperimentPropInsertSql.toString());
+		if(this.batchExperimentPropInsertSql.length() != 0){
+			this.batchExperimentPropInsertSql.append(";");
+			final SQLQuery sqlQuery = this.sessionProvider.getSession().createSQLQuery(this.batchExperimentPropInsertSql.toString());
 			sqlQuery.executeUpdate();
 		}
 

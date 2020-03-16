@@ -20,8 +20,7 @@ import com.beust.jcommander.internal.Lists;
 /**
  * The class <code>QueryTest</code> contains tests for the class <code>{@link ObservationQuery}</code>.
  *
- * @generatedBy CodePro at 17/04/15 3:08 PM
- * @author Akhil
+ *  @author Akhil
  * @version $Revision: 1.0 $
  */
 public class ObservationQueryTest {
@@ -30,9 +29,9 @@ public class ObservationQueryTest {
 	private static final String STOCK_ID = "STOCK_ID";
 	private static final String FACT1 = "FACT1";
 	final private BasicFormatterImpl formattedSQL = new BasicFormatterImpl();
-	final List<String> germplasmDescriptors = Lists.newArrayList(STOCK_ID);
-	final List<String> designFactors = Lists.newArrayList(FACT1);
-	List<MeasurementVariableDto> traitNames  = new LinkedList<>();
+	private final List<String> germplasmDescriptors = Lists.newArrayList(STOCK_ID);
+	private final List<String> designFactors = Lists.newArrayList(FACT1);
+	private List<MeasurementVariableDto> traitNames  = new LinkedList<>();
 
 	private ObservationQuery observationQuery;
 
@@ -46,19 +45,16 @@ public class ObservationQueryTest {
 	/**
 	 * Run the String generateQuery(String,List<String>) method test.
 	 *
-	 * @throws Exception
-	 *
-	 * @generatedBy CodePro at 17/04/15 3:08 PM
 	 */
 	@Test
-	public void testGetAllMeasurementsQueryGeneration() throws Exception {
+	public void testGetAllMeasurementsQueryGeneration() {
 		final String result = this.observationQuery.getAllObservationsQuery(this.traitNames, this.germplasmDescriptors, this.designFactors, null, null);
 		assertEquals("The generated query must match the expected query.", this.formatString(this.expectedQueryForAllMeasurements()),
 			this.formatString(result));
 	}
 
 	@Test
-	public void testGetSingleMeasurementQueryGeneration() throws Exception {
+	public void testGetSingleMeasurementQueryGeneration() {
 		final String result = this.observationQuery.getSingleObservationQuery(this.traitNames, this.germplasmDescriptors, this.designFactors);
 		assertEquals("The generated query must match the expected query.", this.formatString(this.expectedQueryForSingleMeasurement()),
 			this.formatString(result));

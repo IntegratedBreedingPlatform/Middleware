@@ -1057,7 +1057,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			final List<Integer> locationIds =
 				filters.get(StudyFilters.LOCATION_ID) != null ?
 					Collections.singletonList(Integer.parseInt(filters.get(StudyFilters.LOCATION_ID))) :
-					new ArrayList<Integer>();
+					new ArrayList<>();
 			studySummary.setInstanceMetaData(this.getInstanceMetadata(dmsProject.getProjectId(), locationIds));
 			studySummaries.add(studySummary);
 		}

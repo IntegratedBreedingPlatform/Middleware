@@ -54,20 +54,20 @@ import java.util.Random;
 
 public class IntegrationTestDataInitializer {
 
-	private ExperimentDao experimentDao;
-	private ExperimentPropertyDao experimentPropertyDao;
-	private StockDao stockDao;
-	private DmsProjectDao dmsProjectDao;
-	private GermplasmDAO germplasmDao;
-	private PhenotypeDao phenotypeDao;
-	private CVTermDao cvTermDao;
-	private SampleDao sampleDao;
-	private SampleListDao sampleListDao;
-	private ProjectPropertyDao projectPropertyDao;
+	private final ExperimentDao experimentDao;
+	private final ExperimentPropertyDao experimentPropertyDao;
+	private final StockDao stockDao;
+	private final DmsProjectDao dmsProjectDao;
+	private final GermplasmDAO germplasmDao;
+	private final PhenotypeDao phenotypeDao;
+	private final CVTermDao cvTermDao;
+	private final SampleDao sampleDao;
+	private final SampleListDao sampleListDao;
+	private final ProjectPropertyDao projectPropertyDao;
 
-	private DaoFactory daoFactory;
-	private UserService userService;
-	private WorkbenchDataManager workbenchDataManager;
+	private final DaoFactory daoFactory;
+	private final UserService userService;
+	private final WorkbenchDataManager workbenchDataManager;
 
 	public IntegrationTestDataInitializer(final HibernateSessionProvider hibernateSessionProvider,
 		final HibernateSessionProvider workbenchSessionProvider) {
@@ -269,10 +269,10 @@ public class IntegrationTestDataInitializer {
 
 	public ObservationUnitsSearchDTO createTestObservationUnitsDTO() {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = new ObservationUnitsSearchDTO();
-		observationUnitsSearchDTO.setSelectionMethodsAndTraits(new ArrayList<MeasurementVariableDto>());
-		observationUnitsSearchDTO.setEnvironmentConditions(new ArrayList<MeasurementVariableDto>());
-		observationUnitsSearchDTO.setAdditionalDesignFactors(new ArrayList<String>());
-		observationUnitsSearchDTO.setGenericGermplasmDescriptors(new ArrayList<String>());
+		observationUnitsSearchDTO.setSelectionMethodsAndTraits(new ArrayList<>());
+		observationUnitsSearchDTO.setEnvironmentConditions(new ArrayList<>());
+		observationUnitsSearchDTO.setAdditionalDesignFactors(new ArrayList<>());
+		observationUnitsSearchDTO.setGenericGermplasmDescriptors(new ArrayList<>());
 		return observationUnitsSearchDTO;
 	}
 

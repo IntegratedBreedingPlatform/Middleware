@@ -88,7 +88,7 @@ public class TrialEnvironmentBuilder extends Builder {
 	}
 
 	private String getValue(final ExperimentModel location, final DMSVariableType variableType) {
-		String value = null;
+		final String value;
 		final int id = variableType.getStandardVariable().getId();
 		if (id == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 			value = String.valueOf(location.getObservationUnitNo());
@@ -193,10 +193,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		final Set<Integer> idsToReturn = new HashSet<>();
 
 		for (final Entry<Integer, Set<Integer>> environmentIds : germplasmEnvironments.entrySet()) {
-			final Set<Integer> ids = environmentIds.getValue();
-			for (final Integer id : ids) {
-				idsToReturn.add(id);
-			}
+			idsToReturn.addAll(environmentIds.getValue());
 		}
 		return idsToReturn;
 

@@ -1654,7 +1654,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public Map<Integer, StudyGermplasmDto> getPlotNoToStudyGermplasmDtoMap(final Integer studyId, final Set<Integer> plotNos) {
 		final Map<Integer, StudyGermplasmDto> plotNoToImportedGermplasmParentMap = new HashMap<>();
 
-		String queryString = "select  distinct(nd_ep.value) AS position, s.name AS designation, s.dbxref_id AS germplasmId "
+		final String queryString = "select  distinct(nd_ep.value) AS position, s.name AS designation, s.dbxref_id AS germplasmId "
 			+ " FROM nd_experiment e "
 			+ " INNER JOIN nd_experimentprop nd_ep ON e.nd_experiment_id = nd_ep.nd_experiment_id "
 			+ " INNER JOIN stock s ON s.stock_id = e.stock_id "
@@ -1676,7 +1676,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		query.addScalar("germplasmId", new IntegerType());
 		query.setResultTransformer(Transformers.aliasToBean(StudyGermplasmDto.class));
 		final List<StudyGermplasmDto> result = query.list();
-		for(StudyGermplasmDto parent: result) {
+		for(final StudyGermplasmDto parent: result) {
 			plotNoToImportedGermplasmParentMap.put(Integer.valueOf(parent.getPosition()), parent);
 		}
 		return plotNoToImportedGermplasmParentMap;

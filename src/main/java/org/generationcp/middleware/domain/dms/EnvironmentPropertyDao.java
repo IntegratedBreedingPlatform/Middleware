@@ -141,7 +141,7 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 	}
 
 	public List<MeasurementVariable> getEnvironmentDetailVariablesExcludeVariableIds(final Integer environmentId, final List<Integer> excludedVariableIds) {
-		List<MeasurementVariable> studyVariables = new ArrayList<>();
+		final List<MeasurementVariable> studyVariables = new ArrayList<>();
 
 		try{
 			final SQLQuery query =
@@ -161,7 +161,7 @@ public class EnvironmentPropertyDao extends GenericDAO<ExperimentProperty, Integ
 			query.setParameterList("excludedVariableIds", excludedVariableIds);
 
 			final List<Object> results = query.list();
-			for(Object result: results) {
+			for(final Object result: results) {
 
 				final Object[] row = (Object[]) result;
 				final MeasurementVariable measurementVariable = new MeasurementVariable();

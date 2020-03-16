@@ -42,7 +42,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	static final String DBXREF_ID = "dbxrefId";
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
+	List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
 		final List<Integer> stockIds;
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -61,7 +61,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockIds;
 	}
 
-	public long countStudiesByGid(final int gid)  {
+	long countStudiesByGid(final int gid)  {
 
 		try {
 			final SQLQuery query = this.getSession()

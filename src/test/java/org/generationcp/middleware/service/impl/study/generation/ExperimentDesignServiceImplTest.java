@@ -159,7 +159,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		for (final ObservationUnitRow row : rows) {
 			final Integer trialInstance = row.getTrialInstance();
 			if (instancesRowMap.get(trialInstance) == null) {
-				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+				instancesRowMap.put(trialInstance, new ArrayList<>());
 			}
 			instancesRowMap.get(trialInstance).add(row);
 		}
@@ -167,7 +167,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(2).size());
 		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(3).size());
 
-		verifyObservationUnitRowValues(instancesRowMap);
+		this.verifyObservationUnitRowValues(instancesRowMap);
 	}
 
 	@Test
@@ -203,7 +203,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(2).size());
 		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(3).size());
 
-		verifyObservationUnitRowValues(instancesRowMap);
+		this.verifyObservationUnitRowValues(instancesRowMap);
 	}
 
 	@Test
@@ -215,7 +215,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(2 * NO_ENTRIES * NO_REPS * NO_TREATMENTS, previousRows.size());
 		// Save fieldmap info for instance1
 		final Integer geolocationId1 = this.daoFactory.getInstanceDao()
-			.getEnvironmentsForInstances(studyId, Collections.singletonList(1)).get(0).getNdExperimentId();
+			.getEnvironmentsForInstances(this.studyId, Collections.singletonList(1)).get(0).getNdExperimentId();
 		Assert.assertFalse(this.daoFactory.getEnvironmentPropertyDao()
 			.getEnvironmentVariablesMap(this.environmentDatasetId, geolocationId1)
 			.containsKey(TermId.BLOCK_ID.getId()));
@@ -251,7 +251,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		for (final ObservationUnitRow row : rows) {
 			final Integer trialInstance = row.getTrialInstance();
 			if (instancesRowMap.get(trialInstance) == null) {
-				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+				instancesRowMap.put(trialInstance, new ArrayList<>());
 			}
 			instancesRowMap.get(trialInstance).add(row);
 		}
@@ -259,7 +259,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(2).size());
 		Assert.assertEquals(NO_ENTRIES * NO_REPS * NO_TREATMENTS, instancesRowMap.get(3).size());
 
-		verifyObservationUnitRowValues(instancesRowMap);
+		this.verifyObservationUnitRowValues(instancesRowMap);
 	}
 
 	@Test
@@ -283,7 +283,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		for (final ObservationUnitRow row : rows) {
 			final Integer trialInstance = row.getTrialInstance();
 			if (instancesRowMap.get(trialInstance) == null) {
-				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+				instancesRowMap.put(trialInstance, new ArrayList<>());
 			}
 			instancesRowMap.get(trialInstance).add(row);
 		}
@@ -306,7 +306,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			new ProjectProperty(new DmsProject(this.environmentDatasetId), VariableType.ENVIRONMENT_DETAIL.getId(), null, 1,
 				TermId.BLOCK_ID.getId(), "BLOCK_ID"));
 		final Integer environmentId = this.daoFactory.getInstanceDao()
-			.getEnvironmentsForInstances(studyId, Collections.singletonList(1)).get(0).getNdExperimentId();
+			.getEnvironmentsForInstances(this.studyId, Collections.singletonList(1)).get(0).getNdExperimentId();
 		this.daoFactory.getEnvironmentPropertyDao().save(this.createEnvironmentProperty(environmentId, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5)));
 
 		List<Integer> environmentVariableIds =
@@ -389,7 +389,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		for (final ObservationUnitRow row : rows) {
 			final Integer trialInstance = row.getTrialInstance();
 			if (instancesRowMap.get(trialInstance) == null) {
-				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+				instancesRowMap.put(trialInstance, new ArrayList<>());
 			}
 			instancesRowMap.get(trialInstance).add(row);
 		}
@@ -471,7 +471,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	}
 
 	private void verifyGeolocationPropRecords(final boolean shouldExist, final List<Integer> instanceNumbers) {
-		final List<ExperimentModel> environments = this.daoFactory.getInstanceDao().getEnvironments(studyId);
+		final List<ExperimentModel> environments = this.daoFactory.getInstanceDao().getEnvironments(this.studyId);
 		Assert.assertEquals(NO_INSTANCES.intValue(), environments.size());
 
 		for (final ExperimentModel env : environments) {
@@ -569,7 +569,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		for (int instance = 1; instance <= NO_INSTANCES; instance++) {
 
 			if (instanceNumbers.contains(instance)) {
-				instanceRowsMap.put(instance, new ArrayList<ObservationUnitRow>());
+				instanceRowsMap.put(instance, new ArrayList<>());
 				int plotNo = 1;
 				for (int rep = 1; rep <= NO_REPS; rep++) {
 					for (int entry = 1; entry <= NO_ENTRIES; entry++) {
@@ -577,7 +577,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 							final ObservationUnitRow row = new ObservationUnitRow();
 							row.setEntryNumber(entry);
 							row.setTrialInstance(instance);
-							row.setVariables(new HashMap<String, ObservationUnitData>());
+							row.setVariables(new HashMap<>());
 							row.getVariables().put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()),
 								new ObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), "1"));
 							row.getVariables()

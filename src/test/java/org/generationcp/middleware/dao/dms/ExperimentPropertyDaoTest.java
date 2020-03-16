@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -44,8 +45,8 @@ public class ExperimentPropertyDaoTest {
 
 		this.dao = new ExperimentPropertyDao();
 		this.dao.setSession(this.mockSession);
-		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockQuery);
-		Mockito.when(this.mockQuery.addScalar(Matchers.anyString())).thenReturn(this.mockQuery);
+		Mockito.when(this.mockSession.createSQLQuery(ArgumentMatchers.anyString())).thenReturn(this.mockQuery);
+		Mockito.when(this.mockQuery.addScalar(ArgumentMatchers.anyString())).thenReturn(this.mockQuery);
 	}
 
 	@Test
@@ -91,7 +92,7 @@ public class ExperimentPropertyDaoTest {
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(this.formatString(expectedSql), this.formatString(sqlCaptor.getValue()));
-		Mockito.verify(this.mockQuery, Mockito.never()).setParameter(Matchers.eq("blockId"), Matchers.any());
+		Mockito.verify(this.mockQuery, Mockito.never()).setParameter(ArgumentMatchers.eq("blockId"), Matchers.any());
 		Mockito.verify(this.mockQuery).setParameter("datasetId", datasetId);
 		Mockito.verify(this.mockQuery).setParameter("instanceId", geolocationId);
 	}

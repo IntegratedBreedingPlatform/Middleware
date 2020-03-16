@@ -110,39 +110,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		+ "FROM nd_experiment e  INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id "
 		+ "AND p.observable_id = :variableId AND (p.value IS NOT NULL  OR p.cvalue_id IS NOT NULL)";
 
-	@SuppressWarnings("unchecked")
-	public List<Integer> getExperimentIdsByEnvironmentIds(final Collection<Integer> environmentIds) {
-		try {
-			if (environmentIds != null && !environmentIds.isEmpty()) {
-				final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-				criteria.add(Restrictions.in("parent.ndExperimentId", environmentIds));
-				criteria.setProjection(Projections.property(ND_EXPERIMENT_ID));
-
-				return criteria.list();
-			}
-		} catch (final HibernateException e) {
-			final String message =
-				"Error at getExperimentIdsByEnvironmentIds=" + environmentIds + " query at ExperimentDao: " + e.getMessage();
-			ExperimentDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return new ArrayList<>();
-	}
-
-
-	@SuppressWarnings("unchecked")
-	public List<ExperimentModel> getExperimentsByProjectIds(final List<Integer> projectIds) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.in("project.projectId", projectIds));
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			final String message = "Error at getExperimentsByProjectIds query at ExperimentDao: " + e.getMessage();
-			ExperimentDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
 
 	public boolean hasFieldmap(final int datasetId) {
 		try {
@@ -257,7 +224,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	public void deleteExperimentsForDataset(final int datasetId) {
-		this.deleteExperimentsForDatasetInstances(datasetId, Collections.<Integer>emptyList());
+		this.deleteExperimentsForDatasetInstances(datasetId, Collections.emptyList());
 
 	}
 
@@ -433,7 +400,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getExperimentIdsByStockIds(final Collection<Integer> stockIds) {
+	List<Integer> getExperimentIdsByStockIds(final Collection<Integer> stockIds) {
 		try {
 			if (stockIds != null && !stockIds.isEmpty()) {
 				final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -874,10 +841,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final String variableId = (String) row.get("variableId");
 			final Object value = row.get("value");
 			if (!map.containsKey(experimentId)) {
-				map.put(experimentId, new HashMap<String, List<Object>>());
+				map.put(experimentId, new HashMap<>());
 			}
 			if (!map.get(experimentId).containsKey(variableId)) {
-				map.get(experimentId).put(variableId, new ArrayList<Object>());
+				map.get(experimentId).put(variableId, new ArrayList<>());
 			}
 			// Group values per variable and experimentId.
 			map.get(experimentId).get(variableId).add(value);

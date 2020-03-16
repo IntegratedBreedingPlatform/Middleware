@@ -504,12 +504,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter("traitId", traitId).setParameterList("environmentIds", environmentIds);
-			query.addScalar("observable_id", Hibernate.INTEGER);
-			query.addScalar("value", Hibernate.STRING);
-			query.addScalar("dbxref_id", Hibernate.INTEGER);
-			query.addScalar("nd_experiment_id", Hibernate.INTEGER);
-			query.addScalar("lname", Hibernate.STRING);
-			query.addScalar("locationId", Hibernate.INTEGER);
+			query.addScalar("observable_id", new IntegerType());
+			query.addScalar("value", new StringType());
+			query.addScalar("dbxref_id", new IntegerType());
+			query.addScalar("nd_experiment_id", new IntegerType());
+			query.addScalar("lname", new StringType());
+			query.addScalar("locationId", new IntegerType());
 
 			final List<Object[]> list = query.list();
 
@@ -965,7 +965,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					try {
 						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
 						observationUnitPosition.setGeoCoordinates((Map<String, Object>) jsonProp.get("geoCoordinates"));
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
 					}
 				}
@@ -1287,8 +1287,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final Criterion draftCValueId = Restrictions.isNotNull("draftCValueId");
 		criteria.add(Restrictions.or(draftValue, draftCValueId));
 		criteria.setProjection(Projections.rowCount());
-		final Long count = (Long) criteria.uniqueResult();
-		return count;
+		return (Long) criteria.uniqueResult();
 	}
 
 	public Map<Integer, Long> countOutOfSyncDataOfDatasetsInStudy(final Integer studyId) {
@@ -1348,7 +1347,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public List<MeasurementVariable> getEnvironmentConditionVariables(final Integer environmentId) {
-		List<MeasurementVariable> studyVariables = new ArrayList<>();
+		final List<MeasurementVariable> studyVariables = new ArrayList<>();
 
 		try{
 			final SQLQuery query =
@@ -1367,7 +1366,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.setParameter("environmentId", environmentId);
 
 			final List<Object> results = query.list();
-			for(Object result: results) {
+			for(final Object result: results) {
 				final Object[] row = (Object[]) result;
 				final MeasurementVariable measurementVariable = new MeasurementVariable();
 				measurementVariable.setName((row[0] instanceof String) ? (String) row[0] : null);

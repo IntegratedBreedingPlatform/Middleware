@@ -26,7 +26,6 @@ import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -128,7 +127,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetSampleListByParentAndNameOk() throws Exception {
+	public void testGetSampleListByParentAndNameOk() {
 		final WorkbenchUser workbenchUser = this.userService.getUserByUsername(SampleListDaoTest.ADMIN);
 		final SampleList sampleList =
 			SampleListTestDataInitializer.createSampleList(workbenchUser.getUserid());
@@ -147,12 +146,12 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	}
 
 	@Test(expected = NullPointerException.class)
-	public void testGetSampleListByParentAndNameNullSampleName() throws Exception {
+	public void testGetSampleListByParentAndNameNullSampleName() {
 		this.sampleListDao.getSampleListByParentAndName(null, 1, PROGRAM_UUID);
 	}
 
 	@Test(expected = NullPointerException.class)
-	public void testGetSampleListByParentAndNameNullParent() throws Exception {
+	public void testGetSampleListByParentAndNameNullParent() {
 		this.sampleListDao.getSampleListByParentAndName("name", null, PROGRAM_UUID);
 	}
 

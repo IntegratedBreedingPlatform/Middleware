@@ -132,7 +132,7 @@ public class DataSetBuilder extends Builder {
 		return variableTypes.sort();
 	}
 
-	public DmsProject getTrialDataset(final int studyId) {
+	DmsProject getTrialDataset(final int studyId) {
 		// Get dataset reference with Summary Data type
 		final DatasetReference trialDatasetReference =
 			this.studyDataManager.findOneDataSetReferenceByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
@@ -174,7 +174,7 @@ public class DataSetBuilder extends Builder {
 		return workbook;
 	}
 
-	protected VariableTypeList filterDatasetVariables(final VariableTypeList variables, final boolean isMeasurementDataset) {
+	VariableTypeList filterDatasetVariables(final VariableTypeList variables, final boolean isMeasurementDataset) {
 		final VariableTypeList newVariables = new VariableTypeList();
 		if (variables != null) {
 			for (final DMSVariableType variable : variables.getVariableTypes()) {
@@ -212,7 +212,7 @@ public class DataSetBuilder extends Builder {
 		return newList;
 	}
 
-	protected DmsProject getDmsProjectById(final int studyId) {
+	DmsProject getDmsProjectById(final int studyId) {
 		return this.daoFactory.getDmsProjectDAO().getById(studyId);
 	}
 

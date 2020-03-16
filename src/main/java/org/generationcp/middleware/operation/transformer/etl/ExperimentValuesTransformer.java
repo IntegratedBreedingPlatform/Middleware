@@ -36,7 +36,7 @@ public class ExperimentValuesTransformer extends Transformer {
 
 				for (int i = 0, l = varTypes.size(); i < l; i++) {
 					final DMSVariableType varType = varTypes.get(i);
-					String value = null;
+					String value;
 					for (final MeasurementData data : nonTrialMD) {
 						if (data.getMeasurementVariable().getTermId() == varTypes.get(i).getId()) {
 							if (data.getcValueId() != null) {

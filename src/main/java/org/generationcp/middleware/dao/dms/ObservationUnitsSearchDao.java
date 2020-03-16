@@ -57,7 +57,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	protected static final String ENTRY_TYPE = "ENTRY_TYPE";
 	protected static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 	static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
-	protected static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
+	static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
 	private static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
@@ -1063,7 +1063,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	protected List<Map<String, Object>> convertSelectionAndTraitColumnsValueType(final List<Map<String, Object>> result,
+	List<Map<String, Object>> convertSelectionAndTraitColumnsValueType(final List<Map<String, Object>> result,
 		final List<MeasurementVariableDto> selectionAndTraits) {
 		final Iterator<Map<String, Object>> iterator = result.iterator();
 		while (iterator.hasNext()) {

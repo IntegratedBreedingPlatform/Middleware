@@ -36,9 +36,9 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class CVTermRelationshipDaoTest extends IntegrationTestBase {
-	
+
 	private static final int NO_OF_CATEGORIES = 12;
-	
+
 	private CVTermRelationshipDao cvtermRelationshipDao;
 	private CVTermDao cvtermDao;
 	private DmsProjectDao projectDao;
@@ -51,7 +51,6 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	private StockPropertyDao stockPropDao;
 
 	private DmsProject study;
-	private Geolocation geolocation;
 	private Germplasm germplasm;
 	private StockModel stock;
 	private CVTerm variable;
@@ -60,60 +59,60 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		if (this.cvtermRelationshipDao == null) {			
+		if (this.cvtermRelationshipDao == null) {
 			this.cvtermRelationshipDao = new CVTermRelationshipDao();
 			this.cvtermRelationshipDao.setSession(this.sessionProvder.getSession());
 		}
-		
-		if (this.cvtermDao == null) {			
+
+		if (this.cvtermDao == null) {
 			this.cvtermDao = new CVTermDao();
 			this.cvtermDao.setSession(this.sessionProvder.getSession());
 		}
-		
-		if (this.projectDao == null) {			
+
+		if (this.projectDao == null) {
 			this.projectDao = new DmsProjectDao();
 			this.projectDao.setSession(this.sessionProvder.getSession());
 		}
-		
-		if (this.projectPropDao == null) {			
+
+		if (this.projectPropDao == null) {
 			this.projectPropDao = new ProjectPropertyDao();
 			this.projectPropDao.setSession(this.sessionProvder.getSession());
 		}
-		
-		if (this.experimentDao == null) {			
+
+		if (this.experimentDao == null) {
 			this.experimentDao = new ExperimentDao();
 			this.experimentDao.setSession(this.sessionProvder.getSession());
 		}
-		
-		if (this.experimentPropDao == null) {			
+
+		if (this.experimentPropDao == null) {
 			this.experimentPropDao = new ExperimentPropertyDao();
 			this.experimentPropDao.setSession(this.sessionProvder.getSession());
 		}
-		
-		if (this.phenotypeDao == null) {			
+
+		if (this.phenotypeDao == null) {
 			this.phenotypeDao = new PhenotypeDao();
 			this.phenotypeDao.setSession(this.sessionProvder.getSession());
 		}
-		
+
 		if (this.germplasmDao == null) {
 			this.germplasmDao = new GermplasmDAO();
 			this.germplasmDao.setSession(this.sessionProvder.getSession());
 		}
-		
-		if (this.stockDao == null) {			
+
+		if (this.stockDao == null) {
 			this.stockDao = new StockDao();
 			this.stockDao.setSession(this.sessionProvder.getSession());
 		}
-		
-		if (this.stockPropDao == null) {			
+
+		if (this.stockPropDao == null) {
 			this.stockPropDao = new StockPropertyDao();
 			this.stockPropDao.setSession(this.sessionProvder.getSession());
 		}
-		
+
 
 		this.createTestStudy();
 		this.createTestOntologyData();
-		
+
 	}
 
 	private void createTestStudy() {
@@ -122,20 +121,20 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		this.study.setDescription("Test Project");
 		this.projectDao.save(this.study);
 	}
-	
+
 	private void createTestOntologyData() {
 		if (this.scale == null) {
 			this.scale = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.SCALES.getId());
 			this.cvtermDao.save(this.scale);
 		}
-		
+
 		if (this.categories == null) {
 			this.categories = new ArrayList<>();
 			for (int i = 0; i < NO_OF_CATEGORIES; i++) {
 				final CVTerm category = this.cvtermDao
 						.save(CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(20), CvId.IBDB_TERMS.getId()));
 				this.categories.add(category);
-				
+
 				final CVTermRelationship hasValueRelationship = new CVTermRelationship();
 				hasValueRelationship.setTypeId(TermId.HAS_VALUE.getId());
 				hasValueRelationship.setSubjectId(this.scale.getCvTermId());
@@ -143,11 +142,11 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 				this.cvtermRelationshipDao.save(hasValueRelationship);
 			}
 		}
-		
+
 		if (this.variable == null) {
 			this.variable = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
 			this.cvtermDao.save(this.variable);
-			
+
 			final CVTermRelationship hasScaleRelationship = new CVTermRelationship();
 			hasScaleRelationship.setTypeId(TermId.HAS_SCALE.getId());
 			hasScaleRelationship.setSubjectId(this.variable.getCvTermId());
@@ -155,7 +154,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 			this.cvtermRelationshipDao.save(hasScaleRelationship);
 		}
 	}
-	
+
 	@Test
 	public void testGetScaleCategoriesUsedInStudies() {
 		this.createStudyData();
@@ -185,7 +184,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		assertEquals(this.categories.get(0).getName(), usedCategories.get(0));
 		assertEquals(this.categories.get(1).getName(), usedCategories.get(1));
 	}
-	
+
 	@Test
 	public void testGetScaleCategoriesUsedInObservationsWithStudyDeleted() {
 		this.markTestStudyAsDeleted();
@@ -195,8 +194,8 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		final List<String> usedCategories = this.cvtermRelationshipDao.getScaleCategoriesUsedInObservations(this.scale.getCvTermId());
 		assertEquals(0, usedCategories.size());
 	}
-	
-	
+
+
 	@Test
 	public void testGetScaleCategoriesUsedAsConditions() {
 		this.createStudyConstant();
@@ -204,7 +203,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		assertEquals(1, usedCategories.size());
 		assertEquals(this.categories.get(2).getName(), usedCategories.get(0));
 	}
-	
+
 	@Test
 	public void testGetScaleCategoriesUsedAsConditionsWithStudyDeleted() {
 		this.markTestStudyAsDeleted();
@@ -214,7 +213,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		final List<String> usedCategories = this.cvtermRelationshipDao.getScaleCategoriesUsedAsConditions(this.scale.getCvTermId());
 		assertEquals(0, usedCategories.size());
 	}
-	
+
 	@Test
 	public void testGetScaleCategoriesUsedAsGermplasmDescriptor() {
 		this.createGermplasmDescriptor();
@@ -222,7 +221,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		assertEquals(1, usedCategories.size());
 		assertEquals(this.categories.get(3).getName(), usedCategories.get(0));
 	}
-	
+
 	@Test
 	public void testGetScaleCategoriesUsedAsGermplasmDescriptorWithStudyDeleted() {
 		this.markTestStudyAsDeleted();
@@ -232,7 +231,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		final List<String> usedCategories = this.cvtermRelationshipDao.getScaleCategoriesUsedAsGermplasmDescriptors(this.scale.getCvTermId());
 		assertEquals(0, usedCategories.size());
 	}
-	
+
 	@Test
 	public void testGetScaleCategoriesUsedAsTrialDesignFactors() {
 		this.createTrialDesignFactor();
@@ -240,7 +239,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		assertEquals(1, usedCategories.size());
 		assertEquals(this.categories.get(4).getName(), usedCategories.get(0));
 	}
-	
+
 	@Test
 	public void testGetScaleCategoriesUsedAsTrialDesignFactorsWithStudyDeleted() {
 		this.markTestStudyAsDeleted();
@@ -255,7 +254,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		final ExperimentModel experiment1 = new ExperimentModel();
 		experiment1.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experiment1.setProject(this.study);
-		experiment1.setStock(getStock());
+		experiment1.setStock(this.getStock());
 		this.experimentDao.save(experiment1);
 
 		final Phenotype phenotype1 = new Phenotype();
@@ -265,13 +264,13 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		phenotype1.setValue(category.getName());
 		phenotype1.setcValue(category.getCvTermId());
 		this.phenotypeDao.save(phenotype1);
-		
+
 		final ExperimentModel experiment2 = new ExperimentModel();
 		experiment2.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experiment2.setProject(this.study);
-		experiment2.setStock(getStock());
+		experiment2.setStock(this.getStock());
 		this.experimentDao.save(experiment2);
-		
+
 		final Phenotype phenotype2 = new Phenotype();
 		phenotype2.setObservableId(this.variable.getCvTermId());
 		phenotype2.setExperiment(experiment2);
@@ -279,34 +278,34 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		phenotype2.setValue(category2.getName());
 		phenotype2.setcValue(category2.getCvTermId());
 		this.phenotypeDao.save(phenotype2);
-		
+
 		// For some reason, need to flush to be able to get the phenotypes created
 		this.sessionProvder.getSession().flush();
 	}
-	
+
 	private void createGermplasmDescriptor() {
 		final ExperimentModel experiment = new ExperimentModel();
 		experiment.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experiment.setProject(this.study);
-		experiment.setStock(getStock());
+		experiment.setStock(this.getStock());
 		this.experimentDao.save(experiment);
-		
+
 		final StockProperty prop = new StockProperty();
 		prop.setRank(1);
-		prop.setStock(getStock());
+		prop.setStock(this.getStock());
 		prop.setTypeId(this.variable.getCvTermId());
 		prop.setValue(String.valueOf(this.categories.get(3).getCvTermId()));
 		this.stockPropDao.save(prop);
 
 	}
-	
+
 	private void createTrialDesignFactor() {
 		final ExperimentModel experiment = new ExperimentModel();
 		experiment.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experiment.setProject(this.study);
-		experiment.setStock(getStock());
+		experiment.setStock(this.getStock());
 		this.experimentDao.save(experiment);
-		
+
 		final ExperimentProperty  prop = new ExperimentProperty();
 		prop.setRank(1);
 		prop.setExperiment(experiment);
@@ -314,14 +313,14 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		prop.setValue(String.valueOf(this.categories.get(4).getCvTermId()));
 		this.experimentPropDao.save(prop);
 	}
-	
+
 	private void createEnvironmentFactor() {
 		final ExperimentModel experiment = new ExperimentModel();
 		experiment.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experiment.setProject(this.study);
-		experiment.setStock(getStock());
+		experiment.setStock(this.getStock());
 		this.experimentDao.save(experiment);
-		
+
 		final GeolocationProperty prop = new GeolocationProperty();
 		prop.setRank(1);
 		prop.setType(this.variable.getCvTermId());
@@ -329,27 +328,27 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	}
 
 	private StockModel getStock() {
-		if (this.stock == null) {			
+		if (this.stock == null) {
 			this.stock = new StockModel();
 			this.stock.setName("Germplasm ");
 			this.stock.setIsObsolete(false);
 			this.stock.setTypeId(TermId.ENTRY_CODE.getId());
 			this.stock.setUniqueName("1");
-			this.stock.setGermplasm(getGermplasm());
+			this.stock.setGermplasm(this.getGermplasm());
 			this.stockDao.save(this.stock);
 		}
 		return this.stock;
 	}
 
 	private Germplasm getGermplasm() {
-		if (this.germplasm == null) {			
+		if (this.germplasm == null) {
 			this.germplasm = GermplasmTestDataInitializer.createGermplasm(1);
-			germplasm.setGid(null);
-			this.germplasmDao.save(germplasm);
+			this.germplasm.setGid(null);
+			this.germplasmDao.save(this.germplasm);
 		}
-		return germplasm;
+		return this.germplasm;
 	}
-	
+
 	private void createStudyConstant() {
 		final ProjectProperty prop = new ProjectProperty();
 		prop.setProject(this.study);
@@ -360,7 +359,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		prop.setValue(String.valueOf(this.categories.get(2).getCvTermId()));
 		this.projectPropDao.save(prop);
 	}
-	
+
 	private void markTestStudyAsDeleted() {
 		this.study.setDeleted(true);
 		this.projectDao.save(this.study);

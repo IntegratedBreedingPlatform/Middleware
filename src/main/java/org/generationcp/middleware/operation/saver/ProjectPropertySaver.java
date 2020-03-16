@@ -23,7 +23,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
@@ -134,7 +133,6 @@ public class ProjectPropertySaver {
 	 * @param project DMSProject
 	 * @param objDMSVariableType DMSVariableType
 	 * @param value the value of the measurement variable
-	 * @throws MiddlewareQueryException
 	 */
 	public void saveVariableType(final DmsProject project, final DMSVariableType objDMSVariableType, final String value) {
 		objDMSVariableType.setVariableTypeIfNull();

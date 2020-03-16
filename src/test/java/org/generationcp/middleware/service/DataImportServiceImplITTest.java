@@ -41,7 +41,7 @@ import java.util.Random;
 
 public class DataImportServiceImplITTest extends IntegrationTestBase {
 
-	public static final int CURRENT_IBDB_USER_ID = 1;
+	private static final int CURRENT_IBDB_USER_ID = 1;
 	@Autowired
 	private DataImportService dataImportService;
 
@@ -334,7 +334,7 @@ public class DataImportServiceImplITTest extends IntegrationTestBase {
 
 	@Ignore
 	@Test
-	public void testCheckIfProjectNameIsExisting() throws Exception {
+	public void testCheckIfProjectNameIsExisting() {
 		// try to save first then use the name of the saved study
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);

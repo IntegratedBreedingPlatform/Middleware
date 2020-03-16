@@ -611,7 +611,7 @@ public interface StudyDataManager {
 	 * @return list of DMS project names with no programUUID
 	 * @
 	 */
-	public List<String> getAllSharedProjectNames();
+	List<String> getAllSharedProjectNames();
 
 	/**
 	 * Return counts of experiments for given dataset type and environment IDs

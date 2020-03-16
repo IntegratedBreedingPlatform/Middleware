@@ -2,7 +2,6 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.beust.jcommander.internal.Lists;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -20,15 +19,10 @@ import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
-import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.generationcp.middleware.service.api.user.RoleDto;
-import org.generationcp.middleware.service.api.user.UserDto;
-import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -42,9 +36,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -93,9 +85,9 @@ public class StudyServiceImplTest {
 
 	private StudyServiceImpl studyServiceImpl;
 
-	final List<String> additionalGermplasmDescriptors = Lists.newArrayList(STOCK_ID);
+	private final List<String> additionalGermplasmDescriptors = Lists.newArrayList(STOCK_ID);
 
-	final List<String> additionalDesignFactors = Lists.newArrayList(FACT1);
+	private final List<String> additionalDesignFactors = Lists.newArrayList(FACT1);
 
 	@Before
 	public void setUp() {
@@ -185,14 +177,14 @@ public class StudyServiceImplTest {
 		studyServiceImpl.setDaoFactory(this.daoFactory);
 
 		final List<MeasurementVariableDto> projectTraits =
-			Arrays.<MeasurementVariableDto>asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
+			Arrays.asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
 		Mockito.when(mockTraits.getVariables(StudyServiceImplTest.STUDY_ID, VariableType.TRAIT.getId(),
 			VariableType.SELECTION_METHOD.getId())).thenReturn(projectTraits);
 		final List<MeasurementDto> traits = new ArrayList<>();
 		traits.add(new MeasurementDto(new MeasurementVariableDto(1, "traitName"), 9999, "traitValue", Phenotype.ValueStatus.OUT_OF_SYNC));
 		final ObservationDto measurement = new ObservationDto(1, "trialInstance", "entryType", StudyServiceImplTest.STUDY_ID, "designation",
 			"entryNo", "seedSource", "repitionNumber", "plotNumber", "blockNumber", traits);
-		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
+		final List<ObservationDto> testMeasurements = Collections.singletonList(measurement);
 		final int instanceId = 1;
 		final int pageNumber = 1;
 		final int pageSize = 100;
@@ -416,7 +408,7 @@ public class StudyServiceImplTest {
 	@Test
 	public void testGetPlotDatasetId() {
 		final Integer plotDatasetId = new Random().nextInt();
-		final Integer studyId = new Random().nextInt();
+		final int studyId = new Random().nextInt();
 		Mockito.doReturn(Collections.singletonList(new DmsProject(plotDatasetId))).when(this.dmsProjectDao).getDatasetsByTypeForStudy(
 			studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		Assert.assertEquals(plotDatasetId, this.studyServiceImpl.getPlotDatasetId(studyId));
@@ -425,7 +417,7 @@ public class StudyServiceImplTest {
 	@Test
 	public void testEnvironmentDatasetId() {
 		final Integer envDatasetId = new Random().nextInt();
-		final Integer studyId = new Random().nextInt();
+		final int studyId = new Random().nextInt();
 		Mockito.doReturn(Collections.singletonList(new DmsProject(envDatasetId))).when(this.dmsProjectDao).getDatasetsByTypeForStudy(
 			studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Assert.assertEquals(envDatasetId, this.studyServiceImpl.getEnvironmentDatasetId(studyId));

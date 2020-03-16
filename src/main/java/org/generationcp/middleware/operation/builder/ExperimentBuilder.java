@@ -151,7 +151,7 @@ public class ExperimentBuilder {
 		}
 	}
 
-	public Experiment buildOne(final int projectId, final TermId type, final VariableTypeList variableTypes) {
+	Experiment buildOne(final int projectId, final TermId type, final VariableTypeList variableTypes) {
 		final List<Experiment> experiments = this.build(projectId, type, 0, 1, variableTypes);
 		if (experiments != null && !experiments.isEmpty()) {
 			return experiments.get(0);
@@ -159,7 +159,7 @@ public class ExperimentBuilder {
 		return null;
 	}
 
-	public Experiment buildOne(final int projectId, final TermId type, final VariableTypeList variableTypes, final boolean hasVariableType)
+	Experiment buildOne(final int projectId, final TermId type, final VariableTypeList variableTypes, final boolean hasVariableType)
 			{
 		final List<Experiment> experiments = this.build(projectId, type, 0, 1, variableTypes, hasVariableType);
 		if (experiments != null && !experiments.isEmpty()) {
@@ -218,7 +218,7 @@ public class ExperimentBuilder {
 				// added this validation for now, to handle the said scenario, otherwise, and NPE is thrown
 				// in the future, trial constant will no longer be saved at the measurements level
 				if (variableType != null) {
-					Variable var =  null;
+					final Variable var;
 					if (variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());
 						if (phenotype.getcValueId() == null && phenotype.getValue() != null) {
@@ -273,7 +273,7 @@ public class ExperimentBuilder {
 		}
 	}
 
-	protected Variable createLocationFactor(final ExperimentModel experiment, final DMSVariableType variableType, final ExperimentModel environment) {
+	Variable createLocationFactor(final ExperimentModel experiment, final DMSVariableType variableType, final ExperimentModel environment) {
 		final StandardVariable standardVariable = variableType.getStandardVariable();
 
 		LOG.info("** Expt: " + experiment.getNdExperimentId() + " with envt " + environment != null? (environment.getNdExperimentId() + " :: " +environment.getObservationUnitNo()) : "NULL");
@@ -428,11 +428,5 @@ public class ExperimentBuilder {
 
 	public boolean hasFieldmap(final int datasetId) {
 		return this.daoFactory.getExperimentDao().hasFieldmap(datasetId);
-	}
-
-	public boolean checkIfStudyHasFieldmap(final int studyId) {
-		final List<Integer> geolocationIdsOfStudy = this.daoFactory.getExperimentDao().getInstanceIds(studyId);
-		final List<Integer> geolocationIdsOfStudyWithFieldmap = this.daoFactory.getExperimentDao().getLocationIdsOfStudyWithFieldmap(studyId);
-		return geolocationIdsOfStudy.size() == geolocationIdsOfStudyWithFieldmap.size();
 	}
 }

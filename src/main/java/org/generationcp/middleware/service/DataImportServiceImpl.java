@@ -192,8 +192,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		throws WorkbookParserException {
 		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 		// Only parses the description sheet.
-		final Workbook workbook = parser.parseFile(excelWorkbook, false, currentIbdbUserId.toString());
-		return workbook;
+		return parser.parseFile(excelWorkbook, false, currentIbdbUserId.toString());
 	}
 
 	@Override
