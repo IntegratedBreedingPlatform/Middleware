@@ -418,15 +418,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, Set<Integer>> getEnvironmentsOfGermplasms(final Set<Integer> gids, final String programUUID) {
+	public Map<Integer, Set<Integer>> getStudyInstancesForGermplasm(final Set<Integer> gids, final String programUUID) {
 		final Map<Integer, Set<Integer>> germplasmEnvironments = new HashMap<>();
 
 		if (gids.isEmpty()) {
 			return germplasmEnvironments;
-		}
-
-		for (final Integer gid : gids) {
-			germplasmEnvironments.put(gid, new HashSet<>());
 		}
 
 		// Plot experiment's parent is Environment Experiment
@@ -448,17 +444,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final List<Object[]> result = query.list();
 
 			for (final Object[] row : result) {
-				final Integer gId = (Integer) row[0];
+				final Integer gid = (Integer) row[0];
 				final Integer environmentId = (Integer) row[1];
-
-				final Set<Integer> gidEnvironments = germplasmEnvironments.get(gId);
-				gidEnvironments.add(environmentId);
-				germplasmEnvironments.remove(gId);
-				germplasmEnvironments.put(gId, gidEnvironments);
+				germplasmEnvironments.putIfAbsent(gid, new HashSet<>());
+				germplasmEnvironments.get(gid).add(environmentId);
 			}
 
 		} catch (final HibernateException e) {
-			final String error = "Error at getEnvironmentsOfGermplasms(programUUID=" + programUUID + " ,gids=" + gids
+			final String error = "Error at getEnvironmentsOfGermplasm(programUUID=" + programUUID + " ,gids=" + gids
 				+ ") query on ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(error);
 			throw new MiddlewareQueryException(error, e);
