@@ -83,16 +83,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PhenotypeDao.class);
 
-	private static final String GET_OBSERVATIONS = "SELECT p.observable_id, s.dbxref_id, plot.parent_id, p.value "
-		+ "FROM nd_experiment e "
-		+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
-		+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id "
-		+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-		+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-		+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-		+ "WHERE plot.parent_id IN (:environmentIds) "
-		+ "AND p.observable_id IN (:traitIds) ";
-
 	private static final String ORDER_BY_OBS = "ORDER BY p.observable_id, s.dbxref_id, plot.parent_id, p.value ";
 
 	//FIXME BMS-5055
@@ -127,7 +117,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count , "
 					+ "IF (MIN(p.value * 1) IS NULL, 0, MIN(p.value * 1))  AS min_value, "
 					+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value "
-					+ this.getPhenotypesInEnvironmentQuery(true)
+					+ this.getPhenotypesInEnvironmentFromQuery(true)
 					+ "    WHERE env.nd_experiment_id IN (:environmentIds) "
 					+ "       AND p.observable_id IN (:numericVariableIds) "
 					+ "     GROUP by p.observable_id ");
@@ -161,7 +151,15 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	}
 
-	private String getPhenotypesInEnvironmentQuery(final boolean doJoinStockTable){
+	private String getObservationsOnTraitsQuery() {
+		final StringBuilder sb = new StringBuilder(" SELECT p.observable_id, s.dbxref_id, plot.parent_id, p.value ");
+		sb.append(this.getPhenotypesInEnvironmentFromQuery(true));
+		sb.append(" WHERE env.nd_experiment_id IN (:environmentIds) ");
+		sb.append("   AND p.observable_id IN (:traitIds) ");
+		return sb.toString();
+	}
+
+	private String getPhenotypesInEnvironmentFromQuery(final boolean doJoinStockTable){
 		final StringBuilder sb = new StringBuilder(" FROM phenotype p ");
 			sb.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
 			.append(" LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id and plot.type_id = " + TermId.PLOT_EXPERIMENT.getId())
@@ -182,7 +180,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT env.nd_experiment_id) AS location_count, "
 					+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
 					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count "
-					+ this.getPhenotypesInEnvironmentQuery(true)
+					+ this.getPhenotypesInEnvironmentFromQuery(true)
 					+ " WHERE env.nd_experiment_id IN (:environmentIds) "
 					+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
@@ -219,7 +217,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("SELECT p.observable_id, p.value * 1 "
-					+ this.getPhenotypesInEnvironmentQuery(false)
+					+ this.getPhenotypesInEnvironmentFromQuery(false)
 					+ " WHERE env.nd_experiment_id IN (:environmentIds) "
 					+ "    AND p.observable_id IN (:traitIds) ");
 			query.setParameterList("environmentIds", environmentIds);
@@ -267,7 +265,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("SELECT DISTINCT p.observable_id, p.value "
-					+ this.getPhenotypesInEnvironmentQuery(false)
+					+ this.getPhenotypesInEnvironmentFromQuery(false)
 					+ " WHERE env.nd_experiment_id IN (:environmentIds) "
 					+ "    AND p.observable_id IN (:traitIds) "
 					+ "ORDER BY p.observable_id ");
@@ -311,7 +309,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("SELECT p.observable_id, p.cvalue_id, COUNT(p.phenotype_id) AS valuesCount "
-					+ this.getPhenotypesInEnvironmentQuery(false)
+					+ this.getPhenotypesInEnvironmentFromQuery(false)
 					+ " WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) "
 					+ "  AND env.nd_experiment_id IN (:environmentIds) "
 					+ "GROUP BY p.observable_id, p.cvalue_id ");
@@ -350,7 +348,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final List<Observation> observationFinal = new ArrayList<>();
 
 		try {
-			final StringBuilder sb = new StringBuilder(PhenotypeDao.GET_OBSERVATIONS);
+			final StringBuilder sb = new StringBuilder(this.getObservationsOnTraitsQuery());
 			sb.append(" AND s.dbxref_id IN (:germplasmIds) ");
 			sb.append(PhenotypeDao.ORDER_BY_OBS);
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
@@ -390,7 +388,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final List<Observation> toReturn = new ArrayList<>();
 
 		try {
-			final StringBuilder sb = new StringBuilder(PhenotypeDao.GET_OBSERVATIONS);
+			final StringBuilder sb = new StringBuilder(this.getObservationsOnTraitsQuery());
 			sb.append(PhenotypeDao.ORDER_BY_OBS);
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 
@@ -421,7 +419,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT p.observable_id, p.value, s.dbxref_id, e.nd_experiment_id, l.lname, xp.value as locationId ");
-			queryString.append(this.getPhenotypesInEnvironmentQuery(true));
+			queryString.append(this.getPhenotypesInEnvironmentFromQuery(true));
 			queryString.append(" INNER JOIN nd_experimentprop xp ON xp.nd_experiment_id = env.nd_experiment_id AND xp.type_id = "
 				+ TermId.LOCATION_ID.getId() + " ");
 			queryString.append(" LEFT JOIN location l ON l.locid = xp.value ");
