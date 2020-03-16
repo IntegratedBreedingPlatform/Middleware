@@ -529,10 +529,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.append("  INNER JOIN project pr ON pr.project_id = e.project_id ")
 			.append("  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3 ")
 			.append("  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 AND env.nd_experiment_id IN (:environmentIds) ")
+			// handle cases for with/without plot and with/without sub-observations
 			.append("      AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) ")
 			.append("  INNER JOIN projectprop pp on e.project_id = pp.project_id and pp.type_id = " + VariableType.TRAIT.getId())
-				// handle cases for with/without plot and with/without sub-observations
-			.append("  AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id ) ")
 			.append("	LEFT JOIN cvterm_relationship cr_scale ON pp.variable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
 			.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.object_id  AND cr_type.type_id = 1105 ")
 			.append("	LEFT JOIN cvterm_relationship cr_property ON pp.variable_id = cr_property.subject_id AND cr_property.type_id = 1200 ")
