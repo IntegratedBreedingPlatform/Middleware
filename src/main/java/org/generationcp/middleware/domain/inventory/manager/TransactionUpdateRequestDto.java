@@ -11,6 +11,14 @@ public class TransactionUpdateRequestDto {
 	private Double availableBalance;
 	private String notes;
 
+	public TransactionUpdateRequestDto(final Integer transactionId, final Double amount, final Double availableBalance,
+		final String notes) {
+		this.transactionId = transactionId;
+		this.amount = amount;
+		this.availableBalance = availableBalance;
+		this.notes = notes;
+	}
+
 	public Integer getTransactionId() {
 		return transactionId;
 	}
@@ -44,7 +52,8 @@ public class TransactionUpdateRequestDto {
 	}
 
 	public boolean isValid() {
-		return transactionId != null && ((amount != null ^ availableBalance != null) || notes != null);
+		return transactionId != null && ((amount != null ^ availableBalance != null) || (amount == null && availableBalance == null
+			&& notes != null));
 	}
 
 	@Override
