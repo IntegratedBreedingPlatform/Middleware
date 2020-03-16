@@ -92,15 +92,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		+ "WHERE plot.parent_id IN (:environmentIds) "
 		+ "AND p.observable_id IN (:traitIds) ";
 
-	private static final String COUNT_OBSERVATIONS =
-		"SELECT COUNT(*) " + "FROM nd_experiment e "
-			+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
-			+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id "
-			+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-			+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
-			+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-			+ "WHERE plot.parent_id IN (:environmentIds) "
-			+ "AND p.observable_id IN (:traitIds) ";
 
 	private static final String ORDER_BY_OBS = "ORDER BY p.observable_id, s.dbxref_id, plot.parent_id, p.value ";
 
@@ -436,18 +427,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return observationFinal;
 	}
 
-	public long countObservationForTraits(final List<Integer> traitIds, final List<Integer> environmentIds) {
-
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery(PhenotypeDao.COUNT_OBSERVATIONS);
-			query.setParameterList(TRAIT_IDS, traitIds);
-			query.setParameterList("environmentIds", environmentIds);
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at countObservationForTraits() query on PhenotypeDao: " + e.getMessage(), e);
-		}
-	}
 
 	public List<Observation> getObservationForTraits(
 		final List<Integer> traitIds, final List<Integer> environmentIds, final int start,

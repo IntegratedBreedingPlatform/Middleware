@@ -1,9 +1,5 @@
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
-
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.hibernate.SQLQuery;
@@ -18,6 +14,10 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 
 public class PhenotypeDaoTest {
 
@@ -96,29 +96,6 @@ public class PhenotypeDaoTest {
 		Mockito.verify(this.query).setParameterList("environmentIds", environmentIds);
 		Mockito.verify(this.query).setFirstResult(start);
 		Mockito.verify(this.query).setMaxResults(numOfRows);
-	}
-
-	@Test
-	public void testCountObservationForTraits() {
-		Mockito.doReturn(new BigInteger("100")).when(this.query).uniqueResult();
-		final List<Integer> traitIds = Arrays.asList(5134, 7645);
-		final List<Integer> environmentIds = Arrays.asList(1, 2, 3);
-		final long count = this.dao.countObservationForTraits(traitIds, environmentIds);
-
-		final String expectedSql = "SELECT COUNT(*) "
-			+ "		FROM nd_experiment e "
-			+ "		INNER JOIN stock s ON e.stock_id = s.stock_id "
-			+ "		INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id  "
-			+ "		INNER JOIN project pr ON pr.project_id = e.project_id "
-			+ "		INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = 4 "
-			+ "		INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-			+ "		WHERE plot.parent_id IN (:environmentIds) AND p.observable_id IN (:traitIds)";
-		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
-		Assert.assertEquals(this.formatString(expectedSql), this.formatString(sqlCaptor.getValue()));
-		Mockito.verify(this.query).setParameterList("traitIds", traitIds);
-		Mockito.verify(this.query).setParameterList("environmentIds", environmentIds);
-		Assert.assertEquals(100L, count);
 	}
 
 	@Test
