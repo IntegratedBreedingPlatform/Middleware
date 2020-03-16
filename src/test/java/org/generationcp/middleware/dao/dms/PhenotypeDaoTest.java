@@ -153,28 +153,6 @@ public class PhenotypeDaoTest {
 	}
 
 	@Test
-	public void testGetTraitInfoCounts() {
-		final List<Integer> environmentIds = Arrays.asList(1, 2, 3);
-		this.dao.getTraitInfoCounts(environmentIds);
-
-		final String expectedSql = "SELECT p.observable_id, "
-			+ "		COUNT(DISTINCT plot.parent_id) AS location_count, "
-			+ "		COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
-			+ "		COUNT(DISTINCT e.nd_experiment_id) AS observation_count "
-			+ "		FROM phenotype p "
-			+ "		INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-			+ "		INNER JOIN stock s ON e.stock_id = s.stock_id  INNER JOIN project pr ON pr.project_id = e.project_id "
-			+ "		INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = "
-			+ 		DatasetTypeEnum.PLOT_DATA.getId()
-			+ "		INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-			+ "		WHERE plot.parent_id IN (:environmentIds) GROUP by p.observable_id";
-		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
-		Assert.assertEquals(this.formatString(expectedSql), this.formatString(sqlCaptor.getValue()));
-		Mockito.verify(this.query).setParameterList("environmentIds", environmentIds);
-	}
-
-	@Test
 	public void testUpdatePhenotypesByProjectIdAndLocationId() {
 		final int projectId = 1;
 		final int cvTermId = 5157;
