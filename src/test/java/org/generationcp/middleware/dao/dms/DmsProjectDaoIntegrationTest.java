@@ -435,7 +435,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyDTOs() {
+	public void testGetStudies() {
 
 		final Project workbenchProject = this.testDataInitializer.createWorkbenchProject();
 		this.workbenchSessionProvider.getSessionFactory().getCurrentSession().flush();
@@ -459,7 +459,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyDTOsWithStudyFilter() {
+	public void testGetStudiesWithStudyFilter() {
 
 		final Project workbenchProject = this.testDataInitializer.createWorkbenchProject();
 		this.workbenchSessionProvider.getSessionFactory().getCurrentSession().flush();
