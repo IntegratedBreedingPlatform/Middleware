@@ -326,6 +326,29 @@ public class Util {
 		return formatter.parse(date);
 	}
 
+	/**
+	 * Returns the date object from the specified format
+	 *
+	 * @return date object or null if it cannot be parsed
+	 */
+	public static Date tryParseDate(final String date, final String format) {
+		try {
+			return Util.parseDate(date, format);
+		} catch (final ParseException | NullPointerException e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Parses the date given default format
+	 *
+	 * See {@link #tryParseDate(String, String)}
+	 *
+	 */
+	public static Date tryParseDate(final String date) {
+		return tryParseDate(date, Util.DATE_AS_NUMBER_FORMAT);
+	}
+
 	public static String nullIfEmpty(final String value) {
 		if (StringUtils.isEmpty(value)) {
 			return null;
