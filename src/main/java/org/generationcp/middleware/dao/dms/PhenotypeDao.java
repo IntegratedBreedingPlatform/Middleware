@@ -65,6 +65,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link Phenotype}.
@@ -121,18 +122,15 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>();
 		try {
 			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT plot.parent_id) AS location_count, "
+				.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT env.nd_experiment_id) AS location_count, "
 					+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
 					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count , "
 					+ "IF (MIN(p.value * 1) IS NULL, 0, MIN(p.value * 1))  AS min_value, "
-					+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value " + "FROM phenotype p "
-					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-					+ " INNER JOIN stock s ON e.stock_id = s.stock_id "
-					+ "  WHERE plot.parent_id IN (:environmentIds) "
-					+ "    AND p.observable_id IN (:numericVariableIds) " + "GROUP by p.observable_id ");
+					+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value "
+					+ this.getPhenotypesInEnvironmentQuery(true)
+					+ "    WHERE env.nd_experiment_id IN (:environmentIds) "
+					+ "       AND p.observable_id IN (:numericVariableIds) "
+					+ "     GROUP by p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("numericVariableIds", numericVariableIds);
 
@@ -163,19 +161,29 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	}
 
+	private String getPhenotypesInEnvironmentQuery(final boolean doJoinStockTable){
+		final StringBuilder sb = new StringBuilder(" FROM phenotype p ");
+			sb.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
+			.append(" LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id and plot.type_id = " + TermId.PLOT_EXPERIMENT.getId())
+			.append(" INNER JOIN project pr ON pr.project_id = e.project_id ")
+			.append(" INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId())
+			.append(" INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId())
+			.append("    AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) ");
+		if (doJoinStockTable) {
+			sb.append(" INNER JOIN stock s ON e.stock_id = s.stock_id ");
+		}
+		return sb.toString();
+	}
+
 	public List<TraitInfo> getTraitInfoCounts(final List<Integer> environmentIds, final List<Integer> variableIds) {
 		final List<TraitInfo> traitInfoList = new ArrayList<>();
 		try {
 			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT plot.parent_id) AS location_count, "
+				.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT env.nd_experiment_id) AS location_count, "
 					+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
-					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
-					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id "
-					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-					+ "WHERE plot.parent_id IN (:environmentIds) "
+					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count "
+					+ this.getPhenotypesInEnvironmentQuery(true)
+					+ " WHERE env.nd_experiment_id IN (:environmentIds) "
 					+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("variableIds", variableIds);
@@ -203,41 +211,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	}
 
-	public List<TraitInfo> getTraitInfoCounts(final List<Integer> environmentIds) {
-		final List<TraitInfo> traitInfoList = new ArrayList<>();
-		try {
-			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT plot.parent_id) AS location_count, "
-					+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
-					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
-					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id "
-					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-					+ "WHERE plot.parent_id IN (:environmentIds) "
-					+ "GROUP by p.observable_id ");
-			query.setParameterList("environmentIds", environmentIds);
-
-			final List<Object[]> list = query.list();
-
-			for (final Object[] row : list) {
-				final Integer id = (Integer) row[0];
-				final long locationCount = ((BigInteger) row[1]).longValue();
-				final long germplasmCount = ((BigInteger) row[2]).longValue();
-				final long observationCount = ((BigInteger) row[3]).longValue();
-
-				traitInfoList.add(new TraitInfo(id, null, null, locationCount, germplasmCount, observationCount));
-			}
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at getTraitInfoCounts() query on PhenotypeDao: " + e.getMessage(), e);
-		}
-
-		return traitInfoList;
-
-	}
-
 	public Map<Integer, List<Double>> getNumericTraitInfoValues(
 		final List<Integer> environmentIds,
 		final List<Integer> traitIds) {
@@ -246,12 +219,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("SELECT p.observable_id, p.value * 1 "
-					+ "FROM phenotype p "
-					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-					+ "WHERE plot.parent_id IN (:environmentIds) "
+					+ this.getPhenotypesInEnvironmentQuery(false)
+					+ " WHERE env.nd_experiment_id IN (:environmentIds) "
 					+ "    AND p.observable_id IN (:traitIds) ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList(TRAIT_IDS, traitIds);
@@ -293,20 +262,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final Map<Integer, List<String>> traitValues = new HashMap<>();
 
 		// Get trait IDs
-		final List<Integer> traitIds = new ArrayList<>();
-		for (final CharacterTraitInfo trait : traitInfoList) {
-			traitIds.add(trait.getId());
-		}
+		final List<Integer> traitIds = traitInfoList.stream().map(CharacterTraitInfo::getId).collect(Collectors.toList());
 
 		try {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("SELECT DISTINCT p.observable_id, p.value "
-					+ "FROM phenotype p "
-					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-					+ "WHERE plot.parent_id IN (:environmentIds) "
+					+ this.getPhenotypesInEnvironmentQuery(false)
+					+ " WHERE env.nd_experiment_id IN (:environmentIds) "
 					+ "    AND p.observable_id IN (:traitIds) "
 					+ "ORDER BY p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
@@ -343,21 +305,15 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public void setCategoricalTraitInfoValues(final List<CategoricalTraitInfo> traitInfoList, final List<Integer> environmentIds) {
 
 		// Get trait IDs
-		final List<Integer> traitIds = new ArrayList<>();
-		for (final CategoricalTraitInfo trait : traitInfoList) {
-			traitIds.add(trait.getId());
-		}
+		final List<Integer> traitIds = traitInfoList.stream().map(CategoricalTraitInfo::getId).collect(Collectors.toList());
+		
 
 		try {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("SELECT p.observable_id, p.cvalue_id, COUNT(p.phenotype_id) AS valuesCount "
-					+ "FROM phenotype p "
-					+ "INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-					+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-					+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-					+ "WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) "
-					+ "  AND plot.parent_id IN (:environmentIds) "
+					+ this.getPhenotypesInEnvironmentQuery(false)
+					+ " WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) "
+					+ "  AND env.nd_experiment_id IN (:environmentIds) "
 					+ "GROUP BY p.observable_id, p.cvalue_id ");
 			query.setParameterList(TRAIT_IDS, traitIds);
 			query.setParameterList("environmentIds", environmentIds);
@@ -375,7 +331,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 				for (final CategoricalTraitInfo traitInfo : traitInfoList) {
 					if (traitInfo.getId() == traitId) {
-						traitInfo.addValueCount(new CategoricalValue(cValueId), count.longValue());
+						traitInfo.addValueCount(new CategoricalValue(cValueId), count);
 						break;
 					}
 				}
@@ -465,17 +421,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT p.observable_id, p.value, s.dbxref_id, e.nd_experiment_id, l.lname, xp.value as locationId ");
-			queryString.append("FROM phenotype p ");
-			queryString.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ");
-			queryString.append("INNER JOIN project pr ON pr.project_id = e.project_id  ");
-			queryString.append("INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = ");
-			queryString.append(DatasetTypeEnum.PLOT_DATA.getId()).append(" ");
-			queryString.append("INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id ");
-			queryString.append("INNER JOIN nd_experimentprop xp ON xp.nd_experiment_id = plot.parent_id AND xp.type_id = "
+			queryString.append(this.getPhenotypesInEnvironmentQuery(true));
+			queryString.append(" INNER JOIN nd_experimentprop xp ON xp.nd_experiment_id = env.nd_experiment_id AND xp.type_id = "
 				+ TermId.LOCATION_ID.getId() + " ");
 			queryString.append(" LEFT JOIN location l ON l.locid = xp.value ");
-			queryString.append("INNER JOIN stock s ON s.stock_id = e.stock_id ");
-			queryString.append("WHERE p.observable_id = :traitId AND plot.parent_id IN ( :environmentIds ) ");
+			queryString.append(" WHERE p.observable_id = :traitId AND env.nd_experiment_id IN (:environmentIds ) ");
 			queryString.append("ORDER BY s.dbxref_id ");
 
 			PhenotypeDao.LOG.debug(queryString.toString());
