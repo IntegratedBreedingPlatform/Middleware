@@ -152,7 +152,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	private String getObservationsOnTraitsQuery() {
-		final StringBuilder sb = new StringBuilder(" SELECT p.observable_id, s.dbxref_id, plot.parent_id, p.value ");
+		final StringBuilder sb = new StringBuilder(" SELECT p.observable_id, s.dbxref_id, env.nd_experiment_id, p.value ");
 		sb.append(this.getPhenotypesInEnvironmentFromQuery(true));
 		sb.append(" WHERE env.nd_experiment_id IN (:environmentIds) ");
 		sb.append("   AND p.observable_id IN (:traitIds) ");
