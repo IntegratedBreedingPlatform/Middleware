@@ -151,7 +151,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(3, instances.size());
 
 		final StudyInstance instance1 = instances.get(0);
-		Assert.assertEquals(env1.intValue(), instance1.getExperimentId());
+		Assert.assertEquals(env1.intValue(), instance1.getInstanceId());
 		Assert.assertEquals(1, instance1.getInstanceNumber());
 		Assert.assertEquals("Afghanistan", instance1.getLocationName());
 		Assert.assertEquals("AFG", instance1.getLocationAbbreviation());
@@ -159,7 +159,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(instance1.isHasFieldmap());
 
 		final StudyInstance instance2 = instances.get(1);
-		Assert.assertEquals(env2.intValue(), instance2.getExperimentId());
+		Assert.assertEquals(env2.intValue(), instance2.getInstanceId());
 		Assert.assertEquals(2, instance2.getInstanceNumber());
 		Assert.assertEquals("Albania", instance2.getLocationName());
 		Assert.assertEquals("ALB", instance2.getLocationAbbreviation());
@@ -167,7 +167,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(instance2.isHasFieldmap());
 
 		final StudyInstance instance3 = instances.get(2);
-		Assert.assertEquals(env3.intValue(), instance3.getExperimentId());
+		Assert.assertEquals(env3.intValue(), instance3.getInstanceId());
 		Assert.assertEquals(3, instance3.getInstanceNumber());
 		Assert.assertEquals("Algeria", instance3.getLocationName());
 		Assert.assertEquals("DZA", instance3.getLocationAbbreviation());

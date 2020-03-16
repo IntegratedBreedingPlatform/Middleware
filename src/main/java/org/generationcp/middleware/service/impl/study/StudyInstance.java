@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class StudyInstance {
 
-	private int experimentId;
+	private int instanceId;
 	private Integer locationId;
 	private String locationName;
 	private String locationAbbreviation;
@@ -23,10 +23,10 @@ public class StudyInstance {
 
 	}
 
-	public StudyInstance(final int experimentId, final int instanceNumber, final boolean hasFieldmap,
+	public StudyInstance(final int instanceId, final int instanceNumber, final boolean hasFieldmap,
 		final Boolean hasExperimentalDesign,
 		final Boolean hasMeasurements, final Boolean canBeDeleted) {
-		this.experimentId = experimentId;
+		this.instanceId = instanceId;
 		this.instanceNumber = instanceNumber;
 		this.hasFieldmap = hasFieldmap;
 		this.hasExperimentalDesign = hasExperimentalDesign;
@@ -34,7 +34,7 @@ public class StudyInstance {
 		this.canBeDeleted = canBeDeleted;
 	}
 
-	public StudyInstance(final Integer experimentId, final Integer locationId, final String locationName,
+	public StudyInstance(final Integer instanceId, final Integer locationId, final String locationName,
 		final String locationAbbreviation,
 		final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldMap) {
 		this.locationId = locationId;
@@ -43,7 +43,7 @@ public class StudyInstance {
 		this.instanceNumber = instanceNumber;
 		this.customLocationAbbreviation = customLocationAbbreviation;
 		this.hasFieldmap = hasFieldMap;
-		this.experimentId = experimentId;
+		this.instanceId = instanceId;
 	}
 
 	public String getLocationName() {
@@ -118,12 +118,12 @@ public class StudyInstance {
 		this.canBeDeleted = canBeDeleted;
 	}
 
-	public int getExperimentId() {
-		return this.experimentId;
+	public int getInstanceId() {
+		return this.instanceId;
 	}
 
-	public void setExperimentId(final int experimentId) {
-		this.experimentId = experimentId;
+	public void setInstanceId(final int instanceId) {
+		this.instanceId = instanceId;
 
 	}
 
@@ -133,12 +133,12 @@ public class StudyInstance {
 			return false;
 		}
 		final StudyInstance castOther = (StudyInstance) other;
-		return new EqualsBuilder().append(this.experimentId, castOther.experimentId).isEquals();
+		return new EqualsBuilder().append(this.instanceId, castOther.instanceId).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.experimentId).toHashCode();
+		return new HashCodeBuilder().append(this.instanceId).toHashCode();
 	}
 
 	@Override

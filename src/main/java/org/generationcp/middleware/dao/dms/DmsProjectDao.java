@@ -1082,7 +1082,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		try {
 			final String sql = "select \n"
-				+ "	env.nd_experiment_id as experimentId, \n"
+				+ "	env.nd_experiment_id as instanceId, \n"
 				+ " env.observation_unit_no as instanceNumber, \n"
 				+ "	max(if(xprop.type_id = 8190, loc.locid, null)) as locationId, \n"  // 8190 = cvterm for LOCATION_ID
 				+ "	max(if(xprop.type_id = 8190, loc.lname, null)) as locationName, \n" +
@@ -1132,7 +1132,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			if (!CollectionUtils.isEmpty(instanceIds)) {
 				query.setParameterList("locationIds", instanceIds);
 			}
-			query.addScalar("experimentId", new IntegerType());
+			query.addScalar("instanceId", new IntegerType());
 			query.addScalar("locationId", new IntegerType());
 			query.addScalar("locationName", new StringType());
 			query.addScalar("locationAbbreviation", new StringType());

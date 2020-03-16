@@ -7,42 +7,42 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class EnvironmentData {
+public class InstanceData {
 
-	private Integer environmentId;
+	private Integer instanceId;
 	// This can be nd_experimentprop or phenotype ID depending if variable is environmental condition
-	private Integer environmentDataId;
+	private Integer instanceDataId;
 	private Integer variableId;
 	private String value;
 	private Integer categoricalValueId;
 
-	public EnvironmentData() {
+	public InstanceData() {
 		// Empty constructor is needed to be able to map JSON from request
 	}
 
-	public EnvironmentData(final Integer environmentId, final Integer environmentDataId, final Integer variableId, final String value,
+	public InstanceData(final Integer instanceId, final Integer instanceDataId, final Integer variableId, final String value,
 		final Integer categoricalValueId) {
-		this.environmentId = environmentId;
-		this.environmentDataId = environmentDataId;
+		this.instanceId = instanceId;
+		this.instanceDataId = instanceDataId;
 		this.variableId = variableId;
 		this.value = value;
 		this.categoricalValueId = categoricalValueId;
 	}
 
-	public Integer getEnvironmentId() {
-		return environmentId;
+	public Integer getInstanceId() {
+		return instanceId;
 	}
 
-	public void setEnvironmentId(final Integer environmentId) {
-		this.environmentId = environmentId;
+	public void setInstanceId(final Integer instanceId) {
+		this.instanceId = instanceId;
 	}
 
-	public Integer getEnvironmentDataId() {
-		return environmentDataId;
+	public Integer getInstanceDataId() {
+		return instanceDataId;
 	}
 
-	public void setEnvironmentDataId(final Integer environmentDataId) {
-		this.environmentDataId = environmentDataId;
+	public void setInstanceDataId(final Integer instanceDataId) {
+		this.instanceDataId = instanceDataId;
 	}
 
 	public Integer getVariableId() {
@@ -71,16 +71,16 @@ public class EnvironmentData {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof EnvironmentData)) {
+		if (!(other instanceof InstanceData)) {
 			return false;
 		}
-		final EnvironmentData castOther = (EnvironmentData) other;
-		return new EqualsBuilder().append(this.environmentDataId, castOther.environmentDataId).isEquals();
+		final InstanceData castOther = (InstanceData) other;
+		return new EqualsBuilder().append(this.instanceDataId, castOther.instanceDataId).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.environmentDataId).toHashCode();
+		return new HashCodeBuilder().append(this.instanceDataId).toHashCode();
 	}
 
 	@Override
