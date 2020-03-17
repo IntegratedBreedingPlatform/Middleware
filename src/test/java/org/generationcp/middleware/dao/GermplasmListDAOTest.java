@@ -293,7 +293,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetGermplasmUsedInMoreThanOneListSuccess() {
 		final Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
-		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+		final Germplasm germplasm = new Germplasm(null, GermplasmListDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
 
 		final GermplasmList list1 = saveGermplasm(GermplasmListTestDataInitializer.createGermplasmListTestData(
 			TEST_GERMPLASM_LIST_NAME, GermplasmListDAOTest.TEST_GERMPLASM_LIST_DESC,
