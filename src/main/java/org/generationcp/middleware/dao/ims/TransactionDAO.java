@@ -621,7 +621,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "    i.etype = 'GERMPLSM' "; //
 
 	private String buildSearchTransactionsQuery(final TransactionsSearchDto transactionsSearchDto) {
-		final StringBuilder query = new StringBuilder(this.SEARCH_TRANSACTIONS_QUERY);
+		final StringBuilder query = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
 		if (transactionsSearchDto != null) {
 			if (transactionsSearchDto.getLotIds() != null && !transactionsSearchDto.getLotIds().isEmpty()) {
 				query.append(" and i.lotid IN (").append(Joiner.on(",").join(transactionsSearchDto.getLotIds())).append(") ");
@@ -723,22 +723,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				this.addSortToSearchTransactionsQuery(this.buildSearchTransactionsQuery(transactionsSearchDto), pageable);
 
 			final SQLQuery query = this.getSession().createSQLQuery(filterTransactionsQuery);
-			query.addScalar("transactionId");
-			query.addScalar("createdByUsername");
-			query.addScalar("transactionType");
-			query.addScalar("amount");
-			query.addScalar("notes");
-			query.addScalar("transactionDate", Hibernate.DATE);
-			query.addScalar("lotLotId");
-			query.addScalar("lotGid");
-			query.addScalar("lotDesignation");
-			query.addScalar("lotStockId");
-			query.addScalar("lotScaleId");
-			query.addScalar("lotScaleName");
-			query.addScalar("lotStatus");
-			query.addScalar("transactionStatus");
-			query.addScalar("lotLocationId");
-			query.addScalar("lotComments");
+			this.addSearchTransactionsQueryScalars(query);
 
 			query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
 
@@ -766,12 +751,59 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
+	public List<TransactionDto> getAvailableBalanceTransactions(final Integer lotId) {
+		try {
+
+			if (lotId != null) {
+				final StringBuilder sql = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
+				sql.append(" and (act.trnstat =").append(TransactionStatus.CONFIRMED.getIntValue()).append(" or (act.trnstat = ")
+					.append(TransactionStatus.PENDING.getIntValue()).
+					append(" and act.trntype = ").append(TransactionType.WITHDRAWAL.getId()).append(")) ");
+				sql.append(" and act.lotid = ").append(lotId).append(" ");
+				final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+				this.addSearchTransactionsQueryScalars(query);
+
+				query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
+
+				final List<TransactionDto> transactionDtos = query.list();
+
+				return transactionDtos;
+			} else {
+				return new ArrayList<>();
+			}
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getAvailableBalanceTransactions() query on TransactionDAO: " + e.getMessage(), e);
+		}
+	}
+
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
 			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class, Double.class, String.class, Date.class,
-					Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class, String.class, Integer.class, String.class);
+				Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class, String.class,
+				Integer.class, String.class);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
+
+	private void addSearchTransactionsQueryScalars(final SQLQuery query) {
+		query.addScalar("transactionId");
+		query.addScalar("createdByUsername");
+		query.addScalar("transactionType");
+		query.addScalar("amount");
+		query.addScalar("notes");
+		query.addScalar("transactionDate", Hibernate.DATE);
+		query.addScalar("lotLotId");
+		query.addScalar("lotGid");
+		query.addScalar("lotDesignation");
+		query.addScalar("lotStockId");
+		query.addScalar("lotScaleId");
+		query.addScalar("lotScaleName");
+		query.addScalar("lotStatus");
+		query.addScalar("transactionStatus");
+		query.addScalar("lotLocationId");
+		query.addScalar("lotComments");
+	}
+
 }
