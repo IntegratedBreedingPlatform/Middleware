@@ -11,10 +11,10 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /**
  * Contains the details of a Variable - type and value.
@@ -28,6 +28,8 @@ public class Variable implements Serializable, Comparable<Variable> {
 	private String value;
 
 	private Integer phenotypeId;
+
+	private Integer experimentPropertyId;
 
 	private boolean isCustomValue;
 
@@ -93,6 +95,15 @@ public class Variable implements Serializable, Comparable<Variable> {
 		}
 	}
 
+	public Variable(DMSVariableType variableType, String value, Integer experimentPropertyId) {
+		this.experimentPropertyId = experimentPropertyId;
+		this.variableType = variableType;
+		this.value = value;
+		if (variableType == null) {
+			throw new RuntimeException();
+		}
+	}
+
 	public DMSVariableType getVariableType() {
 		return this.variableType;
 	}
@@ -121,16 +132,24 @@ public class Variable implements Serializable, Comparable<Variable> {
 		this.value = value;
 	}
 
+	public Integer getExperimentPropertyId() {
+		return this.experimentPropertyId;
+	}
+
+	public void setExperimentPropertyId(final Integer experimentPropertyId) {
+		this.experimentPropertyId = experimentPropertyId;
+	}
+
 	public String getDisplayValue() {
 		String value = this.value;
 		if (this.variableType.getStandardVariable().hasEnumerations()) {
 			try {
 				Enumeration enumeration = this.variableType.getStandardVariable()
-						.findEnumerationById(Integer.parseInt(value));
+					.findEnumerationById(Integer.parseInt(value));
 				if (enumeration != null) {
 					if (this.variableType.getStandardVariable().getDataType() != null
-							&& this.variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
-									.getId()) {
+						&& this.variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
+						.getId()) {
 
 						// GCP-5536 - get description instead
 						value = enumeration.getDescription();
@@ -138,19 +157,19 @@ public class Variable implements Serializable, Comparable<Variable> {
 						value = enumeration.getName();
 					}
 				} else if (this.variableType.getStandardVariable().getDataType() != null
-						&& this.variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
-								.getId()) {
+					&& this.variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
+					.getId()) {
 
 					Integer overridingId = null;
 
 					if (this.variableType.getStandardVariable().getOverridenEnumerations() != null) {
 						overridingId = this.variableType.getStandardVariable()
-								.getOverridenEnumerations().get(Integer.parseInt(value));
+							.getOverridenEnumerations().get(Integer.parseInt(value));
 					}
 
 					if (overridingId != null) {
 						enumeration = this.variableType.getStandardVariable().findEnumerationById(
-								overridingId);
+							overridingId);
 					}
 
 					if (enumeration != null) {
@@ -172,7 +191,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 		if (this.variableType.getStandardVariable().hasEnumerations()) {
 			try {
 				Enumeration enumeration = this.variableType.getStandardVariable()
-						.findEnumerationById(Integer.parseInt(value));
+					.findEnumerationById(Integer.parseInt(value));
 				if (enumeration != null) {
 					value = enumeration.getName();
 				}
@@ -188,6 +207,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 
 	/**
 	 * When the name of the enumeration is saved as value, this method returns the id of the enumeration
+	 *
 	 * @return
 	 */
 	public String getIdValue() {
@@ -209,7 +229,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 			Debug.println(indent + 3, "VariableType: null");
 		} else {
 			Debug.println(indent + 3, "VariableType: " + this.variableType.getId() + " ["
-					+ this.variableType.getLocalName() + "]");
+				+ this.variableType.getLocalName() + "]");
 		}
 		Debug.println(indent + 3, "Value: " + this.value);
 	}
@@ -229,7 +249,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 		}
 		Variable other = (Variable) obj;
 		return other.getVariableType().equals(this.getVariableType())
-				&& this.stringEquals(other.getValue(), this.getValue());
+			&& this.stringEquals(other.getValue(), this.getValue());
 	}
 
 	private boolean stringEquals(String s1, String s2) {

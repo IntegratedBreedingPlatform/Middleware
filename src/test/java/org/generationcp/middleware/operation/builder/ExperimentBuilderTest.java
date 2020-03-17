@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
@@ -62,8 +63,8 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		variableType.setStandardVariable(standardVariable);
-		final Variable variable = builder.createLocationFactor(geoLocation, variableType, null);
-		Assert.assertEquals("The variable instance should be set properly since there is a mathcing variable", variable.getValue(),
+		final Optional<Variable> variableOptional = builder.createLocationFactor(geoLocation, variableType, null);
+		Assert.assertEquals("The variable instance should be set properly since there is a mathcing variable", variableOptional.get().getValue(),
 				instance.toString());
 	}
 
@@ -83,8 +84,8 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(typeId);
 		variableType.setStandardVariable(standardVariable);
-		final Variable variable = builder.createLocationFactor(geoLocation, variableType, null);
-		Assert.assertEquals("The variable description should be set properly since there is a mathcing variable", variable.getValue(),
+		final Optional<Variable> variableOptional = builder.createLocationFactor(geoLocation, variableType, null);
+		Assert.assertEquals("The variable description should be set properly since there is a mathcing variable", variableOptional.get().getValue(),
 				instance.toString());
 	}
 
@@ -103,8 +104,8 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(1001);
 		variableType.setStandardVariable(standardVariable);
-		final Variable variable = builder.createLocationFactor(geoLocation, variableType, null);
-		Assert.assertNull("The variable be null", variable);
+		final Optional<Variable> variableOptional = builder.createLocationFactor(geoLocation, variableType, null);
+		Assert.assertFalse("The variable must not be present", variableOptional.isPresent());
 	}
 
 	@Test

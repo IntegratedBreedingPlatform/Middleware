@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -263,8 +264,9 @@ public class ExperimentBuilder {
 	private void addEnvironmentFactors(final ExperimentModel experimentModel, final VariableList factors, final VariableTypeList variableTypes, final ExperimentModel environment) {
 		for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
 			if (PhenotypicType.TRIAL_ENVIRONMENT == variableType.getRole()) {
-				final Variable variable = this.createLocationFactor(experimentModel, variableType, environment);
-				if (variable != null) {
+				final Optional<Variable> variableOptional = this.createLocationFactor(experimentModel, variableType, environment);
+				if (variableOptional.isPresent()) {
+					final Variable variable = variableOptional.get();
 					variable.getVariableType().setRole(PhenotypicType.TRIAL_ENVIRONMENT);
 					variable.getVariableType().getStandardVariable().setPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
 					factors.add(variable);
@@ -273,30 +275,35 @@ public class ExperimentBuilder {
 		}
 	}
 
-	Variable createLocationFactor(final ExperimentModel experiment, final DMSVariableType variableType, final ExperimentModel environment) {
+	Optional<Variable> createLocationFactor(final ExperimentModel experiment, final DMSVariableType variableType, final ExperimentModel environment) {
 		final StandardVariable standardVariable = variableType.getStandardVariable();
 
-		LOG.info("** Expt: " + experiment.getNdExperimentId() + " with envt " + environment != null? (environment.getNdExperimentId() + " :: " +environment.getObservationUnitNo()) : "NULL");
 		if (standardVariable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() && environment != null) {
-			return new Variable(variableType, environment.getObservationUnitNo());
+			return Optional.of(new Variable(variableType, environment.getObservationUnitNo()));
 		}
 
-		final String locVal = this.findLocationValue(variableType.getId(), experiment.getProperties());
-		if (locVal != null) {
-			return new Variable(variableType, locVal);
+		final Optional<ExperimentProperty> experimentPropertyOptional = this.findProperty(variableType.getId(), experiment.getProperties());
+
+		if (experimentPropertyOptional.isPresent()) {
+			final ExperimentProperty experimentProperty = experimentPropertyOptional.get();
+			final Integer experimentPropertyId = experimentProperty.getNdExperimentpropId();
+			final String locVal = experimentProperty.getValue();
+			if (locVal != null) {
+				return Optional.of(new Variable(variableType, locVal, experimentPropertyId));
+			}
 		}
-		return null;
+		return Optional.empty();
 	}
 
-	private String findLocationValue(final int stdVariableId, final List<ExperimentProperty> properties) {
+	private Optional<ExperimentProperty> findProperty(final int stdVariableId, final List<ExperimentProperty> properties) {
 		if (properties != null) {
 			for (final ExperimentProperty property : properties) {
 				if (property.getTypeId().equals(stdVariableId)) {
-					return property.getValue();
+					return Optional.of(property);
 				}
 			}
 		}
-		return null;
+		return Optional.empty();
 	}
 
 	private void addPlotExperimentFactors(final VariableList variables, final ExperimentModel experimentModel, final VariableTypeList variableTypes,
@@ -414,6 +421,7 @@ public class ExperimentBuilder {
 		variable.setValue(property.getValue());
 		variable.getVariableType().setRole(role);
 		variable.getVariableType().getStandardVariable().setPhenotypicType(role);
+		variable.setExperimentPropertyId(property.getNdExperimentpropId());
 		return variable;
 	}
 
@@ -423,6 +431,7 @@ public class ExperimentBuilder {
 		variable.setVariableType(variableTypes.findById(property.getTypeId()), hasVariableType);
 		variable.setValue(property.getValue());
 		variable.getVariableType().setRole(role);
+		variable.setExperimentPropertyId(property.getNdExperimentpropId());
 		return variable;
 	}
 
