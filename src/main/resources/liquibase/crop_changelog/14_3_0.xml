@@ -7,8 +7,8 @@
     <changeSet author="gelli" id="v14.3.0-1">
         <preConditions onFail="MARK_RAN">
             <and>
-                <sqlCheck expectedResult="true">
-                    SELECT COUNT(*) > 0 FROM germplsm WHERE methn = 0 OR NOT EXISTS (SELECT 1 FROM methods WHERE mid = methn)
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(*) &gt; 0 FROM germplsm WHERE methn = 0 OR NOT EXISTS ( SELECT 1 FROM methods WHERE mid = methn);
                 </sqlCheck>
                 <sqlCheck expectedResult="2">
                     SELECT COUNT(*) FROM methods WHERE mid IN (1,31);
@@ -20,8 +20,8 @@
             UPDATE germplsm SET methn =
                 CASE WHEN gnpgs &lt;= 0 THEN 31
                      ELSE 1
-                END;
-            WHERE methn = 0 OR NOT EXISTS (SELECT 1 FROM methods WHERE mid = methn)
+                END
+            WHERE methn = 0 OR NOT EXISTS (SELECT 1 FROM methods WHERE mid = methn);
         </sql>
     </changeSet>
     <changeSet id="v14.3.0-2" author="gelli">
@@ -31,10 +31,10 @@
                     <foreignKeyConstraintExists foreignKeyName="fk_germplasm_methods_methn"></foreignKeyConstraintExists>
                 </not>
                 <sqlCheck expectedResult="0">
-                    SELECT CASE WHEN (SELECT COUNT(*) FROM germplsm WHERE methn = 0) > 0 THEN 1 ELSE 0 END;
+                    SELECT COUNT(*) &gt; 0 FROM germplsm WHERE methn = 0 OR NOT EXISTS ( SELECT 1 FROM methods WHERE mid = methn);
                 </sqlCheck>
                 <sqlCheck expectedResult="0">
-                    SELECT COUNT(*) FROM germplsm WHERE methn NOT IN (SELECT mid FROM methods)
+                    SELECT COUNT(*) FROM germplsm WHERE methn NOT IN (SELECT mid FROM methods);
                 </sqlCheck>
             </and>
         </preConditions>
