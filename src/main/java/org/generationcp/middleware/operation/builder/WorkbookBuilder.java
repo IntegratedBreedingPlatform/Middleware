@@ -987,7 +987,7 @@ public class WorkbookBuilder extends Builder {
 					value = experiment.getObsUnitId();
 				}
 				measurementDataList.add(new MeasurementData(factor.getName(), value, isEditable,
-					this.getDataType(factor.getDataTypeId()), factor.getTermId(), factor));
+					this.getDataType(factor.getDataTypeId()), null, factor));
 			} else {
 				measurementDataList.add(measurementDataOptional.get());
 			}
