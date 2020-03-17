@@ -1339,7 +1339,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
 
-		// TODO: Check if we can reuse this query/method in getStudyMetadataForGeolocationId()
+		// TODO: Check if we can reuse this query/method in getStudyMetadataForEnvironmentId()
 		final SQLQuery sqlQuery =
 			this.getSession().createSQLQuery(this.createStudySummaryQueryString(studySearchFilter));
 
@@ -1430,7 +1430,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	private String createCountStudyQueryString(final StudySearchFilter studySearchFilter) {
-		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT geoloc.nd_geolocation_id) ");
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT env.nd_experiment_id) ");
 		this.appendStudySummaryFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
 		return sql.toString();
@@ -1438,11 +1438,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private String createStudySummaryQueryString(final StudySearchFilter studySearchFilter) {
 		final StringBuilder sql = new StringBuilder(" SELECT  ");
-		sql.append("     geoloc.nd_geolocation_id AS " + StudySearchFilter.STUDY_DB_ID + ", ");
-		sql.append("		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS " + StudySearchFilter.STUDY_NAME + ", ");
+		sql.append("     env.nd_experiment_id AS " + StudySearchFilter.STUDY_DB_ID + ", ");
+		sql.append("		CONCAT(pmain.name, ' Environment Number ', env.observation_unit_no) AS " + StudySearchFilter.STUDY_NAME + ", ");
 		sql.append("     pmain.study_type_id AS " + StudySearchFilter.STUDY_TYPE_DB_ID + ", ");
 		sql.append("     studyType.label AS " + StudySearchFilter.STUDY_TYPE_NAME + ", ");
-		sql.append("     geopropSeason.value AS " + StudySearchFilter.SEASON_DB_ID + ", ");
+		sql.append("     xpropSeason.value AS " + StudySearchFilter.SEASON_DB_ID + ", ");
 		sql.append("     cvtermSeason.definition AS " + StudySearchFilter.SEASON + ", ");
 		sql.append("     pmain.project_id AS " + StudySearchFilter.TRIAL_DB_ID + ", ");
 		sql.append(" 	 pmain.name AS " + StudySearchFilter.TRIAL_NAME + ", ");
@@ -1455,7 +1455,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     wp.project_uuid AS " + StudySearchFilter.PROGRAM_DB_ID + " ");
 		this.appendStudySummaryFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
-		sql.append(" GROUP BY geoloc.nd_geolocation_id ");
+		sql.append(" GROUP BY env.observation_unit_no ");
 
 		final String sortBy = studySearchFilter.getSortedRequest().getSortBy();
 		final String sortOrder = studySearchFilter.getSortedRequest().getSortOrder();
@@ -1469,39 +1469,37 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private void appendStudySummaryFromQuery(final StringBuilder sql) {
 		sql.append(" FROM ");
-		sql.append("     nd_geolocation geoloc ");
+		sql.append("     nd_experiment env ");
 		sql.append("         INNER JOIN ");
-		sql.append("     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id ");
-		sql.append("         INNER JOIN ");
-		sql.append("     project proj ON proj.project_id = nde.project_id ");
+		sql.append("     project proj ON proj.project_id = env.project_id ");
 		sql.append("         INNER JOIN ");
 		sql.append("     project pmain ON pmain.project_id = proj.study_id ");
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     study_type studyType ON studyType.study_type_id = pmain.study_type_id ");
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append(
-			"     nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropSeason.type_id = "
+			"     nd_experimentprop xpropSeason ON xpropSeason.nd_experiment_id = env.nd_experiment_id AND xpropSeason.type_id = "
 				+ TermId.SEASON_VAR.getId());
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append(
-			"     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = "
+			"     nd_experimentprop xpropLocation ON xpropLocation.nd_experiment_id = env.nd_experiment_id AND xpropLocation.type_id = "
 				+ TermId.LOCATION_ID.getId());
 		sql.append("         LEFT OUTER JOIN ");
-		sql.append("     location ON geopropLocation.value = location.locid");
+		sql.append("     location ON env.nd_experiment_id.value = location.locid");
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
 		sql.append("         LEFT OUTER JOIN ");
-		sql.append("     cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value");
+		sql.append("     cvterm cvtermSeason ON cvtermSeason.cvterm_id = xpropSeason.value");
 		sql.append(" WHERE ");
-		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
+		sql.append("     env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
 	}
 
 	private void appendStudySearchFilter(final StringBuilder sql, final StudySearchFilter studySearchFilter) {
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
-			sql.append("AND geoloc.nd_geolocation_id = :studyDbId ");
+			sql.append("AND env.nd_experiment_id = :studyDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
-			sql.append("AND geopropLocation.value = :locationDbId ");
+			sql.append("AND xpropLocation.value = :locationDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getProgramDbId())) {
 			sql.append("AND pmain.program_uuid = :programDbId ");
