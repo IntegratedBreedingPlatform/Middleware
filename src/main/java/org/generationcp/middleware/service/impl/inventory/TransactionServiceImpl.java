@@ -146,6 +146,11 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
+	public List<TransactionDto> getAvailableBalanceTransactions(final Integer lotId) {
+		return this.daoFactory.getTransactionDAO().getAvailableBalanceTransactions(lotId);
+	}
+
+	@Override
 	public void updatePendingTransactions(final List<TransactionUpdateRequestDto> transactionUpdateRequestDtos) {
 
 		final Set<Integer> transactionIds =

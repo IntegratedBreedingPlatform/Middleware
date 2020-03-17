@@ -34,5 +34,8 @@ public interface TransactionService {
 
 	void confirmPendingTransactions(List<TransactionDto> confirmedTransactionDtoList);
 
+	List<TransactionDto> getAvailableBalanceTransactions(Integer lotId);
+
+
 	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
 }
