@@ -13,12 +13,6 @@ package org.generationcp.middleware.manager;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.dao.dms.PhenotypeDao;
-import org.generationcp.middleware.dao.dms.StockDao;
-import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
@@ -37,8 +31,6 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -50,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -96,7 +89,8 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetTraitsForNumericVariates() {
 		final List<Integer> environmentIds = Arrays.asList(10081, 10082, 10083, 10084, 10085, 10086, 10087); // Rice
-		final List<NumericTraitInfo> result = this.crossStudyDataManager.getTraitsForNumericVariates(environmentIds);
+		final List<Integer> traitIds = Arrays.asList(20081, 20082, 20083);
+		final List<NumericTraitInfo> result = this.crossStudyDataManager.getTraitsForNumericVariates(environmentIds, traitIds);
 		for (final NumericTraitInfo trait : result) {
 			trait.print(IntegrationTestBase.INDENT);
 		}
@@ -106,7 +100,8 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetTraitsForCharacterVariates() {
 		final List<Integer> environmentIds = Arrays.asList(10040, 10050, 10060, 10070); // Rice
-		final List<CharacterTraitInfo> result = this.crossStudyDataManager.getTraitsForCharacterVariates(environmentIds);
+		final List<Integer> traitIds = Arrays.asList(20081, 20082, 20083);
+		final List<CharacterTraitInfo> result = this.crossStudyDataManager.getTraitsForCharacterVariates(environmentIds, traitIds);
 		for (final CharacterTraitInfo trait : result) {
 			trait.print(IntegrationTestBase.INDENT);
 		}
@@ -116,7 +111,8 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetTraitsForCategoricalVariates() {
 		final List<Integer> environmentIds = Arrays.asList(10010, 10020, 10030, 10040, 10050, 10060, 10070); // Rice
-		final List<CategoricalTraitInfo> result = this.crossStudyDataManager.getTraitsForCategoricalVariates(environmentIds);
+		final List<Integer> traitIds = Arrays.asList(20081, 20082, 20083);
+		final List<CategoricalTraitInfo> result = this.crossStudyDataManager.getTraitsForCategoricalVariates(environmentIds, traitIds);
 		for (final CategoricalTraitInfo trait : result) {
 			trait.print(IntegrationTestBase.INDENT);
 		}
@@ -142,7 +138,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetObservationsForTraitOnGermplasms() {
 
 		final List<Integer> traitIds = Arrays.asList(18020, 18180, 18190, 18200);
-		final List<Integer> germplasmIds = Arrays.asList(1709);
+		final List<Integer> germplasmIds = Collections.singletonList(1709);
 		final List<Integer> environmentIds = Arrays.asList(10081, 10084, 10085, 10086);
 
 		final List<Observation> result =
