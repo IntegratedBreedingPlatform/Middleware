@@ -3,6 +3,8 @@ package org.generationcp.middleware.service.impl.inventory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -19,6 +21,7 @@ import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +79,55 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 			new TransactionUpdateRequestDto(pendingWithdrawalId, 22D, null, null);
 		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
 	}
+
+	@Test
+	public void testUpdatePendingTransactions_WithdrawalNewAmount_Ok() {
+		final TransactionUpdateRequestDto transactionUpdateRequestDto =
+			new TransactionUpdateRequestDto(pendingWithdrawalId, 20D, null, null);
+		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
+		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingWithdrawalId);
+		Assert.assertTrue(transaction.getQuantity().equals(-20D));
+	}
+
+	@Test
+	public void testUpdatePendingTransactions_WithdrawalNewBalance_Ok() {
+		final TransactionUpdateRequestDto transactionUpdateRequestDto =
+			new TransactionUpdateRequestDto(pendingWithdrawalId, null, 0D, null);
+		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
+		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingWithdrawalId);
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(Arrays.asList(lot.getId()));
+		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
+		Assert.assertTrue(transaction.getQuantity().equals(-20D));
+		Assert.assertTrue(lotDto.getAvailableBalance().equals(0D));
+	}
+
+	@Test
+	public void testUpdatePendingTransactions_DepositNewBalance_Ok() {
+		final TransactionUpdateRequestDto transactionUpdateRequestDto =
+			new TransactionUpdateRequestDto(pendingDepositId, null, 20D, null);
+		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
+		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingDepositId);
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(Arrays.asList(lot.getId()));
+		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
+		Assert.assertTrue(transaction.getQuantity().equals(2D));
+		Assert.assertTrue(lotDto.getAvailableBalance().equals(18D));
+	}
+
+	@Test
+	public void testUpdatePendingTransactions_DepositNewAmount_Ok() {
+		final TransactionUpdateRequestDto transactionUpdateRequestDto =
+			new TransactionUpdateRequestDto(pendingDepositId, 5D, null, null);
+		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
+		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingDepositId);
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(Arrays.asList(lot.getId()));
+		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
+		Assert.assertTrue(transaction.getQuantity().equals(5D));
+		Assert.assertTrue(lotDto.getAvailableBalance().equals(18D));
+	}
+
 
 	private void findAdminUser() {
 		final WorkbenchUser user = this.userService.getUserByName("admin", 0, 1, Operation.EQUAL).get(0);
