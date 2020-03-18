@@ -8,7 +8,7 @@
         <preConditions onFail="MARK_RAN">
             <and>
                 <sqlCheck expectedResult="1">
-                    SELECT COUNT(*) &gt; 0 FROM germplsm WHERE methn = 0 OR NOT EXISTS ( SELECT 1 FROM methods WHERE mid = methn);
+                    SELECT COUNT(*) > 0 FROM germplsm WHERE methn = 0 OR NOT EXISTS ( SELECT 1 FROM methods WHERE mid = methn);
                 </sqlCheck>
                 <sqlCheck expectedResult="2">
                     SELECT COUNT(*) FROM methods WHERE mid IN (1,31);
@@ -31,7 +31,7 @@
                     <foreignKeyConstraintExists foreignKeyName="fk_germplasm_methods_methn"></foreignKeyConstraintExists>
                 </not>
                 <sqlCheck expectedResult="0">
-                    SELECT COUNT(*) &gt; 0 FROM germplsm WHERE methn = 0 OR NOT EXISTS ( SELECT 1 FROM methods WHERE mid = methn);
+                    SELECT COUNT(*) > 0 FROM germplsm WHERE methn = 0 OR NOT EXISTS ( SELECT 1 FROM methods WHERE mid = methn);
                 </sqlCheck>
             </and>
         </preConditions>
