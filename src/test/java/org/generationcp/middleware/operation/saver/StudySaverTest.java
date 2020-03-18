@@ -29,7 +29,7 @@ public class StudySaverTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudyExperiment() throws Exception {
+	public void testSaveStudyExperiment() {
 		final StudyValues values = new StudyValues();
 		values.setVariableList(new VariableList());
 		values.setGermplasmId(1);

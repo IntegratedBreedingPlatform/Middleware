@@ -167,6 +167,11 @@ public class SimplifiedWorkbookTestDataInitializer {
 			FIELD_PLOT, NUMERIC, NUMERIC_VALUE,
 			PLOT, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_DESIGN, false));
 
+		factors.add(createMeasurementVariable(TermId.ENTRY_NO.getId(), ENTRY,
+			"Entry number ", NESTED_NUMBER, ENUMERATED,
+			FIELD_PLOT, NUMERIC, NUMERIC_VALUE,
+			ENTRY, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_DESIGN, false));
+
 		factors.add(createMeasurementVariable(TermId.OBS_UNIT_ID.getId(), OBS_UNIT_ID,
 			"Field Observation Unit id - enumerated (number) ", TEXT, ASSIGNED,
 			FIELD_PLOT, CHAR, STUDY,

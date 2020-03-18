@@ -12,6 +12,7 @@
 package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -43,7 +44,7 @@ public class ExperimentValuesTransformerTest extends TestOutputFormatter {
 		final MeasurementRow mRow = this.createMeasurementRowTestData();
 		final VariableTypeList varTypeList = this.createVariableTypeListTestData();
 
-		final ExperimentValues expVal = ExperimentValuesTransformerTest.transformer.transform(mRow, varTypeList, null, null);
+		final ExperimentValues expVal = ExperimentValuesTransformerTest.transformer.transform(mRow, varTypeList, null, new HashMap<>());
 
 		Assert.assertNotNull(expVal);
 		Debug.println(TestOutputFormatter.INDENT, expVal.toString());
