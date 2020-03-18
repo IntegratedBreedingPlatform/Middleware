@@ -1455,7 +1455,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     wp.project_uuid AS " + StudySearchFilter.PROGRAM_DB_ID + " ");
 		this.appendStudySummaryFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
-		sql.append(" GROUP BY env.observation_unit_no ");
+		sql.append(" GROUP BY env.nd_experiment_id ");
 
 		final String sortBy = studySearchFilter.getSortedRequest().getSortBy();
 		final String sortOrder = studySearchFilter.getSortedRequest().getSortOrder();
@@ -1485,7 +1485,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			"     nd_experimentprop xpropLocation ON xpropLocation.nd_experiment_id = env.nd_experiment_id AND xpropLocation.type_id = "
 				+ TermId.LOCATION_ID.getId());
 		sql.append("         LEFT OUTER JOIN ");
-		sql.append("     location ON env.nd_experiment_id.value = location.locid");
+		sql.append("     location ON xpropLocation.value = location.locid");
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
 		sql.append("         LEFT OUTER JOIN ");
