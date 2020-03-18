@@ -68,6 +68,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private final int germplasmDate = 20150101;
 	private String attributeValue;
 	private String code1NameTypeValue;
+	private static final int UNKNOWN_GENERATIVE_METHOD_ID = 1;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataDM;
@@ -1336,15 +1337,15 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		for (int counter = 1; counter <= 5; counter++) {
 
 			final Germplasm fParent = GermplasmTestDataInitializer
-					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName" + counter, "LocationName" + counter);
+					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1, "MethodName" + counter, "LocationName" + counter);
 			final Integer tempFemaleParentGID = this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName());
 
 			final Germplasm mParent = GermplasmTestDataInitializer
-					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName" + counter, "LocationName" + counter);
+					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1, "MethodName" + counter, "LocationName" + counter);
 			final Integer tempMaleParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName());
 
 			final Germplasm germplasm = GermplasmTestDataInitializer
-					.createGermplasm(tempGermplasmDate, tempFemaleParentGID, tempMaleParentGID, 2, 0, 0, 1, counter, counter, 1, 1,
+					.createGermplasm(tempGermplasmDate, tempFemaleParentGID, tempMaleParentGID, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, counter, 1, 1,
 							"MethodName", "LocationName");
 
 			// Create Germplasm and add Preferred Name
