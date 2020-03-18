@@ -33,13 +33,14 @@ public class StudySaverTest extends IntegrationTestBase {
 		final StudyValues values = new StudyValues();
 		values.setVariableList(new VariableList());
 		values.setGermplasmId(1);
+		values.setLocationId(1);
 
 		//Save the experiment
 		final CropType crop = new CropType();
 		crop.setUseUUID(false);
 		crop.setPlotCodePrefix(CROP_PREFIX);
-		this.studySaver.saveStudyExperiment(crop, 1, values);
-		final ExperimentModel experiment = this.experimentDao.getById(values.getLocationId());
+		final ExperimentModel savedStudyExperiment = this.studySaver.saveStudyExperiment(crop, 1, values);
+		final ExperimentModel experiment = this.experimentDao.getById(savedStudyExperiment.getNdExperimentId());
 		Assert.assertNotNull(experiment.getObsUnitId());
 		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
 		Assert.assertEquals(TermId.STUDY_INFORMATION.getId(), experiment.getTypeId().intValue());

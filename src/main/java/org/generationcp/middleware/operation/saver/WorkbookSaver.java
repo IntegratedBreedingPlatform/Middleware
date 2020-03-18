@@ -1035,4 +1035,8 @@ public class WorkbookSaver extends Saver {
 			throw new PhenotypeException(exceptions);
 		}
 	}
+
+	void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
 }
