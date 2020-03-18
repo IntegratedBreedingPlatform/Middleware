@@ -669,6 +669,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ ") THEN transaction.trnqty ELSE 0 END) AS availableBalance, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) AS reservedTotal, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trnqty * -1 ELSE 0 END) AS withdrawalTotal, " //
+		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " and transaction.trntype = "
+		+ TransactionType.DEPOSIT.getId() + " THEN transaction.trnqty ELSE 0 END) AS pendingDepositsTotal, " //
 		+ "  lot.comments as notes, " //
 		+ "  users.uname as createdByUsername, " //
 		+ "  lot.created_date as createdDate, " //
@@ -797,6 +799,20 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 						.append(lotsSearchDto.getMaxWithdrawalTotal()).append(" ");
 			}
 
+			if (lotsSearchDto.getMinPendingDepositsTotal() != null) {
+				query.append(
+					" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " and transaction.trntype = "
+						+ TransactionType.DEPOSIT.getId() + "  THEN transaction.trnqty ELSE 0 END) >= ")
+					.append(lotsSearchDto.getMinPendingDepositsTotal()).append(" ");
+			}
+
+			if (lotsSearchDto.getMaxPendingDepositsTotal() != null) {
+				query.append(
+					" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " and transaction.trntype = "
+						+ TransactionType.DEPOSIT.getId() + "  THEN transaction.trnqty ELSE 0 END) <= ")
+					.append(lotsSearchDto.getMaxPendingDepositsTotal()).append(" ");
+			}
+
 			if (lotsSearchDto.getLastDepositDateFrom() != null) {
 				query.append(
 						" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END)) >= '")
@@ -860,6 +876,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("availableBalance");
 			query.addScalar("reservedTotal");
 			query.addScalar("withdrawalTotal");
+			query.addScalar("pendingDepositsTotal");
 			query.addScalar("notes");
 			query.addScalar("createdByUsername");
 			query.addScalar("createdDate", Hibernate.DATE);
