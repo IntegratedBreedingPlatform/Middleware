@@ -100,6 +100,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Autowired
 	private FieldbookService middlewareFieldbookService;
 
+	private static final int UNKNOWN_GENERATIVE_METHOD_ID = 1;
+
 	@Before
 	public void setUp() throws Exception {
 		if (this.dao == null) {
@@ -230,15 +232,15 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetAllChildren() {
 		final Germplasm parentGermplsm =
-				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 1, -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 1, -1, 0, 0, 1, GermplasmDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(parentGermplsm, parentGermplsm.getPreferredName());
 
 		final Germplasm childDerivativeGermplsm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+				.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, GermplasmDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(childDerivativeGermplsm, childDerivativeGermplsm.getPreferredName());
 
 		final Germplasm maintenanceChildrenGermplsm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, 80, 0, 1, 1, "MethodName", "LocationName");
+				.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, GermplasmDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(maintenanceChildrenGermplsm, maintenanceChildrenGermplsm.getPreferredName());
 
 		final List<Germplasm> children = this.dao.getAllChildren(parentGermplsm.getGid());
@@ -594,7 +596,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	public void testGetNextSequenceNumberForCrossNameForMixedCasePrefix() {
 
 		final String crossNamePrefix = "aBcDeFg";
-		final Integer lastCodeForMixedCasePrefix = 29;
+		final int lastCodeForMixedCasePrefix = 29;
 		final String nameWithMixedCasePrefix = crossNamePrefix + lastCodeForMixedCasePrefix;
 		final int lastCodeForUppercasePrefix = 19;
 		final String nameWithUppercasePrefix = crossNamePrefix.toUpperCase() + lastCodeForUppercasePrefix;
@@ -879,8 +881,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		Map<Integer, StudyGermplasmDto> importedCrossParentMap = this.dao.getPlotNoToStudyGermplasmDtoMap(studyId, new HashSet<>(Arrays.asList(1, 2, 3, 4, 5)));
 
-		List<Integer> gidsList = Arrays.asList(gids);
-		for (Map.Entry<Integer,StudyGermplasmDto> entry : importedCrossParentMap.entrySet()) {
+		final List<Integer> gidsList = Arrays.asList(gids);
+		for (final Map.Entry<Integer,StudyGermplasmDto> entry : importedCrossParentMap.entrySet()) {
 			Assert.assertEquals(DataSetupTest.GERMPLSM_PREFIX + entry.getKey(), entry.getValue().getDesignation());
 			Assert.assertEquals( entry.getKey().toString(), entry.getValue().getPosition());
 			Assert.assertTrue(gidsList.contains(entry.getValue().getGermplasmId()));
@@ -916,6 +918,18 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 				.createGermplasm(20150101, fParentGID, mParentGID, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName",
 						"LocationName");
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName());
+	}
+
+	@Test
+	public void testReplacedGermplasm(){
+		final Germplasm replacedGermplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.dao.save(replacedGermplasm);
+		final Germplasm validGermplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.dao.save(validGermplasm);
+		Assert.assertNotNull(replacedGermplasm.getGid());
+		Assert.assertNull("Replaced Germplasm will not be retrieve", this.dao.getById(replacedGermplasm.getGid()));
+		Assert.assertNotNull(validGermplasm.getGid());
+		Assert.assertNotNull("Valid Germplasm will be retrieve", this.dao.getById(validGermplasm.getGid()));
 	}
 
 }
