@@ -73,7 +73,7 @@ public class DataSetupTest extends IntegrationTestBase {
 
     public static final int NUMBER_OF_GERMPLASM = 20;
     public static final String GERMPLSM_PREFIX = "GP-VARIETY-";
-    public static final String LOCATION_NAME = "LOCATION_NAME";
+    public static final String SITE_LONG = "SITE_LONG";
 
     private static final String PROP_BREEDING_METHOD = "Breeding Method";
     private static final String PROP_INSTITUTE = "Institute";
@@ -253,7 +253,7 @@ public class DataSetupTest extends IntegrationTestBase {
         conditions.add(this.createMeasurementVariable(TermId.LATITUDE.getId(), "SITE_LAT", "Latitude of site - observed (decimal + for N, - for S)",
                 "Latitude", DataSetupTest.OBSERVED, "Decimal + for N, - for S", DataSetupTest.NUMERIC,
                 "422", DataSetupTest.TRIAL, PhenotypicType.TRIAL_ENVIRONMENT, true));
-        conditions.add(this.createMeasurementVariable(TermId.LONGITUDE.getId(), "SITE_LONG", "Longitude of site - observed (decimal + for E , - for W)",
+        conditions.add(this.createMeasurementVariable(TermId.LONGITUDE.getId(), DataSetupTest.SITE_LONG, "Longitude of site - observed (decimal + for E , - for W)",
                 "Longitude", DataSetupTest.OBSERVED, "Decimal + for E, - for W", DataSetupTest.NUMERIC,
                 "242", DataSetupTest.TRIAL, PhenotypicType.TRIAL_ENVIRONMENT, true));
         conditions.add(this.createMeasurementVariable(TermId.GEODETIC_DATUM.getId(), "SITE_DATUM", "Geodetic datum for lat, long - observed (text)",

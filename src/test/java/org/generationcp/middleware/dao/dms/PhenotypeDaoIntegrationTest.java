@@ -34,7 +34,6 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -210,8 +209,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		values.setVariableList(factors);
 		values.setGermplasmId(1);
 		//Save the experiment
-		this.studyDataManager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.experimentDao.getById(values.getLocationId());
+		final ExperimentModel experiment = this.experimentModelSaver.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
 	}
@@ -223,10 +221,10 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
 		values.setGermplasmId(1);
+		values.setLocationId(1);
 
 		//Save the experiment
-		this.studyDataManager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.experimentDao.getById(values.getLocationId());
+		final ExperimentModel experiment = this.experimentModelSaver.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
 
@@ -370,7 +368,6 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			}
 			final boolean isFirstStudy = result.getStudyName().equals(this.study.getName() + "_1");
 			Assert.assertEquals(isFirstStudy? this.study.getName() + "_1": study2.getName() + "_1", result.getStudyName());
-			Assert.assertNull(result.getPlantNumber());
 			final String obsUnitId = result.getObservationUnitDbId();
 			Assert.assertNotNull(obsUnitId);
 			final ExperimentModel experimentModel = this.experiments.get(obsUnitId);
@@ -443,8 +440,12 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	}
 	private Integer createEnvironmentData(final DmsProject project, final Integer numberOfReps, final List<Integer> traitIds) {
 		this.phenotypes = new ArrayList<>();
-		final Geolocation geolocation = new Geolocation();
-		geolocation.setDescription("1");
+
+		final ExperimentModel model = new ExperimentModel();
+		model.setObservationUnitNo(1);
+		model.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+		model.setProject(project);
+		final ExperimentModel environmentExperiment = this.experimentDao.saveOrUpdate(model);
 
 		for (final Germplasm germplasm : this.germplasm) {
 			final StockModel stockModel = new StockModel();
@@ -461,6 +462,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 				experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 				experimentModel.setProject(project);
 				experimentModel.setStock(stockModel);
+				experimentModel.setParent(environmentExperiment);
 				this.experimentDao.saveOrUpdate(experimentModel);
 				this.experiments.put(experimentModel.getObsUnitId(), experimentModel);
 
@@ -474,7 +476,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			}
 
 		}
+		return environmentExperiment.getNdExperimentId();
 
-		return geolocation.getLocationId();
 	}
 }

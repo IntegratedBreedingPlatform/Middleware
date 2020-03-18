@@ -106,7 +106,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	public void testGetStandardVariableIdsWithTypeByPropertyNames() {
 
 		final List<String> propertyNames = new ArrayList<>();
-		propertyNames.add(DataSetupTest.LOCATION_NAME);
+		propertyNames.add(DataSetupTest.SITE_LONG);
 
 		final String programUUID = UUID.randomUUID().toString();
 		this.createNurseryTestData(programUUID);
@@ -114,8 +114,8 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		final Map<String, Map<Integer, VariableType>> results =
 			this.projectPropDao.getStandardVariableIdsWithTypeByAlias(propertyNames, programUUID);
 
-		Assert.assertTrue(results.get(DataSetupTest.LOCATION_NAME).containsValue(VariableType.ENVIRONMENT_DETAIL));
-		Assert.assertTrue(results.get(DataSetupTest.LOCATION_NAME).containsKey(TermId.TRIAL_LOCATION.getId()));
+		Assert.assertTrue(results.get(DataSetupTest.SITE_LONG).containsValue(VariableType.ENVIRONMENT_DETAIL));
+		Assert.assertTrue(results.get(DataSetupTest.SITE_LONG).containsKey(TermId.LONGITUDE.getId()));
 	}
 
 	@Test
@@ -148,7 +148,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStandardVariableIdsWithTypeByAliasWhenVariableIsObsolete() {
 
-		final List<String> aliases = Collections.singletonList(DataSetupTest.LOCATION_NAME);
+		final List<String> aliases = Collections.singletonList(DataSetupTest.SITE_LONG);
 
 		final String programUUID = UUID.randomUUID().toString();
 		this.createNurseryTestData(programUUID);
@@ -160,7 +160,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		Assert.assertFalse(results.isEmpty());
 
 		// Then mark the location name variable as obsolete to test if we can still retrieve it
-		final CVTerm locationName = this.cvTermDao.getByName(DataSetupTest.LOCATION_NAME);
+		final CVTerm locationName = this.cvTermDao.getByName(DataSetupTest.SITE_LONG);
 		locationName.setIsObsolete(true);
 		this.cvTermDao.merge(locationName);
 		this.sessionProvder.getSession().flush();
@@ -168,7 +168,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		final Map<String, Map<Integer, VariableType>> results2 = this.projectPropDao
 			.getStandardVariableIdsWithTypeByAlias(aliases, programUUID);
 
-		// The LOCATION_NAME variable is obsolete so the result should be empty
+		// The SITE_LONG variable is obsolete so the result should be empty
 		Assert.assertTrue(results2.isEmpty());
 	}
 
@@ -178,17 +178,17 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		final String programUUID = UUID.randomUUID().toString();
 		this.createNurseryTestData(programUUID);
 
-		final List<String> aliases = Arrays.asList(DataSetupTest.LOCATION_NAME, DataSetupTest.STUDY_INSTITUTE);
+		final List<String> aliases = Arrays.asList(DataSetupTest.SITE_LONG, DataSetupTest.STUDY_INSTITUTE);
 
 		final Map<String, Map<Integer, VariableType>> results = this.projectPropDao
 			.getStandardVariableIdsWithTypeByAlias(aliases, programUUID);
 		Assert.assertNotNull(results);
 		Assert.assertFalse(results.isEmpty());
 		Assert.assertFalse(results.containsKey(DataSetupTest.STUDY_INSTITUTE));
-		Assert.assertTrue(results.containsKey(DataSetupTest.LOCATION_NAME));
+		Assert.assertTrue(results.containsKey(DataSetupTest.SITE_LONG));
 		Assert.assertEquals(
 			VariableType.ENVIRONMENT_DETAIL,
-			results.get(DataSetupTest.LOCATION_NAME).entrySet().iterator().next().getValue());
+			results.get(DataSetupTest.SITE_LONG).entrySet().iterator().next().getValue());
 
 	}
 
