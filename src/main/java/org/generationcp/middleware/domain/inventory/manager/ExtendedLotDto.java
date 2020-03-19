@@ -22,6 +22,9 @@ public class ExtendedLotDto extends LotDto {
 	@JsonView({InventoryView.LotView.class})
 	private String locationName;
 
+	@JsonView({InventoryView.LotView.class})
+	private String locationAbbr;
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	@JsonView({InventoryView.LotView.class})
 	private Date createdDate;
@@ -47,6 +50,8 @@ public class ExtendedLotDto extends LotDto {
 	@JsonView({InventoryView.LotView.class})
 	private Date lastWithdrawalDate;
 
+	@JsonView({InventoryView.LotView.class})
+	private String pedigree;
 
 	public Date getCreatedDate() {
 		return createdDate;
@@ -128,6 +133,14 @@ public class ExtendedLotDto extends LotDto {
 		this.locationName = locationName;
 	}
 
+	public String getLocationAbbr() {
+		return locationAbbr;
+	}
+
+	public void setLocationAbbr(final String locationAbbr) {
+		this.locationAbbr = locationAbbr;
+	}
+
 	public String getUnitName() {
 		return unitName;
 	}
@@ -142,6 +155,14 @@ public class ExtendedLotDto extends LotDto {
 
 	public void setCreatedByUsername(final String createdByUsername) {
 		this.createdByUsername = createdByUsername;
+	}
+
+	public String getPedigree() {
+		return pedigree;
+	}
+
+	public void setPedigree(final String pedigree) {
+		this.pedigree = pedigree;
 	}
 
 	@Override
