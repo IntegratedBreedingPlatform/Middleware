@@ -148,6 +148,16 @@ public class IntegrationTestDataInitializer {
 		return experimentModels;
 	}
 
+	public ExperimentModel createInstanceExperimentModel(final DmsProject project, final Integer instanceNumber, final String locationId) {
+		ExperimentModel experimentModel = new ExperimentModel();
+		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+		experimentModel.setProject(project);
+		experimentModel.setObservationUnitNo(instanceNumber);
+		experimentModel = this.experimentDao.saveOrUpdate(experimentModel);
+		this.addExperimentProp(experimentModel, TermId.LOCATION_ID.getId(), locationId, 1);
+		return experimentModel;
+	}
+	
 	public ExperimentModel createTestExperiment(final DmsProject project, final Geolocation geolocation, final int experimentType,
 		final String value, final ExperimentModel parent) {
 

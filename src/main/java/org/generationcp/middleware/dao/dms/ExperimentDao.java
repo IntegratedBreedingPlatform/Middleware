@@ -172,27 +172,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Integer> getLocationIdsOfStudyWithFieldmap(final int studyId) {
-		try {
-			final String sql =
-				"SELECT DISTINCT e.parent_id " + " FROM nd_experiment e "
-					+ " INNER JOIN project p ON p.project_id = e.project_id "
-					+ " WHERE p.study_id = :studyId "
-					+ " AND EXISTS (SELECT 1 FROM nd_experimentprop eprop " + "   WHERE eprop.type_id = "
-					+ TermId.COLUMN_NO.getId() + "     AND eprop.nd_experiment_id = e.nd_experiment_id  AND eprop.value <> '') ";
-
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			query.setParameter("studyId", studyId);
-			return query.list();
-
-		} catch (final HibernateException e) {
-			final String message = "Error at getLocationIdsOfStudyWithFieldmap=" + studyId + " query at ExperimentDao: " + e.getMessage();
-			ExperimentDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	public void deleteExperimentsByIds(final List<Integer> experimentIdList) {
 		final String experimentIds = StringUtils.join(experimentIdList, ",");
 
