@@ -102,13 +102,13 @@ public class ExperimentDaoTest {
 	@Test
 	public void testGetEnvironmentsOfGermplasms() {
 		this.setupEnvironmentsOfGermplasmMocks();
-		final Set<Integer> gids = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5));
+		final Set<Integer> gids = new HashSet<>(Arrays.asList(1, 2, 3));
 		final Map<Integer, Set<Integer>> environmentsMap =
 				this.experimentDao.getStudyInstancesForGermplasm(gids, ExperimentDaoTest.PROGRAM_UUID);
 
-		final String expectedSql = "SELECT DISTINCT s.dbxref_id, e.nd_geolocation_id " + "FROM nd_experiment e "
-				+ "     INNER JOIN stock s ON e.stock_id = s.stock_id AND s.dbxref_id IN (:gids) "
-				+ "INNER JOIN project p ON p.project_id = e.project_id and p.program_uuid = :programUUID " + " ORDER BY s.dbxref_id ";
+		final String expectedSql = "SELECT DISTINCT s.dbxref_id, e.parent_id FROM nd_experiment e      "
+			+ "INNER JOIN stock s ON e.stock_id = s.stock_id AND s.dbxref_id IN (:gids) "
+			+ "INNER JOIN project p ON p.project_id = e.project_id and p.program_uuid = :programUUID  ORDER BY s.dbxref_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
@@ -124,11 +124,11 @@ public class ExperimentDaoTest {
 	@Test
 	public void testGetEnvironmentsOfGermplasmsWithNullProgramUUID() {
 		this.setupEnvironmentsOfGermplasmMocks();
-		final Set<Integer> gids = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5));
+		final Set<Integer> gids = new HashSet<>(Arrays.asList(1, 2, 3));
 		final Map<Integer, Set<Integer>> environmentsMap = this.experimentDao.getStudyInstancesForGermplasm(gids, null);
 
-		final String expectedSql = "SELECT DISTINCT s.dbxref_id, e.nd_geolocation_id " + "FROM nd_experiment e "
-				+ "     INNER JOIN stock s ON e.stock_id = s.stock_id AND s.dbxref_id IN (:gids) " + " ORDER BY s.dbxref_id ";
+		final String expectedSql = "SELECT DISTINCT s.dbxref_id, e.parent_id FROM nd_experiment e"
+			+ "      INNER JOIN stock s ON e.stock_id = s.stock_id AND s.dbxref_id IN (:gids)  ORDER BY s.dbxref_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
@@ -216,13 +216,21 @@ public class ExperimentDaoTest {
 		final int dataset = 1234;
 		this.experimentDao.deleteExperimentsForDataset(dataset);
 
-		Mockito.verify(this.mockSession).flush();
-		final String deletePhenotypeSql = "DELETE pheno FROM nd_experiment e"
-				+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
-				+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id" + "  WHERE e.project_id IN (:datasetIds) ";
-		final String deleteExperimentSql = "DELETE e, eprop " + "FROM nd_experiment e "
-				+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
-				+ "  LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id " + "  WHERE e.project_id IN (:datasetIds) ";
+		final String deletePhenotypeSql = "DELETE pheno  FROM phenotype pheno"
+			+ "  INNER JOIN nd_experiment e ON pheno.nd_experiment_id = e.nd_experiment_id"
+			+ "  LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id"
+			+ "   INNER JOIN project pr ON pr.project_id = e.project_id"
+			+ "   INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3"
+			+ "  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020"
+			+ " AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id or e.nd_experiment_id = env.nd_experiment_id)"
+			+ "  WHERE e.project_id IN (:datasetIds) ";
+		final String deleteExperimentSql = "DELETE eprop, e  FROM nd_experiment e"
+			+ "   LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id"
+			+ "   INNER JOIN project pr ON pr.project_id = e.project_id"
+			+ "   INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3"
+			+ "  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020"
+			+ " AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id or e.nd_experiment_id = env.nd_experiment_id)"
+			+ "  LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id   WHERE e.project_id IN (:datasetIds) ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession, Mockito.times(2)).createSQLQuery(sqlCaptor.capture());
 		final List<String> queries = sqlCaptor.getAllValues();
@@ -237,63 +245,68 @@ public class ExperimentDaoTest {
 		final int studyId = 1234;
 		this.experimentDao.deleteExperimentsForDataset(studyId);
 
-		Mockito.verify(this.mockSession).flush();
-		final String deletePhenotypeSql = "DELETE pheno FROM nd_experiment e"
-				+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id" + "  WHERE e.project_id = :datasetId ";
-		final String deleteExperimentSql = "DELETE g, gp, e, eprop " + "FROM nd_geolocation g "
-				+ "LEFT JOIN nd_geolocationprop gp on g.nd_geolocation_id = gp.nd_geolocation_id "
-				+ "LEFT join nd_experiment e on g.nd_geolocation_id = e.nd_geolocation_id "
-				+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id " + "WHERE e.project_id = :datasetId ";
+		final String deletePhenotypeSql = "DELETE pheno  FROM phenotype pheno"
+			+ "  INNER JOIN nd_experiment e ON pheno.nd_experiment_id = e.nd_experiment_id"
+			+ "  LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id   INNER JOIN project pr ON pr.project_id = e.project_id"
+			+ "   INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3"
+			+ "  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020"
+			+ " AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id or e.nd_experiment_id = env.nd_experiment_id)"
+			+ "  WHERE e.project_id IN (:datasetIds) ";
+		final String deleteExperimentSql = "DELETE eprop, e  FROM nd_experiment e"
+			+ "   LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id"
+			+ "   INNER JOIN project pr ON pr.project_id = e.project_id"
+			+ "   INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3"
+			+ "  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020"
+			+ " AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id or e.nd_experiment_id = env.nd_experiment_id)"
+			+ "  LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id   WHERE e.project_id IN (:datasetIds) ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession, Mockito.times(2)).createSQLQuery(sqlCaptor.capture());
 		final List<String> queries = sqlCaptor.getAllValues();
 		Assert.assertEquals(deletePhenotypeSql, queries.get(0));
 		Assert.assertEquals(deleteExperimentSql, queries.get(1));
-		Mockito.verify(this.mockQuery, Mockito.times(2)).setParameter("datasetId", studyId);
+		Mockito.verify(this.mockQuery, Mockito.times(2)).setParameterList("datasetIds", Collections.singletonList(studyId));
 		Mockito.verify(this.mockQuery, Mockito.times(2)).executeUpdate();
 	}
 
 	@Test
 	public void testGetExperiments_FirstInstance() {
-		final Query query = Mockito.mock(Query.class);
-		Mockito.when(this.mockSession.createQuery(ArgumentMatchers.anyString())).thenReturn(query);
+		final SQLQuery query = Mockito.mock(SQLQuery.class);
+		Mockito.when(this.mockSession.createSQLQuery(ArgumentMatchers.anyString())).thenReturn(query);
 		final int projectId = 1011;
 		final int start = 1000;
 		final int numOfRows = 5000;
 		this.experimentDao.getExperiments(projectId, Arrays.asList(TermId.PLOT_EXPERIMENT, TermId.SAMPLE_EXPERIMENT), start, numOfRows,
 				true);
 
-		final String sql = "select distinct exp from ExperimentModel as exp "
-				+ "left outer join exp.properties as plot with plot.typeId IN (8200,8380) "
-				+ "left outer join exp.properties as rep with rep.typeId = 8210 " + "left outer join exp.stock as st "
-				+ "where exp.project.projectId =:p_id and exp.typeId in (:type_ids) " + "and exp.geoLocation.description = 1 "
-				+ "order by (exp.geoLocation.description * 1) ASC, " + "(plot.value * 1) ASC, " + "(rep.value * 1) ASC, "
-				+ "(st.uniqueName * 1) ASC, " + "exp.ndExperimentId ASC";
-		Mockito.verify(this.mockSession).createQuery(ArgumentMatchers.eq(sql));
+		final String sql = "select distinct exp.* from nd_experiment exp inner join project pr on exp.project_id = pr.project_id inner join project env_ds on env_ds.study_id = pr.study_id and env_ds.dataset_type_id = 3 inner join nd_experiment env ON env_ds.project_id = env.project_id and env.type_id = 1020 where exp.project_id =:p_id and exp.type_id in (:type_ids) and env.observation_unit_no = 1 order by (env.observation_unit_no * 1) ASC, exp.nd_experiment_id ASC";
+		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
+		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
+		Assert.assertEquals(sql, sqlCaptor.getValue());
 		Mockito.verify(query).setParameter("p_id", projectId);
 		Mockito.verify(query).setParameterList("type_ids",
 				Arrays.asList(TermId.PLOT_EXPERIMENT.getId(), TermId.SAMPLE_EXPERIMENT.getId()));
 		Mockito.verify(query).setMaxResults(numOfRows);
 		Mockito.verify(query).setFirstResult(start);
 	}
-	
+
 	@Test
 	public void testGetExperiments_NotFirstInstance() {
-		final Query query = Mockito.mock(Query.class);
-		Mockito.when(this.mockSession.createQuery(ArgumentMatchers.anyString())).thenReturn(query);
+		final SQLQuery query = Mockito.mock(SQLQuery.class);
+		Mockito.when(this.mockSession.createSQLQuery(ArgumentMatchers.anyString())).thenReturn(query);
 		final int projectId = 1011;
 		final int start = 1000;
 		final int numOfRows = 5000;
 		this.experimentDao.getExperiments(projectId, Arrays.asList(TermId.PLOT_EXPERIMENT, TermId.SAMPLE_EXPERIMENT), start, numOfRows,
 				false);
 
-		final String sql = "select distinct exp from ExperimentModel as exp "
-				+ "left outer join exp.properties as plot with plot.typeId IN (8200,8380) "
-				+ "left outer join exp.properties as rep with rep.typeId = 8210 " + "left outer join exp.stock as st "
-				+ "where exp.project.projectId =:p_id and exp.typeId in (:type_ids) "
-				+ "order by (exp.geoLocation.description * 1) ASC, " + "(plot.value * 1) ASC, " + "(rep.value * 1) ASC, "
-				+ "(st.uniqueName * 1) ASC, " + "exp.ndExperimentId ASC";
-		Mockito.verify(this.mockSession).createQuery(ArgumentMatchers.eq(sql));
+		final String sql = "select distinct exp.* from nd_experiment exp"
+			+ " inner join project pr on exp.project_id = pr.project_id"
+			+ " inner join project env_ds on env_ds.study_id = pr.study_id"
+			+ " and env_ds.dataset_type_id = 3 inner join nd_experiment env ON env_ds.project_id = env.project_id and env.type_id = 1020"
+			+ " where exp.project_id =:p_id and exp.type_id in (:type_ids) order by (env.observation_unit_no * 1) ASC, exp.nd_experiment_id ASC";
+		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
+		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
+		Assert.assertEquals(sql, sqlCaptor.getValue());
 		Mockito.verify(query).setParameter("p_id", projectId);
 		Mockito.verify(query).setParameterList("type_ids",
 				Arrays.asList(TermId.PLOT_EXPERIMENT.getId(), TermId.SAMPLE_EXPERIMENT.getId()));
@@ -314,7 +327,11 @@ public class ExperimentDaoTest {
 		Assert.assertTrue(this.experimentDao.areAllInstancesExistInDataset(datasetId, instanceIds));
 
 		Mockito.verify(this.mockSession).createSQLQuery(
-			"SELECT COUNT(DISTINCT e.nd_geolocation_id) FROM nd_experiment e  WHERE e.project_id = :datasetId and e.nd_geolocation_id in (:instanceIds)");
+			"SELECT COUNT(DISTINCT env.nd_experiment_id) FROM nd_experiment e"
+				+ "   INNER JOIN project pr ON pr.project_id = e.project_id"
+				+ "   INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = 3"
+				+ "   INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020"
+				+ "  WHERE e.project_id = :datasetId and env.nd_experiment_id in (:instanceIds)");
 		Mockito.verify(query).setParameter("datasetId", datasetId);
 		Mockito.verify(query).setParameterList("instanceIds", instanceIds);
 	}

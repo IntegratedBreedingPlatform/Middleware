@@ -3,18 +3,28 @@ package org.generationcp.middleware.operation.builder;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,12 +40,18 @@ import java.util.Random;
 import java.util.Set;
 
 public class ExperimentBuilderTest extends IntegrationTestBase {
+	private static final String CROP_PREFIX =  org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(5);
+	private ExperimentDao experimentDao;
+	private ExperimentModelSaver experimentModelSaver;
 
 	private static ExperimentBuilder builder;
 
 	@Before
 	public void setUp() throws Exception {
 		builder = new ExperimentBuilder(this.sessionProvder);
+		experimentDao = new ExperimentDao();
+		this.experimentDao.setSession(this.sessionProvder.getSession());
+		this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
 	}
 
 	@Test
@@ -56,55 +72,82 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testCreateLocationFactorThereIsMatching() {
-		final ExperimentModel geoLocation = new ExperimentModel();
-		final Integer instance = 3;
-		geoLocation.setObservationUnitNo(instance);
+		final VariableList factors = new VariableList();
+		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
+		final ExperimentValues values = new ExperimentValues();
+		values.setVariableList(factors);
+		values.setGermplasmId(1);
+		values.setObservationUnitNo(3);
+
+		//Save the experiment
+		final CropType crop = new CropType();
+		crop.setUseUUID(false);
+		crop.setPlotCodePrefix(CROP_PREFIX);
+		final ExperimentModel environmentExperiment = this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+
+		final ExperimentModel experiment = this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final DMSVariableType variableType = new DMSVariableType();
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		variableType.setStandardVariable(standardVariable);
-		final Optional<Variable> variableOptional = builder.createLocationFactor(geoLocation, variableType, null);
-		Assert.assertEquals("The variable instance should be set properly since there is a mathcing variable", variableOptional.get().getValue(),
-				instance.toString());
+		final Optional<Variable> variableOptional = builder.createLocationFactor(experiment, variableType, environmentExperiment);
+		Assert.assertEquals("The variable instance should be set properly since there is a mathcing variable",
+			environmentExperiment.getObservationUnitNo().toString(), variableOptional.get().getValue());
 	}
 
 	@Test
 	public void testCreateLocationFactorThereIsLocationValue() {
-		final int typeId = 1000;
-		final ExperimentModel geoLocation = new ExperimentModel();
-		final List<ExperimentProperty> properties = new ArrayList<>();
-		final ExperimentProperty e = new ExperimentProperty();
-		e.setTypeId(typeId);
-		e.setValue("XXX");
-		properties.add(e);
-		geoLocation.setProperties(properties);
-		final Integer instance = 2;
-		geoLocation.setObservationUnitNo(instance);
+		final VariableList factors = new VariableList();
+		final Variable envVariable = DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.ENVIRONMENT_DETAIL);
 		final DMSVariableType variableType = new DMSVariableType();
+		variableType.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+
 		final StandardVariable standardVariable = new StandardVariable();
-		standardVariable.setId(typeId);
+		standardVariable.setId(1001);
+		standardVariable.setDataType(new Term(DataType.NUMERIC_VARIABLE.getId(), DataType.NUMERIC_VARIABLE.getName(), DataType.NUMERIC_VARIABLE.getName()));
 		variableType.setStandardVariable(standardVariable);
-		final Optional<Variable> variableOptional = builder.createLocationFactor(geoLocation, variableType, null);
-		Assert.assertEquals("The variable description should be set properly since there is a mathcing variable", variableOptional.get().getValue(),
-				instance.toString());
+		envVariable.setVariableType(variableType);
+		factors.add(envVariable);
+
+		final ExperimentValues values = new ExperimentValues();
+		values.setVariableList(factors);
+		values.setGermplasmId(1);
+		values.setObservationUnitNo(3);
+
+		//Save the experiment
+		final CropType crop = new CropType();
+		crop.setUseUUID(false);
+		crop.setPlotCodePrefix(CROP_PREFIX);
+		final ExperimentModel environmentExperiment = this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+
+		final ExperimentModel experiment = this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+
+		final Optional<Variable> variableOptional = builder.createLocationFactor(experiment, variableType, environmentExperiment);
+		Assert.assertEquals("The variable description should be set properly since there is a mathcing variable",
+			envVariable.getValue(), variableOptional.get().getValue());
 	}
 
 	@Test
 	public void testCreateLocationFactorThereIsNoMatchingLocationValue() {
-		final int typeId = 1000;
-		final ExperimentModel geoLocation = new ExperimentModel();
-		final List<ExperimentProperty> properties = new ArrayList<>();
-		final ExperimentProperty e = new ExperimentProperty();
-		e.setTypeId(typeId);
-		properties.add(e);
-		geoLocation.setProperties(properties);
-		final Integer instance = 4;
-		geoLocation.setObservationUnitNo(instance);
+		final VariableList factors = new VariableList();
+		factors.add(DMSVariableTestDataInitializer.createVariable(1000, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
+		final ExperimentValues values = new ExperimentValues();
+		values.setVariableList(factors);
+		values.setGermplasmId(1);
+		values.setObservationUnitNo(3);
+
+		//Save the experiment
+		final CropType crop = new CropType();
+		crop.setUseUUID(false);
+		crop.setPlotCodePrefix(CROP_PREFIX);
+		final ExperimentModel environmentExperiment = this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+
+		final ExperimentModel experiment = this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final DMSVariableType variableType = new DMSVariableType();
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(1001);
 		variableType.setStandardVariable(standardVariable);
-		final Optional<Variable> variableOptional = builder.createLocationFactor(geoLocation, variableType, null);
+		final Optional<Variable> variableOptional = builder.createLocationFactor(experiment, variableType, environmentExperiment);
 		Assert.assertFalse("The variable must not be present", variableOptional.isPresent());
 	}
 

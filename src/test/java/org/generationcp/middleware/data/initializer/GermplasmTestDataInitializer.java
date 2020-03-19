@@ -15,13 +15,13 @@ public class GermplasmTestDataInitializer {
 
 	public static Germplasm createGermplasmWithPreferredName() {
 		final Name name = new Name(null, null, 1, 1, 1, GermplasmTestDataInitializer.PREFERRED_NAME, 0, 0, 0);
-		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+		final Germplasm germplasm = new Germplasm(null, 1, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
 		return germplasm;
 	}
 
 	public static Germplasm createGermplasmWithPreferredName(final String preferredName) {
 		final Name name = new Name(null, null, 1, 1, 1, preferredName, 0, 0, 0);
-		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+		final Germplasm germplasm = new Germplasm(null, 1, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
 		return germplasm;
 	}
 

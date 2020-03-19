@@ -1,0 +1,42 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="gelli" id="v14.3.0-1">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(*) > 0 FROM germplsm WHERE methn = 0 OR NOT EXISTS ( SELECT 1 FROM methods WHERE mid = methn);
+                </sqlCheck>
+                <sqlCheck expectedResult="2">
+                    SELECT COUNT(*) FROM methods WHERE mid IN (1,31);
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <comment>Update records with germplasm.methn = 0 or germplasm.methn not existing to methods </comment>
+        <sql dbms="mysql" >
+            UPDATE germplsm SET methn =
+                CASE WHEN gnpgs &lt;= 0 THEN 31
+                     ELSE 1
+                END
+            WHERE methn = 0 OR NOT EXISTS (SELECT 1 FROM methods WHERE mid = methn);
+        </sql>
+    </changeSet>
+    <changeSet id="v14.3.0-2" author="gelli">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_germplasm_methods_methn"></foreignKeyConstraintExists>
+                </not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) > 0 FROM germplsm WHERE methn = 0 OR NOT EXISTS ( SELECT 1 FROM methods WHERE mid = methn);
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <comment>Add FK to germplasm.methn linking to methods.mid</comment>
+        <addForeignKeyConstraint baseTableName="germplsm" baseColumnNames="methn" constraintName="fk_germplasm_methods_methn" referencedTableName="methods"
+                                  referencedColumnNames="mid"/>
+    </changeSet>
+</databaseChangeLog>

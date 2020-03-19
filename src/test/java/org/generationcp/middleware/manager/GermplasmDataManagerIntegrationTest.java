@@ -1295,7 +1295,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		germplasm.setGid(1166066);
 		germplasm.setMethodId(31);
 		germplasm.setGnpgs(-1);
-		germplasm.setGrplce(-1);
+		germplasm.setGrplce(0);
 		germplasm.setGpid1(0);
 		germplasm.setGpid2(0);
 		germplasm.setUserId(1);

@@ -30,7 +30,6 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -47,7 +46,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class StockDaoTest extends IntegrationTestBase {
-
 	private static final int TEST_COUNT = 3;
 	private DmsProjectDao dmsProjectDao;
 	private GermplasmDAO germplasmDao;
@@ -61,7 +59,7 @@ public class StockDaoTest extends IntegrationTestBase {
 	private DmsProject project;
 	private List<StockModel> testStocks;
 	private List<ExperimentModel> experiments;
-	private Geolocation environment;
+	private ExperimentModel environmentExperiment;
 	private WorkbenchUser workbenchUser;
 	private IntegrationTestDataInitializer testDataInitializer;
 
@@ -186,7 +184,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		}
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
-		final long count = this.stockDao.countStocks(this.project.getProjectId(), this.environment.getLocationId(), variateTerm.getCvTermId());
+		final long count = this.stockDao.countStocks(this.project.getProjectId(), this.environmentExperiment.getNdExperimentId(), variateTerm.getCvTermId());
 		Assert.assertEquals(TEST_COUNT, count);
 	}
 
@@ -265,8 +263,7 @@ public class StockDaoTest extends IntegrationTestBase {
 	}
 
 	private void createSampleStocks(final Integer count, final DmsProject study) {
-		// Save the experiments in the same instance
-		this.environment = new Geolocation();
+		this.createTestEnvExperiment(study, null);
 
 		for (int i = 0; i < count; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
@@ -298,7 +295,17 @@ public class StockDaoTest extends IntegrationTestBase {
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(study);
 		experimentModel.setStock(stockModel);
+		experimentModel.setParent(this.environmentExperiment);
 		this.experimentDao.saveOrUpdate(experimentModel);
 		this.experiments.add(experimentModel);
+	}
+
+	private void createTestEnvExperiment(final DmsProject study, final StockModel stockModel) {
+		final ExperimentModel experimentModel = new ExperimentModel();
+		experimentModel.setObservationUnitNo(1);
+		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+		experimentModel.setProject(study);
+		experimentModel.setStock(stockModel);
+		this.environmentExperiment = this.experimentDao.saveOrUpdate(experimentModel);
 	}
 }
