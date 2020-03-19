@@ -82,10 +82,10 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			final ExperimentModel experimentModel =
 				this.experimentModelGenerator.generate(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT);
 			experimentModel.setObservationUnitNo(instanceNumber);
+			final ExperimentProperty locationExperimentProperty = new ExperimentProperty(experimentModel, String.valueOf(location.get().getLocid()), 1, TermId.LOCATION_ID.getId());
 			final boolean locationPresent = location.isPresent();
 			if (locationPresent) {
-				experimentModel.setProperties(Collections.singletonList(
-					new ExperimentProperty(experimentModel, String.valueOf(location.get().getLocid()), 1, TermId.LOCATION_ID.getId())));
+				experimentModel.setProperties(Collections.singletonList(locationExperimentProperty));
 			}
 			this.daoFactory.getExperimentDao().save(experimentModel);
 
@@ -95,6 +95,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 				studyInstance.setLocationId(location.get().getLocid());
 				studyInstance.setLocationName(location.get().getLname());
 				studyInstance.setLocationAbbreviation(location.get().getLabbr());
+				studyInstance.setLocationInstanceDataId(locationExperimentProperty.getNdExperimentpropId());
 			}
 
 			instanceNumbers.add(instanceNumber);
