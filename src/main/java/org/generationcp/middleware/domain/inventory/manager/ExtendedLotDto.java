@@ -1,6 +1,7 @@
 package org.generationcp.middleware.domain.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -8,6 +9,7 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.Date;
 
 @AutoProperty
+@JsonIgnoreProperties({"locationAbbr", "pedigree"})
 public class ExtendedLotDto extends LotDto {
 
 	private String designation;
@@ -22,7 +24,6 @@ public class ExtendedLotDto extends LotDto {
 	@JsonView({InventoryView.LotView.class})
 	private String locationName;
 
-	@JsonView({InventoryView.LotView.class})
 	private String locationAbbr;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
@@ -50,7 +51,6 @@ public class ExtendedLotDto extends LotDto {
 	@JsonView({InventoryView.LotView.class})
 	private Date lastWithdrawalDate;
 
-	@JsonView({InventoryView.LotView.class})
 	private String pedigree;
 
 	public Date getCreatedDate() {
