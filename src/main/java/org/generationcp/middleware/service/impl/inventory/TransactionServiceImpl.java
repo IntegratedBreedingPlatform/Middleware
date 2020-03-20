@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -179,8 +180,8 @@ public class TransactionServiceImpl implements TransactionService {
 
 				if (TransactionType.WITHDRAWAL.getId().equals(transaction.getType())) {
 					if (lotDto.getAvailableBalance() - transaction.getQuantity() - updateRequestDto.getAmount() < 0) {
-						throw new MiddlewareException("Update results in negative balance for transaction " + transaction.getId()
-							+ ", please review transactions and available balances. Please review");
+						throw new MiddlewareRequestException("", "transaction.update.negative.balance",
+							String.valueOf(transaction.getId()));
 					} else {
 						transaction.setQuantity(-1 * updateRequestDto.getAmount());
 					}
@@ -189,9 +190,8 @@ public class TransactionServiceImpl implements TransactionService {
 			} else if (updateRequestDto.getAvailableBalance() != null) {
 				if (TransactionType.DEPOSIT.getId().equals(transaction.getType())) {
 					if (updateRequestDto.getAvailableBalance() <= lotDto.getAvailableBalance()) {
-						throw new MiddlewareException("New available balance for the transaction:" + transaction.getId()
-							+ " can not be lower or equal than the actual available balance for the lot: " + lotDto.getLotId()
-							+ ". Please review");
+						throw new MiddlewareRequestException("", "transaction.update.new.balance.lower.than.actual",
+							String.valueOf(transaction.getId()), String.valueOf(lotDto.getLotId()));
 					} else {
 						transaction.setQuantity(updateRequestDto.getAvailableBalance() - lotDto.getAvailableBalance());
 					}
@@ -199,8 +199,8 @@ public class TransactionServiceImpl implements TransactionService {
 
 				if (TransactionType.WITHDRAWAL.getId().equals(transaction.getType())) {
 					if (updateRequestDto.getAvailableBalance() >= lotDto.getAvailableBalance() - transaction.getQuantity()) {
-						throw new MiddlewareException("New balance would not produce a withdrawal for transaction " + transaction.getId()
-							+ ". Please adjust the balance accordingly");
+						throw new MiddlewareRequestException("", "transaction.update.new.balance.not.a.withdrawal",
+							String.valueOf(transaction.getId()));
 					} else {
 						transaction
 							.setQuantity(updateRequestDto.getAvailableBalance() - lotDto.getAvailableBalance() + transaction.getQuantity());

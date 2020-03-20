@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -60,20 +60,20 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		this.createTransactions();
 	}
 
-	@Test(expected = MiddlewareException.class)
+	@Test(expected = MiddlewareRequestException.class)
 	public void testUpdatePendingTransactions_WithdrawalInvalidAvailableBalance() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
 			new TransactionUpdateRequestDto(pendingWithdrawalId, null, 30D, null);
 		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
 	}
 
-	@Test(expected = MiddlewareException.class)
+	@Test(expected = MiddlewareRequestException.class)
 	public void testUpdatePendingTransactions_DepositInvalidAvailableBalance() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto = new TransactionUpdateRequestDto(pendingDepositId, null, 2D, null);
 		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
 	}
 
-	@Test(expected = MiddlewareException.class)
+	@Test(expected = MiddlewareRequestException.class)
 	public void testUpdatePendingTransactions_WithdrawalInvalidAmount() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
 			new TransactionUpdateRequestDto(pendingWithdrawalId, 22D, null, null);
