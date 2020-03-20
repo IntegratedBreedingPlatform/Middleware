@@ -276,7 +276,6 @@ public class ExperimentBuilder {
 	Variable createLocationFactor(final ExperimentModel experiment, final DMSVariableType variableType, final ExperimentModel environment) {
 		final StandardVariable standardVariable = variableType.getStandardVariable();
 
-		LOG.info("** Expt: " + experiment.getNdExperimentId() + " with envt " + environment != null? (environment.getNdExperimentId() + " :: " +environment.getObservationUnitNo()) : "NULL");
 		if (standardVariable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() && environment != null) {
 			return new Variable(variableType, environment.getObservationUnitNo());
 		}
