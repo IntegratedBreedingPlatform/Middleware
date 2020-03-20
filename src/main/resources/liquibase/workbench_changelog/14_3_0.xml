@@ -49,25 +49,5 @@
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
         </sql>
     </changeSet>
-    <changeSet author="cuenyad" id="v14.3.0-3">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT count(*) FROM permission
-				where permission_id = (select permission_id from permission where name = 'EXPORT_TRANSACTIONS')
-            </sqlCheck>
-        </preConditions>
-        <comment>EXPORT_TRANSACTIONS in MANAGE_TRANSACTIONS granular permissions</comment>
-        <sql dbms="mysql" splitStatements="true">
-			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'inventory_manager');
-			set @manage_transactions_id = (SELECT permission_id FROM workbench.permission WHERE NAME = 'MANAGE_TRANSACTIONS');
 
-			# Manage Transactions Permissions
-
-			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
-			values ('EXPORT_TRANSACTIONS', 'Export Transactions', @manage_transactions_id, @sidebar_category_link_id);
-			set @last_permission_id  = (select last_insert_id());
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
-        </sql>
-    </changeSet>
 </databaseChangeLog>
