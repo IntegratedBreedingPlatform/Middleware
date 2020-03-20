@@ -63,16 +63,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyServiceImpl.class);
 
-	static final String SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED =
-		"SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value) \n" + " FROM \n" + " project p \n"
-			+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
-			+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-			+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
-			+ "        LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
-			+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
-			+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
-			+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
-
 	private MeasurementVariableService measurementVariableService;
 
 	private StudyMeasurements studyMeasurements;
