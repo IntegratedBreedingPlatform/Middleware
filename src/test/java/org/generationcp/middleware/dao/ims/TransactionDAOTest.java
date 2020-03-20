@@ -22,6 +22,8 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
+import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -68,7 +70,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 	private Integer germplasmListId;
 	private final Map<Integer, Transaction> listDataIdTransactionMap = new HashMap<Integer, Transaction>();
-
+	private UserService userService;
 
 	@Before
 	public void setUp() throws Exception {
@@ -85,6 +87,17 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		this.initializeGermplasms(1);
 		this.initializeGermplasmsListAndListData(this.germplasmMap);
 		this.initLotsAndTransactions(this.germplasmListId);
+
+		this.userService = new UserServiceImpl(workbenchSessionProvider);
+
+	}
+
+	public UserService getUserService() {
+		return userService;
+	}
+
+	public void setUserService(final UserService userService) {
+		this.userService = userService;
 	}
 
 	@Test
@@ -216,10 +229,10 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	public void testGetTransactionDetailsForLot() throws ParseException {
 
 		final Germplasm germplasm =
-				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
 
-		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
+		final WorkbenchUser user = this.getUserService().getUserById(1);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments",
 			"InventoryId");
@@ -277,10 +290,11 @@ public class TransactionDAOTest extends IntegrationTestBase {
 				1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
 
-		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
+		final WorkbenchUser user = this.getUserService().getUserById(1);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1,
-			8264, 0, 1, "Comments","ABC-1");
+			8264, 0, 1, "Comments", "ABC-1");
+
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
 
 		final String sDate1 = "01/01/2015";
@@ -335,6 +349,8 @@ public class TransactionDAOTest extends IntegrationTestBase {
 			Assert.assertTrue(transactionDto.getTransactionId().equals(depositTransaction.getId()));
 			Assert.assertTrue(transactionDto.getTransactionType().equalsIgnoreCase("Deposit"));
 			Assert.assertTrue(transactionDto.getCreatedByUsername().equalsIgnoreCase(user.getName()));
+			Assert.assertTrue(transactionDto.getLot().getLocationName().equalsIgnoreCase("Afghanistan"));
+			Assert.assertTrue(transactionDto.getLot().getLocationAbbr().equalsIgnoreCase("AFG"));
 		}
 	}
 }
