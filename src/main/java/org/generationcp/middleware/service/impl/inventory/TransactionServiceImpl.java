@@ -6,7 +6,6 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -105,11 +104,11 @@ public class TransactionServiceImpl implements TransactionService {
 			final Double amountToWithdraw = (withdrawAll) ? lotDto.getAvailableBalance() : amount;
 
 			if (lotDto.getAvailableBalance().equals(0D)) {
-				throw new MiddlewareException("One of the selected lots does not have enough available inventory to perform a withdrawal. Please review.");
+				throw new MiddlewareRequestException("", "lot.withdrawal.zero.balance");
 			}
 
 			if (lotDto.getAvailableBalance() < amountToWithdraw) {
-				throw new MiddlewareException("One of the selected lots does not have enough available inventory to perform the withdrawal. Please review the amount");
+				throw new MiddlewareRequestException("", "lot.withdrawal.not.enough.inventory");
 			}
 
 			final Transaction transaction = new Transaction();
