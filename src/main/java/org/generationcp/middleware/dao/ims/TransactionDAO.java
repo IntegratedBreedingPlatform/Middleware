@@ -602,13 +602,17 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "   (CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '" + TransactionStatus.CANCELLED.getValue()
-		+ "' END) as transactionStatus, " 
+		+ "' END) as transactionStatus, "
 		+ " i.locid as lotLocationId, "
+		+ " loc.lname as lotLocationName, "//
+		+ " loc.labbr as lotLocationAbbr, "//
 		+ " i.comments as lotComments "
 		+ " FROM"//
 		+ "   ims_transaction act "//
 		+ "        INNER JOIN"//
 		+ "    ims_lot i ON act.lotid = i.lotid "//
+		+ "		   LEFT JOIN" //
+		+ "	   location loc on loc.locid = i.locid "//
 		+ "        LEFT JOIN"//
 		+ "    cvterm scale ON scale.cvterm_id = i.scaleid"//
 		+ "        LEFT JOIN"//
@@ -781,7 +785,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		try {
 			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class, Double.class, String.class, Date.class,
 				Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class, String.class,
-				Integer.class, String.class);
+				Integer.class, String.class, String.class, String.class);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
 		}
@@ -803,6 +807,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("lotStatus");
 		query.addScalar("transactionStatus");
 		query.addScalar("lotLocationId");
+		query.addScalar("lotLocationName");
+		query.addScalar("lotLocationAbbr");
 		query.addScalar("lotComments");
 	}
 
