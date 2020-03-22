@@ -17,7 +17,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Before;
@@ -38,6 +37,7 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 
 	private DmsProject study;
 	private DmsProject plot;
+	private DmsProject summary;
 
 	@Before
 	public void setUp() {
@@ -52,6 +52,8 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
 		this.plot = this.testDataInitializer
 			.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
+		this.summary = this.testDataInitializer
+			.createDmsProject("Summary Dataset", "Summary Dataset-Description", this.study, this.study, DatasetTypeEnum.SUMMARY_DATA);
 	}
 
 	@Test
@@ -74,12 +76,12 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetFieldMapLabels() {
 
-		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		this.testDataInitializer.addGeolocationProp(geolocation, TermId.SEASON_VAR.getId(), "10101", 1);
-		this.testDataInitializer.addGeolocationProp(geolocation, TermId.TRIAL_LOCATION.getId(), "India", 2);
+		final ExperimentModel instanceModel1 = this.testDataInitializer.createInstanceExperimentModel(this.summary, 1, "1");
+		this.testDataInitializer.addExperimentProp(instanceModel1, TermId.SEASON_VAR.getId(), "10101", 1);
+		this.testDataInitializer.addExperimentProp(instanceModel1, TermId.TRIAL_LOCATION.getId(), "India", 2);
 
 		final ExperimentModel experimentModel =
-			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), "1", null);
+			this.testDataInitializer.createTestExperiment(this.plot, null, TermId.PLOT_EXPERIMENT.getId(), "1", instanceModel1);
 		this.testDataInitializer.createTestStock(experimentModel);
 		this.testDataInitializer.addExperimentProp(experimentModel, TermId.REP_NO.getId(), RandomStringUtils.randomNumeric(5), 2);
 		this.testDataInitializer.addExperimentProp(experimentModel, TermId.BLOCK_NO.getId(), RandomStringUtils.randomNumeric(5), 3);
@@ -114,26 +116,26 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetAllFieldMapsInBlockByTrialInstanceId() {
 
-		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		this.testDataInitializer.addGeolocationProp(geolocation, TermId.SEASON_VAR.getId(), "10101", 1);
-		this.testDataInitializer.addGeolocationProp(geolocation, TermId.TRIAL_LOCATION.getId(), "India", 2);
-		this.testDataInitializer.addGeolocationProp(geolocation, TermId.BLOCK_ID.getId(), "1234", 3);
+		final ExperimentModel instanceModel1 = this.testDataInitializer.createInstanceExperimentModel(this.summary, 1, "1");
+		this.testDataInitializer.addExperimentProp(instanceModel1, TermId.SEASON_VAR.getId(), "10101", 1);
+		this.testDataInitializer.addExperimentProp(instanceModel1, TermId.TRIAL_LOCATION.getId(), "India", 2);
+		this.testDataInitializer.addExperimentProp(instanceModel1, TermId.BLOCK_ID.getId(), "1234", 3);
 
 		final ExperimentModel experimentModel =
-			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), "1", null);
+			this.testDataInitializer.createTestExperiment(this.plot, null, TermId.PLOT_EXPERIMENT.getId(), "1", instanceModel1);
 		this.testDataInitializer.createTestStock(experimentModel);
 
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
 
 		final List<FieldMapInfo> fieldMapInfos1 = this.experimentPropertyDao
-			.getAllFieldMapsInBlockByTrialInstanceId(this.study.getProjectId(), geolocation.getLocationId(), 1234);
+			.getAllFieldMapsInBlockByTrialInstanceId(this.study.getProjectId(), instanceModel1.getNdExperimentId(), 1234);
 
 		assertEquals(1, fieldMapInfos1.size());
 		assertEquals(1, fieldMapInfos1.get(0).getDatasets().size());
 
 		final List<FieldMapInfo> fieldMapInfos2 = this.experimentPropertyDao
-			.getAllFieldMapsInBlockByTrialInstanceId(this.study.getProjectId(), geolocation.getLocationId(), 9999);
+			.getAllFieldMapsInBlockByTrialInstanceId(this.study.getProjectId(), instanceModel1.getNdExperimentId(), 9999);
 		assertEquals(0, fieldMapInfos2.size());
 
 	}
