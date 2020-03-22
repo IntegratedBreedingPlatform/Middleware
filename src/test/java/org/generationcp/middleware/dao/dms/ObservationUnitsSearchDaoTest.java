@@ -179,11 +179,8 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final int noOfSubObservationExperiment = 3;
 
 		final CVTerm trait1 = this.testDataInitializer.createTrait(traitName);
-		final DmsProject plantSubObsDataset =
-			this.testDataInitializer.createDmsProject("Plant SubObs Dataset", "Plot Dataset-Description", this.study, this.plot,
-				DatasetTypeEnum.PLANT_SUBOBSERVATIONS);
 		this.testDataInitializer
-			.addProjectProp(plantSubObsDataset, 8206, observationUnitVariableName, VariableType.OBSERVATION_UNIT, "", 1);
+			.addProjectProp(plot, 8206, observationUnitVariableName, VariableType.OBSERVATION_UNIT, "", 1);
 
 		final ExperimentModel instanceModel1 = this.testDataInitializer.createInstanceExperimentModel(this.summary, 1, "101");
 
@@ -191,14 +188,14 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 			this.testDataInitializer.createTestExperiment(this.plot, null, TermId.PLOT_EXPERIMENT.getId(), null, instanceModel1);
 		final List<ExperimentModel> plantExperimentModels =
 			this.testDataInitializer
-				.createTestExperiments(plantSubObsDataset, plotExperimentModel, null, noOfSubObservationExperiment);
+				.createTestExperiments(plot, instanceModel1, null, noOfSubObservationExperiment);
 
 		this.testDataInitializer.addPhenotypes(plantExperimentModels, trait1.getCvTermId(), RandomStringUtils.randomNumeric(5));
 
 		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(trait1.getCvTermId(), trait1.getName());
 
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
-		observationUnitsSearchDTO.setDatasetId(plantSubObsDataset.getProjectId());
+		observationUnitsSearchDTO.setDatasetId(plot.getProjectId());
 		observationUnitsSearchDTO.setInstanceId(instanceModel1.getNdExperimentId());
 		observationUnitsSearchDTO.setSelectionMethodsAndTraits(Collections.singletonList(measurementVariableDto));
 

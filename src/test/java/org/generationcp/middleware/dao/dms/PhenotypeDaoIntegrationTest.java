@@ -251,9 +251,50 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testCountPhenotypesForDatasetAndInstance() {
 		final int numberOfReps = 2;
-		final int instanceId = this.createEnvironmentData(numberOfReps, true);
-		Assert.assertEquals(NO_OF_GERMPLASM * numberOfReps,
-			this.phenotypeDao.countPhenotypesForDatasetAndInstance(this.study.getProjectId(), instanceId));
+		final DmsProject plot =
+			this.createDataset(this.study.getName() + " - Plot Dataset", study.getProgramUUID(), DatasetTypeEnum.PLOT_DATA.getId(),
+				this.study, this.study);
+		final DmsProject summary =
+			this.createDataset(this.study.getName() + " - Summary Dataset", study.getProgramUUID(), DatasetTypeEnum.SUMMARY_DATA.getId(),
+				this.study, this.study);
+
+		final ExperimentModel model = new ExperimentModel();
+		model.setObservationUnitNo(1);
+		model.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+		model.setProject(summary);
+		final ExperimentModel environmentExperiment = this.experimentDao.saveOrUpdate(model);
+
+		this.phenotypes = new ArrayList<>();
+		for (final Germplasm germplasm : this.germplasm) {
+			final StockModel stockModel = new StockModel();
+			stockModel.setName("Germplasm " + RandomStringUtils.randomAlphanumeric(5));
+			stockModel.setIsObsolete(false);
+			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
+			stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(10));
+			stockModel.setGermplasm(germplasm);
+			this.stockDao.saveOrUpdate(stockModel);
+
+			// Create N experiments for the same stock
+			for (int j = 0; j < numberOfReps; j++) {
+				final ExperimentModel experimentModel = new ExperimentModel();
+				experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+				experimentModel.setProject(plot);
+				experimentModel.setStock(stockModel);
+				experimentModel.setParent(environmentExperiment);
+				this.experimentDao.saveOrUpdate(experimentModel);
+				this.experiments.put(experimentModel.getObsUnitId(), experimentModel);
+
+				final Phenotype phenotype = new Phenotype();
+				phenotype.setObservableId(this.trait.getCvTermId());
+				phenotype.setExperiment(experimentModel);
+				phenotype.setValue(String.valueOf(new Random().nextDouble()));
+				this.phenotypes.add(this.phenotypeDao.save(phenotype));
+			}
+
+		}
+		this.sessionProvder.getSession().flush();
+		Assert.assertEquals(this.phenotypes.size(),
+			this.phenotypeDao.countPhenotypesForDatasetAndInstance(plot.getProjectId(), model.getNdExperimentId()));
 	}
 
 	@Test
