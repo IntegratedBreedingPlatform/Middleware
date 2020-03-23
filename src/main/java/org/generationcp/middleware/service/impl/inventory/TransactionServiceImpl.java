@@ -12,15 +12,21 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.Util;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,6 +35,12 @@ import java.util.stream.Collectors;
 public class TransactionServiceImpl implements TransactionService {
 
 	private DaoFactory daoFactory;
+
+	@Resource
+	private PedigreeService pedigreeService;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
 
 	public TransactionServiceImpl() {
 	}
@@ -39,7 +51,15 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public List<TransactionDto> searchTransactions(final TransactionsSearchDto transactionsSearchDto, final Pageable pageable) {
-		return this.daoFactory.getTransactionDAO().searchTransactions(transactionsSearchDto, pageable);
+		final List<TransactionDto> transactionDtos =
+			this.daoFactory.getTransactionDAO().searchTransactions(transactionsSearchDto, pageable);
+		final Set<Integer> gids =
+			transactionDtos.stream().map(transactionDto -> transactionDto.getLot().getGid()).collect(Collectors.toSet());
+		final Map<Integer, String> pedigreeStringMap =
+			this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties);
+		transactionDtos.stream().forEach(transactionDto ->
+			transactionDto.getLot().setPedigree(pedigreeStringMap.get(transactionDto.getLot().getGid())));
+		return transactionDtos;
 	}
 
 	@Override
