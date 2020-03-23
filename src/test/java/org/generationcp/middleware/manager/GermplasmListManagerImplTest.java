@@ -380,6 +380,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		for (final GermplasmList germplasmList : results) {
 			if (germplasmList.getName().equals(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME)) {
 				hasMatch = true;
+				break;
 			}
 		}
 		Assert.assertFalse(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME + " should not be found", hasMatch);
@@ -396,6 +397,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		for (final GermplasmList germplasmList : results) {
 			if (germplasmList.getName().equals(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME)) {
 				hasMatch = true;
+				break;
 			}
 		}
 		Assert.assertTrue(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME + " should be found", hasMatch);
@@ -411,6 +413,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		for (final GermplasmList germplasmList : results) {
 			if (germplasmList.getName().equals(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME)) {
 				hasMatch = true;
+				break;
 			}
 		}
 		Assert.assertTrue(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME + " should be found", hasMatch);
