@@ -141,18 +141,18 @@ public class LotServiceImpl implements LotService {
 			//FIXME Commitment date in some cases is not 0. For Deposits is always zero, but for other types it will be the current date
 			transaction.setCommitmentDate(0);
 
-			daoFactory.getTransactionDAO().save(transaction);
+			this.daoFactory.getTransactionDAO().save(transaction);
 		}
 	}
 
 	@Override
 	public List<LotDto> getLotsByStockIds(final List<String> stockIds) {
-		return daoFactory.getLotDao().getLotsByStockIds(stockIds);
+		return this.daoFactory.getLotDao().getLotsByStockIds(stockIds);
 	}
 
 	@Override
 	public LotSearchMetadata getLotSearchMetadata(final LotsSearchDto lotsSearchDto) {
-		return new LotSearchMetadata(daoFactory.getLotDao().getLotsCountPerScaleName(lotsSearchDto));
+		return new LotSearchMetadata(this.daoFactory.getLotDao().getLotsCountPerScaleName(lotsSearchDto));
 	}
 
 }
