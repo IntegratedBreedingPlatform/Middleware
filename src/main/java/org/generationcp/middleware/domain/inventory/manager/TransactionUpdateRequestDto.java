@@ -1,5 +1,6 @@
 package org.generationcp.middleware.domain.inventory.manager;
 
+import org.apache.commons.lang3.StringUtils;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -56,7 +57,7 @@ public class TransactionUpdateRequestDto {
 
 	public boolean isValid() {
 		return transactionId != null && ((amount != null ^ availableBalance != null) || (amount == null && availableBalance == null
-			&& notes != null));
+			&& !StringUtils.isEmpty(notes)));
 	}
 
 	@Override
