@@ -19,8 +19,6 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -321,10 +319,13 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		experiment.setStock(this.getStock());
 		this.experimentDao.save(experiment);
 
-		final GeolocationProperty prop = new GeolocationProperty();
-		prop.setRank(1);
-		prop.setType(this.variable.getCvTermId());
-		prop.setValue(String.valueOf(this.categories.get(5).getCvTermId()));
+
+		final ExperimentProperty experimentProperty = new ExperimentProperty();
+		experimentProperty.setExperiment(experiment);
+		experimentProperty.setTypeId(this.variable.getCvTermId());
+		experimentProperty.setValue(String.valueOf(this.categories.get(5).getCvTermId()));
+		experimentProperty.setRank(1);
+		this.experimentPropDao.save(experimentProperty);
 	}
 
 	private StockModel getStock() {

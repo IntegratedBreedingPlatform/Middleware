@@ -160,7 +160,7 @@ public class StockDaoTest extends IntegrationTestBase {
 
 		final Set<StockModel> stocks = this.stockDao.findInDataSet(this.project.getProjectId());
 		Assert.assertNotNull(stocks);
-		Assert.assertEquals(TEST_COUNT, stocks.size());
+		Assert.assertEquals(4, stocks.size());
 	}
 
 	@Test

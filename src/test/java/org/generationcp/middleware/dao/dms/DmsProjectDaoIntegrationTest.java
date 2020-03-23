@@ -27,8 +27,6 @@ import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -143,15 +141,18 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetDatasetInstances() {
-		final Integer env1 = this.createEnvironmentData("1", 1, Optional.<String>absent(), Optional.of(1));
-		final Integer env2 = this.createEnvironmentData("2", 2, Optional.<String>absent(), Optional.of(2));
-		final String customLocation = RandomStringUtils.randomAlphabetic(10);
-		final Integer env3 = this.createEnvironmentData("3", 3, Optional.of(customLocation), Optional.<Integer>absent());
-		final List<StudyInstance> instances = this.dmsProjectDao.getDatasetInstances(this.study.getProjectId());
+		final DmsProject summaryDataset = this.testDataInitializer
+			.createDmsProject("Summary Dataset", "Summary Dataset-Description", this.study, this.study, DatasetTypeEnum.SUMMARY_DATA);
+		final ExperimentModel instanceModel1 = this.testDataInitializer.createInstanceExperimentModel(summaryDataset, 1, "1");
+		this.testDataInitializer.addExperimentProp(instanceModel1, TermId.BLOCK_ID.getId(), "1", 2);
+		final ExperimentModel instanceModel2= this.testDataInitializer.createInstanceExperimentModel(summaryDataset, 2, "2");
+		this.testDataInitializer.addExperimentProp(instanceModel2, TermId.BLOCK_ID.getId(), "1", 2);
+		final ExperimentModel instanceModel3 = this.testDataInitializer.createInstanceExperimentModel(summaryDataset, 3, "3");
+		final List<StudyInstance> instances = this.dmsProjectDao.getDatasetInstances(summaryDataset.getProjectId());
 		Assert.assertEquals(3, instances.size());
 
 		final StudyInstance instance1 = instances.get(0);
-		Assert.assertEquals(env1.intValue(), instance1.getInstanceId());
+		Assert.assertEquals(instanceModel1.getNdExperimentId().intValue(), instance1.getInstanceId());
 		Assert.assertEquals(1, instance1.getInstanceNumber());
 		Assert.assertEquals("Afghanistan", instance1.getLocationName());
 		Assert.assertEquals("AFG", instance1.getLocationAbbreviation());
@@ -159,7 +160,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(instance1.isHasFieldmap());
 
 		final StudyInstance instance2 = instances.get(1);
-		Assert.assertEquals(env2.intValue(), instance2.getInstanceId());
+		Assert.assertEquals(instanceModel2.getNdExperimentId().intValue(), instance2.getInstanceId());
 		Assert.assertEquals(2, instance2.getInstanceNumber());
 		Assert.assertEquals("Albania", instance2.getLocationName());
 		Assert.assertEquals("ALB", instance2.getLocationAbbreviation());
@@ -167,11 +168,11 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(instance2.isHasFieldmap());
 
 		final StudyInstance instance3 = instances.get(2);
-		Assert.assertEquals(env3.intValue(), instance3.getInstanceId());
+		Assert.assertEquals(instanceModel3.getNdExperimentId().intValue(), instance3.getInstanceId());
 		Assert.assertEquals(3, instance3.getInstanceNumber());
 		Assert.assertEquals("Algeria", instance3.getLocationName());
 		Assert.assertEquals("DZA", instance3.getLocationAbbreviation());
-		Assert.assertEquals(customLocation, instance3.getCustomLocationAbbreviation());
+		Assert.assertNull(instance3.getCustomLocationAbbreviation());
 		Assert.assertFalse(instance3.isHasFieldmap());
 	}
 
@@ -380,15 +381,15 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyMetadataForGeolocationId() {
-		final DmsProject plot =
-			this.createDataset(this.study.getName() + " - Plot Dataset", this.study.getProgramUUID(), DatasetTypeEnum.PLOT_DATA.getId(),
+	public void testGetStudyMetadataForEnvironmentId() {
+		final DmsProject summary =
+			this.createDataset(this.study.getName() + " - Summary Dataset", this.study.getProgramUUID(), DatasetTypeEnum.SUMMARY_DATA.getId(),
 				study, study);
-		final Integer locationId = 3;
-		final Integer envId = this.createEnvironmentData(plot, "1", locationId, Optional.<String>absent(), Optional.<Integer>absent());
-		final StudyMetadata studyMetadata = this.dmsProjectDao.getStudyMetadataForEnvironmentId(envId);
+		final Integer locationId = 1;
+		final Integer instanceId = this.testDataInitializer.createInstanceExperimentModel(summary, 1, "1").getNdExperimentId();
+		final StudyMetadata studyMetadata = this.dmsProjectDao.getStudyMetadataForEnvironmentId(instanceId);
 		Assert.assertNotNull(studyMetadata);
-		Assert.assertEquals(envId, studyMetadata.getStudyDbId());
+		Assert.assertEquals(instanceId, studyMetadata.getStudyDbId());
 		Assert.assertEquals(locationId, studyMetadata.getLocationId());
 		Assert.assertEquals(this.study.getProjectId(), studyMetadata.getTrialDbId());
 		Assert.assertEquals(this.study.getProjectId(), studyMetadata.getNurseryOrTrialId());
@@ -425,8 +426,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			this.createDataset(studyName + " - Summary Dataset", workbenchProject.getUniqueID(), DatasetTypeEnum.SUMMARY_DATA.getId(),
 				study, study);
 
-		final Geolocation instance1 = this.testDataInitializer.createInstance(summary, locationId, 1);
-		this.testDataInitializer.addGeolocationProp(instance1, TermId.SEASON_VAR.getId(), String.valueOf(TermId.SEASON_DRY.getId()), 1);
+		this.testDataInitializer.createInstanceExperimentModel(summary, 1, "1");
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		final Long count = (Long) this.dmsProjectDao.countStudies(studySearchFilter);
@@ -445,16 +445,19 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		// Afghanistan location
 		final String locationId = "1";
 		final DmsProject study = this.createProject(studyName, workbenchProject.getUniqueID(), true);
+		final DmsProject plot =
+			this.createDataset(studyName + " - Plot Dataset", workbenchProject.getUniqueID(), DatasetTypeEnum.PLOT_DATA.getId(),
+				study, study);
 		final DmsProject summary =
 			this.createDataset(studyName + " - Summary Dataset", workbenchProject.getUniqueID(), DatasetTypeEnum.SUMMARY_DATA.getId(),
 				study, study);
 
-		final Geolocation instance1 = this.testDataInitializer.createInstance(summary, locationId, 1);
-		this.testDataInitializer.addGeolocationProp(instance1, TermId.SEASON_VAR.getId(), String.valueOf(TermId.SEASON_DRY.getId()), 1);
+		final ExperimentModel instance = this.testDataInitializer.createInstanceExperimentModel(summary, 1, locationId);
+		this.testDataInitializer.addExperimentProp(instance, TermId.SEASON_VAR.getId(), String.valueOf(TermId.SEASON_DRY.getId()), 2);
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		studySearchFilter.setTrialDbId(study.getProjectId().toString());
-		studySearchFilter.setStudyDbId(String.valueOf(instance1.getLocationId()));
+		studySearchFilter.setStudyDbId(String.valueOf(instance.getObservationUnitNo()));
 		studySearchFilter.setLocationDbId(locationId);
 		studySearchFilter.setStudyTypeDbId(String.valueOf(STUDY_TYPE_ID));
 		studySearchFilter.setSeasonDbId(String.valueOf(TermId.SEASON_DRY.getId()));
@@ -474,7 +477,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(study.getEndDate(), dateFormat.format(studyDto.getEndDate()));
 		Assert.assertEquals(String.valueOf(study.getStudyType().getStudyTypeId()), studyDto.getStudyTypeDbId());
 		Assert.assertEquals(study.getStudyType().getLabel(), studyDto.getStudyTypeName());
-		Assert.assertEquals(String.valueOf(instance1.getLocationId()), studyDto.getStudyDbId());
+		Assert.assertEquals(String.valueOf(instance.getObservationUnitNo()), studyDto.getStudyDbId());
 		Assert.assertEquals(study.getName() + " Environment Number 1", studyDto.getStudyName());
 		Assert.assertEquals("true", studyDto.getActive());
 		Assert.assertEquals("1", studyDto.getLocationDbId());
@@ -522,66 +525,6 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		dataset.setStudy(study);
 		this.dmsProjectDao.save(dataset);
 		return dataset;
-	}
-
-	private Integer createEnvironmentData(
-		final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId) {
-		return this.createEnvironmentData(this.study, instanceNumber, locationId, customAbbev, blockId);
-	}
-
-	private Integer createEnvironmentData(final DmsProject project,
-		final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId) {
-		final Geolocation geolocation = new Geolocation();
-		geolocation.setDescription(instanceNumber);
-//		this.geolocationDao.saveOrUpdate(geolocation);
-
-		final GeolocationProperty prop = new GeolocationProperty();
-		prop.setGeolocation(geolocation);
-		prop.setType(TermId.LOCATION_ID.getId());
-		prop.setRank(1);
-		prop.setValue(locationId.toString());
-//		this.geolocPropDao.save(prop);
-
-		if (customAbbev.isPresent()) {
-			final GeolocationProperty prop2 = new GeolocationProperty();
-			prop2.setGeolocation(geolocation);
-			prop2.setType(TermId.LOCATION_ABBR.getId());
-			prop2.setRank(2);
-			prop2.setValue(customAbbev.get());
-//			this.geolocPropDao.save(prop2);
-		}
-
-		if (blockId.isPresent()) {
-			final GeolocationProperty prop3 = new GeolocationProperty();
-			prop3.setGeolocation(geolocation);
-			prop3.setType(TermId.BLOCK_ID.getId());
-			prop3.setRank(3);
-			prop3.setValue(blockId.get().toString());
-//			this.geolocPropDao.save(prop3);
-		}
-
-		for (int i = 1; i < NO_OF_GERMPLASM + 1; i++) {
-			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
-			germplasm.setGid(null);
-			this.germplasmDao.save(germplasm);
-
-			final StockModel stockModel = new StockModel();
-			stockModel.setName("Germplasm " + i);
-			stockModel.setIsObsolete(false);
-			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
-			stockModel.setUniqueName(String.valueOf(i));
-			stockModel.setGermplasm(germplasm);
-			this.stockDao.saveOrUpdate(stockModel);
-
-			final ExperimentModel experimentModel = new ExperimentModel();
-			experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
-			experimentModel.setObsUnitId(RandomStringUtils.randomAlphabetic(13));
-			experimentModel.setProject(project);
-			experimentModel.setStock(stockModel);
-			this.experimentDao.saveOrUpdate(experimentModel);
-		}
-
-		return geolocation.getLocationId();
 	}
 
 }

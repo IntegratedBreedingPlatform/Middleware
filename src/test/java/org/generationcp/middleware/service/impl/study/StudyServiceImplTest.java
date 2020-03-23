@@ -39,10 +39,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.core.Is.is;
-
 /**
  * The class <code>StudyServiceImplTest</code> contains tests for the class <code>{@link StudyServiceImpl}</code>.
  *
@@ -108,51 +104,6 @@ public class StudyServiceImplTest {
 		Mockito.when(this.studyServiceImpl.getAdditionalDesignFactors(StudyServiceImplTest.STUDY_ID))
 			.thenReturn(Lists.newArrayList(TermId.REP_NO.name(), TermId.PLOT_NO.name(), StudyServiceImplTest.FACT1));
 
-	}
-
-	@Test
-	public void testHasMeasurementDataOnEnvironmentAssertTrue() {
-		Mockito.when(this.mockSqlQuery.uniqueResult()).thenReturn(1);
-		Mockito.when(
-			this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
-			.thenReturn(this.mockSqlQuery);
-
-		Assert.assertTrue(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
-	}
-
-	@Test
-	public void testHasMeasurementDataOnEnvironmentAssertFalse() {
-		Mockito.when(this.mockSqlQuery.uniqueResult()).thenReturn(0);
-		Mockito.when(
-			this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
-			.thenReturn(this.mockSqlQuery);
-
-		Assert.assertFalse(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
-	}
-
-	@Test
-	public void testHasMeasurementDataEnteredAssertTrue() {
-		final Object[] testDBRow = {2503, 51547, "AleuCol_E_1to5", 43};
-		final List<Object[]> testResult = Collections.singletonList(testDBRow);
-		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
-
-		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
-			.thenReturn(this.mockSqlQuery);
-
-		final List<Integer> ids = Arrays.asList(1000, 1002);
-		assertThat(true, is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
-	}
-
-	@Test
-	public void testHasMeasurementDataEnteredAssertFalse() {
-		final List<Object[]> testResult = Collections.emptyList();
-
-		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
-		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
-			.thenReturn(this.mockSqlQuery);
-
-		final List<Integer> ids = Arrays.asList(1000, 1002);
-		assertThat(false, is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
 	}
 
 	@Test

@@ -147,6 +147,13 @@ public class StudyTestDataInitializer {
 		return studyValues;
 	}
 
+	private Variable createVariable(final int termId, final String value, final int rank, final String name) {
+		final Variable variable = new Variable();
+		variable.setValue(value);
+		variable.setVariableType(this.createVariableType(termId, name, "", rank));
+		return variable;
+	}
+
 	private Variable createVariable(final int termId, final String value, final int rank, final PhenotypicType type) {
 		final StandardVariable stVar = this.ontologyManager.getStandardVariable(termId, this.commonTestProject.getUniqueID());
 
@@ -176,13 +183,12 @@ public class StudyTestDataInitializer {
 	}
 
 	public VariableList createEnvironmentWithLocationAndSeason(
-		final String trialInstance, final String siteName, final String locationId, final String seasonId)
-		throws Exception {
+		final String trialInstance, final String siteName, final String locationId, final String seasonId) {
 		final VariableList variableList = new VariableList();
-		variableList.add(this.createVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstance, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(TermId.TRIAL_LOCATION.getId(), siteName, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(TermId.LOCATION_ID.getId(), locationId, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(TermId.SEASON_VAR.getId(), seasonId, 0, PhenotypicType.TRIAL_ENVIRONMENT));
+		variableList.add(this.createVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstance, 1, TermId.TRIAL_INSTANCE_FACTOR.name()));
+		variableList.add(this.createVariable(TermId.TRIAL_LOCATION.getId(), siteName, 2, TermId.TRIAL_LOCATION.name()));
+		variableList.add(this.createVariable(TermId.LOCATION_ID.getId(), locationId, 3, TermId.LOCATION_ID.name()));
+		variableList.add(this.createVariable(TermId.SEASON_VAR.getId(), seasonId, 4, TermId.SEASON_VAR.name()));
 		return variableList;
 	}
 
@@ -281,12 +287,8 @@ public class StudyTestDataInitializer {
 		final VariableList
 			locationVariableList = this.createEnvironmentWithLocationAndSeason(String.valueOf(trialInstance), "SOME SITE NAME", locationId, seasonId);
 		final ExperimentValues experimentValue = new ExperimentValues();
-		final VariableList variableList = new VariableList();
-		final Variable variable = new Variable();
-		variable.setValue(locationId);
-		variable.setVariableType(this.createVariableType(TermId.LOCATION_ID.getId(), "LOCATION_ID", "", 1));
-		variableList.add(variable);
-		experimentValue.setVariableList(variableList);
+		experimentValue.setVariableList(locationVariableList);
+		experimentValue.setObservationUnitNo(trialInstance);
 		this.studyDataManager.addExperiment(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
 	}
 
