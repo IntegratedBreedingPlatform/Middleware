@@ -176,8 +176,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertTrue(studyInstance2.isHasExperimentalDesign());
-		// Instance deletion not allowed because study has advance list and design already generated for instance
-		Assert.assertFalse(studyInstance2.getCanBeDeleted());
+		Assert.assertTrue(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 
 		final StudyInstance studyInstance3 = studyInstances.get(2);
@@ -216,8 +215,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertTrue(studyInstance2.isHasExperimentalDesign());
-		// Instance deletion not allowed because study has advance list and design already generated for instance
-		Assert.assertFalse(studyInstance2.getCanBeDeleted());
+		Assert.assertTrue(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 
 		final StudyInstance studyInstance3 = this.studyInstanceService.getStudyInstance(study.getProjectId(), instance3.getNdExperimentId()).get();
@@ -269,10 +267,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		this.testDataInitializer.createTestExperiment(study, null, TermId.STUDY_EXPERIMENT.getId(), "0", null);
 
 		this.instance1 = this.testDataInitializer.createInstanceExperimentModel(this.summary, 1, "1");
-		this.instance2 = this.testDataInitializer.createInstanceExperimentModel(this.summary, 2, "2");
-		this.instance3 = this.testDataInitializer.createInstanceExperimentModel(this.summary, 3, "3");
-
-
 		final ExperimentModel instance1PlotExperiment =
 			this.testDataInitializer.createTestExperiment(plot, null, TermId.PLOT_EXPERIMENT.getId(), "1", instance1);
 		final DmsProject subobs =
@@ -287,11 +281,11 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			.createTestExperiment(subobs, null, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
 		this.savePhenotype(instance1SubObsExperiment2);
 
-
+		this.instance2 = this.testDataInitializer.createInstanceExperimentModel(this.summary, 2, "2");
 		this.testDataInitializer.addExperimentProp(instance2, TermId.BLOCK_ID.getId(), "", 1);
 		this.testDataInitializer.createTestExperiment(plot, null, TermId.PLOT_EXPERIMENT.getId(), "1", instance2);
 
-
+		this.instance3 = this.testDataInitializer.createInstanceExperimentModel(this.summary, 3, "3");
 	}
 
 	private void savePhenotype(final ExperimentModel experiment) {
