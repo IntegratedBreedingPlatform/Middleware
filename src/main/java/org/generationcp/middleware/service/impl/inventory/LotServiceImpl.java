@@ -28,12 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -116,7 +111,8 @@ public class LotServiceImpl implements LotService {
 		final Map<String, Integer> locationsByAbbreviationMap = locations.stream().collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
 		final VariableFilter variableFilter = new VariableFilter();
 		final List<Variable> scaleVariables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
-		final Map<String, Integer> scaleVariablesByNameMap = scaleVariables.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
+		//Ignore duplicates; Retain previous value
+		final Map<String, Integer> scaleVariablesByNameMap = scaleVariables.stream().collect(Collectors.toMap(Variable::getName, Variable::getId, (v1, v2)->{return v1;}));
 		for (final LotItemDto lotItemDto: lotItemDtos) {
 			final Lot lot = new Lot();
 			lot.setUserId(userId);
