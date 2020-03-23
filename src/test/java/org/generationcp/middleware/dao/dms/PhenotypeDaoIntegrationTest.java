@@ -332,13 +332,13 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testUpdateOutOfSyncPhenotypesByGeolocation() {
+	public void testUpdateOutOfSyncPhenotypesByInstance() {
 		final Integer geolocationId = this.createEnvironmentData(1, true);
 		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
 		final Integer variableId = this.trait.getCvTermId();
 		final Integer datasetId = this.study.getProjectId();
 		Assert.assertFalse(this.phenotypeDao.hasOutOfSync(datasetId));
-		this.phenotypeDao.updateOutOfSyncPhenotypesByEnvironment(geolocationId, new HashSet<>(Arrays.asList(variableId)));
+		this.phenotypeDao.updateOutOfSyncPhenotypesByInstance(geolocationId, new HashSet<>(Arrays.asList(variableId)));
 		Assert.assertTrue(this.phenotypeDao.hasOutOfSync(datasetId));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experimentId, variableId);
 		Assert.assertEquals(Phenotype.ValueStatus.OUT_OF_SYNC, phenotype.getValueStatus());

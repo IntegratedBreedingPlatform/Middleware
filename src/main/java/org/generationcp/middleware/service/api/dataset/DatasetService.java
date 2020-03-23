@@ -153,12 +153,12 @@ public interface DatasetService {
 
 	/**
 	 * Update the phenotype status as "OUT OF SYNC" for calculated variables using given variables as inputs.
-	 * This will update the phenotype status of calculated variables in all observation for the specified geolocation (trial instance)
+	 * This will update the phenotype status of calculated variables in all observation for the specified instanceId (trial instance)
 	 *
-	 * @param geolocation
+	 * @param instanceId
 	 * @param variableIds
 	 */
-	void updateDependentPhenotypesStatusByGeolocation(Integer geolocation, List<Integer> variableIds);
+	void updateDependentPhenotypesStatusByInstance(Integer instanceId, List<Integer> variableIds);
 
 	/**
 	 * Return a dataset given the id

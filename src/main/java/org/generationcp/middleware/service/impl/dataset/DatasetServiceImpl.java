@@ -543,7 +543,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void updateDependentPhenotypesStatusByGeolocation(final Integer geolocation, final List<Integer> variableIds) {
+	public void updateDependentPhenotypesStatusByInstance(final Integer instanceId, final List<Integer> variableIds) {
 
 		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputIds(variableIds);
 		if (!formulaList.isEmpty()) {
@@ -555,7 +555,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			});
 			this.daoFactory.getPhenotypeDAO()
-				.updateOutOfSyncPhenotypesByEnvironment(geolocation, Sets.newHashSet(targetVariableIds));
+				.updateOutOfSyncPhenotypesByInstance(instanceId, Sets.newHashSet(targetVariableIds));
 		}
 	}
 

@@ -16,6 +16,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
@@ -37,6 +38,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Resource
 	private StudyService studyService;
+
+	@Resource
+	private DatasetService datasetService;
 
 	@Resource
 	private ExperimentDesignService experimentDesignService;
@@ -229,6 +233,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			property.setValue(this.getEnvironmentDataValue(instanceData));
 			propertyDao.update(property);
 		}
+
+		this.datasetService.updateDependentPhenotypesStatusByInstance(instanceData.getInstanceId(), Arrays.asList(instanceData.getVariableId()));
+
 		return instanceData;
 	}
 
