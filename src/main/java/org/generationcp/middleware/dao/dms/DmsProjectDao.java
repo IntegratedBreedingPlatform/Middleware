@@ -1126,7 +1126,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 				+ " LEFT OUTER JOIN nd_experimentprop xprop ON xprop.nd_experiment_id = env.nd_experiment_id "
 				+ " LEFT OUTER JOIN location loc on xprop.value = loc.locid and xprop.type_id = 8190 "
-				+ " WHERE nde.project_id = :datasetId \n";
+				+ " LEFT JOIN nd_experiment plot on plot.nd_experiment_id = nde.parent_id and plot.type_id = 1155 \n "
+				+ " WHERE nde.project_id = :datasetId "
+				// handle for trial, plot and sub-obs dataset types
+				+ " AND (nde.parent_id = env.nd_experiment_id or plot.parent_id = env.nd_experiment_id "
+				+ "  or nde.nd_experiment_id = env.nd_experiment_id) ";
 			final StringBuilder sb = new StringBuilder(sql);
 			if (!CollectionUtils.isEmpty(instanceIds)) {
 				sb.append(" AND env.nd_experiment_id IN (:locationIds) \n");
