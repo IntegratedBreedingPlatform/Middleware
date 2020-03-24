@@ -1153,11 +1153,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final String sql = "UPDATE nd_experiment experiment\n"
 			+ "LEFT JOIN nd_experiment experimentParent ON experimentParent.nd_experiment_id = experiment.parent_id\n"
 			+ "INNER JOIN phenotype pheno ON  pheno.nd_experiment_id = experimentParent.nd_experiment_id OR pheno.nd_experiment_id = experiment.nd_experiment_id\n"
-			+ " INNER JOIN project pr ON pr.project_id = experiment.project_id OR pr.project_id =  experimentParent.project_id"
-			+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-			+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
 			+ "SET pheno.status = :status \n"
-			+ "WHERE plot.parent_id = :environmentId  AND pheno.observable_id in (:variableIds) ;";
+			+ "WHERE experiment.parent_id = :environmentId AND pheno.observable_id in (:variableIds);";
 
 		final SQLQuery statement = this.getSession().createSQLQuery(sql);
 		statement.setParameter("status", Phenotype.ValueStatus.OUT_OF_SYNC.getName());
