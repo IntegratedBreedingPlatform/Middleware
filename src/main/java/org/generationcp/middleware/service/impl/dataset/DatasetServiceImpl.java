@@ -433,6 +433,11 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public boolean isValidDatasetId(final Integer datasetId) {
+		return this.daoFactory.getDmsProjectDAO().isValidDatasetId(datasetId);
+	}
+
+	@Override
 	public Phenotype getPhenotype(final Integer observationUnitId, final Integer observationId) {
 		return this.daoFactory.getPhenotypeDAO().getPhenotype(observationUnitId, observationId);
 	}
@@ -974,6 +979,11 @@ public class DatasetServiceImpl implements DatasetService {
 		if (!draftMode) {
 			this.reorganizePhenotypesStatus(studyId, phenotypes);
 		}
+	}
+
+	@Override
+	public boolean allDatasetIdsBelongToStudy(final Integer studyId, final List<Integer> datasetIds) {
+		return this.daoFactory.getDmsProjectDAO().allDatasetIdsBelongToStudy(studyId, datasetIds);
 	}
 
 	private void acceptDraftData(final Phenotype phenotype) {
