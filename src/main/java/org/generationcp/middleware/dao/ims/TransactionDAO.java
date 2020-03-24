@@ -597,7 +597,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "	   location loc on loc.locid = i.locid "//
 		+ "        LEFT JOIN"//
 		+ "    cvterm scale ON scale.cvterm_id = i.scaleid"//
-		+ "        LEFT JOIN"//
+		+ "        INNER JOIN"//
 		+ "    germplsm g ON g.gid = i.eid"//
 		+ "        LEFT JOIN"//
 		+ "    names n ON n.gid = i.eid AND n.nstat = 1"//
