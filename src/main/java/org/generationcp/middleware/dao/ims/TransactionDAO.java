@@ -604,7 +604,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "        LEFT JOIN"//
 		+ "    workbench.users users ON users.userid = act.userid"//
 		+ " WHERE"//
-		+ "    i.etype = 'GERMPLSM' "; //
+		+ "    i.etype = 'GERMPLSM' and g.deleted=0 "; //
 
 	private String buildSearchTransactionsQuery(final TransactionsSearchDto transactionsSearchDto) {
 		final StringBuilder query = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
