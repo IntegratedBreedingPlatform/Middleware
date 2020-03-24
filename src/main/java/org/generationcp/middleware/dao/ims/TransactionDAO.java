@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Transaction}.
@@ -373,25 +374,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			return criteria.list();
 		} catch (final HibernateException e) {
 			final String message = "Error getByLotIds() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-	}
-
-	public List<Transaction> getByIds(final List<Integer> transactionIds) {
-		final List<Transaction> transactions = new ArrayList<>();
-
-		if (transactionIds == null || transactionIds.isEmpty()) {
-			return transactions;
-		}
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.in("id", transactionIds));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error getByIds() query from Transaction: " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -781,6 +763,25 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
+	public List<Transaction> getByIds(final Set<Integer> transactionIds) {
+		final List<Transaction> transactions = new ArrayList<>();
+
+		if (transactionIds == null || transactionIds.isEmpty()) {
+			return transactions;
+		}
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			criteria.add(Restrictions.in("id", transactionIds));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error getByIds() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+	}
+
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
 			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class, Double.class, String.class, Date.class,
@@ -812,4 +813,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("lotComments");
 	}
 
+
+	public Transaction update(final Transaction transaction) {
+		super.update(transaction);
+		this.getSession().flush();
+		return transaction;
+	}
 }

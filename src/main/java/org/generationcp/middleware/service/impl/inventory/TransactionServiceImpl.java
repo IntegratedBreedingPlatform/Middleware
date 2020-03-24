@@ -4,8 +4,9 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
-import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -121,11 +123,11 @@ public class TransactionServiceImpl implements TransactionService {
 			final Double amountToWithdraw = (withdrawAll) ? lotDto.getAvailableBalance() : amount;
 
 			if (lotDto.getAvailableBalance().equals(0D)) {
-				throw new MiddlewareException("One of the selected lots does not have enough available inventory to perform a withdrawal. Please review.");
+				throw new MiddlewareRequestException("", "lot.withdrawal.zero.balance");
 			}
 
 			if (lotDto.getAvailableBalance() < amountToWithdraw) {
-				throw new MiddlewareException("One of the selected lots does not have enough available inventory to perform the withdrawal. Please review the amount");
+				throw new MiddlewareRequestException("", "lot.withdrawal.not.enough.inventory");
 			}
 
 			final Transaction transaction = new Transaction();
@@ -151,8 +153,8 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public void confirmPendingTransactions(final List<TransactionDto> confirmedTransactionDtos) {
-		final List<Integer> transactionIds = confirmedTransactionDtos.stream().map(TransactionDto::getTransactionId).collect(
-			Collectors.toList());
+		final Set<Integer> transactionIds = confirmedTransactionDtos.stream().map(TransactionDto::getTransactionId).collect(
+			Collectors.toSet());
 
 		final List<Transaction> transactions = daoFactory.getTransactionDAO().getByIds(transactionIds);
 		for (final Transaction transaction : transactions) {
@@ -167,4 +169,64 @@ public class TransactionServiceImpl implements TransactionService {
 		return this.daoFactory.getTransactionDAO().getAvailableBalanceTransactions(lotId);
 	}
 
+	@Override
+	public void updatePendingTransactions(final List<TransactionUpdateRequestDto> transactionUpdateRequestDtos) {
+
+		final Set<Integer> transactionIds =
+			transactionUpdateRequestDtos.stream().map(TransactionUpdateRequestDto::getTransactionId).collect(
+				Collectors.toSet());
+		final List<Transaction> transactions = this.daoFactory.getTransactionDAO().getByIds(transactionIds);
+		final Map<Integer, Transaction> transactionMap = transactions.stream().collect(Collectors.toMap(x -> x.getId(), x -> x));
+
+		for (final TransactionUpdateRequestDto updateRequestDto : transactionUpdateRequestDtos) {
+			final Transaction transaction = transactionMap.get(updateRequestDto.getTransactionId());
+			final List<Integer> lotIds = Arrays.asList(transaction.getLot().getId());
+			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+			lotsSearchDto.setLotIds(lotIds);
+
+			//Needs to be queried per transaction so we get the most recent available balance when editing transaction for the same lot.
+			final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
+
+			if (updateRequestDto.getNotes() != null) {
+				transaction.setComments(updateRequestDto.getNotes());
+			}
+
+			if (updateRequestDto.getAmount() != null) {
+				if (TransactionType.DEPOSIT.getId().equals(transaction.getType())) {
+					transaction.setQuantity(updateRequestDto.getAmount());
+				}
+
+				if (TransactionType.WITHDRAWAL.getId().equals(transaction.getType())) {
+					if (lotDto.getAvailableBalance() - transaction.getQuantity() - updateRequestDto.getAmount() < 0) {
+						throw new MiddlewareRequestException("", "transaction.update.negative.balance",
+							String.valueOf(transaction.getId()));
+					} else {
+						transaction.setQuantity(-1 * updateRequestDto.getAmount());
+					}
+				}
+
+			} else if (updateRequestDto.getAvailableBalance() != null) {
+				if (TransactionType.DEPOSIT.getId().equals(transaction.getType())) {
+					if (updateRequestDto.getAvailableBalance() <= lotDto.getAvailableBalance()) {
+						throw new MiddlewareRequestException("", "transaction.update.new.balance.lower.than.actual",
+							String.valueOf(transaction.getId()), String.valueOf(lotDto.getLotId()));
+					} else {
+						transaction.setQuantity(updateRequestDto.getAvailableBalance() - lotDto.getAvailableBalance());
+					}
+				}
+
+				if (TransactionType.WITHDRAWAL.getId().equals(transaction.getType())) {
+					if (updateRequestDto.getAvailableBalance() >= lotDto.getAvailableBalance() - transaction.getQuantity()) {
+						throw new MiddlewareRequestException("", "transaction.update.new.balance.not.a.withdrawal",
+							String.valueOf(transaction.getId()));
+					} else {
+						transaction
+							.setQuantity(updateRequestDto.getAvailableBalance() - lotDto.getAvailableBalance() + transaction.getQuantity());
+					}
+				}
+			}
+			this.daoFactory.getTransactionDAO().update(transaction);
+		}
+
+	}
 }
