@@ -1545,4 +1545,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}
+
+	public boolean isValidDatasetId(final Integer datasetId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("projectId", datasetId));
+		criteria.add(Restrictions.isNotNull("datasetType"));
+		criteria.setProjection(Projections.rowCount());
+		final Long count = (Long) criteria.uniqueResult();
+		return count > 0;
+	}
+
+	public boolean allDatasetIdsBelongToStudy(final Integer studyId, final List<Integer> datasetIds){
+
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.in("projectId", datasetIds));
+		criteria.add(Restrictions.eq("study.projectId", studyId));
+		criteria.setProjection(Projections.rowCount());
+		final Long count = (Long) criteria.uniqueResult();
+		return count.intValue() == datasetIds.size();
+	}
+
 }
