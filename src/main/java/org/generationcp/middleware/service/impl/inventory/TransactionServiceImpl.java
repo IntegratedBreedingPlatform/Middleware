@@ -55,12 +55,6 @@ public class TransactionServiceImpl implements TransactionService {
 	public List<TransactionDto> searchTransactions(final TransactionsSearchDto transactionsSearchDto, final Pageable pageable) {
 		final List<TransactionDto> transactionDtos =
 			this.daoFactory.getTransactionDAO().searchTransactions(transactionsSearchDto, pageable);
-		final Set<Integer> gids =
-			transactionDtos.stream().map(transactionDto -> transactionDto.getLot().getGid()).collect(Collectors.toSet());
-		final Map<Integer, String> pedigreeStringMap =
-			this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties);
-		transactionDtos.stream().forEach(transactionDto ->
-			transactionDto.getLot().setPedigree(pedigreeStringMap.get(transactionDto.getLot().getGid())));
 		return transactionDtos;
 	}
 
@@ -228,5 +222,15 @@ public class TransactionServiceImpl implements TransactionService {
 			this.daoFactory.getTransactionDAO().update(transaction);
 		}
 
+	}
+
+	@Override
+	public void loadPedigreeString(final List<TransactionDto> transactionDtos) {
+		final Set<Integer> gids =
+			transactionDtos.stream().map(transactionDto -> transactionDto.getLot().getGid()).collect(Collectors.toSet());
+		final Map<Integer, String> pedigreeStringMap =
+			this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties);
+		transactionDtos.stream().forEach(transactionDto ->
+			transactionDto.getLot().setPedigree(pedigreeStringMap.get(transactionDto.getLot().getGid())));
 	}
 }

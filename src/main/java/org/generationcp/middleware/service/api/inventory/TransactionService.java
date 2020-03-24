@@ -38,4 +38,6 @@ public interface TransactionService {
 
 
 	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
+
+	void loadPedigreeString(List<TransactionDto> transactionDtos);
 }
