@@ -323,7 +323,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			queryString.append(DatasetTypeEnum.SUMMARY_DATA.getId()).append(" ");
 			queryString.append("inner join nd_experiment env ON env_ds.project_id = env.project_id and env.type_id = ");
 			queryString.append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()).append(" ");
+			queryString.append("left join nd_experiment plot ON plot.nd_experiment_id = exp.parent_id and plot.type_id = ");
+			queryString.append(TermId.PLOT_EXPERIMENT.getId()).append(" ");
 			queryString.append("where exp.project_id =:p_id and exp.type_id in (:type_ids) ");
+			// handle trial environment, plot, means, and sub-observation dataset types
+			queryString.append(" and (exp.parent_id = env.nd_experiment_id or env.nd_experiment_id = exp.nd_experiment_id or plot.parent_id = env.nd_experiment_id) ");
 			if (firstInstance) {
 				queryString.append("and env.observation_unit_no = 1 ");
 			}
