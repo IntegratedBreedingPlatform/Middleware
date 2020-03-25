@@ -597,14 +597,14 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "	   location loc on loc.locid = i.locid "//
 		+ "        LEFT JOIN"//
 		+ "    cvterm scale ON scale.cvterm_id = i.scaleid"//
-		+ "        LEFT JOIN"//
+		+ "        INNER JOIN"//
 		+ "    germplsm g ON g.gid = i.eid"//
 		+ "        LEFT JOIN"//
 		+ "    names n ON n.gid = i.eid AND n.nstat = 1"//
 		+ "        LEFT JOIN"//
 		+ "    workbench.users users ON users.userid = act.userid"//
 		+ " WHERE"//
-		+ "    i.etype = 'GERMPLSM' "; //
+		+ "    i.etype = 'GERMPLSM' and g.deleted=0 "; //
 
 	private String buildSearchTransactionsQuery(final TransactionsSearchDto transactionsSearchDto) {
 		final StringBuilder query = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);

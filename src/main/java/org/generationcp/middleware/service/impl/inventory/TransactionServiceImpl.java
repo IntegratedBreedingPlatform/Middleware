@@ -26,7 +26,6 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,12 +54,6 @@ public class TransactionServiceImpl implements TransactionService {
 	public List<TransactionDto> searchTransactions(final TransactionsSearchDto transactionsSearchDto, final Pageable pageable) {
 		final List<TransactionDto> transactionDtos =
 			this.daoFactory.getTransactionDAO().searchTransactions(transactionsSearchDto, pageable);
-		final Set<Integer> gids =
-			transactionDtos.stream().map(transactionDto -> transactionDto.getLot().getGid()).collect(Collectors.toSet());
-		final Map<Integer, String> pedigreeStringMap =
-			this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties);
-		transactionDtos.stream().forEach(transactionDto ->
-			transactionDto.getLot().setPedigree(pedigreeStringMap.get(transactionDto.getLot().getGid())));
 		return transactionDtos;
 	}
 
@@ -229,4 +222,5 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 
 	}
+
 }

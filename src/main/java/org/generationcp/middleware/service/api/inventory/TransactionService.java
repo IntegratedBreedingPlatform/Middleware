@@ -38,4 +38,5 @@ public interface TransactionService {
 
 
 	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
+
 }
