@@ -21,6 +21,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -339,6 +340,36 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return criteria.list();
 	}
 
+	private List<MeasurementVariableDto> getVariablesByStudy(final int studyIdentifier, final String query,
+		final Integer... variableTypes) {
+		final SQLQuery variableSqlQuery = this.getSession().createSQLQuery(query);
+		variableSqlQuery.addScalar("cvterm_id");
+		variableSqlQuery.addScalar("name");
+		variableSqlQuery.setParameter("studyId", studyIdentifier);
+		variableSqlQuery.setParameterList("variablesTypes", variableTypes);
+		final List<Object[]> measurementVariables = variableSqlQuery.list();
+		final List<MeasurementVariableDto> variableList = new ArrayList<>();
+		for (final Object[] rows : measurementVariables) {
+			variableList.add(new MeasurementVariableDto((Integer) rows[0], (String) rows[1]));
+		}
+		return variableList;
+	}
+
+	public List<MeasurementVariableDto> getVariablesForDataset(final int datasetId, final Integer... variableTypes) {
+		final String queryString = " SELECT \n"
+			+ "   cvterm_id, \n"
+			+ "   name \n"
+			+ " FROM cvterm cvt \n"
+			+ "   INNER JOIN projectprop pp ON (pp.variable_id = cvt.cvterm_id) \n"
+			+ " WHERE pp.type_id IN (:variablesTypes) AND pp.project_id = :datasetId ";
+		final List<MeasurementVariableDto> measurementVariables =
+				this.getVariablesByStudy(datasetId, queryString, variableTypes);
+		if (!measurementVariables.isEmpty()) {
+			return Collections.unmodifiableList(measurementVariables);
+		}
+		return Collections.unmodifiableList(Collections.<MeasurementVariableDto>emptyList());
+	}
+
 	public List<ProjectProperty> getByProjectIdAndVariableIds(final Integer projectId, final List<Integer> standardVariableIds) {
 		final List<ProjectProperty> list;
 		final DmsProject dmsProject = new DmsProject();
@@ -356,6 +387,23 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return list;
+	}
+
+	public List<MeasurementVariableDto> getVariables(final int studyIdentifier, final Integer... variableTypes) {
+		final String queryString = " SELECT \n"
+			+ "   cvterm_id, \n"
+			+ "   cvt.name \n"
+			+ " FROM cvterm cvt \n"
+			+ "   INNER JOIN projectprop pp ON (pp.variable_id = cvt.cvterm_id) \n"
+			+ "   INNER JOIN project p ON p.project_id = pp.project_id \n"
+			+ " WHERE pp.type_id IN (:variablesTypes) AND p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
+			+ " \n";
+		final List<MeasurementVariableDto> measurementVariables =
+			this.getVariablesByStudy(studyIdentifier, queryString, variableTypes);
+		if (!measurementVariables.isEmpty()) {
+			return Collections.unmodifiableList(measurementVariables);
+		}
+		return Collections.unmodifiableList(Collections.<MeasurementVariableDto>emptyList());
 	}
 
 

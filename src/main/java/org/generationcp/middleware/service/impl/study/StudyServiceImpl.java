@@ -26,7 +26,6 @@ import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -87,8 +86,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 			+ "		LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
 			+ StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE + " and ph.value is not null ";
 
-	private MeasurementVariableService measurementVariableService;
-
 	private StudyMeasurements studyMeasurements;
 
 	private StudyGermplasmListService studyGermplasmListService;
@@ -114,7 +111,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(),
 			this.getOntologyPropertyDataManager(), this.getOntologyScaleDataManager(), this.getFormulaService(), sessionProvider);
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
-		this.measurementVariableService = new MeasurementVariableServiceImpl(currentSession);
 
 		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {
 
@@ -131,12 +127,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 	/**
 	 * Only used for tests.
 	 *
-	 * @param measurementVariableService
 	 * @param trialMeasurements
 	 */
-	StudyServiceImpl(final MeasurementVariableService measurementVariableService, final StudyMeasurements trialMeasurements,
+	StudyServiceImpl(final StudyMeasurements trialMeasurements,
 		final StudyGermplasmListService studyGermplasmListServiceImpl) {
-		this.measurementVariableService = measurementVariableService;
 		this.studyMeasurements = trialMeasurements;
 		this.studyGermplasmListService = studyGermplasmListServiceImpl;
 		this.daoFactory = new DaoFactory(this.sessionProvider);
@@ -259,7 +253,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize,
 		final String sortBy, final String sortOrder) {
 
-		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariables(studyIdentifier,
+		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.daoFactory.getProjectPropertyDAO().getVariables(studyIdentifier,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 
 		return this.studyMeasurements.getAllMeasurements(studyIdentifier, selectionMethodsAndTraits,
@@ -322,7 +316,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier) {
 		final List<MeasurementVariableDto> traits =
-			this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
+			this.daoFactory.getProjectPropertyDAO().getVariables(studyIdentifier, VariableType.TRAIT.getId());
 		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, this.getGenericGermplasmDescriptors(studyIdentifier),
 			this.getAdditionalDesignFactors(studyIdentifier), measurementIdentifier);
 	}
@@ -369,7 +363,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, final Integer instanceDbId) {
 		final List<MeasurementVariableDto> traits =
-			this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
+			this.daoFactory.getProjectPropertyDAO().getVariables(studyIdentifier, VariableType.TRAIT.getId());
 
 		final List<MeasurementVariableDto> measurementVariables = Ordering.from(new Comparator<MeasurementVariableDto>() {
 
@@ -634,10 +628,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 			return startDate.substring(0, 4);
 		}
 		return startDate;
-	}
-
-	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
-		this.measurementVariableService = measurementVariableService;
 	}
 
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
