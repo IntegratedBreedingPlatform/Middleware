@@ -588,6 +588,11 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	@Override
+	public Map<String, Double>  getStockIdsWithMultipleTransactions(final Integer listId) {
+		return this.daoFactory.getTransactionDAO().getStockIdsWithMultipleTransactions(listId);
+	}
+
+	@Override
 	public void updateInventory(final Integer listId, final List<InventoryDetails> inventoryDetailList) {
 
 
