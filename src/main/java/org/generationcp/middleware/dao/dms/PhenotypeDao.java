@@ -1177,15 +1177,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					"select p.* "
 						+ " from phenotype p "
 						+ " INNER JOIN nd_experiment e ON p.nd_experiment_id = e.nd_experiment_id "
-						+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-						+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-						+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-						+ " WHERE e.project_id = :projectId AND plot.parent_id = :instanceId")
+						+ " LEFT JOIN nd_experiment level2 ON level2.nd_experiment_id = e.parent_id "
+						+ " LEFT JOIN nd_experiment level3 ON level3.nd_experiment_id = level2.parent_id "
+						+ " WHERE e.project_id = :projectId AND "
+						+ "(CASE "
+						+ " WHEN level3.nd_experiment_id IS NULL AND  level2.nd_experiment_id IS NULL THEN e.nd_experiment_id "
+						+ " WHEN level3.nd_experiment_id IS NULL THEN level2.nd_experiment_id ELSE level3.nd_experiment_id "
+						+ "END) = :instanceId")
 				.addEntity(Phenotype.class);
 		query.setParameter("projectId", datasetId);
 		query.setParameter("instanceId", instanceId);
 		return query.list();
-
 	}
 
 	@SuppressWarnings("Duplicates")
