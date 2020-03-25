@@ -16,7 +16,9 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -26,13 +28,14 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestD
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
+import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
@@ -87,7 +90,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private StudyMeasurements studyMeasurements;
 
-	@Resource
+	private StudyGermplasmListService studyGermplasmListService;
+
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Resource
@@ -105,6 +109,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 		super(sessionProvider);
 		final Session currentSession = this.getCurrentSession();
 		this.studyMeasurements = new StudyMeasurements(currentSession);
+		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(sessionProvider);
+		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(),
+			this.getOntologyPropertyDataManager(), this.getOntologyScaleDataManager(), this.getFormulaService(), sessionProvider);
+		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
 
 		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {
 
@@ -123,8 +131,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 	 *
 	 * @param trialMeasurements
 	 */
-	StudyServiceImpl(final StudyMeasurements trialMeasurements) {
+	StudyServiceImpl(final StudyMeasurements trialMeasurements,
+		final StudyGermplasmListService studyGermplasmListServiceImpl) {
 		this.studyMeasurements = trialMeasurements;
+		this.studyGermplasmListService = studyGermplasmListServiceImpl;
 		this.daoFactory = new DaoFactory(this.sessionProvider);
 	}
 
@@ -329,12 +339,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public List<StudyGermplasmDto> getStudyGermplasmList(final Integer studyIdentifer) {
-		return this.daoFactory.getListDataProjectDAO().getGermplasmList(studyIdentifer);
+		return this.studyGermplasmListService.getGermplasmList(studyIdentifer);
 	}
 
 	@Override
 	public List<StudyGermplasmDto> getStudyGermplasmListWithPlotInformation(final Integer studyIdentifer, final Set<Integer> plotNos) {
-		return daoFactory.getStockDao().getStudyGermplasmDtoList(studyIdentifer, plotNos);
+		return this.studyGermplasmListService.getGermplasmListFromPlots(studyIdentifer, plotNos);
 	}
 
 	@Override
