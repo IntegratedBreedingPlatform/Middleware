@@ -287,14 +287,15 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		sql.append(" 1 FROM " //
 			+ "	project p " //
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
-			+ "	INNER JOIN nd_experiment env ON nde.parent_id = env.nd_experiment_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
+			+ "	LEFT JOIN nd_experiment level2 ON level2.nd_experiment_id = nde.parent_id "
+			+ "	LEFT JOIN nd_experiment level3 ON level3.nd_experiment_id = level2.parent_id "
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
 			+ " WHERE p.project_id = :datasetId "); //
 
 		if (searchDto.getInstanceId() != null) {
-			sql.append(" AND env.nd_experiment_id = :instanceId"); //
+			sql.append(" AND (CASE WHEN level3.nd_experiment_id IS NULL THEN level2.nd_experiment_id ELSE level3.nd_experiment_id END) = :instanceId"); //
 		}
 
 		final ObservationUnitsSearchDTO.Filter filter = searchDto.getFilter();
