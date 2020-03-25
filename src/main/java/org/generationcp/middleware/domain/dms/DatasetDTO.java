@@ -9,58 +9,22 @@ import java.io.Serializable;
 import java.util.List;
 
 @AutoProperty
-public class DatasetDTO implements Serializable {
+public class DatasetDTO extends DatasetBasicDTO implements Serializable {
 
 	private static final long serialVersionUID = 736579292676142736L;
 
-	private Integer datasetId;
-	private Integer datasetTypeId;
-	private String name;
-	private Integer parentDatasetId;
+
 	private List<StudyInstance> instances;
 	private List<MeasurementVariable> variables;
 	private Boolean hasPendingData;
 	private Boolean hasOutOfSyncData;
 
 	public DatasetDTO(){
-
+		super();
 	}
 
 	public DatasetDTO(final Integer datasetId) {
-		this();
-		this.datasetId = datasetId;
-	}
-
-	public Integer getDatasetId() {
-		return this.datasetId;
-	}
-
-	public void setDatasetId(final Integer datasetId) {
-		this.datasetId = datasetId;
-	}
-
-	public Integer getDatasetTypeId() {
-		return this.datasetTypeId;
-	}
-
-	public void setDatasetTypeId(final Integer datasetTypeId) {
-		this.datasetTypeId = datasetTypeId;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public void setName(final String name) {
-		this.name = name;
-	}
-
-	public Integer getParentDatasetId() {
-		return this.parentDatasetId;
-	}
-
-	public void setParentDatasetId(final Integer parentDatasetId) {
-		this.parentDatasetId = parentDatasetId;
+		super(datasetId);
 	}
 
 	public List<StudyInstance> getInstances() {

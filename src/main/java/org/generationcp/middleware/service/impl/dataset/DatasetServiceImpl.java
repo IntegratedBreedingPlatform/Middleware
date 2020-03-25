@@ -13,6 +13,7 @@ import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dms.DatasetBasicDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -165,9 +166,9 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<MeasurementVariable> getObservationSetColumns(final Integer observationSetId, final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
 		final List<MeasurementVariable> factorColumns;
-		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
+		final DatasetBasicDTO datasetBasicDTO = this.daoFactory.getDmsProjectDAO().getDataset(observationSetId);
 
-		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+		if (datasetBasicDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			//PLOTDATA
 			factorColumns = this.daoFactory.getDmsProjectDAO()
 				.getObservationSetVariables(observationSetId, PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
@@ -182,7 +183,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		List<MeasurementVariable> variateColumns;
-		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+		if (datasetBasicDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			//PLOTDATA
 			variateColumns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, MEASUREMENT_VARIABLE_TYPES);
 		} else {
@@ -238,12 +239,12 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getObservationSetVariables(final Integer observationSetId) {
 
-		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
+		final DatasetBasicDTO datasetBasicDTO = this.daoFactory.getDmsProjectDAO().getDataset(observationSetId);
 
 		final List<MeasurementVariable> plotDataSetColumns;
-		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+		if (datasetBasicDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			plotDataSetColumns =
-				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetDTO.getDatasetId(), PLOT_COLUMNS_ALL_VARIABLE_TYPES);
+				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetBasicDTO.getDatasetId(), PLOT_COLUMNS_ALL_VARIABLE_TYPES);
 
 		} else {
 			final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(observationSetId).getParent();
@@ -578,6 +579,11 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		return datasetDTO;
+	}
+
+	@Override
+	public DatasetBasicDTO getDatasetBasicDTO(final Integer datasetId) {
+		return this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
 	}
 
 	@Override

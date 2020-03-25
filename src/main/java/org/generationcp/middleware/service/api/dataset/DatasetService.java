@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.dataset;
 
 import com.google.common.collect.Table;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dms.DatasetBasicDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -169,6 +170,14 @@ public interface DatasetService {
 	 * @return
 	 */
 	DatasetDTO getDataset(Integer datasetId);
+
+	/**
+	 * Return a dataset basic DTO given the id
+	 *
+	 * @param datasetId Id of the dataset
+	 * @return
+	 */
+	DatasetBasicDTO getDatasetBasicDTO(Integer datasetId);
 
 	/**
 	 * Get dataset that observationUnitDbId belongs to

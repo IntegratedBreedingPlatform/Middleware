@@ -13,6 +13,7 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
+import org.generationcp.middleware.domain.dms.DatasetBasicDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -229,7 +230,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final DmsProject summary =
 			this.createDataset(studyName + " - Summary Dataset", programUUID, DatasetTypeEnum.SUMMARY_DATA.getId(), study, study);
 
-		final DatasetDTO retrievedProject = this.dmsProjectDao.getDataset(summary.getProjectId());
+		final DatasetBasicDTO retrievedProject = this.dmsProjectDao.getDataset(summary.getProjectId());
 		Assert.assertNotNull(retrievedProject);
 		Assert.assertEquals(summary.getName(), retrievedProject.getName());
 		Assert.assertEquals(summary.getDatasetType().getDatasetTypeId(), retrievedProject.getDatasetTypeId());
