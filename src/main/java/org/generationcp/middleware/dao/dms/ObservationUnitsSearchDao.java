@@ -171,16 +171,15 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		try {
 			final StringBuilder sql = new StringBuilder(
-				"select count(*) as totalObservationUnits, count(distinct(env.nd_experiment_id)) as totalInstances from " //
-					+ "nd_experiment nde " //
-					+ "    inner join project p on p.project_id = nde.project_id " //
-					+ " INNER JOIN project env_ds ON env_ds.study_id = p.study_id AND env_ds.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId()
-					+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
+				"select count(*) as totalObservationUnits, count(distinct(CASE WHEN level3.nd_experiment_id IS NULL THEN level2.nd_experiment_id ELSE level3.nd_experiment_id END)) as totalInstances " //
+					+ "FROM   nd_experiment nde "
+					+ "LEFT JOIN  nd_experiment level2 ON level2.nd_experiment_id = nde.parent_id "
+					+ "LEFT JOIN  nd_experiment level3 ON level3.nd_experiment_id = level2.parent_id "
 					+ " where " //
-					+ "	p.project_id = :datasetId ");
+					+ "	nde.project_id = :datasetId ");
 
 			if (observationUnitsSearchDTO.getInstanceId() != null) {
-				sql.append(" and env.nd_experiment_id = :instanceId ");
+				sql.append(" and (CASE WHEN level3.nd_experiment_id IS NULL THEN level2.nd_experiment_id ELSE level3.nd_experiment_id END) = :instanceId ");
 			}
 
 			final String filterByVariableSQL =
