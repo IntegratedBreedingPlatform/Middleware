@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Transaction}.
@@ -379,25 +380,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	}
 
-	public List<Transaction> getByIds(final List<Integer> transactionIds) {
-		final List<Transaction> transactions = new ArrayList<>();
-
-		if (transactionIds == null || transactionIds.isEmpty()) {
-			return transactions;
-		}
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.in("id", transactionIds));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error getByIds() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-	}
-
 	public void cancelUnconfirmedTransactionsForListEntries(final List<Integer> listEntryIds) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
@@ -602,23 +584,27 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "   (CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '" + TransactionStatus.CANCELLED.getValue()
-		+ "' END) as transactionStatus, " 
+		+ "' END) as transactionStatus, "
 		+ " i.locid as lotLocationId, "
+		+ " loc.lname as lotLocationName, "//
+		+ " loc.labbr as lotLocationAbbr, "//
 		+ " i.comments as lotComments "
 		+ " FROM"//
 		+ "   ims_transaction act "//
 		+ "        INNER JOIN"//
 		+ "    ims_lot i ON act.lotid = i.lotid "//
+		+ "		   LEFT JOIN" //
+		+ "	   location loc on loc.locid = i.locid "//
 		+ "        LEFT JOIN"//
 		+ "    cvterm scale ON scale.cvterm_id = i.scaleid"//
-		+ "        LEFT JOIN"//
+		+ "        INNER JOIN"//
 		+ "    germplsm g ON g.gid = i.eid"//
 		+ "        LEFT JOIN"//
 		+ "    names n ON n.gid = i.eid AND n.nstat = 1"//
 		+ "        LEFT JOIN"//
 		+ "    workbench.users users ON users.userid = act.userid"//
 		+ " WHERE"//
-		+ "    i.etype = 'GERMPLSM' "; //
+		+ "    i.etype = 'GERMPLSM' and g.deleted=0 "; //
 
 	private String buildSearchTransactionsQuery(final TransactionsSearchDto transactionsSearchDto) {
 		final StringBuilder query = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
@@ -777,11 +763,30 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
+	public List<Transaction> getByIds(final Set<Integer> transactionIds) {
+		final List<Transaction> transactions = new ArrayList<>();
+
+		if (transactionIds == null || transactionIds.isEmpty()) {
+			return transactions;
+		}
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			criteria.add(Restrictions.in("id", transactionIds));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error getByIds() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+	}
+
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
 			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class, Double.class, String.class, Date.class,
 				Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class, String.class,
-				Integer.class, String.class);
+				Integer.class, String.class, String.class, String.class);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
 		}
@@ -803,7 +808,15 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("lotStatus");
 		query.addScalar("transactionStatus");
 		query.addScalar("lotLocationId");
+		query.addScalar("lotLocationName");
+		query.addScalar("lotLocationAbbr");
 		query.addScalar("lotComments");
 	}
 
+
+	public Transaction update(final Transaction transaction) {
+		super.update(transaction);
+		this.getSession().flush();
+		return transaction;
+	}
 }

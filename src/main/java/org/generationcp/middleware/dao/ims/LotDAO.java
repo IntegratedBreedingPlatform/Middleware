@@ -683,7 +683,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "       LEFT JOIN location l on l.locid = lot.locid " //
 		+ "       LEFT join cvterm scale on scale.cvterm_id = lot.scaleid " //
 		+ "       INNER JOIN workbench.users users on users.userid = lot.userid " //
-		+ "WHERE 1=1 "; //
+		+ "WHERE g.deleted=0 "; //
 
 	private String buildSearchLotsQuery(final LotsSearchDto lotsSearchDto) {
 		final StringBuilder query = new StringBuilder(SEARCH_LOT_QUERY);
