@@ -114,6 +114,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private DaoFactory daoFactory;
 
+	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Autowired
@@ -137,8 +138,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
-		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
-		this.studyService = new StudyServiceImpl(sessionProvider);
 	}
 
 	@Override
