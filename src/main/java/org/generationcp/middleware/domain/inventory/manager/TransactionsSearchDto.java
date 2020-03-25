@@ -36,6 +36,16 @@ public class TransactionsSearchDto extends SearchRequestDto {
 
 	private Integer lotStatus;
 
+	private List<Integer> germplasmListIds;
+
+	public List<Integer> getGermplasmListIds() {
+		return germplasmListIds;
+	}
+
+	public void setGermplasmListIds(final List<Integer> germplasmListIds) {
+		this.germplasmListIds = germplasmListIds;
+	}
+
 	public String getDesignation() {
 		return this.designation;
 	}

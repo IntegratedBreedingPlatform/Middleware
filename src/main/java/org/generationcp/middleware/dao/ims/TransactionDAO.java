@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Transaction}.
@@ -583,13 +584,17 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "   (CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '" + TransactionStatus.CANCELLED.getValue()
-		+ "' END) as transactionStatus, " 
+		+ "' END) as transactionStatus, "
 		+ " i.locid as lotLocationId, "
+		+ " loc.lname as lotLocationName, "//
+		+ " loc.labbr as lotLocationAbbr, "//
 		+ " i.comments as lotComments "
 		+ " FROM"//
 		+ "   ims_transaction act "//
 		+ "        INNER JOIN"//
 		+ "    ims_lot i ON act.lotid = i.lotid "//
+		+ "		   LEFT JOIN" //
+		+ "	   location loc on loc.locid = i.locid "//
 		+ "        LEFT JOIN"//
 		+ "    cvterm scale ON scale.cvterm_id = i.scaleid"//
 		+ "        LEFT JOIN"//
@@ -602,7 +607,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "    i.etype = 'GERMPLSM' "; //
 
 	private String buildSearchTransactionsQuery(final TransactionsSearchDto transactionsSearchDto) {
-		final StringBuilder query = new StringBuilder(this.SEARCH_TRANSACTIONS_QUERY);
+		final StringBuilder query = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
 		if (transactionsSearchDto != null) {
 			if (transactionsSearchDto.getLotIds() != null && !transactionsSearchDto.getLotIds().isEmpty()) {
 				query.append(" and i.lotid IN (").append(Joiner.on(",").join(transactionsSearchDto.getLotIds())).append(") ");
@@ -670,6 +675,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				query.append(" and i.status = ").append(transactionsSearchDto.getLotStatus()).append(" ");
 			}
 
+			if (transactionsSearchDto.getGermplasmListIds() != null && !transactionsSearchDto.getGermplasmListIds().isEmpty()) {
+				query.append(" and i.eid in (select distinct (gid) from listdata where listid in (")
+					.append(Joiner.on(",").join(transactionsSearchDto.getGermplasmListIds())).
+					append(")) and i.etype = 'GERMPLSM' ");
+			}
 		}
 
 		return query.toString();
@@ -699,22 +709,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				this.addSortToSearchTransactionsQuery(this.buildSearchTransactionsQuery(transactionsSearchDto), pageable);
 
 			final SQLQuery query = this.getSession().createSQLQuery(filterTransactionsQuery);
-			query.addScalar("transactionId");
-			query.addScalar("createdByUsername");
-			query.addScalar("transactionType");
-			query.addScalar("amount");
-			query.addScalar("notes");
-			query.addScalar("transactionDate", Hibernate.DATE);
-			query.addScalar("lotLotId");
-			query.addScalar("lotGid");
-			query.addScalar("lotDesignation");
-			query.addScalar("lotStockId");
-			query.addScalar("lotScaleId");
-			query.addScalar("lotScaleName");
-			query.addScalar("lotStatus");
-			query.addScalar("transactionStatus");
-			query.addScalar("lotLocationId");
-			query.addScalar("lotComments");
+			this.addSearchTransactionsQueryScalars(query);
 
 			query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
 
@@ -742,12 +737,86 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
+	public List<TransactionDto> getAvailableBalanceTransactions(final Integer lotId) {
+		try {
+
+			if (lotId != null) {
+				final StringBuilder sql = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
+				sql.append(" and (act.trnstat =").append(TransactionStatus.CONFIRMED.getIntValue()).append(" or (act.trnstat = ")
+					.append(TransactionStatus.PENDING.getIntValue()).
+					append(" and act.trntype = ").append(TransactionType.WITHDRAWAL.getId()).append(")) ");
+				sql.append(" and act.lotid = ").append(lotId).append(" ");
+				final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+				this.addSearchTransactionsQueryScalars(query);
+
+				query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
+
+				final List<TransactionDto> transactionDtos = query.list();
+
+				return transactionDtos;
+			} else {
+				return new ArrayList<>();
+			}
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getAvailableBalanceTransactions() query on TransactionDAO: " + e.getMessage(), e);
+		}
+	}
+
+	public List<Transaction> getByIds(final Set<Integer> transactionIds) {
+		final List<Transaction> transactions = new ArrayList<>();
+
+		if (transactionIds == null || transactionIds.isEmpty()) {
+			return transactions;
+		}
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			criteria.add(Restrictions.in("id", transactionIds));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error getByIds() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+	}
+
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
 			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class, Double.class, String.class, Date.class,
-					Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class, String.class, Integer.class, String.class);
+				Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class, String.class,
+				Integer.class, String.class, String.class, String.class);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+
+	private void addSearchTransactionsQueryScalars(final SQLQuery query) {
+		query.addScalar("transactionId");
+		query.addScalar("createdByUsername");
+		query.addScalar("transactionType");
+		query.addScalar("amount");
+		query.addScalar("notes");
+		query.addScalar("transactionDate", Hibernate.DATE);
+		query.addScalar("lotLotId");
+		query.addScalar("lotGid");
+		query.addScalar("lotDesignation");
+		query.addScalar("lotStockId");
+		query.addScalar("lotScaleId");
+		query.addScalar("lotScaleName");
+		query.addScalar("lotStatus");
+		query.addScalar("transactionStatus");
+		query.addScalar("lotLocationId");
+		query.addScalar("lotLocationName");
+		query.addScalar("lotLocationAbbr");
+		query.addScalar("lotComments");
+	}
+
+
+	public Transaction update(final Transaction transaction) {
+		super.update(transaction);
+		this.getSession().flush();
+		return transaction;
 	}
 }
