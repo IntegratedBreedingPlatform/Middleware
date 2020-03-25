@@ -18,7 +18,6 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
@@ -165,9 +164,8 @@ public class StudyServiceImplTest {
 	@Test
 	public void testGetObservations() {
 		final StudyMeasurements mockMeasurements = Mockito.mock(StudyMeasurements.class);
-		final StudyGermplasmListService mockStudyGermplasmListService = Mockito.mock(StudyGermplasmListService.class);
 
-		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl( mockMeasurements, mockStudyGermplasmListService);
+		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl( mockMeasurements);
 		studyServiceImpl.setDaoFactory(this.daoFactory);
 
 		final List<MeasurementVariableDto> projectTraits =

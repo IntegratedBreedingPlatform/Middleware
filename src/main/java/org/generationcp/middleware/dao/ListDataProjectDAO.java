@@ -11,6 +11,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -361,5 +362,34 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		}
 		return result;
 
+	}
+
+	public List<StudyGermplasmDto> getGermplasmList(final int studyBusinessIdentifier) {
+
+		final Criteria listDataCriteria =
+			this.getSession().createCriteria(ListDataProject.class).createAlias("list", "l")
+				.add(Restrictions.eq("l.projectId", studyBusinessIdentifier));
+		listDataCriteria.add(Restrictions.eq("l.type", GermplasmListType.STUDY.name()));
+		listDataCriteria.addOrder(Order.asc("entryId"));
+		final List<ListDataProject> list = listDataCriteria.list();
+		final List<StudyGermplasmDto> studyGermplasmDtos = new ArrayList<>();
+		Integer index = 0;
+		for (final ListDataProject listDataProject : list) {
+			final StudyGermplasmDto studyGermplasmDto = new StudyGermplasmDto();
+			studyGermplasmDto.setCross(listDataProject.getGroupName());
+			studyGermplasmDto.setDesignation(listDataProject.getDesignation());
+			studyGermplasmDto.setEntryCode(listDataProject.getEntryCode());
+			studyGermplasmDto.setEntryNumber(listDataProject.getEntryId());
+			studyGermplasmDto.setGermplasmId(listDataProject.getGermplasmId());
+			++index;
+			studyGermplasmDto.setPosition(index.toString());
+			studyGermplasmDto.setSeedSource(listDataProject.getSeedSource());
+			studyGermplasmDto.setEntryType(listDataProject.getList().getType());
+			studyGermplasmDto.setCheckType(listDataProject.getCheckType());
+			studyGermplasmDto.setStockIds(listDataProject.getStockIDs());
+			studyGermplasmDto.setGroupId(listDataProject.getGroupId());
+			studyGermplasmDtos.add(studyGermplasmDto);
+		}
+		return studyGermplasmDtos;
 	}
 }
