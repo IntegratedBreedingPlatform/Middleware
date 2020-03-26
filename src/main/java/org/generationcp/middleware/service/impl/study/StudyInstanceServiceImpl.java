@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.base.Preconditions;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.InstanceDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
@@ -146,8 +147,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 		// Delete plot and environment experiments
 		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);
-		this.daoFactory.getExperimentDao()
-			.deleteExperimentsForDatasets(Arrays.asList(plotDatasetId, environmentDatasetId), instanceNumbersToDelete);
+		final ExperimentDao experimentDao = this.daoFactory.getExperimentDao();
+		experimentDao.deleteExperimentsForDatasets(Arrays.asList(plotDatasetId, environmentDatasetId), instanceNumbersToDelete);
 
 		// IF experimental design is not yet generated, re-number succeeding trial instances
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
@@ -163,7 +164,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			Integer instanceNumber = startingInstanceNumber;
 			for (final ExperimentModel instance : instancesToUpdate) {
 				instance.setObservationUnitNo(instanceNumber++);
-				this.daoFactory.getExperimentDao().saveOrUpdate(instance);
+				experimentDao.saveOrUpdate(instance);
 			}
 		}
 	}
