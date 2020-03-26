@@ -361,7 +361,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			+ "   name \n"
 			+ " FROM cvterm cvt \n"
 			+ "   INNER JOIN projectprop pp ON (pp.variable_id = cvt.cvterm_id) \n"
-			+ " WHERE pp.type_id IN (:variablesTypes) AND pp.project_id = :datasetId ";
+			+ " WHERE pp.type_id IN (:variablesTypes) AND pp.project_id = :studyId ";
 		final List<MeasurementVariableDto> measurementVariables =
 				this.getVariablesByStudy(datasetId, queryString, variableTypes);
 		if (!measurementVariables.isEmpty()) {

@@ -28,7 +28,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -49,10 +48,8 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImpl;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
-import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
@@ -119,9 +116,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private OntologyDataManager ontologyDataManager;
-
-	@Autowired
-	ResourceBundleMessageSource messageSource;
 
 	@Autowired
 	private StudyService studyService;

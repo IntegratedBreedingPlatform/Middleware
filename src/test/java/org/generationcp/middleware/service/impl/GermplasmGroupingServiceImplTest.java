@@ -392,6 +392,7 @@ public class GermplasmGroupingServiceImplTest {
 		final Integer crossGid2 = 2;
 		final Integer nonHybridMethodId = 416;
 		final Germplasm crossGermplasm2 = new Germplasm(crossGid2);
+		crossGermplasm2.setMethodId(hybridMethodId);
 		crossGermplasm1.setMethodId(nonHybridMethodId);
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2, crossGermplasm2));
@@ -438,6 +439,7 @@ public class GermplasmGroupingServiceImplTest {
 		final Integer crossGid2 = 2;
 		final Integer nonHybridMethodId = 416;
 		final Germplasm crossGermplasm2 = new Germplasm(crossGid2);
+		crossGermplasm2.setMethodId(hybridMethodId);
 		crossGermplasm1.setMethodId(nonHybridMethodId);
 		Mockito.when(this.germplasmDAO.getById(crossGid2)).thenReturn(crossGermplasm2);
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
@@ -612,6 +614,7 @@ public class GermplasmGroupingServiceImplTest {
 		final Integer crossGid2 = 2;
 		final Integer nonHybridMethodId = 416;
 		final Germplasm crossGermplasm2 = new Germplasm(crossGid2);
+		crossGermplasm2.setMethodId(hybridMethodId);
 		crossGermplasm1.setMethodId(nonHybridMethodId);
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2, crossGermplasm2));
@@ -635,7 +638,6 @@ public class GermplasmGroupingServiceImplTest {
 
 		final Integer crossGid1 = 1;
 		final Integer crossGid1Parent1 = 11;
-		final Integer crossGid1Parent2 = 12;
 		final Integer hybridMethodId = 416;
 
 		final Germplasm crossGermplasm1 = new Germplasm(crossGid1);
