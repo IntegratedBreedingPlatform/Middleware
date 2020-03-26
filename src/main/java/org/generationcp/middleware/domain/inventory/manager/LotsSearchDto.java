@@ -45,6 +45,10 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private Double maxWithdrawalTotal;
 
+	private Double minPendingDepositsTotal;
+
+	private Double maxPendingDepositsTotal;
+
 	private String createdByUsername;
 
 	private List<Integer> germplasmListIds;
@@ -277,6 +281,22 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	public void setLocationNameContainsString(final String locationNameContainsString) {
 		this.locationNameContainsString = locationNameContainsString;
+	}
+
+	public Double getMinPendingDepositsTotal() {
+		return minPendingDepositsTotal;
+	}
+
+	public void setMinPendingDepositsTotal(final Double minPendingDepositTotal) {
+		this.minPendingDepositsTotal = minPendingDepositTotal;
+	}
+
+	public Double getMaxPendingDepositsTotal() {
+		return maxPendingDepositsTotal;
+	}
+
+	public void setMaxPendingDepositsTotal(final Double maxPendingDepositTotal) {
+		this.maxPendingDepositsTotal = maxPendingDepositTotal;
 	}
 
 	@Override
