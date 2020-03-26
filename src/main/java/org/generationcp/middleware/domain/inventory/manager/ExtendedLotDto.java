@@ -42,12 +42,15 @@ public class ExtendedLotDto extends LotDto {
 
 	@JsonView({InventoryView.LotView.class})
 	private Double withdrawalTotal;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 
 	@JsonView({InventoryView.LotView.class})
-	private Date lastDepositDate;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
+	private Double pendingDepositsTotal;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
+	@JsonView({InventoryView.LotView.class})
+	private Date lastDepositDate;
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	@JsonView({InventoryView.LotView.class})
 	private Date lastWithdrawalDate;
 
@@ -153,6 +156,14 @@ public class ExtendedLotDto extends LotDto {
 
 	public void setCreatedByUsername(final String createdByUsername) {
 		this.createdByUsername = createdByUsername;
+	}
+
+	public Double getPendingDepositsTotal() {
+		return pendingDepositsTotal;
+	}
+
+	public void setPendingDepositsTotal(final Double pendingDepositsTotal) {
+		this.pendingDepositsTotal = pendingDepositsTotal;
 	}
 
 	@Override
