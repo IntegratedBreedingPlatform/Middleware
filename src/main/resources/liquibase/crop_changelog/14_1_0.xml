@@ -1,0 +1,636 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="gelli" id="v14.1.0-1">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="sample" columnName="created_by_bkp"/>
+        </preConditions>
+        <comment>Drop Column created_by_bkp if exists from table sample.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE sample DROP COLUMN created_by_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="sample" columnName="taken_by_bkp"/>
+        </preConditions>
+        <comment>Drop Column taken_by_bkp if exists from table sample.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE sample DROP COLUMN taken_by_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-3">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="sample_list"/>
+            <columnExists tableName="sample_list" columnName="created_by_bkp"/>
+        </preConditions>
+        <comment>Drop Column created_by_bkp if exists from table sample_list.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE sample_list DROP COLUMN created_by_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-4">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="user_program_tree_state" columnName="userid_bkp"/>
+        </preConditions>
+        <comment>Drop Column userid_bkp if exists from table user_program_tree_state.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE user_program_tree_state DROP COLUMN userid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-5">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="gdms_dataset_users" columnName="user_id_bkp"/>
+        </preConditions>
+        <comment>Drop Column user_id_bkp if exists from table gdms_dataset_users.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE gdms_dataset_users DROP COLUMN user_id_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-6">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="gmds_track_data" columnName="user_id_bkp"/>
+        </preConditions>
+        <comment>Drop Column user_id_bkp if exists from table gmds_track_data.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE gmds_track_data DROP COLUMN user_id_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-7">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="ims_lot" columnName="userid_bkp"/>
+        </preConditions>
+        <comment>Drop Column userid_bkp if exists from table ims_lot.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE ims_lot DROP COLUMN userid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-8">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="ims_transaction" columnName="userid_bkp"/>
+        </preConditions>
+        <comment>Drop Column userid_bkp if exists from table ims_transaction.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE ims_transaction DROP COLUMN userid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-9">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="ims_transaction" columnName="personid_bkp"/>
+        </preConditions>
+        <comment>Drop Column personid_bkp if exists from table ims_transaction.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE ims_transaction DROP COLUMN personid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-10">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="project"/>
+            <columnExists tableName="project" columnName="created_by_bkp"/>
+        </preConditions>
+        <comment>Drop Column created_by_bkp if exists from table project.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE project DROP COLUMN created_by_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-11">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="listnms" columnName="listuid_bkp"/>
+        </preConditions>
+        <comment>Drop Column listuid_bkp if exists from table listnms.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE listnms DROP COLUMN listuid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-12">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="atributs" columnName="auid_bkp"/>
+        </preConditions>
+        <comment>Drop Column auid_bkp if exists from table atributs.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE atributs DROP COLUMN auid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-13">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="changes" columnName="cuid_bkp"/>
+        </preConditions>
+        <comment>Drop Column cuid_bkp if exists from table changes.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE changes DROP COLUMN cuid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-14">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="germplsm" columnName="germuid_bkp"/>
+        </preConditions>
+        <comment>Drop Column germuid_bkp if exists from table germplsm.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE germplsm DROP COLUMN germuid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-15">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="locdes" columnName="duid_bkp"/>
+        </preConditions>
+        <comment>Drop Column duid_bkp if exists from table locdes.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE locdes DROP COLUMN duid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-16">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="methods" columnName="muid_bkp"/>
+        </preConditions>
+        <comment>Drop Column muid_bkp if exists from table methods.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE methods DROP COLUMN muid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-17">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="names" columnName="nuid_bkp"/>
+        </preConditions>
+        <comment>Drop Column nuid_bkp if exists from table names.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE names DROP COLUMN nuid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-18">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="udflds" columnName="fuid_bkp"/>
+        </preConditions>
+        <comment>Drop Column fuid_bkp if exists from table udflds.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE udflds DROP COLUMN fuid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-19">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="reflinks" columnName="refuid_bkp"/>
+        </preConditions>
+        <comment>Drop Column refuid_bkp if exists from table reflinks.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE reflinks DROP COLUMN refuid_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-20">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="projectprop_users_bkp"/>
+        </preConditions>
+        <comment>Drop Table projectprop_users_bkp if exists.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+          DROP TABLE projectprop_users_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-21">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="nd_geolocationprop_users_bkp"/>
+        </preConditions>
+        <comment>Drop Table nd_geolocationprop_users_bkp if exists.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE nd_geolocationprop_users_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-22">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="users_bkp"/>
+        </preConditions>
+        <comment>Drop Table users_bkp if exists.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE users_bkp;
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v14.1.0-23">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="persons_bkp"/>
+        </preConditions>
+        <comment>Drop Table persons_bkp if exists.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE persons_bkp;
+        </sql>
+    </changeSet>
+
+    <changeSet author="vanina" id="v14.1.0-1">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="listdata_project_bkp"></tableExists>
+        </preConditions>
+        <comment> Remove unused table listdata_project_bkp
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE listdata_project_bkp;
+        </sql>
+    </changeSet>
+
+    <changeSet author="vanina" id="v14.1.0-2">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="listnms_bkp"></tableExists>
+        </preConditions>
+        <comment> Remove unused table listnms_bkp
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE listnms_bkp;
+        </sql>
+    </changeSet>
+
+    <changeSet author="vanina" id="v14.1.0-3">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="stock_id_bkp"></tableExists>
+        </preConditions>
+        <comment> Remove unused table stock_id_bkp
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE stock_id_bkp;
+        </sql>
+    </changeSet>
+
+    <changeSet author="vanina" id="v14.1.0-4">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="ims_labelinfo"></tableExists>
+        </preConditions>
+        <comment> Remove unused table ims_labelinfo
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE ims_labelinfo;
+        </sql>
+    </changeSet>
+
+    <changeSet author="vanina" id="v14.1.0-5">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="ims_label_otherinfo"></tableExists>
+        </preConditions>
+        <comment> Remove unused table ims_label_otherinfo
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DROP TABLE ims_label_otherinfo;
+        </sql>
+    </changeSet>
+
+	<changeSet author="nahuel" id="v14.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="nd_experiment" columnName="json_props"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create column to store properties in json format.
+			Aimed to replace nd_experimentprop
+		</comment>
+		<addColumn tableName="nd_experiment">
+			<column name="json_props" type="CLOB" />
+		</addColumn>
+	</changeSet>
+
+    <changeSet author="clarysabel" id="v14.1.0-1">
+        <preConditions onFail="CONTINUE">
+            <and>
+                <columnExists tableName="ims_lot" columnName="stock_id"/>
+                <sqlCheck expectedResult="YES">
+                    SELECT IS_NULLABLE
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE table_name = 'ims_lot' and column_name='stock_id' and table_schema = DATABASE();
+                </sqlCheck>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM ims_lot WHERE stock_id IS NULL;
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <comment>Add not null restriction to ims_table.stock_id</comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE ims_lot MODIFY stock_id VARCHAR(35) NOT NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet author="clarysabel" id="v14.1.0-2">
+        <preConditions onFail="CONTINUE">
+            <and>
+                <columnExists tableName="ims_lot" columnName="stock_id"/>
+				<not>
+					<indexExists tableName="ims_lot" indexName="ims_lot_stock_id_unique"/>
+				</not>
+                <sqlCheck expectedResult="0">
+                    select count(*) from
+                        (select stock_id, count(*) from ims_lot group by stock_id having  count(*)&gt;1) count_by_stock_id
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <comment>Add stock_id unique index to ims_lot</comment>
+		<createIndex indexName="ims_lot_stock_id_unique" tableName="ims_lot" unique="true">
+			<column name="stock_id" type="varchar(35)"/>
+		</createIndex>
+    </changeSet>
+
+
+	<changeSet author="vanina" id="v14.1.0-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="ims_transaction" columnName="trntype"/>
+			</not>
+		</preConditions>
+		<comment> Add trntype to ims_transaction table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			ADD COLUMN trntype INT(11) NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-7">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					trnstat = 1
+					AND trntype IS NULL
+					AND comments = 'Stock taking adjustment';
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for committed Stock taking adjustment
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 3
+			WHERE
+			trnstat = 1
+			AND trntype IS NULL
+			AND comments = 'Stock taking adjustment';
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-8">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					trnstat = 1
+					AND trntype IS NULL
+					AND (comments != 'Stock taking adjustment' OR comments IS NULL)
+					AND trnqty >= 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for committed and not Stock taking adjustment, qty greater or equal than 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 4
+			WHERE
+			trnstat = 1
+			AND trntype IS NULL
+			AND (comments != 'Stock taking adjustment' OR comments IS NULL)
+			AND trnqty >= 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-9">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					trnstat = 1
+					AND trntype IS NULL
+					AND (comments != 'Stock taking adjustment' OR comments IS NULL)
+					AND trnqty &lt; 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for committed and not Stock taking adjustment, qty lower than 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 1
+			WHERE
+			trnstat = 1
+			AND trntype IS NULL
+			AND (comments != 'Stock taking adjustment' OR comments IS NULL)
+			AND trnqty &lt; 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-10">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+						trnid IN (SELECT
+									t.trnid
+								FROM
+									ims_transaction t
+								INNER JOIN
+									ims_lot l ON t.lotid = l.lotid
+								WHERE
+									t.trnstat = 1 AND l.status = 1 AND trnqty &lt; 0
+								AND t.comments = 'Discard'
+								AND t.trnid = (SELECT
+													MAX(trnid)
+												FROM
+													ims_transaction tr
+												WHERE
+													tr.lotid = l.lotid));
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for discard transaction when lot is closed
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+				trntype = 2
+			WHERE
+				trnid IN (SELECT
+					t.trnid
+				FROM
+					(select * from ims_transaction) t
+				INNER JOIN
+					ims_lot l ON t.lotid = l.lotid
+				WHERE
+					t.trnstat = 1 AND l.status = 1 AND trnqty &lt; 0
+				AND t.comments = 'Discard'
+				AND t.trnid = (SELECT
+									MAX(trnid)
+								FROM
+									(select * from ims_transaction) as tr
+								WHERE
+									tr.lotid = l.lotid));
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-11">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					trnstat IN (0, 9)
+					AND trntype IS NULL
+					AND trnqty &lt; 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for pending or cancelled transaction and qty lower than 0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 1
+			WHERE
+			trnstat IN (0, 9)
+			AND trntype IS NULL
+			AND trnqty &lt; 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-12">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from ims_transaction it
+					WHERE
+					trnstat IN (0, 9)
+					AND trntype IS NULL
+					AND trnqty >= 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set transaction type for pending or cancelled transaction and qty greater or equal  0
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			SET
+			trntype = 4
+			WHERE
+			trnstat IN (0, 9)
+			AND trntype IS NULL
+			AND trnqty >=  0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-13">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="ims_transaction" columnName="trntype"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM ims_transaction
+					WHERE trntype is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'ims_transaction'
+					AND COLUMN_NAME = 'trntype'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Set trntype as not nullable
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			MODIFY COLUMN trntype INT(11) NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-14">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="ims_transaction" columnName="trnstat"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM ims_transaction
+					WHERE trnstat is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'ims_transaction'
+					AND COLUMN_NAME = 'trnstat'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Set trnstat as not nullable
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			MODIFY COLUMN trnstat INT(11) NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v14.1.0-15">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="ims_transaction" columnName="trnqty"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM ims_transaction
+					WHERE trnqty is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'ims_transaction'
+					AND COLUMN_NAME = 'trnqty'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Set trnqty as not nullable
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_transaction
+			MODIFY COLUMN trnqty DOUBLE NOT NULL;
+		</sql>
+	</changeSet>
+</databaseChangeLog>

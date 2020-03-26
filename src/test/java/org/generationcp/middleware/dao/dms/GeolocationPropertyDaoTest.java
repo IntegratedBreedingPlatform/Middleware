@@ -17,8 +17,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -81,31 +81,11 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 			this.createEnvironmentData(dataset, Arrays.asList(this.variable1.getCvTermId(), this.variable2.getCvTermId()));
 
 		final Map<String, String> propertiesMap =
-			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationId);
+			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationId, Collections.emptyList());
 		Assert.assertNotNull(propertiesMap);
 		Assert.assertEquals(2, propertiesMap.size());
 		Assert.assertNotNull(propertiesMap.get(this.variable1.getDefinition()));
 		Assert.assertNotNull(propertiesMap.get(this.variable2.getDefinition()));
-	}
-
-	@Test
-	public void testGetInstanceIdLocationIdMap() {
-		final DmsProject dataset =
-			this.createDataset(RandomStringUtils.randomAlphabetic(20), DatasetTypeEnum.SUMMARY_DATA.getId(), this.study);
-		final Integer geolocationId =
-			this.createEnvironmentData(dataset, new ArrayList<Integer>());
-
-		final GeolocationProperty prop = new GeolocationProperty();
-		prop.setType(TermId.LOCATION_ID.getId());
-		final Geolocation geolocation = new Geolocation(geolocationId);
-		prop.setGeolocation(geolocation);
-		prop.setRank(1);
-		prop.setValue("1001");
-		this.geolocationPropDao.save(prop);
-
-		final Map<Integer, String> instanceIdLocationIdMap = this.geolocationPropDao.getInstanceIdLocationIdMap(Arrays.asList(geolocationId));
-		Assert.assertEquals(1, instanceIdLocationIdMap.size());
-		Assert.assertEquals("1001", instanceIdLocationIdMap.get(geolocationId));
 	}
 
 	@Test
@@ -119,11 +99,11 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 
 		// Verify that geolocation props exist before deletion
 		final Map<String, String> studyProperties =
-			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationIdMain);
+			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationIdMain, Collections.emptyList());
 		Assert.assertNotNull(studyProperties);
 		Assert.assertFalse(studyProperties.isEmpty());
 		final Map<String, String> datasetProperties =
-			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationIdDataset);
+			this.geolocationPropDao.getGeolocationPropsAndValuesByGeolocation(geolocationIdDataset, Collections.emptyList());
 		Assert.assertNotNull(datasetProperties);
 		Assert.assertFalse(datasetProperties.isEmpty());
 	}

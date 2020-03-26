@@ -41,6 +41,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
@@ -899,7 +900,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		this.lotDAO.save(lot);
 
 		final Transaction transaction =
-			InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, "2 reserved", lot, 1, 1, 1, "LIST");
+			InventoryDetailsTestDataInitializer
+				.createReservationTransaction(2.0, 0, "2 reserved", lot, 1, 1, 1, "LIST", TransactionType.WITHDRAWAL.getId());
 		this.transactionDAO.save(transaction);
 
 		final GermplasmSearchParameter searchParameter =
@@ -1293,7 +1295,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		germplasm.setGid(1166066);
 		germplasm.setMethodId(31);
 		germplasm.setGnpgs(-1);
-		germplasm.setGrplce(-1);
+		germplasm.setGrplce(0);
 		germplasm.setGpid1(0);
 		germplasm.setGpid2(0);
 		germplasm.setUserId(1);

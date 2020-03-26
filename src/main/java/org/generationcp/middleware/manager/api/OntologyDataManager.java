@@ -26,7 +26,6 @@ import org.generationcp.middleware.domain.oms.TraitClass;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
 import java.util.List;

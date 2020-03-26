@@ -138,8 +138,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final String programUUID) {
-		return this.daoFactory.getLocationDAO().getFilteredLocations(types, locationIds, programUUID);
+	public List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final List<String> locationAbbreviations) {
+		return this.daoFactory.getLocationDAO().filterLocations(types, locationIds, locationAbbreviations);
 	}
 
 	@Override
@@ -472,9 +472,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<LocationDetails> getFilteredLocations(
-		final Integer countryId, final Integer locationType, final String locationName,
-		final String programUUID) {
+	public List<LocationDetails> getFilteredLocationsDetails(final Integer countryId, final Integer locationType, final String locationName,
+			final String programUUID) {
 		return this.daoFactory.getLocationDAO().getFilteredLocations(countryId, locationType, locationName, programUUID);
 	}
 

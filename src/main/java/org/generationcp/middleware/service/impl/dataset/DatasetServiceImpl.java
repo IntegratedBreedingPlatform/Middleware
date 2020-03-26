@@ -303,8 +303,8 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.getDataset(dataset.getProjectId());
 	}
 
-	/*
-	 * Create sub-observation units for each plot observation unit
+	/**
+	 * Creates sub-observation units for each plot observation unit
 	 */
 	void saveSubObservationUnits(
 		final Integer studyId, final List<Integer> instanceIds, final Integer numberOfSubObservationUnits,
@@ -563,6 +563,11 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		return datasetDTO;
+	}
+
+	@Override
+	public DatasetDTO getDatasetByObsUnitDbId(final String observationUnitDbId) {
+		return this.daoFactory.getDmsProjectDAO().getDatasetByObsUnitDbId(observationUnitDbId);
 	}
 
 	protected void setDaoFactory(final DaoFactory daoFactory) {
@@ -1010,13 +1015,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 					if (StringUtils.isNotBlank(importedVariableValue)) {
 						final MeasurementVariable measurementVariable =
-							(MeasurementVariable) CollectionUtils.find(measurementVariableList, new Predicate() {
-
-								@Override
-								public boolean evaluate(final Object object) {
-									final MeasurementVariable variable = (MeasurementVariable) object;
-									return variable.getAlias().equalsIgnoreCase(variableName);
-								}
+							(MeasurementVariable) CollectionUtils.find(measurementVariableList, object -> {
+								final MeasurementVariable variable = (MeasurementVariable) object;
+								return variable.getAlias().equalsIgnoreCase(variableName);
 							});
 
 						BigInteger categoricalValueId = null;

@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.api.study;
 
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public interface StudyService {
 	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
 
 	List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize,
-			final String sortBy, final String sortOrder);
+		final String sortBy, final String sortOrder);
 
 	List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier);
 
@@ -31,31 +30,29 @@ public interface StudyService {
 	TrialObservationTable getTrialObservationTable(int studyIdentifier);
 
 	/**
-	 *
 	 * @param studyIdentifier id for the study (Nursery / Trial)
-	 * @param instanceDbId id for a Trial instance of a Trial (Nursery has 1 instance). If present studyIdentifier will not be used
+	 * @param instanceDbId    id for a Trial instance of a Trial (Nursery has 1 instance). If present studyIdentifier will not be used
 	 * @return
 	 */
 	TrialObservationTable getTrialObservationTable(int studyIdentifier, Integer instanceDbId);
 
 	/**
-	 *
 	 * @param geolocationId
 	 * @return StudyDetailsDto
 	 */
-	StudyDetailsDto getStudyDetailsForGeolocation(Integer geolocationId);
-	
+	StudyDetailsDto getStudyDetailsByGeolocation(Integer geolocationId);
+
 	/**
-	 *
-	 * @param ids of the variables that i need to check data
+	 * @param ids     of the variables that i need to check data
 	 * @param studyId id for the study (Nursery / Trial)
 	 * @return the true if any id have data on the study
 	 */
-	boolean hasMeasurementDataEntered(final List<Integer> ids,final int studyId);
+	boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId);
 
 	/**
 	 * Retrieves Phenotypes given certain search parameters
 	 * specified in https://brapi.docs.apiary.io/#reference/phenotypes/phenotype-search V1.1
+	 *
 	 * @param pageSize
 	 * @param pageNumber
 	 * @param requestDTO
@@ -65,6 +62,7 @@ public interface StudyService {
 
 	/**
 	 * Retrieves a count of how many phenotypes match with the search parameters
+	 *
 	 * @param requestDTO
 	 * @return Number of phenotypes
 	 */
@@ -77,4 +75,8 @@ public interface StudyService {
 	Integer getPlotDatasetId(final int studyId);
 
 	Integer getEnvironmentDatasetId(final int studyId);
+
+	List<StudyDto> getStudies(StudySearchFilter studySearchFilter);
+
+	long countStudies(StudySearchFilter studySearchFilter);
 }
