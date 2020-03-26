@@ -326,8 +326,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Boolean isDatasetNameAvailable(final String name, final int studyId) {
-		final List<DatasetDTO> datasetDTOs = this.getDatasets(studyId, new HashSet<Integer>());
-		for (final DatasetDTO datasetDTO : datasetDTOs) {
+		final List<DatasetBasicDTO> datasetDTOs = this.getDatasetBasicDTOs(studyId, new HashSet<>());
+		for (final DatasetBasicDTO datasetDTO : datasetDTOs) {
 			if (datasetDTO.getName().equals(name)) {
 				return false;
 			}
@@ -372,6 +372,18 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new MiddlewareException("Specified type does not match with the list of types associated to the variable");
 		}
 		return new ProjectProperty(dmsProject, typeId, value, rank, variableId, (alias == null) ? variable.getName() : alias);
+	}
+
+	@Override
+	public List<DatasetBasicDTO> getDatasetBasicDTOs(final Integer studyId, final Set<Integer> datasetTypeIds) {
+		final List<DatasetDTO> datasetDTOs = this.daoFactory.getDmsProjectDAO().getDatasets(studyId);
+		final List<DatasetBasicDTO> datasetBasicDTOS = new ArrayList<>();
+		for (final DatasetDTO datasetDTO : datasetDTOs) {
+			if (datasetTypeIds.isEmpty() || datasetTypeIds.contains(datasetDTO.getDatasetTypeId())) {
+				datasetBasicDTOS.add(datasetDTO);
+			}
+		}
+		return datasetBasicDTOS;
 	}
 
 	@Override

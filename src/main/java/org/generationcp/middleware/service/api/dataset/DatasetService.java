@@ -128,6 +128,15 @@ public interface DatasetService {
 		Integer parentId);
 
 	/**
+	 * Given a list of dataset types and a study, it will retrieve the study dataset basic dtos with the specified types
+	 *
+	 * @param studyId        Id of the study
+	 * @param datasetTypeIds List of dataset types
+	 * @return List of datasets
+	 */
+	List<DatasetBasicDTO> getDatasetBasicDTOs(Integer studyId, Set<Integer> datasetTypeIds);
+
+	/**
 	 * Given a list of dataset types and a study, it will retrieve the study datasets with the specified types
 	 *
 	 * @param studyId        Id of the study
