@@ -1,6 +1,7 @@
 package org.generationcp.middleware.domain.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -8,6 +9,7 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.Date;
 
 @AutoProperty
+@JsonIgnoreProperties({"locationAbbr"})
 public class ExtendedLotDto extends LotDto {
 
 	private String designation;
@@ -21,6 +23,8 @@ public class ExtendedLotDto extends LotDto {
 
 	@JsonView({InventoryView.LotView.class})
 	private String locationName;
+
+	private String locationAbbr;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	@JsonView({InventoryView.LotView.class})
@@ -38,15 +42,17 @@ public class ExtendedLotDto extends LotDto {
 
 	@JsonView({InventoryView.LotView.class})
 	private Double withdrawalTotal;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 
+	@JsonView({InventoryView.LotView.class})
+	private Double pendingDepositsTotal;
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	@JsonView({InventoryView.LotView.class})
 	private Date lastDepositDate;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	@JsonView({InventoryView.LotView.class})
 	private Date lastWithdrawalDate;
-
 
 	public Date getCreatedDate() {
 		return createdDate;
@@ -128,6 +134,14 @@ public class ExtendedLotDto extends LotDto {
 		this.locationName = locationName;
 	}
 
+	public String getLocationAbbr() {
+		return locationAbbr;
+	}
+
+	public void setLocationAbbr(final String locationAbbr) {
+		this.locationAbbr = locationAbbr;
+	}
+
 	public String getUnitName() {
 		return unitName;
 	}
@@ -142,6 +156,14 @@ public class ExtendedLotDto extends LotDto {
 
 	public void setCreatedByUsername(final String createdByUsername) {
 		this.createdByUsername = createdByUsername;
+	}
+
+	public Double getPendingDepositsTotal() {
+		return pendingDepositsTotal;
+	}
+
+	public void setPendingDepositsTotal(final Double pendingDepositsTotal) {
+		this.pendingDepositsTotal = pendingDepositsTotal;
 	}
 
 	@Override
