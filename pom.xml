@@ -15,13 +15,14 @@
 		<spring.version>4.1.6.RELEASE</spring.version>
 		<liquibase.version>3.6.1</liquibase.version>
 		<envConfig>${user.name}</envConfig>
+		<hibernate.version>4.2.21.Final</hibernate.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>4.2.11.Final</version>
+			<version>${hibernate.version}</version>
 			<exclusions>
 				<exclusion>
       				<groupId>org.javassist</groupId>
@@ -32,7 +33,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-c3p0</artifactId>
-			<version>4.2.11.Final</version>
+			<version>${hibernate.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -56,7 +57,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-ehcache</artifactId>
-			<version>4.2.11.Final</version>
+			<version>${hibernate.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>net.sf.ehcache</groupId>
@@ -157,6 +158,7 @@
 			<version>1.1.2</version>
 		</dependency>
 
+		<!-- Servlet API Dependency -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>

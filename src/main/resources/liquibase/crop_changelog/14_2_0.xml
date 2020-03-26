@@ -1,0 +1,52 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="nahuel" id="v14.2.0-1">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from sequence where sequence_name = 'nd_experimentprop'
+			</sqlCheck>
+        </preConditions>
+        <comment>
+            Create sequence entry for nd_experimentprop table generator
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			insert into sequence(sequence_name, sequence_value)
+			select 'nd_experimentprop', coalesce(ceil(max(nd_experimentprop_id) / 500), 1) from nd_experimentprop;
+        </sql>
+    </changeSet>
+
+    <changeSet author="nahuel" id="v14.2.0-2">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from sequence where sequence_name = 'stock'
+			</sqlCheck>
+        </preConditions>
+        <comment>
+            Create sequence entry for stock table generator
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			insert into sequence(sequence_name, sequence_value)
+			select 'stock', coalesce(ceil(max(stock_id) / 500), 1) from stock;
+        </sql>
+    </changeSet>
+
+    <changeSet author="nahuel" id="v14.2.0-3">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from sequence where sequence_name = 'stockprop'
+			</sqlCheck>
+        </preConditions>
+        <comment>
+            Create sequence entry for stockprop table generator
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			insert into sequence(sequence_name, sequence_value)
+			select 'stockprop', coalesce(ceil(max(stockprop_id) / 500), 1) from stockprop;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
