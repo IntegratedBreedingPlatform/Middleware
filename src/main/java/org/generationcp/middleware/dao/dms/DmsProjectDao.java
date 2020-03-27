@@ -1096,28 +1096,32 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
 				+ "  AND exp.parent_id = env.nd_experiment_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
 
-				// If study has samples or sub-observations, canBeDeleted = false
-				+ " case when (select count(1) from sample s "
-				+ " inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
-				+ " inner join project p on p.project_id = exp.project_id "
-				+ " LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = exp.parent_id and plot.type_id = 1155 "
-				+ " where p.study_id = env_ds.study_id and "
-				+ " (exp.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id)) > 0 or "
-				+ " (select count(1) from nd_experiment exp "
-				+ " INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 "
-				+ " INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 "
-				+ " INNER JOIN nd_experiment plot on exp.parent_id = plot.nd_experiment_id "
-				+ " where pr.study_id = env_ds.study_id and plot.parent_id = env.nd_experiment_id) > 0 "
-				+ " then 0 else 1 end as canBeDeleted, "
+				// If study has samples (plot and sub-obs levels) or sub-observations, canBeDeleted = false
+				+ "  CASE WHEN EXISTS (select 1 from sample s "
+				+ "                     inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155\n"
+				+ "                     where exp.parent_id = env.nd_experiment_id) OR "
+								// we are making a separate query for samples at the sub-obs level for optimization purposes
+				+ "            EXISTS (select 1 from sample s "
+				+ "                     inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155\n"
+				+ "                     inner join nd_experiment plot ON plot.nd_experiment_id = exp.parent_id and plot.type_id = 1155\n"
+				+ "                     where plot.parent_id = env.nd_experiment_id) OR "
+				+ "            EXISTS (select 1 from nd_experiment exp "
+				+ "                     INNER JOIN nd_experiment plot on exp.parent_id = plot.nd_experiment_id and plot.type_id = 1155\n"
+				+ "                     where exp.type_id = 1155 and plot.parent_id = env.nd_experiment_id) "
+				+ "       THEN 0 else 1 end as canBeDeleted, "
 
-				// if study has any pending or accepted plot observations, hasMeasurements = true
-				+ " case when (select count(1) from phenotype ph "
-				+ " inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
-				+ " inner join project p on p.project_id = exp.project_id "
-				+ " LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = exp.parent_id and plot.type_id = 1155 "
-				+ " where p.study_id = env_ds.study_id and "
-				+ " (exp.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) and "
-				+ " (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) > 0 then 1 else 0 end as hasMeasurements "
+				// if study has any pending or accepted observations (plot and sub-obs levels), hasMeasurements = true
+				+ " CASE WHEN EXISTS (select 1 from phenotype ph\n"
+				+ "                    inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155\n"
+				+ "                    where exp.parent_id = env.nd_experiment_id and\n"
+				+ "                    (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null))\n"
+								// we are making a separate query for observations at the sub-obs level for optimization purposes
+				+ "        OR EXISTS (select 1 from phenotype ph\n"
+				+ "                    inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155\n"
+				+ "                    inner JOIN nd_experiment plot ON plot.nd_experiment_id = exp.parent_id and plot.type_id = 1155\n"
+				+ "                    where plot.parent_id = env.nd_experiment_id and\n"
+				+ "                  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null))\n"
+				+ "                  then 1 else 0 end as hasMeasurements "
 
 				// Query tables
 				+ " FROM nd_experiment nde "
