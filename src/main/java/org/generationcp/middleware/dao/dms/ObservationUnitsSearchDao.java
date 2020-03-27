@@ -526,7 +526,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					columns.add(String.format(designFactorClauseFormat, designFactor, designFactor));
 				}
 			}
-		}r
+		}
 
 		// Only variables at observation level are supported in filtering columns. Variables at environment level are automatically excluded if filterColumns has values.
 		if (noFilterVariables && !CollectionUtils.isEmpty(searchDto.getEnvironmentDetails())) {
