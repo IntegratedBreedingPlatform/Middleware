@@ -79,7 +79,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	static {
 
 		mainVariablesMap.put(OBSERVATION_UNIT_ID, "    nde.nd_experiment_id as observationUnitId");
-		mainVariablesMap.put(TRIAL_INSTANCE, "(SELECT observation_unit_no from nd_experiment e where e.type_id = 1020 and e.nd_experiment_id = plot.parent_id)");
+		mainVariablesMap.put(TRIAL_INSTANCE, "(SELECT observation_unit_no from nd_experiment e where e.type_id = 1020 and e.nd_experiment_id = plot.parent_id) as TRIAL_INSTANCE");
 		mainVariablesMap.put(LOCATION_ID,
 			"    (SELECT loc.lname FROM nd_experimentprop xprop INNER JOIN location loc on loc.locid = xprop.value WHERE xprop.nd_experiment_id = plot.parent_id and xprop.type_id = 8190) 'LOCATION_ID'");
 		mainVariablesMap.put(EXPT_DESIGN,
