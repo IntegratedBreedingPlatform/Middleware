@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Transaction}.
@@ -379,25 +380,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	}
 
-	public List<Transaction> getByIds(final List<Integer> transactionIds) {
-		final List<Transaction> transactions = new ArrayList<>();
-
-		if (transactionIds == null || transactionIds.isEmpty()) {
-			return transactions;
-		}
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.in("id", transactionIds));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error getByIds() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-	}
-
 	public void cancelUnconfirmedTransactionsForListEntries(final List<Integer> listEntryIds) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
@@ -503,8 +485,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	public List<String> getStockIdsByListDataProjectListId(final Integer listId) {
 		try {
 			final String sql =
-				"SELECT lot.stock_id" + " FROM ims_transaction tran, listnms l, ims_lot lot " + " WHERE l.listId = :listId "
-					+ " AND tran.lotid = lot.lotid AND tran.sourceId = l.listref AND sourceType = 'LIST'" + " AND lot.stock_id IS NOT NULL";
+				" SELECT lot.stock_id, trnqty " +
+				" FROM ims_lot lot " +
+				" INNER JOIN ims_transaction tran ON lot.lotid = tran.lotid " +
+				" INNER join listnms l ON l.listref = tran.sourceid " +
+				" WHERE sourceType = 'LIST'	AND lot.stock_id is not null AND l.listid =  :listId";
 			final Query query = this.getSession().createSQLQuery(sql).setParameter("listId", listId);
 			return query.list();
 		} catch (final Exception e) {
@@ -512,6 +497,32 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<String, Double> getStockIdsWithMultipleTransactions(final Integer listId) {
+		final Map<String, Double> map = new HashMap<>();
+		try {
+			final String sql =
+				" SELECT lot.stock_id, trnqty " +
+					" FROM ims_lot lot " +
+					" INNER JOIN ims_transaction tran ON lot.lotid = tran.lotid " +
+					" INNER join listnms l ON l.listref = tran.sourceid " +
+					" WHERE sourceType = 'LIST'	AND lot.stock_id is not null AND l.listid =  :listId " +
+					" AND EXISTS (select 1 from ims_transaction tr WHERE tr.lotid = tran.lotid "
+					+ "  group by lotid having count(tr.trnid) > 1)";
+			final Query query = this.getSession().createSQLQuery(sql).setParameter("listId", listId);
+			final List<Object> results = query.list();
+			for (final Object obj : results) {
+				final Object[] row = (Object[]) obj;
+				map.put((String) row[0], (Double) row[1]);
+			}
+		} catch (final Exception e) {
+			final String message = "Error with getStockIdsWithMultipleTransactions(" + listId + ") query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return map;
 	}
 
 	public List<TransactionReportRow> getTransactionDetailsForLot(final Integer lotId) {
@@ -602,23 +613,27 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "   (CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '" + TransactionStatus.CANCELLED.getValue()
-		+ "' END) as transactionStatus, " 
+		+ "' END) as transactionStatus, "
 		+ " i.locid as lotLocationId, "
+		+ " loc.lname as lotLocationName, "//
+		+ " loc.labbr as lotLocationAbbr, "//
 		+ " i.comments as lotComments "
 		+ " FROM"//
 		+ "   ims_transaction act "//
 		+ "        INNER JOIN"//
 		+ "    ims_lot i ON act.lotid = i.lotid "//
+		+ "		   LEFT JOIN" //
+		+ "	   location loc on loc.locid = i.locid "//
 		+ "        LEFT JOIN"//
 		+ "    cvterm scale ON scale.cvterm_id = i.scaleid"//
-		+ "        LEFT JOIN"//
+		+ "        INNER JOIN"//
 		+ "    germplsm g ON g.gid = i.eid"//
 		+ "        LEFT JOIN"//
 		+ "    names n ON n.gid = i.eid AND n.nstat = 1"//
 		+ "        LEFT JOIN"//
 		+ "    workbench.users users ON users.userid = act.userid"//
 		+ " WHERE"//
-		+ "    i.etype = 'GERMPLSM' "; //
+		+ "    i.etype = 'GERMPLSM' and g.deleted=0 "; //
 
 	private String buildSearchTransactionsQuery(final TransactionsSearchDto transactionsSearchDto) {
 		final StringBuilder query = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
@@ -777,11 +792,30 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
+	public List<Transaction> getByIds(final Set<Integer> transactionIds) {
+		final List<Transaction> transactions = new ArrayList<>();
+
+		if (transactionIds == null || transactionIds.isEmpty()) {
+			return transactions;
+		}
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			criteria.add(Restrictions.in("id", transactionIds));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error getByIds() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+	}
+
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
 			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class, Double.class, String.class, Date.class,
 				Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class, String.class,
-				Integer.class, String.class);
+				Integer.class, String.class, String.class, String.class);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
 		}
@@ -803,7 +837,15 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("lotStatus");
 		query.addScalar("transactionStatus");
 		query.addScalar("lotLocationId");
+		query.addScalar("lotLocationName");
+		query.addScalar("lotLocationAbbr");
 		query.addScalar("lotComments");
 	}
 
+
+	public Transaction update(final Transaction transaction) {
+		super.update(transaction);
+		this.getSession().flush();
+		return transaction;
+	}
 }
