@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -978,8 +979,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		observationUnitRow.setDesignation(designation);
 		observationVariables.put(DESIGNATION, new ObservationUnitData(designation));
 
-		final Integer trialInstance = (Integer) row.get(TRIAL_INSTANCE);
-		observationUnitRow.setTrialInstance(trialInstance);
+		final BigInteger trialInstance = (BigInteger) row.get(TRIAL_INSTANCE);
+		observationUnitRow.setTrialInstance(trialInstance.intValue());
 
 		observationVariables.put(TRIAL_INSTANCE, new ObservationUnitData(String.valueOf(trialInstance)));
 
