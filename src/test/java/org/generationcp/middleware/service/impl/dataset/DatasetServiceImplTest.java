@@ -41,7 +41,6 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImplTest;
 import org.hibernate.SQLQuery;
@@ -128,9 +127,6 @@ public class DatasetServiceImplTest {
 
 	@Mock
 	private ObservationUnitsSearchDao obsUnitsSearchDao;
-
-	@Mock
-	private MeasurementVariableService measurementVariableService;
 
 	@Mock
 	private StudyService studyService;
@@ -473,7 +469,6 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testGetObservations() {
 		this.datasetService = new DatasetServiceImpl(this.mockSessionProvider);
-		this.datasetService.setMeasurementVariableService(this.measurementVariableService);
 		this.datasetService.setStudyService(this.studyService);
 
 		Mockito.when(this.mockSessionProvider.getSession()).thenReturn(this.mockSession);
@@ -482,12 +477,10 @@ public class DatasetServiceImplTest {
 		Mockito.when(this.studyService.getAdditionalDesignFactors(DatasetServiceImplTest.STUDY_ID))
 			.thenReturn(DESING_FACTORS);
 
-		final MeasurementVariableService mockTraits = Mockito.mock(MeasurementVariableService.class);
-		this.datasetService.setMeasurementVariableService(mockTraits);
 		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
 		final List<MeasurementVariableDto> projectTraits =
 			Arrays.asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
-		Mockito.when(mockTraits.getVariables(
+		Mockito.when(this.projectPropertyDao.getVariables(
 			DatasetServiceImplTest.STUDY_ID, VariableType.TRAIT.getId(),
 			VariableType.SELECTION_METHOD.getId())).thenReturn(projectTraits);
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();

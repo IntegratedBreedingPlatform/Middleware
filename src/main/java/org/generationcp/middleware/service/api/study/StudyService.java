@@ -5,6 +5,7 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 
 import java.util.List;
+import java.util.Set;
 
 public interface StudyService {
 
@@ -24,6 +25,8 @@ public interface StudyService {
 	ObservationDto updataObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement);
 
 	List<StudyGermplasmDto> getStudyGermplasmList(Integer studyIdentifer);
+
+	List<StudyGermplasmDto> getStudyGermplasmListWithPlotInformation(Integer studyIdentifer, Set<Integer> plotNos);
 
 	String getProgramUUID(Integer studyIdentifier);
 
