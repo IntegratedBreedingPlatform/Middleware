@@ -79,11 +79,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	static {
 
 		mainVariablesMap.put(OBSERVATION_UNIT_ID, "    nde.nd_experiment_id as observationUnitId");
-		mainVariablesMap.put(TRIAL_INSTANCE, "    env.observation_unit_no AS TRIAL_INSTANCE");
+		mainVariablesMap.put(TRIAL_INSTANCE, "(SELECT observation_unit_no from nd_experiment e where e.type_id = 1020 and e.nd_experiment_id = plot.parent_id)");
 		mainVariablesMap.put(LOCATION_ID,
-			"    (SELECT loc.lname FROM nd_experimentprop xprop INNER JOIN location loc on loc.locid = xprop.value WHERE xprop.nd_experiment_id = env.nd_experiment_id and xprop.type_id = 8190) 'LOCATION_ID'");
+			"    (SELECT loc.lname FROM nd_experimentprop xprop INNER JOIN location loc on loc.locid = xprop.value WHERE xprop.nd_experiment_id = plot.parent_id and xprop.type_id = 8190) 'LOCATION_ID'");
 		mainVariablesMap.put(EXPT_DESIGN,
-			"    (SELECT edesign.name FROM nd_experimentprop xprop INNER JOIN cvterm edesign on edesign.cvterm_id = xprop.value WHERE xprop.nd_experiment_id = env.nd_experiment_id and xprop.type_id = 8135) 'EXPT_DESIGN'");
+			"    (SELECT edesign.name FROM nd_experimentprop xprop INNER JOIN cvterm edesign on edesign.cvterm_id = xprop.value WHERE xprop.nd_experiment_id = plot.parent_id and xprop.type_id = 8135) 'EXPT_DESIGN'");
 		mainVariablesMap.put(ENTRY_TYPE,
 			"    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS ENTRY_TYPE");
 		mainVariablesMap.put(GID, "    s.dbxref_id AS GID");
@@ -122,13 +122,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "    inner join project p on p.project_id = nde.project_id " //
 				+ "    inner join stock s ON s.stock_id = nde.stock_id " //
 				// FIXME won't work for sub-sub-obs
-				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id) AND plot.type_id = 1155 "
-				+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
-				//
+				+ " INNER JOIN nd_experiment plot ON (plot.nd_experiment_id = nde.parent_id OR plot.nd_experiment_id = nde.nd_experiment_id) AND plot.type_id = 1155 "
 				+ " where p.project_id = :datasetId ");
 
 			if (instanceId != null) {
-				sql.append(" and env.nd_experiment_id = :instanceId ");
+				sql.append(" and plot.parent_id = :instanceId ");
 			}
 
 			if (Boolean.TRUE.equals(draftMode)) {
@@ -528,12 +526,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					columns.add(String.format(designFactorClauseFormat, designFactor, designFactor));
 				}
 			}
-		}
+		}r
 
 		// Only variables at observation level are supported in filtering columns. Variables at environment level are automatically excluded if filterColumns has values.
 		if (noFilterVariables && !CollectionUtils.isEmpty(searchDto.getEnvironmentDetails())) {
 			final String envFactorFormat =
-				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = xprop.type_id AND ispcvt.name = '%s' WHERE xprop.nd_experiment_id = env.nd_experiment_id ) '%s'";
+				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = xprop.type_id AND ispcvt.name = '%s' WHERE xprop.nd_experiment_id = plot.parent_id ) '%s'";
 			for (final MeasurementVariableDto envFactor : searchDto.getEnvironmentDetails()) {
 				columns.add(String.format(envFactorFormat, envFactor.getName(), this.getEnvironmentColumnName(envFactor.getName())));
 			}
@@ -544,7 +542,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			final String envConditionFormat =
 				"    (SELECT pheno.value from phenotype pheno "
 					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.name = '%s' "
-					+ "		WHERE pheno.nd_experiment_id = env.nd_experiment_id) '%s'";
+					+ "		WHERE pheno.nd_experiment_id = plot.parent_id) '%s'";
 			for (final MeasurementVariableDto envCondition : searchDto.getEnvironmentConditions()) {
 				columns.add(
 					String.format(envConditionFormat, envCondition.getName(), this.getEnvironmentColumnName(envCondition.getName())));
@@ -597,13 +595,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "            INNER JOIN nd_experiment parent ON child.parent_id = parent.nd_experiment_id " //
 			+ "     GROUP BY parent.nd_experiment_id) child_sample_count ON child_sample_count.nd_experiment_id = nde.nd_experiment_id " //
 			// FIXME won't work for sub-sub-obs
-			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR (plot.nd_experiment_id = nde.nd_experiment_id) AND plot.type_id = 1155 "
-			+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
-			//
+			+ " INNER JOIN nd_experiment plot ON (plot.nd_experiment_id = nde.parent_id OR plot.nd_experiment_id = nde.nd_experiment_id) AND plot.type_id = 1155 "
 			+ " WHERE p.project_id = :datasetId "); //
 
 		if (searchDto.getInstanceId() != null) {
-			sql.append(" AND env.nd_experiment_id = :instanceId"); //
+			sql.append(" AND plot.parent_id = :instanceId"); //
 		}
 
 		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
