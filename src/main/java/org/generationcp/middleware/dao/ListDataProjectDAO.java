@@ -11,6 +11,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -321,5 +322,14 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		}
 		return result;
 
+	}
+
+	public List<ListDataProject> getGermplasmList(final int studyBusinessIdentifier) {
+		final Criteria listDataCriteria =
+			this.getSession().createCriteria(ListDataProject.class).createAlias("list", "l")
+				.add(Restrictions.eq("l.projectId", studyBusinessIdentifier));
+		listDataCriteria.add(Restrictions.eq("l.type", GermplasmListType.STUDY.name()));
+		listDataCriteria.addOrder(Order.asc("entryId"));
+		return listDataCriteria.list();
 	}
 }

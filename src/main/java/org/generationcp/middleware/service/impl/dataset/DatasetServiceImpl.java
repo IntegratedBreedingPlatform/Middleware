@@ -29,7 +29,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -47,15 +46,11 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.StudyService;
-import org.generationcp.middleware.service.impl.study.MeasurementVariableServiceImpl;
 import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImpl;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
-import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
@@ -117,16 +112,11 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private DaoFactory daoFactory;
 
+	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Autowired
 	private OntologyDataManager ontologyDataManager;
-
-	@Autowired
-	private MeasurementVariableService measurementVariableService;
-
-	@Autowired
-	ResourceBundleMessageSource messageSource;
 
 	@Autowired
 	private StudyService studyService;
@@ -143,9 +133,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
-		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
-		this.measurementVariableService = new MeasurementVariableServiceImpl(sessionProvider.getSession());
-		this.studyService = new StudyServiceImpl(sessionProvider);
 	}
 
 	@Override
@@ -627,7 +614,7 @@ public class DatasetServiceImpl implements DatasetService {
 		searchDTO.setGenericGermplasmDescriptors(this.findGenericGermplasmDescriptors(studyId));
 		searchDTO.setAdditionalDesignFactors(this.findAdditionalDesignFactors(studyId));
 
-		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
+		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 		searchDTO.setSelectionMethodsAndTraits(selectionMethodsAndTraits);
 	}
@@ -739,9 +726,10 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 	}
 
+	// TODO consolidate with getObservationSetVariables
 	@Override
 	public List<MeasurementVariableDto> getDatasetVariablesByType(final Integer datasetId, final VariableType variableType) {
-		return this.measurementVariableService.getVariablesForDataset(datasetId, variableType.getId());
+		return this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId, variableType.getId());
 	}
 
 	@Override
@@ -1131,7 +1119,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<Integer> instanceIds) {
 		final Map<Integer, List<ObservationUnitRow>> instanceMap = new LinkedHashMap<>();
 
-		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
+		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 		final List<String> designFactors = this.findAdditionalDesignFactors(studyId);
 		final List<String> germplasmDescriptors = this.findGenericGermplasmDescriptors(studyId);
@@ -1287,10 +1275,6 @@ public class DatasetServiceImpl implements DatasetService {
 		observation.setStatus(savedRecord.getValueStatus() != null ? savedRecord.getValueStatus().getName() : null);
 
 		return phenotype;
-	}
-
-	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
-		this.measurementVariableService = measurementVariableService;
 	}
 
 	public void setStudyService(final StudyService studyService) {

@@ -35,15 +35,14 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.service.api.study.StudyService;
-import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
-import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
+import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nullable;
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -76,14 +75,13 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
-	private StudyService studyService;
-
 	private DaoFactory daoFactory;
 	private StudyDataManagerImpl studyDataManager;
 	private StudyTestDataInitializer studyTDI;
 
+	@Resource
 	private DatasetService datasetService;
-	private ExperimentDesignServiceImpl experimentDesignService;
+
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	private Project commonTestProject;
@@ -95,12 +93,11 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	private CVTerm treatmentFactorLabel;
 	private Integer[] gids;
 
+	@Autowired
+	private ExperimentDesignService experimentDesignService;
+
 	@Before
 	public void setup() throws Exception {
-		this.experimentDesignService = new ExperimentDesignServiceImpl(this.sessionProvder);
-		this.studyService = new StudyServiceImpl(this.sessionProvder);
-		this.experimentDesignService.setStudyService(this.studyService);
-		this.datasetService = new DatasetServiceImpl(this.sessionProvder);
 		this.studyDataManager = new StudyDataManagerImpl(this.sessionProvder);
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 

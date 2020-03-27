@@ -4,6 +4,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface GermplasmGroupingService {
@@ -41,15 +42,15 @@ public interface GermplasmGroupingService {
 	/**
 	 * Service to apply group (MGID) inheritance to newly created crosses.
 	 *
-	 * @param gidsOfCrossesCreated           - Must not be null.
-	 * @param applyGroupingToPreviousCrosses - Whether to apply new group to previous crosses as well when
+	 * @param germplasmIdMethodIdMap           - Must not be null.
+	 * @param applyNewGroupToPreviousCrosses - Whether to apply new group to previous crosses as well when
 	 *                                       creating a new group for new cross?
 	 * @param hybridMethods                  Set of method identifiers that indicate hybrid breeding
 	 *                                       methods. Group inheritance is only applied to germplasm where
 	 *                                       breeding method of the germplasm is one of the hybris methods
 	 *                                       specified in this set. Must not be null.
 	 */
-	void processGroupInheritanceForCrosses(List<Integer> gidsOfCrossesCreated, boolean applyNewGroupToPreviousCrosses,
+	void processGroupInheritanceForCrosses(Map<Integer, Integer> germplasmIdMethodIdMap, boolean applyNewGroupToPreviousCrosses,
 			Set<Integer> hybridMethods);
 
 	/**

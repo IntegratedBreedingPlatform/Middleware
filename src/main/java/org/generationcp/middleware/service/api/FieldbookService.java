@@ -840,12 +840,4 @@ public interface FieldbookService {
 	 */
 	void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID);
 
-	/**
-	 * Retrieves the Plot Number to Imported Cross Parent Map
-	 *
-	 * @param studyId  - the Study Id
-	 * @param plotNos - the set of Plot Numbers
-	 * @return
-	 */
-	Map<Integer, StudyGermplasmDto> getPlotNoToStudyGermplasmDtoMap(Integer studyId, Set<Integer> plotNos);
 }

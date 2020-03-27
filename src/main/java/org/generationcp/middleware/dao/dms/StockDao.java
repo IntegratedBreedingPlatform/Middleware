@@ -18,12 +18,17 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -179,6 +184,35 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 
 		return stockModels;
+	}
+
+	public List<StudyGermplasmDto> getStudyGermplasmDtoList(final Integer studyId, final Set<Integer> plotNos) {
+		final String queryString = "select  distinct(nd_ep.value) AS position, s.name AS designation, s.dbxref_id AS germplasmId "
+			+ " FROM nd_experiment e "
+			+ " INNER JOIN nd_experimentprop nd_ep ON e.nd_experiment_id = nd_ep.nd_experiment_id AND nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
+			+ " INNER JOIN stock s ON s.stock_id = e.stock_id "
+			+ " INNER JOIN project p ON e.project_id = p.project_id "
+			+ " WHERE p.dataset_type_id = :DATASET_TYPE "
+			+ " AND p.study_id = :STUDY_ID "
+			+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id ";
+
+		final StringBuilder sb = new StringBuilder(queryString);
+		if (!CollectionUtils.isEmpty(plotNos)) {
+			sb.append(" AND nd_ep.value in (:PLOT_NOS) ");
+		}
+		final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+		query.setParameter("STUDY_ID", studyId);
+		if (!CollectionUtils.isEmpty(plotNos)) {
+			query.setParameterList("PLOT_NOS", plotNos);
+		}
+		query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
+		query.setParameterList("PLOT_NO_TERM_IDS",
+			new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
+		query.addScalar("position", new StringType());
+		query.addScalar("designation", new StringType());
+		query.addScalar("germplasmId", new IntegerType());
+		query.setResultTransformer(Transformers.aliasToBean(StudyGermplasmDto.class));
+		return query.list();
 	}
 
 }
