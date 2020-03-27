@@ -608,7 +608,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "    n.nval AS lotDesignation,"//
 		+ "    i.stock_id AS lotStockId,"//
 		+ "    scaleid AS lotScaleId,"//
-		+ "    scale.name AS lotScaleName," //
+		+ "    scale.name AS lotUnitName," //
 		+ "    (CASE WHEN i.status = 0 THEN 'Active' WHEN i.status = 1 THEN 'Closed' END) AS lotStatus, "
 		+ "   (CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
@@ -833,7 +833,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("lotDesignation");
 		query.addScalar("lotStockId");
 		query.addScalar("lotScaleId");
-		query.addScalar("lotScaleName");
+		query.addScalar("lotUnitName");
 		query.addScalar("lotStatus");
 		query.addScalar("transactionStatus");
 		query.addScalar("lotLocationId");

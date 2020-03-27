@@ -16,6 +16,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.junit.Assert;
@@ -35,9 +36,6 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     private static final String SELECTION_NAME = "NPSEL";
 
     private static final String TRAIT_NAME = "GW_DW_g1000grn";
-
-    @Autowired
-    private WorkbenchDataManager workbenchDataManager;
 
     @Autowired
     private GermplasmDataManager germplasmDataManager;
@@ -62,7 +60,9 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     private GermplasmTestDataGenerator germplasmTestDataGenerator;
     private DataSetupTest dataSetupTest;
 
-    private DatasetServiceImpl datasetService;
+    @Autowired
+    private DatasetService datasetService;
+
     private Integer studyId;
     private List<Integer> instanceIds;
     private Integer subObsDatasetId;
@@ -70,9 +70,6 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
 
     @Before
     public void setUp() {
-        this.datasetService = new DatasetServiceImpl(this.sessionProvder);
-        this.datasetService.setWorkbenchDataManager(this.workbenchDataManager);
-
         this.dataSetupTest = new DataSetupTest();
         this.dataSetupTest.setDataImportService(this.dataImportService);
         this.dataSetupTest.setGermplasmListManager(this.germplasmListManager);

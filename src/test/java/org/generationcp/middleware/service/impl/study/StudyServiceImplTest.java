@@ -17,7 +17,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
@@ -68,9 +67,6 @@ public class StudyServiceImplTest {
 	private StudyMeasurements studyMeasurements;
 
 	@Mock
-	private MeasurementVariableService measurementVariableService;
-
-	@Mock
 	private DaoFactory daoFactory;
 
 	@Mock
@@ -90,7 +86,6 @@ public class StudyServiceImplTest {
 		MockitoAnnotations.initMocks(this);
 		this.studyServiceImpl = new StudyServiceImpl(this.mockSessionProvider);
 		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
-		this.studyServiceImpl.setMeasurementVariableService(this.measurementVariableService);
 		this.studyServiceImpl.setStudyMeasurements(this.studyMeasurements);
 		this.studyServiceImpl.setDaoFactory(this.daoFactory);
 		Mockito.when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
@@ -120,16 +115,15 @@ public class StudyServiceImplTest {
 	 */
 	@Test
 	public void testGetObservations() {
-		final MeasurementVariableService mockTraits = Mockito.mock(MeasurementVariableService.class);
 		final StudyMeasurements mockMeasurements = Mockito.mock(StudyMeasurements.class);
 		final StudyGermplasmListService mockStudyGermplasmListService = Mockito.mock(StudyGermplasmListService.class);
 
-		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockTraits, mockMeasurements, mockStudyGermplasmListService);
+		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl( mockMeasurements, mockStudyGermplasmListService);
 		studyServiceImpl.setDaoFactory(this.daoFactory);
 
 		final List<MeasurementVariableDto> projectTraits =
 			Arrays.asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
-		Mockito.when(mockTraits.getVariables(StudyServiceImplTest.STUDY_ID, VariableType.TRAIT.getId(),
+		Mockito.when(this.projectPropertyDao.getVariables(StudyServiceImplTest.STUDY_ID, VariableType.TRAIT.getId(),
 			VariableType.SELECTION_METHOD.getId())).thenReturn(projectTraits);
 		final List<MeasurementDto> traits = new ArrayList<>();
 		traits.add(new MeasurementDto(new MeasurementVariableDto(1, "traitName"), 9999, "traitValue", Phenotype.ValueStatus.OUT_OF_SYNC));
@@ -331,7 +325,7 @@ public class StudyServiceImplTest {
 		Mockito.when(this.studyMeasurements
 			.getAllStudyDetailsAsTable(ArgumentMatchers.anyInt(), ArgumentMatchers.anyListOf(MeasurementVariableDto.class),
 				ArgumentMatchers.anyInt())).thenReturn(results);
-		Mockito.when(this.measurementVariableService.getVariables(1, VariableType.TRAIT.getId()))
+		Mockito.when(this.projectPropertyDao.getVariables(1, VariableType.TRAIT.getId()))
 			.thenReturn(Arrays.asList(new MeasurementVariableDto(TermId.ALTITUDE.getId(), TermId.ALTITUDE.name())));
 		Mockito.when(this.studyDataManager.getProjectStartDateByProjectId(1)).thenReturn("20180821");
 
@@ -339,7 +333,7 @@ public class StudyServiceImplTest {
 		Mockito.verify(this.studyMeasurements)
 			.getAllStudyDetailsAsTable(ArgumentMatchers.anyInt(), ArgumentMatchers.anyListOf(MeasurementVariableDto.class),
 				ArgumentMatchers.anyInt());
-		Mockito.verify(this.measurementVariableService).getVariables(1, VariableType.TRAIT.getId());
+		Mockito.verify(this.projectPropertyDao).getVariables(1, VariableType.TRAIT.getId());
 		Assert.assertNotNull(dto.getHeaderRow());
 		Assert.assertEquals("1", dto.getStudyDbId().toString());
 		Assert.assertEquals(String.valueOf(TermId.ALTITUDE.getId()), dto.getObservationVariableDbIds().get(0).toString());

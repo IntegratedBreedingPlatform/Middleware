@@ -231,5 +231,20 @@
         <aop:scoped-proxy />
     </bean>
 
+	<bean id="experimentDesignService" factory-bean="managerFactory"
+		  factory-method="getExperimentDesignService">
+        <aop:scoped-proxy />
+    </bean>
+
+	<bean id="datasetService" factory-bean="managerFactory"
+			  factory-method="getDatasetMiddlewareService">
+        <aop:scoped-proxy />
+    </bean>
+
+	<bean id="derivedVariableService" factory-bean="managerFactory"
+		  factory-method="getDerivedVariableService">
+        <aop:scoped-proxy />
+    </bean>
+
 
 </beans>
