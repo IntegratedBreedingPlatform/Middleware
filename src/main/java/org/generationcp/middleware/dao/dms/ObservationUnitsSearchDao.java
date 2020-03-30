@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -79,7 +80,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	static {
 
 		mainVariablesMap.put(OBSERVATION_UNIT_ID, "    nde.nd_experiment_id as observationUnitId");
-		mainVariablesMap.put(TRIAL_INSTANCE, "(SELECT observation_unit_no from nd_experiment e where e.type_id = 1020 and e.nd_experiment_id = plot.parent_id)");
+		mainVariablesMap.put(TRIAL_INSTANCE, "(SELECT observation_unit_no from nd_experiment e where e.type_id = 1020 and e.nd_experiment_id = plot.parent_id) as TRIAL_INSTANCE");
 		mainVariablesMap.put(LOCATION_ID,
 			"    (SELECT loc.lname FROM nd_experimentprop xprop INNER JOIN location loc on loc.locid = xprop.value WHERE xprop.nd_experiment_id = plot.parent_id and xprop.type_id = 8190) 'LOCATION_ID'");
 		mainVariablesMap.put(EXPT_DESIGN,
@@ -526,7 +527,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					columns.add(String.format(designFactorClauseFormat, designFactor, designFactor));
 				}
 			}
-		}r
+		}
 
 		// Only variables at observation level are supported in filtering columns. Variables at environment level are automatically excluded if filterColumns has values.
 		if (noFilterVariables && !CollectionUtils.isEmpty(searchDto.getEnvironmentDetails())) {
@@ -978,8 +979,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		observationUnitRow.setDesignation(designation);
 		observationVariables.put(DESIGNATION, new ObservationUnitData(designation));
 
-		final Integer trialInstance = (Integer) row.get(TRIAL_INSTANCE);
-		observationUnitRow.setTrialInstance(trialInstance);
+		final BigInteger trialInstance = (BigInteger) row.get(TRIAL_INSTANCE);
+		observationUnitRow.setTrialInstance(trialInstance.intValue());
 
 		observationVariables.put(TRIAL_INSTANCE, new ObservationUnitData(String.valueOf(trialInstance)));
 
