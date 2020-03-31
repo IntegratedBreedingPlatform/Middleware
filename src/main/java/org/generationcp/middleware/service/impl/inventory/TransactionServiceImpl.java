@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -13,16 +14,12 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
-import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
-import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.Util;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -36,12 +33,6 @@ import java.util.stream.Collectors;
 public class TransactionServiceImpl implements TransactionService {
 
 	private DaoFactory daoFactory;
-
-	@Resource
-	private PedigreeService pedigreeService;
-
-	@Autowired
-	private CrossExpansionProperties crossExpansionProperties;
 
 	public TransactionServiceImpl() {
 	}
@@ -223,4 +214,33 @@ public class TransactionServiceImpl implements TransactionService {
 
 	}
 
+	@Override
+	public void depositLots(final Integer userId, final Set<Integer> lotIds, final LotDepositRequestDto lotDepositRequestDto,
+		final TransactionStatus transactionStatus) {
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
+		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+
+		for (final ExtendedLotDto lotDto : lots) {
+			final Double amount = lotDepositRequestDto.getDepositsPerUnit().get(lotDto.getUnitName());
+			final Transaction transaction = new Transaction();
+			transaction.setStatus(transactionStatus.getIntValue());
+			transaction.setType(TransactionType.DEPOSIT.getId());
+			transaction.setLot(new Lot(lotDto.getLotId()));
+			transaction.setPersonId(userId);
+			transaction.setUserId(userId);
+			transaction.setTransactionDate(new Date());
+			transaction.setQuantity(amount);
+			transaction.setComments(lotDepositRequestDto.getNotes());
+			//Always zero for new transactions
+			transaction.setPreviousAmount(0D);
+			if (transactionStatus.equals(TransactionStatus.CONFIRMED)) {
+				transaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
+			} else {
+				transaction.setCommitmentDate(0);
+			}
+			daoFactory.getTransactionDAO().save(transaction);
+		}
+
+	}
 }
