@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.Util;
@@ -1010,11 +1011,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					(result[5] != null && !((String) result[5]).isEmpty()) ? (String) result[5] : String.valueOf(result[2]);
 				observation.setObservationVariableDbId(variableId);
 				observation.setObservationVariableName((String) result[3]);
-				observation.setObservationDbId((Integer) result[1]);
+				observation.setObservationDbId(String.valueOf((Integer) result[1]));
 				observation.setValue((String) result[4]);
-				observation.setObservationTimeStamp(Util.formatDateAsStringValue((Date) result[6], Util.FRONTEND_TIMESTAMP_FORMAT));
+				observation.setObservationTimeStamp((Date) result[6]);
 				// TODO
-				observation.setSeason(StringUtils.EMPTY);
+				observation.setSeason(null);
 				observation.setCollector(StringUtils.EMPTY);
 
 				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
