@@ -1,5 +1,7 @@
 package org.generationcp.middleware.service.api.study;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -230,6 +232,7 @@ public class VariableDTO {
 			return this.attribute;
 		}
 
+		@JsonProperty("class")
 		public String getTraitClass() {
 			return this.traitClass;
 		}
@@ -461,6 +464,7 @@ public class VariableDTO {
 
 		// Getter Methods
 
+		@JsonProperty("class")
 		public String getMethodClass() {
 			return this.methodClass;
 		}
