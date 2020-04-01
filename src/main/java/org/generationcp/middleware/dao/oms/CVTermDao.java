@@ -1590,7 +1590,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append("   from cvterm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = ");
 		stringBuilder.append(TermId.IS_A.getId() + ")" + " traitClass on traitClass.propertyTermId = property.cvterm_id ");
 		// Retrieve the categories (valid values) of the variables' scale
-		stringBuilder.append("   LEFT JOIN (SELECT cvtrcategory.subject_id, CONCAT(o.name, '=', o.definition) as name");
+		stringBuilder.append("   LEFT JOIN (SELECT cvtrcategory.subject_id, o.name as name");
 		stringBuilder.append(
 			"	  FROM cvterm o inner JOIN cvterm_relationship cvtrcategory ON cvtrcategory.object_id = o.cvterm_id AND cvtrcategory.type_id = ");
 		stringBuilder.append(TermId.HAS_VALUE.getId() + ")" + " category on category.subject_id = scale.cvterm_id ");
