@@ -200,6 +200,6 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void resolveUnitName() {
-		unitName = "SEED_AMOUNT_g";
+		unitName = this.daoFactory.getCvTermDao().getById(UNIT_ID).getName();
 	}
 }
