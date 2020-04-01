@@ -1670,6 +1670,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			variableDto.setObservationVariableDbId(String.valueOf(result.get(VARIABLE_ID)));
 			variableDto.setObservationVariableName(observationVariableName);
 			variableDto.setDate(result.get(VARIABLE_CREATION_DATE) != null ? String.valueOf(result.get(VARIABLE_CREATION_DATE)) : null);
+			variableDto.setDefaultValue(StringUtils.EMPTY);
 
 			final VariableDTO.Trait trait = variableDto.getTrait();
 			trait.setName(String.valueOf(result.get(VARIABLE_PROPERTY)));
