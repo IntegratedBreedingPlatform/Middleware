@@ -17,8 +17,6 @@ public interface TransactionService {
 
 	long countSearchTransactions(TransactionsSearchDto transactionsSearchDto);
 
-	Integer saveTransaction(TransactionDto transactionDto);
-
 	/**
 	 * Withdraw a set of lots given the instructions.
 	 * This function needs to be synchronized externally when used to warranty that the lots involved does not either change the available balance
