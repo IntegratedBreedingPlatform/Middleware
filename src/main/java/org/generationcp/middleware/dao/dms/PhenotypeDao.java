@@ -943,14 +943,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setStudyDbId((String) row[8]);
 				observationUnit.setStudyName((String) row[9]);
 				observationUnit.setProgramName((String) row[10]);
-				String x = (String) row[16]; // ROW
-				String y = (String) row[17]; // COL
+
+				String x = row[16] != null ? (String) row[16] : null; // ROW
+				String y = row[17] != null ? (String) row[17] : null; // COL
 				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-					x = (String) row[11]; // fieldMapRow
-					y = (String) row[12]; // fieldMapCol
+					x = row[11] != null ? (String) row[11] : "1"; // fieldMapRow
+					y = row[12] != null ? (String) row[12] : "1"; // fieldMapCol
 				}
 				observationUnit.setX(x);
 				observationUnit.setY(y);
+				observationUnit.setPositionCoordinateX(x);
+				observationUnit.setPositionCoordinateY(y);
 				observationUnit.setPlotNumber((String) row[13]);
 				observationUnit.setBlockNumber((String) row[14]);
 				observationUnit.setReplicate((String) row[15]);
