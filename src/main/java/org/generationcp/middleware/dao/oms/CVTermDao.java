@@ -1733,7 +1733,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		if (DataType.CATEGORICAL_VARIABLE.getId().equals(dataTypeId)) {
 			return VariableDTO.Scale.NOMINAL;
 		} else if (DataType.CHARACTER_VARIABLE.getId().equals(dataTypeId)) {
-			return VariableDTO.Scale.ORDINAL;
+			return VariableDTO.Scale.TEXT;
 		} else if (DataType.DATE_TIME_VARIABLE.getId().equals(dataTypeId)) {
 			return VariableDTO.Scale.DATE;
 		} else if (DataType.NUMERIC_VARIABLE.getId().equals(dataTypeId)) {

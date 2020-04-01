@@ -336,6 +336,7 @@ public class VariableDTO {
 		public static final String ORDINAL = "Ordinal";
 		public static final String DATE = "Date";
 		public static final String NUMERICAL = "Numerical";
+		public static final String TEXT = "Text";
 
 		private String dataType;
 		private Integer decimalPlaces;
