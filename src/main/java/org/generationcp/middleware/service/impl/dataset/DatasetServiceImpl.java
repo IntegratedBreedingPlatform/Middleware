@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.base.Function;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -980,7 +981,10 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode) {
+	public Table<String, Integer, Integer> importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode) {
+
+		final Table<String, Integer, Integer> observationDbIdsTable = HashBasedTable.create();
+
 		final List<MeasurementVariable> measurementVariableList =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
@@ -1055,6 +1059,9 @@ public class DatasetServiceImpl implements DatasetService {
 						if (phenotype != null) {
 							phenotypes.add(phenotype);
 						}
+
+						// We need to return the observationDbIds (mapped in a table by observationUnitId and variableId) of the created/updated observations.
+						observationDbIdsTable.put((String) observationUnitId, observationUnitData.getVariableId(), phenotype.getPhenotypeId());
 					}
 				}
 
@@ -1073,6 +1080,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 		}
+		return observationDbIdsTable;
 	}
 
 	@Override
