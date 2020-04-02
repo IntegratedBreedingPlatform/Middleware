@@ -55,6 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1003,7 +1004,7 @@ public class DatasetServiceImpl implements DatasetService {
 				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
 
 				for (final String variableName : table.columnKeySet()) {
-					final String importedVariableValue = table.get(observationUnitId, variableName);
+					String importedVariableValue = table.get(observationUnitId, variableName);
 
 					if (StringUtils.isNotBlank(importedVariableValue)) {
 						final MeasurementVariable measurementVariable =
@@ -1021,6 +1022,14 @@ public class DatasetServiceImpl implements DatasetService {
 								}
 							}
 
+						}
+						if (measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
+							try {
+								// In case the date is in yyyy-MM-dd format, try to parse it as number format yyyyMMdd
+								importedVariableValue = Util.convertDate(importedVariableValue, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
+							} catch (ParseException e) {
+								// Do nothing
+							}
 						}
 
 						final ObservationUnitData observationUnitData = currentRow.getVariables().get(measurementVariable.getName());
