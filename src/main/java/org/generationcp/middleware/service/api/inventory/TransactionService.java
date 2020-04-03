@@ -30,13 +30,15 @@ public interface TransactionService {
 	 * @param lotWithdrawalInputDto
 	 * @param transactionStatus
 	 */
-	void withdrawLots(Integer userId, Set<Integer> lotIds, LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus) ;
+	void withdrawLots(
+		Integer userId, Set<Integer> lotIds, LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus);
 
 	void confirmPendingTransactions(List<TransactionDto> confirmedTransactionDtoList);
 
 	List<TransactionDto> getAvailableBalanceTransactions(Integer lotId);
 
-
 	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
+
+	void cancelPendingTransactions(List<TransactionDto> confirmedTransactionDtoList);
 
 }
