@@ -5,6 +5,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
@@ -128,6 +129,65 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(lotDto.getAvailableBalance().equals(18D));
 	}
 
+	@Test
+	public void testConfirmPendingTransactions_Deposit_Ok() {
+		final TransactionDto transactionDepositDto = new TransactionDto();
+		transactionDepositDto.setTransactionId(pendingDepositId);
+
+		final Transaction transactionDeposit = this.daoFactory.getTransactionDAO().getById(pendingDepositId);
+		Assert.assertTrue(transactionDeposit.getType().equals(4));
+		Assert.assertTrue(transactionDeposit.getStatus().equals(0));
+
+		this.transactionService.confirmPendingTransactions(Arrays.asList(transactionDepositDto));
+		final Transaction transactionDepositCancelled = this.daoFactory.getTransactionDAO().getById(pendingDepositId);
+		Assert.assertTrue(transactionDeposit.getType().equals(4));
+		Assert.assertTrue(transactionDepositCancelled.getStatus().equals(1));
+	}
+
+	@Test
+	public void testConfirmPendingTransactions_Withdrawal_Ok() {
+		final TransactionDto transactionDepositDto = new TransactionDto();
+		transactionDepositDto.setTransactionId(pendingWithdrawalId);
+
+		final Transaction transactionWithdrawal = this.daoFactory.getTransactionDAO().getById(pendingWithdrawalId);
+		Assert.assertTrue(transactionWithdrawal.getType().equals(1));
+		Assert.assertTrue(transactionWithdrawal.getStatus().equals(0));
+
+		this.transactionService.confirmPendingTransactions(Arrays.asList(transactionDepositDto));
+		final Transaction transactionWithdrawalCancelled = this.daoFactory.getTransactionDAO().getById(pendingWithdrawalId);
+		Assert.assertTrue(transactionWithdrawal.getType().equals(1));
+		Assert.assertTrue(transactionWithdrawalCancelled.getStatus().equals(1));
+	}
+
+	@Test
+	public void testCancelPendingTransactions_Deposit_Ok() {
+		final TransactionDto transactionDepositDto = new TransactionDto();
+		transactionDepositDto.setTransactionId(pendingDepositId);
+
+		final Transaction transactionDeposit = this.daoFactory.getTransactionDAO().getById(pendingDepositId);
+		Assert.assertTrue(transactionDeposit.getType().equals(4));
+		Assert.assertTrue(transactionDeposit.getStatus().equals(0));
+
+		this.transactionService.cancelPendingTransactions(Arrays.asList(transactionDepositDto));
+		final Transaction transactionDepositCancelled = this.daoFactory.getTransactionDAO().getById(pendingDepositId);
+		Assert.assertTrue(transactionDeposit.getType().equals(4));
+		Assert.assertTrue(transactionDepositCancelled.getStatus().equals(9));
+	}
+
+	@Test
+	public void testCancelPendingTransactions_Withdrawal_Ok() {
+		final TransactionDto transactionDepositDto = new TransactionDto();
+		transactionDepositDto.setTransactionId(pendingWithdrawalId);
+
+		final Transaction transactionWithdrawal = this.daoFactory.getTransactionDAO().getById(pendingWithdrawalId);
+		Assert.assertTrue(transactionWithdrawal.getType().equals(1));
+		Assert.assertTrue(transactionWithdrawal.getStatus().equals(0));
+
+		this.transactionService.cancelPendingTransactions(Arrays.asList(transactionDepositDto));
+		final Transaction transactionWithdrawalCancelled = this.daoFactory.getTransactionDAO().getById(pendingWithdrawalId);
+		Assert.assertTrue(transactionWithdrawal.getType().equals(1));
+		Assert.assertTrue(transactionWithdrawalCancelled.getStatus().equals(9));
+	}
 
 	private void findAdminUser() {
 		final WorkbenchUser user = this.userService.getUserByName("admin", 0, 1, Operation.EQUAL).get(0);
