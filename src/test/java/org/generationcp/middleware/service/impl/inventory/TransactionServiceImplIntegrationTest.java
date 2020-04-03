@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
@@ -27,17 +28,25 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private TransactionServiceImpl transactionService;
+
+	private LotServiceImpl lotService;
 
 	private DaoFactory daoFactory;
 
 	private Integer userId, pendingWithdrawalId, pendingDepositId, gid;
 
 	private Lot lot;
+
+	private String unitName;
 
 	private static final Integer DEFAULT_STORAGE_LOCATION = 6000;
 
@@ -54,38 +63,40 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 		this.transactionService = new TransactionServiceImpl(this.sessionProvder);
+		this.lotService = new LotServiceImpl(this.sessionProvder);
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.createGermplasm();
 		this.findAdminUser();
 		this.createLot();
 		this.createTransactions();
+		this.resolveUnitName();
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
 	public void testUpdatePendingTransactions_WithdrawalInvalidAvailableBalance() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
 			new TransactionUpdateRequestDto(pendingWithdrawalId, null, 30D, null);
-		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
+		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
 	public void testUpdatePendingTransactions_DepositInvalidAvailableBalance() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto = new TransactionUpdateRequestDto(pendingDepositId, null, 2D, null);
-		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
+		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
 	public void testUpdatePendingTransactions_WithdrawalInvalidAmount() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
 			new TransactionUpdateRequestDto(pendingWithdrawalId, 22D, null, null);
-		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
+		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
 	}
 
 	@Test
 	public void testUpdatePendingTransactions_WithdrawalNewAmount_Ok() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
 			new TransactionUpdateRequestDto(pendingWithdrawalId, 20D, null, null);
-		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
+		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
 		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingWithdrawalId);
 		Assert.assertTrue(transaction.getQuantity().equals(-20D));
 	}
@@ -94,10 +105,10 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testUpdatePendingTransactions_WithdrawalNewBalance_Ok() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
 			new TransactionUpdateRequestDto(pendingWithdrawalId, null, 0D, null);
-		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
+		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
 		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingWithdrawalId);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Arrays.asList(lot.getId()));
+		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
 		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
 		Assert.assertTrue(transaction.getQuantity().equals(-20D));
 		Assert.assertTrue(lotDto.getAvailableBalance().equals(0D));
@@ -107,10 +118,10 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testUpdatePendingTransactions_DepositNewBalance_Ok() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
 			new TransactionUpdateRequestDto(pendingDepositId, null, 20D, null);
-		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
+		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
 		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingDepositId);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Arrays.asList(lot.getId()));
+		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
 		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
 		Assert.assertTrue(transaction.getQuantity().equals(2D));
 		Assert.assertTrue(lotDto.getAvailableBalance().equals(18D));
@@ -120,15 +131,31 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testUpdatePendingTransactions_DepositNewAmount_Ok() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
 			new TransactionUpdateRequestDto(pendingDepositId, 5D, null, null);
-		this.transactionService.updatePendingTransactions(Arrays.asList(transactionUpdateRequestDto));
+		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
 		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingDepositId);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Arrays.asList(lot.getId()));
+		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
 		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
 		Assert.assertTrue(transaction.getQuantity().equals(5D));
 		Assert.assertTrue(lotDto.getAvailableBalance().equals(18D));
 	}
 
+	@Test
+	public void testDepositLots_Ok() {
+		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
+		final Map<String, Double> instructions = new HashMap<>();
+		instructions.put(unitName, 20D);
+		lotDepositRequestDto.setDepositsPerUnit(instructions);
+
+		final List<Integer> lotIds = Collections.singletonList(lot.getId());
+		this.transactionService.depositLots(userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED);
+
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(lotIds);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
+		Assert.assertTrue(extendedLotDto.getAvailableBalance().equals(38D));
+	}
 	@Test
 	public void testConfirmPendingTransactions_Deposit_Ok() {
 		final TransactionDto transactionDepositDto = new TransactionDto();
@@ -230,5 +257,9 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getTransactionDAO().save(pendingWithdrawal);
 		this.pendingWithdrawalId = pendingWithdrawal.getId();
 
+	}
+
+	private void resolveUnitName() {
+		unitName = this.daoFactory.getCvTermDao().getById(UNIT_ID).getName();
 	}
 }
