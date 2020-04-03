@@ -21,7 +21,7 @@ public class VariableDTO {
 	private String observationVariableName;
 	private String ontologyDbId;
 	private String ontologyName;
-	private OntologyReference ontologyReferenceObject = new OntologyReference();
+	private OntologyReference ontologyReferenceObject;
 	private Trait traitObject = new Trait();
 	private Method methodObject = new Method();
 	private Scale scaleObject = new Scale();
