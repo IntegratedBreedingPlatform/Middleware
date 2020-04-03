@@ -532,4 +532,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return favoriteLocationIds;
 	}
 
+	@Override
+	public Location getDefaultLocationByType(final LocationType locationType) {
+		final Integer id = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locationType.getCode());
+		return this.daoFactory.getLocationDAO().getDefaultLocationByType(id);
+	}
 }

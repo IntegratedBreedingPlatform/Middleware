@@ -1,0 +1,40 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="clarysabel" id="v14.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="location" columnName="ldefault"/>
+			</not>
+		</preConditions>
+		<comment>Add ldefault column to location table</comment>
+		<addColumn tableName="location">
+			<column name="ldefault" type="TINYINT(1) UNSIGNED ZEROFILL" defaultValue="0" afterColumn="program_uuid">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v14.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="location" columnName="ldefault"/>
+				<sqlCheck expectedResult="0">
+					select count(1) from location l
+					where l.ldefault = 1 and l.ltype = (select u.fldno from udflds u where u.ftable='LOCATION' and u.ftype='LTYPE' and fcode='SSTORE')
+				</sqlCheck>
+			</and>
+		</preConditions>
+
+		<comment>Set DSS as default storage location</comment>
+
+        <sql dbms="mysql">
+			update location set ldefault = 1 where
+			ltype = (select u.fldno from udflds u where u.ftable='LOCATION' and u.ftype='LTYPE' and fcode='SSTORE') and labbr='DSS'
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

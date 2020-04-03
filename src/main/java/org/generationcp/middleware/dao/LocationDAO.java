@@ -405,8 +405,10 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					final Double longitude = (Double) result[12];
 					final Double altitude = (Double) result[13];
 					final String programUUID = (String) result[14];
+					final Boolean ldefault = (Boolean) result[15];
 
 					final Location location = new Location(locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce);
+					location.setLdefault(ldefault);
 					location.setUniqueID(programUUID);
 
 					final Georef georef = new Georef();
@@ -1009,6 +1011,21 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
+	public Location getDefaultLocationByType(final Integer type) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Location.class);
+			criteria.add(Restrictions.eq("ltype", type));
+			criteria.add(Restrictions.eq("ldefault", Boolean.TRUE));
+
+			return (Location) criteria.uniqueResult();
+		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("getDefaultLocationByType", "type", String.valueOf(type), e.getMessage(), "Location"),
+				e);
+		}
+	}
+
 	private void setQueryParameters(final SQLQuery query, final Map<LocationFilters, Object> filters) {
 		for (final Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
 			final LocationFilters filter = entry.getKey();
@@ -1041,4 +1058,5 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return sqlString.toString();
 
 	}
+
 }
