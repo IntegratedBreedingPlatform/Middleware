@@ -37,4 +37,64 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="clarysabel" id="v14.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1) from ims_lot l
+					where l.locid is null;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Set the default storage location to the lots with no locations</comment>
+		<sql dbms="mysql">
+			update ims_lot set locid = (select l.locid from location l where l.ltype = (select u.fldno from udflds u where u.ftable='LOCATION' and u.ftype='LTYPE' and fcode='SSTORE') and l.ldefault=1)
+			where locid is null;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v14.4.0-4">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="ims_lot" columnName="locid"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM ims_lot
+					WHERE locid is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'ims_lot'
+					AND COLUMN_NAME = 'locid'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Set ims_lot.locid as not null
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_lot
+			MODIFY COLUMN locid INT(11) NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v14.4.0-5">
+		<preConditions onFail="MARK_RAN">
+            <and>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="location_fk_idx"></foreignKeyConstraintExists>
+                </not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM ims_lot il WHERE il.locid is null OR NOT EXISTS ( SELECT 1 FROM location l WHERE l.locid = il.locid);
+                </sqlCheck>
+            </and>
+		</preConditions>
+		<comment>Add ims_lot.locid foreign key to location table</comment>
+		<addForeignKeyConstraint baseTableName="ims_lot" baseColumnNames="locid" constraintName="location_fk_idx" referencedTableName="location"
+								 referencedColumnNames="locid"/>
+	</changeSet>
+
 </databaseChangeLog>
