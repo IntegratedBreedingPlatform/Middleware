@@ -27,6 +27,8 @@ import org.generationcp.middleware.domain.h2h.ObservationKey;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -38,7 +40,6 @@ import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -64,6 +65,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link Phenotype}.
@@ -81,19 +83,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PhenotypeDao.class);
 
-	private static final String GET_OBSERVATIONS = "SELECT p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value "
-		+ "FROM nd_experiment e "
-		+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
-		+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-		+ "AND p.observable_id IN (:traitIds) ";
-
-	private static final String COUNT_OBSERVATIONS =
-		"SELECT COUNT(*) " + "FROM nd_experiment e "
-			+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
-			+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-			+ "AND p.observable_id IN (:traitIds) ";
-
-	private static final String ORDER_BY_OBS = "ORDER BY p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value ";
+	private static final String ORDER_BY_OBS = "ORDER BY p.observable_id, s.dbxref_id, plot.parent_id, p.value ";
 
 	//FIXME BMS-5055
 	private static final String HAS_OUT_OF_SYNC = "SELECT "
@@ -122,14 +112,15 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>();
 		try {
 			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT e.nd_geolocation_id) AS location_count, "
+				.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT env.nd_experiment_id) AS location_count, "
 					+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
 					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count , "
 					+ "IF (MIN(p.value * 1) IS NULL, 0, MIN(p.value * 1))  AS min_value, "
-					+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value " + "FROM phenotype p "
-					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-					+ "    AND p.observable_id IN (:numericVariableIds) " + "GROUP by p.observable_id ");
+					+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value "
+					+ this.getPhenotypesInEnvironmentFromQuery(true)
+					+ "    WHERE env.nd_experiment_id IN (:environmentIds) "
+					+ "       AND p.observable_id IN (:numericVariableIds) "
+					+ "     GROUP by p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("numericVariableIds", numericVariableIds);
 
@@ -160,15 +151,37 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	}
 
+	private String getObservationsOnTraitsQuery() {
+		final StringBuilder sb = new StringBuilder(" SELECT p.observable_id, s.dbxref_id, env.nd_experiment_id, p.value ");
+		sb.append(this.getPhenotypesInEnvironmentFromQuery(true));
+		sb.append(" WHERE env.nd_experiment_id IN (:environmentIds) ");
+		sb.append("   AND p.observable_id IN (:traitIds) ");
+		return sb.toString();
+	}
+
+	private String getPhenotypesInEnvironmentFromQuery(final boolean doJoinStockTable){
+		final StringBuilder sb = new StringBuilder(" FROM phenotype p ");
+			sb.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
+			.append(" LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id and plot.type_id = " + TermId.PLOT_EXPERIMENT.getId())
+			.append(" INNER JOIN project pr ON pr.project_id = e.project_id ")
+			.append(" INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId())
+			.append(" INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId())
+			.append("    AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) ");
+		if (doJoinStockTable) {
+			sb.append(" INNER JOIN stock s ON e.stock_id = s.stock_id ");
+		}
+		return sb.toString();
+	}
+
 	public List<TraitInfo> getTraitInfoCounts(final List<Integer> environmentIds, final List<Integer> variableIds) {
 		final List<TraitInfo> traitInfoList = new ArrayList<>();
 		try {
 			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT e.nd_geolocation_id) AS location_count, "
+				.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT env.nd_experiment_id) AS location_count, "
 					+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
-					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
-					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count "
+					+ this.getPhenotypesInEnvironmentFromQuery(true)
+					+ " WHERE env.nd_experiment_id IN (:environmentIds) "
 					+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("variableIds", variableIds);
@@ -196,96 +209,19 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	}
 
-	public List<TraitInfo> getTraitInfoCounts(final List<Integer> environmentIds) {
-		final List<TraitInfo> traitInfoList = new ArrayList<>();
-		try {
-			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT e.nd_geolocation_id) AS location_count, "
-					+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
-					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
-					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-					+ "GROUP by p.observable_id ");
-			query.setParameterList("environmentIds", environmentIds);
-
-			final List<Object[]> list = query.list();
-
-			for (final Object[] row : list) {
-				final Integer id = (Integer) row[0];
-				final long locationCount = ((BigInteger) row[1]).longValue();
-				final long germplasmCount = ((BigInteger) row[2]).longValue();
-				final long observationCount = ((BigInteger) row[3]).longValue();
-
-				traitInfoList.add(new TraitInfo(id, null, null, locationCount, germplasmCount, observationCount));
-			}
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at getTraitInfoCounts() query on PhenotypeDao: " + e.getMessage(), e);
-		}
-
-		return traitInfoList;
-
-	}
-
 	public Map<Integer, List<Double>> getNumericTraitInfoValues(
 		final List<Integer> environmentIds,
-		final List<NumericTraitInfo> traitInfoList) {
+		final List<Integer> traitIds) {
 		final Map<Integer, List<Double>> traitValues = new HashMap<>();
-
-		// Get trait IDs
-		final List<Integer> traitIds = new ArrayList<>();
-		for (final NumericTraitInfo trait : traitInfoList) {
-			traitIds.add(trait.getId());
-		}
 
 		try {
 			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT p.observable_id, p.value * 1 " + "FROM phenotype p "
-					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ "WHERE e.nd_geolocation_id IN (:environmentIds) " + "    AND p.observable_id IN (:traitIds) ");
+				.createSQLQuery("SELECT p.observable_id, p.value * 1 "
+					+ this.getPhenotypesInEnvironmentFromQuery(false)
+					+ " WHERE env.nd_experiment_id IN (:environmentIds) "
+					+ "    AND p.observable_id IN (:traitIds) ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList(TRAIT_IDS, traitIds);
-
-			List<Object[]> list = new ArrayList<>();
-
-			if (!environmentIds.isEmpty()) {
-				list = query.list();
-			}
-
-			for (final Object[] row : list) {
-				final Integer traitId = (Integer) row[0];
-				final Double value = (Double) row[1];
-
-				List<Double> values = new ArrayList<>();
-				values.add(value);
-				// If the trait exists in the map, add the value found. Else, just add the <trait, values> pair.
-				if (traitValues.containsKey(traitId)) {
-					values = traitValues.get(traitId);
-					values.add(value);
-					traitValues.remove(traitId);
-				}
-				traitValues.put(traitId, values);
-
-			}
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at getNumericTraitInfoValues() query on PhenotypeDao: " + e.getMessage(), e);
-		}
-
-		return traitValues;
-
-	}
-
-	public Map<Integer, List<Double>> getNumericTraitInfoValues(final List<Integer> environmentIds, final Integer trait) {
-		final Map<Integer, List<Double>> traitValues = new HashMap<>();
-
-		try {
-			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT p.observable_id, p.value * 1 " + "FROM phenotype p "
-					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ "WHERE e.nd_geolocation_id IN (:environmentIds) " + "    AND p.observable_id = :traitId ");
-			query.setParameterList("environmentIds", environmentIds);
-			query.setParameter("traitId", trait);
 
 			List<Object[]> list = new ArrayList<>();
 
@@ -324,16 +260,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final Map<Integer, List<String>> traitValues = new HashMap<>();
 
 		// Get trait IDs
-		final List<Integer> traitIds = new ArrayList<>();
-		for (final CharacterTraitInfo trait : traitInfoList) {
-			traitIds.add(trait.getId());
-		}
+		final List<Integer> traitIds = traitInfoList.stream().map(CharacterTraitInfo::getId).collect(Collectors.toList());
 
 		try {
 			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT DISTINCT p.observable_id, p.value " + "FROM phenotype p "
-					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ "WHERE e.nd_geolocation_id IN (:environmentIds) " + "    AND p.observable_id IN (:traitIds) "
+				.createSQLQuery("SELECT DISTINCT p.observable_id, p.value "
+					+ this.getPhenotypesInEnvironmentFromQuery(false)
+					+ " WHERE env.nd_experiment_id IN (:environmentIds) "
+					+ "    AND p.observable_id IN (:traitIds) "
 					+ "ORDER BY p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList(TRAIT_IDS, traitIds);
@@ -369,17 +303,16 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public void setCategoricalTraitInfoValues(final List<CategoricalTraitInfo> traitInfoList, final List<Integer> environmentIds) {
 
 		// Get trait IDs
-		final List<Integer> traitIds = new ArrayList<>();
-		for (final CategoricalTraitInfo trait : traitInfoList) {
-			traitIds.add(trait.getId());
-		}
+		final List<Integer> traitIds = traitInfoList.stream().map(CategoricalTraitInfo::getId).collect(Collectors.toList());
+
 
 		try {
 			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT p.observable_id, p.cvalue_id, COUNT(p.phenotype_id) AS valuesCount " + "FROM phenotype p "
-					+ "INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ "WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) "
-					+ "  AND e.nd_geolocation_id IN (:environmentIds) " + "GROUP BY p.observable_id, p.cvalue_id ");
+				.createSQLQuery("SELECT p.observable_id, p.cvalue_id, COUNT(p.phenotype_id) AS valuesCount "
+					+ this.getPhenotypesInEnvironmentFromQuery(false)
+					+ " WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) "
+					+ "  AND env.nd_experiment_id IN (:environmentIds) "
+					+ "GROUP BY p.observable_id, p.cvalue_id ");
 			query.setParameterList(TRAIT_IDS, traitIds);
 			query.setParameterList("environmentIds", environmentIds);
 
@@ -396,7 +329,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 				for (final CategoricalTraitInfo traitInfo : traitInfoList) {
 					if (traitInfo.getId() == traitId) {
-						traitInfo.addValueCount(new CategoricalValue(cValueId), count.longValue());
+						traitInfo.addValueCount(new CategoricalValue(cValueId), count);
 						break;
 					}
 				}
@@ -415,7 +348,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final List<Observation> observationFinal = new ArrayList<>();
 
 		try {
-			final StringBuilder sb = new StringBuilder(PhenotypeDao.GET_OBSERVATIONS);
+			final StringBuilder sb = new StringBuilder(this.getObservationsOnTraitsQuery());
 			sb.append(" AND s.dbxref_id IN (:germplasmIds) ");
 			sb.append(PhenotypeDao.ORDER_BY_OBS);
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
@@ -447,18 +380,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return observationFinal;
 	}
 
-	public long countObservationForTraits(final List<Integer> traitIds, final List<Integer> environmentIds) {
-
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery(PhenotypeDao.COUNT_OBSERVATIONS);
-			query.setParameterList(TRAIT_IDS, traitIds);
-			query.setParameterList("environmentIds", environmentIds);
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at countObservationForTraits() query on PhenotypeDao: " + e.getMessage(), e);
-		}
-	}
 
 	public List<Observation> getObservationForTraits(
 		final List<Integer> traitIds, final List<Integer> environmentIds, final int start,
@@ -467,7 +388,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final List<Observation> toReturn = new ArrayList<>();
 
 		try {
-			final StringBuilder sb = new StringBuilder(PhenotypeDao.GET_OBSERVATIONS);
+			final StringBuilder sb = new StringBuilder(this.getObservationsOnTraitsQuery());
 			sb.append(PhenotypeDao.ORDER_BY_OBS);
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 
@@ -497,26 +418,24 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		try {
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT p.observable_id, p.value, s.dbxref_id, e.nd_experiment_id, l.lname, gp.value as locationId ");
-			queryString.append("FROM phenotype p ");
-			queryString.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ");
-			queryString.append("INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
+			queryString.append("SELECT p.observable_id, p.value, s.dbxref_id, e.nd_experiment_id, l.lname, xp.value as locationId ");
+			queryString.append(this.getPhenotypesInEnvironmentFromQuery(true));
+			queryString.append(" INNER JOIN nd_experimentprop xp ON xp.nd_experiment_id = env.nd_experiment_id AND xp.type_id = "
 				+ TermId.LOCATION_ID.getId() + " ");
-			queryString.append(" LEFT JOIN location l ON l.locid = gp.value ");
-			queryString.append("INNER JOIN stock s ON s.stock_id = e.stock_id ");
-			queryString.append("WHERE p.observable_id = :traitId AND e.nd_geolocation_id IN ( :environmentIds ) ");
+			queryString.append(" LEFT JOIN location l ON l.locid = xp.value ");
+			queryString.append(" WHERE p.observable_id = :traitId AND env.nd_experiment_id IN (:environmentIds ) ");
 			queryString.append("ORDER BY s.dbxref_id ");
 
 			PhenotypeDao.LOG.debug(queryString.toString());
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter("traitId", traitId).setParameterList("environmentIds", environmentIds);
-			query.addScalar("observable_id", Hibernate.INTEGER);
-			query.addScalar("value", Hibernate.STRING);
-			query.addScalar("dbxref_id", Hibernate.INTEGER);
-			query.addScalar("nd_experiment_id", Hibernate.INTEGER);
-			query.addScalar("lname", Hibernate.STRING);
-			query.addScalar("locationId", Hibernate.INTEGER);
+			query.addScalar("observable_id", new IntegerType());
+			query.addScalar("value", new StringType());
+			query.addScalar("dbxref_id", new IntegerType());
+			query.addScalar("nd_experiment_id", new IntegerType());
+			query.addScalar("lname", new StringType());
+			query.addScalar("locationId", new IntegerType());
 
 			final List<Object[]> list = query.list();
 
@@ -538,7 +457,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return traitObservationList;
 	}
 
-	public List<TrialEnvironment> getEnvironmentTraits(final Set<TrialEnvironment> trialEnvironments, final List<Integer> experimentTypes) {
+	public List<TrialEnvironment> getEnvironmentTraits(final Set<TrialEnvironment> trialEnvironments, final List<Integer> experimentTypes, final String programUUID) {
 		final List<TrialEnvironment> environmentDetails = new ArrayList<>();
 
 		if (trialEnvironments.isEmpty()) {
@@ -552,22 +471,29 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		final StringBuilder sql = new StringBuilder()
 			.append(
-				"SELECT DISTINCT e.nd_geolocation_id as nd_geolocation_id, p.observable_id as observable_id, trait.name as name, property.name as property, trait.definition as definition, c_scale.name as scale, cr_type.object_id as object_id ")
-			.append("	FROM phenotype p ")
-			.append(
-				"	INNER JOIN nd_experiment e ON p.nd_experiment_id = e.nd_experiment_id  AND e.nd_geolocation_id IN (:environmentIds) AND e.type_id in (:experimentTypes)")
-			.append("	LEFT JOIN cvterm_relationship cr_scale ON p.observable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
+				"  SELECT DISTINCT env.nd_experiment_id as environmentId, pp.variable_id as observable_id, trait.name as name, property.name as property, trait.definition as definition, c_scale.name as scale, cr_type.object_id as object_id  ")
+			.append("	FROM nd_experiment e ")
+			.append("  LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = e.parent_id and plot.type_id = 1155 ")
+			.append("  INNER JOIN project pr ON pr.project_id = e.project_id ")
+			.append("  INNER JOIN project env_ds ON env_ds.study_id = pr.study_id AND env_ds.dataset_type_id = ")
+			.append(DatasetTypeEnum.SUMMARY_DATA.getId()).append(" ")
+			.append("  INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = 1020 AND env.nd_experiment_id IN (:environmentIds) ")
+			// handle cases for with/without plot and with/without sub-observations
+			.append("      AND (e.parent_id = env.nd_experiment_id OR plot.parent_id = env.nd_experiment_id) ")
+			.append("  INNER JOIN projectprop pp on e.project_id = pp.project_id and pp.type_id = " + VariableType.TRAIT.getId())
+			.append("	LEFT JOIN cvterm_relationship cr_scale ON pp.variable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
 			.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.object_id  AND cr_type.type_id = 1105 ")
-			.append(
-				"	LEFT JOIN cvterm_relationship cr_property ON p.observable_id = cr_property.subject_id AND cr_property.type_id = 1200 ")
+			.append("	LEFT JOIN cvterm_relationship cr_property ON pp.variable_id = cr_property.subject_id AND cr_property.type_id = 1200 ")
 			.append("	LEFT JOIN cvterm c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
-			.append("	LEFT JOIN cvterm trait ON trait.cvterm_id = p.observable_id ")
-			.append("	LEFT JOIN cvterm property ON property.cvterm_id = cr_property.object_id ");
-
+			.append("	LEFT JOIN cvterm trait ON trait.cvterm_id = pp.variable_id ")
+			.append("	LEFT JOIN cvterm property ON property.cvterm_id = cr_property.object_id ")
+			.append(" WHERE e.type_id IN (:experimentTypes) AND pr.program_uuid = :programUUID ")
+			.append("    AND EXISTS (select 1 from phenotype ph where ph.observable_id = pp.variable_id and ph.nd_experiment_id = e.nd_experiment_id) ");
 		try {
 
-			final Query query = this.getSession().createSQLQuery(sql.toString()).addScalar("nd_geolocation_id").addScalar("observable_id")
+			final Query query = this.getSession().createSQLQuery(sql.toString()).addScalar("environmentId").addScalar("observable_id")
 				.addScalar("name").addScalar("property").addScalar("definition").addScalar("scale").addScalar("object_id")
+				.setParameter("programUUID", programUUID)
 				.setParameterList("environmentIds", environmentIds).setParameterList("experimentTypes", experimentTypes);
 
 			final List<Object[]> result = query.list();
@@ -592,30 +518,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		return environmentDetails;
-	}
-
-	public void deletePhenotypesByProjectIdAndLocationId(final Integer projectId, final Integer locationId) {
-		try {
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
-			// of synch with
-			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-			// statement
-			this.getSession().flush();
-
-			// Delete phenotypes
-			final String sql = "delete pheno " + " from nd_experiment e,"
-				+ "  phenotype pheno" + " where e.project_id = :projectId "
-				+ " and e.nd_geolocation_id = :locationId "
-				+ " and e.nd_experiment_id = pheno.nd_experiment_id";
-			final SQLQuery statement = this.getSession().createSQLQuery(sql);
-			statement.setParameter("projectId", projectId);
-			statement.setParameter("locationId", locationId);
-			statement.executeUpdate();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in deletePhenotypesByProjectIdAndLocationId=" + projectId + ", " + locationId
-				+ IN_PHENOTYPE_DAO + e.getMessage(), e);
-		}
 	}
 
 	public void deletePhenotypesByProjectIdAndVariableIds(final Integer projectId, final List<Integer> variableIds) {
@@ -672,8 +574,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			final String sql = "SELECT  expprop.value, pheno.observable_id, pheno.phenotype_id FROM "
 				+ "nd_experiment exp "
 				+ "INNER JOIN nd_experimentprop expprop ON expprop.nd_experiment_id = exp.nd_experiment_id "
-				+ "INNER JOIN phenotype pheno ON exp.nd_experiment_id = pheno.nd_experiment_id " + "WHERE exp.project_id = :projectId "
-				+ "AND exp.nd_geolocation_id = :locationId " + "AND pheno.observable_id IN (:cvTermIds) "
+				+ "INNER JOIN phenotype pheno ON exp.nd_experiment_id = pheno.nd_experiment_id "
+				+ " INNER JOIN project pr ON pr.project_id = exp.project_id  "
+				+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
+				+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
+				+ "WHERE exp.project_id = :projectId "
+				+ "AND plot.parent_id = :locationId " + "AND pheno.observable_id IN (:cvTermIds) "
 				+ "AND expprop.value = :plotNo " + "AND exp.type_id = 1155 " + "AND expprop.type_id in (8200, 8380)";
 
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);
@@ -882,14 +788,22 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final StringBuilder sql = new StringBuilder().append(" SELECT phenotype.observable_id,count(phenotype.observable_id) ")
 			.append(" FROM nd_experiment nd_exp ")
 			.append(" INNER JOIN stock ON nd_exp.stock_id = stock.stock_id ")
-			.append(" LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id ").append(" where nd_exp.project_id = ")
-			.append(projectId).append(" and nd_exp.nd_geolocation_id = ").append(locationId)
+			.append(" LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id ")
+			.append(" INNER JOIN project pr ON pr.project_id = nd_exp.project_id  ")
+			.append(" INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = ")
+			.append(DatasetTypeEnum.PLOT_DATA.getId()).append(" ")
+			.append(" INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id ")
+			.append(" where nd_exp.project_id = :projectId")
+			.append(" and plot.parent_id = :environmentId")
 			.append(" and ((phenotype.value <> '' and phenotype.value is not null) or ")
-			.append(" (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null)) ").append(" group by nd_exp.nd_geolocation_id, ")
+			.append(" (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null)) ")
+			.append(" group by plot.parent_id, ")
 			.append(groupByGermplasm).append(" , phenotype.observable_id ")
 			.append(" having count(phenotype.observable_id) >= 2 LIMIT 1 ");
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+		query.setParameter("projectId", projectId);
+		query.setParameter("environmentId", locationId);
 
 		return !query.list().isEmpty();
 	}
@@ -931,32 +845,32 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final PhenotypeSearchDTO observationUnit = new PhenotypeSearchDTO();
 
 				final Integer ndExperimentId = (Integer) row[0];
-				observationUnit.setObservationUnitDbId((String) row[1]); // OBS_UNIT_ID
-				observationUnit.setObservationUnitName((String) row[2]);
-				observationUnit.setObservationLevel((String) row[3]);
+				observationUnit.setObservationUnitDbId(String.valueOf(row[1])); // OBS_UNIT_ID
+				observationUnit.setObservationUnitName(String.valueOf(row[2]));
+				observationUnit.setObservationLevel(String.valueOf(row[3]));
 				observationUnit.setObservationLevels("1");
-				observationUnit.setPlantNumber((String) row[4]);
-				observationUnit.setGermplasmDbId((String) row[5]);
-				observationUnit.setGermplasmName((String) row[6]);
-				observationUnit.setInstanceNumber((String) row[7]);
-				observationUnit.setStudyDbId((String) row[8]);
-				observationUnit.setStudyName((String) row[9]);
-				observationUnit.setProgramName((String) row[10]);
-				String x = (String) row[16]; // ROW
-				String y = (String) row[17]; // COL
+				observationUnit.setPlantNumber(String.valueOf(row[4]));
+				observationUnit.setGermplasmDbId(String.valueOf(row[5]));
+				observationUnit.setGermplasmName(String.valueOf(row[6]));
+				observationUnit.setInstanceNumber(String.valueOf(row[7]));
+				observationUnit.setStudyDbId(String.valueOf(row[8]));
+				observationUnit.setStudyName(String.valueOf(row[9]));
+				observationUnit.setProgramName(String.valueOf(row[10]));
+				String x = String.valueOf(row[16]); // ROW
+				String y = String.valueOf(row[17]); // COL
 				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-					x = (String) row[11]; // fieldMapRow
-					y = (String) row[12]; // fieldMapCol
+					x = String.valueOf(row[11]); // fieldMapRow
+					y = String.valueOf(row[12]); // fieldMapCol
 				}
 				observationUnit.setX(x);
 				observationUnit.setY(y);
-				observationUnit.setPlotNumber((String) row[13]);
-				observationUnit.setBlockNumber((String) row[14]);
-				observationUnit.setReplicate((String) row[15]);
-				observationUnit.setStudyLocationDbId((String) row[18]);
-				observationUnit.setStudyLocation((String) row[19]);
-				observationUnit.setEntryType((String) row[20]);
-				observationUnit.setEntryNumber((String) row[21]);
+				observationUnit.setPlotNumber(String.valueOf(row[13]));
+				observationUnit.setBlockNumber(String.valueOf(row[14]));
+				observationUnit.setReplicate(String.valueOf(row[15]));
+				observationUnit.setStudyLocationDbId(String.valueOf(row[18]));
+				observationUnit.setStudyLocation(String.valueOf(row[19]));
+				observationUnit.setEntryType(String.valueOf(row[20]));
+				observationUnit.setEntryNumber(String.valueOf(row[21]));
 
 				observationUnit.setAdditionalInfo("");
 				observationUnit.setLocationDbId(observationUnit.getStudyLocationDbId());
@@ -980,16 +894,16 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					try {
 						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
 						observationUnitPosition.setGeoCoordinates((Map<String, Object>) jsonProp.get("geoCoordinates"));
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
 					}
 				}
 				observationUnitPosition.setReplicate(observationUnit.getReplicate());
 				observationUnit.setObservationUnitPosition(observationUnitPosition);
 
-				observationUnit.setProgramDbId((String) row[22]);
-				observationUnit.setTrialDbId((String) row[23]);
-				observationUnit.setTrialName((String) row[24]);
+				observationUnit.setProgramDbId(String.valueOf(row[22]));
+				observationUnit.setTrialDbId(String.valueOf(row[23]));
+				observationUnit.setTrialName(String.valueOf(row[24]));
 
 				observationUnitsByNdExpId.put(ndExperimentId, observationUnit);
 			}
@@ -1007,11 +921,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 				final PhenotypeSearchObservationDTO observation = new PhenotypeSearchObservationDTO();
 				final String variableId =
-					(result[5] != null && !((String) result[5]).isEmpty()) ? (String) result[5] : String.valueOf(result[2]);
+					(result[5] != null && !(String.valueOf(result[5])).isEmpty()) ? String.valueOf(result[5]) : String.valueOf(result[2]);
 				observation.setObservationVariableDbId(variableId);
-				observation.setObservationVariableName((String) result[3]);
+				observation.setObservationVariableName(String.valueOf(result[3]));
 				observation.setObservationDbId((Integer) result[1]);
-				observation.setValue((String) result[4]);
+				observation.setValue(String.valueOf(result[4]));
 				observation.setObservationTimeStamp(Util.formatDateAsStringValue((Date) result[6], Util.FRONTEND_TIMESTAMP_FORMAT));
 				// TODO
 				observation.setSeason(StringUtils.EMPTY);
@@ -1028,8 +942,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			final List<Object[]> treatmentFactorsResults = treatmentFactorsQuery.list();
 
 			for (final Object[] result : treatmentFactorsResults) {
-				final String factor = (String) result[0];
-				final String modality = (String) result[1];
+				final String factor = String.valueOf(result[0]);
+				final String modality = String.valueOf(result[1]);
 				final Integer ndExperimentId = (Integer) result[2];
 				final PhenotypeSearchDTO.Treatment treatment = new PhenotypeSearchDTO.Treatment();
 				treatment.setFactor(factor);
@@ -1156,13 +1070,20 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public long countPhenotypesForDatasetAndInstance(final Integer datasetId, final Integer instanceId) {
-		final Criteria criteria = this.getSession().createCriteria(Phenotype.class);
-		criteria.createAlias("experiment", "experiment");
-		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
-		criteria.add(Restrictions.eq("experiment.geoLocation.locationId", instanceId));
-		criteria.setProjection(Projections.rowCount());
+		final Query query =
+			this.getSession()
+				.createSQLQuery(
+					"SELECT COUNT(DISTINCT p.phenotype_id) "
+						+ " from phenotype p "
+						+ " INNER JOIN nd_experiment e ON p.nd_experiment_id = e.nd_experiment_id "
+						+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
+						+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
+						+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
+						+ " WHERE e.project_id = :projectId AND plot.parent_id = :environmentId");
+		query.setParameter("projectId", datasetId);
+		query.setParameter("environmentId", instanceId);
 
-		return (Long) criteria.uniqueResult();
+		return ((BigInteger) query.uniqueResult()).longValue();
 
 	}
 
@@ -1228,16 +1149,16 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		statement.executeUpdate();
 	}
 
-	public void updateOutOfSyncPhenotypesByGeolocation(final int geoLocationId, final Set<Integer> targetVariableIds) {
+	public void updateOutOfSyncPhenotypesByEnvironment(final int environmentId, final Set<Integer> targetVariableIds) {
 		final String sql = "UPDATE nd_experiment experiment\n"
 			+ "LEFT JOIN nd_experiment experimentParent ON experimentParent.nd_experiment_id = experiment.parent_id\n"
 			+ "INNER JOIN phenotype pheno ON  pheno.nd_experiment_id = experimentParent.nd_experiment_id OR pheno.nd_experiment_id = experiment.nd_experiment_id\n"
 			+ "SET pheno.status = :status \n"
-			+ "WHERE experiment.nd_geolocation_id = :geoLocationId  AND pheno.observable_id in (:variableIds) ;";
+			+ "WHERE experiment.parent_id = :environmentId AND pheno.observable_id in (:variableIds);";
 
 		final SQLQuery statement = this.getSession().createSQLQuery(sql);
 		statement.setParameter("status", Phenotype.ValueStatus.OUT_OF_SYNC.getName());
-		statement.setParameter("geoLocationId", geoLocationId);
+		statement.setParameter("environmentId", environmentId);
 		statement.setParameterList("variableIds", targetVariableIds);
 		statement.executeUpdate();
 	}
@@ -1250,11 +1171,23 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public List<Phenotype> getPhenotypeByDatasetIdAndInstanceDbId(final Integer datasetId, final Integer instanceDbId) {
-		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-		criteria.createAlias("experiment", "experiment");
-		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
-		criteria.add(Restrictions.eq("experiment.geoLocation.locationId", instanceDbId));
-		return criteria.list();
+		final Query query =
+			this.getSession()
+				.createSQLQuery(
+					"select p.* "
+						+ " from phenotype p "
+						+ " INNER JOIN nd_experiment e ON p.nd_experiment_id = e.nd_experiment_id "
+						+ " LEFT JOIN nd_experiment level2 ON level2.nd_experiment_id = e.parent_id "
+						+ " LEFT JOIN nd_experiment level3 ON level3.nd_experiment_id = level2.parent_id "
+						+ " WHERE e.project_id = :projectId AND "
+						+ "(CASE "
+						+ " WHEN level3.nd_experiment_id IS NULL AND  level2.nd_experiment_id IS NULL THEN e.nd_experiment_id "
+						+ " WHEN level3.nd_experiment_id IS NULL THEN level2.nd_experiment_id ELSE level3.nd_experiment_id "
+						+ "END) = :instanceId")
+				.addEntity(Phenotype.class);
+		query.setParameter("projectId", datasetId);
+		query.setParameter("instanceId", instanceDbId);
+		return query.list();
 	}
 
 	@SuppressWarnings("Duplicates")
@@ -1282,8 +1215,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final Criterion draftCValueId = Restrictions.isNotNull("draftCValueId");
 		criteria.add(Restrictions.or(draftValue, draftCValueId));
 		criteria.setProjection(Projections.rowCount());
-		final Long count = (Long) criteria.uniqueResult();
-		return count;
+		return (Long) criteria.uniqueResult();
 	}
 
 	public Map<Integer, Long> countOutOfSyncDataOfDatasetsInStudy(final Integer studyId) {
@@ -1342,27 +1274,27 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return criteria.list();
 	}
 
-	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
-		List<MeasurementVariable> studyVariables = new ArrayList<>();
+	public List<MeasurementVariable> getEnvironmentConditionVariables(final Integer environmentId) {
+		final List<MeasurementVariable> studyVariables = new ArrayList<>();
 
 		try{
 			final SQLQuery query =
-				this.getSession().createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, "
-					+ "		cvt_scale.name AS scaleName, pheno.value AS value from phenotype pheno "
-					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.cvterm_id IN (:variableIds) "
+				this.getSession().createSQLQuery("SELECT envcvt.name AS  name, envcvt.definition AS definition, "
+					+ "		cvt_scale.name AS scaleName, pheno.value AS value "
+					+ "     FROM phenotype pheno "
+					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id "
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
-					+ "     INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id\n"
-					+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id = :geolocationId ;");
+					+ "     INNER JOIN nd_experiment env ON  pheno.nd_experiment_id = env.nd_experiment_id\n"
+					+ "		WHERE env.nd_experiment_id = :environmentId AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ;");
 			query.addScalar("name", new StringType());
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());
 			query.addScalar("value", new StringType());
-			query.setParameterList("variableIds", variableIds);
-			query.setParameter("geolocationId", geolocationId);
+			query.setParameter("environmentId", environmentId);
 
 			final List<Object> results = query.list();
-			for(Object result: results) {
+			for(final Object result: results) {
 				final Object[] row = (Object[]) result;
 				final MeasurementVariable measurementVariable = new MeasurementVariable();
 				measurementVariable.setName((row[0] instanceof String) ? (String) row[0] : null);
@@ -1372,8 +1304,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				studyVariables.add(measurementVariable);
 			}
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationId: " + geolocationId
-				+ " and variableIds: " + variableIds;
+			final String message = "Error with getEnvironmentConditionVariables() query from environmentId: " + environmentId;
 			PhenotypeDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

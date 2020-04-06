@@ -79,7 +79,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByName(final String name, final StudySearchMatchingOption studySearchMatchingOption,
+	List<StudyReference> getStudiesByName(final String name, final StudySearchMatchingOption studySearchMatchingOption,
 		final String programUUID) {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		if (name != null && !name.isEmpty()) {
@@ -175,7 +175,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesBySeason(final Season season, final String programUUID) {
+	List<StudyReference> getStudiesBySeason(final Season season, final String programUUID) {
 
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		if (season != null) {
@@ -216,8 +216,8 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 				+ " INNER JOIN project ds ON ds.study_id = p.project_id"
 				+ " INNER JOIN nd_experiment e ON e.project_id = ds.project_id  and e.type_id = "
 				+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
-				+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
-				+ TermId.SEASON_VAR.getId() + " WHERE  p.program_uuid = :programUUID AND gp.value = :seasonId "
+				+ " INNER JOIN nd_experimentprop xp ON xp.nd_experiment_id = e.nd_experiment_id AND xp.type_id = "
+				+ TermId.SEASON_VAR.getId() + " WHERE  p.program_uuid = :programUUID AND xp.value = :seasonId "
 				+ StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY + StudySearchDao.HAS_STUDY_TYPE;
 	}
 
@@ -229,7 +229,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByLocationIds(final List<Integer> locationIds, final String programUUID) {
+	List<StudyReference> getStudiesByLocationIds(final List<Integer> locationIds, final String programUUID) {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		if (!locationIds.isEmpty()) {
 			try {
@@ -260,8 +260,8 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			+ " INNER JOIN project ds ON ds.study_id = p.project_id"
 			+ " INNER JOIN nd_experiment e ON e.project_id = ds.project_id  and e.type_id = "
 			+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
-			+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
-				+ TermId.LOCATION_ID.getId() + " WHERE  p.program_uuid = :programUUID AND  gp.value IN (" + this.stringify(locationIds)
+			+ " INNER JOIN nd_experimentprop xp ON xp.nd_experiment_id = e.nd_experiment_id AND xp.type_id = "
+			+ TermId.LOCATION_ID.getId() + " WHERE  p.program_uuid = :programUUID AND  xp.value IN (" + this.stringify(locationIds)
 				+ ") " + StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY + StudySearchDao.HAS_STUDY_TYPE;
 	}
 

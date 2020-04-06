@@ -11,17 +11,9 @@
 
 package org.generationcp.middleware.service;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
-
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -29,7 +21,6 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -39,20 +30,23 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 
 public class DataImportServiceImplITTest extends IntegrationTestBase {
 
-	public static final int CURRENT_IBDB_USER_ID = 1;
+	private static final int CURRENT_IBDB_USER_ID = 1;
 	@Autowired
 	private DataImportService dataImportService;
 
 	@Autowired
 	private FieldbookService fieldbookService;
-
-	// TODO need setup
-	private GeolocationDao geolocationDao;
 
 	private static final String PROGRAM_UUID = "123456789";
 	private final String cropPrefix = "ABCD";
@@ -63,9 +57,6 @@ public class DataImportServiceImplITTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() {
-		this.geolocationDao = new GeolocationDao();
-		this.geolocationDao.setSession(this.sessionProvder.getSession());
-
 		this.cropType = new CropType();
 		this.cropType.setPlotCodePrefix(this.cropPrefix);
 
@@ -343,7 +334,7 @@ public class DataImportServiceImplITTest extends IntegrationTestBase {
 
 	@Ignore
 	@Test
-	public void testCheckIfProjectNameIsExisting() throws Exception {
+	public void testCheckIfProjectNameIsExisting() {
 		// try to save first then use the name of the saved study
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
@@ -360,25 +351,6 @@ public class DataImportServiceImplITTest extends IntegrationTestBase {
 		isExisting = this.dataImportService.checkIfProjectNameIsExistingInProgram(name,
 				DataImportServiceImplITTest.PROGRAM_UUID);
 		Assert.assertFalse(isExisting);
-	}
-
-	@Ignore
-	@Test
-	public void getLocationIdByProjectNameAndDescription() {
-		// try to save first then use the name of the saved study
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
-		workbook.print(IntegrationTestBase.INDENT);
-		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplITTest.PROGRAM_UUID,
-				this.cropType);
-		final String name = workbook.getStudyDetails().getStudyName();
-		Debug.println(IntegrationTestBase.INDENT, "Name: " + name);
-		final Integer locationId = this.dataImportService.getLocationIdByProjectNameAndDescriptionAndProgramUUID(name,
-				"1", DataImportServiceImplITTest.PROGRAM_UUID);
-		Assert.assertNotNull(locationId);
-		final Geolocation geolocation = this.geolocationDao.getById(locationId);
-		Assert.assertNotNull(geolocation);
-		Assert.assertEquals(locationId, geolocation.getLocationId());
-		Assert.assertEquals("1", geolocation.getDescription());
 	}
 
 	@Ignore

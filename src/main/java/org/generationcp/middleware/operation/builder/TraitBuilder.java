@@ -11,13 +11,6 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
@@ -28,30 +21,39 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TraitBuilder extends Builder {
 
 	private static final List<Integer> NUMERIC_VARIABLE_TYPE = Arrays.asList(TermId.NUMERIC_VARIABLE.getId(),
 			TermId.DATE_VARIABLE.getId());
 
-	private DaoFactory daoFactory;
+	private final DaoFactory daoFactory;
 
 	public TraitBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
-	public List<NumericTraitInfo> getTraitsForNumericVariates(final List<Integer> environmentIds) {
-		final List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>();
-		final List<CVTerm> variableTerms = new ArrayList<>();
-		final List<Integer> variableIds = new ArrayList<>();
-
-		// Get locationCount, germplasmCount, observationCount, minValue,
-		// maxValue
+	public List<NumericTraitInfo> getTraitsForNumericVariates(final List<Integer> environmentIds, final List<Integer> selectedTraitIds) {
+		// Get locationCount, germplasmCount, observationCount, minValue, maxValue
 		// Retrieve traits environments
-		variableTerms.addAll(daoFactory.getCvTermDao().getVariablesByType(TraitBuilder.NUMERIC_VARIABLE_TYPE));
-		variableIds.addAll(this.getVariableIds(variableTerms));
-		numericTraitInfoList.addAll(this.getPhenotypeDao().getNumericTraitInfoList(environmentIds, variableIds));
+		final List<CVTerm> variableTerms = new ArrayList<>(
+			this.daoFactory.getCvTermDao().getVariablesByType(TraitBuilder.NUMERIC_VARIABLE_TYPE));
+		final List<Integer> allNumericTraitIds = new ArrayList<>(this.getVariableIds(variableTerms));
+
+		// If selected traits were specified, filter to numeric variable types
+		final List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>(this.getPhenotypeDao().getNumericTraitInfoList(environmentIds,
+			CollectionUtils.isEmpty(selectedTraitIds) ? allNumericTraitIds : allNumericTraitIds.stream().filter(selectedTraitIds::contains).collect(
+				Collectors.toList())));
 
 		Collections.sort(numericTraitInfoList);
 
@@ -76,15 +78,18 @@ public class TraitBuilder extends Builder {
 		return numericTraitInfoList;
 	}
 
-	public List<CharacterTraitInfo> getTraitsForCharacterVariates(final List<Integer> environmentIds) {
-		final List<CharacterTraitInfo> characterTraitInfoList = new ArrayList<>();
-		final List<CVTerm> variableTerms = new ArrayList<>();
 
-		// Get character variable terms
-		variableTerms.addAll(daoFactory.getCvTermDao().getVariablesByType(Arrays.asList(TermId.CHARACTER_VARIABLE.getId())));
+	public List<CharacterTraitInfo> getTraitsForCharacterVariates(final List<Integer> environmentIds, final List<Integer> selectedTraitIds) {
+		final List<CharacterTraitInfo> characterTraitInfoList = new ArrayList<>();
+		final List<CVTerm> variableTerms = new ArrayList<>(
+			this.daoFactory.getCvTermDao().getVariablesByType(Collections.singletonList(TermId.CHARACTER_VARIABLE.getId())));
 
 		// Get location, germplasm and observation counts
-		final List<TraitInfo> traitInfoList = this.getTraitCounts(this.getVariableIds(variableTerms), environmentIds);
+		// If selected traits were specified, filter to character variable types
+		final List<Integer> allCharacterTraitIds = this.getVariableIds(variableTerms);
+		final List<TraitInfo> traitInfoList = this.getTraitCounts(CollectionUtils.isEmpty(selectedTraitIds) ? allCharacterTraitIds :
+			allCharacterTraitIds.stream().filter(selectedTraitIds::contains).collect(
+				Collectors.toList()), environmentIds);
 		// Set name and description
 		for (final TraitInfo traitInfo : traitInfoList) {
 			for (final CVTerm variable : variableTerms) {
@@ -123,14 +128,12 @@ public class TraitBuilder extends Builder {
 		return characterTraitInfoList;
 	}
 
-	public List<CategoricalTraitInfo> getTraitsForCategoricalVariates(final List<Integer> environmentIds) {
+	public List<CategoricalTraitInfo> getTraitsForCategoricalVariates(final List<Integer> environmentIds, final List<Integer> selectedTraitIds) {
 		final List<CategoricalTraitInfo> localCategTraitList = new ArrayList<>();
 		final List<CategoricalTraitInfo> finalTraitInfoList = new ArrayList<>();
 
 		// Get locationCount, germplasmCount, observationCount
-		final List<TraitInfo> localTraitInfoList = new ArrayList<>();
-
-		localTraitInfoList.addAll(this.getPhenotypeDao().getTraitInfoCounts(environmentIds));
+		final List<TraitInfo> localTraitInfoList = new ArrayList<>(this.getPhenotypeDao().getTraitInfoCounts(environmentIds, selectedTraitIds));
 
 		Collections.sort(localTraitInfoList);
 
@@ -142,7 +145,7 @@ public class TraitBuilder extends Builder {
 		// Set name, description and get categorical domain values and count per
 		// value
 		if (!localCategTraitList.isEmpty()) {
-			finalTraitInfoList.addAll(daoFactory.getCvTermDao().setCategoricalVariables(localCategTraitList));
+			finalTraitInfoList.addAll(this.daoFactory.getCvTermDao().setCategoricalVariables(localCategTraitList));
 			this.getPhenotypeDao().setCategoricalTraitInfoValues(finalTraitInfoList, environmentIds);
 		}
 
@@ -151,10 +154,7 @@ public class TraitBuilder extends Builder {
 	}
 
 	private List<TraitInfo> getTraitCounts(final List<Integer> variableIds, final List<Integer> environmentIds) {
-		final List<TraitInfo> traitInfoList = new ArrayList<>();
-		// Get locationCount, germplasmCount, observationCount
-		traitInfoList.addAll(this.getPhenotypeDao().getTraitInfoCounts(environmentIds, variableIds));
-		return traitInfoList;
+		return this.getPhenotypeDao().getTraitInfoCounts(environmentIds, variableIds);
 	}
 
 	private List<Integer> getVariableIds(final List<CVTerm> variableTerms) {
@@ -175,11 +175,13 @@ public class TraitBuilder extends Builder {
 		// error for large DBs
 		if (environmentIds.size() > 1000) {
 			for (final NumericTraitInfo traitInfo : numericTraitInfoList) {
-				traitValues.putAll(this.getPhenotypeDao().getNumericTraitInfoValues(environmentIds, traitInfo.getId()));
+				traitValues.putAll(this.getPhenotypeDao().getNumericTraitInfoValues(environmentIds, Collections.singletonList(traitInfo.getId())));
 				this.getMedianValue(traitValues, traitInfo);
 			}
 		} else {
-			traitValues.putAll(this.getPhenotypeDao().getNumericTraitInfoValues(environmentIds, numericTraitInfoList));
+			traitValues.putAll(
+				this.getPhenotypeDao().getNumericTraitInfoValues(environmentIds, numericTraitInfoList.stream().map(t -> t.getId()).collect(
+				Collectors.toList())));
 			for (final NumericTraitInfo traitInfo : numericTraitInfoList) {
 				this.getMedianValue(traitValues, traitInfo);
 			}

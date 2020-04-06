@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.service;
@@ -18,13 +18,11 @@ import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.InventoryDataManagerImpl;
 import org.generationcp.middleware.manager.LocationDataManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
@@ -37,19 +35,10 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
-import org.generationcp.middleware.operation.builder.LotBuilder;
-import org.generationcp.middleware.operation.builder.NameBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
-import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
-import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
-import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
-import org.generationcp.middleware.operation.saver.GeolocationSaver;
-import org.generationcp.middleware.operation.saver.PhenotypeOutlierSaver;
-import org.generationcp.middleware.operation.saver.PhenotypeSaver;
-import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -65,32 +54,20 @@ public abstract class Service extends DatabaseBroker {
 	public Service() {
 	}
 
-	public Service(HibernateSessionProvider sessionProvider) {
+	public Service(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 
-	public Service(HibernateSessionProvider sessionProvider, String databaseName) {
+	public Service(final HibernateSessionProvider sessionProvider, final String databaseName) {
 		super(sessionProvider, databaseName);
 	}
 
-	protected void logAndThrowException(String message, Throwable e, Logger log) {
+	protected void logAndThrowException(final String message, final Throwable e, final Logger log) {
 		log.error(e.getMessage(), e);
 		if (e instanceof PhenotypeException) {
 			throw (PhenotypeException) e;
 		}
 		throw new MiddlewareQueryException(message + e.getMessage(), e);
-	}
-
-	protected final PhenotypeSaver getPhenotypeSaver() {
-		return new PhenotypeSaver(this.sessionProvider);
-	}
-
-	protected final PhenotypeOutlierSaver getPhenotypeOutlierSaver() {
-		return new PhenotypeOutlierSaver(this.sessionProvider);
-	}
-
-	protected final ExperimentPropertySaver getExperimentPropertySaver() {
-		return new ExperimentPropertySaver(this.sessionProvider);
 	}
 
 	protected final OntologyDataManager getOntologyDataManager() {
@@ -134,28 +111,12 @@ public abstract class Service extends DatabaseBroker {
 		return new ValueReferenceBuilder(this.sessionProvider);
 	}
 
-	protected final GeolocationSaver getGeolocationSaver() {
-		return new GeolocationSaver(this.sessionProvider);
-	}
-
 	protected final StandardVariableBuilder getStandardVariableBuilder() {
 		return new StandardVariableBuilder(this.sessionProvider);
 	}
 
-	protected final LotBuilder getLotBuilder() {
-		return new LotBuilder(this.sessionProvider);
-	}
-
 	protected final ExperimentBuilder getExperimentBuilder() {
 		return new ExperimentBuilder(this.sessionProvider);
-	}
-
-	protected final ExperimentDestroyer getExperimentDestroyer() {
-		return new ExperimentDestroyer(this.sessionProvider);
-	}
-
-	protected final TransactionBuilder getTransactionBuilder() {
-		return new TransactionBuilder(this.sessionProvider);
 	}
 
 	protected final MeasurementVariableTransformer getMeasurementVariableTransformer() {
@@ -170,16 +131,12 @@ public abstract class Service extends DatabaseBroker {
 		return new StudyDestroyer(this.sessionProvider);
 	}
 
-	protected final NameBuilder getNameBuilder() {
-		return new NameBuilder(this.sessionProvider);
-	}
-
-	protected void setLocationDataManager(LocationDataManager locationDataManager) {
+	protected void setLocationDataManager(final LocationDataManager locationDataManager) {
 		this.locationDataManager = locationDataManager;
 	}
 
 	protected LocationDataManager getLocationDataManager() {
-		return locationDataManager;
+		return this.locationDataManager;
 	}
 
 	protected final SampleListService getSampleListService() {

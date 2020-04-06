@@ -14,7 +14,6 @@ package org.generationcp.middleware.operation.builder;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -34,11 +33,11 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -120,7 +119,7 @@ public class DataSetBuilder extends Builder {
 	}
 
 	private Set<Integer> getLocationIds(final Integer projectId) {
-		return this.getGeolocationDao().getLocationIds(projectId);
+		return new HashSet<>(this.daoFactory.getInstanceDao().getEnvironmentIds(projectId));
 	}
 
 	private VariableTypeList getVariableTypes(final DmsProject project) {
@@ -133,7 +132,7 @@ public class DataSetBuilder extends Builder {
 		return variableTypes.sort();
 	}
 
-	public DmsProject getTrialDataset(final int studyId) {
+	DmsProject getTrialDataset(final int studyId) {
 		// Get dataset reference with Summary Data type
 		final DatasetReference trialDatasetReference =
 			this.studyDataManager.findOneDataSetReferenceByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
@@ -175,7 +174,7 @@ public class DataSetBuilder extends Builder {
 		return workbook;
 	}
 
-	protected VariableTypeList filterDatasetVariables(final VariableTypeList variables, final boolean isMeasurementDataset) {
+	VariableTypeList filterDatasetVariables(final VariableTypeList variables, final boolean isMeasurementDataset) {
 		final VariableTypeList newVariables = new VariableTypeList();
 		if (variables != null) {
 			for (final DMSVariableType variable : variables.getVariableTypes()) {
@@ -213,7 +212,7 @@ public class DataSetBuilder extends Builder {
 		return newList;
 	}
 
-	protected DmsProject getDmsProjectById(final int studyId) {
+	DmsProject getDmsProjectById(final int studyId) {
 		return this.daoFactory.getDmsProjectDAO().getById(studyId);
 	}
 

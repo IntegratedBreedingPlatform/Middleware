@@ -4,20 +4,16 @@ import com.google.common.collect.Ordering;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
-import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -46,16 +42,15 @@ public class SampleDaoTest extends IntegrationTestBase {
 	public static final String USER_NAME = "JohnDoe";
 	public static final String USER_FIRST_NAME = "John";
 	public static final String USER_LAST_NAME = "Doe";
-	public static final Integer TEST_SAMPLE_RECORD_COUNT = 23;
+	private static final Integer TEST_SAMPLE_RECORD_COUNT = 23;
 	public static final String STUDY_NAME = "Study1";
-	public static final String STUDY_DESCRIPTION = "Study Project";
+	private static final String STUDY_DESCRIPTION = "Study Project";
 	private static final String SAMPLE_LIST_NAME_FOR_PLOT_DATA = "PlotSampleList";
 	private static final String SAMPLE_LIST_NAME_FOR_SUBOBSERVATION_DATA = "SubObsSampleList";
 
 	private SampleListDao sampleListDao;
 	private SampleDao sampleDao;
 	private ExperimentDao experimentDao;
-	private GeolocationDao geolocationDao;
 	private StockDao stockDao;
 	private PersonDAO personDAO;
 	private DmsProjectDao dmsProjectDao;
@@ -80,9 +75,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 		this.experimentDao = new ExperimentDao();
 		this.experimentDao.setSession(this.sessionProvder.getSession());
-
-		this.geolocationDao = new GeolocationDao();
-		this.geolocationDao.setSession(this.sessionProvder.getSession());
 
 		this.stockDao = new StockDao();
 		this.stockDao.setSession(this.sessionProvder.getSession());
@@ -296,8 +288,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetBySampleBks() {
 
-		final Integer listId =
-			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+		this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final Set<String> sampleUIDs = new HashSet<>();
 		for (int i = 1; i < TEST_SAMPLE_RECORD_COUNT + 1; i++) {
@@ -427,9 +418,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 		sampleList.setDescription("DESCRIPTION-" + listName);
 		this.sampleListDao.saveOrUpdate(sampleList);
 
-		final Geolocation geolocation = new Geolocation();
-		this.geolocationDao.saveOrUpdate(geolocation);
-
 		// Create one sample for each experiment.
 		for (int i = 1; i < sampleSize + 1; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
@@ -444,7 +432,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 			this.stockDao.saveOrUpdate(stockModel);
 
 			final ExperimentModel experimentModel = new ExperimentModel();
-			experimentModel.setGeoLocation(geolocation);
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 			experimentModel.setProject(dmsProject);
 			experimentModel.setStock(stockModel);

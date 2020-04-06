@@ -48,7 +48,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	static final String DBXREF_ID = "dbxrefId";
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
+	List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
 		final List<Integer> stockIds;
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -67,7 +67,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockIds;
 	}
 
-	public long countStudiesByGid(final int gid)  {
+	long countStudiesByGid(final int gid)  {
 
 		try {
 			final SQLQuery query = this.getSession()
@@ -145,15 +145,20 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockModels;
 	}
 
-	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId)  {
+	public long countStocks(final int datasetId, final int trialEnvironmentId, final int traitId)  {
 		try {
-
+			// Dataset ID can be for means or plot dataset type
 			final String sql = "select count(distinct e.stock_id) "
-					+ "from nd_experiment e, phenotype p "
-					+ "where e.nd_experiment_id = p.nd_experiment_id  "
-					+ "  and e.nd_geolocation_id = " + trialEnvironmentId + "  and p.observable_id = " + variateStdVarId
-					+ "  and e.project_id = " + datasetId;
+					+ "from nd_experiment e "
+					+ " inner join phenotype p ON e.nd_experiment_id = p.nd_experiment_id "
+					+ " inner join nd_experiment env ON env.nd_experiment_id = e.parent_id AND env.type_id =  " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
+					+ "  WHERE env.nd_experiment_id = :environmentId  and p.observable_id = :traitId "
+					+ "  and e.project_id = :datasetId ";
 			final Query query = this.getSession().createSQLQuery(sql);
+			query.setParameter("environmentId", trialEnvironmentId);
+			query.setParameter("datasetId", datasetId);
+			query.setParameter("traitId", traitId);
+
 
 			return ((BigInteger) query.uniqueResult()).longValue();
 

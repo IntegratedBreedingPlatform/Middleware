@@ -6,16 +6,12 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
@@ -136,7 +132,7 @@ public class VariableListTransformer extends Transformer {
 		if (trialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
 			final List<DMSVariableType> varTypes = variableTypeList.getVariableTypes();
 			final int varTypeSize = varTypes.size();
-			for (int i = 0, l = varTypeSize; i < l; i++) {
+			for (int i = 0; i < varTypeSize; i++) {
 				final DMSVariableType varType = varTypes.get(i);
 
 				if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT
@@ -165,7 +161,7 @@ public class VariableListTransformer extends Transformer {
 		if (trialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
 			final List<DMSVariableType> varTypes = variableTypeList.getVariableTypes();
 			final int varTypeSize = varTypes.size();
-			for (int i = 0, l = varTypeSize; i < l; i++) {
+			for (int i = 0; i < varTypeSize; i++) {
 				final DMSVariableType varType = varTypes.get(i);
 				MeasurementData trialData = null;
 				for (final MeasurementData aData : trialMD) {
@@ -197,8 +193,8 @@ public class VariableListTransformer extends Transformer {
 		return variableList;
 	}
 
-	public VariableList transformTrialEnvironment(final List<MeasurementVariable> measurementVariableList,
-			final VariableTypeList variableTypeList) throws MiddlewareQueryException {
+	VariableList transformTrialEnvironment(final List<MeasurementVariable> measurementVariableList,
+			final VariableTypeList variableTypeList) {
 		final VariableList variableList = new VariableList();
 
 		if (measurementVariableList == null && variableTypeList == null) {
@@ -224,37 +220,5 @@ public class VariableListTransformer extends Transformer {
 		return variableList;
 	}
 
-	private int addVariableIfNecessary(final VariableList variables, final VariableTypeList variableTypeList,
-			final TermId termId, final String localName, final String localDescription, final String value,
-			final int rank, final String programUUID, final PhenotypicType role) throws MiddlewareException {
 
-		Variable variable = null;
-
-		boolean found = false;
-		if (variableTypeList != null && variableTypeList.getVariableTypes() != null
-				&& !variableTypeList.getVariableTypes().isEmpty()) {
-			for (final DMSVariableType variableType : variableTypeList.getVariableTypes()) {
-				if (variableType.getStandardVariable() != null) {
-					final StandardVariable standardVariable = variableType.getStandardVariable();
-					if (standardVariable.getId() == termId.getId()) {
-						found = true;
-						break;
-					}
-				}
-			}
-
-		}
-		if (!found) {
-			final StandardVariable standardVariable = this.getStandardVariableBuilder().create(termId.getId(),
-					programUUID);
-			standardVariable.setPhenotypicType(role);
-			final DMSVariableType variableType = new DMSVariableType(localName, localDescription, standardVariable,
-					rank);
-			variable = new Variable(variableType, value);
-			variableType.setRole(role);
-			variables.add(variable);
-			return rank + 1;
-		}
-		return rank;
-	}
 }

@@ -12,7 +12,6 @@
 package org.generationcp.middleware.operation.saver;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetValues;
@@ -43,7 +42,6 @@ import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTra
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
@@ -56,11 +54,11 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // ASsumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName
@@ -115,11 +113,10 @@ public class WorkbookSaver extends Saver {
 	 * @return Map<String>, ?> : a map of 3 sub-maps containing
 	 * Strings(headers), VariableTypeLists and Lists of
 	 * MeasurementVariables
-	 * @throws Exception
 	 */
 
 	@SuppressWarnings("rawtypes")
-	public Map saveVariables(final Workbook workbook, final String programUUID) throws Exception {
+	public Map saveVariables(final Workbook workbook, final String programUUID) {
 		// make sure to reset all derived variables
 		workbook.reset();
 
@@ -207,67 +204,17 @@ public class WorkbookSaver extends Saver {
 		// TODO : Review code and see whether variable validation and possible
 		// dataset creation abort is a good idea (rebecca)
 
-		// GCP-6091 start
-		final int studyLocationId;
-		final List<Integer> locationIds = new ArrayList<>();
-		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
-
-		// get the trial and measurement dataset id to use in deletion of
-		// experiments
-		Integer environmentDatasetId = workbook.getTrialDatasetId();
-		Integer plotDatasetId = workbook.getMeasurementDatesetId();
-		int savedEnvironmentsCount = 0;
-		boolean isDeleteTrialObservations = false;
-		if (environmentDatasetId == null && workbook.getStudyDetails().getId() != null) {
-			environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
-		}
-		if (plotDatasetId == null && workbook.getStudyDetails().getId() != null) {
-			plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
-		}
-
-		if (environmentDatasetId != null) {
-			savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
-		}
-
-		if ((savedEnvironmentsCount != workbook.getTrialObservations().size() && savedEnvironmentsCount > 0 || isDeleteObservations)
-			&& environmentDatasetId != null) {
-			isDeleteTrialObservations = true;
-			// delete measurement data
-			this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
-			// reset trial observation details such as experimentid, stockid and
-			// geolocationid
-			this.resetTrialObservations(workbook.getTrialObservations());
-		}
-
-		studyLocationId =
-			this.createLocationIfNecessary(trialVariableTypeList, isDeleteObservations, locationIds, workbook, trialVariables, trialMV,
-				trialHeaders, trialVariatesMap, isDeleteTrialObservations, programUUID);
-
-		// GCP-6091 end
-		if (isDeleteTrialObservations) {
-
-			final ExperimentModel studyExperiment =
-				this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
-			studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
-			this.getExperimentDao().saveOrUpdate(studyExperiment);
-
-			// delete trial observations
-			this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
-		}
-
 		final int studyId;
 		if (!(workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null)) {
-			studyId = this.createStudyIfNecessary(workbook, studyLocationId, true, programUUID, crop);
+			studyId = this.createStudyIfNecessary(workbook, true, programUUID, crop);
 		} else {
 			studyId = workbook.getStudyDetails().getId();
 		}
-		environmentDatasetId = this.createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables, programUUID);
+		final Integer environmentDatasetId = this.createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables, programUUID);
 
-		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId,
-			savedEnvironmentsCount,
-			isDeleteObservations, programUUID);
+		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook, trialVariables, trialHeaders);
 
-		plotDatasetId =
+		final int plotDatasetId =
 			this.createPlotDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables, programUUID);
 		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
 
@@ -286,57 +233,14 @@ public class WorkbookSaver extends Saver {
 			workbook.setMeasurementDatesetId(plotDatasetId);
 		}
 
-		this.createMeasurementEffectExperiments(crop, plotDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
+		this.createExperiments(crop, plotDatasetId, environmentDatasetId, effectVariables, workbook.getObservations(), trialHeaders, ExperimentType.PLOT);
 
 		return studyId;
 	}
 
-	public void deleteExperimentalDesign(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) {
 
-		final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get(WorkbookSaver.HEADERMAP);
-		final Map<String, VariableTypeList> variableTypeMap =
-			(Map<String, VariableTypeList>) variableMap.get(WorkbookSaver.VARIABLETYPEMAP);
-		final Map<String, List<MeasurementVariable>> measurementVariableMap =
-			(Map<String, List<MeasurementVariable>>) variableMap.get(WorkbookSaver.MEASUREMENTVARIABLEMAP);
-
-		final VariableTypeList trialVariableTypeList = variableTypeMap.get(WorkbookSaver.TRIALVARIABLETYPELIST);
-		final VariableTypeList trialVariables = variableTypeMap.get(WorkbookSaver.TRIALVARIABLES);
-		final List<MeasurementVariable> trialMV = measurementVariableMap.get(WorkbookSaver.TRIALMV);
-		final List<String> trialHeaders = headerMap.get(WorkbookSaver.TRIALHEADERS);
-
-
-		final List<Integer> locationIds = new ArrayList<>();
-		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
-
-		final Integer environmentDatasetId = workbook.getTrialDatasetId();
-		final Integer plotDatasetId = workbook.getMeasurementDatesetId();
-
-		final int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
-
-		// delete measurement data
-		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
-		// reset trial observation details such as experimentid, stockid and
-		// geolocationid
-		this.resetTrialObservations(workbook.getTrialObservations());
-
-		final int studyLocationId =
-			this.createLocationIfNecessary(trialVariableTypeList, true, locationIds, workbook, trialVariables, trialMV,
-				trialHeaders, trialVariatesMap, true, programUUID);
-
-		final ExperimentModel studyExperiment =
-			this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
-		studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
-		this.getExperimentDao().saveOrUpdate(studyExperiment);
-
-		// delete trial observations
-		this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
-
-		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId,
-			savedEnvironmentsCount,
-			true, programUUID);
-	}
-
-	public void savePlotDataset(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) throws Exception {
+	// Used in Design Import
+	public void savePlotDataset(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) {
 
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList ,
 		// Maps of Lists of MeasurementVariable
@@ -354,53 +258,26 @@ public class WorkbookSaver extends Saver {
 		final List<String> trialHeaders = headerMap.get(WorkbookSaver.TRIALHEADERS);
 		final VariableTypeList effectVariables = variableTypeMap.get(WorkbookSaver.EFFECTVARIABLE);
 
-		final int studyLocationId;
-		final List<Integer> locationIds = new ArrayList<>();
-		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
-
-		final Integer environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
-		final Integer plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
+		final int environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
+		final int plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
 		final int studyId = workbook.getStudyDetails().getId();
 
-		int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
-		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
+		// TODO: IBP-3389 Check if we can remove the code that resets/delete trial experiments
+//		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
+//		this.resetTrialObservations(workbook.getTrialObservations());
+//
+//		final ExperimentModel studyExperiment =
+//			this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(studyId)).get(0);
+//		this.getExperimentDao().saveOrUpdate(studyExperiment);
+//
+//		// delete trial observations
+//		this.getExperimentDestroyer().deleteExperimentsByStudy(environmentDatasetId);
 
-		this.resetTrialObservations(workbook.getTrialObservations());
-
-		studyLocationId = this.createLocationIfNecessary(trialVariableTypeList, true, locationIds, workbook, trialVariables, trialMV,
-			trialHeaders, trialVariatesMap, true, programUUID);
-
-		final ExperimentModel studyExperiment =
-			this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(studyId)).get(0);
-		studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
-		this.getExperimentDao().saveOrUpdate(studyExperiment);
-
-		// delete trial observations
-		this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
-
-		this.saveOrUpdateTrialObservations( crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId, savedEnvironmentsCount, true, programUUID);
+		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook, trialVariables, trialHeaders);
 
 		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
-		this.createMeasurementEffectExperiments(crop, plotDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
+		this.createExperiments(crop, plotDatasetId, environmentDatasetId, effectVariables, workbook.getObservations(), trialHeaders, ExperimentType.PLOT);
 
-	}
-
-	private int createLocationIfNecessary(final VariableTypeList trialVariableTypeList, final boolean isDeleteObservations,
-		final List<Integer> locationIds, final Workbook workbook, final VariableTypeList trialVariables, final List<MeasurementVariable> trialMV, final List<String> trialHeaders, final Map<Integer, VariableList> trialVariatesMap, final boolean isDeleteTrialObservations, final String programUUID) {
-
-		final int studyLocationId;
-
-		if (trialVariableTypeList != null && !isDeleteObservations) {
-			// multi-location for data loader
-			studyLocationId = this.createLocationsAndSetToObservations(locationIds, workbook, trialVariables, trialHeaders, trialVariatesMap, false, programUUID);
-		} else if (workbook.getTrialObservations().size() > 1) {
-			// also a multi-location
-			studyLocationId = this.createLocationsAndSetToObservations(locationIds, workbook, trialVariables, trialHeaders, trialVariatesMap, isDeleteTrialObservations, programUUID);
-		} else {
-			studyLocationId = this.createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, isDeleteTrialObservations, programUUID);
-		}
-
-		return studyLocationId;
 	}
 
 	public void removeDeletedVariablesAndObservations(final Workbook workbook) {
@@ -467,183 +344,53 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
-	public void resetTrialObservations(final List<MeasurementRow> trialObservations) {
-		for (final MeasurementRow row : trialObservations) {
-			row.setExperimentId(0);
-			row.setLocationId(0);
-			row.setStockId(0);
-			for (final MeasurementData data : row.getDataList()) {
-				data.setPhenotypeId(null);
-			}
-		}
-	}
+	private void saveOrUpdateTrialObservations(
+		final CropType crop, final int trialDatasetId, final Workbook workbook, final VariableTypeList trialVariables, final List<String> trialHeaders) {
 
-	public void saveOrUpdateTrialObservations(
-		final CropType crop, final int trialDatasetId, final Workbook workbook, final List<Integer> locationIds,
-		final Map<Integer, VariableList> trialVariatesMap, final int studyLocationId, final int totalRows,
-		final boolean isDeleteObservations, final String programUUID) {
-		if (totalRows == workbook.getTrialObservations().size() && totalRows > 0 && !isDeleteObservations) {
-			this.saveTrialObservations(workbook, programUUID);
-		} else {
-			if (locationIds != null && !locationIds.isEmpty()) {// multi-location
-				for (final Integer locationId : locationIds) {
-					this.setVariableListValues(trialVariatesMap.get(locationId), workbook.getConstants());
-					this.createTrialExperiment(crop, trialDatasetId, locationId, trialVariatesMap.get(locationId));
-				}
-			} else {
-				this.createTrialExperiment(crop, trialDatasetId, studyLocationId, trialVariatesMap.get(studyLocationId));
-			}
-		}
-	}
+		final List<Location> locations = this.daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 
-	public void saveTrialObservations(final Workbook workbook, final String programUUID) {
 		if (!workbook.getTrialObservations().isEmpty()) {
-			for (final MeasurementRow trialObservation : workbook.getTrialObservations()) {
-				this.getGeolocationSaver().updateGeolocationInformation(trialObservation, programUUID);
-			}
-		}
-	}
-
-	public int createLocationAndSetToObservations(
-		final Workbook workbook, final List<MeasurementVariable> trialMV,
-		final VariableTypeList trialVariables, final Map<Integer, VariableList> trialVariatesMap,
-		final boolean isDeleteTrialObservations, final String programUUID) {
-
-		final TimerWatch watch = new TimerWatch("transform trial environment");
-		if (workbook.getTrialObservations().size() == 1) {
-			final MeasurementRow trialObs = workbook.getTrialObservations().get(0);
-			for (final MeasurementVariable mv : trialMV) {
-				for (final MeasurementData mvrow : trialObs.getDataList()) {
-					if (mvrow.getMeasurementVariable().getTermId() == mv.getTermId()) {
-						mv.setValue(mvrow.getValue());
-						break;
-					}
-				}
-			}
-		}
-		VariableList geolocation = this.getVariableListTransformer().transformTrialEnvironment(trialMV, trialVariables);
-		this.setVariableListValues(geolocation, trialMV);
-		final Integer studyLocationId;
-
-		// GCP-8092 Nurseries will always have a unique geolocation, no more
-		// concept of shared/common geolocation
-		if (geolocation == null || geolocation.isEmpty()) {
-			geolocation = this.createDefaultGeolocationVariableList(programUUID);
-		}
-
-		watch.restart("save geolocation");
-
-		this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(geolocation, this.daoFactory.getLocationDAO());
-		this.assignExptDesignAsExternallyGeneratedDesignIfEmpty(geolocation);
-
-		final Geolocation g = this.getGeolocationSaver()
-			.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, null,
-				isDeleteTrialObservations, programUUID);
-		studyLocationId = g.getLocationId();
-		if (g.getVariates() != null && !g.getVariates().isEmpty()) {
-			final VariableList trialVariates = new VariableList();
-			trialVariates.addAll(g.getVariates());
-			trialVariatesMap.put(studyLocationId, trialVariates);
-		}
-
-		watch.restart("set to observations(total)");
-		if (!workbook.getTrialObservations().isEmpty()) {
+			// If a study is created from Study Manager, extract the trial environments from workbook.getTrialObservations().
 			for (final MeasurementRow row : workbook.getTrialObservations()) {
-				row.setLocationId(studyLocationId);
+				final Integer instanceNumber = this.getTrialInstanceNumber(row);
+				if (row.getExperimentId() <= 0) {
+					final VariableList environmentVariables =
+						this.getVariableListTransformer().transformTrialEnvironment(row, trialVariables);
+					this.setVariableListValues(environmentVariables, workbook.getConditions());
+					this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
+						environmentVariables, locations);
+					this.createTrialExperiment(crop, trialDatasetId, instanceNumber, environmentVariables);
+				} else {
+					// TODO: Update the trial environment variables if it is already existing.
+				}
 			}
-		}
-		if (workbook.getObservations() != null) {
-			for (final MeasurementRow row : workbook.getObservations()) {
-				row.setLocationId(studyLocationId);
-			}
-		}
-		watch.stop();
-
-		return studyLocationId;
-	}
-
-	public int createLocationsAndSetToObservations(
-		final List<Integer> locationIds, final Workbook workbook,
-		final VariableTypeList trialFactors, final List<String> trialHeaders, final Map<Integer, VariableList> trialVariatesMap,
-		final boolean isDeleteTrialObservations, final String programUUID) {
-
-		final List<MeasurementRow> observations;
-		Long geolocationId = null;
-		boolean hasTrialObservations = false;
-		if (!workbook.getTrialObservations().isEmpty()) {
-			observations = workbook.getTrialObservations();
-			hasTrialObservations = true;
 		} else {
-			observations = workbook.getObservations();
-		}
-		final Map<String, Long> locationMap = new HashMap<>();
-		if (observations != null) {
-			for (final MeasurementRow row : observations) {
-				geolocationId = row.getLocationId();
-				if (geolocationId == 0) {
-					// if geolocationId does not exist, create the geolocation
-					// and set to row.locationId
-					final TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations");
-					final VariableList geolocation =
-						this.getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
+			// workbook.getTrialObservations() is empty when a study is created from Dataset Importer.
+			// In this case, extract the trial environments from plot observations
+			final Map<Integer, Integer> instanceNumberEnvironmentIdsMap = this.daoFactory.getExperimentDao()
+				.getInstanceNumberEnvironmentIdsMap(trialDatasetId);
 
-					this.setVariableListValues(geolocation, workbook.getConditions());
-					if (geolocation != null && !geolocation.isEmpty()) {
+			for (final MeasurementRow row : workbook.getObservations()) {
+				final Integer instanceNumber = this.getTrialInstanceNumber(row);
+				if (!instanceNumberEnvironmentIdsMap.containsKey(instanceNumber)) {
+					final VariableList environmentVariables =
+						this.getVariableListTransformer().transformTrialEnvironment(row, trialVariables, trialHeaders);
+					this.setVariableListValues(environmentVariables, workbook.getConditions());
+					this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
+						environmentVariables, locations);
+					this.assignExptDesignAsExternallyGeneratedDesignIfEmpty(environmentVariables);
 
-						final String trialInstanceNumber = this.getTrialInstanceNumber(geolocation);
-						if (WorkbookSaver.LOG.isDebugEnabled()) {
-							WorkbookSaver.LOG.debug("trialInstanceNumber = " + trialInstanceNumber);
-						}
-						if (!locationMap.containsKey(trialInstanceNumber)) {
-
-							// if new location (unique by trial instance number)
-							watch.restart("save geolocation");
-
-							this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
-								geolocation, this.daoFactory.getLocationDAO());
-							this.assignExptDesignAsExternallyGeneratedDesignIfEmpty(geolocation);
-
-							final Geolocation g = this.getGeolocationSaver()
-								.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, row,
-									isDeleteTrialObservations, programUUID);
-							geolocationId = g.getLocationId().longValue();
-							locationIds.add(geolocationId.intValue());
-							if (g.getVariates() != null && !g.getVariates().isEmpty()) {
-								final VariableList trialVariates = new VariableList();
-								trialVariates.addAll(g.getVariates());
-								trialVariatesMap.put(geolocationId.intValue(), trialVariates);
-							}
-							locationMap.put(trialInstanceNumber, geolocationId);
-						} else {
-							geolocationId = locationMap.get(trialInstanceNumber);
-						}
-						row.setLocationId(geolocationId);
-					}
+					final Integer environmentId = this.createTrialExperiment(crop, trialDatasetId, instanceNumber, environmentVariables);
+					instanceNumberEnvironmentIdsMap.put(instanceNumber, environmentId);
 				}
-			}
-
-			if (hasTrialObservations && workbook.getObservations() != null) {
-				for (final MeasurementRow row : workbook.getObservations()) {
-					final String trialInstance = this.getTrialInstanceNumber(row);
-					if (trialInstance != null) {
-						row.setLocationId(locationMap.get(trialInstance));
-					} else if (geolocationId != null && geolocationId != 0) {
-						row.setLocationId(geolocationId);
-					}
-				}
-			}
-			// return studyLocationId
-			if (workbook.getObservations() != null && !workbook.getObservations().isEmpty()) {
-				return Long.valueOf(workbook.getObservations().get(0).getLocationId()).intValue();
-			} else {
-				return Long.valueOf(workbook.getTrialObservations().get(0).getLocationId()).intValue();
+				row.setLocationId(instanceNumberEnvironmentIdsMap.get(instanceNumber));
 			}
 		}
 
-		return 0;
 	}
 
-	protected void assignExptDesignAsExternallyGeneratedDesignIfEmpty(final VariableList variableList) {
+
+	private void assignExptDesignAsExternallyGeneratedDesignIfEmpty(final VariableList variableList) {
 		final Variable exptDesignVariable = variableList.findById(TermId.EXPERIMENT_DESIGN_FACTOR);
 
 		if (exptDesignVariable != null) {
@@ -653,8 +400,8 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
-	protected void assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
-		final VariableList variableList, final LocationDAO locationDAO) {
+	void assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(
+		final VariableList variableList, final List<Location> locations) {
 		final Variable locationIdVariable = variableList.findById(TermId.LOCATION_ID);
 
 		if (locationIdVariable != null) {
@@ -663,11 +410,11 @@ public class WorkbookSaver extends Saver {
 
 			if (!StringUtils.isEmpty(locationIdVariable.getValue())) {
 				locationId.add(Integer.valueOf(locationIdVariable.getValue()));
-				locationIdExists = (locationDAO.getByIds(locationId).size() > 0) ? true : false;
+				locationIdExists = this.daoFactory.getLocationDAO().getByIds(locationId).size() > 0;
 			}
 			if (StringUtils.isEmpty(locationIdVariable.getValue()) || !locationIdExists) {
 				String unspecifiedLocationLocId = "";
-				final List<Location> locations = locationDAO.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
+
 				if (!locations.isEmpty()) {
 					unspecifiedLocationLocId = String.valueOf(locations.get(0).getLocid());
 				}
@@ -702,10 +449,10 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
-	private String getTrialInstanceNumber(final MeasurementRow row) {
+	private Integer getTrialInstanceNumber(final MeasurementRow row) {
 		for (final MeasurementData data : row.getDataList()) {
 			if (data.getMeasurementVariable().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-				return data.getValue();
+				return Integer.valueOf(data.getValue());
 			}
 		}
 		return null;
@@ -722,18 +469,6 @@ public class WorkbookSaver extends Saver {
 		return null;
 	}
 
-	private String getTrialInstanceNumber(final VariableList trialVariables) {
-		if (trialVariables != null && trialVariables.getVariables() != null) {
-			for (final Variable variable : trialVariables.getVariables()) {
-				if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variable.getVariableType().getStandardVariable().getId()) {
-					return variable.getValue();
-				}
-			}
-		}
-		return null;
-
-	}
-
 	private String generateTrialDatasetName(final String studyName) {
 		return studyName + ENVIRONMENT;
 	}
@@ -746,15 +481,15 @@ public class WorkbookSaver extends Saver {
 		return studyName + "-MEANS";
 	}
 
-	private ExperimentValues createTrialExperimentValues(final Integer locationId, final VariableList variates) {
+	private ExperimentValues createTrialExperimentValues(final VariableList variates, final Integer instanceNumber) {
 		final ExperimentValues value = new ExperimentValues();
-		value.setLocationId(locationId);
 		value.setVariableList(variates);
+		value.setObservationUnitNo(instanceNumber);
 		return value;
 	}
 
 	private int createStudyIfNecessary(
-		final Workbook workbook, final int studyLocationId, final boolean saveStudyExperiment,
+		final Workbook workbook, final boolean saveStudyExperiment,
 		final String programUUID, final CropType crop) throws Exception {
 		final TimerWatch watch = new TimerWatch("find study");
 
@@ -771,7 +506,7 @@ public class WorkbookSaver extends Saver {
 			studyVariables.addAll(this.getVariableTypeListTransformer()
 				.transform(workbook.getStudyConstants(), studyVariables.size() + 1, programUUID));
 
-			final StudyValues studyValues = this.getStudyValuesTransformer().transform(null, studyLocationId, studyMV, studyVariables);
+			final StudyValues studyValues = this.getStudyValuesTransformer().transform(studyMV, studyVariables);
 
 			watch.restart("save study");
 
@@ -833,12 +568,14 @@ public class WorkbookSaver extends Saver {
 		return datasetId;
 	}
 
-	private void createTrialExperiment(
-		final CropType crop, final int trialProjectId, final int locationId, final VariableList trialVariates) {
+	private Integer createTrialExperiment(
+		final CropType crop, final int trialProjectId, final Integer instanceNumber, final VariableList trialVariates) {
 		final TimerWatch watch = new TimerWatch("save trial experiments");
-		final ExperimentValues trialDatasetValues = this.createTrialExperimentValues(locationId, trialVariates);
-		this.getExperimentModelSaver().addExperiment(crop, trialProjectId, ExperimentType.TRIAL_ENVIRONMENT, trialDatasetValues);
+		final ExperimentValues trialDatasetValues = this.createTrialExperimentValues(trialVariates, instanceNumber);
+		final ExperimentModel experimentModel =
+			this.getExperimentModelSaver().addExperiment(crop, trialProjectId, ExperimentType.TRIAL_ENVIRONMENT, trialDatasetValues);
 		watch.stop();
+		return experimentModel.getNdExperimentId();
 	}
 
 	private int createPlotDatasetIfNecessary(
@@ -884,7 +621,7 @@ public class WorkbookSaver extends Saver {
 		return datasetId;
 	}
 
-	public void createStocksIfNecessary(
+	private void createStocksIfNecessary(
 		final int datasetId, final Workbook workbook, final VariableTypeList effectVariables,
 		final List<String> trialHeaders) {
 		final Map<String, Integer> stockMap = this.getStockModelBuilder().getStockMapForDataset(datasetId);
@@ -927,65 +664,8 @@ public class WorkbookSaver extends Saver {
 
 	}
 
-	private void createMeasurementEffectExperiments(
-		final CropType crop, final int datasetId, final VariableTypeList effectVariables,
-		final List<MeasurementRow> observations, final List<String> trialHeaders) {
+	// TODO IBP-3389 See if this can be consolidated with createMeansExperiments
 
-		final TimerWatch watch = new TimerWatch("saving stocks and measurement effect data (total)");
-		final TimerWatch rowWatch = new TimerWatch("for each row");
-
-		// observation values start at row 2
-		int i = 2;
-
-		final ExperimentValuesTransformer experimentValuesTransformer = this.getExperimentValuesTransformer();
-		final ExperimentModelSaver experimentModelSaver = this.getExperimentModelSaver();
-		Map<Integer, PhenotypeExceptionDto> exceptions = null;
-		final Session activeSession = this.getActiveSession();
-		final FlushMode existingFlushMode = activeSession.getFlushMode();
-		try {
-			activeSession.setFlushMode(FlushMode.MANUAL);
-			if (observations != null) {
-				for (final MeasurementRow row : observations) {
-					rowWatch.restart("saving row " + i++);
-					final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
-					try {
-						experimentModelSaver.addExperiment(crop, datasetId, ExperimentType.PLOT, experimentValues);
-					} catch (final PhenotypeException e) {
-						WorkbookSaver.LOG.error(e.getMessage(), e);
-						if (exceptions == null) {
-							exceptions = e.getExceptions();
-						} else {
-							for (final Integer standardVariableId : e.getExceptions().keySet()) {
-								final PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
-								if (exceptions.get(standardVariableId) == null) {
-									// add exception
-									exceptions.put(standardVariableId, exception);
-								} else {
-									// add invalid values to the existing map of
-									// exceptions for each phenotype
-									for (final String invalidValue : exception.getInvalidValues()) {
-										exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			activeSession.flush();
-		} finally {
-			if (existingFlushMode != null) {
-				activeSession.setFlushMode(existingFlushMode);
-			}
-		}
-
-		rowWatch.stop();
-		watch.stop();
-
-		if (exceptions != null) {
-			throw new PhenotypeException(exceptions);
-		}
-	}
 
 	private boolean isTrialFactorInDataset(final VariableTypeList list) {
 
@@ -998,7 +678,7 @@ public class WorkbookSaver extends Saver {
 
 	}
 
-	protected VariableTypeList propagateTrialFactorsIfNecessary(
+	VariableTypeList propagateTrialFactorsIfNecessary(
 		final VariableTypeList effectVariables,
 		final VariableTypeList trialVariables) {
 
@@ -1064,7 +744,7 @@ public class WorkbookSaver extends Saver {
 		final List<MeasurementVariable> effectMV = measurementVariableMap.get(WorkbookSaver.EFFECTMV);
 
 		// locationId and experiment are not yet needed here
-		final int studyId = this.createStudyIfNecessary(workbook, 0, false, programUUID, crop);
+		final int studyId = this.createStudyIfNecessary(workbook, false, programUUID, crop);
 		final int trialDatasetId = this.createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables, programUUID);
 		int measurementDatasetId = 0;
 		int meansDatasetId = 0;
@@ -1092,8 +772,7 @@ public class WorkbookSaver extends Saver {
 
 	/**
 	 * Saves experiments creating entries in the following tables:
-	 * nd_geolocation, nd_geolocationprop, nd_experiment,
-	 * nd_experimentprop, stock, stockprop,
+	 * nd_experiment, nd_experimentprop, stock, stockprop,
 	 * and phenotype
 	 *
 	 * @param workbook
@@ -1125,26 +804,10 @@ public class WorkbookSaver extends Saver {
 
 		// unpack maps
 		final List<String> trialHeaders = headerMap.get(WorkbookSaver.TRIALHEADERS);
-		final VariableTypeList trialVariableTypeList = variableTypeMap.get(WorkbookSaver.TRIALVARIABLETYPELIST);
 		final VariableTypeList trialVariables = variableTypeMap.get(WorkbookSaver.TRIALVARIABLES);
 		final VariableTypeList effectVariables = variableTypeMap.get(WorkbookSaver.EFFECTVARIABLE);
-		final List<MeasurementVariable> trialMV = measurementVariableMap.get(WorkbookSaver.TRIALMV);
 		this.removeConstantsVariables(effectVariables, workbook.getConstants());
-		// GCP-8092 Nurseries will always have a unique geolocation, no more
-		// concept of shared/common geolocation
-		// create locations (entries to nd_geolocation) and associate to
-		// observations
-		final int studyLocationId/* = DEFAULT_GEOLOCATION_ID */;
-		final List<Integer> locationIds = new ArrayList<>();
-		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
-		if (trialVariableTypeList != null) {// multi-location
-			studyLocationId =
-				this.createLocationsAndSetToObservations(locationIds, workbook, trialVariables, trialHeaders, trialVariatesMap, false,
-					programUUID);
-		} else {
-			studyLocationId =
-				this.createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, false, programUUID);
-		}
+
 
 		// create stock and stockprops and associate to observations
 		int datasetId = measurementDatasetId;
@@ -1155,31 +818,19 @@ public class WorkbookSaver extends Saver {
 
 		// create trial experiments if not yet existing
 		final boolean hasExistingStudyExperiment = this.checkIfHasExistingStudyExperiment(studyId);
-		final boolean hasExistingTrialExperiments = this.checkIfHasExistingExperiments(locationIds);
 		if (!hasExistingStudyExperiment) {
 			// 1. study experiment
 			final StudyValues values = new StudyValues();
-			values.setLocationId(studyLocationId);
 			this.getStudySaver().saveStudyExperiment(crop, studyId, values);
 		}
-		// create trial experiments if not yet existing
-		if (!hasExistingTrialExperiments) {
-			// 2. trial experiments
-			if (trialVariableTypeList != null) {// multi-location
-				for (final Integer locationId : locationIds) {
-					this.setVariableListValues(trialVariatesMap.get(locationId), workbook.getConstants());
-					this.createTrialExperiment(crop, trialDatasetId, locationId, trialVariatesMap.get(locationId));
-				}
-			} else {
-				this.createTrialExperiment(crop, trialDatasetId, studyLocationId, trialVariatesMap.get(studyLocationId));
-			}
-		}
+		// 2. trial experiments
+		this.saveOrUpdateTrialObservations(crop, trialDatasetId, workbook, trialVariables, trialHeaders);
 		if (isMeansDataImport) {
 			// 3. means experiments
-			this.createMeansExperiments(crop, meansDatasetId, effectVariables, workbook.getObservations(), trialHeaders, trialVariatesMap);
+			this.createExperiments(crop, meansDatasetId, trialDatasetId, effectVariables, workbook.getObservations(), trialHeaders, ExperimentType.AVERAGE);
 		} else {
 			// 3. measurement experiments
-			this.createMeasurementEffectExperiments(crop, measurementDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
+			this.createExperiments(crop, measurementDatasetId, trialDatasetId, effectVariables, workbook.getObservations(), trialHeaders, ExperimentType.PLOT);
 		}
 	}
 
@@ -1207,23 +858,6 @@ public class WorkbookSaver extends Saver {
 	private boolean checkIfHasExistingStudyExperiment(final int studyId) {
 		final Integer experimentId = this.getExperimentDao().getExperimentIdByProjectId(studyId);
 		return experimentId != null;
-	}
-
-	private boolean checkIfHasExistingExperiments(final List<Integer> locationIds) {
-		final List<Integer> experimentIds = this.getExperimentDao().getExperimentIdsByGeolocationIds(locationIds);
-		return experimentIds != null && !experimentIds.isEmpty();
-	}
-
-	private VariableList createDefaultGeolocationVariableList(final String programUUID) {
-		final VariableList list = new VariableList();
-
-		final DMSVariableType variableType = new DMSVariableType(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0),
-			PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0),
-			this.getStandardVariableBuilder().create(TermId.TRIAL_INSTANCE_FACTOR.getId(), programUUID), 1);
-		final Variable variable = new Variable(variableType, "1");
-		list.add(variable);
-
-		return list;
 	}
 
 	public void saveWorkbookVariables(final Workbook workbook) throws ParseException {
@@ -1340,11 +974,11 @@ public class WorkbookSaver extends Saver {
 		return newList;
 	}
 
-	private void createMeansExperiments(
-		final CropType crop, final int datasetId, final VariableTypeList effectVariables,
-		final List<MeasurementRow> observations, final List<String> trialHeaders, final Map<Integer, VariableList> trialVariatesMap) {
+	private void createExperiments(
+		final CropType crop, final int plotDatasetId, final Integer environmentDatasetId, final VariableTypeList effectVariables,
+		final List<MeasurementRow> observations, final List<String> trialHeaders, final ExperimentType experimentType) {
 
-		final TimerWatch watch = new TimerWatch("saving means data (total)");
+		final TimerWatch watch = new TimerWatch("saving experiments (total)");
 		final TimerWatch rowWatch = new TimerWatch("for each row");
 
 		// observation values start at row 2
@@ -1353,43 +987,56 @@ public class WorkbookSaver extends Saver {
 		final ExperimentValuesTransformer experimentValuesTransformer = this.getExperimentValuesTransformer();
 		final ExperimentModelSaver experimentModelSaver = this.getExperimentModelSaver();
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
-		if (observations != null) {
-			for (final MeasurementRow row : observations) {
-				rowWatch.restart("saving row " + i++);
-				final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
-				final VariableList trialVariates = trialVariatesMap.get((int) row.getLocationId());
-				if (trialVariates != null) {
-					experimentValues.getVariableList().addAll(trialVariates);
-				}
-				try {
-					experimentModelSaver.addExperiment(crop, datasetId, ExperimentType.AVERAGE, experimentValues);
-				} catch (final PhenotypeException e) {
-					WorkbookSaver.LOG.error(e.getMessage(), e);
-					if (exceptions == null) {
-						exceptions = e.getExceptions();
-					} else {
-						for (final Integer standardVariableId : e.getExceptions().keySet()) {
-							final PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
-							if (exceptions.get(standardVariableId) == null) {
-								// add exception
-								exceptions.put(standardVariableId, exception);
-							} else {
-								// add invalid values to the existing map of
-								// exceptions for each phenotype
-								for (final String invalidValue : exception.getInvalidValues()) {
-									exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+		final Session activeSession = this.getActiveSession();
+		final FlushMode existingFlushMode = activeSession.getFlushMode();
+		final Map<Integer, Integer> instanceNumberEnvironmentIdMap = this.daoFactory.getInstanceDao().getEnvironmentsByDataset(environmentDatasetId, true).stream()
+			.collect(Collectors.toMap(ExperimentModel::getObservationUnitNo, ExperimentModel::getNdExperimentId));
+		try {
+			activeSession.setFlushMode(FlushMode.MANUAL);
+			if (observations != null) {
+				for (final MeasurementRow row : observations) {
+					rowWatch.restart("saving row " + i++);
+					final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders, instanceNumberEnvironmentIdMap);
+					try {
+						experimentModelSaver.addExperiment(crop, plotDatasetId, experimentType, experimentValues);
+					} catch (final PhenotypeException e) {
+						WorkbookSaver.LOG.error(e.getMessage(), e);
+						if (exceptions == null) {
+							exceptions = e.getExceptions();
+						} else {
+							for (final Integer standardVariableId : e.getExceptions().keySet()) {
+								final PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
+								if (exceptions.get(standardVariableId) == null) {
+									// add exception
+									exceptions.put(standardVariableId, exception);
+								} else {
+									// add invalid values to the existing map of
+									// exceptions for each phenotype
+									for (final String invalidValue : exception.getInvalidValues()) {
+										exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+									}
 								}
 							}
 						}
 					}
 				}
 			}
+			activeSession.flush();
+		} finally {
+			if (existingFlushMode != null) {
+				activeSession.setFlushMode(existingFlushMode);
+			}
 		}
+
 		rowWatch.stop();
 		watch.stop();
 
 		if (exceptions != null) {
 			throw new PhenotypeException(exceptions);
 		}
+	}
+
+	void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 }

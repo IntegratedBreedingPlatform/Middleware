@@ -15,34 +15,38 @@ package org.generationcp.middleware.dao.dms;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.jdbc.util.BasicFormatterImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class ExperimentPropertyDaoTest {
-	
+
 	@Mock
 	private Session mockSession;
-	
+
 	@Mock
 	private SQLQuery mockQuery;
 
 	private ExperimentPropertyDao dao;
 
+	final private BasicFormatterImpl formattedSQL = new BasicFormatterImpl();
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		
+
 		this.dao = new ExperimentPropertyDao();
 		this.dao.setSession(this.mockSession);
-		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockQuery);
-		Mockito.when(this.mockQuery.addScalar(Matchers.anyString())).thenReturn(this.mockQuery);
+		Mockito.when(this.mockSession.createSQLQuery(ArgumentMatchers.anyString())).thenReturn(this.mockQuery);
+		Mockito.when(this.mockQuery.addScalar(ArgumentMatchers.anyString())).thenReturn(this.mockQuery);
 	}
 
 	@Test
@@ -50,64 +54,62 @@ public class ExperimentPropertyDaoTest {
 	public void testGetFieldMapLabels() {
 		final int projectId = 112;
 		this.dao.getFieldMapLabels(projectId);
-		
+
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(this.getFieldmapLabelsQuery(), sqlCaptor.getValue());
 		Mockito.verify(this.mockQuery).setParameter("projectId", projectId);
 	}
-	
+
 	@Test
 	public void testGetAllFieldMapsInBlockByTrialInstanceId_WithBlockId() {
 		final int datasetId = 11;
 		final int geolocationId = 22;
 		final int blockId = 33;
 		this.dao.getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, blockId);
-		
+
 		final String expectedSql = this.getFieldmapsInBlockMainQuery() + " AND blk.value = :blockId  ORDER BY e.nd_experiment_id ASC";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
-		Assert.assertEquals(expectedSql.replace(" ", ""), sqlCaptor.getValue().replace(" ", ""));
+		Assert.assertEquals(this.formatString(expectedSql), this.formatString(sqlCaptor.getValue()));
 		Mockito.verify(this.mockQuery).setParameter("blockId", blockId);
 		Mockito.verify(this.mockQuery, Mockito.never()).setParameter("datasetId", datasetId);
 		Mockito.verify(this.mockQuery, Mockito.never()).setParameter("geolocationId", geolocationId);
 	}
-	
+
 	@Test
 	public void testGetAllFieldMapsInBlockByTrialInstanceId_WithNullBlockId() {
 		final int datasetId = 11;
 		final int geolocationId = 22;
 		this.dao.getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
-		
+
 		final String expectedSql = this.getFieldmapsInBlockMainQuery() +
-				" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval " +
-				" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id " +
-				" AND bexp.nd_geolocation_id = :geolocationId " +
+				" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_experimentprop bval " +
+				" INNER JOIN nd_experiment bexp ON bexp.parent_id = bval.nd_experiment_id "  +
+				" AND bexp.parent_id = :instanceId " +
 				" AND bexp.project_id = :datasetId  WHERE bval.type_id = " + TermId.BLOCK_ID.getId() +
 				") ORDER BY e.nd_experiment_id ASC";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
-		Assert.assertEquals(expectedSql.replace(" ", ""), sqlCaptor.getValue().replace(" ", ""));
-		Mockito.verify(this.mockQuery, Mockito.never()).setParameter(Matchers.eq("blockId"), Matchers.any());
+		Assert.assertEquals(this.formatString(expectedSql), this.formatString(sqlCaptor.getValue()));
+		Mockito.verify(this.mockQuery, Mockito.never()).setParameter(ArgumentMatchers.eq("blockId"), Matchers.any());
 		Mockito.verify(this.mockQuery).setParameter("datasetId", datasetId);
-		Mockito.verify(this.mockQuery).setParameter("geolocationId", geolocationId);
+		Mockito.verify(this.mockQuery).setParameter("instanceId", geolocationId);
 	}
-	
+
 	private String getFieldmapsInBlockMainQuery() {
 		return " SELECT  p.project_id AS datasetId  , p.name AS datasetName "
-		+ " , st.name AS studyName , e.nd_geolocation_id AS geolocationId "
+		+ " , st.name AS studyName , env.nd_experiment_id AS instanceId "
 		+ " , site.value AS siteName , siteId.value AS siteId"
 		+ " , e.nd_experiment_id AS experimentId , s.uniqueName AS entryNumber "
 		+ " , s.name AS germplasmName , epropRep.value AS rep "
 		+ " , epropPlot.value AS plotNo , row.value AS row , col.value AS col "
 		+ " , blk.value AS blockId , st.project_id AS studyId "
-		+ " , geo.description AS trialInstance , s.dbxref_id AS gid "
-		+ " , st.start_date as startDate , gpSeason.value as season "
+		+ " , env.observation_unit_no AS trialInstance , s.dbxref_id AS gid "
+		+ " , st.start_date as startDate , season.value as season "
 		+ " , epropBlock.value AS blockNo "
 		+ " , e.obs_unit_id as obsUnitId "
-		+ " FROM nd_geolocationprop blk "
-		+ "  INNER JOIN nd_experiment e ON e.nd_geolocation_id = blk.nd_geolocation_id "
-		+ "  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id "
+		+ " FROM nd_experiment e "
 		+ "  INNER JOIN project p ON p.project_id = e.project_id "
 		+ "  INNER JOIN project st ON st.project_id = p.study_id "
 		+ "  INNER JOIN stock s ON e.stock_id = s.stock_id "
@@ -118,19 +120,23 @@ public class ExperimentPropertyDaoTest {
 		+ "  INNER JOIN nd_experimentprop epropPlot ON epropPlot.nd_experiment_id = e.nd_experiment_id "
 		+ "    AND epropPlot.type_id IN (" + TermId.PLOT_NO.getId()+ ", "
 		+ TermId.PLOT_NNO.getId() + ") AND epropPlot.value <> '' "
-		+ "  LEFT JOIN nd_geolocationprop site ON site.nd_geolocation_id = e.nd_geolocation_id "
+		+ " INNER JOIN nd_experimentenv ON e.parent_id = env.nd_experiment_id AND env.type_id = "
+		+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
+		+ "  LEFT JOIN nd_experimentprop site ON site.nd_experiment_id=env.nd_experiment_id "
 		+ "    AND site.type_id = " + TermId.TRIAL_LOCATION.getId()
-		+ "  LEFT JOIN nd_geolocationprop siteId ON siteId.nd_geolocation_id = e.nd_geolocation_id "
+		+ "  LEFT JOIN nd_experimentprop siteId ON siteId.nd_experiment_id = env.nd_experiment_id "
 		+ "    AND siteId.type_id = "+ TermId.LOCATION_ID.getId()
 		+ "  LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = e.nd_experiment_id "
 		+ "    AND row.type_id = "+ TermId.RANGE_NO.getId()
 		+ "  LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = e.nd_experiment_id "
 		+ "    AND col.type_id = "+ TermId.COLUMN_NO.getId()
-		+ "  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id "
-		+ "     AND gpSeason.type_id =  "+ TermId.SEASON_VAR.getId() + " "
-		+ " WHERE blk.type_id = "+ TermId.BLOCK_ID.getId();
+		+ "  LEFT JOIN nd_experimentpropseason "
+		+ " ON season.nd_experiment_id = env.nd_experiment_id"
+		+ " AND season.type_id = " + TermId.SEASON_VAR.getId()
+		+ " INNER JOIN  nd_experimentprop blk on blk.nd_experiment_id = env.nd_experiment_id "
+		+ " AND blk.type_id =  "+ TermId.BLOCK_ID.getId();
 	}
-	
+
 	private String getFieldmapLabelsQuery() {
 		return " SELECT " +
 				" nde.project_id AS datasetId " +
@@ -192,6 +198,10 @@ public class ExperimentPropertyDaoTest {
 				" LEFT JOIN listdata_project ldp on ldp.list_id = lnms.listid AND ldp.entry_id = s.uniqueName AND ldp.germplasm_id  = s.dbxref_id" +
 				" WHERE st.project_id = :studyId" +
 				" ORDER BY casted_trialInstance, inst.description, nde.nd_experiment_id ASC";
+	}
+
+	private String formatString(final String format) {
+		return this.formattedSQL.format(format).replace(" ", "");
 	}
 }
 

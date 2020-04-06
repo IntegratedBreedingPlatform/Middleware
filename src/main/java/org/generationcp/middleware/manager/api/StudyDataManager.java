@@ -38,9 +38,7 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -127,6 +125,11 @@ public interface StudyDataManager {
 	 */
 	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows);
 
+	List<Experiment> getExperimentsOfFirstInstance(int dataSetId, int start, int numOfRows);
+
+	VariableTypeList getTreatmentFactorVariableTypes(int dataSetId);
+
+
 	/**
 	 * Gets the experiments.
 	 *
@@ -137,24 +140,6 @@ public interface StudyDataManager {
 	 * @return the experiments
 	 */
 	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList);
-
-	/**
-	 * Gets the experiments of the first Instance.
-	 *
-	 * @param dataSetId the data set id
-	 * @param start     the start
-	 * @param numOfRows the num of rows
-	 * @return the experiments
-	 */
-	List<Experiment> getExperimentsOfFirstInstance(final int dataSetId, final int start, final int numOfRows);
-
-	/**
-	 * Gets the treatment factor variables of the study
-	 *
-	 * @param dataSetId
-	 * @return
-	 */
-	VariableTypeList getTreatmentFactorVariableTypes(final int dataSetId);
 
 	/**
 	 * Get the number of experiments in a dataset. Retrieves from central if the given ID is positive, otherwise retrieves from local.
@@ -252,15 +237,6 @@ public interface StudyDataManager {
 	 * @param experimentValues The values to set
 	 */
 	void addOrUpdateExperiment(final CropType crop, int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues);
-
-	/**
-	 * Adds a Trial Environment. Accepts a variable list and sets up the trial environment data in the local database. It will throw an
-	 * exception if the variable in the variable list passed is not recognized for trial environment.
-	 *
-	 * @param variableList the variable list
-	 * @return ID of the trial environment data created.
-	 */
-	int addTrialEnvironment(VariableList variableList);
 
 	/**
 	 * Adds a Stock entry. Accepts a variable list and sets up the stock data in the local database. It will throw an exception if the
@@ -384,11 +360,11 @@ public interface StudyDataManager {
 	 * Retrieve all field map labels in the block of the specified trial instance id.
 	 *
 	 * @param datasetId     the dataset id
-	 * @param geolocationId the geolocation id
+	 * @param environmentId the environment id
 	 * @return the all field maps in block by trial instance id
 	 */
 	List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(
-		int datasetId, int geolocationId,
+		int datasetId, int environmentId,
 		CrossExpansionProperties crossExpansionProperties);
 
 	/**
@@ -447,13 +423,12 @@ public interface StudyDataManager {
 	DmsProject getParentFolder(int id);
 
 	/**
-	 * Returns the datasetId of dataset to which the studyDbId (nd_geolocation_id) belongs to.
-	 * In Brapi, studyDbId is the environment/instance (nd_geolocation_id)
-	 * @param studyDbId
+	 * Returns the datasetId of dataset to which the environment id belongs to.
+	 * @param environmentId
 	 * @param datasetType
 	 * @return
 	 */
-	Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType);
+	Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType);
 
 
 	/**
@@ -631,30 +606,22 @@ public interface StudyDataManager {
 	void updateVariableOrdering(int datasetId, List<Integer> variableIds);
 
 	/**
-	 * Retrieves the trial instance number by geolocation id
-	 *
-	 * @param geolocationId
-	 * @return trial instance number
-	 */
-	public String getTrialInstanceNumberByGeolocationId(int geolocationId);
-
-	/**
 	 * Retrieves all DMS project names with no program uuid.
 	 *
 	 * @return list of DMS project names with no programUUID
 	 * @
 	 */
-	public List<String> getAllSharedProjectNames();
+	List<String> getAllSharedProjectNames();
 
 	/**
-	 * Checks whether the specified locationIds exist in a given dataset
+	 * Return counts of experiments for given dataset type and environment IDs
 	 *
 	 * @param studyId
 	 * @param datasetTypeId
-	 * @param locationIds
+	 * @param environmentIds
 	 * @return
 	 */
-	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, int datasetTypeId, List<Integer> locationIds);
+	Long countExperimentsByDatasetTypeAndEnvironments(int studyId, int datasetTypeId, List<Integer> environmentIds);
 
 	/**
 	 * Retrieves all the StudySummaries of the DMS Project that matches the conditions: SeasonDbId, LocationDbId and ProgramDbId
@@ -676,11 +643,9 @@ public interface StudyDataManager {
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
 
-	Phenotype getPhenotypeById(int phenotypeId);
+	StudyMetadata getStudyMetadataForEnvironmentId(Integer environmentId);
 
-	StudyMetadata getStudyMetadataForGeolocationId(Integer geolocationId);
-
-	Map<String, String> getGeolocationPropsAndValuesByGeolocation(Integer geolocationId, List<Integer> excludedVariableIds);
+	Map<Integer, String> getEnvironmentVariableIdValuesMap(Integer datasetId, Integer environmentId);
 
 	Map<String, String> getProjectPropsAndValuesByStudy(Integer studyId, List<Integer> excludedVariableIds);
 
@@ -694,11 +659,7 @@ public interface StudyDataManager {
 	 */
 	Map<Integer, String> getExperimentSampleMap(final Integer studyDbId);
 
-	/**
-	 * @param studyId
-	 * @return a map of experiments ids with a list of it sampled plants
-	 */
-	Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(final Integer studyId);
+	Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(Integer studyId);
 
 	/**
 	 * Detect the usage of the specified variable in any programs except for the specified programUUID.
@@ -710,8 +671,6 @@ public interface StudyDataManager {
 	 */
 	boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(
 		final String variableId, final String variableValue, final String programUUID);
-
-	Map<String, Integer> getInstanceGeolocationIdsMap(final Integer studyId);
 
 	List<StudyTypeDto> getAllStudyTypes();
 
@@ -752,13 +711,11 @@ public interface StudyDataManager {
 
 	boolean areAllInstancesExistInDataset(final Integer datasetId, final Set<Integer> instanceIds);
 
-	String getBlockId(int datasetId, String trialInstance);
+	String getBlockId(int datasetId, Integer trialInstance);
 
 	FieldmapBlockInfo getBlockInformation(int blockId);
 
-	Boolean instanceExists(final Set<Integer> instanceIds);
-
-	Map<Integer, String> getGeolocationByVariableId(final Integer datasetId, final Integer instanceDbId);
+	Boolean instancesExist(final Set<Integer> instanceIds);
 
 	Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId);
 
@@ -777,9 +734,5 @@ public interface StudyDataManager {
 	 * @return
 	 */
 	List<UserDto> getUsersForEnvironment(final Integer instanceId);
-
-	List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
-
-	List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
 
 }

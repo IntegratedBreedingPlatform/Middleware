@@ -186,7 +186,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		}
 
 		final Integer plotDatasetId =
-			this.datasetService.getDatasets(studyId, Sets.newHashSet(DatasetTypeEnum.PLOT_DATA.getId())).get(0).getDatasetId();
+			this.datasetService.getDatasetBasicDTOs(studyId, Sets.newHashSet(DatasetTypeEnum.PLOT_DATA.getId())).get(0).getDatasetId();
 		final List<ProjectProperty> projectProperties;
 
 		// if the calculated variable is executed from a plot dataset, the system should be able to read all input variables added in a study

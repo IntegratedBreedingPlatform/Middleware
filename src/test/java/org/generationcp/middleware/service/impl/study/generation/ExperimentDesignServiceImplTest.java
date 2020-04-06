@@ -26,8 +26,8 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -156,7 +156,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		for (final ObservationUnitRow row : rows) {
 			final Integer trialInstance = row.getTrialInstance();
 			if (instancesRowMap.get(trialInstance) == null) {
-				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+				instancesRowMap.put(trialInstance, new ArrayList<>());
 			}
 			instancesRowMap.get(trialInstance).add(row);
 		}
@@ -211,14 +211,14 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		final List<ObservationUnitRow> previousRows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
 		Assert.assertEquals(2 * NO_ENTRIES * NO_REPS * NO_TREATMENTS, previousRows.size());
 		// Save fieldmap info for instance1
-		final Integer geolocationId1 = this.daoFactory.getGeolocationDao()
-			.getEnvironmentGeolocationsForInstances(this.studyId, Collections.singletonList(1)).get(0).getLocationId();
-		Assert.assertFalse(this.daoFactory.getGeolocationPropertyDao()
-			.getGeoLocationPropertyByVariableId(this.environmentDatasetId, geolocationId1)
+		final Integer geolocationId1 = this.daoFactory.getInstanceDao()
+			.getEnvironmentsForInstances(this.studyId, Collections.singletonList(1)).get(0).getNdExperimentId();
+		Assert.assertFalse(this.daoFactory.getEnvironmentPropertyDao()
+			.getEnvironmentVariablesMap(this.environmentDatasetId, geolocationId1)
 			.containsKey(TermId.BLOCK_ID.getId()));
-		this.daoFactory.getGeolocationPropertyDao().save(this.createGeolocationProperty(geolocationId1, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5)));
-		Assert.assertTrue(this.daoFactory.getGeolocationPropertyDao()
-			.getGeoLocationPropertyByVariableId(this.environmentDatasetId, geolocationId1)
+		this.daoFactory.getEnvironmentPropertyDao().save(this.createEnvironmentProperty(geolocationId1, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5)));
+		Assert.assertTrue(this.daoFactory.getEnvironmentPropertyDao()
+			.getEnvironmentVariablesMap(this.environmentDatasetId, geolocationId1)
 			.containsKey(TermId.BLOCK_ID.getId()));
 
 		// Save design - overwrite first instance, generate experiments for 3rd
@@ -234,8 +234,8 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		this.verifyEnvironmentVariablesWereSaved();
 		this.verifyPlotVariablesWereSaved();
 		this.verifyGeolocationPropRecords(true, Arrays.asList(1, 2, 3));
-		final Map<Integer, String> map = this.daoFactory.getGeolocationPropertyDao()
-			.getGeoLocationPropertyByVariableId(this.environmentDatasetId, geolocationId1);
+		final Map<Integer, String> map = this.daoFactory.getEnvironmentPropertyDao()
+			.getEnvironmentVariablesMap(this.environmentDatasetId, geolocationId1);
 		for (final Integer id : map.keySet()) {
 			System.out.println("TEST ASSERTION LOC = " + geolocationId1 + ":: Found geolocprop variable= " + id);
 		}
@@ -248,7 +248,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		for (final ObservationUnitRow row : rows) {
 			final Integer trialInstance = row.getTrialInstance();
 			if (instancesRowMap.get(trialInstance) == null) {
-				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+				instancesRowMap.put(trialInstance, new ArrayList<>());
 			}
 			instancesRowMap.get(trialInstance).add(row);
 		}
@@ -280,7 +280,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		for (final ObservationUnitRow row : rows) {
 			final Integer trialInstance = row.getTrialInstance();
 			if (instancesRowMap.get(trialInstance) == null) {
-				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+				instancesRowMap.put(trialInstance, new ArrayList<>());
 			}
 			instancesRowMap.get(trialInstance).add(row);
 		}
@@ -302,17 +302,17 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		this.daoFactory.getProjectPropertyDAO().save(
 			new ProjectProperty(new DmsProject(this.environmentDatasetId), VariableType.ENVIRONMENT_DETAIL.getId(), null, 1,
 				TermId.BLOCK_ID.getId(), "BLOCK_ID"));
-		final Geolocation geolocation1 = this.daoFactory.getGeolocationDao()
-			.getEnvironmentGeolocationsForInstances(this.studyId, Collections.singletonList(1)).get(0);
-		this.daoFactory.getGeolocationPropertyDao().save(this.createGeolocationProperty(geolocation1.getLocationId(), TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5)));
+		final Integer environmentId = this.daoFactory.getInstanceDao()
+			.getEnvironmentsForInstances(this.studyId, Collections.singletonList(1)).get(0).getNdExperimentId();
+		this.daoFactory.getEnvironmentPropertyDao().save(this.createEnvironmentProperty(environmentId, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5)));
 
 		List<Integer> environmentVariableIds =
 			this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(this.environmentDatasetId);
 		Assert.assertTrue(environmentVariableIds.contains(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
 		Assert.assertTrue(environmentVariableIds.contains(TermId.NUMBER_OF_REPLICATES.getId()));
 		Assert.assertTrue(environmentVariableIds.contains(TermId.BLOCK_ID.getId()));
-		Assert.assertTrue(this.daoFactory.getGeolocationPropertyDao()
-			.getGeoLocationPropertyByVariableId(this.environmentDatasetId,geolocation1.getLocationId())
+		Assert.assertTrue(this.daoFactory.getEnvironmentPropertyDao()
+			.getEnvironmentVariablesMap(this.environmentDatasetId, environmentId)
 			.containsKey(TermId.BLOCK_ID.getId()));
 
 		// Delete experiment design
@@ -386,7 +386,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		for (final ObservationUnitRow row : rows) {
 			final Integer trialInstance = row.getTrialInstance();
 			if (instancesRowMap.get(trialInstance) == null) {
-				instancesRowMap.put(trialInstance, new ArrayList<ObservationUnitRow>());
+				instancesRowMap.put(trialInstance, new ArrayList<>());
 			}
 			instancesRowMap.get(trialInstance).add(row);
 		}
@@ -468,22 +468,21 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	}
 
 	private void verifyGeolocationPropRecords(final boolean shouldExist, final List<Integer> instanceNumbers) {
-		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(this.studyId);
-		Assert.assertEquals(NO_INSTANCES.intValue(), geolocations.size());
+		final List<ExperimentModel> environments = this.daoFactory.getInstanceDao().getEnvironments(this.studyId);
+		Assert.assertEquals(NO_INSTANCES.intValue(), environments.size());
 
-		for (final Geolocation geolocation : geolocations) {
+		for (final ExperimentModel env : environments) {
 
-			final List<GeolocationProperty> properties =
-				this.daoFactory.getGeolocationPropertyDao().getByGeolocation(geolocation.getLocationId());
-			final ImmutableMap<Object, GeolocationProperty> propertiesMap =
-				Maps.uniqueIndex(properties, new Function<GeolocationProperty, Object>() {
+			final List<ExperimentProperty> properties = env.getProperties();
+			final ImmutableMap<Object, ExperimentProperty> propertiesMap =
+				Maps.uniqueIndex(properties, new Function<ExperimentProperty, Object>() {
 
 					@Override
-					public Object apply(@Nullable final GeolocationProperty input) {
+					public Object apply(@Nullable final ExperimentProperty input) {
 						return input.getTypeId();
 					}
 				});
-			final Integer instanceNumber = Integer.valueOf(geolocation.getDescription());
+			final Integer instanceNumber = env.getObservationUnitNo();
 
 			if (shouldExist && instanceNumbers.contains(instanceNumber)) {
 				Assert.assertNotNull("Expecting EXP_DESIGN factor for instance " + instanceNumber, propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
@@ -567,7 +566,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		for (int instance = 1; instance <= NO_INSTANCES; instance++) {
 
 			if (instanceNumbers.contains(instance)) {
-				instanceRowsMap.put(instance, new ArrayList<ObservationUnitRow>());
+				instanceRowsMap.put(instance, new ArrayList<>());
 				int plotNo = 1;
 				for (int rep = 1; rep <= NO_REPS; rep++) {
 					for (int entry = 1; entry <= NO_ENTRIES; entry++) {
@@ -575,7 +574,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 							final ObservationUnitRow row = new ObservationUnitRow();
 							row.setEntryNumber(entry);
 							row.setTrialInstance(instance);
-							row.setVariables(new HashMap<String, ObservationUnitData>());
+							row.setVariables(new HashMap<>());
 							row.getVariables().put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()),
 								new ObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), "1"));
 							row.getVariables()
@@ -609,10 +608,10 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		return instanceRowsMap;
 	}
 
-	private GeolocationProperty createGeolocationProperty(final Integer geolocationId, final Integer variableId, final String value) {
-		final GeolocationProperty property = new GeolocationProperty();
-		property.setGeolocation(this.daoFactory.getGeolocationDao().getById(geolocationId));
-		property.setType(variableId);
+	private ExperimentProperty createEnvironmentProperty(final Integer environmentId, final Integer variableId, final String value) {
+		final ExperimentProperty property = new ExperimentProperty();
+		property.setExperiment(this.daoFactory.getInstanceDao().getById(environmentId));
+		property.setTypeId(variableId);
 		property.setRank(1);
 		property.setValue(value);
 		return property;

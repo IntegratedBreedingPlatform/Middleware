@@ -34,7 +34,6 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
 import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -58,7 +57,6 @@ import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -252,7 +250,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		for (final StudyReference study : studyReferences) {
 			Assert.assertNotNull(study.getOwnerId());
 			final WorkbenchUser workbenchUser = this.userService.getUserById(study.getOwnerId());
-			Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
+			Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
+				study.getOwnerName());
 
 		}
 	}
@@ -307,7 +306,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 				Assert.assertFalse(study.getIsLocked());
 				Assert.assertEquals(this.studyReference.getOwnerId(), study.getOwnerId());
 				final WorkbenchUser workbenchUser = this.userService.getUserById(this.studyReference.getOwnerId());
-				Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
+				Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
+					study.getOwnerName());
 			}
 		}
 	}
@@ -416,7 +416,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> nurseryStudyDetails =
 			this.manager.getAllStudyDetails(StudyTypeDto.getNurseryDto(), this.commonTestProject.getUniqueID());
 		final int sizeBeforeAddingNewNursery = nurseryStudyDetails.size();
-		this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY");
+
+		final StudyReference study = this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY");
+		final DatasetReference environment =
+			this.addTestDataset(study.getId(), study.getName() + ENVIRONMENT, DatasetTypeEnum.SUMMARY_DATA.getId());
+
 		final List<StudyDetails> updatedNurseryStudyDetails =
 			this.manager.getAllStudyDetails(StudyTypeDto.getNurseryDto(), this.commonTestProject.getUniqueID());
 		final int sizeAfterAddingNewNursery = updatedNurseryStudyDetails.size();
@@ -581,7 +585,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> trialStudyDetails =
 			this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
+
 		final StudyReference newStudy = this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW STUDY");
+		final DatasetReference environment =
+			this.addTestDataset(newStudy.getId(), newStudy.getName() + ENVIRONMENT, DatasetTypeEnum.SUMMARY_DATA.getId());
+
 		final List<StudyDetails> updatedStudyDetails =
 			this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeAfterAddingNewStudy = updatedStudyDetails.size();
@@ -619,7 +627,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeBeforeAddingNewStudy = studyDetailsList.size();
 		final StudyReference nursery = this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY");
+		this.addTestDataset(nursery.getId(), nursery.getName() + ENVIRONMENT, DatasetTypeEnum.SUMMARY_DATA.getId());
+
 		final StudyReference trial = this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW TRIAL");
+		this.addTestDataset(trial.getId(), trial.getName() + ENVIRONMENT, DatasetTypeEnum.SUMMARY_DATA.getId());
+
 		final List<StudyDetails> newStudyDetailsList =
 			this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeAfterAddingNewStudy = newStudyDetailsList.size();
@@ -641,27 +653,18 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyDetails() {
+	public void testGetStudyDetails() throws Exception {
+
+		final DatasetReference environment =
+			this.addTestDataset(this.studyReference.getId(), this.studyReference.getName() + ENVIRONMENT,
+				DatasetTypeEnum.SUMMARY_DATA.getId());
+
 		final StudyDetails studyDetails = this.manager.getStudyDetails(this.studyReference.getId());
 		Assert.assertNotNull("Study should not be null", studyDetails);
 		Assert.assertEquals(this.studyReference.getId(), studyDetails.getId());
 		Assert.assertEquals(this.studyReference.getName(), studyDetails.getStudyName());
 		Assert.assertEquals(this.studyReference.getStudyType(), studyDetails.getStudyType());
 		this.verifyCommonStudyDetails(studyDetails);
-	}
-
-	@Test
-	public void testGetTrialInstanceNumberByGeolocationId() throws Exception {
-		final Integer studyId = this.studyReference.getId();
-		final Integer dataSetId = this.studyTDI.createEnvironmentDataset(this.crop, studyId, "1", "1");
-		final TrialEnvironments trialEnvironments = this.manager.getTrialEnvironmentsInDataset(dataSetId);
-		Assert.assertNotNull(trialEnvironments.getTrialEnvironments());
-		Assert.assertFalse(trialEnvironments.getTrialEnvironments().isEmpty());
-
-		final String trialInstanceNumberActual =
-			this.manager.getTrialInstanceNumberByGeolocationId(trialEnvironments.getTrialEnvironments().iterator().next().getId());
-		Assert.assertEquals("1", trialInstanceNumberActual);
-
 	}
 
 	@Test
@@ -768,12 +771,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		variable.setVariableType(dmsVariableType);
 		variable.setValue(locationNameIdValue);
 		variableList.add(variable);
-		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false);
+		//		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false);
 
 		// Create experiment record
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
-		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setProject(project);
 		this.manager.getExperimentDao().save(experimentModel);
 
@@ -807,12 +809,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		variable.setVariableType(dmsVariableType);
 		variable.setValue(locationNameIdValue);
 		variableList.add(variable);
-		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false);
+		//		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false);
 
 		// Create experiment record
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
-		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setProject(project);
 		this.manager.getExperimentDao().save(experimentModel);
 
@@ -839,7 +840,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIsLocationIdVariable() throws Exception {
+	public void testIsLocationIdVariable() {
 		this.studyTDI.addTestDataset(this.studyReference.getId(), DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		Assert.assertTrue(this.manager.isLocationIdVariable(this.studyReference.getId(), "LOCATION_NAME"));
@@ -902,12 +903,15 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(studyFromDB.getIsLocked());
 		Assert.assertEquals(this.studyReference.getOwnerId(), studyFromDB.getOwnerId());
 		final WorkbenchUser workbenchUser = this.userService.getUserById(this.studyReference.getOwnerId());
-		Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), studyFromDB.getOwnerName());
+		Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
+			studyFromDB.getOwnerName());
 	}
 
 	@Test
-	public void testUpdateStudyLockedStatus() {
+	public void testUpdateStudyLockedStatus() throws Exception {
 		final Integer studyId = this.studyReference.getId();
+		this.addTestDataset(this.studyReference.getId(), this.studyReference.getName() + ENVIRONMENT, DatasetTypeEnum.SUMMARY_DATA.getId());
+
 		Assert.assertFalse(this.manager.getStudyDetails(studyId).getIsLocked());
 		this.manager.updateStudyLockedStatus(studyId, true);
 		// Flushing to force Hibernate to synchronize with the underlying database
@@ -972,10 +976,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
 		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
-		values.setLocationId(this.manager.getExperimentModelSaver().createNewGeoLocation().getLocationId());
 		//Save the experiment
 		this.manager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.manager.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		final ExperimentModel experiment = this.manager.getExperimentDao().getById(values.getLocationId());
 		Phenotype updatedPhenotype =
 			this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", updatedPhenotype.getValue());
@@ -987,7 +990,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		values.getVariableList().add(
 			DMSVariableTestDataInitializer.createVariable(1002, "1000", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
 
-		this.manager.updateExperimentValues(Arrays.asList(values), 1);
+		this.manager.updateExperimentValues(Arrays.asList(values));
 
 		updatedPhenotype = this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		final Phenotype savedPhenotype =

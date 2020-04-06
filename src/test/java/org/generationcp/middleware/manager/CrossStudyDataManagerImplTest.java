@@ -13,14 +13,6 @@ package org.generationcp.middleware.manager;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
-import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
-import org.generationcp.middleware.dao.dms.PhenotypeDao;
-import org.generationcp.middleware.dao.dms.StockDao;
-import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
@@ -38,8 +30,7 @@ import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -51,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,71 +53,12 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private CrossStudyDataManager crossStudyDataManager;
 
-	private DmsProjectDao dmsProjectDao;
-
-	private ExperimentDao experimentDao;
-
-	private GeolocationDao geolocationDao;
-
-	private GeolocationPropertyDao geolocationPropertyDao;
-
-	private StockDao stockDao;
-
-	private GermplasmDAO germplasmDao;
-
-	private PhenotypeDao phenotypeDao;
-
-	private CVTermDao cvTermDao;
-
-	private int trait;
+	private DaoFactory daoFactory;
 
 	@Before
 	public void setUp() throws Exception {
 
-		if (this.geolocationDao == null) {
-			this.geolocationDao = new GeolocationDao();
-			this.geolocationDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.geolocationDao == null) {
-			this.geolocationDao = new GeolocationDao();
-			this.geolocationDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.geolocationPropertyDao == null) {
-			this.geolocationPropertyDao = new GeolocationPropertyDao();
-			this.geolocationPropertyDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.germplasmDao == null) {
-			this.germplasmDao = new GermplasmDAO();
-			this.germplasmDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.experimentDao == null) {
-			this.experimentDao = new ExperimentDao();
-			this.experimentDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.stockDao == null) {
-			this.stockDao = new StockDao();
-			this.stockDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.dmsProjectDao == null) {
-			this.dmsProjectDao = new DmsProjectDao();
-			this.dmsProjectDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.phenotypeDao == null) {
-			this.phenotypeDao = new PhenotypeDao();
-			this.phenotypeDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.cvTermDao == null) {
-			this.cvTermDao = new CVTermDao();
-			this.cvTermDao.setSession(this.sessionProvder.getSession());
-		}
+		this.daoFactory = new DaoFactory(this.sessionProvder);
 
 	}
 
@@ -156,7 +89,8 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetTraitsForNumericVariates() {
 		final List<Integer> environmentIds = Arrays.asList(10081, 10082, 10083, 10084, 10085, 10086, 10087); // Rice
-		final List<NumericTraitInfo> result = this.crossStudyDataManager.getTraitsForNumericVariates(environmentIds);
+		final List<Integer> traitIds = Arrays.asList(20081, 20082, 20083);
+		final List<NumericTraitInfo> result = this.crossStudyDataManager.getTraitsForNumericVariates(environmentIds, traitIds);
 		for (final NumericTraitInfo trait : result) {
 			trait.print(IntegrationTestBase.INDENT);
 		}
@@ -166,7 +100,8 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetTraitsForCharacterVariates() {
 		final List<Integer> environmentIds = Arrays.asList(10040, 10050, 10060, 10070); // Rice
-		final List<CharacterTraitInfo> result = this.crossStudyDataManager.getTraitsForCharacterVariates(environmentIds);
+		final List<Integer> traitIds = Arrays.asList(20081, 20082, 20083);
+		final List<CharacterTraitInfo> result = this.crossStudyDataManager.getTraitsForCharacterVariates(environmentIds, traitIds);
 		for (final CharacterTraitInfo trait : result) {
 			trait.print(IntegrationTestBase.INDENT);
 		}
@@ -176,7 +111,8 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetTraitsForCategoricalVariates() {
 		final List<Integer> environmentIds = Arrays.asList(10010, 10020, 10030, 10040, 10050, 10060, 10070); // Rice
-		final List<CategoricalTraitInfo> result = this.crossStudyDataManager.getTraitsForCategoricalVariates(environmentIds);
+		final List<Integer> traitIds = Arrays.asList(20081, 20082, 20083);
+		final List<CategoricalTraitInfo> result = this.crossStudyDataManager.getTraitsForCategoricalVariates(environmentIds, traitIds);
 		for (final CategoricalTraitInfo trait : result) {
 			trait.print(IntegrationTestBase.INDENT);
 		}
@@ -202,7 +138,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetObservationsForTraitOnGermplasms() {
 
 		final List<Integer> traitIds = Arrays.asList(18020, 18180, 18190, 18200);
-		final List<Integer> germplasmIds = Arrays.asList(1709);
+		final List<Integer> germplasmIds = Collections.singletonList(1709);
 		final List<Integer> environmentIds = Arrays.asList(10081, 10084, 10085, 10086);
 
 		final List<Observation> result =
@@ -256,13 +192,13 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
 	}
 
-	int createTestData(final String studyName, final String programUUID, final String locationId) {
+	private int createTestData(final String studyName, final String programUUID, final String locationId) {
 
 		final DmsProject study = new DmsProject();
 		study.setName(studyName);
 		study.setDescription(studyName);
 		study.setProgramUUID(programUUID);
-		this.dmsProjectDao.save(study);
+		this.daoFactory.getDmsProjectDAO().save(study);
 
 		final DmsProject plot = new DmsProject();
 		plot.setName(studyName + " - Plot Dataset");
@@ -270,22 +206,11 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		plot.setProgramUUID(programUUID);
 		plot.setParent(study);
 		plot.setStudy(study);
-		this.dmsProjectDao.save(plot);
-
-		final Geolocation geolocation = new Geolocation();
-		geolocation.setDescription("1");
-		this.geolocationDao.saveOrUpdate(geolocation);
-
-		final GeolocationProperty geolocationProperty = new GeolocationProperty();
-		geolocationProperty.setGeolocation(geolocation);
-		geolocationProperty.setType(TermId.LOCATION_ID.getId());
-		geolocationProperty.setRank(1);
-		geolocationProperty.setValue(locationId);
-		this.geolocationPropertyDao.save(geolocationProperty);
+		this.daoFactory.getDmsProjectDAO().save(plot);
 
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		germplasm.setGid(null);
-		this.germplasmDao.save(germplasm);
+		this.daoFactory.getGermplasmDao().save(germplasm);
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setName("Germplasm 1");
@@ -293,25 +218,31 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		stockModel.setUniqueName("1");
 		stockModel.setGermplasm(germplasm);
-		this.stockDao.saveOrUpdate(stockModel);
+		this.daoFactory.getStockDao().saveOrUpdate(stockModel);
 
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(plot);
 		experimentModel.setStock(stockModel);
 		final String customUnitID = RandomStringUtils.randomAlphabetic(10);
 		experimentModel.setObsUnitId(customUnitID);
-		this.experimentDao.saveOrUpdate(experimentModel);
+		this.daoFactory.getExperimentDao().saveOrUpdate(experimentModel);
+
+		final ExperimentProperty experimentProperty = new ExperimentProperty();
+		experimentProperty.setExperiment(experimentModel);
+		experimentProperty.setTypeId(TermId.LOCATION_ID.getId());
+		experimentProperty.setRank(1);
+		experimentProperty.setValue(locationId);
+		this.daoFactory.getExperimentPropertyDao().saveOrUpdate(experimentProperty);
 
 		final CVTerm trait = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
-		this.cvTermDao.save(trait);
+		this.daoFactory.getCvTermDao().save(trait);
 
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setObservableId(trait.getCvTermId());
 		phenotype.setExperiment(experimentModel);
 		phenotype.setValue("data");
-		this.phenotypeDao.save(phenotype);
+		this.daoFactory.getPhenotypeDAO().save(phenotype);
 
 		return trait.getCvTermId();
 

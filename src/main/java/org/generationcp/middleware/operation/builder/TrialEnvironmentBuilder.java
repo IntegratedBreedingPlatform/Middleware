@@ -24,9 +24,10 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -41,21 +42,25 @@ public class TrialEnvironmentBuilder extends Builder {
 	@Resource
 	private DataSetBuilder dataSetBuilder;
 
+	private DaoFactory daoFactory;
+
 	public TrialEnvironmentBuilder() {
 
 	}
 
 	public TrialEnvironmentBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public TrialEnvironments getTrialEnvironmentsInDataset(final int studyId, final int datasetId) {
 		final DmsProject project = this.dataSetBuilder.getTrialDataset(studyId);
-		final DataSet dataSet = this.dataSetBuilder.build(project.getProjectId());
+		final Integer environmentDatasetId = project.getProjectId();
+		final DataSet dataSet = this.dataSetBuilder.build(environmentDatasetId);
 		final Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
 
 		final VariableTypeList trialEnvironmentVariableTypes = this.getTrialEnvironmentVariableTypes(study, dataSet);
-		final Set<Geolocation> locations = this.getGeoLocations(datasetId);
+		final List<ExperimentModel> locations = this.daoFactory.getInstanceDao().getEnvironmentsByDataset(datasetId, environmentDatasetId.equals(datasetId));
 
 		return this.buildTrialEnvironments(locations, trialEnvironmentVariableTypes);
 	}
@@ -67,48 +72,36 @@ public class TrialEnvironmentBuilder extends Builder {
 		return trialEnvironmentVariableTypes;
 	}
 
-	private Set<Geolocation> getGeoLocations(final int datasetId) {
-		return this.getGeolocationDao().findInDataSet(datasetId);
-	}
-
-	private TrialEnvironments buildTrialEnvironments(final Set<Geolocation> locations,
+	private TrialEnvironments buildTrialEnvironments(final List<ExperimentModel> locations,
 			final VariableTypeList trialEnvironmentVariableTypes) {
 
 		final TrialEnvironments trialEnvironments = new TrialEnvironments();
-		for (final Geolocation location : locations) {
+		for (final ExperimentModel location : locations) {
 			final VariableList variables = new VariableList();
 			for (final DMSVariableType variableType : trialEnvironmentVariableTypes.getVariableTypes()) {
 				final Variable variable = new Variable(variableType, this.getValue(location, variableType));
 				variables.add(variable);
 			}
-			trialEnvironments.add(new TrialEnvironment(location.getLocationId(), variables));
+			trialEnvironments.add(new TrialEnvironment(location.getNdExperimentId(), variables));
 		}
 		return trialEnvironments;
 	}
 
-	private String getValue(final Geolocation location, final DMSVariableType variableType) {
-		String value = null;
+	private String getValue(final ExperimentModel location, final DMSVariableType variableType) {
+		final String value;
 		final int id = variableType.getStandardVariable().getId();
 		if (id == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-			value = location.getDescription();
-		} else if (id == TermId.LATITUDE.getId()) {
-			value = location.getLatitude() == null ? null : Double.toString(location.getLatitude());
-		} else if (id == TermId.LONGITUDE.getId()) {
-			value = location.getLongitude() == null ? null : Double.toString(location.getLongitude());
-		} else if (id == TermId.GEODETIC_DATUM.getId()) {
-			value = location.getGeodeticDatum();
-		} else if (id == TermId.ALTITUDE.getId()) {
-			value = location.getAltitude() == null ? null : Double.toString(location.getAltitude());
+			value = String.valueOf(location.getObservationUnitNo());
 		} else {
 			value = this.getPropertyValue(variableType.getId(), location.getProperties());
 		}
 		return value;
 	}
 
-	private String getPropertyValue(final int id, final List<GeolocationProperty> properties) {
+	private String getPropertyValue(final int id, final List<ExperimentProperty> properties) {
 		String value = null;
 		if (properties != null) {
-			for (final GeolocationProperty property : properties) {
+			for (final ExperimentProperty property : properties) {
 				if (property.getTypeId() == id) {
 					value = property.getValue();
 					break;
@@ -120,16 +113,16 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	public TrialEnvironments getAllTrialEnvironments() {
 		final TrialEnvironments environments = new TrialEnvironments();
-		environments.addAll(this.getGeolocationDao().getAllTrialEnvironments());
+		environments.addAll(this.daoFactory.getInstanceDao().getAllTrialEnvironments());
 		return environments;
 	}
 
 	public long countAllTrialEnvironments() {
-		return this.getGeolocationDao().countAllTrialEnvironments();
+		return this.daoFactory.getInstanceDao().countAllTrialEnvironments();
 	}
 
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(final List<Integer> environmentIds) {
-		return this.getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds);
+		return this.daoFactory.getInstanceDao().getPropertiesForTrialEnvironments(environmentIds);
 	}
 
 	public List<GermplasmPair> getEnvironmentForGermplasmPairs(final List<GermplasmPair> germplasmPairs,
@@ -143,7 +136,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		}
 
 		// Step 1: Get Trial Environments for each GID
-		final Map<Integer, Set<Integer>> germplasmEnvironments = this.getExperimentDao().getEnvironmentsOfGermplasms(allGids, programUUID);
+		final Map<Integer, Set<Integer>> germplasmEnvironments = this.getExperimentDao().getStudyInstancesForGermplasm(allGids, programUUID);
 
 		// Step 2: Get the trial environment details
 		final Set<TrialEnvironment> trialEnvironmentDetails = new HashSet<>();
@@ -151,7 +144,7 @@ public class TrialEnvironmentBuilder extends Builder {
 
 		// Step 3: Get environment traits
 		final List<TrialEnvironment> localTrialEnvironments =
-				this.getPhenotypeDao().getEnvironmentTraits(trialEnvironmentDetails, experimentTypes);
+					this.getPhenotypeDao().getEnvironmentTraits(trialEnvironmentDetails, experimentTypes, programUUID);
 		trialEnvironments.addAll(localTrialEnvironments);
 
 		// Step 4: Build germplasm pairs. Get what's common between GID1 AND GID2
@@ -161,8 +154,8 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	private void getTrialEnvironmentDetails(final Map<Integer, Set<Integer>> germplasmEnvironments,
 			final Set<TrialEnvironment> trialEnvironmentDetails) {
-		final Set<Integer> localEnvironmentIds = this.getEnvironmentIdsFromMap(germplasmEnvironments);
-		trialEnvironmentDetails.addAll(this.getGeolocationDao().getTrialEnvironmentDetails(localEnvironmentIds));
+		final Set<Integer> environmentIds = this.getEnvironmentIdsFromMap(germplasmEnvironments);
+		trialEnvironmentDetails.addAll(this.daoFactory.getInstanceDao().getTrialEnvironmentDetails(environmentIds));
 	}
 
 	private void buildGermplasmPairsBetweenGids(final List<GermplasmPair> germplasmPairs,
@@ -200,10 +193,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		final Set<Integer> idsToReturn = new HashSet<>();
 
 		for (final Entry<Integer, Set<Integer>> environmentIds : germplasmEnvironments.entrySet()) {
-			final Set<Integer> ids = environmentIds.getValue();
-			for (final Integer id : ids) {
-				idsToReturn.add(id);
-			}
+			idsToReturn.addAll(environmentIds.getValue());
 		}
 		return idsToReturn;
 
@@ -211,7 +201,7 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds, final String programUUID) {
 		final TrialEnvironments environments = new TrialEnvironments();
-		environments.addAll(this.getGeolocationDao().getEnvironmentsForTraits(traitIds, programUUID));
+		environments.addAll(this.daoFactory.getInstanceDao().getEnvironmentsForTraits(traitIds, programUUID));
 		return environments;
 	}
 

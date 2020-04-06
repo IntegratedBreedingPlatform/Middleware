@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
 
 /**
@@ -56,9 +57,9 @@ public class StudySaver extends Saver {
 	/**
 	 * Creates an entry in nd_experiment table if saveStudyExperiment is true.
 	 */
-	public void saveStudyExperiment(final CropType crop, final int projectId, final StudyValues values) throws Exception {
+	public ExperimentModel saveStudyExperiment(final CropType crop, final int projectId, final StudyValues values) {
 		try {
-			this.getExperimentModelSaver().addExperiment(crop, projectId, ExperimentType.STUDY_INFORMATION, values);
+			return this.getExperimentModelSaver().addExperiment(crop, projectId, ExperimentType.STUDY_INFORMATION, values);
 		} catch (final Exception e) {
 			throw e;
 		}

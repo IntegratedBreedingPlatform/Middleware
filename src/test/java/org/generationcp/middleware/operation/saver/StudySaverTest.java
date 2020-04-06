@@ -3,7 +3,6 @@ package org.generationcp.middleware.operation.saver;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -30,18 +29,18 @@ public class StudySaverTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudyExperiment() throws Exception {
+	public void testSaveStudyExperiment() {
 		final StudyValues values = new StudyValues();
 		values.setVariableList(new VariableList());
-		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
+		values.setLocationId(1);
 
 		//Save the experiment
 		final CropType crop = new CropType();
 		crop.setUseUUID(false);
 		crop.setPlotCodePrefix(CROP_PREFIX);
-		this.studySaver.saveStudyExperiment(crop, 1, values);
-		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		final ExperimentModel savedStudyExperiment = this.studySaver.saveStudyExperiment(crop, 1, values);
+		final ExperimentModel experiment = this.experimentDao.getById(savedStudyExperiment.getNdExperimentId());
 		Assert.assertNotNull(experiment.getObsUnitId());
 		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
 		Assert.assertEquals(TermId.STUDY_INFORMATION.getId(), experiment.getTypeId().intValue());

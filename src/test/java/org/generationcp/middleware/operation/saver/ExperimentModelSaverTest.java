@@ -5,7 +5,10 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -25,7 +28,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 	private ExperimentModelSaver experimentModelSaver;
 	private ExperimentDao experimentDao;
 	private PhenotypeDao phenotypeDao;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
@@ -48,15 +51,17 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		factors.add(DMSVariableTestDataInitializer.createVariable(104, "1", TermId.NUMERIC_VARIABLE.getId(), VariableType.EXPERIMENTAL_DESIGN));
 		factors.add(DMSVariableTestDataInitializer.createVariable(105, "Environment", TermId.CHARACTER_VARIABLE.getId(), VariableType.ENVIRONMENT_DETAIL));
 
-		final List<ExperimentProperty> experimentProperties = experimentModelSaver.createTrialDesignExperimentProperties(experimentModel, factors);
+		final List<ExperimentProperty> experimentProperties = this.experimentModelSaver
+			.createTrialDesignExperimentProperties(experimentModel, factors);
 
-		Assert.assertEquals(4, experimentProperties.size());
+		Assert.assertEquals(5, experimentProperties.size());
 
 		// Verify that only Study Design Factors are created
 		Assert.assertEquals(Integer.valueOf(101), experimentProperties.get(0).getTypeId());
 		Assert.assertEquals(Integer.valueOf(102), experimentProperties.get(1).getTypeId());
 		Assert.assertEquals(Integer.valueOf(103), experimentProperties.get(2).getTypeId());
 		Assert.assertEquals(Integer.valueOf(104), experimentProperties.get(3).getTypeId());
+		Assert.assertEquals(Integer.valueOf(105), experimentProperties.get(4).getTypeId());
 
 	}
 
@@ -70,7 +75,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final Variable variable = DMSVariableTestDataInitializer.createVariable(variableId, variableValue, TermId.CATEGORICAL_VARIABLE.getId(), VariableType.TREATMENT_FACTOR);
 
-		final ExperimentProperty experimentProperty = experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
+		final ExperimentProperty experimentProperty = this.experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
 
 		Assert.assertEquals(String.valueOf(1234), experimentProperty.getValue());
 		Assert.assertSame(experimentModel, experimentProperty.getExperiment());
@@ -88,7 +93,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final Variable variable = DMSVariableTestDataInitializer.createVariable(variableId, variableValue, TermId.NUMERIC_VARIABLE.getId(), VariableType.TREATMENT_FACTOR);
 
-		final ExperimentProperty experimentProperty = experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
+		final ExperimentProperty experimentProperty = this.experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
 
 		Assert.assertEquals(variableValue, experimentProperty.getValue());
 		Assert.assertSame(experimentModel, experimentProperty.getExperiment());
@@ -106,7 +111,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final Variable variable = DMSVariableTestDataInitializer.createVariable(variableId, variableValue, TermId.CHARACTER_VARIABLE.getId(), VariableType.TREATMENT_FACTOR);
 
-		final ExperimentProperty experimentProperty = experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
+		final ExperimentProperty experimentProperty = this.experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
 
 		Assert.assertEquals(variableValue, experimentProperty.getValue());
 		Assert.assertSame(experimentModel, experimentProperty.getExperiment());
@@ -121,7 +126,6 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
 		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
-		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 
 		//Save the experiment
@@ -129,7 +133,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		crop.setUseUUID(false);
 		crop.setPlotCodePrefix(CROP_PREFIX);
 		this.experimentModelSaver.addOrUpdateExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		final ExperimentModel experiment = this.experimentDao.getById(values.getLocationId());
 		Assert.assertNotNull(experiment.getObsUnitId());
 		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
@@ -142,16 +146,16 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
 		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
-		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
+		values.setObservationUnitNo(1);
 
 		//Save the experiment
 		final CropType crop = new CropType();
 		crop.setUseUUID(false);
 		crop.setPlotCodePrefix(CROP_PREFIX);
-		this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
-		Assert.assertNotNull(experiment.getObsUnitId());
+		final ExperimentModel createdExperiment = this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		final ExperimentModel experiment = this.experimentDao.getById(createdExperiment.getNdExperimentId());
+		Assert.assertEquals(values.getObservationUnitNo(), experiment.getObservationUnitNo());
 		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());

@@ -12,7 +12,7 @@
 package org.generationcp.middleware.domain.dms;
 
 /**
- * This class is used to store variable list, germplasmId and locationId to Experiment.
+ * This class is used to store variable list, germplasmId, locationId, and observationUnitNo to Experiment.
  *
  */
 public abstract class Values {
@@ -20,12 +20,13 @@ public abstract class Values {
 	private VariableList variableList;
 	private Integer germplasmId;
 	private Integer locationId;
+	private Integer observationUnitNo;
 
 	public Values() {
 
 	}
 
-	public Values(VariableList variableList, Integer germplasmId, Integer locationId) {
+	public Values(final VariableList variableList, final Integer germplasmId, final Integer locationId) {
 		super();
 		this.variableList = variableList;
 		this.germplasmId = germplasmId;
@@ -36,7 +37,7 @@ public abstract class Values {
 		return this.variableList != null ? this.variableList.sort() : null;
 	}
 
-	public void setVariableList(VariableList variableList) {
+	public void setVariableList(final VariableList variableList) {
 		this.variableList = variableList;
 	}
 
@@ -44,7 +45,7 @@ public abstract class Values {
 		return this.germplasmId;
 	}
 
-	public void setGermplasmId(Integer germplasmId) {
+	public void setGermplasmId(final Integer germplasmId) {
 		this.germplasmId = germplasmId;
 	}
 
@@ -52,7 +53,7 @@ public abstract class Values {
 		return this.locationId;
 	}
 
-	public void setLocationId(Integer locationId) {
+	public void setLocationId(final Integer locationId) {
 		this.locationId = locationId;
 	}
 
@@ -67,7 +68,7 @@ public abstract class Values {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -77,7 +78,7 @@ public abstract class Values {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		Values other = (Values) obj;
+		final Values other = (Values) obj;
 		if (this.germplasmId == null) {
 			if (other.germplasmId != null) {
 				return false;
@@ -93,18 +94,22 @@ public abstract class Values {
 			return false;
 		}
 		if (this.variableList == null) {
-			if (other.variableList != null) {
-				return false;
-			}
-		} else if (!this.variableList.equals(other.variableList)) {
-			return false;
-		}
-		return true;
+			return other.variableList == null;
+		} else
+			return this.variableList.equals(other.variableList);
+	}
+
+	public Integer getObservationUnitNo() {
+		return this.observationUnitNo;
+	}
+
+	public void setObservationUnitNo(final Integer observationUnitNo) {
+		this.observationUnitNo = observationUnitNo;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append(this.getEntityName() + " [variableList=");
 		builder.append(this.variableList);
 		builder.append(", germplasmId=");

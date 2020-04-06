@@ -38,10 +38,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.core.Is.is;
-
 /**
  * The class <code>StudyServiceImplTest</code> contains tests for the class <code>{@link StudyServiceImpl}</code>.
  *
@@ -81,9 +77,9 @@ public class StudyServiceImplTest {
 
 	private StudyServiceImpl studyServiceImpl;
 
-	final List<String> additionalGermplasmDescriptors = Lists.newArrayList(STOCK_ID);
+	private final List<String> additionalGermplasmDescriptors = Lists.newArrayList(STOCK_ID);
 
-	final List<String> additionalDesignFactors = Lists.newArrayList(FACT1);
+	private final List<String> additionalDesignFactors = Lists.newArrayList(FACT1);
 
 	@Before
 	public void setUp() {
@@ -103,51 +99,6 @@ public class StudyServiceImplTest {
 		Mockito.when(this.studyServiceImpl.getAdditionalDesignFactors(StudyServiceImplTest.STUDY_ID))
 			.thenReturn(Lists.newArrayList(TermId.REP_NO.name(), TermId.PLOT_NO.name(), StudyServiceImplTest.FACT1));
 
-	}
-
-	@Test
-	public void testHasMeasurementDataOnEnvironmentAssertTrue() {
-		Mockito.when(this.mockSqlQuery.uniqueResult()).thenReturn(1);
-		Mockito.when(
-			this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
-			.thenReturn(this.mockSqlQuery);
-
-		Assert.assertTrue(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
-	}
-
-	@Test
-	public void testHasMeasurementDataOnEnvironmentAssertFalse() {
-		Mockito.when(this.mockSqlQuery.uniqueResult()).thenReturn(0);
-		Mockito.when(
-			this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
-			.thenReturn(this.mockSqlQuery);
-
-		Assert.assertFalse(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
-	}
-
-	@Test
-	public void testHasMeasurementDataEnteredAssertTrue() {
-		final Object[] testDBRow = {2503, 51547, "AleuCol_E_1to5", 43};
-		final List<Object[]> testResult = Collections.singletonList(testDBRow);
-		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
-
-		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
-			.thenReturn(this.mockSqlQuery);
-
-		final List<Integer> ids = Arrays.asList(1000, 1002);
-		assertThat(true, is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
-	}
-
-	@Test
-	public void testHasMeasurementDataEnteredAssertFalse() {
-		final List<Object[]> testResult = Collections.emptyList();
-
-		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
-		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
-			.thenReturn(this.mockSqlQuery);
-
-		final List<Integer> ids = Arrays.asList(1000, 1002);
-		assertThat(false, is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
 	}
 
 	@Test
@@ -171,14 +122,14 @@ public class StudyServiceImplTest {
 		studyServiceImpl.setDaoFactory(this.daoFactory);
 
 		final List<MeasurementVariableDto> projectTraits =
-			Arrays.<MeasurementVariableDto>asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
+			Arrays.asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
 		Mockito.when(this.projectPropertyDao.getVariables(StudyServiceImplTest.STUDY_ID, VariableType.TRAIT.getId(),
 			VariableType.SELECTION_METHOD.getId())).thenReturn(projectTraits);
 		final List<MeasurementDto> traits = new ArrayList<>();
 		traits.add(new MeasurementDto(new MeasurementVariableDto(1, "traitName"), 9999, "traitValue", Phenotype.ValueStatus.OUT_OF_SYNC));
 		final ObservationDto measurement = new ObservationDto(1, "trialInstance", "entryType", StudyServiceImplTest.STUDY_ID, "designation",
 			"entryNo", "seedSource", "repitionNumber", "plotNumber", "blockNumber", traits);
-		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
+		final List<ObservationDto> testMeasurements = Collections.singletonList(measurement);
 		final int instanceId = 1;
 		final int pageNumber = 1;
 		final int pageSize = 100;
@@ -319,8 +270,6 @@ public class StudyServiceImplTest {
 		Mockito.when(this.studyDataManager.getUsersForEnvironment(metadata.getStudyDbId())).thenReturn(users2);
 		Mockito.when(this.studyDataManager.getStudyMetadataForGeolocationId(metadata.getStudyDbId())).thenReturn(metadata);
 		Mockito.when(this.studyDataManager.getProjectPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties1);
-		Mockito.when(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(metadata.getNurseryOrTrialId()))
-			.thenReturn(properties2);
 
 		final StudyDetailsDto studyDetailsDto = this.studyServiceImpl.getStudyDetailsForGeolocation(metadata.getStudyDbId());
 
@@ -412,7 +361,7 @@ public class StudyServiceImplTest {
 	@Test
 	public void testGetPlotDatasetId() {
 		final Integer plotDatasetId = new Random().nextInt();
-		final Integer studyId = new Random().nextInt();
+		final int studyId = new Random().nextInt();
 		Mockito.doReturn(Collections.singletonList(new DmsProject(plotDatasetId))).when(this.dmsProjectDao).getDatasetsByTypeForStudy(
 			studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		Assert.assertEquals(plotDatasetId, this.studyServiceImpl.getPlotDatasetId(studyId));
@@ -421,7 +370,7 @@ public class StudyServiceImplTest {
 	@Test
 	public void testEnvironmentDatasetId() {
 		final Integer envDatasetId = new Random().nextInt();
-		final Integer studyId = new Random().nextInt();
+		final int studyId = new Random().nextInt();
 		Mockito.doReturn(Collections.singletonList(new DmsProject(envDatasetId))).when(this.dmsProjectDao).getDatasetsByTypeForStudy(
 			studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Assert.assertEquals(envDatasetId, this.studyServiceImpl.getEnvironmentDatasetId(studyId));

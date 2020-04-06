@@ -12,6 +12,7 @@
 package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -34,16 +35,16 @@ public class ExperimentValuesTransformerTest extends TestOutputFormatter {
 	private static ExperimentValuesTransformer transformer;
 
 	@BeforeClass
-	public static void setUp() throws Exception {
+	public static void setUp() {
 		ExperimentValuesTransformerTest.transformer = new ExperimentValuesTransformer(Mockito.mock(HibernateSessionProvider.class));
 	}
 
 	@Test
-	public void testTransform() throws Exception {
-		MeasurementRow mRow = this.createMeasurementRowTestData();
-		VariableTypeList varTypeList = this.createVariableTypeListTestData();
+	public void testTransform() {
+		final MeasurementRow mRow = this.createMeasurementRowTestData();
+		final VariableTypeList varTypeList = this.createVariableTypeListTestData();
 
-		ExperimentValues expVal = ExperimentValuesTransformerTest.transformer.transform(mRow, varTypeList, null);
+		final ExperimentValues expVal = ExperimentValuesTransformerTest.transformer.transform(mRow, varTypeList, null, new HashMap<>());
 
 		Assert.assertNotNull(expVal);
 		Debug.println(TestOutputFormatter.INDENT, expVal.toString());
@@ -51,8 +52,8 @@ public class ExperimentValuesTransformerTest extends TestOutputFormatter {
 	}
 
 	private VariableTypeList createVariableTypeListTestData() {
-		VariableTypeList varTypeList = new VariableTypeList();
-		StandardVariable standardVariable = new StandardVariable();
+		final VariableTypeList varTypeList = new VariableTypeList();
+		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(2);
 
 		varTypeList.add(new DMSVariableType("ENTRY", "localDescription1", standardVariable, 1));
@@ -64,25 +65,25 @@ public class ExperimentValuesTransformerTest extends TestOutputFormatter {
 	}
 
 	private MeasurementRow createMeasurementRowTestData() {
-		MeasurementRow mRow = new MeasurementRow();
+		final MeasurementRow mRow = new MeasurementRow();
 		mRow.setStockId(1);
 		mRow.setLocationId(1);
 
-		List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+		final List<MeasurementData> dataList = new ArrayList<>();
 
-		MeasurementData data1 = new MeasurementData("ENTRY", "1");
+		final MeasurementData data1 = new MeasurementData("ENTRY", "1");
 		data1.setMeasurementVariable(new MeasurementVariable());
 		dataList.add(data1);
 
-		MeasurementData data2 = new MeasurementData("GID", "-1");
+		final MeasurementData data2 = new MeasurementData("GID", "-1");
 		data2.setMeasurementVariable(new MeasurementVariable());
 		dataList.add(data2);
 
-		MeasurementData data3 = new MeasurementData("DESIG", "TIANDOUGOU-9");
+		final MeasurementData data3 = new MeasurementData("DESIG", "TIANDOUGOU-9");
 		data3.setMeasurementVariable(new MeasurementVariable());
 		dataList.add(data3);
 
-		MeasurementData data4 = new MeasurementData("CROSS", "-");
+		final MeasurementData data4 = new MeasurementData("CROSS", "-");
 		data4.setMeasurementVariable(new MeasurementVariable());
 		dataList.add(data4);
 

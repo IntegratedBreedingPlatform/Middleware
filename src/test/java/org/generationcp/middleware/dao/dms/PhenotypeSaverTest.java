@@ -54,14 +54,13 @@ public class PhenotypeSaverTest extends IntegrationTestBase {
 		final VariableList factors = new VariableList();
 		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
-		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 
 		//Save the experiment
 		final CropType crop = new CropType();
 		crop.setUseUUID(true);
 		this.studyDataManager.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		final ExperimentModel experiment = this.experimentDao.getById(values.getLocationId());
 
 		final Phenotype toBeSaved = new Phenotype();
 		toBeSaved.setValue("999");

@@ -15,10 +15,10 @@ import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.EnvironmentPropertyDao;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -45,7 +45,6 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -146,7 +145,7 @@ public class WorkbookBuilder extends Builder {
 		// FIXME : this heavy id fetch pattern needs changing
 		final int dataSetId = this.getMeasurementDataSetId(id);
 		// validation, bring inline
-		this.checkMeasurementDataset(Integer.valueOf(dataSetId));
+		this.checkMeasurementDataset(dataSetId);
 		workbook.setMeasurementDatesetId(dataSetId);
 
 		// Variables required to get Experiments (?)
@@ -181,7 +180,7 @@ public class WorkbookBuilder extends Builder {
 		final Map<Integer, VariableType> projectPropRoleMapping = this
 			.generateProjectPropertyRoleMap(projectProperties);
 
-		final GeolocationPropertyDao geolocationPropertyDao = this.daoFactory.getGeolocationPropertyDao();
+		final EnvironmentPropertyDao environmentPropertyDao = this.daoFactory.getEnvironmentPropertyDao();
 		for (final ProjectProperty projectProperty : projectProperties) {
 			// FIXME DA IN A LOOP
 			final StandardVariable stdVariable = this.getStandardVariableBuilder()
@@ -202,9 +201,9 @@ public class WorkbookBuilder extends Builder {
 
 				if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
 					String value = projectProperty.getValue();
-					// During import of study, experiment design values are not set in ProjectProperty so we resolve them from GeolocationProperty
+					// During import of study, experiment design values are not set in ProjectProperty so we resolve them from ExperimentProperty
 					if (value == null && VariableType.ENVIRONMENT_DETAIL.equals(varType)) {
-						value = geolocationPropertyDao.getGeolocationPropValue(stdVariableId, id);
+						value = environmentPropertyDao.getVariableValue(stdVariableId, id);
 					}
 
 					final MeasurementVariable measurementVariable =
@@ -231,28 +230,6 @@ public class WorkbookBuilder extends Builder {
 		return workbook;
 	}
 
-	private String getVariableValueFromGeolocation(final int stdVariableId, final String value, final Geolocation geolocation) {
-
-		if (geolocation != null) {
-			if (TermId.TRIAL_INSTANCE_FACTOR.getId() == stdVariableId) {
-				return geolocation.getDescription();
-
-			} else if (TermId.LATITUDE.getId() == stdVariableId && geolocation.getLatitude() != null) {
-				return geolocation.getLatitude().toString();
-
-			} else if (TermId.LONGITUDE.getId() == stdVariableId && geolocation.getLongitude() != null) {
-				return geolocation.getLongitude().toString();
-
-			} else if (TermId.GEODETIC_DATUM.getId() == stdVariableId && geolocation.getGeodeticDatum() != null) {
-				geolocation.setGeodeticDatum(value);
-
-			} else if (TermId.ALTITUDE.getId() == stdVariableId && geolocation.getAltitude() != null) {
-				return geolocation.getAltitude().toString();
-			}
-		}
-		return value;
-	}
-
 	private void populateBreedingMethodPossibleValues(final List<MeasurementVariable> variates) {
 		final Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.populateBreedingMethodPossibleValues");
 
@@ -274,7 +251,7 @@ public class WorkbookBuilder extends Builder {
 		}
 	}
 
-	protected Set<MeasurementVariable> buildConditionVariables(
+	Set<MeasurementVariable> buildConditionVariables(
 		final VariableList studyConditionVariables,
 		final VariableList trialEnvironmentVariables) {
 		// we set roles here (study, trial, variate) which seem to match the
@@ -291,7 +268,7 @@ public class WorkbookBuilder extends Builder {
 		return trialObservations;
 	}
 
-	protected void checkMeasurementDataset(final Integer dataSetId) {
+	void checkMeasurementDataset(final Integer dataSetId) {
 		// if study has no measurementDataset, throw an error as it is an
 		// invalid template
 		if (dataSetId == null || dataSetId.equals(0)) {
@@ -364,7 +341,7 @@ public class WorkbookBuilder extends Builder {
 		final DmsProject dmsProject = this.dataSetBuilder.getTrialDataset(id);
 		final List<MeasurementVariable> experimentalDesignVariables = new ArrayList<>();
 		final List<ProjectProperty> projectProperties = dmsProject != null ? dmsProject.getProperties()
-			: new ArrayList<ProjectProperty>();
+			: new ArrayList<>();
 		final Map<Integer, VariableType> projectPropRoleMapping = this
 			.generateProjectPropertyRoleMap(projectProperties);
 
@@ -549,7 +526,7 @@ public class WorkbookBuilder extends Builder {
 	 * @param experimentId
 	 * @return MeasurementData
 	 */
-	protected MeasurementData getMeasurementDataWithSample(
+	MeasurementData getMeasurementDataWithSample(
 		final Map<Integer, String> samplesMap,
 		final int experimentId) {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
@@ -559,7 +536,7 @@ public class WorkbookBuilder extends Builder {
 		measurementVariable.setLabel(measurementVariable.getName());
 		measurementVariable.setFactor(true);
 		measurementVariable.setDataTypeId(DataType.CHARACTER_VARIABLE.getId());
-		measurementVariable.setPossibleValues(new ArrayList<ValueReference>());
+		measurementVariable.setPossibleValues(new ArrayList<>());
 		final String sampleValue = samplesMap.get(experimentId);
 		return new MeasurementData(String.valueOf(TermId.SAMPLES.getId()), sampleValue, false, "C",
 			measurementVariable);
@@ -578,7 +555,7 @@ public class WorkbookBuilder extends Builder {
 		return this.studyDataManager.getExperimentSampleMap(studyDbId);
 	}
 
-	protected void populateMeasurementData(
+	void populateMeasurementData(
 		final List<MeasurementVariable> variateList, final VariableList variates,
 		final List<MeasurementData> measurementDataList) {
 		for (final MeasurementVariable variate : variateList) {
@@ -621,7 +598,7 @@ public class WorkbookBuilder extends Builder {
 		}
 	}
 
-	protected boolean isCategoricalVariate(final Variable variable) {
+	private boolean isCategoricalVariate(final Variable variable) {
 		final StandardVariable stdVar = variable.getVariableType().getStandardVariable();
 		return PhenotypicType.VARIATE == stdVar.getPhenotypicType()
 			&& stdVar.getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId();
@@ -673,7 +650,7 @@ public class WorkbookBuilder extends Builder {
 		return measurementVariableLists;
 	}
 
-	protected void setMeasurementVarRoles(
+	void setMeasurementVarRoles(
 		final Set<MeasurementVariable> measurementVariableLists, final boolean isFactor,
 		final boolean isStudy) {
 		final PhenotypicType role;
@@ -836,7 +813,7 @@ public class WorkbookBuilder extends Builder {
 		return var;
 	}
 
-	protected VariableList getTrialEnvironmentVariableList(final DataSet trialDataset) {
+	private VariableList getTrialEnvironmentVariableList(final DataSet trialDataset) {
 		final VariableTypeList typeList = trialDataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
 		final VariableList list = new VariableList();
 		for (final DMSVariableType type : typeList.getVariableTypes()) {
@@ -845,7 +822,7 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
-	protected VariableList getTrialConstants(final DataSet trialDataSet) {
+	private VariableList getTrialConstants(final DataSet trialDataSet) {
 		final VariableTypeList typeList = trialDataSet.getVariableTypes().getVariates();
 
 		final VariableList list = new VariableList();
@@ -855,7 +832,7 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
-	public List<MeasurementRow> buildTrialObservations(
+	List<MeasurementRow> buildTrialObservations(
 		final int trialDatasetId,
 		final List<MeasurementVariable> factorList, final List<MeasurementVariable> variateList) {
 
@@ -927,7 +904,7 @@ public class WorkbookBuilder extends Builder {
 		return rows;
 	}
 
-	protected VariableTypeList removeTrialDatasetVariables(
+	VariableTypeList removeTrialDatasetVariables(
 		final VariableTypeList variables,
 		final VariableList toBeDeleted) {
 		final List<Integer> trialList = new ArrayList<>();
@@ -969,7 +946,7 @@ public class WorkbookBuilder extends Builder {
 		}
 	}
 
-	public List<MeasurementRow> buildDatasetObservations(
+	List<MeasurementRow> buildDatasetObservations(
 		final List<Experiment> experiments,
 		final VariableTypeList variateTypes, final List<MeasurementVariable> factorList,
 		final List<MeasurementVariable> variateList) {
@@ -1041,7 +1018,7 @@ public class WorkbookBuilder extends Builder {
 			// is the ID and not the name
 			if (standardVariableDataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
 				&& standardVariable.getId() != TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
-				final Integer id = value != null && NumberUtils.isNumber(value) ? Integer.valueOf(value) : null;
+				final Integer id = NumberUtils.isNumber(value) ? Integer.valueOf(value) : null;
 				return new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
 					this.getDataType(standardVariableDataTypeId), id, factor);
 			}

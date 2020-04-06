@@ -38,7 +38,6 @@ import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -64,7 +63,6 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -78,8 +76,6 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -90,12 +86,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
-	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;
@@ -352,20 +348,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public int addTrialEnvironment(final VariableList variableList) {
-
-		try {
-
-			final Geolocation geolocation = this.getGeolocationSaver().saveGeolocation(variableList, null);
-			return geolocation.getLocationId();
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in addTrialEnvironment " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public int addStock(final VariableList variableList) {
 
 		try {
@@ -514,7 +496,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				} else {
 					this.getLocdesSaver().updateDeletedPlots(info, userId);
 				}
-				this.getGeolocationPropertySaver().saveFieldmapProperties(info);
 				this.getExperimentPropertySaver().saveFieldmapProperties(info);
 
 			} catch (final Exception e) {
@@ -536,7 +517,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, null);
 			}
 			if (experimentValues != null && !experimentValues.isEmpty()) {
-				this.updateExperimentValues(experimentValues, project.getProjectId());
+				this.updateExperimentValues(experimentValues);
 			}
 
 		} catch (final Exception e) {
@@ -545,11 +526,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 	}
 
-	void updateExperimentValues(final List<ExperimentValues> experimentValues, final Integer projectId) {
+	void updateExperimentValues(final List<ExperimentValues> experimentValues) {
 		for (final ExperimentValues exp : experimentValues) {
 			if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
-				final ExperimentModel experimentModel =
-					this.getExperimentDao().getExperimentByProjectIdAndLocation(projectId, exp.getLocationId());
+				// The location id is the environment's experiment id
+				final ExperimentModel experimentModel = this.getExperimentDao().getById(exp.getLocationId());
 				for (final Variable variable : exp.getVariableList().getVariables()) {
 					final int val = this.getPhenotypeDao().updatePhenotypesByExperimentIdAndObervableId(experimentModel.getNdExperimentId(),
 						variable.getVariableType().getId(), variable.getValue());
@@ -563,14 +544,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(
-		final int datasetId, final int geolocationId,
+		final int datasetId, final int environmentId,
 		final CrossExpansionProperties crossExpansionProperties) {
 		final List<FieldMapInfo> fieldMapInfos =
-			this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
+			this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, environmentId, null);
 
 		this.updateFieldMapWithBlockInformation(fieldMapInfos, true);
 		final Map<Integer, String> pedigreeStringMap = new HashMap<>();
-		//		 Filter those belonging to the given geolocationId
+		//		 Filter those belonging to the given environmentId
 		for (final FieldMapInfo fieldMapInfo : fieldMapInfos) {
 			final List<FieldMapDatasetInfo> datasetInfoList = fieldMapInfo.getDatasets();
 			if (datasetInfoList != null) {
@@ -757,7 +738,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<StudyDetails> getStudyDetails(
 		final StudyTypeDto studyType, final String programUUID, final int start,
 		final int numOfRows) {
-		final List<StudyDetails> details = this.getDmsProjectDao().getAllStudyDetails(studyType, programUUID, start, numOfRows);
+		final List<StudyDetails> details = this.getDmsProjectDao().getAllStudyDetails(Optional.of(studyType), programUUID, start, numOfRows);
 		this.populateSiteAndPersonIfNecessary(details);
 		return details;
 	}
@@ -776,6 +757,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return list;
 	}
 
+	// TODO IBP-3389 Optimize, no need to retrieve per study type from ETLServiceImpl
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
 	public List<StudyDetails> getAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {
@@ -1022,33 +1004,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public String getTrialInstanceNumberByGeolocationId(final int geolocationId) {
-		final Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
-		if (geolocation != null) {
-			return geolocation.getDescription();
-		}
-		return null;
-	}
-
-	@Override
 	public List<String> getAllSharedProjectNames() {
 		return this.getDmsProjectDao().getAllSharedProjectNames();
 	}
 
 	@Override
-	public boolean checkIfAnyLocationIDsExistInExperiments(
+	public Long countExperimentsByDatasetTypeAndEnvironments(
 		final int studyId, final int datasetTypeId,
-		final List<Integer> locationIds) {
+		final List<Integer> environmentIds) {
 
 		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getDatasetsByTypeForStudy(studyId, datasetTypeId);
 
 		if (!datasetProjects.isEmpty()) {
 			final int dataSetId = datasetProjects.get(0).getProjectId();
-			return this.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(dataSetId, locationIds);
-		} else {
-			return false;
+			return this.daoFactory.getExperimentDao().countExperimentsByDatasetAndEnvironmentIds(dataSetId, environmentIds);
 		}
-
+		return 0L;
 	}
 
 	@Override
@@ -1086,7 +1057,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			final List<Integer> locationIds =
 				filters.get(StudyFilters.LOCATION_ID) != null ?
 					Collections.singletonList(Integer.parseInt(filters.get(StudyFilters.LOCATION_ID))) :
-					new ArrayList<Integer>();
+					new ArrayList<>();
 			studySummary.setInstanceMetaData(this.getInstanceMetadata(dmsProject.getProjectId(), locationIds));
 			studySummaries.add(studySummary);
 		}
@@ -1100,26 +1071,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
-		return this.getGeolocationDao().getInstanceMetadata(studyId, new ArrayList<Integer>());
+		return this.daoFactory.getInstanceDao().getInstanceMetadata(studyId, Collections.emptyList());
 	}
 
 	List<InstanceMetadata> getInstanceMetadata(final int studyId, final List<Integer> locationIds) {
-		return this.getGeolocationDao().getInstanceMetadata(studyId, locationIds);
+		return this.daoFactory.getInstanceDao().getInstanceMetadata(studyId, locationIds);
 	}
 
 	@Override
-	public Phenotype getPhenotypeById(final int phenotypeId) {
-		return this.getPhenotypeDao().getById(phenotypeId);
-	}
-
-	@Override
-	public StudyMetadata getStudyMetadataForGeolocationId(final Integer geolocationId) {
-		return this.getDmsProjectDao().getStudyMetadataForGeolocationId(geolocationId);
-	}
-
-	@Override
-	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer studyId, final List<Integer> excludedIds) {
-		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByGeolocation(studyId, excludedIds);
+	public StudyMetadata getStudyMetadataForEnvironmentId(final Integer environmentId) {
+		return this.getDmsProjectDao().getStudyMetadataForEnvironmentId(environmentId);
 	}
 
 	@Override
@@ -1135,16 +1096,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(final Integer studyId) {
 		return this.getExperimentDao().getExperimentSamplesDTOMap(studyId);
-	}
-
-	@Override
-	public Map<String, Integer> getInstanceGeolocationIdsMap(final Integer studyId) {
-		final List<Geolocation> geolocations = this.getGeolocationDao().getEnvironmentGeolocations(studyId);
-		final Map<String, Integer> map = new HashMap<>();
-		for (final Geolocation geolocation : geolocations) {
-			map.put(geolocation.getDescription(), geolocation.getLocationId());
-		}
-		return map;
 	}
 
 	@Override
@@ -1259,8 +1210,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public String getBlockId(final int datasetId, final String trialInstance) {
-		return this.daoFactory.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+	public String getBlockId(final int datasetId, final Integer trialInstance) {
+		return this.daoFactory.getEnvironmentPropertyDao().getVariableValueForTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
 
 	}
 
@@ -1276,34 +1227,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return studyReference;
 	}
 
-	public Boolean instanceExists(final Set<Integer> instanceIds) {
-		return this.getGeolocationDao().instanceExists(instanceIds);
+	@Override
+	public Map<Integer, String> getEnvironmentVariableIdValuesMap(final Integer datasetId, final Integer environmentId) {
+		final Map<Integer, String> environmentVariablesMap =
+			this.daoFactory.getEnvironmentPropertyDao().getEnvironmentVariablesMap(datasetId, environmentId);
+		final ExperimentModel environment = this.daoFactory.getInstanceDao().getById(environmentId);
+
+		environmentVariablesMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(environment.getObservationUnitNo()));
+		return environmentVariablesMap;
 	}
 
+	// TODO IBP-3305 Determine if this can be replaced with StudyDataManager#areAllInstancesExistInDataset
 	@Override
-	public Map<Integer, String> getGeolocationByVariableId(final Integer datasetId, final Integer instanceDbId) {
-		final Geolocation geoLocation = this.getGeolocationDao().getById(instanceDbId);
-		final Map<Integer, String> geoLocationMap =
-			this.getGeolocationPropertyDao().getGeoLocationPropertyByVariableId(datasetId, instanceDbId);
-
-		geoLocationMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), geoLocation.getDescription());
-		if (geoLocation.getLatitude() != null) {
-			geoLocationMap.put(TermId.LATITUDE.getId(), geoLocation.getLatitude().toString());
-		}
-
-		if (geoLocation.getLongitude() != null) {
-			geoLocationMap.put(TermId.LONGITUDE.getId(), geoLocation.getLongitude().toString());
-		}
-
-		if (geoLocation.getGeodeticDatum() != null) {
-			geoLocationMap.put(TermId.GEODETIC_DATUM.getId(), geoLocation.getGeodeticDatum());
-		}
-
-		if (geoLocation.getAltitude() != null) {
-			geoLocationMap.put(TermId.ALTITUDE.getId(), geoLocation.getAltitude().toString());
-		}
-
-		return geoLocationMap;
+	public Boolean instancesExist(final Set<Integer> instanceIds) {
+		return this.daoFactory.getInstanceDao().instancesExist(instanceIds);
 	}
 
 	@Override
@@ -1332,16 +1269,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			return this.userService.getUsersByPersonIds(personIds);
 		}
 		return Collections.emptyList();
-	}
-
-	@Override
-	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
-		return this.daoFactory.getPhenotypeDAO().getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
-	}
-
-	@Override
-	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
-		return this.daoFactory.getGeolocationPropertyDao().getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
 	}
 
 	void setDataSetBuilder(final DataSetBuilder dataSetBuilder) {

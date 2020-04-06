@@ -12,15 +12,9 @@
 package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
-import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
-import org.generationcp.middleware.operation.builder.WorkbookBuilder;
-import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.transformer.etl.DatasetValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StudyValuesTransformer;
@@ -43,7 +37,7 @@ public class Saver extends DatabaseBroker {
 	/**
 	 * Instantiates a new data manager given session providers for local and central.
 	 */
-	protected Saver(HibernateSessionProvider sessionProvider) {
+	protected Saver(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 
@@ -59,10 +53,6 @@ public class Saver extends DatabaseBroker {
 		return new ProjectPropertySaver(this.sessionProvider);
 	}
 
-	protected final GeolocationSaver getGeolocationSaver() {
-		return new GeolocationSaver(this.sessionProvider);
-	}
-
 	protected final StockSaver getStockSaver() {
 		return new StockSaver(this.sessionProvider);
 	}
@@ -73,6 +63,10 @@ public class Saver extends DatabaseBroker {
 
 	protected final ExperimentModelSaver getExperimentModelSaver() {
 		return new ExperimentModelSaver(this.sessionProvider);
+	}
+
+	protected final ExperimentPropertySaver getExperimentPropertySaver() {
+		return new ExperimentPropertySaver(this.sessionProvider);
 	}
 
 	protected final StandardVariableBuilder getStandardVariableBuilder() {
@@ -103,10 +97,6 @@ public class Saver extends DatabaseBroker {
 		return new DatasetProjectSaver(this.sessionProvider);
 	}
 
-	protected final VariableTypeBuilder getVariableTypeBuilder() {
-		return new VariableTypeBuilder(this.sessionProvider);
-	}
-
 	protected final StockModelBuilder getStockModelBuilder() {
 		return new StockModelBuilder(this.sessionProvider);
 	}
@@ -115,23 +105,4 @@ public class Saver extends DatabaseBroker {
 		return new TermBuilder(this.sessionProvider);
 	}
 
-	protected final ExperimentBuilder getExperimentBuilder() {
-		return new ExperimentBuilder(this.sessionProvider);
-	}
-
-	protected final ExperimentPropertySaver getExperimentPropertySaver() {
-		return new ExperimentPropertySaver(this.sessionProvider);
-	}
-
-	protected final ListDataPropertySaver getListDataPropertySaver() {
-		return new ListDataPropertySaver(this.sessionProvider);
-	}
-
-	protected final GeolocationPropertySaver getGeolocationPropertySaver() {
-		return new GeolocationPropertySaver(this.sessionProvider);
-	}
-
-	protected final ExperimentDestroyer getExperimentDestroyer() {
-		return new ExperimentDestroyer(this.sessionProvider);
-	}
 }

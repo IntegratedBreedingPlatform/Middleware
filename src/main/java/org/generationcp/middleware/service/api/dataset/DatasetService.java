@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.dataset;
 
 import com.google.common.collect.Table;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dms.DatasetBasicDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -60,6 +61,8 @@ public interface DatasetService {
 	 * @return
 	 */
 	boolean isValidObservationUnit(Integer datasetId, Integer observationUnitId);
+
+	boolean isValidDatasetId(Integer datasetId);
 
 	/**
 	 * Given an observationUnitId, observationId, returns a Phenotype
@@ -125,6 +128,15 @@ public interface DatasetService {
 		Integer parentId);
 
 	/**
+	 * Given a list of dataset types and a study, it will retrieve the study dataset basic dtos with the specified types
+	 *
+	 * @param studyId        Id of the study
+	 * @param datasetTypeIds List of dataset types
+	 * @return List of datasets
+	 */
+	List<DatasetBasicDTO> getDatasetBasicDTOs(Integer studyId, Set<Integer> datasetTypeIds);
+
+	/**
 	 * Given a list of dataset types and a study, it will retrieve the study datasets with the specified types
 	 *
 	 * @param studyId        Id of the study
@@ -167,6 +179,14 @@ public interface DatasetService {
 	 * @return
 	 */
 	DatasetDTO getDataset(Integer datasetId);
+
+	/**
+	 * Return a dataset basic DTO given the id
+	 *
+	 * @param datasetId Id of the dataset
+	 * @return
+	 */
+	DatasetBasicDTO getDatasetBasicDTO(Integer datasetId);
 
 	/**
 	 * Get dataset that observationUnitDbId belongs to
@@ -392,4 +412,6 @@ public interface DatasetService {
 	 * @param studyId
 	 */
 	void setValueToVariable(Integer datasetId, ObservationUnitsParamDTO searchDTO, Integer studyId);
+
+	boolean allDatasetIdsBelongToStudy(final Integer studyId, List<Integer> datasetIds);
 }

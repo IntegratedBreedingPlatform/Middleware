@@ -47,16 +47,16 @@ public class FieldMapDatasetInfo implements Serializable {
 	 * @param datasetName the dataset name
 	 * @param trialInstances the trial instances
 	 */
-	public FieldMapDatasetInfo(Integer datasetId, String datasetName, List<FieldMapTrialInstanceInfo> trialInstances) {
+	public FieldMapDatasetInfo(final Integer datasetId, final String datasetName, final List<FieldMapTrialInstanceInfo> trialInstances) {
 		this.datasetId = datasetId;
 		this.datasetName = datasetName;
 		this.trialInstances = trialInstances;
 	}
 
 	public List<FieldMapTrialInstanceInfo> getTrialInstancesWithFieldMap() {
-		List<FieldMapTrialInstanceInfo> info = new ArrayList<FieldMapTrialInstanceInfo>();
+		final List<FieldMapTrialInstanceInfo> info = new ArrayList<>();
 		if (this.trialInstances != null && !this.trialInstances.isEmpty()) {
-			for (FieldMapTrialInstanceInfo geoloc : this.trialInstances) {
+			for (final FieldMapTrialInstanceInfo geoloc : this.trialInstances) {
 				if (geoloc.isFieldMapGenerated()) {
 					info.add(geoloc);
 				}
@@ -79,7 +79,7 @@ public class FieldMapDatasetInfo implements Serializable {
 	 *
 	 * @param datasetId the new dataset id
 	 */
-	public void setDatasetId(Integer datasetId) {
+	public void setDatasetId(final Integer datasetId) {
 		this.datasetId = datasetId;
 	}
 
@@ -97,7 +97,7 @@ public class FieldMapDatasetInfo implements Serializable {
 	 *
 	 * @param datasetName the new dataset name
 	 */
-	public void setDatasetName(String datasetName) {
+	public void setDatasetName(final String datasetName) {
 		this.datasetName = datasetName;
 	}
 
@@ -115,7 +115,7 @@ public class FieldMapDatasetInfo implements Serializable {
 	 *
 	 * @param trialInstances the new trial instances
 	 */
-	public void setTrialInstances(List<FieldMapTrialInstanceInfo> trialInstances) {
+	public void setTrialInstances(final List<FieldMapTrialInstanceInfo> trialInstances) {
 		this.trialInstances = trialInstances;
 	}
 
@@ -125,9 +125,9 @@ public class FieldMapDatasetInfo implements Serializable {
 	 * @param geolocationId the geolocation id
 	 * @return the trial instance
 	 */
-	public FieldMapTrialInstanceInfo getTrialInstance(Integer geolocationId) {
-		for (FieldMapTrialInstanceInfo trialInstance : this.trialInstances) {
-			if (geolocationId.equals(trialInstance.getGeolocationId())) {
+	public FieldMapTrialInstanceInfo getTrialInstance(final Integer geolocationId) {
+		for (final FieldMapTrialInstanceInfo trialInstance : this.trialInstances) {
+			if (geolocationId.equals(trialInstance.getEnvironmentId())) {
 				return trialInstance;
 			}
 		}
@@ -136,12 +136,12 @@ public class FieldMapDatasetInfo implements Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("FieldMapDatasetInfo [datasetId=");
 		builder.append(this.datasetId);
 		builder.append(", datasetName=");
@@ -163,7 +163,7 @@ public class FieldMapDatasetInfo implements Serializable {
 		Debug.println(indent, "Dataset Id = " + this.datasetId);
 		Debug.println(indent, "Dataset Name = " + this.datasetName);
 		Debug.println(indent, "Trial Instances = ");
-		for (FieldMapTrialInstanceInfo trialInstance : this.trialInstances) {
+		for (final FieldMapTrialInstanceInfo trialInstance : this.trialInstances) {
 			trialInstance.print(indent + 3);
 		}
 	}

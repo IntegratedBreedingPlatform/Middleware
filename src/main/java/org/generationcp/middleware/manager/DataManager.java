@@ -20,7 +20,6 @@ import org.generationcp.middleware.operation.builder.MethodBuilder;
 import org.generationcp.middleware.operation.builder.NameBuilder;
 import org.generationcp.middleware.operation.builder.NameSynonymBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
-import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.StudyBuilder;
 import org.generationcp.middleware.operation.builder.StudyFactorBuilder;
 import org.generationcp.middleware.operation.builder.StudyReferenceBuilder;
@@ -29,7 +28,6 @@ import org.generationcp.middleware.operation.builder.StudyVariateBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.TraitBuilder;
 import org.generationcp.middleware.operation.builder.TraitGroupBuilder;
-import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
@@ -38,8 +36,6 @@ import org.generationcp.middleware.operation.saver.CvTermSaver;
 import org.generationcp.middleware.operation.saver.DatasetProjectSaver;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
-import org.generationcp.middleware.operation.saver.GeolocationPropertySaver;
-import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.ListDataPropertySaver;
 import org.generationcp.middleware.operation.saver.LocdesSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
@@ -207,7 +203,7 @@ public abstract class DataManager extends DatabaseBroker {
 		return new TermBuilder(this.sessionProvider);
 	}
 
-	protected final MethodBuilder getMethodBuilder() {
+	final MethodBuilder getMethodBuilder() {
 		return new MethodBuilder(this.sessionProvider);
 	}
 
@@ -215,11 +211,11 @@ public abstract class DataManager extends DatabaseBroker {
 		return new StandardVariableBuilder(this.sessionProvider);
 	}
 
-	protected final StudyBuilder getStudyBuilder() {
+	final StudyBuilder getStudyBuilder() {
 		return new StudyBuilder(this.sessionProvider);
 	}
 
-	protected final StudyTypeBuilder getStudyTypeBuilder() {
+	final StudyTypeBuilder getStudyTypeBuilder() {
 		return new StudyTypeBuilder();
 	}
 
@@ -271,10 +267,6 @@ public abstract class DataManager extends DatabaseBroker {
 		return new PhenotypeSaver(this.sessionProvider);
 	}
 
-	protected final GeolocationSaver getGeolocationSaver() {
-		return new GeolocationSaver(this.sessionProvider);
-	}
-
 	protected final ProjectSaver getProjectSaver() {
 		return new ProjectSaver(this.sessionProvider);
 	}
@@ -313,10 +305,6 @@ public abstract class DataManager extends DatabaseBroker {
 
 	protected final LocdesSaver getLocdesSaver() {
 		return new LocdesSaver(this.sessionProvider);
-	}
-
-	protected final GeolocationPropertySaver getGeolocationPropertySaver() {
-		return new GeolocationPropertySaver(this.sessionProvider);
 	}
 
 	protected final ListInventoryBuilder getListInventoryBuilder() {

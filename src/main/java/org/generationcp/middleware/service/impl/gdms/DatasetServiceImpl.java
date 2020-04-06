@@ -87,7 +87,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		try {
 			return this.datasetDAO.save(dataset).getDatasetId();
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new MiddlewareException("An error has occurred while saving the dataset");
 		}
@@ -99,12 +99,12 @@ public class DatasetServiceImpl implements DatasetService {
 		try {
 			final Dataset dataset = this.datasetDAO.getByName(datasetName);
 			if (dataset != null) {
-				List<CharValueElement> charValueElements = this.charValuesDAO.getCharValueElementsByDatasetId(dataset.getDatasetId());
+				final List<CharValueElement> charValueElements = this.charValuesDAO.getCharValueElementsByDatasetId(dataset.getDatasetId());
 				return DatasetRetrieveDtoBuilder.build(dataset, charValueElements);
 			} else {
 				return null;
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new MiddlewareException("An error has occurred while querying the dataset");
 		}
@@ -130,7 +130,7 @@ public class DatasetServiceImpl implements DatasetService {
 	private Map<String, Marker> getMarkersMap(final List<Marker> markers) {
 		final Map<String, Marker> mappedMarkers = Maps.uniqueIndex(markers, new Function<Marker, String>() {
 
-			public String apply(Marker from) {
+			public String apply(final Marker from) {
 				return from.getMarkerName();
 			}
 		});
@@ -140,7 +140,7 @@ public class DatasetServiceImpl implements DatasetService {
 	private void validateMarkers(final DatasetUploadDto datasetUploadDto, final Map<String, Marker> markerMap) {
 
 		if (markerMap.size() != datasetUploadDto.getMarkers().size()) {
-			List<String> markersNotFound = new ArrayList<>();
+			final List<String> markersNotFound = new ArrayList<>();
 
 			for (final String marker : datasetUploadDto.getMarkers()) {
 				if (!markerMap.containsKey(marker)) {
@@ -158,7 +158,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private void validateSamples(final Set<String> sampleUIDSet, final Map<String, SampleDTO> sampleDTOMap) {
 		if (sampleDTOMap.size() != sampleUIDSet.size()) {
-			List<String> samplesNotFound = new ArrayList<>();
+			final List<String> samplesNotFound = new ArrayList<>();
 
 			for (final String sample : sampleUIDSet) {
 				if (!sampleDTOMap.containsKey(sample)) {
@@ -175,8 +175,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private void validateInput(final DatasetUploadDto datasetUploadDto) {
-		final Integer numberOfRows = datasetUploadDto.getCharValues().length;
-		final Integer numberOfColums = datasetUploadDto.getCharValues()[0].length;
+		final int numberOfRows = datasetUploadDto.getCharValues().length;
+		final int numberOfColums = datasetUploadDto.getCharValues()[0].length;
 
 		if (!(numberOfRows > 0 && numberOfColums > 0 && numberOfColums == datasetUploadDto.getMarkers().size()
 			&& numberOfRows == datasetUploadDto

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.util.Debug;
 
 /**
@@ -30,8 +29,8 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
-	/** The geolocation id. */
-	private Integer geolocationId;
+	/** The Environment id. */
+	private Integer environmentId;
 
 	/** The site name. trial location id */
 	private String siteName;
@@ -113,12 +112,12 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	/**
 	 * Instantiates a new field map trial instance info.
 	 *
-	 * @param geolocationId the geolocation id
+	 * @param environmentId the geolocation id
 	 * @param siteName the site name
 	 * @param labels the labels
 	 */
-	public FieldMapTrialInstanceInfo(Integer geolocationId, String siteName, List<FieldMapLabel> labels) {
-		this.geolocationId = geolocationId;
+	public FieldMapTrialInstanceInfo(final Integer environmentId, final String siteName, final List<FieldMapLabel> labels) {
+		this.environmentId = environmentId;
 		this.siteName = siteName;
 		this.labels = labels;
 	}
@@ -128,9 +127,9 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @return true, if is field map generated
 	 */
-	public boolean isFieldMapGenerated() {
+	boolean isFieldMapGenerated() {
 		if (this.getFieldMapLabels() != null) {
-			for (FieldMapLabel label : this.getFieldMapLabels()) {
+			for (final FieldMapLabel label : this.getFieldMapLabels()) {
 				if (label.getColumn() != null && label.getColumn() > 0) {
 					return true;
 				}
@@ -144,17 +143,17 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @return the geolocation id
 	 */
-	public Integer getGeolocationId() {
-		return this.geolocationId;
+	public Integer getEnvironmentId() {
+		return this.environmentId;
 	}
 
 	/**
 	 * Sets the geolocation id.
 	 *
-	 * @param geolocationId the new geolocation id
+	 * @param environmentId the new geolocation id
 	 */
-	public void setGeolocationId(Integer geolocationId) {
-		this.geolocationId = geolocationId;
+	public void setEnvironmentId(final Integer environmentId) {
+		this.environmentId = environmentId;
 	}
 
 	/**
@@ -171,7 +170,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param siteName the new site name
 	 */
-	public void setSiteName(String siteName) {
+	public void setSiteName(final String siteName) {
 		this.siteName = siteName;
 	}
 
@@ -189,7 +188,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param trialInstanceNo the new trial instance no
 	 */
-	public void setTrialInstanceNo(String trialInstanceNo) {
+	public void setTrialInstanceNo(final String trialInstanceNo) {
 		this.trialInstanceNo = trialInstanceNo;
 	}
 
@@ -207,7 +206,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param labels the new field map labels
 	 */
-	public void setFieldMapLabels(List<FieldMapLabel> labels) {
+	public void setFieldMapLabels(final List<FieldMapLabel> labels) {
 		this.labels = labels;
 	}
 
@@ -225,7 +224,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param blockName the blockName to set
 	 */
-	public void setBlockName(String blockName) {
+	public void setBlockName(final String blockName) {
 		this.blockName = blockName;
 	}
 
@@ -243,7 +242,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param rowsInBlock the rowsInBlock to set
 	 */
-	public void setRowsInBlock(Integer rowsInBlock) {
+	public void setRowsInBlock(final Integer rowsInBlock) {
 		this.rowsInBlock = rowsInBlock;
 	}
 
@@ -261,7 +260,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param rangesInBlock the rangesInBlock to set
 	 */
-	public void setRangesInBlock(Integer rangesInBlock) {
+	public void setRangesInBlock(final Integer rangesInBlock) {
 		this.rangesInBlock = rangesInBlock;
 	}
 
@@ -279,7 +278,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param plantingOrder the plantingOrder to set
 	 */
-	public void setPlantingOrder(Integer plantingOrder) {
+	public void setPlantingOrder(final Integer plantingOrder) {
 		this.plantingOrder = plantingOrder;
 	}
 
@@ -289,8 +288,8 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 * @return the entry count
 	 */
 	public long getEntryCount() {
-		Set<Integer> entries = new HashSet<Integer>();
-		for (FieldMapLabel label : this.labels) {
+		final Set<Integer> entries = new HashSet<>();
+		for (final FieldMapLabel label : this.labels) {
 			entries.add(label.getEntryNumber());
 		}
 		return entries.size();
@@ -301,7 +300,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param entryCount the new entry count
 	 */
-	public void setEntryCount(long entryCount) {
+	public void setEntryCount(final long entryCount) {
 		this.entryCount = entryCount;
 	}
 
@@ -311,8 +310,8 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 * @return the rep count
 	 */
 	public long getRepCount() {
-		List<Integer> reps = new ArrayList<Integer>();
-		for (FieldMapLabel label : this.labels) {
+		final List<Integer> reps = new ArrayList<>();
+		for (final FieldMapLabel label : this.labels) {
 			reps.add(label.getRep());
 		}
 		if (reps.isEmpty()) {
@@ -326,7 +325,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param repCount the new rep count
 	 */
-	public void setRepCount(long repCount) {
+	public void setRepCount(final long repCount) {
 		this.repCount = repCount;
 	}
 
@@ -344,7 +343,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param plotCount the new plot count
 	 */
-	public void setPlotCount(long plotCount) {
+	public void setPlotCount(final long plotCount) {
 		this.plotCount = plotCount;
 	}
 
@@ -354,8 +353,8 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 * @param experimentId the experiment id
 	 * @return the field map label
 	 */
-	public FieldMapLabel getFieldMapLabel(Integer experimentId) {
-		for (FieldMapLabel label : this.labels) {
+	public FieldMapLabel getFieldMapLabel(final Integer experimentId) {
+		for (final FieldMapLabel label : this.labels) {
 			if (experimentId.equals(label.getExperimentId())) {
 				return label;
 			}
@@ -377,7 +376,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param startColumn the startColumn to set
 	 */
-	public void setStartColumn(Integer startColumn) {
+	public void setStartColumn(final Integer startColumn) {
 		this.startColumn = startColumn;
 	}
 
@@ -395,20 +394,20 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param startRange the startRange to set
 	 */
-	public void setStartRange(Integer startRange) {
+	public void setStartRange(final Integer startRange) {
 		this.startRange = startRange;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("FieldMapTrialInstanceInfo [geolocationId=");
-		builder.append(this.geolocationId);
+		final StringBuilder builder = new StringBuilder();
+		builder.append("FieldMapTrialInstanceInfo [environmentId=");
+		builder.append(this.environmentId);
 		builder.append(", siteName=");
 		builder.append(this.siteName);
 		builder.append(", labels=");
@@ -431,10 +430,10 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	public void print(int indent) {
 		Debug.println(indent, "FieldMapTrialInstanceInfo: ");
 		indent = indent + 3;
-		Debug.println(indent, "Geolocation Id = " + this.geolocationId);
+		Debug.println(indent, "Geolocation Id = " + this.environmentId);
 		Debug.println(indent, "Site Name = " + this.siteName);
 		Debug.println(indent, "Labels = ");
-		for (FieldMapLabel label : this.labels) {
+		for (final FieldMapLabel label : this.labels) {
 			label.print(indent + 3);
 		}
 		Debug.println(indent, "Number of Entries: " + this.getEntryCount());
@@ -456,7 +455,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param hasFieldMap the hasFieldMap to set
 	 */
-	public void setHasFieldMap(boolean hasFieldMap) {
+	public void setHasFieldMap(final boolean hasFieldMap) {
 		this.hasFieldMap = hasFieldMap;
 	}
 
@@ -474,7 +473,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param rowsPerPlot the rowsPerPlot to set
 	 */
-	public void setRowsPerPlot(Integer rowsPerPlot) {
+	public void setRowsPerPlot(final Integer rowsPerPlot) {
 		this.rowsPerPlot = rowsPerPlot;
 	}
 
@@ -492,7 +491,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param fieldName the fieldName to set
 	 */
-	public void setFieldName(String fieldName) {
+	public void setFieldName(final String fieldName) {
 		this.fieldName = fieldName;
 	}
 
@@ -510,7 +509,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param fieldmapUUID the fieldmapUUID to set
 	 */
-	public void setFieldmapUUID(String fieldmapUUID) {
+	public void setFieldmapUUID(final String fieldmapUUID) {
 		this.fieldmapUUID = fieldmapUUID;
 	}
 
@@ -528,7 +527,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param machineRowCapacity the machineRowCapacity to set
 	 */
-	public void setMachineRowCapacity(Integer machineRowCapacity) {
+	public void setMachineRowCapacity(final Integer machineRowCapacity) {
 		this.machineRowCapacity = machineRowCapacity;
 	}
 
@@ -546,7 +545,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param locationName the locationName to set
 	 */
-	public void setLocationName(String locationName) {
+	public void setLocationName(final String locationName) {
 		this.locationName = locationName;
 	}
 
@@ -564,7 +563,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	 *
 	 * @param order the new order
 	 */
-	public void setOrder(Integer order) {
+	public void setOrder(final Integer order) {
 		this.order = order;
 	}
 
@@ -578,7 +577,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	/**
 	 * @param locationId the locationId to set
 	 */
-	public void setLocationId(Integer locationId) {
+	public void setLocationId(final Integer locationId) {
 		this.locationId = locationId;
 	}
 
@@ -592,7 +591,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	/**
 	 * @param fieldId the fieldId to set
 	 */
-	public void setFieldId(Integer fieldId) {
+	public void setFieldId(final Integer fieldId) {
 		this.fieldId = fieldId;
 	}
 
@@ -606,7 +605,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	/**
 	 * @param blockId the blockId to set
 	 */
-	public void setBlockId(Integer blockId) {
+	public void setBlockId(final Integer blockId) {
 		this.blockId = blockId;
 	}
 
@@ -620,14 +619,14 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	/**
 	 * @param deletedPlots the deletedPlots to set
 	 */
-	public void setDeletedPlots(List<String> deletedPlots) {
+	public void setDeletedPlots(final List<String> deletedPlots) {
 		this.deletedPlots = deletedPlots;
 	}
 
 	/**
 	 * @param blockInfo the blockInfo to set
 	 */
-	public void updateBlockInformation(FieldmapBlockInfo blockInfo) {
+	public void updateBlockInformation(final FieldmapBlockInfo blockInfo) {
 		if (blockInfo != null) {
 			this.rowsInBlock = blockInfo.getRowsInBlock();
 			this.rangesInBlock = blockInfo.getRangesInBlock();
@@ -643,15 +642,15 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 		return this.labelHeaders;
 	}
 
-	public void setLabelHeaders(Map<Integer, String> labelHeaders) {
+	public void setLabelHeaders(final Map<Integer, String> labelHeaders) {
 		this.labelHeaders = labelHeaders;
 	}
 
 	public Integer getLabelsNeeded() {
-		return labelsNeeded;
+		return this.labelsNeeded;
 	}
 
-	public void setLabelsNeeded(Integer labelsNeeded) {
+	public void setLabelsNeeded(final Integer labelsNeeded) {
 		this.labelsNeeded = labelsNeeded;
 	}
 }

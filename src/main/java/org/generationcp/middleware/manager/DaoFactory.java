@@ -15,9 +15,9 @@ import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.InstanceDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
-import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
+import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
@@ -31,6 +31,7 @@ import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
+import org.generationcp.middleware.domain.dms.EnvironmentPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class DaoFactory {
@@ -156,16 +157,11 @@ public class DaoFactory {
 
 	}
 
-	public GeolocationDao getGeolocationDao() {
-		final GeolocationDao geolocationDao = new GeolocationDao();
-		geolocationDao.setSession(this.sessionProvider.getSession());
-		return geolocationDao;
-	}
+	public ExperimentPropertyDao getExperimentPropertyDao() {
+		final ExperimentPropertyDao experimentPropDao = new ExperimentPropertyDao();
+		experimentPropDao.setSession(this.sessionProvider.getSession());
+		return experimentPropDao;
 
-	public GeolocationPropertyDao getGeolocationPropertyDao() {
-		final GeolocationPropertyDao geolocationPropertyDao = new GeolocationPropertyDao();
-		geolocationPropertyDao.setSession(this.sessionProvider.getSession());
-		return geolocationPropertyDao;
 	}
 
 	public ProgramPresetDAO getProgramPresetDAO() {
@@ -232,5 +228,17 @@ public class DaoFactory {
 		final ProgramFavoriteDAO programFavoriteDao = new ProgramFavoriteDAO();
 		programFavoriteDao.setSession(this.sessionProvider.getSession());
 		return programFavoriteDao;
+	}
+
+	public InstanceDao getInstanceDao() {
+		final InstanceDao instanceDao = new InstanceDao();
+		instanceDao.setSession(this.sessionProvider.getSession());
+		return instanceDao;
+	}
+
+	public EnvironmentPropertyDao getEnvironmentPropertyDao() {
+		final EnvironmentPropertyDao environmentPropertyDao = new EnvironmentPropertyDao();
+		environmentPropertyDao.setSession(this.sessionProvider.getSession());
+		return environmentPropertyDao;
 	}
 }

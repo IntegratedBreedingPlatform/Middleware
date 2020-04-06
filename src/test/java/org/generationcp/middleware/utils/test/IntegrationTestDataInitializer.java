@@ -7,8 +7,6 @@ import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
-import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
@@ -47,7 +45,6 @@ import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 
@@ -60,31 +57,27 @@ import java.util.UUID;
 
 public class IntegrationTestDataInitializer {
 
-	private ExperimentDao experimentDao;
-	private ExperimentPropertyDao experimentPropertyDao;
-	private GeolocationDao geolocationDao;
-	private GeolocationPropertyDao geolocationPropertyDao;
-	private StockDao stockDao;
-	private DmsProjectDao dmsProjectDao;
-	private GermplasmDAO germplasmDao;
-	private PhenotypeDao phenotypeDao;
-	private CVTermDao cvTermDao;
-	private SampleDao sampleDao;
-	private SampleListDao sampleListDao;
-	private ProjectPropertyDao projectPropertyDao;
+	private final ExperimentDao experimentDao;
+	private final ExperimentPropertyDao experimentPropertyDao;
+	private final StockDao stockDao;
+	private final DmsProjectDao dmsProjectDao;
+	private final GermplasmDAO germplasmDao;
+	private final PhenotypeDao phenotypeDao;
+	private final CVTermDao cvTermDao;
+	private final SampleDao sampleDao;
+	private final SampleListDao sampleListDao;
+	private final ProjectPropertyDao projectPropertyDao;
 
+	private final DaoFactory daoFactory;
+	private final UserService userService;
+	private final WorkbenchDataManager workbenchDataManager;
 	private WorkbenchDaoFactory workbenchDaoFactory;
-	private DaoFactory daoFactory;
-	private UserService userService;
-	private WorkbenchDataManager workbenchDataManager;
 
 	public IntegrationTestDataInitializer(final HibernateSessionProvider hibernateSessionProvider,
 		final HibernateSessionProvider workbenchSessionProvider) {
 		this.workbenchDaoFactory = new WorkbenchDaoFactory(workbenchSessionProvider);
 		this.daoFactory = new DaoFactory(hibernateSessionProvider);
 		this.experimentDao = this.daoFactory.getExperimentDao();
-		this.geolocationDao = this.daoFactory.getGeolocationDao();
-		this.geolocationPropertyDao = this.daoFactory.getGeolocationPropertyDao();
 		this.stockDao = this.daoFactory.getStockDao();
 		this.dmsProjectDao = this.daoFactory.getDmsProjectDAO();
 		this.germplasmDao = this.daoFactory.getGermplasmDao();
@@ -114,6 +107,8 @@ public class IntegrationTestDataInitializer {
 		return dmsProject;
 	}
 
+	// TODO IBP-3390
+	@Deprecated
 	public Geolocation createTestGeolocation(final String trialNumber, final int locationId) {
 
 		final Geolocation geolocation = new Geolocation();
@@ -126,8 +121,6 @@ public class IntegrationTestDataInitializer {
 
 		geolocation.setProperties(Arrays.asList(geolocationPropertyLocationId));
 		geolocation.setDescription(trialNumber);
-		this.geolocationDao.saveOrUpdate(geolocation);
-		this.geolocationDao.refresh(geolocation);
 
 		return geolocation;
 
@@ -155,11 +148,20 @@ public class IntegrationTestDataInitializer {
 		return experimentModels;
 	}
 
+	public ExperimentModel createInstanceExperimentModel(final DmsProject project, final Integer instanceNumber, final String locationId) {
+		ExperimentModel experimentModel = new ExperimentModel();
+		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+		experimentModel.setProject(project);
+		experimentModel.setObservationUnitNo(instanceNumber);
+		experimentModel = this.experimentDao.saveOrUpdate(experimentModel);
+		this.addExperimentProp(experimentModel, TermId.LOCATION_ID.getId(), locationId, 1);
+		return experimentModel;
+	}
+	
 	public ExperimentModel createTestExperiment(final DmsProject project, final Geolocation geolocation, final int experimentType,
 		final String value, final ExperimentModel parent) {
 
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setTypeId(experimentType);
 		experimentModel.setProject(project);
 		experimentModel.setObservationUnitNo(1);
@@ -262,6 +264,8 @@ public class IntegrationTestDataInitializer {
 
 	}
 
+	//  TODO IBP-3389
+	@Deprecated
 	public void addGeolocationProp(final Geolocation geolocation, final int type, final String value, final int rank) {
 
 		final GeolocationProperty geolocationProperty = new GeolocationProperty();
@@ -269,8 +273,6 @@ public class IntegrationTestDataInitializer {
 		geolocationProperty.setRank(rank);
 		geolocationProperty.setType(type);
 		geolocationProperty.setGeolocation(geolocation);
-		this.geolocationPropertyDao.save(geolocationProperty);
-		this.geolocationPropertyDao.refresh(geolocationProperty);
 
 	}
 
@@ -290,7 +292,6 @@ public class IntegrationTestDataInitializer {
 		final StockModel stockModel) {
 
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setTypeId(typeId);
 		experimentModel.setObsUnitId(RandomStringUtils.randomAlphabetic(13));
 		experimentModel.setProject(dmsProject);
@@ -303,10 +304,10 @@ public class IntegrationTestDataInitializer {
 
 	public ObservationUnitsSearchDTO createTestObservationUnitsDTO() {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = new ObservationUnitsSearchDTO();
-		observationUnitsSearchDTO.setSelectionMethodsAndTraits(new ArrayList<MeasurementVariableDto>());
-		observationUnitsSearchDTO.setEnvironmentConditions(new ArrayList<MeasurementVariableDto>());
-		observationUnitsSearchDTO.setAdditionalDesignFactors(new ArrayList<String>());
-		observationUnitsSearchDTO.setGenericGermplasmDescriptors(new ArrayList<String>());
+		observationUnitsSearchDTO.setSelectionMethodsAndTraits(new ArrayList<>());
+		observationUnitsSearchDTO.setEnvironmentConditions(new ArrayList<>());
+		observationUnitsSearchDTO.setAdditionalDesignFactors(new ArrayList<>());
+		observationUnitsSearchDTO.setGenericGermplasmDescriptors(new ArrayList<>());
 		return observationUnitsSearchDTO;
 	}
 

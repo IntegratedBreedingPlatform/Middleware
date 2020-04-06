@@ -31,7 +31,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	private static final String ENTRY_ID = "entryId";
 
-	public static final String GET_GERMPLASM_USED_IN_ENTRY_LIST = " SELECT \n" + "   ldp.germplasm_id, \n"
+	private static final String GET_GERMPLASM_USED_IN_ENTRY_LIST = " SELECT \n" + "   ldp.germplasm_id, \n"
 		+ "   group_concat(p.name) \n" + " FROM listnms l \n"
 		+ "   INNER JOIN listdata_project ldp ON l.listid = ldp.list_id \n"
 		+ "   INNER JOIN project p ON l.projectid = p.project_id \n" + " WHERE ldp.germplasm_id IN (:gids) \n"
@@ -100,59 +100,19 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	}
 
-	public ListDataProject getByListIdAndEntryNo(final int listId, final int entryNo) {
-		ListDataProject result = null;
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
-			criteria.add(Restrictions.eq("list", new GermplasmList(listId)));
-			criteria.add(Restrictions.eq(ListDataProjectDAO.ENTRY_ID, entryNo));
-			criteria.addOrder(Order.asc(ListDataProjectDAO.ENTRY_ID));
-			result = (ListDataProject) criteria.uniqueResult();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getByListIdAndEntryNo(listId=" + listId
-				+ ") query from ListDataProjectDAO: " + e.getMessage(), e);
-		}
-		return result;
-	}
-
-	public List<ListDataProject> getByStudy(
-		final int studyId, final GermplasmListType listType, final List<Integer> plotNumbers, final String instanceNumber) {
+	List<ListDataProject> getByStudy(final int studyId, final GermplasmListType listType) {
 		try {
 
-			final String queryStr = "select ldp.* FROM nd_experiment e,"
-				+ " nd_experimentprop nd_ep, stock,"
-				+ " listdata_project ldp, project p, listnms nms, nd_geolocation geo"
-				+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
-				+ " AND nms.projectid = p.study_id"
-				+ " AND nms.listid = ldp.list_id"
-				+ " AND nms.projectid = :STUDY_ID"
-				+ " AND p.dataset_type_id = :DATASET_TYPE"
-				+ " AND e.project_id = p.project_id"
-				+ " AND e.nd_experiment_id = nd_ep.nd_experiment_id"
-				+ " AND stock.stock_id = e.stock_id"
-				+ " AND ldp.germplasm_id = stock.dbxref_id"
-				+ " AND nd_ep.value in (:PLOT_NO)"
-				+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id"
-				+ " AND e.nd_geolocation_id = geo.nd_geolocation_id"
-				+ " AND geo.description = :INSTANCE_NUMBER"
-				+ " AND ( EXISTS (" + " SELECT 1" + " FROM listnms cl"
-				+ " WHERE cl.listid = ldp.list_id" + " AND cl.listtype = 'CHECK'" + " AND NOT EXISTS ("
-				+ " SELECT 1 FROM listnms nl" + " WHERE nl.listid = ldp.list_id" + " AND nl.listtype = :LIST_TYPE"
-				+ " )) OR EXISTS (" + " SELECT 1 FROM listnms nl" + " WHERE nl.listid = ldp.list_id"
-				+ " AND nl.listtype = :LIST_TYPE" + " ))";
+			final String queryStr = "select ldp.* FROM listdata_project ldp "
+				+ "    INNER JOIN listnms nms on nms.listid = ldp.list_id "
+				+ "    INNER JOIN project p on nms.projectid = p.project_id "
+				+ "    WHERE p.project_id = :STUDY_ID "
+				+ "    AND nms.listtype = :LIST_TYPE ";
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryStr);
 			query.addEntity("ldp", ListDataProject.class);
 			query.setParameter("LIST_TYPE", listType.name());
 			query.setParameter("STUDY_ID", studyId);
-			query.setParameterList("PLOT_NO", plotNumbers);
-			query.setParameter("INSTANCE_NUMBER", instanceNumber);
-			query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
-			query.setParameterList(
-				"PLOT_NO_TERM_IDS",
-				new Integer[] {TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId()});
 
 			return query.list();
 
@@ -201,7 +161,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 				criteria.createAlias("list", "l");
 				criteria.add(Restrictions.eq("l.id", id));
 				criteria.setProjection(Projections.rowCount());
-				return ((Long) criteria.uniqueResult()).longValue(); // count
+				return ((Long) criteria.uniqueResult()); // count
 			}
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
@@ -219,7 +179,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 				criteria.add(Restrictions.eq("l.id", id));
 				criteria.add(Restrictions.in("checkType", systemDefinedEntryTypeIds));
 				criteria.setProjection(Projections.rowCount());
-				return ((Long) criteria.uniqueResult()).longValue(); // count
+				return ((Long) criteria.uniqueResult()); // count
 			}
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(

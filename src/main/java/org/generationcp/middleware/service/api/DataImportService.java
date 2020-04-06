@@ -11,10 +11,7 @@
 
 package org.generationcp.middleware.service.api;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -24,7 +21,9 @@ import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.Message;
 
-import com.google.common.base.Optional;
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is the API for importing data to new schema. The methods here involve
@@ -92,10 +91,9 @@ public interface DataImportService {
 	 * @param programUUID
 	 * @return the workbook
 	 * @throws WorkbookParserException
-	 * @throws MiddlewareQueryException
+	 * @throws WorkbookParserException
 	 */
-	Workbook strictParseWorkbook(File file, String programUUID, final Integer currentIbdbUserId) throws WorkbookParserException,
-		MiddlewareException;
+	Workbook strictParseWorkbook(File file, String programUUID, final Integer currentIbdbUserId) throws WorkbookParserException;
 
 	/**
 	 * Checks if the name specified is an already existing project name
@@ -103,22 +101,8 @@ public interface DataImportService {
 	 * @param name
 	 * @param programUUID
 	 * @return true or false
-	 * @throws MiddlewareQueryException
 	 */
-	boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException;
-
-	/**
-	 * Checks if the experiment is already existing given the project name and
-	 * location description
-	 *
-	 * @param projectName
-	 * @param locationDescription
-	 * @param programUUID
-	 * @return nd_geolocation_id
-	 * @throws MiddlewareQueryException
-	 */
-	Integer getLocationIdByProjectNameAndDescriptionAndProgramUUID(String projectName, String locationDescription,
-			String programUUID) throws MiddlewareQueryException;
+	boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID);
 
 	/**
 	 * Validate the project ontology from the Workbook and return the list of
@@ -127,10 +111,8 @@ public interface DataImportService {
 	 * @param workbook
 	 * @return Map<String,List<Message>> - map of errors for each header and
 	 *         global errors
-	 * @throws MiddlewareQueryException
 	 */
-	Map<String, List<Message>> validateProjectOntology(Workbook workbook, String programUUID)
-			throws MiddlewareException;
+	Map<String, List<Message>> validateProjectOntology(Workbook workbook, String programUUID);
 
 	/**
 	 * Saves the project ontology from the Workbook Tables: project and projectprop
@@ -164,7 +146,6 @@ public interface DataImportService {
 	 * Checks the Workbook's observation data for out-of-bounds values. Returns
 	 * true if there are out-of-bounds data.
 	 *
-	 * @param ontologyDataManager
 	 * @param workbook
 	 * @param programUUID
 	 * @return

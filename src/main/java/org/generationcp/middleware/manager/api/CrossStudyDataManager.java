@@ -55,7 +55,7 @@ public interface CrossStudyDataManager {
 	 * @param environmentIds
 	 * @return List of NumericTraitInfo
 	 */
-	List<NumericTraitInfo> getTraitsForNumericVariates(List<Integer> environmentIds);
+	List<NumericTraitInfo> getTraitsForNumericVariates(List<Integer> environmentIds, List<Integer> traitIds);
 
 	/**
 	 * Retrieves a set of standard variables (traits) used for the character variates observed in given list of environments. Character
@@ -64,7 +64,7 @@ public interface CrossStudyDataManager {
 	 * @param environmentIds
 	 * @return List of CharacterTraitInfo
 	 */
-	List<CharacterTraitInfo> getTraitsForCharacterVariates(List<Integer> environmentIds);
+	List<CharacterTraitInfo> getTraitsForCharacterVariates(List<Integer> environmentIds, List<Integer> traitIds);
 
 	/**
 	 * Retrieve a set of standard variables (traits) used for the categorical variables observed in given list of environments. Categorical
@@ -73,7 +73,7 @@ public interface CrossStudyDataManager {
 	 * @param environmentIds
 	 * @return List of CategoricalTraitInfo
 	 */
-	List<CategoricalTraitInfo> getTraitsForCategoricalVariates(List<Integer> environmentIds);
+	List<CategoricalTraitInfo> getTraitsForCategoricalVariates(List<Integer> environmentIds, List<Integer> traitIds);
 
 	/**
 	 * Given a list of pairs of GIDs, return all environments where any of the pair of GIDs have been observed. Both the GIDs in a pair must

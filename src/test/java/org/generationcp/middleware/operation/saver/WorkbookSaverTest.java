@@ -33,16 +33,20 @@ import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.generationcp.middleware.utils.test.VariableTypeListDataUtil;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,14 +59,19 @@ import java.util.Random;
 
 public class WorkbookSaverTest extends TestOutputFormatter {
 
-	private static WorkbookSaver workbookSaver;
+	private WorkbookSaver workbookSaver;
 
 	private static final String COOPERATOR = "Cooperator";
 	private static final int COOPERATOR_NAME = 8373;
 
-	@BeforeClass
-	public static void setUp() {
-		WorkbookSaverTest.workbookSaver = new WorkbookSaver(Mockito.mock(HibernateSessionProvider.class));
+	@Mock
+	private DaoFactory daoFactory;
+
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		this.workbookSaver = new WorkbookSaver(Mockito.mock(HibernateSessionProvider.class));
+		this.workbookSaver.setDaoFactory(this.daoFactory);
 	}
 
 	@Test
@@ -71,7 +80,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final VariableTypeList trialVariables = VariableTypeListDataUtil.createVariableTypeList(true);
 
 		final VariableTypeList plotVariables =
-				WorkbookSaverTest.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
+			this.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
 
 		Assert.assertEquals("Expected an aditional entry for trial instance but found none.", effectVariables.size() + 1,
 				plotVariables.size());
@@ -110,7 +119,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final VariableTypeList trialVariables = VariableTypeListDataUtil.createVariableTypeList(false);
 
 		final VariableTypeList plotVariables =
-				WorkbookSaverTest.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
+			this.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
 
 		Assert.assertEquals("Expected an aditional entry for trial instance but found none.", effectVariables.size() + 1,
 				plotVariables.size());
@@ -124,7 +133,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final VariableTypeList trialVariables = VariableTypeListDataUtil.createVariableTypeList(false);
 
 		final VariableTypeList plotVariables =
-				WorkbookSaverTest.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
+			this.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
 
 		Assert.assertEquals("Expected no change in the plot dataset but found one.", effectVariables.size(), plotVariables.size());
 	}
@@ -135,7 +144,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final VariableTypeList trialVariables = null;
 
 		final VariableTypeList plotVariables =
-				WorkbookSaverTest.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
+			this.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
 
 		Assert.assertEquals("Expected no change in the plot dataset but found one.", effectVariables.size(), plotVariables.size());
 	}
@@ -145,7 +154,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyTypeDto.getNurseryDto(), "TEST STUDY", 1, true);
 		final VariableTypeList variableTypeList = this.createVariableTypeList(workbook.getConstants(), 1);
 		Assert.assertTrue("The variable type list should have contents.", variableTypeList.getVariableTypes().size() > 0);
-		WorkbookSaverTest.workbookSaver.removeConstantsVariables(variableTypeList, workbook.getConstants());
+		this.workbookSaver.removeConstantsVariables(variableTypeList, workbook.getConstants());
 		Assert.assertEquals("All the variable should be removed.", 0, variableTypeList.getVariableTypes().size());
 	}
 
@@ -154,14 +163,14 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyTypeDto.getNurseryDto(), "TEST STUDY", 1, true);
 		WorkbookTestDataInitializer.setTrialObservations(workbook);
 		final VariableTypeList variableTypeList = this.createVariableTypeList(workbook.getConditions(), 1);
-		final VariableList variableList = WorkbookSaverTest.workbookSaver.getVariableListTransformer()
+		final VariableList variableList = this.workbookSaver.getVariableListTransformer()
 				.transformTrialEnvironment(workbook.getTrialObservation(0), variableTypeList);
 
 		for (final Variable variable : variableList.getVariables()) {
 			// set values to null to check if the values are really set properly
 			variable.setValue(null);
 		}
-		WorkbookSaverTest.workbookSaver.setVariableListValues(variableList, workbook.getConditions());
+		this.workbookSaver.setVariableListValues(variableList, workbook.getConditions());
 
 		for (final Variable variable : variableList.getVariables()) {
 			Assert.assertNotNull(variable.getValue());
@@ -173,7 +182,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final MeasurementVariable mvar = MeasurementVariableTestDataInitializer.createMeasurementVariable(1001, "1");
 		mvar.setPossibleValues(ValueReferenceTestDataInitializer.createPossibleValues());
 		final Variable variable = new Variable();
-		WorkbookSaverTest.workbookSaver.setCategoricalVariableValues(mvar, variable);
+		this.workbookSaver.setCategoricalVariableValues(mvar, variable);
 		Assert.assertNotNull(variable.getValue());
 		Assert.assertEquals("1", variable.getValue());
 	}
@@ -183,14 +192,14 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(false);
 		final VariableTypeList variables = null;
 
-		final VariableTypeList plotVariables = WorkbookSaverTest.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, variables);
+		final VariableTypeList plotVariables = this.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, variables);
 
 		Assert.assertEquals("Expected no change in the plot dataset but found one.", effectVariables.size(), plotVariables.size());
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Test
-	public void testSaveVariables() throws Exception {
+	public void testSaveVariables() {
 
 		final String programUUID = "abc";
 		final String studyName = "nursery_1" + new Random().nextInt(10000);
@@ -255,9 +264,9 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		standardVariable.setName(measurementVariable.getName());
 		standardVariable.setDescription(measurementVariable.getDescription());
 
-		final Integer methodId = new Random().nextInt(10000);
-		final Integer propertyId = new Random().nextInt(10000);
-		final Integer scaleId = new Random().nextInt(10000);
+		final int methodId = new Random().nextInt(10000);
+		final int propertyId = new Random().nextInt(10000);
+		final int scaleId = new Random().nextInt(10000);
 
 		standardVariable.setMethod(new Method(new Term(methodId, measurementVariable.getMethod(), "Method Description")));
 		standardVariable.setProperty(new Property(new Term(propertyId, measurementVariable.getProperty(), "Property Description")));
@@ -317,7 +326,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 		}
 
-		WorkbookSaverTest.workbookSaver.removeDeletedVariablesAndObservations(workbook);
+		this.workbookSaver.removeDeletedVariablesAndObservations(workbook);
 
 		Assert.assertEquals(0, workbook.getTrialObservations().get(0).getMeasurementVariables().size());
 	}
@@ -326,10 +335,11 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	public void testAssignLocationVariableWithUnspecifiedLocationIfEmptyValueIsEmpty() {
 
 		final LocationDAO locationDAO = Mockito.mock(LocationDAO.class);
+		Mockito.when(this.daoFactory.getLocationDAO()).thenReturn(locationDAO);
 		final VariableList variableList = new VariableList();
 
 		// Set the LOCATION_ID variable value to empty
-		final Variable locationVariable = createLocationVariable();
+		final Variable locationVariable = this.createLocationVariable();
 		locationVariable.setValue(null);
 		variableList.add(locationVariable);
 
@@ -339,7 +349,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final List<Location> locations = Arrays.asList(unspecifiedLocation);
 		Mockito.when(locationDAO.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL)).thenReturn(locations);
 
-		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, locationDAO);
+		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, locations);
 
 		Assert.assertEquals(String.valueOf(unspecifiedLocationlocid), locationVariable.getValue());
 
@@ -351,17 +361,18 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final List<Location> nullLocation = new ArrayList<>();
 		Mockito.when(locationDAO.getByIds(invalidLocationId)).thenReturn(nullLocation);
 
-		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, locationDAO);
-		Assert.assertEquals(String.valueOf(unspecifiedLocationlocid), locationVariable.getValue());
+		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, nullLocation);
+		Assert.assertEquals("", locationVariable.getValue());
 	}
 
 	@Test
 	public void testAssignLocationVariableWithUnspecifiedLocationIfLocationIdExists() {
 
 		final LocationDAO locationDAO = Mockito.mock(LocationDAO.class);
+		Mockito.when(this.daoFactory.getLocationDAO()).thenReturn(locationDAO);
 		final VariableList variableList = new VariableList();
 
-		final Variable locationVariable = createLocationVariable();
+		final Variable locationVariable = this.createLocationVariable();
 		// Set the value of LOCATION_ID variable
 		final String locationIdVariableValue = "999";
 		locationVariable.setValue(locationIdVariableValue);
@@ -379,7 +390,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		retrievedLocation.add(existingLocation);
 
 		Mockito.when(locationDAO.getByIds(existingLocationId)).thenReturn(retrievedLocation);
-		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, locationDAO);
+		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, retrievedLocation);
 
 		Assert.assertEquals(Integer.valueOf(locationIdVariableValue), retrievedLocation.get(0).getLocid());
 
@@ -399,14 +410,14 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	}
 
 	private List<MeasurementRow> createObservations(final int noOfTrialInstances, final Workbook workbook) {
-		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		final List<MeasurementRow> observations = new ArrayList<>();
 
 		MeasurementRow row;
 		List<MeasurementData> dataList;
 
 		for (int i = 0; i < noOfTrialInstances; i++) {
 			row = new MeasurementRow();
-			dataList = new ArrayList<MeasurementData>();
+			dataList = new ArrayList<>();
 
 			MeasurementData data = new MeasurementData();
 			data = new MeasurementData(WorkbookSaverTest.COOPERATOR, "COOPERATOR_NAME");

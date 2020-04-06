@@ -11,9 +11,6 @@
 
 package org.generationcp.middleware.dao.oms;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -26,6 +23,9 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DAO class for {@link CVTermRelationship}.
@@ -266,11 +266,10 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 	public List<String> getCategoriesUsedInStudies(final int scaleId) {
 		try {
 			final List<String> allCategories = new ArrayList<>();
-			allCategories.addAll(getScaleCategoriesUsedInObservations(scaleId));
-			allCategories.addAll(getScaleCategoriesUsedAsConditions(scaleId));
-			allCategories.addAll(getScaleCategoriesUsedAsGermplasmDescriptors(scaleId));
-			allCategories.addAll(getScaleCategoriesUsedAsTrialDesignFactors(scaleId));
-			allCategories.addAll(getScaleCategoriesUsedAsEnvironmentFactors(scaleId));
+			allCategories.addAll(this.getScaleCategoriesUsedInObservations(scaleId));
+			allCategories.addAll(this.getScaleCategoriesUsedAsConditions(scaleId));
+			allCategories.addAll(this.getScaleCategoriesUsedAsGermplasmDescriptors(scaleId));
+			allCategories.addAll(this.getScaleCategoriesUsedAsTrialDesignFactors(scaleId));
 			return allCategories;
 		} catch (final HibernateException e) {
 			final String message = "Error in getCategoriesUsedInStudies in CVTermRelationshipDao: "
@@ -282,12 +281,12 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 	}
 
 	@SuppressWarnings("unchecked")
-	protected List<String> getScaleCategoriesUsedInObservations(final int scaleId) {
+	List<String> getScaleCategoriesUsedInObservations(final int scaleId) {
 		final SQLQuery query = this.getSession().createSQLQuery(
 				"SELECT v.name category "
 				+ " FROM cvterm_relationship scale_values "
 				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id "
-				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE.getId() 
+				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE.getId()
 				+ " AND EXISTS ( "
 				+ "     SELECT 1    	 "
 				+ "     FROM phenotype p "
@@ -301,13 +300,13 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 	}
 
 	@SuppressWarnings("unchecked")
-	protected List<String> getScaleCategoriesUsedAsConditions(final int scaleId) {
+	List<String> getScaleCategoriesUsedAsConditions(final int scaleId) {
 		final SQLQuery query = this.getSession().createSQLQuery(
 				"SELECT categ.name category "
 				+ " FROM cvterm_relationship scale_values "
 				+ " INNER JOIN cvterm categ ON categ.cvterm_id = scale_values.object_id "
-				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE.getId() 
-				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE.getId() 
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE.getId()
+				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE.getId()
 				+ " AND EXISTS ( "
 				+ "     SELECT 1    	 "
 				+ "     FROM projectprop pp "
@@ -317,14 +316,14 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		query.addScalar("category", CVTermRelationshipDao.STRING);
 		return query.list();
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	protected List<String> getScaleCategoriesUsedAsGermplasmDescriptors(final int scaleId) {
+	List<String> getScaleCategoriesUsedAsGermplasmDescriptors(final int scaleId) {
 		final SQLQuery query = this.getSession().createSQLQuery(
 				"SELECT categ.name category "
 				+ " FROM cvterm_relationship scale_values "
 				+ " INNER JOIN cvterm categ ON categ.cvterm_id = scale_values.object_id "
-				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE.getId() 
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE.getId()
 				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE.getId()
 				+ " AND EXISTS ( "
 				+ "      SELECT 1 "
@@ -336,26 +335,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		query.addScalar("category", CVTermRelationshipDao.STRING);
 		return query.list();
 	}
-	
-	@SuppressWarnings("unchecked")
-	protected List<String> getScaleCategoriesUsedAsEnvironmentFactors(final int scaleId) {
-		final SQLQuery query = this.getSession().createSQLQuery(
-				"SELECT categ.name category "
-				+ " FROM cvterm_relationship scale_values "
-				+ " INNER JOIN cvterm categ ON categ.cvterm_id = scale_values.object_id "
-				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE.getId() 
-				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE.getId() 
-				+ " AND EXISTS ( "
-				+ "      SELECT 1 "
-				+ "      FROM nd_geolocationprop gp "
-				+ "      INNER JOIN nd_experiment ep on ep.nd_geolocation_id = gp.nd_geolocation_id "
-				+ "      INNER JOIN project pr ON pr.project_id =ep.project_id and pr.deleted = 0 "
-				+ "      WHERE gp.type_id = var.subject_id and gp.value = categ.cvterm_id)");
-		query.setParameter("scaleId", scaleId);
-		query.addScalar("category", CVTermRelationshipDao.STRING);
-		return query.list();
-	}
-	
+
 	@SuppressWarnings("unchecked")
 	protected List<String> getScaleCategoriesUsedAsTrialDesignFactors(final int scaleId) {
 		final SQLQuery query = this.getSession().createSQLQuery(

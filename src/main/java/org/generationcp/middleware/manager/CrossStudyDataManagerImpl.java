@@ -67,18 +67,18 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	}
 
 	@Override
-	public List<NumericTraitInfo> getTraitsForNumericVariates(final List<Integer> environmentIds) {
-		return this.getTraitBuilder().getTraitsForNumericVariates(environmentIds);
+	public List<NumericTraitInfo> getTraitsForNumericVariates(final List<Integer> environmentIds, final List<Integer> traitIds) {
+		return this.getTraitBuilder().getTraitsForNumericVariates(environmentIds, traitIds);
 	}
 
 	@Override
-	public List<CharacterTraitInfo> getTraitsForCharacterVariates(final List<Integer> environmentIds) {
-		return this.getTraitBuilder().getTraitsForCharacterVariates(environmentIds);
+	public List<CharacterTraitInfo> getTraitsForCharacterVariates(final List<Integer> environmentIds, final List<Integer> traitIds) {
+		return this.getTraitBuilder().getTraitsForCharacterVariates(environmentIds, traitIds);
 	}
 
 	@Override
-	public List<CategoricalTraitInfo> getTraitsForCategoricalVariates(final List<Integer> environmentIds) {
-		return this.getTraitBuilder().getTraitsForCategoricalVariates(environmentIds);
+	public List<CategoricalTraitInfo> getTraitsForCategoricalVariates(final List<Integer> environmentIds, final List<Integer> traitIds) {
+		return this.getTraitBuilder().getTraitsForCategoricalVariates(environmentIds, traitIds);
 	}
 
 	@Override

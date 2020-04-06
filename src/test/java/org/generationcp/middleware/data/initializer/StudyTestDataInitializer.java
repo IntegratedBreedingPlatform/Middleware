@@ -36,7 +36,7 @@ public class StudyTestDataInitializer {
 	public static final String STUDY_NAME = "STUDY NAME";
 	public static final String STUDY_DESCRIPTION = "STUDY DESCRIPTION";
 	public static final Integer STUDY_ID = 10010;
-	public static final int PARENT_FOLDER_ID = 1;
+	private static final int PARENT_FOLDER_ID = 1;
 	private static final String TEST_FOLDER_NAME = "TEST_FOLDER_NAME";
 	private static final String TEST_FOLDER_DESC = "TEST_FOLDER_DESC";
 	public static final String DATASET_NAME = "DATA SET NAME";
@@ -135,7 +135,6 @@ public class StudyTestDataInitializer {
 		studyValues.setVariableList(variableList);
 
 		final VariableList locationVariableList = this.createEnvironment("Description", "1.0", "2.0", "data", "3.0", "RCBD");
-		this.geolocationId = this.studyDataManager.addTrialEnvironment(locationVariableList);
 		studyValues.setLocationId(this.geolocationId);
 
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
@@ -148,7 +147,14 @@ public class StudyTestDataInitializer {
 		return studyValues;
 	}
 
-	private Variable createVariable(final int termId, final String value, final int rank, final PhenotypicType type) throws Exception {
+	private Variable createVariable(final int termId, final String value, final int rank, final String name) {
+		final Variable variable = new Variable();
+		variable.setValue(value);
+		variable.setVariableType(this.createVariableType(termId, name, "", rank));
+		return variable;
+	}
+
+	private Variable createVariable(final int termId, final String value, final int rank, final PhenotypicType type) {
 		final StandardVariable stVar = this.ontologyManager.getStandardVariable(termId, this.commonTestProject.getUniqueID());
 
 		final DMSVariableType vtype = new DMSVariableType();
@@ -177,13 +183,12 @@ public class StudyTestDataInitializer {
 	}
 
 	public VariableList createEnvironmentWithLocationAndSeason(
-		final String trialInstance, final String siteName, final String locationId, final String seasonId)
-		throws Exception {
+		final String trialInstance, final String siteName, final String locationId, final String seasonId) {
 		final VariableList variableList = new VariableList();
-		variableList.add(this.createVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstance, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(TermId.TRIAL_LOCATION.getId(), siteName, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(TermId.LOCATION_ID.getId(), locationId, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(TermId.SEASON_VAR.getId(), seasonId, 0, PhenotypicType.TRIAL_ENVIRONMENT));
+		variableList.add(this.createVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstance, 1, TermId.TRIAL_INSTANCE_FACTOR.name()));
+		variableList.add(this.createVariable(TermId.TRIAL_LOCATION.getId(), siteName, 2, TermId.TRIAL_LOCATION.name()));
+		variableList.add(this.createVariable(TermId.LOCATION_ID.getId(), locationId, 3, TermId.LOCATION_ID.name()));
+		variableList.add(this.createVariable(TermId.SEASON_VAR.getId(), seasonId, 4, TermId.SEASON_VAR.name()));
 		return variableList;
 	}
 
@@ -201,7 +206,7 @@ public class StudyTestDataInitializer {
 	}
 
 	public DmsProject createFolderTestData(final String uniqueId) {
-		return createFolderTestData(uniqueId, null);
+		return this.createFolderTestData(uniqueId, null);
 	}
 
 	public DmsProject createFolderTestData(final String uniqueId, final Integer parentId) {
@@ -244,7 +249,7 @@ public class StudyTestDataInitializer {
 		return this.studyDataManager.addDataSet(studyId, typeList, datasetValues, null, DatasetTypeEnum.MEANS_DATA.getId());
 	}
 
-	public DatasetReference addTestDataset(final int studyId, final int datasetTypeId) throws Exception {
+	public DatasetReference addTestDataset(final int studyId, final int datasetTypeId) {
 		final VariableTypeList typeList = new VariableTypeList();
 
 		final DatasetValues datasetValues = new DatasetValues();
@@ -272,26 +277,22 @@ public class StudyTestDataInitializer {
 		final DatasetReference dataSet =
 			this.studyDataManager.addDataSet(studyId, new VariableTypeList(), datasetValues, null, DatasetTypeEnum.SUMMARY_DATA.getId());
 
-		this.geolocationId = this.addEnvironmentToDataset(crop, dataSet.getId(), 1, locationId, seasonId);
+		this.addEnvironmentToDataset(crop, dataSet.getId(), 1, locationId, seasonId);
 
 		return dataSet.getId();
 	}
 
-	public Integer addEnvironmentToDataset(final CropType crop, final Integer datasetId, final Integer trialInstance, final String locationId, final String seasonId)
+	public void addEnvironmentToDataset(final CropType crop, final Integer datasetId, final Integer trialInstance, final String locationId, final String seasonId)
 		throws Exception {
 		final VariableList
 			locationVariableList = this.createEnvironmentWithLocationAndSeason(String.valueOf(trialInstance), "SOME SITE NAME", locationId, seasonId);
-		final int geolocationId = this.studyDataManager.addTrialEnvironment(locationVariableList);
-
 		final ExperimentValues experimentValue = new ExperimentValues();
-		experimentValue.setLocationId(geolocationId);
+		experimentValue.setVariableList(locationVariableList);
+		experimentValue.setObservationUnitNo(trialInstance);
 		this.studyDataManager.addExperiment(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
-
-		return geolocationId;
 	}
 
-	private DMSVariableType createVariableType(final int termId, final String name, final String description, final int rank)
-		throws Exception {
+	private DMSVariableType createVariableType(final int termId, final String name, final String description, final int rank) {
 		final StandardVariable stdVar = this.ontologyManager.getStandardVariable(termId, this.commonTestProject.getUniqueID());
 		final DMSVariableType vtype = new DMSVariableType();
 		vtype.setLocalName(name);
@@ -308,11 +309,11 @@ public class StudyTestDataInitializer {
 	}
 
 	public Integer getStockId() {
-		return stockId;
+		return this.stockId;
 	}
 
 	public Integer getGeolocationId() {
-		return geolocationId;
+		return this.geolocationId;
 	}
 
 	public Integer addTestLocation(final String locationName) {
