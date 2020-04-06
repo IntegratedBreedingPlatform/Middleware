@@ -315,19 +315,5 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="darla" id="v14.3.0-14">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<indexExists tableName="nd_experiment" indexName="nd_experiment_parent_id"/>
-			</not>
-		</preConditions>
-		<comment>
-			Create index for nd_experiment.parent_id
-		</comment>
-		<createIndex indexName="nd_experiment_parent_id" tableName="nd_experiment"
-					 unique="false">
-			<column name="parent_id" type="int" />
-		</createIndex>
-	</changeSet>
 
 </databaseChangeLog>
