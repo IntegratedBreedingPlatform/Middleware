@@ -62,7 +62,7 @@
 	</changeSet>
 
 	<changeSet author="clarysabel" id="v14.4.0-4">
-		<preConditions onFail="CONTINUE">
+		<preConditions onFail="MARK_RAN">
 			<and>
 				<columnExists tableName="ims_lot" columnName="locid"/>
 				<sqlCheck expectedResult="0">
@@ -90,7 +90,7 @@
 	</changeSet>
 
 	<changeSet author="clarysabel" id="v14.4.0-5">
-		<preConditions onFail="CONTINUE">
+		<preConditions onFail="MARK_RAN">
             <and>
                 <not>
                     <foreignKeyConstraintExists foreignKeyName="location_fk_idx"></foreignKeyConstraintExists>
