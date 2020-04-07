@@ -26,25 +26,33 @@
 					select count(1) from location l
 					where l.ldefault = 1 and l.ltype = (select u.fldno from udflds u where u.ftable='LOCATION' and u.ftype='LTYPE' and fcode='SSTORE')
 				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					select count(1) from location where locid=6000
+				</sqlCheck>
 			</and>
 		</preConditions>
 
 		<comment>Set DSS as default storage location</comment>
 
         <sql dbms="mysql">
-			update location set ldefault = 1 where
-			ltype = (select u.fldno from udflds u where u.ftable='LOCATION' and u.ftype='LTYPE' and fcode='SSTORE') and labbr='DSS'
+			update location set ldefault = 1 where locid=6000
 		</sql>
 	</changeSet>
 
 	<changeSet author="clarysabel" id="v14.4.0-3">
 		<preConditions onFail="MARK_RAN">
-			<not>
-				<sqlCheck expectedResult="0">
-					select count(1) from ims_lot l
-					where l.locid is null;
+			<and>
+				<columnExists tableName="location" columnName="ldefault"/>
+				<not>
+					<sqlCheck expectedResult="0">
+						select count(1) from ims_lot l
+						where l.locid is null;
+					</sqlCheck>
+				</not>
+				<sqlCheck expectedResult="1">
+					select count(1) from location l where l.ltype = (select u.fldno from udflds u where u.ftable='LOCATION' and u.ftype='LTYPE' and fcode='SSTORE') and l.ldefault=1
 				</sqlCheck>
-			</not>
+			</and>
 		</preConditions>
 		<comment>Set the default storage location to the lots with no locations</comment>
 		<sql dbms="mysql">
@@ -54,7 +62,7 @@
 	</changeSet>
 
 	<changeSet author="clarysabel" id="v14.4.0-4">
-		<preConditions onFail="MARK_RAN">
+		<preConditions onFail="CONTINUE">
 			<and>
 				<columnExists tableName="ims_lot" columnName="locid"/>
 				<sqlCheck expectedResult="0">
@@ -82,7 +90,7 @@
 	</changeSet>
 
 	<changeSet author="clarysabel" id="v14.4.0-5">
-		<preConditions onFail="MARK_RAN">
+		<preConditions onFail="CONTINUE">
             <and>
                 <not>
                     <foreignKeyConstraintExists foreignKeyName="location_fk_idx"></foreignKeyConstraintExists>
