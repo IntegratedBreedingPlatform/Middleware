@@ -1169,6 +1169,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				"	case when max(if(geoprop.type_id = 8583, geoprop.value, null)) is null then 0 else 1 end as hasFieldmap, \n"
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
 
+				// if instance has X/Y coordinates (fieldmap or row/col design)
+				+ "	case when (max(if(geoprop.type_id = 8583, geoprop.value, null)) is null) \n "
+				+ "		and (max(hasRowColDesign.nd_experiment_id)) is null \n"
+				+ " 	then 0 else 1 end as hasFieldLayout, \n"
+
+				// if instance has been georeferenced using the geojson editor
+				+ "  max(case when json_props like '%geoCoordinates%' then 1 else 0 end) as hasGeoJSON, \n"
+
 				// If study has any plot experiments, hasExperimentalDesign flag = true
 				+ "  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
 				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
@@ -1191,6 +1199,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "    inner join project proj on proj.project_id = nde.project_id \n"
 				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
+				+ " left join ( \n"
+				+ " select ndep.nd_experiment_id \n"
+				+ "     from nd_experimentprop ndep \n"
+				+ "         INNER JOIN cvterm cvt ON cvt.cvterm_id = ndep.type_id \n"
+				+ "     WHERE cvt.name = 'ROW' \n"
+				+ " ) hasRowColDesign on nde.nd_experiment_id = hasRowColDesign.nd_experiment_id "
 				+ " where proj.project_id = :datasetId \n";
 			final StringBuilder sb = new StringBuilder(sql);
 			if (!CollectionUtils.isEmpty(instanceIds)) {
@@ -1211,6 +1225,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("locationAbbreviation", new StringType());
 			query.addScalar("customLocationAbbreviation", new StringType());
 			query.addScalar("hasFieldmap", new BooleanType());
+			query.addScalar("hasGeoJSON", new BooleanType());
+			query.addScalar("hasFieldLayout", new BooleanType());
 			query.addScalar("instanceNumber", new IntegerType());
 			query.addScalar("hasExperimentalDesign", new BooleanType());
 			query.addScalar("canBeDeleted", new BooleanType());
