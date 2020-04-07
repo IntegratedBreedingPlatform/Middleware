@@ -6,7 +6,6 @@ import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
