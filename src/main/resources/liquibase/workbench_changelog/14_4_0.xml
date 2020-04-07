@@ -42,7 +42,7 @@
                 SELECT count(*) FROM permission where name = 'CANCEL_PENDING_TRANSACTIONS'
             </sqlCheck>
         </preConditions>
-        <comment>Create permission to Cancel pending transactions</comment>
+        <comment>Create permission to cancel pending transactions</comment>
 		<sql dbms="mysql" splitStatements="true">
 			set @manage_transactions_id = (select permission_id from permission where name = 'MANAGE_TRANSACTIONS');
 
