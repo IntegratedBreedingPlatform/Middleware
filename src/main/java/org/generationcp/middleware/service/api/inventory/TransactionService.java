@@ -40,6 +40,6 @@ public interface TransactionService {
 
 	void depositLots(Integer userId, Set<Integer> lotIds, LotDepositRequestDto lotDepositRequestDto, TransactionStatus transactionStatus);
 
-	void cancelPendingTransactions(List<TransactionDto> confirmedTransactionDtoList);
+	void cancelPendingTransactions(List<TransactionDto> transactionDtoList);
 
 }
