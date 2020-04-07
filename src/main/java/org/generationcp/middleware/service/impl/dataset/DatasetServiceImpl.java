@@ -1024,11 +1024,10 @@ public class DatasetServiceImpl implements DatasetService {
 
 						}
 						if (measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
-							try {
-								// In case the date is in yyyy-MM-dd format, try to parse it as number format yyyyMMdd
-								importedVariableValue = Util.convertDate(importedVariableValue, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
-							} catch (ParseException e) {
-								// Do nothing
+							// In case the date is in yyyy-MM-dd format, try to parse it as number format yyyyMMdd
+							final String parsedDate = Util.tryConvertDate(importedVariableValue, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
+							if (parsedDate != null) {
+								importedVariableValue = parsedDate;
 							}
 						}
 
