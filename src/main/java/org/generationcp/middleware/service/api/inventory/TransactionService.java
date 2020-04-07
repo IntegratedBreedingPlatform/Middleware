@@ -29,7 +29,8 @@ public interface TransactionService {
 	 * @param lotWithdrawalInputDto
 	 * @param transactionStatus
 	 */
-	void withdrawLots(Integer userId, Set<Integer> lotIds, LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus) ;
+	void withdrawLots(
+		Integer userId, Set<Integer> lotIds, LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus);
 
 	void confirmPendingTransactions(List<TransactionDto> confirmedTransactionDtoList);
 
@@ -38,5 +39,7 @@ public interface TransactionService {
 	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
 
 	void depositLots(Integer userId, Set<Integer> lotIds, LotDepositRequestDto lotDepositRequestDto, TransactionStatus transactionStatus);
+
+	void cancelPendingTransactions(List<TransactionDto> transactionDtoList);
 
 }
