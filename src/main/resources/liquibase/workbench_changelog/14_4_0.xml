@@ -47,7 +47,7 @@
 			set @manage_transactions_id = (select permission_id from permission where name = 'MANAGE_TRANSACTIONS');
 
 			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
-			values ('CANCEL_PENDING_TRANSACTIONS', 'Cancel pending transactions', @manage_transactions_id, null);
+			values ('CANCEL_PENDING_TRANSACTIONS', 'Cancel Pending Transactions', @manage_transactions_id, null);
 			set @last_permission_id  = (select last_insert_id());
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
