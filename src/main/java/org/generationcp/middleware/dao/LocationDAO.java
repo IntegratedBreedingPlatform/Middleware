@@ -446,7 +446,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
 					.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
 					.append(" ud.fname as location_type,").append(" ud.fdesc as location_description, l.program_uuid,")
-					.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id")
+					.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id, l.ldefault")
 					.append(" from location l").append(" left join georef g on l.locid = g.locid")
 					.append(" left join cntry c on l.cntryid = c.cntryid").append(" left join udflds ud on ud.fldno = l.ltype")
 					.append(" ,location province");
@@ -896,7 +896,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
 					.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
 					.append(" ud.fname as location_type,").append(" ud.fdesc as location_description, l.program_uuid")
-					.append(" ,c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id")
+					.append(" ,c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id, l.ldefault as ldefault")
 					.append(" FROM location l").append(" LEFT JOIN georef g on l.locid = g.locid")
 					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid").append(" LEFT JOIN udflds ud on ud.fldno = l.ltype")
 					.append(" ,location province ").append(" WHERE (l.program_uuid = '").append(programUUID).append("'")
