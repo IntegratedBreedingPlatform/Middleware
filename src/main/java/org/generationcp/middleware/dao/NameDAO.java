@@ -28,6 +28,8 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -418,8 +420,13 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			keyword1 = keyword1.replaceAll("\\s", "");
 			keyword2 = keyword2.replaceAll("\\s", "");
 			final StringBuilder sql = new StringBuilder();
-			sql.append("SELECT nval FROM names ").append(" WHERE (REPLACE(nval, ' ', '') LIKE '").append(keyword1).append("'")
-					.append(" OR REPLACE(nval, ' ', '') LIKE '").append(keyword2).append("')");
+			sql.append("SELECT n.nval FROM names n ")
+				.append(" INNER JOIN germplsm g ON g.gid = n.gid ")
+				.append(" WHERE (REPLACE(n.nval, ' ', '') LIKE '")
+				.append(keyword1).append("'")
+				.append(" OR REPLACE(n.nval, ' ', '') LIKE '")
+				.append(keyword2).append("') ")
+				.append(" AND g.deleted = 0 ");
 
 			final Query query = this.getSession().createSQLQuery(sql.toString());
 			return query.list();
@@ -491,6 +498,36 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return map;
+	}
+
+	public List<String> getNamesByGidsAndPrefixes(final List<Integer> gids, final List<String> prefixes) {
+		try {
+			final StringBuilder sql = new StringBuilder();
+			sql.append("SELECT nval FROM names WHERE gid IN (:gids) ")
+				.append(" AND ( ");
+
+			final int prefixesSize = prefixes.size();
+			for (int i=0; i<prefixesSize; i++) {
+				String prefix = prefixes.get(i) + "%";
+				prefix = prefix.replaceAll("\\s", "");
+				sql.append(" nval LIKE '" + prefix + "'");
+				if(i+1 != prefixesSize) {
+					sql.append(" OR ");
+				}
+			}
+			sql.append(" ) ");
+
+			final Query query = this.getSession().createSQLQuery(sql.toString());
+			query.setParameterList("gids", gids);
+			return query.list();
+
+		} catch (final HibernateException e) {
+			final String message = "Error with getNamesByGidsAndPrefixes(gids=" + gids + ", prefixes=" + prefixes
+				+") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
+
 	}
 
 	@SuppressWarnings("unchecked")
