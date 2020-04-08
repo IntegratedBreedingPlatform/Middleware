@@ -39,6 +39,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.KeySequenceRegister;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -47,10 +48,12 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
+import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -59,6 +62,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -67,6 +71,9 @@ import java.util.Set;
  */
 @Transactional
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
+
+	@Resource
+	private KeySequenceRegisterService keySequenceRegisterService;
 
 	private DaoFactory daoFactory;
 
@@ -1431,6 +1438,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public List<String> getNamesByGidsAndPrefixes(final List<Integer> gids, final List<String> prefixes) {
+		return this.getNameDao().getNamesByGidsAndPrefixes(gids, prefixes);
+	}
+
+	@Override
 	public Map<Integer, String> getImmediateSourcePreferredNamesByGids(final List<Integer> gids) {
 		return this.getNameDao().getImmediatePreferredNamesByGids(gids);
 	}
@@ -1588,6 +1600,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Attribute> getAttributeByIds(final List<Integer> ids) {
 		return this.getAttributeDao().getByIDs(ids);
+	}
+
+	@Override
+	public List<KeySequenceRegister> getKeySequenceRegistersByPrefixes(List<String> keyPrefixes) {
+		return this.keySequenceRegisterService.getKeySequenceRegistersByPrefixes(keyPrefixes);
+	}
+
+	@Override
+	public void updateKeySequenceRegister(final List<Integer> keySequenceRegisterIds) {
+		this.keySequenceRegisterService.updateKeySequenceRegister(keySequenceRegisterIds);
 	}
 
 }

@@ -101,7 +101,7 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 		keyRegister.setLastUsedSequence(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED);
 		this.keySequenceRegisterDao.save(keyRegister);
 
-		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder.getSession());
+		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder);
 		final int nextSequence = keySequenceRegisterService.getNextSequence(PREFIX);
 		Assert.assertEquals(LAST_SEQUENCE_USED + 1, nextSequence);
 	}
@@ -113,7 +113,7 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 		keyRegister.setLastUsedSequence(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED);
 		this.keySequenceRegisterDao.save(keyRegister);
 
-		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder.getSession());
+		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder);
 		final Integer newLastSequenceUsed = 51;
 		keySequenceRegisterService.saveLastSequenceUsed(KeySequenceRegisterServiceImplIntegrationTest.PREFIX, newLastSequenceUsed);
 		Assert.assertEquals(newLastSequenceUsed + 1, keySequenceRegisterService.getNextSequence(KeySequenceRegisterServiceImplIntegrationTest.PREFIX));
@@ -135,8 +135,7 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 					@Override
 					public Integer doInTransaction(final TransactionStatus status) {
 						final KeySequenceRegisterService keySequenceRegisterService =
-								new KeySequenceRegisterServiceImpl(SessionFactoryUtils.getSession(
-									KeySequenceRegisterServiceImplIntegrationTest.this.sessionFactory, false));
+								new KeySequenceRegisterServiceImpl(KeySequenceRegisterServiceImplIntegrationTest.this.sessionProvder);
 						return keySequenceRegisterService.incrementAndGetNextSequence("CML");
 					}
 				});

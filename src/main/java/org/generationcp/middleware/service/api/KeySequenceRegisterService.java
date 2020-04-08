@@ -1,5 +1,9 @@
 package org.generationcp.middleware.service.api;
 
+import org.generationcp.middleware.pojos.KeySequenceRegister;
+
+import java.util.List;
+import java.util.Map;
 
 public interface KeySequenceRegisterService {
 
@@ -55,4 +59,18 @@ public interface KeySequenceRegisterService {
 	 * @param lastSequenceUsed
 	 */
 	void saveLastSequenceUsed(String keyPrefix, Integer lastSequenceUsed);
+
+	/**
+	 * Returns the List of KeySequenceRegister given the Key Prefixes
+	 *
+	 * @param keyPrefixes
+	 */
+	List<KeySequenceRegister> getKeySequenceRegistersByPrefixes(final List<String> keyPrefixes);
+
+	/**
+	 * Updates the last used sequence value given the register ids
+	 * 
+	 * @param keySequenceRegisterIds
+	 */
+	void updateKeySequenceRegister(List<Integer> keySequenceRegisterIds);
 }

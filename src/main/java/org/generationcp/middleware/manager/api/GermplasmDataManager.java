@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.KeySequenceRegister;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -1199,4 +1200,10 @@ public interface GermplasmDataManager {
 	long countAttributesByGid(String gid, List<String> attributeDbIds);
 
 	List<Attribute> getAttributeByIds(List<Integer> ids);
+
+	List<String> getNamesByGidsAndPrefixes(List<Integer> gids, List<String> prefixes);
+
+	List<KeySequenceRegister> getKeySequenceRegistersByPrefixes(List<String> keyPrefixes);
+
+	void updateKeySequenceRegister(List<Integer> keySequenceRegisterIds);
 }
