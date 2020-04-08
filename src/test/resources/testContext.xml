@@ -227,7 +227,7 @@
 	</bean>
 
 	<bean id="keySequenceRegisterService" factory-bean="managerFactory"
-		  factory-method="getKeySequenceRegisterService">
+		  factory-method="getKeySequenceRegisterService" scope="request">
 		<aop:scoped-proxy />
 	</bean>
 
