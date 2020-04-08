@@ -31,6 +31,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.service.api.study.SeasonDto;
@@ -1074,11 +1075,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<StudyInstance> getDatasetInstances(final int datasetId) {
-		return this.getDatasetInstances(datasetId, Collections.<Integer>emptyList());
+	public List<StudyInstance> getDatasetInstances(final int datasetId, final DatasetType datasetType) {
+		return this.getDatasetInstances(datasetId, Collections.emptyList(), datasetType);
 	}
 
-	public List<StudyInstance> getDatasetInstances(final int datasetId, final List<Integer> instanceIds) {
+	public List<StudyInstance> getDatasetInstances(final int datasetId, final List<Integer> instanceIds, final DatasetType datasetType) {
 
 		try {
 			final String sql = "select \n"
@@ -1089,53 +1090,64 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				"	max(if(xprop.type_id = 8190, loc.labbr, null)) as locationAbbreviation, \n" + // 8189 = cvterm for LOCATION_ABBR
 				"	max(if(xprop.type_id = 8189, xprop.value, null)) as customLocationAbbreviation, \n" +
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
-				"	case when max(if(xprop.type_id = 8583, xprop.value, null)) is null then 0 else 1 end as hasFieldmap, \n"
+				"	case when max(if(xprop.type_id = 8583, xprop.value, null)) is null then 0 else 1 end as hasFieldmap \n";
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
 
+			final StringBuilder sb = new StringBuilder(sql);
+			final boolean isEnvironmentDataset = DatasetTypeEnum.SUMMARY_DATA.getId() == datasetType.getDatasetTypeId();
+
+			// Only get experimental design-related metadata if the dataset is environment dataset
+			if (isEnvironmentDataset) {
 				// If study has any plot experiments, hasExperimentalDesign flag = true
-				+ "  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
-				+ "  AND exp.parent_id = env.nd_experiment_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
+				sb.append(",  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 ");
+				sb.append("  AND exp.parent_id = env.nd_experiment_id) > 0 then 1 else 0 end as hasExperimentalDesign, ");
 
 				// If study has samples (plot and sub-obs levels) or sub-observations, canBeDeleted = false
-				+ "  CASE WHEN EXISTS (select 1 from sample s "
-				+ "                     inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155\n"
-				+ "                     where exp.parent_id = env.nd_experiment_id) OR "
-								// we are making a separate query for samples at the sub-obs level for optimization purposes
-				+ "            EXISTS (select 1 from sample s "
-				+ "                     inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155\n"
-				+ "                     inner join nd_experiment plot ON plot.nd_experiment_id = exp.parent_id and plot.type_id = 1155\n"
-				+ "                     where plot.parent_id = env.nd_experiment_id) OR "
-				+ "            EXISTS (select 1 from nd_experiment exp "
-				+ "                     INNER JOIN nd_experiment plot on exp.parent_id = plot.nd_experiment_id and plot.type_id = 1155\n"
-				+ "                     where exp.type_id = 1155 and plot.parent_id = env.nd_experiment_id) "
-				+ "       THEN 0 else 1 end as canBeDeleted, "
+				sb.append("  CASE WHEN EXISTS (select 1 from sample s ");
+				sb.append("                     inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155\n");
+				sb.append("                     where exp.parent_id = env.nd_experiment_id) OR ");
+				// we are making a separate query for samples at the sub-obs level for optimization purposes
+				sb.append("            EXISTS (select 1 from sample s ");
+				sb.append("                     inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155\n");
+				sb.append("                     inner join nd_experiment plot ON plot.nd_experiment_id = exp.parent_id and plot.type_id = 1155\n");
+				sb.append("                     where plot.parent_id = env.nd_experiment_id) OR ");
+				sb.append("            EXISTS (select 1 from nd_experiment exp ");
+				sb.append("                     INNER JOIN nd_experiment plot on exp.parent_id = plot.nd_experiment_id and plot.type_id = 1155\n");
+				sb.append("                     where exp.type_id = 1155 and plot.parent_id = env.nd_experiment_id) ");
+				sb.append("       THEN 0 else 1 end as canBeDeleted, ");
 
 				// if study has any pending or accepted observations (plot and sub-obs levels), hasMeasurements = true
-				+ " CASE WHEN EXISTS (select 1 from phenotype ph\n"
-				+ "                    inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155\n"
-				+ "                    where exp.parent_id = env.nd_experiment_id and\n"
-				+ "                    (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null))\n"
-								// we are making a separate query for observations at the sub-obs level for optimization purposes
-				+ "        OR EXISTS (select 1 from phenotype ph\n"
-				+ "                    inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155\n"
-				+ "                    inner JOIN nd_experiment plot ON plot.nd_experiment_id = exp.parent_id and plot.type_id = 1155\n"
-				+ "                    where plot.parent_id = env.nd_experiment_id and\n"
-				+ "                  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null))\n"
-				+ "                  then 1 else 0 end as hasMeasurements "
+				sb.append(" CASE WHEN EXISTS (select 1 from phenotype ph\n");
+				sb.append("                    inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155\n");
+				sb.append("                    where exp.parent_id = env.nd_experiment_id and\n");
+				sb.append("                    (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null))\n");
+				// we are making a separate query for observations at the sub-obs level for optimization purposes
+				sb.append("        OR EXISTS (select 1 from phenotype ph\n");
+				sb.append("                    inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155\n");
+				sb.append("                    inner JOIN nd_experiment plot ON plot.nd_experiment_id = exp.parent_id and plot.type_id = 1155\n");
+				sb.append("                    where plot.parent_id = env.nd_experiment_id and\n");
+				sb.append("                  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null))\n");
+				sb.append("                  then 1 else 0 end as hasMeasurements ");
+				sb.append(" FROM nd_experiment env ");
+			} else {
+				sb.append(" FROM nd_experiment nde ");
+				if (datasetType.isSubObservationType()) {
+					sb.append(" INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id AND plot.type_id = ").append(TermId.PLOT_EXPERIMENT.getId());
+					sb.append(" INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = ").append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+				} else {
+					sb.append(" INNER JOIN nd_experiment env ON nde.parent_id = env.nd_experiment_id AND env.type_id = ").append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+				}
+			}
 
-				// Query tables
-				+ " FROM nd_experiment nde "
-				+ " INNER JOIN project proj ON proj.project_id = nde.project_id "
-				+ " INNER JOIN project env_ds ON env_ds.study_id = proj.study_id AND env_ds.dataset_type_id = "  + DatasetTypeEnum.SUMMARY_DATA.getId()
-				+ " INNER JOIN nd_experiment env ON env_ds.project_id = env.project_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
-				+ " LEFT OUTER JOIN nd_experimentprop xprop ON xprop.nd_experiment_id = env.nd_experiment_id "
-				+ " LEFT OUTER JOIN location loc on xprop.value = loc.locid and xprop.type_id = 8190 "
-				+ " LEFT JOIN nd_experiment plot on plot.nd_experiment_id = nde.parent_id and plot.type_id = 1155 \n "
-				+ " WHERE nde.project_id = :datasetId "
-				// handle for trial, plot and sub-obs dataset types
-				+ " AND (nde.parent_id = env.nd_experiment_id or plot.parent_id = env.nd_experiment_id "
-				+ "  or nde.nd_experiment_id = env.nd_experiment_id) ";
-			final StringBuilder sb = new StringBuilder(sql);
+
+			sb.append(" LEFT OUTER JOIN nd_experimentprop xprop ON xprop.nd_experiment_id = env.nd_experiment_id ");
+			sb.append(" LEFT OUTER JOIN location loc on xprop.value = loc.locid and xprop.type_id = 8190 ");
+			if (isEnvironmentDataset) {
+				sb.append(" WHERE env.project_id = :datasetId");
+			} else {
+				sb.append(" WHERE nde.project_id = :datasetId ");
+			}
+
 			if (!CollectionUtils.isEmpty(instanceIds)) {
 				sb.append(" AND env.nd_experiment_id IN (:locationIds) \n");
 			}
@@ -1154,9 +1166,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("customLocationAbbreviation", new StringType());
 			query.addScalar("hasFieldmap", new BooleanType());
 			query.addScalar("instanceNumber", new IntegerType());
-			query.addScalar("hasExperimentalDesign", new BooleanType());
-			query.addScalar("canBeDeleted", new BooleanType());
-			query.addScalar("hasMeasurements", new BooleanType());
+			if (isEnvironmentDataset) {
+				query.addScalar("hasExperimentalDesign", new BooleanType());
+				query.addScalar("canBeDeleted", new BooleanType());
+				query.addScalar("hasMeasurements", new BooleanType());
+			}
 			query.setResultTransformer(Transformers.aliasToBean(StudyInstance.class));
 			return query.list();
 		} catch (final HibernateException he) {

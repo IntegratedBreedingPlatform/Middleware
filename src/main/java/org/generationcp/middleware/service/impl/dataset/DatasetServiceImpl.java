@@ -328,8 +328,10 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<StudyInstance> getDatasetInstances(final Integer datasetId) {
-		return this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId);
+		public List<StudyInstance> getDatasetInstances(final Integer datasetId) {
+		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
+		final DatasetType datasetType = this.daoFactory.getDatasetTypeDao().getById(datasetDTO.getDatasetTypeId());
+		return this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId, datasetType);
 	}
 
 	private List<ProjectProperty> buildDefaultDatasetProperties(
@@ -559,7 +561,8 @@ public class DatasetServiceImpl implements DatasetService {
 	public DatasetDTO getDataset(final Integer datasetId) {
 		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
 		if (datasetDTO != null) {
-			datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
+			final DatasetType datasetType = this.daoFactory.getDatasetTypeDao().getById(datasetDTO.getDatasetTypeId());
+			datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId, datasetType));
 			datasetDTO.setVariables(
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
 			datasetDTO.setHasPendingData(this.daoFactory.getPhenotypeDAO().countPendingDataOfDataset(datasetId) > 0);
