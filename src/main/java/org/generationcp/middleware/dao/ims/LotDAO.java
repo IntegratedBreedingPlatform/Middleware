@@ -655,6 +655,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	//New inventory functions, please locate them below this line to help cleaning in the near future.
 	private final String SEARCH_LOT_QUERY = "SELECT lot.lotid as lotId, " //
+		+ "  lot.lot_uuid AS lotUUID, " //
 		+ "  lot.stock_id AS stockId, " //
 		+ "  lot.eid as gid, " //
 		+ "  g.mgid as mgid, " //
@@ -863,6 +864,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(filterLotsQuery);
 			query.addScalar("lotId");
+			query.addScalar("lotUUID");
 			query.addScalar("stockId");
 			query.addScalar("gid");
 			query.addScalar("mgid");
