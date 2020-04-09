@@ -950,6 +950,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	}
 
 	public List<LotDto> getLotsByStockIds(final List<String> stockIds) {
+		if (stockIds == null || stockIds.isEmpty()) {
+			return new ArrayList<>();
+		}
 		try {
 			final String sql = "select l.lotid as lotId, " //
 				+ "  l.stock_id as stockId, " //
