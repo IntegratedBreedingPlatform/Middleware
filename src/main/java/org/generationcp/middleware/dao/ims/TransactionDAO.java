@@ -604,6 +604,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "    tr.comments AS notes,"//
 		+ "    tr.trndate as transactionDate, "//
 		+ "    lot.lotid AS lotLotId," //
+		+ "    lot.lot_uuid AS lotUUID," //
 		+ "    lot.eid AS lotGid,"//
 		+ "    n.nval AS lotDesignation,"//
 		+ "    lot.stock_id AS lotStockId,"//
@@ -813,9 +814,26 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
-			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class, Double.class, String.class, Date.class,
-				Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class, String.class,
-				Integer.class, String.class, String.class, String.class);
+			return TransactionDto.class.getConstructor(Integer.class, // transactionId
+				String.class,    // createdByUsername
+				String.class,    // transactionType
+				Double.class,    // amount
+				String.class,    // notes
+				Date.class,      // transactionDate
+				Integer.class,   // lotId
+				String.class,    // lotUUID
+				Integer.class,   // gid
+				String.class,    // designation
+				String.class,    // stockId
+				Integer.class,   // scaleId
+				String.class,    // scaleName
+				String.class,    // lotStatus
+				String.class,    // transactionStatus
+				Integer.class,   // locationId
+				String.class,    // locationName
+				String.class,    // locationAbbr
+				String.class     // comments
+			);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
 		}
@@ -829,6 +847,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("notes");
 		query.addScalar("transactionDate", Hibernate.DATE);
 		query.addScalar("lotLotId");
+		query.addScalar("lotUUID");
 		query.addScalar("lotGid");
 		query.addScalar("lotDesignation");
 		query.addScalar("lotStockId");

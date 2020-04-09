@@ -30,9 +30,10 @@ public class TransactionDto {
 	public TransactionDto(
 		final Integer transactionId, final String createdByUsername, final String transactionType, final Double amount,
 		final String notes,
-		final Date transactionDate, final Integer lotId, final Integer gid, final String designation, final String stockId,
+		final Date transactionDate, final Integer lotId, final String lotUUID, final Integer gid, final String designation, final String stockId,
 		final Integer scaleId, final String scaleName, final String lotStatus, final String transactionStatus, final Integer locationId,
 		final String locationName, final String locationAbbr, final String comments) {
+
 		this.transactionId = transactionId;
 		this.createdByUsername = createdByUsername;
 		this.transactionType = transactionType;
@@ -42,6 +43,7 @@ public class TransactionDto {
 		this.transactionStatus = transactionStatus;
 		this.lot = new ExtendedLotDto();
 		this.lot.setLotId(lotId);
+		this.lot.setLotUUID(lotUUID);
 		this.lot.setGid(gid);
 		this.lot.setStockId(stockId);
 		this.lot.setUnitId(scaleId);
