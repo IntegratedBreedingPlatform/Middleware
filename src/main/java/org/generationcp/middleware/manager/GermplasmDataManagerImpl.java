@@ -62,7 +62,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -975,9 +974,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public String getNextSequenceNumberForCrossName(final String prefix) {
+	public String getNextSequenceNumberString(final String prefix) {
 		final String nextSequenceStr;
-		nextSequenceStr = this.getGermplasmDao().getNextSequenceNumberForCrossName(prefix);
+		nextSequenceStr = this.getGermplasmDao().getNextSequenceNumber(prefix);
 		return nextSequenceStr;
 	}
 

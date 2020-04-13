@@ -758,7 +758,7 @@ public interface GermplasmDataManager {
 	 * @param prefix - String used as prefix for Germplasm Names querying
 	 * @return next available sequence number for a germplasm with given prefix
 	 */
-	String getNextSequenceNumberForCrossName(String prefix);
+	String getNextSequenceNumberString(String prefix);
 
 	/**
 	 * Returns a Map of GIDs to preferred ids given a list of GIDs.
