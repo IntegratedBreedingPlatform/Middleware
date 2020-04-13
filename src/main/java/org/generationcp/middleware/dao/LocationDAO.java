@@ -405,8 +405,10 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					final Double longitude = (Double) result[12];
 					final Double altitude = (Double) result[13];
 					final String programUUID = (String) result[14];
+					final Boolean ldefault = (Boolean) result[15];
 
 					final Location location = new Location(locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce);
+					location.setLdefault(ldefault);
 					location.setUniqueID(programUUID);
 
 					final Georef georef = new Georef();
@@ -444,7 +446,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
 					.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
 					.append(" ud.fname as location_type,").append(" ud.fdesc as location_description, l.program_uuid,")
-					.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id")
+					.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id, l.ldefault")
 					.append(" from location l").append(" left join georef g on l.locid = g.locid")
 					.append(" left join cntry c on l.cntryid = c.cntryid").append(" left join udflds ud on ud.fldno = l.ltype")
 					.append(" ,location province");
@@ -894,7 +896,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
 					.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
 					.append(" ud.fname as location_type,").append(" ud.fdesc as location_description, l.program_uuid")
-					.append(" ,c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id")
+					.append(" ,c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id, l.ldefault as ldefault")
 					.append(" FROM location l").append(" LEFT JOIN georef g on l.locid = g.locid")
 					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid").append(" LEFT JOIN udflds ud on ud.fldno = l.ltype")
 					.append(" ,location province ").append(" WHERE (l.program_uuid = '").append(programUUID).append("'")
@@ -1010,6 +1012,21 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
+	public Location getDefaultLocationByType(final Integer type) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Location.class);
+			criteria.add(Restrictions.eq("ltype", type));
+			criteria.add(Restrictions.eq("ldefault", Boolean.TRUE));
+
+			return (Location) criteria.uniqueResult();
+		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("getDefaultLocationByType", "type", String.valueOf(type), e.getMessage(), "Location"),
+				e);
+		}
+	}
+
 	private void setQueryParameters(final SQLQuery query, final Map<LocationFilters, Object> filters) {
 		for (final Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
 			final LocationFilters filter = entry.getKey();
@@ -1042,4 +1059,5 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return sqlString.toString();
 
 	}
+
 }
