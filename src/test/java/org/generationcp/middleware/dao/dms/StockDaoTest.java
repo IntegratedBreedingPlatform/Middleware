@@ -16,6 +16,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.PersonDAO;
@@ -35,6 +36,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,9 +44,11 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class StockDaoTest extends IntegrationTestBase {
 
@@ -65,6 +69,7 @@ public class StockDaoTest extends IntegrationTestBase {
 	private Geolocation environment;
 	private WorkbenchUser workbenchUser;
 	private IntegrationTestDataInitializer testDataInitializer;
+
 
 	@Before
 	public void setUp() throws Exception {
@@ -106,7 +111,6 @@ public class StockDaoTest extends IntegrationTestBase {
 		this.experiments = new ArrayList<>();
 
 		this.createSampleStocks(TEST_COUNT, project);
-
 
 	}
 
@@ -240,6 +244,23 @@ public class StockDaoTest extends IntegrationTestBase {
 			Assert.assertNull(studyReference.getOwnerName());
 			Assert.assertTrue(studyReference.getIsLocked());
 		}
+	}
+
+	@Test
+	public void testGetPlotNoToImportedGermplasmParentMap() {
+		List<StudyGermplasmDto> studyGermplasmDtoList = this.stockDao.getStudyGermplasmDtoList(this.project.getProjectId(), new HashSet<>(Arrays.asList(1, 2, 3, 4, 5)));
+
+		final List<Integer> gids = this.testStocks.stream().map(s -> s.getGermplasm().getGid()).collect(Collectors.toList());
+		for (final StudyGermplasmDto dto : studyGermplasmDtoList) {
+			final String plot = dto.getPosition();
+			Assert.assertEquals(DataSetupTest.GERMPLSM_PREFIX + plot, dto.getDesignation());
+			Assert.assertTrue(gids.contains(dto.getGermplasmId()));
+		}
+
+		//Retrieve non existent plots in study
+		studyGermplasmDtoList = this.stockDao.getStudyGermplasmDtoList(this.project.getProjectId(), new HashSet<>(Arrays.asList(51, 49)));
+		Assert.assertTrue(studyGermplasmDtoList.isEmpty());
+
 	}
 
 	private void setupParentProjects(final DmsProject parent1, final DmsProject parent2, final StockModel stockToReuse) {

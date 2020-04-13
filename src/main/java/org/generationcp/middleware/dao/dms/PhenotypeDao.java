@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.Util;
@@ -941,14 +942,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setStudyDbId((String) row[8]);
 				observationUnit.setStudyName((String) row[9]);
 				observationUnit.setProgramName((String) row[10]);
-				String x = (String) row[16]; // ROW
-				String y = (String) row[17]; // COL
+
+				String x = row[16] != null ? (String) row[16] : null; // ROW
+				String y = row[17] != null ? (String) row[17] : null; // COL
 				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-					x = (String) row[11]; // fieldMapRow
-					y = (String) row[12]; // fieldMapCol
+					x = row[11] != null ? (String) row[11] : "1"; // fieldMapRow
+					y = row[12] != null ? (String) row[12] : "1"; // fieldMapCol
 				}
 				observationUnit.setX(x);
 				observationUnit.setY(y);
+				observationUnit.setPositionCoordinateX(x);
+				observationUnit.setPositionCoordinateY(y);
 				observationUnit.setPlotNumber((String) row[13]);
 				observationUnit.setBlockNumber((String) row[14]);
 				observationUnit.setReplicate((String) row[15]);
@@ -1009,11 +1013,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					(result[5] != null && !((String) result[5]).isEmpty()) ? (String) result[5] : String.valueOf(result[2]);
 				observation.setObservationVariableDbId(variableId);
 				observation.setObservationVariableName((String) result[3]);
-				observation.setObservationDbId((Integer) result[1]);
+				observation.setObservationDbId(String.valueOf((Integer) result[1]));
 				observation.setValue((String) result[4]);
-				observation.setObservationTimeStamp(Util.formatDateAsStringValue((Date) result[6], Util.FRONTEND_TIMESTAMP_FORMAT));
+				observation.setObservationTimeStamp((Date) result[6]);
 				// TODO
-				observation.setSeason(StringUtils.EMPTY);
 				observation.setCollector(StringUtils.EMPTY);
 
 				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);

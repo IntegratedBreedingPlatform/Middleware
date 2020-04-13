@@ -216,6 +216,7 @@ public class InventoryDetailsTestDataInitializer {
 		lotDetails.setLotScaleNameAbbr("g");
 		final Location location = new Location(1);
 		location.setLname("locName");
+		location.setLdefault(Boolean.FALSE);
 		lotDetails.setLocationOfLot(location);
 		lotDetails.setStockIds("stockIds");
 		lotDetails.setTransactionId(120);

@@ -405,7 +405,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(VariableDTO.Scale.NUMERICAL, dao.convertDataTypeToVariableDtoScale(DataType.NUMERIC_VARIABLE.getId()));
 		Assert.assertEquals(VariableDTO.Scale.DATE, dao.convertDataTypeToVariableDtoScale(DataType.DATE_TIME_VARIABLE.getId()));
 		Assert.assertEquals(VariableDTO.Scale.NOMINAL, dao.convertDataTypeToVariableDtoScale(DataType.CATEGORICAL_VARIABLE.getId()));
-		Assert.assertEquals(VariableDTO.Scale.ORDINAL, dao.convertDataTypeToVariableDtoScale(DataType.CHARACTER_VARIABLE.getId()));
+		Assert.assertEquals(VariableDTO.Scale.TEXT, dao.convertDataTypeToVariableDtoScale(DataType.CHARACTER_VARIABLE.getId()));
 		Assert.assertEquals("", dao.convertDataTypeToVariableDtoScale(DataType.DATASET.getId()));
 
 	}

@@ -28,6 +28,11 @@ public class SearchCompositeDto {
 		this.itemIds = itemIds;
 	}
 
+	public boolean isValid() {
+		return !((searchRequestId == null && (itemIds == null || itemIds.isEmpty()))
+			|| (searchRequestId != null && itemIds != null));
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
