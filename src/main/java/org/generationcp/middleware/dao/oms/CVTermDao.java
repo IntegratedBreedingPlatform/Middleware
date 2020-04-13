@@ -1590,7 +1590,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append("   from cvterm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = ");
 		stringBuilder.append(TermId.IS_A.getId() + ")" + " traitClass on traitClass.propertyTermId = property.cvterm_id ");
 		// Retrieve the categories (valid values) of the variables' scale
-		stringBuilder.append("   LEFT JOIN (SELECT cvtrcategory.subject_id, CONCAT(o.name, '=', o.definition) as name");
+		stringBuilder.append("   LEFT JOIN (SELECT cvtrcategory.subject_id, o.name as name");
 		stringBuilder.append(
 			"	  FROM cvterm o inner JOIN cvterm_relationship cvtrcategory ON cvtrcategory.object_id = o.cvterm_id AND cvtrcategory.type_id = ");
 		stringBuilder.append(TermId.HAS_VALUE.getId() + ")" + " category on category.subject_id = scale.cvterm_id ");
@@ -1670,6 +1670,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			variableDto.setObservationVariableDbId(String.valueOf(result.get(VARIABLE_ID)));
 			variableDto.setObservationVariableName(observationVariableName);
 			variableDto.setDate(result.get(VARIABLE_CREATION_DATE) != null ? String.valueOf(result.get(VARIABLE_CREATION_DATE)) : null);
+			variableDto.setDefaultValue(StringUtils.EMPTY);
 
 			final VariableDTO.Trait trait = variableDto.getTrait();
 			trait.setName(String.valueOf(result.get(VARIABLE_PROPERTY)));
@@ -1695,9 +1696,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				scale.getValidValues().setMax((Double) result.get(VARIABLE_EXPECTED_MAX));
 			} else {
 				scale.getValidValues()
-					.setMin(result.get(VARIABLE_SCALE_MIN_RANGE) != null ? (Double) result.get(VARIABLE_SCALE_MIN_RANGE) : 0);
+					.setMin(result.get(VARIABLE_SCALE_MIN_RANGE) != null ? (Double) result.get(VARIABLE_SCALE_MIN_RANGE) : null);
 				scale.getValidValues()
-					.setMax(result.get(VARIABLE_SCALE_MAX_RANGE) != null ? (Double) result.get(VARIABLE_SCALE_MAX_RANGE) : 0);
+					.setMax(result.get(VARIABLE_SCALE_MAX_RANGE) != null ? (Double) result.get(VARIABLE_SCALE_MAX_RANGE) : null);
 			}
 
 			scale.setDataType(this.convertDataTypeToVariableDtoScale((Integer) result.get(VARIABLE_DATA_TYPE_ID)));
@@ -1732,7 +1733,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		if (DataType.CATEGORICAL_VARIABLE.getId().equals(dataTypeId)) {
 			return VariableDTO.Scale.NOMINAL;
 		} else if (DataType.CHARACTER_VARIABLE.getId().equals(dataTypeId)) {
-			return VariableDTO.Scale.ORDINAL;
+			return VariableDTO.Scale.TEXT;
 		} else if (DataType.DATE_TIME_VARIABLE.getId().equals(dataTypeId)) {
 			return VariableDTO.Scale.DATE;
 		} else if (DataType.NUMERIC_VARIABLE.getId().equals(dataTypeId)) {

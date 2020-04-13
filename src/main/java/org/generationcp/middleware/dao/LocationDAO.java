@@ -991,6 +991,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					final LocationDetailsDto locationDetailsDto =
 							new LocationDetailsDto(locationDbId, locationType, name, abbreviation, countryCode, countryName, latitude,
 									longitude, altitude);
+					locationDetailsDto.setLocationName(name);
 					if (!locationType.equalsIgnoreCase(LocationDAO.COUNTRY)) {
 						final AdditionalInfoDto additionalInfoDto = new AdditionalInfoDto(locationDetailsDto.getLocationDbId());
 						additionalInfoDto.addInfo("province", (String) row[9]);
