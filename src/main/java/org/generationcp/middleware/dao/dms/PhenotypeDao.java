@@ -1018,7 +1018,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observation.setValue((String) result[4]);
 				observation.setObservationTimeStamp((Date) result[6]);
 				// TODO
-				observation.setSeason(null);
 				observation.setCollector(StringUtils.EMPTY);
 
 				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
