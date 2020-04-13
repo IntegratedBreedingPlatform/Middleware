@@ -55,6 +55,7 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1234,27 +1235,40 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		}
 
 	}
-	
+
 	@Test
 	public void testGetNamesByTypeAndGIDList() {
 		final UserDefinedField nameType = this.createUserdefinedField("NAMES", "NAME", RandomStringUtils.randomAlphabetic(5).toUpperCase());
 		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		germplasm1.getPreferredName().setTypeId(nameType.getFldno());
 		final Integer gid1 = this.germplasmDataManager.addGermplasm(germplasm1, germplasm1.getPreferredName());
-		
+
 		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		germplasm2.getPreferredName().setTypeId(nameType.getFldno());
 		final Integer gid2 = this.germplasmDataManager.addGermplasm(germplasm2, germplasm2.getPreferredName());
-		
+
 		final Germplasm germplasm3 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer gid3 = this.germplasmDataManager.addGermplasm(germplasm3, germplasm3.getPreferredName());
-		
+
 		final Map<Integer, String> namesMap = this.germplasmDataManager.getNamesByTypeAndGIDList(nameType.getFldno(), Arrays.asList(gid1, gid2, gid3));
 		Assert.assertNotNull(namesMap);
 		Assert.assertEquals(3, namesMap.size());
 		Assert.assertEquals(germplasm1.getPreferredName().getNval(), namesMap.get(gid1));
 		Assert.assertEquals(germplasm2.getPreferredName().getNval(), namesMap.get(gid2));
 		Assert.assertEquals("-", namesMap.get(gid3));
+	}
+
+	@Test
+	public void testGetNamesByGidsAndPrefixes() {
+		final Germplasm germplasm = this.createGermplasm();
+		final Name name1 = NameTestDataInitializer.createName(2016, germplasm.getGid(), "PREF 001");
+		this.nameDAO.save(name1);
+		final Name name2 = NameTestDataInitializer.createName(2016, germplasm.getGid(), "REF 001");
+		this.nameDAO.save(name2);
+		final List<String> names = this.germplasmDataManager.getNamesByGidsAndPrefixes(Collections.singletonList(germplasm.getGid()), Collections.singletonList("PREF"));
+		Assert.assertEquals(1, names.size());
+		Assert.assertEquals(name1.getNval(), names.get(0));
+
 	}
 
 	private Attribute createAttribute(final Germplasm germplasm, final UserDefinedField userDefinedField, final String aval) {

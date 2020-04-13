@@ -2,6 +2,7 @@
 package org.generationcp.middleware.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -12,8 +13,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
+import org.generationcp.middleware.dao.KeySequenceRegisterDAOTest;
+import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.KeySequenceRegister;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -45,19 +53,22 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 	private static final Integer LAST_SEQUENCE_USED = 9;
 
 	@Autowired
-	@Qualifier(value = "IBDBV2_MAIZE_MERGED_SessionFactory")
-	private SessionFactory sessionFactory;
-
-	@Autowired
 	private PlatformTransactionManager platformTransactionManager;
 
 	private KeySequenceRegisterDAO keySequenceRegisterDao;
+	private GermplasmDAO germplasmDAO;
+	private NameDAO nameDAO;
+
 
 	@Before
 	public void setup() {
 		final Session session = this.sessionProvder.getSession();
 		this.keySequenceRegisterDao = new KeySequenceRegisterDAO();
 		this.keySequenceRegisterDao.setSession(session);
+		this.nameDAO = new NameDAO();
+		this.nameDAO.setSession(session);
+		this.germplasmDAO = new GermplasmDAO();
+		this.germplasmDAO.setSession(session);
 	}
 
 	@Test
@@ -117,6 +128,22 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 		final Integer newLastSequenceUsed = 51;
 		keySequenceRegisterService.saveLastSequenceUsed(KeySequenceRegisterServiceImplIntegrationTest.PREFIX, newLastSequenceUsed);
 		Assert.assertEquals(newLastSequenceUsed + 1, keySequenceRegisterService.getNextSequence(KeySequenceRegisterServiceImplIntegrationTest.PREFIX));
+	}
+
+	@Test
+	public void testGetByKeyPrefixes() {
+		final KeySequenceRegister keyRegister = new KeySequenceRegister();
+		keyRegister.setKeyPrefix(KeySequenceRegisterServiceImplIntegrationTest.PREFIX);
+		keyRegister.setLastUsedSequence(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED);
+		this.keySequenceRegisterDao.save(keyRegister);
+
+		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder);
+		final List<KeySequenceRegister> keySequenceRegisters = keySequenceRegisterService
+			.getKeySequenceRegistersByPrefixes(Collections.singletonList(keyRegister.getKeyPrefix()));
+		Assert.assertEquals(1, keySequenceRegisters.size());
+		Assert.assertEquals(KeySequenceRegisterServiceImplIntegrationTest.PREFIX, keySequenceRegisters.get(0).getKeyPrefix());
+		Assert.assertEquals(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED.intValue(),
+			keySequenceRegisters.get(0).getLastUsedSequence());
 	}
 
 	/**

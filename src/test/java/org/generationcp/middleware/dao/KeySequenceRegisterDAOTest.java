@@ -2,26 +2,37 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.KeySequenceRegister;
+import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 
 	private static final String PREFIX = "QWERTY" + new Random().nextInt();
 	private static final Integer LAST_SEQUENCE_USED = 9;
-	private static final Integer LAST_SEQUENCE_USED2 = 19;
 	private KeySequenceRegisterDAO keySequenceRegisterDao;
+	private GermplasmDAO germplasmDAO;
+	private NameDAO nameDAO;
 
 	@Before
 	public void setup() {
 		final Session session = this.sessionProvder.getSession();
 		this.keySequenceRegisterDao = new KeySequenceRegisterDAO();
 		this.keySequenceRegisterDao.setSession(session);
+		this.germplasmDAO = new GermplasmDAO();
+		this.germplasmDAO.setSession(session);
+		this.nameDAO = new NameDAO();
+		this.nameDAO.setSession(session);
 	}
 
 	@Test
@@ -133,7 +144,7 @@ public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 		Assert.assertNotNull(existingKeyRegister);
 		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue(), existingKeyRegister.getLastUsedSequence());
 
-		final Integer lastSequenceUsed = KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue() - 1 ;
+		final Integer lastSequenceUsed = KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED - 1 ;
 		// Expecting record to retain the saved last sequence # since specified start number is smaller
 		this.keySequenceRegisterDao.saveLastSequenceUsed(KeySequenceRegisterDAOTest.PREFIX, lastSequenceUsed);
 		final KeySequenceRegister retrievedKeyRegister =
@@ -142,4 +153,16 @@ public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue(), retrievedKeyRegister.getLastUsedSequence());
 	}
 
+	@Test
+	public void testGetByKeyPrefixes() {
+		final KeySequenceRegister keyRegister = new KeySequenceRegister();
+		keyRegister.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX);
+		keyRegister.setLastUsedSequence(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED);
+		this.keySequenceRegisterDao.save(keyRegister);
+
+		final List<KeySequenceRegister> keySequenceRegisters = this.keySequenceRegisterDao.getByKeyPrefixes(Collections.singletonList(keyRegister.getKeyPrefix()));
+		Assert.assertEquals(1, keySequenceRegisters.size());
+		Assert.assertEquals(KeySequenceRegisterDAOTest.PREFIX, keySequenceRegisters.get(0).getKeyPrefix());
+		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue(), keySequenceRegisters.get(0).getLastUsedSequence());
+	}
 }
