@@ -1252,11 +1252,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public int getMaximumSequence(final boolean isBulk, final String prefix, final String suffix, final int count) {
-		return this.getNameBuilder().getMaximumSequence(isBulk, prefix, suffix, count);
-	}
-
-	@Override
 	public boolean checkIfMatches(final String name) {
 		return this.getNameDao().checkIfMatches(name);
 	}

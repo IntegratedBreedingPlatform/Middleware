@@ -981,16 +981,6 @@ public interface GermplasmDataManager {
 	void deleteProgramFavorite(ProgramFavorite favorite);
 
 	/**
-	 * Returns the maximum number in the sequence.
-	 *
-	 * @param prefix
-	 * @param suffix
-	 * @param count
-	 * @return
-	 */
-	int getMaximumSequence(boolean isBulk, String prefix, String suffix, int count);
-
-	/**
 	 * check if name and standardized version of it already exists.
 	 *
 	 * @param name

@@ -412,33 +412,6 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<String> getAllMatchingNames(final String prefix, final String suffix) {
-		try {
-			String keyword1 = prefix + "%" + suffix + "%";
-			String keyword2 =
-					GermplasmDataManagerUtil.standardizeName(prefix) + "%" + GermplasmDataManagerUtil.standardizeName(suffix) + "%";
-			keyword1 = keyword1.replaceAll("\\s", "");
-			keyword2 = keyword2.replaceAll("\\s", "");
-			final StringBuilder sql = new StringBuilder();
-			sql.append("SELECT n.nval FROM names n ")
-				.append(" INNER JOIN germplsm g ON g.gid = n.gid ")
-				.append(" WHERE (REPLACE(n.nval, ' ', '') LIKE '")
-				.append(keyword1).append("'")
-				.append(" OR REPLACE(n.nval, ' ', '') LIKE '")
-				.append(keyword2).append("') ")
-				.append(" AND g.deleted = 0 ");
-
-			final Query query = this.getSession().createSQLQuery(sql.toString());
-			return query.list();
-
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllMatchingNames(" + prefix + ", " + suffix + ") query from Name " + e.getMessage();
-			NameDAO.LOG.error(message);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
 	public boolean checkIfMatches(final String name) {
 		try {
 			final StringBuilder sql = new StringBuilder();
