@@ -288,7 +288,7 @@ public interface DatasetService {
 	 * @param table
 	 * @param draftMode
 	 */
-	void importDataset(Integer datasetId, Table<String, String, String> table, Boolean draftMode);
+	Table<String, Integer, Integer> importDataset(Integer datasetId, Table<String, String, String> table, Boolean draftMode);
 
 	/**
 	 * Return all measurements variables from dataset

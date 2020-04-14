@@ -12,7 +12,10 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.LocationType;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
@@ -47,7 +50,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private String unitName;
 
-	private static final Integer DEFAULT_STORAGE_LOCATION = 6000;
+	private Integer storageLocationId;
 
 	private static final int GROUP_ID = 0;
 
@@ -59,6 +62,9 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private LocationDataManager locationDataManager;
+
 	@Before
 	public void setUp() {
 		this.transactionService = new TransactionServiceImpl(this.sessionProvder);
@@ -66,6 +72,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.createGermplasm();
 		this.findAdminUser();
+		this.resolveStorageLocation();
 		this.createLot();
 		this.createTransactions();
 		this.resolveUnitName();
@@ -169,7 +176,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void createLot() {
-		lot = new Lot(null, userId, EntityType.GERMPLSM.name(), gid, DEFAULT_STORAGE_LOCATION, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
+		lot = new Lot(null, userId, EntityType.GERMPLSM.name(), gid, storageLocationId, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
 			"Lot", RandomStringUtils.randomAlphabetic(35));
 		this.daoFactory.getLotDao().save(lot);
 	}
@@ -201,5 +208,10 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private void resolveUnitName() {
 		unitName = this.daoFactory.getCvTermDao().getById(UNIT_ID).getName();
+	}
+
+	private void resolveStorageLocation() {
+		final Integer id = locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.name());
+		storageLocationId = this.daoFactory.getLocationDAO().getDefaultLocationByType(id).getLocid();
 	}
 }

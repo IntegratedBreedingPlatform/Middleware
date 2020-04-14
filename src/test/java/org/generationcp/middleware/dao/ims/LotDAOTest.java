@@ -261,6 +261,7 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		final int provinceId = 1001;
 		location.setSnl1id(provinceId);
+		location.setLdefault(Boolean.FALSE);
 
 		locationDAO.saveOrUpdate(location);
 
