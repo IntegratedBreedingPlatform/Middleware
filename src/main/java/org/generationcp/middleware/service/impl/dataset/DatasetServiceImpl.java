@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.base.Function;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -55,6 +56,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1010,7 +1012,10 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode) {
+	public Table<String, Integer, Integer> importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode) {
+
+		final Table<String, Integer, Integer> observationDbIdsTable = HashBasedTable.create();
+
 		final List<MeasurementVariable> measurementVariableList =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
@@ -1029,7 +1034,7 @@ public class DatasetServiceImpl implements DatasetService {
 				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
 
 				for (final String variableName : table.columnKeySet()) {
-					final String importedVariableValue = table.get(observationUnitId, variableName);
+					String importedVariableValue = table.get(observationUnitId, variableName);
 
 					if (StringUtils.isNotBlank(importedVariableValue)) {
 						final MeasurementVariable measurementVariable =
@@ -1047,6 +1052,13 @@ public class DatasetServiceImpl implements DatasetService {
 								}
 							}
 
+						}
+						if (measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
+							// In case the date is in yyyy-MM-dd format, try to parse it as number format yyyyMMdd
+							final String parsedDate = Util.tryConvertDate(importedVariableValue, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
+							if (parsedDate != null) {
+								importedVariableValue = parsedDate;
+							}
 						}
 
 						final ObservationUnitData observationUnitData = currentRow.getVariables().get(measurementVariable.getName());
@@ -1085,6 +1097,9 @@ public class DatasetServiceImpl implements DatasetService {
 						if (phenotype != null) {
 							phenotypes.add(phenotype);
 						}
+
+						// We need to return the observationDbIds (mapped in a table by observationUnitId and variableId) of the created/updated observations.
+						observationDbIdsTable.put((String) observationUnitId, observationUnitData.getVariableId(), phenotype.getPhenotypeId());
 					}
 				}
 
@@ -1103,6 +1118,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 		}
+		return observationDbIdsTable;
 	}
 
 	@Override

@@ -572,7 +572,7 @@ public class DatasetServiceImplTest {
         final Random random = new Random();
         final int datasetId = random.nextInt();
         this.datasetService.getDatasetInstances(datasetId);
-        Mockito.verify(this.dmsProjectDao).getDatasetInstances(datasetId);
+        Mockito.verify(this.dmsProjectDao).getDatasetInstances(datasetId, null);
     }
 
     @Test

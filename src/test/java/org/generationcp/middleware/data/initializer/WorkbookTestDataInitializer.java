@@ -721,14 +721,18 @@ public class WorkbookTestDataInitializer {
 
 	public static List<Location> createLocationData() {
 		final List<Location> locations = new ArrayList<>();
-		locations.add(new Location(WorkbookTestDataInitializer.LOCATION_ID_1, WorkbookTestDataInitializer.LTYPE,
-				WorkbookTestDataInitializer.NLLP, WorkbookTestDataInitializer.LNAME + " 1", WorkbookTestDataInitializer.LABBR,
-				WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, WorkbookTestDataInitializer.SNL1ID,
-				WorkbookTestDataInitializer.CNTRYID, WorkbookTestDataInitializer.LRPLCE));
-		locations.add(new Location(WorkbookTestDataInitializer.LOCATION_ID_2, WorkbookTestDataInitializer.LTYPE,
-				WorkbookTestDataInitializer.NLLP, WorkbookTestDataInitializer.LNAME + " 2", WorkbookTestDataInitializer.LABBR,
-				WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, WorkbookTestDataInitializer.SNL1ID,
-				WorkbookTestDataInitializer.CNTRYID, WorkbookTestDataInitializer.LRPLCE));
+		final Location location1 = new Location(WorkbookTestDataInitializer.LOCATION_ID_1, WorkbookTestDataInitializer.LTYPE,
+			WorkbookTestDataInitializer.NLLP, WorkbookTestDataInitializer.LNAME + " 1", WorkbookTestDataInitializer.LABBR,
+			WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, WorkbookTestDataInitializer.SNL1ID,
+			WorkbookTestDataInitializer.CNTRYID, WorkbookTestDataInitializer.LRPLCE);
+		location1.setLdefault(Boolean.FALSE);
+		locations.add(location1);
+		final Location location2 = new Location(WorkbookTestDataInitializer.LOCATION_ID_2, WorkbookTestDataInitializer.LTYPE,
+			WorkbookTestDataInitializer.NLLP, WorkbookTestDataInitializer.LNAME + " 2", WorkbookTestDataInitializer.LABBR,
+			WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, WorkbookTestDataInitializer.SNL1ID,
+			WorkbookTestDataInitializer.CNTRYID, WorkbookTestDataInitializer.LRPLCE);
+		location2.setLdefault(Boolean.FALSE);
+		locations.add(location2);
 		return locations;
 	}
 

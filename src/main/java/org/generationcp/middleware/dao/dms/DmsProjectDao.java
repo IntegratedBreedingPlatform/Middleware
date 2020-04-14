@@ -162,7 +162,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     nde.nd_experiment_id AS studyDbId, "
 		+ "     pmain.project_id AS trialOrNurseryId, "
 		+ "		CONCAT(pmain.name, ' Environment Number ', nde.observation_unit_no) AS studyName, "
-		+ "     pmain.study_type_id AS studyType, "
+		+ "     study_type.study_type_id AS studyType, "
+		+ "     study_type.label AS studyTypeName, "
 		+ "     MAX(IF(xprop.type_id = " + TermId.SEASON_VAR.getId() + ", "
 		+ "                 xprop.value, "
 		+ "                 NULL)) AS seasonId, "
@@ -176,6 +177,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "                 NULL)) "
 		+ "     AS locationId,"
 		+ "		pmain.description AS studyDescription, "
+		+ "     pmain.objective AS studyObjective, "
 		+ "     (Select definition from cvterm where cvterm_id = (MAX(IF(xprop.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId() + ", "
 		+ "			xprop.value, "
 		+ "			NULL)))) "
@@ -187,6 +189,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     project proj ON proj.project_id = nde.project_id "
 		+ "         INNER JOIN "
 		+ "     project pmain ON pmain.project_id = proj.study_id "
+		+ "         INNER JOIN "
+		+ "     study_type ON study_type.study_type_id = pmain.study_type_id "
 		+ "         LEFT OUTER JOIN "
 		+ "     nd_experimentprop xprop ON xprop.nd_experiment_id = nde.nd_experiment_id "
 		+ "         LEFT OUTER JOIN "
@@ -688,6 +692,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("trialOrNurseryId");
 			query.addScalar("studyName");
 			query.addScalar("studyType");
+			query.addScalar("studyTypeName");
 			query.addScalar("seasonId");
 			query.addScalar("trialDbId");
 			query.addScalar("trialName");
@@ -696,6 +701,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("deleted");
 			query.addScalar("locationID");
 			query.addScalar("studyDescription");
+			query.addScalar("studyObjective");
 			query.addScalar("experimentalDesign");
 			query.addScalar("lastUpdate");
 			query.setParameter("environmentId", environmentId);
@@ -707,19 +713,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				studyMetadata.setNurseryOrTrialId((row[1] instanceof Integer) ? (Integer) row[1] : null);
 				studyMetadata.setStudyName((row[2] instanceof String) ? (String) row[2] : null);
 				studyMetadata.setStudyType((row[3] instanceof Integer) ? ((Integer) row[3]).toString() : null);
-				if (row[4] instanceof String && !StringUtils.isBlank((String) row[4])) {
-					studyMetadata.addSeason(TermId.getById(Integer.parseInt((String) row[4])).toString());
+				studyMetadata.setStudyTypeName((row[4] instanceof String) ? (String) row[4] : null);
+				if (row[5] instanceof String && !StringUtils.isBlank((String) row[5])) {
+					studyMetadata.addSeason(TermId.getById(Integer.parseInt((String) row[5])).toString());
 				}
 				studyMetadata.setTrialDbId(
-					(row[5] instanceof Integer) ? (Integer) row[5] : null);
-				studyMetadata.setTrialName((row[6] instanceof String) ? (String) row[6] : null);
-				studyMetadata.setStartDate(Util.tryParseDate((String) row[7]));
-				studyMetadata.setEndDate(Util.tryParseDate((String) row[8]));
-				studyMetadata.setActive(Boolean.FALSE.equals(row[9]));
-				studyMetadata.setLocationId((row[10] instanceof String) ? Integer.parseInt((String) row[10]) : null);
-				studyMetadata.setStudyDescription((row[11] instanceof String) ? (String) row[11] : null);
-				studyMetadata.setExperimentalDesign((row[12] instanceof String) ? (String) row[12] : null);
-				studyMetadata.setLastUpdate((row[13] instanceof String) ? (String) row[13] : null);
+					(row[6] instanceof Integer) ? (Integer) row[6] : null);
+				studyMetadata.setTrialName((row[7] instanceof String) ? (String) row[7] : null);
+				studyMetadata.setStartDate(Util.tryParseDate((String) row[8]));
+				studyMetadata.setEndDate(Util.tryParseDate((String) row[9]));
+				studyMetadata.setActive(Boolean.FALSE.equals(row[10]));
+				studyMetadata.setLocationId((row[11] instanceof String) ? Integer.parseInt((String) row[11]) : null);
+				studyMetadata.setStudyDescription((row[12] instanceof String) ? (String) row[12] : null);
+				studyMetadata.setStudyObjective((row[13] instanceof String) ? (String) row[13] : null);
+				studyMetadata.setExperimentalDesign((row[14] instanceof String) ? (String) row[14] : null);
+				studyMetadata.setLastUpdate((row[15] instanceof String) ? (String) row[15] : null);
 				return studyMetadata;
 			} else {
 				return null;
@@ -1090,13 +1098,22 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				"	max(if(xprop.type_id = 8190, loc.labbr, null)) as locationAbbreviation, \n" + // 8189 = cvterm for LOCATION_ABBR
 				"	max(if(xprop.type_id = 8189, xprop.value, null)) as customLocationAbbreviation, \n" +
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
-				"	case when max(if(xprop.type_id = 8583, xprop.value, null)) is null then 0 else 1 end as hasFieldmap \n";
+				"	case when max(if(xprop.type_id = 8583, xprop.value, null)) is null then 0 else 1 end as hasFieldmap, \n"
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
+
+				// if instance has X/Y coordinates (fieldmap or row/col design)
+				+ "	case when (max(if(xprop.type_id = 8583, geoprop.value, null)) is null) \n "
+				+ "		and (max(hasRowColDesign.nd_experiment_id)) is null \n"
+				+ " 	then 0 else 1 end as hasFieldLayout, \n"
+
+				// if instance has been georeferenced using the geojson editor
+				+ "  max(case when json_props like '%geoCoordinates%' then 1 else 0 end) as hasGeoJSON \n";
+
 
 			final StringBuilder sb = new StringBuilder(sql);
 			final boolean isEnvironmentDataset = DatasetTypeEnum.SUMMARY_DATA.getId() == datasetType.getDatasetTypeId();
 
-			// Only get experimental design-related metadata if the dataset is environment dataset
+			// To optmize performance, only get experimental design-related metadata if the dataset is environment dataset
 			if (isEnvironmentDataset) {
 				// If study has any plot experiments, hasExperimentalDesign flag = true
 				sb.append(",  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 ");
@@ -1142,6 +1159,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			sb.append(" LEFT OUTER JOIN nd_experimentprop xprop ON xprop.nd_experiment_id = env.nd_experiment_id ");
 			sb.append(" LEFT OUTER JOIN location loc on xprop.value = loc.locid and xprop.type_id = 8190 ");
+			sb.append(" LEFT JOIN (select ndep.nd_experiment_id from nd_experimentprop ndep INNER JOIN cvterm cvt ON cvt.cvterm_id = ndep.type_id ");
+			sb.append(" WHERE cvt.name = 'ROW') hasRowColDesign on nde.nd_experiment_id = hasRowColDesign.nd_experiment_id ");
 			if (isEnvironmentDataset) {
 				sb.append(" WHERE env.project_id = :datasetId");
 			} else {
@@ -1165,6 +1184,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("locationAbbreviation", new StringType());
 			query.addScalar("customLocationAbbreviation", new StringType());
 			query.addScalar("hasFieldmap", new BooleanType());
+			query.addScalar("hasGeoJSON", new BooleanType());
+			query.addScalar("hasFieldLayout", new BooleanType());
 			query.addScalar("instanceNumber", new IntegerType());
 			if (isEnvironmentDataset) {
 				query.addScalar("hasExperimentalDesign", new BooleanType());
