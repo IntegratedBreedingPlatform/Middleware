@@ -66,8 +66,8 @@ public class InstanceDao extends GenericDAO<ExperimentModel, Integer> {
 		} else {
 			final DetachedCriteria childExperimentsCriteria = DetachedCriteria.forClass(ExperimentModel.class, "childExperiment");
 			childExperimentsCriteria.add(Restrictions.eq("childExperiment.project.projectId", datasetId));
-			childExperimentsCriteria.add(Property.forName("environment.ndExperimentId").eqProperty("childExperiment.parent.ndExperimentId"));
-			criteria.add(Subqueries.exists(childExperimentsCriteria.setProjection(Projections.property("childExperiment.ndExperimentId"))));
+			childExperimentsCriteria.setProjection(Projections.distinct(Projections.property("childExperiment.parent.ndExperimentId")));
+			criteria.add(Property.forName("ndExperimentId").in(childExperimentsCriteria));
 		}
 		return criteria.list();
 	}
