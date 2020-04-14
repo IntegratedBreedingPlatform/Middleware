@@ -11,8 +11,7 @@
 
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -32,6 +31,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * POJO for location table.
@@ -111,6 +112,10 @@ public class Location implements Serializable, Comparable<Location> {
 	@Column(name = "lrplce")
 	private Integer lrplce;
 
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	@Column(name = "ldefault", columnDefinition = "TINYINT")
+	private Boolean ldefault;
+
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "locid")
 	private Georef georef;
@@ -125,7 +130,7 @@ public class Location implements Serializable, Comparable<Location> {
 	private String parentLocationAbbr;
 
 	public static final String GET_ALL_BREEDING_LOCATIONS =
-			"SELECT l.locid, l.ltype, l.nllp, l.lname, l.labbr, l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce, l.nnpid, g.lat, g.lon, g.alt, l.program_uuid "
+		"SELECT l.locid, l.ltype, l.nllp, l.lname, l.labbr, l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce, l.nnpid, g.lat, g.lon, g.alt, l.program_uuid, l.ldefault "
 					+ "FROM location l left join georef g on l.locid = g.locid WHERE l.ltype IN (410, 411, 412) ORDER BY lname";
 	public static final String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (410, 411, 412)";
 	public static final String GET_LOCATION_NAMES_BY_GIDS = "SELECT gid, g.glocn, lname " + "FROM germplsm g " + "LEFT JOIN location l "
@@ -313,26 +318,34 @@ public class Location implements Serializable, Comparable<Location> {
 	/**
 	 * @return the parentLocationId
 	 */
-	 public Integer getParentLocationId() {
-		 return this.parentLocationId;
-	 }
+	public Integer getParentLocationId() {
+		return this.parentLocationId;
+	}
 
-	 /**
-	  * @param parentLocationId the parentLocationId to set
-	  */
-	 public void setParentLocationId(Integer parentLocationId) {
-		 this.parentLocationId = parentLocationId;
-	 }
+	/**
+	 * @param parentLocationId the parentLocationId to set
+	 */
+	public void setParentLocationId(Integer parentLocationId) {
+		this.parentLocationId = parentLocationId;
+	}
 
 	public String getParentLocationAbbr() {
-		 return this.parentLocationAbbr;
-	 }
+		return this.parentLocationAbbr;
+	}
 
-	 public void setParentLocationAbbr(String parentLocationAbbr) {
-		 this.parentLocationAbbr = parentLocationAbbr;
-	 }
+	public void setParentLocationAbbr(String parentLocationAbbr) {
+		this.parentLocationAbbr = parentLocationAbbr;
+	}
 
-	 @Override
+	public Boolean getLdefault() {
+		return ldefault;
+	}
+
+	public void setLdefault(final Boolean ldefault) {
+		this.ldefault = ldefault;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -384,6 +397,8 @@ public class Location implements Serializable, Comparable<Location> {
 		builder.append(", altitude=");
 		builder.append(this.georef != null ? this.georef.getAlt() : null);
 		builder.append(", parentLocationName=");
+		builder.append(this.parentLocationName);
+		builder.append(", ldefault=");
 		builder.append(this.parentLocationName);
 		builder.append("]");
 		return builder.toString();

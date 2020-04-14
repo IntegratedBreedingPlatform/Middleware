@@ -406,8 +406,27 @@ public class Util {
 		return sdf.format(d);
 	}
 
+	public static String tryConvertDate(final String date, final String oldFormat, final String newformat) {
+		final Date parsedDate = Util.tryParseDate(date, oldFormat);
+		if (parsedDate != null) {
+			final SimpleDateFormat sdf = Util.getSimpleDateFormat(newformat);
+			return sdf.format(parsedDate);
+		}
+		return null;
+	}
+
 	public static boolean isValidDate(final String dateString) {
-		if (dateString == null || dateString.length() != Util.DATE_AS_NUMBER_FORMAT.length()) {
+		if (dateString == null) {
+			return false;
+		}
+
+		// If the dateString is parseable from yyyy-MM-dd format, it should be valid
+		if (Util.tryParseDate(dateString, Util.FRONTEND_DATE_FORMAT) != null) {
+			return true;
+		}
+
+		// Check if the dateString is parseable from yyyyMMdd format
+		if (dateString.length() != Util.DATE_AS_NUMBER_FORMAT.length()) {
 			return false;
 		}
 

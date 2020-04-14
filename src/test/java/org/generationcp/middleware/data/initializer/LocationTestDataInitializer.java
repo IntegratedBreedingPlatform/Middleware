@@ -55,6 +55,8 @@ public class LocationTestDataInitializer {
 		location.setSnl3id(0);
 		location.setCntryid(0);
 		location.setLrplce(0);
+		location.setLdefault(Boolean.FALSE);
+
 		return location;
 	}
 
