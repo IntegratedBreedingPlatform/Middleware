@@ -18,6 +18,7 @@ import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
@@ -34,6 +35,7 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
+import org.generationcp.middleware.pojos.KeySequenceRegister;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
@@ -109,6 +111,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	private UserDefinedFieldDAO userDefinedFieldDAO;
 
+	private KeySequenceRegisterDAO keySequenceRegisterDAO;
+
 	@Before
 	public void setUp() throws Exception {
 		this.programFavoriteTestDataInitializer = new ProgramFavoriteTestDataInitializer();
@@ -149,6 +153,11 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		if (this.progenitorDAO == null) {
 			this.progenitorDAO = new ProgenitorDAO();
 			this.progenitorDAO.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.keySequenceRegisterDAO == null) {
+			this.keySequenceRegisterDAO = new KeySequenceRegisterDAO();
+			this.keySequenceRegisterDAO.setSession(this.sessionProvder.getSession());
 		}
 
 	}
@@ -1269,6 +1278,24 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(1, names.size());
 		Assert.assertEquals(name1.getNval(), names.get(0));
 
+	}
+
+	@Test
+	public void testUpdateKeySequenceRegister() {
+		final String prefix = "SKSKSPREFSKSKSKS";
+		final Germplasm germplasm = this.createGermplasm();
+		final Name name1 = NameTestDataInitializer.createName(2016, germplasm.getGid(), prefix + "001");
+		this.nameDAO.save(name1);
+		final Germplasm germplasm2 = this.createGermplasm();
+		final Name name2 = NameTestDataInitializer.createName(2016, germplasm2.getGid(), prefix + " 005");
+		this.nameDAO.save(name2);
+		this.keySequenceRegisterDAO.saveLastSequenceUsed(prefix, 5);
+		this.germplasmDAO.deleteGermplasms(Collections.singletonList(germplasm2.getGid()));
+		final KeySequenceRegister keySequenceRegister = this.keySequenceRegisterDAO.getByPrefix(prefix);
+		Assert.assertEquals(5, keySequenceRegister.getLastUsedSequence());
+		this.germplasmDataManager.updateKeySequenceRegister(Collections.singletonList(keySequenceRegister));
+		final KeySequenceRegister upatedKeySequenceRegister = this.keySequenceRegisterDAO.getByPrefix(prefix);
+		Assert.assertEquals(1, upatedKeySequenceRegister.getLastUsedSequence());
 	}
 
 	private Attribute createAttribute(final Germplasm germplasm, final UserDefinedField userDefinedField, final String aval) {

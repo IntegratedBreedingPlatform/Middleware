@@ -48,9 +48,4 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 	public List<KeySequenceRegister> getKeySequenceRegistersByPrefixes(final List<String> keyPrefixes) {
 		return this.daoFactory.getKeySequenceRegisterDAO().getByKeyPrefixes(keyPrefixes);
 	}
-
-	@Override
-	public void updateKeySequenceRegister(final List<Integer> keySequenceRegisterIds) {
-		this.daoFactory.getKeySequenceRegisterDAO().updateKeySequenceRegister(keySequenceRegisterIds);
-	}
 }

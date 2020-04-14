@@ -66,11 +66,4 @@ public interface KeySequenceRegisterService {
 	 * @param keyPrefixes
 	 */
 	List<KeySequenceRegister> getKeySequenceRegistersByPrefixes(final List<String> keyPrefixes);
-
-	/**
-	 * Updates the last used sequence value given the register ids
-	 * 
-	 * @param keySequenceRegisterIds
-	 */
-	void updateKeySequenceRegister(List<Integer> keySequenceRegisterIds);
 }

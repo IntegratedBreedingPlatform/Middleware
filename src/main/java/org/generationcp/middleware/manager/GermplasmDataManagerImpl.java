@@ -1602,8 +1602,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public void updateKeySequenceRegister(final List<Integer> keySequenceRegisterIds) {
-		this.keySequenceRegisterService.updateKeySequenceRegister(keySequenceRegisterIds);
+	public void updateKeySequenceRegister(final List<KeySequenceRegister> keyPrefixes) {
+		for(final KeySequenceRegister keyRegister: keyPrefixes) {
+			final Integer currentMaxSequence = Integer.valueOf(this.daoFactory.getGermplasmDao()
+				.getNextSequenceNumber(keyRegister.getKeyPrefix())) - 1;
+			keyRegister.setLastUsedSequence(currentMaxSequence);
+			this.daoFactory.getKeySequenceRegisterDAO().update(keyRegister);
+		}
 	}
 
 }

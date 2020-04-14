@@ -78,22 +78,4 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 
 		return criteria.list();
 	}
-
-	public void updateKeySequenceRegister(final List<Integer> keySequenceRegisterIds) {
-		try {
-			final StringBuilder sql = new StringBuilder();
-			sql.append("UPDATE key_sequence_register ksr ")
-				.append(" SET last_used_sequence = (SELECT COALESCE(MAX(CONVERT(REPLACE(UPPER(n.nval), ksr.key_prefix, ''), SIGNED)), 0) ")
-				.append(" FROM names n ")
-				.append(" INNER JOIN germplsm g ON g.gid=n.gid ")
-				.append(" WHERE n.nval LIKE CONCAT(ksr.key_prefix, '%') ")
-				.append(" AND g.deleted = 0) WHERE ksr.id in (:ids)");
-			final Query query = this.getSession().createSQLQuery(sql.toString());
-			query.setParameterList("ids", keySequenceRegisterIds);
-			query.executeUpdate();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error with updateKeySequenceRegister(keySequenceRegisterIds=" + keySequenceRegisterIds + "): " + e.getMessage(), e);
-		}
-	}
 }

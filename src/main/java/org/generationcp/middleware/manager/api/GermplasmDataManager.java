@@ -1195,5 +1195,5 @@ public interface GermplasmDataManager {
 
 	List<KeySequenceRegister> getKeySequenceRegistersByPrefixes(List<String> keyPrefixes);
 
-	void updateKeySequenceRegister(List<Integer> keySequenceRegisterIds);
+	void updateKeySequenceRegister(List<KeySequenceRegister> keyPrefixes);
 }
