@@ -15,24 +15,16 @@ import java.util.concurrent.Future;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
-import org.generationcp.middleware.dao.KeySequenceRegisterDAOTest;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.KeySequenceRegister;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -144,6 +136,16 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 		Assert.assertEquals(KeySequenceRegisterServiceImplIntegrationTest.PREFIX, keySequenceRegisters.get(0).getKeyPrefix());
 		Assert.assertEquals(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED.intValue(),
 			keySequenceRegisters.get(0).getLastUsedSequence());
+	}
+
+	@Test
+	public void testUpdateKeySequenceRegister() {
+		final String prefix = "SKSKSKSPREFIXSKSKSKS";
+		this.keySequenceRegisterDao.save(new KeySequenceRegister(prefix, 10));
+		Assert.assertNotNull(this.keySequenceRegisterDao.getByPrefix(prefix));
+		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder);
+		keySequenceRegisterService.deleteKeySequenceRegistersByKeyPrefixes(Collections.singletonList(prefix));
+		Assert.assertNull(this.keySequenceRegisterDao.getByPrefix(prefix));
 	}
 
 	/**

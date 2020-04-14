@@ -35,7 +35,6 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
-import org.generationcp.middleware.pojos.KeySequenceRegister;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
@@ -77,9 +76,9 @@ import static org.hamcrest.core.IsNot.not;
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	public static final String separator = "-";
-	public static final String parent1Name = "CML502";
-	public static final String parent2Name = "CLQRCWQ109";
-	public static final String parent3Name = "CLQRCWQ55";
+	private static final String parent1Name = "CML502";
+	private static final String parent2Name = "CLQRCWQ109";
+	private static final String parent3Name = "CLQRCWQ55";
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -1278,24 +1277,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(1, names.size());
 		Assert.assertEquals(name1.getNval(), names.get(0));
 
-	}
-
-	@Test
-	public void testUpdateKeySequenceRegister() {
-		final String prefix = "SKSKSPREFSKSKSKS";
-		final Germplasm germplasm = this.createGermplasm();
-		final Name name1 = NameTestDataInitializer.createName(2016, germplasm.getGid(), prefix + "001");
-		this.nameDAO.save(name1);
-		final Germplasm germplasm2 = this.createGermplasm();
-		final Name name2 = NameTestDataInitializer.createName(2016, germplasm2.getGid(), prefix + " 005");
-		this.nameDAO.save(name2);
-		this.keySequenceRegisterDAO.saveLastSequenceUsed(prefix, 5);
-		this.germplasmDAO.deleteGermplasms(Collections.singletonList(germplasm2.getGid()));
-		final KeySequenceRegister keySequenceRegister = this.keySequenceRegisterDAO.getByPrefix(prefix);
-		Assert.assertEquals(5, keySequenceRegister.getLastUsedSequence());
-		this.germplasmDataManager.updateKeySequenceRegister(Collections.singletonList(keySequenceRegister));
-		final KeySequenceRegister upatedKeySequenceRegister = this.keySequenceRegisterDAO.getByPrefix(prefix);
-		Assert.assertEquals(1, upatedKeySequenceRegister.getLastUsedSequence());
 	}
 
 	private Attribute createAttribute(final Germplasm germplasm, final UserDefinedField userDefinedField, final String aval) {

@@ -2,11 +2,7 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.KeySequenceRegister;
-import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,18 +17,12 @@ public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 	private static final String PREFIX = "QWERTY" + new Random().nextInt();
 	private static final Integer LAST_SEQUENCE_USED = 9;
 	private KeySequenceRegisterDAO keySequenceRegisterDao;
-	private GermplasmDAO germplasmDAO;
-	private NameDAO nameDAO;
 
 	@Before
 	public void setup() {
 		final Session session = this.sessionProvder.getSession();
 		this.keySequenceRegisterDao = new KeySequenceRegisterDAO();
 		this.keySequenceRegisterDao.setSession(session);
-		this.germplasmDAO = new GermplasmDAO();
-		this.germplasmDAO.setSession(session);
-		this.nameDAO = new NameDAO();
-		this.nameDAO.setSession(session);
 	}
 
 	@Test
@@ -164,5 +154,14 @@ public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(1, keySequenceRegisters.size());
 		Assert.assertEquals(KeySequenceRegisterDAOTest.PREFIX, keySequenceRegisters.get(0).getKeyPrefix());
 		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue(), keySequenceRegisters.get(0).getLastUsedSequence());
+	}
+
+	@Test
+	public void testUpdateKeySequenceRegister() {
+		final String prefix = "SKSKSKSPREFIXSKSKSK";
+		this.keySequenceRegisterDao.save(new KeySequenceRegister(prefix, 10));
+		Assert.assertNotNull(this.keySequenceRegisterDao.getByPrefix(prefix));
+		this.keySequenceRegisterDao.deleteByKeyPrefixes(Collections.singletonList(prefix));
+		Assert.assertNull(this.keySequenceRegisterDao.getByPrefix(prefix));
 	}
 }

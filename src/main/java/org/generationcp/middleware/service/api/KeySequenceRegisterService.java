@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.api;
 import org.generationcp.middleware.pojos.KeySequenceRegister;
 
 import java.util.List;
-import java.util.Map;
 
 public interface KeySequenceRegisterService {
 
@@ -65,5 +64,12 @@ public interface KeySequenceRegisterService {
 	 *
 	 * @param keyPrefixes
 	 */
-	List<KeySequenceRegister> getKeySequenceRegistersByPrefixes(final List<String> keyPrefixes);
+	List<KeySequenceRegister> getKeySequenceRegistersByPrefixes(List<String> keyPrefixes);
+
+	/**
+	 * Deletes the KeySequenceRegister entries given the Key Prefixes
+	 *
+	 * @param keyPrefixes
+	 */
+	void deleteKeySequenceRegistersByKeyPrefixes(List<String> keyPrefixes);
 }

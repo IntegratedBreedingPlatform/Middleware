@@ -78,4 +78,21 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 
 		return criteria.list();
 	}
+
+	public void deleteByKeyPrefixes(final List<String> keyPrefixes) {
+		try {
+			final StringBuilder sql = new StringBuilder();
+			sql.append("DELETE FROM key_sequence_register ");
+			sql.append(" WHERE key_prefix IN (:keyPrefixes)");
+
+			final Query query = this.getSession().createSQLQuery(sql.toString());
+			query.setParameterList("keyPrefixes", keyPrefixes);
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error with deleteByKeyPrefixes(" + keyPrefixes + ") query from keyPrefixes " + e.getMessage();
+			throw new MiddlewareQueryException(message, e);
+		}
+
+
+	}
 }
