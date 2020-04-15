@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -119,6 +120,7 @@ public class LotServiceImpl implements LotService {
 			final Map<String, Integer> locationsByAbbreviationMap =
 				locations.stream().collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
 			final VariableFilter variableFilter = new VariableFilter();
+			variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 			final List<Variable> scaleVariables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 			final Map<String, Integer> scaleVariablesByNameMap =
 				scaleVariables.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
