@@ -1102,12 +1102,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
 
 				// if instance has X/Y coordinates (fieldmap or row/col design)
-				+ "	case when (max(if(xprop.type_id = 8583, geoprop.value, null)) is null) \n "
+				+ "	case when (max(if(xprop.type_id = 8583, xprop.value, null)) is null) \n "
 				+ "		and (max(hasRowColDesign.nd_experiment_id)) is null \n"
 				+ " 	then 0 else 1 end as hasFieldLayout, \n"
 
 				// if instance has been georeferenced using the geojson editor
-				+ "  max(case when json_props like '%geoCoordinates%' then 1 else 0 end) as hasGeoJSON \n";
+				+ "  max(case when env.json_props like '%geoCoordinates%' then 1 else 0 end) as hasGeoJSON \n";
 
 
 			final StringBuilder sb = new StringBuilder(sql);
