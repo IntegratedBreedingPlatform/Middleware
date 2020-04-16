@@ -164,6 +164,24 @@ public class NameDAOTest extends IntegrationTestBase {
 
 	}
 
+	@Test
+	public void testCheckIfMatches() {
+		final Germplasm germplasm1 = this.createGermplasmTestData(20190910);
+		NameDAOTest.germplasmDAO.save(germplasm1);
+		final Name name1 = this.createNameTestData(20190910, germplasm1.getGid(), 0, "SKSKSKSKSPREF 001",
+			GermplasmNameType.DERIVATIVE_NAME);
+		NameDAOTest.nameDAO.save(name1);
+		Assert.assertTrue(NameDAOTest.nameDAO.checkIfMatches(name1.getNval()));
+
+		final Germplasm germplasm2 = this.createGermplasmTestData(20190910);
+		germplasm2.setDeleted(true);
+		NameDAOTest.germplasmDAO.save(germplasm2);
+		final Name name2 = this.createNameTestData(20190910, germplasm2.getGid(), 0, "SKSKSKSKSPREF 002",
+			GermplasmNameType.DERIVATIVE_NAME);
+		NameDAOTest.nameDAO.save(name2);
+		Assert.assertFalse(NameDAOTest.nameDAO.checkIfMatches(name2.getNval()));
+	}
+
 	private Germplasm createGermplasmTestData(final int dateIntValue) {
 		final Germplasm germplasm = new Germplasm();
 		germplasm.setUserId(1);

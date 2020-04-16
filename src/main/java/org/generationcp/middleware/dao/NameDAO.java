@@ -415,8 +415,10 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	public boolean checkIfMatches(final String name) {
 		try {
 			final StringBuilder sql = new StringBuilder();
-			sql.append("SELECT COUNT(nid) FROM names ");
+			sql.append("SELECT COUNT(n.nid) FROM names n ");
+			sql.append(" INNER JOIN germplsm g ON g.gid = n.gid ");
 			sql.append(" WHERE nval = '").append(name).append("'");
+			sql.append(" AND g.deleted = 0 ");
 
 			final Query query = this.getSession().createSQLQuery(sql.toString());
 			final List<BigInteger> result = query.list();
