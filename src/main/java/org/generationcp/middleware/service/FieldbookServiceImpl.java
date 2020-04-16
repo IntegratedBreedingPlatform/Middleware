@@ -750,6 +750,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		final Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, parentCode);
 		final Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentId), 0, 0);
 
+		location.setLdefault(false);
 		return manager.addLocationAndLocdes(location, locdes);
 	}
 
