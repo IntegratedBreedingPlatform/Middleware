@@ -483,8 +483,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 			final int prefixesSize = prefixes.size();
 			for (int i=0; i<prefixesSize; i++) {
-				String prefix = prefixes.get(i) + "%";
-				prefix = prefix.replaceAll("\\s", "");
+				final String prefix = prefixes.get(i) + "%";
 				sql.append(" nval LIKE '" + prefix + "'");
 				if(i+1 != prefixesSize) {
 					sql.append(" OR ");
