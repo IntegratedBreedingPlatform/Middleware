@@ -1113,7 +1113,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final StringBuilder sb = new StringBuilder(sql);
 			final boolean isEnvironmentDataset = DatasetTypeEnum.SUMMARY_DATA.getId() == datasetType.getDatasetTypeId();
 
-			// To optmize performance, only get experimental design-related metadata if the dataset is environment dataset
+			// To optimize performance, only get experimental design-related metadata if the dataset is environment dataset
 			if (isEnvironmentDataset) {
 				// If study has any plot experiments, hasExperimentalDesign flag = true
 				sb.append(",  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 ");
@@ -1145,7 +1145,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				sb.append("                    where plot.parent_id = env.nd_experiment_id and\n");
 				sb.append("                  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null))\n");
 				sb.append("                  then 1 else 0 end as hasMeasurements ");
-				sb.append(" FROM nd_experiment env ");
+				sb.append(" FROM nd_experiment nde ");
+				sb.append(" INNER JOIN nd_experiment env ON nde.nd_experiment_id = env.nd_experiment_id ");
 			} else {
 				sb.append(" FROM nd_experiment nde ");
 				if (datasetType.isSubObservationType()) {
@@ -1155,17 +1156,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					sb.append(" INNER JOIN nd_experiment env ON nde.parent_id = env.nd_experiment_id AND env.type_id = ").append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 				}
 			}
-
-
 			sb.append(" LEFT OUTER JOIN nd_experimentprop xprop ON xprop.nd_experiment_id = env.nd_experiment_id ");
 			sb.append(" LEFT OUTER JOIN location loc on xprop.value = loc.locid and xprop.type_id = 8190 ");
 			sb.append(" LEFT JOIN (select ndep.nd_experiment_id from nd_experimentprop ndep INNER JOIN cvterm cvt ON cvt.cvterm_id = ndep.type_id ");
 			sb.append(" WHERE cvt.name = 'ROW') hasRowColDesign on nde.nd_experiment_id = hasRowColDesign.nd_experiment_id ");
-			if (isEnvironmentDataset) {
-				sb.append(" WHERE env.project_id = :datasetId");
-			} else {
-				sb.append(" WHERE nde.project_id = :datasetId ");
-			}
+			sb.append(" WHERE nde.project_id = :datasetId ");
+
 
 			if (!CollectionUtils.isEmpty(instanceIds)) {
 				sb.append(" AND env.nd_experiment_id IN (:locationIds) \n");
