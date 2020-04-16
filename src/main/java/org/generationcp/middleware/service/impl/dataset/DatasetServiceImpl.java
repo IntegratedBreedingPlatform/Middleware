@@ -642,10 +642,11 @@ public class DatasetServiceImpl implements DatasetService {
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
 		final ObservationUnitsSearchDTO searchDTO =
-			new ObservationUnitsSearchDTO(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<MeasurementVariableDto>());
+			new ObservationUnitsSearchDTO(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<>());
 		searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
+		searchDTO.setSubobservationDataset(this.getDatasetType(datasetId).isSubObservationType());
 
 		final List<ObservationUnitRow> observationUnits = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
 		this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
@@ -1164,6 +1165,7 @@ public class DatasetServiceImpl implements DatasetService {
 			searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 			searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 			searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
+			searchDTO.setSubobservationDataset(this.getDatasetType(datasetId).isSubObservationType());
 
 			final List<ObservationUnitRow> observationUnits =
 				this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
