@@ -331,9 +331,13 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 		public List<StudyInstance> getDatasetInstances(final Integer datasetId) {
-		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
-		final DatasetType datasetType = this.daoFactory.getDatasetTypeDao().getById(datasetDTO.getDatasetTypeId());
+		final DatasetType datasetType = this.getDatasetType(datasetId);
 		return this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId, datasetType);
+	}
+
+	private DatasetType getDatasetType(final Integer datasetId) {
+		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
+		return this.daoFactory.getDatasetTypeDao().getById(datasetDTO.getDatasetTypeId());
 	}
 
 	private List<ProjectProperty> buildDefaultDatasetProperties(
@@ -618,6 +622,7 @@ public class DatasetServiceImpl implements DatasetService {
 		searchDTO.setDatasetId(datasetId);
 		searchDTO.setGenericGermplasmDescriptors(this.findGenericGermplasmDescriptors(studyId));
 		searchDTO.setAdditionalDesignFactors(this.findAdditionalDesignFactors(studyId));
+		searchDTO.setSubobservationDataset(this.getDatasetType(datasetId).isSubObservationType());
 
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
@@ -683,14 +688,17 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public Integer countAllObservationUnitsForDataset(
 		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
-		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, null);
+		final DatasetType datasetType = this.getDatasetType(datasetId);
+		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, null, datasetType.isSubObservationType());
 	}
 
 	@Override
 	public long countFilteredObservationUnitsForDataset(
 		final Integer datasetId, final Integer instanceId, final Boolean draftMode,
 		final ObservationUnitsSearchDTO.Filter filter) {
-		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
+		final DatasetType datasetType = this.getDatasetType(datasetId);
+		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, filter,
+			datasetType.isSubObservationType());
 	}
 
 	@Override
@@ -1312,6 +1320,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
 		final Integer datasetId, final ObservationUnitsSearchDTO filter) {
-		return this.daoFactory.getObservationUnitsSearchDAO().countFilteredInstancesAndPhenotypes(datasetId, filter);
+		final DatasetType datasetType = this.getDatasetType(datasetId);
+		return this.daoFactory.getObservationUnitsSearchDAO().countFilteredInstancesAndPhenotypes(datasetId, filter, datasetType.isSubObservationType());
 	}
 }

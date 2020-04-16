@@ -24,6 +24,7 @@ public class ObservationUnitsSearchDTO {
 	private Integer instanceId;
 	private Integer environmentDatasetId;
 	private Boolean draftMode;
+	private Boolean isSubobservationDataset;
 
 	/** This is used by Visualization tool, to specify the columns that will be included in the data returned from the server. **/
 	private List<String> filterColumns = new ArrayList<>();
@@ -243,6 +244,14 @@ public class ObservationUnitsSearchDTO {
 
 	public void setFilterColumns(final List<String> filterColumns) {
 		this.filterColumns = filterColumns;
+	}
+
+	public Boolean getSubobservationDataset() {
+		return isSubobservationDataset;
+	}
+
+	public void setSubobservationDataset(final Boolean subobservationDataset) {
+		isSubobservationDataset = subobservationDataset;
 	}
 
 	@Override

@@ -115,16 +115,15 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	public Integer countObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode,
-		final ObservationUnitsSearchDTO.Filter filter) {
+		final ObservationUnitsSearchDTO.Filter filter, final boolean isSubobservationDataset) {
 
 		try {
 			final StringBuilder sql = new StringBuilder("select count(*) as totalObservationUnits from " //
 				+ "nd_experiment nde " //
 				+ "    inner join project p on p.project_id = nde.project_id " //
-				+ "    inner join stock s ON s.stock_id = nde.stock_id " //
-				// FIXME won't work for sub-sub-obs
-				+ " INNER JOIN nd_experiment plot ON (plot.nd_experiment_id = nde.parent_id OR plot.nd_experiment_id = nde.nd_experiment_id) AND plot.type_id = 1155 "
-				+ " where p.project_id = :datasetId ");
+				+ "    inner join stock s ON s.stock_id = nde.stock_id ");
+			appendPlotAndEnvironmentExperimentJoins(isSubobservationDataset, sql);
+			sql.append(" where p.project_id = :datasetId ");
 
 			if (instanceId != null) {
 				sql.append(" and plot.parent_id = :instanceId ");
@@ -161,8 +160,18 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
+	private void appendPlotAndEnvironmentExperimentJoins(final boolean isSubobservationDataset, final StringBuilder sql) {
+		if (isSubobservationDataset) {
+			// FIXME won't work for sub-sub-obs
+			sql.append(" INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id AND plot.type_id = ").append(TermId.PLOT_EXPERIMENT.getId());
+		} else {
+			sql.append(" INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.nd_experiment_id AND plot.type_id = ").append(TermId.PLOT_EXPERIMENT.getId());
+		}
+		sql.append(" INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = ").append(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+	}
+
 	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(final Integer datasetId,
-		final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
+		final ObservationUnitsSearchDTO observationUnitsSearchDTO, final boolean isSubobservationDataset) {
 
 		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.getFilter();
 
@@ -170,15 +179,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		try {
 			final StringBuilder sql = new StringBuilder(
-				"select count(*) as totalObservationUnits, count(distinct(CASE WHEN level3.nd_experiment_id IS NULL THEN level2.nd_experiment_id ELSE level3.nd_experiment_id END)) as totalInstances " //
-					+ "FROM   nd_experiment nde "
-					+ "LEFT JOIN  nd_experiment level2 ON level2.nd_experiment_id = nde.parent_id "
-					+ "LEFT JOIN  nd_experiment level3 ON level3.nd_experiment_id = level2.parent_id "
-					+ " where " //
-					+ "	nde.project_id = :datasetId ");
+				"select count(*) as totalObservationUnits, count(distinct env.nd_experiment_id) as totalInstances " //
+					+ "FROM   nd_experiment nde ");
+			this.appendPlotAndEnvironmentExperimentJoins(isSubobservationDataset, sql);
+			sql.append(" where nde.project_id = :datasetId ");
 
 			if (observationUnitsSearchDTO.getInstanceId() != null) {
-				sql.append(" and (CASE WHEN level3.nd_experiment_id IS NULL THEN level2.nd_experiment_id ELSE level3.nd_experiment_id END) = :instanceId ");
+				sql.append(" and env.nd_experiment_id = :instanceId ");
 			}
 
 			final String filterByVariableSQL =
@@ -286,15 +293,14 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		sql.append(" 1 FROM " //
 			+ "	project p " //
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
-			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
-			+ "	LEFT JOIN nd_experiment level2 ON level2.nd_experiment_id = nde.parent_id "
-			+ "	LEFT JOIN nd_experiment level3 ON level3.nd_experiment_id = level2.parent_id "
-			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
+			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id ");
+	  	this.appendPlotAndEnvironmentExperimentJoins(searchDto.getSubobservationDataset(), sql);
+		sql.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
 			+ " WHERE p.project_id = :datasetId "); //
 
 		if (searchDto.getInstanceId() != null) {
-			sql.append(" AND (CASE WHEN level3.nd_experiment_id IS NULL THEN level2.nd_experiment_id ELSE level3.nd_experiment_id END) = :instanceId"); //
+			sql.append(" AND env.nd_experiment_id = :instanceId"); //
 		}
 
 		final ObservationUnitsSearchDTO.Filter filter = searchDto.getFilter();
@@ -594,12 +600,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "     FROM nd_experiment child " // start the join with child to avoid parent_id full index scan
 			+ "            LEFT JOIN sample child_sample ON child.nd_experiment_id = child_sample.nd_experiment_id " //
 			+ "            INNER JOIN nd_experiment parent ON child.parent_id = parent.nd_experiment_id " //
-			+ "     GROUP BY parent.nd_experiment_id) child_sample_count ON child_sample_count.nd_experiment_id = nde.nd_experiment_id " //
-			// FIXME won't work for sub-sub-obs
-			+ " INNER JOIN nd_experiment plot ON (plot.nd_experiment_id = nde.parent_id OR plot.nd_experiment_id = nde.nd_experiment_id) AND plot.type_id = 1155 "
-			+ " INNER JOIN nd_experiment env ON plot.parent_id = env.nd_experiment_id AND env.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
-			//
-			+ " WHERE p.project_id = :datasetId "); //
+			+ "     GROUP BY parent.nd_experiment_id) child_sample_count ON child_sample_count.nd_experiment_id = nde.nd_experiment_id ");
+
+		this.appendPlotAndEnvironmentExperimentJoins(searchDto.getSubobservationDataset(), sql);
+		sql.append(" WHERE p.project_id = :datasetId "); //
 
 		if (searchDto.getInstanceId() != null) {
 			sql.append(" AND plot.parent_id = :instanceId"); //
