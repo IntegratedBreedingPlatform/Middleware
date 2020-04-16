@@ -25,6 +25,8 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.inventory.LotService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LotServiceImpl implements LotService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(LotServiceImpl.class);
 
 	private DaoFactory daoFactory;
 
@@ -155,6 +159,7 @@ public class LotServiceImpl implements LotService {
 				daoFactory.getTransactionDAO().save(transaction);
 			}
 		} catch (final Exception e) {
+			LOG.error(e.getMessage(), e);
 			throw new MiddlewareRequestException("", "common.middleware.error.import.lots");
 		}
 	}
