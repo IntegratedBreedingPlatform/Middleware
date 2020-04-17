@@ -392,6 +392,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public Map<Integer, Map<Integer, String>> getAttributeValuesGIDList(final List<Integer> gidList) {
+		final Map<Integer, Map<Integer, String>> attributeMap = new HashMap<>();
+
+		// retrieve attribute values
+		final List<Attribute> attributeList = this.getAttributeDao().getAttributeValuesGIDList(gidList);
+		for (final Attribute attribute : attributeList) {
+			Map<Integer, String> attrByType = attributeMap.get(attribute.getGermplasmId());
+			if (attrByType == null) {
+				attrByType = new HashMap<>();
+			}
+			attrByType.put(attribute.getTypeId(), attribute.getAval());
+			attributeMap.put(attribute.getGermplasmId(), attrByType);
+		}
+
+		return attributeMap;
+	}
+
+	@Override
 	public List<UserDefinedField> getNameTypesByGIDList(final List<Integer> gidList) {
 		return this.getUserDefinedFieldDao().getNameTypesByGIDList(gidList);
 	}

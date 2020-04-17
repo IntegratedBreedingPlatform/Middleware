@@ -655,9 +655,12 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	//New inventory functions, please locate them below this line to help cleaning in the near future.
 	private final String SEARCH_LOT_QUERY = "SELECT lot.lotid as lotId, " //
+		+ "  lot.lot_uuid AS lotUUID, " //
 		+ "  lot.stock_id AS stockId, " //
 		+ "  lot.eid as gid, " //
 		+ "  g.mgid as mgid, " //
+		+ "  m.mname as germplasmMethodName, " //
+		+ "  gloc.lname as germplasmLocation, " //
 		+ "  n.nval as designation, "
 		+ "  CASE WHEN lot.status = 0 then '" + LotStatus.ACTIVE.name()  +"' else '"+ LotStatus.CLOSED.name()+ "' end as status, " //
 		+ "  lot.locid as locationId, " //
@@ -680,7 +683,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "       LEFT JOIN ims_transaction transaction ON transaction.lotid = lot.lotid AND transaction.trnstat <> " + TransactionStatus.CANCELLED.getIntValue()  //
 		+ "       INNER JOIN germplsm g on g.gid = lot.eid " //
 		+ "       INNER JOIN names n ON n.gid = lot.eid AND n.nstat = 1 " //
+		+ "       LEFT JOIN methods m ON m.mid = g.methn " //
 		+ "       LEFT JOIN location l on l.locid = lot.locid " //
+		+ "       LEFT JOIN location gloc on gloc.locid = g.glocn " //
 		+ "       LEFT join cvterm scale on scale.cvterm_id = lot.scaleid " //
 		+ "       INNER JOIN workbench.users users on users.userid = lot.userid " //
 		+ "WHERE g.deleted=0 "; //
@@ -863,9 +868,12 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(filterLotsQuery);
 			query.addScalar("lotId");
+			query.addScalar("lotUUID");
 			query.addScalar("stockId");
 			query.addScalar("gid");
 			query.addScalar("mgid");
+			query.addScalar("germplasmMethodName");
+			query.addScalar("germplasmLocation");
 			query.addScalar("designation");
 			query.addScalar("status");
 			query.addScalar("locationId");
