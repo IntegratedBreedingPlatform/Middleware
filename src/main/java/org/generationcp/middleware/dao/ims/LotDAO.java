@@ -685,7 +685,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "       INNER JOIN names n ON n.gid = lot.eid AND n.nstat = 1 " //
 		+ "       LEFT JOIN methods m ON m.mid = g.methn " //
 		+ "       LEFT JOIN location l on l.locid = lot.locid " //
-		+ "       LEFT JOIN location gloc on l.locid = g.glocn " //
+		+ "       LEFT JOIN location gloc on gloc.locid = g.glocn " //
 		+ "       LEFT join cvterm scale on scale.cvterm_id = lot.scaleid " //
 		+ "       INNER JOIN workbench.users users on users.userid = lot.userid " //
 		+ "WHERE g.deleted=0 "; //
