@@ -128,7 +128,7 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 		this.keySequenceRegisterDao.save(new KeySequenceRegister(prefix, 10));
 		Assert.assertNotNull(this.keySequenceRegisterDao.getByPrefix(prefix));
 		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder);
-		keySequenceRegisterService.deleteKeySequenceRegistersByKeyPrefixes(Collections.singletonList(prefix));
+		keySequenceRegisterService.deleteKeySequences(Collections.singletonList(prefix));
 		Assert.assertNull(this.keySequenceRegisterDao.getByPrefix(prefix));
 	}
 

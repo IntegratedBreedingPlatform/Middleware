@@ -17,7 +17,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -481,14 +483,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			sql.append("SELECT nval FROM names WHERE gid IN (:gids) ")
 				.append(" AND ( ");
 
-			final int prefixesSize = prefixes.size();
-			for (int i=0; i<prefixesSize; i++) {
-				final String prefix = prefixes.get(i) + "%";
-				sql.append(" nval LIKE '" + prefix + "'");
-				if(i+1 != prefixesSize) {
-					sql.append(" OR ");
-				}
-			}
+			final List<String> formattedPrefixes = prefixes.stream().map(prefix -> " nval LIKE '" + prefix + "%'").collect(Collectors.toList());
+			sql.append(String.join(" OR ", formattedPrefixes));
 			sql.append(" ) ");
 
 			final Query query = this.getSession().createSQLQuery(sql.toString());
