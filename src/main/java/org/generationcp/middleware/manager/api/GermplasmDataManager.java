@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.KeySequenceRegister;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -764,7 +765,7 @@ public interface GermplasmDataManager {
 	 * @param prefix - String used as prefix for Germplasm Names querying
 	 * @return next available sequence number for a germplasm with given prefix
 	 */
-	String getNextSequenceNumberForCrossName(String prefix);
+	String getNextSequenceNumberAsString(String prefix);
 
 	/**
 	 * Returns a Map of GIDs to preferred ids given a list of GIDs.
@@ -987,16 +988,6 @@ public interface GermplasmDataManager {
 	void deleteProgramFavorite(ProgramFavorite favorite);
 
 	/**
-	 * Returns the maximum number in the sequence.
-	 *
-	 * @param prefix
-	 * @param suffix
-	 * @param count
-	 * @return
-	 */
-	int getMaximumSequence(boolean isBulk, String prefix, String suffix, int count);
-
-	/**
 	 * check if name and standardized version of it already exists.
 	 *
 	 * @param name
@@ -1206,4 +1197,6 @@ public interface GermplasmDataManager {
 	long countAttributesByGid(String gid, List<String> attributeDbIds);
 
 	List<Attribute> getAttributeByIds(List<Integer> ids);
+
+	List<String> getNamesByGidsAndPrefixes(List<Integer> gids, List<String> prefixes);
 }
