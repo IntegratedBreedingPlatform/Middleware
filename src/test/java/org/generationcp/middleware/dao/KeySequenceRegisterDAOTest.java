@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
@@ -144,20 +143,7 @@ public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByKeyPrefixes() {
-		final KeySequenceRegister keyRegister = new KeySequenceRegister();
-		keyRegister.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX);
-		keyRegister.setLastUsedSequence(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED);
-		this.keySequenceRegisterDao.save(keyRegister);
-
-		final List<KeySequenceRegister> keySequenceRegisters = this.keySequenceRegisterDao.getByKeyPrefixes(Collections.singletonList(keyRegister.getKeyPrefix()));
-		Assert.assertEquals(1, keySequenceRegisters.size());
-		Assert.assertEquals(KeySequenceRegisterDAOTest.PREFIX, keySequenceRegisters.get(0).getKeyPrefix());
-		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue(), keySequenceRegisters.get(0).getLastUsedSequence());
-	}
-
-	@Test
-	public void testUpdateKeySequenceRegister() {
+	public void testDeleteByKeyPrefixes() {
 		final String prefix = "SKSKSKSPREFIXSKSKSK";
 		this.keySequenceRegisterDao.save(new KeySequenceRegister(prefix, 10));
 		Assert.assertNotNull(this.keySequenceRegisterDao.getByPrefix(prefix));

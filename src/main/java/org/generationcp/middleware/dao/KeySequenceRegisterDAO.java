@@ -71,14 +71,6 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 		}
 	}
 
-	public List<KeySequenceRegister> getByKeyPrefixes(final List<String> keyPrefixes) {
-		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-		criteria.add(Restrictions.in("keyPrefix", keyPrefixes));
-		criteria.addOrder(Order.asc("lastUsedSequence"));
-
-		return criteria.list();
-	}
-
 	public void deleteByKeyPrefixes(final List<String> keyPrefixes) {
 		try {
 			final StringBuilder sql = new StringBuilder();

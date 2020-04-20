@@ -989,9 +989,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Germplasm> getGermplasmByLocationId(final String name, final int locationID) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		germplasmList.addAll(this.getGermplasmDao().getByLocationId(name, locationID));
-		return germplasmList;
+		return this.getGermplasmDao().getByLocationId(name, locationID);
 	}
 
 	@Override
@@ -1001,8 +999,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Germplasm> getGermplasmByGidRange(final int startGIDParam, final int endGIDParam) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-
 		int startGID = startGIDParam;
 		int endGID = endGIDParam;
 		// assumes the lesser value be the start of the range
@@ -1012,22 +1008,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			startGID = temp;
 		}
 
-		germplasmList.addAll(this.getGermplasmDao().getByGIDRange(startGID, endGID));
-		return germplasmList;
+		return this.getGermplasmDao().getByGIDRange(startGID, endGID);
 	}
 
 	@Override
 	public List<Germplasm> getGermplasms(final List<Integer> gids) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		germplasmList.addAll(this.getGermplasmDao().getByGIDList(gids));
-		return germplasmList;
+		return this.getGermplasmDao().getByGIDList(gids);
 	}
 
 	@Override
 	public List<Germplasm> getGermplasmWithoutGroup(final List<Integer> gids) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		germplasmList.addAll(this.getGermplasmDao().getGermplasmWithoutGroup(gids));
-		return germplasmList;
+		return this.getGermplasmDao().getGermplasmWithoutGroup(gids);
 	}
 
 	@Override
