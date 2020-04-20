@@ -1192,6 +1192,4 @@ public interface GermplasmDataManager {
 	List<Attribute> getAttributeByIds(List<Integer> ids);
 
 	List<String> getNamesByGidsAndPrefixes(List<Integer> gids, List<String> prefixes);
-
-	void deleteKeySequenceRegisters(List<String> keyPrefixes);
 }

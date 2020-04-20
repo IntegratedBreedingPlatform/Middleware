@@ -39,7 +39,6 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
-import org.generationcp.middleware.pojos.KeySequenceRegister;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -48,12 +47,10 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
-import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -70,9 +67,6 @@ import java.util.Set;
  */
 @Transactional
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
-
-	@Resource
-	private KeySequenceRegisterService keySequenceRegisterService;
 
 	private DaoFactory daoFactory;
 
@@ -1594,11 +1588,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Attribute> getAttributeByIds(final List<Integer> ids) {
 		return this.getAttributeDao().getByIDs(ids);
-	}
-
-	@Override
-	public void deleteKeySequenceRegisters(final List<String> keyPrefixes) {
-		this.keySequenceRegisterService.deleteKeySequenceRegistersByKeyPrefixes(keyPrefixes);
 	}
 
 }
