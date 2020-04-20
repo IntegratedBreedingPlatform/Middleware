@@ -123,22 +123,6 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 	}
 
 	@Test
-	public void testGetByKeyPrefixes() {
-		final KeySequenceRegister keyRegister = new KeySequenceRegister();
-		keyRegister.setKeyPrefix(KeySequenceRegisterServiceImplIntegrationTest.PREFIX);
-		keyRegister.setLastUsedSequence(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED);
-		this.keySequenceRegisterDao.save(keyRegister);
-
-		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder);
-		final List<KeySequenceRegister> keySequenceRegisters = keySequenceRegisterService
-			.getKeySequenceRegistersByPrefixes(Collections.singletonList(keyRegister.getKeyPrefix()));
-		Assert.assertEquals(1, keySequenceRegisters.size());
-		Assert.assertEquals(KeySequenceRegisterServiceImplIntegrationTest.PREFIX, keySequenceRegisters.get(0).getKeyPrefix());
-		Assert.assertEquals(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED.intValue(),
-			keySequenceRegisters.get(0).getLastUsedSequence());
-	}
-
-	@Test
 	public void testUpdateKeySequenceRegister() {
 		final String prefix = "SKSKSKSPREFIXSKSKSKS";
 		this.keySequenceRegisterDao.save(new KeySequenceRegister(prefix, 10));

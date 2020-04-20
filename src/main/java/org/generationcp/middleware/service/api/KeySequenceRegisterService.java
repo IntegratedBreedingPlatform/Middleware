@@ -60,13 +60,6 @@ public interface KeySequenceRegisterService {
 	void saveLastSequenceUsed(String keyPrefix, Integer lastSequenceUsed);
 
 	/**
-	 * Returns the List of KeySequenceRegister given the Key Prefixes
-	 *
-	 * @param keyPrefixes
-	 */
-	List<KeySequenceRegister> getKeySequenceRegistersByPrefixes(List<String> keyPrefixes);
-
-	/**
 	 * Deletes the KeySequenceRegister entries given the Key Prefixes
 	 *
 	 * @param keyPrefixes

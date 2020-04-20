@@ -1597,12 +1597,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<KeySequenceRegister> getKeySequenceRegistersByPrefixes(final List<String> keyPrefixes) {
-		return this.keySequenceRegisterService.getKeySequenceRegistersByPrefixes(keyPrefixes);
-	}
-
-	@Override
-	public void deleteKeySequenceRegistersByKeyPrefixes(final List<String> keyPrefixes) {
+	public void deleteKeySequenceRegisters(final List<String> keyPrefixes) {
 		this.keySequenceRegisterService.deleteKeySequenceRegistersByKeyPrefixes(keyPrefixes);
 	}
 
