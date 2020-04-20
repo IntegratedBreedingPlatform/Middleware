@@ -577,7 +577,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		this.insertGermplasmWithName(existingGermplasmNameWithPrefix);
 
-		final String result = this.germplasmDataDM.getNextSequenceNumberString(crossNamePrefix);
+		final String result = this.germplasmDataDM.getNextSequenceNumberAsString(crossNamePrefix);
 		Assert.assertEquals(
 				"Germplasm with prefix " + existingGermplasmNameWithPrefix + " is existing so the next sequence number should be 2", "2",
 				result);
@@ -604,7 +604,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.insertGermplasmWithName(nameWithMixedCasePrefix);
 		this.insertGermplasmWithName(nameWithUppercasePrefix);
 
-		final String result = this.germplasmDataDM.getNextSequenceNumberString(crossNamePrefix);
+		final String result = this.germplasmDataDM.getNextSequenceNumberAsString(crossNamePrefix);
 		final int nextCodeForPrefix = lastCodeForMixedCasePrefix + 1;
 		Assert.assertEquals("Germplasm with prefix " + nameWithMixedCasePrefix + " is existing so the next sequence number should be "
 				+ nextCodeForPrefix, Integer.toString(nextCodeForPrefix), result);
@@ -622,7 +622,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.insertGermplasmWithName(nameWithLowercasePrefix);
 		this.insertGermplasmWithName(nameWithUppercasePrefix);
 
-		final String result = this.germplasmDataDM.getNextSequenceNumberString(crossNamePrefix);
+		final String result = this.germplasmDataDM.getNextSequenceNumberAsString(crossNamePrefix);
 		final int nextCodeForPrefix = lastCodeForLowercasePrefix + 1;
 		Assert.assertEquals("Germplasm with prefix " + nameWithLowercasePrefix + " is existing so the next sequence number should be "
 				+ nextCodeForPrefix, Integer.toString(nextCodeForPrefix), result);
@@ -637,7 +637,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		// Flag the germplasm as deleted
 		this.insertGermplasmWithName(existingGermplasmNameWithPrefix, true);
 
-		final String result = this.germplasmDataDM.getNextSequenceNumberString(crossNamePrefix);
+		final String result = this.germplasmDataDM.getNextSequenceNumberAsString(crossNamePrefix);
 		Assert.assertEquals(
 				"Germplasm with name" + existingGermplasmNameWithPrefix + " is deleted so the next sequence number should still be 1", "1",
 				result);
