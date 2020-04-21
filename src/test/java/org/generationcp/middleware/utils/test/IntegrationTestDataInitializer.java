@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
+import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
@@ -71,7 +72,11 @@ public class IntegrationTestDataInitializer {
 	private final DaoFactory daoFactory;
 	private final UserService userService;
 	private final WorkbenchDataManager workbenchDataManager;
-	private WorkbenchDaoFactory workbenchDaoFactory;
+
+
+	private final StudyTypeDAO studyTypeDAO;
+
+	private final WorkbenchDaoFactory workbenchDaoFactory;
 
 	public IntegrationTestDataInitializer(final HibernateSessionProvider hibernateSessionProvider,
 		final HibernateSessionProvider workbenchSessionProvider) {
@@ -90,6 +95,18 @@ public class IntegrationTestDataInitializer {
 		this.projectPropertyDao = this.daoFactory.getProjectPropertyDAO();
 		this.workbenchDataManager = new WorkbenchDataManagerImpl(workbenchSessionProvider);
 		this.userService = new UserServiceImpl(workbenchSessionProvider);
+		this.studyTypeDAO = new StudyTypeDAO();
+		this.studyTypeDAO.setSession(hibernateSessionProvider.getSession());
+	}
+
+	public DmsProject createStudy(final String name, final String description, final int studyTypeId) {
+		final DmsProject dmsProject = new DmsProject();
+		dmsProject.setName(name);
+		dmsProject.setDescription(description);
+		dmsProject.setStudyType(this.studyTypeDAO.getById(studyTypeId));
+		this.dmsProjectDao.save(dmsProject);
+		this.dmsProjectDao.refresh(dmsProject);
+		return dmsProject;
 	}
 
 	public DmsProject createDmsProject(final String name, final String description, final DmsProject study, final DmsProject parent,

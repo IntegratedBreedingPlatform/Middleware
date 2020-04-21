@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.base.Function;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -332,8 +333,14 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<StudyInstance> getDatasetInstances(final Integer datasetId) {
-		return this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId);
+		public List<StudyInstance> getDatasetInstances(final Integer datasetId) {
+		final DatasetType datasetType = this.getDatasetType(datasetId);
+		return this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId, datasetType);
+	}
+
+	private DatasetType getDatasetType(final Integer datasetId) {
+		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
+		return this.daoFactory.getDatasetTypeDao().getById(datasetDTO.getDatasetTypeId());
 	}
 
 	private List<ProjectProperty> buildDefaultDatasetProperties(
@@ -568,7 +575,8 @@ public class DatasetServiceImpl implements DatasetService {
 	public DatasetDTO getDataset(final Integer datasetId) {
 		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
 		if (datasetDTO != null) {
-			datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
+			final DatasetType datasetType = this.daoFactory.getDatasetTypeDao().getById(datasetDTO.getDatasetTypeId());
+			datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId, datasetType));
 			final List<Integer> variableTypes = DatasetTypeEnum.SUMMARY_DATA.getId() == datasetDTO.getDatasetTypeId() ?
 				DatasetServiceImpl.ENVIRONMENT_DATASET_VARIABLE_TYPES : DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES;
 			datasetDTO.setVariables(
@@ -624,6 +632,7 @@ public class DatasetServiceImpl implements DatasetService {
 		searchDTO.setDatasetId(datasetId);
 		searchDTO.setGenericGermplasmDescriptors(this.findGenericGermplasmDescriptors(studyId));
 		searchDTO.setAdditionalDesignFactors(this.findAdditionalDesignFactors(studyId));
+		searchDTO.setSubobservationDataset(this.getDatasetType(datasetId).isSubObservationType());
 
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
@@ -643,10 +652,11 @@ public class DatasetServiceImpl implements DatasetService {
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
 		final ObservationUnitsSearchDTO searchDTO =
-			new ObservationUnitsSearchDTO(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<MeasurementVariableDto>());
+			new ObservationUnitsSearchDTO(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<>());
 		searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
+		searchDTO.setSubobservationDataset(this.getDatasetType(datasetId).isSubObservationType());
 
 		final List<ObservationUnitRow> observationUnits = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
 		this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
@@ -689,14 +699,17 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public Integer countAllObservationUnitsForDataset(
 		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
-		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, null);
+		final DatasetType datasetType = this.getDatasetType(datasetId);
+		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, null, datasetType.isSubObservationType());
 	}
 
 	@Override
 	public long countFilteredObservationUnitsForDataset(
 		final Integer datasetId, final Integer instanceId, final Boolean draftMode,
 		final ObservationUnitsSearchDTO.Filter filter) {
-		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
+		final DatasetType datasetType = this.getDatasetType(datasetId);
+		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, filter,
+			datasetType.isSubObservationType());
 	}
 
 	@Override
@@ -1018,7 +1031,10 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode) {
+	public Table<String, Integer, Integer> importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode) {
+
+		final Table<String, Integer, Integer> observationDbIdsTable = HashBasedTable.create();
+
 		final List<MeasurementVariable> measurementVariableList =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
@@ -1037,7 +1053,7 @@ public class DatasetServiceImpl implements DatasetService {
 				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
 
 				for (final String variableName : table.columnKeySet()) {
-					final String importedVariableValue = table.get(observationUnitId, variableName);
+					String importedVariableValue = table.get(observationUnitId, variableName);
 
 					if (StringUtils.isNotBlank(importedVariableValue)) {
 						final MeasurementVariable measurementVariable =
@@ -1055,6 +1071,13 @@ public class DatasetServiceImpl implements DatasetService {
 								}
 							}
 
+						}
+						if (measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
+							// In case the date is in yyyy-MM-dd format, try to parse it as number format yyyyMMdd
+							final String parsedDate = Util.tryConvertDate(importedVariableValue, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
+							if (parsedDate != null) {
+								importedVariableValue = parsedDate;
+							}
 						}
 
 						final ObservationUnitData observationUnitData = currentRow.getVariables().get(measurementVariable.getName());
@@ -1093,6 +1116,9 @@ public class DatasetServiceImpl implements DatasetService {
 						if (phenotype != null) {
 							phenotypes.add(phenotype);
 						}
+
+						// We need to return the observationDbIds (mapped in a table by observationUnitId and variableId) of the created/updated observations.
+						observationDbIdsTable.put((String) observationUnitId, observationUnitData.getVariableId(), phenotype.getPhenotypeId());
 					}
 				}
 
@@ -1111,6 +1137,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 		}
+		return observationDbIdsTable;
 	}
 
 	@Override
@@ -1148,6 +1175,7 @@ public class DatasetServiceImpl implements DatasetService {
 			searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 			searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 			searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
+			searchDTO.setSubobservationDataset(this.getDatasetType(datasetId).isSubObservationType());
 
 			final List<ObservationUnitRow> observationUnits =
 				this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
@@ -1304,6 +1332,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
 		final Integer datasetId, final ObservationUnitsSearchDTO filter) {
-		return this.daoFactory.getObservationUnitsSearchDAO().countFilteredInstancesAndPhenotypes(datasetId, filter);
+		final DatasetType datasetType = this.getDatasetType(datasetId);
+		return this.daoFactory.getObservationUnitsSearchDAO().countFilteredInstancesAndPhenotypes(datasetId, filter, datasetType.isSubObservationType());
 	}
 }

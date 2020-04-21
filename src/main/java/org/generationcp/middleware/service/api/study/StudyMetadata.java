@@ -17,7 +17,11 @@ public class StudyMetadata {
 
 	private String studyDescription;
 
+	private String studyObjective;
+
 	private String studyType;
+
+	private String studyTypeName;
 
 	private List<String> seasons = new ArrayList<>();
 
@@ -44,7 +48,7 @@ public class StudyMetadata {
 
 	public StudyMetadata(final Integer nurseryOrTrialId, final Integer studyDbId, final Integer locationId, final Boolean active,
 			final Date endDate, final Date startDate, final Integer trialDbId, final List<String> seasons, final String trialName,
-			final String studyType, final String studyName, final String studyDescription, final String experimentalDesign,
+			final String studyType, final String studyTypeName, final String studyName, final String studyDescription, final String experimentalDesign,
 		final String lastUpdate) {
 		this.nurseryOrTrialId = nurseryOrTrialId;
 		this.studyDbId = studyDbId;
@@ -56,6 +60,7 @@ public class StudyMetadata {
 		this.seasons = seasons;
 		this.trialName = trialName;
 		this.studyType = studyType;
+		this.studyTypeName = studyTypeName;
 		this.studyName = studyName;
 		this.studyDescription = studyDescription;
 		this.experimentalDesign = experimentalDesign;
@@ -170,6 +175,24 @@ public class StudyMetadata {
 		return this;
 	}
 
+	public String getStudyObjective() {
+		return this.studyObjective;
+	}
+
+	public StudyMetadata setStudyObjective(final String studyObjective) {
+		this.studyObjective = studyObjective;
+		return this;
+	}
+
+
+	public String getStudyTypeName() {
+		return this.studyTypeName;
+	}
+
+	public void setStudyTypeName(final String studyTypeName) {
+		this.studyTypeName = studyTypeName;
+	}
+
 	public void addSeason(String season) {
 		this.seasons.add(season);
 	}
@@ -213,4 +236,5 @@ public class StudyMetadata {
 		}
 		return hashCode;
 	}
+
 }

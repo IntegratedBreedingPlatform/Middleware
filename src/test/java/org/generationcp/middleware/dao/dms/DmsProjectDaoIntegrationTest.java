@@ -149,7 +149,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final ExperimentModel instanceModel2= this.testDataInitializer.createInstanceExperimentModel(summaryDataset, 2, "2");
 		this.testDataInitializer.addExperimentProp(instanceModel2, TermId.BLOCK_ID.getId(), "1", 2);
 		final ExperimentModel instanceModel3 = this.testDataInitializer.createInstanceExperimentModel(summaryDataset, 3, "3");
-		final List<StudyInstance> instances = this.dmsProjectDao.getDatasetInstances(summaryDataset.getProjectId());
+		final List<StudyInstance> instances = this.dmsProjectDao.getDatasetInstances(summaryDataset.getProjectId(), new DatasetType( DatasetTypeEnum.SUMMARY_DATA.getId()));
 		Assert.assertEquals(3, instances.size());
 
 		final StudyInstance instance1 = instances.get(0);

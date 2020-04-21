@@ -278,33 +278,33 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		assertEquals((noOfSubObservationExperiment * 2),
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter, true).intValue());
 		assertEquals(noOfSubObservationExperiment,
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, instanceModel1.getNdExperimentId(), false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, instanceModel1.getNdExperimentId(), false, filter, true).intValue());
 		assertEquals(noOfSubObservationExperiment,
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, instanceModel1.getNdExperimentId(), false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, instanceModel1.getNdExperimentId(), false, filter, true).intValue());
 
 		// Filter by draft phenotype
 		filter.setVariableId(trait1.getCvTermId());
 		assertEquals(noOfSubObservationExperiment,
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, true, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, true, filter, true).intValue());
 
 		filter.setVariableId(null);
 		// Filter by TRIAL_INSTANCE
 		filteredValues.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), Collections.singletonList("1"));
 		assertEquals(noOfSubObservationExperiment,
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter, true).intValue());
 		// Filter by GID
 		filteredValues.put(String.valueOf(TermId.GID.getId()),
 			Collections.singletonList(subObsExperimentsInstance1.get(0).getStock().getGermplasm().getGid().toString()));
-		assertEquals(1, this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+		assertEquals(1, this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter, true).intValue());
 
 		filteredValues.clear();
 		filteredValues.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), Collections.singletonList("2"));
 		// Filter by DESIGNATION using LIKE operation
 		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Germplasm");
 		assertEquals(noOfSubObservationExperiment,
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter, true).intValue());
 	}
 
 	@Test
@@ -345,39 +345,39 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		assertEquals(instance1Units.size() + instance2Units.size(),
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter, false).intValue());
 		assertEquals(instance1Units.size(),
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, instanceModel1.getNdExperimentId(), false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, instanceModel1.getNdExperimentId(), false, filter, false).intValue());
 		assertEquals(instance2Units.size(),
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, instanceModel2.getNdExperimentId(), false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, instanceModel2.getNdExperimentId(), false, filter, false).intValue());
 
 		// Filter by draft phenotype
 		filter.setVariableId(trait1.getCvTermId());
 		assertEquals(unitsWithObservations.size(),
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, true, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, true, filter, false).intValue());
 
 		filter.setVariableId(null);
 		// Filter by PLOT_NO
 		filteredValues.put(String.valueOf(TermId.PLOT_NO.getId()), Collections.singletonList("2"));
 		assertEquals(2,
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter, false).intValue());
 
 		// Filter by TRIAL_INSTANCE
 		filteredValues.clear();
 		filteredValues.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), Collections.singletonList("1"));
 		assertEquals(3,
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter, false).intValue());
 		// Filter by GID
 		filteredValues.put(String.valueOf(TermId.GID.getId()),
 			Collections.singletonList(unitsWithObservations.get(0).getStock().getGermplasm().getGid().toString()));
-		assertEquals(1, this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+		assertEquals(1, this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter, false).intValue());
 
 		filteredValues.clear();
 		filteredValues.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), Collections.singletonList("2"));
 		// Filter by DESIGNATION using LIKE operation
 		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Germplasm");
 		assertEquals(3,
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter, false).intValue());
 	}
 
 	@Test
