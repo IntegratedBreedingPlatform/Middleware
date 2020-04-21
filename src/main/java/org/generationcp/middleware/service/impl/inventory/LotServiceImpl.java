@@ -202,7 +202,7 @@ public class LotServiceImpl implements LotService {
 
 			final Transaction transaction = new Transaction();
 			transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
-			transaction.setType(TransactionType.DEPOSIT.getId());
+			transaction.setType(TransactionType.ADJUSTMENT.getId());
 			transaction.setLot(lot);
 			transaction.setPersonId(userId);
 			transaction.setUserId(userId);
