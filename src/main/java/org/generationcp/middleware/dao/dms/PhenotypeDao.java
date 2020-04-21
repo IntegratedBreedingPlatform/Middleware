@@ -788,15 +788,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.append(" FROM nd_experiment nd_exp ")
 			.append(" INNER JOIN stock ON nd_exp.stock_id = stock.stock_id ")
 			.append(" LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id ")
-			.append(" INNER JOIN project pr ON pr.project_id = nd_exp.project_id  ")
-			.append(" INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = ")
-			.append(DatasetTypeEnum.PLOT_DATA.getId()).append(" ")
-			.append(" INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id ")
 			.append(" where nd_exp.project_id = :projectId")
-			.append(" and plot.parent_id = :environmentId")
+			.append(" and nd_exp.parent_id = :environmentId")
 			.append(" and ((phenotype.value <> '' and phenotype.value is not null) or ")
 			.append(" (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null)) ")
-			.append(" group by plot.parent_id, ")
+			.append(" group by nd_exp.parent_id, ")
 			.append(groupByGermplasm).append(" , phenotype.observable_id ")
 			.append(" having count(phenotype.observable_id) >= 2 LIMIT 1 ");
 
@@ -1085,6 +1081,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		return ((BigInteger) query.uniqueResult()).longValue();
 
+	}
+
+	private String getPlotExperimentJoin(final boolean isSubObservation, final String experimentAlias) {
+		return isSubObservation? " INNER JOIN nd_experiment plot ON	 plot.nd_experiment_id = " + experimentAlias + ".parent_id " :
+		" INNER JOIN nd_experiment plot ON plot.nd_experiment_id = " + experimentAlias + ".nd_experiment_id ";
 	}
 
 	@Override
