@@ -296,7 +296,6 @@ public class IntegrationTestDataInitializer {
 		experimentProperty.setValue(value);
 		experimentProperty.setRank(rank);
 		this.experimentPropertyDao.save(experimentProperty);
-		this.experimentPropertyDao.refresh(experimentProperty);
 
 	}
 
