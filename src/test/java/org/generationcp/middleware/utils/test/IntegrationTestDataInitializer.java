@@ -54,6 +54,7 @@ import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -181,12 +182,12 @@ public class IntegrationTestDataInitializer {
 		this.experimentDao.saveOrUpdate(experimentModel);
 
 		final ExperimentProperty experimentProperty = new ExperimentProperty();
+		experimentModel.setProperties(new ArrayList<>(Collections.singleton(experimentProperty)));
 		experimentProperty.setExperiment(experimentModel);
 		experimentProperty.setTypeId(TermId.PLOT_NO.getId());
 		experimentProperty.setValue(value);
 		experimentProperty.setRank(1);
 		this.experimentPropertyDao.saveOrUpdate(experimentProperty);
-		this.experimentDao.refresh(experimentModel);
 
 		return experimentModel;
 	}
