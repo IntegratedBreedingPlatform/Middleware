@@ -1001,4 +1001,17 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
+	public void closeLots(final List<Integer> lotIds) {
+		try {
+			String hqlUpdate = "update Lot l set l.status= 1 where l.id in (:idList)";
+			this.getSession().createQuery(hqlUpdate)
+				.setParameterList("idList", lotIds)
+				.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error with closeLots query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }

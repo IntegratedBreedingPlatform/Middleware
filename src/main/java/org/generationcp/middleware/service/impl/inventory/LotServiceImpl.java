@@ -10,6 +10,8 @@ import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
@@ -25,6 +27,8 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.inventory.LotService;
+import org.generationcp.middleware.service.api.inventory.TransactionService;
+import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -53,6 +58,9 @@ public class LotServiceImpl implements LotService {
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
+
+	@Autowired
+	private TransactionService transactionService;
 
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 
@@ -174,4 +182,38 @@ public class LotServiceImpl implements LotService {
 		return new LotSearchMetadata(daoFactory.getLotDao().getLotsCountPerScaleName(lotsSearchDto));
 	}
 
+	@Override
+	public void closeLots(final Integer userId, final List<Integer> lotIds) {
+		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+		transactionsSearchDto.setLotIds(lotIds);
+		transactionsSearchDto.setStatusIds(Collections.singletonList(TransactionStatus.PENDING.getIntValue()));
+		final List<TransactionDto> transactionDtos = this.daoFactory.getTransactionDAO().searchTransactions(transactionsSearchDto, null);
+		this.transactionService.cancelPendingTransactions(transactionDtos);
+
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(lotIds);
+		final List<ExtendedLotDto> extendedLotDtos = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> lotsWithAvailableBalance = extendedLotDtos.stream().filter(x -> x.getAvailableBalance() > 0).collect(
+			Collectors.toList());
+		for (final ExtendedLotDto extendedLotDto : lotsWithAvailableBalance) {
+
+			final Lot lot = new Lot();
+			lot.setId(extendedLotDto.getLotId());
+
+			final Transaction transaction = new Transaction();
+			transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
+			transaction.setType(TransactionType.DEPOSIT.getId());
+			transaction.setLot(lot);
+			transaction.setPersonId(userId);
+			transaction.setUserId(userId);
+			transaction.setTransactionDate(new Date());
+			transaction.setQuantity(-1 * extendedLotDto.getAvailableBalance());
+			transaction.setPreviousAmount(0D);
+			transaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
+
+			daoFactory.getTransactionDAO().save(transaction);
+		}
+
+		this.daoFactory.getLotDao().closeLots(lotIds);
+	}
 }
