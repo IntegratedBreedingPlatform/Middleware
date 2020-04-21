@@ -22,6 +22,7 @@ import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.Experiment;
@@ -61,6 +62,7 @@ import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -933,7 +935,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(
 		final int projectId, final int locationId, final Integer plotNo,
 		final List<Integer> cvTermIds) {
-		return this.getPhenotypeDao().getPhenotypeIdsByLocationAndPlotNo(projectId, locationId, plotNo, cvTermIds);
+		final DatasetDTO dataset = this.daoFactory.getDmsProjectDAO().getDataset(projectId);
+		final DatasetType datasetType = this.daoFactory.getDatasetTypeDao().getById(dataset.getDatasetTypeId());
+		return this.getPhenotypeDao().getPhenotypeIdsByLocationAndPlotNo(projectId, datasetType.isSubObservationType(), locationId, plotNo, cvTermIds);
 	}
 
 	@Override

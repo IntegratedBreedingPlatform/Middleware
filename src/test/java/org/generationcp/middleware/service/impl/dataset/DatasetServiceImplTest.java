@@ -367,7 +367,7 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testCountPhenotypesByInstance() {
 		final long count = 6;
-		Mockito.when(this.phenotypeDao.countPhenotypesForDatasetAndInstance(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt())).thenReturn(count);
+		Mockito.when(this.phenotypeDao.countPhenotypesForDatasetAndInstance(ArgumentMatchers.anyInt(), ArgumentMatchers.anyBoolean(), ArgumentMatchers.anyInt())).thenReturn(count);
 		Assert.assertEquals(count, this.datasetService.countObservationsByInstance(1, 2));
 	}
 

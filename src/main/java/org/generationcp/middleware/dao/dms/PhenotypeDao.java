@@ -562,7 +562,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(
-		final Integer projectId, final Integer locationId, final Integer plotNo,
+		final Integer projectId,  final boolean isSubObservation, final Integer locationId, final Integer plotNo,
 		final List<Integer> cvTermIds) {
 		try {
 			if (cvTermIds.isEmpty()) {
@@ -573,11 +573,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			final String sql = "SELECT  expprop.value, pheno.observable_id, pheno.phenotype_id FROM "
 				+ "nd_experiment exp "
 				+ "INNER JOIN nd_experimentprop expprop ON expprop.nd_experiment_id = exp.nd_experiment_id "
-				+ "INNER JOIN phenotype pheno ON exp.nd_experiment_id = pheno.nd_experiment_id "
-				+ " INNER JOIN project pr ON pr.project_id = exp.project_id  "
-				+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-				+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
-				+ "WHERE exp.project_id = :projectId "
+				+ this.getPlotExperimentJoin(isSubObservation, "exp")
+				+ " WHERE exp.project_id = :projectId "
 				+ "AND plot.parent_id = :locationId " + "AND pheno.observable_id IN (:cvTermIds) "
 				+ "AND expprop.value = :plotNo " + "AND exp.type_id = 1155 " + "AND expprop.type_id in (8200, 8380)";
 
@@ -1065,16 +1062,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return (Long) criteria.uniqueResult();
 	}
 
-	public long countPhenotypesForDatasetAndInstance(final Integer datasetId, final Integer instanceId) {
+	public long countPhenotypesForDatasetAndInstance(final Integer datasetId, final boolean isSubObservation, final Integer instanceId) {
 		final Query query =
 			this.getSession()
 				.createSQLQuery(
 					"SELECT COUNT(DISTINCT p.phenotype_id) "
 						+ " from phenotype p "
 						+ " INNER JOIN nd_experiment e ON p.nd_experiment_id = e.nd_experiment_id "
-						+ " INNER JOIN project pr ON pr.project_id = e.project_id  "
-						+ " INNER JOIN project plot_ds on plot_ds.study_id = pr.study_id and plot_ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-						+ " INNER JOIN nd_experiment plot ON plot_ds.project_id = plot.project_id "
+						+ getPlotExperimentJoin(isSubObservation, "e")
 						+ " WHERE e.project_id = :projectId AND plot.parent_id = :environmentId");
 		query.setParameter("projectId", datasetId);
 		query.setParameter("environmentId", instanceId);

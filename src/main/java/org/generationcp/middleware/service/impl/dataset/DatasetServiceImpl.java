@@ -144,7 +144,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public long countObservationsByInstance(final Integer datasetId, final Integer instanceId) {
-		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDatasetAndInstance(datasetId, instanceId);
+		final DatasetDTO dataset = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
+		final DatasetType datasetType = this.daoFactory.getDatasetTypeDao().getById(dataset.getDatasetTypeId());
+		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDatasetAndInstance(datasetId, datasetType.isSubObservationType(), instanceId);
 	}
 
 	@Override

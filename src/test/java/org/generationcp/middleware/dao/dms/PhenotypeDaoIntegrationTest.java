@@ -294,14 +294,14 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		}
 		this.sessionProvder.getSession().flush();
 		Assert.assertEquals(this.phenotypes.size(),
-			this.phenotypeDao.countPhenotypesForDatasetAndInstance(plot.getProjectId(), model.getNdExperimentId()));
+			this.phenotypeDao.countPhenotypesForDatasetAndInstance(plot.getProjectId(), false, model.getNdExperimentId()));
 	}
 
 	@Test
 	public void testCountPhenotypesForDatasetAndInstanceNoPhenotypes() {
 		final int numberOfReps = 2;
 		final int instanceId = this.createEnvironmentData(numberOfReps, false);
-		Assert.assertEquals(0, this.phenotypeDao.countPhenotypesForDatasetAndInstance(this.study.getProjectId(), instanceId));
+		Assert.assertEquals(0, this.phenotypeDao.countPhenotypesForDatasetAndInstance(this.study.getProjectId(), false, instanceId));
 	}
 
 	@Test
