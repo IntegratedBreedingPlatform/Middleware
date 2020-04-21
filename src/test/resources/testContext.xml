@@ -226,6 +226,11 @@
 		<aop:scoped-proxy />
 	</bean>
 
+	<bean id="keySequenceRegisterService" factory-bean="managerFactory"
+		  factory-method="getKeySequenceRegisterService" scope="request">
+		<aop:scoped-proxy />
+	</bean>
+
     <bean id="studyDataManager" factory-bean="managerFactory"
           factory-method="getStudyDataManager">
         <aop:scoped-proxy />
