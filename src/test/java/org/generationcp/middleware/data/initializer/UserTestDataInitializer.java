@@ -79,7 +79,7 @@ public class UserTestDataInitializer {
 		if(workbenchUser.getRoles()!=null && !workbenchUser.getRoles().isEmpty()){
 			userRoles = (ArrayList<UserRole>) workbenchUser.getRoles();
 		}
-		UserRole userRole = new UserRole();
+		final UserRole userRole = new UserRole();
 		userRole.setUser(workbenchUser);
 		userRole.setWorkbenchProject(project);
 		userRole.setRole(new Role(roleId, roleName));
