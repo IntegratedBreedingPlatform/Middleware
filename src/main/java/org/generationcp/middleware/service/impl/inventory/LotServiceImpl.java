@@ -215,4 +215,8 @@ public class LotServiceImpl implements LotService {
 
 		this.daoFactory.getLotDao().closeLots(lotIds);
 	}
+
+	public void setTransactionService(final TransactionService transactionService) {
+		this.transactionService = transactionService;
+	}
 }
