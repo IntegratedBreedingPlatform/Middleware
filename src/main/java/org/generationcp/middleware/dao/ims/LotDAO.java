@@ -20,6 +20,8 @@ import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
@@ -38,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -913,6 +916,53 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error at countSearchLots() query on LotDAO: " + e.getMessage(), e);
+		}
+	}
+
+	public List<UserDefinedField> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
+		try {
+			final String lotsQuery = this.buildSearchLotsQuery(searchDto);
+
+			final String sql = "select distinct {u.*} from atributs a inner join udflds u "
+				+ " 	inner join (" + lotsQuery + ") lots on lots.gid = a.gid"
+				+ " where a.atype = u.fldno"
+				+ " order by u.fname";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("u", UserDefinedField.class);
+			return query.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getGermplasmAttributeTypes() in LotDAO: " + e.getMessage(), e);
+		}
+	}
+
+	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final LotsSearchDto searchDto) {
+		try {
+			final String lotsQuery = this.buildSearchLotsQuery(searchDto);
+
+			final String sql = "select distinct {a.*} from atributs a inner join (" + lotsQuery + ") lots on lots.gid = a.gid";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("a", Attribute.class);
+			final List<Attribute> attributes = query.list();
+
+			if (attributes.isEmpty()) {
+				return null;
+			}
+
+			final HashMap<Integer, Map<Integer, String>> attributeMapByGid = new HashMap<>();
+			for (final Attribute attribute : attributes) {
+				Map<Integer, String> attrByType = attributeMapByGid.get(attribute.getGermplasmId());
+				if (attrByType == null) {
+					attrByType = new HashMap<>();
+				}
+				attrByType.put(attribute.getTypeId(), attribute.getAval());
+				attributeMapByGid.put(attribute.getGermplasmId(), attrByType);
+			}
+
+			return attributeMapByGid;
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getGermplasmAttributeValues() in LotDAO: " + e.getMessage(), e);
 		}
 	}
 
