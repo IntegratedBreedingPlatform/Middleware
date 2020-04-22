@@ -18,7 +18,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.fest.util.Collections;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
@@ -334,7 +333,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 				final GermplasmListData recordSaved = this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
 				idGermplasmListDataSaved.add(recordSaved.getId());
-				if (germplasmListData.getStatus() != null && germplasmListData.getStatus().intValue() == 9) {
+				if (germplasmListData.getStatus() != null && germplasmListData.getStatus() == 9) {
 					deletedListEntryIds.add(germplasmListData.getId());
 				}
 			}
@@ -356,18 +355,14 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public int deleteGermplasmListDataByListId(final Integer listId) {
-
-		int germplasmListDataDeleted = 0;
 		try {
-			germplasmListDataDeleted = this.daoFactory.getGermplasmListDataDAO().deleteByListId(listId);
+			return this.daoFactory.getGermplasmListDataDAO().deleteByListId(listId);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 				"Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListDataByListId(listId="
 					+ listId + "): " + e.getMessage(),
 				e);
 		}
-
-		return germplasmListDataDeleted;
 	}
 
 	@Override
@@ -574,7 +569,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				return data.getGid();
 			}
 
-			;
 		});
 		// Append to maleParents of CrossListData other progenitors of GIDs from the list, if any
 		final Map<Integer, List<GermplasmParent>> progenitorsMap =
