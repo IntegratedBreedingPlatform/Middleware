@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -59,5 +60,30 @@ public class UserTestDataInitializer {
 		user.setRoles(userRoleList);
 		
 		return user;
+	}
+
+	public static WorkbenchUser createUserWithProjectRole(final Integer userid, final Project project) {
+		final WorkbenchUser user = new WorkbenchUser();
+		user.setUserid(userid);
+		// Role ID 1 = ADMIN
+		final UserRole userRole = new UserRole();
+		userRole.setUser(user);
+		userRole.setWorkbenchProject(project);
+		userRole.setRole( new Role(1, "Admin"));
+		user.setRoles(Arrays.asList(userRole));
+		return user;
+	}
+
+	public static void addUserRole(final WorkbenchUser workbenchUser, final Integer roleId, final String roleName, final Project project) {
+		ArrayList<UserRole> userRoles = new ArrayList<>();
+		if(workbenchUser.getRoles()!=null && !workbenchUser.getRoles().isEmpty()){
+			userRoles = (ArrayList<UserRole>) workbenchUser.getRoles();
+		}
+		UserRole userRole = new UserRole();
+		userRole.setUser(workbenchUser);
+		userRole.setWorkbenchProject(project);
+		userRole.setRole(new Role(roleId, roleName));
+		userRoles.add(userRole);
+		workbenchUser.setRoles(userRoles);
 	}
 }
