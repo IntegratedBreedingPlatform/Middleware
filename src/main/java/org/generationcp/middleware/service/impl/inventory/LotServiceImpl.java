@@ -161,7 +161,6 @@ public class LotServiceImpl implements LotService {
 				transaction.setTransactionDate(new Date());
 				transaction.setQuantity(lotItemDto.getInitialBalance());
 				transaction.setPreviousAmount(0D);
-				//FIXME Commitment date in some cases is not 0. For Deposits is always zero, but for other types it will be the current date
 				transaction.setCommitmentDate(0);
 
 				daoFactory.getTransactionDAO().save(transaction);
@@ -202,7 +201,7 @@ public class LotServiceImpl implements LotService {
 
 			final Transaction transaction = new Transaction();
 			transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
-			transaction.setType(TransactionType.ADJUSTMENT.getId());
+			transaction.setType(TransactionType.DISCARD.getId());
 			transaction.setLot(lot);
 			transaction.setPersonId(userId);
 			transaction.setUserId(userId);
