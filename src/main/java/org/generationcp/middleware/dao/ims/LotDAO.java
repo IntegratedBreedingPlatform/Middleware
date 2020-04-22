@@ -1004,8 +1004,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public void closeLots(final List<Integer> lotIds) {
 		try {
-			String hqlUpdate = "update Lot l set l.status= 1 where l.id in (:idList)";
+			String hqlUpdate = "update Lot l set l.status= :status where l.id in (:idList)";
 			this.getSession().createQuery(hqlUpdate)
+				.setParameter("status", LotStatus.CLOSED.getIntValue())
 				.setParameterList("idList", lotIds)
 				.executeUpdate();
 		} catch (final HibernateException e) {
