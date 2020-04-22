@@ -18,6 +18,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.fest.util.Collections;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
@@ -543,21 +544,20 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public List<ListDataProject> retrieveSnapshotListDataWithParents(final Integer listID) {
 		final List<ListDataProject> dataList = this.getListDataProjectDAO().getListDataProjectWithParents(listID);
-		final Iterable<Integer> gidList = Iterables.transform(dataList, new Function<ListDataProject, Integer>() {
-
-			public Integer apply(final ListDataProject data) {
-				return data.getGermplasmId();
-			}
-
-			;
-		});
-		// Append to maleParents of ListDataProject other progenitors of GIDs from the list, if any
-		final Map<Integer, List<GermplasmParent>> progenitorsMap =
-			this.daoFactory.getGermplasmDao().getParentsFromProgenitorsForGIDsMap(Lists.newArrayList(gidList));
-		for (final ListDataProject data : dataList) {
-			final List<GermplasmParent> progenitors = progenitorsMap.get(data.getGermplasmId());
-			if (progenitors != null) {
-				data.addMaleParents(progenitors);
+		if(!dataList.isEmpty()) {
+			final Iterable<Integer> gidList = Iterables.transform(dataList, new Function<ListDataProject, Integer>() {
+				public Integer apply(final ListDataProject data) {
+					return data.getGermplasmId();
+				}
+			});
+			// Append to maleParents of ListDataProject other progenitors of GIDs from the list, if any
+			final Map<Integer, List<GermplasmParent>> progenitorsMap =
+				this.daoFactory.getGermplasmDao().getParentsFromProgenitorsForGIDsMap(Lists.newArrayList(gidList));
+			for (final ListDataProject data : dataList) {
+				final List<GermplasmParent> progenitors = progenitorsMap.get(data.getGermplasmId());
+				if (progenitors != null) {
+					data.addMaleParents(progenitors);
+				}
 			}
 		}
 		return dataList;
