@@ -9,7 +9,6 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -21,8 +20,6 @@ import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,9 +55,6 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	private GermplasmDataManager germplasmDataManager;
 
 	@Autowired
-	private UserService userService;
-
-	@Autowired
 	private LocationDataManager locationDataManager;
 
 	@Before
@@ -70,7 +64,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.lotService.setTransactionService(transactionService);
 		this.createGermplasm();
-		this.findAdminUser();
+		userId = this.findAdminUser();
 		this.resolveStorageLocation();
 		this.createLot();
 		this.createTransactions();
@@ -130,11 +124,6 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(pendingTransactions, hasSize(0));
 		assertThat(discardedTrxsAfterClosingLot, equalTo(discardedTrxsBeforeClosingLot));
 
-	}
-
-	private void findAdminUser() {
-		final WorkbenchUser user = this.userService.getUserByName("admin", 0, 1, Operation.EQUAL).get(0);
-		userId = user.getUserid();
 	}
 
 	private void createGermplasm() {
