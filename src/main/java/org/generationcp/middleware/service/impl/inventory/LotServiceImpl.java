@@ -186,31 +186,30 @@ public class LotServiceImpl implements LotService {
 		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
 		transactionsSearchDto.setLotIds(lotIds);
 		transactionsSearchDto.setStatusIds(Collections.singletonList(TransactionStatus.PENDING.getIntValue()));
-		final List<TransactionDto> transactionDtos = this.daoFactory.getTransactionDAO().searchTransactions(transactionsSearchDto, null);
-		this.transactionService.cancelPendingTransactions(transactionDtos);
+		final List<TransactionDto> pendingTransactionsDtos =
+			this.daoFactory.getTransactionDAO().searchTransactions(transactionsSearchDto, null);
+		this.transactionService.cancelPendingTransactions(pendingTransactionsDtos);
 
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(lotIds);
-		final List<ExtendedLotDto> extendedLotDtos = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
-		final List<ExtendedLotDto> lotsWithAvailableBalance = extendedLotDtos.stream().filter(x -> x.getAvailableBalance() > 0).collect(
+		final List<ExtendedLotDto> lotsToBeCancelled = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> lotsWithAvailableBalance = lotsToBeCancelled.stream().filter(x -> x.getAvailableBalance() > 0).collect(
 			Collectors.toList());
-		for (final ExtendedLotDto extendedLotDto : lotsWithAvailableBalance) {
 
+		for (final ExtendedLotDto extendedLotDto : lotsWithAvailableBalance) {
 			final Lot lot = new Lot();
 			lot.setId(extendedLotDto.getLotId());
-
-			final Transaction transaction = new Transaction();
-			transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
-			transaction.setType(TransactionType.DISCARD.getId());
-			transaction.setLot(lot);
-			transaction.setPersonId(userId);
-			transaction.setUserId(userId);
-			transaction.setTransactionDate(new Date());
-			transaction.setQuantity(-1 * extendedLotDto.getAvailableBalance());
-			transaction.setPreviousAmount(0D);
-			transaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
-
-			daoFactory.getTransactionDAO().save(transaction);
+			final Transaction discardTransaction = new Transaction();
+			discardTransaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
+			discardTransaction.setType(TransactionType.DISCARD.getId());
+			discardTransaction.setLot(lot);
+			discardTransaction.setPersonId(userId);
+			discardTransaction.setUserId(userId);
+			discardTransaction.setTransactionDate(new Date());
+			discardTransaction.setQuantity(-1 * extendedLotDto.getAvailableBalance());
+			discardTransaction.setPreviousAmount(0D);
+			discardTransaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
+			daoFactory.getTransactionDAO().save(discardTransaction);
 		}
 
 		this.daoFactory.getLotDao().closeLots(lotIds);
