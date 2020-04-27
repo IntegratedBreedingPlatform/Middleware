@@ -1006,12 +1006,14 @@ public class DatasetServiceImpl implements DatasetService {
 				for (final String variableName : table.columnKeySet()) {
 					String importedVariableValue = table.get(observationUnitId, variableName);
 
-					if (StringUtils.isNotBlank(importedVariableValue)) {
-						final MeasurementVariable measurementVariable =
-							(MeasurementVariable) CollectionUtils.find(measurementVariableList, object -> {
-								final MeasurementVariable variable = (MeasurementVariable) object;
-								return variable.getAlias().equalsIgnoreCase(variableName);
-							});
+					final MeasurementVariable measurementVariable =
+						(MeasurementVariable) CollectionUtils.find(measurementVariableList, object -> {
+							final MeasurementVariable variable = (MeasurementVariable) object;
+							return variable.getAlias().equalsIgnoreCase(variableName);
+						});
+
+					// Allow import of blank value if the variable is DATE datatype, otherwise, ignore blank values of other data types.
+					if (StringUtils.isNotBlank(importedVariableValue) || measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
 
 						BigInteger categoricalValueId = null;
 						if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
