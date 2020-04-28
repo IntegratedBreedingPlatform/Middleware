@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateReq
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -22,8 +21,6 @@ import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
@@ -60,9 +57,6 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	private GermplasmDataManager germplasmDataManager;
 
 	@Autowired
-	private UserService userService;
-
-	@Autowired
 	private LocationDataManager locationDataManager;
 
 	@Before
@@ -71,7 +65,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		this.lotService = new LotServiceImpl(this.sessionProvder);
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.createGermplasm();
-		this.findAdminUser();
+		userId = findAdminUser();
 		this.resolveStorageLocation();
 		this.createLot();
 		this.createTransactions();
@@ -161,11 +155,6 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
 		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
 		Assert.assertTrue(extendedLotDto.getAvailableBalance().equals(38D));
-	}
-
-	private void findAdminUser() {
-		final WorkbenchUser user = this.userService.getUserByName("admin", 0, 1, Operation.EQUAL).get(0);
-		userId = user.getUserid();
 	}
 
 	private void createGermplasm() {
