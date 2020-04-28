@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -55,7 +56,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -594,8 +594,9 @@ public class DatasetServiceImpl implements DatasetService {
 		searchDTO.setGenericGermplasmDescriptors(this.findGenericGermplasmDescriptors(studyId));
 		searchDTO.setAdditionalDesignFactors(this.findAdditionalDesignFactors(studyId));
 
-		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
-			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
+		final List<MeasurementVariableDto> selectionMethodsAndTraits =
+			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
+				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 		searchDTO.setSelectionMethodsAndTraits(selectionMethodsAndTraits);
 	}
 
@@ -982,7 +983,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Table<String, Integer, Integer> importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode) {
+	public Table<String, Integer, Integer> importDataset(final Integer datasetId, final Table<String, String, String> table,
+		final Boolean draftMode, final Boolean allowDateAndCharacterBlankValue) {
 
 		final Table<String, Integer, Integer> observationDbIdsTable = HashBasedTable.create();
 
@@ -1012,8 +1014,8 @@ public class DatasetServiceImpl implements DatasetService {
 							return variable.getAlias().equalsIgnoreCase(variableName);
 						});
 
-					// Allow import of blank value if the variable is DATE datatype, otherwise, ignore blank values of other data types.
-					if (StringUtils.isNotBlank(importedVariableValue) || measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
+					// Allow to import of blank value if the variable is DATE or Character datatype, otherwise, ignore blank values of other data types.
+					if (StringUtils.isNotBlank(importedVariableValue) || (isDateOrCharacterDataType(measurementVariable) && allowDateAndCharacterBlankValue)) {
 
 						BigInteger categoricalValueId = null;
 						if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
@@ -1027,7 +1029,8 @@ public class DatasetServiceImpl implements DatasetService {
 						}
 						if (measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
 							// In case the date is in yyyy-MM-dd format, try to parse it as number format yyyyMMdd
-							final String parsedDate = Util.tryConvertDate(importedVariableValue, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
+							final String parsedDate =
+								Util.tryConvertDate(importedVariableValue, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
 							if (parsedDate != null) {
 								importedVariableValue = parsedDate;
 							}
@@ -1071,7 +1074,8 @@ public class DatasetServiceImpl implements DatasetService {
 						}
 
 						// We need to return the observationDbIds (mapped in a table by observationUnitId and variableId) of the created/updated observations.
-						observationDbIdsTable.put((String) observationUnitId, observationUnitData.getVariableId(), phenotype.getPhenotypeId());
+						observationDbIdsTable
+							.put((String) observationUnitId, observationUnitData.getVariableId(), phenotype.getPhenotypeId());
 					}
 				}
 
@@ -1093,6 +1097,11 @@ public class DatasetServiceImpl implements DatasetService {
 		return observationDbIdsTable;
 	}
 
+	private static boolean isDateOrCharacterDataType(final MeasurementVariable measurementVariable) {
+		return DataType.DATE_TIME_VARIABLE.getId().equals(measurementVariable.getDataTypeId()) || DataType.CHARACTER_VARIABLE.getId()
+			.equals(measurementVariable.getDataTypeId());
+	}
+
 	@Override
 	public List<MeasurementVariable> getDatasetMeasurementVariables(final Integer datasetId) {
 		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, MEASUREMENT_VARIABLE_TYPES);
@@ -1110,8 +1119,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<Integer> instanceIds) {
 		final Map<Integer, List<ObservationUnitRow>> instanceMap = new LinkedHashMap<>();
 
-		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
-			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
+		final List<MeasurementVariableDto> selectionMethodsAndTraits =
+			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
+				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 		final List<String> designFactors = this.findAdditionalDesignFactors(studyId);
 		final List<String> germplasmDescriptors = this.findGenericGermplasmDescriptors(studyId);
 
