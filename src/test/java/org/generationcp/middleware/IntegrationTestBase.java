@@ -2,6 +2,9 @@
 package org.generationcp.middleware;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -44,6 +47,10 @@ public abstract class IntegrationTestBase {
 	@Qualifier(value = "workbenchSessionProvider")
 	protected HibernateSessionProvider workbenchSessionProvider;
 
+	@Autowired
+	private UserService userService;
+
+
 	@Rule
 	public TestName name = new TestName();
 	private long startTime;
@@ -66,6 +73,11 @@ public abstract class IntegrationTestBase {
 		final long elapsedTime = System.nanoTime() - this.startTime;
 		LOG.info(" +++++ Test : " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + "() ended, took "
 				+ (double) elapsedTime / 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++\n");
+	}
+
+	protected Integer findAdminUser() {
+		final WorkbenchUser user = this.userService.getUserByName("admin", 0, 1, Operation.EQUAL).get(0);
+		return user.getUserid();
 	}
 
 }
