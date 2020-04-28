@@ -5,15 +5,15 @@ package org.generationcp.middleware.service.api;
  */
 public class BrapiView {
 
-	public static class BrapiV1_3 {
+	public interface BrapiV1_3 extends BrapiV1_2 {
 
 	}
 
-	public static class BrapiV1_2 {
+	public interface BrapiV1_2 {
 
 	}
 
-	public static class BrapiV2 {
+	public interface BrapiV2 extends BrapiV1_3 {
 
 	}
 
