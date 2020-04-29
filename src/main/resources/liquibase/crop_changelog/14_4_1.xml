@@ -6,11 +6,9 @@
 
 	<changeSet author="gelli" id="v14.4.1-1">
 		<preConditions onFail="MARK_RAN">
-            <and>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="project_parent_fk_idx"></foreignKeyConstraintExists>
-                </not>
-            </and>
+			<not>
+				<foreignKeyConstraintExists foreignKeyName="project_parent_fk_idx"></foreignKeyConstraintExists>
+			</not>
 		</preConditions>
 		<comment>Add project.parent_project_id foreign key to project table</comment>
 		<addForeignKeyConstraint baseTableName="project" baseColumnNames="parent_project_id" constraintName="project_parent_fk_idx" referencedTableName="project"
