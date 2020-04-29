@@ -1014,9 +1014,9 @@ public class DatasetServiceImpl implements DatasetService {
 							return variable.getAlias().equalsIgnoreCase(variableName);
 						});
 
-					// Allow to import of blank value if the variable is DATE or Character datatype, otherwise, ignore blank values of other data types.
-					if (StringUtils.isNotBlank(importedVariableValue) || (isDateOrCharacterDataType(measurementVariable) && allowDateAndCharacterBlankValue)) {
-
+					// If allowDateAndCharacterBlankValue is true, allow to import blank value of Date and Character datatypes,
+					// otherwise, just ignore blank values.
+					if ((allowDateAndCharacterBlankValue && isDateOrCharacterDataType(measurementVariable)) || StringUtils.isNotBlank(importedVariableValue)) {
 						BigInteger categoricalValueId = null;
 						if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 							for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
@@ -1025,7 +1025,6 @@ public class DatasetServiceImpl implements DatasetService {
 									break;
 								}
 							}
-
 						}
 						if (measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
 							// In case the date is in yyyy-MM-dd format, try to parse it as number format yyyyMMdd
