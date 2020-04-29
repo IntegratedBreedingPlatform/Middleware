@@ -104,5 +104,20 @@
 		<addForeignKeyConstraint baseTableName="ims_lot" baseColumnNames="locid" constraintName="location_fk_idx" referencedTableName="location"
 								 referencedColumnNames="locid"/>
 	</changeSet>
+	<changeSet author="gelli" id="v14.4.0-6">
+		<preConditions onFail="MARK_RAN">
+            <and>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="project_parent_fk_idx"></foreignKeyConstraintExists>
+                </not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM project p1 WHERE p1.parent_project_id is not null and NOT EXISTS (SELECT 1 FROM project p2 WHERE p2.project_id = p1.parent_project_id);
+                </sqlCheck>
+            </and>
+		</preConditions>
+		<comment>Add project.parent_project_id foreign key to project table</comment>
+		<addForeignKeyConstraint baseTableName="project" baseColumnNames="parent_project_id" constraintName="project_parent_fk_idx" referencedTableName="project"
+								 referencedColumnNames="project_id"/>
+	</changeSet>
 
 </databaseChangeLog>
