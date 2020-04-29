@@ -5,11 +5,11 @@ package org.generationcp.middleware.service.api;
  */
 public class BrapiView {
 
-	public interface BrapiV1_3 extends BrapiV1_2 {
+	public interface BrapiV1_2 {
 
 	}
 
-	public interface BrapiV1_2 {
+	public interface BrapiV1_3 extends BrapiV1_2 {
 
 	}
 
