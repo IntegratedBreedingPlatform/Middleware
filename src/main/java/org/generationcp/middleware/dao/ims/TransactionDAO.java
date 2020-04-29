@@ -602,7 +602,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "' END) AS transactionType,"//
 		+ "    tr.trnqty AS amount,"//
 		+ "    tr.comments AS notes,"//
-		+ "    tr.trndate as transactionDate, "//
+		+ "    tr.trndate as createdDate, "//
 		+ "    lot.lotid AS lotLotId," //
 		+ "    lot.lot_uuid AS lotUUID," //
 		+ "    lot.eid AS lotGid,"//
@@ -667,12 +667,12 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				query.append(" and tr.comments like '%").append(transactionsSearchDto.getNotes()).append("%' ");
 			}
 
-			if (transactionsSearchDto.getTransactionDateFrom() != null) {
-				query.append(" and DATE(tr.trndate) >= '").append(format.format(transactionsSearchDto.getTransactionDateFrom())).append("' ");
+			if (transactionsSearchDto.getCreatedDateFrom() != null) {
+				query.append(" and DATE(tr.trndate) >= '").append(format.format(transactionsSearchDto.getCreatedDateFrom())).append("' ");
 			}
 
-			if (transactionsSearchDto.getTransactionDateTo() != null) {
-				query.append(" and DATE(tr.trndate) <= '").append(format.format(transactionsSearchDto.getTransactionDateTo())).append("' ");
+			if (transactionsSearchDto.getCreatedDateTo() != null) {
+				query.append(" and DATE(tr.trndate) <= '").append(format.format(transactionsSearchDto.getCreatedDateTo())).append("' ");
 			}
 
 			if (transactionsSearchDto.getCreatedByUsername() != null) {
@@ -814,12 +814,13 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
-			return TransactionDto.class.getConstructor(Integer.class, // transactionId
+			return TransactionDto.class.getConstructor(
+				Integer.class, // transactionId
 				String.class,    // createdByUsername
 				String.class,    // transactionType
 				Double.class,    // amount
 				String.class,    // notes
-				Date.class,      // transactionDate
+				Date.class,      // createdDate
 				Integer.class,   // lotId
 				String.class,    // lotUUID
 				Integer.class,   // gid
@@ -845,7 +846,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("transactionType");
 		query.addScalar("amount");
 		query.addScalar("notes");
-		query.addScalar("transactionDate", Hibernate.DATE);
+		query.addScalar("createdDate", Hibernate.DATE);
 		query.addScalar("lotLotId");
 		query.addScalar("lotUUID");
 		query.addScalar("lotGid");

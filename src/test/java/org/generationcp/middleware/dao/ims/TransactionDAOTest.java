@@ -328,8 +328,8 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		transactionsSearchDto.setNotes("Deposit");
 		transactionsSearchDto.setUnitIds(Lists.newArrayList(8264));
 		transactionsSearchDto.setStockId("ABC-1");
-		transactionsSearchDto.setTransactionDateFrom(date1);
-		transactionsSearchDto.setTransactionDateTo(date1);
+		transactionsSearchDto.setCreatedDateFrom(date1);
+		transactionsSearchDto.setCreatedDateTo(date1);
 		transactionsSearchDto.setTransactionIds(Lists.newArrayList(depositTransaction.getId(), closedTransaction.getId()));
 		transactionsSearchDto.setTransactionTypes(Lists.newArrayList(TransactionType.DEPOSIT.getId()));
 		transactionsSearchDto.setCreatedByUsername(user.getName());
@@ -345,7 +345,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 			Assert.assertTrue(transactionDto.getNotes().equalsIgnoreCase("Deposit"));
 			Assert.assertTrue(transactionDto.getLot().getUnitId().equals(8264));
 			Assert.assertTrue(transactionDto.getLot().getStockId().equalsIgnoreCase("ABC-1"));
-			Assert.assertTrue(transactionDto.getTransactionDate().equals(date1));
+			Assert.assertTrue(transactionDto.getCreatedDate().equals(date1));
 			Assert.assertTrue(transactionDto.getTransactionId().equals(depositTransaction.getId()));
 			Assert.assertTrue(transactionDto.getTransactionType().equalsIgnoreCase("Deposit"));
 			Assert.assertTrue(transactionDto.getCreatedByUsername().equalsIgnoreCase(user.getName()));
