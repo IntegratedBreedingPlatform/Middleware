@@ -13,7 +13,7 @@ public class BrapiView {
 
 	}
 
-	public interface BrapiV2 extends BrapiV1_3 {
+	public interface BrapiV2 {
 
 	}
 
