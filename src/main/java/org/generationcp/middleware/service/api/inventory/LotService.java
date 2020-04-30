@@ -7,16 +7,22 @@ import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface LotService {
 
 	List<ExtendedLotDto> searchLots(LotsSearchDto lotsSearchDto, Pageable pageable);
 
 	long countSearchLots(LotsSearchDto lotsSearchDto);
+
+	List<UserDefinedField> getGermplasmAttributeTypes(LotsSearchDto searchDto);
+
+	Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(LotsSearchDto searchDto);
 
 	Integer saveLot(CropType cropType, Integer userId, LotGeneratorInputDto lotDto);
 
