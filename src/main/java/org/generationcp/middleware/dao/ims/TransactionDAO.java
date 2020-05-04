@@ -485,7 +485,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	public List<String> getStockIdsByListDataProjectListId(final Integer listId) {
 		try {
 			final String sql =
-				" SELECT lot.stock_id, trnqty " +
+				" SELECT lot.stock_id " +
 				" FROM ims_lot lot " +
 				" INNER JOIN ims_transaction tran ON lot.lotid = tran.lotid " +
 				" INNER join listnms l ON l.listref = tran.sourceid " +
