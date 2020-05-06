@@ -23,6 +23,8 @@ import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
+import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -343,7 +345,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 		final List<Integer> traitIds = Arrays.asList(this.trait.getCvTermId());
 		this.createProjectProperties(plot, traitIds);
-		this.createEnvironmentData(plot, 1, traitIds);
+		this.createEnvironmentData(plot, 1, traitIds, true);
 		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
 		final Integer variableId = this.trait.getCvTermId();
 		this.phenotypeDao
@@ -364,13 +366,13 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		this.cvTermDao.save(trait2);
 		final List<Integer> traitIds = Arrays.asList(this.trait.getCvTermId(), trait2.getCvTermId());
 		this.createProjectProperties(plot, traitIds);
-		final Integer environment1 = this.createEnvironmentData(plot, 1, traitIds);
+		final Integer environment1 = this.createEnvironmentData(plot, 1, traitIds, true);
 		final DmsProject study2 = this.createStudy();
 		final DmsProject plot2 =
 			this.createDataset(study2.getName() + " - Plot Dataset", uniqueID, DatasetTypeEnum.MEANS_DATA.getId(),
 				study2, study2);
 		this.createProjectProperties(plot2, traitIds);
-		this.createEnvironmentData(plot2, 1, traitIds);
+		this.createEnvironmentData(plot2, 1, traitIds, true);
 		this.sessionProvder.getSession().flush();
 
 		final PhenotypeSearchRequestDTO dto = new PhenotypeSearchRequestDTO();
@@ -444,7 +446,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
 		return this.createEnvironmentData(this.study, numberOfReps,
-			withPhenotype ? Collections.singletonList(this.trait.getCvTermId()) : Collections.<Integer>emptyList());
+			withPhenotype ? Collections.singletonList(this.trait.getCvTermId()) : Collections.<Integer>emptyList(),true);
 	}
 
 	private void createProjectProperties(final DmsProject project, final List<Integer> traitIds) {
@@ -460,7 +462,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.projectPropertyDao.save(projectProp);
 		}
 	}
-	private Integer createEnvironmentData(final DmsProject project, final Integer numberOfReps, final List<Integer> traitIds) {
+	private Integer createEnvironmentData(final DmsProject project, final Integer numberOfReps, final List<Integer> traitIds, boolean isWithValue) {
 		this.phenotypes = new ArrayList<>();
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription("1");
@@ -489,13 +491,79 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 					final Phenotype phenotype = new Phenotype();
 					phenotype.setObservableId(traitId);
 					phenotype.setExperiment(experimentModel);
-					phenotype.setValue(String.valueOf(new Random().nextDouble()));
+					if(isWithValue){
+						phenotype.setValue(String.valueOf(new Random().nextDouble()));
+					}
 					this.phenotypes.add(this.phenotypeDao.save(phenotype));
 				}
 			}
 
 		}
 
-		return geolocation.getLocationId();
+			return geolocation.getLocationId();
 	}
+
+	@Test
+	public void testgetObservationForTraits(){
+		//Study with valid observation values
+		final Integer geolocation1 = this.createEnvironmentData(1, true);
+		//Study invalid observation values
+		final String uniqueID = this.commonTestProject.getUniqueID();
+		final DmsProject plot =
+			this.createDataset(this.study.getName() + " - Plot Dataset", uniqueID, DatasetTypeEnum.PLOT_DATA.getId(),
+				this.study, this.study);
+		final Integer geolocation2 = this.createEnvironmentData(plot, 1, Arrays.asList(this.trait.getCvTermId()), false);
+
+		final List<Observation> observations = this.phenotypeDao.getObservationForTraits(Arrays.asList(this.trait.getCvTermId()), Arrays.asList(geolocation1, geolocation2), 0, 0);
+		Assert.assertEquals("Null values should not be included",this.germplasm.size(), observations.size());
+	}
+
+	/**
+	 * Method getNumericTraitInfoList(Collection: environment, Collection: trait) is use when environment is > 1000
+	 */
+	@Test
+	public void testGetNumericTraitInfoValues1(){
+		//Study with valid observation values
+		final Integer geolocation1 = this.createEnvironmentData(1, true);
+		//Study invalid observation values
+		final String uniqueID = this.commonTestProject.getUniqueID();
+		final DmsProject plot =
+			this.createDataset(this.study.getName() + " - Plot Dataset", uniqueID, DatasetTypeEnum.PLOT_DATA.getId(),
+				this.study, this.study);
+		final Integer geolocation2 = this.createEnvironmentData(plot, 1, Arrays.asList(this.trait.getCvTermId()), false);
+		final List<NumericTraitInfo> numericTraitInfos = this.phenotypeDao.getNumericTraitInfoList(Arrays.asList(geolocation1, geolocation2), Arrays.asList(this.trait.getCvTermId()));
+		final Map<Integer, List<Double>> traitInfoValues = this.phenotypeDao.getNumericTraitInfoValues( Arrays.asList(geolocation1, geolocation2), numericTraitInfos);
+		final List<Double> values = traitInfoValues.get(this.trait.getCvTermId());
+		try{
+			Collections.sort(values);
+		}catch(Exception ex) {
+			Assert.fail("Sorting encountered an issue " + ex.getMessage());
+		}
+		Assert.assertEquals("Null values should not be included",this.germplasm.size(), traitInfoValues.get(this.trait.getCvTermId()).size());
+	}
+
+	/**
+	 * Method getNumericTraitInfoValues(Collection: environment, Integer trait) is use when environment is < 1000
+	 */
+	@Test
+	public void testGetNumericTraitInfoValues2(){
+		//Study with valid observation values
+		final Integer geolocation1 = this.createEnvironmentData(1, true);
+		//Study invalid observation values
+		final String uniqueID = this.commonTestProject.getUniqueID();
+		final DmsProject plot =
+			this.createDataset(this.study.getName() + " - Plot Dataset", uniqueID, DatasetTypeEnum.PLOT_DATA.getId(),
+				this.study, this.study);
+		final Integer geolocation2 = this.createEnvironmentData(plot, 1, Arrays.asList(this.trait.getCvTermId()), false);
+
+		final Map<Integer, List<Double>> traitInfoValues = this.phenotypeDao.getNumericTraitInfoValues( Arrays.asList(geolocation1, geolocation2), this.trait.getCvTermId() );
+		final List<Double> values = traitInfoValues.get(this.trait.getCvTermId());
+		try{
+			Collections.sort(values);
+		}catch(final Exception ex) {
+			Assert.fail("Sorting encountered an issue " + ex.getMessage());
+		}
+		Assert.assertEquals("Null values should not be included",this.germplasm.size(), traitInfoValues.get(this.trait.getCvTermId()).size());
+	}
+
 }

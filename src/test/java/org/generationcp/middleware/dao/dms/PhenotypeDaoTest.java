@@ -271,7 +271,8 @@ public class PhenotypeDaoTest {
 				+ "FROM nd_experiment e "
 				+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
 				+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-				+ "AND p.observable_id IN (:traitIds) ";
+				+ "AND p.observable_id IN (:traitIds) "
+				+ "AND p.value IS NOT NULL ";
 	}
 
 
