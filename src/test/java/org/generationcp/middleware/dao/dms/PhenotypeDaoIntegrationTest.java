@@ -462,7 +462,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.projectPropertyDao.save(projectProp);
 		}
 	}
-	private Integer createEnvironmentData(final DmsProject project, final Integer numberOfReps, final List<Integer> traitIds, boolean isWithValue) {
+	private Integer createEnvironmentData(final DmsProject project, final Integer numberOfReps, final List<Integer> traitIds, final boolean isWithValue) {
 		this.phenotypes = new ArrayList<>();
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription("1");
@@ -536,7 +536,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final List<Double> values = traitInfoValues.get(this.trait.getCvTermId());
 		try{
 			Collections.sort(values);
-		}catch(Exception ex) {
+		}catch(final Exception ex) {
 			Assert.fail("Sorting encountered an issue " + ex.getMessage());
 		}
 		Assert.assertEquals("Null values should not be included",this.germplasm.size(), traitInfoValues.get(this.trait.getCvTermId()).size());

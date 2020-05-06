@@ -987,7 +987,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					try {
 						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
 						observationUnitPosition.setGeoCoordinates((Map<String, Object>) jsonProp.get("geoCoordinates"));
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
 					}
 				}
@@ -1348,8 +1348,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return criteria.list();
 	}
 
-	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
-		List<MeasurementVariable> studyVariables = new ArrayList<>();
+	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
+		final List<MeasurementVariable> studyVariables = new ArrayList<>();
 
 		try{
 			final SQLQuery query =
@@ -1368,7 +1368,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.setParameter("geolocationId", geolocationId);
 
 			final List<Object> results = query.list();
-			for(Object result: results) {
+			for(final Object result: results) {
 				final Object[] row = (Object[]) result;
 				final MeasurementVariable measurementVariable = new MeasurementVariable();
 				measurementVariable.setName((row[0] instanceof String) ? (String) row[0] : null);
