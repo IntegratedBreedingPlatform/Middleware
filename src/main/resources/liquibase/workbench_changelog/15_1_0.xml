@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="clarysabel" id="v15.1.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'MS_WITHDRAW_INVENTORY'
+			</sqlCheck>
+        </preConditions>
+        <comment>Create first granular permissions for Manage studies: Withdraw Inventory for Program Role Type</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_studies_id = (select permission_id from permission where name = 'MANAGE_STUDIES');
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'study_manager_fieldbook_web');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MS_WITHDRAW_INVENTORY', 'Withdraw Inventory', @manage_studies_id, @sidebar_category_link_id);
+			set @ms_withdraw_inventory_id =  (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @ms_withdraw_inventory_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @ms_withdraw_inventory_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @ms_withdraw_inventory_id , 1);
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MS_CREATE_PENDING_WITHDRAWALS', 'Create Pending Withdrawals', @ms_withdraw_inventory_id, @sidebar_category_link_id);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @last_permission_id , 1);
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MS_CREATE_CONFIRMED_WITHDRAWALS', 'Create Confirmed Withdrawals', @ms_withdraw_inventory_id, @sidebar_category_link_id);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @last_permission_id , 1);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
