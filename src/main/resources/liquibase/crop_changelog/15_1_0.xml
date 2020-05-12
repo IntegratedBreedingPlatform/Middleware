@@ -1,0 +1,25 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="gelli" id="v15.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="key_sequence_register" columnName="key_prefix"/>
+				<sqlCheck expectedResult="0">
+					SELECT
+					if(DATA_TYPE = 'varchar' and CHARACTER_MAXIMUM_LENGTH = 255, 1, 0) as new_datatype
+					FROM  INFORMATION_SCHEMA.COLUMNS
+					WHERE table_name='key_sequence_register'
+					AND column_name='key_prefix'
+					AND TABLE_SCHEMA = database();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Alter key_prefix data type from varchar(50) to varchar(255)</comment>
+		<modifyDataType tableName="key_sequence_register" columnName="key_prefix" newDataType="varchar(255)"/>
+	</changeSet>
+
+</databaseChangeLog>
