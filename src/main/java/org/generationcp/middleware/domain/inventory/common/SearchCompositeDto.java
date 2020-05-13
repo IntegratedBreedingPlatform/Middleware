@@ -1,4 +1,4 @@
-package org.generationcp.middleware.domain.inventory.manager;
+package org.generationcp.middleware.domain.inventory.common;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -6,18 +6,18 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.Set;
 
 @AutoProperty
-public class SearchCompositeDto {
+public class SearchCompositeDto<T> {
 
-	private Integer searchRequestId;
+	private T searchRequest;
 
 	private Set<Integer> itemIds;
 
-	public Integer getSearchRequestId() {
-		return searchRequestId;
+	public T getSearchRequest() {
+		return searchRequest;
 	}
 
-	public void setSearchRequestId(Integer searchRequestId) {
-		this.searchRequestId = searchRequestId;
+	public void setSearchRequest(final T searchRequest) {
+		this.searchRequest = searchRequest;
 	}
 
 	public Set<Integer> getItemIds() {
@@ -29,8 +29,8 @@ public class SearchCompositeDto {
 	}
 
 	public boolean isValid() {
-		return !((searchRequestId == null && (itemIds == null || itemIds.isEmpty()))
-			|| (searchRequestId != null && itemIds != null));
+		return !((searchRequest == null && (itemIds == null || itemIds.isEmpty()))
+			|| (searchRequest != null && itemIds != null));
 	}
 
 	@Override
