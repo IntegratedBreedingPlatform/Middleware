@@ -45,6 +45,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.StockModelService;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
@@ -93,6 +94,9 @@ public class WorkbookSaver extends Saver {
 
 	@Resource
 	private StudyDataManager studyDataManager;
+
+	@Resource
+	private StockModelService stockModelService;
 
 	public WorkbookSaver() {
 
@@ -887,7 +891,7 @@ public class WorkbookSaver extends Saver {
 	public void createStocksIfNecessary(
 		final int datasetId, final Workbook workbook, final VariableTypeList effectVariables,
 		final List<String> trialHeaders) {
-		final Map<String, Integer> stockMap = this.getStockModelBuilder().getStockMapForStudy(datasetId);
+		final Map<String, Integer> stockMap = this.stockModelService.getStockMapForStudy(datasetId);
 
 		List<Integer> variableIndexesList = new ArrayList<>();
 		// we get the indexes so that in the next rows we dont need to compare

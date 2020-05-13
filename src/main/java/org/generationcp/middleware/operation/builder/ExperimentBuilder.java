@@ -30,6 +30,8 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.service.api.StockModelService;
+import org.generationcp.middleware.service.impl.StockModelServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,9 +44,12 @@ import java.util.Set;
 public class ExperimentBuilder extends Builder {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentBuilder.class);
+
+	private StockModelService stockModelService;
 	
 	public ExperimentBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.stockModelService = new StockModelServiceImpl(sessionProviderForLocal);
 	}
 
 	public long count(final int dataSetId) {
@@ -308,7 +313,7 @@ public class ExperimentBuilder extends Builder {
 			if (stockModelMap != null && stockModelMap.get(stockId) != null) {
 				stockModel = stockModelMap.get(stockId);
 			} else {
-				stockModel = this.getStockBuilder().get(stockId);
+				stockModel = this.stockModelService.getStockById(stockId);
 			}
 			
 			for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {

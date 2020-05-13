@@ -23,11 +23,16 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.service.api.StockModelService;
+import org.generationcp.middleware.service.impl.StockModelServiceImpl;
 
 public class StockSaver extends Saver {
 
+	private StockModelService stockModelService;
+
 	public StockSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.stockModelService = new StockModelServiceImpl(sessionProviderForLocal);
 	}
 
 	public Integer saveStock(final VariableList variableList) {
@@ -41,7 +46,7 @@ public class StockSaver extends Saver {
 	}
 
 	public void saveOrUpdateStock(final VariableList variableList, final int stockId) {
-		final StockModel stockModel = this.getStockModelBuilder().get(stockId);
+		final StockModel stockModel = this.stockModelService.getStockById(stockId);
 		this.createStock(variableList, stockModel);
 		if (stockModel != null) {
 			this.getStockDao().merge(stockModel);

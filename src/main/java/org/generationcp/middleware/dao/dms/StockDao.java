@@ -33,7 +33,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -126,13 +125,13 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return studyReferences;
 	}
 
-	public List<StockModel> getStocksForStudy(final int projectId) {
+	public List<StockModel> getStocksForStudy(final int studyId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
-			criteria.add(Restrictions.eq("projectId", projectId));
+			criteria.add(Restrictions.eq("projectId", studyId));
 			return criteria.list();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getByProjectId=" + projectId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 	}
 

@@ -20,13 +20,14 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
+import org.generationcp.middleware.service.api.StockModelService;
+import org.generationcp.middleware.service.impl.StockModelServiceImpl;
 import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImpl;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,13 +41,13 @@ public class ExperimentModelSaver {
 	private DaoFactory daoFactory;
 	private PhenotypeSaver phenotypeSaver;
 	private GeolocationSaver geolocationSaver;
-	private StockModelBuilder stockModelBuilder;
+	private StockModelService stockModelService;
 
 	public ExperimentModelSaver(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.phenotypeSaver = new PhenotypeSaver(sessionProvider);
 		this.geolocationSaver = new GeolocationSaver(sessionProvider);
-		this.stockModelBuilder = new StockModelBuilder(sessionProvider);
+		this.stockModelService = new StockModelServiceImpl(sessionProvider);
 	}
 
 	public ExperimentModel addExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
@@ -93,7 +94,7 @@ public class ExperimentModelSaver {
 			experimentModel.setGeoLocation(this.daoFactory.getGeolocationDao().getById(values.getLocationId()));
 		}
 		if (values.getGermplasmId() != null) {
-			experimentModel.setStock(this.stockModelBuilder.get(values.getGermplasmId()));
+			experimentModel.setStock(this.stockModelService.getStockById(values.getGermplasmId()));
 		}
 		final ObservationUnitIDGenerator observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl();
 		observationUnitIDGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
