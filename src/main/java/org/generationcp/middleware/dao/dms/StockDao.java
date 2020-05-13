@@ -145,7 +145,34 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockModels;
 	}
 
-	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId)  {
+	public List<StockModel> getStocksForStudy(final int projectId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+			criteria.add(Restrictions.eq("projectId", projectId));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getByProjectId=" + projectId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+		}
+	}
+
+	public long countStocksByStudyAndEntryTypeIds(final int studyId, final List<Integer> systemDefinedEntryTypeIds) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+			criteria.createAlias("properties", "properties");
+			criteria.add(Restrictions.eq("project_id", studyId));
+			criteria.add(Restrictions.and(Restrictions.eq("properties.typeId", TermId.ENTRY_TYPE.getId()),
+				Restrictions.in("properties.value", systemDefinedEntryTypeIds)));
+			criteria.setProjection(Projections.rowCount());
+			return ((Long) criteria.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with countStocksByStudyAndEntryTypeIds(studyId=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage(),
+				e);
+		}
+	}
+
+	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId) {
 		try {
 
 			final String sql = "select count(distinct e.stock_id) "
