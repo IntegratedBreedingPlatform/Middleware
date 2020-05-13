@@ -83,6 +83,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
+	// TODO: IBP-3697
 	public List<StudyReference> getStudiesByGid(final int gid) {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
@@ -123,26 +124,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			throw new MiddlewareQueryException("Error in getStudiesByGid=" + gid + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 		return studyReferences;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Set<StockModel> findInDataSet(final int datasetId)  {
-		final Set<StockModel> stockModels = new LinkedHashSet<>();
-		try {
-
-			final String sql = "SELECT DISTINCT e.stock_id" + " FROM nd_experiment e "
-					+ " WHERE e.project_id = :projectId ORDER BY e.stock_id";
-			final Query query = this.getSession().createSQLQuery(sql);
-			query.setParameter("projectId", datasetId);
-			final List<Integer> ids = query.list();
-			for (final Integer id : ids) {
-				stockModels.add(this.getById(id));
-			}
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in findInDataSet=" + datasetId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
-		}
-		return stockModels;
 	}
 
 	public List<StockModel> getStocksForStudy(final int projectId) {

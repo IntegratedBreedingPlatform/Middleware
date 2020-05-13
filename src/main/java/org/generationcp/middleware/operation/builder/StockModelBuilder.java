@@ -45,9 +45,9 @@ public class StockModelBuilder {
 		return stockModels;
 	}
 
-	public Map<String, Integer> getStockMapForDataset(int datasetId) throws MiddlewareQueryException {
+	public Map<String, Integer> getStockMapForStudy(int datasetId) throws MiddlewareQueryException {
 		Map<String, Integer> stockMap = new HashMap<String, Integer>();
-		Set<StockModel> stocks = this.daoFactory.getStockDao().findInDataSet(datasetId);
+		List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(datasetId);
 		for (StockModel stock : stocks) {
 			if (stock != null) {
 				stockMap.put(stock.getUniqueName(), stock.getStockId());

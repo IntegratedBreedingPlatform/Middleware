@@ -887,7 +887,7 @@ public class WorkbookSaver extends Saver {
 	public void createStocksIfNecessary(
 		final int datasetId, final Workbook workbook, final VariableTypeList effectVariables,
 		final List<String> trialHeaders) {
-		final Map<String, Integer> stockMap = this.getStockModelBuilder().getStockMapForDataset(datasetId);
+		final Map<String, Integer> stockMap = this.getStockModelBuilder().getStockMapForStudy(datasetId);
 
 		List<Integer> variableIndexesList = new ArrayList<>();
 		// we get the indexes so that in the next rows we dont need to compare
