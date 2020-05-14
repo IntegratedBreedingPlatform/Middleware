@@ -9,11 +9,9 @@ public interface StockModelService {
 
 	List<StockModel> getStocksForStudy(int studyId);
 
-	long countStocksByStudyAndEntryTypeIds(int studyId, List<Integer> systemDefinedEntryTypeIds);
+	long countStocksByStudyAndEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
 
 	StockModel getStockById(int stockId);
-
-	Map<Integer, StockModel> getStockyId(List<Integer> stockIds);
 
 	Map<String, Integer> getStockMapForStudy(int datasetId);
 

@@ -57,6 +57,7 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.ReportService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.StockModelService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -67,6 +68,7 @@ import org.generationcp.middleware.service.api.study.generation.ExperimentDesign
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
+import org.generationcp.middleware.service.impl.StockModelServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
@@ -350,5 +352,9 @@ public class ManagerFactory implements Serializable {
 
 	public StudyGermplasmListService getStudyGermplasmListService() {
 		return new StudyGermplasmListServiceImpl(this.sessionProvider);
+	}
+
+	public StockModelService getStockModelService() {
+		return new StockModelServiceImpl(this.sessionProvider);
 	}
 }

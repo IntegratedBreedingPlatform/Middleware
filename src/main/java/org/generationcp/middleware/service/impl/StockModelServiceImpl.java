@@ -2,9 +2,12 @@ package org.generationcp.middleware.service.impl;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.StockModelService;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +15,9 @@ import java.util.Map;
 public class StockModelServiceImpl implements StockModelService {
 
 	private final DaoFactory daoFactory;
+
+	@Resource
+	private InventoryDataManager inventoryDataManager;
 
 	public StockModelServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -23,24 +29,13 @@ public class StockModelServiceImpl implements StockModelService {
 	}
 
 	@Override
-	public long countStocksByStudyAndEntryTypeIds(final int studyId, final List<Integer> systemDefinedEntryTypeIds) {
+	public long countStocksByStudyAndEntryTypeIds(final int studyId, final List<String> systemDefinedEntryTypeIds) {
 		return this.daoFactory.getStockDao().countStocksByStudyAndEntryTypeIds(studyId, systemDefinedEntryTypeIds);
 	}
 
 	@Override
 	public StockModel getStockById(final int stockId) {
 		return this.daoFactory.getStockDao().getById(stockId);
-	}
-
-	@Override
-	public Map<Integer, StockModel> getStockyId(final List<Integer> stockIds) {
-		final Map<Integer, StockModel> stockModels = new HashMap<>();
-
-		if (stockIds != null && !stockIds.isEmpty()) {
-			stockModels.putAll(this.daoFactory.getStockDao().getStocksByIds(stockIds));
-		}
-
-		return stockModels;
 	}
 
 	@Override

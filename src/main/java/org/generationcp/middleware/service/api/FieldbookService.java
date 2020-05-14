@@ -841,15 +841,6 @@ public interface FieldbookService {
 	 */
 	List<ListDataProject> getListDataProject(int listId);
 
-	/**
-	 * Counts the number of ListDataProject with speficied SystemDefinedEntryTypeIds.
-	 *
-	 * @param listId
-	 * @param systemDefinedEntryTypeIds
-	 * @return
-	 */
-	long countListDataProjectByListIdAndEntryTypeIds(int listId, List<Integer> systemDefinedEntryTypeIds);
-
 	List<ListDataProject> getListDataProjectByStudy(int projectId, GermplasmListType type, List<Integer> plotNumbers, final String instanceNumber);
 
 

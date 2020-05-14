@@ -1080,11 +1080,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public long countListDataProjectByListIdAndEntryTypeIds(final int listId, final List<Integer> systemDefinedEntryTypeIds) {
-		return this.getListDataProjectDAO().countByListIdAndEntryType(listId, systemDefinedEntryTypeIds);
-	}
-
-	@Override
 	public List<ListDataProject> getListDataProjectByStudy(final int projectId, final GermplasmListType type, final List<Integer> plotNumbers,
 			final String instanceNumber) {
 		return this.getListDataProjectDAO().getByStudy(projectId, type, plotNumbers, instanceNumber);
