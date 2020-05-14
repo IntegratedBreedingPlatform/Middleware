@@ -1,5 +1,8 @@
 package org.generationcp.middleware.service.impl.inventory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +45,7 @@ public class PlantingPreparationDTO {
 		public static class StockDTO {
 
 			private String stockId;
-			private String storateLocation;
+			private String storageLocation;
 			private Double availableBalance;
 			private Integer unitId;
 
@@ -54,12 +57,12 @@ public class PlantingPreparationDTO {
 				this.stockId = stockId;
 			}
 
-			public String getStorateLocation() {
-				return this.storateLocation;
+			public String getStorageLocation() {
+				return this.storageLocation;
 			}
 
-			public void setStorateLocation(final String storateLocation) {
-				this.storateLocation = storateLocation;
+			public void setStorageLocation(final String storageLocation) {
+				this.storageLocation = storageLocation;
 			}
 
 			public Double getAvailableBalance() {
@@ -84,8 +87,8 @@ public class PlantingPreparationDTO {
 		private String entryType;
 		private Integer gid;
 		private String designation;
-		private Map<String, StockDTO> stockByStockId;
-		private List<ObservationUnitDTO> observationUnits;
+		private Map<String, StockDTO> stockByStockId = new LinkedHashMap<>();
+		private List<ObservationUnitDTO> observationUnits = new ArrayList<>();
 
 		public Integer getEntryNo() {
 			return this.entryNo;
