@@ -21,7 +21,7 @@ public class PlantingServiceImpl implements PlantingService {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
-	public PlantingPreparationDTO searchPlantingPreparation(final SearchCompositeDto<ObservationUnitsSearchDTO> searchDTO) {
+	public PlantingPreparationDTO searchPlantingPreparation(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
 		return null; // TODO
 	}
 

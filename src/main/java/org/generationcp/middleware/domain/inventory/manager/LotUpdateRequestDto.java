@@ -11,7 +11,7 @@ public class LotUpdateRequestDto {
 	private Integer locationId;
 	private Integer unitId;
 	private String notes;
-	private SearchCompositeDto<Integer> searchComposite;
+	private SearchCompositeDto<Integer, Integer> searchComposite;
 
 	public Integer getGid() {
 		return gid;
@@ -45,11 +45,11 @@ public class LotUpdateRequestDto {
 		this.notes = notes;
 	}
 
-	public SearchCompositeDto<Integer> getSearchComposite() {
+	public SearchCompositeDto<Integer, Integer> getSearchComposite() {
 		return searchComposite;
 	}
 
-	public void setSearchComposite(final SearchCompositeDto<Integer> searchComposite) {
+	public void setSearchComposite(final SearchCompositeDto<Integer, Integer> searchComposite) {
 		this.searchComposite = searchComposite;
 	}
 

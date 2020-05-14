@@ -6,25 +6,25 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.Set;
 
 @AutoProperty
-public class SearchCompositeDto<T> {
+public class SearchCompositeDto<X, Y> {
 
-	private T searchRequest;
+	private X searchRequest;
 
-	private Set<Integer> itemIds;
+	private Set<Y> itemIds;
 
-	public T getSearchRequest() {
+	public X getSearchRequest() {
 		return searchRequest;
 	}
 
-	public void setSearchRequest(final T searchRequest) {
+	public void setSearchRequest(final X searchRequest) {
 		this.searchRequest = searchRequest;
 	}
 
-	public Set<Integer> getItemIds() {
+	public Set<Y> getItemIds() {
 		return itemIds;
 	}
 
-	public void setItemIds(Set<Integer> itemIds) {
+	public void setItemIds(Set<Y> itemIds) {
 		this.itemIds = itemIds;
 	}
 
