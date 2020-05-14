@@ -135,6 +135,16 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
+	public void deleteStocksForStudy(final int studyId) {
+		try {
+			final Query query = this.getSession().createQuery("DELETE FROM StockModel sm WHERE sm.projectId = :studyId");
+			query.setParameter("studyId", studyId);
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in deleteStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+		}
+	}
+
 	public long countStocksByStudyAndEntryTypeIds(final int studyId, final List<String> systemDefinedEntryTypeIds) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);

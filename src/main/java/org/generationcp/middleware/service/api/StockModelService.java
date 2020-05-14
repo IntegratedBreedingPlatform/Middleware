@@ -9,6 +9,10 @@ public interface StockModelService {
 
 	List<StockModel> getStocksForStudy(int studyId);
 
+	void deleteStocksForStudy(int studyId);
+
+	void saveStocks(List<StockModel> stockModelList);
+
 	long countStocksByStudyAndEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
 
 	StockModel getStockById(int stockId);
