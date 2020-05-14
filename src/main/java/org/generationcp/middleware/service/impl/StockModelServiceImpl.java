@@ -56,4 +56,18 @@ public class StockModelServiceImpl implements StockModelService {
 		return stockMap;
 	}
 
+	@Override
+	public Map<Integer, String> getInventoryStockIdMap(final List<StockModel> stockModelList) {
+
+		final List<Integer> gids = new ArrayList<>();
+		if (stockModelList != null && !stockModelList.isEmpty()) {
+			for (final StockModel stockModel : stockModelList) {
+				gids.add(stockModel.getGermplasm().getGid());
+			}
+		}
+
+		return this.inventoryDataManager.retrieveStockIds(gids);
+
+	}
+
 }

@@ -16,4 +16,6 @@ public interface StockModelService {
 	Map<Integer, StockModel> getStockyId(List<Integer> stockIds);
 
 	Map<String, Integer> getStockMapForStudy(int datasetId);
+
+	Map<Integer, String> getInventoryStockIdMap(List<StockModel> stockModelList);
 }
