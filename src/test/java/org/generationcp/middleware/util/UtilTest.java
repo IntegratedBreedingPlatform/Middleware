@@ -4,6 +4,7 @@ package org.generationcp.middleware.util;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -60,5 +61,24 @@ public class UtilTest {
 		Assert.assertThat(Util.tryParseDate(null, Util.FRONTEND_DATE_FORMAT_2), is(nullValue()));
 		Assert.assertThat(Util.tryParseDate("2015-08-18", Util.FRONTEND_DATE_FORMAT), is(notNullValue()));
 		Assert.assertThat(Util.tryParseDate("20150818"), is(notNullValue()));
+	}
+
+	@Test
+	public void testIsValidDate() {
+		Assert.assertTrue(Util.isValidDate("2015-08-18"));
+		Assert.assertTrue(Util.isValidDate("20150818"));
+		Assert.assertFalse(Util.isValidDate("99999999"));
+		Assert.assertFalse(Util.isValidDate("123456789"));
+		Assert.assertFalse(Util.isValidDate(StringUtils.EMPTY));
+		Assert.assertFalse(Util.isValidDate(null));
+	}
+
+	@Test
+	public void testConvertDate() {
+		Assert.assertThat(Util.tryConvertDate(null, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT), is(nullValue()));
+		Assert.assertThat(Util.tryConvertDate("2015-08-18", Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT), is("20150818"));
+		Assert.assertThat(Util.tryConvertDate("20150818", Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT), is("2015-08-18"));
+		Assert.assertThat(Util.tryConvertDate("20150818", Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT), is(nullValue()));
+		Assert.assertThat(Util.tryConvertDate("2015-08-18", Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT), is(nullValue()));
 	}
 }

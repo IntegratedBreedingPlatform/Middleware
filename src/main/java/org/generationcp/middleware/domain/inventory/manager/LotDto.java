@@ -10,6 +10,7 @@ import org.pojomatic.annotations.AutoProperty;
 public class LotDto {
 
 	private Integer lotId;
+	private String lotUUID;
 	private String stockId;
 	private Integer gid;
 	private Integer locationId;
@@ -23,6 +24,14 @@ public class LotDto {
 
 	public void setLotId(final Integer lotId) {
 		this.lotId = lotId;
+	}
+
+	public String getLotUUID() {
+		return this.lotUUID;
+	}
+
+	public void setLotUUID(final String lotUUID) {
+		this.lotUUID = lotUUID;
 	}
 
 	public String getStockId() {

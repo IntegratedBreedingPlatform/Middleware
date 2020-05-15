@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api;
 
+import java.util.List;
 
 public interface KeySequenceRegisterService {
 
@@ -55,4 +56,11 @@ public interface KeySequenceRegisterService {
 	 * @param lastSequenceUsed
 	 */
 	void saveLastSequenceUsed(String keyPrefix, Integer lastSequenceUsed);
+
+	/**
+	 * Deletes the KeySequenceRegister entries given the Key Prefixes
+	 *
+	 * @param keyPrefixes
+	 */
+	void deleteKeySequences(List<String> keyPrefixes);
 }

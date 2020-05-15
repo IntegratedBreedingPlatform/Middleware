@@ -1,7 +1,9 @@
 package org.generationcp.middleware.service.api.inventory;
 
+import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.springframework.data.domain.Pageable;
@@ -15,8 +17,6 @@ public interface TransactionService {
 
 	long countSearchTransactions(TransactionsSearchDto transactionsSearchDto);
 
-	Integer saveTransaction(TransactionDto transactionDto);
-
 	/**
 	 * Withdraw a set of lots given the instructions.
 	 * This function needs to be synchronized externally when used to warranty that the lots involved does not either change the available balance
@@ -29,10 +29,17 @@ public interface TransactionService {
 	 * @param lotWithdrawalInputDto
 	 * @param transactionStatus
 	 */
-	void withdrawLots(Integer userId, Set<Integer> lotIds, LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus) ;
+	void withdrawLots(
+		Integer userId, Set<Integer> lotIds, LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus);
 
 	void confirmPendingTransactions(List<TransactionDto> confirmedTransactionDtoList);
 
 	List<TransactionDto> getAvailableBalanceTransactions(Integer lotId);
+
+	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
+
+	void depositLots(Integer userId, Set<Integer> lotIds, LotDepositRequestDto lotDepositRequestDto, TransactionStatus transactionStatus);
+
+	void cancelPendingTransactions(List<TransactionDto> transactionDtoList);
 
 }

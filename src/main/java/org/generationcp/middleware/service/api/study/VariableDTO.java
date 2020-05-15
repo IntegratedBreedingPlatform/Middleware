@@ -1,5 +1,7 @@
 package org.generationcp.middleware.service.api.study;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +21,7 @@ public class VariableDTO {
 	private String observationVariableName;
 	private String ontologyDbId;
 	private String ontologyName;
-	private OntologyReference ontologyReferenceObject = new OntologyReference();
+	private OntologyReference ontologyReferenceObject;
 	private Trait traitObject = new Trait();
 	private Method methodObject = new Method();
 	private Scale scaleObject = new Scale();
@@ -230,6 +232,7 @@ public class VariableDTO {
 			return this.attribute;
 		}
 
+		@JsonProperty("class")
 		public String getTraitClass() {
 			return this.traitClass;
 		}
@@ -333,6 +336,7 @@ public class VariableDTO {
 		public static final String ORDINAL = "Ordinal";
 		public static final String DATE = "Date";
 		public static final String NUMERICAL = "Numerical";
+		public static final String TEXT = "Text";
 
 		private String dataType;
 		private Integer decimalPlaces;
@@ -461,6 +465,7 @@ public class VariableDTO {
 
 		// Getter Methods
 
+		@JsonProperty("class")
 		public String getMethodClass() {
 			return this.methodClass;
 		}

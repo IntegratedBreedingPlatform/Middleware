@@ -1,38 +1,34 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+@Transactional
 public class StudyGermplasmListServiceImpl implements StudyGermplasmListService {
 
-	private final Session currentSession;
+	private final DaoFactory daoFactory;
 
-	public StudyGermplasmListServiceImpl(final Session currentSession) {
-		this.currentSession = currentSession;
+	public StudyGermplasmListServiceImpl(final HibernateSessionProvider sessionProvider) {
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
 	public List<StudyGermplasmDto> getGermplasmList(final int studyBusinessIdentifier) {
 
-		final Criteria listDataCriteria =
-			this.currentSession.createCriteria(ListDataProject.class).createAlias("list", "l")
-				.add(Restrictions.eq("l.projectId", studyBusinessIdentifier));
-		listDataCriteria.add(Restrictions.eq("l.type", GermplasmListType.STUDY.name()));
-		listDataCriteria.addOrder(Order.asc("entryId"));
-		final List<ListDataProject> list = listDataCriteria.list();
+		final List<ListDataProject> listEntries = this.daoFactory.getListDataProjectDAO().getGermplasmList(studyBusinessIdentifier);
+
 		final List<StudyGermplasmDto> studyGermplasmDtos = new ArrayList<>();
 		Integer index = 0;
-		for (final ListDataProject listDataProject : list) {
+		for (final ListDataProject listDataProject : listEntries) {
 			final StudyGermplasmDto studyGermplasmDto = new StudyGermplasmDto();
 			studyGermplasmDto.setCross(listDataProject.getGroupName());
 			studyGermplasmDto.setDesignation(listDataProject.getDesignation());
@@ -49,6 +45,11 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 			studyGermplasmDtos.add(studyGermplasmDto);
 		}
 		return studyGermplasmDtos;
+	}
+
+	@Override
+	public List<StudyGermplasmDto> getGermplasmListFromPlots(final int studyBusinessIdentifier, final Set<Integer> plotNos) {
+		return daoFactory.getStockDao().getStudyGermplasmDtoList(studyBusinessIdentifier, plotNos);
 	}
 
 }

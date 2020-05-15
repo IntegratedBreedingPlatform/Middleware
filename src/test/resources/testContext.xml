@@ -226,10 +226,33 @@
 		<aop:scoped-proxy />
 	</bean>
 
+	<bean id="keySequenceRegisterService" factory-bean="managerFactory"
+		  factory-method="getKeySequenceRegisterService" scope="request">
+		<aop:scoped-proxy />
+	</bean>
+
     <bean id="studyDataManager" factory-bean="managerFactory"
           factory-method="getStudyDataManager">
         <aop:scoped-proxy />
     </bean>
 
+	<bean id="experimentDesignService" factory-bean="managerFactory"
+		  factory-method="getExperimentDesignService">
+        <aop:scoped-proxy />
+    </bean>
+
+	<bean id="datasetService" factory-bean="managerFactory"
+			  factory-method="getDatasetMiddlewareService">
+        <aop:scoped-proxy />
+    </bean>
+
+	<bean id="derivedVariableService" factory-bean="managerFactory"
+		  factory-method="getDerivedVariableService">
+        <aop:scoped-proxy />
+    </bean>
+
+	<bean id="transactionService" class="org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
 
 </beans>

@@ -8,13 +8,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.Random;
 
 public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 
 	private static final String PREFIX = "QWERTY" + new Random().nextInt();
 	private static final Integer LAST_SEQUENCE_USED = 9;
-	private static final Integer LAST_SEQUENCE_USED2 = 19;
 	private KeySequenceRegisterDAO keySequenceRegisterDao;
 
 	@Before
@@ -133,7 +133,7 @@ public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 		Assert.assertNotNull(existingKeyRegister);
 		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue(), existingKeyRegister.getLastUsedSequence());
 
-		final Integer lastSequenceUsed = KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue() - 1 ;
+		final Integer lastSequenceUsed = KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED - 1 ;
 		// Expecting record to retain the saved last sequence # since specified start number is smaller
 		this.keySequenceRegisterDao.saveLastSequenceUsed(KeySequenceRegisterDAOTest.PREFIX, lastSequenceUsed);
 		final KeySequenceRegister retrievedKeyRegister =
@@ -142,4 +142,12 @@ public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue(), retrievedKeyRegister.getLastUsedSequence());
 	}
 
+	@Test
+	public void testDeleteByKeyPrefixes() {
+		final String prefix = "SKSKSKSPREFIXSKSKSK";
+		this.keySequenceRegisterDao.save(new KeySequenceRegister(prefix, 10));
+		Assert.assertNotNull(this.keySequenceRegisterDao.getByPrefix(prefix));
+		this.keySequenceRegisterDao.deleteByKeyPrefixes(Collections.singletonList(prefix));
+		Assert.assertNull(this.keySequenceRegisterDao.getByPrefix(prefix));
+	}
 }

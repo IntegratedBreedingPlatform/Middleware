@@ -30,13 +30,8 @@ public class PhenotypeSearchDTO {
 	private String germplasmDbId;
 	private String germplasmName;
 	private String studyDbId;
-
 	private String studyName;
-
-	@JsonView(BrapiView.BrapiV1_2.class)
 	private String studyLocationDbId;
-
-	@JsonView(BrapiView.BrapiV1_2.class)
 	private String studyLocation;
 	private String programName;
 
@@ -48,7 +43,6 @@ public class PhenotypeSearchDTO {
 	private String entryType;
 	private String entryNumber;
 
-	@JsonView(BrapiView.BrapiV1_2.class)
 	private List<PhenotypeSearchObservationDTO> observations;
 
 	@JsonView(BrapiView.BrapiV1_2.class)
@@ -69,19 +63,24 @@ public class PhenotypeSearchDTO {
 	@JsonView(BrapiView.BrapiV2.class)
 	private ObservationUnitPosition observationUnitPosition;
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView(BrapiView.BrapiV1_3.class)
+	private String positionCoordinateX;
+
+	@JsonView(BrapiView.BrapiV1_3.class)
+	private String positionCoordinateY;
+
 	private List<ObservationUnitXRef> observationUnitXRef;
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String programDbId;
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private List<Treatment> treatments;
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String trialDbId;
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String trialName;
 
 
@@ -381,6 +380,22 @@ public class PhenotypeSearchDTO {
 
 	public void setTrialName(final String trialName) {
 		this.trialName = trialName;
+	}
+
+	public String getPositionCoordinateX() {
+		return this.positionCoordinateX;
+	}
+
+	public void setPositionCoordinateX(final String positionCoordinateX) {
+		this.positionCoordinateX = positionCoordinateX;
+	}
+
+	public String getPositionCoordinateY() {
+		return this.positionCoordinateY;
+	}
+
+	public void setPositionCoordinateY(final String positionCoordinateY) {
+		this.positionCoordinateY = positionCoordinateY;
 	}
 
 	@Override

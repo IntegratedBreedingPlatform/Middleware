@@ -9,7 +9,7 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.Date;
 
 @AutoProperty
-@JsonIgnoreProperties({"locationAbbr", "pedigree"})
+@JsonIgnoreProperties({"locationAbbr"})
 public class ExtendedLotDto extends LotDto {
 
 	private String designation;
@@ -20,6 +20,9 @@ public class ExtendedLotDto extends LotDto {
 
 	@JsonView({InventoryView.LotView.class})
 	private Integer mgid;
+
+	private String germplasmMethodName;
+	private String germplasmLocation;
 
 	@JsonView({InventoryView.LotView.class})
 	private String locationName;
@@ -42,16 +45,17 @@ public class ExtendedLotDto extends LotDto {
 
 	@JsonView({InventoryView.LotView.class})
 	private Double withdrawalTotal;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 
+	@JsonView({InventoryView.LotView.class})
+	private Double pendingDepositsTotal;
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	@JsonView({InventoryView.LotView.class})
 	private Date lastDepositDate;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	@JsonView({InventoryView.LotView.class})
 	private Date lastWithdrawalDate;
-
-	private String pedigree;
 
 	public Date getCreatedDate() {
 		return createdDate;
@@ -125,6 +129,22 @@ public class ExtendedLotDto extends LotDto {
 		this.mgid = mgid;
 	}
 
+	public String getGermplasmMethodName() {
+		return this.germplasmMethodName;
+	}
+
+	public void setGermplasmMethodName(final String germplasmMethodName) {
+		this.germplasmMethodName = germplasmMethodName;
+	}
+
+	public String getGermplasmLocation() {
+		return this.germplasmLocation;
+	}
+
+	public void setGermplasmLocation(final String germplasmLocation) {
+		this.germplasmLocation = germplasmLocation;
+	}
+
 	public String getLocationName() {
 		return locationName;
 	}
@@ -157,12 +177,12 @@ public class ExtendedLotDto extends LotDto {
 		this.createdByUsername = createdByUsername;
 	}
 
-	public String getPedigree() {
-		return pedigree;
+	public Double getPendingDepositsTotal() {
+		return pendingDepositsTotal;
 	}
 
-	public void setPedigree(final String pedigree) {
-		this.pedigree = pedigree;
+	public void setPendingDepositsTotal(final Double pendingDepositsTotal) {
+		this.pendingDepositsTotal = pendingDepositsTotal;
 	}
 
 	@Override
