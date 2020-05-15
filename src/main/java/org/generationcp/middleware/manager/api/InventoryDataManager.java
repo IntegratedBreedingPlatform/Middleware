@@ -517,6 +517,8 @@ public interface InventoryDataManager {
 
 	List<String> getStockIdsByListDataProjectListId(Integer listId);
 
+	Map<String, Double>  getStockIdsWithMultipleTransactions(Integer listId);
+
 	void updateInventory(Integer listId, List<InventoryDetails> inventoryDetailListFromDB);
 
 	Lot getLotById(Integer id);

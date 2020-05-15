@@ -43,9 +43,9 @@ public class TransactionReportRow implements Serializable {
 	private String user;
 	private Integer userId;
 	private Integer listId;
-	private Integer trnStatus;
+	private String trnStatus;
 	private String lotStatus;
-
+	private Integer transactionType;
 
 	public TransactionReportRow() {
 
@@ -147,8 +147,12 @@ public class TransactionReportRow implements Serializable {
 		this.listId = listId;
 	}
 
-	public void setTrnStatus(final Integer trnStatus) {
+	public void setTrnStatus(final String trnStatus) {
 		this.trnStatus = trnStatus;
+	}
+
+	public String getTrnStatus() {
+		return this.trnStatus;
 	}
 
 	public String getLotStatus() {
@@ -157,6 +161,14 @@ public class TransactionReportRow implements Serializable {
 
 	public void setLotStatus(final String lotStatus) {
 		this.lotStatus = lotStatus;
+	}
+
+	public Integer getTransactionType() {
+		return this.transactionType;
+	}
+
+	public void setTransactionType(final Integer trnType) {
+		transactionType = trnType;
 	}
 
 	@Override
@@ -179,5 +191,4 @@ public class TransactionReportRow implements Serializable {
 		builder.append("]");
 		return builder.toString();
 	}
-
 }

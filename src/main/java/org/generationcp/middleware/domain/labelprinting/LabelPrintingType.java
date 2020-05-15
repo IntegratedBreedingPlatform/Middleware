@@ -2,7 +2,8 @@ package org.generationcp.middleware.domain.labelprinting;
 
 public enum LabelPrintingType {
 
-	SUBOBSERVATION_DATASET("SubObservationDataset");
+	SUBOBSERVATION_DATASET("SubObservationDataset"),
+	LOT("Lot");
 
 	private String code;
 

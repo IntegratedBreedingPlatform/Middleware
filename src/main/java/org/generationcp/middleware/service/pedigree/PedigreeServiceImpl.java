@@ -1,13 +1,12 @@
 
 package org.generationcp.middleware.service.pedigree;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -25,12 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Default algorithm for generating pedigree strings.
@@ -43,9 +42,9 @@ public class PedigreeServiceImpl implements PedigreeService {
 
 	private PedigreeDataManagerFactory pedigreeDataManagerFactory;
 
-	private static final Cache<CropMethodKey, Method> breedingMethodCache;
+	private static Cache<CropMethodKey, Method> breedingMethodCache;
 
-	private static final Cache<CropNameTypeKey, List<Integer>> nameTypeCache;
+	private static Cache<CropNameTypeKey, List<Integer>> nameTypeCache;
 
 	private String cropName;
 
@@ -70,7 +69,7 @@ public class PedigreeServiceImpl implements PedigreeService {
 		this.pedigreeDataManagerFactory = new PedigreeDataManagerFactory(sessionProvider);
 		this.germplasmDataManager = this.pedigreeDataManagerFactory.getGermplasmDataManager();
 
-		methodCropBasedCache = new FunctionBasedGuavaCacheLoader<>(breedingMethodCache, new Function<CropMethodKey, Method>() {
+		methodCropBasedCache = new FunctionBasedGuavaCacheLoader<CropMethodKey, Method>(breedingMethodCache, new Function<CropMethodKey, Method>() {
 
 			@Override
 			public Method apply(CropMethodKey key) {
@@ -103,7 +102,7 @@ public class PedigreeServiceImpl implements PedigreeService {
 		};
 
 		nameTypeBasedCache =
-				new FunctionBasedGuavaCacheLoader<>(nameTypeCache,
+				new FunctionBasedGuavaCacheLoader<CropNameTypeKey, List<Integer>>(nameTypeCache,
 						nameTypeLoader);
 
 	}
@@ -138,10 +137,10 @@ public class PedigreeServiceImpl implements PedigreeService {
 			
 			// Please note the cache about has been primed with all germplasm and their ancestry tree and thus will not need to go back to
 			// the database for each germplasm required. It will occasionally go back to the DB in case it cannot find the required gid.
-			// This might happen in the case of backcross because we predetermine the number of crosses for a backcross.
+			// This might happen in the case of backcross because we predetermine the number of crosses for a backcross. 
 			for (final Integer gid : gids) {
-					pedigreeStrings.put(gid,
-							buildPedigreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse));
+				pedigreeStrings.put(gid,
+					buildPedigreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse));
 			}
 			return pedigreeStrings;
 		} finally {
@@ -206,10 +205,7 @@ public class PedigreeServiceImpl implements PedigreeService {
 			return pedigreeString.buildPedigreeString(gidAncestryTree, numberOfLevelsToTraverse,
 					new FixedLineNameResolver(crossExpansionProperties, pedigreeDataManagerFactory, nameTypeBasedCache, cropName), false)
 					.getPedigree();
-		} catch (Exception ex) {
-			throw new MiddlewareException(String.format("Problem building pedigree string for gid '%d'.", gid));
-		}
-		finally {
+		} finally {
 			monitor.stop();
 		}
 	}

@@ -16,6 +16,9 @@ public class StudyInstance {
 	private String customLocationAbbreviation;
 	private int instanceNumber;
 	private boolean hasFieldmap;
+	private Boolean hasGeoJSON;
+	/** has X/Y coordinates */
+	private Boolean hasFieldLayout;
 	private Boolean hasExperimentalDesign;
 	private Boolean hasMeasurements;
 	private Boolean canBeDeleted;
@@ -104,6 +107,23 @@ public class StudyInstance {
 	public void setHasFieldmap(final boolean hasFieldmap) {
 		this.hasFieldmap = hasFieldmap;
 	}
+
+	public Boolean getHasGeoJSON() {
+		return this.hasGeoJSON;
+	}
+
+	public void setHasGeoJSON(final Boolean hasGeoJSON) {
+		this.hasGeoJSON = hasGeoJSON;
+	}
+
+	public Boolean getHasFieldLayout() {
+		return this.hasFieldLayout;
+	}
+
+	public void setHasFieldLayout(final Boolean hasFieldLayout) {
+		this.hasFieldLayout = hasFieldLayout;
+	}
+
 
 	public Boolean isHasExperimentalDesign() {
 		return this.hasExperimentalDesign;

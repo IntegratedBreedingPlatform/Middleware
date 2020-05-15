@@ -2,31 +2,25 @@ package org.generationcp.middleware.service.api.phenotype;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * TODO Rename to ObservationUnitDto
+ */
 @AutoProperty
 public class PhenotypeSearchDTO {
-
-	public static class View {
-
-		public static class PhenotypeBrapiV2 {
-
-		}
-
-		public static class PhenotypeBrapiV1_2 {
-
-		}
-	}
 
 	private String observationUnitDbId;
 	private String observationUnitName;
 	private String observationLevel;
 
-	@JsonView(View.PhenotypeBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String observationLevels;
 
 	private String plotNumber;
@@ -36,190 +30,59 @@ public class PhenotypeSearchDTO {
 	private String germplasmDbId;
 	private String germplasmName;
 	private String studyDbId;
-
 	private String studyName;
-
-	@JsonView(View.PhenotypeBrapiV1_2.class)
 	private String studyLocationDbId;
-
-	@JsonView(View.PhenotypeBrapiV1_2.class)
 	private String studyLocation;
 	private String programName;
 
-	@JsonView(View.PhenotypeBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String x;
 
-	@JsonView(View.PhenotypeBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String y;
 	private String entryType;
 	private String entryNumber;
 
-	@JsonView(View.PhenotypeBrapiV1_2.class)
 	private List<PhenotypeSearchObservationDTO> observations;
 
-	@JsonView(View.PhenotypeBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String instanceNumber;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private String additionalInfo;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private String locationDbId;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private String locationName;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private String observationUnitPUI;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	private ObservationUnitPosition observationUnitPosition;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV1_3.class)
+	private String positionCoordinateX;
+
+	@JsonView(BrapiView.BrapiV1_3.class)
+	private String positionCoordinateY;
+
 	private List<ObservationUnitXRef> observationUnitXRef;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String programDbId;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private List<Treatment> treatments;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String trialDbId;
 
-	@JsonView(View.PhenotypeBrapiV2.class)
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String trialName;
 
-	public static class ObservationUnitPosition {
-		private String blockNumber;
-		private String entryNumber;
-		private List<String> entryType;
-		private GeooCordinates geoCoordinates;
-		private String positionCoordinateX;
-		private String positionCoordinateXType;
-		private String positionCoordinateY;
-		private String positionCoordinateYType;
-		private String replicate;
-
-		public ObservationUnitPosition() {
-		}
-
-		protected static class GeooCordinates {
-			private GeooCordinates.Geometry geometry;
-			private String type;
-
-			protected class Geometry {
-				private List<Integer> coordinates;
-				private String type;
-
-				public List<Integer> getCoordinates() {
-					return this.coordinates;
-				}
-
-				public void setCoordinates(final List<Integer> coordinates) {
-					this.coordinates = coordinates;
-				}
-
-				public String getType() {
-					return this.type;
-				}
-
-				public void setType(final String type) {
-					this.type = type;
-				}
-			}
-
-			public GeooCordinates.Geometry getGeometry() {
-				return this.geometry;
-			}
-
-			public void setGeometry(
-				final GeooCordinates.Geometry geometry) {
-				this.geometry = geometry;
-			}
-
-			public String getType() {
-				return this.type;
-			}
-
-			public void setType(final String type) {
-				this.type = type;
-			}
-		}
-
-		public String getBlockNumber() {
-			return this.blockNumber;
-		}
-
-		public void setBlockNumber(final String blockNumber) {
-			this.blockNumber = blockNumber;
-		}
-
-		public String getEntryNumber() {
-			return this.entryNumber;
-		}
-
-		public void setEntryNumber(final String entryNumber) {
-			this.entryNumber = entryNumber;
-		}
-
-		public List<String> getEntryType() {
-			return this.entryType;
-		}
-
-		public void setEntryType(final List<String> entryType) {
-			this.entryType = entryType;
-		}
-
-		public GeooCordinates getGeoCoordinates() {
-			return this.geoCoordinates;
-		}
-
-		public void setGeoCoordinates(
-			final GeooCordinates geoCoordinates) {
-			this.geoCoordinates = geoCoordinates;
-		}
-
-		public String getPositionCoordinateX() {
-			return this.positionCoordinateX;
-		}
-
-		public void setPositionCoordinateX(final String positionCoordinateX) {
-			this.positionCoordinateX = positionCoordinateX;
-		}
-
-		public String getPositionCoordinateXType() {
-			return this.positionCoordinateXType;
-		}
-
-		public void setPositionCoordinateXType(final String positionCoordinateXType) {
-			this.positionCoordinateXType = positionCoordinateXType;
-		}
-
-		public String getPositionCoordinateY() {
-			return this.positionCoordinateY;
-		}
-
-		public void setPositionCoordinateY(final String positionCoordinateY) {
-			this.positionCoordinateY = positionCoordinateY;
-		}
-
-		public String getPositionCoordinateYType() {
-			return this.positionCoordinateYType;
-		}
-
-		public void setPositionCoordinateYType(final String positionCoordinateYType) {
-			this.positionCoordinateYType = positionCoordinateYType;
-		}
-
-		public String getReplicate() {
-			return this.replicate;
-		}
-
-		public void setReplicate(final String replicate) {
-			this.replicate = replicate;
-		}
-	}
 
 	protected static class ObservationUnitXRef {
 		private String id;
@@ -517,6 +380,22 @@ public class PhenotypeSearchDTO {
 
 	public void setTrialName(final String trialName) {
 		this.trialName = trialName;
+	}
+
+	public String getPositionCoordinateX() {
+		return this.positionCoordinateX;
+	}
+
+	public void setPositionCoordinateX(final String positionCoordinateX) {
+		this.positionCoordinateX = positionCoordinateX;
+	}
+
+	public String getPositionCoordinateY() {
+		return this.positionCoordinateY;
+	}
+
+	public void setPositionCoordinateY(final String positionCoordinateY) {
+		this.positionCoordinateY = positionCoordinateY;
 	}
 
 	@Override

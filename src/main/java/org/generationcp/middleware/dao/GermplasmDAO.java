@@ -18,7 +18,9 @@ import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -28,6 +30,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -37,6 +40,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -63,7 +67,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String QUERY_FROM_GERMPLASM = ") query from Germplasm: ";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
-	public static final String SEARCH_GERMPLASM_BY_STUDYDBID =
+	private static final String SEARCH_GERMPLASM_BY_STUDYDBID =
 		"SELECT DISTINCT convert(g.gid, char) AS germplasmDbId, reference.btable AS germplasmPUI, " //
 			+ "  (SELECT n.nval FROM names n " //
 			+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'ACCNO' AND u.fldno = n.ntype)" //
@@ -115,7 +119,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public Germplasm getById(final Integer gid) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT g.* FROM germplsm g WHERE g.deleted = 0 AND gid=:gid LIMIT 1");
+			queryString.append("SELECT g.* FROM germplsm g WHERE g.deleted = 0 AND g.grplce = 0 AND gid=:gid LIMIT 1");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter("gid", gid);
@@ -739,24 +743,26 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		try {
-			final String query = "SELECT groupSource.gid," //
+			final String query = "SELECT "
 				+ "   g.gid as germplasmDbId," //
 				+ "   (select n.nval from names n where n.gid = g.gid AND n.nstat = 1) as defaultDisplayName," //
-				+ "   m.mname AS crossingPlan," //
+				+ "   CONCAT(m.mcode, '|', m.mname, '|', m.mtype) AS crossingPlan," //
 				+ "   year(str_to_date(g.gdate, '%Y%m%d')) as crossingYear," //
 				+ "   femaleParent.gid as parent1DbId," //
 				+ "   femaleParentName.nval as parent1Name," //
-				+ "   if(femaleParent.gid is not null, '" + ParentType.FEMALE.name() + "', null) as parent1Type," //
+				// If germplasmDbId is a cross (gnpgs > 0), the parents' type should be FEMALE and MALE
+				// If germplasmDbId is advanced (gnpgs < 0), the parents type should be POPULATION and SELF
+				+ "   CASE WHEN femaleParent.gid is not null AND g.gnpgs > 0 THEN '" + ParentType.FEMALE.name() + "' "
+				+ "	  WHEN femaleParent.gid is not null AND g.gnpgs < 0 THEN '" + ParentType.POPULATION.name() + "' ELSE NULL END as parent1Type," //
 				+ "   maleParent.gid as parent2DbId," //
 				+ "   maleParentName.nval as parent2Name," //
-				+ "   if(maleParent.gid is not null, '" + ParentType.MALE.name() + "', null) as parent2Type" //
+				+ "   CASE WHEN maleParent.gid is not null AND g.gnpgs > 0 THEN '" + ParentType.MALE.name() + "' "
+				+ "	  WHEN maleParent.gid is not null AND g.gnpgs < 0  THEN '" + ParentType.SELF.name() + "' ELSE NULL END as parent2Type" //
 				+ " FROM germplsm g" //
 				+ "   LEFT JOIN methods m ON m.mid = g.methn" //
-				//  considering groupSource itself in the generative case"
-				+ "   LEFT JOIN germplsm groupSource ON (g.gpid1 = groupSource.gid AND g.gnpgs = -1) OR (groupSource.gid = g.gid AND g.gnpgs >= 2)" //
-				+ "   LEFT JOIN germplsm femaleParent ON groupSource.gpid1 = femaleParent.gid" //
+				+ "   LEFT JOIN germplsm femaleParent ON g.gpid1 = femaleParent.gid" //
 				+ "   LEFT JOIN names femaleParentName ON femaleParent.gid = femaleParentName.gid AND femaleParentName.nstat = 1" //
-				+ "   LEFT JOIN germplsm maleParent ON groupSource.gpid2 = maleParent.gid" //
+				+ "   LEFT JOIN germplsm maleParent ON g.gpid2 = maleParent.gid" //
 				+ "   LEFT JOIN names maleParentName ON maleParent.gid = maleParentName.gid AND maleParentName.nstat = 1" //
 				+ " WHERE g.gid = :gid AND g.deleted = 0 AND g.grplce = 0";
 
@@ -920,7 +926,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public String getNextSequenceNumberForCrossName(String prefix) {
+	public String getNextSequenceNumber(String prefix) {
 		String nextInSequence = "1";
 
 		if (!prefix.isEmpty()) {
@@ -945,7 +951,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				}
 
 			} catch (final HibernateException e) {
-				final String message = "Error with getNextSequenceNumberForCrossName(prefix=" + prefix + ") " + "query : " + e.getMessage();
+				final String message = "Error with getNextSequenceNumber(prefix=" + prefix + ") " + "query : " + e.getMessage();
 				GermplasmDAO.LOG.error(message, e);
 				throw new MiddlewareQueryException(message, e);
 			}
@@ -1644,4 +1650,36 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
+	public Map<Integer, StudyGermplasmDto> getPlotNoToStudyGermplasmDtoMap(final Integer studyId, final Set<Integer> plotNos) {
+		final Map<Integer, StudyGermplasmDto> plotNoToImportedGermplasmParentMap = new HashMap<>();
+
+		final String queryString = "select  distinct(nd_ep.value) AS position, s.name AS designation, s.dbxref_id AS germplasmId "
+			+ " FROM nd_experiment e "
+			+ " INNER JOIN nd_experimentprop nd_ep ON e.nd_experiment_id = nd_ep.nd_experiment_id "
+			+ " INNER JOIN stock s ON s.stock_id = e.stock_id "
+			+ " INNER JOIN project p ON e.project_id = p.project_id "
+			+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS) "
+			+ " AND p.dataset_type_id = :DATASET_TYPE "
+			+ " AND p.study_id = :STUDY_ID "
+			+ " AND nd_ep.value in (:PLOT_NOS) "
+			+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id";
+
+		final SQLQuery query = this.getSession().createSQLQuery(queryString);
+		query.setParameter("STUDY_ID", studyId);
+		query.setParameterList("PLOT_NOS", plotNos);
+		query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
+		query.setParameterList("PLOT_NO_TERM_IDS",
+			new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
+		query.addScalar("position", new StringType());
+		query.addScalar("designation", new StringType());
+		query.addScalar("germplasmId", new IntegerType());
+		query.setResultTransformer(Transformers.aliasToBean(StudyGermplasmDto.class));
+		final List<StudyGermplasmDto> result = query.list();
+		for(final StudyGermplasmDto parent: result) {
+			plotNoToImportedGermplasmParentMap.put(Integer.valueOf(parent.getPosition()), parent);
+		}
+		return plotNoToImportedGermplasmParentMap;
+	}
+
 }

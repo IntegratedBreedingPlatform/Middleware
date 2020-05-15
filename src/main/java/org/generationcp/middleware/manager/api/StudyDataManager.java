@@ -30,12 +30,15 @@ import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
@@ -444,6 +447,16 @@ public interface StudyDataManager {
 	DmsProject getParentFolder(int id);
 
 	/**
+	 * Returns the datasetId of dataset to which the studyDbId (nd_geolocation_id) belongs to.
+	 * In Brapi, studyDbId is the environment/instance (nd_geolocation_id)
+	 * @param studyDbId
+	 * @param datasetType
+	 * @return
+	 */
+	Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType);
+
+
+	/**
 	 * Returns the dms project. Accepts a project id.
 	 *
 	 * @param id the id
@@ -667,9 +680,9 @@ public interface StudyDataManager {
 
 	StudyMetadata getStudyMetadataForGeolocationId(Integer geolocationId);
 
-	Map<String, String> getGeolocationPropsAndValuesByGeolocation(Integer geolocationId);
+	Map<String, String> getGeolocationPropsAndValuesByGeolocation(Integer geolocationId, List<Integer> excludedVariableIds);
 
-	Map<String, String> getProjectPropsAndValuesByStudy(Integer studyId);
+	Map<String, String> getProjectPropsAndValuesByStudy(Integer studyId, List<Integer> excludedVariableIds);
 
 	Integer getProjectIdByStudyDbId(final Integer studyDbId);
 
@@ -743,7 +756,7 @@ public interface StudyDataManager {
 
 	FieldmapBlockInfo getBlockInformation(int blockId);
 
-	Boolean existInstances(final Set<Integer> instanceIds);
+	Boolean instanceExists(final Set<Integer> instanceIds);
 
 	Map<Integer, String> getGeolocationByVariableId(final Integer datasetId, final Integer instanceDbId);
 
@@ -765,10 +778,8 @@ public interface StudyDataManager {
 	 */
 	List<UserDto> getUsersForEnvironment(final Integer instanceId);
 
-	/**
-	 * Returns the instance id to location id map
-	 * @param instanceIds
-	 * @return
-	 */
-	Map<Integer, String> getInstanceIdLocationIdMap(final List<Integer> instanceIds);
+	List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
+
+	List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
+
 }

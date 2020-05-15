@@ -751,6 +751,9 @@ public class WorkbookParser {
 
 	private void incrementDescriptionSheetRowIndex(final Workbook workbook) {
 		while (WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, NUMBER_OF_COLUMNS)) {
+			if (this.rowIndex >= this.getLastRowNumber(workbook, WorkbookParser.DESCRIPTION_SHEET)) {
+				break;
+			}
 			this.rowIndex++;
 		}
 	}
@@ -762,7 +765,6 @@ public class WorkbookParser {
 			if (value != null && !"".equals(value)) {
 				return false;
 			}
-			col++;
 		}
 		return true;
 	}

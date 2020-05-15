@@ -8,7 +8,8 @@ public class PhenotypeQuery {
 	public static final String PHENOTYPE_SEARCH = " SELECT " //
 		+ "  nde.nd_experiment_id AS nd_experiment_id, " //
 		+ "  nde.obs_unit_id AS observationUnitDbId, " //
-		+ "  '' AS observationUnitName, " //
+		+ "  nde.json_props AS jsonProps, " //
+		+ "  CONCAT(dataset_type.name, plotNumber.value) AS observationUnitName, " //
 		+ "  dataset_type.name AS observationLevel, " //
 		+ "  NULL AS plantNumber, " // Until we have plant level observation
 		+ "  s.dbxref_id AS germplasmDbId, " //
@@ -19,7 +20,7 @@ public class PhenotypeQuery {
 		+ "  wp.project_name AS programName, " //
 		+ "  FieldMapRow.value AS FieldMapRow, " //
 		+ "  FieldMapCol.value AS FieldMapCol, " //
-		+ "  (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'PLOT_NO') AS plotNumber, " //
+		+ "  plotNumber.value AS plotNumber, " //
 		+ "  (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') AS blockNumber, " //
 		+ "  (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'REP_NO') AS replicate, " //
 		+ "  (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'COL') AS COL, " //
@@ -38,12 +39,13 @@ public class PhenotypeQuery {
 		+ "  INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 		+ "  INNER JOIN project p ON p.project_id = dataset.study_id " //
 		+ "  LEFT JOIN workbench.workbench_project wp ON p.program_uuid = wp.project_uuid " //
+		+ "  LEFT JOIN nd_experimentprop plotNumber ON plotNumber.nd_experiment_id = nde.nd_experiment_id AND plotNumber.type_id = " + TermId.PLOT_NO.getId() //
 		+ "  LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = " + TermId.FIELDMAP_RANGE.getId() //
 		+ "  LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = " + TermId.FIELDMAP_COLUMN.getId() //
 		+ "  LEFT JOIN dataset_type ON dataset_type.dataset_type_id = dataset.dataset_type_id " //
 		+ "  LEFT JOIN nd_geolocationprop gp ON gl.nd_geolocation_id = gp.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId() + " AND gp.nd_geolocation_id = gl.nd_geolocation_id " //
 		+ "  LEFT JOIN location l ON l.locid = gp.value " //
-		+ " WHERE 1 = 1" //
+		+ " WHERE p.deleted = 0 " //
 		; //
 
 	public static final String PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER = " AND gl.nd_geolocation_id in (:studyDbIds) ";

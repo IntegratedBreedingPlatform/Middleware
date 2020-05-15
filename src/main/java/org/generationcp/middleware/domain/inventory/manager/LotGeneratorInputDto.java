@@ -13,8 +13,6 @@ public class LotGeneratorInputDto extends LotDto {
 
 	private String stockPrefix;
 
-	private Integer userId;
-
 	public Boolean getGenerateStock() {
 		return this.generateStock;
 	}
@@ -29,14 +27,6 @@ public class LotGeneratorInputDto extends LotDto {
 
 	public void setStockPrefix(final String stockPrefix) {
 		this.stockPrefix = stockPrefix;
-	}
-
-	public Integer getUserId() {
-		return this.userId;
-	}
-
-	public void setUserId(final Integer userId) {
-		this.userId = userId;
 	}
 
 	@Override

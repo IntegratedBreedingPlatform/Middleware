@@ -38,10 +38,10 @@ import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
@@ -948,9 +948,9 @@ public interface FieldbookService {
 	List<Method> getAllGenerativeNoBulkingMethods(final String programUUID);
 
 	Workbook getStudyDataSet(int studyID);
-	
+
 	Workbook getStudyByNameAndProgramUUID(String studyName, String programUUID);
-	
+
 	Optional<StudyReference> getStudyReferenceByNameAndProgramUUID(String studyName, String programUUID);
 
 	Boolean hasOutOfSyncObservations(Integer id);
@@ -984,4 +984,5 @@ public interface FieldbookService {
 	 * @param programUUID
 	 */
 	void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID);
+
 }
