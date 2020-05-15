@@ -44,11 +44,11 @@ public class AncestryTreeServiceTest {
 
 		this.randomNumbers = new LinkedHashSet<>();
 
-		setUpGermplasmCache();
+		this.setUpGermplasmCache();
 
-		setUpMethodCache();
+		this.setUpMethodCache();
 
-		generateRandomGermplasm();
+		this.generateRandomGermplasm();
 
 	}
 
@@ -58,7 +58,7 @@ public class AncestryTreeServiceTest {
 				new Function<CropMethodKey, Method>() {
 
 					@Override
-					public Method apply(CropMethodKey key) {
+					public Method apply(final CropMethodKey key) {
 						return AncestryTreeServiceTest.this.methodsMap.get(key);
 					}
 				});
@@ -66,13 +66,13 @@ public class AncestryTreeServiceTest {
 
 	private void setUpGermplasmCache() {
 
-		FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm> functionBasedGuavaCacheLoader =
+		final FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm> functionBasedGuavaCacheLoader =
 				new FunctionBasedGuavaCacheLoader<>(CacheBuilder.newBuilder().maximumSize(100000)
 						.expireAfterWrite(100, TimeUnit.MINUTES).<CropGermplasmKey, Germplasm>build(),
 						new Function<CropGermplasmKey, Germplasm>() {
 
 							@Override
-							public Germplasm apply(CropGermplasmKey key) {
+							public Germplasm apply(final CropGermplasmKey key) {
 								return AncestryTreeServiceTest.this.germplasmMap.get(key);
 							}
 						});
@@ -130,14 +130,14 @@ public class AncestryTreeServiceTest {
 		if (femaleSideNodes != 0) {
 			final Integer femaleGid = iterator.next();
 			final Germplasm generateTestGermplasm = this.generateTestGermplasm(femaleGid, 1);
-			generateTree(generateTestGermplasm, femaleSideNodes - 1, maleSideNodes, iterator);
+			this.generateTree(generateTestGermplasm, femaleSideNodes - 1, maleSideNodes, iterator);
 			germplasm.setGpid1(femaleGid);
 		}
 
 		if (maleSideNodes != 0) {
 			final Integer maleGid = iterator.next();
 			final Germplasm generateTestGermplasm = this.generateTestGermplasm(maleGid, 1);
-			generateTree(generateTestGermplasm, femaleSideNodes, maleSideNodes - 1, iterator);
+			this.generateTree(generateTestGermplasm, femaleSideNodes, maleSideNodes - 1, iterator);
 
 			germplasm.setGpid2(maleGid);
 		}
@@ -188,7 +188,7 @@ public class AncestryTreeServiceTest {
 		if (femaleSideNodes != 0) {
 			final Integer femaleGid = iterator.next();
 			final Germplasm generateTestGermplasm = this.generateTestGermplasm(femaleGid, 107);
-			generateTreeRecurring(generateTestGermplasm, femaleSideNodes - 1, maleSideNodes, recurringMale, iterator);
+			this.generateTreeRecurring(generateTestGermplasm, femaleSideNodes - 1, maleSideNodes, recurringMale, iterator);
 			germplasm.setGpid1(femaleGid);
 		}else {
 			germplasm.setGpid1(0);
@@ -196,7 +196,7 @@ public class AncestryTreeServiceTest {
 
 		if (maleSideNodes != 0) {
 			final Germplasm generateTestGermplasm = this.generateTestGermplasm(recurringMale, 107);
-			generateTreeRecurring(generateTestGermplasm, femaleSideNodes, maleSideNodes - 1, recurringMale, iterator);
+			this.generateTreeRecurring(generateTestGermplasm, femaleSideNodes, maleSideNodes - 1, recurringMale, iterator);
 			germplasm.setGpid2(recurringMale);
 		}else {
 			germplasm.setGpid2(0);
