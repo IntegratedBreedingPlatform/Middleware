@@ -42,9 +42,9 @@ public class PedigreeServiceImpl implements PedigreeService {
 
 	private PedigreeDataManagerFactory pedigreeDataManagerFactory;
 
-	private static Cache<CropMethodKey, Method> breedingMethodCache;
+	private static final Cache<CropMethodKey, Method> breedingMethodCache;
 
-	private static Cache<CropNameTypeKey, List<Integer>> nameTypeCache;
+	private static final Cache<CropNameTypeKey, List<Integer>> nameTypeCache;
 
 	private String cropName;
 
@@ -69,10 +69,10 @@ public class PedigreeServiceImpl implements PedigreeService {
 		this.pedigreeDataManagerFactory = new PedigreeDataManagerFactory(sessionProvider);
 		this.germplasmDataManager = this.pedigreeDataManagerFactory.getGermplasmDataManager();
 
-		methodCropBasedCache = new FunctionBasedGuavaCacheLoader<CropMethodKey, Method>(breedingMethodCache, new Function<CropMethodKey, Method>() {
+		this.methodCropBasedCache = new FunctionBasedGuavaCacheLoader<CropMethodKey, Method>(breedingMethodCache, new Function<CropMethodKey, Method>() {
 
 			@Override
-			public Method apply(CropMethodKey key) {
+			public Method apply(final CropMethodKey key) {
 				return PedigreeServiceImpl.this.germplasmDataManager.getMethodByID(key.getMethodId());
 			}
 		});
@@ -87,7 +87,7 @@ public class PedigreeServiceImpl implements PedigreeService {
 
 				for (final String nameType : nameTypeOrder) {
 					final UserDefinedField userDefinedFieldByTableTypeAndCode =
-							germplasmDataManager.getUserDefinedFieldByTableTypeAndCode("NAMES", "NAME", nameType);
+						PedigreeServiceImpl.this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCode("NAMES", "NAME", nameType);
 					if (userDefinedFieldByTableTypeAndCode != null) {
 						nameTypeOrderIds.add(userDefinedFieldByTableTypeAndCode.getFldno());
 					} else {
@@ -101,7 +101,7 @@ public class PedigreeServiceImpl implements PedigreeService {
 			}
 		};
 
-		nameTypeBasedCache =
+		this.nameTypeBasedCache =
 				new FunctionBasedGuavaCacheLoader<CropNameTypeKey, List<Integer>>(nameTypeCache,
 						nameTypeLoader);
 
@@ -131,9 +131,9 @@ public class PedigreeServiceImpl implements PedigreeService {
 					level == null ? crossExpansionProperties.getCropGenerationLevel(this.getCropName()) : level;
 
 			final GermplasmCache germplasmAncestryCache =
-					new GermplasmCache(germplasmDataManager, getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
+					new GermplasmCache(this.germplasmDataManager, this.getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
 			// Prime cache
-			germplasmAncestryCache.initialiseCache(this.getCropName(), gids, getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
+			germplasmAncestryCache.initialiseCache(this.getCropName(), gids, this.getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
 			
 			// Please note the cache about has been primed with all germplasm and their ancestry tree and thus will not need to go back to
 			// the database for each germplasm required. It will occasionally go back to the DB in case it cannot find the required gid.
@@ -141,8 +141,8 @@ public class PedigreeServiceImpl implements PedigreeService {
 			for (final Integer gid : gids) {
 				try {
 					pedigreeStrings.put(gid,
-						buildPedigreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse));
-				} catch (MiddlewareException ex){
+						this.buildPedigreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse));
+				} catch (final MiddlewareException ex){
 					pedigreeStrings.put(gid, ex.getMessage());
 				}
 			}
@@ -166,9 +166,10 @@ public class PedigreeServiceImpl implements PedigreeService {
 			// Get the cross string
 			final int numberOfLevelsToTraverse = level == null ? crossExpansionProperties.getCropGenerationLevel(this.getCropName()) : level;
 			
-			final GermplasmCache germplasmAncestryCache = new GermplasmCache(germplasmDataManager, getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
+			final GermplasmCache germplasmAncestryCache = new GermplasmCache(this.germplasmDataManager, this
+				.getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
 
-			return buildPedigreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse);
+			return this.buildPedigreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse);
 		} finally {
 			monitor.stop();
 		}
@@ -207,9 +208,10 @@ public class PedigreeServiceImpl implements PedigreeService {
 			LOG.debug(String.format("Building pedigree string for gid '%d'.", gid));
 	
 			return pedigreeString.buildPedigreeString(gidAncestryTree, numberOfLevelsToTraverse,
-					new FixedLineNameResolver(crossExpansionProperties, pedigreeDataManagerFactory, nameTypeBasedCache, cropName), false)
+					new FixedLineNameResolver(crossExpansionProperties, this.pedigreeDataManagerFactory, this.nameTypeBasedCache,
+						this.cropName), false)
 					.getPedigree();
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new MiddlewareException(String.format("Problem building pedigree string for gid '%d'.", gid));
 		} finally {
 			monitor.stop();
