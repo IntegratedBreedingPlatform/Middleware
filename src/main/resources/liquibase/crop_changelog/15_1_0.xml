@@ -7,20 +7,20 @@
 	<changeSet author="clarysabel" id="v15.1.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<tableExists tableName="experiment_transaction"/>
+				<tableExists tableName="ims_experiment_transaction"/>
 			</not>
 		</preConditions>
 		<comment>
 			Creating table to store relationship between transactions and experiments
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			CREATE TABLE experiment_transaction (
+			CREATE TABLE ims_experiment_transaction (
 			  trnid INT(11) NOT NULL,
 			  nd_experiment_id INT(11) NOT NULL,
 			  type INT(11) NOT NULL,
 			  PRIMARY KEY (trnid, nd_experiment_id),
-			  CONSTRAINT fk_experiment_transaction_transaction FOREIGN KEY (trnid) REFERENCES ims_transaction (trnid),
-			  CONSTRAINT fk_experiment_transaction_experiment FOREIGN KEY (nd_experiment_id) REFERENCES nd_experiment (nd_experiment_id)
+			  CONSTRAINT fk_ims_experiment_transaction_transaction FOREIGN KEY (trnid) REFERENCES ims_transaction (trnid),
+			  CONSTRAINT fk_ims_experiment_transaction_experiment FOREIGN KEY (nd_experiment_id) REFERENCES nd_experiment (nd_experiment_id)
 			);
 		</sql>
 	</changeSet>

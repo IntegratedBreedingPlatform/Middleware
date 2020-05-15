@@ -11,7 +11,7 @@ public class ExperimentTransactionId implements Serializable {
 	@Column(name = "experiment_id")
 	private Integer experimentId;
 
-	@Column(name = "transaction_id")
+	@Column(name = "trnid")
 	private Integer transactionId;
 
 	public ExperimentTransactionId() {

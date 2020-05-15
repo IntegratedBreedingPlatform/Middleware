@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
@@ -13,18 +14,20 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "experiment_transaction")
+@Table(name = "ims_experiment_transaction")
 public class ExperimentTransaction implements Serializable {
 
 	@EmbeddedId
 	private ExperimentTransactionId id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@MapsId("experimentId")
+	@JoinColumn(name = "nd_experiment_id")
 	private ExperimentModel experiment;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@MapsId("transactionId")
+	@JoinColumn(name = "trnid")
 	private Transaction transaction;
 
 	@Column(name = "type")

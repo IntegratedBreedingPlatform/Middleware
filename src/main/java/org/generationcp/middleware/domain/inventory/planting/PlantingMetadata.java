@@ -3,28 +3,26 @@ package org.generationcp.middleware.domain.inventory.planting;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.math.BigInteger;
-
 @AutoProperty
 public class PlantingMetadata {
 
-	private BigInteger pendingTransactionsCount;
+	private Long pendingTransactionsCount;
 
-	private BigInteger confirmedTransactionsCount;
+	private Long confirmedTransactionsCount;
 
-	public BigInteger getPendingTransactionsCount() {
+	public Long getPendingTransactionsCount() {
 		return pendingTransactionsCount;
 	}
 
-	public void setPendingTransactionsCount(final BigInteger pendingTransactionsCount) {
+	public void setPendingTransactionsCount(final Long pendingTransactionsCount) {
 		this.pendingTransactionsCount = pendingTransactionsCount;
 	}
 
-	public BigInteger getConfirmedTransactionsCount() {
+	public Long getConfirmedTransactionsCount() {
 		return confirmedTransactionsCount;
 	}
 
-	public void setConfirmedTransactionsCount(final BigInteger confirmedTransactionsCount) {
+	public void setConfirmedTransactionsCount(final Long confirmedTransactionsCount) {
 		this.confirmedTransactionsCount = confirmedTransactionsCount;
 	}
 
