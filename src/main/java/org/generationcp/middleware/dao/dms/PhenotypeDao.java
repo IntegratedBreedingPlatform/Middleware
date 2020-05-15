@@ -131,7 +131,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-					+ "    AND p.observable_id IN (:numericVariableIds) " + "GROUP by p.observable_id ");
+					+ "    AND p.observable_id IN (:numericVariableIds) "
+					+ "    AND p.value IS NOT NULL "
+					+ "GROUP by p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("numericVariableIds", numericVariableIds);
 
@@ -171,7 +173,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-					+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id ");
+					+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id "
+					+ "    AND p.value IS NOT NULL");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("variableIds", variableIds);
 
@@ -207,6 +210,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+					+ "	   AND p.value IS NOT NULL "
 					+ "GROUP by p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
 
