@@ -152,8 +152,8 @@ public class AncestryTreeServiceTest {
 		final Method method = new Method(methodId);
 		if(methodId > 1) {
 			method.setMname("Backcross");
-			germplasm.setGpid1(randomGenerator.nextInt(100)+13);
-			germplasm.setGpid2(randomGenerator.nextInt(100)+ 122);
+			germplasm.setGpid1(randomGenerator.nextInt(10)+1);
+			germplasm.setGpid2(randomGenerator.nextInt(10)+ 2);
 		}
 		germplasm.setMethod(method);
 		germplasm.setMethodId(methodId);
