@@ -173,8 +173,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-					+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id "
-					+ "    AND p.value IS NOT NULL");
+					+ "    AND p.observable_id IN (:variableIds) "
+					+ "	   AND p.value is NOT NULL "
+					+ "GROUP by p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("variableIds", variableIds);
 
