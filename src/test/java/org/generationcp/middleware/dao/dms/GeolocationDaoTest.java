@@ -115,7 +115,7 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 			this.dataset =
 				this.createDataset(this.study.getName() + " - Environment Dataset", this.study.getProgramUUID(),
 					DatasetTypeEnum.SUMMARY_DATA.getId(),
-					study, study);
+					this.study, this.study);
 			this.createGermplasm();
 			this.geolocation = this.createEnvironmentData(this.dataset, "1", Collections.<Integer>emptyList(), true, null);
 		}
@@ -206,7 +206,7 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 				return input.getId();
 			}
 		});
-		Assert.assertTrue(environmentIds.contains(geolocation.getLocationId()));
+		Assert.assertTrue(environmentIds.contains(this.geolocation.getLocationId()));
 		Assert.assertTrue(environmentIds.contains(geolocation2.getLocationId()));
 	}
 
@@ -229,7 +229,7 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 					return input.getId();
 				}
 			});
-		Assert.assertFalse(environmentIds.contains(geolocation.getLocationId()));
+		Assert.assertFalse(environmentIds.contains(this.geolocation.getLocationId()));
 		Assert.assertTrue(environmentIds.contains(geolocation2.getLocationId()));
 		Assert.assertTrue(environmentIds.contains(geolocation3.getLocationId()));
 	}
