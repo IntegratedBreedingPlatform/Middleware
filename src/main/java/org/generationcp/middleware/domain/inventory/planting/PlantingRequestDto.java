@@ -5,6 +5,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.List;
 import java.util.Map;
 
 @AutoProperty
@@ -60,11 +61,50 @@ public class PlantingRequestDto {
 	}
 
 
+	@AutoProperty
+	public static class LotEntryNumber {
+
+		private Integer entryNo;
+		private String stockId;
+
+		public Integer getEntryNo() {
+			return entryNo;
+		}
+
+		public void setEntryNo(final Integer entryNo) {
+			this.entryNo = entryNo;
+		}
+
+		public String getStockId() {
+			return stockId;
+		}
+
+		public void setStockId(final String stockId) {
+			this.stockId = stockId;
+		}
+
+		@Override
+		public int hashCode() {
+			return Pojomatic.hashCode(this);
+		}
+
+		@Override
+		public String toString() {
+			return Pojomatic.toString(this);
+		}
+
+		@Override
+		public boolean equals(final Object o) {
+			return Pojomatic.equals(this, o);
+		}
+	}
+
+
 	private SearchCompositeDto<ObservationUnitsSearchDTO, Integer> selectedObservationUnits;
 
 	private Map<String, PlantingRequestDto.WithdrawalInstruction> withdrawalsPerUnit;
 
-	private Map<String, String> lotPerEntryNo;
+	private List<LotEntryNumber> lotPerEntryNo;
 
 	private String notes;
 
@@ -86,11 +126,11 @@ public class PlantingRequestDto {
 		this.withdrawalsPerUnit = withdrawalsPerUnit;
 	}
 
-	public Map<String, String> getLotPerEntryNo() {
+	public List<LotEntryNumber> getLotPerEntryNo() {
 		return lotPerEntryNo;
 	}
 
-	public void setLotPerEntryNo(final Map<String, String> lotPerEntryNo) {
+	public void setLotPerEntryNo(final List<LotEntryNumber> lotPerEntryNo) {
 		this.lotPerEntryNo = lotPerEntryNo;
 	}
 

@@ -1,7 +1,6 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -9,9 +8,9 @@ import org.generationcp.middleware.domain.inventory.planting.PlantingMetadata;
 import org.generationcp.middleware.domain.inventory.planting.PlantingRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.inventory.PlantingService;
 import org.generationcp.middleware.util.Util;
@@ -24,6 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -111,9 +111,32 @@ public class PlantingServiceImpl implements PlantingService {
 
 		// transform final list
 		final PlantingPreparationDTO plantingPreparationDTO = new PlantingPreparationDTO();
-		plantingPreparationDTO.setEntries(new ArrayList<PlantingPreparationDTO.PlantingPreparationEntryDTO>(entriesByEntryNo.values()));
+		plantingPreparationDTO.setEntries(new ArrayList<>(entriesByEntryNo.values()));
 
 		return plantingPreparationDTO;
+	}
+
+	@Override
+	public PlantingMetadata getPlantingMetadata(final Integer studyId,
+		final Integer datasetId, final PlantingRequestDto plantingRequestDto) {
+		final PlantingPreparationDTO plantingPreparationDTO =
+			this.searchPlantingPreparation(studyId, datasetId, plantingRequestDto.getSelectedObservationUnits());
+
+		final List<Integer> requestedEntryNos =
+			plantingRequestDto.getLotPerEntryNo().stream().map(PlantingRequestDto.LotEntryNumber::getEntryNo).collect(
+				Collectors.toList());
+
+		final List<Integer> obsUnitIds = new ArrayList<>();
+		plantingPreparationDTO.getEntries().stream().filter(entry -> requestedEntryNos.contains(entry.getEntryNo()))
+			.forEach(entry -> obsUnitIds.addAll(entry.getObservationUnits().stream().map(
+				PlantingPreparationDTO.PlantingPreparationEntryDTO.ObservationUnitDTO::getNdExperimentId).collect(Collectors.toList())));
+
+		final PlantingMetadata plantingMetadata = new PlantingMetadata();
+		plantingMetadata.setConfirmedTransactionsCount(
+			daoFactory.getExperimentTransactionDao().countPlantingTransactionsByStatus(obsUnitIds, TransactionStatus.CONFIRMED));
+		plantingMetadata.setPendingTransactionsCount(
+			daoFactory.getExperimentTransactionDao().countPlantingTransactionsByStatus(obsUnitIds, TransactionStatus.PENDING));
+		return plantingMetadata;
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
@@ -124,18 +147,6 @@ public class PlantingServiceImpl implements PlantingService {
 			searchRequest.setFilter(filter);
 			searchDTO.setSearchRequest(searchRequest);
 		}
-	}
-
-	@Override
-	public PlantingMetadata getPlantingMetadata(final PlantingRequestDto plantingRequestDto) {
-		final PlantingMetadata plantingMetadata = new PlantingMetadata();
-		//TODO Get ObervationUnitIds
-		final List<Integer> obsUnitIds = Lists.newArrayList(16500, 16502, 16503, 16501, 16504);
-		plantingMetadata.setConfirmedTransactionsCount(
-			daoFactory.getExperimentTransactionDao().countPlantingTransactionsByStatus(obsUnitIds, TransactionStatus.CONFIRMED));
-		plantingMetadata.setPendingTransactionsCount(
-			daoFactory.getExperimentTransactionDao().countPlantingTransactionsByStatus(obsUnitIds, TransactionStatus.PENDING));
-		return plantingMetadata;
 	}
 
 }

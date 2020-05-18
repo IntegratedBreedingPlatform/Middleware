@@ -17,6 +17,9 @@ public class ExperimentTransactionDAO extends GenericDAO<ExperimentTransaction, 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentTransactionDAO.class);
 
 	public Long countPlantingTransactionsByStatus(final List<Integer> observationUnitIds, final TransactionStatus transactionStatus) {
+		if (observationUnitIds == null || observationUnitIds.isEmpty()) {
+			return 0L;
+		}
 		try {
 			final Query query = this.getSession().createQuery("select count(distinct t.id) from Transaction t "
 				+ "inner join t.experimentTransactions et where et.type = :expTransactionType and et.experiment.id in (:obsUnitList) and t.status = :trnStatus")
