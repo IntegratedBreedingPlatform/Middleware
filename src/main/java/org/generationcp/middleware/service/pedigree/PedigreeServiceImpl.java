@@ -137,14 +137,10 @@ public class PedigreeServiceImpl implements PedigreeService {
 			
 			// Please note the cache about has been primed with all germplasm and their ancestry tree and thus will not need to go back to
 			// the database for each germplasm required. It will occasionally go back to the DB in case it cannot find the required gid.
-			// This might happen in the case of backcross because we predetermine the number of crosses for a backcross. 
+			// This might happen in the case of backcross because we predetermine the number of crosses for a backcross.
 			for (final Integer gid : gids) {
-				try {
 					pedigreeStrings.put(gid,
 						this.buildPedigreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse));
-				} catch (final MiddlewareException ex){
-					pedigreeStrings.put(gid, ex.getMessage());
-				}
 			}
 			return pedigreeStrings;
 		} finally {
