@@ -145,6 +145,17 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
+	public long countStocksForStudy(final int studyId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+			criteria.add(Restrictions.eq("projectId", studyId));
+			criteria.setProjection(Projections.rowCount());
+			return ((Long) criteria.uniqueResult()).longValue();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in countStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+		}
+	}
+
 	public long countStocksByStudyAndEntryTypeIds(final int studyId, final List<String> systemDefinedEntryTypeIds) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
@@ -226,5 +237,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		query.setResultTransformer(Transformers.aliasToBean(StudyGermplasmDto.class));
 		return query.list();
 	}
+
 
 }

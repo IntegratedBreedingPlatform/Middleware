@@ -9,6 +9,8 @@ public interface StockModelService {
 
 	List<StockModel> getStocksForStudy(int studyId);
 
+	long countStocksForStudy(int studyId);
+
 	void deleteStocksForStudy(int studyId);
 
 	void saveStocks(List<StockModel> stockModelList);
@@ -20,4 +22,6 @@ public interface StockModelService {
 	Map<String, Integer> getStockMapForStudy(int datasetId);
 
 	Map<Integer, String> getInventoryStockIdMap(List<StockModel> stockModelList);
+
+
 }

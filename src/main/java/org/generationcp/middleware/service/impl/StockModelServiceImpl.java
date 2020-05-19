@@ -29,6 +29,11 @@ public class StockModelServiceImpl implements StockModelService {
 	}
 
 	@Override
+	public long countStocksForStudy(final int studyId) {
+		return this.daoFactory.getStockDao().countStocksForStudy(studyId);
+	}
+
+	@Override
 	public void deleteStocksForStudy(final int studyId) {
 		this.daoFactory.getStockDao().deleteStocksForStudy(studyId);
 	}
