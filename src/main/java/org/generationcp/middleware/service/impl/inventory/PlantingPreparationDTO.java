@@ -44,6 +44,7 @@ public class PlantingPreparationDTO {
 		public static class StockDTO {
 
 			private String stockId;
+			private Integer lotId;
 			private String storageLocation;
 			private Double availableBalance;
 			private Integer unitId;
@@ -54,6 +55,14 @@ public class PlantingPreparationDTO {
 
 			public void setStockId(final String stockId) {
 				this.stockId = stockId;
+			}
+
+			public Integer getLotId() {
+				return this.lotId;
+			}
+
+			public void setLotId(final Integer lotId) {
+				this.lotId = lotId;
 			}
 
 			public String getStorageLocation() {

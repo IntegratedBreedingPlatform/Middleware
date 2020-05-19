@@ -107,6 +107,7 @@ public class PlantingServiceImpl implements PlantingService {
 				final PlantingPreparationDTO.PlantingPreparationEntryDTO.StockDTO stock =
 					new PlantingPreparationDTO.PlantingPreparationEntryDTO.StockDTO();
 				stock.setStockId(lot.getStockId());
+				stock.setLotId(lot.getLotId());
 				stock.setAvailableBalance(lot.getAvailableBalance());
 				stock.setStorageLocation(lot.getLocationName());
 				stock.setUnitId(lot.getUnitId());
