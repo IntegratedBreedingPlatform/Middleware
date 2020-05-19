@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -1147,11 +1148,13 @@ public class WorkbookSaver extends Saver {
 		}
 
 		// create stock and stockprops and associate to observations
-		int datasetId = measurementDatasetId;
 		if (isMeansDataImport) {
-			datasetId = meansDatasetId;
+			this.setStockIdsForMeansExperiments(workbook, effectVariables.findById(TermId.ENTRY_NO.getId()).getLocalName());
+
+		} else {
+			this.createStocksIfNecessary(measurementDatasetId, workbook, effectVariables, trialHeaders);
 		}
-		this.createStocksIfNecessary(datasetId, workbook, effectVariables, trialHeaders);
+
 
 		// create trial experiments if not yet existing
 		final boolean hasExistingStudyExperiment = this.checkIfHasExistingStudyExperiment(studyId);
@@ -1180,6 +1183,16 @@ public class WorkbookSaver extends Saver {
 		} else {
 			// 3. measurement experiments
 			this.createMeasurementEffectExperiments(crop, measurementDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
+		}
+	}
+
+	void setStockIdsForMeansExperiments(final Workbook workbook, final String entryNoHeader) {
+		final DataSet plotDataset = this.studyDataManager.findOneDataSetByType(workbook.getStudyDetails().getId(), DatasetTypeEnum.PLOT_DATA.getId());
+		final Stocks stocks = this.studyDataManager.getStocksInDataset(plotDataset.getId());
+		final Map<String, Integer> entryNoStockIdMap = stocks.getStockMap(entryNoHeader);
+		for(final MeasurementRow row : workbook.getObservations()) {
+			final String entryNo = row.getMeasurementData(TermId.ENTRY_NO.getId()).getValue();
+			row.setStockId(entryNoStockIdMap.get(entryNo));
 		}
 	}
 
