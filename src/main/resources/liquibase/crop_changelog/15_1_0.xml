@@ -19,4 +19,47 @@
 		<modifyDataType tableName="key_sequence_register" columnName="key_prefix" newDataType="varchar(255)"/>
 	</changeSet>
 
+	<changeSet author="mderamos" id="v15.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) from nd_experiment means_exp
+						INNER JOIN project means ON means.project_id = means_exp.project_id AND means.dataset_type_id = 2
+						INNER JOIN project plot ON plot.study_id = means.study_id AND plot.dataset_type_id = 4
+						INNER JOIN nd_experiment plot_exp ON plot_exp.project_id = plot.project_id
+						INNER JOIN stock means_stock ON means_stock.stock_id = means_exp.stock_id
+						INNER JOIN stock plot_stock ON plot_stock.stock_id = plot_exp.stock_id
+						WHERE means_stock.uniquename = plot_stock.uniquename AND means_exp.stock_id != plot_stock.stock_id;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Set means experiment stock ids</comment>
+		<sql dbms="mysql">
+			CREATE TEMPORARY TABLE means_stock_id AS
+				SELECT DISTINCT means_exp.stock_id FROM nd_experiment means_exp
+						INNER JOIN project means ON means.project_id = means_exp.project_id AND means.dataset_type_id = 2
+						INNER JOIN project plot ON plot.study_id = means.study_id AND plot.dataset_type_id = 4
+						INNER JOIN nd_experiment plot_exp ON plot_exp.project_id = plot.project_id
+						INNER JOIN stock means_stock ON means_stock.stock_id = means_exp.stock_id
+						INNER JOIN stock plot_stock ON plot_stock.stock_id = plot_exp.stock_id
+						WHERE means_stock.uniquename = plot_stock.uniquename AND means_exp.stock_id != plot_stock.stock_id;
+
+
+			UPDATE nd_experiment means_exp
+				INNER JOIN project means ON means.project_id = means_exp.project_id AND means.dataset_type_id = 2
+				INNER JOIN project plot ON plot.study_id = means.study_id AND plot.dataset_type_id = 4
+				INNER JOIN nd_experiment plot_exp ON plot_exp.project_id = plot.project_id
+				INNER JOIN stock means_stock ON means_stock.stock_id = means_exp.stock_id
+				INNER JOIN stock plot_stock ON plot_stock.stock_id = plot_exp.stock_id
+				SET means_exp.stock_id = plot_stock.stock_id
+				WHERE means_stock.uniquename = plot_stock.uniquename;
+
+			DELETE FROM stock
+				WHERE stock_id IN (
+				  SELECT stock_id
+				  FROM means_stock_id
+				);
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
