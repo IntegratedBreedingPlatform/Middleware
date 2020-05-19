@@ -13,6 +13,7 @@ package org.generationcp.middleware.pojos.ims;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.util.Util;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -141,6 +142,25 @@ public class Transaction implements Serializable {
 		this.personId = personId;
 		this.type = type;
 
+	}
+
+	public Transaction(final TransactionType transactionType, final TransactionStatus transactionStatus, final Integer userId,
+		final String notes, final Integer lotId, final Double amount) {
+		super();
+		this.setStatus(transactionStatus.getIntValue());
+		this.setType(transactionType.getId());
+		this.setLot(new Lot(lotId));
+		this.setPersonId(userId);
+		this.setUserId(userId);
+		this.setTransactionDate(new Date());
+		this.setQuantity(amount);
+		this.setComments(notes);
+		this.setPreviousAmount(0D);
+		if (transactionStatus.equals(TransactionStatus.CONFIRMED)) {
+			this.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
+		} else {
+			this.setCommitmentDate(0);
+		}
 	}
 
 	public Integer getId() {

@@ -6,9 +6,15 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.planting.PlantingMetadata;
 import org.generationcp.middleware.domain.inventory.planting.PlantingRequestDto;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.ims.ExperimentTransaction;
+import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
+import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -19,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -137,6 +144,90 @@ public class PlantingServiceImpl implements PlantingService {
 		plantingMetadata.setPendingTransactionsCount(
 			daoFactory.getExperimentTransactionDao().countPlantingTransactionsByStatus(obsUnitIds, TransactionStatus.PENDING));
 		return plantingMetadata;
+	}
+
+	@Override
+	public void savePlanting(final Integer userId, final Integer studyId, final Integer datasetId,
+		final PlantingRequestDto plantingRequestDto,
+		final TransactionStatus transactionStatus) {
+		final PlantingPreparationDTO plantingPreparationDTO =
+			this.searchPlantingPreparation(studyId, datasetId, plantingRequestDto.getSelectedObservationUnits());
+
+		final List<Integer> requestedEntryNos =
+			plantingRequestDto.getLotPerEntryNo().stream().map(PlantingRequestDto.LotEntryNumber::getEntryNo).collect(
+				Collectors.toList());
+
+		final List<Integer> requestedNdExperimentIds = new ArrayList<>();
+		plantingPreparationDTO.getEntries().stream().filter(entry -> requestedEntryNos.contains(entry.getEntryNo()))
+			.forEach(entry -> requestedNdExperimentIds.addAll(entry.getObservationUnits().stream().map(
+				PlantingPreparationDTO.PlantingPreparationEntryDTO.ObservationUnitDTO::getNdExperimentId).collect(Collectors.toList())));
+
+		// Verify that none of them has confirmed transactions, if there are, throw an exception
+		if (daoFactory.getExperimentTransactionDao()
+			.countPlantingTransactionsByStatus(requestedNdExperimentIds, TransactionStatus.CONFIRMED) > 0L) {
+			throw new MiddlewareRequestException("", "planting.confirmed.transactions.found");
+		}
+
+		// Find the pending transactions and cancel them
+		final List<Transaction> pendingTransactions = this.daoFactory.getExperimentTransactionDao()
+			.getTransactionsByNdExperimentIds(requestedNdExperimentIds, TransactionStatus.PENDING, ExperimentTransactionType.PLANTING);
+		for (final Transaction transaction : pendingTransactions) {
+			transaction.setStatus(TransactionStatus.CANCELLED.getIntValue());
+			transaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
+			daoFactory.getTransactionDAO().update(transaction);
+		}
+
+		//Validate that entryNo are not repeated in BMSAPI
+		for (final PlantingRequestDto.LotEntryNumber lotEntryNumber : plantingRequestDto.getLotPerEntryNo()) {
+			final List<Integer> ndExperimentIds = new ArrayList<>();
+			plantingPreparationDTO.getEntries().stream().filter(entry -> entry.getEntryNo().equals(lotEntryNumber.getEntryNo()))
+				.forEach(entry -> ndExperimentIds.addAll(entry.getObservationUnits().stream().map(
+					PlantingPreparationDTO.PlantingPreparationEntryDTO.ObservationUnitDTO::getNdExperimentId)
+					.collect(Collectors.toList())));
+
+			//Get requested lot
+			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+			lotsSearchDto.setLotIds(Collections.singletonList(lotEntryNumber.getLotId()));
+
+			final ExtendedLotDto lot = daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
+
+			//Find instructions for the unit
+			final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction =
+				plantingRequestDto.getWithdrawalsPerUnit().get(lot.getUnitName());
+			final Double amount = (withdrawalInstruction.isWithdrawAllAvailableBalance()) ? lot.getAvailableBalance() :
+				withdrawalInstruction.getWithdrawalAmount();
+			final Double totalToWithdraw =
+				(withdrawalInstruction.isWithdrawAllAvailableBalance()) ? amount : (amount * ndExperimentIds.size());
+
+			if (totalToWithdraw > lot.getAvailableBalance()) {
+				throw new MiddlewareRequestException("", "planting.not.enough.inventory", lot.getStockId());
+			}
+
+			if (withdrawalInstruction.isGroupTransactions()) {
+				final Transaction transaction =
+					new Transaction(TransactionType.WITHDRAWAL, transactionStatus, userId, plantingRequestDto.getNotes(), lot.getLotId(),
+						-1 * totalToWithdraw);
+				this.daoFactory.getTransactionDAO().save(transaction);
+				for (final Integer ndExperimentId : ndExperimentIds) {
+					final ExperimentModel experimentModel = new ExperimentModel(ndExperimentId);
+					final ExperimentTransaction experimentTransaction = new ExperimentTransaction(experimentModel, transaction,
+						ExperimentTransactionType.PLANTING.getId());
+					this.daoFactory.getExperimentTransactionDao().save(experimentTransaction);
+				}
+			} else {
+				for (final Integer ndExperimentId : ndExperimentIds) {
+					final Transaction transaction =
+						new Transaction(TransactionType.WITHDRAWAL, transactionStatus, userId, plantingRequestDto.getNotes(),
+							lot.getLotId(),
+							-1 * amount);
+					this.daoFactory.getTransactionDAO().save(transaction);
+					final ExperimentModel experimentModel = new ExperimentModel(ndExperimentId);
+					final ExperimentTransaction experimentTransaction = new ExperimentTransaction(experimentModel, transaction,
+						ExperimentTransactionType.PLANTING.getId());
+					this.daoFactory.getExperimentTransactionDao().save(experimentTransaction);
+				}
+			}
+		}
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {

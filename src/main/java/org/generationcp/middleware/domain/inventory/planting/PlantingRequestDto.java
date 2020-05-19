@@ -65,7 +65,7 @@ public class PlantingRequestDto {
 	public static class LotEntryNumber {
 
 		private Integer entryNo;
-		private String stockId;
+		private Integer lotId;
 
 		public Integer getEntryNo() {
 			return entryNo;
@@ -75,12 +75,12 @@ public class PlantingRequestDto {
 			this.entryNo = entryNo;
 		}
 
-		public String getStockId() {
-			return stockId;
+		public Integer getLotId() {
+			return lotId;
 		}
 
-		public void setStockId(final String stockId) {
-			this.stockId = stockId;
+		public void setLotId(final Integer lotId) {
+			this.lotId = lotId;
 		}
 
 		@Override

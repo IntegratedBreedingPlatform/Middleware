@@ -37,10 +37,17 @@ public class ExperimentTransaction implements Serializable {
 	public ExperimentTransaction() {
 	}
 
-	public ExperimentTransaction(ExperimentModel experiment, Transaction transaction) {
+	public ExperimentTransaction(final ExperimentModel experiment, final Transaction transaction) {
 		this.experiment = experiment;
 		this.transaction = transaction;
 		this.id = new ExperimentTransactionId(experiment.getNdExperimentId(), transaction.getId());
+	}
+
+	public ExperimentTransaction(final ExperimentModel experiment, final Transaction transaction, final Integer type) {
+		this.experiment = experiment;
+		this.transaction = transaction;
+		this.id = new ExperimentTransactionId(experiment.getNdExperimentId(), transaction.getId());
+		this.type = type;
 	}
 
 	public ExperimentTransactionId getId() {
@@ -76,7 +83,7 @@ public class ExperimentTransaction implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if (this == o)
 			return true;
 
