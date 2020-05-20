@@ -11,13 +11,20 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import org.generationcp.middleware.Work;
 import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.data.initializer.DataSetTestDataInitializer;
+import org.generationcp.middleware.data.initializer.MeasurementRowTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
+import org.generationcp.middleware.data.initializer.VariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Stock;
+import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -32,8 +39,10 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
 import org.generationcp.middleware.pojos.Location;
@@ -42,6 +51,7 @@ import org.generationcp.middleware.utils.test.VariableTypeListDataUtil;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
@@ -383,6 +393,34 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 		Assert.assertEquals(Integer.valueOf(locationIdVariableValue), retrievedLocation.get(0).getLocid());
 
+	}
+
+	@Test
+	public void testSetStockIdsForMeansExperiments() {
+		final StudyDataManager studyDataManager = Mockito.mock(StudyDataManager.class);
+		workbookSaver.setStudyDataManager(studyDataManager);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
+		workbook.getStudyDetails().setId(1);
+		final DataSet plotDataset = DataSetTestDataInitializer.createStudyDatasetTestData("Plot DataSet");
+		Mockito.when(studyDataManager.findOneDataSetByType(workbook.getStudyDetails().getId(), DatasetTypeEnum.PLOT_DATA.getId()))
+			.thenReturn(plotDataset);
+
+		final Stocks stocks =  new Stocks();
+		final VariableList variableList = new VariableList();
+		final Variable variable = new Variable();
+		variable.setValue("1");
+		final DMSVariableType variableType = new DMSVariableType();
+		variableType.setLocalName(TermId.ENTRY_NO.name());
+		variable.setVariableType(variableType);
+		variableList.add(variable);
+		final Stock stock = new Stock(251, variableList);
+		stocks.add(stock);
+		Mockito.when(studyDataManager.getStocksInDataset(plotDataset.getId())).thenReturn(stocks);
+		workbook.setObservations(MeasurementRowTestDataInitializer.
+			createMeasurementRowList(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), "1",
+				MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), "1")));
+		workbookSaver.setStockIdsForMeansExperiments(workbook, TermId.ENTRY_NO.name());
+		Assert.assertEquals(stock.getId(), workbook.getObservations().get(0).getStockId());
 	}
 
 	private Variable createLocationVariable() {

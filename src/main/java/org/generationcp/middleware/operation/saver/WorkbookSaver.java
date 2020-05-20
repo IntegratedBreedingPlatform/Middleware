@@ -1405,4 +1405,8 @@ public class WorkbookSaver extends Saver {
 			throw new PhenotypeException(exceptions);
 		}
 	}
+
+	void setStudyDataManager(final StudyDataManager studyDataManager) {
+		this.studyDataManager = studyDataManager;
+	}
 }
