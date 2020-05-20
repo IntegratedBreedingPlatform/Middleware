@@ -109,7 +109,6 @@ public class AncestryTreeServiceTest {
 		this.compareGeneratedNodes(this.germplasmMap.get(femaleGermplasmKey), resultNode.getFemaleParent());
 
 		final CropGermplasmKey maleGermplasmKey = new CropGermplasmKey(AncestryTreeServiceTest.MAIZE, generateRandomGermplasm.getGpid2());
-
 		this.compareGeneratedNodes(this.germplasmMap.get(maleGermplasmKey), resultNode.getMaleParent());
 
 	}
@@ -145,16 +144,10 @@ public class AncestryTreeServiceTest {
 	}
 
 	private Germplasm generateTestGermplasm(final int gid, final int methodId) {
-		final Random randomGenerator = new Random();
 		final Germplasm germplasm = new Germplasm();
 		germplasm.setGid(gid);
 		germplasm.setGnpgs(2);
 		final Method method = new Method(methodId);
-		if(methodId > 1) {
-			method.setMname("Backcross");
-			germplasm.setGpid1(randomGenerator.nextInt(10)+1);
-			germplasm.setGpid2(randomGenerator.nextInt(10)+ 2);
-		}
 		germplasm.setMethod(method);
 		germplasm.setMethodId(methodId);
 		this.germplasmMap.put(new CropGermplasmKey(AncestryTreeServiceTest.MAIZE, gid), germplasm);
@@ -162,45 +155,4 @@ public class AncestryTreeServiceTest {
 		return germplasm;
 	}
 
-	@Test
-	public void testPedigreeTreeGenerationBackcross() {
-		final Germplasm generateRandomGermplasm = this.generateRandomGermplasmRecurringMaleParent(2);
-
-		final AncestryTreeService pedigreeTree =
-				new AncestryTreeService(this.germplasmCache, this.methodCache, AncestryTreeServiceTest.MAIZE);
-		final GermplasmNode resultNode = pedigreeTree.buildAncestryTree(generateRandomGermplasm.getGid(), 7);
-		this.compareGeneratedNodes(generateRandomGermplasm, resultNode);
-	}
-
-	private Germplasm generateRandomGermplasmRecurringMaleParent(final int maxNumberOfNodes) {
-		final Random randomGenerator = new Random();
-		final int femaleSideNodes = randomGenerator.nextInt(maxNumberOfNodes) + 1;
-		final int maleSideNodes = randomGenerator.nextInt(maxNumberOfNodes) + 1;
-
-		final Germplasm rootGermplasm = this.generateTestGermplasm(1, 1);
-		this.generateTreeRecurring(rootGermplasm, femaleSideNodes, maleSideNodes, 5, this.randomNumbers.iterator());
-		return rootGermplasm;
-	}
-
-	private void generateTreeRecurring(final Germplasm germplasm, final int femaleSideNodes, final int maleSideNodes, final int recurringMale,
-							  final Iterator<Integer> iterator) {
-
-		if (femaleSideNodes != 0) {
-			final Integer femaleGid = iterator.next();
-			final Germplasm generateTestGermplasm = this.generateTestGermplasm(femaleGid, 107);
-			this.generateTreeRecurring(generateTestGermplasm, femaleSideNodes - 1, maleSideNodes, recurringMale, iterator);
-			germplasm.setGpid1(femaleGid);
-		}else {
-			germplasm.setGpid1(0);
-		}
-
-		if (maleSideNodes != 0) {
-			final Germplasm generateTestGermplasm = this.generateTestGermplasm(recurringMale, 107);
-			this.generateTreeRecurring(generateTestGermplasm, femaleSideNodes, maleSideNodes - 1, recurringMale, iterator);
-			germplasm.setGpid2(recurringMale);
-		}else {
-			germplasm.setGpid2(0);
-		}
-
-	}
 }
