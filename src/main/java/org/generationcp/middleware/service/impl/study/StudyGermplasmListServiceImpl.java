@@ -12,10 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
-// FIXME: Merge this class to StockModelService.
+// FIXME: IBP-3697 Merge this class to StockModelService.
 public class StudyGermplasmListServiceImpl implements StudyGermplasmListService {
 
 	private final DaoFactory daoFactory;
@@ -28,23 +30,24 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 	public List<StudyGermplasmDto> getGermplasmList(final int studyBusinessIdentifier) {
 
 		final List<StockModel> stockModelList = this.daoFactory.getStockDao().getStocksForStudy(studyBusinessIdentifier);
-
+		final Map<Integer, String> stockIdsMap =
+			this.daoFactory.getTransactionDAO().retrieveStockIds(stockModelList.stream().map(sm -> sm.getGermplasm().getGid()).collect(
+				Collectors.toList()));
 		final List<StudyGermplasmDto> studyGermplasmDtos = new ArrayList<>();
 		int index = 0;
 		for (final StockModel stockModel : stockModelList) {
 			final StudyGermplasmDto studyGermplasmDto = new StudyGermplasmDto();
-			studyGermplasmDto.setCross(stockModel.getGermplasm().getCrossName()); // TODO: IBP-3697 Verify mapping
+			studyGermplasmDto.setCross(stockModel.getGermplasm().getCrossName());
 			studyGermplasmDto.setDesignation(stockModel.getName());
 			studyGermplasmDto.setEntryCode(stockModel.getValue());
 			studyGermplasmDto.setEntryNumber(Integer.valueOf(stockModel.getUniqueName()));
 			studyGermplasmDto.setGermplasmId(stockModel.getGermplasm().getGid());
 			++index;
 			studyGermplasmDto.setPosition(String.valueOf(index));
-			studyGermplasmDto.setSeedSource(stockModel.getGermplasm().getCrossName()); // TODO: IBP-3697 Verify mapping
-			studyGermplasmDto.setEntryType(""); // TODO: IBP-3697 Verify mapping
+			studyGermplasmDto.setSeedSource(this.findStockPropValue(TermId.SEED_SOURCE.getId(), stockModel.getProperties()));
 			studyGermplasmDto.setCheckType(Integer.valueOf(this.findStockPropValue(TermId.ENTRY_TYPE.getId(), stockModel.getProperties())));
-			studyGermplasmDto.setStockIds(""); // TODO: IBP-3697 Verify mapping
-			studyGermplasmDto.setGroupId(0); // TODO: IBP-3697 Verify mapping
+			studyGermplasmDto.setStockIds(stockIdsMap.getOrDefault(stockModel.getGermplasm().getGid(), ""));
+			studyGermplasmDto.setGroupId(stockModel.getGermplasm().getMgid());
 			studyGermplasmDtos.add(studyGermplasmDto);
 		}
 		return studyGermplasmDtos;

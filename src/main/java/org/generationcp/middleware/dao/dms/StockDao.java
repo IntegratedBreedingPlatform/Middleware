@@ -82,7 +82,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	// TODO: IBP-3697
 	public List<StudyReference> getStudiesByGid(final int gid) {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
