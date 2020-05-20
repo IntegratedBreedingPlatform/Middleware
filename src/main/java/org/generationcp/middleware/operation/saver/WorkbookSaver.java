@@ -63,7 +63,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-// ASsumptions - can be added to validations
+// Assumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName
 // template must not contain exact same combo of property-scale-method
 
@@ -116,11 +116,10 @@ public class WorkbookSaver extends Saver {
 	 * @return Map<String>, ?> : a map of 3 sub-maps containing
 	 * Strings(headers), VariableTypeLists and Lists of
 	 * MeasurementVariables
-	 * @throws Exception
 	 */
 
 	@SuppressWarnings("rawtypes")
-	public Map saveVariables(final Workbook workbook, final String programUUID) throws Exception {
+	public Map saveVariables(final Workbook workbook, final String programUUID) {
 		// make sure to reset all derived variables
 		workbook.reset();
 
@@ -337,7 +336,7 @@ public class WorkbookSaver extends Saver {
 			true, programUUID);
 	}
 
-	public void savePlotDataset(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) throws Exception {
+	public void savePlotDataset(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) {
 
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList ,
 		// Maps of Lists of MeasurementVariable
@@ -359,11 +358,11 @@ public class WorkbookSaver extends Saver {
 		final List<Integer> locationIds = new ArrayList<>();
 		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
 
-		final Integer environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
-		final Integer plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
+		final int environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
+		final int plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
 		final int studyId = workbook.getStudyDetails().getId();
 
-		int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
+		final int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
 		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
 
 		this.resetTrialObservations(workbook.getTrialObservations());
@@ -563,7 +562,7 @@ public class WorkbookSaver extends Saver {
 		return studyLocationId;
 	}
 
-	public int createLocationsAndSetToObservations(
+	private int createLocationsAndSetToObservations(
 		final List<Integer> locationIds, final Workbook workbook,
 		final VariableTypeList trialFactors, final List<String> trialHeaders, final Map<Integer, VariableList> trialVariatesMap,
 		final boolean isDeleteTrialObservations, final String programUUID) {
@@ -664,7 +663,7 @@ public class WorkbookSaver extends Saver {
 
 			if (!StringUtils.isEmpty(locationIdVariable.getValue())) {
 				locationId.add(Integer.valueOf(locationIdVariable.getValue()));
-				locationIdExists = (locationDAO.getByIds(locationId).size() > 0) ? true : false;
+				locationIdExists = locationDAO.getByIds(locationId).size() > 0;
 			}
 			if (StringUtils.isEmpty(locationIdVariable.getValue()) || !locationIdExists) {
 				String unspecifiedLocationLocId = "";
@@ -885,7 +884,7 @@ public class WorkbookSaver extends Saver {
 		return datasetId;
 	}
 
-	public void createStocksIfNecessary(
+	private void createStocksIfNecessary(
 		final int datasetId, final Workbook workbook, final VariableTypeList effectVariables,
 		final List<String> trialHeaders) {
 		final Map<String, Integer> stockMap = this.getStockModelBuilder().getStockMapForDataset(datasetId);
