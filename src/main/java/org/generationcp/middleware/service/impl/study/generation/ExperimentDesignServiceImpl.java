@@ -21,7 +21,6 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.StockModelService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
@@ -41,9 +40,6 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 	@Autowired
 	private StudyService studyService;
-
-	@Autowired
-	private StockModelService stockModelService;
 
 	private static final List<Integer> FIELDMAP_ENVT_VARIABLES = Collections.singletonList(TermId.BLOCK_ID.getId());
 
@@ -162,7 +158,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		final List<MeasurementVariable> variables, 	final Map<Integer, List<ObservationUnitRow>> instanceRowsMap, final List<Geolocation> geolocations) {
 
 		// Retrieved any previously saved stocks. We are not using Immutable map for the case of no stocks yet
-		final List<StockModel> stocks = this.stockModelService.getStocksForStudy(studyId);
+		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(studyId);
 		final ImmutableMap<String, Geolocation> trialInstanceGeolocationMap =
 			Maps.uniqueIndex(geolocations, new Function<Geolocation, String>() {
 

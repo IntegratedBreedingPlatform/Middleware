@@ -44,8 +44,8 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.StockModelService;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
@@ -62,6 +62,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // ASsumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName
@@ -94,9 +95,6 @@ public class WorkbookSaver extends Saver {
 
 	@Resource
 	private StudyDataManager studyDataManager;
-
-	@Resource
-	private StockModelService stockModelService;
 
 	public WorkbookSaver() {
 
@@ -891,7 +889,8 @@ public class WorkbookSaver extends Saver {
 	public void createStocksIfNecessary(
 		final int datasetId, final Workbook workbook, final VariableTypeList effectVariables,
 		final List<String> trialHeaders) {
-		final Map<String, Integer> stockMap = this.stockModelService.getStockMapForStudy(datasetId);
+		final Map<String, Integer> stockMap = this.daoFactory.getStockDao().getStocksForStudy(datasetId).stream().collect(Collectors.toMap(
+			StockModel::getUniqueName, StockModel::getStockId));
 
 		List<Integer> variableIndexesList = new ArrayList<>();
 		// we get the indexes so that in the next rows we dont need to compare
