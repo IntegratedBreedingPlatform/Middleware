@@ -445,6 +445,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 		final Map<Integer, String> gIdStockIdMap = new HashMap<>();
 
+		if (gIds.isEmpty()) {
+			return gIdStockIdMap;
+		}
+
 		final String sql =
 				"SELECT b.eid ,group_concat(distinct b.stock_id SEPARATOR ', ')  " + "FROM "
 						+ "ims_lot b  "
