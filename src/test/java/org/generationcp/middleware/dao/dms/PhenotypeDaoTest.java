@@ -145,7 +145,9 @@ public class PhenotypeDaoTest {
 				+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value " + "FROM phenotype p "
 				+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 				+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-				+ "    AND p.observable_id IN (:numericVariableIds) " + "GROUP by p.observable_id ";
+				+ "    AND p.observable_id IN (:numericVariableIds) "
+				+ "    AND p.value IS NOT NULL "
+				+ "GROUP by p.observable_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
@@ -164,7 +166,9 @@ public class PhenotypeDaoTest {
 				+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
 				+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 				+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-				+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id ";
+				+ "    AND p.observable_id IN (:variableIds) "
+				+ "	   AND p.value IS NOT NULL "
+				+ "GROUP by p.observable_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
@@ -182,6 +186,7 @@ public class PhenotypeDaoTest {
 				+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
 				+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 				+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+				+ "	   AND p.value IS NOT NULL "
 				+ "GROUP by p.observable_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
@@ -271,7 +276,8 @@ public class PhenotypeDaoTest {
 				+ "FROM nd_experiment e "
 				+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
 				+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-				+ "AND p.observable_id IN (:traitIds) ";
+				+ "AND p.observable_id IN (:traitIds) "
+				+ "AND p.value IS NOT NULL ";
 	}
 
 
