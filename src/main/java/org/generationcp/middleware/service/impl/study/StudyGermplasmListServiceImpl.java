@@ -34,9 +34,11 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 	public List<StudyGermplasmDto> getGermplasmList(final int studyBusinessIdentifier) {
 
 		final List<StockModel> stockModelList = this.daoFactory.getStockDao().getStocksForStudy(studyBusinessIdentifier);
-		final Map<Integer, String> stockIdsMap =
-			this.daoFactory.getTransactionDAO().retrieveStockIds(stockModelList.stream().map(sm -> sm.getGermplasm().getGid()).collect(
-				Collectors.toList()));
+		final List<Integer> gids = new ArrayList<>();
+		for (final StockModel stockModel : stockModelList) {
+			gids.add(stockModel.getGermplasm().getGid());
+		}
+		final Map<Integer, String> stockIdsMap = this.daoFactory.getTransactionDAO().retrieveStockIds(gids);
 		final List<StudyGermplasmDto> studyGermplasmDtos = new ArrayList<>();
 		int index = 0;
 		for (final StockModel stockModel : stockModelList) {
