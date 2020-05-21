@@ -35,13 +35,13 @@ public class StockSaver extends Saver {
 		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(sessionProviderForLocal);
 	}
 
-	public Integer saveStock(final VariableList variableList) {
+	public Integer saveStock(final int studyId, final VariableList variableList) {
 		final StockModel stockModel = this.createStock(variableList, null);
 		if (stockModel != null) {
+			stockModel.setProjectId(studyId);
 			this.getStockDao().save(stockModel);
 			return stockModel.getStockId();
 		}
-
 		return null;
 	}
 

@@ -271,7 +271,7 @@ public class WorkbookSaver extends Saver {
 
 		plotDatasetId =
 			this.createPlotDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables, programUUID);
-		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
+		this.createStocksIfNecessary(studyId, plotDatasetId, workbook, effectVariables, trialHeaders);
 
 		if (!retainValues) {
 			// clean up some variable references to save memory space before
@@ -382,7 +382,7 @@ public class WorkbookSaver extends Saver {
 
 		this.saveOrUpdateTrialObservations( crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId, savedEnvironmentsCount, true, programUUID);
 
-		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
+		this.createStocksIfNecessary(studyId, plotDatasetId, workbook, effectVariables, trialHeaders);
 		this.createMeasurementEffectExperiments(crop, plotDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
 
 	}
@@ -886,7 +886,7 @@ public class WorkbookSaver extends Saver {
 		return datasetId;
 	}
 
-	public void createStocksIfNecessary(
+	public void createStocksIfNecessary(final int studyId,
 		final int datasetId, final Workbook workbook, final VariableTypeList effectVariables,
 		final List<String> trialHeaders) {
 		final Map<String, Integer> stockMap = this.daoFactory.getStockDao().getStocksForStudy(datasetId).stream().collect(Collectors.toMap(
@@ -913,7 +913,7 @@ public class WorkbookSaver extends Saver {
 					Integer stockId = stockMap.get(stockFactor);
 
 					if (stockId == null) {
-						stockId = this.getStockSaver().saveStock(stock);
+						stockId = this.getStockSaver().saveStock(studyId, stock);
 						stockMap.put(stockFactor, stockId);
 					} else {
 						this.getStockSaver().saveOrUpdateStock(stock, stockId);
@@ -1154,7 +1154,7 @@ public class WorkbookSaver extends Saver {
 		if (isMeansDataImport) {
 			datasetId = meansDatasetId;
 		}
-		this.createStocksIfNecessary(datasetId, workbook, effectVariables, trialHeaders);
+		this.createStocksIfNecessary(studyId, datasetId, workbook, effectVariables, trialHeaders);
 
 		// create trial experiments if not yet existing
 		final boolean hasExistingStudyExperiment = this.checkIfHasExistingStudyExperiment(studyId);

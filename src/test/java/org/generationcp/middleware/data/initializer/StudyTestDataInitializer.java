@@ -142,7 +142,7 @@ public class StudyTestDataInitializer {
 		this.gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
 		final VariableList germplasmVariableList =
 			this.createGermplasm("unique name", String.valueOf(this.gid), "name", "2000", "prop1", "prop2");
-		this.stockId = this.studyDataManager.addStock(germplasmVariableList);
+		this.stockId = this.studyDataManager.addStock(0, germplasmVariableList);
 		studyValues.setGermplasmId(this.stockId);
 
 		return studyValues;
