@@ -4,12 +4,10 @@ import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.domain.inventory.LotDetails;
-import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,40 +89,6 @@ public class LotTransformer {
 	}
 
 	/**
-	 * For each entry in germplasm list, add related list of ListEntryLotDetails objects transformed from Lot objects. Return list of
-	 * ListEntryLotDetails for all entries.
-	 *
-	 * @param lots        - lot records assumed to have aggregate inventory data
-	 * @param listEntries - entries of list
-	 * @return
-	 */
-	public static List<ListEntryLotDetails> extractLotRowsForList(List<GermplasmListData> listEntries, List<Lot> lots) {
-		List<ListEntryLotDetails> returnLotRows = null;
-
-		if (lots != null && listEntries != null) {
-			Map<Integer, List<Lot>> gidLotsMap = new HashMap<Integer, List<Lot>>();
-			returnLotRows = new ArrayList<ListEntryLotDetails>();
-			LotTransformer.createGidLotListMap(lots, gidLotsMap);
-
-			for (GermplasmListData listEntry : listEntries) {
-				Integer gid = listEntry.getGid();
-				Integer id = listEntry.getId();
-				List<ListEntryLotDetails> lotRows = LotTransformer.extractLotDetailsForListEntry(gidLotsMap.get(gid), id);
-
-				if (lotRows != null) {
-					returnLotRows.addAll(lotRows);
-					if (listEntry.getInventoryInfo() == null) {
-						listEntry.setInventoryInfo(new ListDataInventory(id, gid));
-					}
-					listEntry.getInventoryInfo().setLotRows(lotRows);
-				}
-			}
-
-		}
-		return returnLotRows;
-	}
-
-	/**
 	 * Transform Lot objects to LotDetails objects
 	 *
 	 * @param lots
@@ -161,28 +125,6 @@ public class LotTransformer {
 		}
 
 		return returnLotRows;
-	}
-
-	// Germplasm IDs mapped to list of lots for that germplasm
-	private static void createGidLotListMap(List<Lot> lots, Map<Integer, List<Lot>> gidLotsMap) {
-		List<Lot> lotList = null;
-		Integer lastGid = null;
-
-		for (Lot lot : lots) {
-			Integer gid = lot.getEntityId();
-			if (lastGid == null || !lastGid.equals(gid)) {
-				if (lotList != null && !lotList.isEmpty()) {
-					gidLotsMap.put(lastGid, lotList);
-				}
-				lastGid = gid;
-				lotList = new ArrayList<Lot>();
-			}
-			lotList.add(lot);
-		}
-
-		if (lastGid != null && lotList != null) {
-			gidLotsMap.put(lastGid, lotList);
-		}
 	}
 
 	private static void setAggregateTransactionBalance(Map<Integer, Double> transactionMap, ListEntryLotDetails lotDetails, Integer entryId,
