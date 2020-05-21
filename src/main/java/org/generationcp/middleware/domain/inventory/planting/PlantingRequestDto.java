@@ -58,6 +58,12 @@ public class PlantingRequestDto {
 		public boolean equals(final Object o) {
 			return Pojomatic.equals(this, o);
 		}
+
+		public boolean isValid() {
+			return (groupTransactions && !isWithdrawAllAvailableBalance() && withdrawalAmount != null && withdrawalAmount > 0)
+				|| (groupTransactions && isWithdrawAllAvailableBalance() && withdrawalAmount == null)
+				|| (!groupTransactions && !isWithdrawAllAvailableBalance() && withdrawalAmount != null && withdrawalAmount > 0);
+		}
 	}
 
 
