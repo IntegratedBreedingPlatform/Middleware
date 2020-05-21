@@ -41,7 +41,7 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 		int index = 0;
 		for (final StockModel stockModel : stockModelList) {
 			final StudyGermplasmDto studyGermplasmDto = new StudyGermplasmDto();
-			studyGermplasmDto.setCross(stockModel.getGermplasm().getCrossName());
+			studyGermplasmDto.setCross(this.findStockPropValue(TermId.CROSS.getId(), stockModel.getProperties()));
 			studyGermplasmDto.setDesignation(stockModel.getName());
 			studyGermplasmDto.setEntryCode(stockModel.getValue());
 			studyGermplasmDto.setEntryNumber(Integer.valueOf(stockModel.getUniqueName()));

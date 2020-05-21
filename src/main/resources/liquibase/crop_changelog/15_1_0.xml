@@ -79,6 +79,16 @@
 			INNER JOIN stock ON stock.project_id = p.study_id AND stock.uniquename = ldp.entry_id
 			WHERE lnms.listtype = 'STUDY'
 			AND NOT EXISTS(SELECT 1 FROM nd_experiment where project_id = p.project_id);
+
+			-- GROUPNAME/CROSS
+			INSERT INTO stockprop (stock_id, type_id, value, rank)
+			SELECT stock.stock_id, 8377, ldp.group_name, (SELECT IFNULL(MAX(rank), 0) + 1 FROM stockprop WHERE stock_id = stock.stock_id)
+			FROM listnms lnms
+			INNER JOIN listdata_project ldp ON lnms.listid = ldp.list_id
+			INNER JOIN project p ON p.parent_project_id = lnms.projectid AND p.dataset_type_id = 4
+			INNER JOIN stock ON stock.project_id = p.study_id AND stock.uniquename = ldp.entry_id
+			WHERE lnms.listtype = 'STUDY'
+			AND NOT EXISTS(SELECT 1 FROM nd_experiment where project_id = p.project_id);
         </sql>
 	</changeSet>
 
