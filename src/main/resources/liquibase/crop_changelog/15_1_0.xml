@@ -33,7 +33,7 @@
 				</sqlCheck>
 			</not>
 		</preConditions>
-		<comment>Set means experiment stock ids</comment>
+		<comment>Set stock_id of means experiments to use plot experiments stock_id and delete unnecessary stock entries</comment>
 		<sql dbms="mysql">
 			CREATE TEMPORARY TABLE means_stock_id AS
 				SELECT DISTINCT means_exp.stock_id FROM nd_experiment means_exp
@@ -52,7 +52,7 @@
 				INNER JOIN stock means_stock ON means_stock.stock_id = means_exp.stock_id
 				INNER JOIN stock plot_stock ON plot_stock.stock_id = plot_exp.stock_id
 				SET means_exp.stock_id = plot_stock.stock_id
-				WHERE means_stock.uniquename = plot_stock.uniquename;
+				WHERE means_stock.uniquename = plot_stock.uniquename AND means_exp.stock_id != plot_stock.stock_id;
 
 			DELETE FROM stock
 				WHERE stock_id IN (
