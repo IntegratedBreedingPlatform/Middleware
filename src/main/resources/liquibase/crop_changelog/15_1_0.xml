@@ -55,7 +55,7 @@
 				WHERE means_stock.uniquename = plot_stock.uniquename AND means_exp.stock_id != plot_stock.stock_id;
 
 			DELETE s, sp FROM stock s
-				LEFT JOIN stockprop sp ON s.stock_id = sp.stock
+				LEFT JOIN stockprop sp ON s.stock_id = sp.stock_id
 				WHERE s.stock_id IN (
                   SELECT stock_id
                   FROM means_stock_id
