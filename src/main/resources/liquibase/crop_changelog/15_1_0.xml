@@ -117,11 +117,15 @@
 				</sqlCheck>
 			</not>
 		</preConditions>
-		<comment>Delete all STUDY germplasm list data</comment>
+		<comment>Delete all STUDY germplasm list and its data</comment>
 		<sql dbms="mysql">
 			-- Delete all STUDY entry list data
 			DELETE  ldp FROM listnms
 			INNER JOIN listdata_project ldp ON listnms.listid = ldp.list_id
+			WHERE listnms.listtype = 'STUDY';
+
+			-- Delete all STUDY entry list
+			DELETE  FROM listnms
 			WHERE listnms.listtype = 'STUDY';
         </sql>
 	</changeSet>
