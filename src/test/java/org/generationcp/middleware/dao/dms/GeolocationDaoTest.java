@@ -115,9 +115,9 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 			this.dataset =
 				this.createDataset(this.study.getName() + " - Environment Dataset", this.study.getProgramUUID(),
 					DatasetTypeEnum.SUMMARY_DATA.getId(),
-					study, study);
+					this.study, this.study);
 			this.createGermplasm();
-			this.geolocation = this.createEnvironmentData(this.dataset, "1", Collections.<Integer>emptyList());
+			this.geolocation = this.createEnvironmentData(this.dataset, "1", Collections.<Integer>emptyList(), true, null);
 		}
 	}
 
@@ -194,7 +194,7 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetAllTrialEnvironments() {
 		final long previousCount = this.geolocationDao.getAllTrialEnvironments().size();
-		final Geolocation geolocation2 = this.createEnvironmentData(this.dataset, "2", Collections.<Integer>emptyList());
+		final Geolocation geolocation2 = this.createEnvironmentData(this.dataset, "2", Collections.<Integer>emptyList(), true, null);
 
 		final List<TrialEnvironment> allTrialEnvironments = this.geolocationDao.getAllTrialEnvironments();
 		Assert.assertEquals(previousCount + 1, allTrialEnvironments.size());
@@ -206,7 +206,7 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 				return input.getId();
 			}
 		});
-		Assert.assertTrue(environmentIds.contains(geolocation.getLocationId()));
+		Assert.assertTrue(environmentIds.contains(this.geolocation.getLocationId()));
 		Assert.assertTrue(environmentIds.contains(geolocation2.getLocationId()));
 	}
 
@@ -215,8 +215,8 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 		final CVTerm trait = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
 		this.cvTermDao.save(trait);
 		final List<Integer> traitIds = Collections.singletonList(trait.getCvTermId());
-		final Geolocation geolocation2 = this.createEnvironmentData(this.dataset, "2", traitIds);
-		final Geolocation geolocation3 = this.createEnvironmentData(this.dataset, "3", traitIds);
+		final Geolocation geolocation2 = this.createEnvironmentData(this.dataset, "2", traitIds, true, null);
+		final Geolocation geolocation3 = this.createEnvironmentData(this.dataset, "3", traitIds, true, null);
 
 		final TrialEnvironments environmentsForTraits = this.geolocationDao.getEnvironmentsForTraits(traitIds, this.study.getProgramUUID());
 		Assert.assertNotNull(environmentsForTraits);
@@ -229,7 +229,56 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 					return input.getId();
 				}
 			});
-		Assert.assertFalse(environmentIds.contains(geolocation.getLocationId()));
+		Assert.assertFalse(environmentIds.contains(this.geolocation.getLocationId()));
+		Assert.assertTrue(environmentIds.contains(geolocation2.getLocationId()));
+		Assert.assertTrue(environmentIds.contains(geolocation3.getLocationId()));
+	}
+
+	@Test
+	public void testGetEnvironmentsForTraitsWithPendingExperiment() {
+		final CVTerm trait = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
+		this.cvTermDao.save(trait);
+		final List<Integer> traitIds = Collections.singletonList(trait.getCvTermId());
+		final Geolocation geolocation2 = this.createEnvironmentData(this.dataset, "2", traitIds, true, null);
+		final Geolocation geolocation3 = this.createEnvironmentData(this.dataset, "3", traitIds, false, null);
+
+		final TrialEnvironments environmentsForTraits = this.geolocationDao.getEnvironmentsForTraits(traitIds, this.study.getProgramUUID());
+		Assert.assertNotNull(environmentsForTraits);
+		final List<Integer> environmentIds =
+			Lists.transform(Lists.newArrayList(environmentsForTraits.getTrialEnvironments()), new Function<TrialEnvironment, Integer>() {
+
+				@Nullable
+				@Override
+				public Integer apply(@Nullable final TrialEnvironment input) {
+					return input.getId();
+				}
+			});
+		Assert.assertEquals("Only 1 environment with accepted value", 1, environmentIds.size());
+		Assert.assertTrue(environmentIds.contains(geolocation2.getLocationId()));
+		Assert.assertFalse(environmentIds.contains(geolocation3.getLocationId()));
+	}
+
+	@Test
+	public void testGetEnvironmentsForTraitsWithPendingAndApprovedExperiment() {
+		final CVTerm trait = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
+		this.cvTermDao.save(trait);
+		final List<Integer> traitIds = Collections.singletonList(trait.getCvTermId());
+		final Geolocation geolocation2 = this.createEnvironmentData(this.dataset, "2", traitIds, true, null);
+		final Geolocation geolocation3 = this.createEnvironmentData(this.dataset, "3", traitIds, false, null);
+		this.createEnvironmentData(this.dataset, "3", traitIds, true, geolocation3);
+
+		final TrialEnvironments environmentsForTraits = this.geolocationDao.getEnvironmentsForTraits(traitIds, this.study.getProgramUUID());
+		Assert.assertNotNull(environmentsForTraits);
+		final List<Integer> environmentIds =
+			Lists.transform(Lists.newArrayList(environmentsForTraits.getTrialEnvironments()), new Function<TrialEnvironment, Integer>() {
+
+				@Nullable
+				@Override
+				public Integer apply(@Nullable final TrialEnvironment input) {
+					return input.getId();
+				}
+			});
+		Assert.assertEquals("Only environments with accepted value will be retrieved.", 2, environmentIds.size());
 		Assert.assertTrue(environmentIds.contains(geolocation2.getLocationId()));
 		Assert.assertTrue(environmentIds.contains(geolocation3.getLocationId()));
 	}
@@ -257,13 +306,14 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 		}
 	}
 
-	private Geolocation createEnvironmentData(final DmsProject project, final String instance, final List<Integer> traitIds) {
-		final Geolocation geolocation = new Geolocation();
-		geolocation.setDescription(instance);
-		this.geolocationDao.saveOrUpdate(geolocation);
-
-		this.createGeolocationProperty(geolocation, TermId.LOCATION_ID.getId(), LOCATION_ID.toString());
-
+	private Geolocation createEnvironmentData(final DmsProject project, final String instance, final List<Integer> traitIds,
+		final boolean withValue, Geolocation geolocation) {
+		if (geolocation == null) {
+			geolocation = new Geolocation();
+			geolocation.setDescription(instance);
+			this.geolocationDao.saveOrUpdate(geolocation);
+			this.createGeolocationProperty(geolocation, TermId.LOCATION_ID.getId(), LOCATION_ID.toString());
+		}
 		for (final Germplasm germplasm : this.germplasm) {
 			final StockModel stockModel = new StockModel();
 			stockModel.setName("Germplasm " + RandomStringUtils.randomAlphanumeric(5));
@@ -284,7 +334,9 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 				final Phenotype phenotype = new Phenotype();
 				phenotype.setObservableId(traitId);
 				phenotype.setExperiment(experimentModel);
-				phenotype.setValue(String.valueOf(new Random().nextDouble()));
+				if (withValue) {
+					phenotype.setValue(String.valueOf(new Random().nextDouble()));
+				}
 				this.phenotypeDao.save(phenotype);
 			}
 

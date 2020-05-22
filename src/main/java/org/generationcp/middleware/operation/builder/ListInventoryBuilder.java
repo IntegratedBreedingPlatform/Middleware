@@ -1,17 +1,9 @@
 package org.generationcp.middleware.operation.builder;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
@@ -27,12 +19,17 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
-
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.springframework.util.CollectionUtils;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ListInventoryBuilder extends Builder {
 
@@ -316,69 +313,6 @@ public class ListInventoryBuilder extends Builder {
 		lotDetails = LotTransformer.extraLotDetails(lots);
 		this.setLocationsAndScales(lotDetails);
 		return lotDetails;
-	}
-
-	/**
-	 * Return list of GermplasmListData objects for given list with list of lots associated per germplasm entry
-	 *
-	 * @param listId
-	 * @param start
-	 * @param numOfRows
-	 * @return
-	 * @throws MiddlewareQueryException
-	 */
-	public List<GermplasmListData> retrieveInventoryLotsForList(final Integer listId, final int start, final int numOfRows,
-			final List<GermplasmListData> listEntries) throws MiddlewareQueryException {
-
-		final List<Integer> listEntryIds = new ArrayList<Integer>();
-		final List<Integer> gids = new ArrayList<Integer>();
-		for (final GermplasmListData entry : listEntries) {
-			listEntryIds.add(entry.getId());
-			gids.add(entry.getGid());
-			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
-		}
-
-		if (listEntries != null && !listEntries.isEmpty()) {
-			// retrieve inventory information from local db
-
-			// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table
-			// where listdata.gid may not be the final germplasm displayed
-			final List<Lot> lots = daoFactory.getLotDao().getLotAggregateDataForList(listId, gids);
-
-			// add to each list entry related lot information
-			final List<ListEntryLotDetails> lotRows = LotTransformer.extractLotRowsForList(listEntries, lots);
-			this.setLocationsAndScales(lotRows);
-		}
-		return listEntries;
-	}
-
-	/**
-	 * Return list of GermplasmListData objects for given list with list of reserved lots associated per germplasm entry
-	 *
-	 * @param listId
-	 * @param listEntries germplsm list entries
-	 * @return
-	 * @throws MiddlewareQueryException
-	 */
-	public List<GermplasmListData> retrieveReservedInventoryLotsForList(final Integer listId, final List<GermplasmListData> listEntries)
-			throws MiddlewareQueryException {
-
-		final List<Integer> listEntryIds = new ArrayList<Integer>();
-		final List<Integer> gids = new ArrayList<Integer>();
-		for (final GermplasmListData entry : listEntries) {
-			listEntryIds.add(entry.getId());
-			gids.add(entry.getGid());
-			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
-		}
-
-		if (listEntries != null && !listEntries.isEmpty()) {
-
-			final List<Lot> lots = daoFactory.getLotDao().getReservedLotAggregateDataForList(listId, gids);
-
-			final List<ListEntryLotDetails> lotRows = LotTransformer.extractLotRowsForList(listEntries, lots);
-			this.setLocationsAndScales(lotRows);
-		}
-		return listEntries;
 	}
 
 	public List<ListEntryLotDetails> retrieveInventoryLotsForListEntry(final Integer listId, final Integer recordId, final Integer gid)
