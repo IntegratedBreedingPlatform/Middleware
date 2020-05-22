@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -64,7 +65,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-// ASsumptions - can be added to validations
+// Assumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName
 // template must not contain exact same combo of property-scale-method
 
@@ -117,11 +118,10 @@ public class WorkbookSaver extends Saver {
 	 * @return Map<String>, ?> : a map of 3 sub-maps containing
 	 * Strings(headers), VariableTypeLists and Lists of
 	 * MeasurementVariables
-	 * @throws Exception
 	 */
 
 	@SuppressWarnings("rawtypes")
-	public Map saveVariables(final Workbook workbook, final String programUUID) throws Exception {
+	public Map saveVariables(final Workbook workbook, final String programUUID) {
 		// make sure to reset all derived variables
 		workbook.reset();
 
@@ -338,7 +338,7 @@ public class WorkbookSaver extends Saver {
 			true, programUUID);
 	}
 
-	public void savePlotDataset(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) throws Exception {
+	public void savePlotDataset(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) {
 
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList ,
 		// Maps of Lists of MeasurementVariable
@@ -360,11 +360,11 @@ public class WorkbookSaver extends Saver {
 		final List<Integer> locationIds = new ArrayList<>();
 		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
 
-		final Integer environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
-		final Integer plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
+		final int environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
+		final int plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
 		final int studyId = workbook.getStudyDetails().getId();
 
-		int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
+		final int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
 		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
 
 		this.resetTrialObservations(workbook.getTrialObservations());
@@ -564,7 +564,7 @@ public class WorkbookSaver extends Saver {
 		return studyLocationId;
 	}
 
-	public int createLocationsAndSetToObservations(
+	private int createLocationsAndSetToObservations(
 		final List<Integer> locationIds, final Workbook workbook,
 		final VariableTypeList trialFactors, final List<String> trialHeaders, final Map<Integer, VariableList> trialVariatesMap,
 		final boolean isDeleteTrialObservations, final String programUUID) {
@@ -665,7 +665,7 @@ public class WorkbookSaver extends Saver {
 
 			if (!StringUtils.isEmpty(locationIdVariable.getValue())) {
 				locationId.add(Integer.valueOf(locationIdVariable.getValue()));
-				locationIdExists = (locationDAO.getByIds(locationId).size() > 0) ? true : false;
+				locationIdExists = locationDAO.getByIds(locationId).size() > 0;
 			}
 			if (StringUtils.isEmpty(locationIdVariable.getValue()) || !locationIdExists) {
 				String unspecifiedLocationLocId = "";
@@ -1150,11 +1150,12 @@ public class WorkbookSaver extends Saver {
 		}
 
 		// create stock and stockprops and associate to observations
-		int datasetId = measurementDatasetId;
 		if (isMeansDataImport) {
-			datasetId = meansDatasetId;
+			this.setStockIdsForMeansExperiments(workbook, effectVariables.findById(TermId.ENTRY_NO.getId()).getLocalName());
+
+		} else {
+			this.createStocksIfNecessary(studyId, measurementDatasetId, workbook, effectVariables, trialHeaders);
 		}
-		this.createStocksIfNecessary(studyId, datasetId, workbook, effectVariables, trialHeaders);
 
 		// create trial experiments if not yet existing
 		final boolean hasExistingStudyExperiment = this.checkIfHasExistingStudyExperiment(studyId);
@@ -1183,6 +1184,16 @@ public class WorkbookSaver extends Saver {
 		} else {
 			// 3. measurement experiments
 			this.createMeasurementEffectExperiments(crop, measurementDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
+		}
+	}
+
+	void setStockIdsForMeansExperiments(final Workbook workbook, final String entryNoHeader) {
+		final DataSet plotDataset = this.studyDataManager.findOneDataSetByType(workbook.getStudyDetails().getId(), DatasetTypeEnum.PLOT_DATA.getId());
+		final Stocks stocks = this.studyDataManager.getStocksInDataset(plotDataset.getId());
+		final Map<String, Integer> entryNoStockIdMap = stocks.getStockMap(entryNoHeader);
+		for(final MeasurementRow row : workbook.getObservations()) {
+			final String entryNo = row.getMeasurementData(TermId.ENTRY_NO.getId()).getValue();
+			row.setStockId(entryNoStockIdMap.get(entryNo));
 		}
 	}
 
@@ -1394,5 +1405,9 @@ public class WorkbookSaver extends Saver {
 		if (exceptions != null) {
 			throw new PhenotypeException(exceptions);
 		}
+	}
+
+	void setStudyDataManager(final StudyDataManager studyDataManager) {
+		this.studyDataManager = studyDataManager;
 	}
 }

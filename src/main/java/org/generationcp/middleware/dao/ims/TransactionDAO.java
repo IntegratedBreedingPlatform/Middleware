@@ -29,7 +29,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanConstructorResultTransformer;
 import org.slf4j.Logger;
@@ -55,151 +54,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TransactionDAO.class);
 	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllReserve(final int start, final int numOfRows) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.eq("status", 0));
-			criteria.add(Restrictions.lt("quantity", 0d));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllReserve() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	public long countAllReserve() {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.eq("status", 0));
-			criteria.add(Restrictions.lt("quantity", 0d));
-			return ((Long) criteria.uniqueResult());
-		} catch (final HibernateException e) {
-			final String message = "Error with countAllReserve query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllDeposit(final int start, final int numOfRows) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.eq("status", 0));
-			criteria.add(Restrictions.gt("quantity", 0d));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllDeposit query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	public long countAllDeposit() {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.eq("status", 0));
-			criteria.add(Restrictions.gt("quantity", 0d));
-			return ((Long) criteria.uniqueResult());
-		} catch (final HibernateException e) {
-			final String message = "Error with countAllDeposit() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllUncommitted(final int start, final int numOfRows) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.eq("status", 0));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllUncomitted() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	public long countAllUncommitted() {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.eq("status", 0));
-			return ((Long) criteria.uniqueResult());
-		} catch (final HibernateException e) {
-			final String message = "Error with countAllUncommitted() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllWithdrawals(final int start, final int numOfRows) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.lt("quantity", 0d));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllWithdrawals() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	public long countAllWithdrawals() {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.lt("quantity", 0d));
-			return ((Long) criteria.uniqueResult());
-		} catch (final HibernateException e) {
-			final String message = "Error with countAllWithdrawals() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getEmptyLot(final int start, final int numOfRows) {
-		try {
-			final Query query = this.getSession().getNamedQuery(Transaction.GET_EMPTY_LOT);
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-			return query.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getEmptyLot() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getLotWithMinimumAmount(final double minAmount, final int start, final int numOfRows) {
-		try {
-			final Query query = this.getSession().getNamedQuery(Transaction.GET_LOT_WITH_MINIMUM_AMOUNT);
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-			query.setParameter("minAmount", minAmount);
-			return query.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getLotWithMinimumAmount(minAmount=\" + minAmount + \") query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
 
 	public List<InventoryDetails> getInventoryDetailsByTransactionRecordId(final List<Integer> recordIds) {
 		final List<InventoryDetails> detailsList = new ArrayList<>();
@@ -360,26 +214,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return listOfTransactionStatusForGermplsm;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getByLotIds(final List<Integer> lotIds) {
-		final List<Transaction> transactions = new ArrayList<>();
-
-		if (lotIds == null || lotIds.isEmpty()) {
-			return transactions;
-		}
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.in("lot.id", lotIds));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error getByLotIds() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-	}
-
 	public void cancelUnconfirmedTransactionsForListEntries(final List<Integer> listEntryIds) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
@@ -396,29 +230,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			query.executeUpdate();
 		} catch (final Exception e) {
 			final String message = "Error cancelUnconfirmedTransactionsForListEntries=" + listEntryIds + " query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	public void cancelReservationsForLotEntryAndLrecId(final Integer lotId, final Integer lrecId) {
-		try {
-			
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
-			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-			// statement
-			this.getSession().flush();
-			
-			final String sql =
-					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate " + "WHERE trnstat = 0 AND lotId = :lotId "
-							+ "AND recordId = :lrecId " + "AND trnqty < 0 " + "AND sourceType = 'LIST'";
-			final Query query =
-					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDate())
-							.setParameter("lotId", lotId).setParameter("lrecId", lrecId);
-			query.executeUpdate();
-		} catch (final Exception e) {
-			final String message = "Error cancelReservationsForLotEntryAndLrecId(lotId:" + lotId + ", lrecId:" + lrecId
-				+ ") query from Transaction: " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -465,12 +276,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			gIdStockIdMap.put(gid, stockIds);
 		}
 		return gIdStockIdMap;
-
-	}
-
-	public Boolean isStockIdExists(final List<String> stockIds) {
-		final List<String> result = this.getSimilarStockIds(stockIds);
-		return null != result && !result.isEmpty();
 
 	}
 
