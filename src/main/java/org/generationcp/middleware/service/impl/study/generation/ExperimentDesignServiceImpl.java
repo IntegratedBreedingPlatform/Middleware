@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -229,7 +230,9 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO().deleteDatasetVariablesByVariableTypes(plotDatasetId,
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), TermId.MULTIFACTORIAL_INFO.getId()));
+		this.daoFactory.getExperimentTransactionDao().deleteExperimentTransactionsByStudyId(studyId, ExperimentTransactionType.PLANTING);
 		this.daoFactory.getExperimentDao().deleteExperimentsForDataset(plotDatasetId);
+
 	}
 
 	void setStudyService(final StudyService studyService) {
