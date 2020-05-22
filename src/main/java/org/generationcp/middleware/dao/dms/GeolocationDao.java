@@ -293,7 +293,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					+ " LEFT JOIN location l ON l.locid = gp.value"
 					+ " LEFT JOIN location prov ON prov.locid = l.snl1id"
 					+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
-					+ " WHERE ph.observable_id IN (:traitIds) AND p.program_uuid = :programUUID AND p.deleted = 0;";
+					+ " WHERE ph.observable_id IN (:traitIds) AND p.program_uuid = :programUUID AND p.deleted = 0"
+					+ " AND ph.value IS NOT NULL;";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.addScalar(GeolocationDao.ENVT_ID);
 			query.addScalar(GeolocationDao.LOCATION_NAME);

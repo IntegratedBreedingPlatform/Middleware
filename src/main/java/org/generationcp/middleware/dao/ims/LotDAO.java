@@ -24,7 +24,6 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
-import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.hibernate.Criteria;
@@ -32,7 +31,6 @@ import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
@@ -40,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -135,163 +132,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		return new ArrayList<Lot>();
 	}
 
-	public long countByEntityType(String type) throws MiddlewareQueryException {
-		try {
-			Criteria criteria = this.getSession().createCriteria(Lot.class);
-			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.eq(ENTITY_TYPE, type));
-			return ((Long) criteria.uniqueResult()).longValue();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countByEntityType(type=" + type + QUERY_FROM_LOT + e.getMessage(), e);
-		}
-		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Lot> getByEntityTypeAndEntityId(String type, Integer entityId, int start, int numOfRows) throws MiddlewareQueryException {
-		try {
-			if (entityId != null) {
-				Criteria criteria = this.getSession().createCriteria(Lot.class);
-				criteria.add(Restrictions.eq(ENTITY_TYPE, type));
-				criteria.add(Restrictions.eq(ENTITY_ID, entityId));
-				criteria.setFirstResult(start);
-				criteria.setMaxResults(numOfRows);
-				return criteria.list();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getByEntityTypeAndEntityId(type=" + type + ENTITY_ID2 + entityId + QUERY_FROM_LOT + e.getMessage(), e);
-		}
-		return new ArrayList<Lot>();
-	}
-
-	public long countByEntityTypeAndEntityId(String type, Integer entityId) throws MiddlewareQueryException {
-		try {
-			if (entityId != null) {
-				Criteria criteria = this.getSession().createCriteria(Lot.class);
-				criteria.setProjection(Projections.rowCount());
-				criteria.add(Restrictions.eq(ENTITY_TYPE, type));
-				criteria.add(Restrictions.eq(ENTITY_ID, entityId));
-				return ((Long) criteria.uniqueResult()).longValue();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with countByEntityTypeAndEntityId(type=" + type + ENTITY_ID2 + entityId + QUERY_FROM_LOT + e.getMessage(), e);
-		}
-		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Lot> getByEntityTypeAndLocationId(String type, Integer locationId, int start, int numOfRows)
-			throws MiddlewareQueryException {
-		try {
-			if (locationId != null) {
-				Criteria criteria = this.getSession().createCriteria(Lot.class);
-				criteria.add(Restrictions.eq(ENTITY_TYPE, type));
-				criteria.add(Restrictions.eq(LOCATION_ID, locationId));
-				criteria.setFirstResult(start);
-				criteria.setMaxResults(numOfRows);
-				return criteria.list();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getByEntityTypeAndLocationId(type=" + type + LOCATION_ID2 + locationId + QUERY_FROM_LOT + e.getMessage(),
-					e);
-		}
-		return new ArrayList<Lot>();
-	}
-
-	public long countByEntityTypeAndLocationId(String type, Integer locationId) throws MiddlewareQueryException {
-		try {
-			if (locationId != null) {
-				Criteria criteria = this.getSession().createCriteria(Lot.class);
-				criteria.setProjection(Projections.rowCount());
-				criteria.add(Restrictions.eq(ENTITY_TYPE, type));
-				criteria.add(Restrictions.eq(LOCATION_ID, locationId));
-				return ((Long) criteria.uniqueResult()).longValue();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with countByEntityTypeAndLocationId(type=" + type + LOCATION_ID2 + locationId + QUERY_FROM_LOT + e.getMessage(),
-					e);
-		}
-		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Lot> getByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId, int start, int numOfRows)
-			throws MiddlewareQueryException {
-		try {
-			if (entityId != null && locationId != null) {
-				Criteria criteria = this.getSession().createCriteria(Lot.class);
-				criteria.add(Restrictions.eq(ENTITY_TYPE, type));
-				criteria.add(Restrictions.eq(ENTITY_ID, entityId));
-				criteria.add(Restrictions.eq(LOCATION_ID, locationId));
-				criteria.setFirstResult(start);
-				criteria.setMaxResults(numOfRows);
-				return criteria.list();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getByEntityTypeAndEntityIdAndLocationId(type=" + type + ENTITY_ID2 + entityId + LOCATION_ID2 + locationId
-							+ QUERY_FROM_LOT + e.getMessage(), e);
-		}
-		return new ArrayList<Lot>();
-	}
-
-	public long countByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId)
-			throws MiddlewareQueryException {
-		try {
-			if (entityId != null && locationId != null) {
-				Criteria criteria = this.getSession().createCriteria(Lot.class);
-				criteria.setProjection(Projections.rowCount());
-				criteria.add(Restrictions.eq(ENTITY_TYPE, type));
-				criteria.add(Restrictions.eq(ENTITY_ID, entityId));
-				criteria.add(Restrictions.eq(LOCATION_ID, locationId));
-				return ((Long) criteria.uniqueResult()).longValue();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with countByEntityTypeAndEntityIdAndLocationId(type=" + type + ENTITY_ID2 + entityId + LOCATION_ID2 + locationId
-							+ QUERY_FROM_LOT + e.getMessage(), e);
-		}
-		return 0;
-	}
-
-	public Double getActualLotBalance(Integer lotId) throws MiddlewareQueryException {
-		try {
-			if (lotId != null) {
-				Lot lot = this.getById(lotId, false);
-				Criteria criteria = this.getSession().createCriteria(Transaction.class);
-				criteria.setProjection(Projections.sum("quantity"));
-				criteria.add(Restrictions.eq("lot", lot));
-				// get only committed transactions
-				criteria.add(Restrictions.eq("status", 1));
-				return (Double) criteria.uniqueResult();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getActualLotBalance(lotId=" + lotId + QUERY_FROM_LOT + e.getMessage(), e);
-		}
-		return 0d;
-	}
-
-	public Double getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException {
-		try {
-			if (lotId != null) {
-				Lot lot = this.getById(lotId, false);
-				Criteria criteria = this.getSession().createCriteria(Transaction.class);
-				criteria.setProjection(Projections.sum("quantity"));
-				criteria.add(Restrictions.eq("lot", lot));
-				// get all non-cancelled transactions
-				criteria.add(Restrictions.ne("status", 9));
-				return (Double) criteria.uniqueResult();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAvailableLotBalance(lotId=" + lotId + QUERY_FROM_LOT + e.getMessage(), e);
-		}
-		return 0d;
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<Lot> getByEntityTypeEntityIdsLocationIdAndScaleId(String type, List<Integer> entityIds, Integer locationId, Integer scaleId)
 			throws MiddlewareQueryException {
@@ -377,23 +217,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		return lotCounts;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Lot> getByEntityTypeAndEntityIds(String type, List<Integer> entityIds) throws MiddlewareQueryException {
-		try {
-			if (entityIds != null && !entityIds.isEmpty()) {
-				Criteria criteria = this.getSession().createCriteria(Lot.class);
-				criteria.add(Restrictions.eq(ENTITY_TYPE, type));
-				criteria.add(Restrictions.in(ENTITY_ID, entityIds));
-				return criteria.list();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getByEntityTypeAndEntityIds(type=" + type + ", entityIds=" + entityIds + QUERY_FROM_LOT + e.getMessage(),
-					e);
-		}
-		return new ArrayList<Lot>();
-	}
-
 	public List<Lot> getLotAggregateDataForListEntry(Integer listId, Integer gid) throws MiddlewareQueryException {
 		List<Lot> lots = new ArrayList<Lot>();
 
@@ -418,55 +241,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 					e);
 		}
 
-		return lots;
-	}
-
-	public List<Lot> getLotAggregateDataForList(Integer listId, List<Integer> gids) throws MiddlewareQueryException {
-		List<Lot> lots = new ArrayList<Lot>();
-
-		try {
-			String sql = LotDAO.GET_LOTS_FOR_LIST + " ORDER by lot.eid ";
-
-			Query query = this.getSession().createSQLQuery(sql);
-			query.setParameterList("gids", gids);
-			query.setParameter("listId", listId);
-			query.setParameter("includeCloseLots", 0);
-			List<Integer> statusList = Lists.newArrayList();
-			statusList.add(0);
-			statusList.add(1);
-			query.setParameterList("statusList", statusList);
-
-			this.createLotRows(lots, query, true);
-
-		} catch (Exception e) {
-			this.logAndThrowException(
-					"Error at getLotAggregateDataForList for list ID = " + listId + " and GIDs = " + gids + AT_LOT_DAO + e.getMessage(), e);
-		}
-
-		return lots;
-	}
-
-	public List<Lot> getReservedLotAggregateDataForList(Integer listId, List<Integer> gids) throws MiddlewareQueryException {
-		List<Lot> lots = new ArrayList<Lot>();
-
-		try {
-			String sql = LotDAO.GET_LOTS_FOR_LIST + " ORDER by lot.eid ";
-
-			Query query = this.getSession().createSQLQuery(sql);
-			query.setParameterList("gids", gids);
-			query.setParameter("listId", listId);
-			List<Integer> statusList = Lists.newArrayList();
-			statusList.add(TransactionStatus.PENDING.getIntValue());
-			query.setParameterList("statusList", statusList);
-			query.setParameter("includeCloseLots", 0);
-
-			this.createLotRows(lots, query, true);
-
-		} catch (Exception e) {
-			this.logAndThrowException(
-					"Error at getReservedLotAggregateDataForList for list ID = " + listId + " and GIDs = " + gids + AT_LOT_DAO + e
-							.getMessage(), e);
-		}
 		return lots;
 	}
 

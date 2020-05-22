@@ -48,9 +48,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.both;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
@@ -389,6 +387,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		for (final GermplasmList germplasmList : results) {
 			if (germplasmList.getName().equals(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME)) {
 				hasMatch = true;
+				break;
 			}
 		}
 		Assert.assertFalse(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME + " should not be found", hasMatch);
@@ -403,6 +402,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		for (final GermplasmList germplasmList : results) {
 			if (germplasmList.getName().equals(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME)) {
 				hasMatch = true;
+				break;
 			}
 		}
 		Assert.assertTrue(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME + " should be found", hasMatch);
@@ -416,6 +416,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		for (final GermplasmList germplasmList : results) {
 			if (germplasmList.getName().equals(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME)) {
 				hasMatch = true;
+				break;
 			}
 		}
 		Assert.assertTrue(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME + " should be found", hasMatch);
@@ -505,8 +506,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().clear();
 
 		final List<Germplasm> germplasmDeleted = this.dataManager.getGermplasms(gidsNews);
-		assertThat(germplasmDeleted, both(is(not(empty()))).and(notNullValue()));
-		assertThat(germplasmDeleted, hasItem(this.isDeleted(is(Boolean.TRUE))));
+		assertThat(germplasmDeleted, is(empty()));
 
 		final List<GermplasmListData> germplasmListDataByGID = this.manager.getGermplasmListDataByListId(list1.getId());
 		for (final GermplasmListData result : germplasmListDataByGID) {
