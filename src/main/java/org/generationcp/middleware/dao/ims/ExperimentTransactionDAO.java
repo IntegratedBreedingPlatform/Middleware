@@ -89,8 +89,9 @@ public class ExperimentTransactionDAO extends GenericDAO<ExperimentTransaction, 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Transaction.class, "transaction");
 			criteria.createAlias("transaction.experimentTransactions", "experimentTransaction", Criteria.INNER_JOIN);
+			criteria.createAlias("experimentTransaction.experiment.geoLocation", "geolocation", Criteria.INNER_JOIN);
 			criteria.add(Restrictions.eq("status", transactionStatus.getIntValue()));
-			criteria.add(Restrictions.eq("project.study.projectId", instanceId));
+			criteria.add(Restrictions.eq("geolocation.locationId", instanceId));
 			criteria.add(Restrictions.eq("experimentTransaction.type", experimentTransactionType.getId()));
 			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			return criteria.list();

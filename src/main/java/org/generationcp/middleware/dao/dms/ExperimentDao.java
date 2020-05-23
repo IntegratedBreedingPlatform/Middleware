@@ -14,7 +14,6 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.fest.util.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -28,6 +27,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -288,6 +288,26 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		if (!CollectionUtils.isEmpty(instanceNumbers)) {
 			statement.setParameterList("instanceNumbers", instanceNumbers);
 		}
+		statement.executeUpdate();
+
+		//Delete ims_experiment_transaction for cancelled transactions.
+		queryString = "DELETE et FROM ims_experiment_transaction et "
+			+ "INNER JOIN nd_experiment e on e.nd_experiment_id = et.nd_experiment_id "
+			+ "INNER JOIN ims_transaction t on t.trnid = et.trnid "
+			+ "INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id "
+			+ "WHERE t.trnstat =:cancelledStatus AND e.project_id in (:datasetIds)";
+		sb = new StringBuilder(queryString);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			sb.append(" AND g.description IN (:instanceNumbers)");
+		}
+		statement =
+			this.getSession()
+				.createSQLQuery(sb.toString());
+		statement.setParameterList("datasetIds", datasetIds);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			statement.setParameterList("instanceNumbers", instanceNumbers);
+		}
+		statement.setParameter("cancelledStatus", TransactionStatus.CANCELLED.getIntValue());
 		statement.executeUpdate();
 
 
