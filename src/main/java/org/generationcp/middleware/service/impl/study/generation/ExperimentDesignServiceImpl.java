@@ -230,6 +230,9 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);
 		this.daoFactory.getProjectPropertyDAO().deleteDatasetVariablesByVariableTypes(plotDatasetId,
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), TermId.MULTIFACTORIAL_INFO.getId()));
+		//Conceptually deleteExperimentTransactionsByStudyId is not needed because deleteExperimentsForDataset deletes all information related to the plot dataset
+		//Calling extra function to prevent any other relation with the study in ims_experiment_transaction that could be created manually, specially because validations
+		//are done at the study level
 		this.daoFactory.getExperimentTransactionDao().deleteExperimentTransactionsByStudyId(studyId, ExperimentTransactionType.PLANTING);
 		this.daoFactory.getExperimentDao().deleteExperimentsForDataset(plotDatasetId);
 
