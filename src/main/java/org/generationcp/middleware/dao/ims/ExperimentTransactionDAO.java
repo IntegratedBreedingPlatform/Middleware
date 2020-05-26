@@ -107,15 +107,18 @@ public class ExperimentTransactionDAO extends GenericDAO<ExperimentTransaction, 
 
 	public void deleteExperimentTransactionsByStudyId(final Integer studyId, final ExperimentTransactionType experimentTransactionType) {
 		try {
-			String hqlUpdate =
-				"delete from ExperimentTransaction et where et.type = :type and et.experiment.id in (select em.ndExperimentId from ExperimentModel em where em.project.study.id = :studyId)"
-					+ "and et.transaction.id in (select t.id from Transaction t where t.status = :transactionStatus)";
-			final Integer count = this.getSession().createQuery(hqlUpdate)
+			final String sqlDelete =
+				"delete et from ims_experiment_transaction et"
+					+ " inner join ims_transaction t on (t.trnid = et.trnid) "
+					+ " inner join nd_experiment e on (e.nd_experiment_id = et.nd_experiment_id) "
+					+ " inner join project p on (p.project_id = e.project_id) "
+					+ " where et.type = :type and p.study_id = :studyId "
+					+ " and t.trnstat = :transactionStatus";
+			this.getSession().createSQLQuery(sqlDelete)
 				.setParameter("studyId", studyId)
 				.setParameter("type", experimentTransactionType.getId())
 				.setParameter("transactionStatus", TransactionStatus.CANCELLED.getIntValue())
 				.executeUpdate();
-			System.out.println(count);
 		} catch (final HibernateException e) {
 			final String message =
 				"Error at deleteExperimentTransactionsByStudyId studyId = " + studyId + ", experimentTransactionType + "
