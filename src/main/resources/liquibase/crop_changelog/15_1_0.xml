@@ -60,4 +60,19 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="mderamos" id="v15.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1) > 0 FROM stock s
+				WHERE NOT EXISTS ( SELECT e.stock_id FROM nd_experiment e WHERE s.stock_id = e.stock_id);
+			</sqlCheck>
+		</preConditions>
+		<comment>Delete unused stock and stockprop entries</comment>
+		<sql dbms="mysql">
+			DELETE s, sp FROM stock s
+				INNER JOIN stockprop sp ON s.stock_id = sp.stock_id
+				WHERE NOT EXISTS ( SELECT e.stock_id FROM nd_experiment e WHERE s.stock_id = e.stock_id);
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
