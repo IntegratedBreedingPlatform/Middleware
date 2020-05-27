@@ -63,6 +63,31 @@
 	<changeSet author="mderamos" id="v15.1.0-3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
+				SELECT COUNT(1) > 0 from nd_experiment means_exp
+					INNER JOIN project means ON means.project_id = means_exp.project_id AND means.dataset_type_id = 2
+					INNER JOIN project plot ON plot.study_id = means.study_id AND plot.dataset_type_id = 4
+					INNER JOIN nd_experiment plot_exp ON plot_exp.project_id = plot.project_id
+					INNER JOIN stock means_stock ON means_stock.stock_id = means_exp.stock_id
+					INNER JOIN stock plot_stock ON plot_stock.stock_id = plot_exp.stock_id
+					WHERE means_stock.uniquename = plot_stock.uniquename AND means_exp.stock_id != plot_stock.stock_id;
+			</sqlCheck>
+		</preConditions>
+		<comment>Set stock_id of means experiments to use plot experiments stock_id</comment>
+		<sql dbms="mysql">
+			UPDATE nd_experiment means_exp
+				INNER JOIN project means ON means.project_id = means_exp.project_id AND means.dataset_type_id = 2
+				INNER JOIN project plot ON plot.study_id = means.study_id AND plot.dataset_type_id = 4
+				INNER JOIN nd_experiment plot_exp ON plot_exp.project_id = plot.project_id
+				INNER JOIN stock means_stock ON means_stock.stock_id = means_exp.stock_id
+				INNER JOIN stock plot_stock ON plot_stock.stock_id = plot_exp.stock_id
+				SET means_exp.stock_id = plot_stock.stock_id
+				WHERE means_stock.uniquename = plot_stock.uniquename AND means_exp.stock_id != plot_stock.stock_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v15.1.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
 				SELECT COUNT(1) > 0 FROM stock s
 				WHERE NOT EXISTS ( SELECT e.stock_id FROM nd_experiment e WHERE s.stock_id = e.stock_id);
 			</sqlCheck>
