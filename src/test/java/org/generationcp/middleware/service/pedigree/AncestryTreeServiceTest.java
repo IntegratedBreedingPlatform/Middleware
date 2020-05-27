@@ -34,31 +34,31 @@ public class AncestryTreeServiceTest {
 	private Set<Integer> randomNumbers;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 
 		// Keep our generated germplasm in this map
-		this.germplasmMap = new HashMap<CropGermplasmKey, Germplasm>();
+		this.germplasmMap = new HashMap<>();
 
 		// Keep our generated methods in this map
-		this.methodsMap = new HashMap<CropMethodKey, Method>();
+		this.methodsMap = new HashMap<>();
 
-		this.randomNumbers = new LinkedHashSet<Integer>();
+		this.randomNumbers = new LinkedHashSet<>();
 
-		setUpGermplasmCache();
+		this.setUpGermplasmCache();
 
-		setUpMethodCache();
+		this.setUpMethodCache();
 
-		generateRandomGermplasm();
+		this.generateRandomGermplasm();
 
 	}
 
 	private void setUpMethodCache() {
-		this.methodCache = new FunctionBasedGuavaCacheLoader<CropMethodKey, Method>(
+		this.methodCache = new FunctionBasedGuavaCacheLoader<>(
 				CacheBuilder.newBuilder().maximumSize(100000).expireAfterWrite(100, TimeUnit.MINUTES).<CropMethodKey, Method>build(),
 				new Function<CropMethodKey, Method>() {
 
 					@Override
-					public Method apply(CropMethodKey key) {
+					public Method apply(final CropMethodKey key) {
 						return AncestryTreeServiceTest.this.methodsMap.get(key);
 					}
 				});
@@ -66,13 +66,13 @@ public class AncestryTreeServiceTest {
 
 	private void setUpGermplasmCache() {
 
-		FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm> functionBasedGuavaCacheLoader =
-				new FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm>(CacheBuilder.newBuilder().maximumSize(100000)
+		final FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm> functionBasedGuavaCacheLoader =
+				new FunctionBasedGuavaCacheLoader<>(CacheBuilder.newBuilder().maximumSize(100000)
 						.expireAfterWrite(100, TimeUnit.MINUTES).<CropGermplasmKey, Germplasm>build(),
 						new Function<CropGermplasmKey, Germplasm>() {
 
 							@Override
-							public Germplasm apply(CropGermplasmKey key) {
+							public Germplasm apply(final CropGermplasmKey key) {
 								return AncestryTreeServiceTest.this.germplasmMap.get(key);
 							}
 						});
@@ -90,7 +90,7 @@ public class AncestryTreeServiceTest {
 	}
 
 	@Test
-	public void testPedigreeTreeGeneration() throws Exception {
+	public void testPedigreeTreeGeneration() {
 		final Germplasm generateRandomGermplasm = this.generateRandomGermplasm(2);
 
 		final AncestryTreeService pedigreeTree =
@@ -109,7 +109,6 @@ public class AncestryTreeServiceTest {
 		this.compareGeneratedNodes(this.germplasmMap.get(femaleGermplasmKey), resultNode.getFemaleParent());
 
 		final CropGermplasmKey maleGermplasmKey = new CropGermplasmKey(AncestryTreeServiceTest.MAIZE, generateRandomGermplasm.getGpid2());
-
 		this.compareGeneratedNodes(this.germplasmMap.get(maleGermplasmKey), resultNode.getMaleParent());
 
 	}
@@ -130,14 +129,14 @@ public class AncestryTreeServiceTest {
 		if (femaleSideNodes != 0) {
 			final Integer femaleGid = iterator.next();
 			final Germplasm generateTestGermplasm = this.generateTestGermplasm(femaleGid, 1);
-			generateTree(generateTestGermplasm, femaleSideNodes - 1, maleSideNodes, iterator);
+			this.generateTree(generateTestGermplasm, femaleSideNodes - 1, maleSideNodes, iterator);
 			germplasm.setGpid1(femaleGid);
 		}
 
 		if (maleSideNodes != 0) {
 			final Integer maleGid = iterator.next();
 			final Germplasm generateTestGermplasm = this.generateTestGermplasm(maleGid, 1);
-			generateTree(generateTestGermplasm, femaleSideNodes, maleSideNodes - 1, iterator);
+			this.generateTree(generateTestGermplasm, femaleSideNodes, maleSideNodes - 1, iterator);
 
 			germplasm.setGpid2(maleGid);
 		}
