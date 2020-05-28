@@ -11,13 +11,11 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import org.generationcp.middleware.Work;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.data.initializer.DataSetTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementRowTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
-import org.generationcp.middleware.data.initializer.VariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -51,7 +49,6 @@ import org.generationcp.middleware.utils.test.VariableTypeListDataUtil;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
@@ -405,7 +402,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		Mockito.when(studyDataManager.findOneDataSetByType(workbook.getStudyDetails().getId(), DatasetTypeEnum.PLOT_DATA.getId()))
 			.thenReturn(plotDataset);
 
-		final Stocks stocks =  new Stocks();
+		final Stocks stocks = new Stocks();
 		final VariableList variableList = new VariableList();
 		final Variable variable = new Variable();
 		variable.setValue("1");

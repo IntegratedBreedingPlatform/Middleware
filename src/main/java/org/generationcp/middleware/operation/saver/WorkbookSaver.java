@@ -1186,10 +1186,11 @@ public class WorkbookSaver extends Saver {
 	}
 
 	void setStockIdsForMeansExperiments(final Workbook workbook, final String entryNoHeader) {
-		final DataSet plotDataset = this.studyDataManager.findOneDataSetByType(workbook.getStudyDetails().getId(), DatasetTypeEnum.PLOT_DATA.getId());
+		final DataSet plotDataset =
+			this.studyDataManager.findOneDataSetByType(workbook.getStudyDetails().getId(), DatasetTypeEnum.PLOT_DATA.getId());
 		final Stocks stocks = this.studyDataManager.getStocksInDataset(plotDataset.getId());
 		final Map<String, Integer> entryNoStockIdMap = stocks.getStockMap(entryNoHeader);
-		for(final MeasurementRow row : workbook.getObservations()) {
+		for (final MeasurementRow row : workbook.getObservations()) {
 			final String entryNo = row.getMeasurementData(TermId.ENTRY_NO.getId()).getValue();
 			row.setStockId(entryNoStockIdMap.get(entryNo));
 		}

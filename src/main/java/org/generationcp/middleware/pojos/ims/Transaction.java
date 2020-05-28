@@ -13,8 +13,10 @@ package org.generationcp.middleware.pojos.ims;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.util.Util;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,9 +26,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * POJO for ims_transaction table.
@@ -104,6 +109,13 @@ public class Transaction implements Serializable {
 	@Column(name = "trntype")
 	private Integer type;
 
+	@OneToMany(
+		mappedBy = "transaction",
+		cascade = CascadeType.REMOVE,
+		orphanRemoval = true
+	)
+	private List<ExperimentTransaction> experimentTransactions = new ArrayList<>();
+
 	public Transaction() {
 	}
 
@@ -130,6 +142,25 @@ public class Transaction implements Serializable {
 		this.personId = personId;
 		this.type = type;
 
+	}
+
+	public Transaction(final TransactionType transactionType, final TransactionStatus transactionStatus, final Integer userId,
+		final String notes, final Integer lotId, final Double amount) {
+		super();
+		this.setStatus(transactionStatus.getIntValue());
+		this.setType(transactionType.getId());
+		this.setLot(new Lot(lotId));
+		this.setPersonId(userId);
+		this.setUserId(userId);
+		this.setTransactionDate(new Date());
+		this.setQuantity(amount);
+		this.setComments(notes);
+		this.setPreviousAmount(0D);
+		if (transactionStatus.equals(TransactionStatus.CONFIRMED)) {
+			this.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
+		} else {
+			this.setCommitmentDate(0);
+		}
 	}
 
 	public Integer getId() {
@@ -242,6 +273,14 @@ public class Transaction implements Serializable {
 
 	public void setType(final Integer type) {
 		this.type = type;
+	}
+
+	public List<ExperimentTransaction> getExperimentTransactions() {
+		return experimentTransactions;
+	}
+
+	public void setExperimentTransactions(final List<ExperimentTransaction> experimentTransactions) {
+		this.experimentTransactions = experimentTransactions;
 	}
 
 	@Override

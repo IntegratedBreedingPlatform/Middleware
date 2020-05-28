@@ -447,7 +447,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
 		return this.createEnvironmentData(this.study, numberOfReps,
-			withPhenotype ? Collections.singletonList(this.trait.getCvTermId()) : Collections.<Integer>emptyList(),true);
+			withPhenotype ? Collections.singletonList(this.trait.getCvTermId()) : Collections.<Integer>emptyList(), true);
 	}
 
 	private void createProjectProperties(final DmsProject project, final List<Integer> traitIds) {
@@ -463,7 +463,9 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.projectPropertyDao.save(projectProp);
 		}
 	}
-	private Integer createEnvironmentData(final DmsProject project, final Integer numberOfReps, final List<Integer> traitIds, final boolean isWithValue) {
+
+	private Integer createEnvironmentData(final DmsProject project, final Integer numberOfReps, final List<Integer> traitIds,
+		final boolean isWithValue) {
 		this.phenotypes = new ArrayList<>();
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription("1");
@@ -492,7 +494,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 					final Phenotype phenotype = new Phenotype();
 					phenotype.setObservableId(traitId);
 					phenotype.setExperiment(experimentModel);
-					if(isWithValue){
+					if (isWithValue) {
 						phenotype.setValue(String.valueOf(new Random().nextDouble()));
 					}
 					this.phenotypes.add(this.phenotypeDao.save(phenotype));
@@ -501,11 +503,11 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 		}
 
-			return geolocation.getLocationId();
+		return geolocation.getLocationId();
 	}
 
 	@Test
-	public void testgetObservationForTraits(){
+	public void testgetObservationForTraits() {
 		//Study with valid observation values
 		final Integer geolocation1 = this.createEnvironmentData(1, true);
 		//Study invalid observation values
@@ -515,15 +517,16 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 				this.study, this.study);
 		final Integer geolocation2 = this.createEnvironmentData(plot, 1, Arrays.asList(this.trait.getCvTermId()), false);
 
-		final List<Observation> observations = this.phenotypeDao.getObservationForTraits(Arrays.asList(this.trait.getCvTermId()), Arrays.asList(geolocation1, geolocation2), 0, 0);
-		Assert.assertEquals("Null values should not be included",this.germplasm.size(), observations.size());
+		final List<Observation> observations = this.phenotypeDao
+			.getObservationForTraits(Arrays.asList(this.trait.getCvTermId()), Arrays.asList(geolocation1, geolocation2), 0, 0);
+		Assert.assertEquals("Null values should not be included", this.germplasm.size(), observations.size());
 	}
 
 	/**
 	 * Method getNumericTraitInfoList(Collection: environment, Collection: trait) is use when environment is > 1000
 	 */
 	@Test
-	public void testGetNumericTraitInfoValues1(){
+	public void testGetNumericTraitInfoValues1() {
 		//Study with valid observation values
 		final Integer geolocation1 = this.createEnvironmentData(1, true);
 		//Study invalid observation values
@@ -532,22 +535,25 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.createDataset(this.study.getName() + " - Plot Dataset", uniqueID, DatasetTypeEnum.PLOT_DATA.getId(),
 				this.study, this.study);
 		final Integer geolocation2 = this.createEnvironmentData(plot, 1, Arrays.asList(this.trait.getCvTermId()), false);
-		final List<NumericTraitInfo> numericTraitInfos = this.phenotypeDao.getNumericTraitInfoList(Arrays.asList(geolocation1, geolocation2), Arrays.asList(this.trait.getCvTermId()));
-		final Map<Integer, List<Double>> traitInfoValues = this.phenotypeDao.getNumericTraitInfoValues( Arrays.asList(geolocation1, geolocation2), numericTraitInfos);
+		final List<NumericTraitInfo> numericTraitInfos =
+			this.phenotypeDao.getNumericTraitInfoList(Arrays.asList(geolocation1, geolocation2), Arrays.asList(this.trait.getCvTermId()));
+		final Map<Integer, List<Double>> traitInfoValues =
+			this.phenotypeDao.getNumericTraitInfoValues(Arrays.asList(geolocation1, geolocation2), numericTraitInfos);
 		final List<Double> values = traitInfoValues.get(this.trait.getCvTermId());
-		try{
+		try {
 			Collections.sort(values);
-		}catch(final Exception ex) {
+		} catch (final Exception ex) {
 			Assert.fail("Sorting encountered an issue " + ex.getMessage());
 		}
-		Assert.assertEquals("Null values should not be included",this.germplasm.size(), traitInfoValues.get(this.trait.getCvTermId()).size());
+		Assert.assertEquals("Null values should not be included", this.germplasm.size(),
+			traitInfoValues.get(this.trait.getCvTermId()).size());
 	}
 
 	/**
 	 * Method getNumericTraitInfoValues(Collection: environment, Integer trait) is use when environment is < 1000
 	 */
 	@Test
-	public void testGetNumericTraitInfoValues2(){
+	public void testGetNumericTraitInfoValues2() {
 		//Study with valid observation values
 		final Integer geolocation1 = this.createEnvironmentData(1, true);
 		//Study invalid observation values
@@ -557,27 +563,30 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 				this.study, this.study);
 		final Integer geolocation2 = this.createEnvironmentData(plot, 1, Arrays.asList(this.trait.getCvTermId()), false);
 
-		final Map<Integer, List<Double>> traitInfoValues = this.phenotypeDao.getNumericTraitInfoValues( Arrays.asList(geolocation1, geolocation2), this.trait.getCvTermId() );
+		final Map<Integer, List<Double>> traitInfoValues =
+			this.phenotypeDao.getNumericTraitInfoValues(Arrays.asList(geolocation1, geolocation2), this.trait.getCvTermId());
 		final List<Double> values = traitInfoValues.get(this.trait.getCvTermId());
-		try{
+		try {
 			Collections.sort(values);
-		}catch(final Exception ex) {
+		} catch (final Exception ex) {
 			Assert.fail("Sorting encountered an issue " + ex.getMessage());
 		}
-		Assert.assertEquals("Null values should not be included",this.germplasm.size(), traitInfoValues.get(this.trait.getCvTermId()).size());
+		Assert.assertEquals("Null values should not be included", this.germplasm.size(),
+			traitInfoValues.get(this.trait.getCvTermId()).size());
 	}
 
 	/**
 	 * Method is used in Character Traits
 	 */
 	@Test
-	public void getTraitInfoCounts1(){
+	public void getTraitInfoCounts1() {
 		//Study with valid observation values
 		final Integer geolocation1 = this.createEnvironmentData(1, true);
 		final Integer geolocation2 = this.createEnvironmentData(1, true);
 
-		final List<TraitInfo> traitInfoValues = this.phenotypeDao.getTraitInfoCounts( Arrays.asList(geolocation1, geolocation2), Arrays.asList(this.trait.getCvTermId()));
-		Assert.assertEquals("Trait Count",1, traitInfoValues.size());
+		final List<TraitInfo> traitInfoValues =
+			this.phenotypeDao.getTraitInfoCounts(Arrays.asList(geolocation1, geolocation2), Arrays.asList(this.trait.getCvTermId()));
+		Assert.assertEquals("Trait Count", 1, traitInfoValues.size());
 		Assert.assertEquals("All environment with valid value will be counted", 2, traitInfoValues.get(0).getLocationCount());
 
 	}
@@ -586,7 +595,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	 * Method is used in Character Traits
 	 */
 	@Test
-	public void getTraitInfoCounts2(){
+	public void getTraitInfoCounts2() {
 		//Study with valid observation values
 		final Integer geolocation1 = this.createEnvironmentData(1, true);
 		//Study invalid observation values
@@ -596,8 +605,9 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 				this.study, this.study);
 		final Integer geolocation2 = this.createEnvironmentData(plot, 1, Arrays.asList(this.trait.getCvTermId()), false);
 
-		final List<TraitInfo> traitInfoValues = this.phenotypeDao.getTraitInfoCounts( Arrays.asList(geolocation1, geolocation2), Arrays.asList(this.trait.getCvTermId()));
-		Assert.assertEquals("Trait Count",1, traitInfoValues.size());
+		final List<TraitInfo> traitInfoValues =
+			this.phenotypeDao.getTraitInfoCounts(Arrays.asList(geolocation1, geolocation2), Arrays.asList(this.trait.getCvTermId()));
+		Assert.assertEquals("Trait Count", 1, traitInfoValues.size());
 		Assert.assertEquals("Only environment with valid value will be counted", 1, traitInfoValues.get(0).getLocationCount());
 	}
 
@@ -605,13 +615,13 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	 * Method is used in Categorical Traits
 	 */
 	@Test
-	public void getTraitInfoCountsCategorical(){
+	public void getTraitInfoCountsCategorical() {
 		//Study with valid observation values
 		final Integer geolocation1 = this.createEnvironmentData(1, true);
 		final Integer geolocation2 = this.createEnvironmentData(1, true);
 
-		final List<TraitInfo> traitInfoValues = this.phenotypeDao.getTraitInfoCounts( Arrays.asList(geolocation1, geolocation2));
-		Assert.assertEquals("Trait Count",1, traitInfoValues.size());
+		final List<TraitInfo> traitInfoValues = this.phenotypeDao.getTraitInfoCounts(Arrays.asList(geolocation1, geolocation2));
+		Assert.assertEquals("Trait Count", 1, traitInfoValues.size());
 		Assert.assertEquals("All environment with valid value will be counted", 2, traitInfoValues.get(0).getLocationCount());
 
 	}
@@ -620,7 +630,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	 * Method is used in Categorical Traits
 	 */
 	@Test
-	public void getTraitInfoCountsCategorical2(){
+	public void getTraitInfoCountsCategorical2() {
 		//Study with valid observation values
 		final Integer geolocation1 = this.createEnvironmentData(1, true);
 		//Study invalid observation values
@@ -630,8 +640,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 				this.study, this.study);
 		final Integer geolocation2 = this.createEnvironmentData(plot, 1, Arrays.asList(this.trait.getCvTermId()), false);
 
-		final List<TraitInfo> traitInfoValues = this.phenotypeDao.getTraitInfoCounts( Arrays.asList(geolocation1, geolocation2));
-		Assert.assertEquals("Trait Count",1, traitInfoValues.size());
+		final List<TraitInfo> traitInfoValues = this.phenotypeDao.getTraitInfoCounts(Arrays.asList(geolocation1, geolocation2));
+		Assert.assertEquals("Trait Count", 1, traitInfoValues.size());
 		Assert.assertEquals("Only environment with valid value will be counted", 1, traitInfoValues.get(0).getLocationCount());
 	}
 
