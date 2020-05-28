@@ -39,14 +39,14 @@ public class ExperimentTransactionId implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if (this == o)
 			return true;
 
 		if (o == null || getClass() != o.getClass())
 			return false;
 
-		ExperimentTransactionId that = (ExperimentTransactionId) o;
+		final ExperimentTransactionId that = (ExperimentTransactionId) o;
 		return Objects.equals(experimentId, that.experimentId) &&
 			Objects.equals(transactionId, that.transactionId);
 	}
