@@ -255,4 +255,8 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="plantingService" class="org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
 </beans>

@@ -19,32 +19,61 @@
 		<modifyDataType tableName="key_sequence_register" columnName="key_prefix" newDataType="varchar(255)"/>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v15.1.0-2">
+	<changeSet author="darla" id="v15.1.0-2">
 		<preConditions onFail="MARK_RAN">
-			<not>
-				<sqlCheck expectedResult="0">
-					SELECT COUNT(*) from nd_experiment means_exp
-						INNER JOIN project means ON means.project_id = means_exp.project_id AND means.dataset_type_id = 2
-						INNER JOIN project plot ON plot.study_id = means.study_id AND plot.dataset_type_id = 4
-						INNER JOIN nd_experiment plot_exp ON plot_exp.project_id = plot.project_id
-						INNER JOIN stock means_stock ON means_stock.stock_id = means_exp.stock_id
-						INNER JOIN stock plot_stock ON plot_stock.stock_id = plot_exp.stock_id
-						WHERE means_stock.uniquename = plot_stock.uniquename AND means_exp.stock_id != plot_stock.stock_id;
-				</sqlCheck>
-			</not>
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1) > 0 FROM project p
+				WHERE EXISTS ( SELECT 1 FROM nd_experiment e
+								INNER JOIN stock s ON s.stock_id = e.stock_id
+								WHERE e.project_id = p.project_id
+								GROUP BY e.project_id, s.uniquename
+								HAVING COUNT(DISTINCT s.stock_id) > 1
+							);
+			</sqlCheck>
 		</preConditions>
-		<comment>Set stock_id of means experiments to use plot experiments stock_id and delete unnecessary stock entries</comment>
+		<comment>Update datasets whose stock entries are not unique per entry number</comment>
 		<sql dbms="mysql">
-			CREATE TEMPORARY TABLE means_stock_id AS
-				SELECT DISTINCT means_exp.stock_id FROM nd_experiment means_exp
-						INNER JOIN project means ON means.project_id = means_exp.project_id AND means.dataset_type_id = 2
-						INNER JOIN project plot ON plot.study_id = means.study_id AND plot.dataset_type_id = 4
-						INNER JOIN nd_experiment plot_exp ON plot_exp.project_id = plot.project_id
-						INNER JOIN stock means_stock ON means_stock.stock_id = means_exp.stock_id
-						INNER JOIN stock plot_stock ON plot_stock.stock_id = plot_exp.stock_id
-						WHERE means_stock.uniquename = plot_stock.uniquename AND means_exp.stock_id != plot_stock.stock_id;
+			-- Break down into multiple temp table queries for performance purposes
+			CREATE TEMPORARY TABLE dataset_dupe_stocks AS
+			SELECT DISTINCT project_id FROM project p
+			WHERE EXISTS ( SELECT 1 FROM nd_experiment e
+							INNER JOIN stock s ON s.stock_id = e.stock_id
+							WHERE e.project_id = p.project_id
+							GROUP BY e.project_id, s.uniquename
+							HAVING COUNT(DISTINCT s.stock_id) > 1
+						);
 
+			-- Store in temporary table the first/minimum stock id for the same entry for affected datasets
+			CREATE TEMPORARY TABLE dupe_stocks
+			SELECT project_id, st.uniquename AS entry_no, MIN(st.stock_id) AS first_stk
+			FROM nd_experiment nde
+			INNER JOIN stock st ON st.stock_id = nde.stock_id
+			WHERE nde.project_id IN (SELECT project_id FROM dataset_dupe_stocks)
+			GROUP BY project_id, st.uniquename;
 
+			-- Procced to use the first stock id for a group of dataset stocks with the same entry #
+			UPDATE nd_experiment nde
+			INNER JOIN stock st ON st.stock_id = nde.stock_id
+			INNER JOIN dupe_stocks ds ON ds.project_id = nde.project_id AND ds.entry_no = st.uniquename
+			SET nde.stock_id = ds.first_stk
+			WHERE nde.project_id IN (SELECT project_id FROM dataset_dupe_stocks);
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v15.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1) > 0 from nd_experiment means_exp
+					INNER JOIN project means ON means.project_id = means_exp.project_id AND means.dataset_type_id = 2
+					INNER JOIN project plot ON plot.study_id = means.study_id AND plot.dataset_type_id = 4
+					INNER JOIN nd_experiment plot_exp ON plot_exp.project_id = plot.project_id
+					INNER JOIN stock means_stock ON means_stock.stock_id = means_exp.stock_id
+					INNER JOIN stock plot_stock ON plot_stock.stock_id = plot_exp.stock_id
+					WHERE means_stock.uniquename = plot_stock.uniquename AND means_exp.stock_id != plot_stock.stock_id;
+			</sqlCheck>
+		</preConditions>
+		<comment>Set stock_id of means experiments to use plot experiments stock_id</comment>
+		<sql dbms="mysql">
 			UPDATE nd_experiment means_exp
 				INNER JOIN project means ON means.project_id = means_exp.project_id AND means.dataset_type_id = 2
 				INNER JOIN project plot ON plot.study_id = means.study_id AND plot.dataset_type_id = 4
@@ -53,13 +82,42 @@
 				INNER JOIN stock plot_stock ON plot_stock.stock_id = plot_exp.stock_id
 				SET means_exp.stock_id = plot_stock.stock_id
 				WHERE means_stock.uniquename = plot_stock.uniquename AND means_exp.stock_id != plot_stock.stock_id;
+		</sql>
+	</changeSet>
 
+	<changeSet author="mderamos" id="v15.1.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1) > 0 FROM stock s
+				WHERE NOT EXISTS ( SELECT e.stock_id FROM nd_experiment e WHERE s.stock_id = e.stock_id);
+			</sqlCheck>
+		</preConditions>
+		<comment>Delete unused stock and stockprop entries</comment>
+		<sql dbms="mysql">
 			DELETE s, sp FROM stock s
-				LEFT JOIN stockprop sp ON s.stock_id = sp.stock_id
-				WHERE s.stock_id IN (
-                  SELECT stock_id
-                  FROM means_stock_id
-                );
+				INNER JOIN stockprop sp ON s.stock_id = sp.stock_id
+				WHERE NOT EXISTS ( SELECT e.stock_id FROM nd_experiment e WHERE s.stock_id = e.stock_id);
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v15.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="ims_experiment_transaction"/>
+			</not>
+		</preConditions>
+		<comment>
+			Creating table to store relationship between transactions and experiments
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE ims_experiment_transaction (
+			  trnid INT(11) NOT NULL,
+			  nd_experiment_id INT(11) NOT NULL,
+			  type INT(11) NOT NULL,
+			  PRIMARY KEY (trnid, nd_experiment_id),
+			  CONSTRAINT fk_ims_experiment_transaction_transaction FOREIGN KEY (trnid) REFERENCES ims_transaction (trnid),
+			  CONSTRAINT fk_ims_experiment_transaction_experiment FOREIGN KEY (nd_experiment_id) REFERENCES nd_experiment (nd_experiment_id)
+			);
 		</sql>
 	</changeSet>
 
