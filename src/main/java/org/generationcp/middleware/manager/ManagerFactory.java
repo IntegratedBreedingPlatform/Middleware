@@ -351,4 +351,8 @@ public class ManagerFactory implements Serializable {
 	public StudyGermplasmListService getStudyGermplasmListService() {
 		return new StudyGermplasmListServiceImpl(this.sessionProvider);
 	}
+
+	public InventoryService getInventoryService() {
+		return new InventoryServiceImpl(this.sessionProvider);
+	}
 }
