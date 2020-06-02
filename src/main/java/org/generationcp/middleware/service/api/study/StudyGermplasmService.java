@@ -1,8 +1,6 @@
 
 package org.generationcp.middleware.service.api.study;
 
-import org.generationcp.middleware.pojos.dms.StockModel;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +15,7 @@ public interface StudyGermplasmService {
 
 	void deleteStudyGermplasm(int studyId);
 
-	void saveStudyGermplasm(List<StockModel> stockModelList);
+	void saveStudyGermplasm(Integer studyId, List<StudyGermplasmDto> studyGermplasmDtoList);
 
 	long countStudyGermplasmByEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
 
