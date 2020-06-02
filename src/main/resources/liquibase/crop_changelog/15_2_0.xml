@@ -115,4 +115,25 @@
         </sql>
 	</changeSet>
 
+	 <changeSet author="mderamos" id="v15.2.0-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE TABLE_NAME = 'stock' AND CONSTRAINT_NAME='stock_project_id_fk'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Add FK to project_id column in Stock table to Project project_id
+		</comment>
+		<addForeignKeyConstraint
+			constraintName="stock_project_id_fk"
+			baseTableName="stock"
+			baseColumnNames="project_id"
+			referencedTableName="project"
+			referencedColumnNames="project_id"
+			onDelete="NO ACTION"
+			onUpdate="NO ACTION"/>
+	</changeSet>
+
 </databaseChangeLog>
