@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Transactional
 public class StudyGermplasmListServiceImpl implements StudyGermplasmListService {
@@ -99,10 +98,10 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 
 	}
 
-	private String findStockPropValue(final int termId, final Set<StockProperty> properties) {
+	private String findStockPropValue(final Integer termId, final Set<StockProperty> properties) {
 		if (properties != null) {
 			for (final StockProperty property : properties) {
-				if (termId == property.getTypeId()) {
+				if (termId.equals(property.getTypeId())) {
 					return property.getValue();
 				}
 			}
