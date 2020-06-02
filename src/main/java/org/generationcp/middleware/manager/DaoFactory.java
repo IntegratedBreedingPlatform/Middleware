@@ -26,6 +26,7 @@ import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.dms.StudySearchDao;
+import org.generationcp.middleware.dao.ims.ExperimentTransactionDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -241,4 +242,11 @@ public class DaoFactory {
 		programFavoriteDao.setSession(this.sessionProvider.getSession());
 		return programFavoriteDao;
 	}
+
+	public ExperimentTransactionDAO getExperimentTransactionDao() {
+		final ExperimentTransactionDAO experimentTransactionDAO = new ExperimentTransactionDAO();
+		experimentTransactionDAO.setSession(this.sessionProvider.getSession());
+		return experimentTransactionDAO;
+	}
+
 }

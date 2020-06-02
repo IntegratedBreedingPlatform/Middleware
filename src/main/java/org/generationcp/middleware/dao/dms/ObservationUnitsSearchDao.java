@@ -71,6 +71,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		factorsFilterMap.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), "gl.description");
 		factorsFilterMap.put(SUM_OF_SAMPLES_ID,
 			"EXISTS ( SELECT 1 FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id HAVING count(sample_id)");
+		factorsFilterMap.put(String.valueOf(TermId.OBS_UNIT_ID.getId()), "nde.obs_unit_id");
 	}
 
 	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
@@ -153,7 +154,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-			addFilteredValueParams(query, filter);
+			addQueryParams(query, filter);
 
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("datasetId", datasetId);
@@ -206,7 +207,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			this.addFilters(sql, filter, observationUnitsSearchDTO.getDraftMode());
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-			addFilteredValueParams(query, filter);
+			addQueryParams(query, filter);
 
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.addScalar("totalInstances", new IntegerType());
@@ -249,7 +250,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				query.setParameter("datasetEnvironmentId", String.valueOf(params.getEnvironmentDatasetId()));
 			}
 
-			addFilteredValueParams(query, params.getFilter());
+			addQueryParams(query, params.getFilter());
 
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = query.list();
@@ -401,7 +402,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			query.setParameter("datasetEnvironmentId", String.valueOf(searchDto.getEnvironmentDatasetId()));
 		}
 
-		addFilteredValueParams(query, searchDto.getFilter());
+		addQueryParams(query, searchDto.getFilter());
 
 		final Integer pageNumber = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageNumber() : null;
 		final Integer pageSize = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageSize() : null;
@@ -665,6 +666,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				filter.getFilteredTextValues().keySet(), true);
 		}
 
+		if (filter.getFilteredNdExperimentIds() != null && !filter.getFilteredNdExperimentIds().isEmpty()) {
+			sql.append(" and nde.nd_experiment_id in (:filteredNdExperimentIds) ");
+		}
+
 		if (Boolean.TRUE.equals(filter.getByOverwritten())) {
 			this.appendTraitStatusFilterToQuery(sql, filterByVariableSQL, " and ph2.value is not null and ph2.draft_value is not null");
 		}
@@ -841,7 +846,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	private static void addFilteredValueParams(final SQLQuery query, final ObservationUnitsSearchDTO.Filter filter) {
+	private static void addQueryParams(final SQLQuery query, final ObservationUnitsSearchDTO.Filter filter) {
 		if (filter == null) {
 			return;
 		}
@@ -884,6 +889,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				}
 				query.setParameter(observableId + "_text", "%" + filteredTextValues.get(observableId) + "%");
 			}
+		}
+
+		if (filter.getFilteredNdExperimentIds() != null && !filter.getFilteredNdExperimentIds().isEmpty()) {
+			query.setParameterList("filteredNdExperimentIds", filter.getFilteredNdExperimentIds());
 		}
 	}
 

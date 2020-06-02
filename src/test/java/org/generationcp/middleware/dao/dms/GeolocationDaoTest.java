@@ -253,7 +253,7 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 					return input.getId();
 				}
 			});
-		Assert.assertEquals("Only 1 environment with accepted value",1, environmentIds.size());
+		Assert.assertEquals("Only 1 environment with accepted value", 1, environmentIds.size());
 		Assert.assertTrue(environmentIds.contains(geolocation2.getLocationId()));
 		Assert.assertFalse(environmentIds.contains(geolocation3.getLocationId()));
 	}
@@ -278,7 +278,7 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 					return input.getId();
 				}
 			});
-		Assert.assertEquals("Only environments with accepted value will be retrieved.",2, environmentIds.size());
+		Assert.assertEquals("Only environments with accepted value will be retrieved.", 2, environmentIds.size());
 		Assert.assertTrue(environmentIds.contains(geolocation2.getLocationId()));
 		Assert.assertTrue(environmentIds.contains(geolocation3.getLocationId()));
 	}
@@ -306,8 +306,9 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 		}
 	}
 
-	private Geolocation createEnvironmentData(final DmsProject project, final String instance, final List<Integer> traitIds, final boolean withValue, Geolocation geolocation) {
-		if(geolocation == null) {
+	private Geolocation createEnvironmentData(final DmsProject project, final String instance, final List<Integer> traitIds,
+		final boolean withValue, Geolocation geolocation) {
+		if (geolocation == null) {
 			geolocation = new Geolocation();
 			geolocation.setDescription(instance);
 			this.geolocationDao.saveOrUpdate(geolocation);
@@ -333,7 +334,7 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 				final Phenotype phenotype = new Phenotype();
 				phenotype.setObservableId(traitId);
 				phenotype.setExperiment(experimentModel);
-				if(withValue){
+				if (withValue) {
 					phenotype.setValue(String.valueOf(new Random().nextDouble()));
 				}
 				this.phenotypeDao.save(phenotype);
