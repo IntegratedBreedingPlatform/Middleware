@@ -31,8 +31,6 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
-import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
-import org.generationcp.middleware.service.impl.study.StudyGermplasmListServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.HashSet;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -23,16 +21,18 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
-import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
-import org.generationcp.middleware.service.impl.study.StudyGermplasmListServiceImpl;
+import org.generationcp.middleware.service.api.study.StudyGermplasmService;
+import org.generationcp.middleware.service.impl.study.StudyGermplasmServiceImpl;
+
+import java.util.HashSet;
 
 public class StockSaver extends Saver {
 
-	private StudyGermplasmListService studyGermplasmListService;
+	private StudyGermplasmService studyGermplasmService;
 
 	public StockSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
-		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(sessionProviderForLocal);
+		this.studyGermplasmService = new StudyGermplasmServiceImpl(sessionProviderForLocal);
 	}
 
 	public Integer saveStock(final int studyId, final VariableList variableList) {

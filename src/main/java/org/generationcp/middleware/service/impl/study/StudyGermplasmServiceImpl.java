@@ -8,7 +8,7 @@ import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
+import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -18,19 +18,19 @@ import java.util.Map;
 import java.util.Set;
 
 @Transactional
-public class StudyGermplasmListServiceImpl implements StudyGermplasmListService {
+public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 
 	@Resource
 	private InventoryDataManager inventoryDataManager;
 
 	private final DaoFactory daoFactory;
 
-	public StudyGermplasmListServiceImpl(final HibernateSessionProvider sessionProvider) {
+	public StudyGermplasmServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
-	public List<StudyGermplasmDto> getGermplasmList(final int studyBusinessIdentifier) {
+	public List<StudyGermplasmDto> getGermplasm(final int studyBusinessIdentifier) {
 
 		final List<StockModel> stockModelList = this.daoFactory.getStockDao().getStocksForStudy(studyBusinessIdentifier);
 		final List<Integer> gids = new ArrayList<>();
@@ -58,22 +58,22 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 	}
 
 	@Override
-	public List<StudyGermplasmDto> getGermplasmListFromPlots(final int studyBusinessIdentifier, final Set<Integer> plotNos) {
+	public List<StudyGermplasmDto> getGermplasmFromPlots(final int studyBusinessIdentifier, final Set<Integer> plotNos) {
 		return this.daoFactory.getStockDao().getStudyGermplasmDtoList(studyBusinessIdentifier, plotNos);
 	}
 
 	@Override
-	public long countStudyGermplasmList(final int studyId) {
+	public long countStudyGermplasm(final int studyId) {
 		return this.daoFactory.getStockDao().countStocksForStudy(studyId);
 	}
 
 	@Override
-	public void deleteStudyGermplasmList(final int studyId) {
+	public void deleteStudyGermplasm(final int studyId) {
 		this.daoFactory.getStockDao().deleteStocksForStudy(studyId);
 	}
 
 	@Override
-	public void saveStudyGermplasmList(final List<StockModel> stockModelList) {
+	public void saveStudyGermplasm(final List<StockModel> stockModelList) {
 		for (final StockModel stockModel : stockModelList) {
 			this.daoFactory.getStockDao().saveOrUpdate(stockModel);
 		}
