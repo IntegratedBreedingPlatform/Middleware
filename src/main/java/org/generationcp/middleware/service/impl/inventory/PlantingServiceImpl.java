@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import com.google.common.base.Preconditions;
+import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -235,6 +236,11 @@ public class PlantingServiceImpl implements PlantingService {
 	public List<Transaction> getPlantingTransactionsByStudyId(final Integer studyId, final TransactionStatus transactionStatus) {
 		return daoFactory.getExperimentTransactionDao()
 			.getTransactionsByStudyId(studyId, transactionStatus, ExperimentTransactionType.PLANTING);
+	}
+
+	@Override
+	public List<Transaction> getPlantingTransactionsByStudyAndEntryId(Integer studyId, Integer entryId, TransactionStatus transactionStatus) {
+		return daoFactory.getExperimentTransactionDao().getTransactionsByStudyAndEntryId(studyId, entryId, transactionStatus, Experiment)
 	}
 
 	@Override

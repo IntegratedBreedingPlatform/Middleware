@@ -22,5 +22,7 @@ public interface PlantingService {
 
 	List<Transaction> getPlantingTransactionsByStudyId(Integer studyId, TransactionStatus transactionStatus);
 
+	List<Transaction> getPlantingTransactionsByStudyAndEntryId(Integer studyId, Integer entryId, TransactionStatus transactionStatus);
+
 	List<Transaction> getPlantingTransactionsByInstanceId(Integer instance, TransactionStatus transactionStatus);
 }
