@@ -45,6 +45,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
@@ -62,6 +63,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // Assumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName
@@ -269,7 +271,7 @@ public class WorkbookSaver extends Saver {
 
 		plotDatasetId =
 			this.createPlotDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables, programUUID);
-		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
+		this.createStocksIfNecessary(studyId, plotDatasetId, workbook, effectVariables, trialHeaders);
 
 		if (!retainValues) {
 			// clean up some variable references to save memory space before
@@ -380,7 +382,7 @@ public class WorkbookSaver extends Saver {
 
 		this.saveOrUpdateTrialObservations( crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId, savedEnvironmentsCount, true, programUUID);
 
-		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
+		this.createStocksIfNecessary(studyId, plotDatasetId, workbook, effectVariables, trialHeaders);
 		this.createMeasurementEffectExperiments(crop, plotDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
 
 	}
@@ -884,10 +886,11 @@ public class WorkbookSaver extends Saver {
 		return datasetId;
 	}
 
-	private void createStocksIfNecessary(
+	public void createStocksIfNecessary(final int studyId,
 		final int datasetId, final Workbook workbook, final VariableTypeList effectVariables,
 		final List<String> trialHeaders) {
-		final Map<String, Integer> stockMap = this.getStockModelBuilder().getStockMapForDataset(datasetId);
+		final Map<String, Integer> stockMap = this.daoFactory.getStockDao().getStocksForStudy(datasetId).stream().collect(Collectors.toMap(
+			StockModel::getUniqueName, StockModel::getStockId));
 
 		List<Integer> variableIndexesList = new ArrayList<>();
 		// we get the indexes so that in the next rows we dont need to compare
@@ -910,7 +913,7 @@ public class WorkbookSaver extends Saver {
 					Integer stockId = stockMap.get(stockFactor);
 
 					if (stockId == null) {
-						stockId = this.getStockSaver().saveStock(stock);
+						stockId = this.getStockSaver().saveStock(studyId, stock);
 						stockMap.put(stockFactor, stockId);
 					} else {
 						this.getStockSaver().saveOrUpdateStock(stock, stockId);
@@ -1151,9 +1154,8 @@ public class WorkbookSaver extends Saver {
 			this.setStockIdsForMeansExperiments(workbook, effectVariables.findById(TermId.ENTRY_NO.getId()).getLocalName());
 
 		} else {
-			this.createStocksIfNecessary(measurementDatasetId, workbook, effectVariables, trialHeaders);
+			this.createStocksIfNecessary(studyId, measurementDatasetId, workbook, effectVariables, trialHeaders);
 		}
-
 
 		// create trial experiments if not yet existing
 		final boolean hasExistingStudyExperiment = this.checkIfHasExistingStudyExperiment(studyId);

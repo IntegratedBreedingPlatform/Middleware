@@ -11,6 +11,7 @@ import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.dms.StockModel;
 
 public class FieldbookListUtil {
 
@@ -30,33 +31,6 @@ public class FieldbookListUtil {
 				return methodName1.compareTo(methodName2);
 			}
 		});
-	}
-
-	public static void populateStockIdInListDataProject(final List<ListDataProject> data , InventoryDataManager inventoryDataManager) {
-		final List<Integer> gids = new ArrayList<>();
-		if (data != null && !data.isEmpty()) {
-			for (final ListDataProject listDataProject : data) {
-				gids.add(listDataProject.getGermplasmId());
-			}
-		}
-
-		Map<Integer, String> stockIds = inventoryDataManager.retrieveStockIds(gids);
-
-
-		if (data != null && !data.isEmpty()) {
-			for (final ListDataProject listData : data) {
-				String stockIdValue = "";
-				if (stockIds != null) {
-					for (final Integer gid : stockIds.keySet()) {
-						if (listData.getGermplasmId().equals(gid)) {
-							stockIdValue = stockIds.get(gid);
-							break;
-						}
-					}
-				}
-				listData.setStockIDs(stockIdValue);
-			}
-		}
 	}
 
 	public static void populateStockIdInGermplasmListData(final List<GermplasmListData> data , InventoryDataManager inventoryDataManager) {

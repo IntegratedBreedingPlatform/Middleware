@@ -164,16 +164,6 @@ public class StockDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testFindInDataset() {
-		// Need to flush session to sync with underlying database before querying
-		this.sessionProvder.getSession().flush();
-
-		final Set<StockModel> stocks = this.stockDao.findInDataSet(this.project.getProjectId());
-		Assert.assertNotNull(stocks);
-		Assert.assertEquals(TEST_COUNT, stocks.size());
-	}
-
-	@Test
 	public void testGetStocksByIds() {
 		final List<Integer> ids = new ArrayList<>();
 		for (final StockModel stock : this.testStocks){

@@ -23,9 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * The class <code>StudyGermplasmListServiceImplTest</code> contains tests for the class <code>{@link StudyGermplasmListServiceImpl}</code>.
+ * The class <code>StudyGermplasmListServiceImplTest</code> contains tests for the class <code>{@link StudyGermplasmServiceImpl}</code>.
  */
-public class StudyGermplasmListServiceImplTest extends IntegrationTestBase {
+public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 
 	private static final String GERMPLASM_PREFERRED_NAME_PREFIX = DataSetupTest.GERMPLSM_PREFIX + "PR-";
 	private static final Integer STUDY_ID = 54321;
@@ -34,7 +34,7 @@ public class StudyGermplasmListServiceImplTest extends IntegrationTestBase {
 	@Autowired
 	private GermplasmDataManager germplasmManager;
 
-	private StudyGermplasmListServiceImpl service;
+	private StudyGermplasmServiceImpl service;
 	private GermplasmListDAO listDao;
 	private ListDataProjectDAO listDataProjectDAO;
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
@@ -43,7 +43,7 @@ public class StudyGermplasmListServiceImplTest extends IntegrationTestBase {
 
 	@Before
 	public void setup() {
-		this.service = new StudyGermplasmListServiceImpl(this.sessionProvder);
+		this.service = new StudyGermplasmServiceImpl(this.sessionProvder);
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager);
 		}
@@ -55,8 +55,8 @@ public class StudyGermplasmListServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmList() {
-		final List<StudyGermplasmDto> germplasmList = this.service.getGermplasmList(STUDY_ID);
+	public void testGetGermplasm() {
+		final List<StudyGermplasmDto> germplasmList = this.service.getGermplasm(STUDY_ID);
 		Assert.assertEquals(DataSetupTest.NUMBER_OF_GERMPLASM, germplasmList.size());
 		int index = 1;
 		for (final StudyGermplasmDto dto : germplasmList) {
@@ -79,7 +79,7 @@ public class StudyGermplasmListServiceImplTest extends IntegrationTestBase {
 		// Save entries for study list
 		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 		final Integer[] gids = this.germplasmTestDataGenerator
-			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, StudyGermplasmListServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX,
+			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX,
 				parentGermplasm);
 		this.gids = Arrays.asList(gids);
 		for (int i=1; i<=DataSetupTest.NUMBER_OF_GERMPLASM; i++) {

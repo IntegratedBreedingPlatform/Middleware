@@ -93,6 +93,10 @@ public class StockModel implements Serializable {
 	@Column(name = "is_obsolete")
 	private Boolean isObsolete;
 
+	@Basic(optional = false)
+	@Column(name = "project_id")
+	private Integer projectId;
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "stockModel")
 	@BatchSize(size = 5000)
 	private Set<StockProperty> properties;
@@ -193,6 +197,14 @@ public class StockModel implements Serializable {
 
 	public void setProperties(Set<StockProperty> properties) {
 		this.properties = properties;
+	}
+
+	public Integer getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Integer projectId) {
+		this.projectId = projectId;
 	}
 
 	@Override

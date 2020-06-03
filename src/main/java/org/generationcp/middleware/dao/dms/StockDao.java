@@ -33,7 +33,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -125,27 +124,55 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return studyReferences;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Set<StockModel> findInDataSet(final int datasetId)  {
-		final Set<StockModel> stockModels = new LinkedHashSet<>();
+	public List<StockModel> getStocksForStudy(final int studyId) {
 		try {
-
-			final String sql = "SELECT DISTINCT e.stock_id" + " FROM nd_experiment e "
-					+ " WHERE e.project_id = :projectId ORDER BY e.stock_id";
-			final Query query = this.getSession().createSQLQuery(sql);
-			query.setParameter("projectId", datasetId);
-			final List<Integer> ids = query.list();
-			for (final Integer id : ids) {
-				stockModels.add(this.getById(id));
-			}
-
+			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+			criteria.add(Restrictions.eq("projectId", studyId));
+			return criteria.list();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in findInDataSet=" + datasetId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
-		return stockModels;
 	}
 
-	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId)  {
+	public void deleteStocksForStudy(final int studyId) {
+		try {
+			final Query query = this.getSession().createQuery("DELETE FROM StockModel sm WHERE sm.projectId = :studyId");
+			query.setParameter("studyId", studyId);
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in deleteStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+		}
+	}
+
+	public long countStocksForStudy(final int studyId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+			criteria.add(Restrictions.eq("projectId", studyId));
+			criteria.setProjection(Projections.rowCount());
+			return ((Long) criteria.uniqueResult()).longValue();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in countStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+		}
+	}
+
+	public long countStocksByStudyAndEntryTypeIds(final int studyId, final List<String> systemDefinedEntryTypeIds) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+			criteria.createAlias("properties", "properties");
+			criteria.add(Restrictions.eq("projectId", studyId));
+			criteria.add(Restrictions.and(Restrictions.eq("properties.typeId", TermId.ENTRY_TYPE.getId()),
+				Restrictions.in("properties.value", systemDefinedEntryTypeIds)));
+			criteria.setProjection(Projections.rowCount());
+			return ((Long) criteria.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with countStocksByStudyAndEntryTypeIds(studyId=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage(),
+				e);
+		}
+	}
+
+	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId) {
 		try {
 
 			final String sql = "select count(distinct e.stock_id) "
@@ -209,5 +236,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		query.setResultTransformer(Transformers.aliasToBean(StudyGermplasmDto.class));
 		return query.list();
 	}
+
 
 }
