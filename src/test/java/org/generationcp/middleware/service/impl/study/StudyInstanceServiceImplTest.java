@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -84,7 +85,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	private Geolocation instance2;
 	private Geolocation instance3;
 
-
 	@Before
 	public void setup() throws Exception {
 
@@ -120,7 +120,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			this.studyDataManager
 				.addDataSet(this.studyReference.getId(), environmentVariables, datasetValues, null, DatasetTypeEnum.SUMMARY_DATA.getId());
 
-		if (this.instance1 == null){
+		if (this.instance1 == null) {
 			this.instance1 = this.testDataInitializer.createTestGeolocation("1", 1);
 			this.instance2 = this.testDataInitializer.createTestGeolocation("2", 2);
 			this.instance3 = this.testDataInitializer.createTestGeolocation("3", 3);
@@ -129,17 +129,18 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreateStudyInstance() {
+	public void testCreateStudyInstances() {
 
 		// Create instance 1
 		final Integer studyId = this.studyReference.getId();
-		final StudyInstance studyInstance1 =
-			this.studyInstanceService.createStudyInstance(this.cropType, studyId, this.environmentDataset.getId());
+		final List<StudyInstance> studyInstances =
+			this.studyInstanceService.createStudyInstances(this.cropType, studyId, this.environmentDataset.getId(), 2);
+		final StudyInstance studyInstance1 = studyInstances.get(0);
+
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
 		assertEquals(1, studyInstance1.getInstanceNumber());
-		assertNotNull(studyInstance1.getInstanceDbId());
-		assertNotNull(studyInstance1.getExperimentId());
+		assertNotNull(studyInstance1.getInstanceId());
 		assertNotNull(studyInstance1.getLocationId());
 		assertFalse(studyInstance1.isHasFieldmap());
 		assertEquals("Unspecified Location", studyInstance1.getLocationName());
@@ -150,13 +151,11 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertFalse(studyInstance1.isHasExperimentalDesign());
 
 		// Create instance 2
-		final StudyInstance studyInstance2 =
-			this.studyInstanceService.createStudyInstance(this.cropType, studyId, this.environmentDataset.getId());
+		final StudyInstance studyInstance2 = studyInstances.get(1);
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
 		assertEquals(2, studyInstance2.getInstanceNumber());
-		assertNotNull(studyInstance2.getInstanceDbId());
-		assertNotNull(studyInstance2.getExperimentId());
+		assertNotNull(studyInstance2.getInstanceId());
 		assertNotNull(studyInstance2.getLocationId());
 		assertFalse(studyInstance2.isHasFieldmap());
 		assertEquals("Unspecified Location", studyInstance2.getLocationName());
@@ -166,9 +165,9 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertFalse(studyInstance2.isHasMeasurements());
 		assertFalse(studyInstance2.isHasExperimentalDesign());
 
-		final List<Geolocation> studyInstances =
+		final List<Geolocation> geolocations =
 			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId);
-		Assert.assertEquals(2, studyInstances.size());
+		Assert.assertEquals(2, geolocations.size());
 	}
 
 	@Test
@@ -181,7 +180,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(3, studyInstances.size());
 
 		final StudyInstance studyInstance1 = studyInstances.get(0);
-		Assert.assertEquals(instance1.getLocationId().intValue(), studyInstance1.getInstanceDbId());
+		Assert.assertEquals(this.instance1.getLocationId().intValue(), studyInstance1.getInstanceId());
 		Assert.assertEquals(1, studyInstance1.getInstanceNumber());
 		Assert.assertNull(studyInstance1.getCustomLocationAbbreviation());
 		Assert.assertEquals("AFG", studyInstance1.getLocationAbbreviation());
@@ -193,7 +192,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertTrue(studyInstance1.isHasMeasurements());
 
 		final StudyInstance studyInstance2 = studyInstances.get(1);
-		Assert.assertEquals(instance2.getLocationId().intValue(), studyInstance2.getInstanceDbId());
+		Assert.assertEquals(this.instance2.getLocationId().intValue(), studyInstance2.getInstanceId());
 		Assert.assertEquals(2, studyInstance2.getInstanceNumber());
 		Assert.assertNull(studyInstance2.getCustomLocationAbbreviation());
 		Assert.assertEquals("ALB", studyInstance2.getLocationAbbreviation());
@@ -205,7 +204,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 
 		final StudyInstance studyInstance3 = studyInstances.get(2);
-		Assert.assertEquals(instance3.getLocationId().intValue(), studyInstance3.getInstanceDbId());
+		Assert.assertEquals(this.instance3.getLocationId().intValue(), studyInstance3.getInstanceId());
 		Assert.assertEquals(3, studyInstance3.getInstanceNumber());
 		Assert.assertNull(studyInstance3.getCustomLocationAbbreviation());
 		Assert.assertEquals("DZA", studyInstance3.getLocationAbbreviation());
@@ -221,8 +220,9 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		final DmsProject study = this.createTestStudy();
 
-		final StudyInstance studyInstance1 = this.studyInstanceService.getStudyInstance(study.getProjectId(), instance1.getLocationId()).get();
-		Assert.assertEquals(instance1.getLocationId().intValue(), studyInstance1.getInstanceDbId());
+		final StudyInstance studyInstance1 =
+			this.studyInstanceService.getStudyInstance(study.getProjectId(), this.instance1.getLocationId()).get();
+		Assert.assertEquals(this.instance1.getLocationId().intValue(), studyInstance1.getInstanceId());
 		Assert.assertEquals(1, studyInstance1.getInstanceNumber());
 		Assert.assertNull(studyInstance1.getCustomLocationAbbreviation());
 		Assert.assertEquals("AFG", studyInstance1.getLocationAbbreviation());
@@ -233,8 +233,9 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertFalse(studyInstance1.getCanBeDeleted());
 		Assert.assertTrue(studyInstance1.isHasMeasurements());
 
-		final StudyInstance studyInstance2 = this.studyInstanceService.getStudyInstance(study.getProjectId(), instance2.getLocationId()).get();
-		Assert.assertEquals(instance2.getLocationId().intValue(), studyInstance2.getInstanceDbId());
+		final StudyInstance studyInstance2 =
+			this.studyInstanceService.getStudyInstance(study.getProjectId(), this.instance2.getLocationId()).get();
+		Assert.assertEquals(this.instance2.getLocationId().intValue(), studyInstance2.getInstanceId());
 		Assert.assertEquals(2, studyInstance2.getInstanceNumber());
 		Assert.assertNull(studyInstance2.getCustomLocationAbbreviation());
 		Assert.assertEquals("ALB", studyInstance2.getLocationAbbreviation());
@@ -245,8 +246,9 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertFalse(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 
-		final StudyInstance studyInstance3 = this.studyInstanceService.getStudyInstance(study.getProjectId(), instance3.getLocationId()).get();
-		Assert.assertEquals(instance3.getLocationId().intValue(), studyInstance3.getInstanceDbId());
+		final StudyInstance studyInstance3 =
+			this.studyInstanceService.getStudyInstance(study.getProjectId(), this.instance3.getLocationId()).get();
+		Assert.assertEquals(this.instance3.getLocationId().intValue(), studyInstance3.getInstanceId());
 		Assert.assertEquals(3, studyInstance3.getInstanceNumber());
 		Assert.assertNull(studyInstance3.getCustomLocationAbbreviation());
 		Assert.assertEquals("DZA", studyInstance3.getLocationAbbreviation());
@@ -269,35 +271,36 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 				.createDmsProject("Plot Dataset", "Plot Dataset-Description", study, study, DatasetTypeEnum.PLOT_DATA);
 		final DmsProject subObsDataset =
 			this.testDataInitializer
-				.createDmsProject("Subobs Dataset", "Subobs Dataset-Description", study, plotDataset, DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS);
+				.createDmsProject("Subobs Dataset", "Subobs Dataset-Description", study, plotDataset,
+					DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS);
 		final GermplasmList advanceList = GermplasmListTestDataInitializer.createGermplasmListWithType(null,
 			GermplasmListType.ADVANCED.name());
 		advanceList.setProjectId(study.getProjectId());
 		this.daoFactory.getGermplasmListDAO().save(advanceList);
 
-		this.testDataInitializer.addGeolocationProp(instance1, TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+		this.testDataInitializer.addGeolocationProp(this.instance1, TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
 			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), 1);
-		this.testDataInitializer.addGeolocationProp(instance2, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5), 1);
+		this.testDataInitializer.addGeolocationProp(this.instance2, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5), 1);
 
 		// Instance 1
-		this.testDataInitializer.createTestExperiment(environmentDataset, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
 		final ExperimentModel instance1PlotExperiment =
-			this.testDataInitializer.createTestExperiment(plotDataset, instance1, TermId.PLOT_EXPERIMENT.getId(), "1", null);
+			this.testDataInitializer.createTestExperiment(plotDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", null);
 		// Create 2 Sub-obs records
 		final ExperimentModel instance1SubObsExperiment1 =
 			this.testDataInitializer
-				.createTestExperiment(subObsDataset, instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
+				.createTestExperiment(subObsDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
 		this.savePhenotype(instance1SubObsExperiment1);
 		final ExperimentModel instance1SubObsExperiment2 = this.testDataInitializer
-			.createTestExperiment(subObsDataset, instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
+			.createTestExperiment(subObsDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
 		this.savePhenotype(instance1SubObsExperiment2);
 
 		// Instance 2
-		this.testDataInitializer.createTestExperiment(environmentDataset, instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
-		this.testDataInitializer.createTestExperiment(plotDataset, instance2, TermId.PLOT_EXPERIMENT.getId(), "1", null);
+		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		this.testDataInitializer.createTestExperiment(plotDataset, this.instance2, TermId.PLOT_EXPERIMENT.getId(), "1", null);
 
 		// Instance 3 has no plot experiments
-		this.testDataInitializer.createTestExperiment(environmentDataset, instance3, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance3, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
 		return study;
 	}
 
@@ -323,46 +326,47 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		this.testDataInitializer.addGeolocationProp(instance3, TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
 			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), 1);
 
-		final Integer studyExperimentId = this.createTestExperiments(study, environmentDataset, plotDataset, instance1, instance2, instance3);
+		final Integer studyExperimentId =
+			this.createTestExperiments(study, environmentDataset, plotDataset, instance1, instance2, instance3);
 		final Integer studyId = study.getProjectId();
 
 		// Delete Instance 2
 		final Integer instance2LocationId = instance2.getLocationId();
-		this.studyInstanceService.deleteStudyInstance(studyId, instance2LocationId);
+		this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance2LocationId));
 
 		List<StudyInstance> studyInstances =
 			this.studyInstanceService.getStudyInstances(studyId);
 		Assert.assertEquals(2, studyInstances.size());
 		final Integer instance1LocationId = instance1.getLocationId();
-		Assert.assertEquals(instance1LocationId, this.daoFactory.getExperimentDao().getById(studyExperimentId).getGeoLocation().getLocationId());
+		Assert.assertEquals(instance1LocationId,
+			this.daoFactory.getExperimentDao().getById(studyExperimentId).getGeoLocation().getLocationId());
 		for (final StudyInstance instance : studyInstances) {
 			Assert.assertNotEquals(2, instance.getInstanceNumber());
-			Assert.assertNotEquals(instance2LocationId.intValue(), instance.getInstanceDbId());
+			Assert.assertNotEquals(instance2LocationId.intValue(), instance.getInstanceId());
 		}
 		// Confirm geolocation and its properties have been deleted
 		Assert.assertNull(this.daoFactory.getGeolocationDao().getById(instance2LocationId));
 		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getGeolocationPropertyDao().getByGeolocation(instance2LocationId)));
 
-
 		// Delete Instance 1 - study experiment Geolocation ID will be updated to next available geolocation
-		this.studyInstanceService.deleteStudyInstance(studyId, instance1LocationId);
+		this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance1LocationId));
 		this.sessionProvder.getSession().flush();
 
 		studyInstances =
 			this.studyInstanceService.getStudyInstances(studyId);
 		Assert.assertEquals(1, studyInstances.size());
 		Assert.assertNotEquals(2, studyInstances.get(0).getInstanceNumber());
-		Assert.assertNotEquals(instance2LocationId.intValue(), studyInstances.get(0).getInstanceDbId());
+		Assert.assertNotEquals(instance2LocationId.intValue(), studyInstances.get(0).getInstanceId());
 		final Integer instance3LocationId = instance3.getLocationId();
-		Assert.assertEquals(instance3LocationId, this.daoFactory.getExperimentDao().getById(studyExperimentId).getGeoLocation().getLocationId());
+		Assert.assertEquals(instance3LocationId,
+			this.daoFactory.getExperimentDao().getById(studyExperimentId).getGeoLocation().getLocationId());
 		// Confirm geolocation and its properties have been deleted
 		Assert.assertNull(this.daoFactory.getGeolocationDao().getById(instance1LocationId));
 		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getGeolocationPropertyDao().getByGeolocation(instance1LocationId)));
 
-
 		// Delete Instance 3 - should throw exception
 		try {
-			this.studyInstanceService.deleteStudyInstance(studyId, instance3LocationId);
+			this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance3LocationId));
 			Assert.fail("Should have thrown exception when attempting to delete last environment.");
 		} catch (final MiddlewareQueryException e) {
 			// Perform assertions outside
@@ -370,7 +374,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		studyInstances =
 			this.studyInstanceService.getStudyInstances(studyId);
 		Assert.assertEquals(1, studyInstances.size());
-		Assert.assertEquals(instance3LocationId, this.daoFactory.getExperimentDao().getById(studyExperimentId).getGeoLocation().getLocationId());
+		Assert.assertEquals(instance3LocationId,
+			this.daoFactory.getExperimentDao().getById(studyExperimentId).getGeoLocation().getLocationId());
 		Assert.assertNotNull(this.daoFactory.getGeolocationDao().getById(instance3LocationId));
 		Assert.assertFalse(CollectionUtils.isEmpty(this.daoFactory.getGeolocationPropertyDao().getByGeolocation(instance3LocationId)));
 	}

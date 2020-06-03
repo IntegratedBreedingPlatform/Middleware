@@ -35,6 +35,8 @@ public class MeasurementData {
 	private String dataType;
 	private Integer phenotypeId;
 	private MeasurementVariable measurementVariable;
+	private Integer experimentPropertyId;
+
 
 	private boolean isAccepted;
 	private String oldValue;
@@ -404,5 +406,13 @@ public class MeasurementData {
 
 	public void setValueStatus(final Phenotype.ValueStatus valueStatus) {
 		this.valueStatus = valueStatus;
+	}
+
+	public Integer getExperimentPropertyId() {
+		return this.experimentPropertyId;
+	}
+
+	public void setExperimentPropertyId(final Integer experimentPropertyId) {
+		this.experimentPropertyId = experimentPropertyId;
 	}
 }

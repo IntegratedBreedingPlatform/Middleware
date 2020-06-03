@@ -1,19 +1,27 @@
 package org.generationcp.middleware.service.api.study;
 
-import com.google.common.base.Optional;
+import org.generationcp.middleware.domain.dms.InstanceData;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StudyInstanceService {
 
-	StudyInstance createStudyInstance(final CropType crop, final int studyId, final int datasetId);
+	List<StudyInstance> createStudyInstances(CropType crop, int studyId, int datasetId, Integer numberOfInstancesToGenerate);
 
 	List<StudyInstance> getStudyInstances(int studyId);
 
-	void deleteStudyInstance(final Integer studyId, final Integer instanceId);
+	void deleteStudyInstances(Integer studyId, List<Integer> instanceIds);
 
-	Optional<StudyInstance> getStudyInstance(final int studyId, final Integer instanceId);
+	Optional<StudyInstance> getStudyInstance(int studyId, Integer instanceId);
+
+	InstanceData addInstanceData(InstanceData instanceData, boolean isEnvironmentCondition);
+
+	InstanceData updateInstanceData(InstanceData instanceData, boolean isEnvironmentCondition);
+
+	Optional<InstanceData> getInstanceData(Integer environmentId, final Integer environmentDataId, boolean isEnvironmentCondition);
+
 
 }

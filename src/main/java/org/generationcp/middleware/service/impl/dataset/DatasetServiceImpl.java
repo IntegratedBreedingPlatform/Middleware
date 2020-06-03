@@ -96,7 +96,11 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.TREATMENT_FACTOR.getId(),
 		VariableType.OBSERVATION_UNIT.getId());
 
-	protected static final List<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList(
+	protected static final List<Integer> ENVIRONMENT_DATASET_VARIABLE_TYPES = Lists.newArrayList(
+		VariableType.ENVIRONMENT_DETAIL.getId(),
+		VariableType.STUDY_CONDITION.getId());
+
+	protected static final List<Integer> OBSERVATION_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.OBSERVATION_UNIT.getId(),
 		VariableType.TRAIT.getId(),
 		VariableType.SELECTION_METHOD.getId());
@@ -414,6 +418,11 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public boolean isValidDatasetId(final Integer datasetId) {
+		return this.daoFactory.getDmsProjectDAO().isValidDatasetId(datasetId);
+	}
+
+	@Override
 	public Phenotype getPhenotype(final Integer observationUnitId, final Integer observationId) {
 		return this.daoFactory.getPhenotypeDAO().getPhenotype(observationUnitId, observationId);
 	}
@@ -544,9 +553,12 @@ public class DatasetServiceImpl implements DatasetService {
 	public DatasetDTO getDataset(final Integer datasetId) {
 		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
 		if (datasetDTO != null) {
+			final DatasetType datasetType = this.daoFactory.getDatasetTypeDao().getById(datasetDTO.getDatasetTypeId());
 			datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
+			final List<Integer> variableTypes = DatasetTypeEnum.SUMMARY_DATA.getId() == datasetDTO.getDatasetTypeId() ?
+				DatasetServiceImpl.ENVIRONMENT_DATASET_VARIABLE_TYPES : DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES;
 			datasetDTO.setVariables(
-				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
+				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, variableTypes));
 			datasetDTO.setHasPendingData(this.daoFactory.getPhenotypeDAO().countPendingDataOfDataset(datasetId) > 0);
 			datasetDTO.setHasOutOfSyncData(this.daoFactory.getPhenotypeDAO().hasOutOfSync(datasetId));
 		}
@@ -955,6 +967,11 @@ public class DatasetServiceImpl implements DatasetService {
 		if (!draftMode) {
 			this.reorganizePhenotypesStatus(studyId, phenotypes);
 		}
+	}
+
+	@Override
+	public boolean allDatasetIdsBelongToStudy(final Integer studyId, final List<Integer> datasetIds) {
+		return this.daoFactory.getDmsProjectDAO().allDatasetIdsBelongToStudy(studyId, datasetIds);
 	}
 
 	private void acceptDraftData(final Phenotype phenotype) {

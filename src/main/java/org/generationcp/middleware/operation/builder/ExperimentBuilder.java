@@ -386,6 +386,7 @@ public class ExperimentBuilder extends Builder {
 		variable.setValue(property.getValue());
 		variable.getVariableType().setRole(role);
 		variable.getVariableType().getStandardVariable().setPhenotypicType(role);
+		variable.setExperimentPropertyId(property.getNdExperimentpropId());
 		return variable;
 	}
 
@@ -395,6 +396,7 @@ public class ExperimentBuilder extends Builder {
 		variable.setVariableType(variableTypes.findById(property.getTypeId()), hasVariableType);
 		variable.setValue(property.getValue());
 		variable.getVariableType().setRole(role);
+		variable.setExperimentPropertyId(property.getNdExperimentpropId());
 		return variable;
 	}
 

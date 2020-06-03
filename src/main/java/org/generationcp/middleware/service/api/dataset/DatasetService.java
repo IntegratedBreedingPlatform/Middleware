@@ -61,6 +61,8 @@ public interface DatasetService {
 	 */
 	boolean isValidObservationUnit(Integer datasetId, Integer observationUnitId);
 
+	boolean isValidDatasetId(Integer datasetId);
+
 	/**
 	 * Given an observationUnitId, observationId, returns a Phenotype
 	 *
@@ -393,4 +395,6 @@ public interface DatasetService {
 	 * @param studyId
 	 */
 	void setValueToVariable(Integer datasetId, ObservationUnitsParamDTO searchDTO, Integer studyId);
+
+	boolean allDatasetIdsBelongToStudy(final Integer studyId, List<Integer> datasetIds);
 }

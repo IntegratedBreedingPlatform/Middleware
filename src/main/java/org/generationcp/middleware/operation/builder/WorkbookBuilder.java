@@ -1042,11 +1042,16 @@ public class WorkbookBuilder extends Builder {
 			if (standardVariableDataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
 				&& standardVariable.getId() != TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
 				final Integer id = value != null && NumberUtils.isNumber(value) ? Integer.valueOf(value) : null;
-				return new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
+				final MeasurementData measurementData = new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
 					this.getDataType(standardVariableDataTypeId), id, factor);
+				measurementData.setExperimentPropertyId(variable.getExperimentPropertyId());
+				return measurementData;
 			}
-			return new MeasurementData(variableType.getLocalName(), value, isEditable,
+
+			final MeasurementData measurementData = new MeasurementData(variableType.getLocalName(), value, isEditable,
 				this.getDataType(standardVariableDataTypeId), factor);
+			measurementData.setExperimentPropertyId(variable.getExperimentPropertyId());
+			return measurementData;
 		}
 		return null;
 	}

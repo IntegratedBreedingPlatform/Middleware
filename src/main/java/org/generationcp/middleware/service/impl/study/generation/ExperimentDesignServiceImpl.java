@@ -1,7 +1,6 @@
 package org.generationcp.middleware.service.impl.study.generation;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -34,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Transactional
@@ -100,7 +100,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		if (projectProp != null && projectProp.getValue() != null && NumberUtils.isDigits(projectProp.getValue())) {
 			return Optional.of(Integer.valueOf(projectProp.getValue()));
 		}
-		return Optional.absent();
+		return Optional.empty();
 	}
 
 	private void saveVariables(final List<MeasurementVariable> variables, final Integer plotDatasetId, final Integer environmentDatasetId,  final List<Geolocation> geolocations) {
@@ -207,7 +207,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		if (geolocation != null) {
 			return Optional.of(geolocation);
 		}
-		return Optional.absent();
+		return Optional.empty();
 	}
 
 	private void deleteTrialInstanceExperiments(final Integer plotDatasetId, final Integer environmentDatasetId, final List<Integer> instanceNumbers) {
