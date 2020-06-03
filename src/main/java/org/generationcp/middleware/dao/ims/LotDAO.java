@@ -476,12 +476,18 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				query.append("and lot.lotid IN (").append(Joiner.on(",").join(lotsSearchDto.getLotIds())).append(") ");
 			}
 
+			if (lotsSearchDto.getLotUUIds() != null && !lotsSearchDto.getLotUUIds().isEmpty()) {
+				query.append("and lot.lot_uuid IN ('").append(Joiner.on("','").join(lotsSearchDto.getLotUUIds().toArray())).append("') ");
+			}
+
 			if (lotsSearchDto.getGids() != null && !lotsSearchDto.getGids().isEmpty()) {
-				query.append("and lot.eid IN (").append(Joiner.on(",").join(lotsSearchDto.getGids())).append(") and lot.etype = 'GERMPLSM' ");
+				query.append("and lot.eid IN (").append(Joiner.on(",").join(lotsSearchDto.getGids()))
+					.append(") and lot.etype = 'GERMPLSM' ");
 			}
 
 			if (lotsSearchDto.getMgids() != null && !lotsSearchDto.getMgids().isEmpty()) {
-				query.append("and g.mgid IN (").append(Joiner.on(",").join(lotsSearchDto.getMgids())).append(") and lot.etype = 'GERMPLSM' ");
+				query.append("and g.mgid IN (").append(Joiner.on(",").join(lotsSearchDto.getMgids()))
+					.append(") and lot.etype = 'GERMPLSM' ");
 			}
 
 			if (lotsSearchDto.getLocationIds() != null && !lotsSearchDto.getLocationIds().isEmpty()) {
