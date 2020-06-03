@@ -1194,7 +1194,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
 				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 or (select count(1) from nd_experiment exp \n"
 				+ " INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 \n"
-				+ " INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0"
+				+ " INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 \n"
+				+ " or (select count(1) from ims_experiment_transaction iet inner join nd_experiment ne on ne.nd_experiment_id = iet.nd_experiment_id \n"
+				+ " inner join ims_transaction it on it.trnid = iet.trnid where it.trnstat <> 9 and ne.nd_geolocation_id = geoloc.nd_geolocation_id) > 0  "
 				+ " then 0 else 1 end as canBeDeleted, "
 
 				// if study has any pending or accepted plot observations, hasMeasurements = true
