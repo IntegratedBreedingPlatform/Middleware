@@ -136,7 +136,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public List<StockModel> getStocksForStudy(final int studyId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
-			criteria.add(Restrictions.eq("projectId", studyId));
+			criteria.add(Restrictions.eq("project.projectId", studyId));
 			return criteria.list();
 		} catch (final HibernateException e) {
 			final String errorMessage = "Error in getStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
@@ -147,7 +147,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	public void deleteStocksForStudy(final int studyId) {
 		try {
-			final Query query = this.getSession().createQuery("DELETE FROM StockModel sm WHERE sm.projectId = :studyId");
+			final Query query = this.getSession().createQuery("DELETE FROM StockModel sm WHERE sm.project.projectId = :studyId");
 			query.setParameter("studyId", studyId);
 			query.executeUpdate();
 		} catch (final HibernateException e) {
@@ -160,7 +160,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public long countStocksForStudy(final int studyId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
-			criteria.add(Restrictions.eq("projectId", studyId));
+			criteria.add(Restrictions.eq("project.projectId", studyId));
 			criteria.setProjection(Projections.rowCount());
 			return ((Long) criteria.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
@@ -174,7 +174,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
 			criteria.createAlias("properties", "properties");
-			criteria.add(Restrictions.eq("projectId", studyId));
+			criteria.add(Restrictions.eq("project.projectId", studyId));
 			criteria.add(Restrictions.and(Restrictions.eq("properties.typeId", TermId.ENTRY_TYPE.getId()),
 				Restrictions.in("properties.value", systemDefinedEntryTypeIds)));
 			criteria.setProjection(Projections.rowCount());
