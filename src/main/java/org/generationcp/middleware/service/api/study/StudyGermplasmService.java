@@ -21,4 +21,6 @@ public interface StudyGermplasmService {
 
 	Map<Integer, String> getInventoryStockIdMap(List<StudyGermplasmDto> studyGermplasmDtoList);
 
+	boolean isValidStudyGermplasm(int studyId, int entryId);
+
 }

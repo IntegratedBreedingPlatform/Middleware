@@ -100,6 +100,15 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 
 	}
 
+	@Override
+	public boolean isValidStudyGermplasm(final int studyId, final int entryId) {
+		final StockModel stock = this.daoFactory.getStockDao().getById(entryId);
+		if (stock != null) {
+			return studyId == stock.getProjectId();
+		}
+		return false;
+	}
+
 	private String findStockPropValue(final Integer termId, final Set<StockProperty> properties) {
 		if (properties != null) {
 			for (final StockProperty property : properties) {
