@@ -83,5 +83,5 @@ public interface StudyService {
 
 	long countStudies(StudySearchFilter studySearchFilter);
 
-	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId)
+	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
 }
