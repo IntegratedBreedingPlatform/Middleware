@@ -93,9 +93,9 @@ public class StockModel implements Serializable {
 	@Column(name = "is_obsolete")
 	private Boolean isObsolete;
 
-	@Basic(optional = false)
-	@Column(name = "project_id")
-	private Integer projectId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "project_id")
+	private DmsProject project;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "stockModel")
 	@BatchSize(size = 5000)
@@ -199,12 +199,12 @@ public class StockModel implements Serializable {
 		this.properties = properties;
 	}
 
-	public Integer getProjectId() {
-		return projectId;
+	public DmsProject getProject() {
+		return project;
 	}
 
-	public void setProjectId(Integer projectId) {
-		this.projectId = projectId;
+	public void setProject(final DmsProject project) {
+		this.project = project;
 	}
 
 	@Override

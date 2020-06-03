@@ -2,6 +2,7 @@ package org.generationcp.middleware.domain.study;
 
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -13,7 +14,7 @@ public class StudyGermplasmMapper {
 
     public StockModel map(final Integer studyId, final StudyGermplasmDto studyGermplasmDto) {
         final StockModel stockModel = new StockModel();
-        stockModel.setProjectId(studyId);
+        stockModel.setProject(new DmsProject(studyId));
         stockModel.setName(studyGermplasmDto.getDesignation());
         stockModel.setGermplasm(new Germplasm(Integer.valueOf(studyGermplasmDto.getGermplasmId())));
         stockModel.setTypeId(TermId.ENTRY_CODE.getId());

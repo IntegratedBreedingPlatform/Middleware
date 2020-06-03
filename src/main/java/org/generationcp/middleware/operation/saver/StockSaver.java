@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 
@@ -33,7 +34,7 @@ public class StockSaver extends Saver {
 	public Integer saveStock(final int studyId, final VariableList variableList) {
 		final StockModel stockModel = this.createStock(variableList, null);
 		if (stockModel != null) {
-			stockModel.setProjectId(studyId);
+			stockModel.setProject(new DmsProject(studyId));
 			this.getStockDao().save(stockModel);
 			return stockModel.getStockId();
 		}
