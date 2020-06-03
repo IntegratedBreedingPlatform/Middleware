@@ -469,6 +469,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "       INNER JOIN workbench.users users on users.userid = lot.userid " //
 		+ "WHERE g.deleted=0 "; //
 
+	// FIXME setParameter/setParameterList (SqlQueryParamBuilder)
 	private String buildSearchLotsQuery(final LotsSearchDto lotsSearchDto) {
 		final StringBuilder query = new StringBuilder(SEARCH_LOT_QUERY);
 		if (lotsSearchDto != null) {

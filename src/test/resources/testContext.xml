@@ -259,4 +259,8 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="studyTransactionsService" class="org.generationcp.middleware.api.inventory.study.StudyTransactionsServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
 </beans>

@@ -12,6 +12,9 @@
 package org.generationcp.middleware.dao.ims;
 
 import com.google.common.base.Joiner;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
+import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -22,6 +25,7 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
+import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -31,6 +35,8 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanConstructorResultTransformer;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -42,9 +48,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link Transaction}.
@@ -441,6 +449,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ " WHERE"//
 		+ "    lot.etype = 'GERMPLSM' and g.deleted=0 "; //
 
+	// FIXME setParameter/setParameterList (SqlQueryParamBuilder)
 	private String buildSearchTransactionsQuery(final TransactionsSearchDto transactionsSearchDto) {
 		final StringBuilder query = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
 		if (transactionsSearchDto != null) {
@@ -645,6 +654,34 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
+	private Constructor<StudyTransactionsDto> getStudyTransactionsDtoConstructor() {
+		try {
+			return StudyTransactionsDto.class.getConstructor(
+				Integer.class, // transactionId
+				String.class,    // createdByUsername
+				String.class,    // transactionType
+				Double.class,    // amount
+				String.class,    // notes
+				Date.class,      // createdDate
+				Integer.class,   // lotId
+				String.class,    // lotUUID
+				Integer.class,   // gid
+				String.class,    // designation
+				String.class,    // stockId
+				Integer.class,   // scaleId
+				String.class,    // scaleName
+				String.class,    // lotStatus
+				String.class,    // transactionStatus
+				Integer.class,   // locationId
+				String.class,    // locationName
+				String.class,    // locationAbbr
+				String.class     // comments
+			);
+		} catch (final NoSuchMethodException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
 	private void addSearchTransactionsQueryScalars(final SQLQuery query) {
 		query.addScalar("transactionId");
 		query.addScalar("createdByUsername");
@@ -672,5 +709,143 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		super.update(transaction);
 		this.getSession().flush();
 		return transaction;
+	}
+
+	public long countAllStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest) {
+		final StringBuilder obsUnitsQuerySql = this.buildObsUnitsQuery();
+		final StringBuilder transactionsQuerySql = this.buildTransactionsQuery(null, obsUnitsQuerySql);
+
+		final SQLQuery transactionsQuery =
+			this.getSession().createSQLQuery("select count(1) from ( " + transactionsQuerySql.toString() + ") T");
+		transactionsQuery.setParameter("studyId", studyId);
+
+		return ((BigInteger) transactionsQuery.uniqueResult()).longValue();
+	}
+
+	public long countFilteredStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest) {
+		final StringBuilder obsUnitsQuerySql = this.buildObsUnitsQuery();
+		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQuerySql), studyTransactionsRequest);
+		final StringBuilder transactionsQuerySql = this.buildTransactionsQuery(studyTransactionsRequest.getTransactionsSearch(), obsUnitsQuerySql);
+
+		final SQLQuery transactionsQuery =
+			this.getSession().createSQLQuery("select count(1) from ( " + transactionsQuerySql.toString() + ") T");
+		transactionsQuery.setParameter("studyId", studyId);
+		addObsUnitFilters(new SqlQueryParamBuilder(transactionsQuery), studyTransactionsRequest);
+
+		return ((BigInteger) transactionsQuery.uniqueResult()).longValue();
+	}
+
+	public List<StudyTransactionsDto> searchStudyTransactions(final Integer studyId,
+		final StudyTransactionsRequest studyTransactionsRequest) {
+
+		final StringBuilder obsUnitsQuerySql = this.buildObsUnitsQuery();
+		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQuerySql), studyTransactionsRequest);
+
+		final StringBuilder transactionsQuerySql = this.buildTransactionsQuery(studyTransactionsRequest.getTransactionsSearch(), obsUnitsQuerySql);
+
+		addSortedPageRequestOrderBy(transactionsQuerySql, studyTransactionsRequest.getSortedPageRequest());
+
+		// transactions query
+		final SQLQuery transactionsQuery = this.getSession().createSQLQuery(transactionsQuerySql.toString());
+		transactionsQuery.setParameter("studyId", studyId);
+		addObsUnitFilters(new SqlQueryParamBuilder(transactionsQuery), studyTransactionsRequest);
+		addSortedPageRequestPagination(transactionsQuery, studyTransactionsRequest.getSortedPageRequest());
+		this.addSearchTransactionsQueryScalars(transactionsQuery);
+		transactionsQuery.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getStudyTransactionsDtoConstructor()));
+		final List<StudyTransactionsDto> transactions = transactionsQuery.list();
+
+		// obs units query
+		final SQLQuery obsUnitsQuery = this.getSession().createSQLQuery(obsUnitsQuerySql.toString());
+		obsUnitsQuery.setParameter("studyId", studyId);
+		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQuery), studyTransactionsRequest);
+		obsUnitsQuery.addScalar("ndExperimentId").addScalar("transactionId").addScalar("instanceNo", new IntegerType())
+			.addScalar("entryType").addScalar("entryNo", new IntegerType()).addScalar("repNo", new IntegerType())
+			.addScalar("blockNo", new IntegerType()).addScalar("plotNo", new IntegerType()).addScalar("obsUnitId");
+		obsUnitsQuery.setResultTransformer(Transformers.aliasToBean(StudyTransactionsDto.ObservationUnitDto.class));
+		final List<StudyTransactionsDto.ObservationUnitDto> obsUnits = obsUnitsQuery.list();
+
+		// mapping
+
+		final Map<Integer, List<StudyTransactionsDto.ObservationUnitDto>> obsUnitsByTransactionId =
+			obsUnits.stream().collect(Collectors.groupingBy(StudyTransactionsDto.ObservationUnitDto::getTransactionId,
+				LinkedHashMap::new, Collectors.toList()));
+
+		for (final StudyTransactionsDto transaction : transactions) {
+			if (obsUnitsByTransactionId.get(transaction.getTransactionId()) != null) {
+				transaction.setObservationUnits(obsUnitsByTransactionId.get(transaction.getTransactionId()));
+			}
+		}
+
+		return transactions;
+	}
+
+	private StringBuilder buildTransactionsQuery(
+		final TransactionsSearchDto transactionsSearchDto,
+		final StringBuilder obsUnitsQuerySql) {
+
+		return new StringBuilder(""  //
+				+ " select SEARCH_TRANSACTIONS_QUERY.* " //
+				+ " from ( " //
+				+ 		this.buildSearchTransactionsQuery(transactionsSearchDto) //
+				+ " ) SEARCH_TRANSACTIONS_QUERY inner join ( " //
+				+ 		obsUnitsQuerySql //
+				+ " ) OBS_UNITS_QUERY on SEARCH_TRANSACTIONS_QUERY.transactionId = OBS_UNITS_QUERY.transactionId " //
+				+ " group by SEARCH_TRANSACTIONS_QUERY.transactionId ");
+	}
+
+	private StringBuilder buildObsUnitsQuery() {
+		return new StringBuilder("" //
+			+ "     select iet.nd_experiment_id as ndExperimentId, " //
+			+ "         iet.trnid as transactionId, " //
+			+ "         cast(ndgeo.description as unsigned) as instanceNo, " //
+			+ "         (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS entryType, "  //
+			+ "         (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'REP_NO') AS repNo, "  //
+			+ "         (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') AS blockNo, "  //
+			+ "         cast(s.uniquename as unsigned) as entryNo, " //
+			+ "         cast((SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO') as unsigned) AS plotNo, "  //
+			+ "         plot.obs_unit_id as obsUnitId " //
+			+ "     from ims_experiment_transaction iet " //
+			+ "              inner join nd_experiment plot on iet.nd_experiment_id = plot.nd_experiment_id " //
+			+ "              inner join nd_geolocation ndgeo on plot.nd_geolocation_id = ndgeo.nd_geolocation_id " //
+			+ "              inner join project plotdata on plot.project_id = plotdata.project_id "
+			+ "              inner join project study on plotdata.study_id = study.project_id "
+			+ "	             inner join stock s on s.stock_id = plot.stock_id " //
+			+ "     where study.project_id = :studyId"
+			+ "     having 1 = 1 ");
+	}
+
+	/**
+	 * Filter obs units following the inventory filters convention, using list of ids for numeric values
+	 */
+	private static void addObsUnitFilters(final SqlQueryParamBuilder paramBuilder,
+		final StudyTransactionsRequest studyTransactionsRequest) {
+
+		if (studyTransactionsRequest == null) {
+			return;
+		}
+
+		final List<Integer> instanceNoList = studyTransactionsRequest.getInstanceNoList();
+		if (instanceNoList != null && !instanceNoList.isEmpty()) {
+			paramBuilder.append(" and instanceNo in (:instanceNoList) ");
+			paramBuilder.setParameterList("instanceNoList", instanceNoList);
+		}
+
+		final List<Integer> plotNoList = studyTransactionsRequest.getPlotNoList();
+		if (plotNoList != null && !plotNoList.isEmpty()) {
+			paramBuilder.append(" and plotNo in (:plotNoList) ");
+			paramBuilder.setParameterList("plotNoList", plotNoList);
+		}
+
+		final List<Integer> entryNoList = studyTransactionsRequest.getEntryNoList();
+		if (entryNoList != null && !entryNoList.isEmpty()) {
+			paramBuilder.append(" and entryNo in (:entryNoList) ");
+			paramBuilder.setParameterList("entryNoList", entryNoList);
+		}
+
+		final String entryType = studyTransactionsRequest.getEntryType();
+		if (!StringUtils.isBlank(entryType)) {
+			paramBuilder.append(" and entryType like :entryType ");
+			paramBuilder.setParameter("entryType", "%" + entryType + "%");
+		}
 	}
 }
