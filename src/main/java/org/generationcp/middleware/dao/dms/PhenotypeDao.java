@@ -1251,10 +1251,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		statement.executeUpdate();
 	}
 
-	public Phenotype getPhenotype(final Integer experimentId, final Integer phenotypeId) {
+	public Phenotype getPhenotype(final Integer instanceId, final Integer phenotypeId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.createAlias("experiment", "experiment");
 		criteria.add(Restrictions.eq("phenotypeId", phenotypeId));
-		criteria.add(Restrictions.eq("experiment.ndExperimentId", experimentId));
+		criteria.add(Restrictions.eq("experiment.geoLocation.locationId", instanceId));
 		return (Phenotype) criteria.uniqueResult();
 	}
 

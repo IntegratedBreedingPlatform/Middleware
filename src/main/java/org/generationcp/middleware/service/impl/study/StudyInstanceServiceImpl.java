@@ -194,8 +194,11 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 		// Environment conditions are stored in phenotype. Other environment details are saved in nd_experimentprop
 		if (isEnvironmentCondition) {
+			final ExperimentModel experimentModel =
+				this.daoFactory.getExperimentDao()
+					.getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), instanceData.getInstanceId());
 			final Phenotype phenotype =
-				new Phenotype(variableId, instanceData.getValue(), new ExperimentModel(instanceData.getInstanceId()));
+				new Phenotype(variableId, instanceData.getValue(), experimentModel);
 			phenotype.setCreatedDate(new Date());
 			phenotype.setUpdatedDate(new Date());
 			phenotype.setcValue(instanceData.getCategoricalValueId());
@@ -205,7 +208,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			instanceData.setInstanceDataId(phenotype.getPhenotypeId());
 		} else {
 			final ExperimentModel experimentModel =
-				this.daoFactory.getExperimentDao().getExperimentByInstanceId(instanceData.getInstanceId());
+				this.daoFactory.getExperimentDao()
+					.getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), instanceData.getInstanceId());
 			final String value = this.getEnvironmentDataValue(instanceData);
 			final ExperimentProperty property =
 				new ExperimentProperty(experimentModel, value, 1, instanceData.getVariableId());
@@ -264,7 +268,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 						phenotype.getValue(), phenotype.getcValueId()));
 			}
 		} else {
-			final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getExperimentByInstanceId(instanceId);
+			final ExperimentModel experimentModel =
+				this.daoFactory.getExperimentDao().getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), instanceId);
 			final ExperimentProperty property =
 				this.daoFactory.getExperimentPropertyDao().getExperimentProperty(experimentModel.getNdExperimentId(), environmentDataId);
 			if (property != null) {
