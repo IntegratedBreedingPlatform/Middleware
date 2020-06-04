@@ -1009,7 +1009,7 @@ public class WorkbookBuilder extends Builder {
 					value = experiment.getObsUnitId();
 				}
 				measurementData = new MeasurementData(factor.getName(), value, isEditable,
-					this.getDataType(factor.getDataTypeId()), factor.getTermId(), factor);
+					this.getDataType(factor.getDataTypeId()), null, factor);
 			}
 			measurementDataList.add(measurementData);
 		}
