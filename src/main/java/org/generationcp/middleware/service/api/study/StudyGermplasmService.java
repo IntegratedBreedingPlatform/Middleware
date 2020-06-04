@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.api.study;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public interface StudyGermplasmService {
@@ -21,7 +22,7 @@ public interface StudyGermplasmService {
 
 	Map<Integer, String> getInventoryStockIdMap(List<StudyGermplasmDto> studyGermplasmDtoList);
 
-	boolean isValidStudyGermplasm(int studyId, int entryId);
+	Optional<StudyGermplasmDto> getStudyGermplasm(int studyId, int entryId);
 
 	StudyGermplasmDto replaceStudyGermplasm(int studyId, int entryId, int gid, String crossExpansion);
 

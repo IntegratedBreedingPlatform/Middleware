@@ -4,6 +4,7 @@ package org.generationcp.middleware.service.impl.study;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -103,12 +104,15 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public boolean isValidStudyGermplasm(final int studyId, final int entryId) {
+	public Optional<StudyGermplasmDto> getStudyGermplasm(final int studyId, final int entryId) {
 		final StockModel stock = this.daoFactory.getStockDao().getById(entryId);
 		if (stock != null) {
-			return studyId == stock.getProject().getProjectId();
+			if (studyId != stock.getProject().getProjectId()) {
+				throw new MiddlewareRequestException("", "invalid.entryid.for.study");
+			}
+			return Optional.of(new StudyGermplasmDto(stock));
 		}
-		return false;
+		return Optional.empty();
 	}
 
 	@Override
@@ -122,11 +126,11 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		// Copy from old entry: entry type, entry #, entry code
 		final StockModel stock = stockDao.getById(entryId);
 		if (stock == null) {
-			throw new MiddlewareException("Invalid Entry to be replaced: " + entryId);
+			throw new MiddlewareRequestException("", "invalid.entryid");
 		} else if (studyId != stock.getProject().getProjectId()) {
-			throw new MiddlewareException("Entry " + entryId + " is invalid for Study with ID: " + studyId);
+			throw new MiddlewareRequestException("", "invalid.entryid.for.study");
 		} else if (stock.getGermplasm().getGid() == gid) {
-			throw new MiddlewareException("New GID " + gid + " matches germplasm of entry to be replaced.");
+			throw new MiddlewareRequestException("", "new.gid.matches.old.gid");
 		}
 		final StudyGermplasmDto newStudyGermplasm = new StudyGermplasmDto();
 		newStudyGermplasm.setEntryNumber(Integer.valueOf(stock.getUniqueName()));
