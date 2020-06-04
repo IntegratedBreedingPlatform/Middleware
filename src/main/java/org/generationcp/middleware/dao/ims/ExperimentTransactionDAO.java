@@ -84,20 +84,20 @@ public class ExperimentTransactionDAO extends GenericDAO<ExperimentTransaction, 
 		}
 	}
 
-	public List<Transaction> getTransactionsByInstanceId(final Integer instanceId,
+	public List<Transaction> getTransactionsByInstanceIds(final List<Integer> instanceIds,
 		final TransactionStatus transactionStatus, final ExperimentTransactionType experimentTransactionType) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Transaction.class, "transaction");
 			criteria.createAlias("transaction.experimentTransactions", "experimentTransaction", Criteria.INNER_JOIN);
 			criteria.createAlias("experimentTransaction.experiment.geoLocation", "geolocation", Criteria.INNER_JOIN);
 			criteria.add(Restrictions.eq("status", transactionStatus.getIntValue()));
-			criteria.add(Restrictions.eq("geolocation.locationId", instanceId));
+			criteria.add(Restrictions.in("geolocation.locationId", instanceIds));
 			criteria.add(Restrictions.eq("experimentTransaction.type", experimentTransactionType.getId()));
 			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			return criteria.list();
 		} catch (final HibernateException e) {
 			final String message =
-				"Error at getTransactionsByInstanceId instanceId = " + instanceId + ", transactionType + "
+				"Error at getTransactionsByInstanceIds instanceIds = " + instanceIds + ", transactionType + "
 					+ transactionStatus
 					.getValue() + ", experimentTransactionStatus=" + experimentTransactionType.getValue();
 			ExperimentTransactionDAO.LOG.error(message, e);
