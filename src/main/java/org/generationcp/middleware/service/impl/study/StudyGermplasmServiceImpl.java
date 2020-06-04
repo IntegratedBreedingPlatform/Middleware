@@ -111,6 +111,39 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		return false;
 	}
 
+	@Override
+	public StudyGermplasmDto replaceStudyGermplasm(final int studyId, final int entryId, final int gid, final String crossExpansion) {
+		// Check first that new GID is valid
+		final Germplasm newGermplasm = this.daoFactory.getGermplasmDao().getById(gid);
+		if (newGermplasm == null) {
+			throw new MiddlewareException("Invalid GID: " + gid);
+		}
+		final StockDao stockDao = this.daoFactory.getStockDao();
+		// Copy from old entry: entry type, entry #, entry code
+		final StockModel stock = stockDao.getById(entryId);
+		if (stock == null) {
+			throw new MiddlewareException("Invalid Entry to be replaced: " + entryId);
+		} else if (studyId != stock.getProject().getProjectId()) {
+			throw new MiddlewareException("Entry " + entryId + " is invalid for Study with ID: " + studyId);
+		} else if (stock.getGermplasm().getGid() == gid) {
+			throw new MiddlewareException("New GID " + gid + " matches germplasm of entry to be replaced.");
+		}
+		final StudyGermplasmDto newStudyGermplasm = new StudyGermplasmDto();
+		newStudyGermplasm.setEntryNumber(Integer.valueOf(stock.getUniqueName()));
+		Optional<StockProperty> entryType = stock.getProperties().stream().filter(prop -> TermId.ENTRY_TYPE.getId() == (prop.getTypeId())).findFirst();
+		entryType.ifPresent(entry -> newStudyGermplasm.setEntryType(entry.getValue()) );
+		newStudyGermplasm.setGermplasmId(gid);
+		final Name preferredName = newGermplasm.getPreferredName();
+		newStudyGermplasm.setDesignation(preferredName != null? preferredName.getNval() : "");
+		newStudyGermplasm.setCross(crossExpansion);
+
+		final StudyGermplasmDto savedStudyGermplasm = this.saveStudyGermplasm(studyId, Collections.singletonList(newStudyGermplasm)).get(0);
+		stockDao.replaceExperimentStocks(entryId, savedStudyGermplasm.getEntryId());
+		// Finally delete old stock
+		stockDao.makeTransient(stock);
+		return savedStudyGermplasm;
+	}
+
 	private String findStockPropValue(final Integer termId, final Set<StockProperty> properties) {
 		if (properties != null) {
 			for (final StockProperty property : properties) {

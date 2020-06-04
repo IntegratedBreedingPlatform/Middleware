@@ -263,5 +263,18 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
+	public void replaceExperimentStocks(final Integer oldStockId, final Integer newStockId) {
+		try {
+			final Query query = this.getSession().createQuery("UPDATE ExperimentModel SET stock.stockId = :newStockId WHERE stock.stockId = :oldStockId");
+			query.setParameter("oldStockId", oldStockId);
+			query.setParameter("newStockId", newStockId);
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in replaceExperimentStocks for oldStockId=" + oldStockId + ", newStockId=" + newStockId +StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
 
 }

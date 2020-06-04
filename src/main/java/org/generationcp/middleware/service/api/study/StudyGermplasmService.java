@@ -23,4 +23,6 @@ public interface StudyGermplasmService {
 
 	boolean isValidStudyGermplasm(int studyId, int entryId);
 
+	StudyGermplasmDto replaceStudyGermplasm(int studyId, int entryId, int gid, String crossExpansion);
+
 }
