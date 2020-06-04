@@ -1,11 +1,14 @@
 
 package org.generationcp.middleware.service.impl.study;
 
+import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.study.StudyGermplasmMapper;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -13,10 +16,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Transactional
 public class StudyGermplasmServiceImpl implements StudyGermplasmService {
@@ -74,11 +74,13 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public void saveStudyGermplasm(final Integer studyId, final List<StudyGermplasmDto> studyGermplasmDtoList) {
-		final StudyGermplasmMapper mapper = new StudyGermplasmMapper();
+	public List<StudyGermplasmDto> saveStudyGermplasm(final Integer studyId, final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final List<StudyGermplasmDto> list = new ArrayList<>();
 		for (final StudyGermplasmDto studyGermplasm : studyGermplasmDtoList) {
-			this.daoFactory.getStockDao().saveOrUpdate(mapper.map(studyId, studyGermplasm));
+			final StockModel stockModel = this.daoFactory.getStockDao().saveOrUpdate(new StockModel(studyId, studyGermplasm));
+			list.add(new StudyGermplasmDto(stockModel));
 		}
+		return  list;
 	}
 
 	@Override
@@ -104,7 +106,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	public boolean isValidStudyGermplasm(final int studyId, final int entryId) {
 		final StockModel stock = this.daoFactory.getStockDao().getById(entryId);
 		if (stock != null) {
-			return studyId == stock.getProjectId();
+			return studyId == stock.getProject().getProjectId();
 		}
 		return false;
 	}

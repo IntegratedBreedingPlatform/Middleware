@@ -15,7 +15,7 @@ public interface StudyGermplasmService {
 
 	void deleteStudyGermplasm(int studyId);
 
-	void saveStudyGermplasm(Integer studyId, List<StudyGermplasmDto> studyGermplasmDtoList);
+	List<StudyGermplasmDto> saveStudyGermplasm(Integer studyId, List<StudyGermplasmDto> studyGermplasmDtoList);
 
 	long countStudyGermplasmByEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
 
