@@ -135,6 +135,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		location.setSnl1id(1);
 		location.setSnl2id(1);
 		location.setSnl3id(1);
+		location.setLdefault(Boolean.FALSE);
 
 		// add the location
 		this.manager.addLocation(location);
@@ -307,6 +308,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		location.setSnl1id(1);
 		location.setSnl2id(1);
 		location.setSnl3id(1);
+		location.setLdefault(Boolean.FALSE);
 
 		// add the location
 		final Integer id = this.manager.addLocation(location);
@@ -329,6 +331,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		location1.setSnl1id(1);
 		location1.setSnl2id(1);
 		location1.setSnl3id(1);
+		location1.setLdefault(Boolean.FALSE);
 
 		final Location location2 = new Location();
 		location2.setCntryid(1);
@@ -340,6 +343,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		location2.setSnl1id(1);
 		location2.setSnl2id(1);
 		location2.setSnl3id(1);
+		location2.setLdefault(Boolean.FALSE);
 
 		locations.add(location1);
 		locations.add(location2);
@@ -516,6 +520,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		location.setSnl1id(0);
 		location.setSnl2id(0);
 		location.setSnl3id(0);
+		location.setLdefault(Boolean.FALSE);
 		return location;
 	}
 

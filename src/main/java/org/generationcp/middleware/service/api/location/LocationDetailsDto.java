@@ -17,6 +17,8 @@ public class LocationDetailsDto implements Serializable, Comparable<LocationDeta
 
 	private String name;
 
+	private String locationName;
+
 	private String abbreviation;
 
 	private String countryCode;
@@ -131,6 +133,14 @@ public class LocationDetailsDto implements Serializable, Comparable<LocationDeta
 
 	public void setAltitude(Double altitude) {
 		this.altitude = altitude;
+	}
+
+	public String getLocationName() {
+		return this.locationName;
+	}
+
+	public void setLocationName(final String locationName) {
+		this.locationName = locationName;
 	}
 
 	@Override

@@ -10,10 +10,13 @@
 
 package org.generationcp.middleware.dao.oms;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -31,14 +34,16 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
@@ -63,6 +68,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private final int germplasmDate = 20150101;
 	private String attributeValue;
 	private String code1NameTypeValue;
+	private static final int UNKNOWN_GENERATIVE_METHOD_ID = 1;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataDM;
@@ -1306,12 +1312,14 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		lot.setScaleId(TermId.SEED_AMOUNT_G.getId());
 		lot.setEntityId(germplasmGID);
 		lot.setStatus(0);
+		lot.setStockId(RandomStringUtils.randomAlphabetic(35));
 		this.inventoryDataManager.addLot(lot);
 
 		final Transaction transaction = new Transaction();
 		transaction.setQuantity(100.0);
 		transaction.setStatus(0);
 		transaction.setLot(lot);
+		transaction.setType(TransactionType.DEPOSIT.getId());
 		this.inventoryDataManager.addTransaction(transaction);
 
 		final Germplasm mgMember = GermplasmTestDataInitializer
@@ -1329,15 +1337,15 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		for (int counter = 1; counter <= 5; counter++) {
 
 			final Germplasm fParent = GermplasmTestDataInitializer
-					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName" + counter, "LocationName" + counter);
+					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1, "MethodName" + counter, "LocationName" + counter);
 			final Integer tempFemaleParentGID = this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName());
 
 			final Germplasm mParent = GermplasmTestDataInitializer
-					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName" + counter, "LocationName" + counter);
+					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1, "MethodName" + counter, "LocationName" + counter);
 			final Integer tempMaleParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName());
 
 			final Germplasm germplasm = GermplasmTestDataInitializer
-					.createGermplasm(tempGermplasmDate, tempFemaleParentGID, tempMaleParentGID, 2, 0, 0, 1, counter, counter, 1, 1,
+					.createGermplasm(tempGermplasmDate, tempFemaleParentGID, tempMaleParentGID, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, counter, 1, 1,
 							"MethodName", "LocationName");
 
 			// Create Germplasm and add Preferred Name

@@ -1,18 +1,42 @@
 
 package org.generationcp.middleware.pojos.ims;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Arrays;
+import java.util.List;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum TransactionType {
 
-	DEPOSIT("Deposit"), RESERVATION("Reservation"),  WITHDRAWAL("Withdrawal");
+	WITHDRAWAL("Withdrawal", 1),
+	DISCARD("Discard", 2),
+	ADJUSTMENT("Adjustment", 3),
+	DEPOSIT("Deposit", 4);
 
-	private String type;
+	private final Integer id;
+	private String value;
 
-	private TransactionType(String status) {
-		this.type = status;
+	private static final List<TransactionType> LIST;
+
+	static {
+		LIST = Arrays.asList(TransactionType.values());
+	}
+
+	TransactionType(String type, Integer id) {
+		this.value = type;
+		this.id = id;
 	}
 
 	public String getValue() {
-		return this.type;
+		return this.value;
 	}
 
+	public Integer getId() {
+		return this.id;
+	}
+
+	public static List<TransactionType> getAll() {
+		return LIST;
+	}
 }

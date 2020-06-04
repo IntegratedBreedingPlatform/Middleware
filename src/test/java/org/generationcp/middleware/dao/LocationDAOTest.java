@@ -170,6 +170,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		// Province Badakhshan
 		final int provinceId = 1001;
 		location.setSnl1id(provinceId);
+		location.setLdefault(Boolean.FALSE);
 
 		locationDAO.saveOrUpdate(location);
 
@@ -207,6 +208,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		// Province Badakhshan
 		final int provinceId = 1001;
 		location.setSnl1id(provinceId);
+		location.setLdefault(Boolean.FALSE);
 
 		locationDAO.saveOrUpdate(location);
 		final Location province = locationDAO.getById(1001);
@@ -285,6 +287,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final int cntryid = 1;
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr, programUUID);
 		location.setCntryid(cntryid);
+		location.setLdefault(Boolean.FALSE);
 
 		locationDAO.saveOrUpdate(location);
 
@@ -327,6 +330,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final int cntryid = 1;
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr, programUUID);
 		location.setCntryid(cntryid);
+		location.setLdefault(Boolean.FALSE);
 
 		locationDAO.saveOrUpdate(location);
 

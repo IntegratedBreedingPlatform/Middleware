@@ -3,17 +3,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
-       xmlns:util="http://www.springframework.org/schema/util"
 
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
 						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
-						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
 						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
-						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd"
->
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
 
 	<context:property-placeholder location="classpath:test.properties" />
-    <util:properties id="testProperties" location="classpath:test.properties"/>
 
 	<context:annotation-config />
 
@@ -193,6 +189,16 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="daoFactory" class="org.generationcp.middleware.manager.DaoFactory">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
+	 <bean id="studyService" class="org.generationcp.middleware.service.impl.study.StudyServiceImpl">
+		<property name="sessionProvider" ref="cropSessionProvider"/>
+		<property name="daoFactory" ref="daoFactory"/>
+    </bean>
+
+
     <bean id="cropSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
         <property name="sessionFactory" ref="IBDBV2_MAIZE_MERGED_SessionFactory"/>
         <aop:scoped-proxy proxy-target-class="false"/>
@@ -225,5 +231,38 @@
 		  factory-method="getWorkbookSaver">
 		<aop:scoped-proxy />
 	</bean>
+
+	<bean id="keySequenceRegisterService" factory-bean="managerFactory"
+		  factory-method="getKeySequenceRegisterService" scope="request">
+		<aop:scoped-proxy />
+	</bean>
+
+    <bean id="studyDataManager" factory-bean="managerFactory"
+          factory-method="getStudyDataManager">
+        <aop:scoped-proxy />
+    </bean>
+
+	<bean id="experimentDesignService" factory-bean="managerFactory"
+		  factory-method="getExperimentDesignService">
+        <aop:scoped-proxy />
+    </bean>
+
+	<bean id="datasetService" factory-bean="managerFactory"
+			  factory-method="getDatasetMiddlewareService">
+        <aop:scoped-proxy />
+    </bean>
+
+	<bean id="derivedVariableService" factory-bean="managerFactory"
+		  factory-method="getDerivedVariableService">
+        <aop:scoped-proxy />
+    </bean>
+
+	<bean id="transactionService" class="org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
+	<bean id="plantingService" class="org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
 
 </beans>

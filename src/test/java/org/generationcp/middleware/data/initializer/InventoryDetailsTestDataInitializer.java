@@ -2,6 +2,7 @@
 package org.generationcp.middleware.data.initializer;
 
 import com.beust.jcommander.internal.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
@@ -11,6 +12,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 
 import java.text.ParseException;
@@ -90,7 +92,7 @@ public class InventoryDetailsTestDataInitializer {
 			lot.setStatus(0);
 			lot.setSource(listId);
 			lot.setComments("Lot for gid: " + gid);
-
+			lot.setStockId(RandomStringUtils.randomAlphabetic(35));
 			lots.add(lot);
 		}
 
@@ -107,7 +109,7 @@ public class InventoryDetailsTestDataInitializer {
 	 * @return
 	 */
 	public List<Transaction> createTransactions(final List<Lot> lots, final Integer listId, final Map<Integer, Integer> lotIdLrecIdMap,
-			final String inventoryIdPrefix) {
+			final String inventoryIdPrefix, final Integer type) {
 		final List<Transaction> transactions = new ArrayList<Transaction>();
 
 		for (final Lot lot : lots) {
@@ -123,6 +125,7 @@ public class InventoryDetailsTestDataInitializer {
 			transaction.setSourceType(LIST_SOURCE_TYPE);
 			transaction.setSourceRecordId(lotIdLrecIdMap.get(lot.getId()));
 			transaction.setSourceId(listId);
+			transaction.setType(type);
 
 			transactions.add(transaction);
 		}
@@ -156,6 +159,7 @@ public class InventoryDetailsTestDataInitializer {
 			transaction.setSourceType(LIST_SOURCE_TYPE);
 			transaction.setSourceRecordId(lotIdLrecIdMap.get(lot.getId()));
 			transaction.setSourceId(listId);
+			transaction.setType(TransactionType.DEPOSIT.getId());
 
 			transactions.add(transaction);
 		}
@@ -212,6 +216,7 @@ public class InventoryDetailsTestDataInitializer {
 		lotDetails.setLotScaleNameAbbr("g");
 		final Location location = new Location(1);
 		location.setLname("locName");
+		location.setLdefault(Boolean.FALSE);
 		lotDetails.setLocationOfLot(location);
 		lotDetails.setStockIds("stockIds");
 		lotDetails.setTransactionId(120);
@@ -243,7 +248,7 @@ public class InventoryDetailsTestDataInitializer {
 
 	public static Transaction createReservationTransaction(
 		final Double quantity, final Integer status, final String comments, final Lot lot, final Integer personId,
-						final Integer sourceId, final Integer sourceRecordId, final String sourceType){
+		final Integer sourceId, final Integer sourceRecordId, final String sourceType, final Integer type) {
 		final Transaction transaction = new Transaction();
 		transaction.setQuantity(quantity);
 		transaction.setStatus(status);
@@ -253,8 +258,9 @@ public class InventoryDetailsTestDataInitializer {
 		transaction.setSourceId(sourceId);
 		transaction.setSourceRecordId(sourceRecordId);
 		transaction.setSourceType(sourceType);
+		transaction.setType(type);
 
-		return  transaction;
+		return transaction;
 	}
 
 	public static Transaction createDepositTransaction(

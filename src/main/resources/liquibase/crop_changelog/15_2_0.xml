@@ -1,0 +1,23 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="clarysabel" id="v15.2.0-1">
+		<preConditions onFail="MARK_RAN">
+            <and>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_ims_transaction_lot"></foreignKeyConstraintExists>
+                </not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM ims_transaction it WHERE it.lotid is null OR NOT EXISTS ( SELECT 1 FROM ims_lot l WHERE l.lotid = it.lotid);
+                </sqlCheck>
+            </and>
+		</preConditions>
+		<comment>Add ims_transaction.lotid foreign key to ims_lot table</comment>
+		<addForeignKeyConstraint baseTableName="ims_transaction" baseColumnNames="lotid" constraintName="fk_ims_transaction_lot" referencedTableName="ims_lot"
+								 referencedColumnNames="lotid"/>
+	</changeSet>
+
+</databaseChangeLog>

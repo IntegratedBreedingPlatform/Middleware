@@ -333,7 +333,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 				final GermplasmListData recordSaved = this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
 				idGermplasmListDataSaved.add(recordSaved.getId());
-				if (germplasmListData.getStatus() != null && germplasmListData.getStatus().intValue() == 9) {
+				if (germplasmListData.getStatus() != null && germplasmListData.getStatus() == 9) {
 					deletedListEntryIds.add(germplasmListData.getId());
 				}
 			}
@@ -355,18 +355,14 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public int deleteGermplasmListDataByListId(final Integer listId) {
-
-		int germplasmListDataDeleted = 0;
 		try {
-			germplasmListDataDeleted = this.daoFactory.getGermplasmListDataDAO().deleteByListId(listId);
+			return this.daoFactory.getGermplasmListDataDAO().deleteByListId(listId);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 				"Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListDataByListId(listId="
 					+ listId + "): " + e.getMessage(),
 				e);
 		}
-
-		return germplasmListDataDeleted;
 	}
 
 	@Override
@@ -543,21 +539,20 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public List<ListDataProject> retrieveSnapshotListDataWithParents(final Integer listID) {
 		final List<ListDataProject> dataList = this.getListDataProjectDAO().getListDataProjectWithParents(listID);
-		final Iterable<Integer> gidList = Iterables.transform(dataList, new Function<ListDataProject, Integer>() {
-
-			public Integer apply(final ListDataProject data) {
-				return data.getGermplasmId();
-			}
-
-			;
-		});
-		// Append to maleParents of ListDataProject other progenitors of GIDs from the list, if any
-		final Map<Integer, List<GermplasmParent>> progenitorsMap =
-			this.daoFactory.getGermplasmDao().getParentsFromProgenitorsForGIDsMap(Lists.newArrayList(gidList));
-		for (final ListDataProject data : dataList) {
-			final List<GermplasmParent> progenitors = progenitorsMap.get(data.getGermplasmId());
-			if (progenitors != null) {
-				data.addMaleParents(progenitors);
+		if(!dataList.isEmpty()) {
+			final Iterable<Integer> gidList = Iterables.transform(dataList, new Function<ListDataProject, Integer>() {
+				public Integer apply(final ListDataProject data) {
+					return data.getGermplasmId();
+				}
+			});
+			// Append to maleParents of ListDataProject other progenitors of GIDs from the list, if any
+			final Map<Integer, List<GermplasmParent>> progenitorsMap =
+				this.daoFactory.getGermplasmDao().getParentsFromProgenitorsForGIDsMap(Lists.newArrayList(gidList));
+			for (final ListDataProject data : dataList) {
+				final List<GermplasmParent> progenitors = progenitorsMap.get(data.getGermplasmId());
+				if (progenitors != null) {
+					data.addMaleParents(progenitors);
+				}
 			}
 		}
 		return dataList;
@@ -574,7 +569,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				return data.getGid();
 			}
 
-			;
 		});
 		// Append to maleParents of CrossListData other progenitors of GIDs from the list, if any
 		final Map<Integer, List<GermplasmParent>> progenitorsMap =

@@ -76,18 +76,22 @@ public class BackcrossAncestryTree {
 
 		// Male traversal
 		if (otherParentFemaleParentGid != null && otherParentFemaleParentGid.equals(recurringParentGid)) {
-			final Germplasm maleGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentMaleParentGid)).get();
-			GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, maleGermplasm, recurringParentNode, level);
-			germplasmNode.setFemaleParent(recurringParentNode);
-			germplasmNode.setMaleParent(generateBackcrossTree);
+			if(this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentMaleParentGid)).isPresent()) {
+				final Germplasm maleGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentMaleParentGid)).get();
+				GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, maleGermplasm, recurringParentNode, level);
+				germplasmNode.setFemaleParent(recurringParentNode);
+				germplasmNode.setMaleParent(generateBackcrossTree);
+			}
 		}
 
 		// Female Traversal
 		if (otherParentMaleParentGid != null && otherParentMaleParentGid.equals(recurringParentGid)) {
-			final Germplasm female = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentFemaleParentGid)).get();
-			GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, female, recurringParentNode, level);
-			germplasmNode.setFemaleParent(generateBackcrossTree);
-			germplasmNode.setMaleParent(recurringParentNode);
+			if(this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentFemaleParentGid)).isPresent()) {
+				final Germplasm female = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentFemaleParentGid)).get();
+				GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, female, recurringParentNode, level);
+				germplasmNode.setFemaleParent(generateBackcrossTree);
+				germplasmNode.setMaleParent(recurringParentNode);
+			}
 		}
 
 		return germplasmNode;
@@ -107,16 +111,20 @@ public class BackcrossAncestryTree {
 	 *         found.
 	 */
 	private Optional<Germplasm> findRecurringParent(final Integer femaleParent, final Integer maleParent) {
-		final Germplasm femaleParentGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, femaleParent)).get();
-		final Germplasm maleParentGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, maleParent)).get();
 		Germplasm recurringParent = null;
-		if (maleParentGermplasm.getGnpgs() >= 2 && (femaleParentGermplasm.getGid().equals(maleParentGermplasm.getGpid1())
-				|| femaleParentGermplasm.getGid().equals(maleParentGermplasm.getGpid2()))) {
+		if(this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, femaleParent)).isPresent() &&
+				this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, maleParent)).isPresent()) {
+			final Germplasm femaleParentGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, femaleParent)).get();
+			final Germplasm maleParentGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, maleParent)).get();
 
-			recurringParent = femaleParentGermplasm;
-		} else if (femaleParentGermplasm.getGnpgs() >= 2 && (maleParentGermplasm.getGid().equals(femaleParentGermplasm.getGpid1())
-				|| maleParentGermplasm.getGid().equals(femaleParentGermplasm.getGpid2()))) {
-			recurringParent = maleParentGermplasm;
+			if (maleParentGermplasm.getGnpgs() >= 2 && (femaleParentGermplasm.getGid().equals(maleParentGermplasm.getGpid1())
+					|| femaleParentGermplasm.getGid().equals(maleParentGermplasm.getGpid2()))) {
+
+				recurringParent = femaleParentGermplasm;
+			} else if (femaleParentGermplasm.getGnpgs() >= 2 && (maleParentGermplasm.getGid().equals(femaleParentGermplasm.getGpid1())
+					|| maleParentGermplasm.getGid().equals(femaleParentGermplasm.getGpid2()))) {
+				recurringParent = maleParentGermplasm;
+			}
 		}
 		return Optional.fromNullable(recurringParent);
 	}

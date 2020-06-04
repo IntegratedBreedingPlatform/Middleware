@@ -1,8 +1,11 @@
 
 package org.generationcp.middleware.dao;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.KeySequenceRegister;
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -66,5 +69,22 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 		} else {
 			this.getSession().save(new KeySequenceRegister(keyPrefix, lastSequence));
 		}
+	}
+
+	public void deleteByKeyPrefixes(final List<String> keyPrefixes) {
+		try {
+			final StringBuilder sql = new StringBuilder();
+			sql.append("DELETE FROM key_sequence_register ");
+			sql.append(" WHERE key_prefix IN (:keyPrefixes)");
+
+			final Query query = this.getSession().createSQLQuery(sql.toString());
+			query.setParameterList("keyPrefixes", keyPrefixes);
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error with deleteByKeyPrefixes(" + keyPrefixes + ") query from keyPrefixes " + e.getMessage();
+			throw new MiddlewareQueryException(message, e);
+		}
+
+
 	}
 }

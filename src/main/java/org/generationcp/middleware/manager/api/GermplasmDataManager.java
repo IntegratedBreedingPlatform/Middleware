@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.api;
 
 import org.apache.commons.lang3.tuple.Triple;
+import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -27,6 +28,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.KeySequenceRegister;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -323,6 +325,13 @@ public interface GermplasmDataManager {
 	 */
 	Map<Integer, String> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList);
 
+	/**
+	 * Returns a Map of GIDs to the attribute values by type given a list of GIDs.
+	 *
+	 * @param gidList - list of GIDs
+	 * @return Map<Integer, Map<Integer, String> - map of gids to their corresponding attribute values
+	 */
+	Map<Integer, Map<Integer, String>> getAttributeValuesGIDList(List<Integer> gidList);
 
 	/**
 	 * Returns all the list of name types available for the given list of gids.
@@ -756,7 +765,7 @@ public interface GermplasmDataManager {
 	 * @param prefix - String used as prefix for Germplasm Names querying
 	 * @return next available sequence number for a germplasm with given prefix
 	 */
-	String getNextSequenceNumberForCrossName(String prefix);
+	String getNextSequenceNumberAsString(String prefix);
 
 	/**
 	 * Returns a Map of GIDs to preferred ids given a list of GIDs.
@@ -979,16 +988,6 @@ public interface GermplasmDataManager {
 	void deleteProgramFavorite(ProgramFavorite favorite);
 
 	/**
-	 * Returns the maximum number in the sequence.
-	 *
-	 * @param prefix
-	 * @param suffix
-	 * @param count
-	 * @return
-	 */
-	int getMaximumSequence(boolean isBulk, String prefix, String suffix, int count);
-
-	/**
 	 * check if name and standardized version of it already exists.
 	 *
 	 * @param name
@@ -1191,4 +1190,13 @@ public interface GermplasmDataManager {
 	long countGermplasmByStudy(Integer studyDbId);
 
 	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Integer pageNumber, Integer pageSize);
+
+	List<AttributeDTO> getAttributesByGid(
+		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNumber);
+
+	long countAttributesByGid(String gid, List<String> attributeDbIds);
+
+	List<Attribute> getAttributeByIds(List<Integer> ids);
+
+	List<String> getNamesByGidsAndPrefixes(List<Integer> gids, List<String> prefixes);
 }

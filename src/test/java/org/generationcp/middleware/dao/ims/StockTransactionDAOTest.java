@@ -1,11 +1,6 @@
 
 package org.generationcp.middleware.dao.ims;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -22,11 +17,17 @@ import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class StockTransactionDAOTest extends IntegrationTestBase {
 
@@ -231,7 +232,8 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 
 		// initialize transactions
 		final List<Transaction> transactions =
-				this.inventoryDetailsTestDataInitializer.createTransactions(lots, this.germplasmListId, lotIdLrecIdMap, STOCK_ID_PREFIX);
+				this.inventoryDetailsTestDataInitializer.createTransactions(lots, this.germplasmListId, lotIdLrecIdMap, STOCK_ID_PREFIX,
+					TransactionType.DEPOSIT.getId());
 
 		// add transactions to database
 		final List<Integer> transactionIds = this.inventoryDataManager.addTransactions(transactions);

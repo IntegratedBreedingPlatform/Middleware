@@ -66,7 +66,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			+ " INNER JOIN project ds ON ds.project_id = e.project_id "
 			+ " INNER JOIN project p ON p.project_id = ds.study_id "
 			+ "  LEFT JOIN location l ON l.locid = gp.value " + "  LEFT JOIN location prov ON prov.locid = l.snl1id "
-			+ "  LEFT JOIN cntry c ON c.cntryid = l.cntryid " + " WHERE gp.type_id = " + TermId.LOCATION_ID.getId();
+			+ "  LEFT JOIN cntry c ON c.cntryid = l.cntryid "
+			+ " WHERE gp.type_id = " + TermId.LOCATION_ID.getId() +  " AND p.deleted = 0 ";
 
 	@SuppressWarnings("unchecked")
 	public Set<Geolocation> findInDataSet(final int datasetId) {
@@ -292,7 +293,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					+ " LEFT JOIN location l ON l.locid = gp.value"
 					+ " LEFT JOIN location prov ON prov.locid = l.snl1id"
 					+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
-					+ " WHERE ph.observable_id IN (:traitIds) AND p.program_uuid = :programUUID ;";
+					+ " WHERE ph.observable_id IN (:traitIds) AND p.program_uuid = :programUUID AND p.deleted = 0"
+					+ " AND ph.value IS NOT NULL;";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.addScalar(GeolocationDao.ENVT_ID);
 			query.addScalar(GeolocationDao.LOCATION_NAME);
@@ -446,7 +448,12 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return this.getEnvironmentGeolocationsForInstances(studyId, Collections.<Integer>emptyList());
 	}
 
-	public Boolean existInstances(final Set<Integer> instanceIds) {
+	/**
+	 * FIXME IBP-3472: make a single query
+	 *
+	 * @return TRUE if all of the instanceIds exists. Otherwise FALSE
+	 */
+	public Boolean instanceExists(final Set<Integer> instanceIds) {
 		for (final Integer instanceId : instanceIds) {
 			if (this.getById(instanceId) == null) {
 				return Boolean.FALSE;
