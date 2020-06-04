@@ -225,7 +225,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	public List<StudyGermplasmDto> getStudyGermplasmDtoList(final Integer studyId, final Set<Integer> plotNos) {
 		try {
-			final String queryString = "select  distinct(nd_ep.value) AS position, s.name AS designation, s.dbxref_id AS germplasmId "
+			final String queryString = "select s.stock_id AS entryId, distinct(nd_ep.value) AS position, s.name AS designation, s.dbxref_id AS germplasmId "
 				+ " FROM nd_experiment e "
 				+ " INNER JOIN nd_experimentprop nd_ep ON e.nd_experiment_id = nd_ep.nd_experiment_id AND nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
 				+ " INNER JOIN stock s ON s.stock_id = e.stock_id "
@@ -246,6 +246,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
 			query.setParameterList("PLOT_NO_TERM_IDS",
 				new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
+			query.addScalar("entryId", new IntegerType());
 			query.addScalar("position", new StringType());
 			query.addScalar("designation", new StringType());
 			query.addScalar("germplasmId", new IntegerType());

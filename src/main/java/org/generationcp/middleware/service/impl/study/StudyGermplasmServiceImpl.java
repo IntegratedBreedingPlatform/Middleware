@@ -2,7 +2,6 @@
 package org.generationcp.middleware.service.impl.study;
 
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.study.StudyGermplasmMapper;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -74,11 +73,13 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public void saveStudyGermplasm(final Integer studyId, final List<StudyGermplasmDto> studyGermplasmDtoList) {
-		final StudyGermplasmMapper mapper = new StudyGermplasmMapper();
+	public List<StudyGermplasmDto> saveStudyGermplasm(final Integer studyId, final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final List<StudyGermplasmDto> list = new ArrayList<>();
 		for (final StudyGermplasmDto studyGermplasm : studyGermplasmDtoList) {
-			this.daoFactory.getStockDao().saveOrUpdate(mapper.map(studyId, studyGermplasm));
+			final StockModel stockModel = this.daoFactory.getStockDao().saveOrUpdate(new StockModel(studyId, studyGermplasm));
+			list.add(new StudyGermplasmDto(stockModel));
 		}
+		return  list;
 	}
 
 	@Override

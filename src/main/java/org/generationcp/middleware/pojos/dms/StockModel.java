@@ -11,23 +11,14 @@
 
 package org.generationcp.middleware.pojos.dms;
 
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -115,6 +106,40 @@ public class StockModel implements Serializable {
 		this.description = description;
 		this.typeId = typeId;
 		this.isObsolete = isObsolete;
+	}
+
+	public StockModel (final Integer studyId, final StudyGermplasmDto studyGermplasmDto) {
+		this.setProject(new DmsProject(studyId));
+		this.setName(studyGermplasmDto.getDesignation());
+		this.setGermplasm(new Germplasm(Integer.valueOf(studyGermplasmDto.getGermplasmId())));
+		this.setTypeId(TermId.ENTRY_CODE.getId());
+		this.setValue(studyGermplasmDto.getEntryCode());
+		this.setUniqueName(studyGermplasmDto.getEntryNumber().toString());
+		this.setIsObsolete(false);
+
+		final Set<StockProperty> stockProperties = new HashSet<>();
+		final StockProperty entryTypeProperty = new StockProperty();
+		entryTypeProperty.setStock(this);
+		entryTypeProperty.setRank(1);
+		entryTypeProperty.setTypeId(TermId.ENTRY_TYPE.getId());
+		entryTypeProperty.setValue(studyGermplasmDto.getEntryType());
+		stockProperties.add(entryTypeProperty);
+
+		final StockProperty seedSourceProperty = new StockProperty();
+		seedSourceProperty.setStock(this);
+		seedSourceProperty.setRank(2);
+		seedSourceProperty.setTypeId(TermId.SEED_SOURCE.getId());
+		seedSourceProperty.setValue(studyGermplasmDto.getSeedSource());
+		stockProperties.add(seedSourceProperty);
+
+		final StockProperty crossProperty = new StockProperty();
+		crossProperty.setStock(this);
+		crossProperty.setRank(3);
+		crossProperty.setTypeId(TermId.CROSS.getId());
+		crossProperty.setValue(studyGermplasmDto.getCross());
+		stockProperties.add(crossProperty);
+
+		this.setProperties(stockProperties);
 	}
 
 	public Integer getStockId() {
