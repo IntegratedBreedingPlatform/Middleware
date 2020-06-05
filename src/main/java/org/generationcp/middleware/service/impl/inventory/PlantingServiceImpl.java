@@ -237,7 +237,8 @@ public class PlantingServiceImpl implements PlantingService {
 			.getTransactionsByStudyId(studyId, transactionStatus, ExperimentTransactionType.PLANTING);
 	}
 
-	public List<Transaction> getPlantingTransactionsByInstanceIds(final List<Integer> instanceIds, final TransactionStatus transactionStatus) {
+	public List<Transaction> getPlantingTransactionsByInstanceIds(final List<Integer> instanceIds,
+		final TransactionStatus transactionStatus) {
 		return daoFactory.getExperimentTransactionDao()
 			.getTransactionsByInstanceIds(instanceIds, transactionStatus, ExperimentTransactionType.PLANTING);
 	}
