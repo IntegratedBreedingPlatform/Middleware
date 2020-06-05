@@ -476,8 +476,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				query.append("and lot.lotid IN (").append(Joiner.on(",").join(lotsSearchDto.getLotIds())).append(") ");
 			}
 
-			if (lotsSearchDto.getLotUUIds() != null && !lotsSearchDto.getLotUUIds().isEmpty()) {
-				query.append("and lot.lot_uuid IN ('").append(Joiner.on("','").join(lotsSearchDto.getLotUUIds().toArray())).append("') ");
+			if (lotsSearchDto.getLotUUIDs() != null && !lotsSearchDto.getLotUUIDs().isEmpty()) {
+				query.append("and lot.lot_uuid IN ('").append(Joiner.on("','").join(lotsSearchDto.getLotUUIDs().toArray())).append("') ");
 			}
 
 			if (lotsSearchDto.getGids() != null && !lotsSearchDto.getGids().isEmpty()) {

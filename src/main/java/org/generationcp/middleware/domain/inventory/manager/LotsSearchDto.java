@@ -17,7 +17,7 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private List<Integer> lotIds;
 
-	private List<String> lotUUIds;
+	private List<String> lotUUIDs;
 
 	private String stockId;
 
@@ -93,12 +93,12 @@ public class LotsSearchDto extends SearchRequestDto {
 		this.lotIds = lotIds;
 	}
 
-	public List<String> getLotUUIds() {
-		return lotUUIds;
+	public List<String> getLotUUIDs() {
+		return lotUUIDs;
 	}
 
-	public void setLotUUIds(final List<String> lotUUIds) {
-		this.lotUUIds = lotUUIds;
+	public void setLotUUIDs(final List<String> lotUUIDs) {
+		this.lotUUIDs = lotUUIDs;
 	}
 
 	public String getStockId() {
