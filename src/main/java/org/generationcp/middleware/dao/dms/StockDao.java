@@ -33,11 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * DAO class for {@link StockModel}.
@@ -260,6 +256,20 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
+	}
+
+	public List<Integer> getGermplasmUsedInStudies(final List<Integer> gids)  {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.in("germplasm.gid", gids));
+			criteria.setProjection(Projections.distinct(Projections.property("germplasm.gid")));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in getGermplasmUsedInStudies=" + gids + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+
 	}
 
 

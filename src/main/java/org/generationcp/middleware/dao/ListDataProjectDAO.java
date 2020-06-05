@@ -11,16 +11,11 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,14 +25,6 @@ import java.util.Map;
 public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	private static final String ENTRY_ID = "entryId";
-
-	public static final String GET_GERMPLASM_USED_IN_ENTRY_LIST = " SELECT \n" + "   ldp.germplasm_id, \n"
-		+ "   group_concat(p.name) \n" + " FROM listnms l \n"
-		+ "   INNER JOIN listdata_project ldp ON l.listid = ldp.list_id \n"
-		+ "   INNER JOIN project p ON l.projectid = p.project_id \n" + " WHERE ldp.germplasm_id IN (:gids) \n"
-		+ "       AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " \n" + "       AND l.listtype IN ('"
-		+ GermplasmListType.STUDY.name() + "', '"
-		+ GermplasmListType.CHECK.name() + "') \n" + " GROUP BY ldp.germplasm_id";
 
 	public void deleteByListId(final int listId) {
 		try {
@@ -320,26 +307,6 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			listDataProjects.add(listDataProject);
 		}
 
-	}
-
-	/**
-	 * Verify if the gids are used in some entry list
-	 *
-	 * @param gids gids to check
-	 * @return Map with GID as key and CSV of project where it is used
-	 */
-	public Map<Integer, String> getGermplasmUsedInEntryList(final List<Integer> gids) {
-		final Map<Integer, String> resultMap = new HashMap<>();
-
-		final SQLQuery query = this.getSession().createSQLQuery(ListDataProjectDAO.GET_GERMPLASM_USED_IN_ENTRY_LIST);
-		query.setParameterList("gids", gids);
-
-		final List<Object[]> results = query.list();
-		for (final Object[] result : results) {
-			resultMap.put((Integer) result[0], (String) result[1]);
-		}
-
-		return resultMap;
 	}
 
 	public ListDataProject getByListIdAndGid(final Integer listId, final Integer gid) {
