@@ -10,7 +10,7 @@ import org.pojomatic.annotations.AutoProperty;
 public class InstanceData {
 
 	private Integer instanceId;
-	// This can be nd_experimentprop or phenotype ID depending if variable is environmental condition
+	// This can be geolocationPropertyId or phenotype ID depending if variable is environmental detail or condition.
 	private Integer instanceDataId;
 	private Integer variableId;
 	private String value;

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class StudyInstance {
 
 	private int instanceId;
+	private Integer locationInstanceDataId;
 	private Integer locationId;
 	private String locationName;
 	private String locationAbbreviation;
@@ -144,6 +145,14 @@ public class StudyInstance {
 
 	public void setCanBeDeleted(final Boolean canBeDeleted) {
 		this.canBeDeleted = canBeDeleted;
+	}
+
+	public Integer getLocationInstanceDataId() {
+		return this.locationInstanceDataId;
+	}
+
+	public void setLocationInstanceDataId(final Integer locationInstanceDataId) {
+		this.locationInstanceDataId = locationInstanceDataId;
 	}
 
 	@Override

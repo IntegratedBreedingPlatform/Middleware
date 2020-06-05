@@ -21,7 +21,7 @@ public interface StudyInstanceService {
 
 	InstanceData updateInstanceData(InstanceData instanceData, boolean isEnvironmentCondition);
 
-	Optional<InstanceData> getInstanceData(Integer environmentId, final Integer environmentDataId, boolean isEnvironmentCondition);
+	Optional<InstanceData> getInstanceData(Integer instanceId, final Integer instanceDataId, final Integer variableId, boolean isEnvironmentCondition);
 
 
 }

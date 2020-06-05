@@ -35,7 +35,7 @@ public class MeasurementData {
 	private String dataType;
 	private Integer phenotypeId;
 	private MeasurementVariable measurementVariable;
-	private Integer experimentPropertyId;
+	private Integer instanceDataId;
 
 
 	private boolean isAccepted;
@@ -408,11 +408,11 @@ public class MeasurementData {
 		this.valueStatus = valueStatus;
 	}
 
-	public Integer getExperimentPropertyId() {
-		return this.experimentPropertyId;
+	public Integer getInstanceDataId() {
+		return this.instanceDataId;
 	}
 
-	public void setExperimentPropertyId(final Integer experimentPropertyId) {
-		this.experimentPropertyId = experimentPropertyId;
+	public void setInstanceDataId(final Integer instanceDataId) {
+		this.instanceDataId = instanceDataId;
 	}
 }

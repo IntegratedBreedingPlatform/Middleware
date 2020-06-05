@@ -31,17 +31,16 @@ public class Variable implements Serializable, Comparable<Variable> {
 
 	private boolean isCustomValue;
 
-	private Integer experimentPropertyId;
+	private Integer instanceDataId;
 
 
 	public Variable() {
 	}
 
-	public Variable(Integer phenotypeId, DMSVariableType variableType, String value, Integer experimentPropertyId) {
-		this.phenotypeId = phenotypeId;
+	public Variable(DMSVariableType variableType, String value, Integer instanceDataId) {
 		this.variableType = variableType;
 		this.value = value;
-		this.experimentPropertyId = experimentPropertyId;
+		this.instanceDataId = instanceDataId;
 		if (variableType == null) {
 			throw new RuntimeException();
 		}
@@ -292,12 +291,12 @@ public class Variable implements Serializable, Comparable<Variable> {
 		this.isCustomValue = isCustomValue;
 	}
 
-	public Integer getExperimentPropertyId() {
-		return this.experimentPropertyId;
+	public Integer getInstanceDataId() {
+		return this.instanceDataId;
 	}
 
-	public void setExperimentPropertyId(final Integer experimentPropertyId) {
-		this.experimentPropertyId = experimentPropertyId;
+	public void setInstanceDataId(final Integer instanceDataId) {
+		this.instanceDataId = instanceDataId;
 	}
 
 }

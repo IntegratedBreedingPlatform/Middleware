@@ -1044,13 +1044,13 @@ public class WorkbookBuilder extends Builder {
 				final Integer id = value != null && NumberUtils.isNumber(value) ? Integer.valueOf(value) : null;
 				final MeasurementData measurementData = new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
 					this.getDataType(standardVariableDataTypeId), id, factor);
-				measurementData.setExperimentPropertyId(variable.getExperimentPropertyId());
+				measurementData.setInstanceDataId(variable.getInstanceDataId());
 				return measurementData;
 			}
 
 			final MeasurementData measurementData = new MeasurementData(variableType.getLocalName(), value, isEditable,
 				this.getDataType(standardVariableDataTypeId), factor);
-			measurementData.setExperimentPropertyId(variable.getExperimentPropertyId());
+			measurementData.setInstanceDataId(variable.getInstanceDataId());
 			return measurementData;
 		}
 		return null;

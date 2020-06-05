@@ -1,20 +1,23 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
+import org.generationcp.middleware.dao.dms.GeolocationDao;
+import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.InstanceDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.InstanceData;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -37,6 +40,9 @@ import java.util.stream.Collectors;
 
 @Transactional
 public class StudyInstanceServiceImpl implements StudyInstanceService {
+
+	public static final List<Integer> GEOLOCATION_METADATA =
+		Arrays.asList(TermId.LATITUDE.getId(), TermId.LONGITUDE.getId(), TermId.GEODETIC_DATUM.getId(), TermId.ALTITUDE.getId());
 
 	@Resource
 	private StudyService studyService;
@@ -90,12 +96,15 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			// The default value of an instance's location name is "Unspecified Location"
 			final Optional<Location> location = this.getUnspecifiedLocation();
 
-			final Geolocation geolocation =
-				this.geolocationGenerator.createGeolocation(instanceNumber, location.get().getLocid());
+			final Geolocation geolocation = new Geolocation();
+			geolocation.setDescription(String.valueOf(instanceNumber));
+			final GeolocationProperty locationGeolocationProperty =
+				new GeolocationProperty(geolocation, String.valueOf(location.get().getLocid()), 1, TermId.LOCATION_ID.getId());
+			geolocation.setProperties(Arrays.asList(locationGeolocationProperty));
+			this.daoFactory.getGeolocationDao().save(geolocation);
 
 			final ExperimentModel experimentModel =
 				this.experimentModelGenerator.generate(crop, datasetId, Optional.of(geolocation), ExperimentType.TRIAL_ENVIRONMENT);
-			experimentModel.setObservationUnitNo(instanceNumber);
 
 			this.daoFactory.getExperimentDao().save(experimentModel);
 
@@ -106,6 +115,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 				studyInstance.setLocationName(location.get().getLname());
 				studyInstance.setLocationAbbreviation(location.get().getLabbr());
 				studyInstance.setInstanceId(geolocation.getLocationId());
+				studyInstance.setLocationInstanceDataId(locationGeolocationProperty.getGeolocationPropertyId());
 			}
 
 			instanceNumbers.add(instanceNumber);
@@ -207,14 +217,20 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			this.daoFactory.getPhenotypeDAO().save(phenotype);
 			instanceData.setInstanceDataId(phenotype.getPhenotypeId());
 		} else {
-			final ExperimentModel experimentModel =
-				this.daoFactory.getExperimentDao()
-					.getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), instanceData.getInstanceId());
+
+			final GeolocationDao geolocationDao = this.daoFactory.getGeolocationDao();
+			final Geolocation geolocation = geolocationDao.getById(instanceData.getInstanceId());
 			final String value = this.getEnvironmentDataValue(instanceData);
-			final ExperimentProperty property =
-				new ExperimentProperty(experimentModel, value, 1, instanceData.getVariableId());
-			this.daoFactory.getExperimentPropertyDao().save(property);
-			instanceData.setInstanceDataId(property.getNdExperimentpropId());
+
+			if (GEOLOCATION_METADATA.contains(instanceData.getVariableId())) {
+				this.mapGeolocationMetaData(geolocation, instanceData.getVariableId(), value);
+				geolocationDao.save(geolocation);
+			} else {
+				final GeolocationProperty property = new GeolocationProperty(geolocation, value, 1, instanceData.getVariableId());
+				this.daoFactory.getGeolocationPropertyDao().save(property);
+				instanceData.setInstanceDataId(property.getGeolocationPropertyId());
+			}
+
 		}
 
 		return instanceData;
@@ -243,11 +259,20 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			phenotype.setUpdatedDate(new Date());
 			phenotypeDAO.update(phenotype);
 		} else {
-			final ExperimentPropertyDao propertyDao = this.daoFactory.getExperimentPropertyDao();
-			final ExperimentProperty property = propertyDao.getById(instanceData.getInstanceDataId());
-			Preconditions.checkNotNull(property);
-			property.setValue(this.getEnvironmentDataValue(instanceData));
-			propertyDao.update(property);
+
+			if (GEOLOCATION_METADATA.contains(instanceData.getVariableId())) {
+				final GeolocationDao geolocationDao = this.daoFactory.getGeolocationDao();
+				final Geolocation geolocation = geolocationDao.getById(instanceData.getInstanceId());
+				this.mapGeolocationMetaData(geolocation, instanceData.getVariableId(), this.getEnvironmentDataValue(instanceData));
+				geolocationDao.update(geolocation);
+			} else {
+				final GeolocationPropertyDao propertyDao = this.daoFactory.getGeolocationPropertyDao();
+				final GeolocationProperty property = propertyDao.getById(instanceData.getInstanceDataId());
+				Preconditions.checkNotNull(property);
+				property.setValue(this.getEnvironmentDataValue(instanceData));
+				propertyDao.update(property);
+			}
+
 		}
 
 		this.datasetService
@@ -257,24 +282,29 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public Optional<InstanceData> getInstanceData(final Integer instanceId, final Integer environmentDataId,
+	public Optional<InstanceData> getInstanceData(final Integer instanceId, final Integer instanceDataId, final Integer variableId,
 		final boolean isEnvironmentCondition) {
 
 		if (isEnvironmentCondition) {
-			final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotype(instanceId, environmentDataId);
+			final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotype(instanceId, instanceDataId);
 			if (phenotype != null) {
 				return Optional
-					.of(new InstanceData(phenotype.getExperiment().getNdExperimentId(), environmentDataId, phenotype.getObservableId(),
+					.of(new InstanceData(phenotype.getExperiment().getNdExperimentId(), instanceDataId, phenotype.getObservableId(),
 						phenotype.getValue(), phenotype.getcValueId()));
 			}
 		} else {
-			final ExperimentModel experimentModel =
-				this.daoFactory.getExperimentDao().getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), instanceId);
-			final ExperimentProperty property =
-				this.daoFactory.getExperimentPropertyDao().getExperimentProperty(experimentModel.getNdExperimentId(), environmentDataId);
-			if (property != null) {
-				return Optional.of(new InstanceData(property.getExperiment().getNdExperimentId(), environmentDataId, property.getTypeId(),
-					property.getValue(), null));
+			final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(instanceId);
+
+			if (GEOLOCATION_METADATA.contains(variableId)) {
+				return Optional.of(new InstanceData(geolocation.getLocationId(), geolocation.getLocationId(), variableId,
+					this.getGeolocationMetaDataValue(geolocation, variableId), null));
+			} else {
+				final GeolocationProperty property =
+					this.daoFactory.getGeolocationPropertyDao().getById(instanceDataId);
+				if (property != null) {
+					return Optional.of(new InstanceData(geolocation.getLocationId(), instanceDataId, property.getTypeId(),
+						property.getValue(), null));
+				}
 			}
 		}
 		return Optional.empty();
@@ -286,6 +316,31 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			return Optional.of(locations.get(0));
 		}
 		return Optional.empty();
+	}
+
+	private String getGeolocationMetaDataValue(final Geolocation geolocation, final int variableId) {
+		if (TermId.LATITUDE.getId() == variableId) {
+			return geolocation.getLatitude() != null ? String.valueOf(geolocation.getLatitude()) : StringUtils.EMPTY;
+		} else if (TermId.LONGITUDE.getId() == variableId) {
+			return geolocation.getLongitude() != null ? String.valueOf(geolocation.getLongitude()) : StringUtils.EMPTY;
+		} else if (TermId.GEODETIC_DATUM.getId() == variableId) {
+			return geolocation.getGeodeticDatum();
+		} else if (TermId.ALTITUDE.getId() == variableId) {
+			return geolocation.getAltitude() != null ? String.valueOf(geolocation.getAltitude()) : StringUtils.EMPTY;
+		}
+		return StringUtils.EMPTY;
+	}
+
+	private void mapGeolocationMetaData(final Geolocation geolocation, final int variableId, final String value) {
+		if (TermId.LATITUDE.getId() == variableId) {
+			geolocation.setLatitude(Double.valueOf(value));
+		} else if (TermId.LONGITUDE.getId() == variableId) {
+			geolocation.setLongitude(Double.valueOf(value));
+		} else if (TermId.GEODETIC_DATUM.getId() == variableId) {
+			geolocation.setGeodeticDatum(value);
+		} else if (TermId.ALTITUDE.getId() == variableId) {
+			geolocation.setAltitude(Double.valueOf(value));
+		}
 	}
 
 }
