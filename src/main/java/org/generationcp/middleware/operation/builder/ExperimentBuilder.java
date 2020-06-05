@@ -410,9 +410,4 @@ public class ExperimentBuilder extends Builder {
 		return this.getExperimentDao().hasFieldmap(datasetId);
 	}
 
-	public boolean checkIfStudyHasFieldmap(final int studyId) {
-		final List<Integer> geolocationIdsOfStudy = this.getExperimentDao().getLocationIdsOfStudy(studyId);
-		final List<Integer> geolocationIdsOfStudyWithFieldmap = this.getExperimentDao().getLocationIdsOfStudyWithFieldmap(studyId);
-		return geolocationIdsOfStudy.size() == geolocationIdsOfStudyWithFieldmap.size();
-	}
 }

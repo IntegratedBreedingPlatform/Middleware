@@ -13,13 +13,7 @@ package org.generationcp.middleware.service.api;
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.TreatmentVariable;
@@ -30,22 +24,12 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Progenitor;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This is the API for Fieldbook requirements.
@@ -195,15 +179,6 @@ public interface FieldbookService {
 	Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role);
 
 	/**
-	 * Gets the germplasm id by name.
-	 *
-	 * @param name
-	 *            the name
-	 * @return the germplasm id by name
-	 */
-	Integer getGermplasmIdByName(String name);
-
-	/**
 	 * Given a workbook already loaded which does not load observations now - this is a helper method to trigger
 	 * loading the observations collection IF AND WHEN NEEDED. This method is a
 	 * stop gap mecahnism to lazy load the observations collection until we can
@@ -254,15 +229,6 @@ public interface FieldbookService {
 			List<Pair<Germplasm, List<Attribute>>> germplasmAttributes);
 
 	/**
-	 * Used for retrieving the Cimmyt Wheat Germplasm name.
-	 *
-	 * @param gid
-	 *            the gid
-	 * @return the cimmyt wheat germplasm name by gid
-	 */
-	String getCimmytWheatGermplasmNameByGid(int gid);
-
-	/**
 	 * Used for retrieving the breeding method id given a method id.
 	 *
 	 * @param mid
@@ -292,39 +258,6 @@ public interface FieldbookService {
 	GermplasmList getGermplasmListByName(String name, String programUUID);
 
 	/**
-	 * Get All distinct values given a standard variable id.
-	 *
-	 * @param stdVarId
-	 *            the std var id
-	 * @return the distinct standard variable values
-	 */
-	List<ValueReference> getDistinctStandardVariableValues(int stdVarId);
-
-	/**
-	 * Get all standard variables.
-	 *
-	 * @param programUUID
-	 *            unique id of the program
-	 * @return the all standard variables
-	 */
-	Set<StandardVariable> getAllStandardVariables(String programUUID);
-
-	/**
-	 * Get all distinct values given the PSMR combination.
-	 *
-	 * @param property
-	 *            the property
-	 * @param scale
-	 *            the scale
-	 * @param method
-	 *            the method
-	 * @param role
-	 *            the role
-	 * @return the distinct standard variable values
-	 */
-	List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method, PhenotypicType role);
-
-	/**
 	 * Get a standard variable given an id. After the first read, the variable
 	 * is cached in memory.
 	 *
@@ -335,15 +268,6 @@ public interface FieldbookService {
 	 * @return the standard variable
 	 */
 	StandardVariable getStandardVariable(int id, String programUUID);
-
-	/**
-	 * Gets the all nursery types.
-	 *
-	 * @param programUUID
-	 *            unique id of the program
-	 * @return the all nursery types
-	 */
-	List<ValueReference> getAllNurseryTypes(String programUUID);
 
 	/**
 	 * Count plots with plants selectedof nursery.
@@ -561,29 +485,6 @@ public interface FieldbookService {
 	String getFolderNameById(Integer folderId);
 
 	/**
-	 * Returns true if all instances in the study has fieldmap.
-	 *
-	 * @param studyId
-	 *            the study id
-	 * @return true, if successful
-	 */
-	boolean checkIfStudyHasFieldmap(int studyId);
-
-	/**
-	 * Builds the Trial Observations from the trial dataset id.
-	 *
-	 * @param trialDatasetId
-	 *            the trial dataset id
-	 * @param factorList
-	 *            the factor list
-	 * @param variateList
-	 *            the variate list
-	 * @return the list
-	 */
-	List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList,
-			List<MeasurementVariable> variateList);
-
-	/**
 	 * Check if study has measurement data.
 	 *
 	 * @param datasetId
@@ -604,14 +505,6 @@ public interface FieldbookService {
 	 * @return the int
 	 */
 	int countVariatesWithData(int datasetId, List<Integer> variateIds);
-
-	/**
-	 * Delete observations of study.
-	 *
-	 * @param datasetId
-	 *            the dataset id
-	 */
-	void deleteObservationsOfStudy(int datasetId);
 
 	/**
 	 * Get germplasms by name.
@@ -640,14 +533,6 @@ public interface FieldbookService {
 	 * @return the integer
 	 */
 	Integer addGermplasmName(String nameValue, int gid, int userId, int nameTypeId, int locationId, Integer date);
-
-	/**
-	 *
-	 * @param names
-	 *            The list of germplasm names to be added into the system
-	 * @return
-	 */
-	List<Integer> addGermplasmNames(List<Name> names);
 
 	/**
 	 * Adds a new Germplasm.
@@ -893,10 +778,6 @@ public interface FieldbookService {
 
 	List<Method> getFavoriteMethods(List<Integer> methodIds, Boolean filterOutGenerative);
 
-	String getPlotCodePrefix(final String cropName);
-
-	List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList);
-
 	List<Location> getLocationsByProgramUUID(String programUUID);
 
 	/**
@@ -928,9 +809,6 @@ public interface FieldbookService {
 
 	Optional<StudyReference> getStudyReferenceByNameAndProgramUUID(String studyName, String programUUID);
 
-	Boolean hasOutOfSyncObservations(Integer id);
-
-
 	/**
 	 * Save experimental Design
 	 *
@@ -940,17 +818,6 @@ public interface FieldbookService {
 	 */
 	void saveExperimentalDesign(final Workbook workbook, final String programUUID, final CropType crop);
 
-
-	/**
-	 * Delete experimental Design
-	 *
-	 * @param workbook
-	 *
-	 * @param programUUID
-	 *            the program UUID
-	 * @param crop
-	 */
-	void deleteExperimentalDesign(final Workbook workbook, final String programUUID, final CropType crop);
 
 	/**
 	 * Save workbook variables and Observations

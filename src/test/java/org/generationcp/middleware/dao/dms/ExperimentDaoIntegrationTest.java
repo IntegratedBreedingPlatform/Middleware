@@ -201,49 +201,4 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 
 	}
 
-	@Test
-	public void testGetLocationIdsOfStudy() {
-
-		final DmsProject someStudy = this.testDataInitializer
-			.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
-		final DmsProject someSummary =
-			this.testDataInitializer
-				.createDmsProject("Summary Dataset", "Summary Dataset-Description", someStudy, someStudy, DatasetTypeEnum.SUMMARY_DATA);
-
-		final Geolocation instance1 = this.testDataInitializer.createTestGeolocation("1", 101);
-		final Geolocation instance2 = this.testDataInitializer.createTestGeolocation("2", 102);
-		this.testDataInitializer.createTestExperiment(someSummary, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "1", null);
-		this.testDataInitializer.createTestExperiment(someSummary, instance2, TermId.SUMMARY_EXPERIMENT.getId(), "2", null);
-
-		final List<Integer> instanceIds = this.experimentDao.getLocationIdsOfStudy(someStudy.getProjectId());
-		Assert.assertTrue(instanceIds.contains(instance1.getLocationId()));
-		Assert.assertTrue(instanceIds.contains(instance2.getLocationId()));
-
-	}
-
-	@Test
-	public void testGetLocationIdsOfStudyWithFieldmap() {
-
-		final DmsProject someStudy = this.testDataInitializer
-			.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
-		final DmsProject someSummary =
-			this.testDataInitializer
-				.createDmsProject("Summary Dataset", "Summary Dataset-Description", someStudy, someStudy, DatasetTypeEnum.SUMMARY_DATA);
-
-		final Geolocation instance1 = this.testDataInitializer.createTestGeolocation("1", 101);
-		final Geolocation instance2 = this.testDataInitializer.createTestGeolocation("2", 102);
-		final ExperimentModel instance1Experiment =
-			this.testDataInitializer.createTestExperiment(someSummary, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "1", null);
-		this.testDataInitializer.createTestExperiment(someSummary, instance2, TermId.SUMMARY_EXPERIMENT.getId(), "2", null);
-
-		// Add fieldmap variable to istance 1
-		this.testDataInitializer.addExperimentProp(instance1Experiment, TermId.COLUMN_NO.getId(), "1", 1);
-
-		final List<Integer> instanceIds = this.experimentDao.getLocationIdsOfStudyWithFieldmap(someStudy.getProjectId());
-		// Only instance 1 has fieldmap.
-		Assert.assertTrue(instanceIds.contains(instance1.getLocationId()));
-		Assert.assertFalse(instanceIds.contains(instance2.getLocationId()));
-
-	}
-
 }
