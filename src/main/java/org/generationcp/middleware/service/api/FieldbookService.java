@@ -41,7 +41,6 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
@@ -841,19 +840,6 @@ public interface FieldbookService {
 	 */
 	List<ListDataProject> getListDataProject(int listId);
 
-	List<ListDataProject> getListDataProjectByStudy(int projectId, GermplasmListType type, List<Integer> plotNumbers, final String instanceNumber);
-
-
-	ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo);
-
-	/**
-	 * Deletes a list data project given the project_id and the type.
-	 *
-	 * @param projectId
-	 * @param type
-	 */
-	void deleteListDataProjects(int projectId, GermplasmListType type);
-
 	/**
 	 * Saves germplasm list crosses types. ListData items are always added to
 	 * the database, before saving the germplasm list.
@@ -873,8 +859,6 @@ public interface FieldbookService {
 	void saveStudyColumnOrdering(Integer studyId, List<Integer> orderedTermIds);
 
 	boolean setOrderVariableByRank(Workbook workbook);
-
-	void addListDataProjectList(List<ListDataProject> listDataProjectList);
 
 	/**
 	 * Gets the StandardVariable by Name

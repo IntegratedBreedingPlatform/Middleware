@@ -17,20 +17,9 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
-import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.StandardVariableSummary;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.TreatmentVariable;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
@@ -51,20 +40,7 @@ import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
-import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationType;
-import org.generationcp.middleware.pojos.Locdes;
-import org.generationcp.middleware.pojos.LocdesType;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Progenitor;
-import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -83,13 +59,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -1080,29 +1050,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<ListDataProject> getListDataProjectByStudy(final int projectId, final GermplasmListType type, final List<Integer> plotNumbers,
-			final String instanceNumber) {
-		return this.getListDataProjectDAO().getByStudy(projectId, type, plotNumbers, instanceNumber);
-	}
-
-	@Override
-	public ListDataProject getListDataProjectByListIdAndEntryNo(final int listId, final int entryNo) {
-		return this.getListDataProjectDAO().getByListIdAndEntryNo(listId, entryNo);
-	}
-
-	@Override
-	public void deleteListDataProjects(final int projectId, final GermplasmListType type) {
-		// when used in advanced, it will delete all the advance lists (list
-		// data projects)
-		final List<GermplasmList> lists = this.daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
-		if (lists != null && !lists.isEmpty()) {
-			for (final GermplasmList list : lists) {
-				this.getListDataProjectDAO().deleteByListIdWithList(list.getId());
-			}
-		}
-	}
-
-	@Override
 	public int saveOrUpdateListDataProject(final int projectId, final GermplasmListType type, final Integer originalListId,
 			final List<ListDataProject> listDatas, final int userId) {
 
@@ -1156,20 +1103,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public void addListDataProjectList(final List<ListDataProject> listDataProjectList) {
-
-		try {
-			for (final ListDataProject listDataProject : listDataProjectList) {
-				listDataProject.setList(this.getGermplasmListById(listDataProject.getList().getId()));
-				this.getListDataProjectDAO().save(listDataProject);
-			}
-		} catch (final Exception e) {
-			FieldbookServiceImpl.LOG.error(e.getMessage(), e);
-			this.logAndThrowException("Error encountered with addListDataProjectList(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
-		}
 	}
 
 	@Override

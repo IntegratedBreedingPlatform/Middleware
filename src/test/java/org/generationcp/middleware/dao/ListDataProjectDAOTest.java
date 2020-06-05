@@ -1,14 +1,10 @@
 package org.generationcp.middleware.dao;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
@@ -17,17 +13,11 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,6 +45,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 	private FieldbookService middlewareFieldbookService;
 
 	private Germplasm parentGermplasm;
+	// TODO IBP-3776 initialize test record manually since we don't create study snapshot list anymore
 	private ListDataProject testListDataProject;
 	private Integer studyId;
 	private final String cropPrefix = "ABCD";
@@ -75,9 +66,6 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 		// setup test data
 		studyId = this.createNurseryTestData();
-		final List<ListDataProject> listDataProjectList =
-			this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.STUDY, Arrays.asList(0), "1");
-		this.testListDataProject = listDataProjectList.get(0);
 	}
 
 	@Test
@@ -183,28 +171,6 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmUsedInEntryListTrue() {
-		final Integer listId = this.testListDataProject.getList().getId();
-		final List<ListDataProject> listDataProjects = this.middlewareFieldbookService.getListDataProject(listId);
-
-		final List<Integer> gids = Lists.transform(listDataProjects, new Function<ListDataProject, Integer>() {
-
-			@Nullable
-			@Override
-			public Integer apply(@Nullable final ListDataProject listDataProject) {
-				return listDataProject.getGermplasmId();
-			}
-		});
-
-		Assert.assertTrue(this.listDataProjectDAO.getGermplasmUsedInEntryList(gids).size() > 0);
-	}
-
-	@Test
-	public void testGetGermplasmUsedInEntryListFalse() {
-		Assert.assertFalse(this.listDataProjectDAO.getGermplasmUsedInEntryList(Arrays.asList(this.parentGermplasm.getGid())).size() > 0);
-	}
-
-	@Test
 	public void testGetByListIdAndGidNotNull() {
 		final Integer listId = this.testListDataProject.getList().getId();
 		final List<ListDataProject> listDataProjects = this.middlewareFieldbookService.getListDataProject(listId);
@@ -218,52 +184,6 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 	public void testGetByListIdAndGidNull() {
 		final Integer listId = this.testListDataProject.getList().getId();
 		Assert.assertNull(this.listDataProjectDAO.getByListIdAndGid(listId, this.parentGermplasm.getGid()));
-	}
-
-	@Test
-	public void testGetByStudy() {
-		final Session mockSession = Mockito.mock(Session.class);
-		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
-		this.listDataProjectDAO = new ListDataProjectDAO();
-		this.listDataProjectDAO.setSession(mockSession);
-		Mockito.when(mockSession.createSQLQuery(Matchers.anyString())).thenReturn(mockQuery);
-
-		final List<Integer> plotNumbers = Arrays.asList(1, 2, 3);
-		final String instanceNumber = "3";
-		final GermplasmListType listType = GermplasmListType.STUDY;
-		final int studyID = 5678;
-		this.listDataProjectDAO.getByStudy(studyID, listType, plotNumbers, instanceNumber);
-
-		final String expectedSql = "select ldp.* FROM nd_experiment e,"
-			+ " nd_experimentprop nd_ep, stock,"
-			+ " listdata_project ldp, project p, listnms nms, nd_geolocation geo"
-			+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)" + " AND nms.projectid = p.study_id"
-			+ " AND nms.listid = ldp.list_id"
-			+ " AND nms.projectid = :STUDY_ID" + " AND p.dataset_type_id = :DATASET_TYPE"
-			+ " AND e.project_id = p.project_id"
-			+ " AND e.nd_experiment_id = nd_ep.nd_experiment_id"
-			+ " AND stock.stock_id = e.stock_id" + " AND ldp.germplasm_id = stock.dbxref_id"
-			+ " AND nd_ep.value in (:PLOT_NO)"
-			+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id"
-			+ " AND e.nd_geolocation_id = geo.nd_geolocation_id"
-			+ " AND geo.description = :INSTANCE_NUMBER"
-			+ " AND ( EXISTS (" + " SELECT 1" + " FROM listnms cl"
-			+ " WHERE cl.listid = ldp.list_id" + " AND cl.listtype = 'CHECK'" + " AND NOT EXISTS ("
-			+ " SELECT 1 FROM listnms nl" + " WHERE nl.listid = ldp.list_id" + " AND nl.listtype = :LIST_TYPE"
-			+ " )) OR EXISTS (" + " SELECT 1 FROM listnms nl" + " WHERE nl.listid = ldp.list_id"
-			+ " AND nl.listtype = :LIST_TYPE" + " ))";
-		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(mockSession).createSQLQuery(sqlCaptor.capture());
-		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-		Mockito.verify(mockQuery).addEntity("ldp", ListDataProject.class);
-		Mockito.verify(mockQuery).setParameter("LIST_TYPE", listType.name());
-		Mockito.verify(mockQuery).setParameter("STUDY_ID", studyID);
-		Mockito.verify(mockQuery).setParameterList("PLOT_NO", plotNumbers);
-		Mockito.verify(mockQuery).setParameter("INSTANCE_NUMBER", instanceNumber);
-		Mockito.verify(mockQuery).setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
-		Mockito.verify(mockQuery).setParameterList(
-			"PLOT_NO_TERM_IDS",
-			new Integer[] {TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId()});
 	}
 
 	private List<ListDataProject> createListDataProject(
