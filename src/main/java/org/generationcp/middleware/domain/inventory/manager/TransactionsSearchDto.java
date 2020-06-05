@@ -21,6 +21,7 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	private List<Integer> transactionStatus;
 	private String notes;
 	private List<Integer> lotIds;
+	private List<String> lotUUIDs;
 	private List<Integer> gids;
 	private List<Integer> unitIds;
 	private Double minAmount;
@@ -172,6 +173,14 @@ public class TransactionsSearchDto extends SearchRequestDto {
 
 	public void setTransactionStatus(final List<Integer> transactionStatus) {
 		this.transactionStatus = transactionStatus;
+	}
+
+	public List<String> getLotUUIDs() {
+		return lotUUIDs;
+	}
+
+	public void setLotUUIDs(final List<String> lotUUIDs) {
+		this.lotUUIDs = lotUUIDs;
 	}
 
 	@Override
