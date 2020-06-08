@@ -1,7 +1,6 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import com.google.common.base.Preconditions;
-import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -11,11 +10,7 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.ims.ExperimentTransaction;
-import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
-import org.generationcp.middleware.pojos.ims.Transaction;
-import org.generationcp.middleware.pojos.ims.TransactionStatus;
-import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.ims.*;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -25,12 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -244,9 +234,10 @@ public class PlantingServiceImpl implements PlantingService {
 	}
 
 	@Override
-	public List<Transaction> getPlantingTransactionsByInstanceId(final Integer instanceId, final TransactionStatus transactionStatus) {
+	public List<Transaction> getPlantingTransactionsByInstanceIds(final List<Integer> instanceIds,
+		final TransactionStatus transactionStatus) {
 		return daoFactory.getExperimentTransactionDao()
-			.getTransactionsByInstanceId(instanceId, transactionStatus, ExperimentTransactionType.PLANTING);
+			.getTransactionsByInstanceIds(instanceIds, transactionStatus, ExperimentTransactionType.PLANTING);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
