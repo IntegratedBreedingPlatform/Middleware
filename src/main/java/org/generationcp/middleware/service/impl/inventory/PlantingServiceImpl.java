@@ -238,9 +238,10 @@ public class PlantingServiceImpl implements PlantingService {
 	}
 
 	@Override
-	public List<Transaction> getPlantingTransactionsByInstanceId(final Integer instanceId, final TransactionStatus transactionStatus) {
+	public List<Transaction> getPlantingTransactionsByInstanceIds(final List<Integer> instanceIds,
+		final TransactionStatus transactionStatus) {
 		return daoFactory.getExperimentTransactionDao()
-			.getTransactionsByInstanceId(instanceId, transactionStatus, ExperimentTransactionType.PLANTING);
+			.getTransactionsByInstanceIds(instanceIds, transactionStatus, ExperimentTransactionType.PLANTING);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
