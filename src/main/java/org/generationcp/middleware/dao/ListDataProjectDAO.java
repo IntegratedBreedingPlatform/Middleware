@@ -11,16 +11,11 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,14 +25,6 @@ import java.util.Map;
 public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	private static final String ENTRY_ID = "entryId";
-
-	public static final String GET_GERMPLASM_USED_IN_ENTRY_LIST = " SELECT \n" + "   ldp.germplasm_id, \n"
-		+ "   group_concat(p.name) \n" + " FROM listnms l \n"
-		+ "   INNER JOIN listdata_project ldp ON l.listid = ldp.list_id \n"
-		+ "   INNER JOIN project p ON l.projectid = p.project_id \n" + " WHERE ldp.germplasm_id IN (:gids) \n"
-		+ "       AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " \n" + "       AND l.listtype IN ('"
-		+ GermplasmListType.STUDY.name() + "', '"
-		+ GermplasmListType.CHECK.name() + "') \n" + " GROUP BY ldp.germplasm_id";
 
 	public void deleteByListId(final int listId) {
 		try {
@@ -98,100 +85,6 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 				e);
 		}
 
-	}
-
-	public ListDataProject getByListIdAndEntryNo(final int listId, final int entryNo) {
-		ListDataProject result = null;
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
-			criteria.add(Restrictions.eq("list", new GermplasmList(listId)));
-			criteria.add(Restrictions.eq(ListDataProjectDAO.ENTRY_ID, entryNo));
-			criteria.addOrder(Order.asc(ListDataProjectDAO.ENTRY_ID));
-			result = (ListDataProject) criteria.uniqueResult();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getByListIdAndEntryNo(listId=" + listId
-				+ ") query from ListDataProjectDAO: " + e.getMessage(), e);
-		}
-		return result;
-	}
-
-	public List<ListDataProject> getByStudy(
-		final int studyId, final GermplasmListType listType, final List<Integer> plotNumbers, final String instanceNumber) {
-		try {
-
-			final String queryStr = "select ldp.* FROM nd_experiment e,"
-				+ " nd_experimentprop nd_ep, stock,"
-				+ " listdata_project ldp, project p, listnms nms, nd_geolocation geo"
-				+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
-				+ " AND nms.projectid = p.study_id"
-				+ " AND nms.listid = ldp.list_id"
-				+ " AND nms.projectid = :STUDY_ID"
-				+ " AND p.dataset_type_id = :DATASET_TYPE"
-				+ " AND e.project_id = p.project_id"
-				+ " AND e.nd_experiment_id = nd_ep.nd_experiment_id"
-				+ " AND stock.stock_id = e.stock_id"
-				+ " AND ldp.germplasm_id = stock.dbxref_id"
-				+ " AND nd_ep.value in (:PLOT_NO)"
-				+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id"
-				+ " AND e.nd_geolocation_id = geo.nd_geolocation_id"
-				+ " AND geo.description = :INSTANCE_NUMBER"
-				+ " AND ( EXISTS (" + " SELECT 1" + " FROM listnms cl"
-				+ " WHERE cl.listid = ldp.list_id" + " AND cl.listtype = 'CHECK'" + " AND NOT EXISTS ("
-				+ " SELECT 1 FROM listnms nl" + " WHERE nl.listid = ldp.list_id" + " AND nl.listtype = :LIST_TYPE"
-				+ " )) OR EXISTS (" + " SELECT 1 FROM listnms nl" + " WHERE nl.listid = ldp.list_id"
-				+ " AND nl.listtype = :LIST_TYPE" + " ))";
-
-			final SQLQuery query = this.getSession().createSQLQuery(queryStr);
-			query.addEntity("ldp", ListDataProject.class);
-			query.setParameter("LIST_TYPE", listType.name());
-			query.setParameter("STUDY_ID", studyId);
-			query.setParameterList("PLOT_NO", plotNumbers);
-			query.setParameter("INSTANCE_NUMBER", instanceNumber);
-			query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
-			query.setParameterList(
-				"PLOT_NO_TERM_IDS",
-				new Integer[] {TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId()});
-
-			return query.list();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error in getStudy=" + studyId + " in ListDataProjectDAO: " + e.getMessage(), e);
-		}
-
-	}
-
-	public void deleteByListIdWithList(final int listId) {
-		try {
-			final String nmsListHql = "FROM GermplasmList nms " + "WHERE nms.id = :list_id";
-
-			final Query query = this.getSession().createQuery(nmsListHql);
-			query.setParameter("list_id", listId);
-
-			final GermplasmList germplasmLists = (GermplasmList) query.uniqueResult();
-
-			// delete listdataproj first
-			final String deleteListDataProjHQL = "DELETE FROM ListDataProject ldp "
-				+ "WHERE ldp.list = :germplasmLists";
-
-			final Query query2 = this.getSession().createQuery(deleteListDataProjHQL);
-			query2.setParameter("germplasmLists", germplasmLists);
-
-			query2.executeUpdate();
-
-			// delete listnms data
-			final String deleteNMSHql = "DELETE FROM GermplasmList nms " + "WHERE nms.id = :list_id";
-
-			final Query query3 = this.getSession().createQuery(deleteNMSHql);
-			query3.setParameter("list_id", listId);
-			query3.executeUpdate();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error in deleteByListId=" + listId + " in ListDataProjectDAO: " + e.getMessage(), e);
-		}
 	}
 
 	public long countByListId(final Integer id) {
@@ -322,26 +215,6 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	}
 
-	/**
-	 * Verify if the gids are used in some entry list
-	 *
-	 * @param gids gids to check
-	 * @return Map with GID as key and CSV of project where it is used
-	 */
-	public Map<Integer, String> getGermplasmUsedInEntryList(final List<Integer> gids) {
-		final Map<Integer, String> resultMap = new HashMap<>();
-
-		final SQLQuery query = this.getSession().createSQLQuery(ListDataProjectDAO.GET_GERMPLASM_USED_IN_ENTRY_LIST);
-		query.setParameterList("gids", gids);
-
-		final List<Object[]> results = query.list();
-		for (final Object[] result : results) {
-			resultMap.put((Integer) result[0], (String) result[1]);
-		}
-
-		return resultMap;
-	}
-
 	public ListDataProject getByListIdAndGid(final Integer listId, final Integer gid) {
 		// Make sure parameters are not null.
 		Preconditions.checkNotNull(listId, "List id passed cannot be null.");
@@ -364,12 +237,4 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	}
 
-	public List<ListDataProject> getGermplasmList(final int studyBusinessIdentifier) {
-		final Criteria listDataCriteria =
-			this.getSession().createCriteria(ListDataProject.class).createAlias("list", "l")
-				.add(Restrictions.eq("l.projectId", studyBusinessIdentifier));
-		listDataCriteria.add(Restrictions.eq("l.type", GermplasmListType.STUDY.name()));
-		listDataCriteria.addOrder(Order.asc("entryId"));
-		return listDataCriteria.list();
-	}
 }

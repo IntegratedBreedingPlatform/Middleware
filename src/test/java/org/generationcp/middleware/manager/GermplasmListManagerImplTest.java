@@ -182,9 +182,9 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testRetrieveSnapshotListDataWithParents() {
+		// FIXME IBP-3776 - Seed data manually since we don't create study list anymore
 		final Integer studyId = this.createNurseryTestData();
-		final List<ListDataProject> listDataProjectList =
-			this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.STUDY, Collections.singletonList(0), "1");
+		final List<ListDataProject> listDataProjectList = Collections.emptyList();
 		final List<ListDataProject> listDataProjects = this.manager.retrieveSnapshotListDataWithParents(listDataProjectList.get(0).getList().getId());
 		Assert.assertEquals(20, listDataProjects.size());
 		for(final ListDataProject listDataProject: listDataProjects) {

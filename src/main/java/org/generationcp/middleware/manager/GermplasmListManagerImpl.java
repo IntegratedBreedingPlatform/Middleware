@@ -21,7 +21,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
-import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
@@ -29,12 +28,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.ListMetadata;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
@@ -44,12 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -645,21 +634,21 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return gidsDelete;
 	}
 
-	private List<Integer> validateGermplasmForDeletion(final List<Integer> germplasms) {
+	private List<Integer> validateGermplasmForDeletion(final List<Integer> germplasm) {
 
-		final Set<Integer> codeFixedGermplasms = this.getCodeFixedGidsByGidList(germplasms);
-		final Set<Integer> germplasmOffspringByGIDs = this.getGermplasmOffspringByGIDs(germplasms);
-		final Set<Integer> germplasmsUsedInEntryList = this.getGermplasmUsedInEntryList(germplasms);
-		final Set<Integer> germplasmsWithOpenLots = this.getGidsWithOpenLots(germplasms);
-		final Set<Integer> germplasmsInOneOrMoreLists = this.getGermplasmUsedInMoreThanOneList(germplasms);
+		final Set<Integer> codeFixedGermplasms = this.getCodeFixedGidsByGidList(germplasm);
+		final Set<Integer> germplasmOffspringByGIDs = this.getGermplasmOffspringByGIDs(germplasm);
+		final Set<Integer> germplasmUsedInStudies = new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(germplasm));
+		final Set<Integer> germplasmWithOpenLots = this.getGidsWithOpenLots(germplasm);
+		final Set<Integer> germplasmInOneOrMoreLists = this.getGermplasmUsedInMoreThanOneList(germplasm);
 
 		final Set<Integer> all = new HashSet<>();
 
 		all.addAll(codeFixedGermplasms);
 		all.addAll(germplasmOffspringByGIDs);
-		all.addAll(germplasmsUsedInEntryList);
-		all.addAll(germplasmsWithOpenLots);
-		all.addAll(germplasmsInOneOrMoreLists);
+		all.addAll(germplasmUsedInStudies);
+		all.addAll(germplasmWithOpenLots);
+		all.addAll(germplasmInOneOrMoreLists);
 
 		return Lists.newArrayList(all);
 	}
@@ -713,18 +702,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 				"Error encountered while getting gids thart belongs to more than one list: GermplasmDataManager.getGermplasmUsedInMoreThanOneList(gids="
-					+ gids + "): " + e.getMessage(),
-				e);
-		}
-	}
-
-	private Set<Integer> getGermplasmUsedInEntryList(final List<Integer> gids) {
-		try {
-			final ListDataProjectDAO dao = this.getListDataProjectDAO();
-			return dao.getGermplasmUsedInEntryList(gids).keySet();
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Error encountered while getting gids that are being used in an Entry List: GermplasmDataManager.getGermplasmUsedInEntryList(gids="
 					+ gids + "): " + e.getMessage(),
 				e);
 		}
