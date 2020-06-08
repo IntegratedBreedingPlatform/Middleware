@@ -224,7 +224,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 				query.setParameter("blockId", blockId);
 			} else {
 				query.setParameter("datasetId", datasetId);
-				query.setParameter("geolocationId", instanceId);
+				query.setParameter("instanceId", instanceId);
 			}
 
 			final List<Object[]> list = query.list();
@@ -249,20 +249,20 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		FieldMapTrialInstanceInfo trialInstance = null;
 		List<FieldMapLabel> labels = null;
 		Integer datasetId = null;
-		Integer geolocationId = null;
+		Integer instanceId = null;
 		String datasetName = null;
 		String siteName = null;
 		String trialInstanceNo = null;
 		Integer blockId = null;
 		Integer siteId = null;
 		for (final Object[] row : list) {
-			if (geolocationId == null) {
+			if (instanceId == null) {
 				trialInstance = new FieldMapTrialInstanceInfo();
 				labels = new ArrayList<>();
 			} else {
 				// if trial instance or dataset has changed, add previously saved trial instance
-				if (!geolocationId.equals(row[2]) || !datasetId.equals(row[0])) {
-					trialInstance.setInstanceId(geolocationId);
+				if (!instanceId.equals(row[2]) || !datasetId.equals(row[0])) {
+					trialInstance.setInstanceId(instanceId);
 					trialInstance.setSiteName(siteName);
 					trialInstance.setLocationName(siteName);
 					trialInstance.setLocationId(siteId);
@@ -328,7 +328,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 			datasetId = (Integer) row[0];
 			datasetName = (String) row[1];
-			geolocationId = (Integer) row[2];
+			instanceId = (Integer) row[2];
 			siteName = (String) row[3];
 			if (row[17] != null && NumberUtils.isNumber((String) row[17])) {
 				siteId = Integer.valueOf((String) row[17]);
@@ -339,7 +339,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			blockId = row[11] != null ? Integer.valueOf((String) row[11]) : null;
 		}
 		// add last trial instance and dataset
-		trialInstance.setInstanceId(geolocationId);
+		trialInstance.setInstanceId(instanceId);
 		trialInstance.setSiteName(siteName);
 		trialInstance.setLocationName(siteName);
 		trialInstance.setLocationId(siteId);
