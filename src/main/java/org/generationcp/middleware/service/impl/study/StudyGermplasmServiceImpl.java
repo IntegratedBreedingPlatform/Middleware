@@ -44,6 +44,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		int index = 0;
 		for (final StockModel stockModel : stockModelList) {
 			final StudyGermplasmDto studyGermplasmDto = new StudyGermplasmDto();
+			studyGermplasmDto.setEntryId(stockModel.getStockId());
 			studyGermplasmDto.setCross(this.findStockPropValue(TermId.CROSS.getId(), stockModel.getProperties()));
 			studyGermplasmDto.setDesignation(stockModel.getName());
 			studyGermplasmDto.setEntryCode(stockModel.getValue());
@@ -137,6 +138,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		Optional<StockProperty> entryType = stock.getProperties().stream().filter(prop -> TermId.ENTRY_TYPE.getId() == (prop.getTypeId())).findFirst();
 		entryType.ifPresent(entry -> newStudyGermplasm.setEntryType(entry.getValue()) );
 		newStudyGermplasm.setGermplasmId(gid);
+		newStudyGermplasm.setEntryCode(stock.getValue());
 		final Name preferredName = newGermplasm.getPreferredName();
 		newStudyGermplasm.setDesignation(preferredName != null? preferredName.getNval() : "");
 		newStudyGermplasm.setCross(crossExpansion);

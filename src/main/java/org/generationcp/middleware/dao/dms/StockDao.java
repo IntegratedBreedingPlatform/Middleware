@@ -23,6 +23,8 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.CriteriaQuery;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
@@ -133,7 +135,15 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
 			criteria.add(Restrictions.eq("project.projectId", studyId));
-			return criteria.list();
+			// Return by ascending order of entry number. We need to perform cast first on uniquename since it's stored as string
+			criteria.addOrder(new org.hibernate.criterion.Order("uniquename", true) {
+				@Override
+				public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws HibernateException {
+					return "CAST(uniquename AS UNSIGNED)";
+				}
+			});
+			return  criteria.list();
+
 		} catch (final HibernateException e) {
 			final String errorMessage = "Error in getStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
