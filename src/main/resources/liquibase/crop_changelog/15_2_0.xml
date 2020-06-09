@@ -97,7 +97,7 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					SELECT COUNT(*) FROM stock WHERE stock.project_id IS NULL;
+					SELECT COUNT(*) FROM stock WHERE stock.project_id = 0;
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -106,7 +106,8 @@
 			UPDATE  stock
 			INNER JOIN nd_experiment nde ON nde.stock_id = stock.stock_id
 			INNER JOIN project p ON p.project_id = nde.project_id
-			SET stock.project_id = p.study_id WHERE stock.project_id IS NULL;
+				SET stock.project_id = p.study_id
+			WHERE stock.project_id = 0;
         </sql>
 	</changeSet>
 

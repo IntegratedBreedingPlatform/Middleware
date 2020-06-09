@@ -4,15 +4,14 @@ package org.generationcp.middleware.service.impl.study;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.GermplasmListDAO;
-import org.generationcp.middleware.dao.ListDataProjectDAO;
-import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
-import org.generationcp.middleware.data.initializer.ListDataProjectTestDataInitializer;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,6 +19,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,17 +27,22 @@ import java.util.List;
  */
 public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 
+	private static final Integer NUMBER_OF_GERMPLASM = 5;
+
 	private static final String GERMPLASM_PREFERRED_NAME_PREFIX = DataSetupTest.GERMPLSM_PREFIX + "PR-";
-	private static final Integer STUDY_ID = 54321;
+	private static final String ENTRYCODE = "ENTRYCODE-";
+	private static final String CROSS = "ABC/XYZ-";
+	private static final String SEEDSOURCE = "SEEDSOURCE-";
 
 
 	@Autowired
 	private GermplasmDataManager germplasmManager;
 
 	private StudyGermplasmServiceImpl service;
-	private GermplasmListDAO listDao;
-	private ListDataProjectDAO listDataProjectDAO;
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
+	private DmsProjectDao projectDao;
+	private StockDao stockDao;
+	private Integer studyId;
 	private List<Integer> gids;
 
 
@@ -47,49 +52,95 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager);
 		}
-		this.listDao = new GermplasmListDAO();
-		this.listDao.setSession(this.sessionProvder.getSession());
-		this.listDataProjectDAO = new ListDataProjectDAO();
-		this.listDataProjectDAO.setSession(this.sessionProvder.getSession());
-		this.setupData();
+		if (this.projectDao == null) {
+			this.projectDao = new DmsProjectDao();
+			this.projectDao.setSession(this.sessionProvder.getSession());
+		}
+		if (this.stockDao == null) {
+			this.stockDao = new StockDao();
+			this.stockDao.setSession(this.sessionProvder.getSession());
+		}
+		if (this.studyId == null) {
+			final DmsProject study = new DmsProject(
+			"TEST STUDY", "TEST DESCRIPTION", null, Collections.emptyList(),
+			false,
+			false, new StudyType(6), "20200606", null, null,
+			null, "1");
+			this.projectDao.save(study);
+			this.studyId = study.getProjectId();
+		}
+
+		if (this.gids == null) {
+			this.createTestGermplasm();
+		}
+	}
+
+	private void createTestGermplasm() {
+		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final Integer[] gids = this.germplasmTestDataGenerator
+				.createChildrenGermplasm(StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM, StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX,
+						parentGermplasm);
+		this.gids = Arrays.asList(gids);
+		for (int i=1; i<=StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM; i++) {
+			final Integer gid = gids[i - 1];
+			this.stockDao.save(new StockModel(studyId, createTestStudyGermplasm(i, gid)));
+		}
+	}
+
+	private StudyGermplasmDto createTestStudyGermplasm(int i, Integer gid) {
+		final StudyGermplasmDto germplasmDto = new StudyGermplasmDto();
+		germplasmDto.setGermplasmId(gid);
+		germplasmDto.setEntryNumber(i);
+		germplasmDto.setDesignation(StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + i);
+		germplasmDto.setEntryCode(StudyGermplasmServiceImplTest.ENTRYCODE + gid);
+		germplasmDto.setCross(StudyGermplasmServiceImplTest.CROSS + i);
+		germplasmDto.setEntryType(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()));
+		germplasmDto.setSeedSource(StudyGermplasmServiceImplTest.SEEDSOURCE + i);
+		return germplasmDto;
 	}
 
 	@Test
-	public void testGetGermplasm() {
-		final List<StudyGermplasmDto> germplasmList = this.service.getGermplasm(STUDY_ID);
-		Assert.assertEquals(DataSetupTest.NUMBER_OF_GERMPLASM, germplasmList.size());
+	public void testGetAllStudyGermplasm() {
+		final List<StudyGermplasmDto> studyGermplasm = this.service.getGermplasm(this.studyId);
+		Assert.assertEquals(StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM.intValue(), studyGermplasm.size());
 		int index = 1;
-		for (final StudyGermplasmDto dto : germplasmList) {
-			Assert.assertEquals(index++, dto.getEntryNumber().intValue());
+		for (final StudyGermplasmDto dto : studyGermplasm) {
+			final Integer gid = this.gids.get(index - 1);
+			this.verifyStudyGermplasmDetails(gid, index++, dto);
 		}
 	}
 
-	private void setupData() {
-		final GermplasmList list = new GermplasmListTestDataInitializer().createGermplasmList("TESTLIST", 1, "TESTLIST-DESC", null, 1, "");
-		list.setType(GermplasmListType.STUDY.name());
-		list.setProjectId(STUDY_ID);
-		this.listDao.save(list);
-
-		// Save a second advance list
-		final GermplasmList list2 = new GermplasmListTestDataInitializer().createGermplasmList("ADVLIST", 1, "ADVLIST-DESC", null, 1, "");
-		list2.setType(GermplasmListType.ADVANCED.name());
-		list2.setProjectId(STUDY_ID);
-		this.listDao.save(list2);
-
-		// Save entries for study list
-		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
-		final Integer[] gids = this.germplasmTestDataGenerator
-			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX,
-				parentGermplasm);
-		this.gids = Arrays.asList(gids);
-		for (int i=1; i<=DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
-			final Integer gid = this.gids.get(DataSetupTest.NUMBER_OF_GERMPLASM - i);
-			final ListDataProject listDataProject = ListDataProjectTestDataInitializer
-				.createListDataProject(list, gid, 0, i, "entryCode", "seedSource", "DESIG-" +gid, "groupName",
-					"duplicate", "notes", 20170125);
-			this.listDataProjectDAO.save(listDataProject);
-		}
-
+	@Test
+	public void testCountStudyGermplasm() {
+		Assert.assertEquals(StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM.intValue(), this.service.countStudyGermplasm(this.studyId));
 	}
+
+	@Test
+	public void testDeleteStudyGermplasm() {
+		this.service.deleteStudyGermplasm(this.studyId);
+		Assert.assertTrue(this.service.countStudyGermplasm(this.studyId) == 0);
+	}
+
+	@Test
+	public void testSaveStudyGermplasm() {
+		final Integer gid = gids.get(0);
+		final int index = StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM + 1;
+		final StudyGermplasmDto newStudyGermplasm = createTestStudyGermplasm(index, gid);
+		final List<StudyGermplasmDto> addedStudyGermplasmList = this.service.saveStudyGermplasm(this.studyId, Collections.singletonList(newStudyGermplasm));
+		Assert.assertEquals(1, addedStudyGermplasmList.size());
+		final StudyGermplasmDto dto = addedStudyGermplasmList.get(0);
+		this.verifyStudyGermplasmDetails(gid, index, dto);
+		Assert.assertEquals(index, this.service.countStudyGermplasm(this.studyId));
+	}
+
+	private void verifyStudyGermplasmDetails(Integer gid, int index, StudyGermplasmDto dto) {
+		Assert.assertEquals(index, dto.getEntryNumber().intValue());
+		Assert.assertEquals(StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + index, dto.getDesignation());
+		Assert.assertEquals(StudyGermplasmServiceImplTest.SEEDSOURCE + index, dto.getSeedSource());
+		Assert.assertEquals(StudyGermplasmServiceImplTest.CROSS + index, dto.getCross());
+		Assert.assertEquals(gid.intValue(), dto.getGermplasmId().intValue());
+		Assert.assertEquals(StudyGermplasmServiceImplTest.ENTRYCODE + gid, dto.getEntryCode());
+	}
+
 
 }
