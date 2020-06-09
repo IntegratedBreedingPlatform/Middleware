@@ -140,6 +140,8 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		final Name preferredName = newGermplasm.getPreferredName();
 		newStudyGermplasm.setDesignation(preferredName != null? preferredName.getNval() : "");
 		newStudyGermplasm.setCross(crossExpansion);
+		// Save also Group GID
+		newStudyGermplasm.setGroupId(newGermplasm.getMgid());
 
 		final StudyGermplasmDto savedStudyGermplasm = this.saveStudyGermplasm(studyId, Collections.singletonList(newStudyGermplasm)).get(0);
 		stockDao.replaceExperimentStocks(entryId, savedStudyGermplasm.getEntryId());

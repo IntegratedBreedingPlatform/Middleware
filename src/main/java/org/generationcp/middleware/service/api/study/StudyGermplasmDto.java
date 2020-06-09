@@ -53,6 +53,11 @@ public class StudyGermplasmDto implements Serializable {
 
 		final Optional<StockProperty> cross = stock.getProperties().stream().filter(prop -> TermId.CROSS.getId() == (prop.getTypeId())).findFirst();
 		cross.ifPresent(crs -> this.setCross(crs.getValue()) );
+
+		final Optional<StockProperty> groupGID = stock.getProperties().stream().filter(prop -> TermId.GROUPGID.getId() == (prop.getTypeId())).findFirst();
+		if (groupGID.isPresent() && groupGID.get().getValue() != null) {
+			this.setGroupId(Integer.valueOf(groupGID.get().getValue()));
+		}
 	}
 
 	/**
