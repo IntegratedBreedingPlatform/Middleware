@@ -227,7 +227,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 				// we just need to update their values if they are added to the study. No need to create GeolocationProperty.
 				this.mapGeolocationMetaData(geolocation, instanceData.getVariableId(), value);
 				geolocationDao.save(geolocation);
-				// Change the status to OUT_OF_SYNC of phenotypes that depend on the changed/updated variable.
+				// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 				this.datasetService
 					.updateDependentPhenotypesStatusByGeolocation(instanceData.getInstanceId(),
 						Arrays.asList(instanceData.getVariableId()));
@@ -272,7 +272,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			propertyDao.update(property);
 		}
 
-		// Change the status to OUT_OF_SYNC of phenotypes that depend on the changed/updated variable.
+		// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 		this.datasetService
 			.updateDependentPhenotypesStatusByGeolocation(instanceData.getInstanceId(), Arrays.asList(instanceData.getVariableId()));
 
