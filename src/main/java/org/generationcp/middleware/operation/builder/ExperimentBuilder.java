@@ -34,11 +34,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class ExperimentBuilder extends Builder {
 
@@ -262,7 +264,8 @@ public class ExperimentBuilder extends Builder {
 
 		final Optional<GeolocationProperty>
 			geolocationPropertyOptional =
-			geoLocation.getProperties().stream().filter(o -> o.getTypeId().intValue() == variableType.getId()).findFirst();
+			Optional.ofNullable(geoLocation.getProperties()).map(Collection::stream)
+				.orElseGet(Stream::empty).filter(o -> o.getTypeId().intValue() == variableType.getId()).findFirst();
 
 		if (geolocationPropertyOptional.isPresent()) {
 			return new Variable(variableType, geolocationPropertyOptional.get().getValue(),
