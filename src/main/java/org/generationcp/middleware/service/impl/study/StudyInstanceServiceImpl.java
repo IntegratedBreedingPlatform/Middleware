@@ -284,7 +284,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final boolean isEnvironmentCondition) {
 
 		if (isEnvironmentCondition) {
-			final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotype(instanceId, instanceDataId);
+			final ExperimentModel experimentModel =
+				this.daoFactory.getExperimentDao().getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), instanceId);
+			final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotype(experimentModel.getNdExperimentId(), instanceDataId);
 			if (phenotype != null) {
 				return Optional
 					.of(new InstanceData(phenotype.getExperiment().getNdExperimentId(), instanceDataId, phenotype.getObservableId(),
