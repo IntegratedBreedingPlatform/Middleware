@@ -60,7 +60,7 @@ public class LotWithdrawalInputDto {
 	}
 
 
-	private SearchCompositeDto<Integer, Integer> selectedLots;
+	private SearchCompositeDto<Integer, String> selectedLots;
 
 	private Map<String, WithdrawalAmountInstruction> withdrawalsPerUnit;
 
@@ -82,11 +82,11 @@ public class LotWithdrawalInputDto {
 		this.notes = notes;
 	}
 
-	public SearchCompositeDto<Integer, Integer> getSelectedLots() {
+	public SearchCompositeDto<Integer, String> getSelectedLots() {
 		return selectedLots;
 	}
 
-	public void setSelectedLots(final SearchCompositeDto<Integer, Integer> selectedLots) {
+	public void setSelectedLots(final SearchCompositeDto<Integer, String> selectedLots) {
 		this.selectedLots = selectedLots;
 	}
 
