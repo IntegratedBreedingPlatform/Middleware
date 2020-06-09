@@ -223,8 +223,14 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			final String value = this.getEnvironmentDataValue(instanceData);
 
 			if (GEOLOCATION_METADATA.contains(instanceData.getVariableId())) {
+				// Geolocation Metadata variables are stored in Geolocation table.
+				// we just need to update their values if they are added to the study. No need to create GeolocationProperty.
 				this.mapGeolocationMetaData(geolocation, instanceData.getVariableId(), value);
 				geolocationDao.save(geolocation);
+				// Change the status to OUT_OF_SYNC of phenotypes that depend on the changed/updated variable.
+				this.datasetService
+					.updateDependentPhenotypesStatusByGeolocation(instanceData.getInstanceId(),
+						Arrays.asList(instanceData.getVariableId()));
 			} else {
 				final GeolocationProperty property = new GeolocationProperty(geolocation, value, 1, instanceData.getVariableId());
 				this.daoFactory.getGeolocationPropertyDao().save(property);
@@ -259,22 +265,14 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			phenotype.setUpdatedDate(new Date());
 			phenotypeDAO.update(phenotype);
 		} else {
-
-			if (GEOLOCATION_METADATA.contains(instanceData.getVariableId())) {
-				final GeolocationDao geolocationDao = this.daoFactory.getGeolocationDao();
-				final Geolocation geolocation = geolocationDao.getById(instanceData.getInstanceId());
-				this.mapGeolocationMetaData(geolocation, instanceData.getVariableId(), this.getEnvironmentDataValue(instanceData));
-				geolocationDao.update(geolocation);
-			} else {
-				final GeolocationPropertyDao propertyDao = this.daoFactory.getGeolocationPropertyDao();
-				final GeolocationProperty property = propertyDao.getById(instanceData.getInstanceDataId());
-				Preconditions.checkNotNull(property);
-				property.setValue(this.getEnvironmentDataValue(instanceData));
-				propertyDao.update(property);
-			}
-
+			final GeolocationPropertyDao propertyDao = this.daoFactory.getGeolocationPropertyDao();
+			final GeolocationProperty property = propertyDao.getById(instanceData.getInstanceDataId());
+			Preconditions.checkNotNull(property);
+			property.setValue(this.getEnvironmentDataValue(instanceData));
+			propertyDao.update(property);
 		}
 
+		// Change the status to OUT_OF_SYNC of phenotypes that depend on the changed/updated variable.
 		this.datasetService
 			.updateDependentPhenotypesStatusByGeolocation(instanceData.getInstanceId(), Arrays.asList(instanceData.getVariableId()));
 
