@@ -8,6 +8,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -163,6 +164,29 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(oldEntry.getEntryType(), dto.getEntryType());
 		Assert.assertEquals(oldEntry.getEntryNumber(), dto.getEntryNumber());
 		Assert.assertEquals(oldEntry.getEntryCode(), dto.getEntryCode());
+	}
+
+	@Test(expected = MiddlewareRequestException.class)
+	public void testReplaceStudyGermplasm_InvalidEntryId() {
+		final StudyGermplasmDto oldEntry = this.service.getGermplasm(this.studyId).get(1);
+		Assert.assertNotNull(oldEntry);
+		final Integer newGid = gids.get(0);
+		this.service.replaceStudyGermplasm(this.studyId, oldEntry.getEntryId() + 10, newGid, RandomStringUtils.random(5));
+	}
+
+	@Test(expected = MiddlewareRequestException.class)
+	public void testReplaceStudyGermplasm_InvalidEntryIdForStudy() {
+		final StudyGermplasmDto oldEntry = this.service.getGermplasm(this.studyId).get(1);
+		Assert.assertNotNull(oldEntry);
+		final Integer newGid = gids.get(0);
+		this.service.replaceStudyGermplasm(this.studyId+1, oldEntry.getEntryId(), newGid, RandomStringUtils.random(5));
+	}
+
+	@Test(expected = MiddlewareRequestException.class)
+	public void testReplaceStudyGermplasm_SameGidAsExistingEntry() {
+		final StudyGermplasmDto oldEntry = this.service.getGermplasm(this.studyId).get(1);
+		Assert.assertNotNull(oldEntry);
+		this.service.replaceStudyGermplasm(this.studyId+1, oldEntry.getEntryId(), oldEntry.getGermplasmId(), RandomStringUtils.random(5));
 	}
 
 	private void verifyStudyGermplasmDetails(Integer gid, int index, StudyGermplasmDto dto) {
