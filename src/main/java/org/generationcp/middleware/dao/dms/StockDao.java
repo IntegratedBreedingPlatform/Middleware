@@ -93,9 +93,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "st.study_type_id, st.label, st.name as studyTypeName, st.visible, st.cvterm_id, p.program_uuid, p.locked, "
 				+ "p.created_by "
 				+ "FROM stock s "
-				+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
-				+ "LEFT JOIN project ds ON ds.project_id = e.project_id "
-				+ "LEFT JOIN project p ON ds.study_id = p.project_id "
+				+ "INNER JOIN project p ON s.project_id = p.project_id "
 				+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id "
 				+ " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0");
 			query.addScalar("project_id").addScalar("name").addScalar("description").addScalar("study_type_id").addScalar("label")
