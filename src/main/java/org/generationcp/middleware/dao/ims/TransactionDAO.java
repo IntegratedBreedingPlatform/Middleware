@@ -63,7 +63,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				new StringBuilder().append("Select COUNT(1) ")
 					.append("FROM ims_transaction tran ")
 					.append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
-					.append("INNER JOIN stock s on s.dbxref_id = tran.recordid ")
+					.append("INNER JOIN stock s on s.dbxref_id = lot.eid ")
 					.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue()).append(" AND s.project_id = :studyId ");
 
 			final SQLQuery query = session.createSQLQuery(sql.toString());
@@ -88,7 +88,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					.append("tran.sourceid, tran.trnqty, lot.stock_id, lot.comments, tran.recordid ")
 					.append("FROM ims_transaction tran ")
 					.append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
-					.append("INNER JOIN stock s on s.dbxref_id = tran.recordid ")
+					.append("INNER JOIN stock s on s.dbxref_id = lot.eid ")
 					.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue()).append(" AND s.project_id = :studyId ");
 
 			final SQLQuery query = session.createSQLQuery(sql.toString());
