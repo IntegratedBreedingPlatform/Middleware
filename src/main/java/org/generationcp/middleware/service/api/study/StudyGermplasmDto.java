@@ -37,6 +37,21 @@ public class StudyGermplasmDto implements Serializable {
 
 	public StudyGermplasmDto() { }
 
+	public StudyGermplasmDto(final Integer entryId) {
+		this.entryId = entryId;
+	}
+
+	public StudyGermplasmDto(final Integer entryId, final String entryType, final Integer germplasmId, final String designation, final Integer entryNumber, final String entryCode, final String cross, final String seedSource) {
+		this.entryId = entryId;
+		this.entryType = entryType;
+		this.germplasmId = germplasmId;
+		this.designation = designation;
+		this.entryNumber = entryNumber;
+		this.entryCode = entryCode;
+		this.cross = cross;
+		this.seedSource = seedSource;
+	}
+
 	public StudyGermplasmDto(final StockModel stock) {
 		this.setEntryId(stock.getStockId());
 		this.setDesignation(stock.getName());
