@@ -12,6 +12,7 @@ package org.generationcp.middleware.manager;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.TransformerUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -21,16 +22,11 @@ import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataIni
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.utils.test.Debug;
@@ -44,7 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -182,10 +177,13 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testRetrieveSnapshotListDataWithParents() {
-		// FIXME IBP-3776 - Seed data manually since we don't create study list anymore
-		final Integer studyId = this.createNurseryTestData();
-		final List<ListDataProject> listDataProjectList = Collections.emptyList();
-		final List<ListDataProject> listDataProjects = this.manager.retrieveSnapshotListDataWithParents(listDataProjectList.get(0).getList().getId());
+
+		final GermplasmList list1 =
+				(this.createGermplasmListTestData());
+		this.saveGermplasmList(list1);
+		this.createSnapshotList(list1);
+
+		final List<ListDataProject> listDataProjects = this.manager.retrieveSnapshotListDataWithParents(list1.getId());
 		Assert.assertEquals(20, listDataProjects.size());
 		for(final ListDataProject listDataProject: listDataProjects) {
 			Assert.assertEquals(this.parentGermplasm.getGid(), listDataProject.getMaleGid());
@@ -198,14 +196,12 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	 * nursery as well for refactoring on ListDataProject.getByStudy method
 	 * later on
 	 */
-	private int createNurseryTestData() {
-		final String programUUID = "884fefcc-1cbd-4e0f-9186-ceeef3aa3b78";
+	private void createSnapshotList(final GermplasmList list) {
 		this.parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 
 		final Integer[] gids = this.germplasmTestDataGenerator
 			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, GERMPLASM_PREFERRED_NAME_PREFIX, this.parentGermplasm);
-
-		return this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, "ABCD");
+		this.createListDataProject(list, gids);
 	}
 
 	@Test
@@ -436,10 +432,14 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testRetrieveSnapshotListData() {
-		final Integer listId = 1;
+		final GermplasmList list1 =
+				(this.createGermplasmListTestData());
+		this.saveGermplasmList(list1);
+		this.createSnapshotList(list1);
 
-		final List<ListDataProject> listData = this.manager.retrieveSnapshotListData(listId);
+		final List<ListDataProject> listData = this.manager.retrieveSnapshotListData(list1.getId());
 		Assert.assertNotNull("It should not be null", listData);
+		Assert.assertFalse(listData.isEmpty());
 	}
 
 	@Test
@@ -492,11 +492,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 			this.manager.addGermplasmListData(listData1);
 		}
 
-		final List<ListDataProject> listDataProjects = this.createListDataProject(list1, noOfTestEntries, noOfCheckEntries);
-
-		final int studyId = this.createNurseryTestData();
-
-
 		assertThat(germplasms, is(equalTo(this.dataManager.getGermplasms(gidsNews))));
 
 		this.manager.deleteGermplasms(gidsNews, list1.getId());
@@ -519,31 +514,22 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	}
 
-	private List<ListDataProject> createListDataProject(
-		final GermplasmList germplasmList, final long noOfTestEntries,
-		final long noOfCheckEntries) {
-
-		final List<ListDataProject> listDataProjects = new ArrayList<>();
-		for (int i = 0; i < noOfCheckEntries; i++) {
-			listDataProjects.add(this.createListDataProject(germplasmList, SystemDefinedEntryType.CHECK_ENTRY));
+	private List<ListDataProject> createListDataProject(final GermplasmList germplasmList, final Integer[] gids) {
+		final List<ListDataProject> list = new ArrayList<>();
+		for (int i=1; i <= gids.length; i++) {
+			final ListDataProject listDataProject = new ListDataProject();
+			listDataProject.setCheckType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
+			listDataProject.setDesignation(RandomStringUtils.randomAlphabetic(10));
+			listDataProject.setEntryCode(RandomStringUtils.randomAlphabetic(10));
+			listDataProject.setSeedSource(RandomStringUtils.randomAlphabetic(10));
+			listDataProject.setGroupName(RandomStringUtils.randomAlphabetic(10));
+			listDataProject.setList(germplasmList);
+			listDataProject.setGermplasmId(gids[i-1]);
+			listDataProject.setEntryId(i);
+			list.add(this.listDataProjectDAO.save(listDataProject));
 		}
-		for (int i = 0; i < noOfTestEntries; i++) {
-			listDataProjects.add(this.createListDataProject(germplasmList, SystemDefinedEntryType.TEST_ENTRY));
-		}
 
-		return listDataProjects;
-
-	}
-
-	private ListDataProject createListDataProject(final GermplasmList germplasmList, final SystemDefinedEntryType systemDefinedEntryType) {
-
-		final ListDataProject listDataProject = new ListDataProject();
-		listDataProject.setCheckType(systemDefinedEntryType.getEntryTypeCategoricalId());
-		listDataProject.setSeedSource("");
-		listDataProject.setList(germplasmList);
-		listDataProject.setGermplasmId(1);
-
-		return listDataProject;
+		return list;
 
 	}
 

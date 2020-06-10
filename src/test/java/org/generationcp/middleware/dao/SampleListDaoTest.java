@@ -42,6 +42,7 @@ import org.springframework.data.domain.Sort;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 public class SampleListDaoTest extends IntegrationTestBase {
 
@@ -295,10 +296,17 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	private void createSampleListForSearch(final String listName) {
 
+		final DmsProject study = new DmsProject();
+		study.setName("TEST STUDY " + new Random().nextInt());
+		study.setDescription("Test Study");
+		this.dmsProjectDao.save(study);
+
 		final DmsProject plotDmsProject = new DmsProject();
 		plotDmsProject.setName("Plot Dataset");
 		plotDmsProject.setDescription("Plot Dataset");
 		plotDmsProject.setDatasetType(new DatasetType(DatasetTypeEnum.PLOT_DATA.getId()));
+		plotDmsProject.setStudy(study);
+		plotDmsProject.setParent(study);
 		this.dmsProjectDao.save(plotDmsProject);
 
 		final WorkbenchUser user = this.createTestUser();
