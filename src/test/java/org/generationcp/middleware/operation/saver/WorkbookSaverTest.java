@@ -393,7 +393,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	}
 
 	@Test
-	public void testSetStockIdsForMeansExperiments() {
+	public void testSetStockIdsForDatasetExperiments() {
 		final StudyDataManager studyDataManager = Mockito.mock(StudyDataManager.class);
 		workbookSaver.setStudyDataManager(studyDataManager);
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
@@ -416,7 +416,8 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		workbook.setObservations(MeasurementRowTestDataInitializer.
 			createMeasurementRowList(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), "1",
 				MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), "1")));
-		workbookSaver.setStockIdsForMeansExperiments(workbook, TermId.ENTRY_NO.name());
+		// FIXME
+		workbookSaver.setDatasetStocks(workbook, Collections.emptyList());
 		Assert.assertEquals(stock.getId(), workbook.getObservations().get(0).getStockId());
 	}
 
