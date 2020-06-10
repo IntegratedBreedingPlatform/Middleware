@@ -95,8 +95,8 @@ public class StockModel implements Serializable {
 	public StockModel() {
 	}
 
-	public StockModel(Integer stockId, Integer organismId, String name, String uniqueName, String value,
-			String description, Integer typeId, Boolean isObsolete) {
+	public StockModel(final Integer stockId, final Integer organismId, final String name, final String uniqueName, final String value,
+			final String description, final Integer typeId, final Boolean isObsolete) {
 		super();
 		this.stockId = stockId;
 		this.organismId = organismId;
@@ -357,6 +357,8 @@ public class StockModel implements Serializable {
 		builder.append(this.typeId);
 		builder.append(", isObsolete=");
 		builder.append(this.isObsolete);
+		builder.append(", project=");
+		builder.append(this.project);
 		builder.append("]");
 		return builder.toString();
 	}

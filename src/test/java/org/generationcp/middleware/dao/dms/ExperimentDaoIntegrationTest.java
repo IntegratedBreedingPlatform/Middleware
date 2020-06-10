@@ -57,7 +57,7 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 	public void testSaveOrUpdate() {
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 5);
+		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 5);
 
 		// Verify that new experiments have auto-generated UUIDs as values for obs_unit_id
 		for (final ExperimentModel experiment : experimentModels) {
@@ -124,7 +124,7 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), null, null);
 		final List<ExperimentModel> subObsExperimentsInstance =
 			this.testDataInitializer
-				.createTestExperiments(plantSubObsDataset, plotExperimentModel, geolocation, noOfSubObservationExperiment);
+				.createTestExperimentsWithStock(this.study, plantSubObsDataset, plotExperimentModel, geolocation, noOfSubObservationExperiment);
 
 		final CVTerm trait1 = this.testDataInitializer.createTrait(traitName);
 		this.testDataInitializer.addPhenotypes(subObsExperimentsInstance, trait1.getCvTermId(), RandomStringUtils.randomNumeric(5));
@@ -176,7 +176,7 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testCountObservationsPerInstance() {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation(GEOLOCATION_DESCRIPTION, 101);
-		this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 10);
+		this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 10);
 		final Map<String, Long> result = this.experimentDao.countObservationsPerInstance(this.plot.getProjectId());
 		assertEquals(result.get(GEOLOCATION_DESCRIPTION), Long.valueOf(10));
 	}
@@ -185,7 +185,7 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 	public void testGetExperimentSamplesDTOMap() {
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 1);
+		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 1);
 
 		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
 		final SampleList sampleList = this.testDataInitializer.createTestSampleList("MyList", user.getUserid());

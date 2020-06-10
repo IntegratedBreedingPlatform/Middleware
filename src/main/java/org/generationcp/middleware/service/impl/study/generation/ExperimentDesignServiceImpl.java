@@ -27,6 +27,7 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
@@ -191,11 +192,8 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 					experimentModel = this.experimentGenerator.generate(crop, plotDatasetId, row, ExperimentType.PLOT, geolocation, variablesMap);
 				final String entryNumber = String.valueOf(row.getEntryNumber());
 				StockModel stockModel = stocksMap.get(entryNumber);
-				if (stockModel == null) {
-					stockModel = new StockModelGenerator().generate(variablesMap, Lists.newArrayList(row.getVariables().values()));
-					this.daoFactory.getStockDao().save(stockModel);
-					stocksMap.put(entryNumber, stockModel);
-				}
+				// It is expected that stocks were created before when study was saved with germplasm
+				Assert.notNull(stockModel);
 				experimentModel.setStock(stockModel);
 				this.daoFactory.getExperimentDao().save(experimentModel);
 			}

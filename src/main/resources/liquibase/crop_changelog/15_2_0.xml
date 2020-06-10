@@ -115,24 +115,38 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					SELECT COUNT(*) FROM listnms WHERE listnms.listtype = 'STUDY';
+					SELECT COUNT(*) FROM listnms WHERE listnms.listtype IN ('STUDY', 'CHECK');
 				</sqlCheck>
 			</not>
 		</preConditions>
-		<comment>Delete all STUDY germplasm list and its data</comment>
+		<comment>Delete all STUDY and CHECK germplasm list and its data</comment>
 		<sql dbms="mysql">
-			-- Delete all STUDY entry list data
+			-- Delete all STUDY and CHECK entry list data
 			DELETE  ldp FROM listnms
 			INNER JOIN listdata_project ldp ON listnms.listid = ldp.list_id
-			WHERE listnms.listtype = 'STUDY';
+			WHERE listnms.listtype IN ('STUDY', 'CHECK');
 
-			-- Delete all STUDY entry list
+			-- Delete all STUDY and CHECK entry list
 			DELETE  FROM listnms
-			WHERE listnms.listtype = 'STUDY';
+			WHERE listnms.listtype IN ('STUDY', 'CHECK');
         </sql>
 	</changeSet>
 
-	 <changeSet author="mderamos" id="v15.2.0-6">
+	<changeSet author="aldrin" id="v15.2.0-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM stock WHERE project_id = 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Delete all stocks that don't have study associated to them</comment>
+		<sql dbms="mysql">
+			DELETE FROM stock WHERE project_id = 0;
+        </sql>
+	</changeSet>
+
+	 <changeSet author="mderamos" id="v15.2.0-7">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS

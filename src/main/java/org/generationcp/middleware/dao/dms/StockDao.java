@@ -73,9 +73,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 		try {
 			final SQLQuery query = this.getSession()
-					.createSQLQuery("select count(distinct p.study_id) " + "FROM stock s "
-							+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
-							+ "LEFT JOIN project p ON e.project_id= p.project_id " + "WHERE s.dbxref_id = " + gid
+					.createSQLQuery("select count(distinct p.project_id) " + "FROM stock s "
+							+ "INNER JOIN project p ON s.project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
 							+ " AND p.deleted = 0");
 			return ((BigInteger) query.uniqueResult()).longValue();
 
@@ -95,9 +94,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "st.study_type_id, st.label, st.name as studyTypeName, st.visible, st.cvterm_id, p.program_uuid, p.locked, "
 				+ "p.created_by "
 				+ "FROM stock s "
-				+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
-				+ "LEFT JOIN project ds ON ds.project_id = e.project_id "
-				+ "LEFT JOIN project p ON ds.study_id = p.project_id "
+				+ "INNER JOIN project p ON s.project_id = p.project_id "
 				+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id "
 				+ " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0");
 			query.addScalar("project_id").addScalar("name").addScalar("description").addScalar("study_type_id").addScalar("label")
@@ -235,7 +232,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	public List<StudyGermplasmDto> getStudyGermplasmDtoList(final Integer studyId, final Set<Integer> plotNos) {
 		try {
-			final String queryString = "select s.stock_id AS entryId, distinct(nd_ep.value) AS position, s.name AS designation, s.dbxref_id AS germplasmId "
+
+			final String queryString = "select distinct(nd_ep.value) AS position, s.stock_id AS entryId, s.name AS designation, s.dbxref_id AS germplasmId "
 				+ " FROM nd_experiment e "
 				+ " INNER JOIN nd_experimentprop nd_ep ON e.nd_experiment_id = nd_ep.nd_experiment_id AND nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
 				+ " INNER JOIN stock s ON s.stock_id = e.stock_id "
