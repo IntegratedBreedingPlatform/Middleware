@@ -103,25 +103,6 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		return 0;
 	}
 
-
-	public long countByListIdAndEntryType(final Integer id, final List<Integer> systemDefinedEntryTypeIds) {
-		try {
-			if (id != null) {
-				final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
-				criteria.createAlias("list", "l");
-				criteria.add(Restrictions.eq("l.id", id));
-				criteria.add(Restrictions.in("checkType", systemDefinedEntryTypeIds));
-				criteria.setProjection(Projections.rowCount());
-				return ((Long) criteria.uniqueResult()).longValue(); // count
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error with countByListIdAndEntryType(id=" + id + ") query from ListDataProject " + e.getMessage(),
-				e);
-		}
-		return 0;
-	}
-
 	/**
 	 * This will return all germplasm list data project records including the
 	 * details of their parent germplasm. Note that we're getting the name of
