@@ -132,6 +132,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 			this.gids = this.germplasmTestDataGenerator
 				.createChildrenGermplasm(NO_ENTRIES, "PREF-ABC", parentGermplasm);
+			this.studyTDI.addStudyGermplasm(this.studyId, 1, Arrays.asList(gids));
 		}
 	}
 
