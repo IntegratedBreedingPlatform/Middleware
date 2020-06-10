@@ -347,6 +347,8 @@ public class StockModel implements Serializable {
 		builder.append(this.typeId);
 		builder.append(", isObsolete=");
 		builder.append(this.isObsolete);
+		builder.append(", project=");
+		builder.append(this.project);
 		builder.append("]");
 		return builder.toString();
 	}
