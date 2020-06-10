@@ -159,7 +159,6 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 		final List<ListDataProject> listDataProjects =
 			this.createListDataProject(this.testListDataProject.getList(), noOfTestEntries, noOfCheckEntries);
-		listDataProjectSaver.saveOrUpdateListDataProject(studyId, GermplasmListType.STUDY, listId, listDataProjects, userId);
 
 		Assert.assertEquals(String.format("There are only {0} check entries in the list", noOfCheckEntries), noOfCheckEntries,
 			this.listDataProjectDAO

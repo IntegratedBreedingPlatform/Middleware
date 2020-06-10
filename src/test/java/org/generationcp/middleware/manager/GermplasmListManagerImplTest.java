@@ -496,7 +496,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		final int studyId = this.createNurseryTestData();
 
-		this.listDataProjectSaver.saveOrUpdateListDataProject(studyId, GermplasmListType.STUDY, this.listId, listDataProjects, userId);
 
 		assertThat(germplasms, is(equalTo(this.dataManager.getGermplasms(gidsNews))));
 
