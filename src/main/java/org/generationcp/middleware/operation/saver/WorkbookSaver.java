@@ -1391,7 +1391,5 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
-	void setStudyDataManager(final StudyDataManager studyDataManager) {
-		this.studyDataManager = studyDataManager;
-	}
+
 }
