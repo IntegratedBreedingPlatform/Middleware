@@ -132,7 +132,21 @@
         </sql>
 	</changeSet>
 
-	 <changeSet author="mderamos" id="v15.2.0-6">
+	<changeSet author="aldrin" id="v15.2.0-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM stock WHERE project_id = 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Delete all stocks that don't have study associated to them</comment>
+		<sql dbms="mysql">
+			DELETE FROM stock WHERE project_id = 0;
+        </sql>
+	</changeSet>
+
+	 <changeSet author="mderamos" id="v15.2.0-7">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
