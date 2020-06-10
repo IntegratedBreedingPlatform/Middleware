@@ -24,7 +24,7 @@ public interface LotService {
 
 	Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(LotsSearchDto searchDto);
 
-	Integer saveLot(CropType cropType, Integer userId, LotGeneratorInputDto lotDto);
+	String saveLot(CropType cropType, Integer userId, LotGeneratorInputDto lotDto);
 
 	void updateLots(List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotRequest);
 
