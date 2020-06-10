@@ -71,9 +71,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 		try {
 			final SQLQuery query = this.getSession()
-					.createSQLQuery("select count(distinct p.study_id) " + "FROM stock s "
-							+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
-							+ "LEFT JOIN project p ON e.project_id= p.project_id " + "WHERE s.dbxref_id = " + gid
+					.createSQLQuery("select count(distinct p.project_id) " + "FROM stock s "
+							+ "INNER JOIN project p ON s.project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
 							+ " AND p.deleted = 0");
 			return ((BigInteger) query.uniqueResult()).longValue();
 

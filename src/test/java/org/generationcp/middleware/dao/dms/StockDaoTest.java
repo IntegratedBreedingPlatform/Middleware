@@ -182,10 +182,10 @@ public class StockDaoTest extends IntegrationTestBase {
 	@Test
 	public void testCountStudiesByGid() {
 		final Germplasm germplasm = this.testStocks.get(0).getGermplasm();
-		final StockModel stock = this.createTestStock(germplasm);
-		final DmsProject parent1 = this.createProject(null);
-		final DmsProject parent2 = this.createProject(null);
-		this.setupParentProjects(parent1, parent2, stock);
+		this.createTestStock(this.project, germplasm);
+		final DmsProject study2 = this.createProject(null);
+		this.createTestStock(study2, germplasm);
+
 
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
@@ -196,10 +196,10 @@ public class StockDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudiesByGid() {
 		final Germplasm germplasm = this.testStocks.get(0).getGermplasm();
-		final StockModel stock = this.createTestStock(germplasm);
-		final DmsProject parent1 = this.createProject(null);
-		final DmsProject parent2 = this.createProject(null);
-		this.setupParentProjects(parent1, parent2, stock);
+		this.createTestStock(this.project, germplasm);
+		final DmsProject study2 = this.createProject(null);
+		this.createTestStock(study2, germplasm);
+		;
 
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
@@ -211,7 +211,7 @@ public class StockDaoTest extends IntegrationTestBase {
 			}
 		});
 		Assert.assertEquals(2, resultsMap.size());
-		final List<DmsProject> expectedStudies = Arrays.asList(parent1, parent2);
+		final List<DmsProject> expectedStudies = Arrays.asList(project, study2);
 		for (final DmsProject study : expectedStudies) {
 			final Integer id = study.getProjectId();
 			final StudyReference studyReference = resultsMap.get(id);
@@ -244,18 +244,6 @@ public class StockDaoTest extends IntegrationTestBase {
 
 	}
 
-	private void setupParentProjects(final DmsProject parent1, final DmsProject parent2, final StockModel stockToReuse) {
-		this.saveParents(this.project, parent1);
-		final DmsProject project2 = this.createProject(parent2);
-		this.createTestExperiment(project2, stockToReuse);
-	}
-
-	private void saveParents(final DmsProject project, final DmsProject parent) {
-		project.setParent(parent);
-		project.setStudy(parent);
-		this.dmsProjectDao.save(project);
-	}
-
 	private void createTestObservations(final ExperimentModel experiment, final CVTerm variateTerm) {
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setObservableId(variateTerm.getCvTermId());
@@ -280,14 +268,14 @@ public class StockDaoTest extends IntegrationTestBase {
 			germplasm.setGid(null);
 			this.germplasmDao.save(germplasm);
 
-			final StockModel stockModel = createTestStock(germplasm);
+			final StockModel stockModel = createTestStock(study, germplasm);
 
 			this.createTestExperiment(study, stockModel);
 		}
 
 	}
 
-	private StockModel createTestStock(final Germplasm germplasm) {
+	private StockModel createTestStock(final DmsProject study, final Germplasm germplasm) {
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(10));
 		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
@@ -295,7 +283,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setValue(RandomStringUtils.randomAlphanumeric(5));
-		stockModel.setProject(this.project);
+		stockModel.setProject(study);
 		this.stockDao.saveOrUpdate(stockModel);
 		this.testStocks.add(stockModel);
 		return stockModel;
