@@ -532,6 +532,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				query.append(" and lot.lotid IN (").append(Joiner.on(",").join(transactionsSearchDto.getLotIds())).append(") ");
 			}
 
+			if (transactionsSearchDto.getLotLocationAbbr() != null) {
+				query.append(" and loc.labbr like '%").append(transactionsSearchDto.getLotLocationAbbr()).append("%' ");
+			}
+
 			if (transactionsSearchDto.getLotUUIDs() != null && !transactionsSearchDto.getLotUUIDs().isEmpty()) {
 				query.append("and lot.lot_uuid IN ('").append(Joiner.on("','").join(transactionsSearchDto.getLotUUIDs().toArray()))
 					.append("') ");

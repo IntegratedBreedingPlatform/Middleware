@@ -22,6 +22,7 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	private String notes;
 	private List<Integer> lotIds;
 	private List<String> lotUUIDs;
+	private String lotLocationAbbr;
 	private List<Integer> gids;
 	private List<Integer> unitIds;
 	private Double minAmount;
@@ -93,6 +94,14 @@ public class TransactionsSearchDto extends SearchRequestDto {
 
 	public void setLotIds(final List<Integer> lotIds) {
 		this.lotIds = lotIds;
+	}
+
+	public String getLotLocationAbbr() {
+		return this.lotLocationAbbr;
+	}
+
+	public void setLotLocationAbbr(final String lotLocationAbbr) {
+		this.lotLocationAbbr = lotLocationAbbr;
 	}
 
 	public List<Integer> getGids() {
