@@ -807,9 +807,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	}
 
 	public long countFilteredStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest) {
-		final StringBuilder obsUnitsQuerySql = this.buildObsUnitsQuery();
-		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQuerySql), studyTransactionsRequest);
-		final StringBuilder transactionsQuerySql = this.buildTransactionsQuery(studyTransactionsRequest.getTransactionsSearch(), obsUnitsQuerySql);
+		final StringBuilder obsUnitsQueryFilterSql = this.buildObsUnitsQuery();
+		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQueryFilterSql), studyTransactionsRequest);
+		final StringBuilder transactionsQuerySql = this.buildTransactionsQuery(studyTransactionsRequest.getTransactionsSearch(), obsUnitsQueryFilterSql);
 
 		final SQLQuery transactionsQuery =
 			this.getSession().createSQLQuery("select count(1) from ( " + transactionsQuerySql.toString() + ") T");
@@ -822,14 +822,14 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	public List<StudyTransactionsDto> searchStudyTransactions(final Integer studyId,
 		final StudyTransactionsRequest studyTransactionsRequest) {
 
-		final StringBuilder obsUnitsQuerySql = this.buildObsUnitsQuery();
-		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQuerySql), studyTransactionsRequest);
+		final StringBuilder obsUnitsQueryFilterSql = this.buildObsUnitsQuery();
+		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQueryFilterSql), studyTransactionsRequest);
 
-		final StringBuilder transactionsQuerySql = this.buildTransactionsQuery(studyTransactionsRequest.getTransactionsSearch(), obsUnitsQuerySql);
+		final StringBuilder transactionsQuerySql = this.buildTransactionsQuery(studyTransactionsRequest.getTransactionsSearch(), obsUnitsQueryFilterSql);
 
 		addSortedPageRequestOrderBy(transactionsQuerySql, studyTransactionsRequest.getSortedPageRequest());
 
-		// transactions query
+		// transactions data
 		final SQLQuery transactionsQuery = this.getSession().createSQLQuery(transactionsQuerySql.toString());
 		transactionsQuery.setParameter("studyId", studyId);
 		addObsUnitFilters(new SqlQueryParamBuilder(transactionsQuery), studyTransactionsRequest);
@@ -838,10 +838,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		transactionsQuery.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getStudyTransactionsDtoConstructor()));
 		final List<StudyTransactionsDto> transactions = transactionsQuery.list();
 
-		// obs units query
+		// obs units data
+		final StringBuilder obsUnitsQuerySql = this.buildObsUnitsQuery();
 		final SQLQuery obsUnitsQuery = this.getSession().createSQLQuery(obsUnitsQuerySql.toString());
 		obsUnitsQuery.setParameter("studyId", studyId);
-		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQuery), studyTransactionsRequest);
 		obsUnitsQuery.addScalar("ndExperimentId").addScalar("transactionId").addScalar("instanceNo", new IntegerType())
 			.addScalar("entryType").addScalar("entryNo", new IntegerType()).addScalar("repNo", new IntegerType())
 			.addScalar("blockNo", new IntegerType()).addScalar("plotNo", new IntegerType()).addScalar("obsUnitId");
