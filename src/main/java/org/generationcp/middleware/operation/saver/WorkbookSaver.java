@@ -13,19 +13,7 @@ package org.generationcp.middleware.operation.saver;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Stocks;
-import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -38,13 +26,13 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
@@ -56,12 +44,8 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 // Assumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName
@@ -85,9 +69,6 @@ public class WorkbookSaver extends Saver {
 	public static final String PLOTDATA = "-PLOTDATA";
 
 	private DaoFactory daoFactory;
-
-	@Resource
-	private DataSetBuilder dataSetBuilder;
 
 	@Resource
 	private WorkbookBuilder workbookBuilder;
@@ -269,7 +250,7 @@ public class WorkbookSaver extends Saver {
 
 		plotDatasetId =
 			this.createPlotDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables, programUUID);
-		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
+		this.createOrResolveStudyGermplasm(workbook, studyId, effectVariables, trialHeaders);
 
 		if (!retainValues) {
 			// clean up some variable references to save memory space before
@@ -380,7 +361,8 @@ public class WorkbookSaver extends Saver {
 
 		this.saveOrUpdateTrialObservations( crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId, savedEnvironmentsCount, true, programUUID);
 
-		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
+		// set study germplasm to observation rows
+		this.setDatasetStocks(workbook, this.daoFactory.getStockDao().getStocksForStudy(studyId));
 		this.createMeasurementEffectExperiments(crop, plotDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
 
 	}
@@ -711,7 +693,7 @@ public class WorkbookSaver extends Saver {
 		return null;
 	}
 
-	private String getStockFactor(final VariableList stockVariables) {
+	private String getEntryNumber(final VariableList stockVariables) {
 		if (stockVariables != null && stockVariables.getVariables() != null) {
 			for (final Variable variable : stockVariables.getVariables()) {
 				if (TermId.ENTRY_NO.getId() == variable.getVariableType().getStandardVariable().getId()) {
@@ -884,10 +866,11 @@ public class WorkbookSaver extends Saver {
 		return datasetId;
 	}
 
-	private void createStocksIfNecessary(
-		final int datasetId, final Workbook workbook, final VariableTypeList effectVariables,
+	public void createStocksIfNecessary(final int studyId, final Workbook workbook, final VariableTypeList effectVariables,
 		final List<String> trialHeaders) {
-		final Map<String, Integer> stockMap = this.getStockModelBuilder().getStockMapForDataset(datasetId);
+		final List<StockModel> studyGermplasm = this.daoFactory.getStockDao().getStocksForStudy(studyId);
+		final Map<String, Integer> entryNoStockIdMap = studyGermplasm.stream().collect(Collectors.toMap(StockModel::getUniqueName, StockModel::getStockId));
+
 
 		List<Integer> variableIndexesList = new ArrayList<>();
 		// we get the indexes so that in the next rows we dont need to compare
@@ -906,12 +889,12 @@ public class WorkbookSaver extends Saver {
 
 					final VariableList stock = this.getVariableListTransformer()
 						.transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
-					final String stockFactor = this.getStockFactor(stock);
-					Integer stockId = stockMap.get(stockFactor);
+					final String entryNumber = this.getEntryNumber(stock);
+					Integer stockId = entryNoStockIdMap.get(entryNumber);
 
 					if (stockId == null) {
-						stockId = this.getStockSaver().saveStock(stock);
-						stockMap.put(stockFactor, stockId);
+						stockId = this.getStockSaver().saveStock(studyId, stock);
+						entryNoStockIdMap.put(String.valueOf(entryNumber), stockId);
 					} else {
 						this.getStockSaver().saveOrUpdateStock(stock, stockId);
 					}
@@ -1147,12 +1130,7 @@ public class WorkbookSaver extends Saver {
 		}
 
 		// create stock and stockprops and associate to observations
-		if (isMeansDataImport) {
-			this.setStockIdsForMeansExperiments(workbook, effectVariables.findById(TermId.ENTRY_NO.getId()).getLocalName());
-
-		} else {
-			this.createStocksIfNecessary(measurementDatasetId, workbook, effectVariables, trialHeaders);
-		}
+		this.createOrResolveStudyGermplasm(workbook, studyId, effectVariables, trialHeaders);
 
 
 		// create trial experiments if not yet existing
@@ -1185,11 +1163,18 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
-	void setStockIdsForMeansExperiments(final Workbook workbook, final String entryNoHeader) {
-		final DataSet plotDataset =
-			this.studyDataManager.findOneDataSetByType(workbook.getStudyDetails().getId(), DatasetTypeEnum.PLOT_DATA.getId());
-		final Stocks stocks = this.studyDataManager.getStocksInDataset(plotDataset.getId());
-		final Map<String, Integer> entryNoStockIdMap = stocks.getStockMap(entryNoHeader);
+	void createOrResolveStudyGermplasm(final Workbook workbook, final Integer studyId, final VariableTypeList effectVariables,
+									   final List<String> trialHeaders) {
+		final List<StockModel> studyGermplasm = this.daoFactory.getStockDao().getStocksForStudy(studyId);
+		if (CollectionUtils.isEmpty(studyGermplasm)) {
+			this.createStocksIfNecessary(studyId, workbook, effectVariables, trialHeaders);
+		} else {
+			this.setDatasetStocks(workbook, studyGermplasm);
+		}
+	}
+
+	void setDatasetStocks(final Workbook workbook, final List<StockModel> studyGermplasm) {
+		final Map<String, Integer> entryNoStockIdMap = studyGermplasm.stream().collect(Collectors.toMap(StockModel::getUniqueName, StockModel::getStockId));
 		for (final MeasurementRow row : workbook.getObservations()) {
 			final String entryNo = row.getMeasurementData(TermId.ENTRY_NO.getId()).getValue();
 			row.setStockId(entryNoStockIdMap.get(entryNo));
@@ -1406,7 +1391,5 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
-	void setStudyDataManager(final StudyDataManager studyDataManager) {
-		this.studyDataManager = studyDataManager;
-	}
+
 }

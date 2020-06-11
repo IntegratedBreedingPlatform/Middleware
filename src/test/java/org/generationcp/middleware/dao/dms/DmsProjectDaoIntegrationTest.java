@@ -306,7 +306,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		stockModel.setName("Germplasm 1");
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
-
+		stockModel.setProject(this.study);
 		this.stockDao.saveOrUpdate(stockModel);
 		experimentModel.setStock(stockModel);
 		this.experimentDao.saveOrUpdate(experimentModel);
@@ -594,6 +594,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 			stockModel.setUniqueName(String.valueOf(i));
 			stockModel.setGermplasm(germplasm);
+			stockModel.setProject(this.study);
 			this.stockDao.saveOrUpdate(stockModel);
 
 			final ExperimentModel experimentModel = new ExperimentModel();
