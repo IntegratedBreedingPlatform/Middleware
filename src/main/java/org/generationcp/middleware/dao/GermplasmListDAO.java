@@ -56,7 +56,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	private static final String STATUS = "status";
 
 	public static final Integer STATUS_DELETED = 9;
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDAO.class);
 
 	public static final String GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST = " SELECT \n" + "   ld.gid, \n"
@@ -64,9 +64,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			+ "   INNER JOIN listdata ld ON l.listid = ld.listid \n" + "   INNER JOIN germplsm g ON ld.gid = g.gid"
 			+ " WHERE ld.gid IN (:gids) \n" + "       AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " \n"
 			+ " GROUP BY ld.gid \n" + " HAVING count(1) > 1";
-	
+
 	private static final String HIDDEN_LIST_TYPES_PARAM = "hiddenListTypes";
-	
+
 	private static final String GET_GERMPLASM_LIST_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid "
 			+ "FROM udflds " + "WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' " + "and fcode not in (:" + GermplasmListDAO.HIDDEN_LIST_TYPES_PARAM + ")";
 
@@ -90,7 +90,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	private static final String SEARCH_FOR_GERMPLASM_LIST_EQUAL = "SELECT DISTINCT listnms.* " + "FROM listnms "
 			+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-			+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) " 
+			+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) "
 			+ "WHERE listtype not in (:" + GermplasmListDAO.HIDDEN_LIST_TYPES_PARAM + ")"
 			+ " AND liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
 			+ "      OR desig = :q OR listname = :q " + "      OR desig = :qNoSpaces "
@@ -104,11 +104,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			+ "WHERE listnms.listtype = :listType AND (listnms.program_uuid = :program_uuid OR listnms.program_uuid IS NULL) AND listnms.listname = :searchString ";
 
 	private static final String FILTER_BY_PROGRAM_UUID = " AND (program_uuid = :programUUID OR program_uuid IS NULL)";
-	
-	private static final List<String> SNAPSHOT_LIST_TYPES = Arrays.asList(GermplasmListType.STUDY.name(),
-			GermplasmListType.CHECK.name(), GermplasmListType.ADVANCED.name(), GermplasmListType.CROSSES.name(), GermplasmListType.CRT_CROSS.name(),
-			GermplasmListType.IMP_CROSS.name());
-	
+
+	private static final List<String> SNAPSHOT_LIST_TYPES = Arrays.asList(GermplasmListType.ADVANCED.name(),
+		GermplasmListType.CROSSES.name(), GermplasmListType.CRT_CROSS.name(), GermplasmListType.IMP_CROSS.name());
+
 	private static final List<String> HIDDEN_LIST_TYPES_ON_SEARCH;
 
 	private static final Criterion RESTRICTED_LIST;

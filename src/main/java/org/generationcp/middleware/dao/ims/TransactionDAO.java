@@ -55,6 +55,77 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(TransactionDAO.class);
 	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
+	public boolean hasInventoryDetails(final Integer studyId) {
+		try {
+			final Session session = this.getSession();
+
+			final StringBuilder sql =
+				new StringBuilder().append("Select COUNT(1) ")
+					.append("FROM ims_transaction tran ")
+					.append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
+					.append("INNER JOIN stock s on s.dbxref_id = lot.eid ")
+					.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue()).append(" AND s.project_id = :studyId ");
+
+			final SQLQuery query = session.createSQLQuery(sql.toString());
+			query.setParameter("studyId", studyId);
+
+			return ((BigInteger) query.uniqueResult()).intValue() > 0 ;
+		} catch (final HibernateException e) {
+			final String message = "Error with getInventoryDetailsByTransactionRecordId() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<InventoryDetails> getInventoryDetails(final Integer studyId) {
+		final List<InventoryDetails> detailsList = new ArrayList<>();
+
+		try {
+			final Session session = this.getSession();
+
+			final StringBuilder sql =
+				new StringBuilder().append("Select lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
+					.append("tran.sourceid, tran.trnqty, lot.stock_id, lot.comments, tran.recordid ")
+					.append("FROM ims_transaction tran ")
+					.append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
+					.append("INNER JOIN stock s on s.dbxref_id = lot.eid ")
+					.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue()).append(" AND s.project_id = :studyId ");
+
+			final SQLQuery query = session.createSQLQuery(sql.toString());
+			query.setParameter("studyId", studyId);
+
+			final List<Object[]> results = query.list();
+
+			if (!results.isEmpty()) {
+				for (final Object[] row : results) {
+					final Integer lotId = (Integer) row[0];
+					final Integer userId = (Integer) row[1];
+					final Integer gid = (Integer) row[2];
+					final Integer locationId = (Integer) row[3];
+					final Integer scaleId = (Integer) row[4];
+					final Integer sourceId = (Integer) row[5];
+					final Double amount = (Double) row[6];
+					final String inventoryID = (String) row[7];
+					final String comment = (String) row[8];
+					final Integer sourceRecordId = (Integer) row[9];
+
+					final InventoryDetails details =
+						new InventoryDetails(gid, null, lotId, locationId, null, userId, amount, sourceId, null, scaleId, null, comment);
+					details.setInventoryID(inventoryID);
+					details.setSourceRecordId(sourceRecordId);
+					detailsList.add(details);
+				}
+			}
+
+		} catch (final HibernateException e) {
+			final String message = "Error with getInventoryDetails() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+		return detailsList;
+	}
+
 	public List<InventoryDetails> getInventoryDetailsByTransactionRecordId(final List<Integer> recordIds) {
 		final List<InventoryDetails> detailsList = new ArrayList<>();
 
@@ -220,7 +291,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
-			
+
 			final String sql =
 					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate "
 							+ "WHERE trnstat = 0 AND recordid IN (:entryIds) " + "AND sourceType = 'LIST'";
@@ -255,6 +326,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	public Map<Integer, String> retrieveStockIds(final List<Integer> gIds) {
 
 		final Map<Integer, String> gIdStockIdMap = new HashMap<>();
+
+		if (gIds.isEmpty()) {
+			return gIdStockIdMap;
+		}
 
 		final String sql =
 				"SELECT b.eid ,group_concat(distinct b.stock_id SEPARATOR ', ')  " + "FROM "

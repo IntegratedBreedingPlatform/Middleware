@@ -3,22 +3,14 @@ package org.generationcp.middleware.dao.dms;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.ontology.Method;
-import org.generationcp.middleware.domain.ontology.Property;
-import org.generationcp.middleware.domain.ontology.Scale;
-import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.ontology.*;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.*;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -31,15 +23,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
@@ -109,7 +95,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), null, null);
 		final List<ExperimentModel> plantExperimentModels =
 			this.testDataInitializer
-				.createTestExperiments(plantSubObsDataset, plotExperimentModel, geolocation, noOfSubObservationExperiment);
+				.createTestExperimentsWithStock(this.study, plantSubObsDataset, plotExperimentModel, geolocation, noOfSubObservationExperiment);
 
 		this.testDataInitializer.addPhenotypes(plantExperimentModels, trait1.getCvTermId(), RandomStringUtils.randomNumeric(5));
 
@@ -194,7 +180,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), null, null);
 		final List<ExperimentModel> plantExperimentModels =
 			this.testDataInitializer
-				.createTestExperiments(plantSubObsDataset, plotExperimentModel, geolocation, noOfSubObservationExperiment);
+				.createTestExperimentsWithStock(this.study, plantSubObsDataset, plotExperimentModel, geolocation, noOfSubObservationExperiment);
 
 		this.testDataInitializer.addPhenotypes(plantExperimentModels, trait1.getCvTermId(), RandomStringUtils.randomNumeric(5));
 
@@ -251,13 +237,13 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), null, null);
 		final List<ExperimentModel> subObsExperimentsInstance1 =
 			this.testDataInitializer
-				.createTestExperiments(plantSubObsDataset, plotExperimentModel1, geolocation, noOfSubObservationExperiment);
+				.createTestExperimentsWithStock(this.study, plantSubObsDataset, plotExperimentModel1, geolocation, noOfSubObservationExperiment);
 
 		final Geolocation geolocation2 = this.testDataInitializer.createTestGeolocation("2", 101);
 		final ExperimentModel plotExperimentModel2 =
 			this.testDataInitializer.createTestExperiment(this.plot, geolocation2, TermId.PLOT_EXPERIMENT.getId(), null, null);
 		final List<ExperimentModel> subObsExperimentsInstance2 = this.testDataInitializer
-			.createTestExperiments(plantSubObsDataset, plotExperimentModel2, geolocation2, noOfSubObservationExperiment);
+			.createTestExperimentsWithStock(this.study, plantSubObsDataset, plotExperimentModel2, geolocation2, noOfSubObservationExperiment);
 
 		// Only first instance has observations
 		final CVTerm trait1 = this.testDataInitializer.createTrait(traitName);
@@ -320,10 +306,10 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final int numberOfPlotExperiments = 3;
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 		final List<ExperimentModel> instance1Units =
-			this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, numberOfPlotExperiments);
+			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, numberOfPlotExperiments);
 		final Geolocation geolocation2 = this.testDataInitializer.createTestGeolocation("2", 101);
 		final List<ExperimentModel> instance2Units =
-			this.testDataInitializer.createTestExperiments(this.plot, null, geolocation2, numberOfPlotExperiments);
+			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation2, numberOfPlotExperiments);
 
 		// Only 2 experiments in first instance have observations
 		final CVTerm trait1 = this.testDataInitializer.createTrait(traitName);
@@ -390,7 +376,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final String traitName = "MyTrait";
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 2);
+		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 2);
 		final Integer traitId = this.createTrait(traitName);
 		final List<ExperimentModel> unitsWithObservations = Collections.singletonList(instance1Units.get(0));
 		final List<ExperimentModel> unitsWithObservations2 = Collections.singletonList(instance1Units.get(1));
@@ -421,7 +407,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final String traitName = "MyTrait";
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 3);
+		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 3);
 		final Integer traitId = this.createTrait(traitName);
 		final List<ExperimentModel> unitsWithObservations = Collections.singletonList(instance1Units.get(0));
 		final List<ExperimentModel> unitsWithObservations2 = Collections.singletonList(instance1Units.get(1));
@@ -454,7 +440,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final String traitName = "MyTrait";
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 3);
+		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 3);
 		final Integer traitId = this.createTrait(traitName);
 		final List<ExperimentModel> unitsWithObservations = Collections.singletonList(instance1Units.get(0));
 		final List<ExperimentModel> unitsWithObservations2 = Collections.singletonList(instance1Units.get(1));
@@ -505,7 +491,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), null, null);
 		final List<ExperimentModel> plantExperimentModels =
 			this.testDataInitializer
-				.createTestExperiments(plantSubObsDataset, plotExperimentModel, geolocation, noOfSubObservationExperiment);
+				.createTestExperimentsWithStock(this.study, plantSubObsDataset, plotExperimentModel, geolocation, noOfSubObservationExperiment);
 
 		this.testDataInitializer.addPhenotypes(plantExperimentModels, trait1.getCvTermId(), RandomStringUtils.randomNumeric(5));
 

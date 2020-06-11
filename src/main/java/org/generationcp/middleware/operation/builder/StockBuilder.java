@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+import java.util.HashSet;
 import java.util.Set;
 
 public class StockBuilder extends Builder {
@@ -49,7 +50,7 @@ public class StockBuilder extends Builder {
 		Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
 
 		VariableTypeList stockVariableTypes = this.getStockVariableTypes(study, dataSet);
-		Set<StockModel> stockModels = this.getStockModels(datasetId);
+		Set<StockModel> stockModels = new HashSet<>(this.getStockDao().getStocksForStudy(dataSet.getStudyId()));
 
 		return this.buildStocks(stockModels, stockVariableTypes);
 	}
@@ -59,10 +60,6 @@ public class StockBuilder extends Builder {
 		stockVariableTypes.addAll(study.getVariableTypesByPhenotypicType(PhenotypicType.GERMPLASM));
 		stockVariableTypes.addAll(dataSet.getFactorsByPhenotypicType(PhenotypicType.GERMPLASM));
 		return stockVariableTypes;
-	}
-
-	private Set<StockModel> getStockModels(int datasetId) throws MiddlewareQueryException {
-		return this.getStockDao().findInDataSet(datasetId);
 	}
 
 	private Stocks buildStocks(Set<StockModel> stockModels, VariableTypeList stockVariableTypes) {

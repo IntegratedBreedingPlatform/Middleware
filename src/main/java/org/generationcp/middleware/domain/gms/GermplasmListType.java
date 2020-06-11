@@ -3,7 +3,7 @@ package org.generationcp.middleware.domain.gms;
 
 public enum GermplasmListType {
 
-	LST, CHECK, STUDY, ADVANCED, CROSSES, STOCK, F1,
+	LST, ADVANCED, CROSSES, STOCK, F1,
 	/**
 	 * Imported cross list from a study
 	 */

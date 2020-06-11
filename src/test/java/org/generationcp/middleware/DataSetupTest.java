@@ -2,12 +2,7 @@
 package org.generationcp.middleware;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -15,13 +10,8 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.UserRole;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.pojos.workbench.*;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -34,11 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Ignore("This is just for seeding some test data. Not intended to run regularly on CI.")
 @TransactionConfiguration(defaultRollback = false)
@@ -358,23 +344,6 @@ public class DataSetupTest extends IntegrationTestBase {
         final int nurseryStudyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, crop);
         DataSetupTest.LOG.info("Nursery " + studyDetails.getStudyName() + " created. ID: " + nurseryStudyId);
 
-        // Convert germplasm list we created into ListDataProject entries
-        final List<ListDataProject> listDataProjects = new ArrayList<ListDataProject>();
-        for (final GermplasmListData gpListData : germplasmListData) {
-            final ListDataProject listDataProject = new ListDataProject();
-            listDataProject.setCheckType(0);
-            listDataProject.setGermplasmId(gpListData.getGid());
-            listDataProject.setDesignation(gpListData.getDesignation());
-            listDataProject.setEntryId(gpListData.getEntryId());
-            listDataProject.setEntryCode(gpListData.getEntryCode());
-            listDataProject.setSeedSource(gpListData.getSeedSource());
-            listDataProject.setGroupName(gpListData.getGroupName());
-            listDataProjects.add(listDataProject);
-        }
-        // Add listdata_project entries
-        final int nurseryListId = this.middlewareFieldbookService.saveOrUpdateListDataProject(nurseryStudyId,
-                GermplasmListType.STUDY, germplasmListId, listDataProjects, 1);
-
         // Load and check some basics
         final Workbook nurseryWorkbook = this.middlewareFieldbookService.getStudyDataSet(nurseryStudyId);
         Assert.assertNotNull(nurseryWorkbook);
@@ -396,10 +365,6 @@ public class DataSetupTest extends IntegrationTestBase {
         // Assert.assertEquals(factors.size(),
         // nurseryWorkbook.getFactors().size());
         Assert.assertEquals(variates.size(), nurseryWorkbook.getVariates().size());
-
-        // Assert list data got saved with Nursery
-        final List<ListDataProject> listDataProject = this.middlewareFieldbookService.getListDataProject(nurseryListId);
-        Assert.assertEquals(germplasmListData.size(), listDataProject.size());
 
         return nurseryStudyId;
     }
