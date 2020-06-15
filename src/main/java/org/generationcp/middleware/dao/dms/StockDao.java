@@ -24,7 +24,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaQuery;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
@@ -139,8 +138,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					return "CAST(uniquename AS UNSIGNED)";
 				}
 			});
-			return  criteria.list();
-
+			return criteria.list();
 		} catch (final HibernateException e) {
 			final String errorMessage = "Error in getStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
