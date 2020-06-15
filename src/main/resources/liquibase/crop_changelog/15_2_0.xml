@@ -20,4 +20,151 @@
 								 referencedColumnNames="lotid"/>
 	</changeSet>
 
+	<changeSet author="aldrin" id="v15.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="stock" columnName="project_id"/>
+			</not>
+		</preConditions>
+		<comment>
+			Add project_id column to stock table
+		</comment>
+		<addColumn tableName="stock">
+			<column name="project_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v15.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*)
+					FROM listnms lnms
+					INNER JOIN listdata_project ldp ON lnms.listid = ldp.list_id
+					INNER JOIN project p ON p.parent_project_id = lnms.projectid AND p.dataset_type_id = 4
+					WHERE lnms.listtype = 'STUDY'
+					AND NOT EXISTS(SELECT 1 FROM nd_experiment where project_id = p.project_id);
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Migrate listdata_project to stock table. Only entry list from studies without plot experiments are migrated to the stock table.</comment>
+		<sql dbms="mysql">
+			-- Migrate listdata_project to stock table. Only entry list from studies without plot experiments are migrated to the stock table.
+			INSERT INTO stock (dbxref_id, name, uniquename, value, type_id, project_id)
+			SELECT germplasm_id, designation, entry_id, entry_code, 8300, p.study_id
+			FROM listnms lnms
+			INNER JOIN listdata_project ldp ON lnms.listid = ldp.list_id
+			INNER JOIN project p ON p.parent_project_id = lnms.projectid AND p.dataset_type_id = 4
+			WHERE lnms.listtype = 'STUDY'
+			AND NOT EXISTS(SELECT 1 FROM nd_experiment where project_id = p.project_id);
+
+			-- Create check type property records for migrated stock entries.
+			-- CHECK TYPE
+			INSERT INTO stockprop (stock_id, type_id, value, rank)
+			SELECT stock.stock_id, 8255, ldp.check_type, (SELECT IFNULL(MAX(rank), 0) + 1 FROM stockprop WHERE stock_id = stock.stock_id)
+			FROM listnms lnms
+			INNER JOIN listdata_project ldp ON lnms.listid = ldp.list_id
+			INNER JOIN project p ON p.parent_project_id = lnms.projectid AND p.dataset_type_id = 4
+			INNER JOIN stock ON stock.project_id = p.study_id AND stock.uniquename = ldp.entry_id
+			WHERE lnms.listtype = 'STUDY'
+			AND NOT EXISTS(SELECT 1 FROM nd_experiment where project_id = p.project_id);
+
+			-- SEED_SOURCE
+			INSERT INTO stockprop (stock_id, type_id, value, rank)
+			SELECT stock.stock_id, 8360, ldp.seed_source, (SELECT IFNULL(MAX(rank), 0) + 1 FROM stockprop WHERE stock_id = stock.stock_id)
+			FROM listnms lnms
+			INNER JOIN listdata_project ldp ON lnms.listid = ldp.list_id
+			INNER JOIN project p ON p.parent_project_id = lnms.projectid AND p.dataset_type_id = 4
+			INNER JOIN stock ON stock.project_id = p.study_id AND stock.uniquename = ldp.entry_id
+			WHERE lnms.listtype = 'STUDY'
+			AND NOT EXISTS(SELECT 1 FROM nd_experiment where project_id = p.project_id);
+
+			-- GROUPNAME/CROSS
+			INSERT INTO stockprop (stock_id, type_id, value, rank)
+			SELECT stock.stock_id, 8377, ldp.group_name, (SELECT IFNULL(MAX(rank), 0) + 1 FROM stockprop WHERE stock_id = stock.stock_id)
+			FROM listnms lnms
+			INNER JOIN listdata_project ldp ON lnms.listid = ldp.list_id
+			INNER JOIN project p ON p.parent_project_id = lnms.projectid AND p.dataset_type_id = 4
+			INNER JOIN stock ON stock.project_id = p.study_id AND stock.uniquename = ldp.entry_id
+			WHERE lnms.listtype = 'STUDY'
+			AND NOT EXISTS(SELECT 1 FROM nd_experiment where project_id = p.project_id);
+        </sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v15.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM stock WHERE stock.project_id = 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Associate existing stock records to their respective study</comment>
+		<sql dbms="mysql">
+			UPDATE  stock
+			INNER JOIN nd_experiment nde ON nde.stock_id = stock.stock_id
+			INNER JOIN project p ON p.project_id = nde.project_id
+				SET stock.project_id = p.study_id
+			WHERE stock.project_id = 0;
+        </sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v15.2.0-5">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM listnms WHERE listnms.listtype IN ('STUDY', 'CHECK');
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Delete all STUDY and CHECK germplasm list and its data</comment>
+		<sql dbms="mysql">
+			-- Delete all STUDY and CHECK entry list data
+			DELETE  ldp FROM listnms
+			INNER JOIN listdata_project ldp ON listnms.listid = ldp.list_id
+			WHERE listnms.listtype IN ('STUDY', 'CHECK');
+
+			-- Delete all STUDY and CHECK entry list
+			DELETE  FROM listnms
+			WHERE listnms.listtype IN ('STUDY', 'CHECK');
+        </sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v15.2.0-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM stock WHERE project_id = 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Delete all stocks that don't have study associated to them</comment>
+		<sql dbms="mysql">
+			DELETE FROM stock WHERE project_id = 0;
+        </sql>
+	</changeSet>
+
+	 <changeSet author="mderamos" id="v15.2.0-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE TABLE_NAME = 'stock' AND CONSTRAINT_NAME='stock_project_id_fk'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Add FK to project_id column in Stock table to Project project_id
+		</comment>
+		<addForeignKeyConstraint
+			constraintName="stock_project_id_fk"
+			baseTableName="stock"
+			baseColumnNames="project_id"
+			referencedTableName="project"
+			referencedColumnNames="project_id"
+			onDelete="NO ACTION"
+			onUpdate="NO ACTION"/>
+	</changeSet>
+
 </databaseChangeLog>

@@ -74,10 +74,6 @@ public abstract class Builder extends DatabaseBroker {
 		return new ExperimentBuilder(this.sessionProvider);
 	}
 
-	protected final StockModelBuilder getStockBuilder() {
-		return new StockModelBuilder(this.sessionProvider);
-	}
-
 	protected final StandardVariableBuilder getStandardVariableBuilder() {
 		return new StandardVariableBuilder(this.sessionProvider);
 	}

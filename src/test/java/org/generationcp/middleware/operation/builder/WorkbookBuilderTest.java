@@ -352,29 +352,6 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testBuildTrialObservations() {
-
-		final Workbook workbook = new Workbook();
-		WorkbookTestDataInitializer.createStudyDetails(workbook, "Test Study Name", StudyTypeDto.getTrialDto());
-		workbook.setFactors(testdata.createFactors(1));
-		workbook.setTrialObservations(testdata.createTrialObservations(1, workbook.getFactors()));
-
-		final CropType crop = new CropType();
-		crop.setPlotCodePrefix(WorkbookBuilderTest.CROP_PREFIX);
-		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID,
-			crop);
-		final List<MeasurementRow> result = this.workbookBuilder.buildTrialObservations(workbook.getTrialDatasetId(),
-			workbook.getFactors(), new ArrayList<MeasurementVariable>());
-
-		Assert.assertEquals(4, result.get(0).getDataList().size());
-		Assert.assertTrue(this.isTermIdExists(TermId.TRIAL_INSTANCE_FACTOR.getId(), result.get(0).getDataList()));
-		Assert.assertTrue(this.isTermIdExists(TermId.COOPERATOOR_ID.getId(), result.get(0).getDataList()));
-		Assert.assertTrue(this.isTermIdExists(TermId.COOPERATOR.getId(), result.get(0).getDataList()));
-		Assert.assertTrue(this.isTermIdExists(TermId.LOCATION_ID.getId(), result.get(0).getDataList()));
-
-	}
-
-	@Test
 	public void testBuildConditionVariablesOnStudy() {
 
 		final Workbook workbook = testdata.createWorkbookWithStudyDetails("Test Study Name", StudyTypeDto.getTrialDto());

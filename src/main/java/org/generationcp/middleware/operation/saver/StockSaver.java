@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.HashSet;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -21,8 +19,11 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+
+import java.util.HashSet;
 
 public class StockSaver extends Saver {
 
@@ -30,18 +31,18 @@ public class StockSaver extends Saver {
 		super(sessionProviderForLocal);
 	}
 
-	public Integer saveStock(final VariableList variableList) {
+	public Integer saveStock(final int studyId, final VariableList variableList) {
 		final StockModel stockModel = this.createStock(variableList, null);
 		if (stockModel != null) {
+			stockModel.setProject(new DmsProject(studyId));
 			this.getStockDao().save(stockModel);
 			return stockModel.getStockId();
 		}
-
 		return null;
 	}
 
 	public void saveOrUpdateStock(final VariableList variableList, final int stockId) {
-		final StockModel stockModel = this.getStockModelBuilder().get(stockId);
+		final StockModel stockModel = this.getStockDao().getById(stockId);
 		this.createStock(variableList, stockModel);
 		if (stockModel != null) {
 			this.getStockDao().merge(stockModel);

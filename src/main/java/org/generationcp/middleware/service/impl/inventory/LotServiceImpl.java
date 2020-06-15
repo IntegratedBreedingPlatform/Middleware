@@ -93,7 +93,7 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public Integer saveLot(final CropType cropType, final Integer userId, final LotGeneratorInputDto lotDto) {
+	public String saveLot(final CropType cropType, final Integer userId, final LotGeneratorInputDto lotDto) {
 
 		final Lot lot = new Lot();
 		lot.setUserId(userId);
@@ -110,7 +110,7 @@ public class LotServiceImpl implements LotService {
 		this.inventoryDataManager.generateLotIds(cropType, Lists.newArrayList(lot));
 		this.daoFactory.getLotDao().save(lot);
 
-		return lot.getId();
+		return lot.getLotUuId();
 	}
 
 	@Override

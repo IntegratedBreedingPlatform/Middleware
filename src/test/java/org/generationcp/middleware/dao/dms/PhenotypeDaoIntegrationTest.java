@@ -478,6 +478,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 			stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(10));
 			stockModel.setGermplasm(germplasm);
+			stockModel.setProject(this.study);
 			this.stockDao.saveOrUpdate(stockModel);
 
 			// Create N experiments for the same stock

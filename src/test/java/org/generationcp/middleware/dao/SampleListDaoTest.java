@@ -42,6 +42,7 @@ import org.springframework.data.domain.Sort;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 public class SampleListDaoTest extends IntegrationTestBase {
 
@@ -295,16 +296,23 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	private void createSampleListForSearch(final String listName) {
 
+		final DmsProject study = new DmsProject();
+		study.setName("TEST STUDY " + new Random().nextInt());
+		study.setDescription("Test Study");
+		this.dmsProjectDao.save(study);
+
 		final DmsProject plotDmsProject = new DmsProject();
 		plotDmsProject.setName("Plot Dataset");
 		plotDmsProject.setDescription("Plot Dataset");
 		plotDmsProject.setDatasetType(new DatasetType(DatasetTypeEnum.PLOT_DATA.getId()));
+		plotDmsProject.setStudy(study);
+		plotDmsProject.setParent(study);
 		this.dmsProjectDao.save(plotDmsProject);
 
 		final WorkbenchUser user = this.createTestUser();
 
 		final ExperimentModel experimentModel = this.createTestExperiment(plotDmsProject);
-		this.createTestStock(experimentModel);
+		this.createTestStock(study, experimentModel);
 
 		this.createTestSampleList(listName, user, experimentModel);
 
@@ -372,7 +380,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	}
 
-	private StockModel createTestStock(final ExperimentModel experimentModel) {
+	private StockModel createTestStock(final DmsProject study, final ExperimentModel experimentModel) {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		germplasm.setGid(null);
 		this.germplasmDao.save(germplasm);
@@ -383,6 +391,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		stockModel.setName("Germplasm 1");
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
+		stockModel.setProject(study);
 
 		this.stockDao.saveOrUpdate(stockModel);
 		experimentModel.setStock(stockModel);

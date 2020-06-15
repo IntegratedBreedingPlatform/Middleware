@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.data.initializer;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -23,9 +25,12 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /*
@@ -44,6 +49,7 @@ public class StudyTestDataInitializer {
 	public static final String END_DATE = "20160606";
 	public static final String OBJECTIVE = "OBJ1";
 	public static int datasetId = 255;
+	private static final String GERMPLASM_PREFIX = "GERMPLASM_PREFIX";
 
 	private final StudyDataManagerImpl studyDataManager;
 	private final OntologyDataManager ontologyManager;
@@ -138,13 +144,6 @@ public class StudyTestDataInitializer {
 		this.geolocationId = this.studyDataManager.addTrialEnvironment(locationVariableList);
 		studyValues.setLocationId(this.geolocationId);
 
-		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
-		this.gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
-		final VariableList germplasmVariableList =
-			this.createGermplasm("unique name", String.valueOf(this.gid), "name", "2000", "prop1", "prop2");
-		this.stockId = this.studyDataManager.addStock(germplasmVariableList);
-		studyValues.setGermplasmId(this.stockId);
-
 		return studyValues;
 	}
 
@@ -188,15 +187,15 @@ public class StudyTestDataInitializer {
 	}
 
 	private VariableList createGermplasm(
-		final String name, final String gid, final String designation, final String code,
-		final String property1, final String property2) throws Exception {
+		final String entryNumber, final String gid, final String designation, final String code,
+		final String check, final String cross) throws Exception {
 		final VariableList variableList = new VariableList();
-		variableList.add(this.createVariable(TermId.ENTRY_NO.getId(), name, 1, PhenotypicType.GERMPLASM));
+		variableList.add(this.createVariable(TermId.ENTRY_NO.getId(), entryNumber, 1, PhenotypicType.GERMPLASM));
 		variableList.add(this.createVariable(TermId.GID.getId(), gid, 2, PhenotypicType.GERMPLASM));
 		variableList.add(this.createVariable(TermId.DESIG.getId(), designation, 3, PhenotypicType.GERMPLASM));
 		variableList.add(this.createVariable(TermId.ENTRY_CODE.getId(), code, 4, PhenotypicType.GERMPLASM));
-		variableList.add(this.createVariable(TermId.CHECK.getId(), property1, 5, PhenotypicType.GERMPLASM));
-		variableList.add(this.createVariable(TermId.CROSS.getId(), property2, 6, PhenotypicType.GERMPLASM));
+		variableList.add(this.createVariable(TermId.CHECK.getId(), check, 5, PhenotypicType.GERMPLASM));
+		variableList.add(this.createVariable(TermId.CROSS.getId(), cross, 6, PhenotypicType.GERMPLASM));
 		return variableList;
 	}
 
@@ -331,5 +330,24 @@ public class StudyTestDataInitializer {
 
 		// add the location
 		return this.locationDataManager.addLocation(location);
+	}
+
+	public List<Integer> addStudyGermplasm(final Integer studyId, final Integer startingEntryNumber, final List<Integer> gids) throws Exception {
+		Integer entryNumber = startingEntryNumber;
+		final List<Integer> entryIds = new ArrayList<>();
+		for (final Integer gid : gids) {
+			final StockModel stockModel = new StockModel();
+			stockModel.setUniqueName("1");
+			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
+			stockModel.setName("Germplasm " + RandomStringUtils.randomAlphanumeric(5));
+			stockModel.setIsObsolete(false);
+			stockModel.setGermplasm(new Germplasm(gid));
+			stockModel.setProject(new DmsProject(studyId));
+
+			final int entryId = this.studyDataManager.addStock(studyId, this.createGermplasm(String.valueOf(entryNumber), gid.toString(), StudyTestDataInitializer.GERMPLASM_PREFIX + gid, RandomStringUtils.randomAlphanumeric(5), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), RandomStringUtils.randomAlphanumeric(5)));
+			entryIds.add(entryId);
+			entryNumber++;
+		}
+		return entryIds;
 	}
 }

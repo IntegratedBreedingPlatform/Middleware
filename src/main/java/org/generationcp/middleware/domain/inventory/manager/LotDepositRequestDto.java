@@ -9,17 +9,17 @@ import java.util.Map;
 @AutoProperty
 public class LotDepositRequestDto {
 
-	private SearchCompositeDto<Integer, Integer> selectedLots;
+	private SearchCompositeDto<Integer, String> selectedLots;
 
 	private Map<String, Double> depositsPerUnit;
 
 	private String notes;
 
-	public SearchCompositeDto<Integer, Integer> getSelectedLots() {
+	public SearchCompositeDto<Integer, String> getSelectedLots() {
 		return selectedLots;
 	}
 
-	public void setSelectedLots(final SearchCompositeDto<Integer, Integer> selectedLots) {
+	public void setSelectedLots(final SearchCompositeDto<Integer, String> selectedLots) {
 		this.selectedLots = selectedLots;
 	}
 

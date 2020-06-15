@@ -269,7 +269,7 @@ public interface StudyDataManager {
 	 * @param variableList the variable list
 	 * @return ID of the stock data created
 	 */
-	int addStock(VariableList variableList);
+	int addStock(int studyId, VariableList variableList);
 
 	/**
 	 * Returns a list of datasets based on the given type. Retrieves from central if the given ID is positive, otherwise retrieves from

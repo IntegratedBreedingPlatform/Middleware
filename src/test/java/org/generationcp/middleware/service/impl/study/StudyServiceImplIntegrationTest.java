@@ -49,7 +49,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testCountTotalObservationUnits() {
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 5);
+		this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 5);
 
 		Assert.assertEquals(5, this.studyService.countTotalObservationUnits(this.study.getProjectId(), geolocation.getLocationId()));
 	}
@@ -57,7 +57,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testHasMeasurementDataEntered() {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 5);
+		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 5);
 
 		Assert.assertFalse(
 			this.studyService.hasMeasurementDataEntered(Collections.singletonList(this.testTrait.getCvTermId()), this.study.getProjectId()));
@@ -72,7 +72,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testHasMeasurementDataOnEnvironment() {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 5);
+		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 5);
 		Assert.assertFalse(this.studyService.hasMeasurementDataOnEnvironment(this.study.getProjectId(), geolocation.getLocationId()));
 
 		this.testDataInitializer.addPhenotypes(experimentModels, this.testTrait.getCvTermId(), RandomStringUtils.randomNumeric(5));

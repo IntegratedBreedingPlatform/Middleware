@@ -57,7 +57,7 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 	public void testSaveOrUpdate() {
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 5);
+		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 5);
 
 		// Verify that new experiments have auto-generated UUIDs as values for obs_unit_id
 		for (final ExperimentModel experiment : experimentModels) {
@@ -124,7 +124,7 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), null, null);
 		final List<ExperimentModel> subObsExperimentsInstance =
 			this.testDataInitializer
-				.createTestExperiments(plantSubObsDataset, plotExperimentModel, geolocation, noOfSubObservationExperiment);
+				.createTestExperimentsWithStock(this.study, plantSubObsDataset, plotExperimentModel, geolocation, noOfSubObservationExperiment);
 
 		final CVTerm trait1 = this.testDataInitializer.createTrait(traitName);
 		this.testDataInitializer.addPhenotypes(subObsExperimentsInstance, trait1.getCvTermId(), RandomStringUtils.randomNumeric(5));
@@ -176,7 +176,7 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testCountObservationsPerInstance() {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation(GEOLOCATION_DESCRIPTION, 101);
-		this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 10);
+		this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 10);
 		final Map<String, Long> result = this.experimentDao.countObservationsPerInstance(this.plot.getProjectId());
 		assertEquals(result.get(GEOLOCATION_DESCRIPTION), Long.valueOf(10));
 	}
@@ -185,7 +185,7 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 	public void testGetExperimentSamplesDTOMap() {
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperiments(this.plot, null, geolocation, 1);
+		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 1);
 
 		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
 		final SampleList sampleList = this.testDataInitializer.createTestSampleList("MyList", user.getUserid());
@@ -198,51 +198,6 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 		final Sample sample = samples.get(0);
 		assertEquals(sample.getSampleId(), sampleDTO.getSampleId());
 		assertEquals(1, sampleDTO.getSampleNumber().intValue());
-
-	}
-
-	@Test
-	public void testGetLocationIdsOfStudy() {
-
-		final DmsProject someStudy = this.testDataInitializer
-			.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
-		final DmsProject someSummary =
-			this.testDataInitializer
-				.createDmsProject("Summary Dataset", "Summary Dataset-Description", someStudy, someStudy, DatasetTypeEnum.SUMMARY_DATA);
-
-		final Geolocation instance1 = this.testDataInitializer.createTestGeolocation("1", 101);
-		final Geolocation instance2 = this.testDataInitializer.createTestGeolocation("2", 102);
-		this.testDataInitializer.createTestExperiment(someSummary, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "1", null);
-		this.testDataInitializer.createTestExperiment(someSummary, instance2, TermId.SUMMARY_EXPERIMENT.getId(), "2", null);
-
-		final List<Integer> instanceIds = this.experimentDao.getLocationIdsOfStudy(someStudy.getProjectId());
-		Assert.assertTrue(instanceIds.contains(instance1.getLocationId()));
-		Assert.assertTrue(instanceIds.contains(instance2.getLocationId()));
-
-	}
-
-	@Test
-	public void testGetLocationIdsOfStudyWithFieldmap() {
-
-		final DmsProject someStudy = this.testDataInitializer
-			.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
-		final DmsProject someSummary =
-			this.testDataInitializer
-				.createDmsProject("Summary Dataset", "Summary Dataset-Description", someStudy, someStudy, DatasetTypeEnum.SUMMARY_DATA);
-
-		final Geolocation instance1 = this.testDataInitializer.createTestGeolocation("1", 101);
-		final Geolocation instance2 = this.testDataInitializer.createTestGeolocation("2", 102);
-		final ExperimentModel instance1Experiment =
-			this.testDataInitializer.createTestExperiment(someSummary, instance1, TermId.SUMMARY_EXPERIMENT.getId(), "1", null);
-		this.testDataInitializer.createTestExperiment(someSummary, instance2, TermId.SUMMARY_EXPERIMENT.getId(), "2", null);
-
-		// Add fieldmap variable to istance 1
-		this.testDataInitializer.addExperimentProp(instance1Experiment, TermId.COLUMN_NO.getId(), "1", 1);
-
-		final List<Integer> instanceIds = this.experimentDao.getLocationIdsOfStudyWithFieldmap(someStudy.getProjectId());
-		// Only instance 1 has fieldmap.
-		Assert.assertTrue(instanceIds.contains(instance1.getLocationId()));
-		Assert.assertFalse(instanceIds.contains(instance2.getLocationId()));
 
 	}
 

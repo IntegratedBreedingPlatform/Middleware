@@ -26,6 +26,7 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
@@ -88,7 +89,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		this.saveVariables(variables, plotDatasetId, environmentDatasetId, geolocations);
 
 		// Save experiments and stocks (if applicable) in plot dataset
-		this.saveObservationUnitRows(crop, plotDatasetId, variables, instanceRowsMap, geolocations);
+		this.saveObservationUnitRows(crop, studyId, plotDatasetId, variables, instanceRowsMap, geolocations);
 
 	}
 
@@ -155,11 +156,11 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		return isEnvironmentVariable ? environmentVariableIds.contains(variableId) : plotVariableIds.contains(variableId);
 	}
 
-	private void saveObservationUnitRows(final CropType crop, final Integer plotDatasetId,
+	private void saveObservationUnitRows(final CropType crop, final Integer studyId, final Integer plotDatasetId,
 		final List<MeasurementVariable> variables, 	final Map<Integer, List<ObservationUnitRow>> instanceRowsMap, final List<Geolocation> geolocations) {
 
 		// Retrieved any previously saved stocks. We are not using Immutable map for the case of no stocks yet
-		final Set<StockModel> stocks = this.daoFactory.getStockDao().findInDataSet(plotDatasetId);
+		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(studyId);
 		final ImmutableMap<String, Geolocation> trialInstanceGeolocationMap =
 			Maps.uniqueIndex(geolocations, new Function<Geolocation, String>() {
 
@@ -191,11 +192,8 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 					experimentModel = this.experimentGenerator.generate(crop, plotDatasetId, row, ExperimentType.PLOT, geolocation, variablesMap);
 				final String entryNumber = String.valueOf(row.getEntryNumber());
 				StockModel stockModel = stocksMap.get(entryNumber);
-				if (stockModel == null) {
-					stockModel = new StockModelGenerator().generate(variablesMap, Lists.newArrayList(row.getVariables().values()));
-					this.daoFactory.getStockDao().save(stockModel);
-					stocksMap.put(entryNumber, stockModel);
-				}
+				// It is expected that stocks were created before when study was saved with germplasm
+				Assert.notNull(stockModel);
 				experimentModel.setStock(stockModel);
 				this.daoFactory.getExperimentDao().save(experimentModel);
 			}

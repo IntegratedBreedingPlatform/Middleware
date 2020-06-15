@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -45,9 +46,11 @@ import java.util.stream.Stream;
 public class ExperimentBuilder extends Builder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentBuilder.class);
-
+private DaoFactory daoFactory;
+	
 	public ExperimentBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public long count(final int dataSetId) {
@@ -271,7 +274,7 @@ public class ExperimentBuilder extends Builder {
 			return new Variable(variableType, geolocationPropertyOptional.get().getValue(),
 				geolocationPropertyOptional.get().getGeolocationPropertyId());
 		}
-		
+
 		return null;
 	}
 
@@ -309,7 +312,7 @@ public class ExperimentBuilder extends Builder {
 			if (stockModelMap != null && stockModelMap.get(stockId) != null) {
 				stockModel = stockModelMap.get(stockId);
 			} else {
-				stockModel = this.getStockBuilder().get(stockId);
+				stockModel = this.daoFactory.getStockDao().getById(stockId);
 			}
 
 			for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
@@ -414,9 +417,4 @@ public class ExperimentBuilder extends Builder {
 		return this.getExperimentDao().hasFieldmap(datasetId);
 	}
 
-	public boolean checkIfStudyHasFieldmap(final int studyId) {
-		final List<Integer> geolocationIdsOfStudy = this.getExperimentDao().getLocationIdsOfStudy(studyId);
-		final List<Integer> geolocationIdsOfStudyWithFieldmap = this.getExperimentDao().getLocationIdsOfStudyWithFieldmap(studyId);
-		return geolocationIdsOfStudy.size() == geolocationIdsOfStudyWithFieldmap.size();
-	}
 }
