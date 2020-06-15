@@ -107,10 +107,6 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 			this.createPhenotype(observationDto);
 		}
 
-		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
-		// In case the derived trait is also input of another formula (no recursion, just mark the target of that formula).
-		this.datasetService.updateDependentPhenotypesAsOutOfSync(measurementVariable.getTermId(), observationUnitId);
-
 	}
 
 	@Override

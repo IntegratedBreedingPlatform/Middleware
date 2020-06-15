@@ -138,9 +138,9 @@ public interface DatasetService {
 	 * This will also update the phenotype status of calculated variables in plot observation if the observation unit is a sub-observation.
 	 *
 	 * @param variableId
-	 * @param observationUnitId
+	 * @param observationUnitIds
 	 */
-	void updateDependentPhenotypesAsOutOfSync(Integer variableId, Integer observationUnitId);
+	void updateDependentPhenotypesAsOutOfSync(Integer variableId, Set<Integer> observationUnitIds);
 
 	/**
 	 * Update the phenotype status as "OUT OF SYNC" for given calculated variables and observation unit.

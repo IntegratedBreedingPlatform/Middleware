@@ -437,7 +437,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
 
 		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
-		this.updateDependentPhenotypesAsOutOfSync(observableId, observationUnitId);
+		this.updateDependentPhenotypesAsOutOfSync(observableId, Sets.newHashSet(observationUnitId));
 
 		observation.setObservationId(savedRecord.getPhenotypeId());
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -469,7 +469,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		if (!observationDto.isDraftMode()) {
 			// Also update the status of phenotypes of the same observation unit for variables using it as input variable
-			this.updateDependentPhenotypesAsOutOfSync(observableId, observationDto.getObservationUnitId());
+			this.updateDependentPhenotypesAsOutOfSync(observableId, Sets.newHashSet(observationDto.getObservationUnitId()));
 		}
 
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -498,7 +498,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void updateDependentPhenotypesAsOutOfSync(final Integer variableId, final Integer observationUnitId) {
+	public void updateDependentPhenotypesAsOutOfSync(final Integer variableId, final Set<Integer> observationUnitIds) {
 		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputId(variableId);
 		if (!formulaList.isEmpty()) {
 			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
@@ -509,7 +509,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			});
 			this.daoFactory.getPhenotypeDAO()
-				.updateOutOfSyncPhenotypes(Sets.newHashSet(observationUnitId), Sets.newHashSet(targetVariableIds));
+				.updateOutOfSyncPhenotypes(observationUnitIds, Sets.newHashSet(targetVariableIds));
 
 		}
 
@@ -690,7 +690,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (updateDependentPhenotypes) {
 			final Integer observableId = phenotype.getObservableId();
 			final Integer observationUnitId = experiment.getNdExperimentId();
-			this.updateDependentPhenotypesAsOutOfSync(observableId, observationUnitId);
+			this.updateDependentPhenotypesAsOutOfSync(observableId, Sets.newHashSet(observationUnitId));
 		}
 	}
 

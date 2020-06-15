@@ -331,7 +331,7 @@ public class DatasetServiceImplTest {
 		final int variableId = ran.nextInt();
 		final int observationUnitId = ran.nextInt();
 		Mockito.doReturn(new ArrayList<Formula>()).when(this.formulaDao).getByInputId(variableId);
-		this.datasetService.updateDependentPhenotypesAsOutOfSync(variableId, observationUnitId);
+		this.datasetService.updateDependentPhenotypesAsOutOfSync(variableId, Sets.newHashSet(observationUnitId));
 		Mockito.verify(this.phenotypeDao, Mockito.never()).updateOutOfSyncPhenotypes(ArgumentMatchers.<Integer>anySet(), ArgumentMatchers.<Integer>anySet());
 	}
 
@@ -349,7 +349,7 @@ public class DatasetServiceImplTest {
 		term2.setCvTermId(ran.nextInt());
 		formula2.setTargetCVTerm(term2);
 		Mockito.doReturn(Arrays.asList(formula1, formula2)).when(this.formulaDao).getByInputId(variableId);
-		this.datasetService.updateDependentPhenotypesAsOutOfSync(variableId, observationUnitId);
+		this.datasetService.updateDependentPhenotypesAsOutOfSync(variableId, Sets.newHashSet(observationUnitId));
 		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(
 			new HashSet<Integer>(Arrays.asList(observationUnitId)),
 			new HashSet<Integer>(Arrays.asList(term1.getCvTermId(), term2.getCvTermId())));

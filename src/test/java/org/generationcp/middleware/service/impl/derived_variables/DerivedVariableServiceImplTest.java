@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.derived_variables;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -288,7 +289,7 @@ public class DerivedVariableServiceImplTest {
 		this.derivedVariableService.saveCalculatedResult(value, categoricalId, observationUnitId, observationId, measurementVariable);
 
 		verify(this.phenotypeDao).update(existingPhenotype);
-		verify(this.datasetService).updateDependentPhenotypesAsOutOfSync(variableTermId, observationUnitId);
+		verify(this.datasetService).updateDependentPhenotypesAsOutOfSync(variableTermId, Sets.newHashSet(observationUnitId));
 		assertEquals(value, existingPhenotype.getValue());
 		assertEquals(categoricalId, existingPhenotype.getcValueId());
 		assertTrue(existingPhenotype.isChanged());
@@ -386,7 +387,7 @@ public class DerivedVariableServiceImplTest {
 
 		final ArgumentCaptor<Phenotype> captor = ArgumentCaptor.forClass(Phenotype.class);
 		verify(this.phenotypeDao).save(captor.capture());
-		verify(this.datasetService).updateDependentPhenotypesAsOutOfSync(variableTermId, observationUnitId);
+		verify(this.datasetService).updateDependentPhenotypesAsOutOfSync(variableTermId, Sets.newHashSet(observationUnitId));
 
 		final Phenotype phenotypeToBeSaved = captor.getValue();
 		assertNotNull(phenotypeToBeSaved.getCreatedDate());
