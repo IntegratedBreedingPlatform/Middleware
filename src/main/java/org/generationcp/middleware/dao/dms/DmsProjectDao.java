@@ -780,7 +780,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("studyObjective");
 			query.addScalar("experimentalDesign");
 			query.addScalar("lastUpdate");
-			query.setParameter("geolocationId", instanceId);
+			query.setParameter("instanceId", instanceId);
 			final Object result = query.uniqueResult();
 			if (result != null) {
 				final Object[] row = (Object[]) result;

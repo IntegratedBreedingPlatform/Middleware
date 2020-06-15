@@ -26,6 +26,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -475,5 +476,12 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			return maxInstanceNumber.intValue() + 1;
 		}
 		return 1;
+	}
+
+	public void deleteGeolocations(final List<Integer> instanceIds) {
+		final List<Geolocation> geolocations = this.getByCriteria(Collections.singletonList(Restrictions.in("locationId", instanceIds)));
+		for (final Geolocation geolocation : geolocations) {
+			this.makeTransient(geolocation);
+		}
 	}
 }

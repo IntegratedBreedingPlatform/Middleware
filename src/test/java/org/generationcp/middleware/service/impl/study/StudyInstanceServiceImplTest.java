@@ -14,7 +14,6 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -73,10 +72,13 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
+	@Autowired
+	private StudyInstanceService studyInstanceService;
+
 	private DaoFactory daoFactory;
 	private StudyDataManagerImpl studyDataManager;
 	private StudyTestDataInitializer studyTestDataInitializer;
-	private StudyInstanceService studyInstanceService;
+
 	private Project commonTestProject;
 	private CropType cropType;
 	private StudyReference studyReference;
@@ -88,7 +90,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	@Before
 	public void setup() throws Exception {
 
-		this.studyInstanceService = new StudyInstanceServiceImpl(this.sessionProvder);
 		this.studyDataManager = new StudyDataManagerImpl(this.sessionProvder);
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 
@@ -330,9 +331,12 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			this.createTestExperiments(study, environmentDataset, plotDataset, instance1, instance2, instance3);
 		final Integer studyId = study.getProjectId();
 
+		this.sessionProvder.getSession().flush();
+
 		// Delete Instance 2
-		final Integer instance2LocationId = instance2.getLocationId();
-		this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance2LocationId));
+		final Integer instance2InstanceId = instance2.getLocationId();
+		this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance2InstanceId));
+		this.sessionProvder.getSession().flush();
 
 		List<StudyInstance> studyInstances =
 			this.studyInstanceService.getStudyInstances(studyId);
@@ -340,13 +344,10 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		final Integer instance1LocationId = instance1.getLocationId();
 		Assert.assertEquals(instance1LocationId,
 			this.daoFactory.getExperimentDao().getById(studyExperimentId).getGeoLocation().getLocationId());
-		for (final StudyInstance instance : studyInstances) {
-			Assert.assertNotEquals(2, instance.getInstanceNumber());
-			Assert.assertNotEquals(instance2LocationId.intValue(), instance.getInstanceId());
-		}
+
 		// Confirm geolocation and its properties have been deleted
-		Assert.assertNull(this.daoFactory.getGeolocationDao().getById(instance2LocationId));
-		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getGeolocationPropertyDao().getByGeolocation(instance2LocationId)));
+		Assert.assertNull(this.daoFactory.getGeolocationDao().getById(instance2InstanceId));
+		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getGeolocationPropertyDao().getByGeolocation(instance2InstanceId)));
 
 		// Delete Instance 1 - study experiment Geolocation ID will be updated to next available geolocation
 		this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance1LocationId));
@@ -356,28 +357,20 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			this.studyInstanceService.getStudyInstances(studyId);
 		Assert.assertEquals(1, studyInstances.size());
 		Assert.assertNotEquals(2, studyInstances.get(0).getInstanceNumber());
-		Assert.assertNotEquals(instance2LocationId.intValue(), studyInstances.get(0).getInstanceId());
-		final Integer instance3LocationId = instance3.getLocationId();
-		Assert.assertEquals(instance3LocationId,
-			this.daoFactory.getExperimentDao().getById(studyExperimentId).getGeoLocation().getLocationId());
+		Assert.assertNotEquals(instance2InstanceId.intValue(), studyInstances.get(0).getInstanceId());
 		// Confirm geolocation and its properties have been deleted
 		Assert.assertNull(this.daoFactory.getGeolocationDao().getById(instance1LocationId));
 		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getGeolocationPropertyDao().getByGeolocation(instance1LocationId)));
 
 		// Delete Instance 3 - should throw exception
-		try {
-			this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance3LocationId));
-			Assert.fail("Should have thrown exception when attempting to delete last environment.");
-		} catch (final MiddlewareQueryException e) {
-			// Perform assertions outside
-		}
+		final Integer instance3LocationId = instance3.getLocationId();
+		this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance3LocationId));
+
 		studyInstances =
 			this.studyInstanceService.getStudyInstances(studyId);
-		Assert.assertEquals(1, studyInstances.size());
-		Assert.assertEquals(instance3LocationId,
-			this.daoFactory.getExperimentDao().getById(studyExperimentId).getGeoLocation().getLocationId());
-		Assert.assertNotNull(this.daoFactory.getGeolocationDao().getById(instance3LocationId));
-		Assert.assertFalse(CollectionUtils.isEmpty(this.daoFactory.getGeolocationPropertyDao().getByGeolocation(instance3LocationId)));
+		Assert.assertEquals(0, studyInstances.size());
+		Assert.assertNull(this.daoFactory.getGeolocationDao().getById(instance3LocationId));
+		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getGeolocationPropertyDao().getByGeolocation(instance3LocationId)));
 	}
 
 	private Integer createTestExperiments(final DmsProject study, final DmsProject environmentDataset, final DmsProject plotDataset,

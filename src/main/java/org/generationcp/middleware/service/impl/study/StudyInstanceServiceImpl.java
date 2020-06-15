@@ -25,7 +25,6 @@ import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
-import org.generationcp.middleware.service.impl.study.generation.GeolocationGenerator;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -41,7 +40,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class StudyInstanceServiceImpl implements StudyInstanceService {
 
-	public static final List<Integer> GEOLOCATION_METADATA =
+	protected static final List<Integer> GEOLOCATION_METADATA =
 		Arrays.asList(TermId.LATITUDE.getId(), TermId.LONGITUDE.getId(), TermId.GEODETIC_DATUM.getId(), TermId.ALTITUDE.getId());
 
 	@Resource
@@ -53,9 +52,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	@Resource
 	private ExperimentDesignService experimentDesignService;
 
+	@Resource
 	private ExperimentModelGenerator experimentModelGenerator;
-
-	private GeolocationGenerator geolocationGenerator;
 
 	private DaoFactory daoFactory;
 
@@ -65,9 +63,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	public StudyInstanceServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
-		this.experimentModelGenerator = new ExperimentModelGenerator(sessionProvider);
-		this.geolocationGenerator = new GeolocationGenerator(sessionProvider);
-		this.studyService = new StudyServiceImpl(sessionProvider);
 	}
 
 	@Override
@@ -85,7 +80,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		int instancesGenerated = 0;
 		while (instancesGenerated < numberOfInstancesToGenerate) {
 			// If design is generated, increment last instance number. Otherwise, attempt to find  "gap" instance number first (if any)
-			Integer instanceNumber = Collections.max(instanceNumbers) + 1;
+			Integer instanceNumber = (!instanceNumbers.isEmpty() ? Collections.max(instanceNumbers) : 0) + 1;
 			if (!hasExperimentalDesign) {
 				instanceNumber = 1;
 				while (instanceNumbers.contains(instanceNumber)) {
@@ -166,10 +161,13 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final ExperimentDao experimentDao = this.daoFactory.getExperimentDao();
 		experimentDao.deleteExperimentsForDatasets(Arrays.asList(plotDatasetId, environmentDatasetId), instanceNumbersToDelete);
 
+		// Delete geolocation and its properties
+		this.daoFactory.getGeolocationDao().deleteGeolocations(instanceIds);
+
 		// IF experimental design is not yet generated, re-number succeeding trial instances
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
 		if (!hasExperimentalDesign) {
-			final Integer startingInstanceNumber = Collections.min(instanceNumbersToDelete);
+			final Integer startingInstanceNumber = instanceNumbersToDelete.isEmpty() ? 1 : Collections.min(instanceNumbersToDelete);
 			final List<ExperimentModel> instancesToUpdate =
 				allEnvironments.stream()
 					.filter(instance -> !instanceNumbersToDelete.contains(Integer.valueOf(instance.getGeoLocation().getDescription()))
