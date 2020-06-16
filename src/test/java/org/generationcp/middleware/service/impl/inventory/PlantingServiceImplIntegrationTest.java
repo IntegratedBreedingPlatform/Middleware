@@ -202,7 +202,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void test_SavePlanting_GroupTransactions_ThrowsException() {
+	public void test_SavePlanting_GroupTransactions_Ok() {
 		final Integer entryNo = Integer.valueOf(
 			experiments.get(0).getFactors().getVariables().stream().filter(v -> v.getVariableType().getLocalName().equals("ENTRY_NO"))
 				.findFirst().get().getValue());
@@ -242,11 +242,12 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 			.getTransactionsByNdExperimentIds(filteredByEntryNo.stream().map(Experiment::getId).collect(Collectors.toList()),
 				TransactionStatus.CONFIRMED, ExperimentTransactionType.PLANTING);
 		assertThat(transactions.size(), equalTo(1));
+		assertThat(transactions.get(0).getQuantity(), equalTo(-100D));
 
 	}
 
 	@Test
-	public void test_SavePlanting_UngroupTransactions_ThrowsException() {
+	public void test_SavePlanting_UngroupTransactions_Ok() {
 		final Integer entryNo = Integer.valueOf(
 			experiments.get(0).getFactors().getVariables().stream().filter(v -> v.getVariableType().getLocalName().equals("ENTRY_NO"))
 				.findFirst().get().getValue());
@@ -286,6 +287,8 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 			.getTransactionsByNdExperimentIds(filteredByEntryNo.stream().map(Experiment::getId).collect(Collectors.toList()),
 				TransactionStatus.CONFIRMED, ExperimentTransactionType.PLANTING);
 		assertThat(transactions.size(), equalTo(2));
+		assertThat(transactions.get(0).getQuantity(), equalTo(-50D));
+		assertThat(transactions.get(1).getQuantity(), equalTo(-50D));
 
 	}
 
