@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
+import org.generationcp.middleware.domain.dms.InstanceData;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
@@ -38,6 +39,8 @@ import org.springframework.util.CollectionUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -75,6 +78,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	@Autowired
 	private StudyInstanceService studyInstanceService;
 
+	private final Random random = new Random();
 	private DaoFactory daoFactory;
 	private StudyDataManagerImpl studyDataManager;
 	private StudyTestDataInitializer studyTestDataInitializer;
@@ -260,53 +264,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertFalse(studyInstance3.isHasMeasurements());
 	}
 
-	private DmsProject createTestStudy() {
-		final DmsProject study =
-			this.testDataInitializer
-				.createDmsProject("Study1", "Study-Description", null, this.daoFactory.getDmsProjectDAO().getById(1), null);
-		final DmsProject environmentDataset =
-			this.testDataInitializer
-				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
-		final DmsProject plotDataset =
-			this.testDataInitializer
-				.createDmsProject("Plot Dataset", "Plot Dataset-Description", study, study, DatasetTypeEnum.PLOT_DATA);
-		final DmsProject subObsDataset =
-			this.testDataInitializer
-				.createDmsProject("Subobs Dataset", "Subobs Dataset-Description", study, plotDataset,
-					DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS);
-		final GermplasmList advanceList = GermplasmListTestDataInitializer.createGermplasmListWithType(null,
-			GermplasmListType.ADVANCED.name());
-		advanceList.setProjectId(study.getProjectId());
-		this.daoFactory.getGermplasmListDAO().save(advanceList);
-
-		this.testDataInitializer.addGeolocationProp(this.instance1, TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
-			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), 1);
-		this.testDataInitializer.addGeolocationProp(this.instance2, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5), 1);
-
-		// Instance 1
-		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
-		final ExperimentModel instance1PlotExperiment =
-			this.testDataInitializer.createTestExperiment(plotDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", null);
-		// Create 2 Sub-obs records
-		final ExperimentModel instance1SubObsExperiment1 =
-			this.testDataInitializer
-				.createTestExperiment(subObsDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
-		this.savePhenotype(instance1SubObsExperiment1);
-		final ExperimentModel instance1SubObsExperiment2 = this.testDataInitializer
-			.createTestExperiment(subObsDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
-		this.savePhenotype(instance1SubObsExperiment2);
-
-		// Instance 2
-		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
-		this.testDataInitializer.createTestExperiment(plotDataset, this.instance2, TermId.PLOT_EXPERIMENT.getId(), "1", null);
-
-		// Instance 3 has no plot experiments
-		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance3, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
-		return study;
-	}
-
 	@Test
-	public void testDeleteEnvironment() {
+	public void testDeleteStudyInstances() {
 		final DmsProject study =
 			this.testDataInitializer
 				.createDmsProject("Study1", "Study-Description", null, this.daoFactory.getDmsProjectDAO().getById(1), null);
@@ -371,6 +330,160 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(0, studyInstances.size());
 		Assert.assertNull(this.daoFactory.getGeolocationDao().getById(instance3LocationId));
 		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getGeolocationPropertyDao().getByGeolocation(instance3LocationId)));
+	}
+
+	@Test
+	public void testAddInstanceData_EnvironmentDetail_GeolocationMetadata() {
+
+		final boolean isEnvironmentCondition = false;
+		final InstanceData instanceData = this.createTestInstanceData(TermId.ALTITUDE.getId());
+		final InstanceData addedInstanceData = this.studyInstanceService.addInstanceData(instanceData, isEnvironmentCondition);
+
+		final Optional<InstanceData>
+			result = this.studyInstanceService
+			.getInstanceData(addedInstanceData.getInstanceId(), addedInstanceData.getInstanceDataId(), TermId.ALTITUDE.getId(),
+				isEnvironmentCondition);
+
+		Assert.assertTrue(result.isPresent());
+		Assert.assertEquals(Double.valueOf(instanceData.getValue()).toString(), result.get().getValue());
+	}
+
+	@Test
+	public void testAddInstanceData_EnvironmentDetail() {
+
+		final boolean isEnvironmentCondition = false;
+		final InstanceData instanceData = this.createTestInstanceData(TermId.BLOCK_NAME.getId());
+		final InstanceData addedInstanceData = this.studyInstanceService.addInstanceData(instanceData, isEnvironmentCondition);
+
+		final Optional<InstanceData>
+			result = this.studyInstanceService
+			.getInstanceData(addedInstanceData.getInstanceId(), addedInstanceData.getInstanceDataId(), TermId.BLOCK_NAME.getId(),
+				isEnvironmentCondition);
+
+		Assert.assertTrue(result.isPresent());
+		Assert.assertEquals(instanceData.getValue(), result.get().getValue());
+	}
+
+	@Test
+	public void testAddInstanceData_EnvironmentCondition() {
+
+		final boolean isEnvironmentCondition = true;
+		final InstanceData instanceData = this.createTestInstanceData(TermId.BLOCK_NAME.getId());
+		final InstanceData addedInstanceData = this.studyInstanceService.addInstanceData(instanceData, isEnvironmentCondition);
+
+		final Optional<InstanceData>
+			result = this.studyInstanceService
+			.getInstanceData(addedInstanceData.getInstanceId(), addedInstanceData.getInstanceDataId(), TermId.BLOCK_NAME.getId(),
+				isEnvironmentCondition);
+
+		Assert.assertTrue(result.isPresent());
+		Assert.assertEquals(instanceData.getValue(), result.get().getValue());
+	}
+
+	@Test
+	public void testUpdateInstanceData_EnvironmentDetail() {
+
+		final boolean isEnvironmentCondition = false;
+		final InstanceData instanceData = this.createTestInstanceData(TermId.BLOCK_NAME.getId());
+		final InstanceData addedInstanceData = this.studyInstanceService.addInstanceData(instanceData, isEnvironmentCondition);
+
+		final String oldValue = addedInstanceData.getValue();
+		final String newValue = RandomStringUtils.randomNumeric(10);
+
+		addedInstanceData.setValue(newValue);
+		this.studyInstanceService.updateInstanceData(addedInstanceData, isEnvironmentCondition);
+
+		final Optional<InstanceData>
+			result = this.studyInstanceService
+			.getInstanceData(addedInstanceData.getInstanceId(), addedInstanceData.getInstanceDataId(), TermId.BLOCK_NAME.getId(),
+				isEnvironmentCondition);
+
+		Assert.assertTrue(result.isPresent());
+		Assert.assertEquals(newValue, result.get().getValue());
+	}
+
+	@Test
+	public void testUpdateInstanceData_EnvironmentCondition() {
+
+		final boolean isEnvironmentCondition = true;
+		final InstanceData instanceData = this.createTestInstanceData(TermId.BLOCK_NAME.getId());
+		final InstanceData addedInstanceData = this.studyInstanceService.addInstanceData(instanceData, isEnvironmentCondition);
+
+		final String oldValue = addedInstanceData.getValue();
+		final String newValue = RandomStringUtils.randomNumeric(10);
+
+		addedInstanceData.setValue(newValue);
+		this.studyInstanceService.updateInstanceData(addedInstanceData, isEnvironmentCondition);
+
+		final Optional<InstanceData>
+			result = this.studyInstanceService
+			.getInstanceData(addedInstanceData.getInstanceId(), addedInstanceData.getInstanceDataId(), TermId.BLOCK_NAME.getId(),
+				isEnvironmentCondition);
+
+		Assert.assertTrue(result.isPresent());
+		Assert.assertEquals(newValue, result.get().getValue());
+
+	}
+
+	private InstanceData createTestInstanceData(final int variableId) {
+		// Create an instance
+		final Integer studyId = this.studyReference.getId();
+		final List<StudyInstance> studyInstances =
+			this.studyInstanceService.createStudyInstances(this.cropType, studyId, this.environmentDataset.getId(), 1);
+		final StudyInstance studyInstance = studyInstances.get(0);
+
+		final String value = RandomStringUtils.randomNumeric(5);
+
+		final InstanceData instanceData = new InstanceData();
+		instanceData.setValue(value);
+		instanceData.setInstanceId(studyInstance.getInstanceId());
+		instanceData.setVariableId(variableId);
+		return instanceData;
+	}
+
+	private DmsProject createTestStudy() {
+		final DmsProject study =
+			this.testDataInitializer
+				.createDmsProject("Study1", "Study-Description", null, this.daoFactory.getDmsProjectDAO().getById(1), null);
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
+		final DmsProject plotDataset =
+			this.testDataInitializer
+				.createDmsProject("Plot Dataset", "Plot Dataset-Description", study, study, DatasetTypeEnum.PLOT_DATA);
+		final DmsProject subObsDataset =
+			this.testDataInitializer
+				.createDmsProject("Subobs Dataset", "Subobs Dataset-Description", study, plotDataset,
+					DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS);
+		final GermplasmList advanceList = GermplasmListTestDataInitializer.createGermplasmListWithType(null,
+			GermplasmListType.ADVANCED.name());
+		advanceList.setProjectId(study.getProjectId());
+		this.daoFactory.getGermplasmListDAO().save(advanceList);
+
+		this.testDataInitializer.addGeolocationProp(this.instance1, TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), 1);
+		this.testDataInitializer.addGeolocationProp(this.instance2, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5), 1);
+
+		// Instance 1
+		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		final ExperimentModel instance1PlotExperiment =
+			this.testDataInitializer.createTestExperiment(plotDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", null);
+		// Create 2 Sub-obs records
+		final ExperimentModel instance1SubObsExperiment1 =
+			this.testDataInitializer
+				.createTestExperiment(subObsDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
+		this.savePhenotype(instance1SubObsExperiment1);
+		final ExperimentModel instance1SubObsExperiment2 = this.testDataInitializer
+			.createTestExperiment(subObsDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
+		this.savePhenotype(instance1SubObsExperiment2);
+
+		// Instance 2
+		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		this.testDataInitializer.createTestExperiment(plotDataset, this.instance2, TermId.PLOT_EXPERIMENT.getId(), "1", null);
+
+		// Instance 3 has no plot experiments
+		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance3, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		return study;
 	}
 
 	private Integer createTestExperiments(final DmsProject study, final DmsProject environmentDataset, final DmsProject plotDataset,
