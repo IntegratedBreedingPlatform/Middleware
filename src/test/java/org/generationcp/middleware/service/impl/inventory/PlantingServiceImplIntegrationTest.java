@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -66,33 +67,30 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
-	private Project commonTestProject;
-
-	private GermplasmTestDataGenerator germplasmTestDataGenerator;
-	private DataSetupTest dataSetupTest;
-
 	@Autowired
 	private DatasetService datasetService;
 
 	@Autowired
 	private LocationDataManager locationDataManager;
 
+	private Project commonTestProject;
+
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
+	private DataSetupTest dataSetupTest;
 	private DaoFactory daoFactory;
+
+	private TransactionServiceImpl transactionService;
+	private PlantingServiceImpl plantingService;
+	private LotServiceImpl lotService;
 
 	private Integer studyId;
 	private Integer observationDatasetId;
 	private Integer userId;
 	private Integer storageLocationId;
-
-	private TransactionServiceImpl transactionService;
-
-	private PlantingServiceImpl plantingService;
-
-	private LotServiceImpl lotService;
+	public String unitName;
+	private List<Experiment> experiments;
 
 	public static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
-
-	public String unitName;
 
 	@Before
 	public void setUp() {
@@ -121,13 +119,13 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		}
 		this.userId = this.findAdminUser();
 		this.resolveStorageLocation();
-		this.unitName = "SEED_AMOUNT_g";
+		this.unitName = this.daoFactory.getCvTermDao().getById(UNIT_ID).getName();
+		experiments = studyDataManager.getExperiments(this.observationDatasetId, 0, 40);
 
 	}
 
 	@Test
 	public void test_SavePlanting_FoundConfirmedTransactions_ThrowsException() {
-		final List<Experiment> experiments = studyDataManager.getExperiments(this.observationDatasetId, 0, 20);
 		final Integer gid = Integer.valueOf(
 			experiments.get(0).getFactors().getVariables().stream().filter(v -> v.getVariableType().getLocalName().equals("GID"))
 				.findFirst().get().getValue());
@@ -168,7 +166,6 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void test_SavePlanting_NotEnoughInventory_ThrowsException() {
-		final List<Experiment> experiments = studyDataManager.getExperiments(this.observationDatasetId, 0, 20);
 		final Integer gid = Integer.valueOf(
 			experiments.get(0).getFactors().getVariables().stream().filter(v -> v.getVariableType().getLocalName().equals("GID"))
 				.findFirst().get().getValue());
@@ -202,6 +199,94 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		} catch (final MiddlewareRequestException e) {
 			assertThat(e.getErrorCode(), equalTo("planting.not.enough.inventory"));
 		}
+	}
+
+	@Test
+	public void test_SavePlanting_GroupTransactions_ThrowsException() {
+		final Integer entryNo = Integer.valueOf(
+			experiments.get(0).getFactors().getVariables().stream().filter(v -> v.getVariableType().getLocalName().equals("ENTRY_NO"))
+				.findFirst().get().getValue());
+		final List<Experiment> filteredByEntryNo = experiments.stream()
+			.filter(e -> e.getFactors().getVariables().stream().filter(v -> v.getVariableType().getLocalName().equals("ENTRY_NO"))
+				.findFirst().get().getValue().equals(String.valueOf(entryNo))).collect(Collectors.toList());
+
+		final Integer gid = Integer.valueOf(
+			filteredByEntryNo.get(0).getFactors().getVariables().stream().filter(v -> v.getVariableType().getLocalName().equals("GID"))
+				.findFirst().get().getValue());
+
+		final Lot lot = createLot(gid);
+		this.createTransaction(lot, TransactionType.DEPOSIT, TransactionStatus.CONFIRMED, 100D);
+
+		final PlantingRequestDto plantingRequestDto = new PlantingRequestDto();
+		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
+		searchCompositeDto.setItemIds(filteredByEntryNo.stream().map(Experiment::getId).collect(Collectors.toSet()));
+		plantingRequestDto.setSelectedObservationUnits(searchCompositeDto);
+
+		final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction = new PlantingRequestDto.WithdrawalInstruction();
+		withdrawalInstruction.setWithdrawAllAvailableBalance(false);
+		withdrawalInstruction.setGroupTransactions(true);
+		withdrawalInstruction.setWithdrawalAmount(50D);
+
+		final Map<String, PlantingRequestDto.WithdrawalInstruction> withdrawalInstructionMap = new HashMap<>();
+		withdrawalInstructionMap.put(unitName, withdrawalInstruction);
+		plantingRequestDto.setWithdrawalsPerUnit(withdrawalInstructionMap);
+
+		final PlantingRequestDto.LotEntryNumber lotEntryNumber = new PlantingRequestDto.LotEntryNumber();
+		lotEntryNumber.setEntryNo(entryNo);
+		lotEntryNumber.setLotId(lot.getId());
+		plantingRequestDto.setLotPerEntryNo(Collections.singletonList(lotEntryNumber));
+
+		this.plantingService.savePlanting(userId, studyId, observationDatasetId, plantingRequestDto, TransactionStatus.CONFIRMED);
+
+		final List<Transaction> transactions = this.daoFactory.getExperimentTransactionDao()
+			.getTransactionsByNdExperimentIds(filteredByEntryNo.stream().map(Experiment::getId).collect(Collectors.toList()),
+				TransactionStatus.CONFIRMED, ExperimentTransactionType.PLANTING);
+		assertThat(transactions.size(), equalTo(1));
+
+	}
+
+	@Test
+	public void test_SavePlanting_UngroupTransactions_ThrowsException() {
+		final Integer entryNo = Integer.valueOf(
+			experiments.get(0).getFactors().getVariables().stream().filter(v -> v.getVariableType().getLocalName().equals("ENTRY_NO"))
+				.findFirst().get().getValue());
+		final List<Experiment> filteredByEntryNo = experiments.stream()
+			.filter(e -> e.getFactors().getVariables().stream().filter(v -> v.getVariableType().getLocalName().equals("ENTRY_NO"))
+				.findFirst().get().getValue().equals(String.valueOf(entryNo))).collect(Collectors.toList());
+
+		final Integer gid = Integer.valueOf(
+			filteredByEntryNo.get(0).getFactors().getVariables().stream().filter(v -> v.getVariableType().getLocalName().equals("GID"))
+				.findFirst().get().getValue());
+
+		final Lot lot = createLot(gid);
+		this.createTransaction(lot, TransactionType.DEPOSIT, TransactionStatus.CONFIRMED, 100D);
+
+		final PlantingRequestDto plantingRequestDto = new PlantingRequestDto();
+		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
+		searchCompositeDto.setItemIds(filteredByEntryNo.stream().map(Experiment::getId).collect(Collectors.toSet()));
+		plantingRequestDto.setSelectedObservationUnits(searchCompositeDto);
+
+		final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction = new PlantingRequestDto.WithdrawalInstruction();
+		withdrawalInstruction.setWithdrawAllAvailableBalance(false);
+		withdrawalInstruction.setGroupTransactions(false);
+		withdrawalInstruction.setWithdrawalAmount(50D);
+
+		final Map<String, PlantingRequestDto.WithdrawalInstruction> withdrawalInstructionMap = new HashMap<>();
+		withdrawalInstructionMap.put(unitName, withdrawalInstruction);
+		plantingRequestDto.setWithdrawalsPerUnit(withdrawalInstructionMap);
+
+		final PlantingRequestDto.LotEntryNumber lotEntryNumber = new PlantingRequestDto.LotEntryNumber();
+		lotEntryNumber.setEntryNo(entryNo);
+		lotEntryNumber.setLotId(lot.getId());
+		plantingRequestDto.setLotPerEntryNo(Collections.singletonList(lotEntryNumber));
+
+		this.plantingService.savePlanting(userId, studyId, observationDatasetId, plantingRequestDto, TransactionStatus.CONFIRMED);
+
+		final List<Transaction> transactions = this.daoFactory.getExperimentTransactionDao()
+			.getTransactionsByNdExperimentIds(filteredByEntryNo.stream().map(Experiment::getId).collect(Collectors.toList()),
+				TransactionStatus.CONFIRMED, ExperimentTransactionType.PLANTING);
+		assertThat(transactions.size(), equalTo(2));
+
 	}
 
 	private void createTestStudyWithObservationDataset() {
