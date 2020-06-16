@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
 public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TransactionDAO.class);
-	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	public boolean hasInventoryDetails(final Integer studyId) {
 		try {
@@ -524,97 +524,129 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ " WHERE"//
 		+ "    lot.etype = 'GERMPLSM' and g.deleted=0 "; //
 
-	// FIXME setParameter/setParameterList (SqlQueryParamBuilder)
-	private String buildSearchTransactionsQuery(final TransactionsSearchDto transactionsSearchDto) {
-		final StringBuilder query = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
+	private static void addSearchTransactionsFilters(
+		final SqlQueryParamBuilder paramBuilder,
+		final TransactionsSearchDto transactionsSearchDto) {
+
 		if (transactionsSearchDto != null) {
-			if (transactionsSearchDto.getLotIds() != null && !transactionsSearchDto.getLotIds().isEmpty()) {
-				query.append(" and lot.lotid IN (").append(Joiner.on(",").join(transactionsSearchDto.getLotIds())).append(") ");
+			final List<Integer> lotIds = transactionsSearchDto.getLotIds();
+			if (lotIds != null && !lotIds.isEmpty()) {
+				paramBuilder.append(" and lot.lotid IN (:lotIds)");
+				paramBuilder.setParameterList("lotIds", lotIds);
 			}
 
-			if (transactionsSearchDto.getLotLocationAbbr() != null) {
-				query.append(" and loc.labbr like '%").append(transactionsSearchDto.getLotLocationAbbr()).append("%' ");
+			final String lotLocationAbbr = transactionsSearchDto.getLotLocationAbbr();
+			if (lotLocationAbbr != null) {
+				paramBuilder.append(" and loc.labbr like :lotLocationAbbr");
+				paramBuilder.setParameter("lotLocationAbbr", '%' + lotLocationAbbr + '%');
 			}
 
-			if (transactionsSearchDto.getLotUUIDs() != null && !transactionsSearchDto.getLotUUIDs().isEmpty()) {
-				query.append("and lot.lot_uuid IN ('").append(Joiner.on("','").join(transactionsSearchDto.getLotUUIDs().toArray()))
-					.append("') ");
+			final List<String> lotUUIDs = transactionsSearchDto.getLotUUIDs();
+			if (lotUUIDs != null && !lotUUIDs.isEmpty()) {
+				paramBuilder.append(" and lot.lot_uuid IN (:lotUUIDs)");
+				paramBuilder.setParameterList("lotUUIDs", lotUUIDs);
 			}
 
-			if (transactionsSearchDto.getTransactionIds() != null && !transactionsSearchDto.getTransactionIds().isEmpty()) {
-				query.append(" and trnid IN (").append(Joiner.on(",").join(transactionsSearchDto.getTransactionIds())).append(") ");
+			final List<Integer> transactionIds = transactionsSearchDto.getTransactionIds();
+			if (transactionIds != null && !transactionIds.isEmpty()) {
+				paramBuilder.append(" and trnid IN (:transactionIds)");
+				paramBuilder.setParameterList("transactionIds", transactionIds);
 			}
 
-			if (transactionsSearchDto.getGids() != null && !transactionsSearchDto.getGids().isEmpty()) {
-				query.append(" and lot.eid IN (").append(Joiner.on(",").join(transactionsSearchDto.getGids())).append(") ");
+			final List<Integer> gids = transactionsSearchDto.getGids();
+			if (gids != null && !gids.isEmpty()) {
+				paramBuilder.append(" and lot.eid IN (:gids)");
+				paramBuilder.setParameterList("gids", gids);
 			}
 
-			if (transactionsSearchDto.getUnitIds() != null && !transactionsSearchDto.getUnitIds().isEmpty()) {
-				query.append(" and lot.scaleid IN (").append(Joiner.on(",").join(transactionsSearchDto.getUnitIds())).append(") ");
+			final List<Integer> unitIds = transactionsSearchDto.getUnitIds();
+			if (unitIds != null && !unitIds.isEmpty()) {
+				paramBuilder.append(" and lot.scaleid IN (:unitIds)");
+				paramBuilder.setParameterList("unitIds", unitIds);
 			}
 
-			if (transactionsSearchDto.getDesignation() != null) {
-				query.append(" and n.nval like '%").append(transactionsSearchDto.getDesignation()).append("%' ");
+			final String designation = transactionsSearchDto.getDesignation();
+			if (designation != null) {
+				paramBuilder.append(" and n.nval like :designation");
+				paramBuilder.setParameter("designation", '%' + designation + '%');
 			}
 
-			if (transactionsSearchDto.getStockId() != null) {
-				query.append(" and lot.stock_id like '").append(transactionsSearchDto.getStockId()).append("%' ");
+			final String stockId = transactionsSearchDto.getStockId();
+			if (stockId != null) {
+				paramBuilder.append(" and lot.stock_id like :stockId");
+				paramBuilder.setParameter("stockId", stockId + '%');
 			}
 
-			if (transactionsSearchDto.getNotes() != null) {
-				query.append(" and tr.comments like '%").append(transactionsSearchDto.getNotes()).append("%' ");
+			final String notes = transactionsSearchDto.getNotes();
+			if (notes != null) {
+				paramBuilder.append(" and tr.comments like :notes");
+				paramBuilder.setParameter("notes", '%' + notes + '%');
 			}
 
-			if (transactionsSearchDto.getCreatedDateFrom() != null) {
-				query.append(" and DATE(tr.trndate) >= '").append(format.format(transactionsSearchDto.getCreatedDateFrom())).append("' ");
+			final Date createdDateFrom = transactionsSearchDto.getCreatedDateFrom();
+			if (createdDateFrom != null) {
+				paramBuilder.append(" and DATE(tr.trndate) >= :createdDateFrom");
+				paramBuilder.setParameter("createdDateFrom", DATE_FORMAT.format(createdDateFrom));
 			}
 
-			if (transactionsSearchDto.getCreatedDateTo() != null) {
-				query.append(" and DATE(tr.trndate) <= '").append(format.format(transactionsSearchDto.getCreatedDateTo())).append("' ");
+			final Date createdDateTo = transactionsSearchDto.getCreatedDateTo();
+			if (createdDateTo != null) {
+				paramBuilder.append(" and DATE(tr.trndate) <= :createdDateTo");
+				paramBuilder.setParameter("createdDateTo", DATE_FORMAT.format(createdDateTo));
 			}
 
-			if (transactionsSearchDto.getCreatedByUsername() != null) {
-				query.append(" and users.uname like '%").append(transactionsSearchDto.getCreatedByUsername()).append("%'");
+			final String createdByUsername = transactionsSearchDto.getCreatedByUsername();
+			if (createdByUsername != null) {
+				paramBuilder.append(" and users.uname like :createdByUsername");
+				paramBuilder.setParameter("createdByUsername", '%' + createdByUsername + '%');
 			}
 
-			if (transactionsSearchDto.getMinAmount() != null) {
-				query.append("and tr.trnqty >= ")
-					.append(transactionsSearchDto.getMinAmount()).append(" ");
+			final Double minAmount = transactionsSearchDto.getMinAmount();
+			if (minAmount != null) {
+				paramBuilder.append(" and tr.trnqty >= :minAmount");
+				paramBuilder.setParameter("minAmount", minAmount);
 			}
 
-			if (transactionsSearchDto.getMaxAmount() != null) {
-				query.append("and tr.trnqty <= ")
-					.append(transactionsSearchDto.getMaxAmount()).append(" ");
+			final Double maxAmount = transactionsSearchDto.getMaxAmount();
+			if (maxAmount != null) {
+				paramBuilder.append(" and tr.trnqty <= :maxAmount");
+				paramBuilder.setParameter("maxAmount", maxAmount);
 			}
 
-			if (transactionsSearchDto.getTransactionTypes() != null && !transactionsSearchDto.getTransactionTypes().isEmpty()) {
-				query.append(" and trntype IN ( ").append(Joiner.on(",").join(transactionsSearchDto.getTransactionTypes())).append(") ");
+			final List<Integer> transactionTypes = transactionsSearchDto.getTransactionTypes();
+			if (transactionTypes != null && !transactionTypes.isEmpty()) {
+				paramBuilder.append(" and trntype IN (:transactionTypes)");
+				paramBuilder.setParameterList("transactionTypes", transactionTypes);
 			}
 
-			if (transactionsSearchDto.getTransactionStatus() != null && !transactionsSearchDto.getTransactionStatus().isEmpty()) {
-				query.append(" and trnstat IN ( ").append(Joiner.on(",").join(transactionsSearchDto.getTransactionStatus())).append(") ");
+			final List<Integer> transactionStatus = transactionsSearchDto.getTransactionStatus();
+			if (transactionStatus != null && !transactionStatus.isEmpty()) {
+				paramBuilder.append(" and trnstat IN (:transactionStatus)");
+				paramBuilder.setParameterList("transactionStatus", transactionStatus);
 			}
 
-			if (transactionsSearchDto.getStatusIds() != null && !transactionsSearchDto.getStatusIds().isEmpty()) {
-				query.append(" and tr.trnstat IN (").append(Joiner.on(",").join(transactionsSearchDto.getStatusIds())).append(") ");
+			final List<Integer> statusIds = transactionsSearchDto.getStatusIds();
+			if (statusIds != null && !statusIds.isEmpty()) {
+				paramBuilder.append(" and tr.trnstat IN (:statusIds)");
+				paramBuilder.setParameterList("statusIds", statusIds);
 			}
 
-			if (transactionsSearchDto.getLotStatus() != null) {
-				query.append(" and lot.status = ").append(transactionsSearchDto.getLotStatus()).append(" ");
+			final Integer lotStatus = transactionsSearchDto.getLotStatus();
+			if (lotStatus != null) {
+				paramBuilder.append(" and lot.status = :lotStatus");
+				paramBuilder.setParameter("lotStatus", lotStatus);
 			}
 
-			if (transactionsSearchDto.getGermplasmListIds() != null && !transactionsSearchDto.getGermplasmListIds().isEmpty()) {
-				query.append(" and lot.eid in (select distinct (gid) from listdata where listid in (")
-					.append(Joiner.on(",").join(transactionsSearchDto.getGermplasmListIds())).
-					append(")) and lot.etype = 'GERMPLSM' ");
+			final List<Integer> germplasmListIds = transactionsSearchDto.getGermplasmListIds();
+			if (germplasmListIds != null && !germplasmListIds.isEmpty()) {
+				paramBuilder.append(" and lot.eid in (select distinct (gid) from listdata where listid in (:germplasmListIds))"
+					+ " and lot.etype = 'GERMPLSM' ");
+				paramBuilder.setParameterList("germplasmListIds", germplasmListIds);
 			}
 		}
-
-		return query.toString();
 	}
 
-	private String addSortToSearchTransactionsQuery(final String transactionsSearchQuery, final Pageable pageable) {
-		final StringBuilder sortedTransactionsSearchQuery = new StringBuilder(transactionsSearchQuery);
+	private static void addSortToSearchTransactionsQuery(final StringBuilder transactionsSearchQuery, final Pageable pageable) {
 		if (pageable != null) {
 			if (pageable.getSort() != null) {
 				final List<String> sorts = new ArrayList<>();
@@ -622,21 +654,22 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					sorts.add(order.getProperty().replace(".", "") + " " + order.getDirection().toString());
 				}
 				if (!sorts.isEmpty()) {
-					sortedTransactionsSearchQuery.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
+					transactionsSearchQuery.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
 				}
 			} else {
-				sortedTransactionsSearchQuery.append(" ORDER BY lotLotId");
+				transactionsSearchQuery.append(" ORDER BY lotLotId");
 			}
 		}
-		return sortedTransactionsSearchQuery.toString();
 	}
 
 	public List<TransactionDto> searchTransactions(final TransactionsSearchDto transactionsSearchDto, final Pageable pageable) {
 		try {
-			final String filterTransactionsQuery =
-				this.addSortToSearchTransactionsQuery(this.buildSearchTransactionsQuery(transactionsSearchDto), pageable);
+			final StringBuilder filterTransactionsQuery = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
+			addSearchTransactionsFilters(new SqlQueryParamBuilder(filterTransactionsQuery), transactionsSearchDto);
+			addSortToSearchTransactionsQuery(filterTransactionsQuery, pageable);
 
-			final SQLQuery query = this.getSession().createSQLQuery(filterTransactionsQuery);
+			final SQLQuery query = this.getSession().createSQLQuery(filterTransactionsQuery.toString());
+			addSearchTransactionsFilters(new SqlQueryParamBuilder(query), transactionsSearchDto);
 			this.addSearchTransactionsQueryScalars(query);
 
 			query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
@@ -654,10 +687,12 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	public long countSearchTransactions(final TransactionsSearchDto transactionsSearchDto) {
 		try {
-			final StringBuilder countTransactionsQuery =
-				new StringBuilder("Select count(1) from (").append(this.buildSearchTransactionsQuery(transactionsSearchDto))
-					.append(") as filteredTransactions");
+			final StringBuilder filterTransactionsQuery = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
+			addSearchTransactionsFilters(new SqlQueryParamBuilder(filterTransactionsQuery), transactionsSearchDto);
+			final String countTransactionsQuery =
+				"Select count(1) from (" + filterTransactionsQuery.toString() + ") as filteredTransactions";
 			final SQLQuery query = this.getSession().createSQLQuery(countTransactionsQuery.toString());
+			addSearchTransactionsFilters(new SqlQueryParamBuilder(query), transactionsSearchDto);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
@@ -673,6 +708,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				sql.append(" and (tr.trnstat =").append(TransactionStatus.CONFIRMED.getIntValue()).append(" or (tr.trnstat = ")
 					.append(TransactionStatus.PENDING.getIntValue()).
 					append(" and tr.trntype = ").append(TransactionType.WITHDRAWAL.getId()).append(")) ");
+				// FIXME
 				sql.append(" and tr.lotid = ").append(lotId).append(" ");
 				final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 				this.addSearchTransactionsQueryScalars(query);
@@ -797,7 +833,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	public long countAllStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest) {
 		final StringBuilder obsUnitsQuerySql = this.buildObsUnitsQuery();
-		final StringBuilder transactionsQuerySql = this.buildTransactionsQuery(null, obsUnitsQuerySql);
+		final StringBuilder transactionsQuerySql = this.buildStudyTransactionsQuery(null, obsUnitsQuerySql);
 
 		final SQLQuery transactionsQuery =
 			this.getSession().createSQLQuery("select count(1) from ( " + transactionsQuerySql.toString() + ") T");
@@ -807,31 +843,38 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	}
 
 	public long countFilteredStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest) {
+		final TransactionsSearchDto transactionsSearch = studyTransactionsRequest.getTransactionsSearch();
+
 		final StringBuilder obsUnitsQueryFilterSql = this.buildObsUnitsQuery();
 		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQueryFilterSql), studyTransactionsRequest);
-		final StringBuilder transactionsQuerySql = this.buildTransactionsQuery(studyTransactionsRequest.getTransactionsSearch(), obsUnitsQueryFilterSql);
+		final StringBuilder transactionsQuerySql = this.buildStudyTransactionsQuery(transactionsSearch, obsUnitsQueryFilterSql);
 
 		final SQLQuery transactionsQuery =
 			this.getSession().createSQLQuery("select count(1) from ( " + transactionsQuerySql.toString() + ") T");
 		transactionsQuery.setParameter("studyId", studyId);
+		addSearchTransactionsFilters(new SqlQueryParamBuilder(transactionsQuery), transactionsSearch);
 		addObsUnitFilters(new SqlQueryParamBuilder(transactionsQuery), studyTransactionsRequest);
 
 		return ((BigInteger) transactionsQuery.uniqueResult()).longValue();
 	}
 
-	public List<StudyTransactionsDto> searchStudyTransactions(final Integer studyId,
+	public List<StudyTransactionsDto> searchStudyTransactions(
+		final Integer studyId,
 		final StudyTransactionsRequest studyTransactionsRequest) {
+
+		final TransactionsSearchDto transactionsSearch = studyTransactionsRequest.getTransactionsSearch();
 
 		final StringBuilder obsUnitsQueryFilterSql = this.buildObsUnitsQuery();
 		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQueryFilterSql), studyTransactionsRequest);
 
-		final StringBuilder transactionsQuerySql = this.buildTransactionsQuery(studyTransactionsRequest.getTransactionsSearch(), obsUnitsQueryFilterSql);
+		final StringBuilder transactionsQuerySql = this.buildStudyTransactionsQuery(transactionsSearch, obsUnitsQueryFilterSql);
 
 		addSortedPageRequestOrderBy(transactionsQuerySql, studyTransactionsRequest.getSortedPageRequest());
 
 		// transactions data
 		final SQLQuery transactionsQuery = this.getSession().createSQLQuery(transactionsQuerySql.toString());
 		transactionsQuery.setParameter("studyId", studyId);
+		addSearchTransactionsFilters(new SqlQueryParamBuilder(transactionsQuery), transactionsSearch);
 		addObsUnitFilters(new SqlQueryParamBuilder(transactionsQuery), studyTransactionsRequest);
 		addSortedPageRequestPagination(transactionsQuery, studyTransactionsRequest.getSortedPageRequest());
 		this.addSearchTransactionsQueryScalars(transactionsQuery);
@@ -863,14 +906,17 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return transactions;
 	}
 
-	private StringBuilder buildTransactionsQuery(
+	private StringBuilder buildStudyTransactionsQuery(
 		final TransactionsSearchDto transactionsSearchDto,
 		final StringBuilder obsUnitsQuerySql) {
+
+		final StringBuilder searchTransactionsQuery = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
+		addSearchTransactionsFilters(new SqlQueryParamBuilder(searchTransactionsQuery), transactionsSearchDto);
 
 		return new StringBuilder(""  //
 				+ " select SEARCH_TRANSACTIONS_QUERY.* " //
 				+ " from ( " //
-				+ 		this.buildSearchTransactionsQuery(transactionsSearchDto) //
+				+ 		searchTransactionsQuery.toString() //
 				+ " ) SEARCH_TRANSACTIONS_QUERY inner join ( " //
 				+ 		obsUnitsQuerySql //
 				+ " ) OBS_UNITS_QUERY on SEARCH_TRANSACTIONS_QUERY.transactionId = OBS_UNITS_QUERY.transactionId " //
