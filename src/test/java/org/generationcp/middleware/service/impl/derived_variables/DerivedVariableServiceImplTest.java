@@ -387,7 +387,6 @@ public class DerivedVariableServiceImplTest {
 
 		final ArgumentCaptor<Phenotype> captor = ArgumentCaptor.forClass(Phenotype.class);
 		verify(this.phenotypeDao).save(captor.capture());
-		verify(this.datasetService).updateDependentPhenotypesAsOutOfSync(variableTermId, Sets.newHashSet(observationUnitId));
 
 		final Phenotype phenotypeToBeSaved = captor.getValue();
 		assertNotNull(phenotypeToBeSaved.getCreatedDate());
