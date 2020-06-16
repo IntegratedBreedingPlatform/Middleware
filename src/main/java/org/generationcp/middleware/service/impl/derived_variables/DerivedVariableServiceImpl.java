@@ -240,6 +240,6 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	public DaoFactory getDaoFactory() {
-		return daoFactory;
+		return this.daoFactory;
 	}
 }

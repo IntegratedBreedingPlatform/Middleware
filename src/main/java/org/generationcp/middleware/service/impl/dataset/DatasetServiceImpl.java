@@ -76,13 +76,13 @@ public class DatasetServiceImpl implements DatasetService {
 
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
-	protected static final List<Integer> SUBOBS_COLUMNS_ALL_VARIABLE_TYPES = Lists.newArrayList(
+	private static final List<Integer> SUBOBS_COLUMNS_ALL_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.GERMPLASM_DESCRIPTOR.getId(),
 		VariableType.TRAIT.getId(),
 		VariableType.SELECTION_METHOD.getId(),
 		VariableType.OBSERVATION_UNIT.getId());
 
-	protected static final List<Integer> PLOT_COLUMNS_ALL_VARIABLE_TYPES = Lists.newArrayList( //
+	private static final List<Integer> PLOT_COLUMNS_ALL_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
 		VariableType.EXPERIMENTAL_DESIGN.getId(), //
 		VariableType.TREATMENT_FACTOR.getId(), //
@@ -90,13 +90,13 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId());
 
-	protected static final List<Integer> PLOT_COLUMNS_FACTOR_VARIABLE_TYPES = Lists.newArrayList(
+	private static final List<Integer> PLOT_COLUMNS_FACTOR_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.GERMPLASM_DESCRIPTOR.getId(),
 		VariableType.EXPERIMENTAL_DESIGN.getId(),
 		VariableType.TREATMENT_FACTOR.getId(),
 		VariableType.OBSERVATION_UNIT.getId());
 
-	protected static final List<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList(
+	private static final List<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.OBSERVATION_UNIT.getId(),
 		VariableType.TRAIT.getId(),
 		VariableType.SELECTION_METHOD.getId());
@@ -105,11 +105,11 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.TRAIT.getId(),
 		VariableType.SELECTION_METHOD.getId());
 
-	protected static final List<Integer> STANDARD_ENVIRONMENT_FACTORS = Lists.newArrayList(
+	private static final List<Integer> STANDARD_ENVIRONMENT_FACTORS = Lists.newArrayList(
 		TermId.LOCATION_ID.getId(),
 		TermId.TRIAL_INSTANCE_FACTOR.getId(),
 		TermId.EXPERIMENT_DESIGN_FACTOR.getId());
-	public static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
+	private static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
 
 	private DaoFactory daoFactory;
 
@@ -315,7 +315,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Boolean isDatasetNameAvailable(final String name, final int studyId) {
-		final List<DatasetDTO> datasetDTOs = this.getDatasets(studyId, new HashSet<Integer>());
+		final List<DatasetDTO> datasetDTOs = this.getDatasets(studyId, new HashSet<>());
 		for (final DatasetDTO datasetDTO : datasetDTOs) {
 			if (datasetDTO.getName().equals(name)) {
 				return false;
@@ -613,7 +613,7 @@ public class DatasetServiceImpl implements DatasetService {
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
 		final ObservationUnitsSearchDTO searchDTO =
-			new ObservationUnitsSearchDTO(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<MeasurementVariableDto>());
+			new ObservationUnitsSearchDTO(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<>());
 		searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
@@ -635,7 +635,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	List<MeasurementVariableDto> getEnvironmentConditionVariableNames(final Integer trialDatasetId) {
 		final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
-			.getObservationSetVariables(trialDatasetId, Lists.<Integer>newArrayList(VariableType.STUDY_CONDITION.getId()));
+			.getObservationSetVariables(trialDatasetId, Lists.newArrayList(VariableType.STUDY_CONDITION.getId()));
 		final List<MeasurementVariableDto> factors = new ArrayList<>();
 		for (final MeasurementVariable variable : environmentConditions) {
 			factors.add(new MeasurementVariableDto(variable.getTermId(), variable.getName()));
@@ -1187,7 +1187,7 @@ public class DatasetServiceImpl implements DatasetService {
 				final FormulaDto formula = target.getFormula();
 				if (formula != null && formula.isInputVariablePresent(input.getTermId())) {
 					if (!targetByInput.containsKey(input.getTermId())) {
-						targetByInput.put(input.getTermId(), new ArrayList<Integer>());
+						targetByInput.put(input.getTermId(), new ArrayList<>());
 					}
 					targetByInput.get(input.getTermId()).add(target.getTermId());
 				}
