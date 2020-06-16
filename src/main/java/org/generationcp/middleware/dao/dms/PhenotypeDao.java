@@ -34,10 +34,8 @@ import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.generationcp.middleware.util.Debug;
-import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -85,7 +83,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		+ "FROM nd_experiment e "
 		+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
 		+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-		+ "AND p.observable_id IN (:traitIds) ";
+		+ "AND p.observable_id IN (:traitIds) "
+		+ "AND p.value IS NOT NULL ";
 
 	private static final String COUNT_OBSERVATIONS =
 		"SELECT COUNT(*) " + "FROM nd_experiment e "
@@ -129,7 +128,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-					+ "    AND p.observable_id IN (:numericVariableIds) " + "GROUP by p.observable_id ");
+					+ "    AND p.observable_id IN (:numericVariableIds) "
+					+ "    AND p.value IS NOT NULL "
+					+ "GROUP by p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("numericVariableIds", numericVariableIds);
 
@@ -169,7 +170,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-					+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id ");
+					+ "    AND p.observable_id IN (:variableIds) "
+					+ "	   AND p.value IS NOT NULL "
+					+ "GROUP by p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("variableIds", variableIds);
 
@@ -205,6 +208,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 					+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+					+ "	   AND p.value IS NOT NULL "
 					+ "GROUP by p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
 
@@ -242,7 +246,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("SELECT p.observable_id, p.value * 1 " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ "WHERE e.nd_geolocation_id IN (:environmentIds) " + "    AND p.observable_id IN (:traitIds) ");
+					+ "WHERE e.nd_geolocation_id IN (:environmentIds) " + "    AND p.observable_id IN (:traitIds) "
+					+ "AND p.value IS NOT NULL");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList(TRAIT_IDS, traitIds);
 
@@ -283,7 +288,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("SELECT p.observable_id, p.value * 1 " + "FROM phenotype p "
 					+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-					+ "WHERE e.nd_geolocation_id IN (:environmentIds) " + "    AND p.observable_id = :traitId ");
+					+ "WHERE e.nd_geolocation_id IN (:environmentIds) " + "    AND p.observable_id = :traitId "
+					+ "AND p.value IS NOT NULL");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameter("traitId", trait);
 
@@ -983,7 +989,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					try {
 						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
 						observationUnitPosition.setGeoCoordinates((Map<String, Object>) jsonProp.get("geoCoordinates"));
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
 					}
 				}
@@ -1344,8 +1350,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return criteria.list();
 	}
 
-	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
-		List<MeasurementVariable> studyVariables = new ArrayList<>();
+	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId,
+		final List<Integer> variableIds) {
+		final List<MeasurementVariable> studyVariables = new ArrayList<>();
 
 		try{
 			final SQLQuery query =
@@ -1364,7 +1371,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.setParameter("geolocationId", geolocationId);
 
 			final List<Object> results = query.list();
-			for(Object result: results) {
+			for (final Object result : results) {
 				final Object[] row = (Object[]) result;
 				final MeasurementVariable measurementVariable = new MeasurementVariable();
 				measurementVariable.setName((row[0] instanceof String) ? (String) row[0] : null);

@@ -15,13 +15,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.service.api.study.MeasurementDto;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
-import org.generationcp.middleware.service.api.study.StudySearchParameters;
-import org.generationcp.middleware.service.api.study.StudySummary;
-import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.generationcp.middleware.service.api.study.*;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -32,11 +26,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -165,7 +155,7 @@ public class StudyServiceImplTest {
 	@Test
 	public void testGetObservations() {
 		final StudyMeasurements mockMeasurements = Mockito.mock(StudyMeasurements.class);
-		final StudyGermplasmListService mockStudyGermplasmListService = Mockito.mock(StudyGermplasmListService.class);
+		final StudyGermplasmService mockStudyGermplasmListService = Mockito.mock(StudyGermplasmService.class);
 
 		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl( mockMeasurements, mockStudyGermplasmListService);
 		studyServiceImpl.setDaoFactory(this.daoFactory);

@@ -1,5 +1,6 @@
 package org.generationcp.middleware.domain.inventory.manager;
 
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -59,7 +60,7 @@ public class LotWithdrawalInputDto {
 	}
 
 
-	private SearchCompositeDto selectedLots;
+	private SearchCompositeDto<Integer, String> selectedLots;
 
 	private Map<String, WithdrawalAmountInstruction> withdrawalsPerUnit;
 
@@ -81,11 +82,11 @@ public class LotWithdrawalInputDto {
 		this.notes = notes;
 	}
 
-	public SearchCompositeDto getSelectedLots() {
+	public SearchCompositeDto<Integer, String> getSelectedLots() {
 		return selectedLots;
 	}
 
-	public void setSelectedLots(final SearchCompositeDto selectedLots) {
+	public void setSelectedLots(final SearchCompositeDto<Integer, String> selectedLots) {
 		this.selectedLots = selectedLots;
 	}
 

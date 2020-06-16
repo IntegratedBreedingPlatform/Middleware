@@ -21,6 +21,9 @@ public class ExtendedLotDto extends LotDto {
 	@JsonView({InventoryView.LotView.class})
 	private Integer mgid;
 
+	private String germplasmMethodName;
+	private String germplasmLocation;
+
 	@JsonView({InventoryView.LotView.class})
 	private String locationName;
 
@@ -124,6 +127,22 @@ public class ExtendedLotDto extends LotDto {
 
 	public void setMgid(final Integer mgid) {
 		this.mgid = mgid;
+	}
+
+	public String getGermplasmMethodName() {
+		return this.germplasmMethodName;
+	}
+
+	public void setGermplasmMethodName(final String germplasmMethodName) {
+		this.germplasmMethodName = germplasmMethodName;
+	}
+
+	public String getGermplasmLocation() {
+		return this.germplasmLocation;
+	}
+
+	public void setGermplasmLocation(final String germplasmLocation) {
+		this.germplasmLocation = germplasmLocation;
 	}
 
 	public String getLocationName() {

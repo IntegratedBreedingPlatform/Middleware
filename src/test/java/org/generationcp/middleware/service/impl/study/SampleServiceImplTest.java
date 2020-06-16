@@ -59,7 +59,7 @@ public class SampleServiceImplTest extends IntegrationTestBase {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 		final ExperimentModel experimentModel =
 			this.testDataInitializer.createTestExperiment(plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), "1", null);
-		this.testDataInitializer.createTestStock(experimentModel);
+		this.testDataInitializer.createTestStock(study, experimentModel);
 
 		final SampleList sampleList = this.testDataInitializer.createTestSampleList("List1", user.getUserid());
 		final List<Sample> samples = this.testDataInitializer.addSamples(Arrays.asList(experimentModel), sampleList, user.getUserid());

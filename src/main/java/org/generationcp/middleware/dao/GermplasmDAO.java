@@ -926,7 +926,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public String getNextSequenceNumberForCrossName(String prefix) {
+	public String getNextSequenceNumber(String prefix) {
 		String nextInSequence = "1";
 
 		if (!prefix.isEmpty()) {
@@ -951,7 +951,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				}
 
 			} catch (final HibernateException e) {
-				final String message = "Error with getNextSequenceNumberForCrossName(prefix=" + prefix + ") " + "query : " + e.getMessage();
+				final String message = "Error with getNextSequenceNumber(prefix=" + prefix + ") " + "query : " + e.getMessage();
 				GermplasmDAO.LOG.error(message, e);
 				throw new MiddlewareQueryException(message, e);
 			}
@@ -1045,6 +1045,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT {g.*} FROM germplsm g WHERE ");
 			queryString.append("g.gid IN( :gids ) ");
+			queryString.append(" AND g.deleted = 0");
+			queryString.append(" AND g.grplce = 0");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gids);

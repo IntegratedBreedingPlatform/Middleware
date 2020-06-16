@@ -2,29 +2,18 @@ package org.generationcp.middleware.dao;
 
 import com.google.common.collect.Ordering;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
-import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.dao.dms.*;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
-import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.dms.DatasetType;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.*;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
@@ -34,12 +23,7 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SampleDaoTest extends IntegrationTestBase {
 
@@ -384,7 +368,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		final DmsProject plotDataset =
 			this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetTypeEnum.PLOT_DATA.getId(), study, study);
 		final SampleList sampleListForPlotDataset =
-			this.createExperimentsWithSampleList(listName, plotDataset, user, sampleSize);
+			this.createExperimentsWithSampleList(listName, study, plotDataset, user, sampleSize);
 
 		return sampleListForPlotDataset.getId();
 	}
@@ -398,7 +382,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 			this.createDmsProject("SUB-OBSERVATION DATASET", "UB-OBSERVATION DATASET", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(),
 				plotDataset, study);
 		final SampleList sampleListForSubObservation =
-			this.createExperimentsWithSampleList(listName, subObservationDataset, user, sampleSize);
+			this.createExperimentsWithSampleList(listName, study, subObservationDataset, user, sampleSize);
 
 		return sampleListForSubObservation.getId();
 	}
@@ -420,7 +404,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 	}
 
 	private SampleList createExperimentsWithSampleList(
-		final String listName, final DmsProject dmsProject, final WorkbenchUser user, final int sampleSize) {
+		final String listName, final DmsProject study, final DmsProject dataset, final WorkbenchUser user, final int sampleSize) {
 
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user.getUserid());
 		sampleList.setListName(listName);
@@ -441,12 +425,13 @@ public class SampleDaoTest extends IntegrationTestBase {
 			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 			stockModel.setUniqueName(String.valueOf(i));
 			stockModel.setGermplasm(germplasm);
+			stockModel.setProject(study);
 			this.stockDao.saveOrUpdate(stockModel);
 
 			final ExperimentModel experimentModel = new ExperimentModel();
 			experimentModel.setGeoLocation(geolocation);
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-			experimentModel.setProject(dmsProject);
+			experimentModel.setProject(dataset);
 			experimentModel.setStock(stockModel);
 			experimentModel.setObservationUnitNo(i);
 			final ExperimentModel savedExperiment = this.experimentDao.saveOrUpdate(experimentModel);

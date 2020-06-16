@@ -154,16 +154,16 @@ public class IntegrationTestDataInitializer {
 		return geolocation;
 	}
 
-	public List<ExperimentModel> createTestExperiments(final DmsProject project, final ExperimentModel parent,
-		final Geolocation geolocation,
-		final int noOfExperiments) {
+	public List<ExperimentModel> createTestExperimentsWithStock(final DmsProject study, final DmsProject dataset, final ExperimentModel parent,
+													   final Geolocation geolocation,
+													   final int noOfExperiments) {
 
 		final List<ExperimentModel> experimentModels = new ArrayList<>();
 
 		for (int i = 1; i <= noOfExperiments; i++) {
 			final ExperimentModel experimentModel =
-				this.createTestExperiment(project, geolocation, TermId.PLOT_EXPERIMENT.getId(), String.valueOf(i), parent);
-			this.createTestStock(experimentModel);
+				this.createTestExperiment(dataset, geolocation, TermId.PLOT_EXPERIMENT.getId(), String.valueOf(i), parent);
+			this.createTestStock(study, experimentModel);
 			experimentModels.add(experimentModel);
 		}
 
@@ -198,7 +198,7 @@ public class IntegrationTestDataInitializer {
 		return trait;
 	}
 
-	public StockModel createTestStock(final ExperimentModel experimentModel) {
+	public StockModel createTestStock(final DmsProject study, final ExperimentModel experimentModel) {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		germplasm.setGid(null);
 		this.germplasmDao.save(germplasm);
@@ -209,6 +209,7 @@ public class IntegrationTestDataInitializer {
 		stockModel.setName("Germplasm " + RandomStringUtils.randomAlphanumeric(5));
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
+		stockModel.setProject(study);
 
 		this.stockDao.saveOrUpdate(stockModel);
 		experimentModel.setStock(stockModel);

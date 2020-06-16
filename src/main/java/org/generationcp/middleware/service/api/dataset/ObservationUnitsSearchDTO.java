@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings("unused") // Used in POST body
 @AutoProperty
@@ -44,6 +45,7 @@ public class ObservationUnitsSearchDTO {
 		private Boolean byMissing;
 		private Map<String, List<String>> filteredValues;
 		private Map<String, String> filteredTextValues;
+		private Set<Integer> filteredNdExperimentIds;
 		private Map<String, String> variableTypeMap;
 		private Integer variableId;
 
@@ -103,6 +105,14 @@ public class ObservationUnitsSearchDTO {
 
 		public void setFilteredValues(final Map<String, List<String>> filteredValues) {
 			this.filteredValues = filteredValues;
+		}
+
+		public Set<Integer> getFilteredNdExperimentIds() {
+			return this.filteredNdExperimentIds;
+		}
+
+		public void setFilteredNdExperimentIds(final Set<Integer> filteredNdExperimentIds) {
+			this.filteredNdExperimentIds = filteredNdExperimentIds;
 		}
 
 		public Integer getVariableId() {

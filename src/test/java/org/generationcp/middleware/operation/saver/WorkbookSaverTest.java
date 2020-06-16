@@ -11,20 +11,18 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.data.initializer.MeasurementRowTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -37,6 +35,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.generationcp.middleware.utils.test.VariableTypeListDataUtil;
 import org.junit.Assert;
@@ -44,14 +43,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class WorkbookSaverTest extends TestOutputFormatter {
 
@@ -190,7 +182,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Test
-	public void testSaveVariables() throws Exception {
+	public void testSaveVariables() {
 
 		final String programUUID = "abc";
 		final String studyName = "nursery_1" + new Random().nextInt(10000);
@@ -255,9 +247,9 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		standardVariable.setName(measurementVariable.getName());
 		standardVariable.setDescription(measurementVariable.getDescription());
 
-		final Integer methodId = new Random().nextInt(10000);
-		final Integer propertyId = new Random().nextInt(10000);
-		final Integer scaleId = new Random().nextInt(10000);
+		final int methodId = new Random().nextInt(10000);
+		final int propertyId = new Random().nextInt(10000);
+		final int scaleId = new Random().nextInt(10000);
 
 		standardVariable.setMethod(new Method(new Term(methodId, measurementVariable.getMethod(), "Method Description")));
 		standardVariable.setProperty(new Property(new Term(propertyId, measurementVariable.getProperty(), "Property Description")));
@@ -292,7 +284,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	}
 
 	@Test
-	public void testRemoveDeletedStudyObservations() throws Exception {
+	public void testRemoveDeletedStudyObservations() {
 
 		final String studyName = "nursery_1" + new Random().nextInt(10000);
 
@@ -329,7 +321,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final VariableList variableList = new VariableList();
 
 		// Set the LOCATION_ID variable value to empty
-		final Variable locationVariable = createLocationVariable();
+		final Variable locationVariable = this.createLocationVariable();
 		locationVariable.setValue(null);
 		variableList.add(locationVariable);
 
@@ -361,7 +353,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final LocationDAO locationDAO = Mockito.mock(LocationDAO.class);
 		final VariableList variableList = new VariableList();
 
-		final Variable locationVariable = createLocationVariable();
+		final Variable locationVariable = this.createLocationVariable();
 		// Set the value of LOCATION_ID variable
 		final String locationIdVariableValue = "999";
 		locationVariable.setValue(locationIdVariableValue);
@@ -383,6 +375,21 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 		Assert.assertEquals(Integer.valueOf(locationIdVariableValue), retrievedLocation.get(0).getLocid());
 
+	}
+
+	@Test
+	public void testSetDatasetStocks() {
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
+		workbook.getStudyDetails().setId(1);
+
+		final Random random = new Random();
+		final StockModel stock = new StockModel(random.nextInt(), random.nextInt(), RandomStringUtils.randomAlphabetic(10), "1", RandomStringUtils.randomAlphabetic(10),
+				RandomStringUtils.randomAlphabetic(10), SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId(), false);
+		workbook.setObservations(MeasurementRowTestDataInitializer.
+			createMeasurementRowList(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), "1",
+				MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), "1")));
+		workbookSaver.setDatasetStocks(workbook, Collections.singletonList(stock));
+		Assert.assertEquals(stock.getStockId().toString(), String.valueOf(workbook.getObservations().get(0).getStockId()));
 	}
 
 	private Variable createLocationVariable() {

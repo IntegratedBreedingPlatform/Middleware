@@ -1,5 +1,6 @@
 package org.generationcp.middleware.domain.inventory.manager;
 
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -8,17 +9,17 @@ import java.util.Map;
 @AutoProperty
 public class LotDepositRequestDto {
 
-	private SearchCompositeDto selectedLots;
+	private SearchCompositeDto<Integer, String> selectedLots;
 
 	private Map<String, Double> depositsPerUnit;
 
 	private String notes;
 
-	public SearchCompositeDto getSelectedLots() {
+	public SearchCompositeDto<Integer, String> getSelectedLots() {
 		return selectedLots;
 	}
 
-	public void setSelectedLots(final SearchCompositeDto selectedLots) {
+	public void setSelectedLots(final SearchCompositeDto<Integer, String> selectedLots) {
 		this.selectedLots = selectedLots;
 	}
 

@@ -12,28 +12,23 @@ package org.generationcp.middleware.manager;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.TransformerUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.utils.test.Debug;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
@@ -48,14 +43,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.both;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.hamcrest.core.IsNot.not;
 
 public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
@@ -75,6 +66,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	private static final int TEST_GERMPLASM_LIST_USER_ID = 1;
 	private static final Integer STATUS_ACTIVE = 0;
 	private ListDataProjectSaver listDataProjectSaver;
+	private ListDataProjectDAO listDataProjectDAO;
 
 	@Autowired
 	private GermplasmListManager manager;
@@ -87,12 +79,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private FieldbookService middlewareFieldbookService;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
-	@Autowired
-	private UserService userService;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
@@ -108,16 +94,15 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	private Integer lrecId;
 
 	private Germplasm testGermplasm;
-
-	private GermplasmListTestDataInitializer germplasmListTDI;
-	private Integer studyId;
 	private Germplasm parentGermplasm;
 	private DataSetupTest dataSetupTest;
 
 	@Before
 	public void setUpBefore() {
 		this.listDataProjectSaver = new ListDataProjectSaver(this.sessionProvder);
-		this.germplasmListTDI = new GermplasmListTestDataInitializer();
+		this.listDataProjectDAO = new ListDataProjectDAO();
+		this.listDataProjectDAO.setSession(this.sessionProvder.getSession());
+		final GermplasmListTestDataInitializer germplasmListTDI = new GermplasmListTestDataInitializer();
 		this.dataSetupTest = new DataSetupTest();
 		this.dataSetupTest.setDataImportService(this.dataImportService);
 		this.dataSetupTest.setGermplasmListManager(this.manager);
@@ -125,23 +110,24 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.testGermplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		this.dataManager.addGermplasm(this.testGermplasm, this.testGermplasm.getPreferredName());
 
-		final GermplasmList germplasmListOther = this.germplasmListTDI
+
+		final GermplasmList germplasmListOther = germplasmListTDI
 			.createGermplasmList(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME, GermplasmListManagerImplTest.OWNER_ID,
 				GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME + " Desc", null, 1,
 				GermplasmListManagerImplTest.OTHER_PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmListOther);
 
-		final GermplasmList germplasmListParent = this.germplasmListTDI
+		final GermplasmList germplasmListParent = germplasmListTDI
 			.createGermplasmList(TEST_LIST_1_PARENT, GermplasmListManagerImplTest.OWNER_ID, "Test Parent List #1", null, 1,
 				GermplasmListManagerImplTest.PROGRAM_UUID);
 		this.parentId = this.manager.addGermplasmList(germplasmListParent);
 
-		final GermplasmList germplasmList = this.germplasmListTDI
+		final GermplasmList germplasmList = germplasmListTDI
 			.createGermplasmList(TEST_LIST_1, GermplasmListManagerImplTest.OWNER_ID, "Test List #1 for GCP-92", germplasmListParent, 1,
 				GermplasmListManagerImplTest.PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmList);
 
-		final GermplasmList germplasmList1 = this.germplasmListTDI
+		final GermplasmList germplasmList1 = germplasmListTDI
 			.createGermplasmList(TEST_LIST_444, GermplasmListManagerImplTest.OWNER_ID, "Test List #4 for GCP-92", null, 1,
 				GermplasmListManagerImplTest.PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmList1);
@@ -150,7 +136,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 			GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList1, this.testGermplasm.getGid(), 2);
 		this.manager.addGermplasmListData(germplasmListData);
 
-		final GermplasmList germplasmList2 = this.germplasmListTDI
+		final GermplasmList germplasmList2 = germplasmListTDI
 			.createGermplasmList(TEST_LIST_5, GermplasmListManagerImplTest.OWNER_ID, "Test List #5 for GCP-92", null, 1,
 				GermplasmListManagerImplTest.PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmList2);
@@ -159,12 +145,12 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 			GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList2, this.testGermplasm.getGid(), 1);
 		this.manager.addGermplasmListData(germplasmListData1);
 
-		final GermplasmList germplasmList3 = this.germplasmListTDI
+		final GermplasmList germplasmList3 = germplasmListTDI
 			.createGermplasmList(TEST_LIST_3, GermplasmListManagerImplTest.OWNER_ID, "Test List #3 for GCP-92", null, 1,
 				GermplasmListManagerImplTest.PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmList3);
 
-		final GermplasmList germplasmList6 = this.germplasmListTDI
+		final GermplasmList germplasmList6 = germplasmListTDI
 			.createGermplasmList(TEST_LIST_6, GermplasmListManagerImplTest.OWNER_ID, "Test List #6 for GCP-92", null, 1,
 				GermplasmListManagerImplTest.PROGRAM_UUID);
 		this.listId = this.manager.addGermplasmList(germplasmList6);
@@ -174,7 +160,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.manager.addGermplasmListData(germplasmListData2);
 		this.lrecId = germplasmListData2.getId();
 
-		final GermplasmList testGermplasmList = this.germplasmListTDI
+		final GermplasmList testGermplasmList = germplasmListTDI
 			.createGermplasmList(GermplasmListManagerImplTest.GERMPLASM_LIST_NAME, GermplasmListManagerImplTest.OWNER_ID,
 				GermplasmListManagerImplTest.GERMPLASM_LIST_DESC, null, 1, GermplasmListManagerImplTest.LIST_PROGRAM_UUID);
 		this.manager.addGermplasmList(testGermplasmList);
@@ -189,19 +175,33 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	}
 
+	@Test
+	public void testRetrieveSnapshotListDataWithParents() {
+
+		final GermplasmList list1 =
+				(this.createGermplasmListTestData());
+		this.saveGermplasmList(list1);
+		this.createSnapshotList(list1);
+
+		final List<ListDataProject> listDataProjects = this.manager.retrieveSnapshotListDataWithParents(list1.getId());
+		Assert.assertEquals(20, listDataProjects.size());
+		for(final ListDataProject listDataProject: listDataProjects) {
+			Assert.assertEquals(this.parentGermplasm.getGid(), listDataProject.getMaleGid());
+		}
+
+	}
+
 	/*
 	 * Create nursery to create proper listdataproject records. Would be needing
 	 * nursery as well for refactoring on ListDataProject.getByStudy method
 	 * later on
 	 */
-	private int createNurseryTestData() {
-		final String programUUID = "884fefcc-1cbd-4e0f-9186-ceeef3aa3b78";
+	private void createSnapshotList(final GermplasmList list) {
 		this.parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 
 		final Integer[] gids = this.germplasmTestDataGenerator
 			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, GERMPLASM_PREFERRED_NAME_PREFIX, this.parentGermplasm);
-
-		return this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, "ABCD");
+		this.createListDataProject(list, gids);
 	}
 
 	@Test
@@ -307,14 +307,13 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		this.manager.deleteGermplasmListByListIdPhysically(germplasmListId);
 
-		Assert.assertTrue(
-				this.manager.getGermplasmListByName(TEST_LIST_1, GermplasmListManagerImplTest.PROGRAM_UUID, 0, 1, Operation.EQUAL).size()
-						== 0);
+		Assert.assertEquals(0,
+				this.manager.getGermplasmListByName(TEST_LIST_1, GermplasmListManagerImplTest.PROGRAM_UUID, 0, 1, Operation.EQUAL).size());
 	}
 
 	@Test
 	public void testGermplasmListByParentFolderId() {
-		final Integer parentFolderId = Integer.valueOf(56);
+		final int parentFolderId = 56;
 		final List<GermplasmList> children =
 			this.manager.getGermplasmListByParentFolderId(parentFolderId, GermplasmListManagerImplTest.PROGRAM_UUID);
 		Debug.println(IntegrationTestBase.INDENT, "testGermplasmListByParentFolderId(" + parentFolderId + "): ");
@@ -324,7 +323,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountGermplasmListByParentFolderId() {
-		final Integer parentFolderId = Integer.valueOf(56);
+		final int parentFolderId = 56;
 		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmListByParentFolderId(" + parentFolderId + "): ");
 		// Verify using: select count(*) from listnms where liststatus <> 9 and lhierarchy = 56;
 	}
@@ -382,6 +381,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		for (final GermplasmList germplasmList : results) {
 			if (germplasmList.getName().equals(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME)) {
 				hasMatch = true;
+				break;
 			}
 		}
 		Assert.assertFalse(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME + " should not be found", hasMatch);
@@ -389,15 +389,14 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchGermplasmListOtherProgram() {
-		final String q = GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME;
-
 		final List<GermplasmList> results =
-			this.manager.searchForGermplasmList(q, GermplasmListManagerImplTest.OTHER_PROGRAM_UUID, Operation.EQUAL);
+			this.manager.searchForGermplasmList(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME, GermplasmListManagerImplTest.OTHER_PROGRAM_UUID, Operation.EQUAL);
 		Assert.assertEquals("There should be one result found", 1, results.size());
 		boolean hasMatch = false;
 		for (final GermplasmList germplasmList : results) {
 			if (germplasmList.getName().equals(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME)) {
 				hasMatch = true;
+				break;
 			}
 		}
 		Assert.assertTrue(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME + " should be found", hasMatch);
@@ -405,14 +404,13 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchGermplasmListProgramAgnostic() {
-		final String q = GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME;
-
-		final List<GermplasmList> results = this.manager.searchForGermplasmList(q, Operation.EQUAL);
+		final List<GermplasmList> results = this.manager.searchForGermplasmList(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME, Operation.EQUAL);
 		Assert.assertEquals("There should be one result found", 1, results.size());
 		boolean hasMatch = false;
 		for (final GermplasmList germplasmList : results) {
 			if (germplasmList.getName().equals(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME)) {
 				hasMatch = true;
+				break;
 			}
 		}
 		Assert.assertTrue(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME + " should be found", hasMatch);
@@ -434,10 +432,14 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testRetrieveSnapshotListData() {
-		final Integer listId = 1;
+		final GermplasmList list1 =
+				(this.createGermplasmListTestData());
+		this.saveGermplasmList(list1);
+		this.createSnapshotList(list1);
 
-		final List<ListDataProject> listData = this.manager.retrieveSnapshotListData(listId);
+		final List<ListDataProject> listData = this.manager.retrieveSnapshotListData(list1.getId());
 		Assert.assertNotNull("It should not be null", listData);
+		Assert.assertFalse(listData.isEmpty());
 	}
 
 	@Test
@@ -480,8 +482,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		final List<Integer> gidsNews = (List<Integer>) CollectionUtils.collect(germplasms, TransformerUtils.invokerTransformer("getGid"));
 
 		final GermplasmList list1 =
-			(this.createGermplasmListTestData(TEST_GERMPLASM_LIST_NAME, TEST_GERMPLASM_LIST_DESC, TEST_GERMPLASM_LIST_DATE,
-				TEST_GERMPLASM_LIST_TYPE_LST, TEST_GERMPLASM_LIST_USER_ID, STATUS_ACTIVE));
+			(this.createGermplasmListTestData());
 		this.saveGermplasmList(list1);
 
 		for (final Germplasm result : germplasms) {
@@ -491,20 +492,13 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 			this.manager.addGermplasmListData(listData1);
 		}
 
-		final List<ListDataProject> listDataProjects = this.createListDataProject(list1, noOfTestEntries, noOfCheckEntries);
-
-		this.studyId = this.createNurseryTestData();
-
-		this.listDataProjectSaver.saveOrUpdateListDataProject(this.studyId, GermplasmListType.STUDY, this.listId, listDataProjects, userId);
-
 		assertThat(germplasms, is(equalTo(this.dataManager.getGermplasms(gidsNews))));
 
 		this.manager.deleteGermplasms(gidsNews, list1.getId());
 		this.sessionProvder.getSession().clear();
 
 		final List<Germplasm> germplasmDeleted = this.dataManager.getGermplasms(gidsNews);
-		assertThat(germplasmDeleted, both(is(not(empty()))).and(notNullValue()));
-		assertThat(germplasmDeleted, hasItem(this.isDeleted(is(Boolean.TRUE))));
+		assertThat(germplasmDeleted, is(empty()));
 
 		final List<GermplasmListData> germplasmListDataByGID = this.manager.getGermplasmListDataByListId(list1.getId());
 		for (final GermplasmListData result : germplasmListDataByGID) {
@@ -520,31 +514,22 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	}
 
-	private List<ListDataProject> createListDataProject(
-		final GermplasmList germplasmList, final long noOfTestEntries,
-		final long noOfCheckEntries) {
-
-		final List<ListDataProject> listDataProjects = new ArrayList<>();
-		for (int i = 0; i < noOfCheckEntries; i++) {
-			listDataProjects.add(this.createListDataProject(germplasmList, SystemDefinedEntryType.CHECK_ENTRY));
+	private List<ListDataProject> createListDataProject(final GermplasmList germplasmList, final Integer[] gids) {
+		final List<ListDataProject> list = new ArrayList<>();
+		for (int i=1; i <= gids.length; i++) {
+			final ListDataProject listDataProject = new ListDataProject();
+			listDataProject.setCheckType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
+			listDataProject.setDesignation(RandomStringUtils.randomAlphabetic(10));
+			listDataProject.setEntryCode(RandomStringUtils.randomAlphabetic(10));
+			listDataProject.setSeedSource(RandomStringUtils.randomAlphabetic(10));
+			listDataProject.setGroupName(RandomStringUtils.randomAlphabetic(10));
+			listDataProject.setList(germplasmList);
+			listDataProject.setGermplasmId(gids[i-1]);
+			listDataProject.setEntryId(i);
+			list.add(this.listDataProjectDAO.save(listDataProject));
 		}
-		for (int i = 0; i < noOfTestEntries; i++) {
-			listDataProjects.add(this.createListDataProject(germplasmList, SystemDefinedEntryType.TEST_ENTRY));
-		}
 
-		return listDataProjects;
-
-	}
-
-	private ListDataProject createListDataProject(final GermplasmList germplasmList, final SystemDefinedEntryType systemDefinedEntryType) {
-
-		final ListDataProject listDataProject = new ListDataProject();
-		listDataProject.setCheckType(systemDefinedEntryType.getEntryTypeCategoricalId());
-		listDataProject.setSeedSource("");
-		listDataProject.setList(germplasmList);
-		listDataProject.setGermplasmId(1);
-
-		return listDataProject;
+		return list;
 
 	}
 
@@ -552,16 +537,14 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		return this.manager.addGermplasmList(list);
 	}
 
-	private GermplasmList createGermplasmListTestData(
-		final String name, final String description, final long date, final String type,
-		final int userId, final int status) {
+	private GermplasmList createGermplasmListTestData() {
 		final GermplasmList list = new GermplasmList();
-		list.setName(name);
-		list.setDescription(description);
-		list.setDate(date);
-		list.setType(type);
-		list.setUserId(userId);
-		list.setStatus(status);
+		list.setName(GermplasmListManagerImplTest.TEST_GERMPLASM_LIST_NAME);
+		list.setDescription(GermplasmListManagerImplTest.TEST_GERMPLASM_LIST_DESC);
+		list.setDate(GermplasmListManagerImplTest.TEST_GERMPLASM_LIST_DATE);
+		list.setType(GermplasmListManagerImplTest.TEST_GERMPLASM_LIST_TYPE_LST);
+		list.setUserId(GermplasmListManagerImplTest.TEST_GERMPLASM_LIST_USER_ID);
+		list.setStatus(GermplasmListManagerImplTest.STATUS_ACTIVE);
 		list.setProgramUUID(PROGRAM_UUID);
 		return list;
 	}

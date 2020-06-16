@@ -28,7 +28,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanConstructorResultTransformer;
 import org.hibernate.type.DateType;
@@ -56,149 +55,75 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(TransactionDAO.class);
 	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllReserve(final int start, final int numOfRows) {
+	public boolean hasInventoryDetails(final Integer studyId) {
 		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.eq("status", 0));
-			criteria.add(Restrictions.lt("quantity", 0d));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
+			final Session session = this.getSession();
+
+			final StringBuilder sql =
+				new StringBuilder().append("Select COUNT(1) ")
+					.append("FROM ims_transaction tran ")
+					.append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
+					.append("INNER JOIN stock s on s.dbxref_id = lot.eid ")
+					.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue()).append(" AND s.project_id = :studyId ");
+
+			final SQLQuery query = session.createSQLQuery(sql.toString());
+			query.setParameter("studyId", studyId);
+
+			return ((BigInteger) query.uniqueResult()).intValue() > 0 ;
 		} catch (final HibernateException e) {
-			final String message = "Error with getAllReserve() query from Transaction: " + e.getMessage();
+			final String message = "Error with getInventoryDetailsByTransactionRecordId() query from Transaction: " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public long countAllReserve() {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.eq("status", 0));
-			criteria.add(Restrictions.lt("quantity", 0d));
-			return ((Long) criteria.uniqueResult());
-		} catch (final HibernateException e) {
-			final String message = "Error with countAllReserve query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
+	public List<InventoryDetails> getInventoryDetails(final Integer studyId) {
+		final List<InventoryDetails> detailsList = new ArrayList<>();
 
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllDeposit(final int start, final int numOfRows) {
 		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.eq("status", 0));
-			criteria.add(Restrictions.gt("quantity", 0d));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllDeposit query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
+			final Session session = this.getSession();
 
-	public long countAllDeposit() {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.eq("status", 0));
-			criteria.add(Restrictions.gt("quantity", 0d));
-			return ((Long) criteria.uniqueResult());
-		} catch (final HibernateException e) {
-			final String message = "Error with countAllDeposit() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
+			final StringBuilder sql =
+				new StringBuilder().append("Select lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
+					.append("tran.sourceid, tran.trnqty, lot.stock_id, lot.comments, tran.recordid ")
+					.append("FROM ims_transaction tran ")
+					.append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
+					.append("INNER JOIN stock s on s.dbxref_id = lot.eid ")
+					.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue()).append(" AND s.project_id = :studyId ");
 
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllUncommitted(final int start, final int numOfRows) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.eq("status", 0));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllUncomitted() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
+			final SQLQuery query = session.createSQLQuery(sql.toString());
+			query.setParameter("studyId", studyId);
 
-	public long countAllUncommitted() {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.eq("status", 0));
-			return ((Long) criteria.uniqueResult());
-		} catch (final HibernateException e) {
-			final String message = "Error with countAllUncommitted() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
+			final List<Object[]> results = query.list();
 
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllWithdrawals(final int start, final int numOfRows) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.lt("quantity", 0d));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllWithdrawals() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
+			if (!results.isEmpty()) {
+				for (final Object[] row : results) {
+					final Integer lotId = (Integer) row[0];
+					final Integer userId = (Integer) row[1];
+					final Integer gid = (Integer) row[2];
+					final Integer locationId = (Integer) row[3];
+					final Integer scaleId = (Integer) row[4];
+					final Integer sourceId = (Integer) row[5];
+					final Double amount = (Double) row[6];
+					final String inventoryID = (String) row[7];
+					final String comment = (String) row[8];
+					final Integer sourceRecordId = (Integer) row[9];
 
-	public long countAllWithdrawals() {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.lt("quantity", 0d));
-			return ((Long) criteria.uniqueResult());
-		} catch (final HibernateException e) {
-			final String message = "Error with countAllWithdrawals() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
+					final InventoryDetails details =
+						new InventoryDetails(gid, null, lotId, locationId, null, userId, amount, sourceId, null, scaleId, null, comment);
+					details.setInventoryID(inventoryID);
+					details.setSourceRecordId(sourceRecordId);
+					detailsList.add(details);
+				}
+			}
 
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getEmptyLot(final int start, final int numOfRows) {
-		try {
-			final Query query = this.getSession().getNamedQuery(Transaction.GET_EMPTY_LOT);
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-			return query.list();
 		} catch (final HibernateException e) {
-			final String message = "Error with getEmptyLot() query from Transaction: " + e.getMessage();
+			final String message = "Error with getInventoryDetails() query from Transaction: " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-	}
 
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getLotWithMinimumAmount(final double minAmount, final int start, final int numOfRows) {
-		try {
-			final Query query = this.getSession().getNamedQuery(Transaction.GET_LOT_WITH_MINIMUM_AMOUNT);
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-			query.setParameter("minAmount", minAmount);
-			return query.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getLotWithMinimumAmount(minAmount=\" + minAmount + \") query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
+		return detailsList;
 	}
 
 	public List<InventoryDetails> getInventoryDetailsByTransactionRecordId(final List<Integer> recordIds) {
@@ -360,33 +285,13 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return listOfTransactionStatusForGermplsm;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getByLotIds(final List<Integer> lotIds) {
-		final List<Transaction> transactions = new ArrayList<>();
-
-		if (lotIds == null || lotIds.isEmpty()) {
-			return transactions;
-		}
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.in("lot.id", lotIds));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error getByLotIds() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-	}
-
 	public void cancelUnconfirmedTransactionsForListEntries(final List<Integer> listEntryIds) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
-			
+
 			final String sql =
 					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate "
 							+ "WHERE trnstat = 0 AND recordid IN (:entryIds) " + "AND sourceType = 'LIST'";
@@ -396,29 +301,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			query.executeUpdate();
 		} catch (final Exception e) {
 			final String message = "Error cancelUnconfirmedTransactionsForListEntries=" + listEntryIds + " query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	public void cancelReservationsForLotEntryAndLrecId(final Integer lotId, final Integer lrecId) {
-		try {
-			
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
-			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-			// statement
-			this.getSession().flush();
-			
-			final String sql =
-					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate " + "WHERE trnstat = 0 AND lotId = :lotId "
-							+ "AND recordId = :lrecId " + "AND trnqty < 0 " + "AND sourceType = 'LIST'";
-			final Query query =
-					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDate())
-							.setParameter("lotId", lotId).setParameter("lrecId", lrecId);
-			query.executeUpdate();
-		} catch (final Exception e) {
-			final String message = "Error cancelReservationsForLotEntryAndLrecId(lotId:" + lotId + ", lrecId:" + lrecId
-				+ ") query from Transaction: " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -445,6 +327,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 		final Map<Integer, String> gIdStockIdMap = new HashMap<>();
 
+		if (gIds.isEmpty()) {
+			return gIdStockIdMap;
+		}
+
 		final String sql =
 				"SELECT b.eid ,group_concat(distinct b.stock_id SEPARATOR ', ')  " + "FROM "
 						+ "ims_lot b  "
@@ -464,12 +350,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	}
 
-	public Boolean isStockIdExists(final List<String> stockIds) {
-		final List<String> result = this.getSimilarStockIds(stockIds);
-		return null != result && !result.isEmpty();
-
-	}
-
 	public List<String> getSimilarStockIds(final List<String> stockIds) {
 		if (null == stockIds || stockIds.isEmpty()) {
 			return new ArrayList<>();
@@ -485,7 +365,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	public List<String> getStockIdsByListDataProjectListId(final Integer listId) {
 		try {
 			final String sql =
-				" SELECT lot.stock_id, trnqty " +
+				" SELECT lot.stock_id " +
 				" FROM ims_lot lot " +
 				" INNER JOIN ims_transaction tran ON lot.lotid = tran.lotid " +
 				" INNER join listnms l ON l.listref = tran.sourceid " +
@@ -593,53 +473,59 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	//New inventory functions, please locate them below this line to help cleaning in the near future.
 	private final String SEARCH_TRANSACTIONS_QUERY = "SELECT " //
-		+ "    act.trnid AS transactionId,"//
+		+ "    tr.trnid AS transactionId,"//
 		+ "    users.uname AS createdByUsername,"//
 		+ "(CASE WHEN trntype = " + TransactionType.DEPOSIT.getId() + " THEN '" + TransactionType.DEPOSIT.getValue()
 		+ "' WHEN trntype = " + TransactionType.WITHDRAWAL.getId() + "  THEN '" + TransactionType.WITHDRAWAL.getValue()
 		+ "' WHEN trntype = " + TransactionType.DISCARD.getId() + "  THEN '" + TransactionType.DISCARD.getValue()
 		+ "' WHEN trntype = " + TransactionType.ADJUSTMENT.getId() + "  THEN '" + TransactionType.ADJUSTMENT.getValue()
 		+ "' END) AS transactionType,"//
-		+ "    act.trnqty AS amount,"//
-		+ "    act.comments AS notes,"//
-		+ "    act.trndate as transactionDate, "//
-		+ "    i.lotid AS lotLotId," //
-		+ "    i.eid AS lotGid,"//
+		+ "    tr.trnqty AS amount,"//
+		+ "    tr.comments AS notes,"//
+		+ "    tr.trndate as createdDate, "//
+		+ "    lot.lotid AS lotLotId," //
+		+ "    lot.lot_uuid AS lotUUID," //
+		+ "    lot.eid AS lotGid,"//
 		+ "    n.nval AS lotDesignation,"//
-		+ "    i.stock_id AS lotStockId,"//
+		+ "    lot.stock_id AS lotStockId,"//
 		+ "    scaleid AS lotScaleId,"//
 		+ "    scale.name AS lotUnitName," //
-		+ "    (CASE WHEN i.status = 0 THEN 'Active' WHEN i.status = 1 THEN 'Closed' END) AS lotStatus, "
+		+ "    (CASE WHEN lot.status = 0 THEN 'Active' WHEN lot.status = 1 THEN 'Closed' END) AS lotStatus, "
 		+ "   (CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
 		+ "' WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '" + TransactionStatus.CANCELLED.getValue()
 		+ "' END) as transactionStatus, "
-		+ " i.locid as lotLocationId, "
+		+ " lot.locid as lotLocationId, "
 		+ " loc.lname as lotLocationName, "//
 		+ " loc.labbr as lotLocationAbbr, "//
-		+ " i.comments as lotComments "
+		+ " lot.comments as lotComments "
 		+ " FROM"//
-		+ "   ims_transaction act "//
+		+ "   ims_transaction tr "//
 		+ "        INNER JOIN"//
-		+ "    ims_lot i ON act.lotid = i.lotid "//
+		+ "    ims_lot lot ON tr.lotid = lot.lotid "//
 		+ "		   LEFT JOIN" //
-		+ "	   location loc on loc.locid = i.locid "//
+		+ "	   location loc on loc.locid = lot.locid "//
 		+ "        LEFT JOIN"//
-		+ "    cvterm scale ON scale.cvterm_id = i.scaleid"//
+		+ "    cvterm scale ON scale.cvterm_id = lot.scaleid"//
 		+ "        INNER JOIN"//
-		+ "    germplsm g ON g.gid = i.eid"//
+		+ "    germplsm g ON g.gid = lot.eid"//
 		+ "        LEFT JOIN"//
-		+ "    names n ON n.gid = i.eid AND n.nstat = 1"//
+		+ "    names n ON n.gid = lot.eid AND n.nstat = 1"//
 		+ "        LEFT JOIN"//
-		+ "    workbench.users users ON users.userid = act.userid"//
+		+ "    workbench.users users ON users.userid = tr.userid"//
 		+ " WHERE"//
-		+ "    i.etype = 'GERMPLSM' and g.deleted=0 "; //
+		+ "    lot.etype = 'GERMPLSM' and g.deleted=0 "; //
 
 	private String buildSearchTransactionsQuery(final TransactionsSearchDto transactionsSearchDto) {
 		final StringBuilder query = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
 		if (transactionsSearchDto != null) {
 			if (transactionsSearchDto.getLotIds() != null && !transactionsSearchDto.getLotIds().isEmpty()) {
-				query.append(" and i.lotid IN (").append(Joiner.on(",").join(transactionsSearchDto.getLotIds())).append(") ");
+				query.append(" and lot.lotid IN (").append(Joiner.on(",").join(transactionsSearchDto.getLotIds())).append(") ");
+			}
+
+			if (transactionsSearchDto.getLotUUIDs() != null && !transactionsSearchDto.getLotUUIDs().isEmpty()) {
+				query.append("and lot.lot_uuid IN ('").append(Joiner.on("','").join(transactionsSearchDto.getLotUUIDs().toArray()))
+					.append("') ");
 			}
 
 			if (transactionsSearchDto.getTransactionIds() != null && !transactionsSearchDto.getTransactionIds().isEmpty()) {
@@ -647,11 +533,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			}
 
 			if (transactionsSearchDto.getGids() != null && !transactionsSearchDto.getGids().isEmpty()) {
-				query.append(" and i.eid IN (").append(Joiner.on(",").join(transactionsSearchDto.getGids())).append(") ");
+				query.append(" and lot.eid IN (").append(Joiner.on(",").join(transactionsSearchDto.getGids())).append(") ");
 			}
 
 			if (transactionsSearchDto.getUnitIds() != null && !transactionsSearchDto.getUnitIds().isEmpty()) {
-				query.append(" and i.scaleid IN (").append(Joiner.on(",").join(transactionsSearchDto.getUnitIds())).append(") ");
+				query.append(" and lot.scaleid IN (").append(Joiner.on(",").join(transactionsSearchDto.getUnitIds())).append(") ");
 			}
 
 			if (transactionsSearchDto.getDesignation() != null) {
@@ -659,19 +545,19 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			}
 
 			if (transactionsSearchDto.getStockId() != null) {
-				query.append(" and i.stock_id like '").append(transactionsSearchDto.getStockId()).append("%' ");
+				query.append(" and lot.stock_id like '").append(transactionsSearchDto.getStockId()).append("%' ");
 			}
 
 			if (transactionsSearchDto.getNotes() != null) {
-				query.append(" and act.comments like '%").append(transactionsSearchDto.getNotes()).append("%' ");
+				query.append(" and tr.comments like '%").append(transactionsSearchDto.getNotes()).append("%' ");
 			}
 
-			if (transactionsSearchDto.getTransactionDateFrom() != null) {
-				query.append(" and DATE(act.trndate) >= '").append(format.format(transactionsSearchDto.getTransactionDateFrom())).append("' ");
+			if (transactionsSearchDto.getCreatedDateFrom() != null) {
+				query.append(" and DATE(tr.trndate) >= '").append(format.format(transactionsSearchDto.getCreatedDateFrom())).append("' ");
 			}
 
-			if (transactionsSearchDto.getTransactionDateTo() != null) {
-				query.append(" and DATE(act.trndate) <= '").append(format.format(transactionsSearchDto.getTransactionDateTo())).append("' ");
+			if (transactionsSearchDto.getCreatedDateTo() != null) {
+				query.append(" and DATE(tr.trndate) <= '").append(format.format(transactionsSearchDto.getCreatedDateTo())).append("' ");
 			}
 
 			if (transactionsSearchDto.getCreatedByUsername() != null) {
@@ -679,12 +565,12 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			}
 
 			if (transactionsSearchDto.getMinAmount() != null) {
-				query.append("and act.trnqty >= ")
+				query.append("and tr.trnqty >= ")
 					.append(transactionsSearchDto.getMinAmount()).append(" ");
 			}
 
 			if (transactionsSearchDto.getMaxAmount() != null) {
-				query.append("and act.trnqty <= ")
+				query.append("and tr.trnqty <= ")
 					.append(transactionsSearchDto.getMaxAmount()).append(" ");
 			}
 
@@ -697,17 +583,17 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			}
 
 			if (transactionsSearchDto.getStatusIds() != null && !transactionsSearchDto.getStatusIds().isEmpty()) {
-				query.append(" and act.trnstat IN (").append(Joiner.on(",").join(transactionsSearchDto.getStatusIds())).append(") ");
+				query.append(" and tr.trnstat IN (").append(Joiner.on(",").join(transactionsSearchDto.getStatusIds())).append(") ");
 			}
 
 			if (transactionsSearchDto.getLotStatus() != null) {
-				query.append(" and i.status = ").append(transactionsSearchDto.getLotStatus()).append(" ");
+				query.append(" and lot.status = ").append(transactionsSearchDto.getLotStatus()).append(" ");
 			}
 
 			if (transactionsSearchDto.getGermplasmListIds() != null && !transactionsSearchDto.getGermplasmListIds().isEmpty()) {
-				query.append(" and i.eid in (select distinct (gid) from listdata where listid in (")
+				query.append(" and lot.eid in (select distinct (gid) from listdata where listid in (")
 					.append(Joiner.on(",").join(transactionsSearchDto.getGermplasmListIds())).
-					append(")) and i.etype = 'GERMPLSM' ");
+					append(")) and lot.etype = 'GERMPLSM' ");
 			}
 		}
 
@@ -771,10 +657,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 			if (lotId != null) {
 				final StringBuilder sql = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
-				sql.append(" and (act.trnstat =").append(TransactionStatus.CONFIRMED.getIntValue()).append(" or (act.trnstat = ")
+				sql.append(" and (tr.trnstat =").append(TransactionStatus.CONFIRMED.getIntValue()).append(" or (tr.trnstat = ")
 					.append(TransactionStatus.PENDING.getIntValue()).
-					append(" and act.trntype = ").append(TransactionType.WITHDRAWAL.getId()).append(")) ");
-				sql.append(" and act.lotid = ").append(lotId).append(" ");
+					append(" and tr.trntype = ").append(TransactionType.WITHDRAWAL.getId()).append(")) ");
+				sql.append(" and tr.lotid = ").append(lotId).append(" ");
 				final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 				this.addSearchTransactionsQueryScalars(query);
 
@@ -813,9 +699,27 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	private Constructor<TransactionDto> getTransactionDtoConstructor() {
 		try {
-			return TransactionDto.class.getConstructor(Integer.class, String.class, String.class, Double.class, String.class, Date.class,
-				Integer.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class, String.class,
-				Integer.class, String.class, String.class, String.class);
+			return TransactionDto.class.getConstructor(
+				Integer.class, // transactionId
+				String.class,    // createdByUsername
+				String.class,    // transactionType
+				Double.class,    // amount
+				String.class,    // notes
+				Date.class,      // createdDate
+				Integer.class,   // lotId
+				String.class,    // lotUUID
+				Integer.class,   // gid
+				String.class,    // designation
+				String.class,    // stockId
+				Integer.class,   // scaleId
+				String.class,    // scaleName
+				String.class,    // lotStatus
+				String.class,    // transactionStatus
+				Integer.class,   // locationId
+				String.class,    // locationName
+				String.class,    // locationAbbr
+				String.class     // comments
+			);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
 		}
@@ -827,8 +731,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("transactionType");
 		query.addScalar("amount");
 		query.addScalar("notes");
-		query.addScalar("transactionDate", DateType.INSTANCE);
+		query.addScalar("createdDate", DateType.INSTANCE);
 		query.addScalar("lotLotId");
+		query.addScalar("lotUUID");
 		query.addScalar("lotGid");
 		query.addScalar("lotDesignation");
 		query.addScalar("lotStockId");

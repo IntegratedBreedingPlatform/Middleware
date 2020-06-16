@@ -51,7 +51,10 @@ public class PhenotypeSearchDTO {
 	@JsonView(BrapiView.BrapiV2.class)
 	private String additionalInfo;
 
+	@JsonView(BrapiView.BrapiV2.class)
 	private String locationDbId;
+
+	@JsonView(BrapiView.BrapiV2.class)
 	private String locationName;
 
 	@JsonView(BrapiView.BrapiV2.class)
@@ -68,12 +71,16 @@ public class PhenotypeSearchDTO {
 
 	private List<ObservationUnitXRef> observationUnitXRef;
 
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String programDbId;
 
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private List<Treatment> treatments;
 
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String trialDbId;
 
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String trialName;
 
 

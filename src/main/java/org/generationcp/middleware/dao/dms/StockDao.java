@@ -23,20 +23,18 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * DAO class for {@link StockModel}.
@@ -44,6 +42,7 @@ import java.util.Set;
  */
 public class StockDao extends GenericDAO<StockModel, Integer> {
 
+	private static final Logger LOG = LoggerFactory.getLogger(StockDao.class);
 	private static final String IN_STOCK_DAO = " in StockDao: ";
 	static final String DBXREF_ID = "dbxrefId";
 
@@ -62,7 +61,9 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			stockIds = criteria.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getStockIdsByProperty=" + value + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+			final String errorMessage = "Error in getStockIdsByProperty=" + value + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return stockIds;
 	}
@@ -71,14 +72,15 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 		try {
 			final SQLQuery query = this.getSession()
-					.createSQLQuery("select count(distinct p.study_id) " + "FROM stock s "
-							+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
-							+ "LEFT JOIN project p ON e.project_id= p.project_id " + "WHERE s.dbxref_id = " + gid
+					.createSQLQuery("select count(distinct p.project_id) " + "FROM stock s "
+							+ "INNER JOIN project p ON s.project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
 							+ " AND p.deleted = 0");
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in countStudiesByGid=" + gid + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+			final String errorMessage = "Error in countStudiesByGid=" + gid + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
 
@@ -91,9 +93,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "st.study_type_id, st.label, st.name as studyTypeName, st.visible, st.cvterm_id, p.program_uuid, p.locked, "
 				+ "p.created_by "
 				+ "FROM stock s "
-				+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
-				+ "LEFT JOIN project ds ON ds.project_id = e.project_id "
-				+ "LEFT JOIN project p ON ds.study_id = p.project_id "
+				+ "INNER JOIN project p ON s.project_id = p.project_id "
 				+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id "
 				+ " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0");
 			query.addScalar("project_id").addScalar("name").addScalar("description").addScalar("study_type_id").addScalar("label")
@@ -120,32 +120,75 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getStudiesByGid=" + gid + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+			final String errorMessage = "Error in getStudiesByGid=" + gid + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return studyReferences;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Set<StockModel> findInDataSet(final int datasetId)  {
-		final Set<StockModel> stockModels = new LinkedHashSet<>();
+	public List<StockModel> getStocksForStudy(final int studyId) {
 		try {
-
-			final String sql = "SELECT DISTINCT e.stock_id" + " FROM nd_experiment e "
-					+ " WHERE e.project_id = :projectId ORDER BY e.stock_id";
-			final Query query = this.getSession().createSQLQuery(sql);
-			query.setParameter("projectId", datasetId);
-			final List<Integer> ids = query.list();
-			for (final Integer id : ids) {
-				stockModels.add(this.getById(id));
-			}
-
+			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+			criteria.add(Restrictions.eq("project.projectId", studyId));
+			// Return by ascending order of entry number. We need to perform cast first on uniquename since it's stored as string
+			criteria.addOrder(new org.hibernate.criterion.Order("uniquename", true) {
+				@Override
+				public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws HibernateException {
+					return "CAST(uniquename AS UNSIGNED)";
+				}
+			});
+			return criteria.list();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in findInDataSet=" + datasetId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+			final String errorMessage = "Error in getStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
-		return stockModels;
 	}
 
-	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId)  {
+	public void deleteStocksForStudy(final int studyId) {
+		try {
+			final Query query = this.getSession().createQuery("DELETE FROM StockModel sm WHERE sm.project.projectId = :studyId");
+			query.setParameter("studyId", studyId);
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in deleteStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
+	public long countStocksForStudy(final int studyId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+			criteria.add(Restrictions.eq("project.projectId", studyId));
+			criteria.setProjection(Projections.rowCount());
+			return ((Long) criteria.uniqueResult()).longValue();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in countStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
+	public long countStocksByStudyAndEntryTypeIds(final int studyId, final List<String> systemDefinedEntryTypeIds) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+			criteria.createAlias("properties", "properties");
+			criteria.add(Restrictions.eq("project.projectId", studyId));
+			criteria.add(Restrictions.and(Restrictions.eq("properties.typeId", TermId.ENTRY_TYPE.getId()),
+				Restrictions.in("properties.value", systemDefinedEntryTypeIds)));
+			criteria.setProjection(Projections.rowCount());
+			return ((Long) criteria.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with countStocksByStudyAndEntryTypeIds(studyId=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
+	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId) {
 		try {
 
 			final String sql = "select count(distinct e.stock_id) "
@@ -158,7 +201,9 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at countStocks=" + datasetId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+			final String errorMessage = "Error at countStocks=" + datasetId + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
 
@@ -175,39 +220,64 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getStocksByIds=" + ids + StockDao.IN_STOCK_DAO + e.getMessage(), e);
+			final String errorMessage = "Error in getStocksByIds=" + ids + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 
 		return stockModels;
 	}
 
 	public List<StudyGermplasmDto> getStudyGermplasmDtoList(final Integer studyId, final Set<Integer> plotNos) {
-		final String queryString = "select  distinct(nd_ep.value) AS position, s.name AS designation, s.dbxref_id AS germplasmId "
-			+ " FROM nd_experiment e "
-			+ " INNER JOIN nd_experimentprop nd_ep ON e.nd_experiment_id = nd_ep.nd_experiment_id AND nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
-			+ " INNER JOIN stock s ON s.stock_id = e.stock_id "
-			+ " INNER JOIN project p ON e.project_id = p.project_id "
-			+ " WHERE p.dataset_type_id = :DATASET_TYPE "
-			+ " AND p.study_id = :STUDY_ID "
-			+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id ";
+		try {
 
-		final StringBuilder sb = new StringBuilder(queryString);
-		if (!CollectionUtils.isEmpty(plotNos)) {
-			sb.append(" AND nd_ep.value in (:PLOT_NOS) ");
+			final String queryString = "select distinct(nd_ep.value) AS position, s.stock_id AS entryId, s.name AS designation, s.dbxref_id AS germplasmId "
+				+ " FROM nd_experiment e "
+				+ " INNER JOIN nd_experimentprop nd_ep ON e.nd_experiment_id = nd_ep.nd_experiment_id AND nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
+				+ " INNER JOIN stock s ON s.stock_id = e.stock_id "
+				+ " INNER JOIN project p ON e.project_id = p.project_id "
+				+ " WHERE p.dataset_type_id = :DATASET_TYPE "
+				+ " AND p.study_id = :STUDY_ID "
+				+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id ";
+
+			final StringBuilder sb = new StringBuilder(queryString);
+			if (!CollectionUtils.isEmpty(plotNos)) {
+				sb.append(" AND nd_ep.value in (:PLOT_NOS) ");
+			}
+			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+			query.setParameter("STUDY_ID", studyId);
+			if (!CollectionUtils.isEmpty(plotNos)) {
+				query.setParameterList("PLOT_NOS", plotNos);
+			}
+			query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
+			query.setParameterList("PLOT_NO_TERM_IDS",
+				new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
+			query.addScalar("entryId", new IntegerType());
+			query.addScalar("position", new StringType());
+			query.addScalar("designation", new StringType());
+			query.addScalar("germplasmId", new IntegerType());
+			query.setResultTransformer(Transformers.aliasToBean(StudyGermplasmDto.class));
+			return query.list();
+		} catch (HibernateException e) {
+			final String errorMessage = "Error in getStudyGermplasmDtoList " + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
-		final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
-		query.setParameter("STUDY_ID", studyId);
-		if (!CollectionUtils.isEmpty(plotNos)) {
-			query.setParameterList("PLOT_NOS", plotNos);
-		}
-		query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
-		query.setParameterList("PLOT_NO_TERM_IDS",
-			new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
-		query.addScalar("position", new StringType());
-		query.addScalar("designation", new StringType());
-		query.addScalar("germplasmId", new IntegerType());
-		query.setResultTransformer(Transformers.aliasToBean(StudyGermplasmDto.class));
-		return query.list();
 	}
+
+	public List<Integer> getGermplasmUsedInStudies(final List<Integer> gids)  {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.in("germplasm.gid", gids));
+			criteria.setProjection(Projections.distinct(Projections.property("germplasm.gid")));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in getGermplasmUsedInStudies=" + gids + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+
+	}
+
 
 }

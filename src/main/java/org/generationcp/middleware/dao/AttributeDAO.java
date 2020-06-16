@@ -47,6 +47,23 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return toReturn;
 	}
 
+	public List<Attribute> getAttributeValuesGIDList(final List<Integer> gidList) {
+		List<Attribute> attributes = new ArrayList<>();
+		if (gidList != null && !gidList.isEmpty()) {
+			try {
+				final String sql = "SELECT {a.*}" + " FROM atributs a" + " WHERE a.gid in (:gidList)";
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
+				query.addEntity("a", Attribute.class);
+				query.setParameterList("gidList", gidList);
+				attributes = query.list();
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException(
+					"Error with getAttributeValuesGIDList(gidList=" + gidList + "): " + e.getMessage(), e);
+			}
+		}
+		return attributes;
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<Attribute> getAttributeValuesByTypeAndGIDList(final Integer attributeType, final List<Integer> gidList) {
 		List<Attribute> returnList = new ArrayList<>();

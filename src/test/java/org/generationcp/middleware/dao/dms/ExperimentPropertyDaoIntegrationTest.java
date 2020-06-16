@@ -81,7 +81,7 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 
 		final ExperimentModel experimentModel =
 			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), "1", null);
-		this.testDataInitializer.createTestStock(experimentModel);
+		this.testDataInitializer.createTestStock(this.study, experimentModel);
 		this.testDataInitializer.addExperimentProp(experimentModel, TermId.REP_NO.getId(), RandomStringUtils.randomNumeric(5), 2);
 		this.testDataInitializer.addExperimentProp(experimentModel, TermId.BLOCK_NO.getId(), RandomStringUtils.randomNumeric(5), 3);
 		this.testDataInitializer.addExperimentProp(experimentModel, TermId.RANGE_NO.getId(), RandomStringUtils.randomNumeric(5), 4);
@@ -122,7 +122,7 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 
 		final ExperimentModel experimentModel =
 			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), "1", null);
-		this.testDataInitializer.createTestStock(experimentModel);
+		this.testDataInitializer.createTestStock(this.study, experimentModel);
 
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();

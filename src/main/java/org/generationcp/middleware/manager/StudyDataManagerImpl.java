@@ -366,11 +366,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public int addStock(final VariableList variableList) {
+	public int addStock(final int studyId, final VariableList variableList) {
 
 		try {
 
-			return this.getStockSaver().saveStock(variableList);
+			return this.getStockSaver().saveStock(studyId, variableList);
 
 		} catch (final Exception e) {
 

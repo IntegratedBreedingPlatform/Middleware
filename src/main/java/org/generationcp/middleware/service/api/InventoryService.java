@@ -26,6 +26,23 @@ import java.util.List;
  */
 public interface InventoryService {
 
+
+	/**
+	 * Checks if the study has inventory.
+	 *
+	 * @param studyId the study id
+	 * @return boolean
+	 */
+	boolean hasInventoryDetails(Integer studyId);
+
+	/**
+	 * Gets the inventory details by studyId.
+	 *
+	 * @param studyId the study id
+	 * @return the inventory details by study id
+	 */
+	List<InventoryDetails> getInventoryDetails(Integer studyId);
+
 	/**
 	 * Gets the inventory details by germplasm list.
 	 *
