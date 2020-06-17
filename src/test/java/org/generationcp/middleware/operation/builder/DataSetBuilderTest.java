@@ -5,9 +5,12 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DMSVariableTypeTestDataInitializer;
+import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -25,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -40,6 +44,20 @@ public class DataSetBuilderTest {
 	private static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 	private static final String LOCATION_NAME = "LOCATION_NAME";
 	private static final String NFERT_NO = "NFert_NO";
+	private static final int TRIAL_DATASET_ID = 1;
+
+	private final List<DMSVariableType> factorVariableTypes = new ArrayList<>();
+	private final List<DMSVariableType> variateVariableTypes = new ArrayList<>();
+
+	private static final String EMPTY_VALUE = "";
+	private static final String[] TRAITS = {
+		DataSetBuilderTest.TRAIT_ASI, DataSetBuilderTest.TRAIT_APHID,
+		DataSetBuilderTest.TRAIT_EPH, DataSetBuilderTest.TRAIT_FMSROT};
+	private static final String ACDTOL_E_1TO5 = "AcdTol_E_1to5";
+	private static final String TRAIT_ASI = "ASI";
+	private static final String TRAIT_APHID = "Aphid1_5";
+	private static final String TRAIT_EPH = "EPH";
+	private static final String TRAIT_FMSROT = "FMSROT";
 
 	@Mock
 	private HibernateSessionProvider hibernateSessionProvider;
@@ -66,6 +84,21 @@ public class DataSetBuilderTest {
 			.thenReturn(this.generateDatasetReference(3));
 		when(this.daoFactory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
 		when(this.dmsProjectDao.getById(3)).thenReturn(this.generateDmsProject(3));
+
+		this.factorVariableTypes.add(this.createGermplasmFactorVariableType("TRIAL_INSTANCE", TermId.TRIAL_INSTANCE_FACTOR.getId()));
+		this.factorVariableTypes.add(this.createGermplasmFactorVariableType("ENTRY_TYPE", TermId.ENTRY_TYPE.getId()));
+		this.factorVariableTypes.add(this.createGermplasmFactorVariableType("ENTRY_NO", TermId.ENTRY_NO.getId()));
+		this.factorVariableTypes.add(this.createGermplasmFactorVariableType("GID", TermId.GID.getId()));
+		this.factorVariableTypes.add(this.createGermplasmFactorVariableType("DESIG", TermId.DESIG.getId()));
+		this.factorVariableTypes.add(this.createGermplasmFactorVariableType("REP_NO", TermId.REP_NO.getId()));
+		this.factorVariableTypes.add(this.createGermplasmFactorVariableType("PLOT_NO", TermId.PLOT_NO.getId()));
+		this.factorVariableTypes.add(this.createGermplasmFactorVariableType("OBS_UNIT_ID", TermId.OBS_UNIT_ID.getId()));
+
+		int ctr = 1;
+		for (final String traitName : DataSetBuilderTest.TRAITS) {
+			this.variateVariableTypes.add(this.createVariateVariableType(traitName,ctr));
+			ctr++;
+		}
 
 	}
 
@@ -171,4 +204,152 @@ public class DataSetBuilderTest {
 		return dsr;
 	}
 
+	@Test
+	public void testFilterVariables() {
+		List<Integer> siblingsList = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId(), TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+			TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId(), TermId.GID.getId(), TermId.DESIG.getId(),
+			TermId.ENTRY_NO.getId(), TermId.OBS_UNIT_ID.getId(), TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), 1, 2, 3, 4);
+
+		final DataSet dataSet = this.createDataSet();
+
+		Assert.assertEquals("Default Column with Traits", DataSetBuilder.DEFAULT_DATASET_COLUMNS.size(), this.dataSetBuilder.filterVariables(dataSet.getVariableTypes(),siblingsList).size());
+	}
+	private DataSet createDataSet() {
+
+		final DataSet dataSet = new DataSet();
+		dataSet.setId(DataSetBuilderTest.TRIAL_DATASET_ID);
+
+		final VariableTypeList variableTypes = new VariableTypeList();
+
+		dataSet.setVariableTypes(variableTypes);
+		for (final DMSVariableType factor : this.factorVariableTypes) {
+			dataSet.getVariableTypes().add(factor);
+		}
+		for (final DMSVariableType variate : this.variateVariableTypes) {
+			dataSet.getVariableTypes().add(variate);
+		}
+
+		return dataSet;
+	}
+
+	private DMSVariableType createEnvironmentVariableType(final String localName) {
+
+		final DMSVariableType factor = new DMSVariableType();
+		final StandardVariable factorStandardVar = new StandardVariable();
+		factorStandardVar.setId(TermId.LOCATION_ID.getId());
+		factorStandardVar.setPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
+		factorStandardVar.setName(localName);
+		factor.setLocalName(localName);
+		factor.setStandardVariable(factorStandardVar);
+		factor.setRole(factorStandardVar.getPhenotypicType());
+		return factor;
+	}
+
+	private DMSVariableType createGermplasmFactorVariableType(final String localName, final int termId) {
+		final DMSVariableType factor = new DMSVariableType();
+		final StandardVariable factorStandardVar = new StandardVariable();
+		factorStandardVar.setPhenotypicType(PhenotypicType.GERMPLASM);
+
+		final Term dataType = new Term();
+		dataType.setId(TermId.NUMERIC_DBID_VARIABLE.getId());
+
+		final Term method = new Term();
+		method.setId(1111);
+		method.setDefinition(DataSetBuilderTest.EMPTY_VALUE);
+
+		final Term scale = new Term();
+		scale.setDefinition(DataSetBuilderTest.EMPTY_VALUE);
+		scale.setId(22222);
+
+		final Term property = new Term();
+		scale.setDefinition(DataSetBuilderTest.EMPTY_VALUE);
+		scale.setId(33333);
+
+		factorStandardVar.setId(termId);
+		factorStandardVar.setProperty(property);
+		factorStandardVar.setScale(scale);
+		factorStandardVar.setMethod(method);
+		factorStandardVar.setDataType(dataType);
+		factor.setLocalName(localName);
+		factor.setStandardVariable(factorStandardVar);
+		factor.setRole(factorStandardVar.getPhenotypicType());
+
+		return factor;
+	}
+
+	private DMSVariableType createVariateVariableType(final String localName, final int termId) {
+		final DMSVariableType variate = new DMSVariableType();
+		final StandardVariable variateStandardVar = new StandardVariable();
+		variateStandardVar.setPhenotypicType(PhenotypicType.VARIATE);
+
+		final Term storedIn = new Term();
+		storedIn.setId(TermId.OBSERVATION_VARIATE.getId());
+
+		final Term dataType = new Term();
+		dataType.setId(TermId.NUMERIC_VARIABLE.getId());
+
+		final Term method = new Term();
+		method.setId(1111);
+		method.setDefinition(DataSetBuilderTest.EMPTY_VALUE);
+
+		final Term scale = new Term();
+		scale.setDefinition(DataSetBuilderTest.EMPTY_VALUE);
+		scale.setId(22222);
+
+		final Term property = new Term();
+		scale.setDefinition(DataSetBuilderTest.EMPTY_VALUE);
+		scale.setId(33333);
+
+		variateStandardVar.setId(termId);
+		variateStandardVar.setProperty(property);
+		variateStandardVar.setScale(scale);
+		variateStandardVar.setMethod(method);
+		variateStandardVar.setDataType(dataType);
+		variateStandardVar.setName(localName);
+		variate.setLocalName(localName);
+		variate.setStandardVariable(variateStandardVar);
+		variate.setRole(variateStandardVar.getPhenotypicType());
+
+		return variate;
+	}
+
+	private DMSVariableType createVariateVariableType(
+		final String localName, final String propertyName, final String scaleName,
+		final String methodName) {
+		final DMSVariableType variate = new DMSVariableType();
+		final StandardVariable variateStandardVar = new StandardVariable();
+		variateStandardVar.setPhenotypicType(PhenotypicType.VARIATE);
+
+		final Term storedIn = new Term();
+		storedIn.setId(TermId.OBSERVATION_VARIATE.getId());
+
+		final Term dataType = new Term();
+		dataType.setId(TermId.NUMERIC_VARIABLE.getId());
+
+		final Term method = new Term();
+		method.setId(1111);
+		method.setDefinition(DataSetBuilderTest.EMPTY_VALUE);
+		method.setName(methodName);
+
+		final Term scale = new Term();
+		scale.setDefinition(DataSetBuilderTest.EMPTY_VALUE);
+		scale.setId(22222);
+		scale.setName(scaleName);
+
+		final Term property = new Term();
+		property.setDefinition(DataSetBuilderTest.EMPTY_VALUE);
+		property.setId(33333);
+		property.setName(propertyName);
+
+		variateStandardVar.setId(1234);
+		variateStandardVar.setProperty(property);
+		variateStandardVar.setScale(scale);
+		variateStandardVar.setMethod(method);
+		variateStandardVar.setDataType(dataType);
+		variate.setLocalName(localName);
+		variate.setStandardVariable(variateStandardVar);
+		variate.setRole(variateStandardVar.getPhenotypicType());
+
+		return variate;
+	}
 }
