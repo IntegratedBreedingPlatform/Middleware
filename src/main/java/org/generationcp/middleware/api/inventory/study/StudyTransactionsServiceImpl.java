@@ -21,13 +21,8 @@ public class StudyTransactionsServiceImpl implements StudyTransactionsService {
 	}
 
 	@Override
-	public long countAllStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest) {
-		return this.daoFactory.getTransactionDAO().countAllStudyTransactions(studyId, studyTransactionsRequest);
-	}
-
-	@Override
-	public long countFilteredStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest) {
-		return this.daoFactory.getTransactionDAO().countFilteredStudyTransactions(studyId, studyTransactionsRequest);
+	public long countStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest) {
+		return this.daoFactory.getTransactionDAO().countStudyTransactions(studyId, studyTransactionsRequest);
 	}
 
 	@Override

@@ -831,19 +831,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return transaction;
 	}
 
-	public long countAllStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest) {
-		final StringBuilder obsUnitsQuerySql = this.buildObsUnitsQuery();
-		final StringBuilder transactionsQuerySql = this.buildStudyTransactionsQuery(null, obsUnitsQuerySql);
-
-		final SQLQuery transactionsQuery =
-			this.getSession().createSQLQuery("select count(1) from ( " + transactionsQuerySql.toString() + ") T");
-		transactionsQuery.setParameter("studyId", studyId);
-
-		return ((BigInteger) transactionsQuery.uniqueResult()).longValue();
-	}
-
-	public long countFilteredStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest) {
-		final TransactionsSearchDto transactionsSearch = studyTransactionsRequest.getTransactionsSearch();
+	public long countStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest) {
+		TransactionsSearchDto transactionsSearch = null;
+		if (studyTransactionsRequest != null) {
+			transactionsSearch = studyTransactionsRequest.getTransactionsSearch();
+		}
 
 		final StringBuilder obsUnitsQueryFilterSql = this.buildObsUnitsQuery();
 		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQueryFilterSql), studyTransactionsRequest);
