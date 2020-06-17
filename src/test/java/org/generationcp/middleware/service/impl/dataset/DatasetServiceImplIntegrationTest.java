@@ -11,7 +11,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
@@ -95,7 +94,9 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         final Map<Integer, List<ObservationUnitRow>> instanceObsUnitRowMap = this.datasetService.getInstanceIdToObservationUnitRowsMap(this.studyId, this.subObsDatasetId, this.instanceIds);
         final List<ObservationUnitRow> observationUnitRows = instanceObsUnitRowMap.get(this.instanceIds.get(0));
         Assert.assertNotNull(observationUnitRows);
-        Assert.assertEquals(40, observationUnitRows.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
+        Assert.assertEquals(80,
+			observationUnitRows
+				.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)  multiplied by the number of reps (2)
         final ObservationUnitRow observationUnitRow = observationUnitRows.get(0);
         this.verifyObservationUnitRowValues(observationUnitRow);
         // Check for study and environment values
@@ -114,7 +115,9 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         final List<ObservationUnitRow> observationUnitRows = this.datasetService.getObservationUnitRows(this.studyId, this.subObsDatasetId,
                 searchDto);
         Assert.assertNotNull(observationUnitRows);
-        Assert.assertEquals(40, observationUnitRows.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
+        Assert.assertEquals(80,
+			observationUnitRows
+				.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2) multiplied by the number of reps (2)
         final ObservationUnitRow observationUnitRow = observationUnitRows.get(0);
         this.verifyObservationUnitRowValues(observationUnitRow);
     }
@@ -128,7 +131,9 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         final List<Map<String, Object>> rowsAsListMap = this.datasetService.getObservationUnitRowsAsMapList(this.studyId, this.subObsDatasetId,
             searchDto);
         Assert.assertNotNull(rowsAsListMap);
-        Assert.assertEquals(40, rowsAsListMap.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
+        Assert
+			.assertEquals(80, rowsAsListMap
+				.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2) multiplied by the number of reps (2)
         final Map<String, Object> dataMap = rowsAsListMap.get(0);
         Assert.assertEquals(searchDto.getFilterColumns().size(), dataMap.size());
         Assert.assertNotNull(dataMap.get("TRIAL_INSTANCE"));

@@ -338,9 +338,9 @@ public class DatasetServiceImplTest {
 		final int variableId = ran.nextInt();
 		final int observationUnitId = ran.nextInt();
 		Mockito.doReturn(new ArrayList<Formula>()).when(this.formulaDao).getByInputId(variableId);
-		this.datasetService.updateDependentPhenotypesAsOutOfSync(variableId, observationUnitId);
+		this.datasetService.updateDependentPhenotypesAsOutOfSync(variableId, Sets.newHashSet(observationUnitId));
 		Mockito.verify(this.phenotypeDao, Mockito.never())
-			.updateOutOfSyncPhenotypes(ArgumentMatchers.<Integer>anySet(), ArgumentMatchers.<Integer>anySet());
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
 	}
 
 	@Test
@@ -357,7 +357,7 @@ public class DatasetServiceImplTest {
 		term2.setCvTermId(ran.nextInt());
 		formula2.setTargetCVTerm(term2);
 		Mockito.doReturn(Arrays.asList(formula1, formula2)).when(this.formulaDao).getByInputId(variableId);
-		this.datasetService.updateDependentPhenotypesAsOutOfSync(variableId, observationUnitId);
+		this.datasetService.updateDependentPhenotypesAsOutOfSync(variableId, Sets.newHashSet(observationUnitId));
 		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(
 			new HashSet<Integer>(Arrays.asList(observationUnitId)),
 			new HashSet<Integer>(Arrays.asList(term1.getCvTermId(), term2.getCvTermId())));
@@ -421,47 +421,33 @@ public class DatasetServiceImplTest {
 	}
 
 	private List<DatasetDTO> setUpDatasets(final Integer datasetTypeId) {
-		final List<DatasetDTO> datasetDTOs1 = new ArrayList<>();
-		final List<DatasetDTO> datasetDTOs2 = new ArrayList<>();
-		final List<DatasetDTO> datasetDTOs3 = new ArrayList<>();
-		final List<DatasetDTO> datasetDTOs4 = new ArrayList<>();
 		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
 		DatasetDTO datasetDTO;
 
 		final boolean filterDataset = datasetTypeId != null && datasetTypeId != 0;
 
 		datasetDTO = createDataset(25020, 25019, "IBP-2015-ENVIRONMENT", DatasetTypeEnum.SUMMARY_DATA.getId());
-		datasetDTOs1.add(datasetDTO);
 		if (!filterDataset || datasetTypeId.equals(datasetDTO.getDatasetTypeId())) {
 			datasetDTOList.add(datasetDTO);
-
 		}
 		datasetDTO = createDataset(25021, 25019, "IBP-2015-PLOTDATA", DatasetTypeEnum.PLOT_DATA.getId());
-		datasetDTOs1.add(datasetDTO);
 		if (!filterDataset || datasetTypeId.equals(datasetDTO.getDatasetTypeId())) {
 			datasetDTOList.add(datasetDTO);
-
 		}
 
 		datasetDTO = createDataset(25022, 25021, "IBP-2015-PLOTDATA-SUBOBS", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
-		datasetDTOs2.add(datasetDTO);
 		if (!filterDataset || datasetTypeId.equals(datasetDTO.getDatasetTypeId())) {
 			datasetDTOList.add(datasetDTO);
-
 		}
 
 		datasetDTO = createDataset(25023, 25022, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
-		datasetDTOs3.add(datasetDTO);
 		if (!filterDataset || datasetTypeId.equals(datasetDTO.getDatasetTypeId())) {
 			datasetDTOList.add(datasetDTO);
-
 		}
 
 		datasetDTO = createDataset(25024, 25023, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS-SUBOBS", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
-		datasetDTOs4.add(datasetDTO);
 		if (!filterDataset || datasetTypeId.equals(datasetDTO.getDatasetTypeId())) {
 			datasetDTOList.add(datasetDTO);
-
 		}
 		Mockito.when(this.dmsProjectDao.getDatasets(25019)).thenReturn(datasetDTOList);
 
@@ -714,7 +700,7 @@ public class DatasetServiceImplTest {
 
 		Assert.assertNull(phenotypeArgumentCaptorValue.getDraftValue());
 		Mockito.verify(this.phenotypeDao, Mockito.never())
-			.updateOutOfSyncPhenotypes(ArgumentMatchers.<Integer>anySet(), ArgumentMatchers.<Integer>anySet());
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
 	}
 
 	@Test
@@ -755,7 +741,7 @@ public class DatasetServiceImplTest {
 		Assert.assertTrue(phenotype.isChanged());
 		// Variable is not used as input to formula hence nothing to update as out of sync
 		Mockito.verify(this.phenotypeDao, Mockito.never())
-			.updateOutOfSyncPhenotypes(ArgumentMatchers.<Integer>anySet(), ArgumentMatchers.<Integer>anySet());
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
 
 	}
 
@@ -793,7 +779,7 @@ public class DatasetServiceImplTest {
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
 		Mockito.verify(this.phenotypeDao, Mockito.never())
-			.updateOutOfSyncPhenotypes(ArgumentMatchers.<Integer>anySet(), ArgumentMatchers.<Integer>anySet());
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
 	}
 
 	@Test
@@ -831,12 +817,12 @@ public class DatasetServiceImplTest {
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
 		Mockito.verify(this.phenotypeDao, Mockito.never())
-			.updateOutOfSyncPhenotypes(ArgumentMatchers.<Integer>anySet(), ArgumentMatchers.<Integer>anySet());
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
 	}
 
 	@Test
 	public void testAcceptDraftDataDeletingRowWithEmpty() {
-		final Integer studyId = 2;
+		final int studyId = 2;
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
@@ -879,7 +865,7 @@ public class DatasetServiceImplTest {
 
 	@Test
 	public void testSetAsMissingDraftDataValidValue() {
-		final Integer studyId = 2;
+		final int studyId = 2;
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
