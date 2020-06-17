@@ -17,6 +17,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -42,6 +43,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
@@ -84,6 +86,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	private CVTermDao cvTermDao;
 	private ProjectPropertyDao projectPropertyDao;
 	private ProjectDAO workbenchProjectDao;
+	private CvTermPropertyDao cvTermPropertyDao;
 
 	private DmsProject study;
 	private CVTerm trait;
@@ -133,6 +136,11 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		if (this.cvTermDao == null) {
 			this.cvTermDao = new CVTermDao();
 			this.cvTermDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if(this.cvTermPropertyDao == null) {
+			this.cvTermPropertyDao = new CvTermPropertyDao();
+			this.cvTermPropertyDao.setSession(this.sessionProvder.getSession());
 		}
 
 		if (this.projectPropertyDao == null) {
@@ -365,6 +373,16 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 				this.study, this.study);
 		final CVTerm trait2 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
 		this.cvTermDao.save(trait2);
+
+		//Create cvTermproperty for trait 2
+		final CVTermProperty cvTermProperty = new CVTermProperty();
+		cvTermProperty.setCvTermPropertyId(1);
+		cvTermProperty.setCvTermId(trait2.getCvTermId());
+		cvTermProperty.setTypeId(TermId.CROP_ONTOLOGY_ID.getId());
+		cvTermProperty.setRank(1);
+		cvTermProperty.setValue("CO:1200");
+		this.cvTermPropertyDao.save(cvTermProperty);
+
 		final List<Integer> traitIds = Arrays.asList(this.trait.getCvTermId(), trait2.getCvTermId());
 		this.createProjectProperties(plot, traitIds);
 		final Integer environment1 = this.createEnvironmentData(plot, 1, traitIds, true);

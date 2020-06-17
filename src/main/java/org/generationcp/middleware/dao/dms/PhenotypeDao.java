@@ -142,9 +142,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 				for (final Object[] row : list) {
 					final Integer id = (Integer) row[0];
-					final Long locationCount = ((BigInteger) row[1]).longValue();
-					final Long germplasmCount = ((BigInteger) row[2]).longValue();
-					final Long observationCount = ((BigInteger) row[3]).longValue();
+					final long locationCount = ((BigInteger) row[1]).longValue();
+					final long germplasmCount = ((BigInteger) row[2]).longValue();
+					final long observationCount = ((BigInteger) row[3]).longValue();
 					final Double minValue = (Double) row[4];
 					final Double maxValue = (Double) row[5];
 
@@ -399,11 +399,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			for (final Object[] row : list) {
 				final Integer traitId = (Integer) row[0];
 				final Integer cValueId = (Integer) row[1];
-				final Long count = ((BigInteger) row[2]).longValue();
+				final long count = ((BigInteger) row[2]).longValue();
 
 				for (final CategoricalTraitInfo traitInfo : traitInfoList) {
 					if (traitInfo.getId() == traitId) {
-						traitInfo.addValueCount(new CategoricalValue(cValueId), count.longValue());
+						traitInfo.addValueCount(new CategoricalValue(cValueId), count);
 						break;
 					}
 				}
@@ -1016,9 +1016,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final Integer ndExperimentId = (Integer) result[0];
 
 				final PhenotypeSearchObservationDTO observation = new PhenotypeSearchObservationDTO();
-				final String variableId =
-					(result[5] != null && !((String) result[5]).isEmpty()) ? (String) result[5] : String.valueOf(result[2]);
-				observation.setObservationVariableDbId(variableId);
+
+				observation.setObservationVariableDbId(String.valueOf(result[2]));
 				observation.setObservationVariableName((String) result[3]);
 				observation.setObservationDbId(String.valueOf((Integer) result[1]));
 				observation.setValue((String) result[4]);
