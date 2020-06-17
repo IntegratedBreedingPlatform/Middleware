@@ -1,6 +1,5 @@
 package org.generationcp.middleware.service.impl.study.generation;
 
-import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -20,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ExperimentModelGenerator {
 

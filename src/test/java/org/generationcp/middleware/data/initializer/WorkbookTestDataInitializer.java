@@ -1,15 +1,12 @@
 
 package org.generationcp.middleware.data.initializer;
 
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -864,7 +861,7 @@ public class WorkbookTestDataInitializer {
 				if (data.getMeasurementVariable().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 					data.setValue(String.valueOf(currentObsCount));
 				}
-				data.setPhenotypeId(null);
+				data.setMeasurementDataId(null);
 			}
 			row.setExperimentId(0);
 			row.setLocationId(0);

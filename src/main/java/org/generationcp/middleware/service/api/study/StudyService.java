@@ -43,7 +43,7 @@ public interface StudyService {
 	 * @param geolocationId
 	 * @return StudyDetailsDto
 	 */
-	StudyDetailsDto getStudyDetailsByGeolocation(Integer geolocationId);
+	StudyDetailsDto getStudyDetailsByInstance(Integer geolocationId);
 
 	/**
 	 * @param ids     of the variables that i need to check data

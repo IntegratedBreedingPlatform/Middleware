@@ -82,7 +82,7 @@ public class MeasurementsTest {
 		Assert.assertEquals("Phenotype name is mapped incorrectly", testMeasurementData.getLabel(), phenotypeFromMeasurement.getName());
 		Assert.assertEquals("Phenotype observable id mapped incorrectly", (Integer) Integer.parseInt(testMeasurementData.getDataType()),
 				phenotypeFromMeasurement.getObservableId());
-		Assert.assertEquals("Phenotype id mapped incorrectly", testMeasurementData.getPhenotypeId(),
+		Assert.assertEquals("Phenotype id mapped incorrectly", testMeasurementData.getMeasurementDataId(),
 				phenotypeFromMeasurement.getPhenotypeId());
 	}
 
@@ -111,7 +111,7 @@ public class MeasurementsTest {
 	public void testMeasurementDataWithPhenotypicIDSetToZeroAndBlankValueAreSkipped() throws Exception {
 		final MeasurementData testMeasurementData =
 				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
-		testMeasurementData.setPhenotypeId(0);
+		testMeasurementData.setMeasurementDataId(0);
 		testMeasurementData.setValue("");
 
 		this.assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
@@ -121,7 +121,7 @@ public class MeasurementsTest {
 	public void testMeasurementDataWithPhenotypicIDSetToZeroAndNullValueAreSkipped() throws Exception {
 		final MeasurementData testMeasurementData =
 				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
-		testMeasurementData.setPhenotypeId(0);
+		testMeasurementData.setMeasurementDataId(0);
 		testMeasurementData.setValue(null);
 
 		this.assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
@@ -131,7 +131,7 @@ public class MeasurementsTest {
 	public void testMeasurementDataWithNullPhenotypicIDAndBlankValueAreSkipped() throws Exception {
 		final MeasurementData testMeasurementData =
 				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
-		testMeasurementData.setPhenotypeId(null);
+		testMeasurementData.setMeasurementDataId(null);
 		testMeasurementData.setValue("");
 
 		this.assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
@@ -141,7 +141,7 @@ public class MeasurementsTest {
 	public void testMeasurementDataWithNullPhenotypicIDAndNullValueAreSkipped() throws Exception {
 		final MeasurementData testMeasurementData =
 				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
-		testMeasurementData.setPhenotypeId(null);
+		testMeasurementData.setMeasurementDataId(null);
 		testMeasurementData.setValue(null);
 
 		this.assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
@@ -199,10 +199,10 @@ public class MeasurementsTest {
 		Mockito.when(testMeasurementData.getMeasurementVariable()).thenReturn(testMeasurementVariable);
 
 		final int testPhenotypeId = 245;
-		Mockito.when(testMeasurementData.getPhenotypeId()).thenReturn(testPhenotypeId);
+		Mockito.when(testMeasurementData.getMeasurementDataId()).thenReturn(testPhenotypeId);
 
 		measurements.saveMeasurementData(Collections.<MeasurementRow>singletonList(measurementRow));
-		Mockito.verify(testMeasurementData).setPhenotypeId(245);
+		Mockito.verify(testMeasurementData).setMeasurementDataId(245);
 	}
 
 	@Test
@@ -214,7 +214,7 @@ public class MeasurementsTest {
 		final MeasurementData testMeasurementData =
 				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "missing");
 		testMeasurementData.setOldValue(measurementOldValue);
-		testMeasurementData.setPhenotypeId(phenotypeId);
+		testMeasurementData.setMeasurementDataId(phenotypeId);
 
 		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 
@@ -243,7 +243,7 @@ public class MeasurementsTest {
 		final MeasurementData testMeasurementData =
 				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "missing");
 		testMeasurementData.setOldValue(measurementOldValue);
-		testMeasurementData.setPhenotypeId(phenotypeId);
+		testMeasurementData.setMeasurementDataId(phenotypeId);
 
 		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 
@@ -270,7 +270,7 @@ public class MeasurementsTest {
 		final MeasurementData testMeasurementData =
 				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "9");
 		testMeasurementData.setOldValue(measurementOldValue);
-		testMeasurementData.setPhenotypeId(phenotypeId);
+		testMeasurementData.setMeasurementDataId(phenotypeId);
 
 		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 
@@ -297,11 +297,11 @@ public class MeasurementsTest {
 		final MeasurementData testMeasurementData =
 				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "9");
 		testMeasurementData.setOldValue(measurementOldValue);
-		testMeasurementData.setPhenotypeId(phenotypeId);
+		testMeasurementData.setMeasurementDataId(phenotypeId);
 
 		final PhenotypeOutlier phenotypeOutlier = this.measurements.createPhenotypeOutlierFromMeasurement(testMeasurementData);
 
-		Assert.assertEquals("The phenotypeId is mapped incorrectly", testMeasurementData.getPhenotypeId(),
+		Assert.assertEquals("The phenotypeId is mapped incorrectly", testMeasurementData.getMeasurementDataId(),
 				phenotypeOutlier.getPhenotypeId());
 		Assert.assertEquals("The value is mapped incorrectly", testMeasurementData.getOldValue(), phenotypeOutlier.getValue());
 

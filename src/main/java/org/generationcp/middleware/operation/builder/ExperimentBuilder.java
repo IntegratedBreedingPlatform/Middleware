@@ -35,17 +35,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class ExperimentBuilder extends Builder {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(ExperimentBuilder.class);
 
+	private static final Logger LOG = LoggerFactory.getLogger(ExperimentBuilder.class);
 	private DaoFactory daoFactory;
-	
+
 	public ExperimentBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 		this.daoFactory = new DaoFactory(sessionProviderForLocal);
@@ -55,11 +57,11 @@ public class ExperimentBuilder extends Builder {
 		return this.getExperimentDao().count(dataSetId);
 	}
 
-	public List<Experiment> build(final int projectId, final TermId type, final int start, final int numOfRows, final VariableTypeList variableTypes)
-			{
+	public List<Experiment> build(final int projectId, final TermId type, final int start, final int numOfRows,
+		final VariableTypeList variableTypes) {
 		final List<Experiment> experiments = new ArrayList<>();
 		final List<ExperimentModel> experimentModels =
-				this.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
+			this.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
 		final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
 		for (final ExperimentModel experimentModel : experimentModels) {
 			experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap));
@@ -67,11 +69,12 @@ public class ExperimentBuilder extends Builder {
 		return experiments;
 	}
 
-	public List<Experiment> build(final int projectId, final TermId type, final int start, final int numOfRows, final VariableTypeList variableTypes,
-			final boolean hasVariableType) {
+	public List<Experiment> build(final int projectId, final TermId type, final int start, final int numOfRows,
+		final VariableTypeList variableTypes,
+		final boolean hasVariableType) {
 		final List<Experiment> experiments = new ArrayList<>();
 		final List<ExperimentModel> experimentModels =
-				this.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
+			this.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
 		for (final ExperimentModel experimentModel : experimentModels) {
 			experiments.add(this.createExperiment(experimentModel, variableTypes, hasVariableType));
 		}
@@ -91,13 +94,12 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	public List<Experiment> build(
-		final int projectId, final List<TermId> types, final int start, final int numOfRows, final VariableTypeList variableTypes)
-		{
+		final int projectId, final List<TermId> types, final int start, final int numOfRows, final VariableTypeList variableTypes) {
 		final Monitor monitor = MonitorFactory.start("Build Experiments");
 		try {
 			final List<Experiment> experiments = new ArrayList<>();
 			final List<ExperimentModel> experimentModels =
-					this.getExperimentDao().getExperiments(projectId, types, start, numOfRows, false);
+				this.getExperimentDao().getExperiments(projectId, types, start, numOfRows, false);
 			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
 			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
 
@@ -111,13 +113,13 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	public List<Experiment> build(final int projectId, final List<TermId> types, final int start, final int numOfRows,
-			final VariableTypeList variableTypes, final boolean firstInstance) {
+		final VariableTypeList variableTypes, final boolean firstInstance) {
 		final Monitor monitor = MonitorFactory.start("Build Experiments");
 		try {
 			final List<Experiment> experiments = new ArrayList<>();
 
 			final List<ExperimentModel> experimentModels =
-					this.getExperimentDao().getExperiments(projectId, types, start, numOfRows, firstInstance);
+				this.getExperimentDao().getExperiments(projectId, types, start, numOfRows, firstInstance);
 			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
 			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
 
@@ -138,8 +140,8 @@ public class ExperimentBuilder extends Builder {
 		return null;
 	}
 
-	public Experiment buildOne(final int projectId, final TermId type, final VariableTypeList variableTypes, final boolean hasVariableType)
-			{
+	public Experiment buildOne(final int projectId, final TermId type, final VariableTypeList variableTypes,
+		final boolean hasVariableType) {
 		final List<Experiment> experiments = this.build(projectId, type, 0, 1, variableTypes, hasVariableType);
 		if (experiments != null && !experiments.isEmpty()) {
 			return experiments.get(0);
@@ -148,7 +150,7 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private Experiment createExperiment(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
-			final Map<Integer, StockModel> stockModelMap) {
+		final Map<Integer, StockModel> stockModelMap) {
 		final Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
 		experiment.setFactors(this.getFactors(experimentModel, variableTypes, stockModelMap));
@@ -158,8 +160,8 @@ public class ExperimentBuilder extends Builder {
 		return experiment;
 	}
 
-	private Experiment createExperiment(final ExperimentModel experimentModel, final VariableTypeList variableTypes, final boolean hasVariableType)
-			{
+	private Experiment createExperiment(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
+		final boolean hasVariableType) {
 		final Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
 		experiment.setFactors(this.getFactors(experimentModel, variableTypes, hasVariableType));
@@ -176,13 +178,11 @@ public class ExperimentBuilder extends Builder {
 		return variates.sort();
 	}
 
-	private void addPlotVariates(final ExperimentModel experimentModel, final VariableList variates, final VariableTypeList variableTypes)
-			{
+	private void addPlotVariates(final ExperimentModel experimentModel, final VariableList variates, final VariableTypeList variableTypes) {
 		this.addVariates(experimentModel, variates, variableTypes);
 	}
 
-	private void addVariates(final ExperimentModel experiment, final VariableList variates, final VariableTypeList variableTypes)
-			{
+	private void addVariates(final ExperimentModel experiment, final VariableList variates, final VariableTypeList variableTypes) {
 		if (experiment.getPhenotypes() != null) {
 			for (final Phenotype phenotype : experiment.getPhenotypes()) {
 				final DMSVariableType variableType = variableTypes.findById(phenotype.getObservableId());
@@ -190,14 +190,14 @@ public class ExperimentBuilder extends Builder {
 				// added this validation for now, to handle the said scenario, otherwise, and NPE is thrown
 				// in the future, trial constant will no longer be saved at the measurements level
 				if (variableType != null) {
-					Variable var =  null;
+					Variable var = null;
 					if (variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());						
+						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());
 						if (phenotype.getcValueId() == null && phenotype.getValue() != null) {
 							var.setValue(phenotype.getValue());
 							var.setCustomValue(true);
 						}
-						
+
 						variates.add(var);
 					} else {
 						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue());
@@ -210,8 +210,8 @@ public class ExperimentBuilder extends Builder {
 		}
 	}
 
-	private VariableList getFactors(final ExperimentModel experimentModel, final VariableTypeList variableTypes, final Map<Integer, StockModel> stockModelMap)
-			{
+	private VariableList getFactors(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
+		final Map<Integer, StockModel> stockModelMap) {
 		final VariableList factors = new VariableList();
 
 		this.addPlotExperimentFactors(factors, experimentModel, variableTypes, stockModelMap);
@@ -221,8 +221,8 @@ public class ExperimentBuilder extends Builder {
 		return factors.sort();
 	}
 
-	private VariableList getFactors(final ExperimentModel experimentModel, final VariableTypeList variableTypes, final boolean hasVariableType)
-			{
+	private VariableList getFactors(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
+		final boolean hasVariableType) {
 		final VariableList factors = new VariableList();
 
 		this.addPlotExperimentFactors(factors, experimentModel, variableTypes, hasVariableType);
@@ -232,7 +232,8 @@ public class ExperimentBuilder extends Builder {
 		return factors.sort();
 	}
 
-	private void addLocationFactors(final ExperimentModel experimentModel, final VariableList factors, final VariableTypeList variableTypes) {
+	private void addLocationFactors(final ExperimentModel experimentModel, final VariableList factors,
+		final VariableTypeList variableTypes) {
 		for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
 			if (PhenotypicType.TRIAL_ENVIRONMENT == variableType.getRole()) {
 				final Variable variable = this.createLocationFactor(experimentModel.getGeoLocation(), variableType);
@@ -247,7 +248,7 @@ public class ExperimentBuilder extends Builder {
 
 	protected Variable createLocationFactor(final Geolocation geoLocation, final DMSVariableType variableType) {
 		final StandardVariable standardVariable = variableType.getStandardVariable();
-		
+
 		if (standardVariable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 			return new Variable(variableType, geoLocation.getDescription());
 		}
@@ -263,38 +264,37 @@ public class ExperimentBuilder extends Builder {
 		if (standardVariable.getId() == TermId.ALTITUDE.getId()) {
 			return new Variable(variableType, geoLocation.getAltitude());
 		}
-		final String locVal = this.findLocationValue(variableType.getId(), geoLocation.getProperties());
-		if (locVal != null) {
-			return new Variable(variableType, locVal);
+
+		final Optional<GeolocationProperty>
+			geolocationPropertyOptional =
+			Optional.ofNullable(geoLocation.getProperties()).map(Collection::stream)
+				.orElseGet(Stream::empty).filter(o -> o.getTypeId().intValue() == variableType.getId()).findFirst();
+
+		if (geolocationPropertyOptional.isPresent()) {
+			return new Variable(geolocationPropertyOptional.get().getGeolocationPropertyId(), variableType,
+				geolocationPropertyOptional.get().getValue());
 		}
+
 		return null;
 	}
 
-	private String findLocationValue(final int stdVariableId, final List<GeolocationProperty> properties) {
-		if (properties != null) {
-			for (final GeolocationProperty property : properties) {
-				if (property.getTypeId().equals(stdVariableId)) {
-					return property.getValue();
-				}
-			}
-		}
-		return null;
-	}
-
-	private void addPlotExperimentFactors(final VariableList variables, final ExperimentModel experimentModel, final VariableTypeList variableTypes,
-			final Map<Integer, StockModel> stockModelMap) {
+	private void addPlotExperimentFactors(final VariableList variables, final ExperimentModel experimentModel,
+		final VariableTypeList variableTypes,
+		final Map<Integer, StockModel> stockModelMap) {
 		this.addExperimentFactors(variables, experimentModel, variableTypes);
 		this.addGermplasmFactors(variables, experimentModel, variableTypes, stockModelMap);
 		this.addObsUnitIdFactor(variables, experimentModel, variableTypes);
 	}
 
-	private void addPlotExperimentFactors(final VariableList variables, final ExperimentModel experimentModel, final VariableTypeList variableTypes,
-			final boolean hasVariableType) {
+	private void addPlotExperimentFactors(final VariableList variables, final ExperimentModel experimentModel,
+		final VariableTypeList variableTypes,
+		final boolean hasVariableType) {
 		this.addExperimentFactors(variables, experimentModel, variableTypes, hasVariableType);
 		this.addGermplasmFactors(variables, experimentModel, variableTypes, null);
 	}
 
-	private void addObsUnitIdFactor(final VariableList factors, final ExperimentModel experimentModel, final VariableTypeList variableTypes) {
+	private void addObsUnitIdFactor(final VariableList factors, final ExperimentModel experimentModel,
+		final VariableTypeList variableTypes) {
 		for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
 			final StandardVariable standardVariable = variableType.getStandardVariable();
 			if (standardVariable.getId() == TermId.OBS_UNIT_ID.getId()) {
@@ -305,7 +305,7 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	void addGermplasmFactors(final VariableList factors, final ExperimentModel experimentModel, final VariableTypeList variableTypes,
-			final Map<Integer, StockModel> stockModelMap) {
+		final Map<Integer, StockModel> stockModelMap) {
 		StockModel stockModel = experimentModel.getStock();
 		if (stockModel != null) {
 			final Integer stockId = stockModel.getStockId();
@@ -314,19 +314,19 @@ public class ExperimentBuilder extends Builder {
 			} else {
 				stockModel = this.daoFactory.getStockDao().getById(stockId);
 			}
-			
+
 			for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
 				final Variable var = this.createGermplasmFactor(stockModel, variableType);
-				if(var != null){
+				if (var != null) {
 					factors.add(var);
-				}				
+				}
 			}
 		}
 	}
 
 	protected Variable createGermplasmFactor(final StockModel stockModel, final DMSVariableType variableType) {
 		final StandardVariable standardVariable = variableType.getStandardVariable();
-		
+
 		if (standardVariable.getId() == TermId.ENTRY_NO.getId()) {
 			return new Variable(variableType, stockModel.getUniqueName());
 		}
@@ -348,7 +348,7 @@ public class ExperimentBuilder extends Builder {
 		if (val != null) {
 			return new Variable(variableType, val);
 		}
-		
+
 		return null;
 	}
 
@@ -363,22 +363,29 @@ public class ExperimentBuilder extends Builder {
 		return null;
 	}
 
-	private void addExperimentFactors(final VariableList variables, final ExperimentModel experimentModel, final VariableTypeList variableTypes)
-			{
+	private void addExperimentFactors(final VariableList variables, final ExperimentModel experimentModel,
+		final VariableTypeList variableTypes) {
 		if (experimentModel.getProperties() != null) {
 			for (final ExperimentProperty property : experimentModel.getProperties()) {
-				variables.add(this.createVariable(property, variableTypes, PhenotypicType.TRIAL_DESIGN));
+				// Exclude the BLOCK_ID experiment property because it is not expected to included in the dataset variable list.
+				if (!property.getTypeId().equals(TermId.BLOCK_ID.getId())) {
+					variables.add(this.createVariable(property, variableTypes, PhenotypicType.TRIAL_DESIGN));
+				}
 			}
 		}
 	}
 
-	private void addExperimentFactors(final VariableList variables, final ExperimentModel experimentModel, final VariableTypeList variableTypes,
-			final boolean hasVariableType) {
+	private void addExperimentFactors(final VariableList variables, final ExperimentModel experimentModel,
+		final VariableTypeList variableTypes,
+		final boolean hasVariableType) {
 		if (experimentModel.getProperties() != null) {
 			for (final ExperimentProperty property : experimentModel.getProperties()) {
-				final Variable var = this.createVariable(property, variableTypes, hasVariableType, PhenotypicType.TRIAL_DESIGN);
-				if (var.getVariableType() != null) {
-					variables.add(var);
+				// Exclude the BLOCK_ID experiment property because it is not expected to included in the dataset variable list.
+				if (!property.getTypeId().equals(TermId.BLOCK_ID.getId())) {
+					final Variable var = this.createVariable(property, variableTypes, hasVariableType, PhenotypicType.TRIAL_DESIGN);
+					if (var.getVariableType() != null) {
+						variables.add(var);
+					}
 				}
 			}
 		}
@@ -393,8 +400,8 @@ public class ExperimentBuilder extends Builder {
 		return variable;
 	}
 
-	protected Variable createVariable(final ExperimentProperty property, final VariableTypeList variableTypes, final boolean hasVariableType, final PhenotypicType role)
-			{
+	protected Variable createVariable(final ExperimentProperty property, final VariableTypeList variableTypes,
+		final boolean hasVariableType, final PhenotypicType role) {
 		final Variable variable = new Variable();
 		variable.setVariableType(variableTypes.findById(property.getTypeId()), hasVariableType);
 		variable.setValue(property.getValue());

@@ -2,7 +2,11 @@
 package org.generationcp.middleware;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.etl.*;
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -11,7 +15,11 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.workbench.*;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.UserRole;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -24,7 +32,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 @Ignore("This is just for seeding some test data. Not intended to run regularly on CI.")
 @TransactionConfiguration(defaultRollback = false)
@@ -78,6 +90,8 @@ public class DataSetupTest extends IntegrationTestBase {
     private static final String TRIAL = "TRIAL";
     private static final String ENTRY = "ENTRY";
     private static final String PLOT = "PLOT";
+    private static final String REP_NO = "REP_NO";
+
 
     private static final String CONDUCTED = "CONDUCTED";
     private static final String DBCV = "DBCV";
@@ -286,7 +300,13 @@ public class DataSetupTest extends IntegrationTestBase {
         final MeasurementVariable plotFactor = this.createMeasurementVariable(TermId.PLOT_NO.getId(), "PLOT_NO",
                 "Field plot - enumerated (number)", "Field plot", DataSetupTest.ENUMERATED, DataSetupTest.NUMBER,
                 DataSetupTest.NUMERIC, null, DataSetupTest.PLOT, PhenotypicType.TRIAL_DESIGN, true);
+
         factors.add(plotFactor);
+
+        final MeasurementVariable repNoFactor = this.createMeasurementVariable(TermId.REP_NO.getId(), "REP_NO",
+            "Replication - assigned (number)", "Replication factor", DataSetupTest.ENUMERATED, DataSetupTest.NUMBER,
+            DataSetupTest.NUMERIC, null, DataSetupTest.REP_NO, PhenotypicType.TRIAL_DESIGN, true);
+        factors.add(repNoFactor);
 
         workbook.setFactors(factors);
 
@@ -303,39 +323,46 @@ public class DataSetupTest extends IntegrationTestBase {
         final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
         MeasurementRow row;
         List<MeasurementData> dataList;
-        for (int i = 0; i < DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
-            row = new MeasurementRow();
-            dataList = new ArrayList<MeasurementData>();
-            final MeasurementData entryData = new MeasurementData(entryFactor.getLabel(), String.valueOf(i));
-            entryData.setMeasurementVariable(entryFactor);
-            dataList.add(entryData);
+        for (int repNo = 1; repNo <= 2; repNo++) {
+            for (int i = 0; i < DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
+                row = new MeasurementRow();
+                dataList = new ArrayList<>();
+                final MeasurementData entryData = new MeasurementData(entryFactor.getLabel(), String.valueOf(i));
+                entryData.setMeasurementVariable(entryFactor);
+                dataList.add(entryData);
 
-            final MeasurementData designationData = new MeasurementData(designationFactor.getLabel(),
+                final MeasurementData designationData = new MeasurementData(designationFactor.getLabel(),
                     DataSetupTest.GERMPLSM_PREFIX + i);
-            designationData.setMeasurementVariable(designationFactor);
-            dataList.add(designationData);
+                designationData.setMeasurementVariable(designationFactor);
+                dataList.add(designationData);
 
-            final MeasurementData crossData = new MeasurementData(crossFactor.getLabel(), DataSetupTest.GERMPLSM_PREFIX
+                final MeasurementData crossData = new MeasurementData(crossFactor.getLabel(), DataSetupTest.GERMPLSM_PREFIX
                     + i + "MP-" + i + "/" + DataSetupTest.GERMPLSM_PREFIX + i + "FP-" + i);
-            crossData.setMeasurementVariable(crossFactor);
-            dataList.add(crossData);
+                crossData.setMeasurementVariable(crossFactor);
+                dataList.add(crossData);
 
-            final MeasurementData gidData = new MeasurementData(gidFactor.getLabel(), String.valueOf(gids[i]));
-            gidData.setMeasurementVariable(gidFactor);
-            dataList.add(gidData);
+                final MeasurementData gidData = new MeasurementData(gidFactor.getLabel(), String.valueOf(gids[i]));
+                gidData.setMeasurementVariable(gidFactor);
+                dataList.add(gidData);
 
-            final MeasurementData plotData = new MeasurementData(plotFactor.getLabel(), String.valueOf(i));
-            plotData.setMeasurementVariable(plotFactor);
-            dataList.add(plotData);
+                final MeasurementData plotData = new MeasurementData(plotFactor.getLabel(), String.valueOf(i));
+                plotData.setMeasurementVariable(plotFactor);
+                dataList.add(plotData);
 
-            final MeasurementData variateData = new MeasurementData(variate.getLabel(),
+                final MeasurementData repNoData = new MeasurementData(repNoFactor.getLabel(), String.valueOf(repNo));
+                repNoData.setMeasurementVariable(repNoFactor);
+                dataList.add(repNoData);
+
+                final MeasurementData variateData = new MeasurementData(variate.getLabel(),
                     String.valueOf(new Random().nextInt(100)));
-            variateData.setMeasurementVariable(variate);
-            dataList.add(variateData);
+                variateData.setMeasurementVariable(variate);
+                dataList.add(variateData);
 
-            row.setDataList(dataList);
-            observations.add(row);
+                row.setDataList(dataList);
+                observations.add(row);
+            }
         }
+
         workbook.setObservations(observations);
 
         // Save the workbook
