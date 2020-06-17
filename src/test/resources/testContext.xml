@@ -267,4 +267,12 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="studyInstanceService" class="org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
+	<bean id="experimentModelGenerator" class="org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
 </beans>

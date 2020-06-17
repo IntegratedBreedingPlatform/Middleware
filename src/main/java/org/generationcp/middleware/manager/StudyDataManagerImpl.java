@@ -1113,8 +1113,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public StudyMetadata getStudyMetadataForGeolocationId(final Integer geolocationId) {
-		return this.getDmsProjectDao().getStudyMetadataForGeolocationId(geolocationId);
+	public StudyMetadata getStudyMetadataForInstance(final Integer instanceId) {
+		return this.getDmsProjectDao().getStudyMetadataForInstanceId(instanceId);
 	}
 
 	@Override
@@ -1259,7 +1259,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public String getBlockId(final int datasetId, final String trialInstance) {
+	public String getBlockId(final int datasetId, final Integer trialInstance) {
 		return this.daoFactory.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
 
 	}
@@ -1276,12 +1276,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return studyReference;
 	}
 
-	public Boolean instanceExists(final Set<Integer> instanceIds) {
-		return this.getGeolocationDao().instanceExists(instanceIds);
-	}
-
 	@Override
-	public Map<Integer, String> getGeolocationByVariableId(final Integer datasetId, final Integer instanceDbId) {
+	public Map<Integer, String> getGeolocationByInstanceId(final Integer datasetId, final Integer instanceDbId) {
 		final Geolocation geoLocation = this.getGeolocationDao().getById(instanceDbId);
 		final Map<Integer, String> geoLocationMap =
 			this.getGeolocationPropertyDao().getGeoLocationPropertyByVariableId(datasetId, instanceDbId);
@@ -1304,6 +1300,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 
 		return geoLocationMap;
+	}
+
+	// TODO IBP-3305 Determine if this can be replaced with StudyDataManager#areAllInstancesExistInDataset
+	@Override
+	public Boolean instancesExist(final Set<Integer> instanceIds) {
+		return this.daoFactory.getGeolocationDao().isInstancesExist(instanceIds);
 	}
 
 	@Override

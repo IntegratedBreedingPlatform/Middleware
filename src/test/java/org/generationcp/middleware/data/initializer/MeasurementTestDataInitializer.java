@@ -35,7 +35,7 @@ public class MeasurementTestDataInitializer {
 
 		measurementData.setMeasurementVariable(this.createMeasurementVariable(termId, variableDataTypeId));
 
-		measurementData.setPhenotypeId(123);
+		measurementData.setMeasurementDataId(123);
 		measurementData.setVariable(new Variable());
 
 		if (TermId.CATEGORICAL_VARIABLE.getId() == variableDataTypeId) {

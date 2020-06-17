@@ -473,7 +473,7 @@ public interface FieldbookService {
 	 *            the trial instance
 	 * @return the block id
 	 */
-	String getBlockId(int datasetId, String trialInstance);
+	String getBlockId(int datasetId, Integer trialInstance);
 
 	/**
 	 * Gets the folder name by id.
