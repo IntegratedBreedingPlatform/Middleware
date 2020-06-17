@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
-import org.generationcp.middleware.dao.dms.InstanceDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.InstanceData;
@@ -71,9 +70,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		Preconditions.checkArgument(numberOfInstancesToGenerate > 0);
 
 		// Retrieve existing study instances
-		final List<ExperimentModel> environments = this.daoFactory.getInstanceDao().getEnvironmentsByDataset(datasetId, true);
-		final List<Integer> instanceNumbers = environments.stream().map(ExperimentModel::getGeoLocation)
-			.mapToInt(o -> Integer.valueOf(o.getDescription())).boxed().collect(Collectors.toList());
+		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId);
+		final List<Integer> instanceNumbers =
+			geolocations.stream().mapToInt(o -> Integer.valueOf(o.getDescription())).boxed().collect(Collectors.toList());
 
 		final List<StudyInstance> studyInstances = new ArrayList<>();
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
@@ -147,13 +146,12 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	@Override
 	public void deleteStudyInstances(final Integer studyId, final List<Integer> instanceIds) {
 		final Integer environmentDatasetId = this.studyService.getEnvironmentDatasetId(studyId);
-		final InstanceDao environmentDao = this.daoFactory.getInstanceDao();
-		final List<ExperimentModel> allEnvironments = environmentDao.getEnvironmentsByDataset(environmentDatasetId, true);
-		final List<ExperimentModel> environmentsToDelete = allEnvironments.stream()
-			.filter(instance -> instanceIds.contains(instance.getGeoLocation().getLocationId())).collect(
+		final List<Geolocation> allEnvironments = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId);
+		final List<Geolocation> environmentsToDelete = allEnvironments.stream()
+			.filter(instance -> instanceIds.contains(instance.getLocationId())).collect(
 				Collectors.toList());
 		final List<Integer> instanceNumbersToDelete =
-			environmentsToDelete.stream().map(ExperimentModel::getGeoLocation).mapToInt(o -> Integer.valueOf(o.getDescription())).boxed()
+			environmentsToDelete.stream().mapToInt(o -> Integer.valueOf(o.getDescription())).boxed()
 				.collect(Collectors.toList());
 
 		// Delete plot and environment experiments
@@ -168,18 +166,18 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
 		if (!hasExperimentalDesign) {
 			final Integer startingInstanceNumber = instanceNumbersToDelete.isEmpty() ? 1 : Collections.min(instanceNumbersToDelete);
-			final List<ExperimentModel> instancesToUpdate =
+			final List<Geolocation> instancesToUpdate =
 				allEnvironments.stream()
-					.filter(instance -> !instanceNumbersToDelete.contains(Integer.valueOf(instance.getGeoLocation().getDescription()))
-						&& Integer.valueOf(instance.getGeoLocation().getDescription()) > startingInstanceNumber).collect(
+					.filter(instance -> !instanceNumbersToDelete.contains(Integer.valueOf(instance.getDescription()))
+						&& Integer.valueOf(instance.getDescription()) > startingInstanceNumber).collect(
 					Collectors.toList());
 			// Unfortunately, not possible in MySQL 5 to do batch update as row_number function is only available in MySQL 8
 			// Also tried using MySQL variable assignment like @instance_number:=@instance_number + 1 but it causes Hibernate error
 			// as it's being treated as named parameter. Hopefully can be optimized when we upgrade Hibernate and/or MySQL version
 			Integer instanceNumber = startingInstanceNumber;
-			for (final ExperimentModel instance : instancesToUpdate) {
-				instance.getGeoLocation().setDescription(String.valueOf(instanceNumber++));
-				experimentDao.saveOrUpdate(instance);
+			for (final Geolocation instance : instancesToUpdate) {
+				instance.setDescription(String.valueOf(instanceNumber++));
+				this.daoFactory.getGeolocationDao().saveOrUpdate(instance);
 			}
 		}
 	}

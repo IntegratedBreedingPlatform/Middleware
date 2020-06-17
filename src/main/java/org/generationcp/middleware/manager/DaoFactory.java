@@ -20,7 +20,6 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
-import org.generationcp.middleware.dao.dms.InstanceDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
@@ -249,12 +248,6 @@ public class DaoFactory {
 		final ExperimentTransactionDAO experimentTransactionDAO = new ExperimentTransactionDAO();
 		experimentTransactionDAO.setSession(this.sessionProvider.getSession());
 		return experimentTransactionDAO;
-	}
-
-	public InstanceDao getInstanceDao() {
-		final InstanceDao instanceDao = new InstanceDao();
-		instanceDao.setSession(this.sessionProvider.getSession());
-		return instanceDao;
 	}
 
 	public ExperimentPropertyDao getExperimentPropertyDao() {

@@ -1305,7 +1305,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	// TODO IBP-3305 Determine if this can be replaced with StudyDataManager#areAllInstancesExistInDataset
 	@Override
 	public Boolean instancesExist(final Set<Integer> instanceIds) {
-		return this.daoFactory.getInstanceDao().instancesExist(instanceIds);
+		return this.daoFactory.getGeolocationDao().isInstancesExist(instanceIds);
 	}
 
 	@Override
