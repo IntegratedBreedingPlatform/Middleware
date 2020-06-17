@@ -237,6 +237,7 @@ public class PlantingServiceImpl implements PlantingService {
 			.getTransactionsByStudyId(studyId, transactionStatus, ExperimentTransactionType.PLANTING);
 	}
 
+	@Override
 	public List<Transaction> getPlantingTransactionsByInstanceIds(final List<Integer> instanceIds,
 		final TransactionStatus transactionStatus) {
 		return daoFactory.getExperimentTransactionDao()

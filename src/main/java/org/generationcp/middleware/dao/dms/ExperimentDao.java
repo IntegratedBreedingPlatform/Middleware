@@ -158,7 +158,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				return list.get(0);
 			}
 		} catch (final HibernateException e) {
-			final String message = "Error at getExperimentByProjectIdAndLocation=" + instanceId
+			final String message = "Error at getExperimentByTypeInstanceId=" + instanceId
 				+ " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);

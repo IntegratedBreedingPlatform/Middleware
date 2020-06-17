@@ -33,7 +33,7 @@ public class ExperimentTransactionDAO extends GenericDAO<ExperimentTransaction, 
 			return (Long) query.uniqueResult();
 		} catch (final HibernateException e) {
 			final String message =
-				"Error at countTransactionsByType ndExperimentIds = " + ndExperimentIds + ", transactionType = " + transactionStatus
+				"Error at countPlantingTransactionsByStatus ndExperimentIds = " + ndExperimentIds + ", transactionType = " + transactionStatus
 					.getValue();
 			ExperimentTransactionDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);

@@ -809,7 +809,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				return null;
 			}
 		} catch (final HibernateException e) {
-			final String message = "Error with getStudyMetadataForGeolocationId() query from study with geoloCationId: " + instanceId;
+			final String message = "Error with getStudyMetadataForInstanceId() query from study with instanceId: " + instanceId;
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
