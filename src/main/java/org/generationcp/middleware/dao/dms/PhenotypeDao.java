@@ -1253,6 +1253,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public Phenotype getPhenotype(final Integer experimentId, final Integer phenotypeId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.createAlias("experiment", "experiment");
 		criteria.add(Restrictions.eq("phenotypeId", phenotypeId));
 		criteria.add(Restrictions.eq("experiment.ndExperimentId", experimentId));
 		return (Phenotype) criteria.uniqueResult();

@@ -43,7 +43,7 @@ public class MeasurementDataTestDataInitializer {
 		final MeasurementData measurementData = new MeasurementData(label, value);
 		measurementData.setEditable(false);
 		measurementData.setLabel(label);
-		measurementData.setPhenotypeId(0);
+		measurementData.setMeasurementDataId(0);
 		measurementData.setValue(value);
 		measurementData.setcValueId("1");
 

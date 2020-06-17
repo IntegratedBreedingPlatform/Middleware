@@ -6,6 +6,7 @@ import com.google.common.collect.Table;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.FormulaDAO;
+import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
@@ -27,6 +28,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -123,6 +125,9 @@ public class DatasetServiceImplTest {
 	private DmsProjectDao dmsProjectDao;
 
 	@Mock
+	private DatasetTypeDAO datasetTypeDAO;
+
+	@Mock
 	private ExperimentDao experimentDao;
 
 	@Mock
@@ -158,12 +163,14 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
 		when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
 		when(this.daoFactory.getObservationUnitsSearchDAO()).thenReturn(this.obsUnitsSearchDao);
+		when(this.daoFactory.getDatasetTypeDao()).thenReturn(this.datasetTypeDAO);
 	}
 
 	@Test
 	public void testCountPhenotypes() {
 		final long count = 5;
-		when(this.phenotypeDao.countPhenotypesForDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyListOf(Integer.class))).thenReturn(count);
+		when(this.phenotypeDao.countPhenotypesForDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyListOf(Integer.class)))
+			.thenReturn(count);
 		Assert.assertEquals(count, this.datasetService.countObservationsByVariables(123, Arrays.asList(11, 22)));
 	}
 
@@ -181,7 +188,7 @@ public class DatasetServiceImplTest {
 	public void testUpdateDependentPhenotypesStatusByGeolocation() {
 		final Integer inputId = 1000;
 		final Formula formula = new Formula();
-		final CVTerm targetCVTerm =  new CVTerm();
+		final CVTerm targetCVTerm = new CVTerm();
 		targetCVTerm.setCvTermId(1001);
 		formula.setTargetCVTerm(targetCVTerm);
 		when(this.formulaDao.getByInputIds(Arrays.asList(inputId))).thenReturn(Arrays.asList(formula));
@@ -332,7 +339,8 @@ public class DatasetServiceImplTest {
 		final int observationUnitId = ran.nextInt();
 		Mockito.doReturn(new ArrayList<Formula>()).when(this.formulaDao).getByInputId(variableId);
 		this.datasetService.updateDependentPhenotypesAsOutOfSync(variableId, Sets.newHashSet(observationUnitId));
-		Mockito.verify(this.phenotypeDao, Mockito.never()).updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
+		Mockito.verify(this.phenotypeDao, Mockito.never())
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
 	}
 
 	@Test
@@ -367,7 +375,8 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testCountPhenotypesByInstance() {
 		final long count = 6;
-		Mockito.when(this.phenotypeDao.countPhenotypesForDatasetAndInstance(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt())).thenReturn(count);
+		Mockito.when(this.phenotypeDao.countPhenotypesForDatasetAndInstance(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt()))
+			.thenReturn(count);
 		Assert.assertEquals(count, this.datasetService.countObservationsByInstance(1, 2));
 	}
 
@@ -381,8 +390,12 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testGetDataset() {
 		final List<DatasetDTO> datasetDTOList = this.setUpDatasets(null);
-		Mockito.when(this.datasetService.getDataset(datasetDTOList.get(4).getDatasetId())).thenReturn(datasetDTOList.get(4));
-		final DatasetDTO result = this.datasetService.getDataset(datasetDTOList.get(4).getDatasetId());
+		final DatasetDTO datasetDTO = datasetDTOList.get(4);
+		final DatasetType datasetType = new DatasetType();
+		datasetType.setDatasetTypeId(datasetDTO.getDatasetTypeId());
+		Mockito.when(this.datasetTypeDAO.getById(datasetDTO.getDatasetTypeId())).thenReturn(datasetType);
+		Mockito.when(this.datasetService.getDataset(datasetDTOList.get(4).getDatasetId())).thenReturn(datasetDTO);
+		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
 		assertThat(datasetDTOList.get(4), equalTo(result));
 	}
 
@@ -401,12 +414,13 @@ public class DatasetServiceImplTest {
 		final Map<String, ObservationUnitData> variables = new HashMap<>();
 		variables.put(OBS_UNIT_ID, new ObservationUnitData("obunit123"));
 		observationUnitRow.setVariables(variables);
-		final MeasurementVariable trialInstanceVariable = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(),"1");
+		final MeasurementVariable trialInstanceVariable = MeasurementVariableTestDataInitializer
+			.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(), "1");
 		this.datasetService.addStudyVariablesToUnitRows(Arrays.asList(observationUnitRow), Arrays.asList(trialInstanceVariable));
 		Assert.assertNotNull(observationUnitRow.getVariables().get(trialInstanceVariable.getName()));
 	}
 
-	private  List<DatasetDTO> setUpDatasets(final Integer datasetTypeId){
+	private List<DatasetDTO> setUpDatasets(final Integer datasetTypeId) {
 		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
 		DatasetDTO datasetDTO;
 
@@ -549,20 +563,21 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.experimentDao).merge(experimentModelArgumentCaptor.capture());
 		Assert.assertTrue(CollectionUtils.isEmpty(experimentModelArgumentCaptor.getValue().getPhenotypes()));
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotype);
-		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(observationUnitId)), new HashSet<>(Arrays.asList(term1.getCvTermId(), term2.getCvTermId())));
+		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(observationUnitId)),
+			new HashSet<>(Arrays.asList(term1.getCvTermId(), term2.getCvTermId())));
 
 	}
 
-    @Test
-    public void testGetDatasetInstances() {
-        final Random random = new Random();
-        final int datasetId = random.nextInt();
-        this.datasetService.getDatasetInstances(datasetId);
-        Mockito.verify(this.dmsProjectDao).getDatasetInstances(datasetId);
-    }
+	@Test
+	public void testGetDatasetInstances() {
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		this.datasetService.getDatasetInstances(datasetId);
+		Mockito.verify(this.dmsProjectDao).getDatasetInstances(datasetId);
+	}
 
-    @Test
-	public void countObservationsGroupedByInstance_Verified_ExperimentCountObservationsPerInstance(){
+	@Test
+	public void countObservationsGroupedByInstance_Verified_ExperimentCountObservationsPerInstance() {
 		final Random random = new Random();
 		final int datasetId = random.nextInt();
 		this.datasetService.countObservationsGroupedByInstance(datasetId);
@@ -570,7 +585,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void getAllObservationUnitRows_Verified_DAOInteractions(){
+	public void getAllObservationUnitRows_Verified_DAOInteractions() {
 		final Random random = new Random();
 		final int datasetId = random.nextInt();
 		final int studyId = random.nextInt();
@@ -579,11 +594,12 @@ public class DatasetServiceImplTest {
 
 		Mockito.doReturn(new ArrayList<>()).when(this.studyService).getGenericGermplasmDescriptors(studyId);
 		Mockito.doReturn(new ArrayList<>()).when(this.studyService).getAdditionalDesignFactors(studyId);
-		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
+		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao)
+			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
 		Mockito.verify(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
-		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId,Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
+		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.obsUnitsSearchDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class));
 
 	}
@@ -683,7 +699,8 @@ public class DatasetServiceImplTest {
 		Assert.assertFalse(phenotype.isChanged());
 
 		Assert.assertNull(phenotypeArgumentCaptorValue.getDraftValue());
-		Mockito.verify(this.phenotypeDao, Mockito.never()).updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
+		Mockito.verify(this.phenotypeDao, Mockito.never())
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
 	}
 
 	@Test
@@ -723,7 +740,8 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
 		Assert.assertTrue(phenotype.isChanged());
 		// Variable is not used as input to formula hence nothing to update as out of sync
-		Mockito.verify(this.phenotypeDao, Mockito.never()).updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
+		Mockito.verify(this.phenotypeDao, Mockito.never())
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
 
 	}
 
@@ -760,7 +778,8 @@ public class DatasetServiceImplTest {
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
-		Mockito.verify(this.phenotypeDao, Mockito.never()).updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
+		Mockito.verify(this.phenotypeDao, Mockito.never())
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
 	}
 
 	@Test
@@ -793,11 +812,12 @@ public class DatasetServiceImplTest {
 
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
-		this.datasetService.rejectDatasetDraftData( datasetId);
+		this.datasetService.rejectDatasetDraftData(datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
-		Mockito.verify(this.phenotypeDao, Mockito.never()).updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
+		Mockito.verify(this.phenotypeDao, Mockito.never())
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
 	}
 
 	@Test
@@ -883,7 +903,8 @@ public class DatasetServiceImplTest {
 		final Integer targetVariableId = new Random().nextInt();
 		this.setupTargetVariable(studyId, variableId, targetVariableId);
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
-		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES)).thenReturn(variables);
+		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES))
+			.thenReturn(variables);
 		this.datasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
@@ -932,9 +953,9 @@ public class DatasetServiceImplTest {
 		variable.setPossibleValues(Lists.newArrayList(valueReference));
 		final List<MeasurementVariable> variables = Lists.newArrayList(variable);
 
-
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
-		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES)).thenReturn(variables);
+		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES))
+			.thenReturn(variables);
 		this.datasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
@@ -974,7 +995,7 @@ public class DatasetServiceImplTest {
 		final ArgumentCaptor<ExperimentModel> experimentCaptor = ArgumentCaptor.forClass(ExperimentModel.class);
 		Mockito.verify(this.experimentDao, Mockito.times(plotCount * numberOfSubObsUnits)).save(experimentCaptor.capture());
 		final List<ExperimentModel> subObsExperiments = experimentCaptor.getAllValues();
-		for (int i=0; i<plotCount; i++){
+		for (int i = 0; i < plotCount; i++) {
 			final ExperimentModel plotExperiment = plotExperiments.get(i);
 			final List<ExperimentModel> plotSubObsUnits = subObsExperiments.subList(i * numberOfSubObsUnits, (i + 1) * numberOfSubObsUnits);
 			for (final ExperimentModel subObsUnit : plotSubObsUnits) {
@@ -987,6 +1008,7 @@ public class DatasetServiceImplTest {
 			}
 		}
 	}
+
 	@Test
 	public void testFindAdditionalEnvironmentFactors() {
 		final Random random = new Random();
@@ -1029,7 +1051,6 @@ public class DatasetServiceImplTest {
 		Assert.assertEquals(result.get(0).getId().intValue(), measurementVariable.getTermId());
 	}
 
-
 	@Test
 	public void testGetEnvironmentConditionVariableNames() {
 		final Random random = new Random();
@@ -1064,11 +1085,11 @@ public class DatasetServiceImplTest {
 		this.datasetService.importDataset(datasetId, table, draftMode, false);
 	}
 
-	private  List<ExperimentModel> getPlotExperiments(final Integer count) {
+	private List<ExperimentModel> getPlotExperiments(final Integer count) {
 		final List<ExperimentModel> plotUnits = new ArrayList<>();
-		for (int i=0; i<count; i++) {
+		for (int i = 0; i < count; i++) {
 			final Random random = new Random();
-			final ExperimentModel plot= new ExperimentModel();
+			final ExperimentModel plot = new ExperimentModel();
 			final Geolocation geoLocation = new Geolocation();
 			geoLocation.setLocationId(random.nextInt());
 			plot.setGeoLocation(geoLocation);

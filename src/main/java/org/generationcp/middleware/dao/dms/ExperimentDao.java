@@ -148,6 +148,24 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return null;
 	}
 
+	public ExperimentModel getExperimentByTypeInstanceId(final Integer experimentType, final Integer instanceId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("geoLocation.locationId", instanceId));
+			criteria.add(Restrictions.eq("typeId", experimentType));
+			final List<ExperimentModel> list = criteria.list();
+			if (list != null && !list.isEmpty()) {
+				return list.get(0);
+			}
+		} catch (final HibernateException e) {
+			final String message = "Error at getExperimentByTypeInstanceId=" + instanceId
+				+ " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return null;
+	}
+
 	public ExperimentModel getExperimentByProjectIdAndGeoLocationAndType(final Integer projectId, final Integer geolocationId, final Integer typeId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("project.projectId", projectId));

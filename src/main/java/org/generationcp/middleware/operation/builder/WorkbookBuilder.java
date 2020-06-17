@@ -569,7 +569,7 @@ public class WorkbookBuilder extends Builder {
 						variable.getVariableType().getLocalName(), variable.getValue(), true,
 						this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
 						variate);
-					measurementData.setPhenotypeId(variable.getPhenotypeId());
+					measurementData.setMeasurementDataId(variable.getVariableDataId());
 					measurementData.setAccepted(true);
 					if (this.isCategoricalVariate(variable) && !variable.isCustomValue()
 						&& NumberUtils.isNumber(variable.getValue())) {
@@ -593,7 +593,7 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private void setValueStatusToMeasurementData(final Variable variable, final MeasurementData measurementData) {
-		final Phenotype phenotype = this.getPhenotypeDao().getById(variable.getPhenotypeId());
+		final Phenotype phenotype = this.getPhenotypeDao().getById(variable.getVariableDataId());
 		if (phenotype != null) {
 			measurementData.setValueStatus(phenotype.getValueStatus());
 		}
@@ -915,7 +915,7 @@ public class WorkbookBuilder extends Builder {
 					value = experiment.getObsUnitId();
 				}
 				measurementData = new MeasurementData(factor.getName(), value, isEditable,
-					this.getDataType(factor.getDataTypeId()), factor.getTermId(), factor);
+					this.getDataType(factor.getDataTypeId()), null, factor);
 			}
 			measurementDataList.add(measurementData);
 		}
@@ -948,11 +948,16 @@ public class WorkbookBuilder extends Builder {
 			if (standardVariableDataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
 				&& standardVariable.getId() != TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
 				final Integer id = value != null && NumberUtils.isNumber(value) ? Integer.valueOf(value) : null;
-				return new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
+				final MeasurementData measurementData = new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
 					this.getDataType(standardVariableDataTypeId), id, factor);
+				measurementData.setMeasurementDataId(variable.getVariableDataId());
+				return measurementData;
 			}
-			return new MeasurementData(variableType.getLocalName(), value, isEditable,
+
+			final MeasurementData measurementData = new MeasurementData(variableType.getLocalName(), value, isEditable,
 				this.getDataType(standardVariableDataTypeId), factor);
+			measurementData.setMeasurementDataId(variable.getVariableDataId());
+			return measurementData;
 		}
 		return null;
 	}
