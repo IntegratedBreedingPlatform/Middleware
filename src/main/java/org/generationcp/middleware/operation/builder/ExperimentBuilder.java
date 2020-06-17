@@ -46,8 +46,8 @@ import java.util.stream.Stream;
 public class ExperimentBuilder extends Builder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentBuilder.class);
-private DaoFactory daoFactory;
-	
+	private DaoFactory daoFactory;
+
 	public ExperimentBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 		this.daoFactory = new DaoFactory(sessionProviderForLocal);
@@ -271,8 +271,8 @@ private DaoFactory daoFactory;
 				.orElseGet(Stream::empty).filter(o -> o.getTypeId().intValue() == variableType.getId()).findFirst();
 
 		if (geolocationPropertyOptional.isPresent()) {
-			return new Variable(variableType, geolocationPropertyOptional.get().getValue(),
-				geolocationPropertyOptional.get().getGeolocationPropertyId());
+			return new Variable(geolocationPropertyOptional.get().getGeolocationPropertyId(), variableType,
+				geolocationPropertyOptional.get().getValue());
 		}
 
 		return null;

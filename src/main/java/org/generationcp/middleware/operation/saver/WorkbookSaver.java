@@ -455,7 +455,7 @@ public class WorkbookSaver extends Saver {
 			row.setLocationId(0);
 			row.setStockId(0);
 			for (final MeasurementData data : row.getDataList()) {
-				data.setPhenotypeId(null);
+				data.setMeasurementDataId(null);
 			}
 		}
 	}

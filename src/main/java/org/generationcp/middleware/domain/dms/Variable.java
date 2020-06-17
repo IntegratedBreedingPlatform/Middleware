@@ -27,27 +27,18 @@ public class Variable implements Serializable, Comparable<Variable> {
 
 	private String value;
 
-	private Integer phenotypeId;
+	// This can be geolocationPropertyId or phenotype ID depending on variable type
+	// (e.g. geolocationPropertyId for ENVIRONMENT_DETAIL, phenotypeID for TRAIT or STUDY_CONDITION).
+	private Integer variableDataId;
 
 	private boolean isCustomValue;
-
-	private Integer instanceDataId;
 
 
 	public Variable() {
 	}
 
-	public Variable(DMSVariableType variableType, String value, Integer instanceDataId) {
-		this.variableType = variableType;
-		this.value = value;
-		this.instanceDataId = instanceDataId;
-		if (variableType == null) {
-			throw new RuntimeException();
-		}
-	}
-
-	public Variable(Integer phenotypeId, DMSVariableType variableType, String value) {
-		this.phenotypeId = phenotypeId;
+	public Variable(Integer variableDataId, DMSVariableType variableType, String value) {
+		this.variableDataId = variableDataId;
 		this.variableType = variableType;
 		this.value = value;
 		if (variableType == null) {
@@ -63,8 +54,8 @@ public class Variable implements Serializable, Comparable<Variable> {
 		}
 	}
 
-	public Variable(Integer phenotypeId, DMSVariableType variableType, Double value) {
-		this.phenotypeId = phenotypeId;
+	public Variable(Integer variableDataId, DMSVariableType variableType, Double value) {
+		this.variableDataId = variableDataId;
 		this.variableType = variableType;
 		if (value != null) {
 			this.value = Double.toString(value);
@@ -84,8 +75,8 @@ public class Variable implements Serializable, Comparable<Variable> {
 		}
 	}
 
-	public Variable(Integer phenotypeId, DMSVariableType variableType, Integer value) {
-		this.phenotypeId = phenotypeId;
+	public Variable(Integer variableDataId, DMSVariableType variableType, Integer value) {
+		this.variableDataId = variableDataId;
 		this.variableType = variableType;
 		if (value != null) {
 			this.value = Integer.toString(value);
@@ -275,12 +266,12 @@ public class Variable implements Serializable, Comparable<Variable> {
 		return Integer.valueOf(this.getVariableType().getRank()).compareTo(compareRank);
 	}
 
-	public Integer getPhenotypeId() {
-		return this.phenotypeId;
+	public Integer getVariableDataId() {
+		return this.variableDataId;
 	}
 
-	public void setPhenotypeId(Integer phenotypeId) {
-		this.phenotypeId = phenotypeId;
+	public void setVariableDataId(Integer variableDataId) {
+		this.variableDataId = variableDataId;
 	}
 
 	public boolean isCustomValue() {
@@ -289,14 +280,6 @@ public class Variable implements Serializable, Comparable<Variable> {
 
 	public void setCustomValue(boolean isCustomValue) {
 		this.isCustomValue = isCustomValue;
-	}
-
-	public Integer getInstanceDataId() {
-		return this.instanceDataId;
-	}
-
-	public void setInstanceDataId(final Integer instanceDataId) {
-		this.instanceDataId = instanceDataId;
 	}
 
 }

@@ -33,9 +33,12 @@ public class MeasurementData {
 	private String cValueId;
 	private boolean isEditable;
 	private String dataType;
-	private Integer phenotypeId;
+
+	// This can be geolocationPropertyId or phenotype ID depending on variable type
+	// (e.g. geolocationPropertyId for ENVIRONMENT_DETAIL, phenotypeID for TRAIT or STUDY_CONDITION).
+	private Integer measurementDataId;
+
 	private MeasurementVariable measurementVariable;
-	private Integer instanceDataId;
 
 
 	private boolean isAccepted;
@@ -55,7 +58,7 @@ public class MeasurementData {
 		this.value = data.value;
 		this.isEditable = data.isEditable;
 		this.dataType = data.dataType;
-		this.phenotypeId = data.phenotypeId;
+		this.measurementDataId = data.measurementDataId;
 		this.cValueId = data.cValueId;
 		this.measurementVariable = data.measurementVariable;
 		this.valueStatus = data.valueStatus;
@@ -117,15 +120,15 @@ public class MeasurementData {
 		this.value = value;
 	}
 
-	public Integer getPhenotypeId() {
-		if (this.phenotypeId == null && this.variable != null) {
-			return this.variable.getPhenotypeId();
+	public Integer getMeasurementDataId() {
+		if (this.measurementDataId == null && this.variable != null) {
+			return this.variable.getVariableDataId();
 		}
-		return this.phenotypeId;
+		return this.measurementDataId;
 	}
 
-	public void setPhenotypeId(final Integer phenotypeId) {
-		this.phenotypeId = phenotypeId;
+	public void setMeasurementDataId(final Integer measurementDataId) {
+		this.measurementDataId = measurementDataId;
 	}
 
 	@Override
@@ -137,7 +140,7 @@ public class MeasurementData {
 			", cValueId='" + this.cValueId + '\'' +
 			", isEditable=" + this.isEditable +
 			", dataType='" + this.dataType + '\'' +
-			", phenotypeId=" + this.phenotypeId +
+			", phenotypeId=" + this.measurementDataId +
 			", measurementVariable=" + this.measurementVariable +
 			", isAccepted=" + this.isAccepted +
 			", oldValue='" + this.oldValue + '\'' +
@@ -266,7 +269,7 @@ public class MeasurementData {
 	// FIXME consolidate logic in the copy constructor
 	public MeasurementData copy() {
 		final MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, this.measurementVariable);
-		data.setPhenotypeId(this.phenotypeId);
+		data.setMeasurementDataId(this.measurementDataId);
 		data.setcValueId(this.cValueId);
 		data.setCustomCategoricalValue(this.isCustomCategoricalValue);
 		data.setAccepted(this.isAccepted);
@@ -277,7 +280,7 @@ public class MeasurementData {
 	// FIXME consolidate logic in a copy constructor
 	public MeasurementData copy(final MeasurementVariable oldVar) {
 		final MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, oldVar);
-		data.setPhenotypeId(this.phenotypeId);
+		data.setMeasurementDataId(this.measurementDataId);
 		data.setcValueId(this.cValueId);
 		data.setValueStatus(this.valueStatus);
 		return data;
@@ -408,11 +411,4 @@ public class MeasurementData {
 		this.valueStatus = valueStatus;
 	}
 
-	public Integer getInstanceDataId() {
-		return this.instanceDataId;
-	}
-
-	public void setInstanceDataId(final Integer instanceDataId) {
-		this.instanceDataId = instanceDataId;
-	}
 }

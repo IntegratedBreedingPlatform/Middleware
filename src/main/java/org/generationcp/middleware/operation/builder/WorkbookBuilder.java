@@ -569,7 +569,7 @@ public class WorkbookBuilder extends Builder {
 						variable.getVariableType().getLocalName(), variable.getValue(), true,
 						this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
 						variate);
-					measurementData.setPhenotypeId(variable.getPhenotypeId());
+					measurementData.setMeasurementDataId(variable.getVariableDataId());
 					measurementData.setAccepted(true);
 					if (this.isCategoricalVariate(variable) && !variable.isCustomValue()
 						&& NumberUtils.isNumber(variable.getValue())) {
@@ -593,7 +593,7 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private void setValueStatusToMeasurementData(final Variable variable, final MeasurementData measurementData) {
-		final Phenotype phenotype = this.getPhenotypeDao().getById(variable.getPhenotypeId());
+		final Phenotype phenotype = this.getPhenotypeDao().getById(variable.getVariableDataId());
 		if (phenotype != null) {
 			measurementData.setValueStatus(phenotype.getValueStatus());
 		}
@@ -950,13 +950,13 @@ public class WorkbookBuilder extends Builder {
 				final Integer id = value != null && NumberUtils.isNumber(value) ? Integer.valueOf(value) : null;
 				final MeasurementData measurementData = new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
 					this.getDataType(standardVariableDataTypeId), id, factor);
-				measurementData.setInstanceDataId(variable.getInstanceDataId());
+				measurementData.setMeasurementDataId(variable.getVariableDataId());
 				return measurementData;
 			}
 
 			final MeasurementData measurementData = new MeasurementData(variableType.getLocalName(), value, isEditable,
 				this.getDataType(standardVariableDataTypeId), factor);
-			measurementData.setInstanceDataId(variable.getInstanceDataId());
+			measurementData.setMeasurementDataId(variable.getVariableDataId());
 			return measurementData;
 		}
 		return null;

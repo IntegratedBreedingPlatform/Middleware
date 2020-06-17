@@ -60,12 +60,12 @@ public class GeolocationSaver {
 			}
 			if (null != geolocation.getVariates()) {
 				for (final Variable var : geolocation.getVariates().getVariables()) {
-					if (null == var.getPhenotypeId()) {
+					if (null == var.getVariableDataId()) {
 						this.phenotypeSaver.save(row.getExperimentId(), var);
 					} else {
 						this.phenotypeSaver
 							.saveOrUpdate(row.getExperimentId(), var.getVariableType().getStandardVariable().getId(), var.getValue(),
-								this.daoFactory.getPhenotypeDAO().getById(var.getPhenotypeId()),
+								this.daoFactory.getPhenotypeDAO().getById(var.getVariableDataId()),
 								var.getVariableType().getStandardVariable().getDataType().getId(), null);
 					}
 				}
