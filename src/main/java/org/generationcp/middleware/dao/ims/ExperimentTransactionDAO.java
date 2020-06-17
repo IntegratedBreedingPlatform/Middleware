@@ -97,7 +97,7 @@ public class ExperimentTransactionDAO extends GenericDAO<ExperimentTransaction, 
 			return criteria.list();
 		} catch (final HibernateException e) {
 			final String message =
-				"Error at getTransactionsByInstanceId instanceIds = " + instanceIds + ", transactionType + "
+				"Error at getTransactionsByInstanceIds instanceIds = " + instanceIds + ", transactionType + "
 					+ transactionStatus
 					.getValue() + ", experimentTransactionStatus=" + experimentTransactionType.getValue();
 			ExperimentTransactionDAO.LOG.error(message, e);
