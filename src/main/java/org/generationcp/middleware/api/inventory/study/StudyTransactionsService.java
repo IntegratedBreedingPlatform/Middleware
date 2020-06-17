@@ -6,5 +6,5 @@ public interface StudyTransactionsService {
 
 	long countStudyTransactions(Integer studyId, StudyTransactionsRequest studyTransactionsRequest);
 
-	List<StudyTransactionsDto> searchStudyTransactions(final Integer studyId, StudyTransactionsRequest studyTransactionsRequest);
+	List<StudyTransactionsDto> searchStudyTransactions(Integer studyId, StudyTransactionsRequest studyTransactionsRequest);
 }
