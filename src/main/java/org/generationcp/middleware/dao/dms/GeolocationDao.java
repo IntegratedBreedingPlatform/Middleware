@@ -453,7 +453,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
 	public boolean isInstancesExist(final Set<Integer> instanceIds) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-		criteria.add(Restrictions.eq("locationId", instanceIds));
+		criteria.add(Restrictions.in("locationId", instanceIds));
 		return instanceIds.size() == criteria.list().size();
 	}
 
