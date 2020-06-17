@@ -206,7 +206,7 @@ public class DataSetBuilderTest {
 
 	@Test
 	public void testFilterVariables() {
-		List<Integer> siblingsList = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId(), TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+		final List<Integer> siblingsList = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId(), TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
 			TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId(), TermId.GID.getId(), TermId.DESIG.getId(),
 			TermId.ENTRY_NO.getId(), TermId.OBS_UNIT_ID.getId(), TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), 1, 2, 3, 4);
 
