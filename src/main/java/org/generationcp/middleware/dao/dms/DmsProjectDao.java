@@ -1176,45 +1176,67 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				"	case when max(if(geoprop.type_id = 8583, geoprop.value, null)) is null then 0 else 1 end as hasFieldmap, \n"
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
 
+				// FIXME rewrite to be valid for the whole instance, not just the datasetId
 				// if instance has X/Y coordinates (fieldmap or row/col design)
 				+ "	case when (max(if(geoprop.type_id = 8583, geoprop.value, null)) is null) \n "
 				+ "		and (max(hasRowColDesign.nd_experiment_id)) is null \n"
 				+ " 	then 0 else 1 end as hasFieldLayout, \n"
 
+				// FIXME rewrite to be valid for the whole instance, not just the datasetId
 				// if instance has been georeferenced using the geojson editor
 				+ "  max(case when json_props like '%geoCoordinates%' then 1 else 0 end) as hasGeoJSON, \n"
+
+				// if instance obs units are associated to transactions
+				+ "	case when hasInventory.nd_geolocation_id is null then 0 else 1 end as hasInventory, \n"
 
 				// If study has any plot experiments, hasExperimentalDesign flag = true
 				+ "  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
 				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
 
-				// If study has sub-observations or samples, canBeDeleted = false
-				+ "  case when (select count(1) from sample s "
-				+ "  inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 or (select count(1) from nd_experiment exp \n"
-				+ " INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 \n"
-				+ " INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 \n"
-				+ " or (select count(1) from ims_experiment_transaction iet inner join nd_experiment ne on ne.nd_experiment_id = iet.nd_experiment_id \n"
-				+ " inner join ims_transaction it on it.trnid = iet.trnid where it.trnstat <> 9 and ne.nd_geolocation_id = geoloc.nd_geolocation_id) > 0  "
-				+ " then 0 else 1 end as canBeDeleted, "
+				// If study samples
+				+ "  case when (select count(1) \n"
+				+ "               from sample s \n"
+				+ "                        inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 \n"
+				+ "               where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 \n"
+				// or has sub-observations or
+				+ "        or (select count(1) \n"
+				+ "            from nd_experiment exp \n"
+				+ "                     INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 \n"
+				+ "                     INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 \n"
+				+ "            where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 \n"
+				// or inventory
+				+ "        or hasInventory.nd_geolocation_id is not null \n"
+				// then canBeDeleted = false
+				+ "             then 0 \n"
+				+ "         else 1 end as canBeDeleted, "
 
 				// if study has any pending or accepted plot observations, hasMeasurements = true
 				+ "  case when (select count(1) from phenotype ph "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
 				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
 				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) > 0 then 1 else 0 end as hasMeasurements "
-				+ "    from	nd_geolocation geoloc \n"
-				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "    inner join project proj on proj.project_id = nde.project_id \n"
-				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
+
+				+ " from nd_geolocation geoloc \n"
+				+ " inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ " inner join project proj on proj.project_id = nde.project_id \n"
+				+ " left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ "	left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
 				+ " left join ( \n"
-				+ " select ndep.nd_experiment_id \n"
-				+ "     from nd_experimentprop ndep \n"
-				+ "         INNER JOIN cvterm cvt ON cvt.cvterm_id = ndep.type_id \n"
-				+ "     WHERE cvt.name = 'ROW' \n"
+				+ " 	select ndep.nd_experiment_id \n"
+				+ " 	    from nd_experimentprop ndep \n"
+				+ " 	        INNER JOIN cvterm cvt ON cvt.cvterm_id = ndep.type_id \n"
+				+ " 	    WHERE cvt.name = 'ROW' \n"
 				+ " ) hasRowColDesign on nde.nd_experiment_id = hasRowColDesign.nd_experiment_id "
+				+ " left join (  \n"
+				+ "    select ne.nd_geolocation_id  \n"
+				+ "    from ims_experiment_transaction iet  \n"
+				+ "             inner join nd_experiment ne on ne.nd_experiment_id = iet.nd_experiment_id  \n"
+				+ "             inner join ims_transaction it on it.trnid = iet.trnid  \n"
+				+ "    where it.trnstat <> 9  \n"
+				+ ") hasInventory on hasInventory.nd_geolocation_id = geoloc.nd_geolocation_id "
+
 				+ " where proj.project_id = :datasetId \n";
+
 			final StringBuilder sb = new StringBuilder(sql);
 			if (!CollectionUtils.isEmpty(instanceIds)) {
 				sb.append(" AND geoloc.nd_geolocation_id IN (:instanceIds) \n");
@@ -1235,6 +1257,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("hasFieldmap", new BooleanType());
 			query.addScalar("hasGeoJSON", new BooleanType());
 			query.addScalar("hasFieldLayout", new BooleanType());
+			query.addScalar("hasInventory", new BooleanType());
 			query.addScalar("instanceNumber", new IntegerType());
 			query.addScalar("hasExperimentalDesign", new BooleanType());
 			query.addScalar("canBeDeleted", new BooleanType());

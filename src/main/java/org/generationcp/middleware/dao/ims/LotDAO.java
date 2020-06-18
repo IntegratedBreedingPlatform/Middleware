@@ -26,6 +26,7 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -70,7 +71,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	private static final String ENTITY_ID = "entityId";
 
-	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	/*
 	 * NOTE setting the trnstat=0 for actual_balance to include anticipated transaction to the total_amount. This is only temporary change
@@ -469,193 +470,242 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "       INNER JOIN workbench.users users on users.userid = lot.userid " //
 		+ "WHERE g.deleted=0 "; //
 
-	private String buildSearchLotsQuery(final LotsSearchDto lotsSearchDto) {
-		final StringBuilder query = new StringBuilder(SEARCH_LOT_QUERY);
+	private static void addSearchLotsQueryFiltersAndGroupBy(
+		final SqlQueryParamBuilder paramBuilder,
+		final LotsSearchDto lotsSearchDto) {
+
 		if (lotsSearchDto != null) {
-			if (lotsSearchDto.getLotIds() != null && !lotsSearchDto.getLotIds().isEmpty()) {
-				query.append("and lot.lotid IN (").append(Joiner.on(",").join(lotsSearchDto.getLotIds())).append(") ");
+			final List<Integer> lotIds = lotsSearchDto.getLotIds();
+			if (lotIds != null && !lotIds.isEmpty()) {
+				paramBuilder.append(" and lot.lotid IN (:lotIds)");
+				paramBuilder.setParameterList("lotIds", lotIds);
 			}
 
-			if (lotsSearchDto.getLotUUIDs() != null && !lotsSearchDto.getLotUUIDs().isEmpty()) {
-				query.append("and lot.lot_uuid IN ('").append(Joiner.on("','").join(lotsSearchDto.getLotUUIDs().toArray())).append("') ");
+			final List<String> lotUUIDs = lotsSearchDto.getLotUUIDs();
+			if (lotUUIDs != null && !lotUUIDs.isEmpty()) {
+				paramBuilder.append(" and lot.lot_uuid IN (:lotUUIDs)");
+				paramBuilder.setParameterList("lotUUIDs", lotUUIDs);
 			}
 
-			if (lotsSearchDto.getGids() != null && !lotsSearchDto.getGids().isEmpty()) {
-				query.append("and lot.eid IN (").append(Joiner.on(",").join(lotsSearchDto.getGids()))
-					.append(") and lot.etype = 'GERMPLSM' ");
+			final List<Integer> gids = lotsSearchDto.getGids();
+			if (gids != null && !gids.isEmpty()) {
+				paramBuilder.append(" and lot.eid IN (:gids)");
+				paramBuilder.setParameterList("gids", gids);
 			}
 
-			if (lotsSearchDto.getMgids() != null && !lotsSearchDto.getMgids().isEmpty()) {
-				query.append("and g.mgid IN (").append(Joiner.on(",").join(lotsSearchDto.getMgids()))
-					.append(") and lot.etype = 'GERMPLSM' ");
+			final List<Integer> mgids = lotsSearchDto.getMgids();
+			if (mgids != null && !mgids.isEmpty()) {
+				paramBuilder.append(" and g.mgid IN (:mgids)");
+				paramBuilder.setParameterList("mgids", mgids);
 			}
 
-			if (lotsSearchDto.getLocationIds() != null && !lotsSearchDto.getLocationIds().isEmpty()) {
-				query.append("and lot.locid IN (").append(Joiner.on(",").join(lotsSearchDto.getLocationIds())).append(") ");
+			final List<Integer> locationIds = lotsSearchDto.getLocationIds();
+			if (locationIds != null && !locationIds.isEmpty()) {
+				paramBuilder.append(" and lot.locid IN (:locationIds)");
+				paramBuilder.setParameterList("locationIds", locationIds);
 			}
 
-			if (lotsSearchDto.getUnitIds() != null && !lotsSearchDto.getUnitIds().isEmpty()) {
-				query.append("and lot.scaleid IN (").append(Joiner.on(",").join(lotsSearchDto.getUnitIds())).append(") ");
+			final List<Integer> unitIds = lotsSearchDto.getUnitIds();
+			if (unitIds != null && !unitIds.isEmpty()) {
+				paramBuilder.append(" and lot.scaleid IN (:unitIds)");
+				paramBuilder.setParameterList("unitIds", unitIds);
 			}
 
-			if (lotsSearchDto.getDesignation()!=null) {
-				query.append("and n.nval like '%").append(lotsSearchDto.getDesignation()).append("%' ");
+			final String designation = lotsSearchDto.getDesignation();
+			if (designation != null) {
+				paramBuilder.append(" and n.nval like :designation");
+				paramBuilder.setParameter("designation", '%' + designation + '%');
 			}
 
-			if (lotsSearchDto.getStatus() != null) {
-				query.append(" and lot.status = ").append(lotsSearchDto.getStatus());
+			final Integer lotStatus = lotsSearchDto.getStatus();
+			if (lotStatus != null) {
+				paramBuilder.append(" and lot.status = :lotStatus");
+				paramBuilder.setParameter("lotStatus", lotStatus);
 			}
 
-			if (lotsSearchDto.getNotesContainsString() != null) {
-				query.append(" and lot.comments like '%").append(lotsSearchDto.getNotesContainsString()).append("%' ");
+			final String notes = lotsSearchDto.getNotesContainsString();
+			if (notes != null) {
+				paramBuilder.append(" and lot.comments like :notes");
+				paramBuilder.setParameter("notes", '%' + notes + '%');
 			}
 
-			if (lotsSearchDto.getLocationNameContainsString() != null) {
-				query.append(" and l.lname like '%").append(lotsSearchDto.getLocationNameContainsString()).append("%' ");
+			final String locationName = lotsSearchDto.getLocationNameContainsString();
+			if (locationName != null) {
+				paramBuilder.append(" and l.lname like :locationName");
+				paramBuilder.setParameter("locationName", '%' + locationName + '%');
 			}
 
-			if(lotsSearchDto.getCreatedDateFrom() != null) {
-				query.append(" and DATE(lot.created_date) >= '").append(format.format(lotsSearchDto.getCreatedDateFrom())).append("' ");
+			final Date createdDateFrom = lotsSearchDto.getCreatedDateFrom();
+			if (createdDateFrom != null) {
+				paramBuilder.append(" and DATE(lot.created_date) >= :createdDateFrom");
+				paramBuilder.setParameter("createdDateFrom", DATE_FORMAT.format(createdDateFrom));
 			}
 
-			if(lotsSearchDto.getCreatedDateTo() != null) {
-				query.append(" and DATE(lot.created_date) <= '").append(format.format(lotsSearchDto.getCreatedDateTo())).append("' ");
+			final Date createdDateTo = lotsSearchDto.getCreatedDateTo();
+			if (createdDateTo != null) {
+				paramBuilder.append(" and DATE(lot.created_date) <= :createdDateTo");
+				paramBuilder.setParameter("createdDateTo", DATE_FORMAT.format(createdDateTo));
 			}
 
-			if(lotsSearchDto.getCreatedByUsername() != null) {
-				query.append(" and users.uname like '%").append(lotsSearchDto.getCreatedByUsername()).append("%'" );
+			final String createdByUsername =lotsSearchDto.getCreatedByUsername();
+			if (createdByUsername != null) {
+				paramBuilder.append(" and users.uname like :createdByUsername");
+				paramBuilder.setParameter("createdByUsername", '%' + createdByUsername + '%');
 			}
 
-			if(lotsSearchDto.getGermplasmListIds() != null && !lotsSearchDto.getGermplasmListIds().isEmpty()) {
-				query.append(" and lot.eid in (select distinct (gid) from listdata where listid in (").append(Joiner.on(",").join(lotsSearchDto.getGermplasmListIds())).
-						append(")) and lot.etype = 'GERMPLSM' ");
+			final List<Integer> germplasmListIds = lotsSearchDto.getGermplasmListIds();
+			if (germplasmListIds != null && !germplasmListIds.isEmpty()) {
+				paramBuilder.append(" and lot.eid in (select distinct (gid) from listdata where listid in (:germplasmListIds))"
+					+ " and lot.etype = 'GERMPLSM' ");
+				paramBuilder.setParameterList("germplasmListIds", germplasmListIds);
 			}
 
-			if (lotsSearchDto.getStockId() != null) {
-				query.append(" and lot.stock_id like '").append(lotsSearchDto.getStockId())
-						.append("%' ");
+			final String stockId = lotsSearchDto.getStockId();
+			if (stockId != null) {
+				paramBuilder.append(" and lot.stock_id like :stockId");
+				paramBuilder.setParameter("stockId", stockId + '%');
 			}
 
 		}
-		query.append(" GROUP BY lot.lotid ");
+		paramBuilder.append(" GROUP BY lot.lotid ");
 
 		if (lotsSearchDto != null) {
 
-			query.append(" having 1=1 ");
+			paramBuilder.append(" having 1=1 ");
 
-			if (lotsSearchDto.getMinActualBalance() != null) {
-				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) >= ")
-						.append(lotsSearchDto.getMinActualBalance()).append(" ");
+			final Double minActualBalance = lotsSearchDto.getMinActualBalance();
+			if (minActualBalance != null) {
+				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() 
+					+ " THEN transaction.trnqty ELSE 0 END) >= :minActualBalance");
+				paramBuilder.setParameter("minActualBalance", minActualBalance);
 			}
 
-			if (lotsSearchDto.getMaxActualBalance() != null) {
-				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) <= ")
-						.append(lotsSearchDto.getMaxActualBalance()).append(" ");
+			final Double maxActualBalance = lotsSearchDto.getMaxActualBalance();
+			if (maxActualBalance != null) {
+				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() 
+					+ " THEN transaction.trnqty ELSE 0 END) <= :maxActualBalance");
+				paramBuilder.setParameter("maxActualBalance", maxActualBalance);
 			}
 
-			if (lotsSearchDto.getMinAvailableBalance() != null) {
-				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
-					+ ") THEN transaction.trnqty ELSE 0 END) >= ")
-						.append(lotsSearchDto.getMinAvailableBalance()).append(" ");
+			final Double minAvailableBalance = lotsSearchDto.getMinAvailableBalance();
+			if (minAvailableBalance != null) {
+				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() 
+					+ " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() 
+					+ "     AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId() 
+					+ ") THEN transaction.trnqty ELSE 0 END) >= :minAvailableBalance");
+				paramBuilder.setParameter("minAvailableBalance", minAvailableBalance);
 			}
 
-			if (lotsSearchDto.getMaxAvailableBalance() != null) {
-				query.append("and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
-					+ ") THEN transaction.trnqty ELSE 0 END) <= ")
-					.append(lotsSearchDto.getMaxAvailableBalance()).append(" ");
+			final Double maxAvailableBalance = lotsSearchDto.getMaxAvailableBalance();
+			if (maxAvailableBalance != null) {
+				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
+					+ " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue()
+					+ "     AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
+					+ " ) THEN transaction.trnqty ELSE 0 END) <= :maxAvailableBalance");
+				paramBuilder.setParameter("maxAvailableBalance", maxAvailableBalance);
 			}
 
-			if (lotsSearchDto.getMinReservedTotal() != null) {
-				query.append(
-					"and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = "
-						+ TransactionType.WITHDRAWAL.getId() + " THEN transaction.trnqty * -1 ELSE 0 END) >= ")
-						.append(lotsSearchDto.getMinReservedTotal()).append(" ");
+			final Double minReservedTotal = lotsSearchDto.getMinReservedTotal();
+			if (minReservedTotal != null) {
+				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue()
+					+ " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
+					+ " THEN transaction.trnqty * -1 ELSE 0 END) >= :minReservedTotal");
+				paramBuilder.setParameter("minReservedTotal", minReservedTotal);
 			}
 
-			if (lotsSearchDto.getMaxReservedTotal() != null) {
-				query.append(
-					"and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = "
-						+ TransactionType.WITHDRAWAL.getId() + " THEN transaction.trnqty * -1 ELSE 0 END) <= ")
-						.append(lotsSearchDto.getMaxReservedTotal()).append(" ");
+			final Double maxReservedTotal = lotsSearchDto.getMaxReservedTotal();
+			if (maxReservedTotal != null) {
+				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue()
+					+ " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
+					+ " THEN transaction.trnqty * -1 ELSE 0 END) <= :maxReservedTotal");
+				paramBuilder.setParameter("maxReservedTotal", maxReservedTotal);
 			}
 
-			if (lotsSearchDto.getMinWithdrawalTotal() != null) {
-				query.append(
-					"and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trntype = "
-						+ TransactionType.WITHDRAWAL.getId() + " THEN transaction.trnqty * -1 ELSE 0 END) >= ")
-						.append(lotsSearchDto.getMinWithdrawalTotal()).append(" ");
+			final Double minWithdrawalTotal = lotsSearchDto.getMinWithdrawalTotal();
+			if (minWithdrawalTotal != null) {
+				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
+					+ " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
+					+ " THEN transaction.trnqty * -1 ELSE 0 END) >= :minWithdrawalTotal");
+				paramBuilder.setParameter("minWithdrawalTotal", minWithdrawalTotal);
 			}
 
-			if (lotsSearchDto.getMaxWithdrawalTotal() != null) {
-				query.append(
-					"and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trntype = "
-						+ TransactionType.WITHDRAWAL.getId() + " THEN transaction.trnqty * -1 ELSE 0 END) <= ")
-						.append(lotsSearchDto.getMaxWithdrawalTotal()).append(" ");
+			final Double maxWithdrawalTotal = lotsSearchDto.getMaxWithdrawalTotal();
+			if (maxWithdrawalTotal != null) {
+				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
+					+ " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
+					+ " THEN transaction.trnqty * -1 ELSE 0 END) <= :maxWithdrawalTotal");
+				paramBuilder.setParameter("maxWithdrawalTotal", maxWithdrawalTotal);
 			}
 
-			if (lotsSearchDto.getMinPendingDepositsTotal() != null) {
-				query.append(
-					" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " and transaction.trntype = "
-						+ TransactionType.DEPOSIT.getId() + "  THEN transaction.trnqty ELSE 0 END) >= ")
-					.append(lotsSearchDto.getMinPendingDepositsTotal()).append(" ");
+			final Double minPendingDepositsTotal = lotsSearchDto.getMinPendingDepositsTotal();
+			if (minPendingDepositsTotal != null) {
+				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue()
+					+ "  and transaction.trntype = " + TransactionType.DEPOSIT.getId()
+					+ "  THEN transaction.trnqty ELSE 0 END) >= :minPendingDepositsTotal");
+				paramBuilder.setParameter("minPendingDepositsTotal", minPendingDepositsTotal);
 			}
 
-			if (lotsSearchDto.getMaxPendingDepositsTotal() != null) {
-				query.append(
-					" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " and transaction.trntype = "
-						+ TransactionType.DEPOSIT.getId() + "  THEN transaction.trnqty ELSE 0 END) <= ")
-					.append(lotsSearchDto.getMaxPendingDepositsTotal()).append(" ");
+			final Double maxPendingDepositsTotal = lotsSearchDto.getMaxPendingDepositsTotal();
+			if (maxPendingDepositsTotal != null) {
+				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue()
+					+ "  and transaction.trntype = " + TransactionType.DEPOSIT.getId()
+					+ "  THEN transaction.trnqty ELSE 0 END) <= :maxPendingDepositsTotal");
+				paramBuilder.setParameter("maxPendingDepositsTotal", maxPendingDepositsTotal);
 			}
 
-			if (lotsSearchDto.getLastDepositDateFrom() != null) {
-				query.append(
-						" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END)) >= '")
-						.
-								append(format.format(lotsSearchDto.getLastDepositDateFrom())).append("' ");
+			final Date lastDepositDateFrom = lotsSearchDto.getLastDepositDateFrom();
+			if (lastDepositDateFrom != null) {
+				paramBuilder.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
+					+ " AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END)) >= :lastDepositDateFrom");
+				paramBuilder.setParameter("lastDepositDateFrom", DATE_FORMAT.format(lastDepositDateFrom));
 			}
 
-			if (lotsSearchDto.getLastDepositDateTo() != null) {
-				query.append(
-						" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END)) <= '")
-						.
-								append(format.format(lotsSearchDto.getLastDepositDateTo())).append("' ");
+			final Date lastDepositDateTo = lotsSearchDto.getLastDepositDateTo();
+			if (lastDepositDateTo != null) {
+				paramBuilder.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
+					+ " AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END)) <= :lastDepositDateTo");
+				paramBuilder.setParameter("lastDepositDateTo", DATE_FORMAT.format(lastDepositDateTo));
 			}
 
-			if (lotsSearchDto.getLastWithdrawalDateFrom() != null) {
-				query.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END)) >= '").
-						append(format.format(lotsSearchDto.getLastWithdrawalDateFrom())).append("' ");
+			final Date lastWithdrawalDateFrom = lotsSearchDto.getLastWithdrawalDateFrom();
+			if (lastWithdrawalDateFrom != null) {
+				paramBuilder.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
+					+ " AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END)) >= :lastWithdrawalDateFrom");
+				paramBuilder.setParameter("lastWithdrawalDateFrom", DATE_FORMAT.format(lastWithdrawalDateFrom));
 			}
 
-			if (lotsSearchDto.getLastWithdrawalDateTo() != null) {
-				query.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END)) <= '").
-						append(format.format(lotsSearchDto.getLastWithdrawalDateTo())).append("' ");
+			final Date lastWithdrawalDateTo = lotsSearchDto.getLastWithdrawalDateTo();
+			if (lastWithdrawalDateTo != null) {
+				paramBuilder.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
+					+ " AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END)) <= :lastWithdrawalDateTo");
+				paramBuilder.setParameter("lastWithdrawalDateTo", DATE_FORMAT.format(lastWithdrawalDateTo));
 			}
 		}
-		return query.toString();
 	}
 
-	private String addSortToSearchLotsQuery(final String lotsSearchQuery, final Pageable pageable) {
-		if (pageable!=null) {
-			final StringBuilder sortedLotsSearchQuery = new StringBuilder(lotsSearchQuery);
+	private static void addSortToSearchLotsQuery(final StringBuilder lotsSearchQuery, final Pageable pageable) {
+		if (pageable != null) {
 			if (pageable.getSort() != null) {
 				final List<String> sorts = new ArrayList<>();
-				for (Sort.Order order : pageable.getSort()) {
+				for (final Sort.Order order : pageable.getSort()) {
 					sorts.add(order.getProperty() + " " + order.getDirection().toString());
 				}
 				if (!sorts.isEmpty()) {
-					sortedLotsSearchQuery.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
-					return sortedLotsSearchQuery.toString();
+					lotsSearchQuery.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
 				}
 			}
 		}
-		return lotsSearchQuery;
 	}
 
 	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
 		try {
-			final String filterLotsQuery = addSortToSearchLotsQuery(buildSearchLotsQuery(lotsSearchDto), pageable);
+			final StringBuilder searchLotQuerySql = new StringBuilder(SEARCH_LOT_QUERY);
+			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(searchLotQuerySql), lotsSearchDto);
+			addSortToSearchLotsQuery(searchLotQuerySql, pageable);
 
-			final SQLQuery query = this.getSession().createSQLQuery(filterLotsQuery);
+			final SQLQuery query = this.getSession().createSQLQuery(searchLotQuerySql.toString());
+			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
+
 			query.addScalar("lotId");
 			query.addScalar("lotUUID");
 			query.addScalar("stockId");
@@ -695,9 +745,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
 		try {
-			final StringBuilder countLotsQuery =
-					new StringBuilder("Select count(1) from (").append(buildSearchLotsQuery(lotsSearchDto)).append(") as filteredLots");
+			final StringBuilder filteredLotsQuery = new StringBuilder(SEARCH_LOT_QUERY);
+			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filteredLotsQuery), lotsSearchDto);
+			final String countLotsQuery = "Select count(1) from (" + filteredLotsQuery + ") as filteredLots";
 			final SQLQuery query = this.getSession().createSQLQuery(countLotsQuery.toString());
+			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
@@ -707,7 +759,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public List<UserDefinedField> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
 		try {
-			final String lotsQuery = this.buildSearchLotsQuery(searchDto);
+			final StringBuilder lotsQuery = new StringBuilder(SEARCH_LOT_QUERY);
+			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
 
 			final String sql = "select distinct {u.*} from atributs a inner join udflds u "
 				+ " 	inner join (" + lotsQuery + ") lots on lots.gid = a.gid"
@@ -715,6 +768,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				+ " order by u.fname";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), searchDto);
 			query.addEntity("u", UserDefinedField.class);
 			return query.list();
 		} catch (final HibernateException e) {
@@ -724,11 +778,13 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final LotsSearchDto searchDto) {
 		try {
-			final String lotsQuery = this.buildSearchLotsQuery(searchDto);
+			final StringBuilder lotsQuery = new StringBuilder(SEARCH_LOT_QUERY);
+			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
 
 			final String sql = "select distinct {a.*} from atributs a inner join (" + lotsQuery + ") lots on lots.gid = a.gid";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), searchDto);
 			query.addEntity("a", Attribute.class);
 			final List<Attribute> attributes = query.list();
 
@@ -756,13 +812,15 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		try {
 			final Map<String, BigInteger> lotsCountPerScaleName = new HashMap<>();
 
-			final String filterLotsQuery = buildSearchLotsQuery(lotsSearchDto);
+			final StringBuilder filterLotsQuery = new StringBuilder(SEARCH_LOT_QUERY);
+			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filterLotsQuery), lotsSearchDto);
 
 			final String countQuery = "SELECT scale.name, count(*) from ("  //
 			+ filterLotsQuery + ") as lot left join cvterm scale on (scale.cvterm_id = lot.unitId) " //
 				+ "group by  scale.name "; //
 
 			final SQLQuery query = this.getSession().createSQLQuery(countQuery);
+			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
 
 			List<Object[]> result = query.list();
 			for (Object[] row : result) {
