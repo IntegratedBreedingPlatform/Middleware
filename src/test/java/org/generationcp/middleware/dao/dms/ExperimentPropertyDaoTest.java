@@ -60,9 +60,9 @@ public class ExperimentPropertyDaoTest {
 	@Test
 	public void testGetAllFieldMapsInBlockByTrialInstanceId_WithBlockId() {
 		final int datasetId = 11;
-		final int geolocationId = 22;
+		final int instanceId = 22;
 		final int blockId = 33;
-		this.dao.getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, blockId);
+		this.dao.getAllFieldMapsInBlockByTrialInstanceId(datasetId, instanceId, blockId);
 		
 		final String expectedSql = this.getFieldmapsInBlockMainQuery() + " AND blk.value = :blockId  ORDER BY e.nd_experiment_id ASC";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -70,7 +70,7 @@ public class ExperimentPropertyDaoTest {
 		Assert.assertEquals(expectedSql.replace(" ", ""), sqlCaptor.getValue().replace(" ", ""));
 		Mockito.verify(this.mockQuery).setParameter("blockId", blockId);
 		Mockito.verify(this.mockQuery, Mockito.never()).setParameter("datasetId", datasetId);
-		Mockito.verify(this.mockQuery, Mockito.never()).setParameter("geolocationId", geolocationId);
+		Mockito.verify(this.mockQuery, Mockito.never()).setParameter("instanceId", instanceId);
 	}
 	
 	@Test
@@ -82,7 +82,7 @@ public class ExperimentPropertyDaoTest {
 		final String expectedSql = this.getFieldmapsInBlockMainQuery() +
 				" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval " +
 				" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id " +
-				" AND bexp.nd_geolocation_id = :geolocationId " +
+				" AND bexp.nd_geolocation_id = :instanceId " +
 				" AND bexp.project_id = :datasetId  WHERE bval.type_id = " + TermId.BLOCK_ID.getId() +
 				") ORDER BY e.nd_experiment_id ASC";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -90,12 +90,12 @@ public class ExperimentPropertyDaoTest {
 		Assert.assertEquals(expectedSql.replace(" ", ""), sqlCaptor.getValue().replace(" ", ""));
 		Mockito.verify(this.mockQuery, Mockito.never()).setParameter(Matchers.eq("blockId"), Matchers.any());
 		Mockito.verify(this.mockQuery).setParameter("datasetId", datasetId);
-		Mockito.verify(this.mockQuery).setParameter("geolocationId", geolocationId);
+		Mockito.verify(this.mockQuery).setParameter("instanceId", geolocationId);
 	}
 	
 	private String getFieldmapsInBlockMainQuery() {
 		return " SELECT  p.project_id AS datasetId  , p.name AS datasetName "
-		+ " , st.name AS studyName , e.nd_geolocation_id AS geolocationId "
+		+ " , st.name AS studyName , e.nd_geolocation_id AS instanceId "
 		+ " , site.value AS siteName , siteId.value AS siteId"
 		+ " , e.nd_experiment_id AS experimentId , s.uniqueName AS entryNumber "
 		+ " , s.name AS germplasmName , epropRep.value AS rep "

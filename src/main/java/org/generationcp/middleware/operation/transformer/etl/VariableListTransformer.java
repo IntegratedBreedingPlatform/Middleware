@@ -13,7 +13,6 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -177,7 +176,7 @@ public class VariableListTransformer extends Transformer {
 
 				if (trialData != null) {
 					String value = trialData.getValue();
-					final Integer phenotypeId = trialData.getPhenotypeId();
+					final Integer phenotypeId = trialData.getMeasurementDataId();
 
 					if (trialData.getcValueId() != null) {
 						value = trialData.getcValueId();
@@ -187,7 +186,7 @@ public class VariableListTransformer extends Transformer {
 							|| varType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {// include
 																												// variate
 						final Variable variable = new Variable(varType, value);
-						variable.setPhenotypeId(phenotypeId);
+						variable.setVariableDataId(phenotypeId);
 						variableList.add(variable);
 					}
 				}

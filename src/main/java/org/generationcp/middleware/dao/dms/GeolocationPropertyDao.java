@@ -61,7 +61,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 	}
 
 	@SuppressWarnings("unchecked")
-	public String getValueOfTrialInstance(final int datasetId, final int typeId, final String trialInstance) {
+	public String getValueOfTrialInstance(final int datasetId, final int typeId, final Integer trialInstance) {
 		try {
 			final StringBuilder sql =
 				new StringBuilder().append("SELECT gp.value FROM nd_geolocationprop gp ")

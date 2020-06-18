@@ -485,9 +485,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId) {
+	public StudyDetailsDto getStudyDetailsByInstance(final Integer instanceId) {
 		try {
-			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadataForGeolocationId(geolocationId);
+			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadataForInstance(instanceId);
 			if (studyMetadata != null) {
 				final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
 				studyDetailsDto.setMetadata(studyMetadata);
@@ -505,33 +505,33 @@ public class StudyServiceImpl extends Service implements StudyService {
 				List<Integer> variableIds = this.getVariableIds(environmentConditions);
 				if(!variableIds.isEmpty()) {
 					environmentParameters.addAll(
-						this.studyDataManager.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
+						this.studyDataManager.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(instanceId, variableIds));
 				}
 				final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
 					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
 				variableIds = this.getVariableIds(environmentDetails);
 				if(!variableIds.isEmpty()) {
 					environmentParameters.addAll(
-						this.studyDataManager.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds));
+						this.studyDataManager.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(instanceId, variableIds));
 				}
 
 
 				final List<MeasurementVariable> environmentVariables = new ArrayList<>(environmentConditions);
 				environmentVariables.addAll(environmentDetails);
-				environmentParameters.addAll(createGeolocationVariables(environmentVariables, geolocationId));
+				environmentParameters.addAll(createGeolocationVariables(environmentVariables, instanceId));
 				studyDetailsDto.setEnvironmentParameters(environmentParameters);
 
 				final Map<String, String> properties = new HashMap<>();
 				variableIds = this.getVariableIds(environmentVariables);
 				properties.put("studyObjective", studyMetadata.getStudyObjective());
-				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(geolocationId, variableIds));
+				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(instanceId, variableIds));
 				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId(), variableIds));
 				studyDetailsDto.setAdditionalInfo(properties);
 				return studyDetailsDto;
 			}
 			return null;
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getStudyDetailsForGeolocation() query with geolocationId: " + geolocationId;
+			final String message = "Error with getStudyDetailsForGeolocation() query with instanceId: " + instanceId;
 			StudyServiceImpl.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
