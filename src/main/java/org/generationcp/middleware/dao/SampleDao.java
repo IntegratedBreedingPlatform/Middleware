@@ -402,7 +402,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 		} catch (final HibernateException he) {
 			throw new MiddlewareException(
-					"Unexpected error in executing hasSamples(studyId = " + studyId + ") query: " + he.getMessage(),
+					"Unexpected error in executing studyEntryHasSamples(studyId = " + studyId + ",entryId=" + entryId + ") query: " + he.getMessage(),
 					he);
 		}
 		return queryResults.isEmpty() ? false : true;
