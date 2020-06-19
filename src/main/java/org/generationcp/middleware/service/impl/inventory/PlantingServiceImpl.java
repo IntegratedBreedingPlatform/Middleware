@@ -10,11 +10,7 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.ims.ExperimentTransaction;
-import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
-import org.generationcp.middleware.pojos.ims.Transaction;
-import org.generationcp.middleware.pojos.ims.TransactionStatus;
-import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.ims.*;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -24,12 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -235,6 +226,11 @@ public class PlantingServiceImpl implements PlantingService {
 	public List<Transaction> getPlantingTransactionsByStudyId(final Integer studyId, final TransactionStatus transactionStatus) {
 		return daoFactory.getExperimentTransactionDao()
 			.getTransactionsByStudyId(studyId, transactionStatus, ExperimentTransactionType.PLANTING);
+	}
+
+	@Override
+	public List<Transaction> getPlantingTransactionsByStudyAndEntryId(Integer studyId, Integer entryId, TransactionStatus transactionStatus) {
+		return daoFactory.getExperimentTransactionDao().getTransactionsByStudyAndEntryId(studyId, entryId, transactionStatus, ExperimentTransactionType.PLANTING);
 	}
 
 	@Override

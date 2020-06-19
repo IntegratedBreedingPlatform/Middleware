@@ -51,7 +51,7 @@ public class GermplasmTestDataGenerator {
 			final Germplasm parentGermplasm) throws MiddlewareQueryException {
 		final Integer[] gids = new Integer[numberOfChildGermplasm];
 		for (int i = 0; i < numberOfChildGermplasm; i++) {
-			final String name = prefix + i;
+			final String name = prefix + (i+1);
 			final Germplasm germplasm = this.createChildGermplasm(parentGermplasm, name);
 			gids[i] = germplasm.getGid();
 		}

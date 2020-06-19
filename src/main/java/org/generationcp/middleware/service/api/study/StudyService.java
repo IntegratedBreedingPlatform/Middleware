@@ -82,4 +82,6 @@ public interface StudyService {
 	List<StudyDto> getStudies(StudySearchFilter studySearchFilter);
 
 	long countStudies(StudySearchFilter studySearchFilter);
+
+	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
 }

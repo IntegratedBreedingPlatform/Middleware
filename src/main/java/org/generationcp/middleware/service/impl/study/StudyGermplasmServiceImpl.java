@@ -1,10 +1,15 @@
 
 package org.generationcp.middleware.service.impl.study;
 
+import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -12,10 +17,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Transactional
 public class StudyGermplasmServiceImpl implements StudyGermplasmService {
@@ -42,6 +44,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		int index = 0;
 		for (final StockModel stockModel : stockModelList) {
 			final StudyGermplasmDto studyGermplasmDto = new StudyGermplasmDto();
+			studyGermplasmDto.setEntryId(stockModel.getStockId());
 			studyGermplasmDto.setCross(this.findStockPropValue(TermId.CROSS.getId(), stockModel.getProperties()));
 			studyGermplasmDto.setDesignation(stockModel.getName());
 			studyGermplasmDto.setEntryCode(stockModel.getValue());
@@ -99,6 +102,54 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 
 		return this.inventoryDataManager.retrieveStockIds(gids);
 
+	}
+
+	@Override
+	public Optional<StudyGermplasmDto> getStudyGermplasm(final int studyId, final int entryId) {
+		final StockModel stock = this.daoFactory.getStockDao().getById(entryId);
+		if (stock != null) {
+			if (studyId != stock.getProject().getProjectId()) {
+				throw new MiddlewareRequestException("", "invalid.entryid.for.study");
+			}
+			return Optional.of(new StudyGermplasmDto(stock));
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public StudyGermplasmDto replaceStudyGermplasm(final int studyId, final int entryId, final int gid, final String crossExpansion) {
+		// Check first that new GID is valid
+		final Germplasm newGermplasm = this.daoFactory.getGermplasmDao().getById(gid);
+		if (newGermplasm == null) {
+			throw new MiddlewareException("Invalid GID: " + gid);
+		}
+		final StockDao stockDao = this.daoFactory.getStockDao();
+		// Copy from old entry: entry type, entry #, entry code
+		final StockModel stock = stockDao.getById(entryId);
+		if (stock == null) {
+			throw new MiddlewareRequestException("", "invalid.entryid");
+		} else if (studyId != stock.getProject().getProjectId()) {
+			throw new MiddlewareRequestException("", "invalid.entryid.for.study");
+		} else if (stock.getGermplasm().getGid() == gid) {
+			throw new MiddlewareRequestException("", "new.gid.matches.old.gid");
+		}
+		final StudyGermplasmDto newStudyGermplasm = new StudyGermplasmDto();
+		newStudyGermplasm.setEntryNumber(Integer.valueOf(stock.getUniqueName()));
+		Optional<StockProperty> entryType = stock.getProperties().stream().filter(prop -> TermId.ENTRY_TYPE.getId() == (prop.getTypeId())).findFirst();
+		entryType.ifPresent(entry -> newStudyGermplasm.setEntryType(entry.getValue()) );
+		newStudyGermplasm.setGermplasmId(gid);
+		newStudyGermplasm.setEntryCode(stock.getValue());
+		final Name preferredName = newGermplasm.getPreferredName();
+		newStudyGermplasm.setDesignation(preferredName != null? preferredName.getNval() : "");
+		newStudyGermplasm.setCross(crossExpansion);
+		// Save also Group GID
+		newStudyGermplasm.setGroupId(newGermplasm.getMgid());
+
+		final StudyGermplasmDto savedStudyGermplasm = this.saveStudyGermplasm(studyId, Collections.singletonList(newStudyGermplasm)).get(0);
+		stockDao.replaceExperimentStocks(entryId, savedStudyGermplasm.getEntryId());
+		// Finally delete old stock
+		stockDao.makeTransient(stock);
+		return savedStudyGermplasm;
 	}
 
 	private String findStockPropValue(final Integer termId, final Set<StockProperty> properties) {

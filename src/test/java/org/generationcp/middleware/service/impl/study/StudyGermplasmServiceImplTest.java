@@ -1,12 +1,14 @@
 
 package org.generationcp.middleware.service.impl.study;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The class <code>StudyGermplasmListServiceImplTest</code> contains tests for the class <code>{@link StudyGermplasmServiceImpl}</code>.
@@ -83,7 +86,7 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 		this.gids = Arrays.asList(gids);
 		for (int i=1; i<=StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM; i++) {
 			final Integer gid = gids[i - 1];
-			this.stockDao.save(new StockModel(studyId, createTestStudyGermplasm(i, gid)));
+			this.stockDao.save(new StockModel(studyId, this.createTestStudyGermplasm(i, gid)));
 		}
 	}
 
@@ -133,13 +136,67 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(index, this.service.countStudyGermplasm(this.studyId));
 	}
 
+	@Test
+	public void testGetStudyGermplasm() {
+		final StudyGermplasmDto secondEntry = this.service.getGermplasm(this.studyId).get(1);
+		Assert.assertNotNull(secondEntry);
+		Assert.assertFalse(this.service.getStudyGermplasm(this.studyId, secondEntry.getEntryId() + 100).isPresent());
+		final Optional<StudyGermplasmDto> studyGermplasm = this.service.getStudyGermplasm(this.studyId, secondEntry.getEntryId());
+		Assert.assertTrue(studyGermplasm.isPresent());
+		this.verifyStudyGermplasmDetails(secondEntry.getGermplasmId(), secondEntry.getEntryNumber(), studyGermplasm.get());
+	}
+
+	@Test
+	public void testReplaceStudyGermplasm() {
+		final StudyGermplasmDto oldEntry = this.service.getGermplasm(this.studyId).get(1);
+		Assert.assertNotNull(oldEntry);
+		final Integer newGid = gids.get(0);
+		final String crossExpansion = RandomStringUtils.randomAlphabetic(20);
+		this.service.replaceStudyGermplasm(this.studyId, oldEntry.getEntryId(), newGid, crossExpansion);
+
+
+		final StudyGermplasmDto dto = this.service.getGermplasm(this.studyId).get(1);
+		Assert.assertNotEquals(oldEntry.getEntryId(), dto.getEntryId());
+		Assert.assertEquals(StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + 1, dto.getDesignation());
+		Assert.assertEquals(crossExpansion, dto.getCross());
+		Assert.assertEquals(newGid, dto.getGermplasmId());
+		// Some fields should have been copied from old entry
+		Assert.assertEquals(oldEntry.getEntryType(), dto.getEntryType());
+		Assert.assertEquals(oldEntry.getEntryNumber(), dto.getEntryNumber());
+		Assert.assertEquals(oldEntry.getEntryCode(), dto.getEntryCode());
+	}
+
+	@Test(expected = MiddlewareRequestException.class)
+	public void testReplaceStudyGermplasm_InvalidEntryId() {
+		final StudyGermplasmDto oldEntry = this.service.getGermplasm(this.studyId).get(1);
+		Assert.assertNotNull(oldEntry);
+		final Integer newGid = gids.get(0);
+		this.service.replaceStudyGermplasm(this.studyId, oldEntry.getEntryId() + 10, newGid, RandomStringUtils.random(5));
+	}
+
+	@Test(expected = MiddlewareRequestException.class)
+	public void testReplaceStudyGermplasm_InvalidEntryIdForStudy() {
+		final StudyGermplasmDto oldEntry = this.service.getGermplasm(this.studyId).get(1);
+		Assert.assertNotNull(oldEntry);
+		final Integer newGid = gids.get(0);
+		this.service.replaceStudyGermplasm(this.studyId+1, oldEntry.getEntryId(), newGid, RandomStringUtils.random(5));
+	}
+
+	@Test(expected = MiddlewareRequestException.class)
+	public void testReplaceStudyGermplasm_SameGidAsExistingEntry() {
+		final StudyGermplasmDto oldEntry = this.service.getGermplasm(this.studyId).get(1);
+		Assert.assertNotNull(oldEntry);
+		this.service.replaceStudyGermplasm(this.studyId+1, oldEntry.getEntryId(), oldEntry.getGermplasmId(), RandomStringUtils.random(5));
+	}
+
 	private void verifyStudyGermplasmDetails(Integer gid, int index, StudyGermplasmDto dto) {
 		Assert.assertEquals(index, dto.getEntryNumber().intValue());
 		Assert.assertEquals(StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + index, dto.getDesignation());
 		Assert.assertEquals(StudyGermplasmServiceImplTest.SEEDSOURCE + index, dto.getSeedSource());
 		Assert.assertEquals(StudyGermplasmServiceImplTest.CROSS + index, dto.getCross());
-		Assert.assertEquals(gid.intValue(), dto.getGermplasmId().intValue());
+		Assert.assertEquals(gid, dto.getGermplasmId());
 		Assert.assertEquals(StudyGermplasmServiceImplTest.ENTRYCODE + gid, dto.getEntryCode());
+		Assert.assertNotNull(dto.getEntryId());
 	}
 
 

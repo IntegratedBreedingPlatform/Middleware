@@ -614,6 +614,13 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return this.daoFactory.getDmsProjectDAO().countStudies(studySearchFilter);
 	}
 
+	@Override
+	public boolean studyHasGivenDatasetType(final Integer studyId, final Integer datasetTypeId) {
+		final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO()
+				.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.MEANS_DATA.getId());
+		return (!org.springframework.util.CollectionUtils.isEmpty(datasets));
+	}
+
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
 	}
