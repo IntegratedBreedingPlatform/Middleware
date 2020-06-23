@@ -141,6 +141,16 @@ public class StockModel implements Serializable {
 		crossProperty.setValue(studyGermplasmDto.getCross());
 		stockProperties.add(crossProperty);
 
+		final Integer groupId = studyGermplasmDto.getGroupId();
+		if (groupId != null) {
+			final StockProperty groupIdProperty = new StockProperty();
+			groupIdProperty.setStock(this);
+			groupIdProperty.setRank(4);
+			groupIdProperty.setTypeId(TermId.GROUPGID.getId());
+			groupIdProperty.setValue(groupId.toString());
+			stockProperties.add(groupIdProperty);
+		}
+
 		this.setProperties(stockProperties);
 	}
 

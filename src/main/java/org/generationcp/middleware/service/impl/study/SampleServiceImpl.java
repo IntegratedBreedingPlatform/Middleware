@@ -224,6 +224,11 @@ public class SampleServiceImpl implements SampleService {
 		return this.daoFactory.getSampleDao().hasSamples(studyId);
 	}
 
+	@Override
+	public Boolean studyEntryHasSamples(Integer studyId, Integer entryId) {
+		return this.daoFactory.getSampleDao().studyEntryHasSamples(studyId, entryId);
+	}
+
 	protected void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}

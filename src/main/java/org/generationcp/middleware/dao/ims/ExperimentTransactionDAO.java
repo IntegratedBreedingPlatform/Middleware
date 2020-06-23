@@ -84,6 +84,29 @@ public class ExperimentTransactionDAO extends GenericDAO<ExperimentTransaction, 
 		}
 	}
 
+	public List<Transaction> getTransactionsByStudyAndEntryId(final Integer studyId, final Integer entryId,
+													  final TransactionStatus transactionStatus, final ExperimentTransactionType experimentTransactionType) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class, "transaction");
+			criteria.createAlias("transaction.experimentTransactions", "experimentTransaction", Criteria.INNER_JOIN);
+			criteria.createAlias("experimentTransaction.experiment.project", "project", Criteria.INNER_JOIN);
+			criteria.createAlias("experimentTransaction.experiment.stock", "stock", Criteria.INNER_JOIN);
+			criteria.add(Restrictions.eq("status", transactionStatus.getIntValue()));
+			criteria.add(Restrictions.eq("project.study.projectId", studyId));
+			criteria.add(Restrictions.eq("stock.stockId", entryId));
+			criteria.add(Restrictions.eq("experimentTransaction.type", experimentTransactionType.getId()));
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message =
+					"Error at getTransactionsByStudyId studyId = " + studyId + ", transactionType + "
+							+ transactionStatus
+							.getValue() + ", experimentTransactionStatus=" + experimentTransactionType.getValue();
+			ExperimentTransactionDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 	public List<Transaction> getTransactionsByInstanceIds(final List<Integer> instanceIds,
 		final TransactionStatus transactionStatus, final ExperimentTransactionType experimentTransactionType) {
 		try {
