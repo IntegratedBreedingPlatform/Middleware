@@ -73,10 +73,20 @@ public class DataSourceProperties {
 
 	public DataSourceProperties(final Properties properties) {
 
-		this.host = this.getPropertyValue(properties, this.host, DataSourceProperties.DB_HOST);
-		this.port = this.getPropertyValue(properties, this.port, DataSourceProperties.DB_PORT);
-		this.userName = this.getPropertyValue(properties, this.userName, DataSourceProperties.DB_USERNAME);
-		this.password = this.getPropertyValue(properties, this.password, DataSourceProperties.DB_PASSWORD);
+		this.host = System.getenv("BMS_DB_HOST");
+
+		if(this.host != null) {
+			this.host = System.getenv("BMS_DB_HOST");
+			this.port = System.getenv("BMS_DB_PORT");
+			this.userName = System.getenv("BMS_DB_USERNAME");
+			this.password = System.getenv("BMS_DB_PASSWORD");
+		} else {
+			this.host = this.getPropertyValue(properties, this.host, DataSourceProperties.DB_HOST);
+			this.port = this.getPropertyValue(properties, this.port, DataSourceProperties.DB_PORT);
+			this.userName = this.getPropertyValue(properties, this.userName, DataSourceProperties.DB_USERNAME);
+			this.password = this.getPropertyValue(properties, this.password, DataSourceProperties.DB_PASSWORD);
+		}
+
 		this.workbenchDbName = this.getPropertyValue(properties, this.workbenchDbName, DataSourceProperties.DB_WORKBENCH_NAME);
 		this.xaDriverName = this.getPropertyValue(properties, this.xaDriverName, DataSourceProperties.CONNECTIONPOOL_XADRIVER_NAME);
 		this.borrowConnectionTimeout =
