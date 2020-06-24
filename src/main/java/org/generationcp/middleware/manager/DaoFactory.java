@@ -5,6 +5,7 @@ import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
 import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.NameDAO;
@@ -16,6 +17,7 @@ import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
@@ -25,6 +27,7 @@ import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.dms.StudySearchDao;
+import org.generationcp.middleware.dao.ims.ExperimentTransactionDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -143,6 +146,13 @@ public class DaoFactory {
 
 	}
 
+	public KeySequenceRegisterDAO getKeySequenceRegisterDAO() {
+		final KeySequenceRegisterDAO keySequenceRegisterDAO = new KeySequenceRegisterDAO();
+		keySequenceRegisterDAO.setSession(this.sessionProvider.getSession());
+		return keySequenceRegisterDAO;
+
+	}
+
 	public ProjectPropertyDao getProjectPropertyDAO() {
 		final ProjectPropertyDao projectPropDao = new ProjectPropertyDao();
 		projectPropDao.setSession(this.sessionProvider.getSession());
@@ -233,4 +243,17 @@ public class DaoFactory {
 		programFavoriteDao.setSession(this.sessionProvider.getSession());
 		return programFavoriteDao;
 	}
+
+	public ExperimentTransactionDAO getExperimentTransactionDao() {
+		final ExperimentTransactionDAO experimentTransactionDAO = new ExperimentTransactionDAO();
+		experimentTransactionDAO.setSession(this.sessionProvider.getSession());
+		return experimentTransactionDAO;
+	}
+
+	public ExperimentPropertyDao getExperimentPropertyDao() {
+		final ExperimentPropertyDao experimentPropertyDao = new ExperimentPropertyDao();
+		experimentPropertyDao.setSession(this.sessionProvider.getSession());
+		return experimentPropertyDao;
+	}
+
 }

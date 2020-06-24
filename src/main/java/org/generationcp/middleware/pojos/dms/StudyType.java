@@ -48,6 +48,10 @@ public class StudyType {
 	public StudyType() {
 	}
 
+	public StudyType(final Integer studyTypeId) {
+		this.studyTypeId = studyTypeId;
+	}
+
 	public Integer getStudyTypeId() {
 		return studyTypeId;
 	}

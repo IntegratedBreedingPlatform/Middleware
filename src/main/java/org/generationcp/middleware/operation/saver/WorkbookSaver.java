@@ -13,18 +13,7 @@ package org.generationcp.middleware.operation.saver;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -37,13 +26,13 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
@@ -55,14 +44,10 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-// ASsumptions - can be added to validations
+// Assumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName
 // template must not contain exact same combo of property-scale-method
 
@@ -84,9 +69,6 @@ public class WorkbookSaver extends Saver {
 	public static final String PLOTDATA = "-PLOTDATA";
 
 	private DaoFactory daoFactory;
-
-	@Resource
-	private DataSetBuilder dataSetBuilder;
 
 	@Resource
 	private WorkbookBuilder workbookBuilder;
@@ -115,11 +97,10 @@ public class WorkbookSaver extends Saver {
 	 * @return Map<String>, ?> : a map of 3 sub-maps containing
 	 * Strings(headers), VariableTypeLists and Lists of
 	 * MeasurementVariables
-	 * @throws Exception
 	 */
 
 	@SuppressWarnings("rawtypes")
-	public Map saveVariables(final Workbook workbook, final String programUUID) throws Exception {
+	public Map saveVariables(final Workbook workbook, final String programUUID) {
 		// make sure to reset all derived variables
 		workbook.reset();
 
@@ -269,7 +250,7 @@ public class WorkbookSaver extends Saver {
 
 		plotDatasetId =
 			this.createPlotDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables, programUUID);
-		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
+		this.createOrResolveStudyGermplasm(workbook, studyId, effectVariables, trialHeaders);
 
 		if (!retainValues) {
 			// clean up some variable references to save memory space before
@@ -336,7 +317,7 @@ public class WorkbookSaver extends Saver {
 			true, programUUID);
 	}
 
-	public void savePlotDataset(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) throws Exception {
+	public void savePlotDataset(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) {
 
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList ,
 		// Maps of Lists of MeasurementVariable
@@ -358,11 +339,11 @@ public class WorkbookSaver extends Saver {
 		final List<Integer> locationIds = new ArrayList<>();
 		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
 
-		final Integer environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
-		final Integer plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
+		final int environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
+		final int plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
 		final int studyId = workbook.getStudyDetails().getId();
 
-		int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
+		final int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
 		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
 
 		this.resetTrialObservations(workbook.getTrialObservations());
@@ -380,7 +361,8 @@ public class WorkbookSaver extends Saver {
 
 		this.saveOrUpdateTrialObservations( crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId, savedEnvironmentsCount, true, programUUID);
 
-		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
+		// set study germplasm to observation rows
+		this.setDatasetStocks(workbook, this.daoFactory.getStockDao().getStocksForStudy(studyId));
 		this.createMeasurementEffectExperiments(crop, plotDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
 
 	}
@@ -473,7 +455,7 @@ public class WorkbookSaver extends Saver {
 			row.setLocationId(0);
 			row.setStockId(0);
 			for (final MeasurementData data : row.getDataList()) {
-				data.setPhenotypeId(null);
+				data.setMeasurementDataId(null);
 			}
 		}
 	}
@@ -562,7 +544,7 @@ public class WorkbookSaver extends Saver {
 		return studyLocationId;
 	}
 
-	public int createLocationsAndSetToObservations(
+	private int createLocationsAndSetToObservations(
 		final List<Integer> locationIds, final Workbook workbook,
 		final VariableTypeList trialFactors, final List<String> trialHeaders, final Map<Integer, VariableList> trialVariatesMap,
 		final boolean isDeleteTrialObservations, final String programUUID) {
@@ -663,7 +645,7 @@ public class WorkbookSaver extends Saver {
 
 			if (!StringUtils.isEmpty(locationIdVariable.getValue())) {
 				locationId.add(Integer.valueOf(locationIdVariable.getValue()));
-				locationIdExists = (locationDAO.getByIds(locationId).size() > 0) ? true : false;
+				locationIdExists = locationDAO.getByIds(locationId).size() > 0;
 			}
 			if (StringUtils.isEmpty(locationIdVariable.getValue()) || !locationIdExists) {
 				String unspecifiedLocationLocId = "";
@@ -711,7 +693,7 @@ public class WorkbookSaver extends Saver {
 		return null;
 	}
 
-	private String getStockFactor(final VariableList stockVariables) {
+	private String getEntryNumber(final VariableList stockVariables) {
 		if (stockVariables != null && stockVariables.getVariables() != null) {
 			for (final Variable variable : stockVariables.getVariables()) {
 				if (TermId.ENTRY_NO.getId() == variable.getVariableType().getStandardVariable().getId()) {
@@ -884,10 +866,11 @@ public class WorkbookSaver extends Saver {
 		return datasetId;
 	}
 
-	public void createStocksIfNecessary(
-		final int datasetId, final Workbook workbook, final VariableTypeList effectVariables,
+	public void createStocksIfNecessary(final int studyId, final Workbook workbook, final VariableTypeList effectVariables,
 		final List<String> trialHeaders) {
-		final Map<String, Integer> stockMap = this.getStockModelBuilder().getStockMapForDataset(datasetId);
+		final List<StockModel> studyGermplasm = this.daoFactory.getStockDao().getStocksForStudy(studyId);
+		final Map<String, Integer> entryNoStockIdMap = studyGermplasm.stream().collect(Collectors.toMap(StockModel::getUniqueName, StockModel::getStockId));
+
 
 		List<Integer> variableIndexesList = new ArrayList<>();
 		// we get the indexes so that in the next rows we dont need to compare
@@ -906,12 +889,12 @@ public class WorkbookSaver extends Saver {
 
 					final VariableList stock = this.getVariableListTransformer()
 						.transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
-					final String stockFactor = this.getStockFactor(stock);
-					Integer stockId = stockMap.get(stockFactor);
+					final String entryNumber = this.getEntryNumber(stock);
+					Integer stockId = entryNoStockIdMap.get(entryNumber);
 
 					if (stockId == null) {
-						stockId = this.getStockSaver().saveStock(stock);
-						stockMap.put(stockFactor, stockId);
+						stockId = this.getStockSaver().saveStock(studyId, stock);
+						entryNoStockIdMap.put(String.valueOf(entryNumber), stockId);
 					} else {
 						this.getStockSaver().saveOrUpdateStock(stock, stockId);
 					}
@@ -1147,11 +1130,8 @@ public class WorkbookSaver extends Saver {
 		}
 
 		// create stock and stockprops and associate to observations
-		int datasetId = measurementDatasetId;
-		if (isMeansDataImport) {
-			datasetId = meansDatasetId;
-		}
-		this.createStocksIfNecessary(datasetId, workbook, effectVariables, trialHeaders);
+		this.createOrResolveStudyGermplasm(workbook, studyId, effectVariables, trialHeaders);
+
 
 		// create trial experiments if not yet existing
 		final boolean hasExistingStudyExperiment = this.checkIfHasExistingStudyExperiment(studyId);
@@ -1180,6 +1160,24 @@ public class WorkbookSaver extends Saver {
 		} else {
 			// 3. measurement experiments
 			this.createMeasurementEffectExperiments(crop, measurementDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
+		}
+	}
+
+	void createOrResolveStudyGermplasm(final Workbook workbook, final Integer studyId, final VariableTypeList effectVariables,
+									   final List<String> trialHeaders) {
+		final List<StockModel> studyGermplasm = this.daoFactory.getStockDao().getStocksForStudy(studyId);
+		if (CollectionUtils.isEmpty(studyGermplasm)) {
+			this.createStocksIfNecessary(studyId, workbook, effectVariables, trialHeaders);
+		} else {
+			this.setDatasetStocks(workbook, studyGermplasm);
+		}
+	}
+
+	void setDatasetStocks(final Workbook workbook, final List<StockModel> studyGermplasm) {
+		final Map<String, Integer> entryNoStockIdMap = studyGermplasm.stream().collect(Collectors.toMap(StockModel::getUniqueName, StockModel::getStockId));
+		for (final MeasurementRow row : workbook.getObservations()) {
+			final String entryNo = row.getMeasurementData(TermId.ENTRY_NO.getId()).getValue();
+			row.setStockId(entryNoStockIdMap.get(entryNo));
 		}
 	}
 
@@ -1392,4 +1390,6 @@ public class WorkbookSaver extends Saver {
 			throw new PhenotypeException(exceptions);
 		}
 	}
+
+
 }

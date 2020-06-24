@@ -74,6 +74,13 @@ public class ExperimentProperty implements Serializable {
 		this.rank = rank;
 	}
 
+	public ExperimentProperty(final ExperimentModel experimentModel, final String value, final Integer rank, final Integer typeId) {
+		this.experiment = experimentModel;
+		this.value = value;
+		this.rank = rank;
+		this.typeId = typeId;
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();

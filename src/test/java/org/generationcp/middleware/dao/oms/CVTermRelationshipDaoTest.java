@@ -374,6 +374,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 			this.stock.setTypeId(TermId.ENTRY_CODE.getId());
 			this.stock.setUniqueName("1");
 			this.stock.setGermplasm(getGermplasm());
+			this.stock.setProject(this.study);
 			this.stockDao.save(this.stock);
 		}
 		return this.stock;

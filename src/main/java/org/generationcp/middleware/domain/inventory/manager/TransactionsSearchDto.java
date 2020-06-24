@@ -17,23 +17,36 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	private String stockId;
 	private List<Integer> transactionIds;
 	private String createdByUsername;
-	private String transactionType;
+	private List<Integer> transactionTypes;
+	private List<Integer> transactionStatus;
 	private String notes;
 	private List<Integer> lotIds;
+	private List<String> lotUUIDs;
+	private String lotLocationAbbr;
 	private List<Integer> gids;
-	private List<Integer> scaleIds;
+	private List<Integer> unitIds;
 	private Double minAmount;
 	private Double maxAmount;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date transactionDateFrom;
+	private Date createdDateFrom;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date transactionDateTo;
+	private Date createdDateTo;
 
 	private List<Integer> statusIds;
 
 	private Integer lotStatus;
+
+	private List<Integer> germplasmListIds;
+
+	public List<Integer> getGermplasmListIds() {
+		return germplasmListIds;
+	}
+
+	public void setGermplasmListIds(final List<Integer> germplasmListIds) {
+		this.germplasmListIds = germplasmListIds;
+	}
 
 	public String getDesignation() {
 		return this.designation;
@@ -67,14 +80,6 @@ public class TransactionsSearchDto extends SearchRequestDto {
 		this.transactionIds = transactionIds;
 	}
 
-	public String getTransactionType() {
-		return this.transactionType;
-	}
-
-	public void setTransactionType(final String transactionType) {
-		this.transactionType = transactionType;
-	}
-
 	public String getNotes() {
 		return this.notes;
 	}
@@ -91,6 +96,14 @@ public class TransactionsSearchDto extends SearchRequestDto {
 		this.lotIds = lotIds;
 	}
 
+	public String getLotLocationAbbr() {
+		return this.lotLocationAbbr;
+	}
+
+	public void setLotLocationAbbr(final String lotLocationAbbr) {
+		this.lotLocationAbbr = lotLocationAbbr;
+	}
+
 	public List<Integer> getGids() {
 		return this.gids;
 	}
@@ -99,12 +112,12 @@ public class TransactionsSearchDto extends SearchRequestDto {
 		this.gids = gids;
 	}
 
-	public List<Integer> getScaleIds() {
-		return this.scaleIds;
+	public List<Integer> getUnitIds() {
+		return this.unitIds;
 	}
 
-	public void setScaleIds(final List<Integer> scaleIds) {
-		this.scaleIds = scaleIds;
+	public void setUnitIds(final List<Integer> unitIds) {
+		this.unitIds = unitIds;
 	}
 
 	public Double getMinAmount() {
@@ -123,20 +136,20 @@ public class TransactionsSearchDto extends SearchRequestDto {
 		this.maxAmount = maxAmount;
 	}
 
-	public Date getTransactionDateFrom() {
-		return this.transactionDateFrom;
+	public Date getCreatedDateFrom() {
+		return this.createdDateFrom;
 	}
 
-	public void setTransactionDateFrom(final Date transactionDateFrom) {
-		this.transactionDateFrom = transactionDateFrom;
+	public void setCreatedDateFrom(final Date createdDateFrom) {
+		this.createdDateFrom = createdDateFrom;
 	}
 
-	public Date getTransactionDateTo() {
-		return this.transactionDateTo;
+	public Date getCreatedDateTo() {
+		return this.createdDateTo;
 	}
 
-	public void setTransactionDateTo(final Date transactionDateTo) {
-		this.transactionDateTo = transactionDateTo;
+	public void setCreatedDateTo(final Date createdDateTo) {
+		this.createdDateTo = createdDateTo;
 	}
 
 	public List<Integer> getStatusIds() {
@@ -153,6 +166,30 @@ public class TransactionsSearchDto extends SearchRequestDto {
 
 	public void setLotStatus(final Integer lotStatus) {
 		this.lotStatus = lotStatus;
+	}
+
+	public List<Integer> getTransactionTypes() {
+		return this.transactionTypes;
+	}
+
+	public void setTransactionTypes(final List<Integer> transactionTypes) {
+		this.transactionTypes = transactionTypes;
+	}
+
+	public List<Integer> getTransactionStatus() {
+		return this.transactionStatus;
+	}
+
+	public void setTransactionStatus(final List<Integer> transactionStatus) {
+		this.transactionStatus = transactionStatus;
+	}
+
+	public List<String> getLotUUIDs() {
+		return lotUUIDs;
+	}
+
+	public void setLotUUIDs(final List<String> lotUUIDs) {
+		this.lotUUIDs = lotUUIDs;
 	}
 
 	@Override

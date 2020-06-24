@@ -392,6 +392,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public Map<Integer, Map<Integer, String>> getAttributeValuesGIDList(final List<Integer> gidList) {
+		final Map<Integer, Map<Integer, String>> attributeMap = new HashMap<>();
+
+		// retrieve attribute values
+		final List<Attribute> attributeList = this.getAttributeDao().getAttributeValuesGIDList(gidList);
+		for (final Attribute attribute : attributeList) {
+			Map<Integer, String> attrByType = attributeMap.get(attribute.getGermplasmId());
+			if (attrByType == null) {
+				attrByType = new HashMap<>();
+			}
+			attrByType.put(attribute.getTypeId(), attribute.getAval());
+			attributeMap.put(attribute.getGermplasmId(), attrByType);
+		}
+
+		return attributeMap;
+	}
+
+	@Override
 	public List<UserDefinedField> getNameTypesByGIDList(final List<Integer> gidList) {
 		return this.getUserDefinedFieldDao().getNameTypesByGIDList(gidList);
 	}
@@ -968,9 +986,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public String getNextSequenceNumberForCrossName(final String prefix) {
+	public String getNextSequenceNumberAsString(final String prefix) {
 		final String nextSequenceStr;
-		nextSequenceStr = this.getGermplasmDao().getNextSequenceNumberForCrossName(prefix);
+		nextSequenceStr = this.getGermplasmDao().getNextSequenceNumber(prefix);
 		return nextSequenceStr;
 	}
 
@@ -989,9 +1007,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Germplasm> getGermplasmByLocationId(final String name, final int locationID) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		germplasmList.addAll(this.getGermplasmDao().getByLocationId(name, locationID));
-		return germplasmList;
+		return this.getGermplasmDao().getByLocationId(name, locationID);
 	}
 
 	@Override
@@ -1001,8 +1017,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Germplasm> getGermplasmByGidRange(final int startGIDParam, final int endGIDParam) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-
 		int startGID = startGIDParam;
 		int endGID = endGIDParam;
 		// assumes the lesser value be the start of the range
@@ -1012,22 +1026,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			startGID = temp;
 		}
 
-		germplasmList.addAll(this.getGermplasmDao().getByGIDRange(startGID, endGID));
-		return germplasmList;
+		return this.getGermplasmDao().getByGIDRange(startGID, endGID);
 	}
 
 	@Override
 	public List<Germplasm> getGermplasms(final List<Integer> gids) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		germplasmList.addAll(this.getGermplasmDao().getByGIDList(gids));
-		return germplasmList;
+		return this.getGermplasmDao().getByGIDList(gids);
 	}
 
 	@Override
 	public List<Germplasm> getGermplasmWithoutGroup(final List<Integer> gids) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		germplasmList.addAll(this.getGermplasmDao().getGermplasmWithoutGroup(gids));
-		return germplasmList;
+		return this.getGermplasmDao().getGermplasmWithoutGroup(gids);
 	}
 
 	@Override
@@ -1245,11 +1254,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public int getMaximumSequence(final boolean isBulk, final String prefix, final String suffix, final int count) {
-		return this.getNameBuilder().getMaximumSequence(isBulk, prefix, suffix, count);
-	}
-
-	@Override
 	public boolean checkIfMatches(final String name) {
 		return this.getNameDao().checkIfMatches(name);
 	}
@@ -1428,6 +1432,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Map<Integer, String> getGroupSourcePreferredNamesByGids(final List<Integer> gids) {
 		return this.getNameDao().getSourcePreferredNamesByGids(gids);
 
+	}
+
+	@Override
+	public List<String> getNamesByGidsAndPrefixes(final List<Integer> gids, final List<String> prefixes) {
+		return this.getNameDao().getNamesByGidsAndPrefixes(gids, prefixes);
 	}
 
 	@Override

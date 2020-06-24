@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
@@ -30,11 +31,8 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.ims.ReservedInventoryKey;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
-import org.generationcp.middleware.pojos.report.LotReportRow;
-import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
@@ -42,7 +40,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -91,21 +88,21 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	@Before
 	public void setUpBefore() {
 		final List<Lot> lots = new ArrayList<Lot>();
-		this.lot = new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9001, 1538, 0, 0, "sample added lot 1");
+		this.lot = new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9001, 1538, 0, 0, "sample added lot 1", RandomStringUtils.randomAlphabetic(35));
 		lots.add(this.lot);
-		lots.add(new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9002, 1539, 0, 0, "sample added lot 2"));
+		lots.add(new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9002, 1539, 0, 0, "sample added lot 2", RandomStringUtils.randomAlphabetic(35)));
 		final List<Integer> idList = this.manager.addLots(lots);
 		this.lotId = idList.get(0);
 		this.lot.setId(this.lotId);
 
 		final List<Transaction> transactions = new ArrayList<Transaction>();
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140413)), 1, -1d, "sample added transaction 1", 0, null, null, null, 100d, 1, null));
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 1, -2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 0, -2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 0, 2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140413)), 1, -1d, "sample added transaction 1", 0, null, null, null, 100d, 1, TransactionType.DEPOSIT.getId()));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 1, -2d, "sample added transaction 2", 0, null, null, null, 150d, 1, TransactionType.DEPOSIT.getId()));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 0, -2d, "sample added transaction 2", 0, null, null, null, 150d, 1, TransactionType.DEPOSIT.getId()));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 0, 2d, "sample added transaction 2", 0, null, null, null, 150d, 1, TransactionType.DEPOSIT.getId()));
 		transactions.add(new Transaction(null, 1, this.lot, new Date((20140413)), 1, -1d, "sample added transaction 1", 0, null, null,
-				null, 100d, 1, null));
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20120518)), 1, 2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+				null, 100d, 1, TransactionType.DEPOSIT.getId()));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20120518)), 1, 2d, "sample added transaction 2", 0, null, null, null, 150d, 1, TransactionType.DEPOSIT.getId()));
 		final Set<Transaction> transactionSet = new HashSet<>();
 		transactionSet.add(transactions.get(4));
 		this.lot.setTransactions(transactionSet);
@@ -115,100 +112,8 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetLotsByEntityType() {
-		final String type = EntityType.GERMPLSM.name();
-		final List<Lot> results = this.manager.getLotsByEntityType(type, 0, 5);
-		Assert.assertTrue(results != null);
-		Assert.assertTrue(!results.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGetLotsByEntityType(" + type + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, results);
-	}
-
-	@Test
-	public void testCountLotsByEntityType() {
-		Debug.println(IntegrationTestBase.INDENT,
-				"testCountLotsByEntityType(\"GERMPLSM\"): " + this.manager.countLotsByEntityType(EntityType.GERMPLSM.name()));
-	}
-
-	@Test
-	public void testGetLotsByEntityTypeAndEntityId() {
-		final String type = EntityType.GERMPLSM.name();
-		final Integer entityId = Integer.valueOf(50533);
-		final List<Lot> results = this.manager.getLotsByEntityTypeAndEntityId(type, entityId, 0, 5);
-		Assert.assertTrue(results != null);
-		Assert.assertTrue(!results.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGetLotsByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, results);
-	}
-
-	@Test
-	public void testCountLotsByEntityTypeAndEntityId() {
-		final String type = EntityType.GERMPLSM.name();
-		final Integer entityId = Integer.valueOf(50533);
-		Debug.println(IntegrationTestBase.INDENT, "testCountLotsByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId + "): "
-				+ this.manager.countLotsByEntityTypeAndEntityId(type, entityId));
-	}
-
-	@Test
-	public void testGetLotsByEntityTypeAndLocationId() {
-		final String type = EntityType.GERMPLSM.name();
-		final Integer locationId = Integer.valueOf(9001);
-		final List<Lot> results = this.manager.getLotsByEntityTypeAndLocationId(type, locationId, 0, 5);
-		Assert.assertTrue(results != null);
-		Assert.assertTrue(!results.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGetLotsByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId
-				+ "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, results);
-	}
-
-	@Test
-	public void testCountLotsByEntityTypeAndLocationId() {
-		final String type = EntityType.GERMPLSM.name();
-		final Integer locationId = Integer.valueOf(9000);
-		Debug.println(IntegrationTestBase.INDENT, "testCountLotsByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId
-				+ "): " + this.manager.countLotsByEntityTypeAndLocationId(type, locationId));
-	}
-
-	@Test
-	public void testGetLotsByEntityTypeAndEntityIdAndLocationId() {
-		final String type = EntityType.GERMPLSM.name();
-		final Integer entityId = Integer.valueOf(50533);
-		final Integer locationId = Integer.valueOf(9001);
-		final List<Lot> results = this.manager.getLotsByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId, 0, 5);
-		Assert.assertTrue(results != null);
-		Assert.assertTrue(!results.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGetLotsByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId=" + entityId
-				+ ", locationId=" + locationId + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, results);
-	}
-
-	@Test
-	public void testCountLotsByEntityTypeAndEntityIdAndLocationId() {
-		final String type = EntityType.GERMPLSM.name();
-		final Integer entityId = Integer.valueOf(50533);
-		final Integer locationId = Integer.valueOf(9000);
-		Debug.println(IntegrationTestBase.INDENT,
-				"testCountLotsByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId=" + entityId + ", locationId=" + locationId
-						+ "): " + this.manager.countLotsByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId));
-	}
-
-	@Test
-	public void testGetActualLotBalance() {
-		final Integer lotId = Integer.valueOf(1);
-		Debug.println(IntegrationTestBase.INDENT,
-				"testGetActualLotBalance(lotId=" + lotId + "): " + this.manager.getActualLotBalance(lotId));
-	}
-
-	@Test
-	public void testGetAvailableLotBalance() {
-		final Integer lotId = Integer.valueOf(1);
-		Debug.println(IntegrationTestBase.INDENT,
-				"testGetAvailableLotBalance(lotId=" + lotId + "): " + this.manager.getAvailableLotBalance(lotId));
-	}
-
-	@Test
 	public void testAddLot() {
-		final Lot lot = new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9001, 6088, 0, 0, "sample added lot");
+		final Lot lot = new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9001, 6088, 0, 0, "sample added lot", RandomStringUtils.randomAlphabetic(35));
 		this.manager.addLot(lot);
 		Assert.assertNotNull(lot.getId());
 		Debug.println(IntegrationTestBase.INDENT, "Added: " + lot.toString());
@@ -217,8 +122,8 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	@Test
 	public void testAddLots() {
 		final List<Lot> lots = new ArrayList<Lot>();
-		lots.add(new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9001, 1538, 0, 0, "sample added lot 1"));
-		lots.add(new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9002, 1539, 0, 0, "sample added lot 2"));
+		lots.add(new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9001, 1538, 0, 0, "sample added lot 1", RandomStringUtils.randomAlphabetic(35)));
+		lots.add(new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9002, 1539, 0, 0, "sample added lot 2", RandomStringUtils.randomAlphabetic(35)));
 		final List<Integer> idList = this.manager.addLots(lots);
 
 		Assert.assertFalse(idList.isEmpty());
@@ -227,67 +132,11 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testUpdateLot() {
-		// this test assumes there are existing lot records with entity type = GERMPLSM
-		final Lot lot = this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0);
-
-		Debug.println(IntegrationTestBase.INDENT, "BEFORE: " + lot.toString());
-
-		final String oldComment = lot.getComments();
-		String newComment = oldComment + " UPDATED " + (int) (Math.random() * 100);
-		if (newComment.length() > 255) {
-			newComment = newComment.substring(newComment.length() - 255);
-		}
-		lot.setComments(newComment);
-
-		this.manager.updateLot(lot);
-
-		Assert.assertFalse(oldComment.equals(lot.getComments()));
-		Debug.println(IntegrationTestBase.INDENT, "AFTER: " + lot.toString());
-	}
-
-	@Test
-	public void testUpdateLots() {
-		// this test assumes there are at least 2 existing lot records with entity type = GERMPLSM
-		final List<Lot> lots = this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 2);
-
-		Debug.println(IntegrationTestBase.INDENT, "BEFORE: ");
-		Debug.printObjects(IntegrationTestBase.INDENT * 2, lots);
-
-		if (lots.size() == 2) {
-			final String oldComment = lots.get(0).getComments();
-			for (final Lot lot : lots) {
-				String newComment = lot.getComments() + " UPDATED " + (int) (Math.random() * 100);
-				if (newComment.length() > 255) {
-					newComment = newComment.substring(newComment.length() - 255);
-				}
-				lot.setComments(newComment);
-			}
-			this.manager.updateLots(lots);
-			Debug.println(IntegrationTestBase.INDENT, "AFTER: ");
-			Debug.printObjects(IntegrationTestBase.INDENT * 2, lots);
-			Assert.assertFalse(oldComment.equals(lots.get(0).getComments()));
-		} else {
-			Debug.println(IntegrationTestBase.INDENT, "At least two LOT entries of type=\"GERMPLSM\" are required in this test");
-		}
-	}
-
-	@Test
-	public void testAddTransaction() {
-		final Transaction transaction =
-				new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0),
-					new Date((20140413)), 1, 200d, "sample added transaction", 0, null, null, null, 100d, 1, null);
-		this.manager.addTransaction(transaction);
-		Assert.assertNotNull(transaction.getId());
-		Debug.println(IntegrationTestBase.INDENT, "testAddTransaction() Added: " + transaction);
-	}
-
-	@Test
 	public void testAddTransactions() {
 		// this test assumes there are existing lot records with entity type = GERMPLSM
 		final List<Transaction> transactions = new ArrayList<Transaction>();
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140413)), 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, 1, null));
-		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140413)), 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, 1, TransactionType.DEPOSIT.getId()));
+		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, 1, TransactionType.DEPOSIT.getId()));
 		this.manager.addTransactions(transactions);
 		Assert.assertNotNull(transactions.get(0).getId());
 		Debug.printObjects(IntegrationTestBase.INDENT, transactions);
@@ -358,156 +207,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllReserveTransactions() {
-		final List<Transaction> transactions = this.manager.getAllReserveTransactions(0, 5);
-		Assert.assertTrue(transactions != null);
-		Assert.assertTrue(!transactions.isEmpty());
-		Debug.printObjects(IntegrationTestBase.INDENT, transactions);
-	}
-
-	@Test
-	public void testCountAllReserveTransactions() {
-		Debug.println(IntegrationTestBase.INDENT, "countAllReserveTransactions(): " + this.manager.countAllReserveTransactions());
-	}
-
-	@Test
-	public void testGetAllDepositTransactions() {
-		final List<Transaction> transactions = this.manager.getAllDepositTransactions(0, 5);
-		Assert.assertTrue(transactions != null);
-		Assert.assertTrue(!transactions.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGetAllDepositTransactions(): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, transactions);
-	}
-
-	@Test
-	public void testCountAllDepositTransactions() {
-		Debug.println(IntegrationTestBase.INDENT, "countAllDepositTransactions(): " + this.manager.countAllDepositTransactions());
-	}
-
-	@Test
-	public void testGenerateReportOnAllUncommittedTransactions() {
-		Debug.println(IntegrationTestBase.INDENT,
-				"Number of uncommitted transactions [countAllUncommittedTransactions()]: " + this.manager.countAllUncommittedTransactions());
-		final List<TransactionReportRow> report = this.manager.generateReportOnAllUncommittedTransactions(0, 5);
-		Assert.assertTrue(report != null);
-		Assert.assertTrue(!report.isEmpty());
-		Debug.printObjects(IntegrationTestBase.INDENT, report);
-	}
-
-	@Test
-	public void testGenerateReportOnAllReserveTransactions() {
-		Debug.println(IntegrationTestBase.INDENT,
-				"Number of reserved transactions [countAllReserveTransactions()]: " + this.manager.countAllReserveTransactions());
-		final List<TransactionReportRow> report = this.manager.generateReportOnAllReserveTransactions(0, 5);
-		Assert.assertTrue(report != null);
-		Assert.assertTrue(!report.isEmpty());
-		Debug.printObjects(IntegrationTestBase.INDENT, report);
-	}
-
-	@Test
-	public void testGenerateReportOnAllWithdrawalTransactions() {
-		Debug.println(IntegrationTestBase.INDENT,
-				"Number of withdrawal transactions [countAllWithdrawalTransactions()]: " + this.manager.countAllWithdrawalTransactions());
-		final List<TransactionReportRow> report = this.manager.generateReportOnAllWithdrawalTransactions(0, 5);
-		Assert.assertTrue(report != null);
-		Assert.assertTrue(!report.isEmpty());
-		Debug.printObjects(IntegrationTestBase.INDENT, report);
-	}
-
-	@Test
-	public void testGenerateReportOnAllLots() {
-		Debug.println(IntegrationTestBase.INDENT, "Balance Report on All Lots");
-		Debug.println(IntegrationTestBase.INDENT, "Number of lots [countAllLots()]: " + this.manager.countAllLots());
-		final List<LotReportRow> report = this.manager.generateReportOnAllLots(0, 10);
-		Assert.assertTrue(report != null);
-		Assert.assertTrue(!report.isEmpty());
-		Debug.printObjects(IntegrationTestBase.INDENT, report);
-	}
-
-	@Test
-	public void testGenerateReportsOnDormantLots() {
-		final int year = 2012;
-		Debug.println(IntegrationTestBase.INDENT, "Balance Report on DORMANT Lots");
-		final List<LotReportRow> report = this.manager.generateReportOnDormantLots(year, 0, 10);
-		Assert.assertTrue(report != null);
-		Assert.assertTrue(!report.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGenerateReportsOnDormantLots(year=" + year + ") REPORT: ");
-		Debug.printObjects(IntegrationTestBase.INDENT, report);
-	}
-
-	@Test
-	public void testGenerateReportOnLotsByEntityType() {
-		final String type = EntityType.GERMPLSM.name();
-		Debug.println(IntegrationTestBase.INDENT, "Balance Report on Lots by Entity Type: " + type);
-		final List<LotReportRow> report = this.manager.generateReportOnLotsByEntityType(type, 0, 10);
-		Assert.assertTrue(report != null);
-		Assert.assertTrue(!report.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGenerateReportOnLotsByEntityType(" + type + ") REPORT: ");
-		Debug.printObjects(IntegrationTestBase.INDENT, report);
-	}
-
-	@Test
-	public void testGenerateReportOnLotsByEntityTypeAndEntityId() {
-		Debug.println(IntegrationTestBase.INDENT, "Balance Report on Lots by Entity Type and Entity ID:");
-		final String type = EntityType.GERMPLSM.name();
-		final List<Integer> entityIdList = new ArrayList<Integer>();
-		entityIdList.add(50533);
-		entityIdList.add(537652);
-
-		final List<LotReportRow> report = this.manager.generateReportOnLotsByEntityTypeAndEntityId(type, entityIdList, 0, 10);
-
-		Assert.assertTrue(report != null);
-		Assert.assertTrue(!report.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGenerateReportOnLotsByEntityTypeAndEntityId(type=" + type + ", entityId="
-				+ entityIdList + ") REPORT: ");
-		Debug.printObjects(IntegrationTestBase.INDENT, report);
-	}
-
-	@Test
-	public void testGenerateReportOnEmptyLot() {
-		Debug.println(IntegrationTestBase.INDENT, "Report on empty lot");
-		final List<LotReportRow> report = this.manager.generateReportOnEmptyLots(0, 2);
-		Assert.assertTrue(report != null);
-		Debug.println(IntegrationTestBase.INDENT, "testGenerateReportOnEmptyLot() REPORT: ");
-		Debug.printObjects(IntegrationTestBase.INDENT, report);
-	}
-
-	@Test
-	public void testGenerateReportOnLotWithMinimumAmount() {
-		final long minimumAmount = 700;
-		Debug.println(IntegrationTestBase.INDENT, "Report on lot with minimum balance");
-		final List<LotReportRow> report = this.manager.generateReportOnLotsWithMinimumAmount(minimumAmount, 0, 5);
-		Assert.assertTrue(report != null);
-		Debug.println(IntegrationTestBase.INDENT, "testGenerateReportOnLotWithMinimumAmount(minimumAmount=" + minimumAmount + ") REPORT: ");
-		Debug.printObjects(IntegrationTestBase.INDENT, report);
-	}
-
-	@Test
-	public void testCountAllUncommittedTransactions() {
-		Debug.println(IntegrationTestBase.INDENT,
-				"testCountAllUncommittedTransactions(): " + this.manager.countAllUncommittedTransactions());
-	}
-
-	@Test
-	public void testCountAllWithdrawalTransactions() {
-		Debug.println(IntegrationTestBase.INDENT, "testCountAllWithdrawalTransactions(): " + this.manager.countAllWithdrawalTransactions());
-	}
-
-	@Test
-	public void testCountAllLots() {
-		Debug.println(IntegrationTestBase.INDENT, "testCountAllLots(): " + this.manager.countAllLots());
-	}
-
-	@Test
-	public void testGetAllLots() {
-		final List<Lot> results = this.manager.getAllLots(0, Integer.MAX_VALUE);
-		Assert.assertNotNull(results);
-		Assert.assertTrue(!results.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGetAllLots(): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, results);
-	}
-
-	@Test
 	public void testGetTransactionById() {
 		final Integer id = 1;
 		final Transaction transactionid = this.manager.getTransactionById(id);
@@ -553,15 +252,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetLotsForGermplasmList() throws MiddlewareQueryException {
-		final List<GermplasmListData> listEntries = this.manager.getLotDetailsForList(-543041, 0, 500);
-		for (final GermplasmListData entry : listEntries) {
-			Debug.print("Id=" + entry.getId() + ", GID = " + entry.getGid());
-			Debug.print(3, entry.getInventoryInfo());
-		}
-	}
-
-	@Test
 	public void testGetLotCountsForGermplasm() throws MiddlewareQueryException {
 		final int gid = -644052;
 		final Integer count = this.manager.countLotsWithAvailableBalanceForGermplasm(gid);
@@ -575,16 +265,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		for (final LotDetails lot : lots) {
 			System.out.println(lot);
 		}
-	}
-
-	@Test
-	public void testCancelReservedInventory() throws MiddlewareQueryException {
-		final int lrecId = -520659;
-		final int lotId = 340597;
-
-		final List<ReservedInventoryKey> lotEntries = new ArrayList<ReservedInventoryKey>();
-		lotEntries.add(new ReservedInventoryKey(1, lrecId, lotId));
-		this.manager.cancelReservedInventory(lotEntries);
 	}
 
 	@Test
@@ -672,33 +352,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetTransactionsByIdList() throws Exception{
-		final String sDate1 = "13/04/2014";
-		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
-
-		final List<Transaction> transactions = new ArrayList<Transaction>();
-		final Transaction transaction1 = new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0),
-			date1, 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, 1, null);
-		transactions.add(transaction1);
-
-		final String sDate2 = "18/05/2014";
-		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
-		final Transaction transaction2 = new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0),
-			date2, 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, 1, null);
-		transactions.add(transaction2);
-
-		this.manager.addTransactions(transactions);
-
-		final List<Integer> transactionIdList = Lists.newArrayList();
-		transactionIdList.add(transaction1.getId());
-		transactionIdList.add(transaction2.getId());
-
-		final List<Transaction> transactionList = this.manager.getTransactionsByIdList(transactionIdList);
-
-		Assert.assertEquals(2, transactionList.size());
-	}
-
-	@Test
 	public void testGetAvailableBalanceForGermplasms() {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
 				"LocationName");
@@ -708,7 +361,8 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		this.manager.addLots(Lists.<Lot>newArrayList(lot));
 
 		final Transaction transaction = InventoryDetailsTestDataInitializer
-				.createReservationTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST");
+			.createReservationTransaction(
+				2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
 		this.manager.addTransactions(Lists.<Transaction>newArrayList(transaction));
 
 		final List<Germplasm> availableBalanceForGermplasms =

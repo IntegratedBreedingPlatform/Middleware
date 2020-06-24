@@ -80,7 +80,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("CROSSES");
 		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("FOLDER");
 	}
-
+	private static final int UNKNOWN_GENERATIVE_METHOD_ID = 1;
 
 	@Before
 	public void setUp() throws Exception {
@@ -91,7 +91,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 				TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_LST,
 				GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE, GermplasmListDAOTest.PROGRAM_UUID, null));
 		final Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
-		this.germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+		this.germplasm = new Germplasm(null, GermplasmListDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
 		this.dataManager.addGermplasm(this.germplasm, name);
 		final GermplasmListData germplasmListData = new GermplasmListData(null, this.list, this.germplasm.getGid(), 1, "EntryCode",
 				"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
@@ -293,7 +293,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetGermplasmUsedInMoreThanOneListSuccess() {
 		final Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
-		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+		final Germplasm germplasm = new Germplasm(null, GermplasmListDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
 
 		final GermplasmList list1 = saveGermplasm(GermplasmListTestDataInitializer.createGermplasmListTestData(
 			TEST_GERMPLASM_LIST_NAME, GermplasmListDAOTest.TEST_GERMPLASM_LIST_DESC,

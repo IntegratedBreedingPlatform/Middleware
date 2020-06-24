@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="nahuel" id="v14.2.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission
+                where parent_id = (select permission_id from permission where name = 'MANAGE_INVENTORY')
+            </sqlCheck>
+        </preConditions>
+        <comment>MANAGE_INVENTORY granular permissions</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @manage_inventory_id = (select permission_id from permission where name = 'MANAGE_INVENTORY');
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'inventory_manager');
+			
+			# Manage Lot Permissions
+			
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MANAGE_LOTS', 'Manage Lots', @manage_inventory_id, @sidebar_category_link_id);
+			set @manage_lots_id = (select last_insert_id());
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+			
+			
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('VIEW_LOTS', 'View Lots', @manage_lots_id, @sidebar_category_link_id);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+			
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('CREATE_LOTS', 'Create Lots', @manage_lots_id, @sidebar_category_link_id);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+			
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('IMPORT_LOTS', 'Import Lots', @manage_lots_id, @sidebar_category_link_id);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+			
+			# Manage Transactions Permissions
+			
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MANAGE_TRANSACTIONS', 'Manage Transactions', @manage_inventory_id, @sidebar_category_link_id);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="clarysabel" id="v14.2.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'WITHDRAW_INVENTORY'
+            </sqlCheck>
+        </preConditions>
+        <comment>WITHDRAW_INVENTORY granular permissions</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'inventory_manager');
+			set @manage_lots_id = (select permission_id from permission where name = 'MANAGE_LOTS');
+
+			# Withdraw Inventory Permissions
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('WITHDRAW_INVENTORY', 'Withdraw Inventory', @manage_lots_id, @sidebar_category_link_id);
+			set @withdraw_inventory_id = (select last_insert_id());
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('CREATE_PENDING_WITHDRAWALS', 'Create Pending Withdrawals', @withdraw_inventory_id, @sidebar_category_link_id);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('CREATE_CONFIRMED_WITHDRAWALS', 'Create Confirmed Withdrawals', @withdraw_inventory_id, @sidebar_category_link_id);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v14.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from permission
+					where name in (
+					               'CREATE_LOTS',
+					               'IMPORT_LOTS',
+					               'WITHDRAW_INVENTORY',
+					               'CREATE_PENDING_WITHDRAWALS',
+					               'CREATE_CONFIRMED_WITHDRAWALS'
+					  ) and workbench_sidebar_category_link_id is not null;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Remove link from some permissions. Explicit VIEW permission are needed now to access IM</comment>
+		<sql dbms="mysql" splitStatements="true">
+			update permission
+			set workbench_sidebar_category_link_id = null
+			where name in (
+			               'CREATE_LOTS',
+			               'IMPORT_LOTS',
+			               'WITHDRAW_INVENTORY',
+			               'CREATE_PENDING_WITHDRAWALS',
+			               'CREATE_CONFIRMED_WITHDRAWALS'
+			  );
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

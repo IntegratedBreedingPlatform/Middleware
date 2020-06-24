@@ -1,32 +1,24 @@
 package org.generationcp.middleware.dao.dms;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
-
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.DataImportService;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.type.Type;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 
 public class PhenotypeDaoTest {
 
@@ -145,7 +137,9 @@ public class PhenotypeDaoTest {
 				+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value " + "FROM phenotype p "
 				+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 				+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-				+ "    AND p.observable_id IN (:numericVariableIds) " + "GROUP by p.observable_id ";
+			+ "    AND p.observable_id IN (:numericVariableIds) "
+			+ "    AND p.value IS NOT NULL "
+			+ "GROUP by p.observable_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
@@ -164,7 +158,9 @@ public class PhenotypeDaoTest {
 				+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
 				+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 				+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-				+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id ";
+			+ "    AND p.observable_id IN (:variableIds) "
+			+ "	   AND p.value IS NOT NULL "
+			+ "GROUP by p.observable_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
@@ -182,6 +178,7 @@ public class PhenotypeDaoTest {
 				+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
 				+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 				+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+			+ "	   AND p.value IS NOT NULL "
 				+ "GROUP by p.observable_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
@@ -271,7 +268,8 @@ public class PhenotypeDaoTest {
 				+ "FROM nd_experiment e "
 				+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
 				+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
-				+ "AND p.observable_id IN (:traitIds) ";
+			+ "AND p.observable_id IN (:traitIds) "
+			+ "AND p.value IS NOT NULL ";
 	}
 
 

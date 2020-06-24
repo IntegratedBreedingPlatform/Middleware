@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.derived_variables;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -50,12 +51,12 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DerivedVariableServiceImplTest {
 
-	public static final int VARIABLE1_TERMID = 123;
-	public static final int VARIABLE2_TERMID = 456;
-	public static final int VARIABLE3_TERMID = 789;
-	public static final int VARIABLE4_TERMID = 999;
+	private static final int VARIABLE1_TERMID = 123;
+	private static final int VARIABLE2_TERMID = 456;
+	private static final int VARIABLE3_TERMID = 789;
+	private static final int VARIABLE4_TERMID = 999;
 	public static final int STUDY_ID = 1000;
-	public static final int TERM_ID = 19001;
+	private static final int TERM_ID = 19001;
 
 	@Mock
 	private FormulaService formulaService;
@@ -82,8 +83,8 @@ public class DerivedVariableServiceImplTest {
 	private final DerivedVariableServiceImpl derivedVariableService = new DerivedVariableServiceImpl();
 
 	private final Random random = new Random();
-	public static final Integer PLOT_DATASET_ID = 1001;
-	public static final Integer SUBOBS_DATASET_ID = 1002;
+	private static final Integer PLOT_DATASET_ID = 1001;
+	private static final Integer SUBOBS_DATASET_ID = 1002;
 
 	@Before
 	public void setup() {
@@ -119,7 +120,7 @@ public class DerivedVariableServiceImplTest {
 		when(this.dmsProjectDao.getObservationSetVariables(Arrays.asList(datasetId),
 			Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId())))
 			.thenReturn(traits);
-		when(this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID))))
+		when(this.formulaService.getAllFormulaVariables(new HashSet<>(Arrays.asList(VARIABLE1_TERMID))))
 			.thenReturn(formulaVariables);
 
 		final Set<FormulaVariable> missingFormulaVariablesInStudy =
@@ -170,9 +171,9 @@ public class DerivedVariableServiceImplTest {
 	@Test
 	public void testGetValuesFromObservations() {
 		this.derivedVariableService
-			.getValuesFromObservations(STUDY_ID, Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()), new HashMap<Integer, Integer>());
+			.getValuesFromObservations(STUDY_ID, Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()), new HashMap<>());
 		verify(this.experimentDao)
-			.getValuesFromObservations(STUDY_ID, Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()), new HashMap<Integer, Integer>());
+			.getValuesFromObservations(STUDY_ID, Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()), new HashMap<>());
 	}
 
 	@Test
@@ -245,7 +246,7 @@ public class DerivedVariableServiceImplTest {
 	public void testCreateVariableIdMeasurementVariableMap() {
 		final List<DatasetDTO> datasets = this.createDatasetDTOS();
 		final List<Integer> projectIds = new ArrayList<>();
-		for (DatasetDTO datasetDTO : datasets) {
+		for (final DatasetDTO datasetDTO : datasets) {
 			projectIds.add(datasetDTO.getDatasetId());
 		}
 		when(this.dmsProjectDao.getDatasets(STUDY_ID)).thenReturn(datasets);
@@ -288,7 +289,7 @@ public class DerivedVariableServiceImplTest {
 		this.derivedVariableService.saveCalculatedResult(value, categoricalId, observationUnitId, observationId, measurementVariable);
 
 		verify(this.phenotypeDao).update(existingPhenotype);
-		verify(this.datasetService).updateDependentPhenotypesAsOutOfSync(variableTermId, observationUnitId);
+		verify(this.datasetService).updateDependentPhenotypesAsOutOfSync(variableTermId, Sets.newHashSet(observationUnitId));
 		assertEquals(value, existingPhenotype.getValue());
 		assertEquals(categoricalId, existingPhenotype.getcValueId());
 		assertTrue(existingPhenotype.isChanged());
@@ -386,7 +387,6 @@ public class DerivedVariableServiceImplTest {
 
 		final ArgumentCaptor<Phenotype> captor = ArgumentCaptor.forClass(Phenotype.class);
 		verify(this.phenotypeDao).save(captor.capture());
-		verify(this.datasetService).updateDependentPhenotypesAsOutOfSync(variableTermId, observationUnitId);
 
 		final Phenotype phenotypeToBeSaved = captor.getValue();
 		assertNotNull(phenotypeToBeSaved.getCreatedDate());
@@ -425,7 +425,6 @@ public class DerivedVariableServiceImplTest {
 		for (int i = 0; i < 4; i++) {
 			final DatasetDTO datasetDTO = new DatasetDTO();
 			datasetDTO.setDatasetId(STUDY_ID + i);
-			final DatasetType datasetType = new DatasetType();
 			datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 			datasets.add(datasetDTO);
 		}

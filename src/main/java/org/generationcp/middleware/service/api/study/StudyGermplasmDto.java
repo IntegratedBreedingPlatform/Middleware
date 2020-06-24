@@ -1,12 +1,17 @@
 
 package org.generationcp.middleware.service.api.study;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.StockProperty;
 
 import java.io.Serializable;
+import java.util.Objects;
+import java.util.Optional;
 
 public class StudyGermplasmDto implements Serializable {
+
+	private Integer entryId;
 
 	private String entryType;
 
@@ -29,6 +34,46 @@ public class StudyGermplasmDto implements Serializable {
 	private Integer groupId;
 
 	private String stockIds;
+
+	public StudyGermplasmDto() { }
+
+	public StudyGermplasmDto(final Integer entryId) {
+		this.entryId = entryId;
+	}
+
+	public StudyGermplasmDto(final Integer entryId, final String entryType, final Integer germplasmId, final String designation, final Integer entryNumber, final String entryCode, final String cross, final String seedSource) {
+		this.entryId = entryId;
+		this.entryType = entryType;
+		this.germplasmId = germplasmId;
+		this.designation = designation;
+		this.entryNumber = entryNumber;
+		this.entryCode = entryCode;
+		this.cross = cross;
+		this.seedSource = seedSource;
+	}
+
+	public StudyGermplasmDto(final StockModel stock) {
+		this.setEntryId(stock.getStockId());
+		this.setDesignation(stock.getName());
+		this.setGermplasmId(stock.getGermplasm().getGid());
+		this.setEntryCode(stock.getValue());
+		this.setEntryNumber(Integer.valueOf(stock.getUniqueName()));
+
+
+		final Optional<StockProperty> entryType = stock.getProperties().stream().filter(prop -> TermId.ENTRY_TYPE.getId() == (prop.getTypeId())).findFirst();
+		entryType.ifPresent(entry -> this.setEntryType(entry.getValue()) );
+
+		final Optional<StockProperty> seedSource = stock.getProperties().stream().filter(prop -> TermId.SEED_SOURCE.getId() == (prop.getTypeId())).findFirst();
+		seedSource.ifPresent(source -> this.setSeedSource(source.getValue()) );
+
+		final Optional<StockProperty> cross = stock.getProperties().stream().filter(prop -> TermId.CROSS.getId() == (prop.getTypeId())).findFirst();
+		cross.ifPresent(crs -> this.setCross(crs.getValue()) );
+
+		final Optional<StockProperty> groupGID = stock.getProperties().stream().filter(prop -> TermId.GROUPGID.getId() == (prop.getTypeId())).findFirst();
+		if (groupGID.isPresent() && groupGID.get().getValue() != null) {
+			this.setGroupId(Integer.valueOf(groupGID.get().getValue()));
+		}
+	}
 
 	/**
 	 * @return the entryType
@@ -66,7 +111,7 @@ public class StudyGermplasmDto implements Serializable {
 	}
 
 	/**
-	 * @param desingation the desingation to set
+	 * @param designation the desingation to set
 	 */
 	public void setDesignation(final String designation) {
 		this.designation = designation;
@@ -185,23 +230,23 @@ public class StudyGermplasmDto implements Serializable {
 	}
 
 	@Override
-	public boolean equals(final Object other) {
-		if (!(other instanceof StudyGermplasmDto)) {
-			return false;
-		}
-		final StudyGermplasmDto castOther = (StudyGermplasmDto) other;
-		return new EqualsBuilder().append(this.entryType, castOther.entryType).append(this.germplasmId, castOther.germplasmId)
-			.append(this.designation, castOther.designation).append(this.entryNumber, castOther.entryNumber)
-			.append(this.entryCode, castOther.entryCode).append(this.position, castOther.position).append(this.cross, castOther.cross)
-			.append(this.seedSource, castOther.seedSource).append(this.checkType, castOther.checkType)
-			.append(this.groupId, castOther.groupId).append(this.stockIds, castOther.stockIds).isEquals();
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		StudyGermplasmDto that = (StudyGermplasmDto) o;
+		return getEntryId().equals(that.getEntryId());
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.entryType).append(this.germplasmId).append(this.designation).append(this.entryNumber)
-			.append(this.entryCode).append(this.position).append(this.cross).append(this.seedSource).append(this.checkType)
-			.append(this.groupId).append(this.stockIds).toHashCode();
+		return Objects.hash(getEntryId());
 	}
 
+	public Integer getEntryId() {
+		return entryId;
+	}
+
+	public void setEntryId(Integer entryId) {
+		this.entryId = entryId;
+	}
 }

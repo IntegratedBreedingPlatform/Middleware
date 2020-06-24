@@ -16,23 +16,8 @@ import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.TreatmentVariable;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -53,14 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class WorkbookBuilder extends Builder {
 
@@ -591,7 +569,7 @@ public class WorkbookBuilder extends Builder {
 						variable.getVariableType().getLocalName(), variable.getValue(), true,
 						this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
 						variate);
-					measurementData.setPhenotypeId(variable.getPhenotypeId());
+					measurementData.setMeasurementDataId(variable.getVariableDataId());
 					measurementData.setAccepted(true);
 					if (this.isCategoricalVariate(variable) && !variable.isCustomValue()
 						&& NumberUtils.isNumber(variable.getValue())) {
@@ -615,7 +593,7 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private void setValueStatusToMeasurementData(final Variable variable, final MeasurementData measurementData) {
-		final Phenotype phenotype = this.getPhenotypeDao().getById(variable.getPhenotypeId());
+		final Phenotype phenotype = this.getPhenotypeDao().getById(variable.getVariableDataId());
 		if (phenotype != null) {
 			measurementData.setValueStatus(phenotype.getValueStatus());
 		}
@@ -855,78 +833,6 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
-	public List<MeasurementRow> buildTrialObservations(
-		final int trialDatasetId,
-		final List<MeasurementVariable> factorList, final List<MeasurementVariable> variateList) {
-
-		final int totalRows = (int) this.studyDataManager.countExperiments(trialDatasetId);
-		final List<Experiment> experiments = this.studyDataManager.getExperiments(trialDatasetId, 0, totalRows);
-
-		final List<MeasurementRow> rows = new ArrayList<>();
-		if (experiments != null) {
-			for (final Experiment experiment : experiments) {
-				final List<MeasurementData> dataList = new ArrayList<>();
-				for (final Variable variable : experiment.getFactors().getVariables()) {
-					if (variable.getVariableType().getId() == TermId.EXPERIMENT_DESIGN_FACTOR.getId()
-						|| variable.getVariableType().getId() == TermId.EXPT_DESIGN_SOURCE.getId()) {
-						continue;
-					}
-					final MeasurementData measurementData;
-					final MeasurementVariable measurementVariable = this
-						.getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList);
-					if (variable.getVariableType().getStandardVariable().getDataType()
-						.getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						final Integer id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue())
-							? Integer.valueOf(variable.getValue()) : null;
-						measurementData = new MeasurementData(variable.getVariableType().getLocalName(),
-							variable.getDisplayValue(), false,
-							this.getDataType(
-								variable.getVariableType().getStandardVariable().getDataType().getId()),
-							id, measurementVariable);
-					} else {
-						measurementData = new MeasurementData(variable.getVariableType().getLocalName(),
-							variable.getValue(), false,
-							this.getDataType(
-								variable.getVariableType().getStandardVariable().getDataType().getId()),
-							measurementVariable);
-					}
-
-					if (experiments.size() == 1 && measurementVariable != null) {
-						measurementVariable.setValue(variable.getValue());
-					}
-					dataList.add(measurementData);
-				}
-				for (final Variable variable : experiment.getVariates().getVariables()) {
-					final MeasurementData measurementData;
-					final MeasurementVariable measurementVariable =
-						this.getMeasurementVariableByName(variable.getVariableType().getLocalName(), variateList);
-					Integer id = null;
-					if (variable.getVariableType().getStandardVariable().getDataType()
-						.getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue())
-							? Integer.valueOf(variable.getValue()) : null;
-					}
-					measurementData = new MeasurementData(variable.getVariableType().getLocalName(),
-						variable.getValue(), true,
-						this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
-						id, measurementVariable);
-					measurementData.setPhenotypeId(variable.getPhenotypeId());
-					if (experiments.size() == 1) {
-						measurementVariable.setValue(variable.getValue());
-					}
-					this.setValueStatusToMeasurementData(variable, measurementData);
-					dataList.add(measurementData);
-				}
-
-				final MeasurementRow row = new MeasurementRow(dataList);
-				row.setExperimentId(experiment.getId());
-				row.setLocationId(experiment.getLocationId());
-				rows.add(row);
-			}
-		}
-		return rows;
-	}
-
 	protected VariableTypeList removeTrialDatasetVariables(
 		final VariableTypeList variables,
 		final VariableList toBeDeleted) {
@@ -1009,7 +915,7 @@ public class WorkbookBuilder extends Builder {
 					value = experiment.getObsUnitId();
 				}
 				measurementData = new MeasurementData(factor.getName(), value, isEditable,
-					this.getDataType(factor.getDataTypeId()), factor.getTermId(), factor);
+					this.getDataType(factor.getDataTypeId()), null, factor);
 			}
 			measurementDataList.add(measurementData);
 		}
@@ -1042,11 +948,16 @@ public class WorkbookBuilder extends Builder {
 			if (standardVariableDataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
 				&& standardVariable.getId() != TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
 				final Integer id = value != null && NumberUtils.isNumber(value) ? Integer.valueOf(value) : null;
-				return new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
+				final MeasurementData measurementData = new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
 					this.getDataType(standardVariableDataTypeId), id, factor);
+				measurementData.setMeasurementDataId(variable.getVariableDataId());
+				return measurementData;
 			}
-			return new MeasurementData(variableType.getLocalName(), value, isEditable,
+
+			final MeasurementData measurementData = new MeasurementData(variableType.getLocalName(), value, isEditable,
 				this.getDataType(standardVariableDataTypeId), factor);
+			measurementData.setMeasurementDataId(variable.getVariableDataId());
+			return measurementData;
 		}
 		return null;
 	}

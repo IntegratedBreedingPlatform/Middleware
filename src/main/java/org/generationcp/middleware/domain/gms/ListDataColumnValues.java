@@ -13,7 +13,7 @@ public class ListDataColumnValues implements Serializable {
 	private Integer listDataId;
 	private String value;
 
-	public ListDataColumnValues(String column, Integer listDataId, String value) {
+	public ListDataColumnValues(final String column, final Integer listDataId, final String value) {
 		super();
 		this.column = column;
 		this.listDataId = listDataId;

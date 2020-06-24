@@ -11,11 +11,11 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.junit.Assert;
@@ -35,9 +35,6 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     private static final String SELECTION_NAME = "NPSEL";
 
     private static final String TRAIT_NAME = "GW_DW_g1000grn";
-
-    @Autowired
-    private WorkbenchDataManager workbenchDataManager;
 
     @Autowired
     private GermplasmDataManager germplasmDataManager;
@@ -62,7 +59,9 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     private GermplasmTestDataGenerator germplasmTestDataGenerator;
     private DataSetupTest dataSetupTest;
 
-    private DatasetServiceImpl datasetService;
+    @Autowired
+    private DatasetService datasetService;
+
     private Integer studyId;
     private List<Integer> instanceIds;
     private Integer subObsDatasetId;
@@ -70,9 +69,6 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
 
     @Before
     public void setUp() {
-        this.datasetService = new DatasetServiceImpl(this.sessionProvder);
-        this.datasetService.setWorkbenchDataManager(this.workbenchDataManager);
-
         this.dataSetupTest = new DataSetupTest();
         this.dataSetupTest.setDataImportService(this.dataImportService);
         this.dataSetupTest.setGermplasmListManager(this.germplasmListManager);
@@ -95,10 +91,12 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testGetInstanceObservationUnitRowsMap() {
-        Map<Integer, List<ObservationUnitRow>> instanceObsUnitRowMap = this.datasetService.getInstanceIdToObservationUnitRowsMap(this.studyId, this.subObsDatasetId, this.instanceIds);
-        List<ObservationUnitRow> observationUnitRows = instanceObsUnitRowMap.get(instanceIds.get(0));
+        final Map<Integer, List<ObservationUnitRow>> instanceObsUnitRowMap = this.datasetService.getInstanceIdToObservationUnitRowsMap(this.studyId, this.subObsDatasetId, this.instanceIds);
+        final List<ObservationUnitRow> observationUnitRows = instanceObsUnitRowMap.get(this.instanceIds.get(0));
         Assert.assertNotNull(observationUnitRows);
-        Assert.assertEquals(40, observationUnitRows.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
+        Assert.assertEquals(80,
+			observationUnitRows
+				.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)  multiplied by the number of reps (2)
         final ObservationUnitRow observationUnitRow = observationUnitRows.get(0);
         this.verifyObservationUnitRowValues(observationUnitRow);
         // Check for study and environment values
@@ -117,7 +115,9 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         final List<ObservationUnitRow> observationUnitRows = this.datasetService.getObservationUnitRows(this.studyId, this.subObsDatasetId,
                 searchDto);
         Assert.assertNotNull(observationUnitRows);
-        Assert.assertEquals(40, observationUnitRows.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
+        Assert.assertEquals(80,
+			observationUnitRows
+				.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2) multiplied by the number of reps (2)
         final ObservationUnitRow observationUnitRow = observationUnitRows.get(0);
         this.verifyObservationUnitRowValues(observationUnitRow);
     }
@@ -131,7 +131,9 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         final List<Map<String, Object>> rowsAsListMap = this.datasetService.getObservationUnitRowsAsMapList(this.studyId, this.subObsDatasetId,
             searchDto);
         Assert.assertNotNull(rowsAsListMap);
-        Assert.assertEquals(40, rowsAsListMap.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
+        Assert
+			.assertEquals(80, rowsAsListMap
+				.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2) multiplied by the number of reps (2)
         final Map<String, Object> dataMap = rowsAsListMap.get(0);
         Assert.assertEquals(searchDto.getFilterColumns().size(), dataMap.size());
         Assert.assertNotNull(dataMap.get("TRIAL_INSTANCE"));
@@ -157,7 +159,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     }
 
     private void createTestStudyWithSubObservations() {
-        Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+        final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 
         final Integer[] gids = this.germplasmTestDataGenerator
                 .createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, "PREFF", parentGermplasm);
@@ -166,7 +168,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         this.instanceIds = new ArrayList<>(this.studyDataManager.getInstanceGeolocationIdsMap(this.studyId).values());
 
         final DatasetDTO datasetDTO = this.datasetService.generateSubObservationDataset(this.studyId, "TEST NURSERY SUB OBS",
-            DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), instanceIds, 8206, 2, this.studyId + 2);
+            DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), this.instanceIds, 8206, 2, this.studyId + 2);
         this.subObsDatasetId = datasetDTO.getDatasetId();
         this.datasetService.addDatasetVariable(datasetDTO.getDatasetId(), 20451, VariableType.TRAIT, TRAIT_NAME);
         this.datasetService.addDatasetVariable(datasetDTO.getDatasetId(), 8263, VariableType.SELECTION_METHOD, SELECTION_NAME);
@@ -174,7 +176,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
 
     public List<String> getVariableNames(final List<MeasurementVariable> measurementVariables) {
         final List<String> variableNames = new ArrayList<>();
-        for (MeasurementVariable mvar : measurementVariables) {
+        for (final MeasurementVariable mvar : measurementVariables) {
             variableNames.add(mvar.getName());
         }
         return variableNames;

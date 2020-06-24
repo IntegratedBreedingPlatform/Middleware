@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.study;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.service.api.user.UserDto;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public class StudyDetailsDto {
 	private List<UserDto> contacts;
 
 	private Map<String, String> additionalInfo;
+
+	private List<MeasurementVariable> environmentParameters;
 
 	private transient int hashCode;
 
@@ -32,6 +35,15 @@ public class StudyDetailsDto {
 
 	public StudyDetailsDto setMetadata(final StudyMetadata metadata) {
 		this.metadata = metadata;
+		return this;
+	}
+
+	public List<MeasurementVariable> getEnvironmentParameters() {
+		return this.environmentParameters;
+	}
+
+	public StudyDetailsDto setEnvironmentParameters(final List<MeasurementVariable> environmentParameters) {
+		this.environmentParameters = environmentParameters;
 		return this;
 	}
 

@@ -1,20 +1,19 @@
 package org.generationcp.middleware.service.api;
 
+/**
+ * TODO IBP-3474: include all fields from prior minor versions
+ */
 public class BrapiView {
 
-	public static class BrapiV1_3 {
+	public interface BrapiV1_2 {
 
 	}
 
-	/**
-	 * Deprecated TODO merge with v1_3 into a v1 (no need to hide fields between minor versions)
-	 */
-	@Deprecated
-	public static class BrapiV1_2 {
+	public interface BrapiV1_3 extends BrapiV1_2 {
 
 	}
 
-	public static class BrapiV2 {
+	public interface BrapiV2 {
 
 	}
 

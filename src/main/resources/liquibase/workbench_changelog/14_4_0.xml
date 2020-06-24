@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="clarysabel" id="v14.4.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'DEPOSIT_INVENTORY'
+            </sqlCheck>
+        </preConditions>
+        <comment>DEPOSIT_INVENTORY granular permissions</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_lots_id = (select permission_id from permission where name = 'MANAGE_LOTS');
+
+			# Deposit Inventory Permissions
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('DEPOSIT_INVENTORY', 'Deposit Inventory', @manage_lots_id, null);
+			set @deposit_inventory_id = (select last_insert_id());
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('CREATE_PENDING_DEPOSITS', 'Create Pending Deposits', @deposit_inventory_id, null);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('CREATE_CONFIRMED_DEPOSITS', 'Create Confirmed Deposits', @deposit_inventory_id, null);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v14.4.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'CANCEL_PENDING_TRANSACTIONS'
+            </sqlCheck>
+        </preConditions>
+        <comment>Create permission to cancel pending transactions</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_transactions_id = (select permission_id from permission where name = 'MANAGE_TRANSACTIONS');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('CANCEL_PENDING_TRANSACTIONS', 'Cancel Pending Transactions', @manage_transactions_id, null);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v14.4.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'LOT_LABEL_PRINTING'
+            </sqlCheck>
+        </preConditions>
+        <comment>Lot "Export data and labels" granular permissions</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_lots_id = (select permission_id from permission where name = 'MANAGE_LOTS');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('LOT_LABEL_PRINTING', 'Export data and labels', @manage_lots_id, null);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

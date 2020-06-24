@@ -16,7 +16,6 @@ import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
-import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
@@ -105,10 +104,6 @@ public class Saver extends DatabaseBroker {
 
 	protected final VariableTypeBuilder getVariableTypeBuilder() {
 		return new VariableTypeBuilder(this.sessionProvider);
-	}
-
-	protected final StockModelBuilder getStockModelBuilder() {
-		return new StockModelBuilder(this.sessionProvider);
 	}
 
 	protected final TermBuilder getTermBuilder() {

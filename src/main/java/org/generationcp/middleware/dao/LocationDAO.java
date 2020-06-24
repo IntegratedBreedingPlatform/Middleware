@@ -58,6 +58,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	private static final String LNAME = "lname";
 	private static final String LOCID = "locid";
 	private static final String LTYPE = "ltype";
+	private static final String LABBREVIATION = "labbr";
 	private static final String NAME_OR_OPERATION = "name|operation";
 
 	private static final Logger LOG = LoggerFactory.getLogger(LocationDAO.class);
@@ -282,7 +283,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final String programUUID) {
+	public List<Location> filterLocations(final Set<Integer> types, final List<Integer> locationIds, final List<String> locationAbbreviations) {
 		final List<Location> locations;
 		try {
 
@@ -296,15 +297,17 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				criteria.add(Restrictions.in(LocationDAO.LOCID, locationIds));
 			}
 
-			criteria.add(
-				Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID), Restrictions.isNull(LocationDAO.UNIQUE_ID)));
+			if (locationAbbreviations!=null && !locationAbbreviations.isEmpty()){
+				criteria.add(Restrictions.in(LocationDAO.LABBREVIATION, locationAbbreviations));
+			}
+
 			criteria.addOrder(Order.asc(LocationDAO.LNAME));
 			locations = criteria.list();
 
 		} catch (final HibernateException e) {
 			LocationDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getFilteredLocations", "types,locationIds,programUUID", "", e.getMessage(),
+				this.getLogExceptionMessage("filterLocations", "types,locationIds,locationAbbreviations", "", e.getMessage(),
 					LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 		return locations;
@@ -402,8 +405,10 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					final Double longitude = (Double) result[12];
 					final Double altitude = (Double) result[13];
 					final String programUUID = (String) result[14];
+					final Boolean ldefault = (Boolean) result[15];
 
 					final Location location = new Location(locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce);
+					location.setLdefault(ldefault);
 					location.setUniqueID(programUUID);
 
 					final Georef georef = new Georef();
@@ -441,7 +446,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
 					.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
 					.append(" ud.fname as location_type,").append(" ud.fdesc as location_description, l.program_uuid,")
-					.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id")
+					.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id, l.ldefault")
 					.append(" from location l").append(" left join georef g on l.locid = g.locid")
 					.append(" left join cntry c on l.cntryid = c.cntryid").append(" left join udflds ud on ud.fldno = l.ltype")
 					.append(" ,location province");
@@ -891,7 +896,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
 					.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
 					.append(" ud.fname as location_type,").append(" ud.fdesc as location_description, l.program_uuid")
-					.append(" ,c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id")
+					.append(" ,c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id, l.ldefault as ldefault")
 					.append(" FROM location l").append(" LEFT JOIN georef g on l.locid = g.locid")
 					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid").append(" LEFT JOIN udflds ud on ud.fldno = l.ltype")
 					.append(" ,location province ").append(" WHERE (l.program_uuid = '").append(programUUID).append("'")
@@ -922,7 +927,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getFilteredLocations", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+					this.getLogExceptionMessage("getFilteredLocationsDetails", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 	}
 
@@ -988,6 +993,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					final LocationDetailsDto locationDetailsDto =
 							new LocationDetailsDto(locationDbId, locationType, name, abbreviation, countryCode, countryName, latitude,
 									longitude, altitude);
+					locationDetailsDto.setLocationName(name);
 					if (!locationType.equalsIgnoreCase(LocationDAO.COUNTRY)) {
 						final AdditionalInfoDto additionalInfoDto = new AdditionalInfoDto(locationDetailsDto.getLocationDbId());
 						additionalInfoDto.addInfo("province", (String) row[9]);
@@ -1003,6 +1009,21 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			LocationDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
 					this.getLogExceptionMessage("getLocalLocationsByFilter", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+	}
+
+	public Location getDefaultLocationByType(final Integer type) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Location.class);
+			criteria.add(Restrictions.eq("ltype", type));
+			criteria.add(Restrictions.eq("ldefault", Boolean.TRUE));
+
+			return (Location) criteria.uniqueResult();
+		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("getDefaultLocationByType", "type", String.valueOf(type), e.getMessage(), "Location"),
+				e);
 		}
 	}
 
@@ -1038,4 +1059,5 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return sqlString.toString();
 
 	}
+
 }

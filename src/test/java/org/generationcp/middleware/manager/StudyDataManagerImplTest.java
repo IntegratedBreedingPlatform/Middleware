@@ -15,29 +15,13 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.FolderReference;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
-import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
@@ -56,11 +40,8 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.*;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -74,14 +55,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
 
 import static org.generationcp.middleware.operation.saver.WorkbookSaver.ENVIRONMENT;
 import static org.generationcp.middleware.operation.saver.WorkbookSaver.PLOTDATA;
@@ -127,6 +101,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private static CrossExpansionProperties crossExpansionProperties;
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 	private CropType crop;
 
 	@Before
@@ -139,6 +114,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 			this.crop = this.workbenchDataManager.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
+		}
+
+		if (this.germplasmTestDataGenerator == null) {
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataDM);
 		}
 		final Properties mockProperties = Mockito.mock(Properties.class);
 		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
@@ -230,22 +209,16 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchStudiesByGid() throws Exception {
-		final Integer gid = this.studyTDI.getGid();
-		final Integer geolocationId = this.studyTDI.getGeolocationId();
-		final Integer stockId = this.studyTDI.getStockId();
-
-		// Create test dataset
-		final DatasetReference dataset = this.studyTDI.addTestDataset(this.studyReference.getId());
-		final ExperimentValues values = new ExperimentValues();
-		values.setLocationId(geolocationId);
-		values.setGermplasmId(stockId);
-		this.manager.addExperiment(this.crop, dataset.getId(), ExperimentType.PLOT, values);
+		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final Integer[] gids = this.germplasmTestDataGenerator
+				.createChildrenGermplasm(1, "PREF-ABC", parentGermplasm);
+		this.studyTDI.addStudyGermplasm(this.studyReference.getId(), 1, Arrays.asList(gids));
 
 		// Flushing to force Hibernate to synchronize with the underlying database before the search
 		// Without this the inserted experiment is not retrieved properly
 		this.manager.getActiveSession().flush();
 
-		final GidStudyQueryFilter filter = new GidStudyQueryFilter(gid);
+		final GidStudyQueryFilter filter = new GidStudyQueryFilter(gids[0]);
 		final List<StudyReference> studyReferences = this.manager.searchStudies(filter);
 		// We are sure that the result set will contain the test study we added in the set up
 		Assert.assertTrue("The size should be greater than 0", studyReferences.size() > 0);

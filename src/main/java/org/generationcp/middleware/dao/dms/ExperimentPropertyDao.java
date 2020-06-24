@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +77,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" SELECT ")
 							.append(" nde.project_id AS datasetId ")
 							.append(" , proj.name AS datasetName ")
-							.append(" , geo.nd_geolocation_id AS geolocationId ")
+							.append(" , geo.nd_geolocation_id AS instanceId ")
 							.append(" , site.value AS siteName ")
 							.append(" , nde.nd_experiment_id AS experimentId ")
 							.append(" , s.uniqueName AS entryNumber ")
@@ -139,7 +138,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			final SQLQuery query =
 					this.getSession().createSQLQuery(sql.toString());
 					query.addScalar("datasetId").addScalar("datasetName")
-							.addScalar("geolocationId").addScalar("siteName").addScalar("experimentId").addScalar("entryNumber")
+							.addScalar("instanceId").addScalar("siteName").addScalar("experimentId").addScalar("entryNumber")
 							.addScalar("germplasmName").addScalar("rep").addScalar("plotNo").addScalar("row").addScalar("col")
 							.addScalar("block_id").addScalar("trialInstance").addScalar("studyName").addScalar("gid")
 							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("pedigree").addScalar("obsUnitId", Hibernate.STRING);
@@ -159,15 +158,15 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId, final Integer blockId)
+	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int instanceId, final Integer blockId)
 			{
 		List<FieldMapInfo> fieldmaps = new ArrayList<>();
 
 		try {
-			final String order = geolocationId > 0 ? "ASC" : "DESC";
+			final String order = instanceId > 0 ? "ASC" : "DESC";
 			final StringBuilder sql =
 					new StringBuilder().append(" SELECT ").append(" p.project_id AS datasetId ").append(" , p.name AS datasetName ")
-							.append(" , st.name AS studyName ").append(" , e.nd_geolocation_id AS geolocationId ")
+							.append(" , st.name AS studyName ").append(" , e.nd_geolocation_id AS instanceId ")
 							.append(" , site.value AS siteName ").append(" , siteId.value AS siteId")
 							.append(" , e.nd_experiment_id AS experimentId ").append(" , s.uniqueName AS entryNumber ")
 							.append(" , s.name AS germplasmName ").append(" , epropRep.value AS rep ")
@@ -207,7 +206,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			} else {
 				sql.append(" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval ")
 						.append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
-						.append(" AND bexp.nd_geolocation_id = :geolocationId ")
+						.append(" AND bexp.nd_geolocation_id = :instanceId ")
 						.append(" AND bexp.project_id = :datasetId ").append(" WHERE bval.type_id = ").append(TermId.BLOCK_ID.getId())
 						.append(")");
 			}
@@ -216,7 +215,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			final SQLQuery query =
 					this.getSession().createSQLQuery(sql.toString());
 					query.addScalar("datasetId").addScalar("datasetName").addScalar("studyName")
-							.addScalar("geolocationId").addScalar("siteName").addScalar("siteId").addScalar("experimentId").addScalar("entryNumber").addScalar("germplasmName").addScalar(
+							.addScalar("instanceId").addScalar("siteName").addScalar("siteId").addScalar("experimentId").addScalar("entryNumber").addScalar("germplasmName").addScalar(
 							"rep").addScalar("plotNo").addScalar("row")
 							.addScalar("col").addScalar("blockId").addScalar("studyId").addScalar("trialInstance").addScalar("gid")
 							.addScalar("startDate").addScalar("season").addScalar("blockNo").addScalar("obsUnitId", Hibernate.STRING);
@@ -225,7 +224,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 				query.setParameter("blockId", blockId);
 			} else {
 				query.setParameter("datasetId", datasetId);
-				query.setParameter("geolocationId", geolocationId);
+				query.setParameter("instanceId", instanceId);
 			}
 
 			final List<Object[]> list = query.list();
@@ -235,7 +234,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			}
 
 		} catch (final HibernateException e) {
-			final String message = "Error at getAllFieldMapsInBlockByTrialInstanceId(" + geolocationId + ") at ExperimentPropertyDao: " + e.getMessage();
+			final String message = "Error at getAllFieldMapsInBlockByTrialInstanceId(" + instanceId + ") at ExperimentPropertyDao: " + e.getMessage();
 			ExperimentPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -250,20 +249,20 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		FieldMapTrialInstanceInfo trialInstance = null;
 		List<FieldMapLabel> labels = null;
 		Integer datasetId = null;
-		Integer geolocationId = null;
+		Integer instanceId = null;
 		String datasetName = null;
 		String siteName = null;
 		String trialInstanceNo = null;
 		Integer blockId = null;
 		Integer siteId = null;
 		for (final Object[] row : list) {
-			if (geolocationId == null) {
+			if (instanceId == null) {
 				trialInstance = new FieldMapTrialInstanceInfo();
 				labels = new ArrayList<>();
 			} else {
 				// if trial instance or dataset has changed, add previously saved trial instance
-				if (!geolocationId.equals(row[2]) || !datasetId.equals(row[0])) {
-					trialInstance.setGeolocationId(geolocationId);
+				if (!instanceId.equals(row[2]) || !datasetId.equals(row[0])) {
+					trialInstance.setInstanceId(instanceId);
 					trialInstance.setSiteName(siteName);
 					trialInstance.setLocationName(siteName);
 					trialInstance.setLocationId(siteId);
@@ -329,7 +328,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 			datasetId = (Integer) row[0];
 			datasetName = (String) row[1];
-			geolocationId = (Integer) row[2];
+			instanceId = (Integer) row[2];
 			siteName = (String) row[3];
 			if (row[17] != null && NumberUtils.isNumber((String) row[17])) {
 				siteId = Integer.valueOf((String) row[17]);
@@ -340,7 +339,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			blockId = row[11] != null ? Integer.valueOf((String) row[11]) : null;
 		}
 		// add last trial instance and dataset
-		trialInstance.setGeolocationId(geolocationId);
+		trialInstance.setInstanceId(instanceId);
 		trialInstance.setSiteName(siteName);
 		trialInstance.setLocationName(siteName);
 		trialInstance.setLocationId(siteId);
@@ -381,7 +380,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			label.setRange(this.getIntegerValue(row[11]));
 			label.setGermplasmName((String) row[8]);
 			label.setDatasetId((Integer) row[0]);
-			label.setGeolocationId((Integer) row[3]);
+			label.setInstanceId((Integer) row[3]);
 			label.setSiteName((String) row[4]);
 			label.setGid((Integer) row[16]);
 			label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
@@ -393,7 +392,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			FieldMapTrialInstanceInfo trial = trialMap.get(trialKey);
 			if (trial == null) {
 				trial = new FieldMapTrialInstanceInfo();
-				trial.setGeolocationId((Integer) row[3]);
+				trial.setInstanceId((Integer) row[3]);
 				trial.setSiteName((String) row[4]);
 				trial.setLocationName((String) row[4]);
 				if (row[5] != null && NumberUtils.isNumber((String) row[5])) {
@@ -430,7 +429,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			if (dataset.getTrialInstances() == null) {
 				dataset.setTrialInstances(new ArrayList<FieldMapTrialInstanceInfo>());
 			}
-			if (dataset.getTrialInstance(trial.getGeolocationId()) == null) {
+			if (dataset.getTrialInstance(trial.getInstanceId()) == null) {
 				dataset.getTrialInstances().add(trial);
 			}
 
@@ -520,6 +519,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			ExperimentPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public ExperimentProperty getExperimentProperty(final Integer experimentId, final Integer experimentPropertyId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("ndExperimentpropId", experimentPropertyId));
+		criteria.add(Restrictions.eq("experiment.ndExperimentId", experimentId));
+		return (ExperimentProperty) criteria.uniqueResult();
 	}
 
 }

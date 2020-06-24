@@ -8,14 +8,18 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class StudyInstance {
 
-	private int instanceDbId;
-	private int experimentId;
+	private int instanceId;
+	private Integer locationInstanceDataId;
 	private Integer locationId;
 	private String locationName;
 	private String locationAbbreviation;
 	private String customLocationAbbreviation;
 	private int instanceNumber;
 	private boolean hasFieldmap;
+	private Boolean hasGeoJSON;
+	/** has X/Y coordinates */
+	private Boolean hasFieldLayout;
+	private Boolean hasInventory;
 	private Boolean hasExperimentalDesign;
 	private Boolean hasMeasurements;
 	private Boolean canBeDeleted;
@@ -24,11 +28,10 @@ public class StudyInstance {
 
 	}
 
-	public StudyInstance(final int instanceDbId, final int experimentId, final int instanceNumber, final boolean hasFieldmap,
+	public StudyInstance(final int instanceId, final int instanceNumber, final boolean hasFieldmap,
 		final Boolean hasExperimentalDesign,
 		final Boolean hasMeasurements, final Boolean canBeDeleted) {
-		this.instanceDbId = instanceDbId;
-		this.experimentId = experimentId;
+		this.instanceId = instanceId;
 		this.instanceNumber = instanceNumber;
 		this.hasFieldmap = hasFieldmap;
 		this.hasExperimentalDesign = hasExperimentalDesign;
@@ -36,25 +39,24 @@ public class StudyInstance {
 		this.canBeDeleted = canBeDeleted;
 	}
 
-	public StudyInstance(final int instanceDbId, final Integer experimentId, final Integer locationId, final String locationName,
+	public StudyInstance(final int instanceId, final Integer locationId, final String locationName,
 		final String locationAbbreviation,
 		final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldMap) {
-		this.instanceDbId = instanceDbId;
+		this.instanceId = instanceId;
 		this.locationId = locationId;
 		this.locationName = locationName;
 		this.locationAbbreviation = locationAbbreviation;
 		this.instanceNumber = instanceNumber;
 		this.customLocationAbbreviation = customLocationAbbreviation;
 		this.hasFieldmap = hasFieldMap;
-		this.experimentId = experimentId;
 	}
 
-	public int getInstanceDbId() {
-		return this.instanceDbId;
+	public int getInstanceId() {
+		return this.instanceId;
 	}
 
-	public void setInstanceDbId(final int instanceDbId) {
-		this.instanceDbId = instanceDbId;
+	public void setInstanceId(final int instanceId) {
+		this.instanceId = instanceId;
 	}
 
 	public String getLocationName() {
@@ -105,6 +107,30 @@ public class StudyInstance {
 		this.hasFieldmap = hasFieldmap;
 	}
 
+	public Boolean getHasGeoJSON() {
+		return this.hasGeoJSON;
+	}
+
+	public void setHasGeoJSON(final Boolean hasGeoJSON) {
+		this.hasGeoJSON = hasGeoJSON;
+	}
+
+	public Boolean getHasFieldLayout() {
+		return this.hasFieldLayout;
+	}
+
+	public void setHasFieldLayout(final Boolean hasFieldLayout) {
+		this.hasFieldLayout = hasFieldLayout;
+	}
+
+	public Boolean getHasInventory() {
+		return this.hasInventory;
+	}
+
+	public void setHasInventory(final Boolean hasInventory) {
+		this.hasInventory = hasInventory;
+	}
+
 	public Boolean isHasExperimentalDesign() {
 		return this.hasExperimentalDesign;
 	}
@@ -129,13 +155,12 @@ public class StudyInstance {
 		this.canBeDeleted = canBeDeleted;
 	}
 
-	public int getExperimentId() {
-		return this.experimentId;
+	public Integer getLocationInstanceDataId() {
+		return this.locationInstanceDataId;
 	}
 
-	public void setExperimentId(final int experimentId) {
-		this.experimentId = experimentId;
-
+	public void setLocationInstanceDataId(final Integer locationInstanceDataId) {
+		this.locationInstanceDataId = locationInstanceDataId;
 	}
 
 	@Override
@@ -144,12 +169,12 @@ public class StudyInstance {
 			return false;
 		}
 		final StudyInstance castOther = (StudyInstance) other;
-		return new EqualsBuilder().append(this.instanceDbId, castOther.instanceDbId).isEquals();
+		return new EqualsBuilder().append(this.instanceId, castOther.instanceId).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.instanceDbId).toHashCode();
+		return new HashCodeBuilder().append(this.instanceId).toHashCode();
 	}
 
 	@Override

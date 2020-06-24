@@ -17,10 +17,8 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.ListInventoryBuilder;
 import org.generationcp.middleware.operation.builder.MethodBuilder;
-import org.generationcp.middleware.operation.builder.NameBuilder;
 import org.generationcp.middleware.operation.builder.NameSynonymBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
-import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.StudyBuilder;
 import org.generationcp.middleware.operation.builder.StudyFactorBuilder;
 import org.generationcp.middleware.operation.builder.StudyReferenceBuilder;
@@ -29,7 +27,6 @@ import org.generationcp.middleware.operation.builder.StudyVariateBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.TraitBuilder;
 import org.generationcp.middleware.operation.builder.TraitGroupBuilder;
-import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
@@ -321,10 +318,6 @@ public abstract class DataManager extends DatabaseBroker {
 
 	protected final ListInventoryBuilder getListInventoryBuilder() {
 		return new ListInventoryBuilder(this.sessionProvider);
-	}
-
-	protected final NameBuilder getNameBuilder() {
-		return new NameBuilder(this.sessionProvider);
 	}
 
 	protected final StudyDestroyer getStudyDestroyer() {

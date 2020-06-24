@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
@@ -34,6 +35,8 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -47,6 +50,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * This is the API for inventory management syste
@@ -59,6 +63,8 @@ public class InventoryServiceImpl implements InventoryService {
 	private LotBuilder lotBuilder;
 	private TransactionBuilder transactionBuilder;
 	private DaoFactory daoFactory;
+
+	private static final Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
 	public InventoryServiceImpl() {
 
@@ -73,6 +79,19 @@ public class InventoryServiceImpl implements InventoryService {
 		this.lotBuilder = new LotBuilder(sessionProvider);
 		this.transactionBuilder = new TransactionBuilder(sessionProvider);
 
+	}
+
+	@Override
+	public boolean hasInventoryDetails(final Integer studyId) {
+		return this.daoFactory.getTransactionDAO().hasInventoryDetails(studyId);
+	}
+
+	@Override
+	public List<InventoryDetails> getInventoryDetails(final Integer studyId) {
+		final List<InventoryDetails> inventoryDetails = this.daoFactory.getTransactionDAO().getInventoryDetails(studyId);
+		this.fillLocationDetails(inventoryDetails);
+		this.fillScaleDetails(inventoryDetails);
+		return inventoryDetails;
 	}
 
 	@Override
@@ -290,13 +309,13 @@ public class InventoryServiceImpl implements InventoryService {
 
 		final Lot lot =
 				this.lotBuilder.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(),
-						details.getUserId(), cropType);
+						details.getUserId(), cropType, details.getInventoryID());
 
 		this.daoFactory.getLotDao().saveOrUpdate(lot);
 
 		final Transaction transaction =
 				this.transactionBuilder.buildForAdd(lot, listData == null ? 0 : listData.getId(), details.getAmount(), workbenchUser.getUserid(), workbenchUser.getPerson().getId(),
-						details.getComment(), details.getSourceId(), details.getInventoryID(), details.getBulkWith(),
+						details.getComment(), details.getSourceId(), details.getBulkWith(),
 						details.getBulkCompl());
 		this.daoFactory.getTransactionDAO().saveOrUpdate(transaction);
 

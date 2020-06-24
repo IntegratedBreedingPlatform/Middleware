@@ -3,13 +3,17 @@ package org.generationcp.middleware.service.impl;
 
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
-import org.hibernate.Session;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+@Transactional
 public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterService {
 
+	private DaoFactory daoFactory;
 	private KeySequenceRegisterDAO keySequenceRegisterDAO;
 
 	public KeySequenceRegisterServiceImpl() {
@@ -19,11 +23,7 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 	public KeySequenceRegisterServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.keySequenceRegisterDAO = new KeySequenceRegisterDAO();
 		this.keySequenceRegisterDAO.setSession(sessionProvider.getSession());
-	}
-
-	public KeySequenceRegisterServiceImpl(final Session session) {
-		this.keySequenceRegisterDAO = new KeySequenceRegisterDAO();
-		this.keySequenceRegisterDAO.setSession(session);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -44,4 +44,8 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 		this.keySequenceRegisterDAO.saveLastSequenceUsed(keyPrefix, lastSequenceUsed);
 	}
 
+	@Override
+	public void deleteKeySequences(final List<String> keyPrefixes){
+		this.daoFactory.getKeySequenceRegisterDAO().deleteByKeyPrefixes(keyPrefixes);
+	}
 }

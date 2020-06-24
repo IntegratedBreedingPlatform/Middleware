@@ -17,6 +17,8 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private List<Integer> lotIds;
 
+	private List<String> lotUUIDs;
+
 	private String stockId;
 
 	private List<Integer> gids;
@@ -27,7 +29,7 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private List<Integer> locationIds;
 
-	private List<Integer> scaleIds;
+	private List<Integer> unitIds;
 
 	private Double minActualBalance;
 
@@ -44,6 +46,10 @@ public class LotsSearchDto extends SearchRequestDto {
 	private Double minWithdrawalTotal;
 
 	private Double maxWithdrawalTotal;
+
+	private Double minPendingDepositsTotal;
+
+	private Double maxPendingDepositsTotal;
 
 	private String createdByUsername;
 
@@ -67,7 +73,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date lastWithdrawalDateTo;
 
-	private String commentContainsString;
+	private String notesContainsString;
 
 	private String locationNameContainsString;
 
@@ -85,6 +91,14 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	public void setLotIds(final List<Integer> lotIds) {
 		this.lotIds = lotIds;
+	}
+
+	public List<String> getLotUUIDs() {
+		return lotUUIDs;
+	}
+
+	public void setLotUUIDs(final List<String> lotUUIDs) {
+		this.lotUUIDs = lotUUIDs;
 	}
 
 	public String getStockId() {
@@ -127,12 +141,12 @@ public class LotsSearchDto extends SearchRequestDto {
 		this.locationIds = locationIds;
 	}
 
-	public List<Integer> getScaleIds() {
-		return scaleIds;
+	public List<Integer> getUnitIds() {
+		return unitIds;
 	}
 
-	public void setScaleIds(final List<Integer> scaleIds) {
-		this.scaleIds = scaleIds;
+	public void setUnitIds(final List<Integer> unitIds) {
+		this.unitIds = unitIds;
 	}
 
 	public Double getMinActualBalance() {
@@ -255,12 +269,12 @@ public class LotsSearchDto extends SearchRequestDto {
 		this.lastWithdrawalDateTo = lastWithdrawalDateTo;
 	}
 
-	public String getCommentContainsString() {
-		return commentContainsString;
+	public String getNotesContainsString() {
+		return notesContainsString;
 	}
 
-	public void setCommentContainsString(final String commentContainsString) {
-		this.commentContainsString = commentContainsString;
+	public void setNotesContainsString(final String notesContainsString) {
+		this.notesContainsString = notesContainsString;
 	}
 
 	public List<Integer> getGermplasmListIds() {
@@ -277,6 +291,22 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	public void setLocationNameContainsString(final String locationNameContainsString) {
 		this.locationNameContainsString = locationNameContainsString;
+	}
+
+	public Double getMinPendingDepositsTotal() {
+		return minPendingDepositsTotal;
+	}
+
+	public void setMinPendingDepositsTotal(final Double minPendingDepositTotal) {
+		this.minPendingDepositsTotal = minPendingDepositTotal;
+	}
+
+	public Double getMaxPendingDepositsTotal() {
+		return maxPendingDepositsTotal;
+	}
+
+	public void setMaxPendingDepositsTotal(final Double maxPendingDepositTotal) {
+		this.maxPendingDepositsTotal = maxPendingDepositTotal;
 	}
 
 	@Override

@@ -25,9 +25,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -363,42 +363,43 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	// have good visualization tools in BMS to verify results of such
 	// complex operations. INFO LOGGing helps.
 	@Override
-	public void processGroupInheritanceForCrosses(final List<Integer> gidsOfCrosses, final boolean applyNewGroupToPreviousCrosses,
+	public void processGroupInheritanceForCrosses(final Map<Integer, Integer> germplasmIdMethodIdMap, final boolean applyNewGroupToPreviousCrosses,
 			final Set<Integer> hybridMethods) {
 		final GermplasmCache germplasmCache = new GermplasmCache(this.germplasmDataManager, 2);
-		germplasmCache.initialiseCache(this.cropName, new HashSet<>(gidsOfCrosses), 2);
-		for (final Integer crossGID : gidsOfCrosses) {
-			final Germplasm cross = this.getGermplasmFromOptionalValue(germplasmCache, crossGID);
-			final Germplasm parent1 = this.getGermplasmFromOptionalValue(germplasmCache, cross.getGpid1());
-			final Germplasm parent2 = this.getGermplasmFromOptionalValue(germplasmCache, cross.getGpid2());
+		final Set<Integer> gidsOfCrosses = germplasmIdMethodIdMap.keySet();
+		germplasmCache.initialiseCache(this.cropName, gidsOfCrosses, 2);
+		// We passed method is as map to optimize performance instead of retrieving cross to get the germplasm method
+		for (final Map.Entry<Integer, Integer> germplasmData : germplasmIdMethodIdMap.entrySet()) {
+			final Integer methodId = germplasmData.getValue();
+			if (hybridMethods.contains(methodId)) {
+				final Germplasm cross = this.getGermplasmFromOptionalValue(germplasmCache, germplasmData.getKey());
+				if (cross != null) {
+					GermplasmGroupingServiceImpl.LOG
+							.info("Processing group inheritance for cross: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.",
+									cross.getGid(), cross.getGpid1(), cross.getGpid2(), cross.getMgid(), cross.getMethodId());
+				}
 
-			if (cross != null) {
-				GermplasmGroupingServiceImpl.LOG
-						.info("Processing group inheritance for cross: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.",
-								cross.getGid(), cross.getGpid1(), cross.getGpid2(), cross.getMgid(), cross.getMethodId());
-			}
-
-			if (parent1 != null) {
-				GermplasmGroupingServiceImpl.LOG
-						.info("Parent 1: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.", parent1.getGid(), parent1.getGpid1(),
-								parent1.getGpid2(), parent1.getMgid(), parent1.getMethodId());
-			}
-
-			if (parent2 != null) {
-				GermplasmGroupingServiceImpl.LOG
-						.info("Parent 2: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.", parent2.getGid(), parent2.getGpid1(),
-								parent2.getGpid2(), parent2.getMgid(), parent2.getMethodId());
-			}
-
-			if (hybridMethods.contains(cross.getMethodId())) {
 				GermplasmGroupingServiceImpl.LOG.info("Breeding method {} of the cross is hybrid.", cross.getMethodId());
+				final Germplasm parent1 = this.getGermplasmFromOptionalValue(germplasmCache, cross.getGpid1());
+				final Germplasm parent2 = this.getGermplasmFromOptionalValue(germplasmCache, cross.getGpid2());
+				if (parent1 != null) {
+					GermplasmGroupingServiceImpl.LOG
+						.info("Parent 1: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.", parent1.getGid(), parent1.getGpid1(),
+							parent1.getGpid2(), parent1.getMgid(), parent1.getMethodId());
+				}
+
+				if (parent2 != null) {
+					GermplasmGroupingServiceImpl.LOG
+						.info("Parent 2: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.", parent2.getGid(), parent2.getGpid1(),
+							parent2.getGpid2(), parent2.getMgid(), parent2.getMethodId());
+				}
 				final boolean parent1HasMGID = parent1 != null && parent1.getMgid() != null && parent1.getMgid() != 0;
 				final boolean parent2HasMGID = parent2 != null && parent2.getMgid() != null && parent2.getMgid() != 0;
 				final boolean bothParentsHaveMGID = parent1HasMGID && parent2HasMGID;
 
 				if (bothParentsHaveMGID) {
 					GermplasmGroupingServiceImpl.LOG
-							.info("Both parents have MGIDs. Parent1 mgid {}. Parent2 mgid {}.", parent1.getMgid(), parent2.getMgid());
+						.info("Both parents have MGIDs. Parent1 mgid {}. Parent2 mgid {}.", parent1.getMgid(), parent2.getMgid());
 					final List<Germplasm> previousCrosses = this.germplasmDAO.getPreviousCrossesBetweenParentGroups(cross);
 
 					// Remove members of the current processing batch from the
@@ -414,8 +415,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 					final boolean crossingFirstTime = previousCrosses.isEmpty();
 					if (crossingFirstTime) {
 						GermplasmGroupingServiceImpl.LOG
-								.info("This is a first cross of the two parents. Starting a new group. Setting gid {} to mgid.",
-										cross.getGid());
+							.info("This is a first cross of the two parents. Starting a new group. Setting gid {} to mgid.",
+								cross.getGid());
 						cross.setMgid(cross.getGid());
 					} else {
 						// Not the first time cross. Assign MGID of previous
@@ -425,9 +426,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 						GermplasmGroupingServiceImpl.LOG.info("Previous crosses exist between the female and male parent groups:");
 						for (final Germplasm previousCross : previousCrosses) {
 							GermplasmGroupingServiceImpl.LOG
-									.info("\t[gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}]", previousCross.getGid(),
-											previousCross.getGpid1(), previousCross.getGpid2(), previousCross.getMgid(),
-											previousCross.getMethodId());
+								.info("\t[gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}]", previousCross.getGid(),
+									previousCross.getGpid1(), previousCross.getGpid2(), previousCross.getMgid(),
+									previousCross.getMethodId());
 						}
 
 						Germplasm oldestPreviousCrossWithMGID = null;
@@ -440,13 +441,13 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 						if (oldestPreviousCrossWithMGID != null) {
 							GermplasmGroupingServiceImpl.LOG.info("Assigning mgid {} from the oldest previous cross (gid {}).",
-									oldestPreviousCrossWithMGID.getMgid(), oldestPreviousCrossWithMGID.getGid());
+								oldestPreviousCrossWithMGID.getMgid(), oldestPreviousCrossWithMGID.getGid());
 							cross.setMgid(oldestPreviousCrossWithMGID.getMgid());
 							this.copySelectionHistoryForCross(cross, oldestPreviousCrossWithMGID);
 							this.copyCodedNames(cross, oldestPreviousCrossWithMGID);
 						} else {
 							GermplasmGroupingServiceImpl.LOG
-									.info("Previous crosses exist but there is none with MGID. Starting a new group with mgid = gid of current cross.");
+								.info("Previous crosses exist but there is none with MGID. Starting a new group with mgid = gid of current cross.");
 							cross.setMgid(cross.getGid());
 							// TODO Flowchart says warn user for this case -
 							// this will require returning flag back to the
@@ -457,7 +458,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 						if (applyNewGroupToPreviousCrosses) {
 							GermplasmGroupingServiceImpl.LOG
-									.info("Applying the new mgid {} to the previous crosses as well.", cross.getMgid());
+								.info("Applying the new mgid {} to the previous crosses as well.", cross.getMgid());
 							for (final Germplasm previousCross : previousCrosses) {
 								previousCross.setMgid(cross.getMgid());
 								this.germplasmDAO.save(previousCross);
@@ -471,6 +472,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			} else {
 				GermplasmGroupingServiceImpl.LOG.info("Breeding method is not hybrid. Cross does not inherit MGID.");
 			}
+
 		}
 	}
 

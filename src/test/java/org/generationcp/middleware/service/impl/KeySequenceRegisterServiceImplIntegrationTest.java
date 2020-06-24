@@ -2,6 +2,7 @@
 package org.generationcp.middleware.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -12,19 +13,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.pojos.KeySequenceRegister;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -45,19 +45,22 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 	private static final Integer LAST_SEQUENCE_USED = 9;
 
 	@Autowired
-	@Qualifier(value = "IBDBV2_MAIZE_MERGED_SessionFactory")
-	private SessionFactory sessionFactory;
-
-	@Autowired
 	private PlatformTransactionManager platformTransactionManager;
 
 	private KeySequenceRegisterDAO keySequenceRegisterDao;
+	private GermplasmDAO germplasmDAO;
+	private NameDAO nameDAO;
+
 
 	@Before
 	public void setup() {
 		final Session session = this.sessionProvder.getSession();
 		this.keySequenceRegisterDao = new KeySequenceRegisterDAO();
 		this.keySequenceRegisterDao.setSession(session);
+		this.nameDAO = new NameDAO();
+		this.nameDAO.setSession(session);
+		this.germplasmDAO = new GermplasmDAO();
+		this.germplasmDAO.setSession(session);
 	}
 
 	@Test
@@ -101,7 +104,7 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 		keyRegister.setLastUsedSequence(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED);
 		this.keySequenceRegisterDao.save(keyRegister);
 
-		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder.getSession());
+		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder);
 		final int nextSequence = keySequenceRegisterService.getNextSequence(PREFIX);
 		Assert.assertEquals(LAST_SEQUENCE_USED + 1, nextSequence);
 	}
@@ -113,10 +116,20 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 		keyRegister.setLastUsedSequence(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED);
 		this.keySequenceRegisterDao.save(keyRegister);
 
-		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder.getSession());
+		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder);
 		final Integer newLastSequenceUsed = 51;
 		keySequenceRegisterService.saveLastSequenceUsed(KeySequenceRegisterServiceImplIntegrationTest.PREFIX, newLastSequenceUsed);
 		Assert.assertEquals(newLastSequenceUsed + 1, keySequenceRegisterService.getNextSequence(KeySequenceRegisterServiceImplIntegrationTest.PREFIX));
+	}
+
+	@Test
+	public void testUpdateKeySequenceRegister() {
+		final String prefix = "SKSKSKSPREFIXSKSKSKS";
+		this.keySequenceRegisterDao.save(new KeySequenceRegister(prefix, 10));
+		Assert.assertNotNull(this.keySequenceRegisterDao.getByPrefix(prefix));
+		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder);
+		keySequenceRegisterService.deleteKeySequences(Collections.singletonList(prefix));
+		Assert.assertNull(this.keySequenceRegisterDao.getByPrefix(prefix));
 	}
 
 	/**
@@ -135,8 +148,7 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 					@Override
 					public Integer doInTransaction(final TransactionStatus status) {
 						final KeySequenceRegisterService keySequenceRegisterService =
-								new KeySequenceRegisterServiceImpl(SessionFactoryUtils.getSession(
-									KeySequenceRegisterServiceImplIntegrationTest.this.sessionFactory, false));
+								new KeySequenceRegisterServiceImpl(KeySequenceRegisterServiceImplIntegrationTest.this.sessionProvder);
 						return keySequenceRegisterService.incrementAndGetNextSequence("CML");
 					}
 				});
