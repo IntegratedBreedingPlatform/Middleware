@@ -30,9 +30,9 @@
 
 	<changeSet author="darla" id="v15.3.0-2">
 		<preConditions onFail="MARK_RAN">
-			<not>
-				<tableExists tableName="germplasm_study_source"/>
-			</not>
+			 <sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 0 FROM  listnms lnms WHERE  lnms.listtype IN ( 'ADVANCED', 'IMP_CROSS', 'CRT_CROSS' );
+			 </sqlCheck>
 		</preConditions>
 		<comment>
 			Migrate advance and cross list to germplasm_study_source.
