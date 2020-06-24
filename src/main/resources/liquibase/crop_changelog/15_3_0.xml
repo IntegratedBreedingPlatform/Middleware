@@ -4,7 +4,7 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="darla" id="v15.3.0-1">
+	<changeSet author="aldrin" id="v15.3.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="germplasm_study_source"/>
