@@ -198,6 +198,13 @@ public class IntegrationTestDataInitializer {
 	}
 
 	public StockModel createTestStock(final DmsProject study, final ExperimentModel experimentModel) {
+		final StockModel stockModel = this.createTestStock(study);
+		experimentModel.setStock(stockModel);
+		return stockModel;
+
+	}
+
+	public StockModel createTestStock(final DmsProject study) {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		germplasm.setGid(null);
 		this.germplasmDao.save(germplasm);
@@ -211,10 +218,7 @@ public class IntegrationTestDataInitializer {
 		stockModel.setProject(study);
 
 		this.stockDao.saveOrUpdate(stockModel);
-		experimentModel.setStock(stockModel);
-
 		return stockModel;
-
 	}
 
 	public SampleList createTestSampleList(final String listName, final Integer userId) {
