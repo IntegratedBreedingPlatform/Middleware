@@ -142,7 +142,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		this.experimentDesignService
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(
 				instanceNumbers));
-
+		this.sessionProvder.getSession().flush();
 		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
 		Assert.assertNotNull(rows);
 

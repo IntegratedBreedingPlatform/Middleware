@@ -224,7 +224,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	public void testGetStudyInstance() {
 
 		final DmsProject study = this.createTestStudy();
-
+		this.sessionProvder.getSession().flush();
 		final StudyInstance studyInstance1 =
 			this.studyInstanceService.getStudyInstance(study.getProjectId(), this.instance1.getLocationId()).get();
 		Assert.assertEquals(this.instance1.getLocationId().intValue(), studyInstance1.getInstanceId());

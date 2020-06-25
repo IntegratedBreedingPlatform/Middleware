@@ -231,7 +231,9 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetScaleCategoriesUsedAsGermplasmDescriptor() {
 		this.createGermplasmDescriptor();
-		final List<String> usedCategories = this.cvtermRelationshipDao.getScaleCategoriesUsedAsGermplasmDescriptors(this.scale.getCvTermId());
+		this.sessionProvder.getSession().flush();
+		final List<String> usedCategories =
+			this.cvtermRelationshipDao.getScaleCategoriesUsedAsGermplasmDescriptors(this.scale.getCvTermId());
 		assertEquals(1, usedCategories.size());
 		assertEquals(this.categories.get(3).getName(), usedCategories.get(0));
 	}

@@ -91,6 +91,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
+		this.sessionProvder.getSession().flush();
 		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsByInstance(geolocation.getLocationId());
 		Assert.assertTrue(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
