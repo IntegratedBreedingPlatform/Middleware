@@ -209,14 +209,17 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final Integer studyId = this.study.getProjectId();
 		// Create environment with 2 reps but no phenotype data
 		Integer locationId = this.createEnvironmentData(2, false);
+		this.sessionProvder.getSession().flush();
 		Assert.assertFalse(this.phenotypeDao.containsAtLeast2CommonEntriesWithValues(studyId, locationId, TermId.GID.getId()));
 
 		// Create environment with 1 rep and phenotype data
 		locationId = this.createEnvironmentData(1, true);
+		this.sessionProvder.getSession().flush();
 		Assert.assertFalse(this.phenotypeDao.containsAtLeast2CommonEntriesWithValues(studyId, locationId, TermId.GID.getId()));
 
 		// Create environment with 2 reps and phenotype data
 		locationId = this.createEnvironmentData(2, true);
+		this.sessionProvder.getSession().flush();
 		Assert.assertTrue(this.phenotypeDao.containsAtLeast2CommonEntriesWithValues(studyId, locationId, TermId.GID.getId()));
 	}
 
@@ -315,6 +318,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final Integer variableId = this.trait.getCvTermId();
 		final Integer datasetId = this.study.getProjectId();
 		Assert.assertFalse(this.phenotypeDao.hasOutOfSync(datasetId));
+		this.sessionProvder.getSession().flush();
 
 		this.phenotypeDao
 			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(experimentId)), new HashSet<>(Arrays.asList(variableId)));
@@ -329,6 +333,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
 		final Integer variableId = this.trait.getCvTermId();
 		final Integer datasetId = this.study.getProjectId();
+		this.sessionProvder.getSession().flush();
 		Assert.assertFalse(this.phenotypeDao.hasOutOfSync(datasetId));
 		this.phenotypeDao.updateOutOfSyncPhenotypesByGeolocation(geolocationId, new HashSet<>(Arrays.asList(variableId)));
 		Assert.assertTrue(this.phenotypeDao.hasOutOfSync(datasetId));
@@ -359,6 +364,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final Integer variableId = this.trait.getCvTermId();
 		this.phenotypeDao
 			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(experimentId)), new HashSet<>(Arrays.asList(variableId)));
+
 		final Map<Integer, Long> outOfSyncMap = this.phenotypeDao.countOutOfSyncDataOfDatasetsInStudy(this.study.getProjectId());
 		Assert.assertNotNull(outOfSyncMap.get(plot.getProjectId()));
 		Assert.assertEquals(new Long(1), outOfSyncMap.get(plot.getProjectId()));
@@ -602,6 +608,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		//Study with valid observation values
 		final Integer geolocation1 = this.createEnvironmentData(1, true);
 		final Integer geolocation2 = this.createEnvironmentData(1, true);
+		this.sessionProvder.getSession().flush();
 
 		final List<TraitInfo> traitInfoValues =
 			this.phenotypeDao.getTraitInfoCounts(Arrays.asList(geolocation1, geolocation2), Arrays.asList(this.trait.getCvTermId()));
@@ -638,6 +645,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		//Study with valid observation values
 		final Integer geolocation1 = this.createEnvironmentData(1, true);
 		final Integer geolocation2 = this.createEnvironmentData(1, true);
+		this.sessionProvder.getSession().flush();
 
 		final List<TraitInfo> traitInfoValues = this.phenotypeDao.getTraitInfoCounts(Arrays.asList(geolocation1, geolocation2));
 		Assert.assertEquals("Trait Count", 1, traitInfoValues.size());

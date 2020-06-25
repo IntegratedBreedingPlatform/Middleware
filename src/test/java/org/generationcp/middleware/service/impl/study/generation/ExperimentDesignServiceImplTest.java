@@ -178,6 +178,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		this.experimentDesignService
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(Arrays.asList(2, 3)));
 
+		this.sessionProvder.getSession().flush();
 
 		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
 		Assert.assertNotNull(rows);
@@ -209,6 +210,8 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		// Save design - first 2 instances
 		this.experimentDesignService
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows((Arrays.asList(1, 2))));
+		this.sessionProvder.getSession().flush();
+
 		final List<ObservationUnitRow> previousRows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
 		Assert.assertEquals(2 * NO_ENTRIES * NO_REPS * NO_TREATMENTS, previousRows.size());
 		// Save fieldmap info for instance1
@@ -266,6 +269,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		final Map<Integer, List<ObservationUnitRow>> instanceRowsMap = this.createObservationUnitRows(instanceNumbers);
 		this.experimentDesignService
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), instanceRowsMap);
+		this.sessionProvder.getSession().flush();
 
 		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
 		Assert.assertNotNull(rows);
@@ -347,7 +351,6 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(
 				instanceNumbers));
 
-
 		// Delete Design
 		this.experimentDesignService.deleteStudyExperimentDesign(this.studyId);
 		List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
@@ -373,6 +376,8 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		final Map<Integer, List<ObservationUnitRow>> instanceRowsMap = this.createObservationUnitRows(instanceNumbers);
 		this.experimentDesignService
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(),instanceRowsMap);
+		this.sessionProvder.getSession().flush();
+
 		rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
 		Assert.assertNotNull(rows);
 

@@ -180,6 +180,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		final DmsProject study = this.createTestStudy();
 
+		this.sessionProvder.getSession().flush();
+
 		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(study.getProjectId());
 
 		Assert.assertEquals(3, studyInstances.size());
