@@ -64,13 +64,6 @@
 			REFERENCES `germplasm_study_source` (`source_id`)
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION;
-
-			-- Remove all ADVANCE and CROSS LIST.
-			DELETE  ldp FROM  listnms lnms INNER JOIN listdata_project ldp ON lnms.listid = ldp.list_id
-			WHERE  lnms.listtype IN ( 'ADVANCED', 'IMP_CROSS', 'CRT_CROSS' );
-
-			DELETE  lnms FROM  listnms lnms
-			WHERE  lnms.listtype IN ( 'ADVANCED', 'IMP_CROSS', 'CRT_CROSS' );
 		</sql>
 	</changeSet>
 
