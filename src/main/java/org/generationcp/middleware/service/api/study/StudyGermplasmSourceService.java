@@ -4,6 +4,8 @@ import java.util.List;
 
 public interface StudyGermplasmSourceService {
 
-	public List<StudyGermplasmSourceDto> getStudyGermplasmSourceList(final StudyGermplasmSourceSearchParameters searchParameters);
+	public List<StudyGermplasmSourceDto> getStudyGermplasmSourceList(final StudyGermplasmSourceRequest searchParameters);
+
+	public long countStudyGermplasmSourceList(final StudyGermplasmSourceRequest searchParameters);
 
 }

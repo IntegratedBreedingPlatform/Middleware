@@ -1,12 +1,15 @@
 package org.generationcp.middleware.service.api.study;
 
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class StudyGermplasmSourceSearchParameters {
+public class StudyGermplasmSourceRequest {
 
 	private int studyId;
+	private SortedPageRequest sortedRequest;
+	private StudyGermplasmSourceSearchDto studyGermplasmSourceSearchDto;
 
 	public int getStudyId() {
 		return this.studyId;
@@ -14,6 +17,15 @@ public class StudyGermplasmSourceSearchParameters {
 
 	public void setStudyId(final int studyId) {
 		this.studyId = studyId;
+	}
+
+	public StudyGermplasmSourceSearchDto getStudyGermplasmSourceSearchDto() {
+		return this.studyGermplasmSourceSearchDto;
+	}
+
+	public void setStudyGermplasmSourceSearchDto(
+		final StudyGermplasmSourceSearchDto studyGermplasmSourceSearchDto) {
+		this.studyGermplasmSourceSearchDto = studyGermplasmSourceSearchDto;
 	}
 
 	@Override

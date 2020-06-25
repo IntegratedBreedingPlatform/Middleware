@@ -1,10 +1,8 @@
 package org.generationcp.middleware.service.api.study;
 
 import org.pojomatic.Pojomatic;
-import org.pojomatic.annotations.AutoProperty;
 
-@AutoProperty
-public class StudyGermplasmSourceDto {
+public class StudyGermplasmSourceSearchDto {
 
 	private Integer gid;
 	private Integer groupId;
@@ -138,4 +136,5 @@ public class StudyGermplasmSourceDto {
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
+
 }

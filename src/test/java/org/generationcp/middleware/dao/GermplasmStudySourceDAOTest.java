@@ -11,7 +11,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StockModel;
-import org.generationcp.middleware.service.api.study.StudyGermplasmSourceSearchParameters;
+import org.generationcp.middleware.service.api.study.StudyGermplasmSourceRequest;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,7 +50,7 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmStudySourceList() {
-		final StudyGermplasmSourceSearchParameters searchParameters = new StudyGermplasmSourceSearchParameters();
+		final StudyGermplasmSourceRequest searchParameters = new StudyGermplasmSourceRequest();
 		searchParameters.setStudyId(this.study.getProjectId());
 		final List<GermplasmStudySource> germplasmStudySourceList =
 			this.daoFactory.getGermplasmStudySourceDAO().getGermplasmStudySourceList(searchParameters);
@@ -64,7 +64,7 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountGermplasmStudySourceList() {
-		final StudyGermplasmSourceSearchParameters searchParameters = new StudyGermplasmSourceSearchParameters();
+		final StudyGermplasmSourceRequest searchParameters = new StudyGermplasmSourceRequest();
 		final long count = this.daoFactory.getGermplasmStudySourceDAO().countGermplasmStudySourceList(searchParameters);
 		Assert.assertEquals(1l, count);
 	}
