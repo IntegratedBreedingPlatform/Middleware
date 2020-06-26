@@ -9,7 +9,6 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.Date;
 
 @AutoProperty
-@JsonIgnoreProperties({"locationAbbr"})
 public class ExtendedLotDto extends LotDto {
 
 	private String designation;

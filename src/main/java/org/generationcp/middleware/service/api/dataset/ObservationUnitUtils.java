@@ -37,7 +37,7 @@ public abstract class ObservationUnitUtils {
 
 		final ObservationUnitData observationUnitData = new ObservationUnitData();
 		observationUnitData.setValue(measurementData.getValue());
-		observationUnitData.setObservationId(measurementData.getPhenotypeId());
+		observationUnitData.setObservationId(measurementData.getMeasurementDataId());
 
 		observationUnitData.setVariableId(measurementData.getMeasurementVariable().getTermId());
 

@@ -32,4 +32,6 @@ public interface SampleService {
 	List<SampleDTO> getByGid(final Integer gid);
 
 	Boolean studyHasSamples(final Integer studyId);
+
+	Boolean studyEntryHasSamples(final Integer studyId, final Integer entryId);
 }

@@ -678,7 +678,7 @@ public interface StudyDataManager {
 
 	Phenotype getPhenotypeById(int phenotypeId);
 
-	StudyMetadata getStudyMetadataForGeolocationId(Integer geolocationId);
+	StudyMetadata getStudyMetadataForInstance(Integer instanceId);
 
 	Map<String, String> getGeolocationPropsAndValuesByGeolocation(Integer geolocationId, List<Integer> excludedVariableIds);
 
@@ -752,13 +752,13 @@ public interface StudyDataManager {
 
 	boolean areAllInstancesExistInDataset(final Integer datasetId, final Set<Integer> instanceIds);
 
-	String getBlockId(int datasetId, String trialInstance);
+	String getBlockId(int datasetId, Integer trialInstance);
 
 	FieldmapBlockInfo getBlockInformation(int blockId);
 
-	Boolean instanceExists(final Set<Integer> instanceIds);
+	Map<Integer, String> getGeolocationByInstanceId(Integer datasetId, Integer instanceDbId);
 
-	Map<Integer, String> getGeolocationByVariableId(final Integer datasetId, final Integer instanceDbId);
+	Boolean instancesExist(final Set<Integer> instanceIds);
 
 	Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId);
 

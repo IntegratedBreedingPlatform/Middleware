@@ -198,7 +198,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     projectprop pProp ON pmain.project_id = pProp.project_id "
 		+ " WHERE "
 		+ "     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
-		+ "         AND geoloc.nd_geolocation_id = :geolocationId "
+		+ "         AND geoloc.nd_geolocation_id = :instanceId "
 		+ " GROUP BY geoloc.nd_geolocation_id ";
 
 	private static final String GET_PROJECTID_BY_STUDYDBID =
@@ -760,8 +760,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return criteria;
 	}
 
-	public StudyMetadata getStudyMetadataForGeolocationId(final Integer geolocationId) {
-		Preconditions.checkNotNull(geolocationId);
+	public StudyMetadata getStudyMetadataForInstanceId(final Integer instanceId) {
+		Preconditions.checkNotNull(instanceId);
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_GEOLOCATION_ID);
 			query.addScalar("studyDbId");
@@ -780,12 +780,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("studyObjective");
 			query.addScalar("experimentalDesign");
 			query.addScalar("lastUpdate");
-			query.setParameter("geolocationId", geolocationId);
+			query.setParameter("instanceId", instanceId);
 			final Object result = query.uniqueResult();
 			if (result != null) {
 				final Object[] row = (Object[]) result;
 				final StudyMetadata studyMetadata = new StudyMetadata();
-				studyMetadata.setStudyDbId(geolocationId);
+				studyMetadata.setStudyDbId(instanceId);
 				studyMetadata.setNurseryOrTrialId((row[1] instanceof Integer) ? (Integer) row[1] : null);
 				studyMetadata.setStudyName((row[2] instanceof String) ? (String) row[2] : null);
 				studyMetadata.setStudyType((row[3] instanceof Integer) ? ((Integer) row[3]).toString() : null);
@@ -809,7 +809,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				return null;
 			}
 		} catch (final HibernateException e) {
-			final String message = "Error with getStudyMetadataForGeolocationId() query from study with geoloCationId: " + geolocationId;
+			final String message = "Error with getStudyMetadataForInstanceId() query from study with instanceId: " + instanceId;
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -1166,8 +1166,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<StudyInstance> getDatasetInstances(final int datasetId, final List<Integer> instanceIds) {
 
 		try {
-			final String sql = "select \n" + "	geoloc.nd_geolocation_id as instanceDbId, \n"
-				+ "	nde.nd_experiment_id as experimentId, \n"
+			final String sql = "select \n" + "	geoloc.nd_geolocation_id as instanceId, \n"
 				+ " geoloc.description as instanceNumber, \n"
 				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as locationId, \n"  // 8190 = cvterm for LOCATION_ID
 				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as locationName, \n" +
@@ -1177,48 +1176,70 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				"	case when max(if(geoprop.type_id = 8583, geoprop.value, null)) is null then 0 else 1 end as hasFieldmap, \n"
 				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
 
+				// FIXME rewrite to be valid for the whole instance, not just the datasetId
 				// if instance has X/Y coordinates (fieldmap or row/col design)
 				+ "	case when (max(if(geoprop.type_id = 8583, geoprop.value, null)) is null) \n "
 				+ "		and (max(hasRowColDesign.nd_experiment_id)) is null \n"
 				+ " 	then 0 else 1 end as hasFieldLayout, \n"
 
+				// FIXME rewrite to be valid for the whole instance, not just the datasetId
 				// if instance has been georeferenced using the geojson editor
 				+ "  max(case when json_props like '%geoCoordinates%' then 1 else 0 end) as hasGeoJSON, \n"
+
+				// if instance obs units are associated to transactions
+				+ "	case when hasInventory.nd_geolocation_id is null then 0 else 1 end as hasInventory, \n"
 
 				// If study has any plot experiments, hasExperimentalDesign flag = true
 				+ "  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
 				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
 
-				// If study has sub-observations or samples, canBeDeleted = false
-				+ "  case when (select count(1) from sample s "
-				+ "  inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 or (select count(1) from nd_experiment exp \n"
-				+ " INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 \n"
-				+ " INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 \n"
-				+ " or (select count(1) from ims_experiment_transaction iet inner join nd_experiment ne on ne.nd_experiment_id = iet.nd_experiment_id \n"
-				+ " inner join ims_transaction it on it.trnid = iet.trnid where it.trnstat <> 9 and ne.nd_geolocation_id = geoloc.nd_geolocation_id) > 0  "
-				+ " then 0 else 1 end as canBeDeleted, "
+				// If study samples
+				+ "  case when (select count(1) \n"
+				+ "               from sample s \n"
+				+ "                        inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 \n"
+				+ "               where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 \n"
+				// or has sub-observations or
+				+ "        or (select count(1) \n"
+				+ "            from nd_experiment exp \n"
+				+ "                     INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 \n"
+				+ "                     INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 \n"
+				+ "            where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 \n"
+				// or inventory
+				+ "        or hasInventory.nd_geolocation_id is not null \n"
+				// then canBeDeleted = false
+				+ "             then 0 \n"
+				+ "         else 1 end as canBeDeleted, "
 
 				// if study has any pending or accepted plot observations, hasMeasurements = true
 				+ "  case when (select count(1) from phenotype ph "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
 				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
 				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) > 0 then 1 else 0 end as hasMeasurements "
-				+ "    from	nd_geolocation geoloc \n"
-				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "    inner join project proj on proj.project_id = nde.project_id \n"
-				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
+
+				+ " from nd_geolocation geoloc \n"
+				+ " inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ " inner join project proj on proj.project_id = nde.project_id \n"
+				+ " left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ "	left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
 				+ " left join ( \n"
-				+ " select ndep.nd_experiment_id \n"
-				+ "     from nd_experimentprop ndep \n"
-				+ "         INNER JOIN cvterm cvt ON cvt.cvterm_id = ndep.type_id \n"
-				+ "     WHERE cvt.name = 'ROW' \n"
+				+ " 	select ndep.nd_experiment_id \n"
+				+ " 	    from nd_experimentprop ndep \n"
+				+ " 	        INNER JOIN cvterm cvt ON cvt.cvterm_id = ndep.type_id \n"
+				+ " 	    WHERE cvt.name = 'ROW' \n"
 				+ " ) hasRowColDesign on nde.nd_experiment_id = hasRowColDesign.nd_experiment_id "
+				+ " left join (  \n"
+				+ "    select ne.nd_geolocation_id  \n"
+				+ "    from ims_experiment_transaction iet  \n"
+				+ "             inner join nd_experiment ne on ne.nd_experiment_id = iet.nd_experiment_id  \n"
+				+ "             inner join ims_transaction it on it.trnid = iet.trnid  \n"
+				+ "    where it.trnstat <> 9  \n"
+				+ ") hasInventory on hasInventory.nd_geolocation_id = geoloc.nd_geolocation_id "
+
 				+ " where proj.project_id = :datasetId \n";
+
 			final StringBuilder sb = new StringBuilder(sql);
 			if (!CollectionUtils.isEmpty(instanceIds)) {
-				sb.append(" AND geoloc.nd_geolocation_id IN (:locationIds) \n");
+				sb.append(" AND geoloc.nd_geolocation_id IN (:instanceIds) \n");
 			}
 			sb.append("    group by geoloc.nd_geolocation_id \n");
 			sb.append("    order by (1 * geoloc.description) asc ");
@@ -1226,10 +1247,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 			query.setParameter("datasetId", datasetId);
 			if (!CollectionUtils.isEmpty(instanceIds)) {
-				query.setParameterList("locationIds", instanceIds);
+				query.setParameterList("instanceIds", instanceIds);
 			}
-			query.addScalar("instanceDbId", new IntegerType());
-			query.addScalar("experimentId", new IntegerType());
+			query.addScalar("instanceId", new IntegerType());
 			query.addScalar("locationId", new IntegerType());
 			query.addScalar("locationName", new StringType());
 			query.addScalar("locationAbbreviation", new StringType());
@@ -1237,6 +1257,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("hasFieldmap", new BooleanType());
 			query.addScalar("hasGeoJSON", new BooleanType());
 			query.addScalar("hasFieldLayout", new BooleanType());
+			query.addScalar("hasInventory", new BooleanType());
 			query.addScalar("instanceNumber", new IntegerType());
 			query.addScalar("hasExperimentalDesign", new BooleanType());
 			query.addScalar("canBeDeleted", new BooleanType());
@@ -1635,4 +1656,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}
+
+	public boolean isValidDatasetId(final Integer datasetId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("projectId", datasetId));
+		criteria.add(Restrictions.isNotNull("datasetType"));
+		criteria.setProjection(Projections.rowCount());
+		final Long count = (Long) criteria.uniqueResult();
+		return count > 0;
+	}
+
+	public boolean allDatasetIdsBelongToStudy(final Integer studyId, final List<Integer> datasetIds){
+
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.in("projectId", datasetIds));
+		criteria.add(Restrictions.eq("study.projectId", studyId));
+		criteria.setProjection(Projections.rowCount());
+		final Long count = (Long) criteria.uniqueResult();
+		return count.intValue() == datasetIds.size();
+	}
+
 }

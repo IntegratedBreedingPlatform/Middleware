@@ -26,26 +26,16 @@ public class GeolocationGenerator {
 		return location;
 	}
 
-	public Geolocation createGeolocation(final List<MeasurementVariable> measurementVariables, final int instanceNumber,
+	public Geolocation createGeolocation(final int instanceNumber,
 		final Integer locationId) {
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription(String.valueOf(instanceNumber));
 		geolocation.setProperties(new ArrayList<GeolocationProperty>());
 
-		int rank = 1;
-		for (final MeasurementVariable measurementVariable : measurementVariables) {
-			if (VariableType.ENVIRONMENT_DETAIL == measurementVariable.getVariableType()) {
-				String value = "";
-				if (measurementVariable.getTermId() == TermId.LOCATION_ID.getId()) {
-					value = String.valueOf(locationId);
-				}
-				final GeolocationProperty geolocationProperty =
-					new GeolocationProperty(geolocation, value, rank, measurementVariable.getTermId());
-				geolocation.getProperties().add(geolocationProperty);
-				rank++;
-			}
+		final GeolocationProperty geolocationProperty =
+			new GeolocationProperty(geolocation, String.valueOf(locationId), 1, TermId.LOCATION_ID.getId());
+		geolocation.getProperties().add(geolocationProperty);
 
-		}
 		this.daoFactory.getGeolocationDao().save(geolocation);
 		return geolocation;
 	}

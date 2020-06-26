@@ -66,7 +66,7 @@ public class PhenotypeSaver {
 		Phenotype phenotype = this.createPhenotype(variable, experimentId);
 		if (phenotype != null) {
 			phenotype = this.daoFactory.getPhenotypeDAO().save(phenotype);
-			variable.setPhenotypeId(phenotype.getPhenotypeId());
+			variable.setVariableDataId(phenotype.getPhenotypeId());
 		}
 	}
 

@@ -11,7 +11,9 @@
 
 package org.generationcp.middleware.dao;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockOptions;
@@ -276,5 +278,25 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 		query.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
 		query.setMaxResults(pageable.getPageSize());
+	}
+
+	public static void addSortedPageRequestPagination(final SQLQuery query, final SortedPageRequest sortedPageRequest) {
+		if (sortedPageRequest == null || query == null) {
+			return;
+		}
+		if (sortedPageRequest.getPageSize() != null && sortedPageRequest.getPageNumber() != null) {
+			query.setFirstResult(sortedPageRequest.getPageSize() * (sortedPageRequest.getPageNumber() - 1));
+			query.setMaxResults(sortedPageRequest.getPageSize());
+		}
+	}
+
+	public static void addSortedPageRequestOrderBy(final StringBuilder query, final SortedPageRequest sortedPageRequest) {
+		if (sortedPageRequest == null || query == null) {
+			return;
+		}
+		if (!StringUtils.isBlank(sortedPageRequest.getSortBy())) {
+			query.append(" ORDER BY " + sortedPageRequest.getSortBy() + " "
+				+ (sortedPageRequest.getSortOrder() == null ? "ASC" : sortedPageRequest.getSortOrder()));
+		}
 	}
 }

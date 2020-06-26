@@ -99,7 +99,7 @@ public class Measurements {
 	PhenotypeOutlier createPhenotypeOutlierFromMeasurement(final MeasurementData measurementData) {
 
 		final PhenotypeOutlier phenotypeOutlier = new PhenotypeOutlier();
-		phenotypeOutlier.setPhenotypeId(measurementData.getPhenotypeId());
+		phenotypeOutlier.setPhenotypeId(measurementData.getMeasurementDataId());
 		phenotypeOutlier.setValue(measurementData.getOldValue());
 		return phenotypeOutlier;
 
@@ -125,7 +125,7 @@ public class Measurements {
 			phenotype.setObservableId(observableId);
 		}
 
-		final Integer phenotypeId = measurementData.getPhenotypeId();
+		final Integer phenotypeId = measurementData.getMeasurementDataId();
 		if (phenotypeId != null && phenotypeId != 0) {
 			phenotype.setPhenotypeId(phenotypeId);
 		}
@@ -149,7 +149,7 @@ public class Measurements {
 			for (final MeasurementData measurementData : dataList) {
 
 				// TODO Change the UI so that we are never send back any data
-				if (!measurementData.isEditable() || (measurementData.getPhenotypeId() == null || measurementData.getPhenotypeId() == 0)
+				if (!measurementData.isEditable() || (measurementData.getMeasurementDataId() == null || measurementData.getMeasurementDataId() == 0)
 						&& StringUtils.isBlank(measurementData.getcValueId()) && StringUtils.isBlank(measurementData.getValue())
 						|| measurementData.getMeasurementVariable().getRole() != PhenotypicType.VARIATE) {
 					continue;
@@ -167,7 +167,7 @@ public class Measurements {
 				// object must be updated so that it has new phenotype id. This
 				// id is then piped back to the UI and is used in subsequent calls to
 				// determine if we need to update or add phenotype values
-				measurementData.setPhenotypeId(phenotype.getPhenotypeId());
+				measurementData.setMeasurementDataId(phenotype.getPhenotypeId());
 
 			}
 
