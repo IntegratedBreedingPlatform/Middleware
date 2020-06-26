@@ -8,4 +8,5 @@ public interface StudyGermplasmSourceService {
 
 	public long countStudyGermplasmSourceList(final StudyGermplasmSourceRequest searchParameters);
 
+	public long countFilteredStudyGermplasmSourceList(StudyGermplasmSourceRequest studyGermplasmSourceRequest);
 }

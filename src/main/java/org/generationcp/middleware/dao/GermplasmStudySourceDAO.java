@@ -6,7 +6,10 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmSourceDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmSourceRequest;
 import org.generationcp.middleware.service.api.study.StudyGermplasmSourceSearchDto;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
+import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 
@@ -82,7 +85,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		return query.list();
 	}
 
-	public long countGermplasmStudySourceList(final StudyGermplasmSourceRequest searchParameters) {
+	public long countFilteredGermplasmStudySourceList(final StudyGermplasmSourceRequest searchParameters) {
 		final StringBuilder sql = new StringBuilder(GERMPLASM_STUDY_SOURCE_COUNT_QUERY);
 		addSearchQueryFilters(new SqlQueryParamBuilder(sql), searchParameters.getStudyGermplasmSourceSearchDto());
 
@@ -90,7 +93,15 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		addSearchQueryFilters(new SqlQueryParamBuilder(query), searchParameters.getStudyGermplasmSourceSearchDto());
 
 		query.setParameter("studyId", searchParameters.getStudyId());
-		return (long) ((BigInteger) query.uniqueResult()).longValue();
+		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
+	public long countGermplasmStudySourceList(final StudyGermplasmSourceRequest searchParameters) {
+		final Criteria criteria = this.getSession().createCriteria(GermplasmStudySource.class);
+		criteria.setProjection(Projections.rowCount());
+		criteria.add(Restrictions.eq("study.projectId", searchParameters.getStudyId()));
+		criteria.setMaxResults(Integer.MAX_VALUE);
+		return (long) criteria.uniqueResult();
 	}
 
 	private static void addSearchQueryFilters(
