@@ -28,6 +28,14 @@ public class StudyGermplasmSourceRequest {
 		this.studyGermplasmSourceSearchDto = studyGermplasmSourceSearchDto;
 	}
 
+	public SortedPageRequest getSortedRequest() {
+		return this.sortedRequest;
+	}
+
+	public void setSortedRequest(final SortedPageRequest sortedRequest) {
+		this.sortedRequest = sortedRequest;
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
