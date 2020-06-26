@@ -360,10 +360,13 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final List<Integer> traitIds = Arrays.asList(this.trait.getCvTermId());
 		this.createProjectProperties(plot, traitIds);
 		this.createEnvironmentData(plot, 1, traitIds, true);
+		this.sessionProvder.getSession().flush();
+
 		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
 		final Integer variableId = this.trait.getCvTermId();
 		this.phenotypeDao
 			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(experimentId)), new HashSet<>(Arrays.asList(variableId)));
+		this.sessionProvder.getSession().flush();
 
 		final Map<Integer, Long> outOfSyncMap = this.phenotypeDao.countOutOfSyncDataOfDatasetsInStudy(this.study.getProjectId());
 		Assert.assertNotNull(outOfSyncMap.get(plot.getProjectId()));

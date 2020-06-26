@@ -251,6 +251,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetScaleCategoriesUsedAsTrialDesignFactors() {
 		this.createTrialDesignFactor();
+		this.sessionProvder.getSession().flush();
 		final List<String> usedCategories = this.cvtermRelationshipDao.getScaleCategoriesUsedAsTrialDesignFactors(this.scale.getCvTermId());
 		assertEquals(1, usedCategories.size());
 		assertEquals(this.categories.get(4).getName(), usedCategories.get(0));
