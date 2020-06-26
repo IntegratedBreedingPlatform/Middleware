@@ -15,7 +15,6 @@ import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -25,6 +24,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
@@ -54,9 +54,6 @@ public class DataSetBuilder extends Builder {
 	private WorkbookBuilder workbookBuilder;
 
 	private static final List<Integer> HIDDEN_DATASET_COLUMNS = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId());
-
-	public static final List<Integer> DEFAULT_DATASET_COLUMNS = Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.ENTRY_TYPE.getId(),
-		TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.DESIG.getId(), TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.OBS_UNIT_ID.getId());
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataSetBuilder.class);
 
@@ -209,7 +206,8 @@ public class DataSetBuilder extends Builder {
 		final VariableTypeList newList = new VariableTypeList();
 		if (variables != null && !variables.getVariableTypes().isEmpty()) {
 			for (final DMSVariableType variable : variables.getVariableTypes()) {
-				if (!filters.contains(variable.getId()) || this.DEFAULT_DATASET_COLUMNS.contains(variable.getId())) {
+				if (!filters.contains(variable.getId()) || variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
+				|| (!variable.getVariableType().equals(VariableType.ENVIRONMENT_DETAIL) && !variable.getVariableType().equals(VariableType.STUDY_DETAIL))) {
 					newList.add(variable);
 				}
 			}

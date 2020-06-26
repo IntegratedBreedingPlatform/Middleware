@@ -26,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.yecht.IoStrRead;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +77,17 @@ public class DataSetBuilderTest {
 
 	@InjectMocks
 	private final DataSetBuilder dataSetBuilder = new DataSetBuilder();
+
+	public static final List<Integer> DEFAULT_DATASET_COLUMNS = Arrays.asList(
+		TermId.TRIAL_INSTANCE_FACTOR.getId(),
+		TermId.ENTRY_TYPE.getId(),
+		TermId.ENTRY_NO.getId(),
+		TermId.GID.getId(),
+		TermId.DESIG.getId(),
+		TermId.REP_NO.getId(),
+		TermId.PLOT_NO.getId(),
+		TermId.OBS_UNIT_ID.getId());
+
 
 	@Before
 	public void setUp() {
@@ -211,8 +223,9 @@ public class DataSetBuilderTest {
 			TermId.ENTRY_NO.getId(), TermId.OBS_UNIT_ID.getId(), TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), 1, 2, 3, 4);
 
 		final DataSet dataSet = this.createDataSet();
+		final int totalVariables = DataSetBuilderTest.DEFAULT_DATASET_COLUMNS.size() + 4;//Traits
 
-		Assert.assertEquals("Default Column with Traits", DataSetBuilder.DEFAULT_DATASET_COLUMNS.size(), this.dataSetBuilder.filterVariables(dataSet.getVariableTypes(),siblingsList).size());
+		Assert.assertEquals("Default Column with Traits", totalVariables, this.dataSetBuilder.filterVariables(dataSet.getVariableTypes(),siblingsList).size());
 	}
 	private DataSet createDataSet() {
 
@@ -223,9 +236,11 @@ public class DataSetBuilderTest {
 
 		dataSet.setVariableTypes(variableTypes);
 		for (final DMSVariableType factor : this.factorVariableTypes) {
+			factor.setVariableType(VariableType.GERMPLASM_DESCRIPTOR);
 			dataSet.getVariableTypes().add(factor);
 		}
 		for (final DMSVariableType variate : this.variateVariableTypes) {
+			variate.setVariableType(VariableType.TRAIT);
 			dataSet.getVariableTypes().add(variate);
 		}
 
