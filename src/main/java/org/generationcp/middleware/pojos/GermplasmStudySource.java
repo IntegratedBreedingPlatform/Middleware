@@ -2,6 +2,7 @@ package org.generationcp.middleware.pojos;
 
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceInput;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -28,6 +29,13 @@ public class GermplasmStudySource {
 		this.study = study;
 		this.experimentModel = experimentModel;
 		this.germplasmStudySourceType = germplasmStudySourceType;
+	}
+
+	public GermplasmStudySource(final StudyGermplasmSourceInput input) {
+		this.germplasm = new Germplasm(input.getGid());
+		this.study = new DmsProject(input.getStudyId());
+		this.experimentModel = new ExperimentModel(input.getObservationUnitId());
+		this.germplasmStudySourceType = input.getType();
 	}
 
 	@Id

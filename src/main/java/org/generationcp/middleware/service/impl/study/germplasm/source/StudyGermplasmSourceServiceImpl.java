@@ -2,7 +2,9 @@ package org.generationcp.middleware.service.impl.study.germplasm.source;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceDto;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceInput;
 import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceRequest;
 import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceService;
 
@@ -29,5 +31,12 @@ public class StudyGermplasmSourceServiceImpl implements StudyGermplasmSourceServ
 	@Override
 	public long countFilteredStudyGermplasmSourceList(final StudyGermplasmSourceRequest studyGermplasmSourceRequest) {
 		return this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(studyGermplasmSourceRequest);
+	}
+
+	@Override
+	public void saveStudyGermplasmSource(List<StudyGermplasmSourceInput> studyGermplasmSourceInputList) {
+		for (final StudyGermplasmSourceInput input : studyGermplasmSourceInputList) {
+			this.daoFactory.getGermplasmStudySourceDAO().save(new GermplasmStudySource(input));
+		}
 	}
 }
