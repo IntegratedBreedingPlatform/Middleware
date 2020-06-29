@@ -243,7 +243,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		final CVTerm variable1 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
 		this.cvTermDao.save(variable1);
 		final ProjectProperty projectProperty = this.saveProjectVariable(plotDataset, variable1, 1, VariableType.TRAIT);
-		final List<ProjectProperty> projectProperties = this.projectPropDao.getByStudyAndStandardVariableIds(study.getProjectId(), Arrays.asList(variable1.getCvTermId()));
+		final List<ProjectProperty> projectProperties = this.projectPropDao.getByStudyAndStandardVariableIds(this.study.getProjectId(), Arrays.asList(variable1.getCvTermId()));
 		Assert.assertTrue(projectProperties.contains(projectProperty));
 	}
 
