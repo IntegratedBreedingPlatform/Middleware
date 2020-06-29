@@ -1,4 +1,4 @@
-package org.generationcp.middleware.service.api.study;
+package org.generationcp.middleware.service.api.study.germplasm.source;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;

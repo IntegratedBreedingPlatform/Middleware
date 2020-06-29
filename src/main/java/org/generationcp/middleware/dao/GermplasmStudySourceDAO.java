@@ -2,9 +2,9 @@ package org.generationcp.middleware.dao;
 
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
-import org.generationcp.middleware.service.api.study.StudyGermplasmSourceDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmSourceRequest;
-import org.generationcp.middleware.service.api.study.StudyGermplasmSourceSearchDto;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceDto;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceSearchDto;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;

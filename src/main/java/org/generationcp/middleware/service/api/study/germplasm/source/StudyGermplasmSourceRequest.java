@@ -1,6 +1,7 @@
-package org.generationcp.middleware.service.api.study;
+package org.generationcp.middleware.service.api.study.germplasm.source;
 
 import org.generationcp.middleware.pojos.SortedPageRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceSearchDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 

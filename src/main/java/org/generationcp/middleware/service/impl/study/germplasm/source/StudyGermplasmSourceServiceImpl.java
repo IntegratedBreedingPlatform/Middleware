@@ -1,10 +1,10 @@
-package org.generationcp.middleware.service.impl.study;
+package org.generationcp.middleware.service.impl.study.germplasm.source;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.service.api.study.StudyGermplasmSourceDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmSourceRequest;
-import org.generationcp.middleware.service.api.study.StudyGermplasmSourceService;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceDto;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceService;
 
 import java.util.List;
 
