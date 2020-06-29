@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link ExperimentModel}.
@@ -660,6 +661,36 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		} catch (final HibernateException e) {
 			final String message =
 				"Error at getObservationUnits=" + projectId + "," + instanceIds + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public Map<Integer, Integer> getPlotNumberObservationUnitIdsMap(final Integer projectId, final List<Integer> plotNumbers) {
+		final Map<Integer, Integer> experimentsMap = new HashMap<>();
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("project.projectId", projectId));
+			criteria.createAlias("properties", "prop");
+			criteria.createAlias("geoLocation", "instance");
+			criteria.add(Restrictions.eq("instance.description", "1"));
+			criteria.add(Restrictions.and(
+					Restrictions.eq("prop.typeId", TermId.PLOT_NO.getId()),
+					Restrictions.in("prop.value", plotNumbers.stream().map(number -> String.valueOf(number)).collect(Collectors.toList()))));
+			// get the observation units from the first study instance, in case there are multiple instances and hence multiple plot numbers match
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("prop.value"));
+			projectionList.add(Projections.property("ndExperimentId"));
+			criteria.setProjection(projectionList);
+
+			final List<Object[]> results = criteria.list();
+			for (final Object[] row : results) {
+				experimentsMap.put(Integer.valueOf((String) row[0]), (Integer) row[1]);
+			}
+			return experimentsMap;
+		} catch (final HibernateException e) {
+			final String message =
+					"Error at getPlotNumberObservationUnitIdsMap=" + projectId + "," + plotNumbers + " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

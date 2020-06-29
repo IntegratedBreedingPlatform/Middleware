@@ -5,7 +5,6 @@ import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -23,9 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by clarysabel on 11/13/17.
@@ -63,6 +60,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     private DatasetService datasetService;
 
     private Integer studyId;
+    private Integer plotDatasetId;
     private List<Integer> instanceIds;
     private Integer subObsDatasetId;
 
@@ -140,6 +138,16 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         Assert.assertNull(dataMap.get(TRAIT_NAME));
     }
 
+    @Test
+    public void testGetObservationUnitIdsPlotNumberMap() {
+        final List<Integer> plotNumbers = Arrays.asList(2, 4, 6, 8, 10, 12, 14, 16, 18, 20);
+        final Map<Integer, Integer> observationUnitIdsPlotNumberMap = this.datasetService.getPlotNumberObservationUnitIdsMap(this.plotDatasetId, plotNumbers);
+        Assert.assertNotNull(observationUnitIdsPlotNumberMap);
+        Assert.assertEquals(plotNumbers.size(), observationUnitIdsPlotNumberMap.size());
+        Assert.assertEquals(new HashSet<>(plotNumbers), observationUnitIdsPlotNumberMap.keySet());
+    }
+
+
     private void verifyObservationUnitRowValues(final ObservationUnitRow observationUnitRow) {
         Assert.assertNotNull(observationUnitRow.getVariables().get(TRAIT_NAME));
         Assert.assertNotNull(observationUnitRow.getVariables().get(SELECTION_NAME));
@@ -167,19 +175,14 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         this.studyId = this.dataSetupTest.createNurseryForGermplasm(this.commonTestProject.getUniqueID(), gids, "ABCD");
         this.instanceIds = new ArrayList<>(this.studyDataManager.getInstanceGeolocationIdsMap(this.studyId).values());
 
+        this.plotDatasetId = this.studyId + 2;
         final DatasetDTO datasetDTO = this.datasetService.generateSubObservationDataset(this.studyId, "TEST NURSERY SUB OBS",
-            DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), this.instanceIds, 8206, 2, this.studyId + 2);
+            DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), this.instanceIds, 8206, 2, this.plotDatasetId);
         this.subObsDatasetId = datasetDTO.getDatasetId();
         this.datasetService.addDatasetVariable(datasetDTO.getDatasetId(), 20451, VariableType.TRAIT, TRAIT_NAME);
         this.datasetService.addDatasetVariable(datasetDTO.getDatasetId(), 8263, VariableType.SELECTION_METHOD, SELECTION_NAME);
     }
 
-    public List<String> getVariableNames(final List<MeasurementVariable> measurementVariables) {
-        final List<String> variableNames = new ArrayList<>();
-        for (final MeasurementVariable mvar : measurementVariables) {
-            variableNames.add(mvar.getName());
-        }
-        return variableNames;
-    }
+
 
 }

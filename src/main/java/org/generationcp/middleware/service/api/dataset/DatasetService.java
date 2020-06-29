@@ -397,4 +397,6 @@ public interface DatasetService {
 	void setValueToVariable(Integer datasetId, ObservationUnitsParamDTO searchDTO, Integer studyId);
 
 	boolean allDatasetIdsBelongToStudy(final Integer studyId, List<Integer> datasetIds);
+
+	Map<Integer, Integer> getPlotNumberObservationUnitIdsMap(final Integer datasetId, final List<Integer> plotNumbers);
 }

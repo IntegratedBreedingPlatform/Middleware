@@ -974,6 +974,11 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getDmsProjectDAO().allDatasetIdsBelongToStudy(studyId, datasetIds);
 	}
 
+	@Override
+	public Map<Integer, Integer> getPlotNumberObservationUnitIdsMap(final Integer datasetId, final List<Integer> plotNumbers) {
+		return this.daoFactory.getExperimentDao().getPlotNumberObservationUnitIdsMap(datasetId, plotNumbers);
+	}
+
 	private void acceptDraftData(final Phenotype phenotype) {
 		if (StringUtils.isEmpty(phenotype.getDraftValue())) {
 			// Set isChanged to true so that the derived traits that depend on it will be tagged as OUT_OF_SYNC later.
