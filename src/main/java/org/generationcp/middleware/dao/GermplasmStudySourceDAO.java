@@ -18,7 +18,7 @@ import java.util.List;
 
 public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, Integer> {
 
-	public static final String GERMPLASM_STUDY_SOURCE_SEARCH_QUERY = "SELECT \n"
+	protected static final String GERMPLASM_STUDY_SOURCE_SEARCH_QUERY = "SELECT \n"
 		+ "gss.gid as `gid`,\n"
 		+ "g.mgid as `groupId`,\n"
 		+ "n.nval as `designation`,\n"
@@ -29,8 +29,9 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "loc.lname as `location`,\n"
 		+ "rep_no.value as `replicationNumber`,\n"
 		+ "plot_no.value as `plotNumber`,\n"
-		+ "g.gdate as `germplasmDate`\n"
-		+ "FROM germplasm_study_source gss\n"
+		+ "g.gdate as `germplasmDate`,\n"
+		+ "count(lot.lotid) as `lots` "
+		+ "FROM germplasm_study_source gss \n"
 		+ "INNER JOIN germplsm g ON g.gid = gss.gid\n"
 		+ "INNER JOIN project p ON p.project_id = gss.project_id\n"
 		+ "LEFT JOIN nd_experiment e ON e.nd_experiment_id = gss.nd_experiment_id\n"
@@ -41,30 +42,20 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "LEFT JOIN location loc ON locationProp.value = loc.locid\n"
 		+ "LEFT JOIN methods m ON m.mid = g.methn\n"
 		+ "LEFT JOIN names n ON g.gid = n.gid AND n.ntype in (2, 5)\n"
-		+ "WHERE gss.project_id = :studyId ";
-
-	public static final String GERMPLASM_STUDY_SOURCE_COUNT_QUERY = "SELECT \n"
-		+ "COUNT(gss.source_id)\n"
-		+ "FROM germplasm_study_source gss\n"
-		+ "INNER JOIN germplsm g ON g.gid = gss.gid\n"
-		+ "INNER JOIN project p ON p.project_id = gss.project_id\n"
-		+ "LEFT JOIN nd_experiment e ON e.nd_experiment_id = gss.nd_experiment_id\n"
-		+ "LEFT JOIN nd_experimentprop rep_no ON rep_no.nd_experiment_id = e.nd_experiment_id AND rep_no.type_id = 8210\n"
-		+ "LEFT JOIN nd_experimentprop plot_no ON plot_no.nd_experiment_id = e.nd_experiment_id AND plot_no.type_id = 8200\n"
-		+ "LEFT JOIN nd_geolocation geo ON e.nd_geolocation_id = geo.nd_geolocation_id\n"
-		+ "LEFT JOIN nd_geolocationprop locationProp ON geo.nd_geolocation_id = locationProp.nd_geolocation_id AND locationProp.type_id = 8190\n"
-		+ "LEFT JOIN location loc ON locationProp.value = loc.locid\n"
-		+ "LEFT JOIN methods m ON m.mid = g.methn\n"
-		+ "LEFT JOIN names n ON g.gid = n.gid AND n.ntype in (2, 5)\n"
+		+ "LEFT JOIN ims_stock_transaction stockTransaction ON gss.source_id  = stockTransaction.source_id\n"
+		+ "LEFT JOIN ims_transaction transaction ON stockTransaction.trnid = transaction.trnid\n"
+		+ "LEFT JOIN ims_transaction lot ON  transaction.lotid = lot.lotid\n"
 		+ "WHERE gss.project_id = :studyId ";
 
 	public List<StudyGermplasmSourceDto> getGermplasmStudySourceList(final StudyGermplasmSourceRequest searchParameters) {
 
 		final StringBuilder sql = new StringBuilder(GERMPLASM_STUDY_SOURCE_SEARCH_QUERY);
 		addSearchQueryFilters(new SqlQueryParamBuilder(sql), searchParameters.getStudyGermplasmSourceSearchDto());
+		addGroupByAndLotsFilter(new SqlQueryParamBuilder(sql), searchParameters.getStudyGermplasmSourceSearchDto());
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 		addSearchQueryFilters(new SqlQueryParamBuilder(query), searchParameters.getStudyGermplasmSourceSearchDto());
+		addGroupByAndLotsFilter(new SqlQueryParamBuilder(query), searchParameters.getStudyGermplasmSourceSearchDto());
 
 		query.addScalar("gid");
 		query.addScalar("groupId");
@@ -77,6 +68,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		query.addScalar("replicationNumber", new IntegerType());
 		query.addScalar("plotNumber", new IntegerType());
 		query.addScalar("germplasmDate");
+		query.addScalar("lots", new IntegerType());
 		query.setParameter("studyId", searchParameters.getStudyId());
 
 		GenericDAO.addSortedPageRequestPagination(query, searchParameters.getSortedRequest());
@@ -86,11 +78,17 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 	}
 
 	public long countFilteredGermplasmStudySourceList(final StudyGermplasmSourceRequest searchParameters) {
-		final StringBuilder sql = new StringBuilder(GERMPLASM_STUDY_SOURCE_COUNT_QUERY);
-		addSearchQueryFilters(new SqlQueryParamBuilder(sql), searchParameters.getStudyGermplasmSourceSearchDto());
+		final StringBuilder subQuery = new StringBuilder(GERMPLASM_STUDY_SOURCE_SEARCH_QUERY);
+		addSearchQueryFilters(new SqlQueryParamBuilder(subQuery), searchParameters.getStudyGermplasmSourceSearchDto());
+		addGroupByAndLotsFilter(new SqlQueryParamBuilder(subQuery), searchParameters.getStudyGermplasmSourceSearchDto());
 
-		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+		final StringBuilder mainSql = new StringBuilder("SELECT COUNT(*) FROM ( \n");
+		mainSql.append(subQuery.toString());
+		mainSql.append(") a \n");
+
+		final SQLQuery query = this.getSession().createSQLQuery(mainSql.toString());
 		addSearchQueryFilters(new SqlQueryParamBuilder(query), searchParameters.getStudyGermplasmSourceSearchDto());
+		addGroupByAndLotsFilter(new SqlQueryParamBuilder(query), searchParameters.getStudyGermplasmSourceSearchDto());
 
 		query.setParameter("studyId", searchParameters.getStudyId());
 		return ((BigInteger) query.uniqueResult()).longValue();
@@ -164,8 +162,21 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				paramBuilder.append(" and geo.description = :trialInstance");
 				paramBuilder.setParameter("trialInstance", trialInstance);
 			}
-			// TODO: Implement LOTS filter
+
 		}
+	}
+
+	private static void addGroupByAndLotsFilter(final SqlQueryParamBuilder paramBuilder,
+		final StudyGermplasmSourceSearchDto studyGermplasmSourceSearchDto) {
+
+		paramBuilder.append(" GROUP BY gss.source_id\n");
+
+		final Integer lots = studyGermplasmSourceSearchDto.getLots();
+		if (lots != null) {
+			paramBuilder.append(" HAVING `lots` = :lots\n");
+			paramBuilder.setParameter("lots", lots);
+		}
+
 	}
 
 }
