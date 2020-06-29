@@ -231,11 +231,20 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		excludedIds.add(TermId.SEASON_VAR.getId());
 		excludedIds.add(TermId.LOCATION_ID.getId());
 		final String sql = " SELECT  "
-			+ "     cvterm.definition AS name, pp.value AS value "
+			+ "     cvterm.definition AS name,"
+			+ "		(CASE WHEN category.object_id = " + TermId.CATEGORICAL_VARIABLE.getId()
+			+ "			THEN (SELECT incvterm.definition FROM cvterm incvterm WHERE incvterm.cvterm_id = pp.value) "
+			+ "			ELSE pp.value "
+			+ "		END) value "
 			+ " FROM "
 			+ "     projectprop pp "
 			+ "         INNER JOIN "
 			+ "     cvterm cvterm ON cvterm.cvterm_id = pp.variable_id "
+			+ "			LEFT JOIN "
+			+ "			(SELECT scale.object_id as object_id, relation.subject_id as subject_id FROM cvterm_relationship relation "
+			+ "				INNER JOIN cvterm_relationship scale ON scale.subject_id = relation.object_id AND scale.type_id = " + TermId.HAS_TYPE.getId()
+			+ "			 WHERE relation.type_id = " + TermId.HAS_SCALE.getId()
+			+ "			) category ON category.subject_id = pp.variable_id"
 			+ " WHERE "
 			+ "     pp.project_id = :studyId "
 			+ "         AND pp.variable_id NOT IN (:excludedIds) "
