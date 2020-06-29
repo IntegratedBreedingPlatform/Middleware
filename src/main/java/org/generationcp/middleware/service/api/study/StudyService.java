@@ -24,10 +24,6 @@ public interface StudyService {
 
 	ObservationDto updataObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement);
 
-	List<StudyGermplasmDto> getStudyGermplasmList(Integer studyIdentifer);
-
-	List<StudyGermplasmDto> getStudyGermplasmListWithPlotInformation(Integer studyIdentifer, Set<Integer> plotNos);
-
 	String getProgramUUID(Integer studyIdentifier);
 
 	TrialObservationTable getTrialObservationTable(int studyIdentifier);

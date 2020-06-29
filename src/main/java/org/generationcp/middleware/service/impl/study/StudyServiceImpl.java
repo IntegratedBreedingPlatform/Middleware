@@ -73,8 +73,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private StudyMeasurements studyMeasurements;
 
-	private StudyGermplasmService studyGermplasmService;
-
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Resource
@@ -92,7 +90,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		super(sessionProvider);
 		final Session currentSession = this.getCurrentSession();
 		this.studyMeasurements = new StudyMeasurements(currentSession);
-		this.studyGermplasmService = new StudyGermplasmServiceImpl(sessionProvider);
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(),
 			this.getOntologyPropertyDataManager(), this.getOntologyScaleDataManager(), this.getFormulaService(), sessionProvider);
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
@@ -114,10 +111,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	 *
 	 * @param trialMeasurements
 	 */
-	StudyServiceImpl(final StudyMeasurements trialMeasurements,
-		final StudyGermplasmService studyGermplasmServiceImpl) {
+	StudyServiceImpl(final StudyMeasurements trialMeasurements) {
 		this.studyMeasurements = trialMeasurements;
-		this.studyGermplasmService = studyGermplasmServiceImpl;
 		this.daoFactory = new DaoFactory(this.sessionProvider);
 	}
 
@@ -318,16 +313,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 			throw new MiddlewareQueryException(
 				"Unexpected error updating observations. Please contact support for " + "further assistence.", e); // or
 		}
-	}
-
-	@Override
-	public List<StudyGermplasmDto> getStudyGermplasmList(final Integer studyIdentifer) {
-		return this.studyGermplasmService.getGermplasm(studyIdentifer);
-	}
-
-	@Override
-	public List<StudyGermplasmDto> getStudyGermplasmListWithPlotInformation(final Integer studyIdentifer, final Set<Integer> plotNos) {
-		return this.studyGermplasmService.getGermplasmFromPlots(studyIdentifer, plotNos);
 	}
 
 	@Override

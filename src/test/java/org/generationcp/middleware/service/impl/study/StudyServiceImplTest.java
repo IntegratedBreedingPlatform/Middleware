@@ -155,9 +155,8 @@ public class StudyServiceImplTest {
 	@Test
 	public void testGetObservations() {
 		final StudyMeasurements mockMeasurements = Mockito.mock(StudyMeasurements.class);
-		final StudyGermplasmService mockStudyGermplasmListService = Mockito.mock(StudyGermplasmService.class);
 
-		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl( mockMeasurements, mockStudyGermplasmListService);
+		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl( mockMeasurements);
 		studyServiceImpl.setDaoFactory(this.daoFactory);
 
 		final List<MeasurementVariableDto> projectTraits =
