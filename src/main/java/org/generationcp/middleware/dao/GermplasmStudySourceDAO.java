@@ -171,10 +171,9 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 
 		paramBuilder.append(" GROUP BY gss.source_id\n");
 
-		final Integer lots = studyGermplasmSourceSearchDto.getLots();
-		if (lots != null) {
+		if (studyGermplasmSourceSearchDto != null && studyGermplasmSourceSearchDto.getLots() != null) {
 			paramBuilder.append(" HAVING `lots` = :lots\n");
-			paramBuilder.setParameter("lots", lots);
+			paramBuilder.setParameter("lots", studyGermplasmSourceSearchDto.getLots());
 		}
 
 	}
