@@ -147,8 +147,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 			final boolean isUpdate = workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null;
 			if (isUpdate) {
-				this.workbookSaver.saveWorkbookVariables(workbook);
-				this.workbookSaver.removeDeletedVariablesAndObservations(workbook);
+				this.workbookSaver.saveWorkbookVariables(workbook, false);
+				this.workbookSaver.removeDeletedVariablesAndObservations(workbook, false);
 			}
 			variableMap = this.workbookSaver.saveVariables(workbook, programUUID);
 

@@ -632,7 +632,7 @@ public class WorkbookTestDataInitializer {
 				}
 			}
 		}
-		return null;
+		return MeasurementVariableTestDataInitializer.createMeasurementVariable(termId, null);
 	}
 
 	private static void createVariatesWithDuplicatePSM(final Workbook workbook) {

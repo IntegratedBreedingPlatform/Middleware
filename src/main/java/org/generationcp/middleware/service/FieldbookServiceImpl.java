@@ -215,12 +215,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID) {
 		try {
 
-			this.workbookSaver.saveWorkbookVariables(workbook);
-			this.workbookSaver.removeDeletedVariablesAndObservations(workbook);
-
-			// save trial observations
-			this.workbookSaver.saveTrialObservations(workbook, programUUID);
-
+			this.workbookSaver.saveWorkbookVariables(workbook, true);
+			this.workbookSaver.removeDeletedVariablesAndObservations(workbook, true);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
 		}
@@ -231,8 +227,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		final Workbook workbook, final String programUUID, final CropType crop) {
 		final TimerWatch timerWatch = new TimerWatch("saveExperimentalDesign (grand total)");
 		try {
-			this.workbookSaver.saveProjectProperties(workbook);
-			this.workbookSaver.removeDeletedVariablesAndObservations(workbook);
+			this.workbookSaver.saveProjectProperties(workbook, false);
+			this.workbookSaver.removeDeletedVariablesAndObservations(workbook, false);
 			final Map<String, ?> variableMap = this.workbookSaver.saveVariables(workbook, programUUID);
 			this.workbookSaver.savePlotDataset(workbook, variableMap, programUUID, crop);
 

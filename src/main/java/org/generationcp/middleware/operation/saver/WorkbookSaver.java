@@ -272,53 +272,7 @@ public class WorkbookSaver extends Saver {
 		return studyId;
 	}
 
-	public void deleteExperimentalDesign(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) {
-
-		final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get(WorkbookSaver.HEADERMAP);
-		final Map<String, VariableTypeList> variableTypeMap =
-			(Map<String, VariableTypeList>) variableMap.get(WorkbookSaver.VARIABLETYPEMAP);
-		final Map<String, List<MeasurementVariable>> measurementVariableMap =
-			(Map<String, List<MeasurementVariable>>) variableMap.get(WorkbookSaver.MEASUREMENTVARIABLEMAP);
-
-		final VariableTypeList trialVariableTypeList = variableTypeMap.get(WorkbookSaver.TRIALVARIABLETYPELIST);
-		final VariableTypeList trialVariables = variableTypeMap.get(WorkbookSaver.TRIALVARIABLES);
-		final List<MeasurementVariable> trialMV = measurementVariableMap.get(WorkbookSaver.TRIALMV);
-		final List<String> trialHeaders = headerMap.get(WorkbookSaver.TRIALHEADERS);
-
-
-		final List<Integer> locationIds = new ArrayList<>();
-		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
-
-		final Integer environmentDatasetId = workbook.getTrialDatasetId();
-		final Integer plotDatasetId = workbook.getMeasurementDatesetId();
-
-		final int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
-
-		// delete measurement data
-		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
-		// reset trial observation details such as experimentid, stockid and
-		// geolocationid
-		this.resetTrialObservations(workbook.getTrialObservations());
-
-		final int studyLocationId =
-			this.createLocationIfNecessary(trialVariableTypeList, true, locationIds, workbook, trialVariables, trialMV,
-				trialHeaders, trialVariatesMap, true, programUUID);
-
-		final ExperimentModel studyExperiment =
-			this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
-		studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
-		this.getExperimentDao().saveOrUpdate(studyExperiment);
-
-		// delete trial observations
-		this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
-
-		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId,
-			savedEnvironmentsCount,
-			true, programUUID);
-	}
-
 	public void savePlotDataset(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) {
-
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList ,
 		// Maps of Lists of MeasurementVariable
 		final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get(WorkbookSaver.HEADERMAP);
@@ -385,17 +339,24 @@ public class WorkbookSaver extends Saver {
 		return studyLocationId;
 	}
 
-	public void removeDeletedVariablesAndObservations(final Workbook workbook) {
-		for (final MeasurementRow measurementRow : workbook.getTrialObservations()) {
-			this.removeDeletedVariablesInObservations(workbook.getConstants(), workbook.getTrialObservations());
-			this.removeDeletedVariablesInObservations(measurementRow.getMeasurementVariables(), workbook.getTrialObservations());
+	public void removeDeletedVariablesAndObservations(final Workbook workbook, final boolean excludeEnvironmentVariables) {
+		if(!excludeEnvironmentVariables) {
+			for (final MeasurementRow measurementRow : workbook.getTrialObservations()) {
+				this.removeDeletedVariablesInObservations(workbook.getConstants(), workbook.getTrialObservations());
+				this.removeDeletedVariablesInObservations(measurementRow.getMeasurementVariables(), workbook.getTrialObservations());
+			}
+
 		}
+
 		this.removeDeletedVariablesInObservations(workbook.getFactors(), workbook.getObservations());
 		this.removeDeletedVariablesInObservations(workbook.getVariates(), workbook.getObservations());
-		this.removeDeletedVariables(workbook.getConditions());
+
 		this.removeDeletedVariables(workbook.getFactors());
 		this.removeDeletedVariables(workbook.getVariates());
-		this.removeDeletedVariables(workbook.getConstants());
+		if(!excludeEnvironmentVariables) {
+			this.removeDeletedVariables(workbook.getConditions());
+			this.removeDeletedVariables(workbook.getConstants());
+		}
 
 	}
 
@@ -1224,7 +1185,7 @@ public class WorkbookSaver extends Saver {
 		return list;
 	}
 
-	public void saveWorkbookVariables(final Workbook workbook) throws ParseException {
+	public void saveWorkbookVariables(final Workbook workbook, final boolean excludeEnvironmentVariables) throws ParseException {
 
 		final int parentFolderId = (int) workbook.getStudyDetails().getParentFolderId();
 
@@ -1240,7 +1201,7 @@ public class WorkbookSaver extends Saver {
 		final DmsProject trialDataset = this.getDmsProjectDao().getById(trialDatasetId);
 		final DmsProject measurementDataset = this.getDmsProjectDao().getById(measurementDatasetId);
 
-		this.saveProjectProperties(workbook);
+		this.saveProjectProperties(workbook, excludeEnvironmentVariables);
 
 		final String description = workbook.getStudyDetails().getDescription();
 		final String startDate = workbook.getStudyDetails().getStartDate();
@@ -1253,7 +1214,7 @@ public class WorkbookSaver extends Saver {
 		this.updateStudyDetails(description + WorkbookSaver.PLOTDATA, measurementDataset, objective);
 	}
 
-	public void saveProjectProperties(final Workbook workbook) {
+	public void saveProjectProperties(final Workbook workbook, final boolean excludeEnvironmentVariables) {
 		final Integer studyId = workbook.getStudyDetails().getId();
 		final Integer trialDatasetId = workbook.getTrialDatasetId();
 		final Integer measurementDatasetId = workbook.getMeasurementDatesetId();
@@ -1262,8 +1223,16 @@ public class WorkbookSaver extends Saver {
 		final DmsProject trialDataset = this.getDmsProjectDao().getById(trialDatasetId);
 		final DmsProject measurementDataset = this.getDmsProjectDao().getById(measurementDatasetId);
 
-		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConditions(), false);
-		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
+		if(!excludeEnvironmentVariables) {
+			this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConditions(), false);
+			this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
+		} else {
+			//Trial Environment Variables are saved automatically.
+			final List<MeasurementVariable> nonEnvironmentConditions = workbook.getConditions().stream()
+				.filter(condition -> !PhenotypicType.TRIAL_ENVIRONMENT.equals(condition.getRole()))
+				.collect(Collectors.toList());
+			this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, nonEnvironmentConditions, false);
+		}
 		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getVariates(), false);
 		this.getProjectPropertySaver().saveFactors(measurementDataset, workbook.getFactors());
 	}

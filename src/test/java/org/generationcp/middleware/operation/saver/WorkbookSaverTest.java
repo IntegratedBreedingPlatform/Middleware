@@ -306,12 +306,61 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 			if (measurementVariable != null && WorkbookSaverTest.COOPERATOR_NAME == measurementVariable.getTermId()) {
 				measurementVariable.setOperation(Operation.DELETE);
 			}
-
 		}
 
-		WorkbookSaverTest.workbookSaver.removeDeletedVariablesAndObservations(workbook);
+		this.setOperationToDelete(workbook.getFactors());
+		this.setOperationToDelete(workbook.getVariates());
+		this.setOperationToDelete(workbook.getConstants());
+		this.setOperationToDelete(workbook.getConditions());
+
+		WorkbookSaverTest.workbookSaver.removeDeletedVariablesAndObservations(workbook, false);
 
 		Assert.assertEquals(0, workbook.getTrialObservations().get(0).getMeasurementVariables().size());
+		Assert.assertEquals(0, workbook.getFactors().size());
+		Assert.assertEquals(0, workbook.getVariates().size());
+		Assert.assertEquals(0, workbook.getConditions().size());
+		Assert.assertEquals(0, workbook.getConstants().size());
+	}
+
+	@Test
+	public void testRemoveDeletedStudyObservationsExcludeEnvironentVariables() {
+
+		final String studyName = "nursery_1" + new Random().nextInt(10000);
+
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyTypeDto.getNurseryDto(), studyName, 1, true);
+		final WorkbookSaver workbookSaver = Mockito.mock(WorkbookSaver.class, Mockito.CALLS_REAL_METHODS);
+
+		final VariableTypeListTransformer transformer = Mockito.mock(VariableTypeListTransformer.class);
+
+		workbook.setTrialObservations(this.createObservations(1, workbook));
+
+		Mockito.doReturn(transformer).when(workbookSaver).getVariableTypeListTransformer();
+
+		final MeasurementRow measurementRow = workbook.getTrialObservations().get(0);
+		final List<MeasurementData> dataList = measurementRow.getDataList();
+		for (final Iterator<MeasurementData> iterator = dataList.iterator(); iterator.hasNext(); ) {
+			final MeasurementData measurementData = iterator.next();
+			final MeasurementVariable measurementVariable = measurementData.getMeasurementVariable();
+
+			if (measurementVariable != null && WorkbookSaverTest.COOPERATOR_NAME == measurementVariable.getTermId()) {
+				measurementVariable.setOperation(Operation.DELETE);
+			}
+		}
+
+		this.setOperationToDelete(workbook.getFactors());
+		this.setOperationToDelete(workbook.getVariates());
+		this.setOperationToDelete(workbook.getConstants());
+		this.setOperationToDelete(workbook.getConditions());
+
+		WorkbookSaverTest.workbookSaver.removeDeletedVariablesAndObservations(workbook, true);
+
+		Assert.assertEquals(1, workbook.getTrialObservations().get(0).getMeasurementVariables().size());
+
+		Assert.assertEquals(0, workbook.getFactors().size());
+		Assert.assertEquals(0, workbook.getVariates().size());
+		Assert.assertNotEquals(0, workbook.getConditions().size());
+		Assert.assertNotEquals(0, workbook.getConstants().size());
+
 	}
 
 	@Test
@@ -390,6 +439,12 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 				MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), "1")));
 		workbookSaver.setDatasetStocks(workbook, Collections.singletonList(stock));
 		Assert.assertEquals(stock.getStockId().toString(), String.valueOf(workbook.getObservations().get(0).getStockId()));
+	}
+
+	private void setOperationToDelete(final List<MeasurementVariable> measurementVariables) {
+		for(MeasurementVariable measurementVariable: measurementVariables) {
+			measurementVariable.setOperation(Operation.DELETE);
+		}
 	}
 
 	private Variable createLocationVariable() {
