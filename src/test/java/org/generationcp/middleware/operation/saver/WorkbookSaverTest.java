@@ -512,7 +512,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	}
 
 	private void setOperationToDelete(final List<MeasurementVariable> measurementVariables) {
-		for(MeasurementVariable measurementVariable: measurementVariables) {
+		for(final MeasurementVariable measurementVariable: measurementVariables) {
 			measurementVariable.setOperation(Operation.DELETE);
 		}
 	}
