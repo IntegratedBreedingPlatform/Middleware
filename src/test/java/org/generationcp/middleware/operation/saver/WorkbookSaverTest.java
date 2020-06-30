@@ -13,6 +13,7 @@ package org.generationcp.middleware.operation.saver;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.data.initializer.MeasurementRowTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
@@ -35,6 +36,8 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.generationcp.middleware.utils.test.VariableTypeListDataUtil;
@@ -44,6 +47,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class WorkbookSaverTest extends TestOutputFormatter {
 
@@ -281,6 +285,72 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 			variableTypeList.add(this.transformToDMSVariableType(measurementVariable, rank));
 		}
 		return variableTypeList;
+	}
+
+	@Test
+	public void testSaveProjectProperties() {
+		final String studyName = "nursery_1" + new Random().nextInt(10000);
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyTypeDto.getNurseryDto(), studyName, 1, true);
+		workbook.getStudyDetails().setId(1);
+		workbook.setTrialDatasetId(2);
+		workbook.setMeasurementDatesetId(3);
+
+		final WorkbookSaver workbookSaver = Mockito.mock(WorkbookSaver.class, Mockito.CALLS_REAL_METHODS);
+		final ProjectPropertySaver projectPropertySaver = Mockito.mock(ProjectPropertySaver.class);
+		Mockito.when(workbookSaver.getProjectPropertySaver()).thenReturn(projectPropertySaver);
+
+		final DmsProjectDao dmsProjectDao = Mockito.mock(DmsProjectDao.class);
+		Mockito.doReturn(dmsProjectDao).when(workbookSaver).getDmsProjectDao();
+
+
+		final DmsProject study = new DmsProject(workbook.getStudyDetails().getId());
+		Mockito.doReturn(study).when(dmsProjectDao).getById(workbook.getStudyDetails().getId());
+		final DmsProject trialDataset = new DmsProject(workbook.getTrialDatasetId());
+		Mockito.doReturn(trialDataset).when(dmsProjectDao).getById(workbook.getTrialDatasetId());
+		final DmsProject measurementDataset = new DmsProject(workbook.getMeasurementDatesetId());
+		Mockito.doReturn(measurementDataset).when(dmsProjectDao).getById(workbook.getMeasurementDatesetId());
+
+		workbookSaver.saveProjectProperties(workbook, false);
+		Mockito.verify(projectPropertySaver).saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConditions(), false);
+		Mockito.verify(projectPropertySaver).saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
+		Mockito.verify(projectPropertySaver).saveProjectProperties(study, trialDataset, measurementDataset, workbook.getVariates(), false);
+		Mockito.verify(projectPropertySaver).saveFactors(measurementDataset, workbook.getFactors());
+
+	}
+
+	@Test
+	public void testSaveProjectPropertiesExcludeEnvironentVariables() {
+		final String studyName = "nursery_1" + new Random().nextInt(10000);
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyTypeDto.getNurseryDto(), studyName, 1, true);
+		workbook.getStudyDetails().setId(1);
+		workbook.setTrialDatasetId(2);
+		workbook.setMeasurementDatesetId(3);
+
+		final WorkbookSaver workbookSaver = Mockito.mock(WorkbookSaver.class, Mockito.CALLS_REAL_METHODS);
+		final ProjectPropertySaver projectPropertySaver = Mockito.mock(ProjectPropertySaver.class);
+		Mockito.when(workbookSaver.getProjectPropertySaver()).thenReturn(projectPropertySaver);
+
+		final DmsProjectDao dmsProjectDao = Mockito.mock(DmsProjectDao.class);
+		Mockito.doReturn(dmsProjectDao).when(workbookSaver).getDmsProjectDao();
+
+
+		final DmsProject study = new DmsProject(workbook.getStudyDetails().getId());
+		Mockito.doReturn(study).when(dmsProjectDao).getById(workbook.getStudyDetails().getId());
+		final DmsProject trialDataset = new DmsProject(workbook.getTrialDatasetId());
+		Mockito.doReturn(trialDataset).when(dmsProjectDao).getById(workbook.getTrialDatasetId());
+		final DmsProject measurementDataset = new DmsProject(workbook.getMeasurementDatesetId());
+		Mockito.doReturn(measurementDataset).when(dmsProjectDao).getById(workbook.getMeasurementDatesetId());
+
+		workbookSaver.saveProjectProperties(workbook, true);
+
+		final List<MeasurementVariable> nonEnvironmentConditions = workbook.getConditions().stream()
+			.filter(condition -> !PhenotypicType.TRIAL_ENVIRONMENT.equals(condition.getRole()))
+			.collect(Collectors.toList());
+		Mockito.verify(projectPropertySaver).saveProjectProperties(study, trialDataset, measurementDataset, nonEnvironmentConditions, false);
+		Mockito.verify(projectPropertySaver, Mockito.never()).saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
+		Mockito.verify(projectPropertySaver).saveProjectProperties(study, trialDataset, measurementDataset, workbook.getVariates(), false);
+		Mockito.verify(projectPropertySaver).saveFactors(measurementDataset, workbook.getFactors());
+
 	}
 
 	@Test

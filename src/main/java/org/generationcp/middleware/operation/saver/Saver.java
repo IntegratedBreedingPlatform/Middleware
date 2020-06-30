@@ -54,7 +54,7 @@ public class Saver extends DatabaseBroker {
 		return new ProjectSaver(this.sessionProvider);
 	}
 
-	protected final ProjectPropertySaver getProjectPropertySaver() {
+	protected ProjectPropertySaver getProjectPropertySaver() {
 		return new ProjectPropertySaver(this.sessionProvider);
 	}
 
