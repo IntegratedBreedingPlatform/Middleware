@@ -64,6 +64,7 @@ import org.generationcp.middleware.service.api.gdms.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
@@ -76,6 +77,7 @@ import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyGermplasmServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
+import org.generationcp.middleware.service.impl.study.germplasm.source.StudyGermplasmSourceServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -350,6 +352,10 @@ public class ManagerFactory implements Serializable {
 
 	public StudyGermplasmService getStudyGermplasmService() {
 		return new StudyGermplasmServiceImpl(this.sessionProvider);
+	}
+
+	public StudyGermplasmSourceService getStudyGermplasmSourceService() {
+		return new StudyGermplasmSourceServiceImpl(this.sessionProvider);
 	}
 
 	public InventoryService getInventoryService() {
