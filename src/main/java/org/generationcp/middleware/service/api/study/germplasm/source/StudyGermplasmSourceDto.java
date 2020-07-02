@@ -6,6 +6,7 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class StudyGermplasmSourceDto {
 
+	private Integer sourceId;
 	private Integer gid;
 	private Integer groupId;
 	private String designation;
@@ -19,6 +20,15 @@ public class StudyGermplasmSourceDto {
 	private Integer plotNumber;
 	private Integer replicationNumber;
 	private Integer germplasmDate;
+
+
+	public Integer getSourceId() {
+		return this.sourceId;
+	}
+
+	public void setSourceId(final Integer sourceId) {
+		this.sourceId = sourceId;
+	}
 
 	public Integer getGid() {
 		return this.gid;

@@ -19,6 +19,7 @@ import java.util.List;
 public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, Integer> {
 
 	protected static final String GERMPLASM_STUDY_SOURCE_SEARCH_QUERY = "SELECT \n"
+		+ "gss.source_id as `sourceId`,\n"
 		+ "gss.gid as `gid`,\n"
 		+ "g.mgid as `groupId`,\n"
 		+ "n.nval as `designation`,\n"
@@ -57,6 +58,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		addSearchQueryFilters(new SqlQueryParamBuilder(query), searchParameters.getStudyGermplasmSourceSearchDto());
 		addGroupByAndLotsFilter(new SqlQueryParamBuilder(query), searchParameters.getStudyGermplasmSourceSearchDto());
 
+		query.addScalar("sourceId");
 		query.addScalar("gid");
 		query.addScalar("groupId");
 		query.addScalar("designation");
