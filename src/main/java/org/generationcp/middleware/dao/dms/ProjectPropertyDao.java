@@ -232,7 +232,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		excludedIds.add(TermId.LOCATION_ID.getId());
 		final String sql = " SELECT  "
 			+ "     cvterm.definition AS name,"
-			+ "		(CASE WHEN category.object_id = " + TermId.CATEGORICAL_VARIABLE.getId()
+			+ "		(CASE WHEN scale_type.object_id = " + TermId.CATEGORICAL_VARIABLE.getId()
 			+ "			THEN (SELECT incvterm.definition FROM cvterm incvterm WHERE incvterm.cvterm_id = pp.value) "
 			+ "			ELSE pp.value "
 			+ "		END) value "
@@ -240,24 +240,13 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			+ "     projectprop pp "
 			+ "         INNER JOIN "
 			+ "     cvterm cvterm ON cvterm.cvterm_id = pp.variable_id "
-			+ "			LEFT JOIN "
-			+ "			(SELECT scale.object_id as object_id, relation.subject_id as subject_id FROM cvterm_relationship relation "
-			+ "				INNER JOIN cvterm_relationship scale ON scale.subject_id = relation.object_id AND scale.type_id = " + TermId.HAS_TYPE.getId()
-			+ "			 WHERE relation.type_id = " + TermId.HAS_SCALE.getId()
-			+ "			) category ON category.subject_id = pp.variable_id"
+			+ " INNER JOIN cvterm_relationship scale ON scale.subject_id = pp.variable_id AND scale.type_id = " + TermId.HAS_SCALE.getId()
+			+ " INNER JOIN cvterm_relationship scale_type ON scale_type.subject_id = scale.object_id AND scale_type.type_id = " + TermId.HAS_TYPE.getId()
 			+ " WHERE "
 			+ "     pp.project_id = :studyId "
 			+ "         AND pp.variable_id NOT IN (:excludedIds) "
-			+ "         AND pp.variable_id NOT IN (SELECT  "
-			+ "             variable.cvterm_id "
-			+ "         FROM "
-			+ "             cvterm scale "
-			+ "                 INNER JOIN "
-			+ "             cvterm_relationship r ON (r.object_id = scale.cvterm_id) "
-			+ "                 INNER JOIN "
-			+ "             cvterm variable ON (r.subject_id = variable.cvterm_id) "
-			+ "         WHERE "
-			+ "             object_id = 1901) ";
+			//Exclude Variables with scale PersonId (1901)
+			+ " AND scale.object_id != 1901 ";
 
 		try {
 			final Query query =
