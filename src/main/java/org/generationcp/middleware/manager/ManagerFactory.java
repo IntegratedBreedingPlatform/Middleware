@@ -22,6 +22,7 @@ import org.generationcp.middleware.manager.api.MBDTDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.PresetService;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
@@ -354,5 +355,9 @@ public class ManagerFactory implements Serializable {
 
 	public InventoryService getInventoryService() {
 		return new InventoryServiceImpl(this.sessionProvider);
+	}
+
+	public SearchRequestService getSearchRequestService() {
+		return new SearchRequestServiceImpl(this.sessionProvider);
 	}
 }
