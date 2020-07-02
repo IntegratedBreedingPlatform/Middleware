@@ -28,7 +28,29 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="darla" id="v15.3.0-2">
+	<changeSet author="aldrin" id="v15.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="ims_stock_transaction" columnName="source_id"/>
+			</not>
+		</preConditions>
+		<comment>
+			Add source_id column
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE `ims_stock_transaction`
+			ADD COLUMN `source_id` INT NULL AFTER `listdata_project_id`;
+
+			ALTER TABLE `ims_stock_transaction`
+			ADD CONSTRAINT `FK_source_id_1`
+			FOREIGN KEY (`source_id`)
+			REFERENCES `germplasm_study_source` (`source_id`)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v15.3.0-3">
 		<preConditions onFail="MARK_RAN">
 			 <sqlCheck expectedResult="1">
 					SELECT COUNT(*) > 0 FROM  listnms lnms WHERE  lnms.listtype IN ( 'ADVANCED', 'IMP_CROSS', 'CRT_CROSS' );
@@ -44,26 +66,26 @@
 			WHERE  lnms.listtype IN ( 'ADVANCED', 'IMP_CROSS', 'CRT_CROSS' );
 
 			-- Remove listdata_project_id reference in ims_stock_transaction table and replace it with sourceid that links to germplasm_study_source
-			ALTER TABLE `ims_stock_transaction`
-			ADD COLUMN `source_id` INT NULL AFTER `listdata_project_id`;
-
 			UPDATE ims_stock_transaction ist
 			INNER JOIN listdata_project ldp ON ist.listdata_project_id = ldp.listdata_project_id
 			INNER JOIN germplasm_study_source gss ON ldp.germplasm_id = gss.gid
 			SET ist.source_id = gss.source_id;
+		</sql>
+	</changeSet>
 
+	<changeSet author="aldrin" id="v15.3.0-4">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="ims_stock_transaction" columnName="listdata_project_id"/>
+		</preConditions>
+		<comment>
+			Drop listdata_project_id column
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE `ims_stock_transaction`
 			DROP COLUMN `listdata_project_id`,
 			DROP INDEX `germplsm_transaction_idx1` ,
 			ADD UNIQUE INDEX `germplsm_transaction_idx1` (`trnid` ASC),
 			ADD INDEX `FK_source_id_idx` (`source_id` ASC);
-
-			ALTER TABLE `ims_stock_transaction`
-			ADD CONSTRAINT `FK_source_id_1`
-			FOREIGN KEY (`source_id`)
-			REFERENCES `germplasm_study_source` (`source_id`)
-			ON DELETE NO ACTION
-			ON UPDATE NO ACTION;
 		</sql>
 	</changeSet>
 
