@@ -1,5 +1,6 @@
 package org.generationcp.middleware.dao;
 
+import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.dms.ExperimentType;
@@ -21,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
@@ -115,6 +117,52 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		searchParameters.setStudyId(this.study.getProjectId());
 		final long count = this.daoFactory.getGermplasmStudySourceDAO().countGermplasmStudySourceList(searchParameters);
 		Assert.assertEquals(2l, count);
+	}
+
+	@Test
+	public void testOrderAscending() {
+		final StudyGermplasmSourceRequest searchParameters = new StudyGermplasmSourceRequest();
+		searchParameters.setStudyId(this.study.getProjectId());
+		final StudyGermplasmSourceSearchDto studyGermplasmSourceSearchDto = new StudyGermplasmSourceSearchDto();
+		searchParameters.setStudyGermplasmSourceSearchDto(studyGermplasmSourceSearchDto);
+		final SortedPageRequest sortedPageRequest = new SortedPageRequest();
+		sortedPageRequest.setPageNumber(1);
+		sortedPageRequest.setPageSize(1);
+		sortedPageRequest.setSortBy("gid");
+		sortedPageRequest.setSortOrder("asc");
+		searchParameters.setSortedRequest(sortedPageRequest);
+
+		final List<Integer> gids = new LinkedList<>();
+		for (final StudyGermplasmSourceDto dto : this.daoFactory.getGermplasmStudySourceDAO()
+			.getGermplasmStudySourceList(searchParameters)) {
+			gids.add(dto.getGid());
+		}
+
+		Assert.assertTrue(Ordering.natural().isOrdered(gids));
+
+	}
+
+	@Test
+	public void testOrderDescending() {
+		final StudyGermplasmSourceRequest searchParameters = new StudyGermplasmSourceRequest();
+		searchParameters.setStudyId(this.study.getProjectId());
+		final StudyGermplasmSourceSearchDto studyGermplasmSourceSearchDto = new StudyGermplasmSourceSearchDto();
+		searchParameters.setStudyGermplasmSourceSearchDto(studyGermplasmSourceSearchDto);
+		final SortedPageRequest sortedPageRequest = new SortedPageRequest();
+		sortedPageRequest.setPageNumber(1);
+		sortedPageRequest.setPageSize(1);
+		sortedPageRequest.setSortBy("gid");
+		sortedPageRequest.setSortOrder("desc");
+		searchParameters.setSortedRequest(sortedPageRequest);
+
+		final List<Integer> gids = new LinkedList<>();
+		for (final StudyGermplasmSourceDto dto : this.daoFactory.getGermplasmStudySourceDAO()
+			.getGermplasmStudySourceList(searchParameters)) {
+			gids.add(dto.getGid());
+		}
+
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(gids));
+
 	}
 
 	@Test

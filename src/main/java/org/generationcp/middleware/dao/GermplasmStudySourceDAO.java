@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao;
 
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceRequest;
 import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceSearchDto;
@@ -53,6 +54,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		final StringBuilder sql = new StringBuilder(GERMPLASM_STUDY_SOURCE_SEARCH_QUERY);
 		addSearchQueryFilters(new SqlQueryParamBuilder(sql), searchParameters.getStudyGermplasmSourceSearchDto());
 		addGroupByAndLotsFilter(new SqlQueryParamBuilder(sql), searchParameters.getStudyGermplasmSourceSearchDto());
+		addOrder(sql, searchParameters.getSortedRequest());
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 		addSearchQueryFilters(new SqlQueryParamBuilder(query), searchParameters.getStudyGermplasmSourceSearchDto());
@@ -165,6 +167,12 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				paramBuilder.setParameter("trialInstance", trialInstance);
 			}
 
+		}
+	}
+
+	private static void addOrder(final StringBuilder sql, final SortedPageRequest sortedPageRequest) {
+		if (sortedPageRequest != null && sortedPageRequest.getSortBy() != null && sortedPageRequest.getSortOrder() != null) {
+			sql.append(" ORDER BY " + sortedPageRequest.getSortBy() + " " + sortedPageRequest.getSortOrder() + "\n ");
 		}
 	}
 
