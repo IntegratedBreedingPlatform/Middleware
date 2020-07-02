@@ -245,7 +245,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			+ " pp.project_id = :studyId "
 			+ " AND pp.variable_id NOT IN (:excludedIds) "
 				//Exclude Variables with scale PersonId (1901)
-			+ " AND scale.object_id != 1901 ";
+			+ " AND scale.object_id != " + TermId.PERSON_ID.getId();
 
 		try {
 			final Query query =
