@@ -404,7 +404,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 		final CVTermRelationship personIdRelationship = new CVTermRelationship();
 		personIdRelationship.setSubjectId(personId.getCvTermId());
-		personIdRelationship.setObjectId(1901);
+		personIdRelationship.setObjectId(TermId.PERSON_ID.getId());
 		personIdRelationship.setTypeId(TermId.HAS_SCALE.getId());
 		this.cvTermRelationshipDao.save(personIdRelationship);
 
@@ -464,7 +464,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 		final CVTermRelationship personIdRelationship = new CVTermRelationship();
 		personIdRelationship.setSubjectId(personId.getCvTermId());
-		personIdRelationship.setObjectId(1901);
+		personIdRelationship.setObjectId(TermId.PERSON_ID.getId());
 		personIdRelationship.setTypeId(TermId.HAS_SCALE.getId());
 		this.cvTermRelationshipDao.save(personIdRelationship);
 
