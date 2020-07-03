@@ -206,8 +206,7 @@ public class DataSetBuilder extends Builder {
 		final VariableTypeList newList = new VariableTypeList();
 		if (variables != null && !variables.getVariableTypes().isEmpty()) {
 			for (final DMSVariableType variable : variables.getVariableTypes()) {
-				if (!filters.contains(variable.getId()) || variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
-				|| (!variable.getVariableType().equals(VariableType.ENVIRONMENT_DETAIL) && !variable.getVariableType().equals(VariableType.STUDY_DETAIL))) {
+				if (!filters.contains(variable.getId()) || (!PhenotypicType.DATASET.equals(variable.getStandardVariable().getPhenotypicType()) && !PhenotypicType.STUDY.equals(variable.getStandardVariable().getPhenotypicType()))) {
 					newList.add(variable);
 				}
 			}
