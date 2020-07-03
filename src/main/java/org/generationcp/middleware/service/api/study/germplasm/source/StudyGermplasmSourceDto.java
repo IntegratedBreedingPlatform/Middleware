@@ -12,7 +12,7 @@ public class StudyGermplasmSourceDto {
 	private String designation;
 	private String cross;
 	private Integer lots;
-	private String breedingMethodAbbrevation;
+	private String breedingMethodAbbreviation;
 	private String breedingMethodName;
 	private String breedingMethodType;
 	private String location;
@@ -70,12 +70,12 @@ public class StudyGermplasmSourceDto {
 		this.lots = lots;
 	}
 
-	public String getBreedingMethodAbbrevation() {
-		return this.breedingMethodAbbrevation;
+	public String getBreedingMethodAbbreviation() {
+		return this.breedingMethodAbbreviation;
 	}
 
-	public void setBreedingMethodAbbrevation(final String breedingMethodAbbrevation) {
-		this.breedingMethodAbbrevation = breedingMethodAbbrevation;
+	public void setBreedingMethodAbbreviation(final String breedingMethodAbbreviation) {
+		this.breedingMethodAbbreviation = breedingMethodAbbreviation;
 	}
 
 	public String getBreedingMethodName() {

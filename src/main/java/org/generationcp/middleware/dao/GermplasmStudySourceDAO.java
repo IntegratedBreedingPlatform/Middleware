@@ -24,7 +24,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "gss.gid as `gid`,\n"
 		+ "g.mgid as `groupId`,\n"
 		+ "n.nval as `designation`,\n"
-		+ "m.mcode as `breedingMethodAbbrevation`,\n"
+		+ "m.mcode as `breedingMethodAbbreviation`,\n"
 		+ "m.mname as `breedingMethodName`,\n"
 		+ "m.mtype as `breedingMethodType`,\n"
 		+ "geo.description as `trialInstance`,\n"
@@ -64,7 +64,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		query.addScalar("gid");
 		query.addScalar("groupId");
 		query.addScalar("designation");
-		query.addScalar("breedingMethodAbbrevation");
+		query.addScalar("breedingMethodAbbreviation");
 		query.addScalar("breedingMethodName");
 		query.addScalar("breedingMethodType");
 		query.addScalar("trialInstance");
@@ -136,10 +136,10 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				paramBuilder.append(" and rep_no.value = :replicationNumber");
 				paramBuilder.setParameter("replicationNumber", replicationNumber);
 			}
-			final String breedingMethodAbbrevation = studyGermplasmSourceSearchDto.getBreedingMethodAbbrevation();
-			if (!StringUtils.isEmpty(breedingMethodAbbrevation)) {
-				paramBuilder.append(" and m.mcode = :breedingMethodAbbrevation");
-				paramBuilder.setParameter("breedingMethodAbbrevation", breedingMethodAbbrevation);
+			final String breedingMethodAbbreviation = filter.getBreedingMethodAbbreviation();
+			if (!StringUtils.isEmpty(breedingMethodAbbreviation)) {
+				paramBuilder.append(" and m.mcode = :breedingMethodAbbreviation");
+				paramBuilder.setParameter("breedingMethodAbbreviation", breedingMethodAbbreviation);
 			}
 			final String breedingMethodName = studyGermplasmSourceSearchDto.getBreedingMethodName();
 			if (!StringUtils.isEmpty(breedingMethodName)) {
