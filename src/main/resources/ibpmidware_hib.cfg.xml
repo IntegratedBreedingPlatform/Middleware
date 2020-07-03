@@ -74,11 +74,13 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLinkRole"/>
         <mapping class="org.generationcp.middleware.pojos.naming.NamingConfiguration"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.CropPerson"/>
-         <mapping class="org.generationcp.middleware.pojos.workbench.RPackage"/>
-         <mapping class="org.generationcp.middleware.pojos.workbench.RCall"/>
-         <mapping class="org.generationcp.middleware.pojos.workbench.RCallParameter"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.RPackage"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.RCall"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.RCallParameter"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.GOBiiContact"/>
 
-        <!-- Mapping classes for new OMS schema -->
+
+		<!-- Mapping classes for new OMS schema -->
         <mapping class="org.generationcp.middleware.pojos.oms.CV"/>
         <mapping class="org.generationcp.middleware.pojos.oms.CVTerm"/>
         <mapping class="org.generationcp.middleware.pojos.oms.CVTermRelationship"/>

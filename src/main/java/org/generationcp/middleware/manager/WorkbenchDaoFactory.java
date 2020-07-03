@@ -2,6 +2,7 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.CropPersonDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
+import org.generationcp.middleware.dao.GOBiiContactDAO;
 import org.generationcp.middleware.dao.PermissionDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
@@ -174,4 +175,11 @@ public class WorkbenchDaoFactory {
 		rCallParameterDAO.setSession(this.sessionProvider.getSession());
 		return rCallParameterDAO;
 	}
+
+	public GOBiiContactDAO getGOBiiContactDao() {
+		final GOBiiContactDAO goBiiContactDAO = new GOBiiContactDAO();
+		goBiiContactDAO.setSession(this.sessionProvider.getSession());
+		return goBiiContactDAO;
+	}
+
 }

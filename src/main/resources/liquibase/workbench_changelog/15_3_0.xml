@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="clarysabel" id="v15.3.0-1">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="gobii_contact"/>
+			</not>
+        </preConditions>
+        <comment>Create gobii_contact table to store external contacts stored in GOBii. gobii_contact_id must match external id in GOBii</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE gobii_contact (
+			  gobii_contact_id INT(11) NOT NULL,
+			  first_name VARCHAR(50) NOT NULL,
+			  last_name VARCHAR(50) NOT NULL,
+			  PRIMARY KEY (gobii_contact_id)
+			);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
