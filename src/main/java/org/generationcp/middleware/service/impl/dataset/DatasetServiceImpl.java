@@ -975,8 +975,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Map<Integer, Integer> getPlotNumberObservationUnitIdsMap(final Integer datasetId, final List<Integer> plotNumbers) {
-		return this.daoFactory.getExperimentDao().getPlotNumberObservationUnitIdsMap(datasetId, plotNumbers);
+	public Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer datasetId, final List<Integer> instanceNumbers, final List<Integer> plotNumbers) {
+		return this.daoFactory.getExperimentDao().getTrialNumberPlotNumberObservationUnitIdTable(datasetId, instanceNumbers, plotNumbers);
 	}
 
 	private void acceptDraftData(final Phenotype phenotype) {

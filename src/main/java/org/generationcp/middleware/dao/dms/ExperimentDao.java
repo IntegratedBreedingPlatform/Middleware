@@ -12,7 +12,9 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Function;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ExperimentType;
@@ -666,31 +668,32 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public Map<Integer, Integer> getPlotNumberObservationUnitIdsMap(final Integer projectId, final List<Integer> plotNumbers) {
-		final Map<Integer, Integer> experimentsMap = new HashMap<>();
+	public Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer projectId, final List<Integer> instanceNumbers, final List<Integer> plotNumbers) {
+		final Table<Integer, Integer, Integer> experimentsTable = HashBasedTable.create();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("project.projectId", projectId));
 			criteria.createAlias("properties", "prop");
 			criteria.createAlias("geoLocation", "instance");
-			criteria.add(Restrictions.eq("instance.description", "1"));
+			criteria.add(Restrictions.in("instance.description", instanceNumbers.stream().map(num -> String.valueOf(num)).collect(Collectors.toList())));
 			criteria.add(Restrictions.and(
 					Restrictions.eq("prop.typeId", TermId.PLOT_NO.getId()),
-					Restrictions.in("prop.value", plotNumbers.stream().map(number -> String.valueOf(number)).collect(Collectors.toList()))));
+					Restrictions.in("prop.value", plotNumbers.stream().map(plot -> String.valueOf(plot)).collect(Collectors.toList()))));
 			// get the observation units from the first study instance, in case there are multiple instances and hence multiple plot numbers match
 			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("instance.description"));
 			projectionList.add(Projections.property("prop.value"));
 			projectionList.add(Projections.property("ndExperimentId"));
 			criteria.setProjection(projectionList);
 
 			final List<Object[]> results = criteria.list();
 			for (final Object[] row : results) {
-				experimentsMap.put(Integer.valueOf((String) row[0]), (Integer) row[1]);
+				experimentsTable.put(Integer.valueOf((String) row[0]), Integer.valueOf((String) row[1]), (Integer) row[2]);
 			}
-			return experimentsMap;
+			return experimentsTable;
 		} catch (final HibernateException e) {
 			final String message =
-					"Error at getPlotNumberObservationUnitIdsMap=" + projectId + "," + plotNumbers + " query at ExperimentDao: " + e.getMessage();
+					"Error at getTrialNumberPlotNumberObservationUnitIdTable=" + projectId + "," + plotNumbers + " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

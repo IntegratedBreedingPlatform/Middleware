@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.dataset;
 
+import com.google.common.collect.Table;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -139,12 +140,24 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testGetObservationUnitIdsPlotNumberMap() {
+    public void testGetTrialNumberPlotNumberObservationUnitIdTable() {
+        final List<Integer> trialInstances = Collections.singletonList(1);
         final List<Integer> plotNumbers = Arrays.asList(2, 4, 6, 8, 10, 12, 14, 16, 18, 20);
-        final Map<Integer, Integer> observationUnitIdsPlotNumberMap = this.datasetService.getPlotNumberObservationUnitIdsMap(this.plotDatasetId, plotNumbers);
-        Assert.assertNotNull(observationUnitIdsPlotNumberMap);
-        Assert.assertEquals(plotNumbers.size(), observationUnitIdsPlotNumberMap.size());
-        Assert.assertEquals(new HashSet<>(plotNumbers), observationUnitIdsPlotNumberMap.keySet());
+        Table<Integer, Integer, Integer> observationUnitIdsPlotNumberTable = this.datasetService.getTrialNumberPlotNumberObservationUnitIdTable(this.plotDatasetId, trialInstances, plotNumbers);
+        Assert.assertNotNull(observationUnitIdsPlotNumberTable);
+        Assert.assertEquals(plotNumbers.size(), observationUnitIdsPlotNumberTable.size());
+        Assert.assertEquals(new HashSet<>(trialInstances), observationUnitIdsPlotNumberTable.rowKeySet());
+        Assert.assertEquals(new HashSet<>(plotNumbers), observationUnitIdsPlotNumberTable.columnKeySet());
+
+        // Table should be empty for not-existing plot numbers
+        final List<Integer> nonExistentPlotNumbers = Arrays.asList(42, 43, 44, 45);
+        observationUnitIdsPlotNumberTable = this.datasetService.getTrialNumberPlotNumberObservationUnitIdTable(this.plotDatasetId, trialInstances, nonExistentPlotNumbers);
+        Assert.assertTrue(observationUnitIdsPlotNumberTable.isEmpty());
+
+        // Table should be empty for not-existing trial instance
+        final Integer nonExistentTrialInstance = 2;
+        observationUnitIdsPlotNumberTable = this.datasetService.getTrialNumberPlotNumberObservationUnitIdTable(this.plotDatasetId, Collections.singletonList(nonExistentTrialInstance), plotNumbers);
+        Assert.assertTrue(observationUnitIdsPlotNumberTable.isEmpty());
     }
 
 
