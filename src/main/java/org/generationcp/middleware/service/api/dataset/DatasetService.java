@@ -398,5 +398,5 @@ public interface DatasetService {
 
 	boolean allDatasetIdsBelongToStudy(final Integer studyId, List<Integer> datasetIds);
 
-	Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer datasetId, final List<Integer> instanceNumbers, final List<Integer> plotNumbers);
+	Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer datasetId, final Set<Integer> instanceNumbers, final Set<Integer> plotNumbers);
 }

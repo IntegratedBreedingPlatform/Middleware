@@ -141,8 +141,8 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testGetTrialNumberPlotNumberObservationUnitIdTable() {
-        final List<Integer> trialInstances = Collections.singletonList(1);
-        final List<Integer> plotNumbers = Arrays.asList(2, 4, 6, 8, 10, 12, 14, 16, 18, 20);
+        final Set<Integer> trialInstances = Collections.singleton(1);
+        final Set<Integer> plotNumbers = new HashSet<>(Arrays.asList(2, 4, 6, 8, 10, 12, 14, 16, 18, 20));
         Table<Integer, Integer, Integer> observationUnitIdsPlotNumberTable = this.datasetService.getTrialNumberPlotNumberObservationUnitIdTable(this.plotDatasetId, trialInstances, plotNumbers);
         Assert.assertNotNull(observationUnitIdsPlotNumberTable);
         Assert.assertEquals(plotNumbers.size(), observationUnitIdsPlotNumberTable.size());
@@ -150,13 +150,13 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         Assert.assertEquals(new HashSet<>(plotNumbers), observationUnitIdsPlotNumberTable.columnKeySet());
 
         // Table should be empty for not-existing plot numbers
-        final List<Integer> nonExistentPlotNumbers = Arrays.asList(42, 43, 44, 45);
+        final Set<Integer> nonExistentPlotNumbers = new HashSet<>(Arrays.asList(42, 43, 44, 45));
         observationUnitIdsPlotNumberTable = this.datasetService.getTrialNumberPlotNumberObservationUnitIdTable(this.plotDatasetId, trialInstances, nonExistentPlotNumbers);
         Assert.assertTrue(observationUnitIdsPlotNumberTable.isEmpty());
 
         // Table should be empty for not-existing trial instance
         final Integer nonExistentTrialInstance = 2;
-        observationUnitIdsPlotNumberTable = this.datasetService.getTrialNumberPlotNumberObservationUnitIdTable(this.plotDatasetId, Collections.singletonList(nonExistentTrialInstance), plotNumbers);
+        observationUnitIdsPlotNumberTable = this.datasetService.getTrialNumberPlotNumberObservationUnitIdTable(this.plotDatasetId, Collections.singleton(nonExistentTrialInstance), plotNumbers);
         Assert.assertTrue(observationUnitIdsPlotNumberTable.isEmpty());
     }
 

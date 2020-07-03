@@ -668,7 +668,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer projectId, final List<Integer> instanceNumbers, final List<Integer> plotNumbers) {
+	public Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer projectId, final Set<Integer> instanceNumbers, final Set<Integer> plotNumbers) {
 		final Table<Integer, Integer, Integer> experimentsTable = HashBasedTable.create();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());

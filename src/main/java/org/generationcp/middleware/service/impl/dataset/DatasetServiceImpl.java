@@ -975,7 +975,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer datasetId, final List<Integer> instanceNumbers, final List<Integer> plotNumbers) {
+	public Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer datasetId, final Set<Integer> instanceNumbers, final Set<Integer> plotNumbers) {
 		return this.daoFactory.getExperimentDao().getTrialNumberPlotNumberObservationUnitIdTable(datasetId, instanceNumbers, plotNumbers);
 	}
 
