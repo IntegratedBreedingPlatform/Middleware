@@ -484,7 +484,9 @@ public class WorkbookSaver extends Saver {
 				if(trialObservation.getExperimentId() <= 0) {
 					final int locationId = (int) trialObservation.getLocationId();
 					final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getExperimentByProjectIdAndLocation(workbook.getTrialDatasetId(), locationId);
-					trialObservation.setExperimentId(experimentModel.getNdExperimentId());
+					if(null != experimentModel) {
+						trialObservation.setExperimentId(experimentModel.getNdExperimentId());
+					}
 				}
 				this.getGeolocationSaver().updateGeolocationInformation(trialObservation, programUUID);
 			}
