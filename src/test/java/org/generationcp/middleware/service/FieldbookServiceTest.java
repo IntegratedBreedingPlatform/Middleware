@@ -217,17 +217,17 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 			this.studyReference.getName(),
 			this.studyReference.getProgramUUID());
 		Assert.assertNotNull("Trial Observation is not null",workbook.getTrialObservations());
-		for(MeasurementRow row : workbook.getTrialObservations()) {
+		for(final MeasurementRow row : workbook.getTrialObservations()) {
 			//Mocking OpenTrialSubmit
 			row.setExperimentId(0);
 		}
 		try {
 			//Mocking OpenTrialSubmit: saving existing study with observation and variates
 			this.fieldbookService.saveWorkbookVariablesAndObservations(workbook, this.studyReference.getProgramUUID());
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Assert.fail("Study should be save successfully.");
 		}
-		for(MeasurementRow row : workbook.getTrialObservations()) {
+		for(final MeasurementRow row : workbook.getTrialObservations()) {
 			Assert.assertNotEquals("nd_experimentId is not null",0, row.getExperimentId());
 		}
 
