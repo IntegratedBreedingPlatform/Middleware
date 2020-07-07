@@ -53,17 +53,23 @@
 	<changeSet author="aldrin" id="v15.3.0-3">
 		<preConditions onFail="MARK_RAN">
 			 <sqlCheck expectedResult="1">
-					SELECT COUNT(*) > 0 FROM  listnms lnms WHERE  lnms.listtype IN ( 'ADVANCED', 'IMP_CROSS', 'CRT_CROSS' );
+				 SELECT COUNT(*) > 0
+				   FROM listnms lnms
+				  INNER JOIN listdata_project ldp ON ldp.list_id = lnms.listid
+				  WHERE lnms.listtype IN ( 'ADVANCED', 'IMP_CROSS', 'CRT_CROSS' )
+				    AND NOT EXISTS (SELECT 1 FROM germplasm_study_source gss where gss.project_id = lnms.projectid and gss.gid = ldp.germplasm_id);
 			 </sqlCheck>
 		</preConditions>
 		<comment>
-			Migrate advance and cross list to germplasm_study_source.
+			Migrate existing advance and cross list to germplasm_study_source.
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO germplasm_study_source(`gid`,`project_id`,`nd_experiment_id`,`type`)
-			SELECT ldp.germplasm_id, lnms.projectid, NULL, CASE WHEN lnms.listtype IN ( 'IMP_CROSS', 'CRT_CROSS' ) THEN 'CROSS' ELSE 'ADVANCE' END
-			FROM   listnms lnms INNER JOIN listdata_project ldp ON lnms.listid = ldp.list_id
-			WHERE  lnms.listtype IN ( 'ADVANCED', 'IMP_CROSS', 'CRT_CROSS' );
+			SELECT DISTINCT ldp.germplasm_id, lnms.projectid, NULL, CASE WHEN lnms.listtype IN ( 'IMP_CROSS', 'CRT_CROSS' ) THEN 'CROSS' ELSE 'ADVANCE' END
+			  FROM listnms lnms INNER JOIN listdata_project ldp ON lnms.listid = ldp.list_id
+			 WHERE lnms.listtype IN ( 'ADVANCED', 'IMP_CROSS', 'CRT_CROSS' )
+			   AND NOT EXISTS (SELECT 1 FROM germplasm_study_source gss where gss.project_id = lnms.projectid and gss.gid = ldp.germplasm_id);
+
 
 			-- Remove listdata_project_id reference in ims_stock_transaction table and replace it with sourceid that links to germplasm_study_source
 			UPDATE ims_stock_transaction ist
