@@ -481,6 +481,11 @@ public class WorkbookSaver extends Saver {
 	public void saveTrialObservations(final Workbook workbook, final String programUUID) {
 		if (!workbook.getTrialObservations().isEmpty()) {
 			for (final MeasurementRow trialObservation : workbook.getTrialObservations()) {
+				if(trialObservation.getExperimentId() <= 0) {
+					final int locationId = (int) trialObservation.getLocationId();
+					final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getExperimentByProjectIdAndLocation(workbook.getTrialDatasetId(), locationId);
+					trialObservation.setExperimentId(experimentModel.getNdExperimentId());
+				}
 				this.getGeolocationSaver().updateGeolocationInformation(trialObservation, programUUID);
 			}
 		}
