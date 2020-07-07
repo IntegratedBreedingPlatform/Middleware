@@ -26,6 +26,7 @@ import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.*;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceRequest;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -209,7 +210,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public boolean hasAdvancedOrCrossesList(final int studyId) {
-		return this.daoFactory.getGermplasmListDAO().hasAdvancedOrCrossesList(studyId);
+		final StudyGermplasmSourceRequest searchParameters = new StudyGermplasmSourceRequest();
+		searchParameters.setStudyId(studyId);
+		return this.daoFactory.getGermplasmStudySourceDAO().countGermplasmStudySourceList(searchParameters) > 0;
 	}
 
 	@Override

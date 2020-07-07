@@ -16,15 +16,14 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.*;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceService;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 import java.util.*;
 
@@ -142,11 +141,13 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void testHasAdvancedOrCrossesList() {
-		final GermplasmListDAO listDao = Mockito.mock(GermplasmListDAO.class);
-		Mockito.doReturn(listDao).when(this.daoFactory).getGermplasmListDAO();
+		final StudyGermplasmSourceService sourceDao = Mockito.mock(StudyGermplasmSourceService.class);
+		Mockito.doReturn(sourceDao).when(this.daoFactory).getGermplasmStudySourceDAO();
 		final int studyId = new Random().nextInt();
 		this.studyServiceImpl.hasAdvancedOrCrossesList(studyId);
-		Mockito.verify(listDao).hasAdvancedOrCrossesList(studyId);
+		final ArgumentCaptor<StudyGermplasmSourceRequest> captor = ArgumentCaptor.forClass(StudyGermplasmSourceRequest.class);
+		Mockito.verify(sourceDao).countStudyGermplasmSourceList(captor.capture());
+		Assert.assertEquals(studyId, captor.getValue().getStudyId());
 	}
 
 	/**
