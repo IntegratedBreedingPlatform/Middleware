@@ -10,6 +10,7 @@ import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitial
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -22,6 +23,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
+import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -32,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 
 public class FieldbookServiceTest extends IntegrationTestBase {
 
@@ -61,6 +64,9 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private WorkbookSaver workbookSaver;
 
 	private FieldbookServiceImpl fieldbookService;
 
@@ -102,6 +108,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		this.fieldbookService.setStudyDataManager(this.studyDataManager);
 		this.fieldbookService.setDataSetBuilder(this.dataSetBuilder);
 		this.fieldbookService.setWorkbookBuilder(this.workbookBuilder);
+		this.fieldbookService.setWorkbookSaver(this.workbookSaver);
 	}
 
 	@Test
@@ -202,5 +209,27 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		testList.setProjectId(this.studyReference.getId());
 		this.germplasmListDAO.saveOrUpdate(testList);
 		Assert.assertTrue(this.fieldbookService.hasAdvancedOrCrossesList(this.studyReference.getId()));
+	}
+
+	@Test
+	public void testSaveWorkbookVariablesAndObservations() {
+		final Workbook workbook = this.fieldbookService.getStudyByNameAndProgramUUID(
+			this.studyReference.getName(),
+			this.studyReference.getProgramUUID());
+		Assert.assertNotNull("Trial Observation is not null",workbook.getTrialObservations());
+		for(MeasurementRow row : workbook.getTrialObservations()) {
+			//Mocking OpenTrialSubmit
+			row.setExperimentId(0);
+		}
+		try {
+			//Mocking OpenTrialSubmit: saving existing study with observation and variates
+			this.fieldbookService.saveWorkbookVariablesAndObservations(workbook, this.studyReference.getProgramUUID());
+		} catch (Exception e) {
+			Assert.fail("Study should be save successfully.");
+		}
+		for(MeasurementRow row : workbook.getTrialObservations()) {
+			Assert.assertNotEquals("nd_experimentId is not null",0, row.getExperimentId());
+		}
+
 	}
 }

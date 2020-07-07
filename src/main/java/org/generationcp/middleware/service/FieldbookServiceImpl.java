@@ -1071,4 +1071,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
 	}
+
+	void setWorkbookSaver(final WorkbookSaver workbookSaver) {
+		this.workbookSaver = workbookSaver;
+	}
 }
