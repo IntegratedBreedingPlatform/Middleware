@@ -679,7 +679,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			criteria.add(Restrictions.and(
 					Restrictions.eq("prop.typeId", TermId.PLOT_NO.getId()),
 					Restrictions.in("prop.value", plotNumbers.stream().map(plot -> String.valueOf(plot)).collect(Collectors.toList()))));
-			// get the observation units from the first study instance, in case there are multiple instances and hence multiple plot numbers match
 			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property("instance.description"));
 			projectionList.add(Projections.property("prop.value"));
