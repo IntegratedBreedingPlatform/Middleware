@@ -1,6 +1,7 @@
 package org.generationcp.middleware.dao;
 
 import liquibase.util.StringUtils;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
@@ -36,16 +37,17 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "INNER JOIN germplsm g ON g.gid = gss.gid\n"
 		+ "INNER JOIN project p ON p.project_id = gss.project_id\n"
 		+ "LEFT JOIN nd_experiment e ON e.nd_experiment_id = gss.nd_experiment_id\n"
-		+ "LEFT JOIN nd_experimentprop rep_no ON rep_no.nd_experiment_id = e.nd_experiment_id AND rep_no.type_id = 8210\n"
-		+ "LEFT JOIN nd_experimentprop plot_no ON plot_no.nd_experiment_id = e.nd_experiment_id AND plot_no.type_id = 8200\n"
+		+ "LEFT JOIN nd_experimentprop rep_no ON rep_no.nd_experiment_id = e.nd_experiment_id AND rep_no.type_id = " + TermId.REP_NO.getId()
+		+ "\n"
+		+ "LEFT JOIN nd_experimentprop plot_no ON plot_no.nd_experiment_id = e.nd_experiment_id AND plot_no.type_id = " + TermId.PLOT_NO
+		.getId() + "\n"
 		+ "LEFT JOIN nd_geolocation geo ON e.nd_geolocation_id = geo.nd_geolocation_id\n"
-		+ "LEFT JOIN nd_geolocationprop locationProp ON geo.nd_geolocation_id = locationProp.nd_geolocation_id AND locationProp.type_id = 8190\n"
+		+ "LEFT JOIN nd_geolocationprop locationProp ON geo.nd_geolocation_id = locationProp.nd_geolocation_id AND locationProp.type_id = "
+		+ TermId.LOCATION_ID.getId() + "\n"
 		+ "LEFT JOIN location loc ON locationProp.value = loc.locid\n"
 		+ "LEFT JOIN methods m ON m.mid = g.methn\n"
-		+ "LEFT JOIN names n ON g.gid = n.gid AND n.ntype in (2, 5)\n"
-		+ "LEFT JOIN ims_stock_transaction stockTransaction ON gss.source_id  = stockTransaction.source_id\n"
-		+ "LEFT JOIN ims_transaction transaction ON stockTransaction.trnid = transaction.trnid\n"
-		+ "LEFT JOIN ims_transaction lot ON  transaction.lotid = lot.lotid\n"
+		+ "LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1\n"
+		+ "LEFT JOIN ims_lot lot ON lot.eid = gss.gid \n"
 		+ "WHERE gss.project_id = :studyId ";
 
 	public List<GermplasmStudySourceDto> getGermplasmStudySourceList(final GermplasmStudySourceRequest germplasmStudySourceRequest) {
