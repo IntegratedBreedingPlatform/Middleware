@@ -2,14 +2,14 @@ package org.generationcp.middleware.service.api.study.germplasm.source;
 
 import org.generationcp.middleware.pojos.GermplasmStudySourceType;
 
-public class StudyGermplasmSourceInput {
+public class GermplasmStudySourceInput {
 
     private Integer gid;
     private Integer studyId;
     private Integer observationUnitId;
     private GermplasmStudySourceType type;
 
-    public StudyGermplasmSourceInput(final Integer gid, final Integer studyId, final Integer observationUnitId, final GermplasmStudySourceType type) {
+    public GermplasmStudySourceInput(final Integer gid, final Integer studyId, final Integer observationUnitId, final GermplasmStudySourceType type) {
         this.gid = gid;
         this.studyId = studyId;
         this.observationUnitId = observationUnitId;

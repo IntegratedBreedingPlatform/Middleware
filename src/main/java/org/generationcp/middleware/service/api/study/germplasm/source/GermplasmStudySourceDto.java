@@ -4,7 +4,7 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class StudyGermplasmSourceDto {
+public class GermplasmStudySourceDto {
 
 	private Integer sourceId;
 	private Integer gid;

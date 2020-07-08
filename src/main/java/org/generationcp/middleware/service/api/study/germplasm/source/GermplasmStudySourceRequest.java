@@ -5,11 +5,11 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class StudyGermplasmSourceRequest {
+public class GermplasmStudySourceRequest {
 
 	private int studyId;
 	private SortedPageRequest sortedRequest;
-	private StudyGermplasmSourceRequest.Filter filter;
+	private GermplasmStudySourceRequest.Filter filter;
 
 	public int getStudyId() {
 		return this.studyId;
@@ -19,11 +19,11 @@ public class StudyGermplasmSourceRequest {
 		this.studyId = studyId;
 	}
 
-	public StudyGermplasmSourceRequest.Filter getFilter() {
+	public GermplasmStudySourceRequest.Filter getFilter() {
 		return this.filter;
 	}
 
-	public void setFilter(final StudyGermplasmSourceRequest.Filter filter) {
+	public void setFilter(final GermplasmStudySourceRequest.Filter filter) {
 		this.filter = filter;
 	}
 

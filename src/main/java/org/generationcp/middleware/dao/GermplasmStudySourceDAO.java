@@ -3,8 +3,8 @@ package org.generationcp.middleware.dao;
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.SortedPageRequest;
-import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceDto;
-import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceRequest;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
@@ -48,16 +48,16 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "LEFT JOIN ims_transaction lot ON  transaction.lotid = lot.lotid\n"
 		+ "WHERE gss.project_id = :studyId ";
 
-	public List<StudyGermplasmSourceDto> getGermplasmStudySourceList(final StudyGermplasmSourceRequest studyGermplasmSourceRequest) {
+	public List<GermplasmStudySourceDto> getGermplasmStudySourceList(final GermplasmStudySourceRequest germplasmStudySourceRequest) {
 
 		final StringBuilder sql = new StringBuilder(GERMPLASM_STUDY_SOURCE_SEARCH_QUERY);
-		addSearchQueryFilters(new SqlQueryParamBuilder(sql), studyGermplasmSourceRequest.getFilter());
-		addGroupByAndLotsFilter(new SqlQueryParamBuilder(sql), studyGermplasmSourceRequest.getFilter());
-		addOrder(sql, studyGermplasmSourceRequest.getSortedRequest());
+		addSearchQueryFilters(new SqlQueryParamBuilder(sql), germplasmStudySourceRequest.getFilter());
+		addGroupByAndLotsFilter(new SqlQueryParamBuilder(sql), germplasmStudySourceRequest.getFilter());
+		addOrder(sql, germplasmStudySourceRequest.getSortedRequest());
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-		addSearchQueryFilters(new SqlQueryParamBuilder(query), studyGermplasmSourceRequest.getFilter());
-		addGroupByAndLotsFilter(new SqlQueryParamBuilder(query), studyGermplasmSourceRequest.getFilter());
+		addSearchQueryFilters(new SqlQueryParamBuilder(query), germplasmStudySourceRequest.getFilter());
+		addGroupByAndLotsFilter(new SqlQueryParamBuilder(query), germplasmStudySourceRequest.getFilter());
 
 		query.addScalar("sourceId");
 		query.addScalar("gid");
@@ -72,32 +72,32 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		query.addScalar("plotNumber", new IntegerType());
 		query.addScalar("germplasmDate");
 		query.addScalar("lots", new IntegerType());
-		query.setParameter("studyId", studyGermplasmSourceRequest.getStudyId());
+		query.setParameter("studyId", germplasmStudySourceRequest.getStudyId());
 
-		GenericDAO.addSortedPageRequestPagination(query, studyGermplasmSourceRequest.getSortedRequest());
+		GenericDAO.addSortedPageRequestPagination(query, germplasmStudySourceRequest.getSortedRequest());
 
-		query.setResultTransformer(Transformers.aliasToBean(StudyGermplasmSourceDto.class));
+		query.setResultTransformer(Transformers.aliasToBean(GermplasmStudySourceDto.class));
 		return query.list();
 	}
 
-	public long countFilteredGermplasmStudySourceList(final StudyGermplasmSourceRequest studyGermplasmSourceRequest) {
+	public long countFilteredGermplasmStudySourceList(final GermplasmStudySourceRequest germplasmStudySourceRequest) {
 		final StringBuilder subQuery = new StringBuilder(GERMPLASM_STUDY_SOURCE_SEARCH_QUERY);
-		addSearchQueryFilters(new SqlQueryParamBuilder(subQuery), studyGermplasmSourceRequest.getFilter());
-		addGroupByAndLotsFilter(new SqlQueryParamBuilder(subQuery), studyGermplasmSourceRequest.getFilter());
+		addSearchQueryFilters(new SqlQueryParamBuilder(subQuery), germplasmStudySourceRequest.getFilter());
+		addGroupByAndLotsFilter(new SqlQueryParamBuilder(subQuery), germplasmStudySourceRequest.getFilter());
 
 		final StringBuilder mainSql = new StringBuilder("SELECT COUNT(*) FROM ( \n");
 		mainSql.append(subQuery.toString());
 		mainSql.append(") a \n");
 
 		final SQLQuery query = this.getSession().createSQLQuery(mainSql.toString());
-		addSearchQueryFilters(new SqlQueryParamBuilder(query), studyGermplasmSourceRequest.getFilter());
-		addGroupByAndLotsFilter(new SqlQueryParamBuilder(query), studyGermplasmSourceRequest.getFilter());
+		addSearchQueryFilters(new SqlQueryParamBuilder(query), germplasmStudySourceRequest.getFilter());
+		addGroupByAndLotsFilter(new SqlQueryParamBuilder(query), germplasmStudySourceRequest.getFilter());
 
-		query.setParameter("studyId", studyGermplasmSourceRequest.getStudyId());
+		query.setParameter("studyId", germplasmStudySourceRequest.getStudyId());
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
-	public long countGermplasmStudySourceList(final StudyGermplasmSourceRequest searchParameters) {
+	public long countGermplasmStudySourceList(final GermplasmStudySourceRequest searchParameters) {
 		final Criteria criteria = this.getSession().createCriteria(GermplasmStudySource.class);
 		criteria.setProjection(Projections.rowCount());
 		criteria.add(Restrictions.eq("study.projectId", searchParameters.getStudyId()));
@@ -107,7 +107,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 
 	private static void addSearchQueryFilters(
 		final SqlQueryParamBuilder paramBuilder,
-		final StudyGermplasmSourceRequest.Filter filter) {
+		final GermplasmStudySourceRequest.Filter filter) {
 
 		if (filter != null) {
 			final Integer sourceId = filter.getSourceId();
@@ -181,7 +181,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 	}
 
 	private static void addGroupByAndLotsFilter(final SqlQueryParamBuilder paramBuilder,
-		final StudyGermplasmSourceRequest.Filter filter) {
+		final GermplasmStudySourceRequest.Filter filter) {
 
 		paramBuilder.append(" GROUP BY gss.source_id\n");
 

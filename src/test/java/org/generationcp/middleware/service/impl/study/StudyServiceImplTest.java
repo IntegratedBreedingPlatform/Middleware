@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.impl.study;
 
 import com.beust.jcommander.internal.Lists;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -16,8 +15,8 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.*;
-import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceRequest;
-import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceService;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -141,12 +140,12 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void testHasAdvancedOrCrossesList() {
-		final StudyGermplasmSourceService sourceDao = Mockito.mock(StudyGermplasmSourceService.class);
+		final GermplasmStudySourceService sourceDao = Mockito.mock(GermplasmStudySourceService.class);
 		Mockito.doReturn(sourceDao).when(this.daoFactory).getGermplasmStudySourceDAO();
 		final int studyId = new Random().nextInt();
 		this.studyServiceImpl.hasAdvancedOrCrossesList(studyId);
-		final ArgumentCaptor<StudyGermplasmSourceRequest> captor = ArgumentCaptor.forClass(StudyGermplasmSourceRequest.class);
-		Mockito.verify(sourceDao).countStudyGermplasmSourceList(captor.capture());
+		final ArgumentCaptor<GermplasmStudySourceRequest> captor = ArgumentCaptor.forClass(GermplasmStudySourceRequest.class);
+		Mockito.verify(sourceDao).countGermplasmStudySourceList(captor.capture());
 		Assert.assertEquals(studyId, captor.getValue().getStudyId());
 	}
 
