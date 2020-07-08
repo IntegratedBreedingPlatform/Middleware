@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.study;
 
 import com.beust.jcommander.internal.Lists;
 import org.generationcp.middleware.constant.ColumnLabels;
+import org.generationcp.middleware.dao.GermplasmStudySourceDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -140,7 +141,7 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void testHasAdvancedOrCrossesList() {
-		final GermplasmStudySourceService sourceDao = Mockito.mock(GermplasmStudySourceService.class);
+		final GermplasmStudySourceDAO sourceDao = Mockito.mock(GermplasmStudySourceDAO.class);
 		Mockito.doReturn(sourceDao).when(this.daoFactory).getGermplasmStudySourceDAO();
 		final int studyId = new Random().nextInt();
 		this.studyServiceImpl.hasAdvancedOrCrossesList(studyId);
