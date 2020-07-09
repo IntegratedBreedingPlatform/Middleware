@@ -4,6 +4,10 @@ import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 @AutoProperty
 public class GermplasmStudySourceRequest {
 
@@ -51,6 +55,25 @@ public class GermplasmStudySourceRequest {
 	}
 
 	public static class Filter {
+		
+		public static final String SOURCE_ID = "sourceId";
+		public static final String GID = "gid";
+		public static final String GROUP_ID = "groupId";
+		public static final String DESIGNATION = "designation";
+		public static final String CROSS = "cross";
+		public static final String LOTS = "lots";
+		public static final String BREEDING_METHOD_ABBREVIATION = "breedingMethodAbbreviation";
+		public static final String BREEDING_METHOD_NAME = "breedingMethodName";
+		public static final String BREEDING_METHOD_TYPE = "breedingMethodType";
+		public static final String LOCATION = "location";
+		public static final String TRIAL_INSTANCE = "trialInstance";
+		public static final String PLOT_NUMBER = "plotNumber";
+		public static final String REPLICATION_NUMBER = "replicationNumber";
+		public static final String GERMPLASM_DATE = "germplasmDate";
+
+		public static final List<String> SORTABLE_FIELDS = Collections.unmodifiableList(Arrays
+			.asList(GID, GROUP_ID, DESIGNATION, CROSS, LOTS, BREEDING_METHOD_ABBREVIATION, BREEDING_METHOD_NAME, BREEDING_METHOD_TYPE,
+				LOCATION, TRIAL_INSTANCE, REPLICATION_NUMBER, GERMPLASM_DATE));
 
 		private Integer sourceId;
 		private Integer gid;

@@ -4,6 +4,7 @@ import liquibase.util.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.SortedPageRequest;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceRequest;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
@@ -177,7 +178,8 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 	}
 
 	private static void addOrder(final StringBuilder sql, final SortedPageRequest sortedPageRequest) {
-		if (sortedPageRequest != null && sortedPageRequest.getSortBy() != null && sortedPageRequest.getSortOrder() != null) {
+		if (sortedPageRequest != null && sortedPageRequest.getSortBy() != null && sortedPageRequest.getSortOrder() != null
+			&& GermplasmStudySourceRequest.Filter.SORTABLE_FIELDS.contains(sortedPageRequest.getSortBy())) {
 			sql.append(" ORDER BY " + sortedPageRequest.getSortBy() + " " + sortedPageRequest.getSortOrder() + "\n ");
 		}
 	}
