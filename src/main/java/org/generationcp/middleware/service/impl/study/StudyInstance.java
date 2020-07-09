@@ -23,6 +23,7 @@ public class StudyInstance {
 	private Boolean hasExperimentalDesign;
 	private Boolean hasMeasurements;
 	private Boolean canBeDeleted;
+	private int experimentId;
 
 	public StudyInstance() {
 
@@ -182,4 +183,11 @@ public class StudyInstance {
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
 	}
 
+	public int getExperimentId() {
+		return this.experimentId;
+	}
+
+	public void setExperimentId(final int experimentId) {
+		this.experimentId = experimentId;
+	}
 }
