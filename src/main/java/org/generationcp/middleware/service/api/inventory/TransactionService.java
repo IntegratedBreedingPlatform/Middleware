@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDt
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.springframework.data.domain.Pageable;
 
@@ -41,5 +42,11 @@ public interface TransactionService {
 	void depositLots(Integer userId, Set<Integer> lotIds, LotDepositRequestDto lotDepositRequestDto, TransactionStatus transactionStatus);
 
 	void cancelPendingTransactions(List<TransactionDto> transactionDtoList);
+
+	long countTransactions(String transactionDbId, String seedLotDbId, String germplasmDbId);
+
+	List<TransactionDto> getTransactions(
+		String transactionDbId, String seedLotDbId, String germplasmDbId, SortedPageRequest sortedPageRequest);
+
 
 }

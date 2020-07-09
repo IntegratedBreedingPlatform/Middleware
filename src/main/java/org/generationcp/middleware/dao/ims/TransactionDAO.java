@@ -20,12 +20,14 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
+import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -62,6 +64,43 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TransactionDAO.class);
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+	//New inventory functions, please locate them below this line to help cleaning in the near future.
+	private final String GET_TRANSACTIONS_QUERY = "SELECT " //
+		+ "    tr.trnid AS transactionId,"//
+		+ "    users.uname AS createdByUsername,"//
+		+ "(CASE WHEN trntype = " + TransactionType.DEPOSIT.getId() + " THEN '" + TransactionType.DEPOSIT.getValue()
+		+ "' WHEN trntype = " + TransactionType.WITHDRAWAL.getId() + "  THEN '" + TransactionType.WITHDRAWAL.getValue()
+		+ "' WHEN trntype = " + TransactionType.DISCARD.getId() + "  THEN '" + TransactionType.DISCARD.getValue()
+		+ "' WHEN trntype = " + TransactionType.ADJUSTMENT.getId() + "  THEN '" + TransactionType.ADJUSTMENT.getValue()
+		+ "' END) AS transactionType,"//
+		+ "    tr.trnqty AS amount,"//
+		+ "    tr.comments AS notes,"//
+		+ "    tr.trndate as createdDate, "//
+		+ "    lot.lot_uuid AS lotUUID," //
+		+ "    lot.eid AS lotGid,"//
+		+ "    scale.name AS lotUnitName," //
+		+ "   (CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
+		+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
+		+ "' WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '" + TransactionStatus.CANCELLED.getValue()
+		+ "' END) as transactionStatus, "
+		+ " lot.locid as lotLocationId, "
+		+ " loc.lname as lotLocationName, "//
+		+ " loc.labbr as lotLocationAbbr "//
+		+ " FROM"//
+		+ "   ims_transaction tr "//
+		+ "        INNER JOIN"//
+		+ "    ims_lot lot ON tr.lotid = lot.lotid "//
+		+ "		   LEFT JOIN" //
+		+ "	   location loc on loc.locid = lot.locid "//
+		+ "        LEFT JOIN"//
+		+ "    cvterm scale ON scale.cvterm_id = lot.scaleid"//
+		+ "        INNER JOIN"//
+		+ "    germplsm g ON g.gid = lot.eid"//
+		+ "        LEFT JOIN"//
+		+ "    workbench.users users ON users.userid = tr.userid"//
+		+ " WHERE"//
+		+ "    lot.etype = 'GERMPLSM' and g.deleted=0 and lot.status = 0"; //
 
 	public boolean hasInventoryDetails(final Integer studyId) {
 		try {
@@ -646,6 +685,38 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
+	private static void addTransactionsFilter(final String transactionDbId, final String seedLotDbId, final String germplasmDbId,
+		final StringBuilder sqlQuery) {
+
+			if (!StringUtils.isEmpty(transactionDbId)) {
+				sqlQuery.append(" and tr.trnid = :transactionDbId");
+			}
+
+			if (!StringUtils.isEmpty(seedLotDbId)) {
+				sqlQuery.append(" and lot.lot_uuid = :seedLotDbId");
+			}
+
+			if (!StringUtils.isEmpty(germplasmDbId)) {
+				sqlQuery.append(" and lot.eid IN :germplasmDbId");
+			}
+	}
+
+	private static void addTransactionsParameters(final String transactionDbId, final String seedLotDbId, final String germplasmDbId,
+		final SQLQuery sqlQuery) {
+
+		if (!StringUtils.isEmpty(transactionDbId)) {
+			sqlQuery.setParameter("transactionDbId", transactionDbId);
+		}
+
+		if (!StringUtils.isEmpty(seedLotDbId)) {
+			sqlQuery.setParameter("seedLotDbId", seedLotDbId);
+		}
+
+		if (!StringUtils.isEmpty(germplasmDbId)) {
+			sqlQuery.setParameter("germplasmDbId", germplasmDbId);
+		}
+	}
+
 	private static void addSortToSearchTransactionsQuery(final StringBuilder transactionsSearchQuery, final Pageable pageable) {
 		if (pageable != null) {
 			if (pageable.getSort() != null) {
@@ -683,6 +754,61 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			throw new MiddlewareQueryException("Error at searchTransactions() query on TransactionDAO: " + e.getMessage(), e);
 		}
 
+	}
+
+	public List<TransactionDto> getTransactions(final String transactionDbId, final String seedLotDbId, final String germplasmDbId,
+	final SortedPageRequest sortedPageRequest) {
+		try {
+			final StringBuilder getTransactionsQuery = new StringBuilder(GET_TRANSACTIONS_QUERY);
+			addTransactionsFilter(transactionDbId, seedLotDbId, germplasmDbId, getTransactionsQuery);
+
+			final SQLQuery query = this.getSession().createSQLQuery(getTransactionsQuery.toString());
+			addTransactionsParameters(transactionDbId, seedLotDbId, germplasmDbId, query);
+			query.addScalar("transactionId");
+			query.addScalar("createdByUsername");
+			query.addScalar("transactionType");
+			query.addScalar("amount");
+			query.addScalar("notes");
+			query.addScalar("createdDate", Hibernate.DATE);
+			query.addScalar("lotUUID");
+			query.addScalar("lotGid");
+			query.addScalar("lotUnitName");
+			query.addScalar("transactionStatus");
+			query.addScalar("lotLocationId");
+			query.addScalar("lotLocationName");
+			query.addScalar("lotLocationAbbr");
+
+			final Integer pageSize = sortedPageRequest.getPageSize();
+			final Integer pageNumber = sortedPageRequest.getPageNumber();
+
+			if (pageNumber != null && pageSize != null) {
+				query.setFirstResult(pageSize * (pageNumber - 1));
+				query.setMaxResults(pageSize);
+			}
+
+			query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoBrAPIConstructor()));
+
+			final List<TransactionDto> transactionDtos = query.list();
+
+			return transactionDtos;
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at searchTransactions() query on TransactionDAO: " + e.getMessage(), e);
+		}
+
+	}
+
+	public long countTransactions(final String transactionDbId, final String seedLotDbId, final String germplasmDbId) {
+		try {
+			final StringBuilder getTransactionsQuery = new StringBuilder(GET_TRANSACTIONS_QUERY);
+			addTransactionsFilter(transactionDbId, seedLotDbId, germplasmDbId, getTransactionsQuery);
+			final String countTransactionsQuery =
+				"Select count(1) from (" + getTransactionsQuery.toString() + ") as transactions";
+			final SQLQuery query = this.getSession().createSQLQuery(countTransactionsQuery.toString());
+			addTransactionsParameters(transactionDbId, seedLotDbId, germplasmDbId, query);
+			return ((BigInteger) query.uniqueResult()).longValue();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at searchTransactions() query on TransactionDAO: " + e.getMessage(), e);
+		}
 	}
 
 	public long countSearchTransactions(final TransactionsSearchDto transactionsSearchDto) {
@@ -768,6 +894,28 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				String.class,    // locationName
 				String.class,    // locationAbbr
 				String.class     // comments
+			);
+		} catch (final NoSuchMethodException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	private Constructor<TransactionDto> getTransactionDtoBrAPIConstructor() {
+		try {
+			return TransactionDto.class.getConstructor(
+				Integer.class, // transactionId
+				String.class,    // createdByUsername
+				String.class,    // transactionType
+				Double.class,    // amount
+				String.class,    // notes
+				Date.class,      // createdDate
+				String.class,    // lotUUID
+				Integer.class,   // gid
+				String.class,    // scaleName
+				String.class,    // transactionStatus
+				Integer.class,   // locationId
+				String.class,    // locationName
+				String.class    // locationAbbr
 			);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);

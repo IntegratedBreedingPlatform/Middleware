@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDt
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -107,6 +108,17 @@ public class TransactionServiceImpl implements TransactionService {
 			transaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
 			daoFactory.getTransactionDAO().update(transaction);
 		}
+	}
+
+	@Override
+	public long countTransactions(final String transactionDbId, final String seedLotDbId, final String germplasmDbId) {
+		return this.daoFactory.getTransactionDAO().countTransactions(transactionDbId, seedLotDbId, germplasmDbId);
+	}
+
+	@Override
+	public List<TransactionDto> getTransactions(final String transactionDbId, final String seedLotDbId, final String germplasmDbId,
+		final SortedPageRequest sortedPageRequest) {
+		return this.daoFactory.getTransactionDAO().getTransactions(transactionDbId, seedLotDbId, germplasmDbId, sortedPageRequest);
 	}
 
 	@Override

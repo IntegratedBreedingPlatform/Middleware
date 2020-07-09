@@ -2,14 +2,21 @@ package org.generationcp.middleware.domain.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionDto {
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private Map<String, Object> additionalInfo;
 
 	private Integer transactionId;
 	private String createdByUsername;
@@ -17,6 +24,19 @@ public class TransactionDto {
 	private String transactionStatus;
 	private Double amount;
 	private String notes;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String transactionDescription;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
+	private Date transactionTimestamp;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String units;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private Integer transactionDbId;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	private Date createdDate;
@@ -55,6 +75,26 @@ public class TransactionDto {
 		this.lot.setNotes(comments);
 		this.lot.setUnitName(scaleName);
 		this.lot.setDesignation(designation);
+	}
+
+	public TransactionDto(
+		final Integer transactionId, final String createdByUsername, final String transactionType, final Double amount,
+		final String notes,	final Date createdDate, final String lotUUID, final Integer gid, final String scaleName,
+		final String transactionStatus,	final Integer locationId, final String locationName, final String locationAbbr) {
+		this.additionalInfo =  new HashMap<>();
+		this.additionalInfo.put("createdByUsername", createdByUsername);
+		this.additionalInfo.put("transactionType", transactionType);
+		this.additionalInfo.put("transactionStatus", transactionStatus);
+		this.additionalInfo.put("seedLotID ", lotUUID);
+		this.additionalInfo.put("germplasmDbId", gid);
+		this.additionalInfo.put("locationId", locationId);
+		this.additionalInfo.put("locationName", locationName);
+		this.additionalInfo.put("locationAbbr", locationAbbr);
+		this.amount = amount;
+		this.transactionDescription = notes;
+		this.transactionTimestamp = createdDate;
+		this.units = scaleName;
+		this.transactionDbId = transactionId;
 	}
 
 	public Integer getTransactionId() {
@@ -119,6 +159,46 @@ public class TransactionDto {
 
 	public void setTransactionStatus(final String transactionStatus) {
 		this.transactionStatus = transactionStatus;
+	}
+
+	public String getTransactionDescription() {
+		return transactionDescription;
+	}
+
+	public void setTransactionDescription(final String transactionDescription) {
+		this.transactionDescription = transactionDescription;
+	}
+
+	public Date getTransactionTimestamp() {
+		return transactionTimestamp;
+	}
+
+	public void setTransactionTimestamp(final Date transactionTimestamp) {
+		this.transactionTimestamp = transactionTimestamp;
+	}
+
+	public String getUnits() {
+		return units;
+	}
+
+	public void setUnits(final String units) {
+		this.units = units;
+	}
+
+	public Map<String, Object> getAdditionalInfo() {
+		return additionalInfo;
+	}
+
+	public void setAdditionalInfo(final Map<String, Object> additionalInfo) {
+		this.additionalInfo = additionalInfo;
+	}
+
+	public Integer getTransactionDbId() {
+		return transactionDbId;
+	}
+
+	public void setTransactionDbId(final Integer transactionDbId) {
+		this.transactionDbId = transactionDbId;
 	}
 
 	@Override
