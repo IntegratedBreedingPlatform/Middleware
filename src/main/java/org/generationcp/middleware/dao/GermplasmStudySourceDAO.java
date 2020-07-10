@@ -28,8 +28,8 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "m.mcode as `breedingMethodAbbreviation`,\n"
 		+ "m.mname as `breedingMethodName`,\n"
 		+ "m.mtype as `breedingMethodType`,\n"
-		+ "geo.description as `trialInstance`,\n"
-		+ "loc.lname as `location`,\n"
+		+ "concat(geo.description, ' - ' , loc.lname) as `trialInstance`,\n"
+		+ "breedingLoc.lname as `location`,\n"
 		+ "rep_no.value as `replicationNumber`,\n"
 		+ "plot_no.value as `plotNumber`,\n"
 		+ "g.gdate as `germplasmDate`,\n"
@@ -47,6 +47,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ TermId.LOCATION_ID.getId() + "\n"
 		+ "LEFT JOIN location loc ON locationProp.value = loc.locid\n"
 		+ "LEFT JOIN methods m ON m.mid = g.methn\n"
+		+ "LEFT JOIN location breedingLoc ON breedingLoc.locid = g.glocn\n"
 		+ "LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1\n"
 		+ "LEFT JOIN ims_lot lot ON lot.eid = gss.gid \n"
 		+ "WHERE gss.project_id = :studyId ";
@@ -165,7 +166,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 			}
 			final String location = filter.getLocation();
 			if (!StringUtils.isEmpty(location)) {
-				paramBuilder.append(" and loc.lname = :location");
+				paramBuilder.append(" and breedingLoc.lname = :location");
 				paramBuilder.setParameter("location", location);
 			}
 			final String trialInstance = filter.getTrialInstance();

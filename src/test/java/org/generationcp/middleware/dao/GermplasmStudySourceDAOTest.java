@@ -89,7 +89,7 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		Assert.assertEquals("Unknown generative method", germplasmStudySourceDtoFirst.getBreedingMethodName());
 		Assert.assertEquals("GEN", germplasmStudySourceDtoFirst.getBreedingMethodType());
 		Assert.assertEquals("Afghanistan", germplasmStudySourceDtoFirst.getLocation());
-		Assert.assertEquals("1", germplasmStudySourceDtoFirst.getTrialInstance());
+		Assert.assertEquals("1 - Afghanistan", germplasmStudySourceDtoFirst.getTrialInstance());
 		Assert.assertEquals(111, germplasmStudySourceDtoFirst.getPlotNumber().intValue());
 		Assert.assertEquals(222, germplasmStudySourceDtoFirst.getReplicationNumber().intValue());
 		Assert.assertEquals(20150101, germplasmStudySourceDtoFirst.getGermplasmDate().intValue());
@@ -103,7 +103,7 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		Assert.assertEquals("Unknown generative method", germplasmStudySourceDtoSecond.getBreedingMethodName());
 		Assert.assertEquals("GEN", germplasmStudySourceDtoSecond.getBreedingMethodType());
 		Assert.assertEquals("Afghanistan", germplasmStudySourceDtoSecond.getLocation());
-		Assert.assertEquals("1", germplasmStudySourceDtoSecond.getTrialInstance());
+		Assert.assertEquals("1 - Afghanistan", germplasmStudySourceDtoSecond.getTrialInstance());
 		Assert.assertEquals(333, germplasmStudySourceDtoSecond.getPlotNumber().intValue());
 		Assert.assertEquals(444, germplasmStudySourceDtoSecond.getReplicationNumber().intValue());
 		Assert.assertEquals(20150101, germplasmStudySourceDtoSecond.getGermplasmDate().intValue());
