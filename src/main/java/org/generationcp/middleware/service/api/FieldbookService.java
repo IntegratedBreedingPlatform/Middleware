@@ -823,8 +823,7 @@ public interface FieldbookService {
 	 * Save workbook variables and Observations
 	 *
 	 * @param workbook
-	 * @param programUUID
 	 */
-	void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID);
+	void saveWorkbookVariablesAndObservations(final Workbook workbook);
 
 }

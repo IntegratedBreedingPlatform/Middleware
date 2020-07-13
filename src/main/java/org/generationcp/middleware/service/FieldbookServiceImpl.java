@@ -212,15 +212,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return false;
 	}
 
-	public void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID) {
+	public void saveWorkbookVariablesAndObservations(final Workbook workbook) {
 		try {
-
 			this.workbookSaver.saveWorkbookVariables(workbook);
 			this.workbookSaver.removeDeletedVariablesAndObservations(workbook);
-
-			// save trial observations
-			this.workbookSaver.saveTrialObservations(workbook, programUUID);
-
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
 		}
@@ -1070,5 +1065,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
+	}
+
+	void setWorkbookSaver(final WorkbookSaver workbookSaver) {
+		this.workbookSaver = workbookSaver;
 	}
 }
