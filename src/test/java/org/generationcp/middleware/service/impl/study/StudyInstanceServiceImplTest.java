@@ -330,11 +330,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		} catch (final MiddlewareQueryException e) {
 			// Perform assertions outside
 		}
-		studyInstances =
-			this.studyInstanceService.getStudyInstances(studyId);
-		Assert.assertEquals(0, studyInstances.size());
-		Assert.assertNull(this.daoFactory.getGeolocationDao().getById(instance3LocationId));
-		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getGeolocationPropertyDao().getByGeolocation(instance3LocationId)));
 	}
 
 	@Test
