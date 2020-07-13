@@ -146,12 +146,11 @@ public class DataSetBuilder extends Builder {
 
 	public Workbook buildCompleteDataset(final int datasetId) {
 		final DataSet dataset = this.build(datasetId);
-		final List<Integer> siblingVariables = this.getVariablesOfSiblingDatasets(datasetId);
 		final boolean isMeasurementDataset =
 			(dataset.getDatasetType() != null) ? dataset.getDatasetType().isObservationType() : Boolean.FALSE;
 		VariableTypeList variables;
 		if (isMeasurementDataset) {
-			variables = this.filterVariables(dataset.getVariableTypes(), siblingVariables);
+			variables = this.filterVariables(dataset.getVariableTypes());
 		} else {
 			variables = dataset.getVariableTypes();
 		}
@@ -202,11 +201,11 @@ public class DataSetBuilder extends Builder {
 		return this.getProjectPropertyDao().getVariablesOfSiblingDatasets(datasetId);
 	}
 
-	public VariableTypeList filterVariables(final VariableTypeList variables, final List<Integer> filters) {
+	public VariableTypeList filterVariables(final VariableTypeList variables) {
 		final VariableTypeList newList = new VariableTypeList();
 		if (variables != null && !variables.getVariableTypes().isEmpty()) {
 			for (final DMSVariableType variable : variables.getVariableTypes()) {
-				if (!filters.contains(variable.getId()) || (!PhenotypicType.DATASET.equals(variable.getStandardVariable().getPhenotypicType()) && !PhenotypicType.STUDY.equals(variable.getStandardVariable().getPhenotypicType()))) {
+				if (!PhenotypicType.DATASET.equals(variable.getStandardVariable().getPhenotypicType()) && !PhenotypicType.STUDY.equals(variable.getStandardVariable().getPhenotypicType())) {
 					newList.add(variable);
 				}
 			}

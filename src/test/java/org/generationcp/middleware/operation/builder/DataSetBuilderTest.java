@@ -225,7 +225,7 @@ public class DataSetBuilderTest {
 		final DataSet dataSet = this.createDataSet();
 		final int totalVariables = DataSetBuilderTest.DEFAULT_DATASET_COLUMNS.size() + 4;//Traits
 
-		Assert.assertEquals("Default Column with Traits", totalVariables, this.dataSetBuilder.filterVariables(dataSet.getVariableTypes(),siblingsList).size());
+		Assert.assertEquals("Default Column with Traits", totalVariables, this.dataSetBuilder.filterVariables(dataSet.getVariableTypes()).size());
 	}
 	private DataSet createDataSet() {
 
