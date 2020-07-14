@@ -5,7 +5,6 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 
 import java.util.List;
-import java.util.Set;
 
 public interface StudyService {
 
