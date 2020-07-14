@@ -217,9 +217,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	 * @return the given GermplasmPedigreeTreeNode with its parents added to it
 	 */
 	private GermplasmPedigreeTreeNode addParents(final GermplasmPedigreeTreeNode node, final int level) {
-		if (level == 1) {
-			return node;
-		} else {
+		if (level != 1) {
 			// get parents of node
 			final Germplasm germplasmOfNode = node.getGermplasm();
 			final Integer maleGid = germplasmOfNode.getGpid2();
@@ -230,11 +228,10 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 				if (maleGid != 0) {
 					this.addNodeForKnownParent(node, level, maleGid, excludeDerivativeLines);
 
-				// Use female parent to continue traversal if source is unknown
-				} else if (femaleGid != 0){
+					// Use female parent to continue traversal if source is unknown
+				} else if (femaleGid != 0) {
 					this.addNodeForKnownParent(node, level, femaleGid, excludeDerivativeLines);
 				}
-
 
 			} else if (germplasmOfNode.getGnpgs() >= 2) {
 				// Get and add female and male parents
@@ -251,8 +248,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 					}
 				}
 			}
-			return node;
 		}
+		return node;
 	}
 
 	void addNodeForParent(final GermplasmPedigreeTreeNode node, final int level, final Integer parentGid,
@@ -295,9 +292,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	 * @return the given GermplasmPedigreeTreeNode with its parents added to it
 	 */
 	private GermplasmPedigreeTreeNode addParentsExcludeDerivativeLines(final GermplasmPedigreeTreeNode node, final int level) {
-		if (level == 1) {
-			return node;
-		} else {
+		if (level != 1) {
 			// get parents of node
 			final Germplasm germplasmOfNode = node.getGermplasm();
 
@@ -327,8 +322,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 					}
 				}
 			}
-			return node;
 		}
+		return node;
 	}
 
 	private void addNodesForParents(final GermplasmPedigreeTreeNode node, final int level, final Integer femaleGid, final Integer maleGid,
@@ -633,8 +628,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
 	@Override
 	public Map<Integer, GermplasmPedigreeTree> generatePedigreeTreeMap(final Set<Integer> gids, final Integer level, final Boolean includeDerivativeLines) {
-		Map<Integer, GermplasmPedigreeTree> pedigreeTreeMap = new HashMap<>();
-		for(Integer gid : gids) {
+		final Map<Integer, GermplasmPedigreeTree> pedigreeTreeMap = new HashMap<>();
+		for(final Integer gid : gids) {
 			pedigreeTreeMap.put(gid, this.generatePedigreeTree(gid, level, includeDerivativeLines));
 		}
 		return pedigreeTreeMap;
