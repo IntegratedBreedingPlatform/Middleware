@@ -10,6 +10,6 @@ public interface GermplasmStudySourceService {
 
 	long countFilteredGermplasmStudySources(GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest);
 
-	void saveGermplasmStudySource(List<GermplasmStudySourceInput> germplasmStudySourceInputList);
+	void saveGermplasmStudySources(List<GermplasmStudySourceInput> germplasmStudySourceInputList);
 
 }

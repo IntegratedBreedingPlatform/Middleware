@@ -35,7 +35,7 @@ public class GermplasmStudySourceServiceImpl implements GermplasmStudySourceServ
 	}
 
 	@Override
-	public void saveGermplasmStudySource(List<GermplasmStudySourceInput> germplasmStudySourceInputList) {
+	public void saveGermplasmStudySources(final List<GermplasmStudySourceInput> germplasmStudySourceInputList) {
 		for (final GermplasmStudySourceInput input : germplasmStudySourceInputList) {
 			this.daoFactory.getGermplasmStudySourceDAO().save(new GermplasmStudySource(input));
 		}

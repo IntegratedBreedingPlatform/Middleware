@@ -305,7 +305,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public ObservationDto updataObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement) {
+	public ObservationDto updateObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement) {
 
 		final Session currentSession = this.getCurrentSession();
 		final Observations observations = new Observations(currentSession, this.ontologyVariableDataManager);
