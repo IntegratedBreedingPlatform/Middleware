@@ -32,7 +32,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "rep_no.value as `replicationNumber`,\n"
 		+ "plot_no.value as `plotNumber`,\n"
 		+ "g.gdate as `germplasmDate`,\n"
-		+ "count(lot.lotid) as `lots` "
+		+ "count(lot.lotid) as `numberOfLots` "
 		+ "FROM germplasm_study_source gss \n"
 		+ "INNER JOIN germplsm g ON g.gid = gss.gid\n"
 		+ "INNER JOIN project p ON p.project_id = gss.project_id\n"
@@ -74,7 +74,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		query.addScalar("replicationNumber", new IntegerType());
 		query.addScalar("plotNumber", new IntegerType());
 		query.addScalar("germplasmDate");
-		query.addScalar("lots", new IntegerType());
+		query.addScalar("numberOfLots", new IntegerType());
 		query.setParameter("studyId", germplasmStudySourceSearchRequest.getStudyId());
 
 		GenericDAO.addSortedPageRequestPagination(query, germplasmStudySourceSearchRequest.getSortedRequest());
@@ -189,9 +189,9 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 
 		paramBuilder.append(" GROUP BY gss.germplasm_study_source_id\n");
 
-		if (filter != null && filter.getLots() != null) {
-			paramBuilder.append(" HAVING `lots` = :lots\n");
-			paramBuilder.setParameter("lots", filter.getLots());
+		if (filter != null && filter.getNumberOfLots() != null) {
+			paramBuilder.append(" HAVING `numberOfLots` = :numberOfLots\n");
+			paramBuilder.setParameter("numberOfLots", filter.getNumberOfLots());
 		}
 
 	}

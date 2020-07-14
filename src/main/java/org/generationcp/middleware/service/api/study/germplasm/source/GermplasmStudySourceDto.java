@@ -11,7 +11,7 @@ public class GermplasmStudySourceDto {
 	private Integer groupId;
 	private String designation;
 	private String cross;
-	private Integer lots;
+	private Integer numberOfLots;
 	private String breedingMethodAbbreviation;
 	private String breedingMethodName;
 	private String breedingMethodType;
@@ -62,12 +62,12 @@ public class GermplasmStudySourceDto {
 		this.cross = cross;
 	}
 
-	public Integer getLots() {
-		return this.lots;
+	public Integer getNumberOfLots() {
+		return this.numberOfLots;
 	}
 
-	public void setLots(final Integer lots) {
-		this.lots = lots;
+	public void setNumberOfLots(final Integer numberOfLots) {
+		this.numberOfLots = numberOfLots;
 	}
 
 	public String getBreedingMethodAbbreviation() {

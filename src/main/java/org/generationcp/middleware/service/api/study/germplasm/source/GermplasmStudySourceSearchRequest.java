@@ -61,7 +61,7 @@ public class GermplasmStudySourceSearchRequest {
 		public static final String GROUP_ID = "groupId";
 		public static final String DESIGNATION = "designation";
 		public static final String CROSS = "cross";
-		public static final String LOTS = "lots";
+		public static final String NUMBER_OF_LOTS = "numberOfLots";
 		public static final String BREEDING_METHOD_ABBREVIATION = "breedingMethodAbbreviation";
 		public static final String BREEDING_METHOD_NAME = "breedingMethodName";
 		public static final String BREEDING_METHOD_TYPE = "breedingMethodType";
@@ -72,7 +72,7 @@ public class GermplasmStudySourceSearchRequest {
 		public static final String GERMPLASM_DATE = "germplasmDate";
 
 		public static final List<String> SORTABLE_FIELDS = Collections.unmodifiableList(Arrays
-			.asList(GID, GROUP_ID, DESIGNATION, CROSS, LOTS, BREEDING_METHOD_ABBREVIATION, BREEDING_METHOD_NAME, BREEDING_METHOD_TYPE,
+			.asList(GID, GROUP_ID, DESIGNATION, CROSS, NUMBER_OF_LOTS, BREEDING_METHOD_ABBREVIATION, BREEDING_METHOD_NAME, BREEDING_METHOD_TYPE,
 				BREEDING_LOCATION_NAME, TRIAL_INSTANCE, REPLICATION_NUMBER, GERMPLASM_DATE));
 
 		private Integer germplasmStudySourceId;
@@ -80,7 +80,7 @@ public class GermplasmStudySourceSearchRequest {
 		private Integer groupId;
 		private String designation;
 		private String cross;
-		private Integer lots;
+		private Integer numberOfLots;
 		private String breedingMethodAbbreviation;
 		private String breedingMethodName;
 		private String breedingMethodType;
@@ -130,12 +130,12 @@ public class GermplasmStudySourceSearchRequest {
 			this.cross = cross;
 		}
 
-		public Integer getLots() {
-			return this.lots;
+		public Integer getNumberOfLots() {
+			return this.numberOfLots;
 		}
 
-		public void setLots(final Integer lots) {
-			this.lots = lots;
+		public void setNumberOfLots(final Integer numberOfLots) {
+			this.numberOfLots = numberOfLots;
 		}
 
 		public String getBreedingMethodAbbreviation() {

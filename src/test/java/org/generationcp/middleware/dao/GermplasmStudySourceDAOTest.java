@@ -418,12 +418,12 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		final GermplasmStudySourceSearchRequest.Filter filter = new GermplasmStudySourceSearchRequest.Filter();
 		germplasmStudySourceSearchRequest.setFilter(filter);
 
-		filter.setLots(0);
+		filter.setNumberOfLots(0);
 		Assert.assertEquals(2, this.daoFactory.getGermplasmStudySourceDAO().getGermplasmStudySourceList(germplasmStudySourceSearchRequest).size());
 		Assert.assertEquals(2l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
-		filter.setLots(1);
+		filter.setNumberOfLots(1);
 		Assert.assertEquals(0, this.daoFactory.getGermplasmStudySourceDAO().getGermplasmStudySourceList(germplasmStudySourceSearchRequest).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
