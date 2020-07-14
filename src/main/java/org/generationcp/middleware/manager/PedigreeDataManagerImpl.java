@@ -13,7 +13,10 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -626,6 +629,15 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		}
 
 		return progenitorId;
+	}
+
+	@Override
+	public Map<Integer, GermplasmPedigreeTree> generatePedigreeTreeMap(final Set<Integer> gids, final Integer level, final Boolean includeDerivativeLines) {
+		Map<Integer, GermplasmPedigreeTree> pedigreeTreeMap = new HashMap<>();
+		for(Integer gid : gids) {
+			pedigreeTreeMap.put(gid, this.generatePedigreeTree(gid, level, includeDerivativeLines));
+		}
+		return pedigreeTreeMap;
 	}
 
 	private int addOrUpdateProgenitors(final List<Progenitor> progenitors) {

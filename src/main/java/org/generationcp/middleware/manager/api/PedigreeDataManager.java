@@ -12,6 +12,8 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
@@ -209,4 +211,6 @@ public interface PedigreeDataManager {
 	 * @return Returns the id of the updated Progenitor
 	 */
 	Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber);
+
+	Map<Integer, GermplasmPedigreeTree> generatePedigreeTreeMap(Set<Integer> gids, Integer level, Boolean includeDerivativeLines);
 }
