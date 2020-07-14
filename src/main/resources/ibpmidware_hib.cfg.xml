@@ -119,5 +119,7 @@
         <mapping class="org.generationcp.middleware.pojos.derived_variables.Formula"/>
 
         <mapping class="org.generationcp.middleware.pojos.search.SearchRequest"/>
+
+        <mapping class="org.generationcp.middleware.pojos.GermplasmStudySource"/>
     </session-factory>
 </hibernate-configuration>

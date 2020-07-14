@@ -1,0 +1,82 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="aldrin" id="v15.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="germplasm_study_source"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create new germplasm_study_source
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `germplasm_study_source` (
+			`germplasm_study_source_id` INT NOT NULL AUTO_INCREMENT,
+			`gid` INT NOT NULL,
+			`project_id` INT NOT NULL,
+			`nd_experiment_id` INT NULL,
+			`type` VARCHAR(45) NULL,
+			PRIMARY KEY (`germplasm_study_source_id`),
+			INDEX `asdasd_idx` (`project_id` ASC),
+			INDEX `FK_nd_experiment_id_idx` (`nd_experiment_id` ASC),
+			CONSTRAINT `FK_project_id_1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+			CONSTRAINT `FK_nd_experiment_id_1` FOREIGN KEY (`nd_experiment_id`) REFERENCES `nd_experiment` (`nd_experiment_id`) ON DELETE NO ACTION ON UPDATE NO ACTION);
+		</sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v15.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="ims_stock_transaction" columnName="germplasm_study_source_id"/>
+			</not>
+		</preConditions>
+		<comment>
+			Add germplasm_study_source_id column in ims_stock_transaction
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE `ims_stock_transaction`
+			ADD COLUMN `germplasm_study_source_id` INT NULL AFTER `listdata_project_id`;
+
+			ALTER TABLE `ims_stock_transaction`
+			ADD CONSTRAINT `FK_source_idgermplasm_study_source_id_1`
+			FOREIGN KEY (`germplasm_study_source_id`)
+			REFERENCES `germplasm_study_source` (`germplasm_study_source_id`)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v15.3.0-3">
+		<preConditions onFail="MARK_RAN">
+			 <sqlCheck expectedResult="1">
+				 SELECT COUNT(*) > 0
+				   FROM listnms lnms
+				  INNER JOIN listdata_project ldp ON ldp.list_id = lnms.listid
+				  WHERE lnms.listtype IN ( 'ADVANCED', 'IMP_CROSS', 'CRT_CROSS' )
+				    AND NOT EXISTS (SELECT 1 FROM germplasm_study_source gss where gss.project_id = lnms.projectid and gss.gid = ldp.germplasm_id);
+			 </sqlCheck>
+		</preConditions>
+		<comment>
+			Migrate existing advance and cross list to germplasm_study_source.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO germplasm_study_source(`gid`,`project_id`,`nd_experiment_id`,`type`)
+			SELECT DISTINCT ldp.germplasm_id, lnms.projectid, NULL, CASE WHEN lnms.listtype IN ( 'IMP_CROSS', 'CRT_CROSS' ) THEN 'CROSS' ELSE 'ADVANCE' END
+			  FROM listnms lnms INNER JOIN listdata_project ldp ON lnms.listid = ldp.list_id
+			 WHERE lnms.listtype IN ( 'ADVANCED', 'IMP_CROSS', 'CRT_CROSS' )
+			   AND NOT EXISTS (SELECT 1 FROM germplasm_study_source gss where gss.project_id = lnms.projectid and gss.gid = ldp.germplasm_id);
+
+
+			-- Link ims_stock_transaction to germplasm_study_source
+			UPDATE ims_stock_transaction ist
+			INNER JOIN listdata_project ldp ON ist.listdata_project_id = ldp.listdata_project_id
+			INNER JOIN germplasm_study_source gss ON ldp.germplasm_id = gss.gid
+			SET ist.germplasm_study_source_id = gss.germplasm_study_source_id;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

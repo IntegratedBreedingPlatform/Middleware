@@ -206,8 +206,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertTrue(studyInstance2.isHasExperimentalDesign());
-		// Instance deletion not allowed because study has advance list and design already generated for instance
-		Assert.assertFalse(studyInstance2.getCanBeDeleted());
+		Assert.assertTrue(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 
 		final StudyInstance studyInstance3 = studyInstances.get(2);
@@ -249,8 +248,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertTrue(studyInstance2.isHasExperimentalDesign());
-		// Instance deletion not allowed because study has advance list and design already generated for instance
-		Assert.assertFalse(studyInstance2.getCanBeDeleted());
+		Assert.assertTrue(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 
 		final StudyInstance studyInstance3 =
@@ -457,10 +455,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			this.testDataInitializer
 				.createDmsProject("Subobs Dataset", "Subobs Dataset-Description", study, plotDataset,
 					DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS);
-		final GermplasmList advanceList = GermplasmListTestDataInitializer.createGermplasmListWithType(null,
-			GermplasmListType.ADVANCED.name());
-		advanceList.setProjectId(study.getProjectId());
-		this.daoFactory.getGermplasmListDAO().save(advanceList);
 
 		this.testDataInitializer.addGeolocationProp(this.instance1, TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
 			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), 1);
