@@ -4,9 +4,8 @@ import liquibase.util.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.SortedPageRequest;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
-import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
@@ -21,7 +20,7 @@ import java.util.List;
 public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, Integer> {
 
 	protected static final String GERMPLASM_STUDY_SOURCE_SEARCH_QUERY = "SELECT \n"
-		+ "gss.source_id as `sourceId`,\n"
+		+ "gss.germplasm_study_source_id as `germplasmStudySourceId`,\n"
 		+ "gss.gid as `gid`,\n"
 		+ "g.mgid as `groupId`,\n"
 		+ "n.nval as `designation`,\n"
@@ -29,7 +28,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "m.mname as `breedingMethodName`,\n"
 		+ "m.mtype as `breedingMethodType`,\n"
 		+ "concat(geo.description, ' - ' , loc.lname) as `trialInstance`,\n"
-		+ "breedingLoc.lname as `location`,\n"
+		+ "breedingLoc.lname as `breedingLocationName`,\n"
 		+ "rep_no.value as `replicationNumber`,\n"
 		+ "plot_no.value as `plotNumber`,\n"
 		+ "g.gdate as `germplasmDate`,\n"
@@ -52,18 +51,18 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "LEFT JOIN ims_lot lot ON lot.eid = gss.gid \n"
 		+ "WHERE gss.project_id = :studyId ";
 
-	public List<GermplasmStudySourceDto> getGermplasmStudySourceList(final GermplasmStudySourceRequest germplasmStudySourceRequest) {
+	public List<GermplasmStudySourceDto> getGermplasmStudySourceList(final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
 
 		final StringBuilder sql = new StringBuilder(GERMPLASM_STUDY_SOURCE_SEARCH_QUERY);
-		addSearchQueryFilters(new SqlQueryParamBuilder(sql), germplasmStudySourceRequest.getFilter());
-		addGroupByAndLotsFilter(new SqlQueryParamBuilder(sql), germplasmStudySourceRequest.getFilter());
-		addOrder(sql, germplasmStudySourceRequest.getSortedRequest());
+		addSearchQueryFilters(new SqlQueryParamBuilder(sql), germplasmStudySourceSearchRequest.getFilter());
+		addGroupByAndLotsFilter(new SqlQueryParamBuilder(sql), germplasmStudySourceSearchRequest.getFilter());
+		addOrder(sql, germplasmStudySourceSearchRequest.getSortedRequest());
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-		addSearchQueryFilters(new SqlQueryParamBuilder(query), germplasmStudySourceRequest.getFilter());
-		addGroupByAndLotsFilter(new SqlQueryParamBuilder(query), germplasmStudySourceRequest.getFilter());
+		addSearchQueryFilters(new SqlQueryParamBuilder(query), germplasmStudySourceSearchRequest.getFilter());
+		addGroupByAndLotsFilter(new SqlQueryParamBuilder(query), germplasmStudySourceSearchRequest.getFilter());
 
-		query.addScalar("sourceId");
+		query.addScalar("germplasmStudySourceId");
 		query.addScalar("gid");
 		query.addScalar("groupId");
 		query.addScalar("designation");
@@ -71,37 +70,37 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		query.addScalar("breedingMethodName");
 		query.addScalar("breedingMethodType");
 		query.addScalar("trialInstance");
-		query.addScalar("location");
+		query.addScalar("breedingLocationName");
 		query.addScalar("replicationNumber", new IntegerType());
 		query.addScalar("plotNumber", new IntegerType());
 		query.addScalar("germplasmDate");
 		query.addScalar("lots", new IntegerType());
-		query.setParameter("studyId", germplasmStudySourceRequest.getStudyId());
+		query.setParameter("studyId", germplasmStudySourceSearchRequest.getStudyId());
 
-		GenericDAO.addSortedPageRequestPagination(query, germplasmStudySourceRequest.getSortedRequest());
+		GenericDAO.addSortedPageRequestPagination(query, germplasmStudySourceSearchRequest.getSortedRequest());
 
 		query.setResultTransformer(Transformers.aliasToBean(GermplasmStudySourceDto.class));
 		return query.list();
 	}
 
-	public long countFilteredGermplasmStudySourceList(final GermplasmStudySourceRequest germplasmStudySourceRequest) {
+	public long countFilteredGermplasmStudySourceList(final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
 		final StringBuilder subQuery = new StringBuilder(GERMPLASM_STUDY_SOURCE_SEARCH_QUERY);
-		addSearchQueryFilters(new SqlQueryParamBuilder(subQuery), germplasmStudySourceRequest.getFilter());
-		addGroupByAndLotsFilter(new SqlQueryParamBuilder(subQuery), germplasmStudySourceRequest.getFilter());
+		addSearchQueryFilters(new SqlQueryParamBuilder(subQuery), germplasmStudySourceSearchRequest.getFilter());
+		addGroupByAndLotsFilter(new SqlQueryParamBuilder(subQuery), germplasmStudySourceSearchRequest.getFilter());
 
 		final StringBuilder mainSql = new StringBuilder("SELECT COUNT(*) FROM ( \n");
 		mainSql.append(subQuery.toString());
 		mainSql.append(") a \n");
 
 		final SQLQuery query = this.getSession().createSQLQuery(mainSql.toString());
-		addSearchQueryFilters(new SqlQueryParamBuilder(query), germplasmStudySourceRequest.getFilter());
-		addGroupByAndLotsFilter(new SqlQueryParamBuilder(query), germplasmStudySourceRequest.getFilter());
+		addSearchQueryFilters(new SqlQueryParamBuilder(query), germplasmStudySourceSearchRequest.getFilter());
+		addGroupByAndLotsFilter(new SqlQueryParamBuilder(query), germplasmStudySourceSearchRequest.getFilter());
 
-		query.setParameter("studyId", germplasmStudySourceRequest.getStudyId());
+		query.setParameter("studyId", germplasmStudySourceSearchRequest.getStudyId());
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
-	public long countGermplasmStudySourceList(final GermplasmStudySourceRequest searchParameters) {
+	public long countGermplasmStudySourceList(final GermplasmStudySourceSearchRequest searchParameters) {
 		final Criteria criteria = this.getSession().createCriteria(GermplasmStudySource.class);
 		criteria.setProjection(Projections.rowCount());
 		criteria.add(Restrictions.eq("study.projectId", searchParameters.getStudyId()));
@@ -111,13 +110,13 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 
 	private static void addSearchQueryFilters(
 		final SqlQueryParamBuilder paramBuilder,
-		final GermplasmStudySourceRequest.Filter filter) {
+		final GermplasmStudySourceSearchRequest.Filter filter) {
 
 		if (filter != null) {
-			final Integer sourceId = filter.getSourceId();
-			if (sourceId != null) {
-				paramBuilder.append(" and gss.source_id = :sourceId");
-				paramBuilder.setParameter("sourceId", sourceId);
+			final Integer germplasmStudySourceId = filter.getGermplasmStudySourceId();
+			if (germplasmStudySourceId != null) {
+				paramBuilder.append(" and gss.germplasm_study_source_id = :germplasmStudySourceId");
+				paramBuilder.setParameter("germplasmStudySourceId", germplasmStudySourceId);
 			}
 			final Integer gid = filter.getGid();
 			if (gid != null) {
@@ -164,10 +163,10 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				paramBuilder.append(" and n.nval = :designation");
 				paramBuilder.setParameter("designation", designation);
 			}
-			final String location = filter.getLocation();
-			if (!StringUtils.isEmpty(location)) {
-				paramBuilder.append(" and breedingLoc.lname = :location");
-				paramBuilder.setParameter("location", location);
+			final String breedingLocationName = filter.getBreedingLocationName();
+			if (!StringUtils.isEmpty(breedingLocationName)) {
+				paramBuilder.append(" and breedingLoc.lname = :breedingLocationName");
+				paramBuilder.setParameter("breedingLocationName", breedingLocationName);
 			}
 			final String trialInstance = filter.getTrialInstance();
 			if (!StringUtils.isEmpty(trialInstance)) {
@@ -180,15 +179,15 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 
 	private static void addOrder(final StringBuilder sql, final SortedPageRequest sortedPageRequest) {
 		if (sortedPageRequest != null && sortedPageRequest.getSortBy() != null && sortedPageRequest.getSortOrder() != null
-			&& GermplasmStudySourceRequest.Filter.SORTABLE_FIELDS.contains(sortedPageRequest.getSortBy())) {
+			&& GermplasmStudySourceSearchRequest.Filter.SORTABLE_FIELDS.contains(sortedPageRequest.getSortBy())) {
 			sql.append(" ORDER BY " + sortedPageRequest.getSortBy() + " " + sortedPageRequest.getSortOrder() + "\n ");
 		}
 	}
 
 	private static void addGroupByAndLotsFilter(final SqlQueryParamBuilder paramBuilder,
-		final GermplasmStudySourceRequest.Filter filter) {
+		final GermplasmStudySourceSearchRequest.Filter filter) {
 
-		paramBuilder.append(" GROUP BY gss.source_id\n");
+		paramBuilder.append(" GROUP BY gss.germplasm_study_source_id\n");
 
 		if (filter != null && filter.getLots() != null) {
 			paramBuilder.append(" HAVING `lots` = :lots\n");

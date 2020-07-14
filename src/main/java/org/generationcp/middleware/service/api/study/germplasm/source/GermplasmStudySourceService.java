@@ -4,15 +4,12 @@ import java.util.List;
 
 public interface GermplasmStudySourceService {
 
-	List<GermplasmStudySourceDto> getGermplasmStudySourceList(final GermplasmStudySourceRequest searchParameters);
+	List<GermplasmStudySourceDto> getGermplasmStudySources(GermplasmStudySourceSearchRequest searchParameters);
 
-	long countGermplasmStudySourceList(final GermplasmStudySourceRequest searchParameters);
+	long countGermplasmStudySources(GermplasmStudySourceSearchRequest searchParameters);
 
-	long countFilteredGermplasmStudySourceList(GermplasmStudySourceRequest germplasmStudySourceRequest);
+	long countFilteredGermplasmStudySources(GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest);
 
 	void saveGermplasmStudySource(List<GermplasmStudySourceInput> germplasmStudySourceInputList);
-
-
-
 
 }

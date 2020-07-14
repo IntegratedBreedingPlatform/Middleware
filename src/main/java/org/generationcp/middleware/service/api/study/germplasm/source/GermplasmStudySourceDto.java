@@ -6,7 +6,7 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class GermplasmStudySourceDto {
 
-	private Integer sourceId;
+	private Integer germplasmStudySourceId;
 	private Integer gid;
 	private Integer groupId;
 	private String designation;
@@ -15,19 +15,19 @@ public class GermplasmStudySourceDto {
 	private String breedingMethodAbbreviation;
 	private String breedingMethodName;
 	private String breedingMethodType;
-	private String location;
+	private String breedingLocationName;
 	private String trialInstance;
 	private Integer plotNumber;
 	private Integer replicationNumber;
 	private Integer germplasmDate;
 
 
-	public Integer getSourceId() {
-		return this.sourceId;
+	public Integer getGermplasmStudySourceId() {
+		return this.germplasmStudySourceId;
 	}
 
-	public void setSourceId(final Integer sourceId) {
-		this.sourceId = sourceId;
+	public void setGermplasmStudySourceId(final Integer germplasmStudySourceId) {
+		this.germplasmStudySourceId = germplasmStudySourceId;
 	}
 
 	public Integer getGid() {
@@ -94,12 +94,12 @@ public class GermplasmStudySourceDto {
 		this.breedingMethodType = breedingMethodType;
 	}
 
-	public String getLocation() {
-		return this.location;
+	public String getBreedingLocationName() {
+		return this.breedingLocationName;
 	}
 
-	public void setLocation(final String location) {
-		this.location = location;
+	public void setBreedingLocationName(final String breedingLocationName) {
+		this.breedingLocationName = breedingLocationName;
 	}
 
 	public String getTrialInstance() {

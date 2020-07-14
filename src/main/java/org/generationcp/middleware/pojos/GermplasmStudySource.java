@@ -41,8 +41,8 @@ public class GermplasmStudySource {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
-	@Column(name = "source_id")
-	private Integer sourceId;
+	@Column(name = "germplasm_study_source_id")
+	private Integer germplasmStudySourceId;
 
 	@OneToOne
 	@JoinColumn(name = "gid", nullable = false)
@@ -60,12 +60,12 @@ public class GermplasmStudySource {
 	@Enumerated(EnumType.STRING)
 	private GermplasmStudySourceType germplasmStudySourceType;
 
-	public Integer getSourceId() {
-		return this.sourceId;
+	public Integer getGermplasmStudySourceId() {
+		return this.germplasmStudySourceId;
 	}
 
-	public void setSourceId(final Integer sourceId) {
-		this.sourceId = sourceId;
+	public void setGermplasmStudySourceId(final Integer sourceId) {
+		this.germplasmStudySourceId = sourceId;
 	}
 
 	public Germplasm getGermplasm() {

@@ -9,11 +9,11 @@ import java.util.Collections;
 import java.util.List;
 
 @AutoProperty
-public class GermplasmStudySourceRequest {
+public class GermplasmStudySourceSearchRequest {
 
 	private int studyId;
 	private SortedPageRequest sortedRequest;
-	private GermplasmStudySourceRequest.Filter filter;
+	private GermplasmStudySourceSearchRequest.Filter filter;
 
 	public int getStudyId() {
 		return this.studyId;
@@ -23,11 +23,11 @@ public class GermplasmStudySourceRequest {
 		this.studyId = studyId;
 	}
 
-	public GermplasmStudySourceRequest.Filter getFilter() {
+	public GermplasmStudySourceSearchRequest.Filter getFilter() {
 		return this.filter;
 	}
 
-	public void setFilter(final GermplasmStudySourceRequest.Filter filter) {
+	public void setFilter(final GermplasmStudySourceSearchRequest.Filter filter) {
 		this.filter = filter;
 	}
 
@@ -65,7 +65,7 @@ public class GermplasmStudySourceRequest {
 		public static final String BREEDING_METHOD_ABBREVIATION = "breedingMethodAbbreviation";
 		public static final String BREEDING_METHOD_NAME = "breedingMethodName";
 		public static final String BREEDING_METHOD_TYPE = "breedingMethodType";
-		public static final String LOCATION = "location";
+		public static final String BREEDING_LOCATION_NAME = "breedingLocationName";
 		public static final String TRIAL_INSTANCE = "trialInstance";
 		public static final String PLOT_NUMBER = "plotNumber";
 		public static final String REPLICATION_NUMBER = "replicationNumber";
@@ -73,9 +73,9 @@ public class GermplasmStudySourceRequest {
 
 		public static final List<String> SORTABLE_FIELDS = Collections.unmodifiableList(Arrays
 			.asList(GID, GROUP_ID, DESIGNATION, CROSS, LOTS, BREEDING_METHOD_ABBREVIATION, BREEDING_METHOD_NAME, BREEDING_METHOD_TYPE,
-				LOCATION, TRIAL_INSTANCE, REPLICATION_NUMBER, GERMPLASM_DATE));
+				BREEDING_LOCATION_NAME, TRIAL_INSTANCE, REPLICATION_NUMBER, GERMPLASM_DATE));
 
-		private Integer sourceId;
+		private Integer germplasmStudySourceId;
 		private Integer gid;
 		private Integer groupId;
 		private String designation;
@@ -84,18 +84,18 @@ public class GermplasmStudySourceRequest {
 		private String breedingMethodAbbreviation;
 		private String breedingMethodName;
 		private String breedingMethodType;
-		private String location;
+		private String breedingLocationName;
 		private String trialInstance;
 		private Integer plotNumber;
 		private Integer replicationNumber;
 		private Integer germplasmDate;
 
-		public Integer getSourceId() {
-			return this.sourceId;
+		public Integer getGermplasmStudySourceId() {
+			return this.germplasmStudySourceId;
 		}
 
-		public void setSourceId(final Integer sourceId) {
-			this.sourceId = sourceId;
+		public void setGermplasmStudySourceId(final Integer germplasmStudySourceId) {
+			this.germplasmStudySourceId = germplasmStudySourceId;
 		}
 
 		public Integer getGid() {
@@ -162,12 +162,12 @@ public class GermplasmStudySourceRequest {
 			this.breedingMethodType = breedingMethodType;
 		}
 
-		public String getLocation() {
-			return this.location;
+		public String getBreedingLocationName() {
+			return this.breedingLocationName;
 		}
 
-		public void setLocation(final String location) {
-			this.location = location;
+		public void setBreedingLocationName(final String breedingLocationName) {
+			this.breedingLocationName = breedingLocationName;
 		}
 
 		public String getTrialInstance() {

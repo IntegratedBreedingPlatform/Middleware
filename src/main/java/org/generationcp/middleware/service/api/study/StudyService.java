@@ -13,7 +13,7 @@ public interface StudyService {
 
 	boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId);
 
-	boolean hasAdvancedOrCrossesList(final int studyId);
+	boolean hasCrossesOrSelections(final int studyId);
 
 	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
 

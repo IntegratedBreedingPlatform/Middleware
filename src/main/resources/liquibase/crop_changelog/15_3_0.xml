@@ -15,12 +15,12 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `germplasm_study_source` (
-			`source_id` INT NOT NULL AUTO_INCREMENT,
+			`germplasm_study_source_id` INT NOT NULL AUTO_INCREMENT,
 			`gid` INT NOT NULL,
 			`project_id` INT NOT NULL,
 			`nd_experiment_id` INT NULL,
 			`type` VARCHAR(45) NULL,
-			PRIMARY KEY (`source_id`),
+			PRIMARY KEY (`germplasm_study_source_id`),
 			INDEX `asdasd_idx` (`project_id` ASC),
 			INDEX `FK_nd_experiment_id_idx` (`nd_experiment_id` ASC),
 			CONSTRAINT `FK_project_id_1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -31,20 +31,20 @@
 	<changeSet author="aldrin" id="v15.3.0-2">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<columnExists tableName="ims_stock_transaction" columnName="source_id"/>
+				<columnExists tableName="ims_stock_transaction" columnName="germplasm_study_source_id"/>
 			</not>
 		</preConditions>
 		<comment>
-			Add source_id column
+			Add germplasm_study_source_id column in ims_stock_transaction
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE `ims_stock_transaction`
-			ADD COLUMN `source_id` INT NULL AFTER `listdata_project_id`;
+			ADD COLUMN `germplasm_study_source_id` INT NULL AFTER `listdata_project_id`;
 
 			ALTER TABLE `ims_stock_transaction`
-			ADD CONSTRAINT `FK_source_id_1`
-			FOREIGN KEY (`source_id`)
-			REFERENCES `germplasm_study_source` (`source_id`)
+			ADD CONSTRAINT `FK_source_idgermplasm_study_source_id_1`
+			FOREIGN KEY (`germplasm_study_source_id`)
+			REFERENCES `germplasm_study_source` (`germplasm_study_source_id`)
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION;
 		</sql>
@@ -75,7 +75,7 @@
 			UPDATE ims_stock_transaction ist
 			INNER JOIN listdata_project ldp ON ist.listdata_project_id = ldp.listdata_project_id
 			INNER JOIN germplasm_study_source gss ON ldp.germplasm_id = gss.gid
-			SET ist.source_id = gss.source_id;
+			SET ist.germplasm_study_source_id = gss.germplasm_study_source_id;
 		</sql>
 	</changeSet>
 
