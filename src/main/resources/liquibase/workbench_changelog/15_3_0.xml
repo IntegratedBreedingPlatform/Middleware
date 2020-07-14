@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="nahuel" id="v15.3.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'MG_MANAGE_INVENTORY'
+			</sqlCheck>
+        </preConditions>
+        <comment>Manage Germplasm first granular permission: create inventory lots</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_germplasm_id = (select permission_id from permission where name = 'MANAGE_GERMPLASM');
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'bm_list_manager_main');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MG_MANAGE_INVENTORY', 'Manage Inventory', @manage_germplasm_id, @sidebar_category_link_id);
+			set @mg_manage_inventory_id =  (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @mg_manage_inventory_id, 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @mg_manage_inventory_id, 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @mg_manage_inventory_id, 1);
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MG_CREATE_LOTS', 'Create Lots', @mg_manage_inventory_id, @sidebar_category_link_id);
+			set @mg_create_lots_id =  (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @mg_create_lots_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @mg_create_lots_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @mg_create_lots_id , 1);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
+
