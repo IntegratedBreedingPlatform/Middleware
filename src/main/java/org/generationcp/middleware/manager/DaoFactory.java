@@ -5,6 +5,7 @@ import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.GermplasmStudySourceDAO;
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
 import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.dao.LocationDAO;
@@ -254,6 +255,12 @@ public class DaoFactory {
 		final ExperimentPropertyDao experimentPropertyDao = new ExperimentPropertyDao();
 		experimentPropertyDao.setSession(this.sessionProvider.getSession());
 		return experimentPropertyDao;
+	}
+
+	public GermplasmStudySourceDAO getGermplasmStudySourceDAO() {
+		final GermplasmStudySourceDAO germplasmStudySourceDAO = new GermplasmStudySourceDAO();
+		germplasmStudySourceDAO.setSession(this.sessionProvider.getSession());
+		return germplasmStudySourceDAO;
 	}
 
 }
