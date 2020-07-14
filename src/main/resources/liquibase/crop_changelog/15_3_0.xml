@@ -71,7 +71,7 @@
 			   AND NOT EXISTS (SELECT 1 FROM germplasm_study_source gss where gss.project_id = lnms.projectid and gss.gid = ldp.germplasm_id);
 
 
-			-- Remove listdata_project_id reference in ims_stock_transaction table and replace it with sourceid that links to germplasm_study_source
+			-- Link ims_stock_transaction to germplasm_study_source
 			UPDATE ims_stock_transaction ist
 			INNER JOIN listdata_project ldp ON ist.listdata_project_id = ldp.listdata_project_id
 			INNER JOIN germplasm_study_source gss ON ldp.germplasm_id = gss.gid
