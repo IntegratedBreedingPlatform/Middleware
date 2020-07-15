@@ -1,0 +1,83 @@
+<?xml version=1.1 encoding=UTF-8 standalone=no?>
+<databaseChangeLog xmlns=http://www.liquibase.org/xml/ns/dbchangelog
+				   xmlns:xsi=http://www.w3.org/2001/XMLSchema-instance
+				   xsi:schemaLocation=http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd>
+
+	<changeSet author=corina id=v15.4.0-1>
+		<preConditions onFail=MARK_RAN>
+			<sqlCheck expectedResult=1>
+				select count(*) from cvtermprop where `value`='Study Detail' and type_id=1800 and cvterm_id in (8583 	,
+8584 	,
+8265 	,
+8690 	,
+8700 	,
+8830 	,
+8386 	,
+8720 	,
+8620 	,
+8740 	,
+8750 	,
+8760 	,
+8770 	,
+8780 	,
+8387 	,
+8790 	,
+8383 	,
+8194 	,
+8195 	,
+8193 	,
+8191 	,
+8192 	,
+8196 	,
+8800 	,
+8810 	,
+8820 	,
+8730 	,
+8384 	,
+8170 	,
+8186);
+			</sqlCheck>
+		</preConditions>
+		<comment> Remove Study Detail as default type for environment-level/plot-level variables. IBP-3889
+		</comment>
+		<sql dbms=mysql splitStatements=true>
+			SET FOREIGN_KEY_CHECKS=0;
+
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8782'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8172';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8174';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8112'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8191';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8193'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8218'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8152';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8196';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8179'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8200';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8202';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8204'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8206';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8208';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8154'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8210';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8146';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8080'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8082';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8078';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8074'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8076';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8084';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8212';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8214';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8216';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8198'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8148';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8062'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8068';
+
+		       SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
