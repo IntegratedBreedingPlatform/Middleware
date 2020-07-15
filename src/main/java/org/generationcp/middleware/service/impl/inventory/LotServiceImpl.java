@@ -37,6 +37,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -135,18 +136,25 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public void saveLotsWithInitialTransaction(final CropType cropType, final Integer userId, final List<LotItemDto> lotItemDtos) {
+	public List<String> saveLots(final CropType cropType, final Integer userId, final List<LotItemDto> lotItemDtos) {
 		try {
+			// locationsByAbbreviationMap
 			final List<Location> locations = this.daoFactory.getLocationDAO()
-				.filterLocations(STORAGE_LOCATION_TYPE, null, lotItemDtos.stream().map(LotItemDto::getStorageLocationAbbr).collect(
-			Collectors.toList()));
+				.filterLocations(STORAGE_LOCATION_TYPE, null, lotItemDtos.stream()
+					.map(LotItemDto::getStorageLocationAbbr)
+					.collect(Collectors.toList()));
 			final Map<String, Integer> locationsByAbbreviationMap =
 				locations.stream().collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
+
+			// scaleVariablesByNameMap
 			final VariableFilter variableFilter = new VariableFilter();
 			variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 			final List<Variable> scaleVariables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 			final Map<String, Integer> scaleVariablesByNameMap =
 				scaleVariables.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
+
+			final List<String> lotUUIDs = new ArrayList<>();
+
 			for (final LotItemDto lotItemDto : lotItemDtos) {
 				final Lot lot = new Lot();
 				lot.setUserId(userId);
@@ -154,28 +162,42 @@ public class LotServiceImpl implements LotService {
 				lot.setCreatedDate(new Date());
 				lot.setEntityId(lotItemDto.getGid());
 				lot.setEntityType("GERMPLSM");
-				lot.setLocationId(locationsByAbbreviationMap.get(lotItemDto.getStorageLocationAbbr()));
+				if (lotItemDto.getStorageLocationId() != null) {
+					lot.setLocationId(lotItemDto.getStorageLocationId());
+				} else {
+					lot.setLocationId(locationsByAbbreviationMap.get(lotItemDto.getStorageLocationAbbr()));
+				}
 				lot.setStockId(lotItemDto.getStockId());
 				lot.setStatus(0);
 				//FIXME check if source has to be always 0
 				lot.setSource(0);
-				lot.setScaleId(scaleVariablesByNameMap.get(lotItemDto.getScaleName()));
+				if (lotItemDto.getScaleId() != null) {
+					lot.setScaleId(lotItemDto.getScaleId());
+				} else {
+					lot.setScaleId(scaleVariablesByNameMap.get(lotItemDto.getScaleName()));
+				}
+
 				this.inventoryDataManager.generateLotIds(cropType, Lists.newArrayList(lot));
-				this.daoFactory.getLotDao().save(lot);
+				final Lot savedLot = this.daoFactory.getLotDao().save(lot);
+				lotUUIDs.add(savedLot.getLotUuId());
 
-				final Transaction transaction = new Transaction();
-				transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
-				transaction.setType(TransactionType.DEPOSIT.getId());
-				transaction.setLot(lot);
-				transaction.setPersonId(userId);
-				transaction.setUserId(userId);
-				transaction.setTransactionDate(new Date());
-				transaction.setQuantity(lotItemDto.getInitialBalance());
-				transaction.setPreviousAmount(0D);
-				transaction.setCommitmentDate(0);
+				final Double initialBalance = lotItemDto.getInitialBalance();
+				if (initialBalance != null) {
+					final Transaction transaction = new Transaction();
+					transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
+					transaction.setType(TransactionType.DEPOSIT.getId());
+					transaction.setLot(lot);
+					transaction.setPersonId(userId);
+					transaction.setUserId(userId);
+					transaction.setTransactionDate(new Date());
+					transaction.setQuantity(initialBalance);
+					transaction.setPreviousAmount(0D);
+					transaction.setCommitmentDate(0);
 
-				daoFactory.getTransactionDAO().save(transaction);
+					daoFactory.getTransactionDAO().save(transaction);
+				}
 			}
+			return lotUUIDs;
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
 			throw new MiddlewareRequestException("", "common.middleware.error.import.lots");
