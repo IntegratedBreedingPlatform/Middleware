@@ -20,12 +20,14 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for Germplasm Search functionality.
@@ -94,24 +96,6 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 String.format("nameOfGermplasm.nval AS `%s` \n", GermplasmSearchDAO.PREFERRED_NAME));
         GermplasmSearchDAO.selectClauseColumnsMap.put(GermplasmSearchDAO.GERMPLASM_DATE,
                 String.format("g.gdate AS `%s` \n", GermplasmSearchDAO.GERMPLASM_DATE));
-        GermplasmSearchDAO.selectClauseColumnsMap.put(GermplasmSearchDAO.FEMALE_PARENT_ID,
-                String.format("       CASE \n" + "         WHEN (g.gnpgs >= 2 OR g.gnpgs = -1) \n" + "              AND g.gpid1 IS NOT NULL \n"
-                        + "              AND g.gpid1 <> 0 THEN g.gpid1 \n" + "         ELSE '-' \n"
-                        + "       END                         AS `%s` \n", GermplasmSearchDAO.FEMALE_PARENT_ID)
-        );
-        GermplasmSearchDAO.selectClauseColumnsMap.put(GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME,
-                String.format("       CASE \n" + "         WHEN (g.gnpgs >= 2 OR g.gnpgs = -1) \n" + "              AND g.gpid1 IS NOT NULL \n"
-                        + "              AND g.gpid1 <> 0 THEN nameOfFemaleParent.nval \n" + "         ELSE '-' \n"
-                        + "       END                         AS `%s` \n", GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME)
-        );
-        GermplasmSearchDAO.selectClauseColumnsMap.put(GermplasmSearchDAO.MALE_PARENT_ID,
-                String.format("        CASE \n" + "         WHEN (g.gnpgs >= 2 OR g.gnpgs = -1) \n" + "              AND g.gpid2 = 0 THEN '" + Name.UNKNOWN + " ' \n"
-                        + " WHEN (g.gnpgs >= 2 OR g.gnpgs = -1) \n" + "              AND g.gpid2 IS NOT NULL \n THEN g.gpid2 \n" + "         ELSE '-' \n"
-                        + "       END                         AS `%s` \n", GermplasmSearchDAO.MALE_PARENT_ID + "_COL"));
-        GermplasmSearchDAO.selectClauseColumnsMap.put(GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME,
-                String.format("        CASE \n" + "         WHEN (g.gnpgs >= 2 OR g.gnpgs = -1) \n" + "              AND g.gpid2 = 0 THEN '" + Name.UNKNOWN + " ' \n"
-                        + " WHEN (g.gnpgs >= 2 OR g.gnpgs =-1) \n" + "              AND g.gpid2 IS NOT NULL \n THEN nameOfMaleParent.nval \n" + "         ELSE '-' \n"
-                        + "       END                         AS `%s` \n", GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME));
         GermplasmSearchDAO.selectClauseColumnsMap
                 .put(GermplasmSearchDAO.GROUP_SOURCE_GID,
                         String.format(" CASE \n WHEN g.gnpgs = -1 AND g.gpid1 IS NOT NULL \n"
@@ -144,10 +128,6 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 "LEFT JOIN names nameOfGermplasm ON g.gid = nameOfGermplasm.gid AND nameOfGermplasm.nstat = 1 \n");
         GermplasmSearchDAO.fromClauseColumnsMap.put(GermplasmSearchDAO.PREFERRED_ID,
                 "LEFT JOIN names preferredIdOfGermplasm ON g.gid = preferredIdOfGermplasm.gid AND preferredIdOfGermplasm.nstat = 8 \n");
-        GermplasmSearchDAO.fromClauseColumnsMap.put(GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME,
-                "LEFT JOIN names nameOfFemaleParent ON g.gpid1 = nameOfFemaleParent.gid AND nameOfFemaleParent.nstat = 1 \n");
-        GermplasmSearchDAO.fromClauseColumnsMap.put(GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME,
-                "LEFT JOIN names nameOfMaleParent ON g.gpid2 = nameOfMaleParent.gid AND nameOfMaleParent.nstat = 1 \n");
         GermplasmSearchDAO.fromClauseColumnsMap.put(GermplasmSearchDAO.GROUP_SOURCE_GID, " ");
         GermplasmSearchDAO.fromClauseColumnsMap.put(GermplasmSearchDAO.GROUP_SOURCE_PREFERRED_NAME,
                 "LEFT JOIN names groupSource ON g.gpid1 = groupSource.gid AND groupSource.nstat = 1 \n");
@@ -193,17 +173,22 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             query.addScalar(GermplasmSearchDAO.METHOD_NAME);
             query.addScalar(GermplasmSearchDAO.LOCATION_NAME);
 
-            for (final String propertyId : germplasmSearchParameter.getAddedColumnsPropertyIds()) {
-                //Append _COL if MALE_PARENT_ID, to avoid duplicate column name on select and fetch the correct value for MGID
-                String scalar = propertyId.equals(GermplasmSearchDAO.MALE_PARENT_ID) ? propertyId + "_COL" : propertyId;
-                query.addScalar(scalar);
+            //Excluding Parents Property from SQL
+            final List<String> germplasmTreeNode = Arrays.asList(GermplasmSearchDAO.MALE_PARENT_ID,
+                GermplasmSearchDAO.FEMALE_PARENT_ID,
+                GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME,
+                GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME);
+
+            final List<String> filteredProperty = germplasmSearchParameter.getAddedColumnsPropertyIds().stream().filter(s -> !germplasmTreeNode.contains(s)).collect(Collectors.toList());
+            for (final String propertyId : filteredProperty) {
+                    query.addScalar(propertyId);
             }
 
             query.setFirstResult(startingRow);
             query.setMaxResults(noOfEntries);
 
             germplasmSearchResult.addAll(this.convertObjectToGermplasmList(query.list(),
-                    germplasmSearchParameter.getAddedColumnsPropertyIds(), attributeTypesMap, nameTypesMap));
+                    filteredProperty, attributeTypesMap, nameTypesMap));
             return new ArrayList<>(germplasmSearchResult);
 
         } catch (final HibernateException e) {
