@@ -16,8 +16,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -30,6 +35,8 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.swing.text.html.Option;
 
 /**
  * Implementation of the PedigreeDataManager interface. To instantiate this
@@ -627,12 +634,18 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	@Override
-	public Map<Integer, GermplasmPedigreeTree> generatePedigreeTreeMap(final Set<Integer> gids, final Integer level, final Boolean includeDerivativeLines) {
-		final Map<Integer, GermplasmPedigreeTree> pedigreeTreeMap = new HashMap<>();
+	public Table<Integer, String, Optional<Germplasm>> generatePedigreeTable(final Set<Integer> gids, final Integer level,
+		final Boolean includeDerivativeLines) {
+		final Table<Integer, String, Optional<Germplasm>> table = HashBasedTable.create();
+		final Integer numberOfLevelsToTraverse = level + 1;//Not zero index
 		for(final Integer gid : gids) {
-			pedigreeTreeMap.put(gid, this.generatePedigreeTree(gid, level, includeDerivativeLines));
+			final GermplasmPedigreeTree root = this.generatePedigreeTree(gid, level, includeDerivativeLines);
+			for (final GermplasmPedigreeTreeNode linkedNode : root.getRoot().getLinkedNodes()) {
+				final String columnName = table.isEmpty() ? ColumnLabels.FGID.getName() : ColumnLabels.MGID.getName();
+				table.put(gid, columnName, Optional.of(linkedNode.getGermplasm()));
+			}
 		}
-		return pedigreeTreeMap;
+		return table;
 	}
 
 	private int addOrUpdateProgenitors(final List<Progenitor> progenitors) {
