@@ -16,23 +16,15 @@ package org.generationcp.middleware.service;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.dms.StockModel;
-import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.ims.StockTransaction;
-import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.slf4j.Logger;
@@ -40,17 +32,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * This is the API for inventory management syste
@@ -293,36 +277,7 @@ public class InventoryServiceImpl implements InventoryService {
 	 * generated seed stock of a nursery/trial
 	 *
 	 */
-	@Override
-	public void addLotAndTransaction(
-		final InventoryDetails details, final GermplasmListData listData, final ListDataProject listDataProject,
-		final CropType cropType) {
-		final Lot existingLot =
-				this.getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(EntityType.GERMPLSM.name(), details.getGid(),
-						details.getLocationId(), details.getScaleId());
 
-		if (existingLot != null) {
-			throw new MiddlewareQueryException("A lot with the same entity id, location id, and scale id already exists");
-		}
-
-		final WorkbenchUser workbenchUser = this.userService.getUserById(details.getUserId());
-
-		final Lot lot =
-				this.lotBuilder.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(),
-						details.getUserId(), cropType, details.getInventoryID());
-
-		this.daoFactory.getLotDao().saveOrUpdate(lot);
-
-		final Transaction transaction =
-				this.transactionBuilder.buildForAdd(lot, listData == null ? 0 : listData.getId(), details.getAmount(), workbenchUser.getUserid(), workbenchUser.getPerson().getId(),
-						details.getComment(), details.getSourceId(), details.getBulkWith(),
-						details.getBulkCompl());
-		this.daoFactory.getTransactionDAO().saveOrUpdate(transaction);
-
-		final StockTransaction stockTransaction = new StockTransaction(null, listDataProject, transaction);
-		stockTransaction.setSourceRecordId(transaction.getSourceRecordId());
-		this.daoFactory.getStockTransactionDAO().saveOrUpdate(stockTransaction);
-	}
 
 	@Override
 	public Lot getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(final String entityType, final Integer entityId,
@@ -334,23 +289,6 @@ public class InventoryServiceImpl implements InventoryService {
 			return lots.get(0);
 		}
 		return null;
-	}
-
-	@Override
-	public List<InventoryDetails> getInventoryListByListDataProjectListId(final Integer listDataProjectListId) {
-		return this.daoFactory.getStockTransactionDAO().retrieveInventoryDetailsForListDataProjectListId(listDataProjectListId);
-	}
-
-	@Override
-	public List<InventoryDetails> getSummedInventoryListByListDataProjectListId(final Integer listDataProjectListId,
-			final GermplasmListType type) {
-		return this.daoFactory.getStockTransactionDAO().retrieveSummedInventoryDetailsForListDataProjectListId(
-				listDataProjectListId, type);
-	}
-
-	@Override
-	public boolean stockHasCompletedBulking(final Integer listId) {
-		return this.daoFactory.getStockTransactionDAO().stockHasCompletedBulking(listId);
 	}
 
 	public void setLotBuilder(final LotBuilder lotBuilder) {

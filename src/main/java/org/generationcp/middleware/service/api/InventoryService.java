@@ -66,15 +66,5 @@ public interface InventoryService {
 	 */
 	Integer getCurrentNotationNumberForBreederIdentifier(String breederIdentifier);
 
-	void addLotAndTransaction(
-		InventoryDetails details, GermplasmListData listData, ListDataProject listDataProject,
-		final CropType cropType);
-
-	List<InventoryDetails> getInventoryListByListDataProjectListId(Integer listDataProjectListId);
-
-	List<InventoryDetails> getSummedInventoryListByListDataProjectListId(Integer listDataProjectListId, GermplasmListType type);
-
-	boolean stockHasCompletedBulking(Integer listId);
-
 	Lot getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(String entityType, Integer entityId, Integer locationId, Integer scaleId);
 }

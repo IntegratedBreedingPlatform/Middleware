@@ -16,7 +16,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.ims.LotDAO;
-import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
@@ -30,23 +29,17 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.HibernateException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Implementation of the InventoryDataManager interface. Most of the functions in this class only use the connection to the local instance,
@@ -100,17 +93,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	@Override
 	public List<Integer> updateLots(final List<Lot> lots) {
 		return this.addOrUpdateLot(lots, Operation.UPDATE);
-	}
-
-	@Override
-	public Integer addStockTransaction(StockTransaction stockTransaction) {
-		try {
-			final StockTransactionDAO stockTransactionDAO = this.daoFactory.getStockTransactionDAO();
-			stockTransaction = stockTransactionDAO.saveOrUpdate(stockTransaction);
-			return stockTransaction.getId();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(e.getMessage(), e);
-		}
 	}
 
 	private List<Integer> addOrUpdateLot(final List<Lot> lots, final Operation operation) {
@@ -206,11 +188,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	private List<GermplasmListData> getGermplasmListDataByListId(final Integer id) {
 		return this.daoFactory.getGermplasmListDataDAO().getByListId(id);
-	}
-
-	@Override
-	public boolean transactionsExistForListProjectDataListID(final Integer listDataProjectListID) {
-		return this.daoFactory.getStockTransactionDAO().listDataProjectListHasStockTransactions(listDataProjectListID);
 	}
 
 	@Override

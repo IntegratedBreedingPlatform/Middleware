@@ -5,13 +5,11 @@ import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
-import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -19,33 +17,21 @@ import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.ims.EntityType;
-import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.ims.LotStatus;
-import org.generationcp.middleware.pojos.ims.StockTransaction;
-import org.generationcp.middleware.pojos.ims.Transaction;
-import org.generationcp.middleware.pojos.ims.TransactionStatus;
-import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
-import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.exceptions.verification.TooLittleActualInvocations;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,9 +73,6 @@ public class InventoryServiceImplTest {
 	private TransactionDAO transactionDAO;
 
 	@Mock
-	private StockTransactionDAO stockTransactionDAO;
-
-	@Mock
 	private GermplasmListDAO germplasmListDAO;
 
 	@Mock
@@ -123,7 +106,6 @@ public class InventoryServiceImplTest {
 	public void setup() {
 
 		when(this.daoFactory.getTransactionDAO()).thenReturn(this.transactionDAO);
-		when(this.daoFactory.getStockTransactionDAO()).thenReturn(this.stockTransactionDAO);
 		when(this.daoFactory.getLotDao()).thenReturn(this.lotDAO);
 		when(this.daoFactory.getLocationDAO()).thenReturn(this.locationDAO);
 		when(this.daoFactory.getGermplasmListDataDAO()).thenReturn(this.germplasmListDataDAO);
@@ -184,137 +166,6 @@ public class InventoryServiceImplTest {
 
 	}
 
-	@Test(expected = MiddlewareQueryException.class)
-	public void testAddLotAndTransaction_LotAlreadyExists() {
-		final InventoryDetails details = this.createInventoryDetailsTestData(1, 1, TEST_GID, TEST_LOCATION_ID, TEST_SCALE_ID);
-		final GermplasmListData listData = this.createGermplasmListDataTestData();
-		final ListDataProject listDataProject = this.createListDataProjectTestData();
-
-		final List<Lot> lots = new ArrayList<Lot>();
-		lots.add(new Lot());
-		Mockito.doReturn(lots)
-				.when(this.lotDAO)
-				.getByEntityTypeEntityIdsLocationIdAndScaleId(Mockito.anyString(), Matchers.anyListOf(Integer.class), Mockito.anyInt(),
-						Mockito.anyInt());
-
-		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject, this.cropType);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testAddLotAndTransaction() {
-		final InventoryDetails details = this.createInventoryDetailsTestData(1, 1, TEST_GID, TEST_LOCATION_ID, TEST_SCALE_ID);
-		final GermplasmListData listData = this.createGermplasmListDataTestData();
-		final ListDataProject listDataProject = this.createListDataProjectTestData();
-
-		Mockito.doReturn(null).when(this.lotDAO)
-				.getByEntityTypeEntityIdsLocationIdAndScaleId(Mockito.anyString(), Mockito.anyListOf(Integer.class), Mockito.anyInt(),
-						Mockito.anyInt());
-
-		final Lot lot = this.createLotTestData(details);
-		Mockito.doReturn(lot)
-				.when(this.lotBuilder)
-				.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId(),
-					this.cropType, details.getInventoryID());
-		final Lot savedLot = new Lot();
-		savedLot.setId(1);
-		Mockito.doReturn(savedLot).when(this.lotDAO).saveOrUpdate(lot);
-
-		final Transaction transaction = this.createTransactionTestData(lot, listData, details);
-		Mockito.doReturn(transaction)
-				.when(this.transactionBuilder)
-				.buildForAdd(lot, listData.getId(), details.getAmount(), details.getUserId(), details.getPersonId(), details.getComment(), details.getSourceId(),
-						details.getBulkWith(), details.getBulkCompl());
-		final Transaction savedTransaction = new Transaction();
-		savedTransaction.setId(1);
-		Mockito.doReturn(savedTransaction).when(this.transactionDAO).saveOrUpdate(transaction);
-
-		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject, this.cropType);
-
-		try {
-			Mockito.verify(this.lotDAO).saveOrUpdate(lot);
-			Mockito.verify(this.transactionDAO).saveOrUpdate(transaction);
-			Mockito.verify(this.stockTransactionDAO).saveOrUpdate(Mockito.any(StockTransaction.class));
-		} catch (final TooLittleActualInvocations e) {
-			Assert.fail("Inventory lot, inventory transaction and stock transaction must be saved to the database");
-		}
-	}
-
-	@Test
-	public void testAddLotAndTransaction_NullListData() {
-		final InventoryDetails details = this.createInventoryDetailsTestData(1, 1, TEST_GID, TEST_LOCATION_ID, TEST_SCALE_ID);
-		final GermplasmListData listData = null;
-		final ListDataProject listDataProject = this.createListDataProjectTestData();
-
-		Mockito.doReturn(null)
-				.when(this.lotDAO)
-				.getByEntityTypeEntityIdsLocationIdAndScaleId(Mockito.anyString(), Matchers.anyListOf(Integer.class), Mockito.anyInt(),
-						Mockito.anyInt());
-
-		final Lot lot = this.createLotTestData(details);
-		Mockito.doReturn(lot)
-				.when(this.lotBuilder)
-				.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId(),
-					this.cropType, details.getInventoryID());
-		final Lot savedLot = new Lot();
-		savedLot.setId(1);
-		Mockito.doReturn(savedLot).when(this.lotDAO).saveOrUpdate(lot);
-
-		final Transaction transaction = this.createTransactionTestData(lot, listData, details);
-		Mockito.doReturn(transaction)
-				.when(this.transactionBuilder)
-				.buildForAdd(lot, 0, details.getAmount(), details.getUserId(), details.getPersonId(), details.getComment(), details.getSourceId(),
-						details.getBulkWith(), details.getBulkCompl());
-		final Transaction savedTransaction = new Transaction();
-		savedTransaction.setId(1);
-		Mockito.doReturn(savedTransaction).when(this.transactionDAO).saveOrUpdate(transaction);
-
-		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject, this.cropType);
-
-		try {
-			Mockito.verify(this.lotDAO).saveOrUpdate(lot);
-			Mockito.verify(this.transactionDAO).saveOrUpdate(transaction);
-			Mockito.verify(this.stockTransactionDAO).saveOrUpdate(Mockito.any(StockTransaction.class));
-		} catch (final TooLittleActualInvocations e) {
-			Assert.fail("Inventory lot, inventory transaction and stock transaction must be saved to the database");
-		}
-	}
-
-	private StockTransaction createStockTransactionTestData(final ListDataProject listDataProject, final Transaction transaction) {
-		final StockTransaction stockTransaction = new StockTransaction(null, listDataProject, transaction);
-		stockTransaction.setSourceRecordId(transaction.getSourceRecordId());
-		return stockTransaction;
-	}
-
-	private Transaction createTransactionTestData(final Lot lot, final GermplasmListData listData, final InventoryDetails details) {
-		final Transaction transaction =
-				new Transaction(null, details.getUserId(), lot, Util.getCurrentDate(),
-						TransactionStatus.PENDING.getIntValue(),
-						Double.valueOf(new DecimalFormat("#.000").format(details.getAmount())), details.getComment(), 0,
-						EntityType.LIST.name(), details.getSourceId(), listData == null ? 0 : listData.getId(), 0d, 1,
-						TransactionType.DEPOSIT.getId());
-
-		transaction.setBulkCompl(details.getBulkCompl());
-		transaction.setBulkWith(details.getBulkWith());
-
-		return transaction;
-	}
-
-	private Lot createLotTestData(final InventoryDetails details) {
-		return new Lot(null, details.getUserId(), EntityType.GERMPLSM.name(), details.getGid(), details.getLocationId(),
-				details.getScaleId(), LotStatus.ACTIVE.getIntValue(), 0, details.getComment(), details.getInventoryID());
-	}
-
-	private ListDataProject createListDataProjectTestData() {
-		final ListDataProject listDataProject = new ListDataProject();
-		return listDataProject;
-	}
-
-	private GermplasmListData createGermplasmListDataTestData() {
-		final GermplasmListData germplasmListData = new GermplasmListData();
-		germplasmListData.setId(1);
-		return germplasmListData;
-	}
 
 	private InventoryDetails createInventoryDetailsTestData(final Integer listId, final int listDataId, final Integer gid, final Integer locationId, final Integer scaleId) {
 		final InventoryDetails inventoryDetails = new InventoryDetails();
@@ -331,40 +182,6 @@ public class InventoryServiceImplTest {
 		inventoryDetails.setBulkCompl("SID1-2");
 		inventoryDetails.setPersonId(PERSON_ID);
 		return inventoryDetails;
-	}
-
-	@Test
-	public void testRetrieveInventoryDetailsForListDataProjectListId() throws MiddlewareQueryException {
-		final Integer listId = 1;
-		final List<InventoryDetails> expectedInventoryDetailsList = this.createInventoryDetailsListTestData(listId);
-		Mockito.doReturn(expectedInventoryDetailsList).when(this.stockTransactionDAO)
-				.retrieveInventoryDetailsForListDataProjectListId(listId);
-		final List<InventoryDetails> inventoryDetailsList = this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId);
-		for (final InventoryDetails inventoryDetails : inventoryDetailsList) {
-			Assert.assertEquals("All inventory details must be belong to the list with id " + listId, listId,
-					inventoryDetails.getSourceId());
-		}
-	}
-
-	private List<InventoryDetails> createInventoryDetailsListTestData(final Integer listId) {
-		final List<InventoryDetails> inventoryDetailsList = new ArrayList<>();
-		inventoryDetailsList.add(this.createInventoryDetailsTestData(listId, 1, TEST_GID, TEST_LOCATION_ID, TEST_SCALE_ID));
-		return inventoryDetailsList;
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testRetrieveInventoryDetailsForListDataProjectListId_WrongListType() throws MiddlewareQueryException {
-		final Integer listId = 1;
-		Mockito.doThrow(IllegalArgumentException.class).when(this.stockTransactionDAO)
-				.retrieveInventoryDetailsForListDataProjectListId(listId);
-		this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId);
-	}
-
-	@Test
-	public void testStockHasCompletedBulking() throws MiddlewareQueryException {
-		final Integer listId = 1;
-		Mockito.doReturn(true).when(this.stockTransactionDAO).stockHasCompletedBulking(listId);
-		Assert.assertEquals("Bulking of stocks should be completed", true, this.inventoryServiceImpl.stockHasCompletedBulking(listId));
 	}
 
 	@SuppressWarnings("unchecked")

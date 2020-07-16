@@ -40,13 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 
@@ -271,29 +265,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	public void testGetStockIdsByListDataProjectListId() throws MiddlewareQueryException {
 		final List<String> stockIds = this.manager.getStockIdsByListDataProjectListId(17);
 		Assert.assertNotNull(stockIds);
-	}
-
-	@Test
-	public void testUpdateInventory() throws MiddlewareQueryException {
-		final Integer listId = 17;
-		final List<InventoryDetails> inventoryDetailList = this.inventoryService.getInventoryListByListDataProjectListId(listId);
-		if (inventoryDetailList != null && !inventoryDetailList.isEmpty()) {
-			final InventoryDetails inventoryDetails = inventoryDetailList.get(0);
-			final Map<String, Object> originalData = this.getInventorySpecificDetails(inventoryDetails);
-			this.modifyInventoryDetails(inventoryDetails);
-			this.manager.updateInventory(listId, inventoryDetailList);
-			final InventoryDetails modifiedInventoryDetails = this.getModifiedInventoryDetails(originalData,
-							this.inventoryService.getInventoryListByListDataProjectListId(listId));
-			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_DUPLICATE, modifiedInventoryDetails.getDuplicate());
-			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_BULK_WITH, modifiedInventoryDetails.getBulkWith());
-			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_BULK_COMPL, modifiedInventoryDetails.getBulkCompl());
-			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_LOCATION_ID, modifiedInventoryDetails.getLocationId().intValue());
-			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_SCALE_ID, modifiedInventoryDetails.getScaleId().intValue());
-			Assert.assertEquals(0, modifiedInventoryDetails.getAmount().compareTo(InventoryDataManagerImplTestIT.TEST_AMOUNT));
-			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_COMMENT, modifiedInventoryDetails.getComment());
-			this.revertChangesToInventoryDetails(inventoryDetails, originalData);
-			this.manager.updateInventory(listId, inventoryDetailList);
-		}
 	}
 
 	private InventoryDetails getModifiedInventoryDetails(final Map<String, Object> data, final List<InventoryDetails> inventoryDetailList) {
