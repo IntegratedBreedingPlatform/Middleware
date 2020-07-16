@@ -496,22 +496,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 	}
 
-	public Integer getListDataListIDFromListDataProjectListID(final Integer listDataProjectListID) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
-			criteria.add(Restrictions.eq("id", listDataProjectListID));
-			criteria.setProjection(Projections.property("listRef"));
-
-			return (Integer) criteria.uniqueResult();
-		} catch (final HibernateException e) {
-			final String errorMessage = "Error with getListDataListIDFromListDataProjectListID(listDataProjectListID="
-					+ listDataProjectListID + ") query from GermplasmList: " + e.getMessage();
-			GermplasmListDAO.LOG.error(errorMessage);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-
-	}
-
 	// returns all the list of the program regardless of the type and status
 	@SuppressWarnings("unchecked")
 	public List<GermplasmList> getListsByProgram(final String programUUID) {

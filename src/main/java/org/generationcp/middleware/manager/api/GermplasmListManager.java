@@ -374,8 +374,6 @@ public interface GermplasmListManager {
 	 */
 	List<GermplasmListData> retrieveGermplasmListDataWithParents(Integer listID);
 
-	Integer retrieveDataListIDFromListDataProjectListID(Integer listDataProjectListID);
-
 	List<GermplasmList> getAllGermplasmListsByProgramUUID(String currentProgramUUID);
 
 	/**

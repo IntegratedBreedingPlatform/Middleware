@@ -227,41 +227,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	@Override
-	public List<String> getStockIdsByListDataProjectListId(final Integer listId) {
-		return this.daoFactory.getTransactionDAO().getStockIdsByListDataProjectListId(listId);
-	}
-
-	@Override
-	public Map<String, Double>  getStockIdsWithMultipleTransactions(final Integer listId) {
-		return this.daoFactory.getTransactionDAO().getStockIdsWithMultipleTransactions(listId);
-	}
-
-	@Override
-	public void updateInventory(final Integer listId, final List<InventoryDetails> inventoryDetailList) {
-
-
-		try {
-
-			final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
-			final GermplasmListType germplasmListType = GermplasmListType.valueOf(germplasmList.getType());
-			for (final InventoryDetails inventoryDetails : inventoryDetailList) {
-				final Lot lot = this.daoFactory.getLotDao().getById(inventoryDetails.getLotId());
-				lot.setLocationId(inventoryDetails.getLocationId());
-				lot.setScaleId(inventoryDetails.getScaleId());
-				this.daoFactory.getLotDao().saveOrUpdate(lot);
-				final org.generationcp.middleware.pojos.ims.Transaction transaction = this.getTransactionById(inventoryDetails.getTrnId());
-				transaction.setQuantity(Util.zeroIfNull(inventoryDetails.getAmount()));
-				transaction.setComments(Util.nullIfEmpty(inventoryDetails.getComment()));
-				this.daoFactory.getTransactionDAO().saveOrUpdate(transaction);
-			}
-
-		} catch (final Exception e) {
-
-			this.logAndThrowException("Error encountered while updating inventory " + "of list id " + listId + "." + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public Lot getLotById(final Integer id) {
 		return this.daoFactory.getLotDao().getById(id, false);
 	}

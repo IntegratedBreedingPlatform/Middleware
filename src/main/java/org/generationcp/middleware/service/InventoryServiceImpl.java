@@ -13,25 +13,17 @@
 package org.generationcp.middleware.service;
 
 
-import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.operation.builder.LotBuilder;
-import org.generationcp.middleware.operation.builder.TransactionBuilder;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.InventoryService;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,8 +36,6 @@ import java.util.regex.Pattern;
 @Transactional
 public class InventoryServiceImpl implements InventoryService {
 
-	private LotBuilder lotBuilder;
-	private TransactionBuilder transactionBuilder;
 	private DaoFactory daoFactory;
 
 	private static final Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
@@ -54,15 +44,10 @@ public class InventoryServiceImpl implements InventoryService {
 
 	}
 
-	@Resource
-	private UserService userService;
 
 	public InventoryServiceImpl(final HibernateSessionProvider sessionProvider) {
 
 		this.daoFactory = new DaoFactory(sessionProvider);
-		this.lotBuilder = new LotBuilder(sessionProvider);
-		this.transactionBuilder = new TransactionBuilder(sessionProvider);
-
 	}
 
 	@Override
@@ -76,55 +61,6 @@ public class InventoryServiceImpl implements InventoryService {
 		this.fillLocationDetails(inventoryDetails);
 		this.fillScaleDetails(inventoryDetails);
 		return inventoryDetails;
-	}
-
-	@Override
-	public List<InventoryDetails> getInventoryDetailsByGermplasmList(final Integer listId, final String germplasmListType) {
-		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
-		final List<GermplasmListData> listData = this.getGermplasmListData(germplasmList, germplasmListType);
-		return this.getInventoryDetailsList(germplasmList, listData);
-	}
-
-	private List<InventoryDetails> getInventoryDetailsList(final GermplasmList germplasmList, final List<GermplasmListData> listData) {
-		// Get recordIds in list
-		final List<Integer> recordIds = new ArrayList<Integer>();
-		for (final GermplasmListData datum : listData) {
-			if (datum != null) {
-				recordIds.add(datum.getId());
-			}
-		}
-		final List<InventoryDetails> inventoryDetails =
-				this.daoFactory.getTransactionDAO().getInventoryDetailsByTransactionRecordId(recordIds);
-		this.fillInventoryDetailList(inventoryDetails, germplasmList, listData);
-		this.fillLocationDetails(inventoryDetails);
-		this.fillScaleDetails(inventoryDetails);
-		this.fillUserDetails(inventoryDetails);
-		Collections.sort(inventoryDetails);
-		return inventoryDetails;
-	}
-
-	private void fillUserDetails(final List<InventoryDetails> inventoryDetails) {
-		// collect all used users
-		final Set<Integer> userIds = new HashSet<Integer>();
-		for (final InventoryDetails detail : inventoryDetails) {
-			final Integer userId = detail.getUserId();
-			if (userId != null) {
-				userIds.add(userId);
-			}
-		}
-		// get the user details from database
-
-		final Map<Integer, String> usersMap = new HashMap<Integer, String>();
-		if (!userIds.isEmpty()) {
-			usersMap.putAll(this.userService.getUserIDFullNameMap(new ArrayList<>(userIds)));
-		}
-
-		// set scale details of the inventory
-		for (final InventoryDetails detail : inventoryDetails) {
-			if (detail.getUserId() != null && usersMap.containsKey(detail.getUserId())) {
-				detail.setUserName(usersMap.get(detail.getUserId()));
-			}
-		}
 	}
 
 	private void fillScaleDetails(final List<InventoryDetails> inventoryDetails) {
@@ -180,51 +116,7 @@ public class InventoryServiceImpl implements InventoryService {
 		}
 	}
 
-	protected void fillInventoryDetailList(final List<InventoryDetails> detailList, final GermplasmList germplasmList,
-			final List<GermplasmListData> dataList) {
-		final List<GermplasmListData> forFill = new ArrayList<>();
 
-		final Map<Integer, List<InventoryDetails>> listDataIdToInventoryDetailsMap = new HashMap<>();
-
-		for (final InventoryDetails inventoryDetails : detailList) {
-		    final Integer recordId = inventoryDetails.getSourceRecordId();
-		  if (!listDataIdToInventoryDetailsMap.containsKey(recordId)) {
-			listDataIdToInventoryDetailsMap.put(recordId, Lists.<InventoryDetails>newArrayList());
-		  }
-		  listDataIdToInventoryDetailsMap.get(recordId).add(inventoryDetails);
-		}
-
-		for (final GermplasmListData germplasmListData : dataList) {
-			final List<InventoryDetails> inventoryDetails = listDataIdToInventoryDetailsMap.get(germplasmListData.getId());
-			if (inventoryDetails != null) {
-			  for(final InventoryDetails inventoryDetailsList: inventoryDetails) {
-				inventoryDetailsList.copyFromGermplasmListData(germplasmListData);
-				inventoryDetailsList.setSourceId(germplasmList.getId());
-				inventoryDetailsList.setSourceName(germplasmList.getName());
-			  }
-			} else {
-				forFill.add(germplasmListData);
-			}
-		}
-
-		for (final GermplasmListData data : forFill) {
-			final InventoryDetails detail = new InventoryDetails();
-			detail.copyFromGermplasmListData(data);
-			detail.setSourceId(germplasmList.getId());
-			detail.setSourceName(germplasmList.getName());
-			detailList.add(detail);
-		}
-	}
-
-	protected List<GermplasmListData> getGermplasmListData(final GermplasmList germplasmList, final String germplasmListType) {
-
-		Integer germplasmListId = germplasmList.getId();
-		if (germplasmList.getType() != null && germplasmList.getType().equalsIgnoreCase(germplasmListType)
-				&& !GermplasmListType.LST.toString().equals(germplasmListType)) {
-			germplasmListId = this.daoFactory.getGermplasmListDAO().getListDataListIDFromListDataProjectListID(germplasmListId);
-		}
-		return this.daoFactory.getGermplasmListDataDAO().getByListId(germplasmListId);
-	}
 
 	/**
 	 * This method gets the maximum notation number of the existing stock IDs. For example, if there are existing stock IDs: SID1-1, SID1-2,
@@ -286,12 +178,5 @@ public class InventoryServiceImpl implements InventoryService {
 		return null;
 	}
 
-	public void setLotBuilder(final LotBuilder lotBuilder) {
-		this.lotBuilder = lotBuilder;
-	}
-
-	public void setTransactionBuilder(final TransactionBuilder transactionBuilder) {
-		this.transactionBuilder = transactionBuilder;
-	}
 
 }

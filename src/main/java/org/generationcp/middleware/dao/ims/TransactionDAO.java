@@ -369,50 +369,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return query.list();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<String> getStockIdsByListDataProjectListId(final Integer listId) {
-		try {
-			final String sql =
-				" SELECT lot.stock_id " +
-				" FROM ims_lot lot " +
-				" INNER JOIN ims_transaction tran ON lot.lotid = tran.lotid " +
-				" INNER join listnms l ON l.listref = tran.sourceid " +
-				" WHERE sourceType = 'LIST'	AND lot.stock_id is not null AND l.listid =  :listId";
-			final Query query = this.getSession().createSQLQuery(sql).setParameter("listId", listId);
-			return query.list();
-		} catch (final Exception e) {
-			final String message = "Error with getStockIdsByListDataProjectListId(" + listId + ") query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<String, Double> getStockIdsWithMultipleTransactions(final Integer listId) {
-		final Map<String, Double> map = new HashMap<>();
-		try {
-			final String sql =
-				" SELECT lot.stock_id, trnqty " +
-					" FROM ims_lot lot " +
-					" INNER JOIN ims_transaction tran ON lot.lotid = tran.lotid " +
-					" INNER join listnms l ON l.listref = tran.sourceid " +
-					" WHERE sourceType = 'LIST'	AND lot.stock_id is not null AND l.listid =  :listId " +
-					" AND EXISTS (select 1 from ims_transaction tr WHERE tr.lotid = tran.lotid "
-					+ "  group by lotid having count(tr.trnid) > 1)";
-			final Query query = this.getSession().createSQLQuery(sql).setParameter("listId", listId);
-			final List<Object> results = query.list();
-			for (final Object obj : results) {
-				final Object[] row = (Object[]) obj;
-				map.put((String) row[0], (Double) row[1]);
-			}
-		} catch (final Exception e) {
-			final String message = "Error with getStockIdsWithMultipleTransactions(" + listId + ") query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return map;
-	}
-
 	public List<TransactionReportRow> getTransactionDetailsForLot(final Integer lotId) {
 
 		final List<TransactionReportRow> transactions = new ArrayList<>();

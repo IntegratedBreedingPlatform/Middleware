@@ -39,13 +39,6 @@ public interface InventoryService {
 	 */
 	List<InventoryDetails> getInventoryDetails(Integer studyId);
 
-	/**
-	 * Gets the inventory details by germplasm list.
-	 *
-	 * @param listId the list id
-	 * @return the inventory details by germplasm list
-	 */
-	List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId, String germplasmListType);
 
 	/**
 	 * This method gets the maximum notation number of the existing stock IDs. For example, if there are existing stock IDs: SID1-1, SID1-2,

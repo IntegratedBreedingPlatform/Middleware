@@ -536,11 +536,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public Integer retrieveDataListIDFromListDataProjectListID(final Integer listDataProjectListID) {
-		return this.daoFactory.getGermplasmListDAO().getListDataListIDFromListDataProjectListID(listDataProjectListID);
-	}
-
-	@Override
 	public List<GermplasmList> getGermplasmListByGIDandProgramUUID(
 		final Integer gid, final int start, final int numOfRows,
 		final String programUUID) {

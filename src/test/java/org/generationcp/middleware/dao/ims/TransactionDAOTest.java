@@ -109,11 +109,6 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		Assert.assertNotNull(lRecIDStockIDMap);
 	}
 
-	@Test
-	public void testGetStockIdsByListDataProjectListId() throws MiddlewareQueryException {
-		final List<String> stockIds = this.dao.getStockIdsByListDataProjectListId(17);
-		Assert.assertNotNull(stockIds);
-	}
 
 	@Test
 	public void testGetInventoryDetailsByTransactionRecordId() throws MiddlewareQueryException {
