@@ -470,7 +470,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME,
             GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME);
 
-        final Map<String, Boolean> filteredSortState = sortState.entrySet().stream().filter(map->germplasmTreeNode.contains(map.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final Map<String, Boolean> filteredSortState = sortState.entrySet().stream().filter(map->!germplasmTreeNode.contains(map.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         final StringBuilder sortingQuery = new StringBuilder();
         sortingQuery.append(" ORDER BY ");
