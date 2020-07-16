@@ -2,6 +2,7 @@ package org.generationcp.middleware.utils.test;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.StudyTypeDAO;
@@ -28,6 +29,7 @@ import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
@@ -74,6 +76,7 @@ public class IntegrationTestDataInitializer {
 	private SampleListDao sampleListDao;
 	private ProjectPropertyDao projectPropertyDao;
 	private StudyTypeDAO studyTypeDAO;
+	private NameDAO nameDAO;
 
 	private WorkbenchDaoFactory workbenchDaoFactory;
 	private DaoFactory daoFactory;
@@ -101,6 +104,8 @@ public class IntegrationTestDataInitializer {
 		this.userService = new UserServiceImpl(workbenchSessionProvider);
 		this.studyTypeDAO = new StudyTypeDAO();
 		this.studyTypeDAO.setSession(hibernateSessionProvider.getSession());
+		this.nameDAO = new NameDAO();
+		this.nameDAO.setSession(hibernateSessionProvider.getSession());
 	}
 
 	public DmsProject createStudy(final String name, final String description, final int studyTypeId) {
@@ -198,9 +203,20 @@ public class IntegrationTestDataInitializer {
 	}
 
 	public StockModel createTestStock(final DmsProject study, final ExperimentModel experimentModel) {
+		final StockModel stockModel = this.createTestStock(study);
+		experimentModel.setStock(stockModel);
+		return stockModel;
+
+	}
+
+	public StockModel createTestStock(final DmsProject study) {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		germplasm.setGid(null);
 		this.germplasmDao.save(germplasm);
+
+		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid());
+		germplasmName.setTypeId(2);
+		this.nameDAO.save(germplasmName);
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
@@ -211,10 +227,7 @@ public class IntegrationTestDataInitializer {
 		stockModel.setProject(study);
 
 		this.stockDao.saveOrUpdate(stockModel);
-		experimentModel.setStock(stockModel);
-
 		return stockModel;
-
 	}
 
 	public SampleList createTestSampleList(final String listName, final Integer userId) {
