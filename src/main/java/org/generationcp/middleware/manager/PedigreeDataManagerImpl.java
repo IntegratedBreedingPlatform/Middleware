@@ -639,10 +639,18 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		final Table<Integer, String, Optional<Germplasm>> table = HashBasedTable.create();
 		final Integer numberOfLevelsToTraverse = level + 1;//Not zero index
 		for(final Integer gid : gids) {
-			final GermplasmPedigreeTree root = this.generatePedigreeTree(gid, level, includeDerivativeLines);
+			final GermplasmPedigreeTree root = this.generatePedigreeTree(gid, numberOfLevelsToTraverse, includeDerivativeLines);
 			for (final GermplasmPedigreeTreeNode linkedNode : root.getRoot().getLinkedNodes()) {
-				final String columnName = table.isEmpty() ? ColumnLabels.FGID.getName() : ColumnLabels.MGID.getName();
-				table.put(gid, columnName, Optional.of(linkedNode.getGermplasm()));
+				if(table.row(gid).isEmpty()) {
+					table.put(gid, ColumnLabels.FGID.getName() , Optional.of(linkedNode.getGermplasm()));
+					table.put(gid, ColumnLabels.MGID.getName(), Optional.empty());
+				} else{
+					table.put(gid, ColumnLabels.MGID.getName() , Optional.of(linkedNode.getGermplasm()));
+				}
+			}
+			if(table.row(gid).isEmpty()) {
+				table.put(gid, ColumnLabels.FGID.getName(), Optional.empty());
+				table.put(gid, ColumnLabels.MGID.getName(), Optional.empty());
 			}
 		}
 		return table;
