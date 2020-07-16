@@ -814,7 +814,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		}
 
 		// Check if the list is in descending order
-		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
 
 	}
 
@@ -862,7 +862,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		}
 
 		// Check if the list is in descending order
-		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
 
 	}
 
@@ -958,7 +958,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		}
 
 		// Check if the list is in descending order
-		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
 
 	}
 
@@ -1458,34 +1458,19 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		} else {
 			Assert.assertTrue("Result germplasm should not contain Method Group", StringUtils.isEmpty(germplasm.getMethodGroup()));
 		}
-		if (propertyIds.contains(GermplasmSearchDAO.FEMALE_PARENT_ID)) {
-			Assert.assertEquals("Result germplasm should contain Female Parent ID", String.valueOf(femaleParentGID),
-					germplasm.getFemaleParentPreferredID());
-		} else {
-			Assert.assertTrue("Result germplasm should not contain Female Parent ID",
-					StringUtils.isEmpty(germplasm.getFemaleParentPreferredID()));
-		}
-		if (propertyIds.contains(GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME)) {
-			Assert.assertEquals("Result germplasm should contain Female Parent Preferred Name", femaleParentPreferredName.getNval(),
-					germplasm.getFemaleParentPreferredName());
-		} else {
-			Assert.assertTrue("Result germplasm should not contain Female Parent Preferred Name",
-					StringUtils.isEmpty(germplasm.getFemaleParentPreferredName()));
-		}
-		if (propertyIds.contains(GermplasmSearchDAO.MALE_PARENT_ID)) {
-			Assert.assertEquals("Result germplasm should contain Male Parent ID", String.valueOf(maleParentGID),
-					germplasm.getMaleParentPreferredID());
-		} else {
-			Assert.assertTrue("Result germplasm should not contain Male Parent ID",
-					StringUtils.isEmpty(germplasm.getMaleParentPreferredID()));
-		}
-		if (propertyIds.contains(GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME)) {
-			Assert.assertEquals("Result germplasm should contain Male Parent Preferred Name", maleParentPreferredName.getNval(),
-					germplasm.getMaleParentPreferredName());
-		} else {
-			Assert.assertTrue("Result germplasm should not contain Male Parent Preferred Name",
-					StringUtils.isEmpty(germplasm.getMaleParentPreferredName()));
-		}
+
+		Assert.assertTrue("Result germplasm should not contain Female Parent ID",
+			StringUtils.isEmpty(germplasm.getFemaleParentPreferredID()));
+
+		Assert.assertTrue("Result germplasm should not contain Female Parent Preferred Name",
+			StringUtils.isEmpty(germplasm.getFemaleParentPreferredName()));
+
+		Assert.assertTrue("Result germplasm should not contain Male Parent ID",
+			StringUtils.isEmpty(germplasm.getMaleParentPreferredID()));
+
+		Assert.assertTrue("Result germplasm should not contain Male Parent Preferred Name",
+			StringUtils.isEmpty(germplasm.getMaleParentPreferredName()));
+
 		if (propertyIds.contains(GermplasmSearchDAO.IMMEDIATE_SOURCE_GID)) {
 			Assert.assertEquals("Result germplasm should contain Immediate Source GID", String.valueOf(maleParentGID),
 					germplasm.getImmediateSourceGID());

@@ -464,9 +464,18 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             return "";
         }
 
+        //Excluding Parents Property from SQL
+        final List<String> germplasmTreeNode = Arrays.asList(GermplasmSearchDAO.MALE_PARENT_ID,
+            GermplasmSearchDAO.FEMALE_PARENT_ID,
+            GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME,
+            GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME);
+
+        final Map<String, Boolean> filteredSortState = sortState.entrySet().stream().filter(map->germplasmTreeNode.contains(map.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
         final StringBuilder sortingQuery = new StringBuilder();
         sortingQuery.append(" ORDER BY ");
-        for (final Map.Entry<String, Boolean> sortCondition : sortState.entrySet()) {
+        for (final Map.Entry<String, Boolean> sortCondition : filteredSortState.entrySet()) {
+
             final String order = sortCondition.getValue().equals(true) ? "ASC" : "DESC";
 
             if (attributeTypesMap.containsKey(sortCondition.getKey()) || nameTypesMap.containsKey(sortCondition.getKey())) {
@@ -644,5 +653,6 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
         return typesMap;
     }
+
 
 }
