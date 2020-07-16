@@ -141,8 +141,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
         // actual searching here
 
-        final Integer startingRow = germplasmSearchParameter.getStartingRow();
-        final Integer noOfEntries = germplasmSearchParameter.getNumberOfEntries();
+        final int startingRow = germplasmSearchParameter.getStartingRow();
+        final int noOfEntries = germplasmSearchParameter.getNumberOfEntries();
 
         try {
 
@@ -264,7 +264,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
         final Monitor countSearchForGermplasms = MonitorFactory.start("Method Started : countSearchForGermplasms ");
 
-        Integer searchResultsCount = 0;
+        int searchResultsCount = 0;
 
         final Set<Integer> gidSearchResults = this.retrieveGIDSearchResults(germplasmSearchParameter);
 
