@@ -11,12 +11,8 @@
 
 package org.generationcp.middleware.service.api;
 
-import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.workbench.CropType;
 
 import java.util.List;
 
