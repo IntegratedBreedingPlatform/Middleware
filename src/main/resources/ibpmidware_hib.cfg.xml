@@ -25,7 +25,6 @@
         
         <mapping class="org.generationcp.middleware.pojos.ims.Lot"/>
         <mapping class="org.generationcp.middleware.pojos.ims.Transaction"/>
-        <mapping class="org.generationcp.middleware.pojos.ims.StockTransaction"/>
         <mapping class="org.generationcp.middleware.pojos.ims.ExperimentTransaction"/>
 
 
