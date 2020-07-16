@@ -252,10 +252,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 				final org.generationcp.middleware.pojos.ims.Transaction transaction = this.getTransactionById(inventoryDetails.getTrnId());
 				transaction.setQuantity(Util.zeroIfNull(inventoryDetails.getAmount()));
 				transaction.setComments(Util.nullIfEmpty(inventoryDetails.getComment()));
-				if (GermplasmListType.isCrosses(germplasmListType)) {
-					transaction.setBulkWith(Util.nullIfEmpty(inventoryDetails.getBulkWith()));
-					transaction.setBulkCompl(Util.nullIfEmpty(inventoryDetails.getBulkCompl()));
-				}
 				this.daoFactory.getTransactionDAO().saveOrUpdate(transaction);
 			}
 
