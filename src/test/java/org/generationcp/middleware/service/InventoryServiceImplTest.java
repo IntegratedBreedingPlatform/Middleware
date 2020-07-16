@@ -186,44 +186,6 @@ public class InventoryServiceImplTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testGetInventoryDetailsByGermplasmList_Advanced() {
-		final Integer advanceListId = 2;
-		final Integer lstListId = 1;
-		final GermplasmList germplasmList = this.createGermplasmListTestData(advanceListId, GermplasmListType.ADVANCED.name());
-		final List<GermplasmListData> germplasmListDataList = this.createGermplasmListDataListTestData(germplasmList);
-		final List<Integer> germplasmListDataIDList = this.getAllGermplasmListDataIDs(germplasmListDataList);
-		final List<InventoryDetails> inventoryDetailsList = this.createInventoryDetailsListTestData(advanceListId, germplasmListDataIDList);
-		final List<Location> locationList = this.createLocationListTestData();
-		final List<CVTerm> scaleList = this.createScaleListTestData();
-		final Map<Integer, String> usernameList = this.createUsernameMapTestData();
-
-		Mockito.doReturn(germplasmList).when(this.germplasmListDAO).getById(advanceListId);
-		Mockito.doReturn(lstListId).when(this.germplasmListDAO).getListDataListIDFromListDataProjectListID(advanceListId);
-		Mockito.doReturn(germplasmListDataList).when(this.germplasmListDataDAO).getByListId(lstListId);
-		Mockito.doReturn(inventoryDetailsList).when(this.transactionDAO).getInventoryDetailsByTransactionRecordId(germplasmListDataIDList);
-		Mockito.doReturn(locationList).when(this.locationDAO).getByIds(Mockito.anyListOf(Integer.class));
-		Mockito.doReturn(scaleList).when(this.cvTermDAO).getByIds(Mockito.anyListOf(Integer.class));
-		Mockito.doReturn(usernameList).when(this.userService).getUserIDFullNameMap(Mockito.anyListOf(Integer.class));
-
-		final List<InventoryDetails> result = this.inventoryServiceImpl.getInventoryDetailsByGermplasmList(advanceListId);
-
-		Assert.assertNotNull(result);
-		Assert.assertEquals(NUM_OF_LISTDATA_RECORDS, result.size());
-		for (final InventoryDetails inventoryDetails : result) {
-			Assert.assertEquals("Inventory source name should be " + germplasmList.getName(), germplasmList.getName(),
-					inventoryDetails.getSourceName());
-			Assert.assertEquals("Inventory source id should be " + germplasmList.getId(), germplasmList.getId(),
-					inventoryDetails.getSourceId());
-			Assert.assertEquals("Location name should be " + TEST_LOCATION_NAME + inventoryDetails.getLocationId(), TEST_LOCATION_NAME
-					+ inventoryDetails.getLocationId(), inventoryDetails.getLocationName());
-			Assert.assertEquals("Scale name should be " + TEST_SCALE_NAME + inventoryDetails.getScaleId(), TEST_SCALE_NAME
-					+ inventoryDetails.getScaleId(), inventoryDetails.getScaleName());
-			Assert.assertEquals("User name must be " + TEST_FULLNAME, TEST_FULLNAME, inventoryDetails.getUserName());
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test
 	public void testGetInventoryDetailsByGermplasmList_Crosses() {
 		final Integer crossesId = 2;
 		final Integer lstListId = 1;

@@ -79,11 +79,6 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public List<InventoryDetails> getInventoryDetailsByGermplasmList(final Integer listId) {
-		return this.getInventoryDetailsByGermplasmList(listId, GermplasmListType.ADVANCED.name());
-	}
-
-	@Override
 	public List<InventoryDetails> getInventoryDetailsByGermplasmList(final Integer listId, final String germplasmListType) {
 		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
 		final List<GermplasmListData> listData = this.getGermplasmListData(germplasmList, germplasmListType);
