@@ -21,7 +21,7 @@
 			`nd_experiment_id` INT NULL,
 			`type` VARCHAR(45) NULL,
 			PRIMARY KEY (`germplasm_study_source_id`),
-			INDEX `asdasd_idx` (`project_id` ASC),
+			INDEX `germplasm_study_source_project_idx` (`project_id` ASC),
 			INDEX `FK_nd_experiment_id_idx` (`nd_experiment_id` ASC),
 			CONSTRAINT `FK_project_id_1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
 			CONSTRAINT `FK_nd_experiment_id_1` FOREIGN KEY (`nd_experiment_id`) REFERENCES `nd_experiment` (`nd_experiment_id`) ON DELETE NO ACTION ON UPDATE NO ACTION);
