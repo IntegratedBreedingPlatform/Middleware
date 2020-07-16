@@ -12,52 +12,17 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.api.CrossStudyDataManager;
-import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.MBDTDataManager;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.manager.api.PresetService;
-import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
-import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.TermDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.manager.api.*;
+import org.generationcp.middleware.manager.ontology.*;
+import org.generationcp.middleware.manager.ontology.api.*;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
-import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
-import org.generationcp.middleware.service.DataImportServiceImpl;
-import org.generationcp.middleware.service.FieldbookServiceImpl;
-import org.generationcp.middleware.service.InventoryServiceImpl;
-import org.generationcp.middleware.service.OntologyServiceImpl;
-import org.generationcp.middleware.service.ReportServiceImpl;
-import org.generationcp.middleware.service.api.DataImportService;
-import org.generationcp.middleware.service.api.FieldbookService;
-import org.generationcp.middleware.service.api.GermplasmGroupingService;
-import org.generationcp.middleware.service.api.GermplasmNamingReferenceDataResolver;
-import org.generationcp.middleware.service.api.InventoryService;
-import org.generationcp.middleware.service.api.KeySequenceRegisterService;
-import org.generationcp.middleware.service.api.OntologyService;
-import org.generationcp.middleware.service.api.PedigreeService;
-import org.generationcp.middleware.service.api.ReportService;
-import org.generationcp.middleware.service.api.SampleListService;
-import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.*;
+import org.generationcp.middleware.service.api.*;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -317,10 +282,6 @@ public class ManagerFactory implements Serializable {
 
 	public DatasetTypeService getDatasetTypeService() {
 		return new DatasetTypeServiceImpl(this.sessionProvider);
-	}
-
-	public ListDataProjectSaver getListDataProjectSaver() {
-		return new ListDataProjectSaver(this.sessionProvider);
 	}
 
 	public DerivedVariableService getDerivedVariableService() {

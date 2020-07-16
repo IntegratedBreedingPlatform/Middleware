@@ -200,12 +200,6 @@ public class DaoFactory {
 		return countryDAO;
 	}
 
-	public ListDataProjectDAO getListDataProjectDAO() {
-		final ListDataProjectDAO listDataProjectDAO = new ListDataProjectDAO();
-		listDataProjectDAO.setSession(this.sessionProvider.getSession());
-		return listDataProjectDAO;
-	}
-
 	public ProgramFavoriteDAO getProgramFavoriteDao() {
 		final ProgramFavoriteDAO programFavoriteDao = new ProgramFavoriteDAO();
 		programFavoriteDao.setSession(this.sessionProvider.getSession());

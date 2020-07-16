@@ -17,7 +17,6 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -25,7 +24,6 @@ import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -65,8 +63,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	private static final int TEST_GERMPLASM_LIST_USER_ID = 1;
 	private static final Integer STATUS_ACTIVE = 0;
-	private ListDataProjectSaver listDataProjectSaver;
-	private ListDataProjectDAO listDataProjectDAO;
 
 	@Autowired
 	private GermplasmListManager manager;
@@ -99,9 +95,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Before
 	public void setUpBefore() {
-		this.listDataProjectSaver = new ListDataProjectSaver(this.sessionProvder);
-		this.listDataProjectDAO = new ListDataProjectDAO();
-		this.listDataProjectDAO.setSession(this.sessionProvder.getSession());
 		final GermplasmListTestDataInitializer germplasmListTDI = new GermplasmListTestDataInitializer();
 		this.dataSetupTest = new DataSetupTest();
 		this.dataSetupTest.setDataImportService(this.dataImportService);
@@ -171,22 +164,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.dataManager);
-		}
-
-	}
-
-	@Test
-	public void testRetrieveSnapshotListDataWithParents() {
-
-		final GermplasmList list1 =
-				(this.createGermplasmListTestData());
-		this.saveGermplasmList(list1);
-		this.createSnapshotList(list1);
-
-		final List<ListDataProject> listDataProjects = this.manager.retrieveSnapshotListDataWithParents(list1.getId());
-		Assert.assertEquals(20, listDataProjects.size());
-		for(final ListDataProject listDataProject: listDataProjects) {
-			Assert.assertEquals(this.parentGermplasm.getGid(), listDataProject.getMaleGid());
 		}
 
 	}
@@ -431,18 +408,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testRetrieveSnapshotListData() {
-		final GermplasmList list1 =
-				(this.createGermplasmListTestData());
-		this.saveGermplasmList(list1);
-		this.createSnapshotList(list1);
-
-		final List<ListDataProject> listData = this.manager.retrieveSnapshotListData(list1.getId());
-		Assert.assertNotNull("It should not be null", listData);
-		Assert.assertFalse(listData.isEmpty());
-	}
-
-	@Test
 	public void testGetAllGermplasmListsByProgramUUID() {
 		final List<GermplasmList> germplasmLists =
 			this.manager.getAllGermplasmListsByProgramUUID(GermplasmListManagerImplTest.LIST_PROGRAM_UUID);
@@ -505,13 +470,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 			assertThat(null, is(equalTo(result)));
 		}
-
-		final List<ListDataProject> deletedListDataProjects = this.manager.retrieveSnapshotListData(this.listId);
-		for (final ListDataProject result : deletedListDataProjects) {
-
-			assertThat(null, is(equalTo(result)));
-		}
-
 	}
 
 	private List<ListDataProject> createListDataProject(final GermplasmList germplasmList, final Integer[] gids) {
@@ -526,7 +484,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 			listDataProject.setList(germplasmList);
 			listDataProject.setGermplasmId(gids[i-1]);
 			listDataProject.setEntryId(i);
-			list.add(this.listDataProjectDAO.save(listDataProject));
 		}
 
 		return list;

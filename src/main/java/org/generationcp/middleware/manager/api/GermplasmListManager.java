@@ -369,20 +369,6 @@ public interface GermplasmListManager {
 	 */
 	GermplasmListNewColumnsInfo getAdditionalColumnsForList(Integer listId);
 
-	long countListDataProjectGermplasmListDataByListId(Integer id);
-
-	/**
-	 * @param listID
-	 * @return
-	 */
-	List<ListDataProject> retrieveSnapshotListData(Integer listID);
-
-	/**
-	 * @param listID
-	 * @return
-	 */
-	List<ListDataProject> retrieveSnapshotListDataWithParents(Integer listID);
-
 	/**
 	 * @param listID
 	 * @return
