@@ -460,10 +460,6 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
     protected String addSortingColumns(final Map<String, Boolean> sortState, final Map<String, Integer> attributeTypesMap,
                                        final Map<String, Integer> nameTypesMap) {
-        if (sortState.isEmpty()) {
-            return "";
-        }
-
         //Excluding Parents Property from SQL
         final List<String> germplasmTreeNode = Arrays.asList(GermplasmSearchDAO.MALE_PARENT_ID,
             GermplasmSearchDAO.FEMALE_PARENT_ID,
@@ -471,6 +467,11 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME);
 
         final Map<String, Boolean> filteredSortState = sortState.entrySet().stream().filter(map->!germplasmTreeNode.contains(map.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        if (filteredSortState.isEmpty()) {
+            return "";
+        }
+
 
         final StringBuilder sortingQuery = new StringBuilder();
         sortingQuery.append(" ORDER BY ");
