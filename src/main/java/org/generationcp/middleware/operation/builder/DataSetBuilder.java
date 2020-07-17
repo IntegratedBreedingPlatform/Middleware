@@ -24,7 +24,6 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
@@ -205,7 +204,8 @@ public class DataSetBuilder extends Builder {
 		final VariableTypeList newList = new VariableTypeList();
 		if (variables != null && !variables.getVariableTypes().isEmpty()) {
 			for (final DMSVariableType variable : variables.getVariableTypes()) {
-				if (!PhenotypicType.DATASET.equals(variable.getStandardVariable().getPhenotypicType()) && !PhenotypicType.STUDY.equals(variable.getStandardVariable().getPhenotypicType())) {
+				if (!PhenotypicType.DATASET.equals(variable.getStandardVariable().getPhenotypicType()) &&
+					!PhenotypicType.STUDY.equals(variable.getStandardVariable().getPhenotypicType())) {
 					newList.add(variable);
 				}
 			}
