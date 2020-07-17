@@ -35,4 +35,11 @@ public enum PermissionsEnum {
 		+ ", 'MS_CREATE_PENDING_WITHDRAWALS'"
 		+ ", 'MS_MANAGE_OBSERVATION_UNITS'"
 		+ ", 'MS_CREATE_CONFIRMED_WITHDRAWALS')";
+
+	public static final String HAS_CREATE_LOTS_BATCH = " or hasAnyAuthority('ADMIN'"
+		+ ", 'BREEDING_ACTIVITIES'"
+		+ ", 'MANAGE_GERMPLASM'"
+		+ ", 'MG_MANAGE_INVENTORY'"
+		+ ", 'MG_CREATE_LOTS'"
+		+ ", 'CREATE_LOTS')";
 }

@@ -13,8 +13,6 @@ package org.generationcp.middleware.service;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.dao.NamingConfigurationDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementRowTestDataInitializer;
@@ -22,6 +20,7 @@ import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataI
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -29,11 +28,11 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
+import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Locdes;
@@ -44,7 +43,6 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.DatabaseBroker;
-import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -52,12 +50,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -81,12 +81,6 @@ public class FieldbookServiceImplTest {
 	SQLQuery query;
 
 	@Mock
-	Criteria criteria;
-
-	@Mock
-	LocationDAO locationDAO;
-
-	@Mock
 	LocationDataManager locationDataManager;
 
 	@Mock
@@ -102,7 +96,7 @@ public class FieldbookServiceImplTest {
 	private GermplasmGroupingService germplasmGroupingService;
 
 	@Mock
-	private NamingConfigurationDAO namingConfigurationDAO;
+	private WorkbookSaver workbookSaver;
 
 	private List<Pair<Germplasm, List<Name>>> germplasms;
 
@@ -120,6 +114,7 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.setLocationDataManager(this.locationDataManager);
 		this.fieldbookServiceImpl.setListDataProjectSaver(this.listDataProjectSaver);
 		this.fieldbookServiceImpl.setGermplasmListManager(this.germplasmListManager);
+		this.fieldbookServiceImpl.setWorkbookSaver(this.workbookSaver);
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
 		Mockito.doReturn(this.query).when(this.session).createSQLQuery(Matchers.anyString());
 		this.dbBroker.setSessionProvider(this.sessionProvider);
@@ -127,7 +122,7 @@ public class FieldbookServiceImplTest {
 		this.listDataItems = this.createListDataItems();
 		this.germplasmAttributes = this.createGermplasmAttributes();
 		when(this.locationDataManager.getLocationsByUniqueID(FieldbookServiceImplTest.PROGRAM_UUID))
-			.thenReturn(new ArrayList<Location>());
+			.thenReturn(new ArrayList<>());
 	}
 
 	@Test
@@ -199,7 +194,7 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.saveOrUpdateTrialDesignData(experimentPropertySaver, new ExperimentModel(), measurementData, termId);
 
 		Mockito.verify(experimentPropertySaver)
-			.saveOrUpdateProperty(Matchers.any(ExperimentModel.class), Matchers.eq(termId), Matchers.eq(cValueId));
+			.saveOrUpdateProperty(ArgumentMatchers.any(ExperimentModel.class), ArgumentMatchers.eq(termId), Matchers.eq(cValueId));
 
 	}
 
@@ -221,7 +216,7 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.saveOrUpdateTrialDesignData(experimentPropertySaver, new ExperimentModel(), measurementData, termId);
 
 		Mockito.verify(experimentPropertySaver)
-			.saveOrUpdateProperty(Matchers.any(ExperimentModel.class), Matchers.eq(termId), Matchers.eq(value));
+			.saveOrUpdateProperty(ArgumentMatchers.any(ExperimentModel.class), ArgumentMatchers.eq(termId), Matchers.eq(value));
 
 	}
 
@@ -235,11 +230,11 @@ public class FieldbookServiceImplTest {
 		originalGermplasmList.setId(originalListId);
 
 		this.fieldbookServiceImpl
-			.saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId, new ArrayList<ListDataProject>(),
+			.saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId, new ArrayList<>(),
 				userId);
 
 		Mockito.verify(this.listDataProjectSaver).saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId,
-			new ArrayList<ListDataProject>(), userId);
+			new ArrayList<>(), userId);
 
 	}
 
@@ -269,13 +264,21 @@ public class FieldbookServiceImplTest {
 
 	}
 
+	@Test
+	public void testSaveWorkbookVariablesAndObservations() throws ParseException {
+		final Workbook workbook = new Workbook();
+		this.fieldbookServiceImpl.saveWorkbookVariablesAndObservations(workbook);
+		Mockito.verify(this.workbookSaver).saveWorkbookVariables(workbook);
+		Mockito.verify(this.workbookSaver).removeDeletedVariablesAndObservations(workbook);
+	}
+
 	private List<Pair<Germplasm, List<Name>>> createGermplasms() {
 		final List<Pair<Germplasm, List<Name>>> germplasms = new ArrayList<>();
 		final Name name = new Name();
 		name.setNid(1);
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		final List<Name> names = Arrays.asList(name);
-		germplasms.add(new ImmutablePair<Germplasm, List<Name>>(germplasm, names));
+		germplasms.add(new ImmutablePair<>(germplasm, names));
 		return germplasms;
 	}
 
@@ -283,7 +286,7 @@ public class FieldbookServiceImplTest {
 		final List<Pair<Germplasm, GermplasmListData>> listDataItems = new ArrayList<>();
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		final GermplasmListData listData = new GermplasmListData();
-		listDataItems.add(new ImmutablePair<Germplasm, GermplasmListData>(germplasm, listData));
+		listDataItems.add(new ImmutablePair<>(germplasm, listData));
 		return listDataItems;
 	}
 
@@ -293,7 +296,7 @@ public class FieldbookServiceImplTest {
 		final Attribute attribute = new Attribute();
 		attribute.setAval("Plot Code");
 		attribute.setTypeId(1552);
-		attrs.add(new ImmutablePair<Germplasm, List<Attribute>>(germplasm, Lists.newArrayList(attribute)));
+		attrs.add(new ImmutablePair<>(germplasm, Lists.newArrayList(attribute)));
 		return attrs;
 	}
 }

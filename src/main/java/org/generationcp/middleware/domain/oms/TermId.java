@@ -164,6 +164,8 @@ public enum TermId {
 	//TODO : Should find a way not to hard code
 	, PROJECT_PREFIX(3001)
 	, HABITAT_DESIGNATION(3002)
+
+	, PERSON_ID(1901)
 	;
 
 	private final int id;

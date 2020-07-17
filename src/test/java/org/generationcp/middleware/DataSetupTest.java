@@ -323,6 +323,7 @@ public class DataSetupTest extends IntegrationTestBase {
         final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
         MeasurementRow row;
         List<MeasurementData> dataList;
+        Integer plotNumber = 1;
         for (int repNo = 1; repNo <= 2; repNo++) {
             for (int i = 0; i < DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
                 row = new MeasurementRow();
@@ -345,7 +346,7 @@ public class DataSetupTest extends IntegrationTestBase {
                 gidData.setMeasurementVariable(gidFactor);
                 dataList.add(gidData);
 
-                final MeasurementData plotData = new MeasurementData(plotFactor.getLabel(), String.valueOf(i));
+                final MeasurementData plotData = new MeasurementData(plotFactor.getLabel(), String.valueOf(plotNumber++));
                 plotData.setMeasurementVariable(plotFactor);
                 dataList.add(plotData);
 

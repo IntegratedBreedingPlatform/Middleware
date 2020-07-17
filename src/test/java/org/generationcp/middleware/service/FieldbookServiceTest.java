@@ -165,42 +165,5 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
 	}
 
-	@Test
-	public void testHasAdvancedOrCrossesListForAdvanced() {
-		Assert.assertFalse(this.fieldbookService.hasAdvancedOrCrossesList(this.studyReference.getId()));
-		final GermplasmList testList =
-			GermplasmListTestDataInitializer.createGermplasmListTestData("ADV LIST", FieldbookServiceTest.TEST_LIST_DESCRIPTION,
-				FieldbookServiceTest.TEST_GERMPLASM_LIST_DATE, GermplasmListType.ADVANCED.name(),
-				FieldbookServiceTest.TEST_GERMPLASM_LIST_USER_ID, FieldbookServiceTest.STATUS_ACTIVE, FieldbookServiceTest.PROGRAM_UUID,
-				this.studyReference.getId());
-		testList.setProjectId(this.studyReference.getId());
-		this.germplasmListDAO.saveOrUpdate(testList);
-		Assert.assertTrue(this.fieldbookService.hasAdvancedOrCrossesList(this.studyReference.getId()));
-	}
 
-	@Test
-	public void testHasAdvancedOrCrossesListForCreatedCrosses() {
-		Assert.assertFalse(this.fieldbookService.hasAdvancedOrCrossesList(this.studyReference.getId()));
-		final GermplasmList testList =
-			GermplasmListTestDataInitializer.createGermplasmListTestData("CREATED CROSSES", FieldbookServiceTest.TEST_LIST_DESCRIPTION,
-				FieldbookServiceTest.TEST_GERMPLASM_LIST_DATE, GermplasmListType.CRT_CROSS.name(),
-				FieldbookServiceTest.TEST_GERMPLASM_LIST_USER_ID, FieldbookServiceTest.STATUS_ACTIVE, FieldbookServiceTest.PROGRAM_UUID,
-				this.studyReference.getId());
-		testList.setProjectId(this.studyReference.getId());
-		this.germplasmListDAO.saveOrUpdate(testList);
-		Assert.assertTrue(this.fieldbookService.hasAdvancedOrCrossesList(this.studyReference.getId()));
-	}
-
-	@Test
-	public void testHasAdvancedOrCrossesListForImportedCrosses() {
-		Assert.assertFalse(this.fieldbookService.hasAdvancedOrCrossesList(this.studyReference.getId()));
-		final GermplasmList testList =
-			GermplasmListTestDataInitializer.createGermplasmListTestData("IMPORTED CROSSES", FieldbookServiceTest.TEST_LIST_DESCRIPTION,
-				FieldbookServiceTest.TEST_GERMPLASM_LIST_DATE, GermplasmListType.IMP_CROSS.name(),
-				FieldbookServiceTest.TEST_GERMPLASM_LIST_USER_ID, FieldbookServiceTest.STATUS_ACTIVE, FieldbookServiceTest.PROGRAM_UUID,
-				this.studyReference.getId());
-		testList.setProjectId(this.studyReference.getId());
-		this.germplasmListDAO.saveOrUpdate(testList);
-		Assert.assertTrue(this.fieldbookService.hasAdvancedOrCrossesList(this.studyReference.getId()));
-	}
 }
