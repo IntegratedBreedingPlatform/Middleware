@@ -110,18 +110,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	}
 
 
-	@Test
-	public void testGetInventoryDetailsByTransactionRecordId() throws MiddlewareQueryException {
-		final List<Integer> recordIds = new ArrayList<Integer>();
-		final List<GermplasmListData> listDataList = this.germplasmListDataDAO.getByListId(1);
-		for (final GermplasmListData germplasmListData : listDataList) {
-			recordIds.add(germplasmListData.getId());
-		}
-		final List<InventoryDetails> inventoryDetailsList = this.dao.getInventoryDetailsByTransactionRecordId(recordIds);
-		for (final InventoryDetails inventoryDetails : inventoryDetailsList) {
-			Assert.assertTrue(recordIds.contains(inventoryDetails.getSourceRecordId()));
-		}
-	}
+
 
 	@Test
 	public void testGetSimilarStockIdsEmptyListParam() {
