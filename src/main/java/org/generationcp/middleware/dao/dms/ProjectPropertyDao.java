@@ -162,27 +162,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getVariablesOfSiblingDatasets(final int datasetId) {
-		final List<Integer> ids;
-		try {
-			final String sql = "SELECT dprop.variable_id "
-					+ " FROM project ds "
-					+ " INNER JOIN project sib ON sib.study_id = ds.study_id AND sib.parent_project_id = ds.parent_project_id AND sib.project_id <> ds.project_id "
-					+ " INNER JOIN projectprop dprop ON dprop.project_id = sib.project_id " +
-					" WHERE ds.project_id = :datasetId";
-			final Query query = this.getSession().createSQLQuery(sql);
-			query.setParameter("datasetId", datasetId);
-			ids = query.list();
-
-		} catch (final HibernateException e) {
-			final String message = "Error in getVariablesOfSiblingDatasets(" + datasetId + ")";
-			ProjectPropertyDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return ids;
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<Integer> getDatasetVariableIdsForVariableTypeIds(final Integer projectId, final List<Integer> variableTypeIds,
 			final List<Integer> varIdsToExclude) {
 		final String mainSql = " SELECT variable_id " + " FROM projectprop pp " + " WHERE project_id = :projectId ";
