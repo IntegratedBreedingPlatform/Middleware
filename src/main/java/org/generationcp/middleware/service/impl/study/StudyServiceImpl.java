@@ -26,6 +26,7 @@ import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.*;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -73,8 +74,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private StudyMeasurements studyMeasurements;
 
-	private StudyGermplasmService studyGermplasmService;
-
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Resource
@@ -92,7 +91,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		super(sessionProvider);
 		final Session currentSession = this.getCurrentSession();
 		this.studyMeasurements = new StudyMeasurements(currentSession);
-		this.studyGermplasmService = new StudyGermplasmServiceImpl(sessionProvider);
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(),
 			this.getOntologyPropertyDataManager(), this.getOntologyScaleDataManager(), this.getFormulaService(), sessionProvider);
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
@@ -114,10 +112,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	 *
 	 * @param trialMeasurements
 	 */
-	StudyServiceImpl(final StudyMeasurements trialMeasurements,
-		final StudyGermplasmService studyGermplasmServiceImpl) {
+	StudyServiceImpl(final StudyMeasurements trialMeasurements) {
 		this.studyMeasurements = trialMeasurements;
-		this.studyGermplasmService = studyGermplasmServiceImpl;
 		this.daoFactory = new DaoFactory(this.sessionProvider);
 	}
 
@@ -213,8 +209,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public boolean hasAdvancedOrCrossesList(final int studyId) {
-		return this.daoFactory.getGermplasmListDAO().hasAdvancedOrCrossesList(studyId);
+	public boolean hasCrossesOrSelections(final int studyId) {
+		final GermplasmStudySourceSearchRequest searchParameters = new GermplasmStudySourceSearchRequest();
+		searchParameters.setStudyId(studyId);
+		return this.daoFactory.getGermplasmStudySourceDAO().countGermplasmStudySourceList(searchParameters) > 0;
 	}
 
 	@Override
@@ -307,7 +305,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public ObservationDto updataObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement) {
+	public ObservationDto updateObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement) {
 
 		final Session currentSession = this.getCurrentSession();
 		final Observations observations = new Observations(currentSession, this.ontologyVariableDataManager);
@@ -318,16 +316,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 			throw new MiddlewareQueryException(
 				"Unexpected error updating observations. Please contact support for " + "further assistence.", e); // or
 		}
-	}
-
-	@Override
-	public List<StudyGermplasmDto> getStudyGermplasmList(final Integer studyIdentifer) {
-		return this.studyGermplasmService.getGermplasm(studyIdentifer);
-	}
-
-	@Override
-	public List<StudyGermplasmDto> getStudyGermplasmListWithPlotInformation(final Integer studyIdentifer, final Set<Integer> plotNos) {
-		return this.studyGermplasmService.getGermplasmFromPlots(studyIdentifer, plotNos);
 	}
 
 	@Override

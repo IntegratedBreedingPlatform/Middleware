@@ -78,6 +78,7 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
+import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -1062,8 +1063,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			final StudySummary studySummary = new StudySummary();
 
 			studySummary.setActive(!dmsProject.isDeleted());
-			studySummary.setStartDate(dmsProject.getStartDate());
-			studySummary.setEndDate(dmsProject.getEndDate());
+			studySummary.setStartDate(Util.tryConvertDate(dmsProject.getStartDate(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
+			studySummary.setEndDate(Util.tryConvertDate(dmsProject.getEndDate(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
 
 			final Map<String, String> additionalProps = Maps.newHashMap();
 
