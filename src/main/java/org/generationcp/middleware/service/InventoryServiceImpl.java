@@ -154,29 +154,5 @@ public class InventoryServiceImpl implements InventoryService {
 		return currentMax;
 	}
 
-	/**
-	 * This method creates a new inventory lot, inventory transaction and stock transaction and save them in the database. An inventory lot
-	 * tracks individual entities, where an entity is stored, what units they are managed in, what quantities are in storage and what
-	 * quantities are available for use. Thus, it should be unique by entity id (ex. germplasm id), entity type (ex. germplasm if the
-	 * entities are seed stocks), location id (where the lot is stored) and scale id (scale in which quantities of entity are measured). An
-	 * inventory transaction tracks anticipated transactions (Deposit or Reserved), committed transactions (Stored or Retrieved) and
-	 * cancelled transactions made on inventory lots. On the other hand, an stock transaction tracks the inventory transaction made on
-	 * generated seed stock of a nursery/trial
-	 *
-	 */
-
-
-	@Override
-	public Lot getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(final String entityType, final Integer entityId,
-			final Integer locationId, final Integer scaleId) {
-		final List<Lot> lots =
-				this.daoFactory.getLotDao().getByEntityTypeEntityIdsLocationIdAndScaleId(entityType,
-						Arrays.asList(new Integer[] {entityId}), locationId, scaleId);
-		if (lots != null && !lots.isEmpty()) {
-			return lots.get(0);
-		}
-		return null;
-	}
-
 
 }

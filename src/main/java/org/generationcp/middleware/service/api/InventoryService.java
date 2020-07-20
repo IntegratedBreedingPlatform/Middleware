@@ -46,6 +46,4 @@ public interface InventoryService {
 	 * existing stock IDs with matching breeder identifier, 0 is returned.
 	 */
 	Integer getCurrentNotationNumberForBreederIdentifier(String breederIdentifier);
-
-	Lot getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(String entityType, Integer entityId, Integer locationId, Integer scaleId);
 }
