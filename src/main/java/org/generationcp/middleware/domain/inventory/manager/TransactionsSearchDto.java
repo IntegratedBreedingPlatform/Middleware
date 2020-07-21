@@ -35,10 +35,9 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	private Date createdDateTo;
 
 	private List<Integer> statusIds;
-
 	private Integer lotStatus;
-
 	private List<Integer> germplasmListIds;
+	private List<Integer> plantingStudyIds;
 
 	public List<Integer> getGermplasmListIds() {
 		return germplasmListIds;
@@ -46,6 +45,14 @@ public class TransactionsSearchDto extends SearchRequestDto {
 
 	public void setGermplasmListIds(final List<Integer> germplasmListIds) {
 		this.germplasmListIds = germplasmListIds;
+	}
+
+	public List<Integer> getPlantingStudyIds() {
+		return this.plantingStudyIds;
+	}
+
+	public void setPlantingStudyIds(final List<Integer> plantingStudyIds) {
+		this.plantingStudyIds = plantingStudyIds;
 	}
 
 	public String getDesignation() {
