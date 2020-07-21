@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="cuenyad" id="v15.4.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(*) FROM permission
+				where name = 'UPDATE_PENDING_TRANSACTIONS'
+            </sqlCheck>
+        </preConditions>
+        <comment>Rename update pending transactions permission by import transaction updates</comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE permission
+			SET
+				name = 'IMPORT_TRANSACTION_UPDATES',
+				description = 'Import Transaction Updates'
+			WHERE
+				name = 'UPDATE_PENDING_TRANSACTIONS'
+		</sql>
+    </changeSet>
+
+</databaseChangeLog>
