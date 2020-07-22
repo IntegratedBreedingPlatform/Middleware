@@ -19,6 +19,9 @@ import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
+import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.*;
@@ -26,6 +29,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -42,6 +46,8 @@ import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.*;
+import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -96,6 +102,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private TrialEnvironmentBuilder trialEnvironmentBuilder;
 
+	private CVTermRelationshipDao cvTermRelationshipDao;
+
+	private ProjectPropertyDao projectPropDao;
+
 	private Project commonTestProject;
 
 	private static CrossExpansionProperties crossExpansionProperties;
@@ -137,6 +147,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		this.manager.setDataSetBuilder(this.datasetBuilder);
 		this.manager.setTrialEnvironmentBuilder(this.trialEnvironmentBuilder);
+
+
+		this.projectPropDao = new ProjectPropertyDao();
+		this.projectPropDao.setSession(this.sessionProvder.getSession());
+		this.cvTermRelationshipDao = new CVTermRelationshipDao();
+		this.cvTermRelationshipDao.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -1067,6 +1083,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Add new study with 2 environments assigned new location IDs
 		final StudyReference newStudy = this.studyTDI.addTestStudy();
 		final Integer studyId = newStudy.getId();
+
 		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Random random = new Random();
 		final String location1 = String.valueOf(random.nextInt());
@@ -1108,4 +1125,55 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(this.manager.isStudy(mainFolder.getProjectId()));
 	}
 
+	@Test
+	public void testFindPagedProjectsWithCategoricalVariable() {
+		// Create project record
+		final DmsProject project = new DmsProject();
+		final String programUUID = "74364-9075-asdhaskj-74825";
+		final String locationNameIdValue = "999999";
+		project.setName("projectName");
+		project.setDescription("projectDescription");
+		project.setProgramUUID(programUUID);
+
+		this.manager.getDmsProjectDao().save(project);
+
+		final CVTerm categoricalScale = CVTermTestDataInitializer.createTerm("Categorical Scale", CvId.SCALES.getId());
+		final CVTerm variable1 = CVTermTestDataInitializer.createTerm("Categorical Option", CvId.SCALES.getId());
+		final CVTerm choice1 = CVTermTestDataInitializer.createTerm("Option 1", 2030);
+
+		final CVTermRelationship scaleRelationShip = new CVTermRelationship();
+		scaleRelationShip.setSubjectId(categoricalScale.getCvTermId());
+		scaleRelationShip.setObjectId(TermId.CATEGORICAL_VARIABLE.getId());
+		scaleRelationShip.setTypeId(TermId.HAS_TYPE.getId());
+		this.cvTermRelationshipDao.save(scaleRelationShip);
+
+		final CVTermRelationship variable1Scale = new CVTermRelationship();
+		variable1Scale.setSubjectId(variable1.getCvTermId());
+		variable1Scale.setObjectId(categoricalScale.getCvTermId());
+		variable1Scale.setTypeId(TermId.HAS_SCALE.getId());
+		this.cvTermRelationshipDao.save(variable1Scale);
+
+		this.saveProjectVariableWithValue(project, variable1, 1, VariableType.STUDY_DETAIL, choice1.getCvTermId().toString());
+
+		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
+		final Map<StudyFilters, String> map = new HashMap<>();
+		map.put(StudyFilters.PROGRAM_ID, project.getProgramUUID());
+		List<StudySummary> studies = this.manager.findPagedProjects(map, 10, 1);
+		Assert.assertEquals(1, studies.size());
+		for (StudySummary studySummary : studies) {
+			Assert.assertEquals(programUUID, studySummary.getProgramDbId());
+			Assert.assertEquals(1, studySummary.getOptionalInfo().size());
+		}
+	}
+
+	private ProjectProperty saveProjectVariableWithValue(final DmsProject project, final CVTerm variable, final int rank, final VariableType variableType, final String value) {
+		final ProjectProperty property1 = new ProjectProperty();
+		property1.setAlias(RandomStringUtils.randomAlphabetic(20));
+		property1.setRank(rank);
+		property1.setTypeId(variableType.getId());
+		property1.setProject(project);
+		property1.setVariableId(variable.getCvTermId());
+		property1.setValue(value);
+		return this.projectPropDao.save(property1);
+	}
 }
