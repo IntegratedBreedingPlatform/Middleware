@@ -87,10 +87,10 @@
 			</sqlCheck>
 		</preConditions>
 		<COMMENT>ADD location ID 6000 AND SET AS DEFAULT</COMMENT>
-		<SQL dbms="mysql" splitStatements="true">
+		<SQL dbms="mysql">
 			INSERT INTO location (`locid`, `ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`, `program_uuid`) VALUES
-(6000,1500,0,'Default Seed Store','DSS',0,0,0,0,0,0,NULL),
-(6001,410,0,'Default Breeding Location','DBL',0,0,0,0,0,0,NULL);
+			(6000,1500,0,'Default Seed Store','DSS',0,0,0,0,0,0,NULL),
+			(6001,410,0,'Default Breeding Location','DBL',0,0,0,0,0,0,NULL);
 		</SQL>
 	</changeSet>
 
@@ -116,6 +116,19 @@
 	</SQL>
 	</changeSet>
 	
+	<changeSet id="v15.4.0-4" author="rowena">
+	<preConditions onFail="CONTINUE">
+		<sqlCheck expectedResult="1">
+			SELECT COUNT(1) FROM udflds u WHERE  fcode = "ANCEST";
+		</sqlCheck>
+	</preConditions>
 
+	<COMMENT>SET </COMMENT>
+
+        <SQL dbms="mysql">
+		UPDATE udflds SET fcode  = "ANCEST_DATA" WHERE fcode = "ANCEST" AND ftable = "ATRIBUTS" AND fldno>1551;
+	</SQL>
+	</changeSet>
+	
 
 </databaseChangeLog>
