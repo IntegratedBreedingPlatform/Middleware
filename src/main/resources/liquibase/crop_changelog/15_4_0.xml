@@ -1,4 +1,4 @@
-<?xml version=1.1 encoding=UTF-8 standalone=no?>
+<?xml VERSION=1.1 encoding=UTF-8 standalone=NO?>
 <databaseChangeLog xmlns=http://www.liquibase.org/xml/ns/dbchangelog
 				   xmlns:xsi=http://www.w3.org/2001/XMLSchema-instance
 				   xsi:schemaLocation=http://www.liquibase.org/xml/ns/dbchangelog
@@ -7,7 +7,7 @@
 	<changeSet author=corina id=v15.4.0-1>
 		<preConditions onFail=MARK_RAN>
 			<sqlCheck expectedResult=1>
-				select count(*) from cvtermprop where `value`='Study Detail' and type_id=1800 and cvterm_id in (8583 	,
+				SELECT COUNT(*) FROM cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583 	,
 8584 	,
 8265 	,
 8690 	,
@@ -39,9 +39,9 @@
 8186);
 			</sqlCheck>
 		</preConditions>
-		<comment> Remove Study Detail as default type for environment-level/plot-level variables. IBP-3889
-		</comment>
-		<sql dbms=mysql splitStatements=true>
+		<COMMENT> REMOVE Study Detail AS DEFAULT TYPE FOR environment-LEVEL/plot-LEVEL variables. IBP-3889
+		</COMMENT>
+		<SQL dbms=mysql splitStatements=TRUE>
 			SET FOREIGN_KEY_CHECKS=0;
 
 			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8782'; 
@@ -77,7 +77,45 @@
 			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8068';
 
 		       SET FOREIGN_KEY_CHECKS=1;
-		</sql>
+		</SQL>
 	</changeSet>
+	
+	<changeSet id="v15.4.0-2" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM cvterm WHERE cvterm_id = 6000;
+			</sqlCheck>
+		</preConditions>
+		<COMMENT>ADD location ID 6000 AND SET AS DEFAULT</COMMENT>
+		<SQL dbms="mysql" splitStatements="true">
+			INSERT INTO location (`locid`, `ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`, `program_uuid`) VALUES
+(6000,1500,0,'Default Seed Store','DSS',0,0,0,0,0,0,NULL),
+(6001,410,0,'Default Breeding Location','DBL',0,0,0,0,0,0,NULL);
+		</SQL>
+	</changeSet>
+
+	<changeSet id="v15.4.0-3" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<AND>
+			<columnExists tableName="location" columnName="ldefault"/>
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(1) FROM location l
+				WHERE l.ldefault = 1 AND l.ltype = 
+				(SELECT u.fldno FROM udflds u WHERE u.ftable='LOCATION' AND u.ftype='LTYPE' AND fcode='SSTORE')
+			</sqlCheck>
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1) FROM location WHERE locid=6000 AND AND ltype = 1500;
+			</sqlCheck>
+			</AND>
+	</preConditions>
+
+	<COMMENT>SET DSS AS DEFAULT STORAGE location</COMMENT>
+
+        <SQL dbms="mysql">
+		UPDATE location SET ldefault = 1 WHERE locid=6000;
+	</SQL>
+	</changeSet>
+	
+
 
 </databaseChangeLog>
