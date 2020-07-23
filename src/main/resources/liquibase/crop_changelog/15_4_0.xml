@@ -1,0 +1,138 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="darla" id="v15.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<tableExists tableName="ims_stock_transaction_bkp"/>
+				</not>
+				<tableExists tableName="ims_stock_transaction"/>
+			</and>
+		</preConditions>
+		<comment>
+			Backup contents of then drop ims_stock_transaction table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `ims_stock_transaction_bkp` (
+				`id` int(11) NOT NULL AUTO_INCREMENT,
+				`source_id` int(11) DEFAULT NULL,
+				`trnid` int(11) NOT NULL,
+				`recordid` int(11) DEFAULT NULL,
+				`listdata_project_id` int(11) DEFAULT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+			INSERT INTO ims_stock_transaction_bkp
+			SELECT * FROM ims_stock_transaction;
+
+			DROP TABLE ims_stock_transaction;
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="darla" id="v15.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<tableExists tableName="listdata_project_bkp"/>
+				</not>
+				<tableExists tableName="listdata_project"/>
+			</and>
+		</preConditions>
+		<comment>
+			Backup contents then drop listdata_project table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `listdata_project_bkp` (
+				`listdata_project_id` int(11) NOT NULL AUTO_INCREMENT,
+				`list_id` int(11) NOT NULL,
+				`germplasm_id` int(11) NOT NULL DEFAULT '0',
+				`check_type` int(11) NOT NULL DEFAULT '0',
+				`entry_id` int(11) NOT NULL DEFAULT '0',
+				`entry_code` varchar(47) NOT NULL DEFAULT '-',
+				`seed_source` varchar(255) NOT NULL DEFAULT '-',
+				`designation` varchar(255) NOT NULL DEFAULT '-',
+				`group_name` varchar(255) NOT NULL DEFAULT '-',
+				`duplicate_notes` varchar(600) DEFAULT NULL,
+				`crossing_date` int(11) DEFAULT NULL,
+				`notes` varchar(200) DEFAULT NULL,
+				PRIMARY KEY (`listdata_project_id`)
+			) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
+
+			INSERT INTO listdata_project_bkp
+			SELECT * FROM listdata_project;
+
+			DROP TABLE listdata_project;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v15.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<tableExists tableName="listnms_bkp"/>
+				</not>
+				<tableExists tableName="listdata_project_bkp"/>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 0
+					  FROM listnms
+					 WHERE EXISTS (SELECT 1 FROM listdata_project_bkp ldp where ldp.list_id = listnms.listid);
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Backup then delete remaining snapshot lists
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `listnms_bkp` (
+				`listid` int(11) NOT NULL AUTO_INCREMENT,
+				`listname` varchar(50) NOT NULL DEFAULT '-',
+				`listdate` int(11) NOT NULL DEFAULT '0',
+				`listtype` varchar(10) NOT NULL DEFAULT 'LST',
+				`listuid` int(11) NOT NULL DEFAULT '0',
+				`listdesc` varchar(255) NOT NULL DEFAULT '-',
+				`lhierarchy` int(11) DEFAULT '0',
+				`liststatus` int(11) DEFAULT '1',
+				`sdate` int(11) DEFAULT NULL,
+				`edate` int(11) DEFAULT NULL,
+				`listlocn` int(11) DEFAULT NULL,
+				`listref` int(11) DEFAULT NULL,
+				`projectid` int(11) DEFAULT '0',
+				`program_uuid` varchar(36) DEFAULT NULL,
+				`notes` text,
+			PRIMARY KEY (`listid`)
+			) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8;
+
+			INSERT INTO listnms_bkp
+			SELECT *
+			  FROM listnms
+			 WHERE EXISTS (SELECT 1 FROM listdata_project_bkp ldp where ldp.list_id = listnms.listid);
+
+			DELETE FROM listnms
+			 WHERE EXISTS (SELECT 1 FROM listdata_project_bkp ldp where ldp.list_id = listnms.listid);
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v15.4.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 0
+				  FROM udflds
+				 WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' AND fcode = 'ADVANCED';
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Remove ADVANCED list type from udflds table. It was being filtered out before when showing available list types
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM udflds
+			 WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' AND fcode = 'ADVANCED';
+		</sql>
+	</changeSet>
+
+
+</databaseChangeLog>
