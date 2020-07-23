@@ -107,26 +107,36 @@ class ObservationQuery {
 			+ "     INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
 			+ "		WHERE ndep.nd_experiment_id = nde.nd_experiment_id " //
 			+ "		AND ispcvt.name = 'BLOCK_NO') AS BLOCK_NO, " //
-			+ "	  (SELECT  ("
+			+ "	  (SELECT "
+			+ "		(CASE WHEN (SELECT COUNT(*) FROM nd_experimentprop prop INNER JOIN cvterm_relationship crelprop ON crelprop.subject_id = prop.type_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2170 ) > 1 " //2170 = Row in Layout
+			+ "		 THEN 'TBD' "
+			+ "		 ELSE (SELECT  ("
 			+ "				CASE WHEN scaletype.object_id = " + TermId.CATEGORICAL_VARIABLE.getId() //Identify if variable is categorical
 			+ "				THEN (SELECT val.name from cvterm val WHERE val.cvterm_id = ndep.value) "//Using the name of the cvterm instead of the definition same as displayed in observation table
 			+ "				ELSE ndep.value END"
 			+ "				)"
-			+ "		FROM  nd_experimentprop ndep " //
-			+ "     INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
-			+ "		INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = ispcvt.cvterm_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2170 "//2170 = Row in Layout
-			+ "     LEFT JOIN (SELECT scale.object_id as object_id, relation.subject_id as subject_id FROM cvterm_relationship relation INNER JOIN cvterm_relationship scale ON scale.subject_id = relation.object_id AND scale.type_id = "+TermId.HAS_TYPE.getId()+" WHERE relation.type_id = "+TermId.HAS_SCALE.getId()+" ) scaletype ON scaletype.subject_id = ispcvt.cvterm_id "
-			+ "     WHERE ndep.nd_experiment_id = nde.nd_experiment_id) AS ROW, " //
-			+ "	  (SELECT  ("
+			+ "			   FROM  nd_experimentprop ndep " //
+			+ "     	   INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
+			+ "			   INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = ispcvt.cvterm_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2170 "//2170 = Row in Layout
+			+ "     	   LEFT JOIN (SELECT scale.object_id as object_id, relation.subject_id as subject_id FROM cvterm_relationship relation INNER JOIN cvterm_relationship scale ON scale.subject_id = relation.object_id AND scale.type_id = "+TermId.HAS_TYPE.getId()+" WHERE relation.type_id = "+TermId.HAS_SCALE.getId()+" ) scaletype ON scaletype.subject_id = ispcvt.cvterm_id "
+			+ "     	   WHERE ndep.nd_experiment_id = nde.nd_experiment_id ) END"
+			+ "		) "
+			+ "	  ) ROW,"//
+			+ "	  (SELECT "
+			+ "		(CASE WHEN (SELECT COUNT(*) FROM nd_experimentprop prop INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = prop.type_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2180 ) > 1 "//2180 = Column in layout
+			+ "		THEN 'TBD' "
+			+ "		ELSE (SELECT  ("
 			+ "				CASE WHEN scaletype.object_id = " + TermId.CATEGORICAL_VARIABLE.getId() //Identify if variable is categorical
 			+ "				THEN (SELECT val.name from cvterm val WHERE val.cvterm_id = ndep.value) "//Using the name of the cvterm instead of the definition same as displayed in observation table
 			+ "				ELSE ndep.value END"
 			+ "				)"
-			+ "		FROM    nd_experimentprop ndep" //
-			+ "   INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
-			+ "	  INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = ispcvt.cvterm_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id = 2180"//2180 = Column in layout
-			+ "   LEFT JOIN (SELECT scale.object_id as object_id, relation.subject_id as subject_id FROM cvterm_relationship relation INNER JOIN cvterm_relationship scale ON scale.subject_id = relation.object_id AND scale.type_id = "+TermId.HAS_TYPE.getId()+" WHERE relation.type_id = "+TermId.HAS_SCALE.getId()+" ) scaletype ON scaletype.subject_id = ispcvt.cvterm_id "
-			+ "   WHERE ndep.nd_experiment_id = nde.nd_experiment_id) AS COL, " //
+			+ "			FROM    nd_experimentprop ndep" //
+			+ "   		INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
+			+ "	  		INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = ispcvt.cvterm_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id = 2180"//2180 = Column in layout
+			+ "   		LEFT JOIN (SELECT scale.object_id as object_id, relation.subject_id as subject_id FROM cvterm_relationship relation INNER JOIN cvterm_relationship scale ON scale.subject_id = relation.object_id AND scale.type_id = "+TermId.HAS_TYPE.getId()+" WHERE relation.type_id = "+TermId.HAS_SCALE.getId()+" ) scaletype ON scaletype.subject_id = ispcvt.cvterm_id "
+			+ "   		WHERE ndep.nd_experiment_id = nde.nd_experiment_id) END"
+			+ "		)"
+			+ "	   ) COL," //
 			+ "	 (SELECT l.locid  " //
 			+ " 	FROM nd_geolocationprop gp " //
 			+ "     INNER JOIN location l ON l.locid = gp.value  " //
