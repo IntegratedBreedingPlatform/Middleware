@@ -1367,4 +1367,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	void setTrialEnvironmentBuilder(final TrialEnvironmentBuilder trialEnvironmentBuilder) {
 		this.trialEnvironmentBuilder = trialEnvironmentBuilder;
 	}
+
+	void setVariableDataManager(final OntologyVariableDataManager ontologyVariableDataManager) {
+		this.variableDataManager = ontologyVariableDataManager;
+	}
 }
