@@ -643,6 +643,17 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					+ " and lot.etype = 'GERMPLSM' ");
 				paramBuilder.setParameterList("germplasmListIds", germplasmListIds);
 			}
+
+			final List<Integer> plantingStudyIds = transactionsSearchDto.getPlantingStudyIds();
+			if (plantingStudyIds != null && !plantingStudyIds.isEmpty()) {
+				paramBuilder.append(" and exists(select 1 \n" //
+					+ " from project study_filter_p \n" //
+					+ "	    inner join project study_filter_plotdata on study_filter_p.project_id = study_filter_plotdata.study_id \n" //
+					+ "     inner join nd_experiment study_filter_nde on study_filter_plotdata.project_id = study_filter_nde.project_id \n"
+					+ "     inner join ims_experiment_transaction study_filter_iet on study_filter_nde.nd_experiment_id = study_filter_iet.nd_experiment_id \n"
+					+ " where study_filter_p.project_id in (:plantingStudyIds) and study_filter_iet.trnid = tr.trnid)"); //
+				paramBuilder.setParameterList("plantingStudyIds", plantingStudyIds);
+			}
 		}
 	}
 

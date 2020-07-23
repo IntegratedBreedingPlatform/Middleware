@@ -34,7 +34,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "g.gdate as `germplasmDate`,\n"
 		+ "count(lot.lotid) as `numberOfLots` "
 		+ "FROM germplasm_study_source gss \n"
-		+ "INNER JOIN germplsm g ON g.gid = gss.gid\n"
+		+ "INNER JOIN germplsm g ON g.gid = gss.gid and g.deleted = 0 AND g.grplce = 0 \n"
 		+ "INNER JOIN project p ON p.project_id = gss.project_id\n"
 		+ "LEFT JOIN nd_experiment e ON e.nd_experiment_id = gss.nd_experiment_id\n"
 		+ "LEFT JOIN nd_experimentprop rep_no ON rep_no.nd_experiment_id = e.nd_experiment_id AND rep_no.type_id = " + TermId.REP_NO.getId()
