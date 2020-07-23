@@ -11,7 +11,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -21,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -81,6 +81,12 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
     private static final int LOT_INDEX = 5;
     private static final int AVAIL_BALANCE_INDEX = 6;
     private static final Map<String, String> selectClauseColumnsMap = new HashMap<>();
+
+    //Excluding Parents Property from SQL
+    private static final List<String> GERMPLASM_TREE_NODE_PROPERTY_IDS = Collections.unmodifiableList(Arrays.asList(GermplasmSearchDAO.MALE_PARENT_ID,
+        GermplasmSearchDAO.FEMALE_PARENT_ID,
+        GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME,
+        GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME));
 
     static {
 
@@ -173,13 +179,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             query.addScalar(GermplasmSearchDAO.METHOD_NAME);
             query.addScalar(GermplasmSearchDAO.LOCATION_NAME);
 
-            //Excluding Parents Property from SQL
-            final List<String> germplasmTreeNode = Arrays.asList(GermplasmSearchDAO.MALE_PARENT_ID,
-                GermplasmSearchDAO.FEMALE_PARENT_ID,
-                GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME,
-                GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME);
-
-            final List<String> filteredProperty = germplasmSearchParameter.getAddedColumnsPropertyIds().stream().filter(s -> !germplasmTreeNode.contains(s)).collect(Collectors.toList());
+            final List<String> filteredProperty = germplasmSearchParameter.getAddedColumnsPropertyIds().stream().filter(s -> !this.GERMPLASM_TREE_NODE_PROPERTY_IDS.contains(s)).collect(Collectors.toList());
             for (final String propertyId : filteredProperty) {
                     query.addScalar(propertyId);
             }
@@ -460,13 +460,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
     protected String addSortingColumns(final Map<String, Boolean> sortState, final Map<String, Integer> attributeTypesMap,
                                        final Map<String, Integer> nameTypesMap) {
-        //Excluding Parents Property from SQL
-        final List<String> germplasmTreeNode = Arrays.asList(GermplasmSearchDAO.MALE_PARENT_ID,
-            GermplasmSearchDAO.FEMALE_PARENT_ID,
-            GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME,
-            GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME);
 
-        final Map<String, Boolean> filteredSortState = sortState.entrySet().stream().filter(map->!germplasmTreeNode.contains(map.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final Map<String, Boolean> filteredSortState = sortState.entrySet().stream().filter(map->!this.GERMPLASM_TREE_NODE_PROPERTY_IDS.contains(map.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         if (filteredSortState.isEmpty()) {
             return "";
