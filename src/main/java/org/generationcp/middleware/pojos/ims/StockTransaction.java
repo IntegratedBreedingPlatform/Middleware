@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.ListDataProject;
 
 /**
@@ -34,6 +35,10 @@ public class StockTransaction implements Serializable {
 	@OneToOne(targetEntity = ListDataProject.class)
 	@JoinColumn(name = "listdata_project_id", nullable = false, updatable = false)
 	private ListDataProject listDataProject;
+
+	@OneToOne(targetEntity = GermplasmStudySource.class)
+	@JoinColumn(name = "germplasm_study_source_id", nullable = false, updatable = false)
+	private GermplasmStudySource germplasmStudySource;
 
 	@OneToOne(targetEntity = Transaction.class)
 	@JoinColumn(name = "trnid", nullable = false, updatable = false)
@@ -81,5 +86,13 @@ public class StockTransaction implements Serializable {
 
 	public void setSourceRecordId(Integer sourceRecordId) {
 		this.sourceRecordId = sourceRecordId;
+	}
+
+	public GermplasmStudySource getGermplasmStudySource() {
+		return this.germplasmStudySource;
+	}
+
+	public void setGermplasmStudySource(final GermplasmStudySource germplasmStudySource) {
+		this.germplasmStudySource = germplasmStudySource;
 	}
 }

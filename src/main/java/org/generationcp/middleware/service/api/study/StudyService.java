@@ -5,28 +5,23 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 
 import java.util.List;
-import java.util.Set;
 
 public interface StudyService {
 
-	List<StudySummary> search(final StudySearchParameters serchParameters);
+	List<StudySummary> search(StudySearchParameters serchParameters);
 
-	boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId);
+	boolean hasMeasurementDataOnEnvironment(int studyIdentifier, int instanceId);
 
-	boolean hasAdvancedOrCrossesList(final int studyId);
+	boolean hasCrossesOrSelections(int studyId);
 
-	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
+	int countTotalObservationUnits(int studyIdentifier, int instanceId);
 
-	List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize,
-		final String sortBy, final String sortOrder);
+	List<ObservationDto> getObservations(int studyIdentifier, int instanceId, int pageNumber, int pageSize, String sortBy,
+		String sortOrder);
 
-	List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier);
+	List<ObservationDto> getSingleObservation(int studyIdentifier, int measurementIdentifier);
 
-	ObservationDto updataObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement);
-
-	List<StudyGermplasmDto> getStudyGermplasmList(Integer studyIdentifer);
-
-	List<StudyGermplasmDto> getStudyGermplasmListWithPlotInformation(Integer studyIdentifer, Set<Integer> plotNos);
+	ObservationDto updateObservation(Integer studyIdentifier, ObservationDto middlewareMeasurement);
 
 	String getProgramUUID(Integer studyIdentifier);
 
@@ -50,7 +45,7 @@ public interface StudyService {
 	 * @param studyId id for the study (Nursery / Trial)
 	 * @return the true if any id have data on the study
 	 */
-	boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId);
+	boolean hasMeasurementDataEntered(List<Integer> ids, int studyId);
 
 	/**
 	 * Retrieves Phenotypes given certain search parameters
@@ -61,7 +56,7 @@ public interface StudyService {
 	 * @param requestDTO
 	 * @return List of phenotypes
 	 */
-	List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO);
+	List<PhenotypeSearchDTO> searchPhenotypes(Integer pageSize, Integer pageNumber, PhenotypeSearchRequestDTO requestDTO);
 
 	/**
 	 * Retrieves a count of how many phenotypes match with the search parameters
@@ -69,15 +64,15 @@ public interface StudyService {
 	 * @param requestDTO
 	 * @return Number of phenotypes
 	 */
-	long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO);
+	long countPhenotypes(PhenotypeSearchRequestDTO requestDTO);
 
-	List<String> getGenericGermplasmDescriptors(final int studyIdentifier);
+	List<String> getGenericGermplasmDescriptors(int studyIdentifier);
 
-	List<String> getAdditionalDesignFactors(final int studyIdentifier);
+	List<String> getAdditionalDesignFactors(int studyIdentifier);
 
-	Integer getPlotDatasetId(final int studyId);
+	Integer getPlotDatasetId(int studyId);
 
-	Integer getEnvironmentDatasetId(final int studyId);
+	Integer getEnvironmentDatasetId(int studyId);
 
 	List<StudyDto> getStudies(StudySearchFilter studySearchFilter);
 

@@ -699,13 +699,6 @@ public interface FieldbookService {
 	List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type);
 
 	/**
-	 * Returns boolean that refers to the existence of Advanced or Crosses list of the Study
-	 *
-	 * @param  projectId - projectId of the study
-	 */
-	boolean hasAdvancedOrCrossesList(final int projectId);
-
-	/**
 	 * Creates or Update a list data project.
 	 *
 	 * @param projectId
@@ -823,8 +816,7 @@ public interface FieldbookService {
 	 * Save workbook variables and Observations
 	 *
 	 * @param workbook
-	 * @param programUUID
 	 */
-	void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID);
+	void saveWorkbookVariablesAndObservations(final Workbook workbook);
 
 }

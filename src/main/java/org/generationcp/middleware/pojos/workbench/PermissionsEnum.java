@@ -27,6 +27,14 @@ public enum PermissionsEnum {
 	MANAGE_LOTS,
 	LOT_LABEL_PRINTING;
 
+	public static final String HAS_INVENTORY_VIEW = " or hasAnyAuthority('ADMIN'"
+		+ ",'CROP_MANAGEMENT'"
+		+ ",'MANAGE_INVENTORY'"
+		+ ",'MANAGE_LOTS'"
+		+ ",'MANAGE_TRANSACTIONS'"
+		+ ",'VIEW_LOTS'"
+		+ ",'VIEW_TRANSACTIONS')";
+
 	public static final String HAS_PREPARE_PLANTING = " or hasAnyAuthority('ADMIN'"
 		+ ", 'BREEDING_ACTIVITIES'"
 		+ ", 'MANAGE_STUDIES'"
@@ -35,4 +43,11 @@ public enum PermissionsEnum {
 		+ ", 'MS_CREATE_PENDING_WITHDRAWALS'"
 		+ ", 'MS_MANAGE_OBSERVATION_UNITS'"
 		+ ", 'MS_CREATE_CONFIRMED_WITHDRAWALS')";
+
+	public static final String HAS_CREATE_LOTS_BATCH = " or hasAnyAuthority('ADMIN'"
+		+ ", 'BREEDING_ACTIVITIES'"
+		+ ", 'MANAGE_GERMPLASM'"
+		+ ", 'MG_MANAGE_INVENTORY'"
+		+ ", 'MG_CREATE_LOTS'"
+		+ ", 'CREATE_LOTS')";
 }

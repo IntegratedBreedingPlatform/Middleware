@@ -15,6 +15,7 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -28,6 +29,7 @@ import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
@@ -56,6 +58,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	private DmsProjectDao projectDao;
 	private ProjectPropertyDao projectPropDao;
 	private CVTermDao cvTermDao;
+	private CVTermRelationshipDao cvTermRelationshipDao;
 
 	private DaoFactory daoFactory;
 
@@ -100,6 +103,8 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 			this.projectDao.save(this.study);
 		}
 
+		this.cvTermRelationshipDao = new CVTermRelationshipDao();
+		this.cvTermRelationshipDao.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -238,7 +243,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		final CVTerm variable1 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
 		this.cvTermDao.save(variable1);
 		final ProjectProperty projectProperty = this.saveProjectVariable(plotDataset, variable1, 1, VariableType.TRAIT);
-		final List<ProjectProperty> projectProperties = this.projectPropDao.getByStudyAndStandardVariableIds(study.getProjectId(), Arrays.asList(variable1.getCvTermId()));
+		final List<ProjectProperty> projectProperties = this.projectPropDao.getByStudyAndStandardVariableIds(this.study.getProjectId(), Arrays.asList(variable1.getCvTermId()));
 		Assert.assertTrue(projectProperties.contains(projectProperty));
 	}
 
@@ -277,35 +282,6 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(2, designFactors.size());
 		Assert.assertTrue(designFactors.contains(variable4.getName()));
 		Assert.assertTrue(designFactors.contains(variable5.getName()));
-	}
-
-	@Test
-	public void testGetVariablesOfSiblingDatasets() {
-		final DmsProject plotDataset = this.saveDataset(DatasetTypeEnum.PLOT_DATA);
-		final DmsProject trialDataset = this.saveDataset(DatasetTypeEnum.SUMMARY_DATA);
-		final CVTerm variable1 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
-		final CVTerm variable2 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
-		final CVTerm variable3 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
-		final CVTerm variable4 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
-		this.cvTermDao.save(variable1);
-		this.cvTermDao.save(variable2);
-		this.cvTermDao.save(variable3);
-		this.cvTermDao.save(variable4);
-
-		this.saveProjectVariable(plotDataset, variable1, 1, VariableType.GERMPLASM_DESCRIPTOR);
-		this.saveProjectVariable(plotDataset, variable2, 2, VariableType.TRAIT);
-		this.saveProjectVariable(trialDataset, variable3, 1, VariableType.GERMPLASM_DESCRIPTOR);
-		this.saveProjectVariable(trialDataset, variable4, 2, VariableType.EXPERIMENTAL_DESIGN);
-
-		List<Integer> variableIds = this.projectPropDao.getVariablesOfSiblingDatasets(plotDataset.getProjectId());
-		Assert.assertNotNull(variableIds);
-		Assert.assertFalse(variableIds.isEmpty());
-		Assert.assertEquals(Arrays.asList(variable3.getCvTermId(), variable4.getCvTermId()), variableIds);
-
-		variableIds = this.projectPropDao.getVariablesOfSiblingDatasets(trialDataset.getProjectId());
-		Assert.assertNotNull(variableIds);
-		Assert.assertFalse(variableIds.isEmpty());
-		Assert.assertEquals(Arrays.asList(variable1.getCvTermId(), variable2.getCvTermId()), variableIds);
 	}
 
 	private DmsProject saveDataset(final DatasetTypeEnum datasetType) {
@@ -355,6 +331,143 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 				parentGermplasm);
 
 		return this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix);
+	}
+
+
+	@Test
+	public void testGetProjectPropsAndValuesByStudy() {
+		final CVTerm categoricalScale = CVTermTestDataInitializer.createTerm("Categorical Scale", CvId.SCALES.getId());
+		final CVTerm textScale = CVTermTestDataInitializer.createTerm("Text Scale", CvId.VARIABLES.getId());
+		final CVTerm variable1 = CVTermTestDataInitializer.createTerm("Categorical Option", CvId.SCALES.getId());
+		final CVTerm variable2 = CVTermTestDataInitializer.createTerm("Text Field", CvId.VARIABLES.getId());
+		final CVTerm personId = CVTermTestDataInitializer.createTerm("PersonId", CvId.VARIABLES.getId());
+		final CVTerm choice1 = CVTermTestDataInitializer.createTerm("Option 1", 2030);
+		this.cvTermDao.save(categoricalScale);
+		this.cvTermDao.save(textScale);
+		this.cvTermDao.save(variable1);
+		this.cvTermDao.save(variable2);
+		this.cvTermDao.save(choice1);
+		this.cvTermDao.save(personId);
+
+		final CVTermRelationship scaleRelationShip = new CVTermRelationship();
+		scaleRelationShip.setSubjectId(categoricalScale.getCvTermId());
+		scaleRelationShip.setObjectId(TermId.CATEGORICAL_VARIABLE.getId());
+		scaleRelationShip.setTypeId(TermId.HAS_TYPE.getId());
+		this.cvTermRelationshipDao.save(scaleRelationShip);
+
+		final CVTermRelationship variable1Scale = new CVTermRelationship();
+		variable1Scale.setSubjectId(variable1.getCvTermId());
+		variable1Scale.setObjectId(categoricalScale.getCvTermId());
+		variable1Scale.setTypeId(TermId.HAS_SCALE.getId());
+		this.cvTermRelationshipDao.save(variable1Scale);
+
+		final CVTermRelationship textRelationship = new CVTermRelationship();
+		textRelationship.setSubjectId(textScale.getCvTermId());
+		textRelationship.setObjectId(TermId.CHARACTER_VARIABLE.getId());
+		textRelationship.setTypeId(TermId.HAS_TYPE.getId());
+		this.cvTermRelationshipDao.save(textRelationship);
+
+		final CVTermRelationship variable2Scale = new CVTermRelationship();
+		variable2Scale.setSubjectId(variable2.getCvTermId());
+		variable2Scale.setObjectId(textScale.getCvTermId());
+		variable2Scale.setTypeId(TermId.HAS_SCALE.getId());
+		this.cvTermRelationshipDao.save(variable2Scale);
+
+		final CVTermRelationship personIdRelationship = new CVTermRelationship();
+		personIdRelationship.setSubjectId(personId.getCvTermId());
+		personIdRelationship.setObjectId(TermId.PERSON_ID.getId());
+		personIdRelationship.setTypeId(TermId.HAS_SCALE.getId());
+		this.cvTermRelationshipDao.save(personIdRelationship);
+
+		this.saveProjectVariableWithValue(this.study, variable1, 1, VariableType.STUDY_DETAIL, choice1.getCvTermId().toString());
+		this.saveProjectVariableWithValue(this.study, variable2, 2, VariableType.STUDY_DETAIL, "Mock Input Field");
+		this.saveProjectVariableWithValue(this.study, personId, 3, VariableType.STUDY_DETAIL, "1");
+
+		final Integer projectId = this.study.getProjectId();
+		final Map<String, String> map = this.projectPropDao.getProjectPropsAndValuesByStudy(projectId, new ArrayList<>());
+		Assert.assertEquals(2, map.size());
+		Assert.assertNotNull("Study has properties ",map);
+ 		Assert.assertEquals(map.get(variable1.getDefinition()),choice1.getDefinition());
+		Assert.assertEquals(map.get(variable2.getDefinition()),"Mock Input Field");
+		Assert.assertNull("Variable PersonId excluded from the result",map.get(personId.getDefinition()));
+	}
+
+	@Test
+	public void testGetProjectPropsAndValuesByStudyWithPiName() {
+		final CVTerm categoricalScale = CVTermTestDataInitializer.createTerm("Categorical Scale", CvId.SCALES.getId());
+		final CVTerm textScale = CVTermTestDataInitializer.createTerm("Text Scale", CvId.VARIABLES.getId());
+		final CVTerm variable1 = CVTermTestDataInitializer.createTerm("Categorical Option", CvId.SCALES.getId());
+		final CVTerm variable2 = CVTermTestDataInitializer.createTerm("Text Field", CvId.VARIABLES.getId());
+		final CVTerm personId = CVTermTestDataInitializer.createTerm("PersonId", CvId.VARIABLES.getId());
+		final CVTerm personName = CVTermTestDataInitializer.createTerm("PersonName", CvId.VARIABLES.getId());
+		final CVTerm choice1 = CVTermTestDataInitializer.createTerm("Option 1", 2030);
+		this.cvTermDao.save(categoricalScale);
+		this.cvTermDao.save(textScale);
+		this.cvTermDao.save(variable1);
+		this.cvTermDao.save(variable2);
+		this.cvTermDao.save(choice1);
+		this.cvTermDao.save(personId);
+		this.cvTermDao.save(personName);
+
+		final CVTermRelationship scaleRelationShip = new CVTermRelationship();
+		scaleRelationShip.setSubjectId(categoricalScale.getCvTermId());
+		scaleRelationShip.setObjectId(TermId.CATEGORICAL_VARIABLE.getId());
+		scaleRelationShip.setTypeId(TermId.HAS_TYPE.getId());
+		this.cvTermRelationshipDao.save(scaleRelationShip);
+
+		final CVTermRelationship variable1Scale = new CVTermRelationship();
+		variable1Scale.setSubjectId(variable1.getCvTermId());
+		variable1Scale.setObjectId(categoricalScale.getCvTermId());
+		variable1Scale.setTypeId(TermId.HAS_SCALE.getId());
+		this.cvTermRelationshipDao.save(variable1Scale);
+
+		final CVTermRelationship textRelationship = new CVTermRelationship();
+		textRelationship.setSubjectId(textScale.getCvTermId());
+		textRelationship.setObjectId(TermId.CHARACTER_VARIABLE.getId());
+		textRelationship.setTypeId(TermId.HAS_TYPE.getId());
+		this.cvTermRelationshipDao.save(textRelationship);
+
+		final CVTermRelationship variable2Scale = new CVTermRelationship();
+		variable2Scale.setSubjectId(variable2.getCvTermId());
+		variable2Scale.setObjectId(textScale.getCvTermId());
+		variable2Scale.setTypeId(TermId.HAS_SCALE.getId());
+		this.cvTermRelationshipDao.save(variable2Scale);
+
+		final CVTermRelationship personIdRelationship = new CVTermRelationship();
+		personIdRelationship.setSubjectId(personId.getCvTermId());
+		personIdRelationship.setObjectId(TermId.PERSON_ID.getId());
+		personIdRelationship.setTypeId(TermId.HAS_SCALE.getId());
+		this.cvTermRelationshipDao.save(personIdRelationship);
+
+		final CVTermRelationship personNameRelationship = new CVTermRelationship();
+		personNameRelationship.setSubjectId(personName.getCvTermId());
+		personNameRelationship.setObjectId(1902);
+		personNameRelationship.setTypeId(TermId.HAS_SCALE.getId());
+		this.cvTermRelationshipDao.save(personNameRelationship);
+
+		this.saveProjectVariableWithValue(this.study, variable1, 1, VariableType.STUDY_DETAIL, choice1.getCvTermId().toString());
+		this.saveProjectVariableWithValue(this.study, variable2, 2, VariableType.STUDY_DETAIL, "Mock Input Field");
+		this.saveProjectVariableWithValue(this.study, personId, 3, VariableType.STUDY_DETAIL, "1");
+		this.saveProjectVariableWithValue(this.study, personName, 4, VariableType.STUDY_DETAIL, "Person Name 1");
+		final Integer projectId = this.study.getProjectId();
+		final Map<String, String> map = this.projectPropDao.getProjectPropsAndValuesByStudy(projectId, new ArrayList<>());
+		Assert.assertEquals(3, map.size());
+		Assert.assertNotNull("Study has properties ",map);
+		Assert.assertEquals(map.get(variable1.getDefinition()),choice1.getDefinition());
+		Assert.assertEquals(map.get(variable2.getDefinition()),"Mock Input Field");
+		Assert.assertEquals(map.get(personName.getDefinition()),"Person Name 1");
+		Assert.assertNull("Variable PersonId excluded from the result",map.get(personId.getDefinition()));
+	}
+
+	private ProjectProperty saveProjectVariableWithValue(final DmsProject project, final CVTerm variable, final int rank, final VariableType variableType, final String value) {
+		final ProjectProperty property1 = new ProjectProperty();
+		property1.setAlias(RandomStringUtils.randomAlphabetic(20));
+		property1.setRank(rank);
+		property1.setTypeId(variableType.getId());
+		property1.setProject(project);
+		property1.setVariableId(variable.getCvTermId());
+		property1.setValue(value);
+		return this.projectPropDao.save(property1);
 	}
 
 }
