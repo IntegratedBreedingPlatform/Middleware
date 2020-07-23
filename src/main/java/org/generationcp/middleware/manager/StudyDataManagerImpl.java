@@ -1351,12 +1351,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
+	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
 		return this.daoFactory.getPhenotypeDAO().getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
 	}
 
 	@Override
-	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
+	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
 		return this.daoFactory.getGeolocationPropertyDao().getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
 	}
 
