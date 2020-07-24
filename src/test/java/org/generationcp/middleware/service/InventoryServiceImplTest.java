@@ -1,20 +1,9 @@
 
 package org.generationcp.middleware.service;
 
-import org.generationcp.middleware.dao.GermplasmListDAO;
-import org.generationcp.middleware.dao.GermplasmListDataDAO;
-import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
-import org.generationcp.middleware.dao.ims.TransactionDAO;
-import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,62 +21,18 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class InventoryServiceImplTest {
 
-	private static final String TEST_LIST_NAME = "LIST-TEST";
-	public static final int USER_ID = 1;
-	public static final int PERSON_ID = 2;
-
-	@Mock
-	private HibernateSessionProvider sessionProvider;
-
 	@Mock
 	private DaoFactory daoFactory;
 
 	@Mock
 	private LotDAO lotDAO;
 
-	@Mock
-	private TransactionDAO transactionDAO;
-
-	@Mock
-	private GermplasmListDAO germplasmListDAO;
-
-	@Mock
-	private GermplasmListDataDAO germplasmListDataDAO;
-
-	@Mock
-	private LocationDAO locationDAO;
-
-	@Mock
-	private CVTermDao cvTermDAO;
-
-	@Mock
-	private WorkbenchDataManager workbenchDataManager;
-
-	@Mock
-	private UserService userService;
-
 	@InjectMocks
 	private final InventoryServiceImpl inventoryServiceImpl = new InventoryServiceImpl();
 
-	@Mock
-	private CropType cropType;
-
 	@Before
 	public void setup() {
-
-		when(this.daoFactory.getTransactionDAO()).thenReturn(this.transactionDAO);
-		when(this.daoFactory.getLotDao()).thenReturn(this.lotDAO);
-		when(this.daoFactory.getLocationDAO()).thenReturn(this.locationDAO);
-		when(this.daoFactory.getGermplasmListDataDAO()).thenReturn(this.germplasmListDataDAO);
-		when(this.daoFactory.getGermplasmListDAO()).thenReturn(this.germplasmListDAO);
-		when(this.daoFactory.getCvTermDao()).thenReturn(this.cvTermDAO);
-
-		final WorkbenchUser workbenchUser = new WorkbenchUser();
-		final Person person = new Person();
-		person.setId(PERSON_ID);
-		workbenchUser.setUserid(USER_ID);
-		workbenchUser.setPerson(person);
-		when(this.userService.getUserById(USER_ID)).thenReturn(workbenchUser);
+	 	when(this.daoFactory.getLotDao()).thenReturn(this.lotDAO);
 	}
 
 	@Test
