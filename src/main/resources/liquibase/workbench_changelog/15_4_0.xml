@@ -22,4 +22,21 @@
 		</sql>
     </changeSet>
 
+	<changeSet author="clarysabel" id="v15.4.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+				SELECT count(*) FROM permission WHERE name = 'UPDATE_LOT_BALANCE'
+            </sqlCheck>
+        </preConditions>
+        <comment>Add new permission to update lot balance</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @manage_lots_id = (select permission_id from permission where name = 'MANAGE_LOTS');
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('UPDATE_LOT_BALANCE', 'Update Balance', @manage_lots_id, null);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+		</sql>
+    </changeSet>
+
 </databaseChangeLog>
