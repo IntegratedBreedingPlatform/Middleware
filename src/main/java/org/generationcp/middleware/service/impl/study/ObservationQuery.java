@@ -108,7 +108,7 @@ class ObservationQuery {
 			+ "		WHERE ndep.nd_experiment_id = nde.nd_experiment_id " //
 			+ "		AND ispcvt.name = 'BLOCK_NO') AS BLOCK_NO, " //
 			+ "	  (SELECT "
-			+ "		(CASE WHEN (SELECT COUNT(*) FROM nd_experimentprop prop INNER JOIN cvterm_relationship crelprop ON crelprop.subject_id = prop.type_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2170 ) > 1 " //2170 = Row in Layout
+			+ "		(CASE WHEN (SELECT COUNT(*) FROM nd_experimentprop prop INNER JOIN cvterm_relationship crelprop ON crelprop.subject_id = prop.type_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2170 WHERE prop.nd_experiment_id = nde.nd_experiment_id ) > 1 " //2170 = Row in Layout
 			+ "		 THEN 'TBD' "
 			+ "		 ELSE (SELECT  ("
 			+ "				CASE WHEN scaletype.object_id = " + TermId.CATEGORICAL_VARIABLE.getId() //Identify if variable is categorical
@@ -123,7 +123,7 @@ class ObservationQuery {
 			+ "		) "
 			+ "	  ) ROW,"//
 			+ "	  (SELECT "
-			+ "		(CASE WHEN (SELECT COUNT(*) FROM nd_experimentprop prop INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = prop.type_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2180 ) > 1 "//2180 = Column in layout
+			+ "		(CASE WHEN (SELECT COUNT(*) FROM nd_experimentprop prop INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = prop.type_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2180  WHERE prop.nd_experiment_id = nde.nd_experiment_id ) > 1 "//2180 = Column in layout
 			+ "		THEN 'TBD' "
 			+ "		ELSE (SELECT  ("
 			+ "				CASE WHEN scaletype.object_id = " + TermId.CATEGORICAL_VARIABLE.getId() //Identify if variable is categorical
