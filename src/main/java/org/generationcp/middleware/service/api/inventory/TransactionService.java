@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.inventory;
 
+import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -39,6 +40,8 @@ public interface TransactionService {
 	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
 
 	void depositLots(Integer userId, Set<Integer> lotIds, LotDepositRequestDto lotDepositRequestDto, TransactionStatus transactionStatus);
+
+	void depositLots(Integer userId, Set<Integer> lotIds, List<LotDepositDto> lotDepositDtos, TransactionStatus transactionStatus);
 
 	void cancelPendingTransactions(List<TransactionDto> transactionDtoList);
 

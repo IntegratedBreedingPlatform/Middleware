@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -184,25 +185,30 @@ public class TransactionServiceImpl implements TransactionService {
 
 		for (final ExtendedLotDto lotDto : lots) {
 			final Double amount = lotDepositRequestDto.getDepositsPerUnit().get(lotDto.getUnitName());
-			final Transaction transaction = new Transaction();
-			transaction.setStatus(transactionStatus.getIntValue());
-			transaction.setType(TransactionType.DEPOSIT.getId());
-			transaction.setLot(new Lot(lotDto.getLotId()));
-			transaction.setPersonId(userId);
-			transaction.setUserId(userId);
-			transaction.setTransactionDate(new Date());
-			transaction.setQuantity(amount);
-			transaction.setComments(lotDepositRequestDto.getNotes());
-			//Always zero for new transactions
-			transaction.setPreviousAmount(0D);
-			if (transactionStatus.equals(TransactionStatus.CONFIRMED)) {
-				transaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
-			} else {
-				transaction.setCommitmentDate(0);
-			}
+			final Transaction transaction =
+				new Transaction(TransactionType.DEPOSIT, transactionStatus, userId, lotDepositRequestDto.getNotes(), lotDto.getLotId(),
+					amount);
 			daoFactory.getTransactionDAO().save(transaction);
 		}
 
+	}
+
+	@Override
+	public void depositLots(final Integer userId, final Set<Integer> lotIds, final List<LotDepositDto> lotDepositDtoList,
+		final TransactionStatus transactionStatus) {
+
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
+		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+		final Map<String, LotDepositDto> lotDepositDtoMap = lotDepositDtoList.stream().collect(Collectors.toMap(LotDepositDto :: getLotUID, lotDepositDto -> lotDepositDto));
+
+		for (final ExtendedLotDto extendedLotDto : lots) {
+			final LotDepositDto lotDepositDto = lotDepositDtoMap.get(extendedLotDto.getLotUUID());
+			final Transaction transaction =
+				new Transaction(TransactionType.DEPOSIT, transactionStatus, userId, lotDepositDto.getNotes(), extendedLotDto.getLotId(),
+					lotDepositDto.getAmount());
+			daoFactory.getTransactionDAO().save(transaction);
+		}
 	}
 
 	@Override
