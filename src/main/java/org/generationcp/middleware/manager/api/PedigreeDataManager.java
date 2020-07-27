@@ -12,7 +12,11 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
+import com.google.common.collect.Table;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.Progenitor;
@@ -209,4 +213,13 @@ public interface PedigreeDataManager {
 	 * @return Returns the id of the updated Progenitor
 	 */
 	Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber);
+
+	/***
+	 * Returns female parent and male parent of given gid
+	 * @param gids
+	 * @param level
+	 * @param includeDerivativeLines
+	 * @return
+	 */
+	Table<Integer, String, Optional<Germplasm>> generatePedigreeTable(Set<Integer> gids, Integer level, Boolean includeDerivativeLines);
 }
