@@ -19,10 +19,10 @@
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `ims_stock_transaction_bkp` (
 				`id` int(11) NOT NULL AUTO_INCREMENT,
-				`source_id` int(11) DEFAULT NULL,
+				`listdata_project_id` int(11) NOT NULL,
+				`germplasm_study_source_id` int(11) DEFAULT NULL,
 				`trnid` int(11) NOT NULL,
 				`recordid` int(11) DEFAULT NULL,
-				`listdata_project_id` int(11) DEFAULT NULL,
 				PRIMARY KEY (`id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -61,7 +61,7 @@
 				`crossing_date` int(11) DEFAULT NULL,
 				`notes` varchar(200) DEFAULT NULL,
 				PRIMARY KEY (`listdata_project_id`)
-			) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 			INSERT INTO listdata_project_bkp
 			SELECT * FROM listdata_project;
@@ -105,7 +105,7 @@
 				`program_uuid` varchar(36) DEFAULT NULL,
 				`notes` text,
 			PRIMARY KEY (`listid`)
-			) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8;
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 			INSERT INTO listnms_bkp
 			SELECT *
