@@ -16,6 +16,10 @@ import org.hibernate.type.IntegerType;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, Integer> {
 
@@ -51,7 +55,16 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "LEFT JOIN ims_lot lot ON lot.eid = gss.gid \n"
 		+ "WHERE gss.project_id = :studyId ";
 
-	public List<GermplasmStudySourceDto> getGermplasmStudySourceList(final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
+	public Map<Integer, GermplasmStudySource> getGermplasmStudySourcesMap(final Set<Integer> gids) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.createAlias("germplasm", "germplasm");
+		criteria.add(Restrictions.in("germplasm.gid", gids));
+		final List<GermplasmStudySource> result = criteria.list();
+		return result.stream().collect(Collectors.toMap(a -> a.getGermplasm().getGid(), Function.identity()));
+	}
+
+	public List<GermplasmStudySourceDto> getGermplasmStudySourceList(
+		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
 
 		final StringBuilder sql = new StringBuilder(GERMPLASM_STUDY_SOURCE_SEARCH_QUERY);
 		addSearchQueryFilters(new SqlQueryParamBuilder(sql), germplasmStudySourceSearchRequest.getFilter());

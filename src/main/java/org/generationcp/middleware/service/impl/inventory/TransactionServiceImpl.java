@@ -10,6 +10,10 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDt
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.GermplasmStudySource;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.ims.ExperimentTransaction;
+import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -55,7 +59,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public void withdrawLots(final Integer userId, final Set<Integer> lotIds, final LotWithdrawalInputDto lotWithdrawalInputDto,
-			final TransactionStatus transactionStatus) {
+		final TransactionStatus transactionStatus) {
 
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
@@ -182,6 +186,10 @@ public class TransactionServiceImpl implements TransactionService {
 		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
 		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
 
+		final Map<Integer, GermplasmStudySource> germplasmStudySourceMap =
+			this.daoFactory.getGermplasmStudySourceDAO()
+				.getGermplasmStudySourcesMap(lots.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet()));
+
 		for (final ExtendedLotDto lotDto : lots) {
 			final Double amount = lotDepositRequestDto.getDepositsPerUnit().get(lotDto.getUnitName());
 			final Transaction transaction = new Transaction();
@@ -200,9 +208,24 @@ public class TransactionServiceImpl implements TransactionService {
 			} else {
 				transaction.setCommitmentDate(0);
 			}
-			daoFactory.getTransactionDAO().save(transaction);
+			this.daoFactory.getTransactionDAO().save(transaction);
+
+			if (lotDepositRequestDto.getSourceStudy() != null) {
+				// Create experiment transaction records when lot and deposit are created in the context of study.
+				this.createExperimentTransaction(lotDto.getGid(), germplasmStudySourceMap, transaction);
+			}
+
 		}
 
+	}
+
+	private void createExperimentTransaction(final Integer gid, final Map<Integer, GermplasmStudySource> germplasmStudySourceMap,
+		final Transaction transaction) {
+		if (germplasmStudySourceMap.containsKey(gid)) {
+			final ExperimentModel experimentModel = germplasmStudySourceMap.get(gid).getExperimentModel();
+			this.daoFactory.getExperimentTransactionDao()
+				.save(new ExperimentTransaction(experimentModel, transaction, ExperimentTransactionType.HARVESTING.getId()));
+		}
 	}
 
 	@Override
