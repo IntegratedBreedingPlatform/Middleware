@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
@@ -46,6 +47,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.StudyResultSetByNameStartDateSeasonCountry;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
@@ -57,6 +59,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
@@ -90,6 +93,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;
+
+	@Resource
+	private OntologyVariableDataManager variableDataManager;
 
 	@Resource
 	private UserService userService;
@@ -1075,7 +1081,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			for (final ProjectProperty prop : dmsProject.getProperties()) {
 
 				final Integer variableId = prop.getVariableId();
-				final String value = prop.getValue();
+				final Optional<DataType> dmsVariableType = this.variableDataManager.getDataType(prop.getVariableId());
+				final String value;
+				if (dmsVariableType.isPresent() && dmsVariableType.get().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
+					final Integer categoricalId = prop.getValue().equals("") ? 0 : Integer.parseInt(prop.getValue());
+					value = this.variableDataManager.retrieveVariableCategoricalValue(dmsProject.getProgramUUID(), prop.getVariableId(), categoricalId);
+ 				} else {
+					value = prop.getValue();
+				}
 
 				if (variableId.equals(TermId.SEASON_VAR_TEXT.getId())) {
 					studySummary.addSeason(value);
@@ -1342,12 +1355,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
+	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
 		return this.daoFactory.getPhenotypeDAO().getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
 	}
 
 	@Override
-	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
+	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
 		return this.daoFactory.getGeolocationPropertyDao().getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
 	}
 
@@ -1357,5 +1370,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	void setTrialEnvironmentBuilder(final TrialEnvironmentBuilder trialEnvironmentBuilder) {
 		this.trialEnvironmentBuilder = trialEnvironmentBuilder;
+	}
+
+	void setVariableDataManager(final OntologyVariableDataManager ontologyVariableDataManager) {
+		this.variableDataManager = ontologyVariableDataManager;
 	}
 }
