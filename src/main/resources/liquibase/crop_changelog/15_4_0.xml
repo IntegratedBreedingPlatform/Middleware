@@ -44,7 +44,7 @@
 			</and>
 		</preConditions>
 		<comment>
-			Backup contents then drop listdata_project table
+			Backup contents of then drop listdata_project table
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `listdata_project_bkp` (
@@ -80,7 +80,8 @@
 				<sqlCheck expectedResult="1">
 					SELECT COUNT(*) > 0
 					  FROM listnms
-					 WHERE EXISTS (SELECT 1 FROM listdata_project_bkp ldp where ldp.list_id = listnms.listid);
+					 WHERE EXISTS (SELECT 1 FROM listdata_project_bkp ldp where ldp.list_id = listnms.listid)
+					    OR listtype IN ('ADVANCED', 'IMP_CROSS', 'CRT_CROSS');
 				</sqlCheck>
 			</and>
 		</preConditions>
@@ -110,10 +111,12 @@
 			INSERT INTO listnms_bkp
 			SELECT *
 			  FROM listnms
-			 WHERE EXISTS (SELECT 1 FROM listdata_project_bkp ldp where ldp.list_id = listnms.listid);
+			 WHERE EXISTS (SELECT 1 FROM listdata_project_bkp ldp where ldp.list_id = listnms.listid)
+			    OR listtype IN ('ADVANCED', 'IMP_CROSS', 'CRT_CROSS');
 
 			DELETE FROM listnms
-			 WHERE EXISTS (SELECT 1 FROM listdata_project_bkp ldp where ldp.list_id = listnms.listid);
+			 WHERE EXISTS (SELECT 1 FROM listdata_project_bkp ldp where ldp.list_id = listnms.listid)
+			    OR listtype IN ('ADVANCED', 'IMP_CROSS', 'CRT_CROSS');
 		</sql>
 	</changeSet>
 
