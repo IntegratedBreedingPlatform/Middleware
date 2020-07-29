@@ -223,8 +223,10 @@ public class TransactionServiceImpl implements TransactionService {
 		final Transaction transaction) {
 		if (germplasmStudySourceMap.containsKey(gid)) {
 			final ExperimentModel experimentModel = germplasmStudySourceMap.get(gid).getExperimentModel();
-			this.daoFactory.getExperimentTransactionDao()
-				.save(new ExperimentTransaction(experimentModel, transaction, ExperimentTransactionType.HARVESTING.getId()));
+			if (experimentModel != null) {
+				this.daoFactory.getExperimentTransactionDao()
+					.save(new ExperimentTransaction(experimentModel, transaction, ExperimentTransactionType.HARVESTING.getId()));
+			}
 		}
 	}
 
