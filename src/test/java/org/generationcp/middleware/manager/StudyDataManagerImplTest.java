@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.RandomStringUtils;
@@ -19,6 +20,8 @@ import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
+import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.*;
@@ -26,6 +29,8 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -38,10 +43,14 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
+import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.*;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -52,10 +61,18 @@ import org.generationcp.middleware.utils.test.FieldMapDataUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
 
 import static org.generationcp.middleware.operation.saver.WorkbookSaver.ENVIRONMENT;
 import static org.generationcp.middleware.operation.saver.WorkbookSaver.PLOTDATA;
@@ -96,6 +113,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private TrialEnvironmentBuilder trialEnvironmentBuilder;
 
+	private OntologyVariableDataManager variableDataManager;
+
+	private CVTermDao cvTermDao;
+
 	private Project commonTestProject;
 
 	private static CrossExpansionProperties crossExpansionProperties;
@@ -103,11 +124,29 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private StudyTestDataInitializer studyTDI;
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 	private CropType crop;
+	private CVTerm option;
 
+	private StandardVariableSaver standardVariableSaver;
 	@Before
 	public void setUp() throws Exception {
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
 		this.manager.setUserService(this.userService);
+
+		this.cvTermDao = new CVTermDao();
+		this.cvTermDao.setSession(this.sessionProvder.getSessionFactory().getCurrentSession());
+
+		this.variableDataManager = Mockito.mock(OntologyVariableDataManagerImpl.class);
+		final Optional<DataType> dataTypeOptional = Optional.of(DataType.CATEGORICAL_VARIABLE);
+		Mockito.when(this.variableDataManager.getDataType(Matchers.anyInt())).thenReturn(dataTypeOptional);
+
+		this.option = CVTermTestDataInitializer.createTerm("Option 1", 2030);
+		this.cvTermDao.save(this.option);
+		Mockito.when(this.variableDataManager.retrieveVariableCategoricalValue(Matchers.anyString(), Matchers.any(), Matchers.anyInt())).thenReturn(
+			this.option.getName());
+
+		this.manager.setVariableDataManager(this.variableDataManager);
+
+		this.standardVariableSaver = new StandardVariableSaver(this.sessionProvder);
 
 		this.workbenchTestDataUtil.setUpWorkbench();
 
@@ -1067,6 +1106,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Add new study with 2 environments assigned new location IDs
 		final StudyReference newStudy = this.studyTDI.addTestStudy();
 		final Integer studyId = newStudy.getId();
+
 		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Random random = new Random();
 		final String location1 = String.valueOf(random.nextInt());
@@ -1108,4 +1148,66 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(this.manager.isStudy(mainFolder.getProjectId()));
 	}
 
+	@Test
+	public void testFindPagedProjectsWithCategoricalVariable() throws Exception {
+		// Create project record
+		final DmsProject project = new DmsProject();
+		final String programUUID = "74364-9075-asdhaskj-74825";
+		final StudyType studyType = new StudyType();
+		studyType.setStudyTypeId(6);
+		studyType.setLabel(StudyTypeDto.TRIAL_LABEL);
+		studyType.setName(StudyTypeDto.TRIAL_NAME);
+		studyType.setCvTermId(10010);
+		studyType.setVisible(true);
+
+		project.setName("projectName");
+		project.setDescription("projectDescription");
+		project.setProgramUUID(programUUID);
+		project.setStudyType(studyType);
+
+		this.manager.getDmsProjectDao().save(project);
+
+		final DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setVariableType(VariableType.STUDY_DETAIL);
+		dmsVariableType.setLocalName("PI_NAME");
+		dmsVariableType.setRank(1);
+		dmsVariableType.setStandardVariable(this.createStandardVariable("Categorical Option"));
+
+
+		// Create projectproperty record
+		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, String.valueOf(this.option.getCvTermId()));
+
+		final Map<StudyFilters, String> map = new HashMap<>();
+		map.put(StudyFilters.PROGRAM_ID, project.getProgramUUID());
+		final List<StudySummary> studySummaryList = this.manager.findPagedProjects(map, 1, 1);
+		Assert.assertTrue(!studySummaryList.isEmpty());
+		for(final StudySummary studySummary : studySummaryList) {
+			Assert.assertEquals(studySummary.getProgramDbId(), programUUID);
+			Assert.assertTrue(!studySummary.getOptionalInfo().isEmpty());
+			for (final String mapKey : studySummary.getOptionalInfo().keySet()) {
+				final String value = studySummary.getOptionalInfo().get(mapKey);
+				Assert.assertEquals(this.option.getName(), value);
+			}
+		}
+
+	}
+
+	private StandardVariable createStandardVariable(final String name) {
+
+		final CVTerm property = this.cvTermDao.save(org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(10), "", CvId.PROPERTIES);
+		final CVTerm scale = this.cvTermDao.save(org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(10), "", CvId.SCALES);
+		final CVTerm method = this.cvTermDao.save(org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(10), "", CvId.METHODS);
+
+		final StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setName(name);
+		standardVariable.setProperty(new Term(property.getCvTermId(), property.getName(), property.getDefinition()));
+		standardVariable.setScale(new Term(scale.getCvTermId(), scale.getName(), scale.getDefinition()));
+		standardVariable.setMethod(new Term(method.getCvTermId(), method.getName(), method.getDefinition()));
+		standardVariable.setDataType(new Term(DataType.CATEGORICAL_VARIABLE.getId(), "Categorical variable", "variable with Categorical values"));
+		standardVariable.setIsA(new Term(1050, "Study detail", "Study detail class"));
+
+		this.standardVariableSaver.save(standardVariable);
+
+		return standardVariable;
+	}
 }
