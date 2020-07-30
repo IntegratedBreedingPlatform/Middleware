@@ -223,9 +223,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
 		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
-
 		for (final ExtendedLotDto lotDto : lots) {
-
 			if (balance >= lotDto.getReservedTotal()) {
 				final Double amount = balance - lotDto.getActualBalance();
 				if (amount != 0) {
