@@ -42,4 +42,6 @@ public interface TransactionService {
 
 	void cancelPendingTransactions(List<TransactionDto> transactionDtoList);
 
+	void saveAdjustmentTransactions(Integer userId, Set<Integer> lotIds, Double balance, String notes);
+
 }
