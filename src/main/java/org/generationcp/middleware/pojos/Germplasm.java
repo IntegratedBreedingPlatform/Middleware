@@ -212,21 +212,17 @@ public class Germplasm implements Serializable {
 	public static final String GET_GERMPLASM_DATES_BY_GIDS = "SELECT gid, gdate " + "FROM germplsm " + "WHERE gid IN (:gids)";
 	public static final String GET_METHOD_IDS_BY_GIDS = "SELECT gid, methn " + "FROM germplsm " + "WHERE gid IN (:gids)";
 	public static final String GET_PARENT_NAMES_BY_STUDY_ID =
-			"select N.gid, N.ntype, N.nval, N.nid, N.nstat" + " from names N" + " inner join (" + "	select distinct G.gpid1 gid"
-					+ "	from listnms LNAMES" + "	inner join listdata_project LDATAPROJ on" + "	LNAMES.listid = LDATAPROJ.list_id"
-					+ "	inner join germplsm G on" + "	G.gid = LDATAPROJ.germplasm_id and" + "	G.gnpgs >= 0"
-					+ "	where LNAMES.projectid = :projId" +
-
-					"    union" +
-
-					"	select distinct G.gpid2" + "	from listnms LNAMES" + "	inner join listdata_project LDATAPROJ on"
-					+ "	LNAMES.listid = LDATAPROJ.list_id" + "	inner join germplsm G on" + "	G.gid = LDATAPROJ.germplasm_id and"
-					+ "	G.gnpgs >= 0" + "	where LNAMES.projectid = :projId" + " ) T on " + " N.gid = T.gid";
+			"select n.gid, n.ntype, n.nval, n.nid, n.nstat  \n" +
+					"from stock s\n" +
+					"inner join germplsm g on g.gid = s.dbxref_id\n" +
+					"inner join names n on (n.gid = g.gpid1 or n.gid = g.gpid2)\n" +
+					"where s.project_id = :projId";
 
 	public static final String GET_KNOWN_PARENT_GIDS_BY_STUDY_ID =
-			"select distinct G.gid, G.gpid1, G.gpid2, G.grplce from listnms LNAMES" + " inner join listdata_project LDATAPROJ on"
-					+ "	LNAMES.listid = LDATAPROJ.list_id" + " inner join germplsm G on" + "	G.gid = LDATAPROJ.germplasm_id and"
-					+ "	G.gnpgs > 0 AND (G.gpid1 > 0 or G.gpid2 > 0)" + " where LNAMES.projectid = :projId";
+			"select g.gid, g.gpid1, g.gpid2, g.grplce \n" +
+					"from stock s\n" +
+					"inner join germplsm g on g.gid = s.dbxref_id and g.gnpgs > 0 AND (g.gpid1 > 0 or g.gpid2 > 0)   \n" +
+					"where s.project_id = :projId";
 
 	public static final String GET_PREFERRED_NAME_AND_PARENT_FOR_A_GID_LIST = "select g.gid as gid, ld.grpname as pedigree, "
 			+ " (select n.nval from names n where n.nstat=1 and n.gid = g.gid limit 1) as nval" + "  from germplsm g "

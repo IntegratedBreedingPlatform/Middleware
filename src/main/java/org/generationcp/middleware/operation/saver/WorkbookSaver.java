@@ -272,51 +272,6 @@ public class WorkbookSaver extends Saver {
 		return studyId;
 	}
 
-	public void deleteExperimentalDesign(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) {
-
-		final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get(WorkbookSaver.HEADERMAP);
-		final Map<String, VariableTypeList> variableTypeMap =
-			(Map<String, VariableTypeList>) variableMap.get(WorkbookSaver.VARIABLETYPEMAP);
-		final Map<String, List<MeasurementVariable>> measurementVariableMap =
-			(Map<String, List<MeasurementVariable>>) variableMap.get(WorkbookSaver.MEASUREMENTVARIABLEMAP);
-
-		final VariableTypeList trialVariableTypeList = variableTypeMap.get(WorkbookSaver.TRIALVARIABLETYPELIST);
-		final VariableTypeList trialVariables = variableTypeMap.get(WorkbookSaver.TRIALVARIABLES);
-		final List<MeasurementVariable> trialMV = measurementVariableMap.get(WorkbookSaver.TRIALMV);
-		final List<String> trialHeaders = headerMap.get(WorkbookSaver.TRIALHEADERS);
-
-
-		final List<Integer> locationIds = new ArrayList<>();
-		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
-
-		final Integer environmentDatasetId = workbook.getTrialDatasetId();
-		final Integer plotDatasetId = workbook.getMeasurementDatesetId();
-
-		final int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
-
-		// delete measurement data
-		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
-		// reset trial observation details such as experimentid, stockid and
-		// geolocationid
-		this.resetTrialObservations(workbook.getTrialObservations());
-
-		final int studyLocationId =
-			this.createLocationIfNecessary(trialVariableTypeList, true, locationIds, workbook, trialVariables, trialMV,
-				trialHeaders, trialVariatesMap, true, programUUID);
-
-		final ExperimentModel studyExperiment =
-			this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
-		studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
-		this.getExperimentDao().saveOrUpdate(studyExperiment);
-
-		// delete trial observations
-		this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
-
-		this.saveOrUpdateTrialObservations(crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId,
-			savedEnvironmentsCount,
-			true, programUUID);
-	}
-
 	public void savePlotDataset(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) {
 
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList ,

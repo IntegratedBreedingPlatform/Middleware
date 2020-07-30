@@ -3,7 +3,7 @@ package org.generationcp.middleware.service.impl.study;
 
 import com.beust.jcommander.internal.Lists;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.GermplasmStudySourceDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -16,15 +16,13 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.*;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 import java.util.*;
 
@@ -141,12 +139,14 @@ public class StudyServiceImplTest {
 	}
 
 	@Test
-	public void testHasAdvancedOrCrossesList() {
-		final GermplasmListDAO listDao = Mockito.mock(GermplasmListDAO.class);
-		Mockito.doReturn(listDao).when(this.daoFactory).getGermplasmListDAO();
+	public void testHasCrossesOrSelections() {
+		final GermplasmStudySourceDAO sourceDao = Mockito.mock(GermplasmStudySourceDAO.class);
+		Mockito.doReturn(sourceDao).when(this.daoFactory).getGermplasmStudySourceDAO();
 		final int studyId = new Random().nextInt();
-		this.studyServiceImpl.hasAdvancedOrCrossesList(studyId);
-		Mockito.verify(listDao).hasAdvancedOrCrossesList(studyId);
+		this.studyServiceImpl.hasCrossesOrSelections(studyId);
+		final ArgumentCaptor<GermplasmStudySourceSearchRequest> captor = ArgumentCaptor.forClass(GermplasmStudySourceSearchRequest.class);
+		Mockito.verify(sourceDao).countGermplasmStudySourceList(captor.capture());
+		Assert.assertEquals(studyId, captor.getValue().getStudyId());
 	}
 
 	/**
@@ -155,9 +155,8 @@ public class StudyServiceImplTest {
 	@Test
 	public void testGetObservations() {
 		final StudyMeasurements mockMeasurements = Mockito.mock(StudyMeasurements.class);
-		final StudyGermplasmService mockStudyGermplasmListService = Mockito.mock(StudyGermplasmService.class);
 
-		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl( mockMeasurements, mockStudyGermplasmListService);
+		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl( mockMeasurements);
 		studyServiceImpl.setDaoFactory(this.daoFactory);
 
 		final List<MeasurementVariableDto> projectTraits =

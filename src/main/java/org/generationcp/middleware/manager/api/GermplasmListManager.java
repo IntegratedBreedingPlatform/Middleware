@@ -17,7 +17,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
 
@@ -369,27 +368,11 @@ public interface GermplasmListManager {
 	 */
 	GermplasmListNewColumnsInfo getAdditionalColumnsForList(Integer listId);
 
-	long countListDataProjectGermplasmListDataByListId(Integer id);
-
-	/**
-	 * @param listID
-	 * @return
-	 */
-	List<ListDataProject> retrieveSnapshotListData(Integer listID);
-
-	/**
-	 * @param listID
-	 * @return
-	 */
-	List<ListDataProject> retrieveSnapshotListDataWithParents(Integer listID);
-
 	/**
 	 * @param listID
 	 * @return
 	 */
 	List<GermplasmListData> retrieveGermplasmListDataWithParents(Integer listID);
-
-	Integer retrieveDataListIDFromListDataProjectListID(Integer listDataProjectListID);
 
 	List<GermplasmList> getAllGermplasmListsByProgramUUID(String currentProgramUUID);
 

@@ -14,8 +14,8 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.DataSetupTest;
-import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -23,18 +23,14 @@ import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Progenitor;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.service.api.DataImportService;
@@ -49,14 +45,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -74,14 +63,11 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	private GermplasmDAO dao;
 	private LotDAO lotDAO;
 	private TransactionDAO transactionDAO;
-	private ListDataProjectDAO listDataProjectDAO;
-	private GermplasmListDAO germplasmListDAO;
 	private MethodDAO methodDAO;
 	private NameDAO nameDAO;
 	private UserDefinedFieldDAO userDefinedFieldDao;
 	private ProgenitorDAO progenitorDao;
-	private GermplasmListDataDAO germplasmListDataDAO;
-	private GermplasmTestDataGenerator germplasmTestDataGenerator;
+	private StockDao stockDao;
 	private DataSetupTest dataSetupTest;
 
 	@Autowired
@@ -113,12 +99,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.transactionDAO = new TransactionDAO();
 			this.transactionDAO.setSession(this.sessionProvder.getSession());
 
-			this.listDataProjectDAO = new ListDataProjectDAO();
-			this.listDataProjectDAO.setSession(this.sessionProvder.getSession());
-
-			this.germplasmListDAO = new GermplasmListDAO();
-			this.germplasmListDAO.setSession(this.sessionProvder.getSession());
-
 			this.methodDAO = new MethodDAO();
 			this.methodDAO.setSession(this.sessionProvder.getSession());
 
@@ -131,10 +111,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.progenitorDao = new ProgenitorDAO();
 			this.progenitorDao.setSession(this.sessionProvder.getSession());
 
-			this.germplasmListDataDAO = new GermplasmListDataDAO();
-			this.germplasmListDataDAO.setSession(this.sessionProvder.getSession());
-
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataDM);
+			this.stockDao = new StockDao();
+			this.stockDao.setSession(this.sessionProvder.getSession());
 
 			this.dataSetupTest = new DataSetupTest();
 			this.dataSetupTest.setDataImportService(this.dataImportService);
@@ -200,24 +178,13 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 12, 13, 1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
-
-		// Germplasm list
-		final GermplasmList germplasmList =
-				new GermplasmList(null, "Test Germplasm List " + 1, Long.valueOf(20141014), "LST", 1,
-						"Test Germplasm List", null, 1);
-		germplasmList.setProjectId(GermplasmDAOTest.TEST_PROJECT_ID);
-		this.germplasmListDAO.save(germplasmList);
-
-		final ListDataProject listDataProject = new ListDataProject();
-		listDataProject.setCheckType(0);
-		listDataProject.setList(germplasmList);
-		listDataProject.setGermplasmId(germplasm.getGid());
-		listDataProject.setDesignation("Deignation");
-		listDataProject.setEntryId(1);
-		listDataProject.setEntryCode("entryCode");
-		listDataProject.setSeedSource("seedSource");
-		listDataProject.setGroupName("grpName");
-		this.listDataProjectDAO.save(listDataProject);
+		final StockModel stock = new StockModel();
+		stock.setGermplasm(germplasm);
+		stock.setUniqueName("1");
+		stock.setIsObsolete(false);
+		stock.setProject(new DmsProject(TEST_PROJECT_ID));
+		stock.setTypeId(TermId.ENTRY_CODE.getId());
+		this.stockDao.save(stock);
 
 		final List<Germplasm> germplasmEntries = this.dao.getGermplasmParentsForStudy(GermplasmDAOTest.TEST_PROJECT_ID);
 

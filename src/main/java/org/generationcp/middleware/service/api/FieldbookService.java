@@ -628,15 +628,6 @@ public interface FieldbookService {
 	int countGermplasmListDataByListId(Integer listId);
 
 	/**
-	 * Count list data project germplasm list data by list id.
-	 *
-	 * @param listId
-	 *            the list id
-	 * @return the int
-	 */
-	int countListDataProjectGermplasmListDataByListId(Integer listId);
-
-	/**
 	 * Gets the method by code.
 	 *
 	 * @param code
@@ -697,33 +688,6 @@ public interface FieldbookService {
 	 * @return List of GermplasmList objects under the given project id and type
 	 */
 	List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type);
-
-	/**
-	 * Returns boolean that refers to the existence of Advanced or Crosses list of the Study
-	 *
-	 * @param  projectId - projectId of the study
-	 */
-	boolean hasAdvancedOrCrossesList(final int projectId);
-
-	/**
-	 * Creates or Update a list data project.
-	 *
-	 * @param projectId
-	 * @param type
-	 * @param list
-	 * @return
-	 */
-	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> list, int userId);
-
-	void updateGermlasmListInfoStudy(int crossesListId, int studyId);
-
-	/**
-	 * Retrieves a list data project
-	 *
-	 * @param listId
-	 * @return
-	 */
-	List<ListDataProject> getListDataProject(int listId);
 
 	/**
 	 * Saves germplasm list crosses types. ListData items are always added to
@@ -823,8 +787,7 @@ public interface FieldbookService {
 	 * Save workbook variables and Observations
 	 *
 	 * @param workbook
-	 * @param programUUID
 	 */
-	void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID);
+	void saveWorkbookVariablesAndObservations(final Workbook workbook);
 
 }

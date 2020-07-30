@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
@@ -46,6 +47,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.StudyResultSetByNameStartDateSeasonCountry;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
@@ -57,18 +59,13 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.pojos.dms.*;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyFilters;
@@ -78,19 +75,16 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
+import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -99,6 +93,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;
+
+	@Resource
+	private OntologyVariableDataManager variableDataManager;
 
 	@Resource
 	private UserService userService;
@@ -458,7 +455,21 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			fieldMapInfo.setFieldbookId(studyId);
 			fieldMapInfo.setFieldbookName(this.getDmsProjectDao().getById(studyId).getName());
 
+			// Retrieve one-off the cross expansions of GIDs of study
+			final List<StockModel> stockModelList = this.daoFactory.getStockDao().getStocksForStudy(studyId);
+			final Set<Integer> gids = new HashSet<>();
+			for (final StockModel stockModel : stockModelList) {
+				gids.add(stockModel.getGermplasm().getGid());
+			}
+			final Map<Integer, String> crossExpansions = this.pedigreeService.getCrossExpansions(gids, null, crossExpansionProperties);
 			final List<FieldMapDatasetInfo> fieldMapDatasetInfos = this.getExperimentPropertyDao().getFieldMapLabels(studyId);
+			for (final FieldMapDatasetInfo datasetInfo : fieldMapDatasetInfos) {
+				for (final FieldMapTrialInstanceInfo instanceInfo : datasetInfo.getTrialInstances()) {
+					for (final FieldMapLabel label : instanceInfo.getFieldMapLabels()) {
+						label.setPedigree(crossExpansions.get(label.getGid()));
+					}
+				}
+			}
 			fieldMapInfo.setDatasets(fieldMapDatasetInfos);
 
 			fieldMapInfos.add(fieldMapInfo);
@@ -1062,15 +1073,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			final StudySummary studySummary = new StudySummary();
 
 			studySummary.setActive(!dmsProject.isDeleted());
-			studySummary.setStartDate(dmsProject.getStartDate());
-			studySummary.setEndDate(dmsProject.getEndDate());
+			studySummary.setStartDate(Util.tryConvertDate(dmsProject.getStartDate(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
+			studySummary.setEndDate(Util.tryConvertDate(dmsProject.getEndDate(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
 
 			final Map<String, String> additionalProps = Maps.newHashMap();
 
 			for (final ProjectProperty prop : dmsProject.getProperties()) {
 
 				final Integer variableId = prop.getVariableId();
-				final String value = prop.getValue();
+				final Optional<DataType> dmsVariableType = this.variableDataManager.getDataType(prop.getVariableId());
+				final String value;
+				if (dmsVariableType.isPresent() && dmsVariableType.get().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
+					final Integer categoricalId = prop.getValue().equals("") ? 0 : Integer.parseInt(prop.getValue());
+					value = this.variableDataManager.retrieveVariableCategoricalValue(dmsProject.getProgramUUID(), prop.getVariableId(), categoricalId);
+ 				} else {
+					value = prop.getValue();
+				}
 
 				if (variableId.equals(TermId.SEASON_VAR_TEXT.getId())) {
 					studySummary.addSeason(value);
@@ -1337,12 +1355,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
+	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
 		return this.daoFactory.getPhenotypeDAO().getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
 	}
 
 	@Override
-	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
+	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
 		return this.daoFactory.getGeolocationPropertyDao().getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
 	}
 
@@ -1352,5 +1370,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	void setTrialEnvironmentBuilder(final TrialEnvironmentBuilder trialEnvironmentBuilder) {
 		this.trialEnvironmentBuilder = trialEnvironmentBuilder;
+	}
+
+	void setVariableDataManager(final OntologyVariableDataManager ontologyVariableDataManager) {
+		this.variableDataManager = ontologyVariableDataManager;
 	}
 }
