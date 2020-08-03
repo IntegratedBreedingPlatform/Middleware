@@ -27,7 +27,6 @@ import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -55,9 +54,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Resource
 	private UserService userService;
-
-	@Resource
-	private ListDataProjectSaver ListDataProjectSaver;
 
 	/**
 	 * Caches the udflds table. udflds should be small so this cache should be fine in terms of size. The string is the database url. So the
@@ -157,11 +153,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public long countGermplasmListDataByListId(final Integer id) {
 		return this.daoFactory.getGermplasmListDataDAO().countByListId(id);
-	}
-
-	@Override
-	public long countListDataProjectGermplasmListDataByListId(final Integer id) {
-		return this.getListDataProjectDAO().countByListId(id);
 	}
 
 	@Override
@@ -521,33 +512,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public List<ListDataProject> retrieveSnapshotListData(final Integer listID) {
-		return this.getListDataProjectDAO().getByListId(listID);
-	}
-
-	@Override
-	public List<ListDataProject> retrieveSnapshotListDataWithParents(final Integer listID) {
-		final List<ListDataProject> dataList = this.getListDataProjectDAO().getListDataProjectWithParents(listID);
-		if(!dataList.isEmpty()) {
-			final Iterable<Integer> gidList = Iterables.transform(dataList, new Function<ListDataProject, Integer>() {
-				public Integer apply(final ListDataProject data) {
-					return data.getGermplasmId();
-				}
-			});
-			// Append to maleParents of ListDataProject other progenitors of GIDs from the list, if any
-			final Map<Integer, List<GermplasmParent>> progenitorsMap =
-				this.daoFactory.getGermplasmDao().getParentsFromProgenitorsForGIDsMap(Lists.newArrayList(gidList));
-			for (final ListDataProject data : dataList) {
-				final List<GermplasmParent> progenitors = progenitorsMap.get(data.getGermplasmId());
-				if (progenitors != null) {
-					data.addMaleParents(progenitors);
-				}
-			}
-		}
-		return dataList;
-	}
-
-	@Override
 	public List<GermplasmListData> retrieveGermplasmListDataWithParents(final Integer listID) {
 		// Retrieve each cross with gpid1 and gpid2 parents info
 		final List<GermplasmListData> dataList =
@@ -569,11 +533,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 			}
 		}
 		return dataList;
-	}
-
-	@Override
-	public Integer retrieveDataListIDFromListDataProjectListID(final Integer listDataProjectListID) {
-		return this.daoFactory.getGermplasmListDAO().getListDataListIDFromListDataProjectListID(listDataProjectListID);
 	}
 
 	@Override
@@ -609,13 +568,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		this.updateGermplasmListData(listDatas);
 	}
 
-	private void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
-		final List<GermplasmList> germplasmLists = this.daoFactory.getGermplasmListDAO().getByListRef(listId);
-		for (final GermplasmList germplasmList : germplasmLists) {
-			this.ListDataProjectSaver.performListDataProjectEntriesDeletion(germplasms, germplasmList.getId());
-		}
-	}
-
 	@Override
 	public List<Integer> deleteGermplasms(final List<Integer> germplasms, final Integer listId) {
 
@@ -628,7 +580,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 			dao.deleteGermplasms(gidsDelete);
 
 			this.performGermplasmListEntriesDeletion(gidsDelete, listId);
-			this.performListDataProjectEntriesDeletion(gidsDelete, listId);
 		}
 
 		return gidsDelete;

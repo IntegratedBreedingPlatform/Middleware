@@ -37,7 +37,6 @@ import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
-import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -68,9 +67,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Resource
 	private GermplasmListManager germplasmListManager;
-
-	@Resource
-	private ListDataProjectSaver listDataProjectSaver;
 
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
@@ -856,11 +852,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public int countListDataProjectGermplasmListDataByListId(final Integer listId) {
-		return (int) this.germplasmListManager.countListDataProjectGermplasmListDataByListId(listId);
-	}
-
-	@Override
 	public Method getMethodById(final int id) {
 		return this.getGermplasmDataManager().getMethodByID(id);
 	}
@@ -922,34 +913,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<GermplasmList> getGermplasmListsByProjectId(final int projectId, final GermplasmListType type) {
 		return this.daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
-	}
-
-	@Override
-	public List<ListDataProject> getListDataProject(final int listId) {
-		return this.getListDataProjectDAO().getByListId(listId);
-	}
-
-	@Override
-	public int saveOrUpdateListDataProject(final int projectId, final GermplasmListType type, final Integer originalListId,
-			final List<ListDataProject> listDatas, final int userId) {
-
-		return this.listDataProjectSaver.saveOrUpdateListDataProject(projectId, type, originalListId, listDatas, userId);
-
-	}
-
-	@Override
-	public void updateGermlasmListInfoStudy(final int crossesListId, final int studyId) {
-
-		try {
-
-			this.listDataProjectSaver.updateGermlasmListInfoStudy(crossesListId, studyId);
-
-		} catch (final Exception e) {
-			FieldbookServiceImpl.LOG.error(e.getMessage(), e);
-			this.logAndThrowException("Error encountered with updateGermlasmListInfoStudy(): " + e.getMessage(), e,
-					FieldbookServiceImpl.LOG);
-		}
-
 	}
 
 	@Override
@@ -1031,10 +994,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
 		this.germplasmListManager = germplasmListManager;
-	}
-
-	public void setListDataProjectSaver(final ListDataProjectSaver listDataProjectSaver) {
-		this.listDataProjectSaver = listDataProjectSaver;
 	}
 
 	@Override

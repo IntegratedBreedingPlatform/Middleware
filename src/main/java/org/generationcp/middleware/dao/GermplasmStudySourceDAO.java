@@ -13,6 +13,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -131,30 +132,30 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				paramBuilder.append(" and gss.germplasm_study_source_id = :germplasmStudySourceId");
 				paramBuilder.setParameter("germplasmStudySourceId", germplasmStudySourceId);
 			}
-			final Integer gid = filter.getGid();
-			if (gid != null) {
-				paramBuilder.append(" and gss.gid = :gid");
-				paramBuilder.setParameter("gid", gid);
+			final List<Integer> gidList = filter.getGidList();
+			if (!CollectionUtils.isEmpty(gidList)) {
+				paramBuilder.append(" and gss.gid IN (:gidList)");
+				paramBuilder.setParameterList("gidList", gidList);
 			}
-			final Integer groupId = filter.getGroupId();
-			if (groupId != null) {
-				paramBuilder.append(" and g.mgid = :groupId");
-				paramBuilder.setParameter("groupId", groupId);
+			final List<Integer> groupIdList = filter.getGroupIdList();
+			if (!CollectionUtils.isEmpty(groupIdList)) {
+				paramBuilder.append(" and g.mgid IN (:groupIdList)");
+				paramBuilder.setParameterList("groupIdList", groupIdList);
 			}
-			final Integer germplasmDate = filter.getGermplasmDate();
-			if (germplasmDate != null) {
-				paramBuilder.append(" and g.gdate = :germplasmDate");
-				paramBuilder.setParameter("germplasmDate", germplasmDate);
+			final List<Integer> germplasmDateList = filter.getGermplasmDateList();
+			if (!CollectionUtils.isEmpty(germplasmDateList)) {
+				paramBuilder.append(" and g.gdate IN (:germplasmDateList)");
+				paramBuilder.setParameterList("germplasmDateList", germplasmDateList);
 			}
-			final Integer plotNumber = filter.getPlotNumber();
-			if (plotNumber != null) {
-				paramBuilder.append(" and plot_no.value = :plotNumber");
-				paramBuilder.setParameter("plotNumber", plotNumber);
+			final List<Integer> plotNumberList = filter.getPlotNumberList();
+			if (!CollectionUtils.isEmpty(plotNumberList)) {
+				paramBuilder.append(" and plot_no.value IN (:plotNumberList)");
+				paramBuilder.setParameterList("plotNumberList", plotNumberList);
 			}
-			final Integer replicationNumber = filter.getReplicationNumber();
-			if (replicationNumber != null) {
-				paramBuilder.append(" and rep_no.value = :replicationNumber");
-				paramBuilder.setParameter("replicationNumber", replicationNumber);
+			final List<Integer> replicationNumberList = filter.getReplicationNumberList();
+			if (!CollectionUtils.isEmpty(replicationNumberList)) {
+				paramBuilder.append(" and rep_no.value IN (:replicationNumberList)");
+				paramBuilder.setParameterList("replicationNumberList", replicationNumberList);
 			}
 			final String breedingMethodAbbreviation = filter.getBreedingMethodAbbreviation();
 			if (!StringUtils.isEmpty(breedingMethodAbbreviation)) {
@@ -181,10 +182,10 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				paramBuilder.append(" and breedingLoc.lname = :breedingLocationName");
 				paramBuilder.setParameter("breedingLocationName", breedingLocationName);
 			}
-			final String trialInstance = filter.getTrialInstance();
-			if (!StringUtils.isEmpty(trialInstance)) {
-				paramBuilder.append(" and geo.description = :trialInstance");
-				paramBuilder.setParameter("trialInstance", trialInstance);
+			final List<String> trialInstanceList = filter.getTrialInstanceList();
+			if (!CollectionUtils.isEmpty(trialInstanceList)) {
+				paramBuilder.append(" and geo.description IN (:trialInstanceList)");
+				paramBuilder.setParameterList("trialInstanceList", trialInstanceList);
 			}
 
 		}
@@ -202,9 +203,12 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 
 		paramBuilder.append(" GROUP BY gss.germplasm_study_source_id\n");
 
-		if (filter != null && filter.getNumberOfLots() != null) {
-			paramBuilder.append(" HAVING `numberOfLots` = :numberOfLots\n");
-			paramBuilder.setParameter("numberOfLots", filter.getNumberOfLots());
+		if (filter != null) {
+			final List<Integer> numberOfLotsList = filter.getNumberOfLotsList();
+			if (!CollectionUtils.isEmpty(numberOfLotsList)) {
+				paramBuilder.append(" HAVING `numberOfLots` IN (:numberOfLotsList)\n");
+				paramBuilder.setParameterList("numberOfLotsList", numberOfLotsList);
+			}
 		}
 
 	}

@@ -13,12 +13,9 @@ import org.generationcp.middleware.manager.api.*;
 import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Criterion;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -100,24 +97,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		this.studyReference = this.studyTDI.addTestStudy("ABCD");
 
-	}
-
-	@Test
-	public void testHideSnapshotListTypes() {
-		final GermplasmListDAO dao = new GermplasmListDAO();
-		final Criteria criteria = Mockito.mock(Criteria.class);
-		dao.hideSnapshotListTypes(criteria);
-		final Criterion restrictedList = dao.getRestrictedSnapshopTypes();
-		// this should ensure that the snapshot list types are added int he criteria object
-		Mockito.verify(criteria, Mockito.times(1)).add(restrictedList);
-		
-	}
-
-	@Test
-	public void testGetRestrictedSnapshopTypes() {
-		final GermplasmListDAO dao = new GermplasmListDAO();
-		final Criterion restrictedList = dao.getRestrictedSnapshopTypes();
-		Assert.assertNotNull(restrictedList);
 	}
 
 	@Test

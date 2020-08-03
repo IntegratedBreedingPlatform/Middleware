@@ -65,13 +65,7 @@ import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.pojos.dms.*;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyFilters;
@@ -84,17 +78,13 @@ import org.generationcp.middleware.util.PlotUtil;
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -465,7 +455,21 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			fieldMapInfo.setFieldbookId(studyId);
 			fieldMapInfo.setFieldbookName(this.getDmsProjectDao().getById(studyId).getName());
 
+			// Retrieve one-off the cross expansions of GIDs of study
+			final List<StockModel> stockModelList = this.daoFactory.getStockDao().getStocksForStudy(studyId);
+			final Set<Integer> gids = new HashSet<>();
+			for (final StockModel stockModel : stockModelList) {
+				gids.add(stockModel.getGermplasm().getGid());
+			}
+			final Map<Integer, String> crossExpansions = this.pedigreeService.getCrossExpansions(gids, null, crossExpansionProperties);
 			final List<FieldMapDatasetInfo> fieldMapDatasetInfos = this.getExperimentPropertyDao().getFieldMapLabels(studyId);
+			for (final FieldMapDatasetInfo datasetInfo : fieldMapDatasetInfos) {
+				for (final FieldMapTrialInstanceInfo instanceInfo : datasetInfo.getTrialInstances()) {
+					for (final FieldMapLabel label : instanceInfo.getFieldMapLabels()) {
+						label.setPedigree(crossExpansions.get(label.getGid()));
+					}
+				}
+			}
 			fieldMapInfo.setDatasets(fieldMapDatasetInfos);
 
 			fieldMapInfos.add(fieldMapInfo);

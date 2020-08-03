@@ -448,16 +448,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetFieldMapInfoOfStudy() {
-		final List<Integer> trialIdList = new ArrayList<>();
-		trialIdList.addAll(Arrays.asList(this.studyReference.getId()));
-		final List<FieldMapInfo> fieldMapInfos =
-			this.manager.getFieldMapInfoOfStudy(trialIdList, StudyDataManagerImplTest.crossExpansionProperties);
-		// compare the size to the minimum possible value of field map infos' size
-		Assert.assertTrue("The size should be greater than 0", fieldMapInfos.size() > 0);
-	}
-
-	@Test
 	public void testGetParentFolder() {
 		final String uniqueId = "001";
 		final DmsProject project = this.studyTDI.createFolderTestData(uniqueId);
