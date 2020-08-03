@@ -233,7 +233,7 @@ public class TransactionServiceImpl implements TransactionService {
 				}
 			} else {
 				throw new MiddlewareRequestException("", "lot.balance.update.invalid.available.balance",
-					String.valueOf(lotDto.getLotId()));
+					String.valueOf(lotDto.getStockId()));
 			}
 		}
 	}

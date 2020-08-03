@@ -6,7 +6,9 @@ import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -155,6 +157,38 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
 		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
 		Assert.assertTrue(extendedLotDto.getAvailableBalance().equals(38D));
+	}
+
+	@Test(expected = MiddlewareRequestException.class)
+	public void testSaveAdjustmentTransactions_InvalidNewBalance() {
+		this.transactionService.saveAdjustmentTransactions(userId, Collections.singleton(lot.getId()), 1D, "");
+	}
+
+	@Test
+	public void testSaveAdjustmentTransactions_OK() {
+		this.transactionService.saveAdjustmentTransactions(userId, Collections.singleton(lot.getId()), 3D, "");
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
+		Assert.assertTrue(extendedLotDto.getActualBalance().equals(3D));
+	}
+
+	@Test
+	public void testSaveAdjustmentTransactions_NoTransactionSaved() {
+		this.transactionService.saveAdjustmentTransactions(userId, Collections.singleton(lot.getId()), 20D, "");
+
+		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+		transactionsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+		final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
+
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
+		Assert.assertTrue(extendedLotDto.getActualBalance().equals(20D));
+
+		Assert.assertEquals(3, transactionDtos.size());
 	}
 
 	private void createGermplasm() {
