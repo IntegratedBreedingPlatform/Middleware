@@ -155,6 +155,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			environmentsToDelete.stream().mapToInt(o -> Integer.valueOf(o.getDescription())).boxed()
 				.collect(Collectors.toList());
 
+		//Update StudyExperimentGeolocation
+		this.daoFactory.getExperimentDao().updateStudyExperimentGeolocationIfNecessary(studyId, instanceIds);
+
 		// Delete plot and environment experiments
 		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);
 		final ExperimentDao experimentDao = this.daoFactory.getExperimentDao();
