@@ -11,11 +11,6 @@
 package org.generationcp.middleware.domain.inventory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.util.Util;
 
 /**
  * Row in Seed Inventory System that shows the details of ims_lot/transaction.
@@ -26,8 +21,7 @@ import org.generationcp.middleware.util.Util;
 public class InventoryDetails implements Comparable<InventoryDetails>, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	public static final String BULK_COMPL_Y = "Y";
-	public static final String BULK_COMPL_COMPLETED = "Completed";
+
 
 	/** The index. */
 	Integer index;
@@ -86,26 +80,9 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	// listdata.source
 	String source;
 
-	String inventoryID;
-
 	/** The ff. fields are from seed inventory import */
 	private String entryCode;
 	private String cross;
-
-	/** The ff. fields are used for export inventory template for stock list */
-	private String duplicate;
-	private String bulkWith;
-	private String bulkCompl;
-	private List<String> bulkWithStockIds;
-
-	/** The ff. fields are used for importing inventory for stock list */
-	private Integer listDataProjectId;
-	private Integer trnId;
-
-	/** This is used for executing bulking instructions */
-	private Integer sourceRecordId;
-	private Integer lotGid;
-	private Integer stockSourceRecordId;
 
 	private Integer instanceNumber;
 	private Integer plotNumber;
@@ -162,17 +139,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.entryId = entryId;
 	}
 
-	public InventoryDetails(final Integer entryId, final String desig, final Integer gid, final String cross, final String source, final String entryCode, final String stockId,
-			final Double seedQuantity) {
-		this.entryId = entryId;
-		this.germplasmName = desig;
-		this.gid = gid;
-		this.cross = cross;
-		this.source = source;
-		this.entryCode = entryCode;
-		this.inventoryID = stockId;
-		this.amount = seedQuantity;
-	}
 
 	/**
 	 * Gets the original gid of the inventory
@@ -191,15 +157,9 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the gid
 	 */
 	public Integer getGid() {
-		if (this.isBulkingDonor()) {
-			return null;
-		}
 		return this.gid;
 	}
 
-	public boolean isBulkingDonor() {
-		return this.isBulkingCompleted() && !this.sourceRecordId.equals(this.stockSourceRecordId);
-	}
 
 	/**
 	 * Sets the gid.
@@ -216,9 +176,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the germplasm name
 	 */
 	public String getGermplasmName() {
-		if (this.isBulkingDonor()) {
-			return null;
-		}
 		return this.germplasmName;
 	}
 
@@ -691,21 +648,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return 0;
 	}
 
-	public String getInventoryID() {
-		if (this.isBulkingRecipient()) {
-			return Util.prependToCSVAndArrange(this.inventoryID, this.bulkWith);
-		}
-		return this.inventoryID;
-	}
-
-	public boolean isBulkingRecipient() {
-		return this.isBulkingCompleted() && this.sourceRecordId.equals(this.stockSourceRecordId);
-	}
-
-	public void setInventoryID(final String inventoryID) {
-		this.inventoryID = inventoryID;
-	}
-
 	public String getEntryCode() {
 		return this.entryCode;
 	}
@@ -722,96 +664,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.cross = cross;
 	}
 
-	public void copyFromGermplasmListData(final GermplasmListData datum) {
-		this.gid = datum.getGid();
-		this.setGermplasmName(datum.getDesignation());
-		this.setEntryId(datum.getEntryId());
-		this.setParentage(datum.getGroupName());
-		this.setSource(datum.getSeedSource());
-	}
-
-	public String getDuplicate() {
-		return this.duplicate;
-	}
-
-	public void setDuplicate(final String duplicate) {
-		this.duplicate = duplicate;
-	}
-
-	public String getBulkWith() {
-		return this.bulkWith;
-	}
-
-	public void setBulkWith(final String bulkWith) {
-		this.bulkWith = bulkWith;
-		this.bulkWithStockIds = new ArrayList<>();
-	}
-
-	public String getBulkCompl() {
-		return this.bulkCompl;
-	}
-
-	public void setBulkCompl(final String bulkCompl) {
-		this.bulkCompl = bulkCompl;
-	}
-
-	public Integer getListDataProjectId() {
-		return this.listDataProjectId;
-	}
-
-	public void setListDataProjectId(final Integer listDataProjectId) {
-		this.listDataProjectId = listDataProjectId;
-	}
-
-	public Integer getTrnId() {
-		return this.trnId;
-	}
-
-	public void setTrnId(final Integer trnId) {
-		this.trnId = trnId;
-	}
-
-	public Integer getSourceRecordId() {
-		return this.sourceRecordId;
-	}
-
-	public void setSourceRecordId(final Integer sourceRecordId) {
-		this.sourceRecordId = sourceRecordId;
-	}
-
-	public Integer getLotGid() {
-		return this.lotGid;
-	}
-
-	public void setLotGid(final Integer lotGid) {
-		this.lotGid = lotGid;
-	}
-
-	public void addBulkWith(final String bulkWith) {
-		if (bulkWith.equals(this.inventoryID)) {
-			return;
-		}
-		if (this.bulkWith == null) {
-			this.bulkWith = bulkWith;
-			this.bulkWithStockIds = new ArrayList<>();
-			this.bulkWithStockIds.add(bulkWith);
-		} else if (!this.bulkWithStockIds.contains(bulkWith)) {
-			this.bulkWith += ", " + bulkWith;
-			this.bulkWithStockIds.add(bulkWith);
-		}
-	}
-
-	public boolean isBulkingCompleted() {
-		return InventoryDetails.BULK_COMPL_COMPLETED.equals(this.bulkCompl);
-	}
-
-	public Integer getStockSourceRecordId() {
-		return this.stockSourceRecordId;
-	}
-
-	public void setStockSourceRecordId(final Integer stockSourceRecordId) {
-		this.stockSourceRecordId = stockSourceRecordId;
-	}
 
 	public Integer getInstanceNumber() {
 		return this.instanceNumber;
@@ -835,10 +687,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	public void setReplicationNumber(final Integer replicationNumber) {
 		this.replicationNumber = replicationNumber;
-	}
-
-	public List<String> getBulkWithStockIds() {
-		return this.bulkWithStockIds;
 	}
 
 	public Integer getGroupId() {

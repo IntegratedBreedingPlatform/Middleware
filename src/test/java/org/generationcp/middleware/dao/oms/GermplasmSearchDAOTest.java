@@ -132,7 +132,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testSearchForGermplasmsStartsWithGermplasmName() throws Exception {
 
 		final Germplasm germplasm =
-				GermplasmTestDataInitializer.createGermplasm(germplasmDate, 12, 13, 1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+				GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 12, 13, 1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		germplasm.getPreferredName().setNval("GermplasmName");
 		this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
 
@@ -171,11 +171,11 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testSearchForGermplasmsIncludeParents() throws Exception {
 
 		final Germplasm parentGermplasm =
-				GermplasmTestDataInitializer.createGermplasm(germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+				GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer parentGermplasmId = this.germplasmDataDM.addGermplasm(parentGermplasm, parentGermplasm.getPreferredName());
 
 		final Germplasm childGermplasm = GermplasmTestDataInitializer
-				.createGermplasm(germplasmDate, parentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+				.createGermplasm(this.germplasmDate, parentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer childGermplasmId = this.germplasmDataDM.addGermplasm(childGermplasm, childGermplasm.getPreferredName());
 
 		final List<Germplasm> results = this.dao.searchForGermplasms(
@@ -255,7 +255,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testSearchForGermplasmsWithImmediateSourceGIDAndName() throws Exception {
 		//Create a new germplasm with -1 gnpgs
 		final Germplasm germplasm = GermplasmTestDataInitializer
-				.createGermplasm(germplasmDate, femaleParentGID, maleParentGID, -1, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID, 1, 1,
+				.createGermplasm(this.germplasmDate, this.femaleParentGID, this.maleParentGID, -1, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID, 1, 1,
 						"MethodName", "LocationName");
 
 		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
@@ -814,7 +814,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		}
 
 		// Check if the list is in descending order
-		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
 
 	}
 
@@ -862,7 +862,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		}
 
 		// Check if the list is in descending order
-		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
 
 	}
 
@@ -958,7 +958,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		}
 
 		// Check if the list is in descending order
-		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
 
 	}
 
@@ -1262,17 +1262,17 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private void initializeGermplasms() {
 
 		final Germplasm fParent =
-				GermplasmTestDataInitializer.createGermplasm(germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+				GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.femaleParentGID = this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName());
 		this.femaleParentPreferredName = fParent.getPreferredName();
 
 		final Germplasm mParent =
-				GermplasmTestDataInitializer.createGermplasm(germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+				GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.maleParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName());
 		this.maleParentPreferredName = mParent.getPreferredName();
 
 		final Germplasm germplasm = GermplasmTestDataInitializer
-				.createGermplasm(germplasmDate, femaleParentGID, maleParentGID, 2, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID, 1, 1,
+				.createGermplasm(this.germplasmDate, this.femaleParentGID, this.maleParentGID, 2, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID, 1, 1,
 						"MethodName", "LocationName");
 
 		// Create Germplasm and add Preferred Name
@@ -1280,25 +1280,25 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.preferredName = germplasm.getPreferredName();
 
 		// Add Preferred Id, nstat = 8 means the name is preferred Id
-		this.preferredId = GermplasmTestDataInitializer.createGermplasmName(germplasmGID, "Preferred Id of " + germplasmGID);
-		preferredId.setNstat(8);
-		this.germplasmDataDM.addGermplasmName(preferredId);
+		this.preferredId = GermplasmTestDataInitializer.createGermplasmName(this.germplasmGID, "Preferred Id of " + this.germplasmGID);
+		this.preferredId.setNstat(8);
+		this.germplasmDataDM.addGermplasmName(this.preferredId);
 		
 		// Add name of CODE1 type
-		this.code1NameTypeValue = "Code1 Name of " + germplasmGID;
-		UserDefinedField nameType = userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", DERIVATIVE_NAME_CODE);
+		this.code1NameTypeValue = "Code1 Name of " + this.germplasmGID;
+		final UserDefinedField nameType = this.userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", DERIVATIVE_NAME_CODE);
 		final Name code1Name =
-				GermplasmTestDataInitializer.createGermplasmName(germplasmGID, this.code1NameTypeValue);
+				GermplasmTestDataInitializer.createGermplasmName(this.germplasmGID, this.code1NameTypeValue);
 		code1Name.setTypeId(nameType.getFldno());
 		code1Name.setNstat(0);
 		this.germplasmDataDM.addGermplasmName(code1Name);
 
 		// Add NOTE attribute
-		final UserDefinedField attributeField = userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE_ATTRIBUTE);
+		final UserDefinedField attributeField = this.userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE_ATTRIBUTE);
 
-		this.attributeValue = "Attribute of " + germplasmGID;
+		this.attributeValue = "Attribute of " + this.germplasmGID;
 		final Attribute attribute = new Attribute();
-		attribute.setGermplasmId(germplasmGID);
+		attribute.setGermplasmId(this.germplasmGID);
 		attribute.setTypeId(attributeField.getFldno());
 		attribute.setAval(this.attributeValue);
 		attribute.setUserId(0);
@@ -1310,7 +1310,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		lot.setEntityType("GERMPLSM");
 		lot.setLocationId(0);
 		lot.setScaleId(TermId.SEED_AMOUNT_G.getId());
-		lot.setEntityId(germplasmGID);
+		lot.setEntityId(this.germplasmGID);
 		lot.setStatus(0);
 		lot.setStockId(RandomStringUtils.randomAlphabetic(35));
 		this.inventoryDataManager.addLot(lot);
@@ -1323,7 +1323,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.inventoryDataManager.addTransaction(transaction);
 
 		final Germplasm mgMember = GermplasmTestDataInitializer
-				.createGermplasm(germplasmDate, femaleParentGID, maleParentGID, 2, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID, 1, 1,
+				.createGermplasm(this.germplasmDate, this.femaleParentGID, this.maleParentGID, 2, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID, 1, 1,
 						"MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName());
 
@@ -1360,7 +1360,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			this.germplasmDataDM.addGermplasmName(tempPreferredId);
 			
 			// Add name of CODE1 type
-			UserDefinedField nameType = userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", DERIVATIVE_NAME_CODE);
+			final UserDefinedField nameType = this.userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", DERIVATIVE_NAME_CODE);
 			final Name code1Name =
 					GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Code1 Name of " + tempGermplasmGid);
 			code1Name.setTypeId(nameType.getFldno());
@@ -1368,7 +1368,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			this.germplasmDataDM.addGermplasmName(code1Name);
 
 			// Add NOTE attribute
-			final UserDefinedField attributeField = userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE_ATTRIBUTE);
+			final UserDefinedField attributeField = this.userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE_ATTRIBUTE);
 
 			final Attribute attribute = new Attribute();
 			attribute.setGermplasmId(tempGermplasmGid);
@@ -1409,7 +1409,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			Assert.assertEquals("Result should contain Method Name", "Unknown generative method", germplasm.getMethodName());
 			Assert.assertEquals("Result should contain Location Name", "Afghanistan", germplasm.getLocationName());
 			Assert.assertEquals("Result should contain Germplasm Number of Progenitor", Integer.valueOf(2), germplasm.getGnpgs());
-			Assert.assertEquals("Result should contain Germplasm Date", Integer.valueOf(germplasmDate), germplasm.getGdate());
+			Assert.assertEquals("Result should contain Germplasm Date", Integer.valueOf(this.germplasmDate), germplasm.getGdate());
 			Assert.assertEquals("Result should contain Reference Id", Integer.valueOf(1), germplasm.getReferenceId());
 		}
 	}
@@ -1458,36 +1458,21 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		} else {
 			Assert.assertTrue("Result germplasm should not contain Method Group", StringUtils.isEmpty(germplasm.getMethodGroup()));
 		}
-		if (propertyIds.contains(GermplasmSearchDAO.FEMALE_PARENT_ID)) {
-			Assert.assertEquals("Result germplasm should contain Female Parent ID", String.valueOf(femaleParentGID),
-					germplasm.getFemaleParentPreferredID());
-		} else {
-			Assert.assertTrue("Result germplasm should not contain Female Parent ID",
-					StringUtils.isEmpty(germplasm.getFemaleParentPreferredID()));
-		}
-		if (propertyIds.contains(GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME)) {
-			Assert.assertEquals("Result germplasm should contain Female Parent Preferred Name", femaleParentPreferredName.getNval(),
-					germplasm.getFemaleParentPreferredName());
-		} else {
-			Assert.assertTrue("Result germplasm should not contain Female Parent Preferred Name",
-					StringUtils.isEmpty(germplasm.getFemaleParentPreferredName()));
-		}
-		if (propertyIds.contains(GermplasmSearchDAO.MALE_PARENT_ID)) {
-			Assert.assertEquals("Result germplasm should contain Male Parent ID", String.valueOf(maleParentGID),
-					germplasm.getMaleParentPreferredID());
-		} else {
-			Assert.assertTrue("Result germplasm should not contain Male Parent ID",
-					StringUtils.isEmpty(germplasm.getMaleParentPreferredID()));
-		}
-		if (propertyIds.contains(GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME)) {
-			Assert.assertEquals("Result germplasm should contain Male Parent Preferred Name", maleParentPreferredName.getNval(),
-					germplasm.getMaleParentPreferredName());
-		} else {
-			Assert.assertTrue("Result germplasm should not contain Male Parent Preferred Name",
-					StringUtils.isEmpty(germplasm.getMaleParentPreferredName()));
-		}
+
+		Assert.assertTrue("Result germplasm should not contain Female Parent ID",
+			StringUtils.isEmpty(germplasm.getFemaleParentPreferredID()));
+
+		Assert.assertTrue("Result germplasm should not contain Female Parent Preferred Name",
+			StringUtils.isEmpty(germplasm.getFemaleParentPreferredName()));
+
+		Assert.assertTrue("Result germplasm should not contain Male Parent ID",
+			StringUtils.isEmpty(germplasm.getMaleParentPreferredID()));
+
+		Assert.assertTrue("Result germplasm should not contain Male Parent Preferred Name",
+			StringUtils.isEmpty(germplasm.getMaleParentPreferredName()));
+
 		if (propertyIds.contains(GermplasmSearchDAO.IMMEDIATE_SOURCE_GID)) {
-			Assert.assertEquals("Result germplasm should contain Immediate Source GID", String.valueOf(maleParentGID),
+			Assert.assertEquals("Result germplasm should contain Immediate Source GID", String.valueOf(this.maleParentGID),
 					germplasm.getImmediateSourceGID());
 		} else {
 			Assert.assertTrue("Result germplasm should not contain Immediate Source GID",
@@ -1495,7 +1480,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		}
 		
 		if (propertyIds.contains(GermplasmSearchDAO.IMMEDIATE_SOURCE_PREFERRED_NAME)) {
-			Assert.assertEquals("Result germplasm should contain Immediate Source Preferred Name", maleParentPreferredName.getNval(),
+			Assert.assertEquals("Result germplasm should contain Immediate Source Preferred Name", this.maleParentPreferredName.getNval(),
 					germplasm.getImmediateSourcePreferredName());
 		} else {
 			Assert.assertTrue("Result germplasm should not contain Immediate Source Preferred Name",

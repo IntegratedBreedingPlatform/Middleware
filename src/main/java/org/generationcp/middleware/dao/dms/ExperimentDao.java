@@ -12,7 +12,9 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Function;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ExperimentType;
@@ -57,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link ExperimentModel}.
@@ -166,10 +169,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return null;
 	}
 
-	public ExperimentModel getExperimentByProjectIdAndGeoLocationAndType(final Integer projectId, final Integer geolocationId, final Integer typeId) {
+	public ExperimentModel getExperimentByProjectIdAndType(final Integer projectId, final Integer typeId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("project.projectId", projectId));
-		criteria.add(Restrictions.eq("geoLocation.locationId", geolocationId));
 		criteria.add(Restrictions.eq("typeId", typeId));
 		return (ExperimentModel) criteria.uniqueResult();
 	}
@@ -665,6 +667,36 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	public Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer projectId, final Set<Integer> instanceNumbers, final Set<Integer> plotNumbers) {
+		final Table<Integer, Integer, Integer> experimentsTable = HashBasedTable.create();
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("project.projectId", projectId));
+			criteria.createAlias("properties", "prop");
+			criteria.createAlias("geoLocation", "instance");
+			criteria.add(Restrictions.in("instance.description", instanceNumbers.stream().map(num -> String.valueOf(num)).collect(Collectors.toList())));
+			criteria.add(Restrictions.and(
+					Restrictions.eq("prop.typeId", TermId.PLOT_NO.getId()),
+					Restrictions.in("prop.value", plotNumbers.stream().map(plot -> String.valueOf(plot)).collect(Collectors.toList()))));
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("instance.description"));
+			projectionList.add(Projections.property("prop.value"));
+			projectionList.add(Projections.property("ndExperimentId"));
+			criteria.setProjection(projectionList);
+
+			final List<Object[]> results = criteria.list();
+			for (final Object[] row : results) {
+				experimentsTable.put(Integer.valueOf((String) row[0]), Integer.valueOf((String) row[1]), (Integer) row[2]);
+			}
+			return experimentsTable;
+		} catch (final HibernateException e) {
+			final String message =
+					"Error at getTrialNumberPlotNumberObservationUnitIdTable=" + projectId + "," + plotNumbers + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 	public Map<String, ObservationUnitRow> getObservationUnitsAsMap(
 		final int datasetId,
 		final List<MeasurementVariable> measurementVariables, final List<String> observationUnitIds) {
@@ -970,30 +1002,32 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	// Update study experiment if the Geolocation ID to be the one is the one used by the study experiment
-	public void updateStudyExperimentGeolocationIfNecessary(final Integer studyId, final Integer geolocationId) {
-		final ExperimentModel studyExperiment = this.getExperimentByProjectIdAndGeoLocationAndType(studyId, geolocationId,
+	public void updateStudyExperimentGeolocationIfNecessary(final Integer studyId, final List<Integer> geolocationIds) {
+		final ExperimentModel studyExperiment = this.getExperimentByProjectIdAndType(studyId,
 			ExperimentType.STUDY_INFORMATION.getTermId());
+		if (studyExperiment != null && studyExperiment.getGeoLocation() != null) {
+			final Integer currentGeolocationId = studyExperiment.getGeoLocation().getLocationId();
+			if (geolocationIds.contains(currentGeolocationId)) {
+				// Query the next available Geolocation ID from environments that will remain
+				final String queryString = "select min(e.nd_geolocation_id)\n"
+					+ "from nd_experiment e "
+					+ "inner join project p on e.project_id = p.project_id "
+					+ "WHERE (p.study_id = :studyId or p.project_id = :studyId) "
+					+ "AND e.nd_geolocation_id NOT IN (:geolocationIds)";
+				final StringBuilder sb = new StringBuilder(queryString);
+				final SQLQuery statement = this.getSession().createSQLQuery(sb.toString());
+				statement.setParameter("studyId", studyId);
+				statement.setParameterList("geolocationIds", geolocationIds);
+				final Integer nextGeolocationId = (Integer) statement.uniqueResult();
 
-		if (studyExperiment != null) {
-			// Query the next available Geolocation ID from environments that will remain
-			final String queryString = "select min(if (e.nd_geolocation_id != :geolocationId, nd_geolocation_id, null))\n"
-				+ "from nd_experiment e "
-				+ "inner join project p on e.project_id = p.project_id "
-				+ "WHERE p.study_id = :studyId or p.project_id = :studyId";
-			final StringBuilder sb = new StringBuilder(queryString);
-			final SQLQuery statement = this.getSession().createSQLQuery(sb.toString());
-			statement.setParameter("studyId", studyId);
-			statement.setParameter("geolocationId", geolocationId);
-			final BigInteger nextGeolocationId = (BigInteger) statement.uniqueResult();
-
-			if (nextGeolocationId != null) {
-				studyExperiment.setGeoLocation(new Geolocation(nextGeolocationId.intValue()));
-				this.update(studyExperiment);
-			} else {
-				throw new MiddlewareQueryException("Cannot update GeolocationID=" + geolocationId + " for Study=" + studyId
-					+ " as no other environments will remain for the study.");
+				if (nextGeolocationId != null) {
+					studyExperiment.setGeoLocation(new Geolocation(nextGeolocationId.intValue()));
+					this.update(studyExperiment);
+				} else {
+					throw new MiddlewareQueryException("Cannot update GeolocationID for Study=" + studyId
+						+ " as no other environments will remain for the study.");
+				}
 			}
-
 		}
 	}
 

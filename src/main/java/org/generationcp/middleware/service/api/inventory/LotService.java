@@ -28,7 +28,7 @@ public interface LotService {
 
 	void updateLots(List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotRequest);
 
-	void saveLotsWithInitialTransaction(CropType cropType, Integer userId, List<LotItemDto> lotItemDtos);
+	List<String> saveLots(CropType cropType, Integer userId, List<LotItemDto> lotItemDtos);
 
 	List<LotDto> getLotsByStockIds(List<String> stockIds);
 

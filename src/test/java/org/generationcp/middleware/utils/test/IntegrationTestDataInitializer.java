@@ -2,6 +2,7 @@ package org.generationcp.middleware.utils.test;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.StudyTypeDAO;
@@ -18,6 +19,7 @@ import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
+import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -28,6 +30,9 @@ import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmStudySource;
+import org.generationcp.middleware.pojos.GermplasmStudySourceType;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
@@ -74,6 +79,7 @@ public class IntegrationTestDataInitializer {
 	private SampleListDao sampleListDao;
 	private ProjectPropertyDao projectPropertyDao;
 	private StudyTypeDAO studyTypeDAO;
+	private NameDAO nameDAO;
 
 	private WorkbenchDaoFactory workbenchDaoFactory;
 	private DaoFactory daoFactory;
@@ -101,6 +107,8 @@ public class IntegrationTestDataInitializer {
 		this.userService = new UserServiceImpl(workbenchSessionProvider);
 		this.studyTypeDAO = new StudyTypeDAO();
 		this.studyTypeDAO.setSession(hibernateSessionProvider.getSession());
+		this.nameDAO = new NameDAO();
+		this.nameDAO.setSession(hibernateSessionProvider.getSession());
 	}
 
 	public DmsProject createStudy(final String name, final String description, final int studyTypeId) {
@@ -153,9 +161,10 @@ public class IntegrationTestDataInitializer {
 		return geolocation;
 	}
 
-	public List<ExperimentModel> createTestExperimentsWithStock(final DmsProject study, final DmsProject dataset, final ExperimentModel parent,
-													   final Geolocation geolocation,
-													   final int noOfExperiments) {
+	public List<ExperimentModel> createTestExperimentsWithStock(final DmsProject study, final DmsProject dataset,
+		final ExperimentModel parent,
+		final Geolocation geolocation,
+		final int noOfExperiments) {
 
 		final List<ExperimentModel> experimentModels = new ArrayList<>();
 
@@ -198,9 +207,20 @@ public class IntegrationTestDataInitializer {
 	}
 
 	public StockModel createTestStock(final DmsProject study, final ExperimentModel experimentModel) {
+		final StockModel stockModel = this.createTestStock(study);
+		experimentModel.setStock(stockModel);
+		return stockModel;
+
+	}
+
+	public StockModel createTestStock(final DmsProject study) {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		germplasm.setGid(null);
 		this.germplasmDao.save(germplasm);
+
+		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid());
+		germplasmName.setTypeId(2);
+		this.nameDAO.save(germplasmName);
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
@@ -211,10 +231,7 @@ public class IntegrationTestDataInitializer {
 		stockModel.setProject(study);
 
 		this.stockDao.saveOrUpdate(stockModel);
-		experimentModel.setStock(stockModel);
-
 		return stockModel;
-
 	}
 
 	public SampleList createTestSampleList(final String listName, final Integer userId) {
@@ -385,5 +402,24 @@ public class IntegrationTestDataInitializer {
 
 		return workbenchUser;
 
+	}
+
+	public GermplasmStudySource addGermplasmStudySource(final DmsProject study, final DmsProject plot, final Geolocation geolocation,
+		final String plotNumber,
+		final String replicationNumber) {
+		final StockModel stockModel = this.createTestStock(study);
+
+		final ExperimentModel experimentModel =
+			this.createExperimentModel(plot, geolocation, ExperimentType.PLOT.getTermId(), stockModel);
+
+		this.addExperimentProp(experimentModel, TermId.PLOT_NO.getId(), plotNumber, 1);
+		this.addExperimentProp(experimentModel, TermId.REP_NO.getId(), replicationNumber, 1);
+
+		final GermplasmStudySource germplasmStudySource =
+			new GermplasmStudySource(stockModel.getGermplasm(), study, experimentModel,
+				GermplasmStudySourceType.ADVANCE);
+		this.daoFactory.getGermplasmStudySourceDAO().save(germplasmStudySource);
+
+		return germplasmStudySource;
 	}
 }

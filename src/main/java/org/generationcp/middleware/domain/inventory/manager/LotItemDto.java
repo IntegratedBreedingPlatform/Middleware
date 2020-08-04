@@ -9,8 +9,14 @@ public class LotItemDto {
 
 	private Integer gid;
 
+	private Integer storageLocationId;
+
+	/** Ignored if storageLocationId is present */
 	private String storageLocationAbbr;
 
+	private Integer scaleId;
+
+	/** Ignored if scaleId is present */
 	private String scaleName;
 
 	private Double initialBalance;
@@ -27,6 +33,14 @@ public class LotItemDto {
 		this.gid = gid;
 	}
 
+	public Integer getStorageLocationId() {
+		return this.storageLocationId;
+	}
+
+	public void setStorageLocationId(final Integer storageLocationId) {
+		this.storageLocationId = storageLocationId;
+	}
+
 	public String getStorageLocationAbbr() {
 		return storageLocationAbbr;
 	}
@@ -37,6 +51,14 @@ public class LotItemDto {
 
 	public String getScaleName() {
 		return scaleName;
+	}
+
+	public Integer getScaleId() {
+		return this.scaleId;
+	}
+
+	public void setScaleId(final Integer scaleId) {
+		this.scaleId = scaleId;
 	}
 
 	public void setScaleName(final String scaleName) {

@@ -27,12 +27,7 @@ import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
+import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanConstructorResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -45,13 +40,7 @@ import org.springframework.data.domain.Sort;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -93,7 +82,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 			final StringBuilder sql =
 				new StringBuilder().append("Select lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
-					.append("tran.sourceid, tran.trnqty, lot.stock_id, lot.comments, tran.recordid ")
+					.append("tran.sourceid, tran.trnqty, lot.comments ")
 					.append("FROM ims_transaction tran ")
 					.append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
 					.append("INNER JOIN stock s on s.dbxref_id = lot.eid ")
@@ -113,14 +102,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					final Integer scaleId = (Integer) row[4];
 					final Integer sourceId = (Integer) row[5];
 					final Double amount = (Double) row[6];
-					final String inventoryID = (String) row[7];
-					final String comment = (String) row[8];
-					final Integer sourceRecordId = (Integer) row[9];
+					final String comment = (String) row[7];
 
 					final InventoryDetails details =
 						new InventoryDetails(gid, null, lotId, locationId, null, userId, amount, sourceId, null, scaleId, null, comment);
-					details.setInventoryID(inventoryID);
-					details.setSourceRecordId(sourceRecordId);
 					detailsList.add(details);
 				}
 			}
@@ -134,56 +119,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return detailsList;
 	}
 
-	public List<InventoryDetails> getInventoryDetailsByTransactionRecordId(final List<Integer> recordIds) {
-		final List<InventoryDetails> detailsList = new ArrayList<>();
-
-		if (recordIds == null || recordIds.isEmpty()) {
-			return detailsList;
-		}
-
-		try {
-			final Session session = this.getSession();
-
-			final StringBuilder sql =
-					new StringBuilder().append("SELECT lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
-							.append("tran.sourceid, tran.trnqty, lot.stock_id, lot.comments, tran.recordid ")
-							.append("FROM ims_transaction tran ").append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
-							.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue())
-							.append("		 AND tran.recordid IN (:recordIds) ");
-			final SQLQuery query = session.createSQLQuery(sql.toString());
-			query.setParameterList("recordIds", recordIds);
-
-			final List<Object[]> results = query.list();
-
-			if (!results.isEmpty()) {
-				for (final Object[] row : results) {
-					final Integer lotId = (Integer) row[0];
-					final Integer userId = (Integer) row[1];
-					final Integer gid = (Integer) row[2];
-					final Integer locationId = (Integer) row[3];
-					final Integer scaleId = (Integer) row[4];
-					final Integer sourceId = (Integer) row[5];
-					final Double amount = (Double) row[6];
-					final String inventoryID = (String) row[7];
-					final String comment = (String) row[8];
-					final Integer sourceRecordId = (Integer) row[9];
-
-					final InventoryDetails details =
-							new InventoryDetails(gid, null, lotId, locationId, null, userId, amount, sourceId, null, scaleId, null, comment);
-					details.setInventoryID(inventoryID);
-					details.setSourceRecordId(sourceRecordId);
-					detailsList.add(details);
-				}
-			}
-
-		} catch (final HibernateException e) {
-			final String message = "Error with getInventoryDetailsByTransactionRecordId() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-		return detailsList;
-	}
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, BigInteger> countLotsWithReservationForListEntries(final List<Integer> listEntryIds) {
@@ -367,50 +302,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final Query query = this.getSession().createSQLQuery(sql).setParameterList("STOCK_ID_LIST", stockIds);
 
 		return query.list();
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<String> getStockIdsByListDataProjectListId(final Integer listId) {
-		try {
-			final String sql =
-				" SELECT lot.stock_id " +
-				" FROM ims_lot lot " +
-				" INNER JOIN ims_transaction tran ON lot.lotid = tran.lotid " +
-				" INNER join listnms l ON l.listref = tran.sourceid " +
-				" WHERE sourceType = 'LIST'	AND lot.stock_id is not null AND l.listid =  :listId";
-			final Query query = this.getSession().createSQLQuery(sql).setParameter("listId", listId);
-			return query.list();
-		} catch (final Exception e) {
-			final String message = "Error with getStockIdsByListDataProjectListId(" + listId + ") query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<String, Double> getStockIdsWithMultipleTransactions(final Integer listId) {
-		final Map<String, Double> map = new HashMap<>();
-		try {
-			final String sql =
-				" SELECT lot.stock_id, trnqty " +
-					" FROM ims_lot lot " +
-					" INNER JOIN ims_transaction tran ON lot.lotid = tran.lotid " +
-					" INNER join listnms l ON l.listref = tran.sourceid " +
-					" WHERE sourceType = 'LIST'	AND lot.stock_id is not null AND l.listid =  :listId " +
-					" AND EXISTS (select 1 from ims_transaction tr WHERE tr.lotid = tran.lotid "
-					+ "  group by lotid having count(tr.trnid) > 1)";
-			final Query query = this.getSession().createSQLQuery(sql).setParameter("listId", listId);
-			final List<Object> results = query.list();
-			for (final Object obj : results) {
-				final Object[] row = (Object[]) obj;
-				map.put((String) row[0], (Double) row[1]);
-			}
-		} catch (final Exception e) {
-			final String message = "Error with getStockIdsWithMultipleTransactions(" + listId + ") query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return map;
 	}
 
 	public List<TransactionReportRow> getTransactionDetailsForLot(final Integer lotId) {
@@ -642,6 +533,17 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				paramBuilder.append(" and lot.eid in (select distinct (gid) from listdata where listid in (:germplasmListIds))"
 					+ " and lot.etype = 'GERMPLSM' ");
 				paramBuilder.setParameterList("germplasmListIds", germplasmListIds);
+			}
+
+			final List<Integer> plantingStudyIds = transactionsSearchDto.getPlantingStudyIds();
+			if (plantingStudyIds != null && !plantingStudyIds.isEmpty()) {
+				paramBuilder.append(" and exists(select 1 \n" //
+					+ " from project study_filter_p \n" //
+					+ "	    inner join project study_filter_plotdata on study_filter_p.project_id = study_filter_plotdata.study_id \n" //
+					+ "     inner join nd_experiment study_filter_nde on study_filter_plotdata.project_id = study_filter_nde.project_id \n"
+					+ "     inner join ims_experiment_transaction study_filter_iet on study_filter_nde.nd_experiment_id = study_filter_iet.nd_experiment_id \n"
+					+ " where study_filter_p.project_id in (:plantingStudyIds) and study_filter_iet.trnid = tr.trnid)"); //
+				paramBuilder.setParameterList("plantingStudyIds", plantingStudyIds);
 			}
 		}
 	}

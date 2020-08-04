@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -204,8 +205,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertTrue(studyInstance2.isHasExperimentalDesign());
-		// Instance deletion not allowed because study has advance list and design already generated for instance
-		Assert.assertFalse(studyInstance2.getCanBeDeleted());
+		Assert.assertTrue(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 
 		final StudyInstance studyInstance3 = studyInstances.get(2);
@@ -247,8 +247,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertTrue(studyInstance2.isHasExperimentalDesign());
-		// Instance deletion not allowed because study has advance list and design already generated for instance
-		Assert.assertFalse(studyInstance2.getCanBeDeleted());
+		Assert.assertTrue(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 
 		final StudyInstance studyInstance3 =
@@ -323,13 +322,12 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		// Delete Instance 3 - should throw exception
 		final Integer instance3LocationId = instance3.getLocationId();
-		this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance3LocationId));
-
-		studyInstances =
-			this.studyInstanceService.getStudyInstances(studyId);
-		Assert.assertEquals(0, studyInstances.size());
-		Assert.assertNull(this.daoFactory.getGeolocationDao().getById(instance3LocationId));
-		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getGeolocationPropertyDao().getByGeolocation(instance3LocationId)));
+		try {
+			this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance3LocationId));
+			Assert.fail("Should have thrown exception when attempting to delete last environment.");
+		} catch (final MiddlewareQueryException e) {
+			// Perform assertions outside
+		}
 	}
 
 	@Test
@@ -455,10 +453,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			this.testDataInitializer
 				.createDmsProject("Subobs Dataset", "Subobs Dataset-Description", study, plotDataset,
 					DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS);
-		final GermplasmList advanceList = GermplasmListTestDataInitializer.createGermplasmListWithType(null,
-			GermplasmListType.ADVANCED.name());
-		advanceList.setProjectId(study.getProjectId());
-		this.daoFactory.getGermplasmListDAO().save(advanceList);
 
 		this.testDataInitializer.addGeolocationProp(this.instance1, TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
 			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), 1);

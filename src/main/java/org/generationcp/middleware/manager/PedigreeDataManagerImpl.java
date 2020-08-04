@@ -13,8 +13,16 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -27,6 +35,8 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.swing.text.html.Option;
 
 /**
  * Implementation of the PedigreeDataManager interface. To instantiate this
@@ -214,9 +224,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	 * @return the given GermplasmPedigreeTreeNode with its parents added to it
 	 */
 	private GermplasmPedigreeTreeNode addParents(final GermplasmPedigreeTreeNode node, final int level) {
-		if (level == 1) {
-			return node;
-		} else {
+		if (level != 1) {
 			// get parents of node
 			final Germplasm germplasmOfNode = node.getGermplasm();
 			final Integer maleGid = germplasmOfNode.getGpid2();
@@ -227,11 +235,10 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 				if (maleGid != 0) {
 					this.addNodeForKnownParent(node, level, maleGid, excludeDerivativeLines);
 
-				// Use female parent to continue traversal if source is unknown
-				} else if (femaleGid != 0){
+					// Use female parent to continue traversal if source is unknown
+				} else if (femaleGid != 0) {
 					this.addNodeForKnownParent(node, level, femaleGid, excludeDerivativeLines);
 				}
-
 
 			} else if (germplasmOfNode.getGnpgs() >= 2) {
 				// Get and add female and male parents
@@ -248,8 +255,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 					}
 				}
 			}
-			return node;
 		}
+		return node;
 	}
 
 	void addNodeForParent(final GermplasmPedigreeTreeNode node, final int level, final Integer parentGid,
@@ -292,9 +299,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	 * @return the given GermplasmPedigreeTreeNode with its parents added to it
 	 */
 	private GermplasmPedigreeTreeNode addParentsExcludeDerivativeLines(final GermplasmPedigreeTreeNode node, final int level) {
-		if (level == 1) {
-			return node;
-		} else {
+		if (level != 1) {
 			// get parents of node
 			final Germplasm germplasmOfNode = node.getGermplasm();
 
@@ -324,8 +329,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 					}
 				}
 			}
-			return node;
 		}
+		return node;
 	}
 
 	private void addNodesForParents(final GermplasmPedigreeTreeNode node, final int level, final Integer femaleGid, final Integer maleGid,
@@ -626,6 +631,29 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		}
 
 		return progenitorId;
+	}
+
+	@Override
+	public Table<Integer, String, Optional<Germplasm>> generatePedigreeTable(final Set<Integer> gids, final Integer level,
+		final Boolean includeDerivativeLines) {
+		final Table<Integer, String, Optional<Germplasm>> table = HashBasedTable.create();
+		final Integer numberOfLevelsToTraverse = level + 1;//Not zero index
+		for(final Integer gid : gids) {
+			final GermplasmPedigreeTree root = this.generatePedigreeTree(gid, numberOfLevelsToTraverse, includeDerivativeLines);
+			for (final GermplasmPedigreeTreeNode linkedNode : root.getRoot().getLinkedNodes()) {
+				if(table.row(gid).isEmpty()) {
+					table.put(gid, ColumnLabels.FGID.getName() , Optional.of(linkedNode.getGermplasm()));
+					table.put(gid, ColumnLabels.MGID.getName(), Optional.empty());
+				} else{
+					table.put(gid, ColumnLabels.MGID.getName() , Optional.of(linkedNode.getGermplasm()));
+				}
+			}
+			if(table.row(gid).isEmpty()) {
+				table.put(gid, ColumnLabels.FGID.getName(), Optional.empty());
+				table.put(gid, ColumnLabels.MGID.getName(), Optional.empty());
+			}
+		}
+		return table;
 	}
 
 	private int addOrUpdateProgenitors(final List<Progenitor> progenitors) {

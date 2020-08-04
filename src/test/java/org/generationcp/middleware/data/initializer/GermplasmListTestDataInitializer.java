@@ -9,7 +9,6 @@ import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.util.Util;
 
 public class GermplasmListTestDataInitializer {
@@ -170,29 +169,6 @@ public class GermplasmListTestDataInitializer {
 		}
 
 		return listEntries;
-	}
-
-	public static List<ListDataProject> createListDataSnapShotFromListEntries(final GermplasmList germplasmList,
-			final List<GermplasmListData> listEntries) {
-
-		final List<ListDataProject> listDataProjectEntries = new ArrayList<ListDataProject>();
-
-		for (final GermplasmListData listEntry : listEntries) {
-			final ListDataProject listDataProjectEntry = new ListDataProject();
-
-			listDataProjectEntry.setList(germplasmList);
-			listDataProjectEntry.setGermplasmId(listEntry.getGermplasmId());
-			listDataProjectEntry.setCheckType(0);
-			listDataProjectEntry.setEntryId(listEntry.getEntryId());
-			listDataProjectEntry.setEntryCode(listEntry.getEntryCode());
-			listDataProjectEntry.setSeedSource(listEntry.getSeedSource());
-			listDataProjectEntry.setDesignation(listEntry.getDesignation());
-			listDataProjectEntry.setGroupName(listEntry.getGroupName());
-
-			listDataProjectEntries.add(listDataProjectEntry);
-		}
-
-		return listDataProjectEntries;
 	}
 
 	protected static GermplasmListData createGermplasmListDataItem(final GermplasmList germplasmList,

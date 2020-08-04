@@ -110,6 +110,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 				studyInstance.setLocationAbbreviation(location.get().getLabbr());
 				studyInstance.setInstanceId(geolocation.getLocationId());
 				studyInstance.setLocationInstanceDataId(locationGeolocationProperty.getGeolocationPropertyId());
+				studyInstance.setExperimentId(experimentModel.getNdExperimentId());
 			}
 
 			instanceNumbers.add(instanceNumber);
@@ -131,9 +132,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0)
 				.getProjectId();
 		final List<StudyInstance> instances = this.daoFactory.getDmsProjectDAO().getDatasetInstances(environmentDatasetId, instanceIds);
-		// If study has advance or cross list and instance has experiment design, mark instance as cannot be deleted
-		final boolean hasAdvancedOrCrossesList = this.daoFactory.getGermplasmListDAO().hasAdvancedOrCrossesList(studyId);
-		if (hasAdvancedOrCrossesList) {
+		// If study has advance or crosses generated and instance has experiment design, mark instance as cannot be deleted
+		final boolean hasCrossesOrSelections = this.studyService.hasCrossesOrSelections(studyId);
+		if (hasCrossesOrSelections) {
 			for (final StudyInstance instance : instances) {
 				if (instance.isHasExperimentalDesign()) {
 					instance.setCanBeDeleted(false);
@@ -153,6 +154,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final List<Integer> instanceNumbersToDelete =
 			environmentsToDelete.stream().mapToInt(o -> Integer.valueOf(o.getDescription())).boxed()
 				.collect(Collectors.toList());
+
+		//Update StudyExperimentGeolocation
+		this.daoFactory.getExperimentDao().updateStudyExperimentGeolocationIfNecessary(studyId, instanceIds);
 
 		// Delete plot and environment experiments
 		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);
