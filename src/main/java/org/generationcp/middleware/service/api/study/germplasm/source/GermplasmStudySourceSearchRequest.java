@@ -55,8 +55,7 @@ public class GermplasmStudySourceSearchRequest {
 	}
 
 	public static class Filter {
-		
-		public static final String SOURCE_ID = "sourceId";
+
 		public static final String GID = "gid";
 		public static final String GROUP_ID = "groupId";
 		public static final String DESIGNATION = "designation";
@@ -76,19 +75,19 @@ public class GermplasmStudySourceSearchRequest {
 				BREEDING_LOCATION_NAME, TRIAL_INSTANCE, REPLICATION_NUMBER, GERMPLASM_DATE));
 
 		private Integer germplasmStudySourceId;
-		private Integer gid;
-		private Integer groupId;
+		private List<Integer> gidList;
+		private List<Integer> groupIdList;
 		private String designation;
 		private String cross;
-		private Integer numberOfLots;
+		private List<Integer> numberOfLotsList;
 		private String breedingMethodAbbreviation;
 		private String breedingMethodName;
 		private String breedingMethodType;
 		private String breedingLocationName;
-		private String trialInstance;
-		private Integer plotNumber;
-		private Integer replicationNumber;
-		private Integer germplasmDate;
+		private List<String> trialInstanceList;
+		private List<Integer> plotNumberList;
+		private List<Integer> replicationNumberList;
+		private List<Integer> germplasmDateList;
 
 		public Integer getGermplasmStudySourceId() {
 			return this.germplasmStudySourceId;
@@ -98,108 +97,108 @@ public class GermplasmStudySourceSearchRequest {
 			this.germplasmStudySourceId = germplasmStudySourceId;
 		}
 
-		public Integer getGid() {
-			return this.gid;
+		public List<Integer> getGidList() {
+			return gidList;
 		}
 
-		public void setGid(final Integer gid) {
-			this.gid = gid;
+		public void setGidList(List<Integer> gidList) {
+			this.gidList = gidList;
 		}
 
-		public Integer getGroupId() {
-			return this.groupId;
+		public List<Integer> getGroupIdList() {
+			return groupIdList;
 		}
 
-		public void setGroupId(final Integer groupId) {
-			this.groupId = groupId;
+		public void setGroupIdList(List<Integer> groupIdList) {
+			this.groupIdList = groupIdList;
 		}
 
 		public String getDesignation() {
-			return this.designation;
+			return designation;
 		}
 
-		public void setDesignation(final String designation) {
+		public void setDesignation(String designation) {
 			this.designation = designation;
 		}
 
 		public String getCross() {
-			return this.cross;
+			return cross;
 		}
 
-		public void setCross(final String cross) {
+		public void setCross(String cross) {
 			this.cross = cross;
 		}
 
-		public Integer getNumberOfLots() {
-			return this.numberOfLots;
+		public List<Integer> getNumberOfLotsList() {
+			return numberOfLotsList;
 		}
 
-		public void setNumberOfLots(final Integer numberOfLots) {
-			this.numberOfLots = numberOfLots;
+		public void setNumberOfLotsList(List<Integer> numberOfLotsList) {
+			this.numberOfLotsList = numberOfLotsList;
 		}
 
 		public String getBreedingMethodAbbreviation() {
-			return this.breedingMethodAbbreviation;
+			return breedingMethodAbbreviation;
 		}
 
-		public void setBreedingMethodAbbreviation(final String breedingMethodAbbreviation) {
+		public void setBreedingMethodAbbreviation(String breedingMethodAbbreviation) {
 			this.breedingMethodAbbreviation = breedingMethodAbbreviation;
 		}
 
 		public String getBreedingMethodName() {
-			return this.breedingMethodName;
+			return breedingMethodName;
 		}
 
-		public void setBreedingMethodName(final String breedingMethodName) {
+		public void setBreedingMethodName(String breedingMethodName) {
 			this.breedingMethodName = breedingMethodName;
 		}
 
 		public String getBreedingMethodType() {
-			return this.breedingMethodType;
+			return breedingMethodType;
 		}
 
-		public void setBreedingMethodType(final String breedingMethodType) {
+		public void setBreedingMethodType(String breedingMethodType) {
 			this.breedingMethodType = breedingMethodType;
 		}
 
 		public String getBreedingLocationName() {
-			return this.breedingLocationName;
+			return breedingLocationName;
 		}
 
-		public void setBreedingLocationName(final String breedingLocationName) {
+		public void setBreedingLocationName(String breedingLocationName) {
 			this.breedingLocationName = breedingLocationName;
 		}
 
-		public String getTrialInstance() {
-			return this.trialInstance;
+		public List<String> getTrialInstanceList() {
+			return trialInstanceList;
 		}
 
-		public void setTrialInstance(final String trialInstance) {
-			this.trialInstance = trialInstance;
+		public void setTrialInstanceList(List<String> trialInstanceList) {
+			this.trialInstanceList = trialInstanceList;
 		}
 
-		public Integer getPlotNumber() {
-			return this.plotNumber;
+		public List<Integer> getPlotNumberList() {
+			return plotNumberList;
 		}
 
-		public void setPlotNumber(final Integer plotNumber) {
-			this.plotNumber = plotNumber;
+		public void setPlotNumberList(List<Integer> plotNumberList) {
+			this.plotNumberList = plotNumberList;
 		}
 
-		public Integer getReplicationNumber() {
-			return this.replicationNumber;
+		public List<Integer> getReplicationNumberList() {
+			return replicationNumberList;
 		}
 
-		public void setReplicationNumber(final Integer replicationNumber) {
-			this.replicationNumber = replicationNumber;
+		public void setReplicationNumberList(List<Integer> replicationNumberList) {
+			this.replicationNumberList = replicationNumberList;
 		}
 
-		public Integer getGermplasmDate() {
-			return this.germplasmDate;
+		public List<Integer> getGermplasmDateList() {
+			return germplasmDateList;
 		}
 
-		public void setGermplasmDate(final Integer germplasmDate) {
-			this.germplasmDate = germplasmDate;
+		public void setGermplasmDateList(List<Integer> germplasmDateList) {
+			this.germplasmDateList = germplasmDateList;
 		}
 
 		@Override

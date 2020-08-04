@@ -18,7 +18,6 @@ import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataIni
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
-import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
@@ -40,42 +39,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
-
-	private static final String TEST_DUPLICATE = "TEST_DUPLICATE";
-	private static final String TEST_BULK_WITH = "SID1-2";
-	private static final String TEST_BULK_COMPL = "Y";
-	private static final int TEST_LOCATION_ID = 1;
-	private static final int TEST_SCALE_ID = 2;
-	private static final double TEST_AMOUNT = 1.0;
-	private static final String TEST_COMMENT = "TEST COMMENT";
-	private static final String LOT_ID_KEY = "lotId";
-	private static final String TRN_ID_KEY = "trnId";
-	private static final String LIST_DATA_PROJECT_ID_KEY = "listDataProjectId";
-	private static final String DUPLICATE_KEY = "duplicate";
-	private static final String BULK_WITH_KEY = "bulkWith";
-	private static final String BULK_COMPL_KEY = "bulkCompl";
-	private static final String LOCATION_ID_KEY = "locationId";
-	private static final String SCALE_ID_KEY = "scaleId";
-	private static final String AMOUNT_KEY = "amount";
-	private static final String COMMENT_KEY = "comment";
 
 	@Autowired
 	private InventoryDataManager manager;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
-	private InventoryService inventoryService;
 
 	@Autowired
 	private GermplasmListManager germplasmListManager;
@@ -267,84 +239,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		}
 	}
 
-	@Test
-	public void testGetStockIdsByListDataProjectListId() throws MiddlewareQueryException {
-		final List<String> stockIds = this.manager.getStockIdsByListDataProjectListId(17);
-		Assert.assertNotNull(stockIds);
-	}
-
-	@Test
-	public void testUpdateInventory() throws MiddlewareQueryException {
-		final Integer listId = 17;
-		final List<InventoryDetails> inventoryDetailList = this.inventoryService.getInventoryListByListDataProjectListId(listId);
-		if (inventoryDetailList != null && !inventoryDetailList.isEmpty()) {
-			final InventoryDetails inventoryDetails = inventoryDetailList.get(0);
-			final Map<String, Object> originalData = this.getInventorySpecificDetails(inventoryDetails);
-			this.modifyInventoryDetails(inventoryDetails);
-			this.manager.updateInventory(listId, inventoryDetailList);
-			final InventoryDetails modifiedInventoryDetails = this.getModifiedInventoryDetails(originalData,
-							this.inventoryService.getInventoryListByListDataProjectListId(listId));
-			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_DUPLICATE, modifiedInventoryDetails.getDuplicate());
-			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_BULK_WITH, modifiedInventoryDetails.getBulkWith());
-			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_BULK_COMPL, modifiedInventoryDetails.getBulkCompl());
-			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_LOCATION_ID, modifiedInventoryDetails.getLocationId().intValue());
-			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_SCALE_ID, modifiedInventoryDetails.getScaleId().intValue());
-			Assert.assertEquals(0, modifiedInventoryDetails.getAmount().compareTo(InventoryDataManagerImplTestIT.TEST_AMOUNT));
-			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_COMMENT, modifiedInventoryDetails.getComment());
-			this.revertChangesToInventoryDetails(inventoryDetails, originalData);
-			this.manager.updateInventory(listId, inventoryDetailList);
-		}
-	}
-
-	private InventoryDetails getModifiedInventoryDetails(final Map<String, Object> data, final List<InventoryDetails> inventoryDetailList) {
-		if (inventoryDetailList != null && !inventoryDetailList.isEmpty()) {
-			final Integer lotId = (Integer) data.get(InventoryDataManagerImplTestIT.LOT_ID_KEY);
-			final Integer trnId = (Integer) data.get(InventoryDataManagerImplTestIT.TRN_ID_KEY);
-			final Integer listDataProjectId = (Integer) data.get(InventoryDataManagerImplTestIT.LIST_DATA_PROJECT_ID_KEY);
-			for (final InventoryDetails inventoryDetails : inventoryDetailList) {
-				if (lotId.equals(inventoryDetails.getLotId()) && trnId.equals(inventoryDetails.getTrnId())
-						&& listDataProjectId.equals(inventoryDetails.getListDataProjectId())) {
-					return inventoryDetails;
-				}
-			}
-		}
-		return null;
-	}
-
-	private void revertChangesToInventoryDetails(final InventoryDetails inventoryDetails, final Map<String, Object> originalData) {
-		inventoryDetails.setDuplicate((String) originalData.get(InventoryDataManagerImplTestIT.DUPLICATE_KEY));
-		inventoryDetails.setBulkWith((String) originalData.get(InventoryDataManagerImplTestIT.BULK_WITH_KEY));
-		inventoryDetails.setBulkCompl((String) originalData.get(InventoryDataManagerImplTestIT.BULK_COMPL_KEY));
-		inventoryDetails.setLocationId((Integer) originalData.get(InventoryDataManagerImplTestIT.LOCATION_ID_KEY));
-		inventoryDetails.setScaleId((Integer) originalData.get(InventoryDataManagerImplTestIT.SCALE_ID_KEY));
-		inventoryDetails.setAmount((Double) originalData.get(InventoryDataManagerImplTestIT.AMOUNT_KEY));
-		inventoryDetails.setComment((String) originalData.get(InventoryDataManagerImplTestIT.COMMENT_KEY));
-	}
-
-	private void modifyInventoryDetails(final InventoryDetails inventoryDetails) {
-		inventoryDetails.setDuplicate(InventoryDataManagerImplTestIT.TEST_DUPLICATE);
-		inventoryDetails.setBulkWith(InventoryDataManagerImplTestIT.TEST_BULK_WITH);
-		inventoryDetails.setBulkCompl(InventoryDataManagerImplTestIT.TEST_BULK_COMPL);
-		inventoryDetails.setLocationId(InventoryDataManagerImplTestIT.TEST_LOCATION_ID);
-		inventoryDetails.setScaleId(InventoryDataManagerImplTestIT.TEST_SCALE_ID);
-		inventoryDetails.setAmount(InventoryDataManagerImplTestIT.TEST_AMOUNT);
-		inventoryDetails.setComment(InventoryDataManagerImplTestIT.TEST_COMMENT);
-	}
-
-	private Map<String, Object> getInventorySpecificDetails(final InventoryDetails inventoryDetails) {
-		final Map<String, Object> data = new HashMap<String, Object>();
-		data.put(InventoryDataManagerImplTestIT.LOT_ID_KEY, inventoryDetails.getLotId());
-		data.put(InventoryDataManagerImplTestIT.TRN_ID_KEY, inventoryDetails.getTrnId());
-		data.put(InventoryDataManagerImplTestIT.LIST_DATA_PROJECT_ID_KEY, inventoryDetails.getListDataProjectId());
-		data.put(InventoryDataManagerImplTestIT.DUPLICATE_KEY, inventoryDetails.getDuplicate());
-		data.put(InventoryDataManagerImplTestIT.BULK_WITH_KEY, inventoryDetails.getBulkWith());
-		data.put(InventoryDataManagerImplTestIT.BULK_COMPL_KEY, inventoryDetails.getBulkCompl());
-		data.put(InventoryDataManagerImplTestIT.LOCATION_ID_KEY, inventoryDetails.getLocationId());
-		data.put(InventoryDataManagerImplTestIT.SCALE_ID_KEY, inventoryDetails.getScaleId());
-		data.put(InventoryDataManagerImplTestIT.AMOUNT_KEY, inventoryDetails.getAmount());
-		data.put(InventoryDataManagerImplTestIT.COMMENT_KEY, inventoryDetails.getComment());
-		return data;
-	}
 
 	@Test
 	public void testGetLotById() throws MiddlewareQueryException {

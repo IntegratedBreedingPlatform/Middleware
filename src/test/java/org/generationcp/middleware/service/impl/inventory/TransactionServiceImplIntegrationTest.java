@@ -2,26 +2,32 @@ package org.generationcp.middleware.service.impl.inventory;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.UDTableType;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.ims.EntityType;
+import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.util.Util;
+import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +47,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private DaoFactory daoFactory;
 
-	private Integer userId, pendingWithdrawalId, pendingDepositId, gid;
+	private Integer studyId, userId, pendingWithdrawalId, pendingDepositId, gid;
 
 	private Lot lot;
 
@@ -64,7 +70,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		this.transactionService = new TransactionServiceImpl(this.sessionProvder);
 		this.lotService = new LotServiceImpl(this.sessionProvder);
 		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.createGermplasm();
+		this.createGermplasmStudySource();
 		userId = findAdminUser();
 		this.resolveStorageLocation();
 		this.createLot();
@@ -157,11 +163,61 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(extendedLotDto.getAvailableBalance().equals(38D));
 	}
 
-	private void createGermplasm() {
-		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(Integer.MIN_VALUE);
-		germplasm.setMgid(GROUP_ID);
-		this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
-		gid = germplasm.getGid();
+
+	@Test
+	public void testDepositLots_WithSourceStudy_Ok() {
+		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
+		final Map<String, Double> instructions = new HashMap<>();
+		instructions.put(unitName, 20D);
+		lotDepositRequestDto.setDepositsPerUnit(instructions);
+		lotDepositRequestDto.setSourceStudyId(this.studyId);
+
+		final List<Integer> lotIds = Collections.singletonList(lot.getId());
+		this.transactionService.depositLots(userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED);
+
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(lotIds);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
+		Assert.assertTrue(extendedLotDto.getAvailableBalance().equals(38D));
+
+		final List<Transaction> transactions = this.daoFactory.getExperimentTransactionDao()
+			.getTransactionsByStudyId(this.studyId, TransactionStatus.CONFIRMED, ExperimentTransactionType.HARVESTING);
+
+		Assert.assertEquals(1, transactions.size());
+	}
+
+
+	@Test(expected = MiddlewareRequestException.class)
+	public void testSaveAdjustmentTransactions_InvalidNewBalance() {
+		this.transactionService.saveAdjustmentTransactions(userId, Collections.singleton(lot.getId()), 1D, "");
+	}
+
+	@Test
+	public void testSaveAdjustmentTransactions_OK() {
+		this.transactionService.saveAdjustmentTransactions(userId, Collections.singleton(lot.getId()), 3D, "");
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
+		Assert.assertTrue(extendedLotDto.getActualBalance().equals(3D));
+	}
+
+	@Test
+	public void testSaveAdjustmentTransactions_NoTransactionSaved() {
+		this.transactionService.saveAdjustmentTransactions(userId, Collections.singleton(lot.getId()), 20D, "");
+
+		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+		transactionsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+		final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
+
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
+		Assert.assertTrue(extendedLotDto.getActualBalance().equals(20D));
+
+		Assert.assertEquals(3, transactionDtos.size());
 	}
 
 	private void createLot() {
@@ -193,6 +249,24 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getTransactionDAO().save(pendingWithdrawal);
 		this.pendingWithdrawalId = pendingWithdrawal.getId();
 
+	}
+
+	private void createGermplasmStudySource() {
+		final IntegrationTestDataInitializer integrationTestDataInitializer =
+			new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
+
+		final DmsProject study = integrationTestDataInitializer
+			.createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 1);
+		final DmsProject plot = integrationTestDataInitializer
+			.createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), study,
+				study, DatasetTypeEnum.PLOT_DATA);
+		final Geolocation geolocation = integrationTestDataInitializer.createInstance(study, "1", 1);
+
+		final GermplasmStudySource
+			germplasmStudySource = integrationTestDataInitializer.addGermplasmStudySource(study, plot, geolocation, "111", "222");
+
+		this.gid = germplasmStudySource.getGermplasm().getGid();
+		this.studyId = study.getProjectId();
 	}
 
 	private void resolveUnitName() {
