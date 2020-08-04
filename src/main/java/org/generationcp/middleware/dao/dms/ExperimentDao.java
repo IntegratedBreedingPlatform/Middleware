@@ -169,10 +169,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return null;
 	}
 
-	public ExperimentModel getExperimentByProjectIdAndGeoLocationAndType(final Integer projectId, final Integer geolocationId, final Integer typeId) {
+	public ExperimentModel getExperimentByProjectIdAndType(final Integer projectId, final Integer typeId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("project.projectId", projectId));
-		criteria.add(Restrictions.eq("geoLocation.locationId", geolocationId));
 		criteria.add(Restrictions.eq("typeId", typeId));
 		return (ExperimentModel) criteria.uniqueResult();
 	}
@@ -1003,30 +1002,32 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	// Update study experiment if the Geolocation ID to be the one is the one used by the study experiment
-	public void updateStudyExperimentGeolocationIfNecessary(final Integer studyId, final Integer geolocationId) {
-		final ExperimentModel studyExperiment = this.getExperimentByProjectIdAndGeoLocationAndType(studyId, geolocationId,
+	public void updateStudyExperimentGeolocationIfNecessary(final Integer studyId, final List<Integer> geolocationIds) {
+		final ExperimentModel studyExperiment = this.getExperimentByProjectIdAndType(studyId,
 			ExperimentType.STUDY_INFORMATION.getTermId());
+		if (studyExperiment != null && studyExperiment.getGeoLocation() != null) {
+			final Integer currentGeolocationId = studyExperiment.getGeoLocation().getLocationId();
+			if (geolocationIds.contains(currentGeolocationId)) {
+				// Query the next available Geolocation ID from environments that will remain
+				final String queryString = "select min(e.nd_geolocation_id)\n"
+					+ "from nd_experiment e "
+					+ "inner join project p on e.project_id = p.project_id "
+					+ "WHERE (p.study_id = :studyId or p.project_id = :studyId) "
+					+ "AND e.nd_geolocation_id NOT IN (:geolocationIds)";
+				final StringBuilder sb = new StringBuilder(queryString);
+				final SQLQuery statement = this.getSession().createSQLQuery(sb.toString());
+				statement.setParameter("studyId", studyId);
+				statement.setParameterList("geolocationIds", geolocationIds);
+				final Integer nextGeolocationId = (Integer) statement.uniqueResult();
 
-		if (studyExperiment != null) {
-			// Query the next available Geolocation ID from environments that will remain
-			final String queryString = "select min(if (e.nd_geolocation_id != :geolocationId, nd_geolocation_id, null))\n"
-				+ "from nd_experiment e "
-				+ "inner join project p on e.project_id = p.project_id "
-				+ "WHERE p.study_id = :studyId or p.project_id = :studyId";
-			final StringBuilder sb = new StringBuilder(queryString);
-			final SQLQuery statement = this.getSession().createSQLQuery(sb.toString());
-			statement.setParameter("studyId", studyId);
-			statement.setParameter("geolocationId", geolocationId);
-			final BigInteger nextGeolocationId = (BigInteger) statement.uniqueResult();
-
-			if (nextGeolocationId != null) {
-				studyExperiment.setGeoLocation(new Geolocation(nextGeolocationId.intValue()));
-				this.update(studyExperiment);
-			} else {
-				throw new MiddlewareQueryException("Cannot update GeolocationID=" + geolocationId + " for Study=" + studyId
-					+ " as no other environments will remain for the study.");
+				if (nextGeolocationId != null) {
+					studyExperiment.setGeoLocation(new Geolocation(nextGeolocationId.intValue()));
+					this.update(studyExperiment);
+				} else {
+					throw new MiddlewareQueryException("Cannot update GeolocationID for Study=" + studyId
+						+ " as no other environments will remain for the study.");
+				}
 			}
-
 		}
 	}
 
