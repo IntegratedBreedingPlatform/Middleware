@@ -109,24 +109,8 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		Assert.assertNotNull(lRecIDStockIDMap);
 	}
 
-	@Test
-	public void testGetStockIdsByListDataProjectListId() throws MiddlewareQueryException {
-		final List<String> stockIds = this.dao.getStockIdsByListDataProjectListId(17);
-		Assert.assertNotNull(stockIds);
-	}
 
-	@Test
-	public void testGetInventoryDetailsByTransactionRecordId() throws MiddlewareQueryException {
-		final List<Integer> recordIds = new ArrayList<Integer>();
-		final List<GermplasmListData> listDataList = this.germplasmListDataDAO.getByListId(1);
-		for (final GermplasmListData germplasmListData : listDataList) {
-			recordIds.add(germplasmListData.getId());
-		}
-		final List<InventoryDetails> inventoryDetailsList = this.dao.getInventoryDetailsByTransactionRecordId(recordIds);
-		for (final InventoryDetails inventoryDetails : inventoryDetailsList) {
-			Assert.assertTrue(recordIds.contains(inventoryDetails.getSourceRecordId()));
-		}
-	}
+
 
 	@Test
 	public void testGetSimilarStockIdsEmptyListParam() {

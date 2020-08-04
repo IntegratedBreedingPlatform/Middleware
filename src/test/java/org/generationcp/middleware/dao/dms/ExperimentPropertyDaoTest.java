@@ -154,7 +154,6 @@ public class ExperimentPropertyDaoTest {
 				" , gpSeason.value as season " +
 				" , siteId.value AS siteId" +
 				" , epropBlock.value AS blockNo " +
-				" , ldp.group_name AS pedigree " +
 				" , geo.obs_unit_id as obsUnitId " +
 				" FROM " +
 				" nd_experiment nde " +
@@ -188,8 +187,6 @@ public class ExperimentPropertyDaoTest {
 				"       AND col.type_id = " +TermId.COLUMN_NO.getId() +
 				" LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id " +
 				"       AND gpSeason.type_id =  " +TermId.SEASON_VAR.getId() + " " +
-				" LEFT JOIN listnms lnms ON lnms.projectid = st.project_id	 AND lnms.listtype in ('STUDY')" +
-				" LEFT JOIN listdata_project ldp on ldp.list_id = lnms.listid AND ldp.entry_id = s.uniqueName AND ldp.germplasm_id  = s.dbxref_id" +
 				" WHERE st.project_id = :studyId" +
 				" ORDER BY casted_trialInstance, inst.description, nde.nd_experiment_id ASC";
 	}

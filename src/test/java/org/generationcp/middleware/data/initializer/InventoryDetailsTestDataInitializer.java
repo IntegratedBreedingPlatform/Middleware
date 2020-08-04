@@ -1,16 +1,8 @@
 
 package org.generationcp.middleware.data.initializer;
 
-import com.beust.jcommander.internal.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.domain.inventory.InventoryDetails;
-import org.generationcp.middleware.domain.inventory.ListDataInventory;
-import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
@@ -19,7 +11,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +20,6 @@ public class InventoryDetailsTestDataInitializer {
 	private static final String LIST_SOURCE_TYPE = "LIST";
 	private static final String GERMPLASM_ENTITY_TYPE = "GERMPLSM";
 	private static final int USER_ID = 1;
-	private static final int NO_OF_STOCK_LIST_ENTRIES = 20;
 	public static final String LIST_NAME = "List1";
 	public static final String USER = "User";
 	public static final String STATUS = "Active";
@@ -47,40 +37,8 @@ public class InventoryDetailsTestDataInitializer {
 		}
 	}
 
-	public Map<String, InventoryDetails> createInventoryDetailsMap() {
-		final Map<String, InventoryDetails> inventoryDetails = new HashMap<String, InventoryDetails>();
-
-		for (int i = 1; i <= InventoryDetailsTestDataInitializer.NO_OF_STOCK_LIST_ENTRIES; i++) {
-			inventoryDetails.put(String.valueOf(i), new InventoryDetails());
-		}
-
-		return inventoryDetails;
-	}
-
-	public List<InventoryDetails> createInventoryDetailList(final Integer numOfEntries) {
-		final List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
-
-		for (int i = 0; i < numOfEntries; i++) {
-			final int id = i + 1;
-			final InventoryDetails invDetails = new InventoryDetails();
-			invDetails.setLotId(id);
-			invDetails.setGid(id);
-			invDetails.setGermplasmName("GermplsmName"+i);
-			invDetails.setCross("Cross"+i);
-			invDetails.setSource("SeedSource"+i);
-			invDetails.setGroupId(i);
-			invDetails.setReplicationNumber(1);
-			invDetails.setPlotNumber(1);
-			invDetails.setInstanceNumber(1);
-			invDetails.setEntryId(1);
-			inventoryDetails.add(invDetails);
-		}
-
-		return inventoryDetails;
-	}
-
 	public List<Lot> createLots(final List<Integer> gids, final Integer listId, final Integer scaleId, final Integer locId) {
-		final List<Lot> lots = new ArrayList<Lot>();
+		final List<Lot> lots = new ArrayList<>();
 
 		for (final Integer gid : gids) {
 			final Lot lot = new Lot();
@@ -110,7 +68,7 @@ public class InventoryDetailsTestDataInitializer {
 	 */
 	public List<Transaction> createTransactions(final List<Lot> lots, final Integer listId, final Map<Integer, Integer> lotIdLrecIdMap,
 			final String inventoryIdPrefix, final Integer type) {
-		final List<Transaction> transactions = new ArrayList<Transaction>();
+		final List<Transaction> transactions = new ArrayList<>();
 
 		for (final Lot lot : lots) {
 			lot.setStockId(inventoryIdPrefix + lot.getId());
@@ -144,7 +102,7 @@ public class InventoryDetailsTestDataInitializer {
 	 */
 	public List<Transaction> createReservedTransactions(final List<Lot> lots, final Integer listId, final Map<Integer, Integer> lotIdLrecIdMap,
 			final String inventoryIdPrefix) {
-		final List<Transaction> transactions = new ArrayList<Transaction>();
+		final List<Transaction> transactions = new ArrayList<>();
 
 		for (final Lot lot : lots) {
 			lot.setStockId(inventoryIdPrefix + lot.getId());
@@ -165,85 +123,6 @@ public class InventoryDetailsTestDataInitializer {
 		}
 
 		return transactions;
-	}
-
-	/**
-	 * Create List of StockTransaction objects based on the following input:
-	 * 
-	 * @param listDataIdTransact - map of listdata_id to transaction
-	 * @param listDataIdListDataProject - map of listdata_id to listdataproject
-	 * @return
-	 */
-	public List<StockTransaction> createStockTransactions(final Map<Integer, Transaction> listDataIdTransact,
-			final Map<Integer, ListDataProject> listDataIdListDataProject) {
-
-		final List<StockTransaction> stockTransactions = new ArrayList<StockTransaction>();
-
-		for (final Map.Entry<Integer, Transaction> entry : listDataIdTransact.entrySet()) {
-			final Integer listDataId = Integer.valueOf(entry.getKey());
-			final Transaction transaction = entry.getValue();
-			final ListDataProject listDataProject = listDataIdListDataProject.get(listDataId);
-
-			final StockTransaction stockTransaction = new StockTransaction();
-			stockTransaction.setSourceRecordId(listDataId);
-			stockTransaction.setTransaction(transaction);
-			stockTransaction.setListDataProject(listDataProject);
-
-			stockTransactions.add(stockTransaction);
-		}
-
-		return stockTransactions;
-	}
-
-	public static List<GermplasmListData> createGermplasmListDataForReservedEntries(){
-		final List germplasmListData = Lists.newArrayList();
-
-		final GermplasmListData listEntry = new GermplasmListData();
-		listEntry.setId(1);
-		listEntry.setDesignation("Des");
-		listEntry.setEntryId(1);
-		listEntry.setGroupName("GroupName");
-		listEntry.setStatus(0);
-		listEntry.setSeedSource("SeedSource");
-		listEntry.setGid(28);
-
-		final List<ListEntryLotDetails> lots = new ArrayList<ListEntryLotDetails>();
-
-		final ListEntryLotDetails lotDetails = new ListEntryLotDetails();
-		lotDetails.setLotId(1);
-		lotDetails.setReservedTotalForEntry(2.0);
-		lotDetails.setLotScaleMethodName("weight");
-		lotDetails.setLotScaleNameAbbr("g");
-		final Location location = new Location(1);
-		location.setLname("locName");
-		location.setLdefault(Boolean.FALSE);
-		lotDetails.setLocationOfLot(location);
-		lotDetails.setStockIds("stockIds");
-		lotDetails.setTransactionId(120);
-		lotDetails.setCommentOfLot("comments");
-		lotDetails.setAvailableLotBalance(1.0);
-		lotDetails.setActualLotBalance(5.0);
-		lotDetails.setReservedTotalForEntry(2.0);
-		lotDetails.setReservedTotal(2.0);
-
-		lots.add(lotDetails);
-		final ListDataInventory listDataInfo = new ListDataInventory(1,28);
-		listDataInfo.setLotRows(lots);
-		listEntry.setInventoryInfo(listDataInfo);
-		germplasmListData.add(listEntry);
-
-		return germplasmListData;
-	}
-
-
-	public static List<Transaction> createValidReservedTransactions(){
-		final Transaction transaction = new Transaction();
-		transaction.setId(110);
-		transaction.setQuantity(-2.0);
-		transaction.setStatus(0);
-		transaction.setComments("comments");
-
-		return Lists.newArrayList(transaction);
 	}
 
 	public static Transaction createReservationTransaction(
