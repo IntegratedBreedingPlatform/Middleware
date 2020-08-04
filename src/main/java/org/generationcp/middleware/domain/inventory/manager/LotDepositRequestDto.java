@@ -15,7 +15,7 @@ public class LotDepositRequestDto {
 
 	private String notes;
 
-	private Integer sourceStudy;
+	private Integer sourceStudyId;
 
 	public SearchCompositeDto<Integer, String> getSelectedLots() {
 		return selectedLots;
@@ -41,12 +41,12 @@ public class LotDepositRequestDto {
 		this.notes = notes;
 	}
 
-	public Integer getSourceStudy() {
-		return this.sourceStudy;
+	public Integer getSourceStudyId() {
+		return this.sourceStudyId;
 	}
 
-	public void setSourceStudy(final Integer sourceStudy) {
-		this.sourceStudy = sourceStudy;
+	public void setSourceStudyId(final Integer sourceStudyId) {
+		this.sourceStudyId = sourceStudyId;
 	}
 
 	@Override

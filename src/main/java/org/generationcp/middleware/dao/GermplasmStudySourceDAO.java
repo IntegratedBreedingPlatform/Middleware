@@ -56,12 +56,11 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "LEFT JOIN ims_lot lot ON lot.eid = gss.gid \n"
 		+ "WHERE gss.project_id = :studyId ";
 
-	public Map<Integer, GermplasmStudySource> getGermplasmStudySourcesMap(final Set<Integer> gids) {
+	public List<GermplasmStudySource> getByGids(final Set<Integer> gids) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.createAlias("germplasm", "germplasm");
 		criteria.add(Restrictions.in("germplasm.gid", gids));
-		final List<GermplasmStudySource> result = criteria.list();
-		return result.stream().collect(Collectors.toMap(a -> a.getGermplasm().getGid(), Function.identity()));
+		return criteria.list();
 	}
 
 	public List<GermplasmStudySourceDto> getGermplasmStudySourceList(

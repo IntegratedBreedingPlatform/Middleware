@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -188,7 +189,8 @@ public class TransactionServiceImpl implements TransactionService {
 
 		final Map<Integer, GermplasmStudySource> germplasmStudySourceMap =
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourcesMap(lots.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet()));
+				.getByGids(lots.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet())).stream()
+				.collect(Collectors.toMap(a -> a.getGermplasm().getGid(), Function.identity()));
 
 		for (final ExtendedLotDto lotDto : lots) {
 			final Double amount = lotDepositRequestDto.getDepositsPerUnit().get(lotDto.getUnitName());
@@ -210,9 +212,10 @@ public class TransactionServiceImpl implements TransactionService {
 			}
 			this.daoFactory.getTransactionDAO().save(transaction);
 
-			if (lotDepositRequestDto.getSourceStudy() != null) {
+			if (lotDepositRequestDto.getSourceStudyId() != null) {
 				// Create experiment transaction records when lot and deposit are created in the context of study.
-				this.createExperimentTransaction(lotDto.getGid(), germplasmStudySourceMap, transaction);
+				this.createExperimentTransaction(lotDto.getGid(), germplasmStudySourceMap, transaction,
+					ExperimentTransactionType.HARVESTING);
 			}
 
 		}
@@ -220,12 +223,12 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	private void createExperimentTransaction(final Integer gid, final Map<Integer, GermplasmStudySource> germplasmStudySourceMap,
-		final Transaction transaction) {
+		final Transaction transaction, final ExperimentTransactionType experimentTransactionType) {
 		if (germplasmStudySourceMap.containsKey(gid)) {
 			final ExperimentModel experimentModel = germplasmStudySourceMap.get(gid).getExperimentModel();
 			if (experimentModel != null) {
 				this.daoFactory.getExperimentTransactionDao()
-					.save(new ExperimentTransaction(experimentModel, transaction, ExperimentTransactionType.HARVESTING.getId()));
+					.save(new ExperimentTransaction(experimentModel, transaction, experimentTransactionType.getId()));
 			}
 		}
 	}
