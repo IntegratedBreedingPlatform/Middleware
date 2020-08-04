@@ -193,12 +193,19 @@ public class TransactionServiceImpl implements TransactionService {
 				.getByGids(lots.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet())).stream()
 				.collect(Collectors.toMap(a -> a.getGermplasm().getGid(), Function.identity()));
 
-		for (final ExtendedLotDto lotDto : lots) {
-			final Double amount = lotDepositRequestDto.getDepositsPerUnit().get(lotDto.getUnitName());
+		for (final ExtendedLotDto extendedLotDto : lots) {
+			final Double amount = lotDepositRequestDto.getDepositsPerUnit().get(extendedLotDto.getUnitName());
 			final Transaction transaction =
-				new Transaction(TransactionType.DEPOSIT, transactionStatus, userId, lotDepositRequestDto.getNotes(), lotDto.getLotId(),
+				new Transaction(TransactionType.DEPOSIT, transactionStatus, userId, lotDepositRequestDto.getNotes(),
+					extendedLotDto.getLotId(),
 					amount);
 			daoFactory.getTransactionDAO().save(transaction);
+
+			if (lotDepositRequestDto.getSourceStudyId() != null) {
+				// Create experiment transaction records when lot and deposit are created in the context of study.
+				this.createExperimentTransaction(extendedLotDto.getGid(), germplasmStudySourceMap, transaction,
+					ExperimentTransactionType.HARVESTING);
+			}
 		}
 
 	}
@@ -218,14 +225,7 @@ public class TransactionServiceImpl implements TransactionService {
 				new Transaction(TransactionType.DEPOSIT, transactionStatus, userId, lotDepositDto.getNotes(), extendedLotDto.getLotId(),
 					lotDepositDto.getAmount());
 			this.daoFactory.getTransactionDAO().save(transaction);
-
-			if (lotDepositRequestDto.getSourceStudyId() != null) {
-				// Create experiment transaction records when lot and deposit are created in the context of study.
-				this.createExperimentTransaction(lotDto.getGid(), germplasmStudySourceMap, transaction,
-					ExperimentTransactionType.HARVESTING);
-			}
 		}
-
 	}
 
 	private void createExperimentTransaction(final Integer gid, final Map<Integer, GermplasmStudySource> germplasmStudySourceMap,
