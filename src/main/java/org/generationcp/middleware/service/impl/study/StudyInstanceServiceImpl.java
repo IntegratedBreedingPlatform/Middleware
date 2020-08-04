@@ -7,7 +7,7 @@ import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.InstanceData;
+import org.generationcp.middleware.domain.dms.ObservationData;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -109,7 +109,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 				studyInstance.setLocationName(location.get().getLname());
 				studyInstance.setLocationAbbreviation(location.get().getLabbr());
 				studyInstance.setInstanceId(geolocation.getLocationId());
-				studyInstance.setLocationInstanceDataId(locationGeolocationProperty.getGeolocationPropertyId());
+				studyInstance.setLocationObservationId(locationGeolocationProperty.getGeolocationPropertyId());
 				studyInstance.setExperimentId(experimentModel.getNdExperimentId());
 			}
 
@@ -196,113 +196,113 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public InstanceData addInstanceData(final InstanceData instanceData, final boolean isEnvironmentCondition) {
-		Preconditions.checkNotNull(instanceData.getInstanceId());
-		final Integer variableId = instanceData.getVariableId();
+	public ObservationData addInstanceObservation(final ObservationData observationData, final boolean isEnvironmentCondition) {
+		Preconditions.checkNotNull(observationData.getInstanceId());
+		final Integer variableId = observationData.getVariableId();
 		Preconditions.checkNotNull(variableId);
-		Preconditions.checkNotNull(instanceData.getValue());
+		Preconditions.checkNotNull(observationData.getValue());
 
 		// Environment conditions are stored in phenotype. Other environment details are saved in nd_experimentprop
 		if (isEnvironmentCondition) {
 			final ExperimentModel experimentModel =
 				this.daoFactory.getExperimentDao()
-					.getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), instanceData.getInstanceId());
+					.getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), observationData.getInstanceId());
 			final Phenotype phenotype =
-				new Phenotype(variableId, instanceData.getValue(), experimentModel);
+				new Phenotype(variableId, observationData.getValue(), experimentModel);
 			phenotype.setCreatedDate(new Date());
 			phenotype.setUpdatedDate(new Date());
-			phenotype.setcValue(instanceData.getCategoricalValueId());
+			phenotype.setcValue(observationData.getCategoricalValueId());
 			phenotype.setName(String.valueOf(variableId));
 
 			this.daoFactory.getPhenotypeDAO().save(phenotype);
-			instanceData.setInstanceDataId(phenotype.getPhenotypeId());
+			observationData.setObservationId(phenotype.getPhenotypeId());
 		} else {
 
 			final GeolocationDao geolocationDao = this.daoFactory.getGeolocationDao();
-			final Geolocation geolocation = geolocationDao.getById(instanceData.getInstanceId());
-			final String value = this.getEnvironmentDataValue(instanceData);
+			final Geolocation geolocation = geolocationDao.getById(observationData.getInstanceId());
+			final String value = this.getEnvironmentDataValue(observationData);
 
-			if (GEOLOCATION_METADATA.contains(instanceData.getVariableId())) {
+			if (GEOLOCATION_METADATA.contains(observationData.getVariableId())) {
 				// Geolocation Metadata variables are stored in Geolocation table.
 				// we just need to update their values if they are added to the study. No need to create GeolocationProperty.
-				this.mapGeolocationMetaData(geolocation, instanceData.getVariableId(), value);
+				this.mapGeolocationMetaData(geolocation, observationData.getVariableId(), value);
 				geolocationDao.save(geolocation);
 				// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 				this.datasetService
-					.updateDependentPhenotypesStatusByGeolocation(instanceData.getInstanceId(),
-						Arrays.asList(instanceData.getVariableId()));
+					.updateDependentPhenotypesStatusByGeolocation(observationData.getInstanceId(),
+						Arrays.asList(observationData.getVariableId()));
 			} else {
-				final GeolocationProperty property = new GeolocationProperty(geolocation, value, 1, instanceData.getVariableId());
+				final GeolocationProperty property = new GeolocationProperty(geolocation, value, 1, observationData.getVariableId());
 				this.daoFactory.getGeolocationPropertyDao().save(property);
-				instanceData.setInstanceDataId(property.getGeolocationPropertyId());
+				observationData.setObservationId(property.getGeolocationPropertyId());
 			}
 
 		}
 
-		return instanceData;
+		return observationData;
 	}
 
-	private String getEnvironmentDataValue(final InstanceData instanceData) {
-		return (instanceData.getCategoricalValueId() != null && instanceData.getCategoricalValueId() > 0) ?
-			String.valueOf(instanceData.getCategoricalValueId()) :
-			instanceData.getValue();
+	private String getEnvironmentDataValue(final ObservationData observationData) {
+		return (observationData.getCategoricalValueId() != null && observationData.getCategoricalValueId() > 0) ?
+			String.valueOf(observationData.getCategoricalValueId()) :
+			observationData.getValue();
 	}
 
 	@Override
-	public InstanceData updateInstanceData(final InstanceData instanceData, final boolean isEnvironmentCondition) {
-		Preconditions.checkNotNull(instanceData.getInstanceDataId());
-		Preconditions.checkNotNull(instanceData.getInstanceId());
-		Preconditions.checkNotNull(instanceData.getVariableId());
-		Preconditions.checkNotNull(instanceData.getValue());
+	public ObservationData updateInstanceObservation(final ObservationData observationData, final boolean isEnvironmentCondition) {
+		Preconditions.checkNotNull(observationData.getObservationId());
+		Preconditions.checkNotNull(observationData.getInstanceId());
+		Preconditions.checkNotNull(observationData.getVariableId());
+		Preconditions.checkNotNull(observationData.getValue());
 
 		// Environment oonditions are stored in phenotype. Other environment details are saved in nd_experimentprop
 		if (isEnvironmentCondition) {
 			final PhenotypeDao phenotypeDAO = this.daoFactory.getPhenotypeDAO();
-			final Phenotype phenotype = phenotypeDAO.getById(instanceData.getInstanceDataId());
+			final Phenotype phenotype = phenotypeDAO.getById(observationData.getObservationId());
 			Preconditions.checkNotNull(phenotype);
-			phenotype.setValue(instanceData.getValue());
-			phenotype.setcValue(instanceData.getCategoricalValueId());
+			phenotype.setValue(observationData.getValue());
+			phenotype.setcValue(observationData.getCategoricalValueId());
 			phenotype.setUpdatedDate(new Date());
 			phenotypeDAO.update(phenotype);
 		} else {
 			final GeolocationPropertyDao propertyDao = this.daoFactory.getGeolocationPropertyDao();
-			final GeolocationProperty property = propertyDao.getById(instanceData.getInstanceDataId());
+			final GeolocationProperty property = propertyDao.getById(observationData.getObservationId());
 			Preconditions.checkNotNull(property);
-			property.setValue(this.getEnvironmentDataValue(instanceData));
+			property.setValue(this.getEnvironmentDataValue(observationData));
 			propertyDao.update(property);
 		}
 
 		// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 		this.datasetService
-			.updateDependentPhenotypesStatusByGeolocation(instanceData.getInstanceId(), Arrays.asList(instanceData.getVariableId()));
+			.updateDependentPhenotypesStatusByGeolocation(observationData.getInstanceId(), Arrays.asList(observationData.getVariableId()));
 
-		return instanceData;
+		return observationData;
 	}
 
 	@Override
-	public Optional<InstanceData> getInstanceData(final Integer instanceId, final Integer instanceDataId, final Integer variableId,
+	public Optional<ObservationData> getInstanceObservation(final Integer instanceId, final Integer observationId, final Integer variableId,
 		final boolean isEnvironmentCondition) {
 
 		if (isEnvironmentCondition) {
 			final ExperimentModel experimentModel =
 				this.daoFactory.getExperimentDao().getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), instanceId);
-			final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotype(experimentModel.getNdExperimentId(), instanceDataId);
+			final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotype(experimentModel.getNdExperimentId(), observationId);
 			if (phenotype != null) {
 				return Optional
-					.of(new InstanceData(phenotype.getExperiment().getNdExperimentId(), instanceDataId, phenotype.getObservableId(),
+					.of(new ObservationData(phenotype.getExperiment().getNdExperimentId(), observationId, phenotype.getObservableId(),
 						phenotype.getValue(), phenotype.getcValueId()));
 			}
 		} else {
 			final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(instanceId);
 
 			if (GEOLOCATION_METADATA.contains(variableId)) {
-				return Optional.of(new InstanceData(geolocation.getLocationId(), geolocation.getLocationId(), variableId,
+				return Optional.of(new ObservationData(geolocation.getLocationId(), geolocation.getLocationId(), variableId,
 					this.getGeolocationMetaDataValue(geolocation, variableId), null));
 			} else {
 				final GeolocationProperty property =
-					this.daoFactory.getGeolocationPropertyDao().getById(instanceDataId);
+					this.daoFactory.getGeolocationPropertyDao().getById(observationId);
 				if (property != null) {
-					return Optional.of(new InstanceData(geolocation.getLocationId(), instanceDataId, property.getTypeId(),
+					return Optional.of(new ObservationData(geolocation.getLocationId(), observationId, property.getTypeId(),
 						property.getValue(), null));
 				}
 			}

@@ -7,23 +7,23 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class InstanceData {
+public class ObservationData {
 
 	private Integer instanceId;
 	// This can be geolocationPropertyId or phenotype ID depending if variable is environmental detail or condition.
-	private Integer instanceDataId;
+	private Integer observationId;
 	private Integer variableId;
 	private String value;
 	private Integer categoricalValueId;
 
-	public InstanceData() {
+	public ObservationData() {
 		// Empty constructor is needed to be able to map JSON from request
 	}
 
-	public InstanceData(final Integer instanceId, final Integer instanceDataId, final Integer variableId, final String value,
+	public ObservationData(final Integer instanceId, final Integer observationId, final Integer variableId, final String value,
 		final Integer categoricalValueId) {
 		this.instanceId = instanceId;
-		this.instanceDataId = instanceDataId;
+		this.observationId = observationId;
 		this.variableId = variableId;
 		this.value = value;
 		this.categoricalValueId = categoricalValueId;
@@ -37,12 +37,12 @@ public class InstanceData {
 		this.instanceId = instanceId;
 	}
 
-	public Integer getInstanceDataId() {
-		return instanceDataId;
+	public Integer getObservationId() {
+		return observationId;
 	}
 
-	public void setInstanceDataId(final Integer instanceDataId) {
-		this.instanceDataId = instanceDataId;
+	public void setObservationId(final Integer observationId) {
+		this.observationId = observationId;
 	}
 
 	public Integer getVariableId() {
@@ -71,22 +71,21 @@ public class InstanceData {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof InstanceData)) {
+		if (!(other instanceof ObservationData)) {
 			return false;
 		}
-		final InstanceData castOther = (InstanceData) other;
-		return new EqualsBuilder().append(this.instanceDataId, castOther.instanceDataId).isEquals();
+		final ObservationData castOther = (ObservationData) other;
+		return new EqualsBuilder().append(this.observationId, castOther.observationId).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.instanceDataId).toHashCode();
+		return new HashCodeBuilder().append(this.observationId).toHashCode();
 	}
 
 	@Override
 	public String toString() {
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
 	}
-
 
 }
