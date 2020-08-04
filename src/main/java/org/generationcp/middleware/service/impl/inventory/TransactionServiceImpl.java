@@ -246,4 +246,23 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 	}
 
+	@Override
+	public void saveAdjustmentTransactions(final Integer userId, final Set<Integer> lotIds, final Double balance, final String notes) {
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
+		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+		for (final ExtendedLotDto lotDto : lots) {
+			if (balance >= lotDto.getReservedTotal()) {
+				final Double amount = balance - lotDto.getActualBalance();
+				if (amount != 0) {
+					final Transaction transaction =
+						new Transaction(TransactionType.ADJUSTMENT, TransactionStatus.CONFIRMED, userId, notes, lotDto.getLotId(), amount);
+					daoFactory.getTransactionDAO().save(transaction);
+				}
+			} else {
+				throw new MiddlewareRequestException("", "lot.balance.update.invalid.available.balance",
+					String.valueOf(lotDto.getStockId()));
+			}
+		}
+	}
 }
