@@ -1,0 +1,134 @@
+<?xml VERSION=1.1 encoding=UTF-8 standalone=NO?>
+<databaseChangeLog xmlns=http://www.liquibase.org/xml/ns/dbchangelog
+				   xmlns:xsi=http://www.w3.org/2001/XMLSchema-instance
+				   xsi:schemaLocation=http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd>
+
+	<changeSet author=corina id=v15.4.1-1>
+		<preConditions onFail=MARK_RAN>
+			<sqlCheck expectedResult=1>
+				SELECT COUNT(*) FROM cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583 	,
+8584 	,
+8265 	,
+8690 	,
+8700 	,
+8830 	,
+8386 	,
+8720 	,
+8620 	,
+8740 	,
+8750 	,
+8760 	,
+8770 	,
+8780 	,
+8387 	,
+8790 	,
+8383 	,
+8194 	,
+8195 	,
+8193 	,
+8191 	,
+8192 	,
+8196 	,
+8800 	,
+8810 	,
+8820 	,
+8730 	,
+8384 	,
+8170 	,
+8186);
+			</sqlCheck>
+		</preConditions>
+		<COMMENT> REMOVE Study Detail AS DEFAULT TYPE FOR environment-LEVEL/plot-LEVEL variables. IBP-3889
+		</COMMENT>
+		<SQL dbms=mysql splitStatements=TRUE>
+			SET FOREIGN_KEY_CHECKS=0;
+
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8782'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8172';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8174';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8112'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8191';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8193'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8218'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8152';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8196';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8179'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8200';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8202';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8204'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8206';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8208';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8154'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8210';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8146';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8080'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8082';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8078';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8074'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8076';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8084';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8212';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8214';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8216';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8198'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8148';
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8062'; 
+			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8068';
+
+		       SET FOREIGN_KEY_CHECKS=1;
+		</SQL>
+	</changeSet>
+	
+	<changeSet id="v15.4.1-2" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM cvterm WHERE cvterm_id = 6000;
+			</sqlCheck>
+		</preConditions>
+		<COMMENT>ADD location ID 6000 AND SET AS DEFAULT</COMMENT>
+		<SQL dbms="mysql">
+			INSERT INTO location (`locid`, `ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`, `program_uuid`) VALUES
+			(6000,1500,0,'Default Seed Store','DSS',0,0,0,0,0,0,NULL),
+			(6001,410,0,'Default Breeding Location','DBL',0,0,0,0,0,0,NULL);
+		</SQL>
+	</changeSet>
+
+	<changeSet id="v15.4.1-3" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<AND>
+			<columnExists tableName="location" columnName="ldefault"/>
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(1) FROM location l
+				WHERE l.ldefault = 1 AND l.ltype = 
+				(SELECT u.fldno FROM udflds u WHERE u.ftable='LOCATION' AND u.ftype='LTYPE' AND fcode='SSTORE')
+			</sqlCheck>
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1) FROM location WHERE locid=6000 AND AND ltype = 1500;
+			</sqlCheck>
+			</AND>
+	</preConditions>
+
+	<COMMENT>SET DSS AS DEFAULT STORAGE location</COMMENT>
+
+        <SQL dbms="mysql">
+		UPDATE location SET ldefault = 1 WHERE locid=6000;
+	</SQL>
+	</changeSet>
+	
+	<changeSet id="v15.4.1-4" author="rowena">
+	<preConditions onFail="CONTINUE">
+		<sqlCheck expectedResult="1">
+			SELECT COUNT(1) FROM udflds u WHERE  fcode = "ANCEST";
+		</sqlCheck>
+	</preConditions>
+
+	<COMMENT>SET </COMMENT>
+
+        <SQL dbms="mysql">
+		UPDATE udflds SET fcode  = "ANCEST_DATA" WHERE fcode = "ANCEST" AND ftable = "ATRIBUTS" AND fldno>1551;
+	</SQL>
+	</changeSet>
+	
+
+</databaseChangeLog>
