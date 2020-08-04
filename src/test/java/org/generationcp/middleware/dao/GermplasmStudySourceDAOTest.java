@@ -406,8 +406,8 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		final List<GermplasmStudySource> result = this.daoFactory.getGermplasmStudySourceDAO().getByGids(
 			Sets.newHashSet(this.germplasmStudySourceFirst.getGermplasm().getGid(), this.germplasmStudySourceSecond.getGermplasm().getGid()));
 
-		Assert.assertEquals(result.get(this.germplasmStudySourceFirst.getGermplasm().getGid()), this.germplasmStudySourceFirst);
-		Assert.assertEquals(result.get(this.germplasmStudySourceSecond.getGermplasm().getGid()), this.germplasmStudySourceSecond);
+		Assert.assertEquals(result.get(0), this.germplasmStudySourceFirst);
+		Assert.assertEquals(result.get(1), this.germplasmStudySourceSecond);
 	}
 
 }
