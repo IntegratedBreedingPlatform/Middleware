@@ -4,10 +4,10 @@
 				   xsi:schemaLocation=http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd>
 
-	<changeSet author=corina id=v15.4.1-1>
+	<changeSet id="v15.4.1-1" author="corina">
 		<preConditions onFail=MARK_RAN>
 			<sqlCheck expectedResult=1>
-				SELECT COUNT(*) FROM cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583 	,
+				SELECT COUNT(*) > 1 FROM cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583 	,
 8584 	,
 8265 	,
 8690 	,
@@ -134,13 +134,49 @@
 	<changeSet id="v15.4.1-5" author="corina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
-				SELECT COUNT(*) FROM projectprop WHERE variable_id=8251 AND project_id IN (SELECT project_id FROM project WHERE `name` LIKE '%Nursery Template%');
+				SELECT COUNT(*) > 1 FROM projectprop WHERE variable_id=8251 AND project_id IN (SELECT project_id FROM project WHERE `name` LIKE '%Nursery Template%');
 			</sqlCheck>
 		</preConditions>
 		<COMMENT>Remove variable STUDY_BM_CODE from nursery template. IBP-3928</COMMENT>
 		<SQL dbms="mysql">
 			DELETE FROM projectprop WHERE variable_id=8251 AND project_id IN (SELECT project_id FROM project WHERE `name` LIKE '%Nursery Template%');
 		</SQL>
+	</changeSet>
+
+       <changeSet id="v15.4.1-7" author="corina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) > 1 from cvterm WHERE `name` IN ('EW_DW_kgPlot','EW_FW_gPlot','EW_FW_kgPlot');
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Apply correction on methods of variables EW_DW_kgPlot, EW_FW_gPlot, EW_FW_kgPlot. IBP-3920
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+			
+			UPDATE cvterm c1, cvterm_relationship c2
+			SET c2.object_id=61390,
+			c1.definition=REPLACE(definition,'Field weight','Dry weight')
+			WHERE c1.`name`='EW_DW_kgPlot' AND c1.cvterm_id=51574
+			AND c1.cvterm_id=c2.subject_id
+			AND c2.type_id=1210;
+
+			UPDATE cvterm c1, cvterm_relationship c2
+			SET c2.object_id=61398,
+			c1.definition=REPLACE(definition,'Dry weight','Field weight')
+			WHERE c1.`name`='EW_FW_gPlot' AND c1.cvterm_id=51675
+			AND c1.cvterm_id=c2.subject_id
+			AND c2.type_id=1210;
+			
+			UPDATE cvterm c1, cvterm_relationship c2
+			SET c2.object_id=61398,
+			c1.definition=REPLACE(definition,'Dry weight','Field weight')
+			WHERE c1.`name`='EW_FW_kgPlot' AND c1.cvterm_id=50854
+			AND c1.cvterm_id=c2.subject_id
+			AND c2.type_id=1210;
+
+			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
 	</changeSet>
 
 </databaseChangeLog>
