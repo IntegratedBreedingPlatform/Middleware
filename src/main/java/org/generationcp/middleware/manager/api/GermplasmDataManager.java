@@ -1199,4 +1199,8 @@ public interface GermplasmDataManager {
 	List<Attribute> getAttributeByIds(List<Integer> ids);
 
 	List<String> getNamesByGidsAndPrefixes(List<Integer> gids, List<String> prefixes);
+
+	List<Germplasm> getExistingCrosses(String femaleParent, int methodId, List<Integer> maleParentIds);
+
+	boolean hasExistingCrosses(String femaleParent, int methodId, List<Integer> maleParentIds);
 }

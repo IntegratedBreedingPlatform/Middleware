@@ -1649,4 +1649,75 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+	public List<Germplasm> getExistingCrosses(final String femaleParent, final int methodId, final List<Integer> maleParentIds) {
+		try {
+			final StringBuilder builder = buildGetExistingCrossesQueryString(maleParentIds);
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(builder.toString());
+			sqlQuery.setParameterList("maleParentIds", maleParentIds);
+			sqlQuery.setParameter("methodId", methodId);
+			sqlQuery.setParameter("femaleParentId", femaleParent);
+			sqlQuery.addScalar("gid");
+			sqlQuery.addScalar("nval");
+
+			final List<Germplasm> existingCrosses = new ArrayList<>();
+			final List<Object[]> results = sqlQuery.list();
+			for (final Object[] result : results) {
+				final Germplasm existingCross = new Germplasm();
+				existingCross.setGid((Integer) result[0]);
+				existingCross.setGermplasmPeferredName((String) result[1]);
+				existingCrosses.add(existingCross);
+			}
+			return existingCrosses;
+		} catch (final HibernateException e) {
+			final String message = "Error with getExistingCrosses" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	StringBuilder buildGetExistingCrossesQueryString(final List<Integer> maleParentIds) {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("SELECT g.gid as gid, (select n.nval from names n where n.nstat=1 and n.gid = g.gid limit 1) as nval ");
+		builder.append(" FROM germplsm g ");
+		if(maleParentIds.size() > 1) {
+			builder.append("INNER JOIN progntrs p ON p.gid = g.gid ");
+			builder.append("WHERE g.deleted = 0 AND g.methn = :methodId AND g.gpid1 = :femaleParentId ");
+			builder.append("AND p.pid IN (:maleParentIds) ");
+			builder.append(" AND g.gpid2 IN ( ");
+			builder.append(" SELECT parentId FROM ( ");
+			for (int i = 0; i < maleParentIds.size(); i++) {
+				builder.append("(SELECT " + maleParentIds.get(i) + " AS parentId) ");
+				if (i != maleParentIds.size() - 1) {
+					builder.append("UNION ALL ");
+				}
+			}
+			builder.append(") AS maleParentGIDs ");
+			builder.append("WHERE parentId not IN (select prog.pid from progntrs prog where prog.gid = g.gid)) ");
+			builder.append("group by p.gid having count(distinct p.pid) = " + (maleParentIds.size() - 1));
+		} else {
+			builder.append("WHERE g.deleted = 0 AND g.methn = :methodId AND g.gpid1 = :femaleParentId ");
+			builder.append("AND g.gpid2 IN (:maleParentIds)");
+		}
+		return builder;
+	}
+
+	public boolean hasExistingCrosses(final String femaleParent, final int methodId, final List<Integer> maleParentIds) {
+		try {
+			final StringBuilder builder = new StringBuilder();
+			builder.append("SELECT COUNT(1) FROM ( ");
+			builder.append(this.buildGetExistingCrossesQueryString(maleParentIds).toString());
+			builder.append(") EXISTING_CROSSES");
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(builder.toString());
+			sqlQuery.setParameterList("maleParentIds", maleParentIds);
+			sqlQuery.setParameter("methodId", methodId);
+			sqlQuery.setParameter("femaleParentId", femaleParent);
+
+			return ((BigInteger) sqlQuery.uniqueResult()).longValue() > 0;
+		} catch (final HibernateException e) {
+			final String message = "Error with hasExistingCrosses" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 }
