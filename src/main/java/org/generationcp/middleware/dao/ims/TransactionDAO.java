@@ -82,7 +82,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 			final StringBuilder sql =
 				new StringBuilder().append("Select lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
-					.append("tran.sourceid, tran.trnqty, lot.comments ")
+					.append("tran.trnqty, lot.comments ")
 					.append("FROM ims_transaction tran ")
 					.append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
 					.append("INNER JOIN stock s on s.dbxref_id = lot.eid ")
@@ -100,12 +100,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					final Integer gid = (Integer) row[2];
 					final Integer locationId = (Integer) row[3];
 					final Integer scaleId = (Integer) row[4];
-					final Integer sourceId = (Integer) row[5];
-					final Double amount = (Double) row[6];
-					final String comment = (String) row[7];
+					final Double amount = (Double) row[5];
+					final String comment = (String) row[6];
 
 					final InventoryDetails details =
-						new InventoryDetails(gid, null, lotId, locationId, null, userId, amount, sourceId, null, scaleId, null, comment);
+						new InventoryDetails(gid, null, lotId, locationId, null, userId, amount, scaleId, null, comment);
 					detailsList.add(details);
 				}
 			}
