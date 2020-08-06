@@ -27,9 +27,6 @@ public class GermplasmInventory implements Serializable {
 	// number of lots with actual inventory available for given germplasm
 	private Integer actualInventoryLotCount;
 
-	// number of lots with reserved amount for given germplasm
-	private Integer reservedLotCount;
-
 	// number of lots for given germplasm
 	private Integer lotCount;
 
@@ -47,12 +44,6 @@ public class GermplasmInventory implements Serializable {
 
 	// count of different scale across all lots for germplsm
 	private Integer distinctScaleCountForGermplsm;
-
-	// total withdrawal balance of germplsm per list entry
-	private Double withdrawalBalance;
-
-	// distinct scales of withdrawal per list entry
-	private Integer distinctCountWithdrawalScale;
 
 	// scale withdrawal if ony one scaleId across all withdrawal
 	private Integer withdrawalScaleId;
@@ -82,15 +73,6 @@ public class GermplasmInventory implements Serializable {
 
 	public void setActualInventoryLotCount(Integer actualInventoryLotCount) {
 		this.actualInventoryLotCount = actualInventoryLotCount;
-	}
-
-	public Integer getReservedLotCount() {
-		//FIXME delete because the value is never used
-		return this.reservedLotCount;
-	}
-
-	public void setReservedLotCount(Integer reservedLotCount) {
-		this.reservedLotCount = reservedLotCount;
 	}
 
 	public List<? extends LotDetails> getLotRows() {
@@ -125,8 +107,6 @@ public class GermplasmInventory implements Serializable {
 		builder.append(this.gid);
 		builder.append(", actualInventoryLotCount=");
 		builder.append(this.actualInventoryLotCount);
-		builder.append(", reservedLotCount=");
-		builder.append(this.reservedLotCount);
 		if (this.lotRows != null) {
 			builder.append(", lotCount = ");
 			builder.append(this.lotRows.size());
@@ -201,28 +181,12 @@ public class GermplasmInventory implements Serializable {
 		this.distinctScaleCountForGermplsm = distinctScaleCountForGermplsm;
 	}
 
-	public Double getWithdrawalBalance() {
-		return withdrawalBalance;
-	}
-
-	public void setWithdrawalBalance(Double withdrawalBalance) {
-		this.withdrawalBalance = withdrawalBalance;
-	}
-
 	public String getWithdrawalScale() {
 		return withdrawalScale;
 	}
 
 	public void setWithdrawalScale(String withdrawalScale) {
 		this.withdrawalScale = withdrawalScale;
-	}
-
-	public Integer getDistinctCountWithdrawalScale() {
-		return distinctCountWithdrawalScale;
-	}
-
-	public void setDistinctCountWithdrawalScale(Integer distinctCountWithdrawalScale) {
-		this.distinctCountWithdrawalScale = distinctCountWithdrawalScale;
 	}
 
 	public Integer getWithdrawalScaleId() {

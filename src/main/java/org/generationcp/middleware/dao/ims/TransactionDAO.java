@@ -118,35 +118,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return detailsList;
 	}
 
-
-	@SuppressWarnings("unchecked")
-	public Map<Integer, BigInteger> countLotsWithReservationForListEntries(final List<Integer> listEntryIds) {
-		//FIXME delete because the value is never used. This query is wrong, should use gids instead of listEntryIds
-		final Map<Integer, BigInteger> lotCounts = new HashMap<>();
-
-		try {
-			final String sql =
-					"SELECT recordid, count(DISTINCT t.lotid) " + "FROM ims_transaction t " + "INNER JOIN ims_lot l ON l.lotid = t.lotid "
-							+ "WHERE trnstat = 0 AND trnqty < 0 AND recordid IN (:entryIds) "
-							+ "  AND l.status = 0 AND l.etype = 'GERMPLSM' " + "GROUP BY recordid " + "ORDER BY recordid ";
-			final Query query = this.getSession().createSQLQuery(sql).setParameterList("entryIds", listEntryIds);
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-				final Integer entryId = (Integer) row[0];
-				final BigInteger count = (BigInteger) row[1];
-
-				lotCounts.put(entryId, count);
-			}
-
-		} catch (final Exception e) {
-			final String message = "Error with countLotsWithReservationForListEntries=" + listEntryIds + " query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-		return lotCounts;
-	}
-
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Object[]> retrieveWithdrawalBalanceWithDistinctScale(final List<Integer> listEntryIds) {
 		final Map<Integer, Object[]> mapWithdrawalStatusEntryWise = new HashMap<>();

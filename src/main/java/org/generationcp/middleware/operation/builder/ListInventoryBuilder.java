@@ -62,14 +62,14 @@ public class ListInventoryBuilder extends Builder {
 
 		if (listEntries != null && !listEntries.isEmpty()) {
 			this.retrieveLotCounts(listEntryIds, listEntries, gids, lrecIds);
-			this.retrieveWithdrawalAndStatus(listEntries, gids, lrecIds);
+			this.retrieveWithdrawalAndStatus(listEntries, lrecIds);
 			this.retrieveGroupId(listEntries, gids);
 		}
 		return listEntries;
 	}
 
 	protected void retrieveWithdrawalAndStatus(final List<GermplasmListData> listEntries,
-			final List<Integer> gids, final List<Integer> lrecIds) throws MiddlewareQueryException {
+			final List<Integer> lrecIds) throws MiddlewareQueryException {
 		this.retrieveWithdrawalBalance(listEntries, lrecIds);
 		this.setAvailableBalanceScale(listEntries);
 		this.setWithdrawalBalanceScale(listEntries);
@@ -117,7 +117,7 @@ public class ListInventoryBuilder extends Builder {
 		}
 		this.retrieveLotCounts(entryIds, listEntries, gids, lrecIds);
 		this.retrieveGroupId(listEntries, gids);
-		this.retrieveWithdrawalAndStatus(listEntries, gids, lrecIds);
+		this.retrieveWithdrawalAndStatus(listEntries, lrecIds);
 		return listEntries;
 	}
 
@@ -127,7 +127,6 @@ public class ListInventoryBuilder extends Builder {
 		// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table
 		// where listdata.gid may not be the final germplasm displayed
 		this.retrieveAvailableBalLotCounts(listEntries, gids);
-		this.retrieveReservedLotCounts(listEntries, entryIds);
 		this.retrieveStockIds(listEntries, gids);
 
 	}
@@ -363,24 +362,6 @@ public class ListInventoryBuilder extends Builder {
 			listDataInventory.setScaleIdForGermplsm(null);
 		}
 	}
-	/*
-	 * Retrieve the number of lots with reserved seeds per list entry
-	 */
-	private void retrieveReservedLotCounts(final List<GermplasmListData> listEntries, final List<Integer> listEntryIds)
-			throws MiddlewareQueryException {
-		final Map<Integer, BigInteger> reservedLotCounts = daoFactory.getTransactionDAO().countLotsWithReservationForListEntries(listEntryIds);
-		for (final GermplasmListData entry : listEntries) {
-			final ListDataInventory inventory = entry.getInventoryInfo();
-			if (inventory != null) {
-				final BigInteger count = reservedLotCounts.get(entry.getId());
-				if (count != null) {
-					inventory.setReservedLotCount(count.intValue());
-				} else {
-					inventory.setReservedLotCount(0);
-				}
-			}
-		}
-	}
 
 	/*
 	 * Retrieve withdrawal balance per entry along with overall status
@@ -393,15 +374,10 @@ public class ListInventoryBuilder extends Builder {
 			if (inventory != null) {
 				final Object[] withdrawalPerRecord = withdrawalData.get(entry.getId());
 				if (withdrawalPerRecord != null) {
-					inventory.setWithdrawalBalance((Double) withdrawalPerRecord[0]);
 
-					BigInteger countWithDrawalScale = (BigInteger) withdrawalPerRecord[1];
-					inventory.setDistinctCountWithdrawalScale(countWithDrawalScale.intValue());
 					inventory.setWithdrawalScaleId((Integer) withdrawalPerRecord[2]);
 
 				} else {
-					inventory.setWithdrawalBalance(0.0);
-					inventory.setDistinctCountWithdrawalScale(0);
 					inventory.setWithdrawalScaleId(null);
 					inventory.setWithdrawalScale(null);
 				}

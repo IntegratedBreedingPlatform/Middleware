@@ -237,7 +237,6 @@ public class GermplasmListTestDataInitializer {
 		listDataInventory.setLotCount(0);
 		listDataInventory.setActualInventoryLotCount(0);
 		listDataInventory.setLotRows(new ArrayList<LotDetails>());
-		listDataInventory.setReservedLotCount(0);
 		listDataInventory.setStockIDs("SID:" + itemNo);
 		listDataInventory.setDistinctScaleCountForGermplsm(0);
 
