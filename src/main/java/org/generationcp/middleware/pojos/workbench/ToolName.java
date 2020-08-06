@@ -40,6 +40,7 @@ public enum ToolName {
 	SAMPLE_MANAGER("sample_manager"),
 	STUDY_BROWSER("study_browser"),
 	STUDY_BROWSER_WITH_ID("study_browser_with_id"),
+	GRAPHICAL_QUERIES("graphical_queries"),
 	TRAIT_DONOR_QUERY("trait_donor_query"),
 	TRIAL_MANAGER_FIELDBOOK_WEB("trial_manager_fieldbook_web"),
 	STUDY_MANAGER_FIELDBOOK_WEB("study_manager_fieldbook_web"),
