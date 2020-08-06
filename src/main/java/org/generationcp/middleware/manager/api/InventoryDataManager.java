@@ -174,11 +174,10 @@ public interface InventoryDataManager {
 	 * Return the germplasm entries of given entry IDs of specific list with lot counts such as # of lots with available balance and # of
 	 * lots with reserved seed per entry
 	 *
-	 * @param listId
 	 * @param entryIds
 	 * @return
 	 */
-	List<GermplasmListData> getLotCountsForListEntries(Integer listId, List<Integer> entryIds);
+	List<GermplasmListData> getLotCountsForListEntries(List<Integer> entryIds);
 
 	/**
 	 * Adds in inventory related information into an existing {@link GermplasmList}

@@ -206,7 +206,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		entryIds.add(1);
 		entryIds.add(2);
 		entryIds.add(3);
-		final List<GermplasmListData> listEntries = this.manager.getLotCountsForListEntries(listid, entryIds);
+		final List<GermplasmListData> listEntries = this.manager.getLotCountsForListEntries(entryIds);
 		for (final GermplasmListData entry : listEntries) {
 			final ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {

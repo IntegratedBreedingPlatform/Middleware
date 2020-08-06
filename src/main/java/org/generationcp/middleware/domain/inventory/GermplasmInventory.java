@@ -60,15 +60,6 @@ public class GermplasmInventory implements Serializable {
 	// scale withdrawal if ony one scale across all withdrawal
 	private String withdrawalScale;
 
-	// count of different withdrawal status per list
-	private Integer distinctCountWithdrawalStatus;
-
-	// withdrawal status(0=reserved, 1=committed) if only one across all transactions
-	private Integer withdrawalStatus;
-
-	// overall status for germplsm for list entry
-	private String transactionStatus;
-
 	// list of lots for germplasm
 	private List<? extends LotDetails> lotRows;
 
@@ -232,30 +223,6 @@ public class GermplasmInventory implements Serializable {
 
 	public void setDistinctCountWithdrawalScale(Integer distinctCountWithdrawalScale) {
 		this.distinctCountWithdrawalScale = distinctCountWithdrawalScale;
-	}
-
-	public Integer getDistinctCountWithdrawalStatus() {
-		return distinctCountWithdrawalStatus;
-	}
-
-	public void setDistinctCountWithdrawalStatus(Integer distinctCountWithdrawalStatus) {
-		this.distinctCountWithdrawalStatus = distinctCountWithdrawalStatus;
-	}
-
-	public Integer getWithdrawalStatus() {
-		return withdrawalStatus;
-	}
-
-	public void setWithdrawalStatus(Integer withdrawalStatus) {
-		this.withdrawalStatus = withdrawalStatus;
-	}
-
-	public String getTransactionStatus() {
-		return transactionStatus;
-	}
-
-	public void setTransactionStatus(String transactionStatus) {
-		this.transactionStatus = transactionStatus;
 	}
 
 	public Integer getWithdrawalScaleId() {

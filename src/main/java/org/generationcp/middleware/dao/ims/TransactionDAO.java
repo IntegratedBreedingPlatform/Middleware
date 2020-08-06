@@ -178,55 +178,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return mapWithdrawalStatusEntryWise;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Object[]> retrieveWithdrawalStatus(final Integer sourceId, final List<Integer> listGids) {
-		final List<Object[]> listOfTransactionStatusForGermplsm = new ArrayList<>();
-
-		try {
-			final String sql =
-					"select lot.*,recordid,trnstat  from  (SELECT i.lotid, i.eid FROM ims_lot i "
-							+ " LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-							+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gIds) GROUP BY i.lotid ) lot "
-							+ " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid   AND trnstat in (0,1) AND trnqty < 0 "
-							+ " AND sourceid = :sourceid AND sourcetype = 'LIST'  ORDER by lot.eid; ";
-			final Query query = this.getSession().createSQLQuery(sql);
-			query.setParameterList("gIds", listGids);
-			query.setParameter("sourceid", sourceId);
-
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-
-				Integer lotId = null;
-				Integer germplsmId = null;
-				Integer recordId = null;
-				Integer tranStatus = null;
-
-				if(row[0] != null){
-					lotId = (Integer) row[0];
-				}
-
-				if(row[1] != null){
-					germplsmId = (Integer) row[1];
-				}
-				if(row[2] != null){
-					recordId = (Integer) row[2];
-				}
-				if(row[3] != null){
-					tranStatus = (Integer) row[3];
-				}
-
-				listOfTransactionStatusForGermplsm.add(new Object[]{ lotId, germplsmId, recordId, tranStatus });
-			}
-
-		} catch (final Exception e) {
-			final String message = "Error withretrieveWithdrawalStatus=" + listGids + " query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-		return listOfTransactionStatusForGermplsm;
-	}
-
 	public void cancelUnconfirmedTransactionsForListEntries(final List<Integer> listEntryIds) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
@@ -286,6 +237,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return query.list();
 	}
 
+	// Used in Lot Details component
 	public List<TransactionReportRow> getTransactionDetailsForLot(final Integer lotId) {
 
 		final List<TransactionReportRow> transactions = new ArrayList<>();

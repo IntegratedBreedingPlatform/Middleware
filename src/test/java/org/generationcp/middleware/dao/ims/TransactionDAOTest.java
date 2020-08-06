@@ -141,16 +141,6 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 	}
 
-	@Test
-	public void testRetrieveWithdrawalStatus() throws MiddlewareQueryException{
-		final List<Object[]> returnObjectArray = this.dao.retrieveWithdrawalStatus(this.germplasmListId, new ArrayList<>(this.germplasmMap.keySet()));
-		Assert.assertNotNull(returnObjectArray);
-		Assert.assertEquals(this.germplasmListData.get(0).getGid(), returnObjectArray.get(0)[1]);
-		Assert.assertEquals(this.germplasmListData.get(0).getId(), returnObjectArray.get(0)[2]);
-		Assert.assertEquals(0, returnObjectArray.get(0)[3]);
-
-	}
-
 	private void initializeGermplasms(final int noOfEntries) {
 		for (int i = 1; i <= noOfEntries; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(i);
