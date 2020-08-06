@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.study;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -166,6 +167,31 @@ public class ObservationQueryTest {
 				+ "		AND nde.nd_experiment_id=:experiment_id \n"
 				+ " GROUP BY nde.nd_experiment_id ";
 
+	}
+
+	@Test
+	public void testGgetObservationQueryWithBlockRowCol() {
+		assertEquals(this.formatString(this.getRowColumnQuery()), this.formatString(this.observationQuery.getObservationQueryWithBlockRowCol(new ArrayList<>(), null)));
+	}
+
+	private String getRowColumnQuery() {
+		return " SELECT    nde.nd_experiment_id,    gl.description AS TRIAL_INSTANCE,    proj.name AS PROJECT_NAME,    gl.nd_geolocation_id,    (SELECT iispcvt.definition  FROM       stockprop isp  INNER JOIN       cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id  INNER JOIN       cvterm iispcvt ON iispcvt.cvterm_id = isp.value  WHERE       isp.stock_id = s.stock_id       AND ispcvt.name = 'ENTRY_TYPE') AS ENTRY_TYPE,    s.dbxref_id AS GID,    "
+			+ "s.name AS DESIGNATION,    "
+			+ "s.uniquename AS ENTRY_NO,    "
+			+ "s.value AS ENTRY_CODE,    "
+			+ "(SELECT isp.value  FROM       stockprop isp  INNER JOIN       cvterm ispcvt1 ON ispcvt1.cvterm_id = isp.type_id  WHERE       isp.stock_id = s.stock_id       AND ispcvt1.name = 'SEED_SOURCE') AS SEED_SOURCE,    "
+			+ "(SELECT ndep.value  FROM       nd_experimentprop ndep  INNER JOIN       cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id  WHERE       ndep.nd_experiment_id = nde.nd_experiment_id       AND ispcvt.name = 'REP_NO') AS REP_NO,    "
+			+ "(SELECT ndep.value  \tFROM       nd_experimentprop ndep  \tINNER JOIN       cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id  \tWHERE       ndep.nd_experiment_id = nde.nd_experiment_id       AND ispcvt.name = 'PLOT_NO') AS PLOT_NO,    "
+			+ "nde.obs_unit_id AS OBS_UNIT_ID,    "
+			+ "(SELECT ndep.value \t\tFROM nd_experimentprop ndep      INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id \t\tWHERE ndep.nd_experiment_id = nde.nd_experiment_id \t\tAND ispcvt.name = 'BLOCK_NO') AS BLOCK_NO, "
+			+ "(SELECT (CASE WHEN(SELECT COUNT(*) FROM nd_experimentpropprop INNER JOIN cvterm_relationshipcrelprop ON crelprop.subject_id=prop.type_id AND crelprop.type_id=1200 AND crelprop.object_id=2170  WHERE prop.nd_experiment_id = nde.nd_experiment_id ) > 1THEN 'TBD' ELSE (SELECT (\t\t\t\tCASE WHEN scaletype.object_id = 1130\t\t\t\tTHEN (SELECT val.name from cvterm val WHERE val.cvterm_id = ndep.value) \t\t\t\tELSE ndep.value END\t\t\t\t)\t\tFROM  nd_experimentprop ndep      INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id \t\tINNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = ispcvt.cvterm_id AND crelprop.type_id = 1200 AND crelprop.object_id=2170      LEFT JOIN (SELECT scale.object_id as object_id, relation.subject_id as subject_id FROM cvterm_relationship relation INNER JOIN cvterm_relationship scale ON scale.subject_id = relation.object_id AND scale.type_id = 1105 WHERE relation.type_id = 1220 ) scaletype ON scaletype.subject_id = ispcvt.cvterm_id      WHERE ndep.nd_experiment_id = nde.nd_experiment_id) END) ) ROW, \t  "
+			+ "(SELECT (CASE WHEN(SELECT COUNT(*) FROM nd_experimentpropprop INNER JOIN cvterm_relationshipcrelprop ON crelprop.subject_id=prop.type_id AND crelprop.type_id=1200 AND crelprop.object_id=2180  WHERE prop.nd_experiment_id = nde.nd_experiment_id ) > 1THEN 'TBD' ELSE (SELECT  (\t\t\t\tCASE WHEN scaletype.object_id = 1130\t\t\t\tTHEN (SELECT val.name from cvterm val WHERE val.cvterm_id = ndep.value) \t\t\t\tELSE ndep.value END\t\t\t\t)\t\tFROM    nd_experimentprop ndep   INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id \t  INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = ispcvt.cvterm_id AND crelprop.type_id = 1200 AND crelprop.object_id = 2180   LEFT JOIN (SELECT scale.object_id as object_id, relation.subject_id as subject_id FROM cvterm_relationship relation INNER JOIN cvterm_relationship scale ON scale.subject_id = relation.object_id AND scale.type_id = 1105 WHERE relation.type_id = 1220 ) scaletype ON scaletype.subject_id = ispcvt.cvterm_id    WHERE ndep.nd_experiment_id = nde.nd_experiment_id) END) ) COL, \t "
+			+ "(SELECT l.locid   \tFROM nd_geolocationprop gp      INNER JOIN location l ON l.locid = gp.value  \t\tWHERE  gp.type_id = 8190     AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS locationDbId, "
+			+ "(SELECT l.lname \tFROM nd_geolocationprop gp \tINNER JOIN location l ON l.locid = gp.value \tWHERE gp.type_id = 8190 AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationName, "
+			+ "(SELECT  gp.value   FROM nd_geolocationprop gp  WHERE gp.type_id = 8189 AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationAbbreviation, "
+			+ "FieldMapCol.value AS FieldMapColumn, "
+			+ "FieldMapRow.value AS FieldMapRow,  1=1  FROM Project p     INNER JOIN project proj ON proj.project_id =  p.study_id     INNER JOIN nd_experiment nde ON nde.project_id = p.project_id     INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id     INNER JOIN stock s ON s.stock_id = nde.stock_id \t   LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \t   LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id     LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = 8410    LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = 8400 WHERE p.study_id = :projectId AND p.dataset_type_id = 4 \n"
+			+ " GROUP BY nde.nd_experiment_id ";
 	}
 
 }
