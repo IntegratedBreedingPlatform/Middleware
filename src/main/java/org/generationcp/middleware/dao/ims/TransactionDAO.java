@@ -249,23 +249,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
-	public void cancelUnconfirmedTransactionsForGermplasms(final List<Integer> gids) {
-		try {
-			final String sql =
-					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate "
-							+ "WHERE trnstat = 0 AND sourceType = 'LIST' " + "AND lotid in ( select lotid from ims_lot "
-							+ "WHERE status = 0 AND etype = 'GERMPLSM' " + "AND eid in (:gids))";
-			final Query query =
-					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDate())
-							.setParameterList("gids", gids);
-			query.executeUpdate();
-		} catch (final Exception e) {
-			final String message = "Error cancelUnconfirmedTransactionsForGermplasms=" + gids + ") query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	public Map<Integer, String> retrieveStockIds(final List<Integer> gIds) {
 
 		final Map<Integer, String> gIdStockIdMap = new HashMap<>();
