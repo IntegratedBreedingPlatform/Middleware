@@ -137,5 +137,20 @@
 		</sql>
 	</changeSet>
 
+	<changeSet id="aldrin" author="v15.4.0-5">
+		 <preConditions onFail="MARK_RAN">
+			 <sqlCheck expectedResult="0">
+				 SELECT COUNT(*)
+				 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
+				 WHERE  tc.TABLE_NAME = 'germplasm_study_source' AND CONSTRAINT_NAME = 'germplasm_study_source_gid_UNIQUE';
+			 </sqlCheck>
+        </preConditions>
+        <comment>Add Unique index constraint for GID</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE `germplasm_study_source`
+			ADD UNIQUE INDEX `germplasm_study_source_gid_UNIQUE` (`gid` ASC);
+		</sql>
+	</changeSet>
+
 
 </databaseChangeLog>

@@ -5,11 +5,14 @@ import org.generationcp.middleware.util.Debug;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class GermplasmListNewColumnsInfo implements Serializable {
 
@@ -40,6 +43,19 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 
 	public void setColumnValuesMap(final Map<String, List<ListDataColumnValues>> columnValuesMap) {
 		this.columnValuesMap = columnValuesMap;
+	}
+
+	/**
+	 * @return map of column names with map of listDataId -> value
+	 */
+	public Map<String, Map<Integer, ListDataColumnValues>> getColumnValuesByListDataIdMap() {
+		if (this.columnValuesMap != null && this.columnValuesMap != null) {
+			return this.columnValuesMap.entrySet().stream()
+				.collect(Collectors.toMap(entry -> entry.getKey(), entry ->
+					entry.getValue().stream().collect(Collectors.toMap(ListDataColumnValues::getListDataId, Function.identity()))
+				));
+		}
+		return Collections.EMPTY_MAP;
 	}
 
 	@Override

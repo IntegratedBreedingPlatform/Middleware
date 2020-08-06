@@ -23,6 +23,10 @@ import javax.persistence.Table;
 @AutoProperty
 public class GermplasmStudySource {
 
+	public GermplasmStudySource() {
+		// Default constructor
+	}
+
 	public GermplasmStudySource(final Germplasm germplasm, final DmsProject study, final ExperimentModel experimentModel,
 		final GermplasmStudySourceType germplasmStudySourceType) {
 		this.germplasm = germplasm;
