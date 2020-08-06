@@ -118,37 +118,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return detailsList;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Map<Integer, Object[]> retrieveWithdrawalBalanceWithDistinctScale(final List<Integer> listEntryIds) {
-		final Map<Integer, Object[]> mapWithdrawalStatusEntryWise = new HashMap<>();
-
-		try {
-			final String sql =
-					"SELECT recordid, sum(trnqty)*-1 as withdrawal, count(distinct l.scaleid),l.scaleid "
-							+ "FROM ims_transaction t " + "INNER JOIN ims_lot l ON l.lotid = t.lotid "
-							+ "WHERE trnqty < 0 AND trnstat <> 9 AND recordid IN (:entryIds) "
-							+ "  AND l.status = 0 AND l.etype = 'GERMPLSM' " + "GROUP BY recordid " + "ORDER BY recordid ";
-			final Query query = this.getSession().createSQLQuery(sql).setParameterList("entryIds", listEntryIds);
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-				final Integer entryId = (Integer) row[0];
-				final Double withdrawalBalance = (Double) row[1];
-
-				final BigInteger distinctWithdrawalScale = (BigInteger) row[2];
-				final Integer withdrawalScale = (Integer) row[3];
-
-				mapWithdrawalStatusEntryWise.put(entryId, new Object[] {withdrawalBalance, distinctWithdrawalScale, withdrawalScale});
-			}
-
-		} catch (final Exception e) {
-			final String message = "Error with retrieveWithdrawalBalanceWithDistinctScale=" + listEntryIds + " query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-		return mapWithdrawalStatusEntryWise;
-	}
-
 	public void cancelUnconfirmedTransactionsForListEntries(final List<Integer> listEntryIds) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with

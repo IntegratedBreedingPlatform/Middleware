@@ -45,12 +45,6 @@ public class GermplasmInventory implements Serializable {
 	// count of different scale across all lots for germplsm
 	private Integer distinctScaleCountForGermplsm;
 
-	// scale withdrawal if ony one scaleId across all withdrawal
-	private Integer withdrawalScaleId;
-
-	// scale withdrawal if ony one scale across all withdrawal
-	private String withdrawalScale;
-
 	// list of lots for germplasm
 	private List<? extends LotDetails> lotRows;
 
@@ -181,19 +175,4 @@ public class GermplasmInventory implements Serializable {
 		this.distinctScaleCountForGermplsm = distinctScaleCountForGermplsm;
 	}
 
-	public String getWithdrawalScale() {
-		return withdrawalScale;
-	}
-
-	public void setWithdrawalScale(String withdrawalScale) {
-		this.withdrawalScale = withdrawalScale;
-	}
-
-	public Integer getWithdrawalScaleId() {
-		return withdrawalScaleId;
-	}
-
-	public void setWithdrawalScaleId(Integer withdrawalScaleId) {
-		this.withdrawalScaleId = withdrawalScaleId;
-	}
 }
