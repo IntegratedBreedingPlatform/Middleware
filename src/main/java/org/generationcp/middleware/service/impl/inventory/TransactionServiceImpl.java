@@ -217,16 +217,15 @@ public class TransactionServiceImpl implements TransactionService {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
 		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
-		final Map<String, List<LotDepositDto>> lotDepositDtoMap = lotDepositDtoList.stream().collect(Collectors.groupingBy(LotDepositDto::getLotUID));
+		final Map<String, ExtendedLotDto> ExtendedLotDtoMap =
+			lots.stream().collect(Collectors.toMap(ExtendedLotDto::getLotUUID, extendedLotDto -> extendedLotDto));
 
-		for (final ExtendedLotDto extendedLotDto : lots) {
-			final List<LotDepositDto> lotDepositDtos = lotDepositDtoMap.get(extendedLotDto.getLotUUID());
-			for (final LotDepositDto lotDepositDto : lotDepositDtos) {
-				final Transaction transaction =
-					new Transaction(TransactionType.DEPOSIT, transactionStatus, userId, lotDepositDto.getNotes(), extendedLotDto.getLotId(),
-						lotDepositDto.getAmount());
-				this.daoFactory.getTransactionDAO().save(transaction);
-			}
+		for (final LotDepositDto lotDepositDto : lotDepositDtoList) {
+			final ExtendedLotDto extendedLotDto = ExtendedLotDtoMap.get(lotDepositDto.getLotUID());
+			final Transaction transaction =
+				new Transaction(TransactionType.DEPOSIT, transactionStatus, userId, lotDepositDto.getNotes(), extendedLotDto.getLotId(),
+					lotDepositDto.getAmount());
+			this.daoFactory.getTransactionDAO().save(transaction);
 		}
 	}
 
