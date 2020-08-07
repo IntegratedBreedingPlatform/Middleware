@@ -75,9 +75,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	private static final String GET_LOTS_FOR_GERMPLASM =
 			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
 
-	private static final String GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS =
-			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
-
 	private static final String GET_LOTS_FOR_LIST_ENTRIES =
 			"SELECT lot.*, recordid, trnqty * -1, trnstat, trnid " + "FROM " + "   (" + LotDAO.GET_LOTS_FOR_GERMPLASM + "   ) lot "
 					+ " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid " + "  AND trnstat in (:statusList) AND trnqty < 0 "
@@ -197,7 +194,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 					"Error at getLotAggregateDataForListEntry for list ID = " + listId + " and GID = " + gid + AT_LOT_DAO + e.getMessage(),
 					e);
 		}
-
 		return lots;
 	}
 
