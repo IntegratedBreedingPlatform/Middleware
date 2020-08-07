@@ -14,10 +14,10 @@ public class LotItemDto {
 	/** Ignored if storageLocationId is present */
 	private String storageLocationAbbr;
 
-	private Integer scaleId;
+	private Integer unitId;
 
 	/** Ignored if scaleId is present */
-	private String scaleName;
+	private String unitName;
 
 	private Double initialBalance;
 
@@ -49,20 +49,20 @@ public class LotItemDto {
 		this.storageLocationAbbr = storageLocationAbbr;
 	}
 
-	public String getScaleName() {
-		return scaleName;
+	public String getUnitName() {
+		return unitName;
 	}
 
-	public Integer getScaleId() {
-		return this.scaleId;
+	public Integer getUnitId() {
+		return this.unitId;
 	}
 
-	public void setScaleId(final Integer scaleId) {
-		this.scaleId = scaleId;
+	public void setUnitId(final Integer unitId) {
+		this.unitId = unitId;
 	}
 
-	public void setScaleName(final String scaleName) {
-		this.scaleName = scaleName;
+	public void setUnitName(final String unitName) {
+		this.unitName = unitName;
 	}
 
 	public Double getInitialBalance() {
