@@ -154,7 +154,10 @@
 
 	<changeSet author="cuenyad" id="v15.4.0-6">
 		<preConditions onFail="MARK_RAN">
+			<and>
 				<tableExists tableName="search_request"/>
+				<columnExists tableName="search_request" columnName="parameters"></columnExists>
+			</and>
 		</preConditions>
 		<comment>
 			Modify the parameters column to MEDIUM TEXT
