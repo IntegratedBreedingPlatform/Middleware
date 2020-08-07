@@ -217,11 +217,11 @@ public class TransactionServiceImpl implements TransactionService {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
 		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
-		final Map<String, ExtendedLotDto> ExtendedLotDtoMap =
+		final Map<String, ExtendedLotDto> extendedLotDtoMap =
 			lots.stream().collect(Collectors.toMap(ExtendedLotDto::getLotUUID, extendedLotDto -> extendedLotDto));
 
 		for (final LotDepositDto lotDepositDto : lotDepositDtoList) {
-			final ExtendedLotDto extendedLotDto = ExtendedLotDtoMap.get(lotDepositDto.getLotUID());
+			final ExtendedLotDto extendedLotDto = extendedLotDtoMap.get(lotDepositDto.getLotUID());
 			final Transaction transaction =
 				new Transaction(TransactionType.DEPOSIT, transactionStatus, userId, lotDepositDto.getNotes(), extendedLotDto.getLotId(),
 					lotDepositDto.getAmount());
