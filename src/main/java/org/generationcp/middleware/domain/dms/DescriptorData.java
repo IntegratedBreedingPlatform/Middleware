@@ -7,29 +7,29 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class ObservationData extends InstanceVariableData {
+public class DescriptorData extends InstanceVariableData {
 
-	private Integer observationDataId;
+	private Integer descriptorDataId;
 
-	public ObservationData() {
+	public DescriptorData() {
 		// Empty constructor is needed to be able to map JSON from request
 	}
 
-	public ObservationData(final Integer instanceId, final Integer observationDataId, final Integer variableId, final String value,
+	public DescriptorData(final Integer instanceId, final Integer descriptorDataId, final Integer variableId, final String value,
 		final Integer categoricalValueId) {
 		this.instanceId = instanceId;
-		this.observationDataId = observationDataId;
+		this.descriptorDataId = descriptorDataId;
 		this.variableId = variableId;
 		this.value = value;
 		this.categoricalValueId = categoricalValueId;
 	}
 
-	public Integer getObservationDataId() {
-		return observationDataId;
+	public Integer getDescriptorDataId() {
+		return descriptorDataId;
 	}
 
-	public void setObservationDataId(final Integer observationDataId) {
-		this.observationDataId = observationDataId;
+	public void setDescriptorDataId(final Integer descriptorDataId) {
+		this.descriptorDataId = descriptorDataId;
 	}
 
 	@Override
@@ -37,13 +37,13 @@ public class ObservationData extends InstanceVariableData {
 		if (!(other instanceof ObservationData)) {
 			return false;
 		}
-		final ObservationData castOther = (ObservationData) other;
-		return new EqualsBuilder().append(this.observationDataId, castOther.observationDataId).isEquals();
+		final DescriptorData castOther = (DescriptorData) other;
+		return new EqualsBuilder().append(this.descriptorDataId, castOther.descriptorDataId).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.observationDataId).toHashCode();
+		return new HashCodeBuilder().append(this.descriptorDataId).toHashCode();
 	}
 
 	@Override

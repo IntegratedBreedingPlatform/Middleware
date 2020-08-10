@@ -7,6 +7,7 @@ import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.DescriptorData;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.ObservationData;
 import org.generationcp.middleware.domain.dms.StudyReference;
@@ -328,101 +329,92 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddInstanceObservation_EnvironmentDetail_GeolocationMetadata() {
+	public void testAddInstanceObservation() {
 
-		final boolean isEnvironmentCondition = false;
-		final ObservationData observationData = this.createTestObservationData(TermId.ALTITUDE.getId());
-		final ObservationData addedObservationData =
-			this.studyInstanceService.addInstanceObservation(observationData, isEnvironmentCondition);
-
-		final Optional<ObservationData>
-			result = this.studyInstanceService
-			.getInstanceObservation(addedObservationData.getInstanceId(), addedObservationData.getObservationId(), TermId.ALTITUDE.getId(),
-				isEnvironmentCondition);
-
-		Assert.assertTrue(result.isPresent());
-		Assert.assertEquals(Double.valueOf(observationData.getValue()).toString(), result.get().getValue());
-	}
-
-	@Test
-	public void testAddInstanceObservation_EnvironmentDetail() {
-
-		final boolean isEnvironmentCondition = false;
 		final ObservationData observationData = this.createTestObservationData(TermId.BLOCK_NAME.getId());
 		final ObservationData addedObservationData =
-			this.studyInstanceService.addInstanceObservation(observationData, isEnvironmentCondition);
+			this.studyInstanceService.addInstanceObservation(observationData);
 
 		final Optional<ObservationData>
 			result = this.studyInstanceService
-			.getInstanceObservation(addedObservationData.getInstanceId(), addedObservationData.getObservationId(),
-				TermId.BLOCK_NAME.getId(),
-				isEnvironmentCondition);
+			.getInstanceObservation(addedObservationData.getInstanceId(), addedObservationData.getObservationDataId(),
+				TermId.BLOCK_NAME.getId());
 
 		Assert.assertTrue(result.isPresent());
 		Assert.assertEquals(observationData.getValue(), result.get().getValue());
 	}
 
 	@Test
-	public void testAddInstanceObservation_EnvironmentCondition() {
+	public void testAddInstanceDescriptor() {
 
-		final boolean isEnvironmentCondition = true;
-		final ObservationData observationData = this.createTestObservationData(TermId.BLOCK_NAME.getId());
-		final ObservationData addedObservationData =
-			this.studyInstanceService.addInstanceObservation(observationData, isEnvironmentCondition);
+		final DescriptorData descriptorData = this.createTestDescriptorData(TermId.BLOCK_NAME.getId());
+		final DescriptorData addedDescriptorData =
+			this.studyInstanceService.addInstanceDescriptor(descriptorData);
 
-		final Optional<ObservationData>
+		final Optional<DescriptorData>
 			result = this.studyInstanceService
-			.getInstanceObservation(addedObservationData.getInstanceId(), addedObservationData.getObservationId(),
-				TermId.BLOCK_NAME.getId(),
-				isEnvironmentCondition);
+			.getInstanceDescriptor(addedDescriptorData.getInstanceId(), addedDescriptorData.getDescriptorDataId(),
+				TermId.BLOCK_NAME.getId());
 
 		Assert.assertTrue(result.isPresent());
-		Assert.assertEquals(observationData.getValue(), result.get().getValue());
+		Assert.assertEquals(descriptorData.getValue(), result.get().getValue());
 	}
 
 	@Test
-	public void testUpdateInstanceObservation_EnvironmentDetail() {
+	public void testAddInstanceDescriptor_GeolocationMetadata() {
 
-		final boolean isEnvironmentCondition = false;
+		final DescriptorData descriptorData = this.createTestDescriptorData(TermId.ALTITUDE.getId());
+		final DescriptorData addedDescriptorData =
+			this.studyInstanceService.addInstanceDescriptor(descriptorData);
+
+		final Optional<DescriptorData>
+			result = this.studyInstanceService
+			.getInstanceDescriptor(addedDescriptorData.getInstanceId(), addedDescriptorData.getDescriptorDataId(),
+				TermId.ALTITUDE.getId());
+
+		Assert.assertTrue(result.isPresent());
+		Assert.assertEquals(Double.valueOf(descriptorData.getValue()).toString(), result.get().getValue());
+	}
+
+	@Test
+	public void testUpdateInstanceObservation() {
+
 		final ObservationData observationData = this.createTestObservationData(TermId.BLOCK_NAME.getId());
 		final ObservationData addedObservationData =
-			this.studyInstanceService.addInstanceObservation(observationData, isEnvironmentCondition);
+			this.studyInstanceService.addInstanceObservation(observationData);
 
 		final String oldValue = addedObservationData.getValue();
 		final String newValue = RandomStringUtils.randomNumeric(10);
 
 		addedObservationData.setValue(newValue);
-		this.studyInstanceService.updateInstanceObservation(addedObservationData, isEnvironmentCondition);
+		this.studyInstanceService.updateInstanceObservation(addedObservationData);
 
 		final Optional<ObservationData>
 			result = this.studyInstanceService
-			.getInstanceObservation(addedObservationData.getInstanceId(), addedObservationData.getObservationId(),
-				TermId.BLOCK_NAME.getId(),
-				isEnvironmentCondition);
+			.getInstanceObservation(addedObservationData.getInstanceId(), addedObservationData.getObservationDataId(),
+				TermId.BLOCK_NAME.getId());
 
 		Assert.assertTrue(result.isPresent());
 		Assert.assertEquals(newValue, result.get().getValue());
 	}
 
 	@Test
-	public void testUpdateInstanceObservation_EnvironmentCondition() {
+	public void testUpdateInstanceDescriptor() {
 
-		final boolean isEnvironmentCondition = true;
-		final ObservationData observationData = this.createTestObservationData(TermId.BLOCK_NAME.getId());
-		final ObservationData addedObservationData =
-			this.studyInstanceService.addInstanceObservation(observationData, isEnvironmentCondition);
+		final DescriptorData descriptorData = this.createTestDescriptorData(TermId.BLOCK_NAME.getId());
+		final DescriptorData addedDescriptorData =
+			this.studyInstanceService.addInstanceDescriptor(descriptorData);
 
-		final String oldValue = addedObservationData.getValue();
+		final String oldValue = addedDescriptorData.getValue();
 		final String newValue = RandomStringUtils.randomNumeric(10);
 
-		addedObservationData.setValue(newValue);
-		this.studyInstanceService.updateInstanceObservation(addedObservationData, isEnvironmentCondition);
+		addedDescriptorData.setValue(newValue);
+		this.studyInstanceService.updateInstanceDescriptor(addedDescriptorData);
 
-		final Optional<ObservationData>
+		final Optional<DescriptorData>
 			result = this.studyInstanceService
-			.getInstanceObservation(addedObservationData.getInstanceId(), addedObservationData.getObservationId(),
-				TermId.BLOCK_NAME.getId(),
-				isEnvironmentCondition);
+			.getInstanceDescriptor(addedDescriptorData.getInstanceId(), addedDescriptorData.getDescriptorDataId(),
+				TermId.BLOCK_NAME.getId());
 
 		Assert.assertTrue(result.isPresent());
 		Assert.assertEquals(newValue, result.get().getValue());
@@ -430,12 +422,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	}
 
 	private ObservationData createTestObservationData(final int variableId) {
-		// Create an instance
-		final Integer studyId = this.studyReference.getId();
-		final List<StudyInstance> studyInstances =
-			this.studyInstanceService.createStudyInstances(this.cropType, studyId, this.environmentDataset.getId(), 1);
-		final StudyInstance studyInstance = studyInstances.get(0);
-
+		final StudyInstance studyInstance = this.createStudyInstance();
 		final String value = RandomStringUtils.randomNumeric(5);
 
 		final ObservationData observationData = new ObservationData();
@@ -443,6 +430,25 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		observationData.setInstanceId(studyInstance.getInstanceId());
 		observationData.setVariableId(variableId);
 		return observationData;
+	}
+
+	private DescriptorData createTestDescriptorData(final int variableId) {
+		final StudyInstance studyInstance = this.createStudyInstance();
+		final String value = RandomStringUtils.randomNumeric(5);
+
+		final DescriptorData descriptorData = new DescriptorData();
+		descriptorData.setValue(value);
+		descriptorData.setInstanceId(studyInstance.getInstanceId());
+		descriptorData.setVariableId(variableId);
+		return descriptorData;
+	}
+
+	private StudyInstance createStudyInstance() {
+		// Create an instance
+		final Integer studyId = this.studyReference.getId();
+		final List<StudyInstance> studyInstances =
+			this.studyInstanceService.createStudyInstances(this.cropType, studyId, this.environmentDataset.getId(), 1);
+		return studyInstances.get(0);
 	}
 
 	private DmsProject createTestStudy() {

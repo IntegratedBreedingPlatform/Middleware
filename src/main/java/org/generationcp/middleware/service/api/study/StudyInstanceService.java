@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.study;
 
+import org.generationcp.middleware.domain.dms.DescriptorData;
 import org.generationcp.middleware.domain.dms.ObservationData;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -17,11 +18,17 @@ public interface StudyInstanceService {
 
 	Optional<StudyInstance> getStudyInstance(int studyId, Integer instanceId);
 
-	ObservationData addInstanceObservation(ObservationData observationData, boolean isEnvironmentCondition);
+	ObservationData addInstanceObservation(ObservationData observationData);
 
-	ObservationData updateInstanceObservation(ObservationData observationData, boolean isEnvironmentCondition);
+	ObservationData updateInstanceObservation(ObservationData observationData);
 
-	Optional<ObservationData> getInstanceObservation(Integer instanceId, final Integer observationId, final Integer variableId, boolean isEnvironmentCondition);
+	Optional<ObservationData> getInstanceObservation(Integer instanceId, final Integer observationDataId, final Integer variableId);
+
+	DescriptorData addInstanceDescriptor(DescriptorData descriptorData);
+
+	DescriptorData updateInstanceDescriptor(DescriptorData descriptorData);
+
+	Optional<DescriptorData> getInstanceDescriptor(Integer instanceId, final Integer descriptorDataId, final Integer variableId);
 
 
 }
