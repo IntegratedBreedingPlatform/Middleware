@@ -111,7 +111,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 				studyInstance.setLocationName(location.get().getLname());
 				studyInstance.setLocationAbbreviation(location.get().getLabbr());
 				studyInstance.setInstanceId(geolocation.getLocationId());
-				studyInstance.setLocationObservationId(locationGeolocationProperty.getGeolocationPropertyId());
+				studyInstance.setLocationDescriptorDataId(locationGeolocationProperty.getGeolocationPropertyId());
 				studyInstance.setExperimentId(experimentModel.getNdExperimentId());
 			}
 

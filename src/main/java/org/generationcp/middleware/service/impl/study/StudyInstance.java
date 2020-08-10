@@ -9,7 +9,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class StudyInstance {
 
 	private int instanceId;
-	private Integer locationObservationId;
+	private Integer locationDescriptorDataId;
 	private Integer locationId;
 	private String locationName;
 	private String locationAbbreviation;
@@ -158,12 +158,12 @@ public class StudyInstance {
 		this.canBeDeleted = canBeDeleted;
 	}
 
-	public Integer getLocationObservationId() {
-		return this.locationObservationId;
+	public Integer getLocationDescriptorDataId() {
+		return this.locationDescriptorDataId;
 	}
 
-	public void setLocationObservationId(final Integer locationObservationId) {
-		this.locationObservationId = locationObservationId;
+	public void setLocationDescriptorDataId(final Integer locationDescriptorDataId) {
+		this.locationDescriptorDataId = locationDescriptorDataId;
 	}
 
 	@Override
