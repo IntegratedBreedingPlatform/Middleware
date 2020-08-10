@@ -1652,7 +1652,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public List<Germplasm> getExistingCrosses(final String femaleParent, final int methodId, final List<Integer> maleParentIds,
 		final String gid) {
 		try {
-			final StringBuilder builder = buildGetExistingCrossesQueryString(maleParentIds, gid);
+			final StringBuilder builder = this.buildGetExistingCrossesQueryString(maleParentIds, gid);
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(builder.toString());
 			sqlQuery.setParameterList("maleParentIds", maleParentIds);
 			sqlQuery.setParameter("methodId", methodId);
