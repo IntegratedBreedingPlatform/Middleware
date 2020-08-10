@@ -399,4 +399,13 @@ public interface DatasetService {
 	boolean allDatasetIdsBelongToStudy(final Integer studyId, List<Integer> datasetIds);
 
 	Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer datasetId, final Set<Integer> instanceNumbers, final Set<Integer> plotNumbers);
+
+	/**
+	 * Given a dataset Id and Study Id, it will retrieve how many observations, number of repetitions, and entries it has associated.
+	 *
+	 * @param datasetId
+	 * @param studyId
+	 * @return
+	 */
+	List<Map<String, Long>> getInformationInstance(final Integer datasetId, final Integer studyId);
 }

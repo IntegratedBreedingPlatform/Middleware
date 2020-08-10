@@ -945,6 +945,54 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	public List<Map<String, Long>> getInstanceInformation(final Integer datasetId, final Integer studyId) {
+
+		try {
+			final StringBuilder sql = new StringBuilder("SELECT \n"
+				+ "    g.description as environment,\n"
+				+ "    COUNT(*) AS observations,\n"
+				+ "    (SELECT \n"
+				+ "            COUNT(*)\n"
+				+ "        FROM\n"
+				+ "            stock s\n"
+				+ "        WHERE\n"
+				+ "            s.project_id = :studyId ) AS entries,\n"
+				+ "    geop.value AS repNumber\n"
+				+ "FROM\n"
+				+ "    nd_experiment nd,\n"
+				+ "    nd_geolocation g,\n"
+				+ "    nd_geolocationprop geop\n"
+				+ "WHERE\n"
+				+ "    g.nd_geolocation_id = nd.nd_geolocation_id\n"
+				+ "        AND nd.project_id = :datasetId \n"
+				+ "        AND nd.nd_geolocation_id = geop.nd_geolocation_id\n"
+				+ "        AND geop.type_id = " + TermId.NUMBER_OF_REPLICATES.getId() +" \n"
+				+ "GROUP BY g.description");
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			query.addScalar("environment",new LongType());
+			query.addScalar("observations",new LongType());
+			query.addScalar("entries",new LongType());
+			query.addScalar("repNumber",new LongType());
+			query.setParameter("studyId", studyId);
+			query.setParameter("datasetId", datasetId);
+
+
+			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			final List<Map<String, Long>> results = query.list();
+
+			return results;
+
+		} catch (
+			final HibernateException e) {
+			final String message =
+				"Error at getInstanceInformation query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+
 	public Map<Integer, Map<String, List<Object>>> getValuesFromObservations(final int studyId, final List<Integer> datasetTypeIds,
 		final Map<Integer, Integer> inputVariableDatasetMap) {
 

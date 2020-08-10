@@ -1312,6 +1312,13 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getExperimentDao().countObservationsPerInstance(datasetId);
 	}
 
+
+	@Override
+	public List<Map<String, Long>> getInformationInstance(final Integer datasetId, final Integer studyId) {
+		return this.daoFactory.getExperimentDao().getInstanceInformation(datasetId, studyId);
+	}
+
+
 	@Override
 	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
 		final Integer datasetId, final ObservationUnitsSearchDTO filter) {
