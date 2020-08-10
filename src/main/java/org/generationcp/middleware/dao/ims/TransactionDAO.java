@@ -620,10 +620,17 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final SQLQuery transactionsQuery =
 			this.getSession().createSQLQuery("select count(1) from ( " + transactionsQuerySql.toString() + ") T");
 		transactionsQuery.setParameter("studyId", studyId);
-		addSearchTransactionsFilters(new SqlQueryParamBuilder(transactionsQuery), transactionsSearch);
-		addObsUnitFilters(new SqlQueryParamBuilder(transactionsQuery), studyTransactionsRequest);
-
+		final SqlQueryParamBuilder paramBuilder = new SqlQueryParamBuilder(transactionsQuery);
+		addSearchTransactionsFilters(paramBuilder, transactionsSearch);
+		addObsUnitFilters(paramBuilder, studyTransactionsRequest);
+		this.excludeCancelledTransactions(paramBuilder);
 		return ((BigInteger) transactionsQuery.uniqueResult()).longValue();
+	}
+
+	private void excludeCancelledTransactions(final SqlQueryParamBuilder paramBuilder) {
+		// Exclude "Cancelled" study transactions from result
+		paramBuilder.append(" and trnstat != :cancelledStatus ");
+		paramBuilder.setParameter("cancelledStatus", TransactionStatus.CANCELLED.getIntValue());
 	}
 
 	public List<StudyTransactionsDto> searchStudyTransactions(
@@ -636,14 +643,15 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQueryFilterSql), studyTransactionsRequest);
 
 		final StringBuilder transactionsQuerySql = this.buildStudyTransactionsQuery(transactionsSearch, obsUnitsQueryFilterSql);
-
 		addSortedPageRequestOrderBy(transactionsQuerySql, studyTransactionsRequest.getSortedPageRequest());
 
 		// transactions data
 		final SQLQuery transactionsQuery = this.getSession().createSQLQuery(transactionsQuerySql.toString());
 		transactionsQuery.setParameter("studyId", studyId);
-		addSearchTransactionsFilters(new SqlQueryParamBuilder(transactionsQuery), transactionsSearch);
-		addObsUnitFilters(new SqlQueryParamBuilder(transactionsQuery), studyTransactionsRequest);
+		final SqlQueryParamBuilder paramBuilder = new SqlQueryParamBuilder(transactionsQuery);
+		addSearchTransactionsFilters(paramBuilder, transactionsSearch);
+		addObsUnitFilters(paramBuilder, studyTransactionsRequest);
+		this.excludeCancelledTransactions(paramBuilder);
 		addSortedPageRequestPagination(transactionsQuery, studyTransactionsRequest.getSortedPageRequest());
 		this.addSearchTransactionsQueryScalars(transactionsQuery);
 		transactionsQuery.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getStudyTransactionsDtoConstructor()));
@@ -679,8 +687,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final StringBuilder obsUnitsQuerySql) {
 
 		final StringBuilder searchTransactionsQuery = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
-		addSearchTransactionsFilters(new SqlQueryParamBuilder(searchTransactionsQuery), transactionsSearchDto);
-
+		final SqlQueryParamBuilder paramBuilder = new SqlQueryParamBuilder(searchTransactionsQuery);
+		addSearchTransactionsFilters(paramBuilder, transactionsSearchDto);
+		this.excludeCancelledTransactions(paramBuilder);
 		return new StringBuilder(""  //
 				+ " select SEARCH_TRANSACTIONS_QUERY.* " //
 				+ " from ( " //
