@@ -69,105 +69,6 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testRetrieveWithdrawalBalance() {
-		final List<GermplasmListData> listEntries = this.germplasmList.getListData();
-
-		final List<Integer> listEntryId = this.retrieveEntryIdFromListEntries(listEntries);
-		final List<Integer> listGid = this.retrieveGidFromListEntries(listEntries);
-
-		final List<Lot> lots = this.inventoryDetailsTestDataInitializer.createLots(listGid, this.germplasmList.getId(), 8234, 9007);
-
-		this.inventoryDataManager.addLots(lots);
-
-		final Transaction reservationTransaction = this.inventoryDetailsTestDataInitializer
-			.createReservationTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
-				"LIST", TransactionType.WITHDRAWAL.getId());
-
-		this.inventoryDataManager.addTransaction(reservationTransaction);
-
-		listInventoryBuilder.retrieveWithdrawalBalance(listEntries, listEntryId);
-
-		GermplasmListData germplasmListData = null;
-		ListDataInventory inventoryInfo = null;
-
-		germplasmListData = listEntries.get(0);
-		inventoryInfo = germplasmListData.getInventoryInfo();
-
-		Assert.assertEquals("2.0", inventoryInfo.getWithdrawalBalance().toString());
-		Assert.assertEquals(1, inventoryInfo.getDistinctCountWithdrawalScale().intValue());
-		Assert.assertEquals(8234, inventoryInfo.getWithdrawalScaleId().intValue());
-
-		germplasmListData = listEntries.get(1);
-		inventoryInfo = germplasmListData.getInventoryInfo();
-
-		Assert.assertEquals("0.0", inventoryInfo.getWithdrawalBalance().toString());
-		Assert.assertEquals(0, inventoryInfo.getDistinctCountWithdrawalScale().intValue());
-		Assert.assertNull(inventoryInfo.getWithdrawalScaleId());
-		Assert.assertNull(inventoryInfo.getWithdrawalScale());
-
-	}
-
-	@Test
-	public void testRetrieveWithdrawalStatusWithReservedTransaction() {
-		final List<GermplasmListData> listEntries = this.germplasmList.getListData();
-
-		final List<Integer> listGid = this.retrieveGidFromListEntries(listEntries);
-
-		final List<Lot> lots = this.inventoryDetailsTestDataInitializer.createLots(listGid, this.germplasmList.getId(), 8234, 9007);
-
-		this.inventoryDataManager.addLots(lots);
-
-		final Transaction reservationTransaction = this.inventoryDetailsTestDataInitializer
-				.createReservationTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
-						"LIST", TransactionType.WITHDRAWAL.getId());
-
-		this.inventoryDataManager.addTransaction(reservationTransaction);
-
-		listInventoryBuilder.retrieveWithdrawalStatus(listEntries, listGid);
-
-		GermplasmListData germplasmListData = null;
-		ListDataInventory inventoryInfo = null;
-
-		germplasmListData = listEntries.get(0);
-		inventoryInfo = germplasmListData.getInventoryInfo();
-		Assert.assertEquals(ListDataInventory.RESERVED, inventoryInfo.getTransactionStatus());
-
-		germplasmListData = listEntries.get(1);
-		inventoryInfo = germplasmListData.getInventoryInfo();
-		Assert.assertEquals("", inventoryInfo.getTransactionStatus());
-
-	}
-
-	@Test
-	public void testRetrieveLotCountsForList() {
-		final List<GermplasmListData> listEntries = this.germplasmList.getListData();
-
-		final List<Integer> listGid = this.retrieveGidFromListEntries(listEntries);
-
-		final List<Lot> lots = this.inventoryDetailsTestDataInitializer.createLots(listGid, this.germplasmList.getId(), 8234, 9007);
-
-		this.inventoryDataManager.addLots(lots);
-
-		final Transaction reservationTransaction = this.inventoryDetailsTestDataInitializer
-			.createReservationTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
-				"LIST", TransactionType.WITHDRAWAL.getId());
-
-		this.inventoryDataManager.addTransaction(reservationTransaction);
-
-		listInventoryBuilder.retrieveLotCountsForList(listEntries);
-
-		GermplasmListData germplasmListData = null;
-		ListDataInventory inventoryInfo = null;
-		germplasmListData = listEntries.get(0);
-		inventoryInfo = germplasmListData.getInventoryInfo();
-		Assert.assertEquals(1, inventoryInfo.getReservedLotCount().intValue());
-		Assert.assertEquals("2.0", inventoryInfo.getWithdrawalBalance().toString());
-		Assert.assertEquals(8234, inventoryInfo.getWithdrawalScaleId().intValue());
-		Assert.assertEquals(ListDataInventory.RESERVED, inventoryInfo.getTransactionStatus());
-
-	}
-
-	@Test
 	public void testRetrieveInventoryLotsForGermplasm() {
 		final List<GermplasmListData> listEntries = this.germplasmList.getListData();
 
@@ -256,15 +157,6 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 			germplasmListData.setInventoryInfo(new ListDataInventory(germplasmListData.getId(), germplasmListData.getGid()));
 		}
 		return listEntryId;
-	}
-
-	private List<Integer> retrieveRecordIdFromListEntries(final List<GermplasmListData> listEntries) {
-		final List<Integer> listRecordId = Lists.newArrayList();
-		for (final GermplasmListData germplasmListData : listEntries) {
-			germplasmListData.setInventoryInfo(new ListDataInventory(germplasmListData.getId(), germplasmListData.getGid()));
-			listRecordId.add(germplasmListData.getId());
-		}
-		return listRecordId;
 	}
 
 }

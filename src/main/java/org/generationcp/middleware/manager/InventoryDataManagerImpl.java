@@ -217,8 +217,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	@Override
-	public List<GermplasmListData> getLotCountsForListEntries(final Integer listId, final List<Integer> entryIds) {
-		return this.getListInventoryBuilder().retrieveLotCountsForListEntries(listId, entryIds);
+	public List<GermplasmListData> getLotCountsForListEntries(final List<Integer> entryIds) {
+		return this.getListInventoryBuilder().retrieveLotCountsForListEntries(entryIds);
 	}
 
 	@Override
