@@ -59,6 +59,28 @@
 		</sql>
     </changeSet>
 
+	<changeSet author="darla" id="v15.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM r_package WHERE endpoint like 'https://opencpu.bms-uat-test.net%';
+			</sqlCheck>
+		</preConditions>
+		<comment>Update OpenCPU packages to use IBP AWS instance</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE r_package SET
+			endpoint = 'https://opencpu.bms-uat-test.net/ocpu/library/reshape/R/cast'
+			WHERE package_id = 1;
+
+			UPDATE r_package SET
+			endpoint = 'https://opencpu.bms-uat-test.net/ocpu/library/reshape/R/melt'
+			WHERE package_id = 2;
+
+			UPDATE r_package SET
+			endpoint = 'https://opencpu.bms-uat-test.net/ocpu/library/ggplot2/R/qplot'
+			WHERE package_id = 3;
+		</sql>
+	</changeSet>
+
     <changeSet author="nahuel" id="v15.4.0-1">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
