@@ -175,6 +175,15 @@
                 </not>
             </and>
 		</preConditions>
+		<comment>Delete germplasm_study_source entries with no germplsm</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TEMPORARY TABLE non_existent_gids
+			SELECT gid FROM germplasm_study_source WHERE gid NOT IN (SELECT gid FROM germplsm);
+
+			DELETE FROM germplasm_study_source WHERE gid IN (SELECT gid FROM non_existent_gids);
+
+			DROP TEMPORARY TABLE non_existent_gids;
+		</sql>
 		<comment>Add germplasm_study_source.gid foreign key</comment>
 		<addForeignKeyConstraint baseTableName="germplasm_study_source" baseColumnNames="gid" constraintName="germplasm_study_source_gid_fk" referencedTableName="germplsm"
 								 referencedColumnNames="gid"/>
