@@ -774,30 +774,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Integer updateGermplasm(final Germplasm germplasm) {
-		final List<Germplasm> germplasms = new ArrayList<>();
-		germplasms.add(germplasm);
-		final List<Integer> ids = this.updateGermplasm(germplasms);
-		return !ids.isEmpty() ? ids.get(0) : null;
-	}
-
-	@Override
-	public List<Integer> updateGermplasm(final List<Germplasm> germplasms) {
-		if (germplasms != null) {
-			final List<Integer> gids = new ArrayList<>();
-			for (final Germplasm germplasm : germplasms) {
-				if (germplasm.getDeleted()) {// deleted
-					gids.add(germplasm.getGid());
-				}
-			}
-			if (!gids.isEmpty()) {
-				this.daoFactory.getTransactionDAO().cancelUnconfirmedTransactionsForGermplasms(gids);
-			}
-		}
-		return this.addOrUpdateGermplasm(germplasms, Operation.UPDATE);
-	}
-
-	@Override
 	public Integer addGermplasm(final Germplasm germplasm, final Name preferredName) {
 		final List<Triple<Germplasm, Name, List<Progenitor>>> tripleList = new ArrayList<>();
 		final List<Progenitor> progenitors = new ArrayList<>();

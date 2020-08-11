@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ListInventoryBuilder extends Builder {
 
@@ -47,6 +48,7 @@ public class ListInventoryBuilder extends Builder {
 	 * @param listEntries list of {@link GermplasmListData} to which we append lot counts.
 	 * @return a germplasm list with the lot count
 	 */
+	//FIXME This function is not needed. Wherever it is called it should be calling retrieveLotCountsForListEntries
 	public List<GermplasmListData> retrieveLotCountsForList(final List<GermplasmListData> listEntries) {
 		final List<Integer> listEntryIds = new ArrayList<Integer>();
 		final List<Integer> gids = new ArrayList<Integer>();
@@ -60,19 +62,10 @@ public class ListInventoryBuilder extends Builder {
 
 		if (listEntries != null && !listEntries.isEmpty()) {
 			this.retrieveLotCounts(listEntryIds, listEntries, gids, lrecIds);
-			this.retrieveWithdrawalAndStatus(listEntryIds, listEntries, gids, lrecIds);
+			this.setAvailableBalanceScale(listEntries);
 			this.retrieveGroupId(listEntries, gids);
 		}
 		return listEntries;
-	}
-
-	protected void retrieveWithdrawalAndStatus(final List<Integer> entryIds, final List<GermplasmListData> listEntries,
-			final List<Integer> gids, final List<Integer> lrecIds) throws MiddlewareQueryException {
-		this.retrieveWithdrawalBalance(listEntries, lrecIds);
-		this.retrieveWithdrawalStatus(listEntries, gids);
-		this.setAvailableBalanceScale(listEntries);
-		this.setWithdrawalBalanceScale(listEntries);
-
 	}
 
 	/**
@@ -103,7 +96,7 @@ public class ListInventoryBuilder extends Builder {
 		}
 	}
 
-	public List<GermplasmListData> retrieveLotCountsForListEntries(final Integer listId, final List<Integer> entryIds)
+	public List<GermplasmListData> retrieveLotCountsForListEntries(final List<Integer> entryIds)
 			throws MiddlewareQueryException {
 		List<GermplasmListData> listEntries = null;
 		listEntries = daoFactory.getGermplasmListDataDAO().getByIds(entryIds);
@@ -116,7 +109,7 @@ public class ListInventoryBuilder extends Builder {
 		}
 		this.retrieveLotCounts(entryIds, listEntries, gids, lrecIds);
 		this.retrieveGroupId(listEntries, gids);
-		this.retrieveWithdrawalAndStatus(entryIds, listEntries, gids, lrecIds);
+		this.setAvailableBalanceScale(listEntries);
 		return listEntries;
 	}
 
@@ -126,7 +119,6 @@ public class ListInventoryBuilder extends Builder {
 		// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table
 		// where listdata.gid may not be the final germplasm displayed
 		this.retrieveAvailableBalLotCounts(listEntries, gids);
-		this.retrieveReservedLotCounts(listEntries, entryIds);
 		this.retrieveStockIds(listEntries, gids);
 
 	}
@@ -227,62 +219,6 @@ public class ListInventoryBuilder extends Builder {
 
 	}
 
-	// This will set withdrawal scale for germplsm for selected list entries
-	private void setWithdrawalBalanceScale(final List<GermplasmListData> listEntries) {
-		Set<Integer> setScaleIds = new HashSet<>();
-		Map<Integer, Term> mapScaleTerm = new HashMap<>();
-		for (GermplasmListData entry : listEntries) {
-			if (entry.getInventoryInfo() != null && entry.getInventoryInfo().getWithdrawalScaleId() != null) {
-				setScaleIds.add(entry.getInventoryInfo().getWithdrawalScaleId());
-			}
-		}
-
-		List<Integer> listScaleIds = Lists.newArrayList(setScaleIds);
-
-		if (!listScaleIds.isEmpty()) {
-			Map<Integer, Integer> scaleIdWiseTermId = new HashMap<>();
-			final List<CVTermRelationship> relationshipsOfScales =
-					daoFactory.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(listScaleIds, TermId.HAS_SCALE.getId());
-			List<Integer> listObjectIds = new ArrayList<>();
-			if (relationshipsOfScales != null) {
-				for (CVTermRelationship relationship : relationshipsOfScales) {
-					scaleIdWiseTermId.put(relationship.getSubjectId(), relationship.getObjectId());
-					listObjectIds.add(relationship.getObjectId());
-				}
-
-				List<CVTerm> listScaleCvTerm = daoFactory.getCvTermDao().getByIds(listObjectIds);
-
-				for (final CVTerm cvTerm : listScaleCvTerm) {
-					Term term = TermBuilder.mapCVTermToTerm(cvTerm);
-					mapScaleTerm.put(term.getId(), term);
-
-				}
-
-				for (GermplasmListData entry : listEntries) {
-					if (entry.getInventoryInfo() != null && entry.getInventoryInfo().getWithdrawalScaleId() != null) {
-						Integer scaleId = entry.getInventoryInfo().getWithdrawalScaleId();
-
-						if (scaleIdWiseTermId.containsKey(scaleId)) {
-							Integer objectId = scaleIdWiseTermId.get(scaleId);
-							if (mapScaleTerm.containsKey(objectId)) {
-								Term scale = mapScaleTerm.get(objectId);
-								entry.getInventoryInfo().setWithdrawalScale(scale.getName());
-
-							} else {
-								entry.getInventoryInfo().setWithdrawalScale("");
-							}
-						} else {
-							entry.getInventoryInfo().setWithdrawalScale("");
-						}
-
-					}
-
-				}
-			}
-		}
-
-	}
-
 	private void retrieveStockIds(final List<GermplasmListData> listEntries, final List<Integer> gIds) {
 		final Map<Integer, String> stockIDs = daoFactory.getTransactionDAO().retrieveStockIds(gIds);
 		for (final GermplasmListData entry : listEntries) {
@@ -365,172 +301,6 @@ public class ListInventoryBuilder extends Builder {
 			listDataInventory.setTotalAvailableBalance(0.0);
 			listDataInventory.setDistinctScaleCountForGermplsm(0);
 			listDataInventory.setScaleIdForGermplsm(null);
-		}
-	}
-	/*
-	 * Retrieve the number of lots with reserved seeds per list entry
-	 */
-	private void retrieveReservedLotCounts(final List<GermplasmListData> listEntries, final List<Integer> listEntryIds)
-			throws MiddlewareQueryException {
-		final Map<Integer, BigInteger> reservedLotCounts = daoFactory.getTransactionDAO().countLotsWithReservationForListEntries(listEntryIds);
-		for (final GermplasmListData entry : listEntries) {
-			final ListDataInventory inventory = entry.getInventoryInfo();
-			if (inventory != null) {
-				final BigInteger count = reservedLotCounts.get(entry.getId());
-				if (count != null) {
-					inventory.setReservedLotCount(count.intValue());
-				} else {
-					inventory.setReservedLotCount(0);
-				}
-			}
-		}
-	}
-
-	/*
-	 * Retrieve withdrawal balance per entry along with overall status
-	 */
-	protected void retrieveWithdrawalBalance(final List<GermplasmListData> listEntries, final List<Integer> listEntryIds)
-			throws MiddlewareQueryException {
-		final Map<Integer, Object[]> withdrawalData = daoFactory.getTransactionDAO().retrieveWithdrawalBalanceWithDistinctScale(listEntryIds);
-		for (final GermplasmListData entry : listEntries) {
-			final ListDataInventory inventory = entry.getInventoryInfo();
-			if (inventory != null) {
-				final Object[] withdrawalPerRecord = withdrawalData.get(entry.getId());
-				if (withdrawalPerRecord != null) {
-					inventory.setWithdrawalBalance((Double) withdrawalPerRecord[0]);
-
-					BigInteger countWithDrawalScale = (BigInteger) withdrawalPerRecord[1];
-					inventory.setDistinctCountWithdrawalScale(countWithDrawalScale.intValue());
-					inventory.setWithdrawalScaleId((Integer) withdrawalPerRecord[2]);
-
-				} else {
-					inventory.setWithdrawalBalance(0.0);
-					inventory.setDistinctCountWithdrawalScale(0);
-					inventory.setWithdrawalScaleId(null);
-					inventory.setWithdrawalScale(null);
-				}
-			}
-		}
-	}
-
-	/*
-	 * Retrieve withdrawal status per entry along with overall status
-	 */
-	protected void retrieveWithdrawalStatus(final List<GermplasmListData> listEntries, final List<Integer> gIds)
-			throws MiddlewareQueryException {
-		Integer sourceId = listEntries.get(0).getList().getId();
-		final List<Object[]> withdrawalData = daoFactory.getTransactionDAO().retrieveWithdrawalStatus(sourceId, gIds);
-
-		final Map<Integer, HashSet<Integer>> germplasmWiseLotsMap = new HashMap<>();
-		final Map<Integer, HashSet<Integer>> lotWiseStatus = new HashMap<>();
-		final Map<Integer, Integer> lotWiseDistinctStatus = new HashMap<>();
-		Integer lotId = null;
-		Integer germplsmId = null;
-		Object tranStatus = null;
-		if (withdrawalData != null && !withdrawalData.isEmpty()) {
-			for (Object[] withdrawalStatusData : withdrawalData) {
-				lotId = (Integer) withdrawalStatusData[0];
-				germplsmId = (Integer) withdrawalStatusData[1];
-				tranStatus = withdrawalStatusData[3];
-
-				if (!lotWiseDistinctStatus.containsKey(lotId)) {
-					lotWiseDistinctStatus.put((Integer) lotId, 0);
-				}
-				Integer lotCount = lotWiseDistinctStatus.get(lotId);
-				lotCount += 1;
-				lotWiseDistinctStatus.put((Integer) lotId, lotCount);
-
-				if (tranStatus != null) {
-					if (!lotWiseStatus.containsKey(lotId)) {
-						lotWiseStatus.put(lotId, new HashSet<Integer>());
-					}
-					lotWiseStatus.get(lotId).add((Integer) tranStatus);
-				} else {
-					lotWiseStatus.put(lotId, new HashSet<Integer>());
-				}
-
-				if (!germplasmWiseLotsMap.containsKey(germplsmId)) {
-					germplasmWiseLotsMap.put(germplsmId, Sets.<Integer>newHashSet());
-				}
-				germplasmWiseLotsMap.get(germplsmId).add(lotId);
-
-			}
-		}
-
-		for (final GermplasmListData entry : listEntries) {
-			final ListDataInventory inventory = entry.getInventoryInfo();
-			Integer germplasmId = entry.getGermplasmId();
-			if (inventory != null) {
-				String status = "";
-				if (germplasmWiseLotsMap.containsKey(germplasmId)) {
-					HashSet<Integer> germplsLots = germplasmWiseLotsMap.get(germplasmId);
-
-					if (germplsLots.size() == 1) {
-						Integer lotID = germplsLots.iterator().next();
-						HashSet<Integer> oneLotStatusSet = lotWiseStatus.get(lotID);
-
-						if (oneLotStatusSet != null) {
-							if (oneLotStatusSet.size() == 1) {
-								Integer oneLotStatus = oneLotStatusSet.iterator().next();
-								if (oneLotStatus == 1) {
-									status = ListDataInventory.WITHDRAWN;
-								} else if (oneLotStatus == 0) {
-									status = ListDataInventory.RESERVED;
-								}
-							} else if (oneLotStatusSet.size() > 1) {
-								status = ListDataInventory.RESERVED;
-							}
-
-						}
-					} else if (germplsLots.size() > 1) {
-						HashSet<Integer> distinctStatus = new HashSet<>();
-						for (Integer lotID : germplsLots) {
-							distinctStatus.addAll(lotWiseStatus.get(lotID));
-						}
-
-						if (distinctStatus.size() == 0) {
-							status = "";
-						} else if (distinctStatus.size() == 1) {
-							Integer singleStatus = distinctStatus.iterator().next();
-							if (singleStatus == 1) {
-								status = ListDataInventory.WITHDRAWN;
-							} else if (singleStatus == 0) {
-								status = ListDataInventory.RESERVED;
-							}
-						} else {
-							Set<Integer> overallStatus = new HashSet<>();
-							for (Integer lotID : germplsLots) {
-								HashSet<Integer> lotStatus = lotWiseStatus.get(lotID);
-
-								if (lotStatus.size() == 1) {
-									if (lotStatus.contains(0)) {
-										overallStatus.add(0);
-									} else if (lotStatus.contains(1)) {
-										overallStatus.add(1);
-									}
-								} else if (lotStatus.size() > 1) {
-									overallStatus.add(0);
-								}
-
-							}
-
-							if (overallStatus.size() == 1) {
-								Integer transactionStatus = overallStatus.iterator().next();
-								if (transactionStatus == 0) {
-									status = ListDataInventory.RESERVED;
-								} else if (transactionStatus == 1) {
-									status = ListDataInventory.WITHDRAWN;
-								}
-
-							} else if (overallStatus.size() > 1) {
-								status = ListDataInventory.MIXED;
-							}
-
-						}
-					}
-				}
-				inventory.setTransactionStatus(status);
-			}
 		}
 	}
 
