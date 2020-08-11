@@ -11,17 +11,7 @@
 
 package org.generationcp.middleware.dao;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
@@ -30,14 +20,14 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link Name}.
@@ -346,71 +336,34 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, List<Name>> getNamesByGidsInMap(final List<Integer> gids) {
-		final Map<Integer, List<Name>> map = new HashMap<>();
-
-		if (gids == null || gids.isEmpty()) {
-			return map;
-		}
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Name.class);
-			criteria.add(Restrictions.in("germplasmId", gids));
-
-			final List<Name> list = criteria.list();
-			if (list == null) {
-				return map;
-			}
-			for (final Name name : list) {
-				List<Name> names = map.get(name.getGermplasmId());
-				if (names == null) {
-					names = new ArrayList<>();
-					map.put(name.getGermplasmId(), names);
-				}
-				names.add(name);
-			}
-
-		} catch (final HibernateException e) {
-			final String message = "Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage();
-			NameDAO.LOG.error(message);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-		return map;
+		return this.getNamesByGidsAndNTypeIdsInMap(gids, Collections.emptyList());
 	}
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, List<Name>> getNamesByGidsAndNTypeIdsInMap(final List<Integer> gids, final List<Integer> ntypeIds) {
 		final Map<Integer, List<Name>> map = new HashMap<>();
 
-		if (gids == null || gids.isEmpty()) {
+		if (CollectionUtils.isEmpty(gids)) {
 			return map;
 		}
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Name.class);
 			criteria.add(Restrictions.in("germplasmId", gids));
-			criteria.add(Restrictions.in("typeId", ntypeIds));
+			if (!CollectionUtils.isEmpty(ntypeIds)) {
+				criteria.add(Restrictions.in("typeId", ntypeIds));
+			}
+
 
 			final List<Name> list = criteria.list();
-			if (list == null) {
-				return map;
-			}
-			for (final Name name : list) {
-				List<Name> names = map.get(name.getGermplasmId());
-				if (names == null) {
-					names = new ArrayList<>();
-					map.put(name.getGermplasmId(), names);
-				}
-				names.add(name);
-			}
+
+			return list.stream().collect(Collectors.groupingBy(Name::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
 
 		} catch (final HibernateException e) {
-			final String message = "Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage();
+			final String message = "Error with getNamesByGidsAndNTypeIdsInMap(gids=" + gids + ", typeIds=" + ntypeIds+ ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
-
-		return map;
 	}
 
 	@SuppressWarnings("unchecked")
