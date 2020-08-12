@@ -81,4 +81,38 @@
 		</sql>
 	</changeSet>
 
+    <changeSet author="nahuel" id="v15.4.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(1) from workbench_tool where name = 'graphical_queries';
+            </sqlCheck>
+        </preConditions>
+        <comment>Move Graphical filtering and Study Comparison tools to a new "Graphical Queries" sub-menu</comment>
+        <sql dbms="mysql" splitStatements="true">
+            # Create new tool and side menu
+            insert into workbench_tool(name, group_name, title, version, tool_type, path)
+            values ('graphical_queries', 'graphical_queries', 'Graphical Queries', '15.4', 'WEB', '/ibpworkbench/controller/graphical-queries');
+            insert into workbench_sidebar_category_link(tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title)
+            values ('graphical_queries', 2, 'graphical_queries', 'Graphical Queries');
+
+            # Create new permission
+            set @information_management_id = (select permission_id from permission where name = 'INFORMATION_MANAGEMENT');
+            set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'graphical_queries');
+
+            insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+            values ('GRAPHICAL_QUERIES', 'Graphical Queries', @information_management_id, @sidebar_category_link_id);
+            set @last_permission_id = (select last_insert_id());
+            insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id, 1);
+            insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id, 1);
+            insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @last_permission_id, 1);
+
+            # associate new 'GRAPHICAL_QUERIES' permission to every role that has 'BROWSE_STUDIES'
+            insert into role_permission(role_id, permission_id)
+            select rp.role_id, @last_permission_id
+            from role_permission rp
+                     inner join permission p on rp.permission_id = p.permission_id
+            where p.name = 'BROWSE_STUDIES';
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
