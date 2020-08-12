@@ -665,22 +665,6 @@ public interface GermplasmDataManager {
 	Attribute getAttributeById(Integer id);
 
 	/**
-	 * Given a valid Germplasm object, update the corresponding record in the database.
-	 *
-	 * @param germplasm the germplasm
-	 * @return Returns the id of the updated {@code Germplasm} record
-	 */
-	Integer updateGermplasm(Germplasm germplasm);
-
-	/**
-	 * Given a List of valid Germplasm objects, update the corresponding records in the database.
-	 *
-	 * @param germplasms the germplasms
-	 * @return Returns the ids of the updated {@code Germplasm} records
-	 */
-	List<Integer> updateGermplasm(List<Germplasm> germplasms);
-
-	/**
 	 * Given a valid Germplasm object with a matching valid Name object to be set as its preferred name, add a new Germplasm record and a
 	 * new Name record for the given parameters.
 	 *

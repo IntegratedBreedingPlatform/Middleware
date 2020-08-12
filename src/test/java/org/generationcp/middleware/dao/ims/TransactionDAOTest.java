@@ -124,33 +124,6 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		Assert.assertTrue("List of returned similar stock ids should be empty given a null parameter", nullParamCondition);
 	}
 
-	@Test
-	public void testRetrieveWithdrawalBalanceWithDistinctScale() throws MiddlewareQueryException{
-		final List<Integer> recordsList = Lists.newArrayList();
-		final Integer recordsId = this.germplasmListData.get(0).getId();
-		recordsList.add(recordsId);
-
-		final Map<Integer, Object[]> returnMap = this.dao.retrieveWithdrawalBalanceWithDistinctScale(recordsList);
-
-		Assert.assertNotNull(returnMap);
-		final Object[] returnObjectArray = returnMap.get(recordsId);
-		Assert.assertNotNull(returnObjectArray);
-		Assert.assertEquals(100.0, returnObjectArray[0]);
-		Assert.assertEquals(new BigInteger("1"), ((BigInteger) returnObjectArray[1]));
-		Assert.assertEquals(1, ((Integer) returnObjectArray[2]).intValue());
-
-	}
-
-	@Test
-	public void testRetrieveWithdrawalStatus() throws MiddlewareQueryException{
-		final List<Object[]> returnObjectArray = this.dao.retrieveWithdrawalStatus(this.germplasmListId, new ArrayList<>(this.germplasmMap.keySet()));
-		Assert.assertNotNull(returnObjectArray);
-		Assert.assertEquals(this.germplasmListData.get(0).getGid(), returnObjectArray.get(0)[1]);
-		Assert.assertEquals(this.germplasmListData.get(0).getId(), returnObjectArray.get(0)[2]);
-		Assert.assertEquals(0, returnObjectArray.get(0)[3]);
-
-	}
-
 	private void initializeGermplasms(final int noOfEntries) {
 		for (int i = 1; i <= noOfEntries; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(i);

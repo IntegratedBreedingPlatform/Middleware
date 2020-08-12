@@ -11,9 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -29,7 +26,7 @@ public class GermplasmAddUpdateFunctionsTest extends IntegrationTestBase {
 	private GermplasmDataManager manager;
 
 	@Test
-	public void testAddAndUpdateGermplasm() throws Exception {
+	public void testAddGermplasm() throws Exception {
 
 		// ADD
 		Germplasm g = new Germplasm();
@@ -65,24 +62,6 @@ public class GermplasmAddUpdateFunctionsTest extends IntegrationTestBase {
 		Assert.assertNotNull(oldG.getGid());
 		Assert.assertEquals(g.getLocationId(), oldG.getLocationId());
 		Assert.assertEquals(n.getNval(), name.getNval());
-
-		// UPDATE
-		List<Germplasm> gList = new ArrayList<Germplasm>();
-		oldG.setGdate(3000);
-		gList.add(oldG);
-		this.manager.updateGermplasm(gList);
-		Germplasm newG = this.manager.getGermplasmByGID(addedGid);
-		Assert.assertEquals(newG.getGdate(), oldG.getGdate());
-
-		// Update a germplasm as deleted
-		newG.setDeleted(Boolean.TRUE);
-		gList.clear();
-		gList.add(newG);
-		this.manager.updateGermplasm(gList);
-		Germplasm newerG = this.manager.getGermplasmByGID(newG.getGid());
-		Assert.assertNull(newerG);
-		Debug.println(IntegrationTestBase.INDENT, "testUpdateGermplasm(" + addedGid + ")");
-
 	}
 
 }
