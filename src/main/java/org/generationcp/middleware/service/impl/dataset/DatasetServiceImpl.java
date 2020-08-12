@@ -41,6 +41,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.InstanceInfomationDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -1314,7 +1315,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 
 	@Override
-	public List<Map<String, Long>> getInformationInstance(final Integer datasetId, final Integer studyId) {
+	public List<InstanceInfomationDTO> getInformationInstance(final Integer datasetId, final Integer studyId) {
 		return this.daoFactory.getExperimentDao().getInstanceInformation(datasetId, studyId);
 	}
 

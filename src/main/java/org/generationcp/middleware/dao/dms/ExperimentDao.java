@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.service.api.dataset.InstanceInfomationDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -41,6 +42,7 @@ import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
@@ -946,41 +948,40 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public List<Map<String, Long>> getInstanceInformation(final Integer datasetId, final Integer studyId) {
+	public List<InstanceInfomationDTO> getInstanceInformation(final Integer datasetId, final Integer studyId) {
 
 		try {
-			final StringBuilder sql = new StringBuilder("SELECT \n"
-				+ "    g.description as environment,\n"
-				+ "    COUNT(*) AS observations,\n"
-				+ "    (SELECT \n"
-				+ "            COUNT(*)\n"
-				+ "        FROM\n"
-				+ "            stock s\n"
-				+ "        WHERE\n"
-				+ "            s.project_id = :studyId ) AS entries,\n"
-				+ "    geop.value AS repNumber\n"
+			final StringBuilder sql = new StringBuilder(
+				"SELECT\n"
+				+ "    g.description AS environment,\n"
+				+ "    COUNT(*) AS nOfObservations,\n"
+				+ "    (SELECT COUNT(*)\n"
+				+ "        FROM stock s\n"
+				+ "        WHERE s.project_id = :studyId) AS nOfEntries,\n"
+				+ "    COALESCE((SELECT geop.value\n"
+				+ "        FROM nd_geolocationprop geop\n"
+				+ "         WHERE nd.nd_geolocation_id = geop.nd_geolocation_id\n"
+				+ "         AND geop.type_id = " + TermId.NUMBER_OF_REPLICATES.getId() +"),\n"
+				+ "            1) AS nOfReps\n"
 				+ "FROM\n"
 				+ "    nd_experiment nd,\n"
-				+ "    nd_geolocation g,\n"
-				+ "    nd_geolocationprop geop\n"
+				+ "    nd_geolocation g\n"
 				+ "WHERE\n"
 				+ "    g.nd_geolocation_id = nd.nd_geolocation_id\n"
 				+ "        AND nd.project_id = :datasetId \n"
-				+ "        AND nd.nd_geolocation_id = geop.nd_geolocation_id\n"
-				+ "        AND geop.type_id = " + TermId.NUMBER_OF_REPLICATES.getId() +" \n"
-				+ "GROUP BY g.description");
+				+ "GROUP BY g.description;");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			query.addScalar("environment",new LongType());
-			query.addScalar("observations",new LongType());
-			query.addScalar("entries",new LongType());
-			query.addScalar("repNumber",new LongType());
+			query.addScalar("nOfObservations",new LongType());
+			query.addScalar("nOfEntries",new LongType());
+			query.addScalar("nOfReps",new LongType());
 			query.setParameter("studyId", studyId);
 			query.setParameter("datasetId", datasetId);
 
 
-			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-			final List<Map<String, Long>> results = query.list();
+			query.setResultTransformer(Transformers.aliasToBean(InstanceInfomationDTO.class));
+			final List<InstanceInfomationDTO> results = query.list();
 
 			return results;
 

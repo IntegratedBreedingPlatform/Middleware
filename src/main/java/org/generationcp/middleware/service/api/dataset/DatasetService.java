@@ -405,7 +405,7 @@ public interface DatasetService {
 	 *
 	 * @param datasetId
 	 * @param studyId
-	 * @return
+	 * @return List<InstanceInfomationDTO>
 	 */
-	List<Map<String, Long>> getInformationInstance(final Integer datasetId, final Integer studyId);
+	List<InstanceInfomationDTO> getInformationInstance(final Integer datasetId, final Integer studyId);
 }
