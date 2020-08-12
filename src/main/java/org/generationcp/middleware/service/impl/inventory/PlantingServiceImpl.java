@@ -17,6 +17,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.inventory.PlantingService;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,8 +49,9 @@ public class PlantingServiceImpl implements PlantingService {
 		this.processSearchComposite(searchDTO);
 
 		// observation units
+		// TODO: IBP-3899
 		final List<ObservationUnitRow> observationUnitRows =
-			this.datasetService.getObservationUnitRows(studyId, datasetId, searchDTO.getSearchRequest());
+			this.datasetService.getObservationUnitRows(studyId, datasetId, searchDTO.getSearchRequest(), null);
 		Preconditions.checkArgument(!Util.isEmpty(observationUnitRows), "No results for observation units");
 
 		// process observation units and build entries

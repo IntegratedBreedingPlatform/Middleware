@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -208,7 +209,7 @@ public interface DatasetService {
 	 * @param searchDTO Search DTO
 	 * @return List of ObservationUnitRow
 	 */
-	List<ObservationUnitRow> getObservationUnitRows(int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO);
+	List<ObservationUnitRow> getObservationUnitRows(int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO, PageRequest pageRequest);
 
 	/**
 	 * Returns the list of observation unit rows (represented as List of HashMap) that matches the search param.
@@ -219,7 +220,7 @@ public interface DatasetService {
 	 * @return List of Variable (Column) Name and Value Map
 	 */
 	List<Map<String, Object>> getObservationUnitRowsAsMapList(
-		int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO);
+		int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO, PageRequest pageRequest);
 
 	/**
 	 * Returns the list of observation unit rows for datasetId

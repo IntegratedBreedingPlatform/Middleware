@@ -58,6 +58,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
@@ -509,8 +510,8 @@ public class DatasetServiceImplTest {
 		Mockito.when(this.obsUnitsSearchDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
 		final ObservationUnitsSearchDTO
 			searchDTO = new ObservationUnitsSearchDTO(DATASET_ID, INSTANCE_ID, GERMPLASM_DESCRIPTORS, DESING_FACTORS, projectTraits);
-		searchDTO.setSortedRequest(new SortedPageRequest(1, 100, null, null));
-		Mockito.when(this.obsUnitsSearchDao.getObservationUnitTable(searchDTO)).thenReturn(testMeasurements);
+
+		Mockito.when(this.obsUnitsSearchDao.getObservationUnitTable(searchDTO, new PageRequest(0, 100))).thenReturn(testMeasurements);
 
 		Mockito.when(this.mockSession.createSQLQuery(Mockito.anyString())).thenReturn(mockQuery);
 		final List<Map<String, Object>> results = new ArrayList<>();
@@ -529,7 +530,7 @@ public class DatasetServiceImplTest {
 		// Method to test
 		final List<ObservationUnitRow> actualMeasurements = this.datasetService.getObservationUnitRows(DatasetServiceImplTest.STUDY_ID,
 			DatasetServiceImplTest.DATASET_ID,
-			new ObservationUnitsSearchDTO());
+			new ObservationUnitsSearchDTO(), new PageRequest(0, 100));
 
 		Assert.assertEquals(testMeasurements, actualMeasurements);
 	}
@@ -600,7 +601,7 @@ public class DatasetServiceImplTest {
 		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
 		Mockito.verify(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.obsUnitsSearchDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class));
+		Mockito.verify(this.obsUnitsSearchDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class), Mockito.any(PageRequest.class));
 
 	}
 

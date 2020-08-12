@@ -21,6 +21,7 @@ import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -116,7 +117,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
 
-		final List<ObservationUnitRow> measurementRows = this.obsUnitSearchDao.getObservationUnitTable(observationUnitsSearchDTO);
+		final List<ObservationUnitRow> measurementRows = this.obsUnitSearchDao.getObservationUnitTable(observationUnitsSearchDTO, new PageRequest(0, Integer.MAX_VALUE));
 
 		assertEquals(noOfSubObservationExperiment, measurementRows.size());
 
@@ -526,7 +527,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<Map<String, Object>> measurementRows =
-			this.obsUnitSearchDao.getObservationUnitTableMapList(observationUnitsSearchDTO);
+			this.obsUnitSearchDao.getObservationUnitTableMapList(observationUnitsSearchDTO, new PageRequest(0, Integer.MAX_VALUE));
 
 		assertEquals(noOfSubObservationExperiment, measurementRows.size());
 

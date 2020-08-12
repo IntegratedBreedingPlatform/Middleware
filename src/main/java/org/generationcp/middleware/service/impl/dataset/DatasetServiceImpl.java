@@ -52,6 +52,8 @@ import org.generationcp.middleware.service.impl.study.ObservationUnitIDGenerator
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
@@ -63,6 +65,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -577,28 +580,32 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final PageRequest pageRequest) {
 
-		this.fillSearchDTO(studyId, datasetId, searchDTO);
+		this.fillSearchDTO(studyId, datasetId, searchDTO, pageRequest);
 
-		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
+		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageRequest);
 	}
 
 	@Override
 	public List<Map<String, Object>> getObservationUnitRowsAsMapList(
-		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final PageRequest pageRequest) {
 
-		this.fillSearchDTO(studyId, datasetId, searchDTO);
+		this.fillSearchDTO(studyId, datasetId, searchDTO, pageRequest);
 
-		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTableMapList(searchDTO);
+		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTableMapList(searchDTO, pageRequest);
 	}
 
-	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
-		if (searchDTO.getSortedRequest() != null && searchDTO.getSortedRequest().getSortBy() != null) {
-			final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(searchDTO.getSortedRequest().getSortBy()));
-			if (term != null) {
-				searchDTO.getSortedRequest()
-					.setSortBy(term.getName());
+	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final PageRequest pageRequest) {
+		if (pageRequest != null) {
+			final Iterator<Sort.Order> iterator = pageRequest.getSort().iterator();
+			while (iterator.hasNext()) {
+				final Sort.Order sort = iterator.next();
+				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
+				if (term != null) {
+					pageRequest.getSort().and(new Sort(sort.getDirection(), term.getName()));
+					iterator.remove();
+				}
 			}
 		}
 
@@ -630,7 +637,7 @@ public class DatasetServiceImpl implements DatasetService {
 		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
 
-		final List<ObservationUnitRow> observationUnits = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
+		final List<ObservationUnitRow> observationUnits = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, new PageRequest(0, Integer.MAX_VALUE));
 		this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 
 		return observationUnits;
@@ -879,7 +886,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final String variableId = searchDTO.getFilter().getVariableId().toString();
 		final List<Phenotype> phenotypes = new ArrayList<>();
-		this.fillSearchDTO(studyId, datasetId, searchDTO);
+		this.fillSearchDTO(studyId, datasetId, searchDTO, null);
 
 		final List<ObservationUnitRow> observationUnitsByVariable =
 			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitsByVariable(searchDTO);
@@ -922,7 +929,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final String newValue = paramDTO.getNewValue();
 		final String variableId = paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId().toString();
 		final List<Phenotype> phenotypes = new ArrayList<>();
-		this.fillSearchDTO(studyId, datasetId, paramDTO.getObservationUnitsSearchDTO());
+
+		// TODO: IBP-3899
+		this.fillSearchDTO(studyId, datasetId, paramDTO.getObservationUnitsSearchDTO(), null);
 		final Boolean draftMode = paramDTO.getObservationUnitsSearchDTO().getDraftMode();
 		final List<ObservationUnitRow> observationUnitsByVariable =
 			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitsByVariable(paramDTO.getObservationUnitsSearchDTO());
@@ -1161,7 +1170,7 @@ public class DatasetServiceImpl implements DatasetService {
 			searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
 
 			final List<ObservationUnitRow> observationUnits =
-				this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
+				this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, null);
 			this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 			instanceMap.put(instanceId, observationUnits);
 		}

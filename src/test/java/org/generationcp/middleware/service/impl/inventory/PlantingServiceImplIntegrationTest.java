@@ -43,6 +43,7 @@ import org.generationcp.middleware.util.Util;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -313,7 +314,8 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 
 		// Study transaction search
 		final StudyTransactionsRequest studyTransactionsRequest = new StudyTransactionsRequest();
-		final List<StudyTransactionsDto> studyTransactionsDtos = transactionDAO.searchStudyTransactions(studyId, studyTransactionsRequest);
+		final List<StudyTransactionsDto> studyTransactionsDtos =
+			transactionDAO.searchStudyTransactions(studyId, studyTransactionsRequest, new PageRequest(0, Integer.MAX_VALUE));
 
 		assertThat(studyTransactionsDtos.size(), equalTo(transactions.size()));
 		assertThat(studyTransactionsDtos.get(0).getTransactionId(), equalTo(transactions.get(0).getId()));

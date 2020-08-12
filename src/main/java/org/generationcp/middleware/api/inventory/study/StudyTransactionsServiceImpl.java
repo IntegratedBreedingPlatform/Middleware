@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.inventory.study;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +28,8 @@ public class StudyTransactionsServiceImpl implements StudyTransactionsService {
 
 	@Override
 	public List<StudyTransactionsDto> searchStudyTransactions(final Integer studyId,
-		final StudyTransactionsRequest studyTransactionsRequest) {
+		final StudyTransactionsRequest studyTransactionsRequest, final PageRequest pageRequest) {
 
-		return this.daoFactory.getTransactionDAO().searchStudyTransactions(studyId, studyTransactionsRequest);
+		return this.daoFactory.getTransactionDAO().searchStudyTransactions(studyId, studyTransactionsRequest, pageRequest);
 	}
 }
