@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -1576,14 +1577,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getExistingCrosses(final String femaleParent, final int methodId, final List<Integer> maleParentIds,
-		final String gid) {
+	public List<Germplasm> getExistingCrosses(final Integer femaleParent, final int methodId, final List<Integer> maleParentIds,
+		final Optional<Integer> gid) {
 		return this.getGermplasmDao().getExistingCrosses(femaleParent, methodId, maleParentIds, gid);
 	}
 
 	@Override
-	public boolean hasExistingCrosses(final String femaleParent, final int methodId, final List<Integer> maleParentIds,
-		final String gid) {
+	public boolean hasExistingCrosses(final Integer femaleParent, final int methodId, final List<Integer> maleParentIds,
+		final Optional<Integer> gid) {
 		return this.getGermplasmDao().hasExistingCrosses(femaleParent, methodId, maleParentIds, gid);
 	}
 }

@@ -49,7 +49,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link Germplasm}.
@@ -1649,16 +1651,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<Germplasm> getExistingCrosses(final String femaleParent, final int methodId, final List<Integer> maleParentIds,
-		final String gid) {
+	public List<Germplasm> getExistingCrosses(final Integer femaleParent, final int methodId, final List<Integer> maleParentIds,
+		final Optional<Integer> gid) {
 		try {
 			final StringBuilder builder = this.buildGetExistingCrossesQueryString(maleParentIds, gid);
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(builder.toString());
 			sqlQuery.setParameterList("maleParentIds", maleParentIds);
 			sqlQuery.setParameter("methodId", methodId);
 			sqlQuery.setParameter("femaleParentId", femaleParent);
-			if(!StringUtils.isEmpty(gid)) {
-				sqlQuery.setParameter("gid", gid);
+			if(gid.isPresent()) {
+				sqlQuery.setParameter("gid", gid.get());
 			}
 			sqlQuery.addScalar("gid");
 			sqlQuery.addScalar("nval");
@@ -1679,40 +1681,42 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	StringBuilder buildGetExistingCrossesQueryString(final List<Integer> maleParentIds, final String gid) {
+	StringBuilder buildGetExistingCrossesQueryString(final List<Integer> maleParentIds, final Optional<Integer> gid) {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("SELECT g.gid as gid, (select n.nval from names n where n.nstat=1 and n.gid = g.gid limit 1) as nval ");
 		builder.append(" FROM germplsm g ");
 		if(maleParentIds.size() > 1) {
+			// For Polycrosses
 			builder.append("INNER JOIN progntrs p ON p.gid = g.gid ");
-			builder.append("WHERE g.deleted = 0 AND g.methn = :methodId AND g.gpid1 = :femaleParentId ");
-			if(!StringUtils.isEmpty(gid)) {
-				builder.append("AND g.gid <> :gid ");
-			}
+			this.addCommonWhereConditions(gid, builder);
+			// Check if all the pids in progenitors table are in the maleParentIds list
 			builder.append("AND p.pid IN (:maleParentIds) ");
-			builder.append(" AND g.gpid2 IN ( ");
-			builder.append(" SELECT parentId FROM ( ");
-			for (int i = 0; i < maleParentIds.size(); i++) {
-				builder.append("(SELECT " + maleParentIds.get(i) + " AS parentId) ");
-				if (i != maleParentIds.size() - 1) {
-					builder.append("UNION ALL ");
-				}
-			}
+			builder.append("AND g.gpid2 IN ( ");
+			// Create a "temporary table" that contains all the specified male parents and return the one that's not in the progenitors table
+			builder.append("SELECT parentId FROM ( ");
+			builder.append(maleParentIds.stream().map(maleParent -> " (SELECT " + maleParent + " AS parentId) ").collect(Collectors.joining("UNION ALL ")));
 			builder.append(") AS maleParentGIDs ");
 			builder.append("WHERE parentId not IN (select prog.pid from progntrs prog where prog.gid = g.gid)) ");
+			// Make sure that the number of progenitors are the same as the number of male parents specified
 			builder.append("group by p.gid having count(distinct p.pid) = " + (maleParentIds.size() - 1));
 		} else {
-			builder.append("WHERE g.deleted = 0 AND g.methn = :methodId AND g.gpid1 = :femaleParentId ");
-			if(!StringUtils.isEmpty(gid)) {
-				builder.append("AND g.gid <> :gid ");
-			}
+			this.addCommonWhereConditions(gid, builder);
 			builder.append("AND g.gpid2 IN (:maleParentIds)");
 		}
 		return builder;
 	}
 
-	public boolean hasExistingCrosses(final String femaleParent, final int methodId, final List<Integer> maleParentIds,
-		final String gid) {
+	public void addCommonWhereConditions(final Optional<Integer> gid, final StringBuilder builder) {
+		builder.append("WHERE g.deleted = 0 AND g.methn = :methodId AND g.gpid1 = :femaleParentId ");
+		// Crosses created using design crosses are saved before going back to the FB module,
+		// this code excludes the pre-created germplasm from the results
+		if(gid.isPresent()) {
+			builder.append("AND g.gid <> :gid ");
+		}
+	}
+
+	public boolean hasExistingCrosses(final Integer femaleParent, final int methodId, final List<Integer> maleParentIds,
+		final Optional<Integer> gid) {
 		try {
 			final StringBuilder builder = new StringBuilder();
 			builder.append("SELECT COUNT(1) FROM ( ");
@@ -1722,8 +1726,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			sqlQuery.setParameterList("maleParentIds", maleParentIds);
 			sqlQuery.setParameter("methodId", methodId);
 			sqlQuery.setParameter("femaleParentId", femaleParent);
-			if(!StringUtils.isEmpty(gid)) {
-				sqlQuery.setParameter("gid", gid);
+			if(gid.isPresent()) {
+				sqlQuery.setParameter("gid", gid.get());
 			}
 
 			return ((BigInteger) sqlQuery.uniqueResult()).longValue() > 0;
