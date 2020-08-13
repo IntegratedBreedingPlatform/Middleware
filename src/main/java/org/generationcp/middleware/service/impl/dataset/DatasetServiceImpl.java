@@ -597,7 +597,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final PageRequest pageRequest) {
-		if (pageRequest != null) {
+		if (pageRequest != null && pageRequest.getSort() != null) {
 			final Iterator<Sort.Order> iterator = pageRequest.getSort().iterator();
 			while (iterator.hasNext()) {
 				final Sort.Order sort = iterator.next();

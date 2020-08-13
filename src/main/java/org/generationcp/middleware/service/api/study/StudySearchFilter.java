@@ -40,14 +40,13 @@ public class StudySearchFilter {
 	private String trialDbId;
 	private String studyDbId;
 	private Boolean active;
-	private SortedPageRequest sortedRequest = new SortedPageRequest();
 
 	public StudySearchFilter() {
 
 	}
 
 	public StudySearchFilter(final String studyTypeDbId, final String programDbId, final String locationDbId, final String seasonDbId,
-		final String trialDbId, final String studyDbId, final Boolean active, final SortedPageRequest sortedPageRequest) {
+		final String trialDbId, final String studyDbId, final Boolean active) {
 		this.studyTypeDbId = studyTypeDbId;
 		this.programDbId = programDbId;
 		this.locationDbId = locationDbId;
@@ -55,7 +54,6 @@ public class StudySearchFilter {
 		this.trialDbId = trialDbId;
 		this.studyDbId = studyDbId;
 		this.active = active;
-		this.sortedRequest = sortedPageRequest;
 	}
 
 	public String getStudyTypeDbId() {
@@ -112,14 +110,6 @@ public class StudySearchFilter {
 
 	public void setActive(final Boolean active) {
 		this.active = active;
-	}
-
-	public SortedPageRequest getSortedRequest() {
-		return this.sortedRequest;
-	}
-
-	public void setSortedRequest(final SortedPageRequest sortedRequest) {
-		this.sortedRequest = sortedRequest;
 	}
 
 	public String getCommonCropName() {
