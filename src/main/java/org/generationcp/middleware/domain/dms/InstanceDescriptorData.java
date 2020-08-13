@@ -7,15 +7,15 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class DescriptorData extends InstanceVariableData {
+public class InstanceDescriptorData extends InstanceVariableData {
 
 	private Integer descriptorDataId;
 
-	public DescriptorData() {
+	public InstanceDescriptorData() {
 		// Empty constructor is needed to be able to map JSON from request
 	}
 
-	public DescriptorData(final Integer instanceId, final Integer descriptorDataId, final Integer variableId, final String value,
+	public InstanceDescriptorData(final Integer instanceId, final Integer descriptorDataId, final Integer variableId, final String value,
 		final Integer categoricalValueId) {
 		this.instanceId = instanceId;
 		this.descriptorDataId = descriptorDataId;
@@ -34,10 +34,10 @@ public class DescriptorData extends InstanceVariableData {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof ObservationData)) {
+		if (!(other instanceof InstanceObservationData)) {
 			return false;
 		}
-		final DescriptorData castOther = (DescriptorData) other;
+		final InstanceDescriptorData castOther = (InstanceDescriptorData) other;
 		return new EqualsBuilder().append(this.descriptorDataId, castOther.descriptorDataId).isEquals();
 	}
 

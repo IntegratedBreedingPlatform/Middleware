@@ -6,10 +6,10 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
-import org.generationcp.middleware.domain.dms.DescriptorData;
+import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.InstanceVariableData;
-import org.generationcp.middleware.domain.dms.ObservationData;
+import org.generationcp.middleware.domain.dms.InstanceObservationData;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -198,26 +198,26 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public ObservationData addInstanceObservation(final ObservationData observationData) {
-		Preconditions.checkNotNull(observationData.getInstanceId());
-		final Integer variableId = observationData.getVariableId();
+	public InstanceObservationData addInstanceObservation(final InstanceObservationData instanceObservationData) {
+		Preconditions.checkNotNull(instanceObservationData.getInstanceId());
+		final Integer variableId = instanceObservationData.getVariableId();
 		Preconditions.checkNotNull(variableId);
-		Preconditions.checkNotNull(observationData.getValue());
+		Preconditions.checkNotNull(instanceObservationData.getValue());
 
 		final ExperimentModel experimentModel =
 			this.daoFactory.getExperimentDao()
-				.getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), observationData.getInstanceId());
+				.getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), instanceObservationData.getInstanceId());
 		final Phenotype phenotype =
-			new Phenotype(variableId, observationData.getValue(), experimentModel);
+			new Phenotype(variableId, instanceObservationData.getValue(), experimentModel);
 		phenotype.setCreatedDate(new Date());
 		phenotype.setUpdatedDate(new Date());
-		phenotype.setcValue(observationData.getCategoricalValueId());
+		phenotype.setcValue(instanceObservationData.getCategoricalValueId());
 		phenotype.setName(String.valueOf(variableId));
 
 		this.daoFactory.getPhenotypeDAO().save(phenotype);
-		observationData.setObservationDataId(phenotype.getPhenotypeId());
+		instanceObservationData.setInstanceObservationId(phenotype.getPhenotypeId());
 
-		return observationData;
+		return instanceObservationData;
 	}
 
 	private String getEnvironmentDataValue(final InstanceVariableData observationData) {
@@ -227,29 +227,29 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public ObservationData updateInstanceObservation(final ObservationData observationData) {
-		Preconditions.checkNotNull(observationData.getObservationDataId());
-		Preconditions.checkNotNull(observationData.getInstanceId());
-		Preconditions.checkNotNull(observationData.getVariableId());
-		Preconditions.checkNotNull(observationData.getValue());
+	public InstanceObservationData updateInstanceObservation(final InstanceObservationData instanceObservationData) {
+		Preconditions.checkNotNull(instanceObservationData.getInstanceObservationId());
+		Preconditions.checkNotNull(instanceObservationData.getInstanceId());
+		Preconditions.checkNotNull(instanceObservationData.getVariableId());
+		Preconditions.checkNotNull(instanceObservationData.getValue());
 
 		final PhenotypeDao phenotypeDAO = this.daoFactory.getPhenotypeDAO();
-		final Phenotype phenotype = phenotypeDAO.getById(observationData.getObservationDataId());
+		final Phenotype phenotype = phenotypeDAO.getById(instanceObservationData.getInstanceObservationId());
 		Preconditions.checkNotNull(phenotype);
-		phenotype.setValue(observationData.getValue());
-		phenotype.setcValue(observationData.getCategoricalValueId());
+		phenotype.setValue(instanceObservationData.getValue());
+		phenotype.setcValue(instanceObservationData.getCategoricalValueId());
 		phenotype.setUpdatedDate(new Date());
 		phenotypeDAO.update(phenotype);
 
 		// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 		this.datasetService
-			.updateDependentPhenotypesStatusByGeolocation(observationData.getInstanceId(), Arrays.asList(observationData.getVariableId()));
+			.updateDependentPhenotypesStatusByGeolocation(instanceObservationData.getInstanceId(), Arrays.asList(instanceObservationData.getVariableId()));
 
-		return observationData;
+		return instanceObservationData;
 	}
 
 	@Override
-	public Optional<ObservationData> getInstanceObservation(final Integer instanceId, final Integer observationDataId,
+	public Optional<InstanceObservationData> getInstanceObservation(final Integer instanceId, final Integer observationDataId,
 		final Integer variableId) {
 
 		final ExperimentModel experimentModel =
@@ -257,76 +257,76 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotype(experimentModel.getNdExperimentId(), observationDataId);
 		if (phenotype != null) {
 			return Optional
-				.of(new ObservationData(phenotype.getExperiment().getNdExperimentId(), observationDataId, phenotype.getObservableId(),
+				.of(new InstanceObservationData(phenotype.getExperiment().getNdExperimentId(), observationDataId, phenotype.getObservableId(),
 					phenotype.getValue(), phenotype.getcValueId()));
 		}
 		return Optional.empty();
 	}
 
 	@Override
-	public DescriptorData addInstanceDescriptor(final DescriptorData descriptorData) {
+	public InstanceDescriptorData addInstanceDescriptorData(final InstanceDescriptorData instanceDescriptorData) {
 
-		Preconditions.checkNotNull(descriptorData.getInstanceId());
-		final Integer variableId = descriptorData.getVariableId();
+		Preconditions.checkNotNull(instanceDescriptorData.getInstanceId());
+		final Integer variableId = instanceDescriptorData.getVariableId();
 		Preconditions.checkNotNull(variableId);
-		Preconditions.checkNotNull(descriptorData.getValue());
+		Preconditions.checkNotNull(instanceDescriptorData.getValue());
 
 		final GeolocationDao geolocationDao = this.daoFactory.getGeolocationDao();
-		final Geolocation geolocation = geolocationDao.getById(descriptorData.getInstanceId());
-		final String value = this.getEnvironmentDataValue(descriptorData);
+		final Geolocation geolocation = geolocationDao.getById(instanceDescriptorData.getInstanceId());
+		final String value = this.getEnvironmentDataValue(instanceDescriptorData);
 
-		if (GEOLOCATION_METADATA.contains(descriptorData.getVariableId())) {
+		if (GEOLOCATION_METADATA.contains(instanceDescriptorData.getVariableId())) {
 			// Geolocation Metadata variables are stored in Geolocation table.
 			// we just need to update their values if they are added to the study. No need to create GeolocationProperty.
-			this.mapGeolocationMetaData(geolocation, descriptorData.getVariableId(), value);
+			this.mapGeolocationMetaData(geolocation, instanceDescriptorData.getVariableId(), value);
 			geolocationDao.save(geolocation);
 			// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 			this.datasetService
-				.updateDependentPhenotypesStatusByGeolocation(descriptorData.getInstanceId(),
-					Arrays.asList(descriptorData.getVariableId()));
+				.updateDependentPhenotypesStatusByGeolocation(instanceDescriptorData.getInstanceId(),
+					Arrays.asList(instanceDescriptorData.getVariableId()));
 		} else {
-			final GeolocationProperty property = new GeolocationProperty(geolocation, value, 1, descriptorData.getVariableId());
+			final GeolocationProperty property = new GeolocationProperty(geolocation, value, 1, instanceDescriptorData.getVariableId());
 			this.daoFactory.getGeolocationPropertyDao().save(property);
-			descriptorData.setDescriptorDataId(property.getGeolocationPropertyId());
+			instanceDescriptorData.setDescriptorDataId(property.getGeolocationPropertyId());
 		}
 
-		return descriptorData;
+		return instanceDescriptorData;
 	}
 
 	@Override
-	public DescriptorData updateInstanceDescriptor(final DescriptorData descriptorData) {
+	public InstanceDescriptorData updateInstanceDescriptorData(final InstanceDescriptorData instanceDescriptorData) {
 
-		Preconditions.checkNotNull(descriptorData.getDescriptorDataId());
-		Preconditions.checkNotNull(descriptorData.getInstanceId());
-		Preconditions.checkNotNull(descriptorData.getVariableId());
-		Preconditions.checkNotNull(descriptorData.getValue());
+		Preconditions.checkNotNull(instanceDescriptorData.getDescriptorDataId());
+		Preconditions.checkNotNull(instanceDescriptorData.getInstanceId());
+		Preconditions.checkNotNull(instanceDescriptorData.getVariableId());
+		Preconditions.checkNotNull(instanceDescriptorData.getValue());
 
 		final GeolocationPropertyDao propertyDao = this.daoFactory.getGeolocationPropertyDao();
-		final GeolocationProperty property = propertyDao.getById(descriptorData.getDescriptorDataId());
+		final GeolocationProperty property = propertyDao.getById(instanceDescriptorData.getDescriptorDataId());
 		Preconditions.checkNotNull(property);
-		property.setValue(this.getEnvironmentDataValue(descriptorData));
+		property.setValue(this.getEnvironmentDataValue(instanceDescriptorData));
 		propertyDao.update(property);
 
 		// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 		this.datasetService
-			.updateDependentPhenotypesStatusByGeolocation(descriptorData.getInstanceId(), Arrays.asList(descriptorData.getVariableId()));
+			.updateDependentPhenotypesStatusByGeolocation(instanceDescriptorData.getInstanceId(), Arrays.asList(instanceDescriptorData.getVariableId()));
 
-		return descriptorData;
+		return instanceDescriptorData;
 	}
 
 	@Override
-	public Optional<DescriptorData> getInstanceDescriptor(final Integer instanceId, final Integer descriptorDataId, final Integer variableId) {
+	public Optional<InstanceDescriptorData> getInstanceDescriptorData(final Integer instanceId, final Integer descriptorDataId, final Integer variableId) {
 
 		final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(instanceId);
 
 		if (GEOLOCATION_METADATA.contains(variableId)) {
-			return Optional.of(new DescriptorData(geolocation.getLocationId(), geolocation.getLocationId(), variableId,
+			return Optional.of(new InstanceDescriptorData(geolocation.getLocationId(), geolocation.getLocationId(), variableId,
 				this.getGeolocationMetaDataValue(geolocation, variableId), null));
 		} else {
 			final GeolocationProperty property =
 				this.daoFactory.getGeolocationPropertyDao().getById(descriptorDataId);
 			if (property != null) {
-				return Optional.of(new DescriptorData(geolocation.getLocationId(), descriptorDataId, property.getTypeId(),
+				return Optional.of(new InstanceDescriptorData(geolocation.getLocationId(), descriptorDataId, property.getTypeId(),
 					property.getValue(), null));
 			}
 		}

@@ -1,6 +1,6 @@
 package org.generationcp.middleware.domain.dms;
 
-public class InstanceVariableData {
+public abstract class InstanceVariableData {
 
 	protected Integer instanceId;
 	protected Integer variableId;
