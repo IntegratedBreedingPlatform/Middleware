@@ -166,4 +166,19 @@
 			ALTER TABLE search_request CHANGE COLUMN parameters parameters MEDIUMTEXT NOT NULL ;
 		</sql>
 	</changeSet>
+
+	<changeSet author="mderamos" id="v15.4.0-7">
+		<preConditions onFail="MARK_RAN">
+            <not>
+				<foreignKeyConstraintExists foreignKeyName="germplasm_study_source_gid_fk"></foreignKeyConstraintExists>
+			</not>
+		</preConditions>
+		<comment>Delete germplasm_study_source entries with no germplsm</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM germplasm_study_source WHERE NOT EXISTS (SELECT 1 FROM germplsm g WHERE g.gid = germplasm_study_source.gid);
+		</sql>
+		<comment>Add germplasm_study_source.gid foreign key</comment>
+		<addForeignKeyConstraint baseTableName="germplasm_study_source" baseColumnNames="gid" constraintName="germplasm_study_source_gid_fk" referencedTableName="germplsm"
+								 referencedColumnNames="gid"/>
+	</changeSet>
 </databaseChangeLog>
