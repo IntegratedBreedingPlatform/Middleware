@@ -407,5 +407,5 @@ public interface DatasetService {
 	 * @param studyId
 	 * @return List<InstanceDetailsDTO>
 	 */
-	List<InstanceDetailsDTO> getInformationInstance(Integer datasetId, Integer studyId);
+	List<InstanceDetailsDTO> getInstanceDetails(Integer datasetId, Integer studyId);
 }

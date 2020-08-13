@@ -1315,7 +1315,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 
 	@Override
-	public List<InstanceDetailsDTO> getInformationInstance(final Integer datasetId, final Integer studyId) {
+	public List<InstanceDetailsDTO> getInstanceDetails(final Integer datasetId, final Integer studyId) {
 		return this.daoFactory.getExperimentDao().getInstanceInformation(datasetId, studyId);
 	}
 
