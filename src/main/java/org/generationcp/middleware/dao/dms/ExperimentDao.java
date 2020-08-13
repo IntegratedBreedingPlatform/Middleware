@@ -30,7 +30,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
-import org.generationcp.middleware.service.api.dataset.InstanceInfomationDTO;
+import org.generationcp.middleware.service.api.dataset.InstanceDetailsDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -948,7 +948,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public List<InstanceInfomationDTO> getInstanceInformation(final Integer datasetId, final Integer studyId) {
+	public List<InstanceDetailsDTO> getInstanceInformation(final Integer datasetId, final Integer studyId) {
 
 		try {
 			final StringBuilder sql = new StringBuilder(
@@ -980,8 +980,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			query.setParameter("datasetId", datasetId);
 
 
-			query.setResultTransformer(Transformers.aliasToBean(InstanceInfomationDTO.class));
-			final List<InstanceInfomationDTO> results = query.list();
+			query.setResultTransformer(Transformers.aliasToBean(InstanceDetailsDTO.class));
+			final List<InstanceDetailsDTO> results = query.list();
 
 			return results;
 

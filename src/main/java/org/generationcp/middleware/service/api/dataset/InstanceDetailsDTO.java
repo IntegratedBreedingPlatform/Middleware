@@ -4,19 +4,18 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class InstanceInfomationDTO {
+public class InstanceDetailsDTO {
 
 	private Long environment;
 	private Long nOfObservations;
 	private Long nOfEntries;
 	private Long nOfReps;
 
-
-	public void InstanceInfomationDTO(){
+	public void InstanceDetailsDTO(){
 
 	}
 
-	public void InstanceInfomationDTO(final Long environment, final Long nOfObservations, final Long nOfEntries, final Long nOfReps) {
+	public void InstanceDetailsDTO(final Long environment, final Long nOfObservations, final Long nOfEntries, final Long nOfReps) {
 		this.environment = environment;
 		this.nOfObservations = nOfObservations;
 		this.nOfEntries = nOfEntries;
@@ -27,38 +26,33 @@ public class InstanceInfomationDTO {
 		return environment;
 	}
 
-	public InstanceInfomationDTO setEnvironment(final Long environment) {
+	public void setEnvironment(final Long environment) {
 		this.environment = environment;
-		return this;
 	}
 
 	public Long getnOfObservations() {
 		return nOfObservations;
 	}
 
-	public InstanceInfomationDTO setnOfObservations(final Long nOfObservations) {
+	public void setnOfObservations(final Long nOfObservations) {
 		this.nOfObservations = nOfObservations;
-		return this;
 	}
 
 	public Long getnOfEntries() {
 		return nOfEntries;
 	}
 
-	public InstanceInfomationDTO setnOfEntries(final Long nOfEntries) {
+	public void setnOfEntries(final Long nOfEntries) {
 		this.nOfEntries = nOfEntries;
-		return this;
 	}
 
 	public Long getnOfReps() {
 		return nOfReps;
 	}
 
-	public InstanceInfomationDTO setnOfReps(final Long nOfReps) {
+	public void setnOfReps(final Long nOfReps) {
 		this.nOfReps = nOfReps;
-		return this;
 	}
-
 
 	@Override
 	public int hashCode() {
