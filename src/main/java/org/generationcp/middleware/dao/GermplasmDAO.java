@@ -1705,7 +1705,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return builder;
 	}
 
-	public void addCommonWhereConditions(final Optional<Integer> gid, final StringBuilder builder) {
+	private void addCommonWhereConditions(final Optional<Integer> gid, final StringBuilder builder) {
 		builder.append("WHERE g.deleted = 0 AND g.gpid1 = :femaleParentId ");
 		// Crosses created using design crosses are saved before going back to the FB module,
 		// this code excludes the pre-created germplasm from the results
