@@ -184,7 +184,7 @@ public interface DatasetService {
 	 * @param draftMode  Indicates to count all observation units  or draft observations
 	 * @return Number of observations units that matches the dataset id and draftMode
 	 */
-	Integer countAllObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
+	Integer countAllObservationUnitsForDataset(Integer datasetId, Integer instanceId, Boolean draftMode);
 
 	/**
 	 * Count how many observation units are affected by a filter
@@ -197,7 +197,7 @@ public interface DatasetService {
 	 * @param filter     Filyer
 	 * @return Number of observation units that matches the datasetId, draftMode and filter
 	 */
-	long countFilteredObservationUnitsForDataset(Integer datasetId, Integer instanceId, final Boolean draftMode,
+	long countFilteredObservationUnitsForDataset(Integer datasetId, Integer instanceId, Boolean draftMode,
 		ObservationUnitsSearchDTO.Filter filter);
 
 	/**
@@ -237,7 +237,7 @@ public interface DatasetService {
 	 * @param studyId
 	 * @return
 	 */
-	Boolean isDatasetNameAvailable(final String name, final int studyId);
+	Boolean isDatasetNameAvailable(String name, int studyId);
 
 	/**
 	 * Return number of children of a dataset
@@ -396,16 +396,16 @@ public interface DatasetService {
 	 */
 	void setValueToVariable(Integer datasetId, ObservationUnitsParamDTO searchDTO, Integer studyId);
 
-	boolean allDatasetIdsBelongToStudy(final Integer studyId, List<Integer> datasetIds);
+	boolean allDatasetIdsBelongToStudy(Integer studyId, List<Integer> datasetIds);
 
-	Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer datasetId, final Set<Integer> instanceNumbers, final Set<Integer> plotNumbers);
+	Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(Integer datasetId, Set<Integer> instanceNumbers, Set<Integer> plotNumbers);
 
 	/**
 	 * Given a dataset Id and Study Id, it will retrieve how many observations, number of repetitions, and entries it has associated.
 	 *
 	 * @param datasetId
 	 * @param studyId
-	 * @return List<InstanceInfomationDTO>
+	 * @return List<InstanceDetailsDTO>
 	 */
-	List<InstanceInfomationDTO> getInformationInstance(final Integer datasetId, final Integer studyId);
+	List<InstanceInfomationDTO> getInformationInstance(Integer datasetId, Integer studyId);
 }
