@@ -171,10 +171,10 @@ public class LotServiceImpl implements LotService {
 				lot.setStatus(0);
 				//FIXME check if source has to be always 0
 				lot.setSource(0);
-				if (lotItemDto.getScaleId() != null) {
-					lot.setScaleId(lotItemDto.getScaleId());
+				if (lotItemDto.getUnitId() != null) {
+					lot.setScaleId(lotItemDto.getUnitId());
 				} else {
-					lot.setScaleId(scaleVariablesByNameMap.get(lotItemDto.getScaleName()));
+					lot.setScaleId(scaleVariablesByNameMap.get(lotItemDto.getUnitName()));
 				}
 
 				this.inventoryDataManager.generateLotIds(cropType, Lists.newArrayList(lot));

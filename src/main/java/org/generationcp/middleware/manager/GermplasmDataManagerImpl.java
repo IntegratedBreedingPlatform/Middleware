@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -771,30 +772,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<GermplasmDTO> getGermplasmByStudy(final Integer studyDbId, final Integer pageNumber, final Integer pageSize) {
 		return this.daoFactory.getGermplasmDao().getGermplasmByStudy(studyDbId, pageNumber, pageSize);
-	}
-
-	@Override
-	public Integer updateGermplasm(final Germplasm germplasm) {
-		final List<Germplasm> germplasms = new ArrayList<>();
-		germplasms.add(germplasm);
-		final List<Integer> ids = this.updateGermplasm(germplasms);
-		return !ids.isEmpty() ? ids.get(0) : null;
-	}
-
-	@Override
-	public List<Integer> updateGermplasm(final List<Germplasm> germplasms) {
-		if (germplasms != null) {
-			final List<Integer> gids = new ArrayList<>();
-			for (final Germplasm germplasm : germplasms) {
-				if (germplasm.getDeleted()) {// deleted
-					gids.add(germplasm.getGid());
-				}
-			}
-			if (!gids.isEmpty()) {
-				this.daoFactory.getTransactionDAO().cancelUnconfirmedTransactionsForGermplasms(gids);
-			}
-		}
-		return this.addOrUpdateGermplasm(germplasms, Operation.UPDATE);
 	}
 
 	@Override
@@ -1599,4 +1576,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.getAttributeDao().getByIDs(ids);
 	}
 
+	@Override
+	public List<Germplasm> getExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
+		final Optional<Integer> gid) {
+		return this.getGermplasmDao().getExistingCrosses(femaleParent, maleParentIds, gid);
+	}
+
+	@Override
+	public boolean hasExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
+		final Optional<Integer> gid) {
+		return this.getGermplasmDao().hasExistingCrosses(femaleParent, maleParentIds, gid);
+	}
 }
+
