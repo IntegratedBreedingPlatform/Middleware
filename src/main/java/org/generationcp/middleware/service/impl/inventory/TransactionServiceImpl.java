@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -10,6 +11,10 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDt
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.GermplasmStudySource;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.ims.ExperimentTransaction;
+import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -26,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -55,7 +61,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public void withdrawLots(final Integer userId, final Set<Integer> lotIds, final LotWithdrawalInputDto lotWithdrawalInputDto,
-			final TransactionStatus transactionStatus) {
+		final TransactionStatus transactionStatus) {
 
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
@@ -182,27 +188,56 @@ public class TransactionServiceImpl implements TransactionService {
 		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
 		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
 
-		for (final ExtendedLotDto lotDto : lots) {
-			final Double amount = lotDepositRequestDto.getDepositsPerUnit().get(lotDto.getUnitName());
-			final Transaction transaction = new Transaction();
-			transaction.setStatus(transactionStatus.getIntValue());
-			transaction.setType(TransactionType.DEPOSIT.getId());
-			transaction.setLot(new Lot(lotDto.getLotId()));
-			transaction.setPersonId(userId);
-			transaction.setUserId(userId);
-			transaction.setTransactionDate(new Date());
-			transaction.setQuantity(amount);
-			transaction.setComments(lotDepositRequestDto.getNotes());
-			//Always zero for new transactions
-			transaction.setPreviousAmount(0D);
-			if (transactionStatus.equals(TransactionStatus.CONFIRMED)) {
-				transaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
-			} else {
-				transaction.setCommitmentDate(0);
-			}
+		final Map<Integer, GermplasmStudySource> germplasmStudySourceMap =
+			this.daoFactory.getGermplasmStudySourceDAO()
+				.getByGids(lots.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet())).stream()
+				.collect(Collectors.toMap(a -> a.getGermplasm().getGid(), Function.identity()));
+
+		for (final ExtendedLotDto extendedLotDto : lots) {
+			final Double amount = lotDepositRequestDto.getDepositsPerUnit().get(extendedLotDto.getUnitName());
+			final Transaction transaction =
+				new Transaction(TransactionType.DEPOSIT, transactionStatus, userId, lotDepositRequestDto.getNotes(),
+					extendedLotDto.getLotId(),
+					amount);
 			daoFactory.getTransactionDAO().save(transaction);
+
+			if (lotDepositRequestDto.getSourceStudyId() != null) {
+				// Create experiment transaction records when lot and deposit are created in the context of study.
+				this.createExperimentTransaction(extendedLotDto.getGid(), germplasmStudySourceMap, transaction,
+					ExperimentTransactionType.HARVESTING);
+			}
 		}
 
+	}
+
+	@Override
+	public void depositLots(final Integer userId, final Set<Integer> lotIds, final List<LotDepositDto> lotDepositDtoList,
+		final TransactionStatus transactionStatus) {
+
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
+		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+		final Map<String, ExtendedLotDto> extendedLotDtoMap =
+			lots.stream().collect(Collectors.toMap(ExtendedLotDto::getLotUUID, extendedLotDto -> extendedLotDto));
+
+		for (final LotDepositDto lotDepositDto : lotDepositDtoList) {
+			final ExtendedLotDto extendedLotDto = extendedLotDtoMap.get(lotDepositDto.getLotUID());
+			final Transaction transaction =
+				new Transaction(TransactionType.DEPOSIT, transactionStatus, userId, lotDepositDto.getNotes(), extendedLotDto.getLotId(),
+					lotDepositDto.getAmount());
+			this.daoFactory.getTransactionDAO().save(transaction);
+		}
+	}
+
+	private void createExperimentTransaction(final Integer gid, final Map<Integer, GermplasmStudySource> germplasmStudySourceMap,
+		final Transaction transaction, final ExperimentTransactionType experimentTransactionType) {
+		if (germplasmStudySourceMap.containsKey(gid)) {
+			final ExperimentModel experimentModel = germplasmStudySourceMap.get(gid).getExperimentModel();
+			if (experimentModel != null) {
+				this.daoFactory.getExperimentTransactionDao()
+					.save(new ExperimentTransaction(experimentModel, transaction, experimentTransactionType.getId()));
+			}
+		}
 	}
 
 	@Override
@@ -218,4 +253,23 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 	}
 
+	@Override
+	public void saveAdjustmentTransactions(final Integer userId, final Set<Integer> lotIds, final Double balance, final String notes) {
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
+		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+		for (final ExtendedLotDto lotDto : lots) {
+			if (balance >= lotDto.getReservedTotal()) {
+				final Double amount = balance - lotDto.getActualBalance();
+				if (amount != 0) {
+					final Transaction transaction =
+						new Transaction(TransactionType.ADJUSTMENT, TransactionStatus.CONFIRMED, userId, notes, lotDto.getLotId(), amount);
+					daoFactory.getTransactionDAO().save(transaction);
+				}
+			} else {
+				throw new MiddlewareRequestException("", "lot.balance.update.invalid.available.balance",
+					String.valueOf(lotDto.getStockId()));
+			}
+		}
+	}
 }

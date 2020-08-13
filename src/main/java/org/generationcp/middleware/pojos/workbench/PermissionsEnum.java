@@ -27,6 +27,14 @@ public enum PermissionsEnum {
 	MANAGE_LOTS,
 	LOT_LABEL_PRINTING;
 
+	public static final String HAS_INVENTORY_VIEW = " or hasAnyAuthority('ADMIN'"
+		+ ",'CROP_MANAGEMENT'"
+		+ ",'MANAGE_INVENTORY'"
+		+ ",'MANAGE_LOTS'"
+		+ ",'MANAGE_TRANSACTIONS'"
+		+ ",'VIEW_LOTS'"
+		+ ",'VIEW_TRANSACTIONS')";
+
 	public static final String HAS_PREPARE_PLANTING = " or hasAnyAuthority('ADMIN'"
 		+ ", 'BREEDING_ACTIVITIES'"
 		+ ", 'MANAGE_STUDIES'"

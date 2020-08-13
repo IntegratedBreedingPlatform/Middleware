@@ -27,18 +27,6 @@ public class ListInventoryDataInitializer {
 		return inventoryDetails;
 	}
 
-	public static List<GermplasmListData> createGermplasmListDataWithInventoryDetails(int noOfListDataEntries) {
-		List<GermplasmListData> inventoryDetails = new ArrayList<GermplasmListData>();
-
-		for (int i = 0; i < noOfListDataEntries; i++) {
-			int id = i + 1;
-			inventoryDetails.add(createGermplasmListData(id));
-		}
-
-		return inventoryDetails;
-	}
-
-
 	public static GermplasmListData createGermplasmListData(int id) {
 
 		GermplasmListData listData = new GermplasmListData();
@@ -61,18 +49,7 @@ public class ListInventoryDataInitializer {
 		inventoryInfo.setLotRows(createLotDetails(listDataId));
 		inventoryInfo.setActualInventoryLotCount(1);
 		inventoryInfo.setTotalAvailableBalance(5.0);
-		inventoryInfo.setReservedLotCount(2);
 		inventoryInfo.setDistinctScaleCountForGermplsm(0);
-		inventoryInfo.setDistinctCountWithdrawalScale(0);
-		return inventoryInfo;
-	}
-
-	public static ListDataInventory createInventoryInfoWithEmptyLocationAndScale(int listDataId) {
-		ListDataInventory inventoryInfo = new ListDataInventory(listDataId, listDataId);
-
-		inventoryInfo.setLotRows(createLotDetailsWithEmptyLocationAndScale(listDataId));
-		inventoryInfo.setActualInventoryLotCount(1);
-		inventoryInfo.setReservedLotCount(2);
 		return inventoryInfo;
 	}
 
@@ -80,23 +57,6 @@ public class ListInventoryDataInitializer {
 		List<ListEntryLotDetails> lotDetails = new ArrayList<ListEntryLotDetails>();
 		for (int i = 0; i < NO_OF_LOTS_PER_LISTDATA; i++) {
 			lotDetails.add(createLotDetail(i, listDataId));
-		}
-		return lotDetails;
-	}
-
-	public static List<ListEntryLotDetails> createLotDetails(int listDataId, int noOfLots) {
-		List<ListEntryLotDetails> lotDetails = new ArrayList<ListEntryLotDetails>();
-		for (int i = 0; i < noOfLots; i++) {
-			lotDetails.add(createLotDetail(i, listDataId));
-		}
-		return lotDetails;
-	}
-
-
-	public static List<ListEntryLotDetails> createLotDetailsWithEmptyLocationAndScale(int listDataId) {
-		List<ListEntryLotDetails> lotDetails = new ArrayList<ListEntryLotDetails>();
-		for (int i = 0; i < NO_OF_LOTS_PER_LISTDATA; i++) {
-			lotDetails.add(createLotDetailWithEmptyLocationAndScale(i, listDataId));
 		}
 		return lotDetails;
 	}
@@ -126,13 +86,6 @@ public class ListInventoryDataInitializer {
 		return lotDetail;
 	}
 
-	public static ListEntryLotDetails createLotDetailWithEmptyLocationAndScale(int i, int listDataId) {
-		ListEntryLotDetails lotDetail = createLotDetail(i, listDataId);
-		lotDetail.setLocationOfLot(null);
-		lotDetail.setScaleOfLot(null);
-		return lotDetail;
-	}
-
 	public static Term createScale(int id) {
 		Term scale = new Term();
 		scale.setId(id);
@@ -154,11 +107,4 @@ public class ListInventoryDataInitializer {
 		return term;
 	}
 
-	public static Integer getNumberOfEntriesInInventoryView() {
-		return NO_OF_LISTDATA * NO_OF_LOTS_PER_LISTDATA;
-	}
-
-	public static Integer getNumberOfEntriesInListView() {
-		return NO_OF_LISTDATA;
-	}
 }

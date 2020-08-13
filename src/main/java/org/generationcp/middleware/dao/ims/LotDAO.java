@@ -27,10 +27,7 @@ import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.DateType;
@@ -43,14 +40,7 @@ import org.springframework.data.domain.Sort;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * DAO class for {@link Lot}.
@@ -59,19 +49,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LotDAO.class);
 
-	private static final String LOCATION_ID2 = ", locationId=";
-
-	private static final String ENTITY_ID2 = ", entityId=";
-
 	private static final String QUERY_FROM_LOT = ") query from Lot: ";
 
 	private static final String AT_LOT_DAO = " at LotDAO: ";
 
-	private static final String LOCATION_ID = "locationId";
-
 	private static final String ENTITY_TYPE = "entityType";
-
-	private static final String ENTITY_ID = "entityId";
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -96,18 +78,10 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	private static final String GET_LOTS_FOR_GERMPLASM =
 			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
 
-	private static final String GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS =
-			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
-
 	private static final String GET_LOTS_FOR_LIST_ENTRIES =
 			"SELECT lot.*, recordid, trnqty * -1, trnstat, trnid " + "FROM " + "   (" + LotDAO.GET_LOTS_FOR_GERMPLASM + "   ) lot "
 					+ " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid " + "  AND trnstat in (:statusList) AND trnqty < 0 "
 					+ "  AND sourceid = :listId AND sourcetype = 'LIST' ";
-
-	private static final String GET_LOTS_FOR_LIST =
-			"SELECT lot.*, recordid, trnqty * -1 , trnstat, trnid " + "FROM " + "   (" + LotDAO.GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS
-					+ "   ) lot " + " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid "
-					+ "  AND trnstat in (:statusList) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
 
 	private static final String GET_LOTS_STATUS_FOR_GERMPLASM = "SELECT i.lotid, COUNT(DISTINCT (act.trnstat)), act.trnstat"
 			+ " FROM ims_lot i LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9"
@@ -131,26 +105,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with getByEntityType(type=" + type + QUERY_FROM_LOT + e.getMessage(), e);
-		}
-		return new ArrayList<Lot>();
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Lot> getByEntityTypeEntityIdsLocationIdAndScaleId(String type, List<Integer> entityIds, Integer locationId, Integer scaleId)
-			throws MiddlewareQueryException {
-		try {
-			if (entityIds != null && !entityIds.isEmpty() && locationId != null) {
-				Criteria criteria = this.getSession().createCriteria(Lot.class);
-				criteria.add(Restrictions.eq(ENTITY_TYPE, type));
-				criteria.add(Restrictions.in(ENTITY_ID, entityIds));
-				criteria.add(Restrictions.eq(LOCATION_ID, locationId));
-				criteria.add(Restrictions.eq("scaleId", scaleId));
-				return criteria.list();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getByEntityTypeEntityIdLocationIdAndScaleId(type=" + type + ", entityIds=" + entityIds + LOCATION_ID2
-							+ locationId + ", scaleId=" + scaleId + QUERY_FROM_LOT + e.getMessage(), e);
 		}
 		return new ArrayList<Lot>();
 	}
@@ -243,7 +197,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 					"Error at getLotAggregateDataForListEntry for list ID = " + listId + " and GID = " + gid + AT_LOT_DAO + e.getMessage(),
 					e);
 		}
-
 		return lots;
 	}
 
@@ -681,6 +634,19 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				paramBuilder.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
 					+ " AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END)) <= :lastWithdrawalDateTo");
 				paramBuilder.setParameter("lastWithdrawalDateTo", DATE_FORMAT.format(lastWithdrawalDateTo));
+			}
+
+			final List<Integer> plantingStudyIds = lotsSearchDto.getPlantingStudyIds();
+			if (plantingStudyIds != null && !plantingStudyIds.isEmpty()) {
+				paramBuilder.append(" and exists(select 1 \n" //
+					+ " from project study_filter_p \n" //
+					+ "	    inner join project study_filter_plotdata on study_filter_p.project_id = study_filter_plotdata.study_id \n" //
+					+ "     inner join nd_experiment study_filter_nde on study_filter_plotdata.project_id = study_filter_nde.project_id \n"
+					+ "     inner join ims_experiment_transaction study_filter_iet on study_filter_nde.nd_experiment_id = study_filter_iet.nd_experiment_id \n"
+					+ "     inner join ims_transaction study_filter_transaction on study_filter_iet.trnid = study_filter_transaction.trnid \n"
+					+ "     inner join ims_lot study_filter_lot on study_filter_transaction.lotid = study_filter_lot.lotid \n" //
+					+ " where study_filter_p.project_id in (:plantingStudyIds) and study_filter_lot.lotid = lot.lotid)"); //
+				paramBuilder.setParameterList("plantingStudyIds", plantingStudyIds);
 			}
 		}
 	}

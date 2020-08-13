@@ -96,7 +96,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" , gpSeason.value as season ")
 							.append(" , siteId.value AS siteId")
 							.append(" , epropBlock.value AS blockNo ")
-							.append(" , ldp.group_name AS pedigree ")
 							.append (" , geo.obs_unit_id as obsUnitId ")
 							.append(" FROM ")
 							.append(" nd_experiment nde ")
@@ -130,8 +129,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("       AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 							.append(" LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 							.append("       AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
-							.append(" LEFT JOIN listnms lnms ON lnms.projectid = st.project_id AND lnms.listtype in ('STUDY')")
-							.append(" LEFT JOIN listdata_project ldp on ldp.list_id = lnms.listid AND ldp.entry_id = s.uniqueName AND ldp.germplasm_id  = s.dbxref_id")
 							.append(" WHERE st.project_id = :studyId")
 							.append(" ORDER BY casted_trialInstance, inst.description, nde.nd_experiment_id ").append(order);
 
@@ -141,7 +138,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.addScalar("instanceId").addScalar("siteName").addScalar("experimentId").addScalar("entryNumber")
 							.addScalar("germplasmName").addScalar("rep").addScalar("plotNo").addScalar("row").addScalar("col")
 							.addScalar("block_id").addScalar("trialInstance").addScalar("studyName").addScalar("gid")
-							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("pedigree").addScalar("obsUnitId",
+							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("obsUnitId",
 						StringType.INSTANCE);
 			query.setParameter("studyId", projectId);
 			final List<Object[]> list = query.list();
@@ -323,8 +320,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			label.setGid(gid);
 			label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
 			label.setSeason(Season.getSeason(season));
-			label.setPedigree((String) row[19]);
-			label.setObsUnitId((row[20] == null) ? "" : (String) row[20]);
+			label.setObsUnitId((row[19] == null) ? "" : (String) row[19]);
 			labels.add(label);
 
 			datasetId = (Integer) row[0];

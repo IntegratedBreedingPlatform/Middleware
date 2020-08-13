@@ -19,6 +19,7 @@ import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
+import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -29,6 +30,8 @@ import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmStudySource;
+import org.generationcp.middleware.pojos.GermplasmStudySourceType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
@@ -159,9 +162,10 @@ public class IntegrationTestDataInitializer {
 		return geolocation;
 	}
 
-	public List<ExperimentModel> createTestExperimentsWithStock(final DmsProject study, final DmsProject dataset, final ExperimentModel parent,
-													   final Geolocation geolocation,
-													   final int noOfExperiments) {
+	public List<ExperimentModel> createTestExperimentsWithStock(final DmsProject study, final DmsProject dataset,
+		final ExperimentModel parent,
+		final Geolocation geolocation,
+		final int noOfExperiments) {
 
 		final List<ExperimentModel> experimentModels = new ArrayList<>();
 
@@ -398,5 +402,24 @@ public class IntegrationTestDataInitializer {
 
 		return workbenchUser;
 
+	}
+
+	public GermplasmStudySource addGermplasmStudySource(final DmsProject study, final DmsProject plot, final Geolocation geolocation,
+		final String plotNumber,
+		final String replicationNumber) {
+		final StockModel stockModel = this.createTestStock(study);
+
+		final ExperimentModel experimentModel =
+			this.createExperimentModel(plot, geolocation, ExperimentType.PLOT.getTermId(), stockModel);
+
+		this.addExperimentProp(experimentModel, TermId.PLOT_NO.getId(), plotNumber, 1);
+		this.addExperimentProp(experimentModel, TermId.REP_NO.getId(), replicationNumber, 1);
+
+		final GermplasmStudySource germplasmStudySource =
+			new GermplasmStudySource(stockModel.getGermplasm(), study, experimentModel,
+				GermplasmStudySourceType.ADVANCE);
+		this.daoFactory.getGermplasmStudySourceDAO().save(germplasmStudySource);
+
+		return germplasmStudySource;
 	}
 }

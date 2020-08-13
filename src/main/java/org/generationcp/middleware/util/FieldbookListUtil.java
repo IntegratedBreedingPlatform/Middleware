@@ -9,9 +9,7 @@ import java.util.Map;
 
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.dms.StockModel;
 
 public class FieldbookListUtil {
 

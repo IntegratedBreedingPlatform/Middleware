@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="cuenyad" id="v15.4.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(*) FROM permission
+				where name = 'UPDATE_PENDING_TRANSACTIONS'
+            </sqlCheck>
+        </preConditions>
+        <comment>Rename update pending transactions permission by import transaction updates</comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE permission
+			SET
+				name = 'IMPORT_TRANSACTION_UPDATES',
+				description = 'Import Transaction Updates'
+			WHERE
+				name = 'UPDATE_PENDING_TRANSACTIONS'
+		</sql>
+    </changeSet>
+
+	<changeSet author="aldrin" id="v15.4.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'MS_CREATE_LOTS'
+			</sqlCheck>
+        </preConditions>
+        <comment>Create granular permissions for Manage studies: Create Lots</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_studies_id = (select permission_id from permission where name = 'MANAGE_STUDIES');
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'study_manager_fieldbook_web');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MS_CREATE_LOTS', 'Create Lots', @manage_studies_id, @sidebar_category_link_id);
+			set @ms_create_lots_id =  (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @ms_create_lots_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @ms_create_lots_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @ms_create_lots_id , 1);
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v15.4.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+				SELECT count(*) FROM permission WHERE name = 'UPDATE_LOT_BALANCE'
+            </sqlCheck>
+        </preConditions>
+        <comment>Add new permission to update lot balance</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @manage_lots_id = (select permission_id from permission where name = 'MANAGE_LOTS');
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('UPDATE_LOT_BALANCE', 'Update Balance', @manage_lots_id, null);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+		</sql>
+    </changeSet>
+
+	<changeSet author="darla" id="v15.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM r_package WHERE endpoint like 'https://opencpu.bms-uat-test.net%';
+			</sqlCheck>
+		</preConditions>
+		<comment>Update OpenCPU packages to use IBP AWS instance</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE r_package SET
+			endpoint = 'https://opencpu.bms-uat-test.net/ocpu/library/reshape/R/cast'
+			WHERE package_id = 1;
+
+			UPDATE r_package SET
+			endpoint = 'https://opencpu.bms-uat-test.net/ocpu/library/reshape/R/melt'
+			WHERE package_id = 2;
+
+			UPDATE r_package SET
+			endpoint = 'https://opencpu.bms-uat-test.net/ocpu/library/ggplot2/R/qplot'
+			WHERE package_id = 3;
+		</sql>
+	</changeSet>
+
+    <changeSet author="nahuel" id="v15.4.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(1) from workbench_tool where name = 'graphical_queries';
+            </sqlCheck>
+        </preConditions>
+        <comment>Move Graphical filtering and Study Comparison tools to a new "Graphical Queries" sub-menu</comment>
+        <sql dbms="mysql" splitStatements="true">
+            # Create new tool and side menu
+            insert into workbench_tool(name, group_name, title, version, tool_type, path)
+            values ('graphical_queries', 'graphical_queries', 'Graphical Queries', '15.4', 'WEB', '/ibpworkbench/controller/graphical-queries');
+            insert into workbench_sidebar_category_link(tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title)
+            values ('graphical_queries', 2, 'graphical_queries', 'Graphical Queries');
+
+            # Create new permission
+            set @information_management_id = (select permission_id from permission where name = 'INFORMATION_MANAGEMENT');
+            set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'graphical_queries');
+
+            insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+            values ('GRAPHICAL_QUERIES', 'Graphical Queries', @information_management_id, @sidebar_category_link_id);
+            set @last_permission_id = (select last_insert_id());
+            insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id, 1);
+            insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id, 1);
+            insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @last_permission_id, 1);
+
+            # associate new 'GRAPHICAL_QUERIES' permission to every role that has 'BROWSE_STUDIES'
+            insert into role_permission(role_id, permission_id)
+            select rp.role_id, @last_permission_id
+            from role_permission rp
+                     inner join permission p on rp.permission_id = p.permission_id
+            where p.name = 'BROWSE_STUDIES';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

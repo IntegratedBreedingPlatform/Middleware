@@ -11,11 +11,6 @@
 package org.generationcp.middleware.domain.inventory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.util.Util;
 
 /**
  * Row in Seed Inventory System that shows the details of ims_lot/transaction.
@@ -26,8 +21,7 @@ import org.generationcp.middleware.util.Util;
 public class InventoryDetails implements Comparable<InventoryDetails>, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	public static final String BULK_COMPL_Y = "Y";
-	public static final String BULK_COMPL_COMPLETED = "Completed";
+
 
 	/** The index. */
 	Integer index;
@@ -61,14 +55,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	/** The amount. */
 	Double amount;
 
-	/** The source id. */
-	// ims_transaction.source_id
-	Integer sourceId;
-
-	/** The source name. */
-	// if list, listnms.listname
-	String sourceName;
-
 	/** The scale id. */
 	Integer scaleId;
 
@@ -77,35 +63,9 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	String comment;
 
-	// listdata.grpname
-	String parentage;
-
-	// listdata.entryid
-	Integer entryId;
-
-	// listdata.source
-	String source;
-
-	String inventoryID;
-
 	/** The ff. fields are from seed inventory import */
 	private String entryCode;
 	private String cross;
-
-	/** The ff. fields are used for export inventory template for stock list */
-	private String duplicate;
-	private String bulkWith;
-	private String bulkCompl;
-	private List<String> bulkWithStockIds;
-
-	/** The ff. fields are used for importing inventory for stock list */
-	private Integer listDataProjectId;
-	private Integer trnId;
-
-	/** This is used for executing bulking instructions */
-	private Integer sourceRecordId;
-	private Integer lotGid;
-	private Integer stockSourceRecordId;
 
 	private Integer instanceNumber;
 	private Integer plotNumber;
@@ -129,13 +89,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @param locationName the location name
 	 * @param userId the user id
 	 * @param amount the amount
-	 * @param sourceId the source id
-	 * @param sourceName the source name
 	 * @param scaleId the scale id
 	 * @param scaleName the scale name
 	 */
 	public InventoryDetails(final Integer gid, final String germplasmName, final Integer lotId, final Integer locationId, final String locationName, final Integer userId,
-			final Double amount, final Integer sourceId, final String sourceName, final Integer scaleId, final String scaleName, final String comment) {
+			final Double amount, final Integer scaleId, final String scaleName, final String comment) {
 		this.gid = gid;
 		this.germplasmName = germplasmName;
 		this.lotId = lotId;
@@ -143,35 +101,9 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.locationName = locationName;
 		this.userId = userId;
 		this.amount = amount;
-		this.sourceId = sourceId;
-		this.sourceName = sourceName;
 		this.scaleId = scaleId;
 		this.scaleName = scaleName;
 		this.comment = comment;
-	}
-
-	public InventoryDetails(final Integer gid, final String germplasmName, final Integer locationId, final Integer userId, final Double amount, final Integer sourceId,
-			final Integer scaleId, final Integer entryId) {
-		this.gid = gid;
-		this.germplasmName = germplasmName;
-		this.locationId = locationId;
-		this.userId = userId;
-		this.amount = amount;
-		this.sourceId = sourceId;
-		this.scaleId = scaleId;
-		this.entryId = entryId;
-	}
-
-	public InventoryDetails(final Integer entryId, final String desig, final Integer gid, final String cross, final String source, final String entryCode, final String stockId,
-			final Double seedQuantity) {
-		this.entryId = entryId;
-		this.germplasmName = desig;
-		this.gid = gid;
-		this.cross = cross;
-		this.source = source;
-		this.entryCode = entryCode;
-		this.inventoryID = stockId;
-		this.amount = seedQuantity;
 	}
 
 	/**
@@ -191,15 +123,9 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the gid
 	 */
 	public Integer getGid() {
-		if (this.isBulkingDonor()) {
-			return null;
-		}
 		return this.gid;
 	}
 
-	public boolean isBulkingDonor() {
-		return this.isBulkingCompleted() && !this.sourceRecordId.equals(this.stockSourceRecordId);
-	}
 
 	/**
 	 * Sets the gid.
@@ -216,9 +142,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the germplasm name
 	 */
 	public String getGermplasmName() {
-		if (this.isBulkingDonor()) {
-			return null;
-		}
 		return this.germplasmName;
 	}
 
@@ -322,42 +245,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	/**
-	 * Gets the source id.
-	 *
-	 * @return the source id
-	 */
-	public Integer getSourceId() {
-		return this.sourceId;
-	}
-
-	/**
-	 * Sets the source id.
-	 *
-	 * @param sourceId the new source id
-	 */
-	public void setSourceId(final Integer sourceId) {
-		this.sourceId = sourceId;
-	}
-
-	/**
-	 * Gets the source name.
-	 *
-	 * @return the source name
-	 */
-	public String getSourceName() {
-		return this.sourceName;
-	}
-
-	/**
-	 * Sets the source name.
-	 *
-	 * @param sourceName the new source name
-	 */
-	public void setSourceName(final String sourceName) {
-		this.sourceName = sourceName;
-	}
-
-	/**
 	 * Gets the scale id.
 	 *
 	 * @return the scale id
@@ -437,30 +324,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.comment = comment;
 	}
 
-	public String getParentage() {
-		return this.parentage;
-	}
-
-	public void setParentage(final String parentage) {
-		this.parentage = parentage;
-	}
-
-	public Integer getEntryId() {
-		return this.entryId;
-	}
-
-	public void setEntryId(final Integer entryId) {
-		this.entryId = entryId;
-	}
-
-	public String getSource() {
-		return this.source;
-	}
-
-	public void setSource(final String source) {
-		this.source = source;
-	}
-
 	public String getLocationAbbr() {
 		return this.locationAbbr;
 	}
@@ -483,19 +346,14 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		int result = 1;
 		result = prime * result + (this.amount == null ? 0 : this.amount.hashCode());
 		result = prime * result + (this.comment == null ? 0 : this.comment.hashCode());
-		result = prime * result + (this.entryId == null ? 0 : this.entryId.hashCode());
 		result = prime * result + (this.germplasmName == null ? 0 : this.germplasmName.hashCode());
 		result = prime * result + (this.gid == null ? 0 : this.gid.hashCode());
 		result = prime * result + (this.index == null ? 0 : this.index.hashCode());
 		result = prime * result + (this.locationId == null ? 0 : this.locationId.hashCode());
 		result = prime * result + (this.locationName == null ? 0 : this.locationName.hashCode());
 		result = prime * result + (this.lotId == null ? 0 : this.lotId.hashCode());
-		result = prime * result + (this.parentage == null ? 0 : this.parentage.hashCode());
 		result = prime * result + (this.scaleId == null ? 0 : this.scaleId.hashCode());
 		result = prime * result + (this.scaleName == null ? 0 : this.scaleName.hashCode());
-		result = prime * result + (this.source == null ? 0 : this.source.hashCode());
-		result = prime * result + (this.sourceId == null ? 0 : this.sourceId.hashCode());
-		result = prime * result + (this.sourceName == null ? 0 : this.sourceName.hashCode());
 		result = prime * result + (this.userId == null ? 0 : this.userId.hashCode());
 		result = prime * result + (this.userName == null ? 0 : this.userName.hashCode());
 		return result;
@@ -525,13 +383,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 				return false;
 			}
 		} else if (!this.comment.equals(other.comment)) {
-			return false;
-		}
-		if (this.entryId == null) {
-			if (other.entryId != null) {
-				return false;
-			}
-		} else if (!this.entryId.equals(other.entryId)) {
 			return false;
 		}
 		if (this.germplasmName == null) {
@@ -576,13 +427,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		} else if (!this.lotId.equals(other.lotId)) {
 			return false;
 		}
-		if (this.parentage == null) {
-			if (other.parentage != null) {
-				return false;
-			}
-		} else if (!this.parentage.equals(other.parentage)) {
-			return false;
-		}
 		if (this.scaleId == null) {
 			if (other.scaleId != null) {
 				return false;
@@ -595,27 +439,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 				return false;
 			}
 		} else if (!this.scaleName.equals(other.scaleName)) {
-			return false;
-		}
-		if (this.source == null) {
-			if (other.source != null) {
-				return false;
-			}
-		} else if (!this.source.equals(other.source)) {
-			return false;
-		}
-		if (this.sourceId == null) {
-			if (other.sourceId != null) {
-				return false;
-			}
-		} else if (!this.sourceId.equals(other.sourceId)) {
-			return false;
-		}
-		if (this.sourceName == null) {
-			if (other.sourceName != null) {
-				return false;
-			}
-		} else if (!this.sourceName.equals(other.sourceName)) {
 			return false;
 		}
 		if (this.userId == null) {
@@ -656,22 +479,12 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		builder.append(this.userName);
 		builder.append(", amount=");
 		builder.append(this.amount);
-		builder.append(", sourceId=");
-		builder.append(this.sourceId);
-		builder.append(", sourceName=");
-		builder.append(this.sourceName);
 		builder.append(", scaleId=");
 		builder.append(this.scaleId);
 		builder.append(", scaleName=");
 		builder.append(this.scaleName);
 		builder.append(", comment=");
 		builder.append(this.comment);
-		builder.append(", parentage=");
-		builder.append(this.parentage);
-		builder.append(", entryId=");
-		builder.append(this.entryId);
-		builder.append(", source=");
-		builder.append(this.source);
 		builder.append(", instanceNumber=");
 		builder.append(this.instanceNumber);
 		builder.append(", plotNumber=");
@@ -686,24 +499,9 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	public int compareTo(final InventoryDetails o) {
 		if (this.gid != null && o != null) {
 
-			return this.entryId.compareTo(o.entryId);
+			return this.gid.compareTo(o.gid);
 		}
 		return 0;
-	}
-
-	public String getInventoryID() {
-		if (this.isBulkingRecipient()) {
-			return Util.prependToCSVAndArrange(this.inventoryID, this.bulkWith);
-		}
-		return this.inventoryID;
-	}
-
-	public boolean isBulkingRecipient() {
-		return this.isBulkingCompleted() && this.sourceRecordId.equals(this.stockSourceRecordId);
-	}
-
-	public void setInventoryID(final String inventoryID) {
-		this.inventoryID = inventoryID;
 	}
 
 	public String getEntryCode() {
@@ -722,96 +520,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.cross = cross;
 	}
 
-	public void copyFromGermplasmListData(final GermplasmListData datum) {
-		this.gid = datum.getGid();
-		this.setGermplasmName(datum.getDesignation());
-		this.setEntryId(datum.getEntryId());
-		this.setParentage(datum.getGroupName());
-		this.setSource(datum.getSeedSource());
-	}
-
-	public String getDuplicate() {
-		return this.duplicate;
-	}
-
-	public void setDuplicate(final String duplicate) {
-		this.duplicate = duplicate;
-	}
-
-	public String getBulkWith() {
-		return this.bulkWith;
-	}
-
-	public void setBulkWith(final String bulkWith) {
-		this.bulkWith = bulkWith;
-		this.bulkWithStockIds = new ArrayList<>();
-	}
-
-	public String getBulkCompl() {
-		return this.bulkCompl;
-	}
-
-	public void setBulkCompl(final String bulkCompl) {
-		this.bulkCompl = bulkCompl;
-	}
-
-	public Integer getListDataProjectId() {
-		return this.listDataProjectId;
-	}
-
-	public void setListDataProjectId(final Integer listDataProjectId) {
-		this.listDataProjectId = listDataProjectId;
-	}
-
-	public Integer getTrnId() {
-		return this.trnId;
-	}
-
-	public void setTrnId(final Integer trnId) {
-		this.trnId = trnId;
-	}
-
-	public Integer getSourceRecordId() {
-		return this.sourceRecordId;
-	}
-
-	public void setSourceRecordId(final Integer sourceRecordId) {
-		this.sourceRecordId = sourceRecordId;
-	}
-
-	public Integer getLotGid() {
-		return this.lotGid;
-	}
-
-	public void setLotGid(final Integer lotGid) {
-		this.lotGid = lotGid;
-	}
-
-	public void addBulkWith(final String bulkWith) {
-		if (bulkWith.equals(this.inventoryID)) {
-			return;
-		}
-		if (this.bulkWith == null) {
-			this.bulkWith = bulkWith;
-			this.bulkWithStockIds = new ArrayList<>();
-			this.bulkWithStockIds.add(bulkWith);
-		} else if (!this.bulkWithStockIds.contains(bulkWith)) {
-			this.bulkWith += ", " + bulkWith;
-			this.bulkWithStockIds.add(bulkWith);
-		}
-	}
-
-	public boolean isBulkingCompleted() {
-		return InventoryDetails.BULK_COMPL_COMPLETED.equals(this.bulkCompl);
-	}
-
-	public Integer getStockSourceRecordId() {
-		return this.stockSourceRecordId;
-	}
-
-	public void setStockSourceRecordId(final Integer stockSourceRecordId) {
-		this.stockSourceRecordId = stockSourceRecordId;
-	}
 
 	public Integer getInstanceNumber() {
 		return this.instanceNumber;
@@ -835,10 +543,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	public void setReplicationNumber(final Integer replicationNumber) {
 		this.replicationNumber = replicationNumber;
-	}
-
-	public List<String> getBulkWithStockIds() {
-		return this.bulkWithStockIds;
 	}
 
 	public Integer getGroupId() {

@@ -23,6 +23,10 @@ import javax.persistence.Table;
 @AutoProperty
 public class GermplasmStudySource {
 
+	public GermplasmStudySource() {
+		// Default constructor
+	}
+
 	public GermplasmStudySource(final Germplasm germplasm, final DmsProject study, final ExperimentModel experimentModel,
 		final GermplasmStudySourceType germplasmStudySourceType) {
 		this.germplasm = germplasm;
@@ -34,7 +38,9 @@ public class GermplasmStudySource {
 	public GermplasmStudySource(final GermplasmStudySourceInput input) {
 		this.germplasm = new Germplasm(input.getGid());
 		this.study = new DmsProject(input.getStudyId());
-		this.experimentModel = new ExperimentModel(input.getObservationUnitId());
+		if (input.getObservationUnitId() != null) {
+			this.experimentModel = new ExperimentModel(input.getObservationUnitId());
+		}
 		this.germplasmStudySourceType = input.getType();
 	}
 

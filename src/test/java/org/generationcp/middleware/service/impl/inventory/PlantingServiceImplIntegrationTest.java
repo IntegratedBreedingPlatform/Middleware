@@ -5,8 +5,14 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
+import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
+import org.generationcp.middleware.dao.ims.LotDAO;
+import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.inventory.planting.PlantingRequestDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -289,6 +295,29 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(transactions.size(), equalTo(2));
 		assertThat(transactions.get(0).getQuantity(), equalTo(-50D));
 		assertThat(transactions.get(1).getQuantity(), equalTo(-50D));
+
+		// Verify using other channels
+
+		final TransactionDAO transactionDAO = this.daoFactory.getTransactionDAO();
+
+		// Transaction search
+		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+		transactionsSearchDto.setPlantingStudyIds(Collections.singletonList(studyId));
+		transactionsSearchDto.setTransactionTypes(Collections.singletonList(TransactionType.WITHDRAWAL.getId()));
+		transactionsSearchDto.setTransactionStatus(Collections.singletonList(TransactionStatus.CONFIRMED.getIntValue()));
+		final List<TransactionDto> transactionDtos = transactionDAO.searchTransactions(transactionsSearchDto, null);
+
+		assertThat(transactionDtos.size(), equalTo(transactions.size()));
+		assertThat(transactionDtos.get(0).getTransactionId(), equalTo(transactions.get(0).getId()));
+		assertThat(transactionDtos.get(1).getTransactionId(), equalTo(transactions.get(1).getId()));
+
+		// Study transaction search
+		final StudyTransactionsRequest studyTransactionsRequest = new StudyTransactionsRequest();
+		final List<StudyTransactionsDto> studyTransactionsDtos = transactionDAO.searchStudyTransactions(studyId, studyTransactionsRequest);
+
+		assertThat(studyTransactionsDtos.size(), equalTo(transactions.size()));
+		assertThat(studyTransactionsDtos.get(0).getTransactionId(), equalTo(transactions.get(0).getId()));
+		assertThat(studyTransactionsDtos.get(1).getTransactionId(), equalTo(transactions.get(1).getId()));
 
 	}
 

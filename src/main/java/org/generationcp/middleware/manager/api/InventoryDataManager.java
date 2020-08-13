@@ -19,7 +19,6 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -134,13 +133,6 @@ public interface InventoryDataManager {
 	List<Transaction> getAllTransactions(int start, int numOfRows);
 
 	/**
-	 *
-	 * @param listDataProjectListID
-	 * @return
-	 */
-	boolean transactionsExistForListProjectDataListID(Integer listDataProjectListID);
-
-	/**
 	 * Returns lot rows and aggregate inventory data for given list entry
 	 *
 	 * @param listId
@@ -182,11 +174,10 @@ public interface InventoryDataManager {
 	 * Return the germplasm entries of given entry IDs of specific list with lot counts such as # of lots with available balance and # of
 	 * lots with reserved seed per entry
 	 *
-	 * @param listId
 	 * @param entryIds
 	 * @return
 	 */
-	List<GermplasmListData> getLotCountsForListEntries(Integer listId, List<Integer> entryIds);
+	List<GermplasmListData> getLotCountsForListEntries(List<Integer> entryIds);
 
 	/**
 	 * Adds in inventory related information into an existing {@link GermplasmList}
@@ -194,15 +185,7 @@ public interface InventoryDataManager {
 	 */
 	void populateLotCountsIntoExistingList(GermplasmList germplasmList);
 
-	Integer addStockTransaction(StockTransaction stockTransaction);
-
 	List<String> getSimilarStockIds(List<String> stockIDs);
-
-	List<String> getStockIdsByListDataProjectListId(Integer listId);
-
-	Map<String, Double>  getStockIdsWithMultipleTransactions(Integer listId);
-
-	void updateInventory(Integer listId, List<InventoryDetails> inventoryDetailListFromDB);
 
 	Lot getLotById(Integer id);
 

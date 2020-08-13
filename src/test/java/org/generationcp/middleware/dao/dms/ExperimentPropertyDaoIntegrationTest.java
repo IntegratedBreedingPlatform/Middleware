@@ -110,6 +110,7 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 		assertEquals("General", fieldMapLabel.getSeason().getLabel());
 		assertEquals("Study1", fieldMapLabel.getStudyName());
 		assertEquals(1, fieldMapLabel.getPlotNo().intValue());
+		assertEquals("Range " + fieldMapLabel.getRange() + " Col " + fieldMapLabel.getColumn() , fieldMapLabel.getPlotCoordinate()) ;
 
 	}
 

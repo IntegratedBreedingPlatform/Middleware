@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -323,13 +324,12 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		// Delete Instance 3 - should throw exception
 		final Integer instance3LocationId = instance3.getLocationId();
-		this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance3LocationId));
-
-		studyInstances =
-			this.studyInstanceService.getStudyInstances(studyId);
-		Assert.assertEquals(0, studyInstances.size());
-		Assert.assertNull(this.daoFactory.getGeolocationDao().getById(instance3LocationId));
-		Assert.assertTrue(CollectionUtils.isEmpty(this.daoFactory.getGeolocationPropertyDao().getByGeolocation(instance3LocationId)));
+		try {
+			this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance3LocationId));
+			Assert.fail("Should have thrown exception when attempting to delete last environment.");
+		} catch (final MiddlewareQueryException e) {
+			// Perform assertions outside
+		}
 	}
 
 	@Test

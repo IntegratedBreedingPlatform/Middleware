@@ -11,12 +11,8 @@
 
 package org.generationcp.middleware.service.api;
 
-import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.workbench.CropType;
 
 import java.util.List;
 
@@ -43,21 +39,6 @@ public interface InventoryService {
 	 */
 	List<InventoryDetails> getInventoryDetails(Integer studyId);
 
-	/**
-	 * Gets the inventory details by germplasm list.
-	 *
-	 * @param listId the list id
-	 * @return the inventory details by germplasm list
-	 */
-	List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId, String germplasmListType);
-
-	/**
-	 * Gets the inventory details by germplasm list.
-	 *
-	 * @param listId the list id
-	 * @return the inventory details by germplasm list
-	 */
-	List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId);
 
 	/**
 	 * This method gets the maximum notation number of the existing stock IDs. For example, if there are existing stock IDs: SID1-1, SID1-2,
@@ -65,16 +46,4 @@ public interface InventoryService {
 	 * existing stock IDs with matching breeder identifier, 0 is returned.
 	 */
 	Integer getCurrentNotationNumberForBreederIdentifier(String breederIdentifier);
-
-	void addLotAndTransaction(
-		InventoryDetails details, GermplasmListData listData, ListDataProject listDataProject,
-		final CropType cropType);
-
-	List<InventoryDetails> getInventoryListByListDataProjectListId(Integer listDataProjectListId);
-
-	List<InventoryDetails> getSummedInventoryListByListDataProjectListId(Integer listDataProjectListId, GermplasmListType type);
-
-	boolean stockHasCompletedBulking(Integer listId);
-
-	Lot getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(String entityType, Integer entityId, Integer locationId, Integer scaleId);
 }

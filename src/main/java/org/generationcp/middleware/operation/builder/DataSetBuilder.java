@@ -14,7 +14,6 @@ package org.generationcp.middleware.operation.builder;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -34,7 +33,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -145,12 +143,11 @@ public class DataSetBuilder extends Builder {
 
 	public Workbook buildCompleteDataset(final int datasetId) {
 		final DataSet dataset = this.build(datasetId);
-		final List<Integer> siblingVariables = this.getVariablesOfSiblingDatasets(datasetId);
 		final boolean isMeasurementDataset =
 			(dataset.getDatasetType() != null) ? dataset.getDatasetType().isObservationType() : Boolean.FALSE;
 		VariableTypeList variables;
 		if (isMeasurementDataset) {
-			variables = this.filterVariables(dataset.getVariableTypes(), siblingVariables);
+			variables = this.filterVariables(dataset.getVariableTypes());
 		} else {
 			variables = dataset.getVariableTypes();
 		}
@@ -197,15 +194,12 @@ public class DataSetBuilder extends Builder {
 		return newVariables;
 	}
 
-	private List<Integer> getVariablesOfSiblingDatasets(final int datasetId) {
-		return this.getProjectPropertyDao().getVariablesOfSiblingDatasets(datasetId);
-	}
-
-	private VariableTypeList filterVariables(final VariableTypeList variables, final List<Integer> filters) {
+	public VariableTypeList filterVariables(final VariableTypeList variables) {
 		final VariableTypeList newList = new VariableTypeList();
 		if (variables != null && !variables.getVariableTypes().isEmpty()) {
 			for (final DMSVariableType variable : variables.getVariableTypes()) {
-				if (!filters.contains(variable.getId()) || variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+				if (!PhenotypicType.DATASET.equals(variable.getStandardVariable().getPhenotypicType()) &&
+					!PhenotypicType.STUDY.equals(variable.getStandardVariable().getPhenotypicType())) {
 					newList.add(variable);
 				}
 			}

@@ -284,35 +284,6 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		Assert.assertTrue(designFactors.contains(variable5.getName()));
 	}
 
-	@Test
-	public void testGetVariablesOfSiblingDatasets() {
-		final DmsProject plotDataset = this.saveDataset(DatasetTypeEnum.PLOT_DATA);
-		final DmsProject trialDataset = this.saveDataset(DatasetTypeEnum.SUMMARY_DATA);
-		final CVTerm variable1 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
-		final CVTerm variable2 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
-		final CVTerm variable3 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
-		final CVTerm variable4 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
-		this.cvTermDao.save(variable1);
-		this.cvTermDao.save(variable2);
-		this.cvTermDao.save(variable3);
-		this.cvTermDao.save(variable4);
-
-		this.saveProjectVariable(plotDataset, variable1, 1, VariableType.GERMPLASM_DESCRIPTOR);
-		this.saveProjectVariable(plotDataset, variable2, 2, VariableType.TRAIT);
-		this.saveProjectVariable(trialDataset, variable3, 1, VariableType.GERMPLASM_DESCRIPTOR);
-		this.saveProjectVariable(trialDataset, variable4, 2, VariableType.EXPERIMENTAL_DESIGN);
-
-		List<Integer> variableIds = this.projectPropDao.getVariablesOfSiblingDatasets(plotDataset.getProjectId());
-		Assert.assertNotNull(variableIds);
-		Assert.assertFalse(variableIds.isEmpty());
-		Assert.assertEquals(Arrays.asList(variable3.getCvTermId(), variable4.getCvTermId()), variableIds);
-
-		variableIds = this.projectPropDao.getVariablesOfSiblingDatasets(trialDataset.getProjectId());
-		Assert.assertNotNull(variableIds);
-		Assert.assertFalse(variableIds.isEmpty());
-		Assert.assertEquals(Arrays.asList(variable1.getCvTermId(), variable2.getCvTermId()), variableIds);
-	}
-
 	private DmsProject saveDataset(final DatasetTypeEnum datasetType) {
 		final DmsProject dataset = new DmsProject();
 		dataset.setName(RandomStringUtils.randomAlphabetic(20));
