@@ -169,11 +169,9 @@
 
 	<changeSet author="mderamos" id="v15.4.0-7">
 		<preConditions onFail="MARK_RAN">
-            <and>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="germplasm_study_source_gid_fk"></foreignKeyConstraintExists>
-                </not>
-            </and>
+            <not>
+				<foreignKeyConstraintExists foreignKeyName="germplasm_study_source_gid_fk"></foreignKeyConstraintExists>
+			</not>
 		</preConditions>
 		<comment>Delete germplasm_study_source entries with no germplsm</comment>
 		<sql dbms="mysql" splitStatements="true">
