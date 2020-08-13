@@ -1651,13 +1651,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<Germplasm> getExistingCrosses(final Integer femaleParent, final int methodId, final List<Integer> maleParentIds,
+	public List<Germplasm> getExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
 		try {
 			final StringBuilder builder = this.buildGetExistingCrossesQueryString(maleParentIds, gid);
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(builder.toString());
 			sqlQuery.setParameterList("maleParentIds", maleParentIds);
-			sqlQuery.setParameter("methodId", methodId);
 			sqlQuery.setParameter("femaleParentId", femaleParent);
 			if(gid.isPresent()) {
 				sqlQuery.setParameter("gid", gid.get());
@@ -1707,7 +1706,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public void addCommonWhereConditions(final Optional<Integer> gid, final StringBuilder builder) {
-		builder.append("WHERE g.deleted = 0 AND g.methn = :methodId AND g.gpid1 = :femaleParentId ");
+		builder.append("WHERE g.deleted = 0 AND g.gpid1 = :femaleParentId ");
 		// Crosses created using design crosses are saved before going back to the FB module,
 		// this code excludes the pre-created germplasm from the results
 		if(gid.isPresent()) {
@@ -1715,7 +1714,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public boolean hasExistingCrosses(final Integer femaleParent, final int methodId, final List<Integer> maleParentIds,
+	public boolean hasExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
 		try {
 			final StringBuilder builder = new StringBuilder();
@@ -1724,7 +1723,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			builder.append(") EXISTING_CROSSES");
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(builder.toString());
 			sqlQuery.setParameterList("maleParentIds", maleParentIds);
-			sqlQuery.setParameter("methodId", methodId);
 			sqlQuery.setParameter("femaleParentId", femaleParent);
 			if(gid.isPresent()) {
 				sqlQuery.setParameter("gid", gid.get());

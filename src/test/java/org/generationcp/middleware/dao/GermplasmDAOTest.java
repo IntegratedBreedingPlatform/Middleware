@@ -879,9 +879,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(maleParent);
 		final Germplasm existingCross = GermplasmTestDataInitializer.createGermplasm(20150101, femaleParent.getGid(), maleParent.getGid(), 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.dao.save(existingCross);
-		Assert.assertTrue(this.dao.hasExistingCrosses(femaleParent.getGid(), 1, Collections.singletonList(maleParent.getGid()), Optional.empty()));
+		Assert.assertTrue(this.dao.hasExistingCrosses(femaleParent.getGid(), Collections.singletonList(maleParent.getGid()), Optional.empty()));
 		//Check if self is excluded
-		Assert.assertFalse(this.dao.hasExistingCrosses(femaleParent.getGid(), 1, Collections.singletonList(maleParent.getGid()), Optional.of(existingCross.getGid())));
+		Assert.assertFalse(this.dao.hasExistingCrosses(femaleParent.getGid(), Collections.singletonList(maleParent.getGid()), Optional.of(existingCross.getGid())));
 	}
 
 	@Test
@@ -895,9 +895,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm maleParent2 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.dao.save(maleParent2);
 		this.progenitorDao.save(new Progenitor(existingCross, 3, maleParent2.getGid()));
-		Assert.assertTrue(this.dao.hasExistingCrosses(femaleParent.getGid(), 1, Arrays.asList(maleParent1.getGid(), maleParent2.getGid()), Optional.empty()));
+		Assert.assertTrue(this.dao.hasExistingCrosses(femaleParent.getGid(), Arrays.asList(maleParent1.getGid(), maleParent2.getGid()), Optional.empty()));
 		//Check if self is excluded
-		Assert.assertFalse(this.dao.hasExistingCrosses(femaleParent.getGid(), 1, Arrays.asList(maleParent1.getGid(), maleParent2.getGid()),  Optional.of(existingCross.getGid())));
+		Assert.assertFalse(this.dao.hasExistingCrosses(femaleParent.getGid(), Arrays.asList(maleParent1.getGid(), maleParent2.getGid()),  Optional.of(existingCross.getGid())));
 	}
 
 	@Test
@@ -908,10 +908,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(maleParent);
 		final Germplasm existingCross = GermplasmTestDataInitializer.createGermplasm(20150101, femaleParent.getGid(), maleParent.getGid(), 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.dao.save(existingCross);
-		List<Germplasm> existingCrosses = this.dao.getExistingCrosses(femaleParent.getGid(), 1, Collections.singletonList(maleParent.getGid()), Optional.empty());
+		List<Germplasm> existingCrosses = this.dao.getExistingCrosses(femaleParent.getGid(), Collections.singletonList(maleParent.getGid()), Optional.empty());
 		Assert.assertEquals(existingCross.getGid(), existingCrosses.get(0).getGid());
 		//Check if self is excluded
-		existingCrosses = this.dao.getExistingCrosses(femaleParent.getGid(), 1, Collections.singletonList(maleParent.getGid()),  Optional.of(existingCross.getGid()));
+		existingCrosses = this.dao.getExistingCrosses(femaleParent.getGid(), Collections.singletonList(maleParent.getGid()),  Optional.of(existingCross.getGid()));
 		Assert.assertTrue(existingCrosses.isEmpty());
 	}
 
@@ -926,10 +926,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm maleParent2 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.dao.save(maleParent2);
 		this.progenitorDao.save(new Progenitor(existingCross, 3, maleParent2.getGid()));
-		List<Germplasm> existingCrosses = this.dao.getExistingCrosses(femaleParent.getGid(), 1, Arrays.asList(maleParent1.getGid(), maleParent2.getGid()), Optional.empty());
+		List<Germplasm> existingCrosses = this.dao.getExistingCrosses(femaleParent.getGid(), Arrays.asList(maleParent1.getGid(), maleParent2.getGid()), Optional.empty());
 		Assert.assertEquals(existingCross.getGid(), existingCrosses.get(0).getGid());
 		//Check if self is excluded
-		existingCrosses = this.dao.getExistingCrosses(femaleParent.getGid(), 1, Arrays.asList(maleParent1.getGid(), maleParent2.getGid()),  Optional.of(existingCross.getGid()));
+		existingCrosses = this.dao.getExistingCrosses(femaleParent.getGid(),Arrays.asList(maleParent1.getGid(), maleParent2.getGid()),  Optional.of(existingCross.getGid()));
 		Assert.assertTrue(existingCrosses.isEmpty());
 	}
 

@@ -1577,15 +1577,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getExistingCrosses(final Integer femaleParent, final int methodId, final List<Integer> maleParentIds,
+	public List<Germplasm> getExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
-		return this.getGermplasmDao().getExistingCrosses(femaleParent, methodId, maleParentIds, gid);
+		return this.getGermplasmDao().getExistingCrosses(femaleParent, maleParentIds, gid);
 	}
 
 	@Override
-	public boolean hasExistingCrosses(final Integer femaleParent, final int methodId, final List<Integer> maleParentIds,
+	public boolean hasExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
-		return this.getGermplasmDao().hasExistingCrosses(femaleParent, methodId, maleParentIds, gid);
+		return this.getGermplasmDao().hasExistingCrosses(femaleParent, maleParentIds, gid);
 	}
 }
 
