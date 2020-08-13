@@ -636,7 +636,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	public List<StudyTransactionsDto> searchStudyTransactions(
 		final Integer studyId,
-		final StudyTransactionsRequest studyTransactionsRequest, final PageRequest pageRequest) {
+		final StudyTransactionsRequest studyTransactionsRequest, final Pageable pageable) {
 
 		final TransactionsSearchDto transactionsSearch = studyTransactionsRequest.getTransactionsSearch();
 
@@ -644,7 +644,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQueryFilterSql), studyTransactionsRequest);
 
 		final StringBuilder transactionsQuerySql = this.buildStudyTransactionsQuery(transactionsSearch, obsUnitsQueryFilterSql);
-		addPageRequestOrderBy(transactionsQuerySql, pageRequest);
+		addPageRequestOrderBy(transactionsQuerySql, pageable);
 
 		// transactions data
 		final SQLQuery transactionsQuery = this.getSession().createSQLQuery(transactionsQuerySql.toString());
@@ -653,7 +653,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		addSearchTransactionsFilters(paramBuilder, transactionsSearch);
 		addObsUnitFilters(paramBuilder, studyTransactionsRequest);
 		this.excludeCancelledTransactions(paramBuilder);
-		addPaginationToSQLQuery(transactionsQuery, pageRequest);
+		addPaginationToSQLQuery(transactionsQuery, pageable);
 		this.addSearchTransactionsQueryScalars(transactionsQuery);
 		transactionsQuery.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getStudyTransactionsDtoConstructor()));
 		final List<StudyTransactionsDto> transactions = transactionsQuery.list();

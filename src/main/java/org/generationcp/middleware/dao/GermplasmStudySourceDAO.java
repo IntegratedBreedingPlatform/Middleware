@@ -12,7 +12,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
@@ -61,12 +61,12 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 	}
 
 	public List<GermplasmStudySourceDto> getGermplasmStudySourceList(
-		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest, final PageRequest pageRequest) {
+		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest, final Pageable pageable) {
 
 		final StringBuilder sql = new StringBuilder(GERMPLASM_STUDY_SOURCE_SEARCH_QUERY);
 		addSearchQueryFilters(new SqlQueryParamBuilder(sql), germplasmStudySourceSearchRequest.getFilter());
 		addGroupByAndLotsFilter(new SqlQueryParamBuilder(sql), germplasmStudySourceSearchRequest.getFilter());
-		addPageRequestOrderBy(sql, pageRequest, GermplasmStudySourceSearchRequest.Filter.SORTABLE_FIELDS);
+		addPageRequestOrderBy(sql, pageable, GermplasmStudySourceSearchRequest.Filter.SORTABLE_FIELDS);
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 		addSearchQueryFilters(new SqlQueryParamBuilder(query), germplasmStudySourceSearchRequest.getFilter());
@@ -87,7 +87,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		query.addScalar("numberOfLots", new IntegerType());
 		query.setParameter("studyId", germplasmStudySourceSearchRequest.getStudyId());
 
-		addPaginationToSQLQuery(query, pageRequest);
+		addPaginationToSQLQuery(query, pageable);
 
 		query.setResultTransformer(Transformers.aliasToBean(GermplasmStudySourceDto.class));
 		return query.list();

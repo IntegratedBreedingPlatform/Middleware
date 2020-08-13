@@ -1,6 +1,5 @@
 package org.generationcp.middleware.service.api.study;
 
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.pojomatic.Pojomatic;
 
 import java.util.Arrays;

@@ -24,7 +24,7 @@ import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -349,12 +349,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return result;
 	}
 
-	public List<ObservationUnitRow> getObservationUnitTable(final ObservationUnitsSearchDTO searchDto, final PageRequest pageRequest) {
+	public List<ObservationUnitRow> getObservationUnitTable(final ObservationUnitsSearchDTO searchDto, final Pageable pageable) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
 				searchDto,
-				observationVariableName, pageRequest);
+				observationVariableName, pageable);
 			return this.convertToObservationUnitRows(results, searchDto, observationVariableName);
 		} catch (final Exception e) {
 			ObservationUnitsSearchDao.LOG.error(e.getMessage(), e);
@@ -363,7 +363,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	public List<Map<String, Object>> getObservationUnitTableMapList(final ObservationUnitsSearchDTO searchDto, final PageRequest pageRequest) {
+	public List<Map<String, Object>> getObservationUnitTableMapList(final ObservationUnitsSearchDTO searchDto,
+		final PageRequest pageRequest) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
 			return this.getObservationUnitTableAsMapListResult(
@@ -378,12 +379,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO searchDto,
-		final String observationVariableName, final PageRequest pageRequest) {
+		final String observationVariableName, final Pageable pageable) {
 		try {
 
-			final String observationUnitTableQuery = this.getObservationUnitTableQuery(searchDto, observationVariableName, pageRequest);
+			final String observationUnitTableQuery = this.getObservationUnitTableQuery(searchDto, observationVariableName, pageable);
 			final SQLQuery query = this.createQueryAndAddScalar(searchDto, observationUnitTableQuery);
-			this.setParameters(searchDto, query, pageRequest);
+			this.setParameters(searchDto, query, pageable);
 			return query.list();
 
 		} catch (final Exception e) {
@@ -393,7 +394,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	private void setParameters(final ObservationUnitsSearchDTO searchDto, final SQLQuery query, final PageRequest pageRequest) {
+	private void setParameters(final ObservationUnitsSearchDTO searchDto, final SQLQuery query, final Pageable pageable) {
 		query.setParameter("datasetId", searchDto.getDatasetId());
 
 		if (searchDto.getInstanceId() != null) {
@@ -406,7 +407,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		addQueryParams(query, searchDto.getFilter());
 
-		addPaginationToSQLQuery(query, pageRequest);
+		addPaginationToSQLQuery(query, pageable);
 
 		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 	}
@@ -461,7 +462,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private String getObservationUnitTableQuery(
-		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName, final PageRequest pageRequest) {
+		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName, final Pageable pageable) {
 
 		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
 		//  same for columns -> DatasetServiceImpl.getSubObservationSetColumns
@@ -594,7 +595,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		sql.append(" GROUP BY nde.nd_experiment_id ");
 
 		if (noFilterVariables) {
-			this.addOrder(sql, searchDto, observationUnitNoName, pageRequest);
+			this.addOrder(sql, searchDto, observationUnitNoName, pageable);
 		} else {
 			sql.append(") T ");
 		}
@@ -683,14 +684,15 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	}
 
-	private void addOrder(final StringBuilder sql, final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName, final PageRequest pageRequest) {
+	private void addOrder(final StringBuilder sql, final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName,
+		final Pageable pageable) {
 
 		String orderColumn;
 		String sortBy = "";
 		String direction = "asc";
-		if (pageRequest != null && pageRequest.getSort() != null) {
-			sortBy = pageRequest.getSort().iterator().hasNext() ? pageRequest.getSort().iterator().next().getProperty() : "";
-			String sortOrder = pageRequest.getSort().iterator().hasNext() ? pageRequest.getSort().iterator().next().getDirection().name() : "";
+		if (pageable != null && pageable.getSort() != null) {
+			sortBy = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getProperty() : "";
+			String sortOrder = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getDirection().name() : "";
 			direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
 		}
 		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)

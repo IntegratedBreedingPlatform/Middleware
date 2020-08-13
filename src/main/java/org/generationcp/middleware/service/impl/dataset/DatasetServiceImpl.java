@@ -53,6 +53,7 @@ import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -580,11 +581,11 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final PageRequest pageRequest) {
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
 
-		this.fillSearchDTO(studyId, datasetId, searchDTO, pageRequest);
+		this.fillSearchDTO(studyId, datasetId, searchDTO, pageable);
 
-		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageRequest);
+		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
 	}
 
 	@Override
@@ -596,14 +597,14 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTableMapList(searchDTO, pageRequest);
 	}
 
-	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final PageRequest pageRequest) {
-		if (pageRequest != null && pageRequest.getSort() != null) {
-			final Iterator<Sort.Order> iterator = pageRequest.getSort().iterator();
+	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
+		if (pageable != null && pageable.getSort() != null) {
+			final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
 			while (iterator.hasNext()) {
 				final Sort.Order sort = iterator.next();
 				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
 				if (term != null) {
-					pageRequest.getSort().and(new Sort(sort.getDirection(), term.getName()));
+					pageable.getSort().and(new Sort(sort.getDirection(), term.getName()));
 					iterator.remove();
 				}
 			}

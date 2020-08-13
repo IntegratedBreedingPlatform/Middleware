@@ -7,7 +7,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;

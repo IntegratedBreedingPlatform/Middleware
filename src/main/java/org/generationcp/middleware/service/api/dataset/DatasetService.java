@@ -9,6 +9,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -207,9 +208,10 @@ public interface DatasetService {
 	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
 	 * @param searchDTO Search DTO
+	 * @param pageable Pagination parameters
 	 * @return List of ObservationUnitRow
 	 */
-	List<ObservationUnitRow> getObservationUnitRows(int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO, PageRequest pageRequest);
+	List<ObservationUnitRow> getObservationUnitRows(int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO, Pageable pageable);
 
 	/**
 	 * Returns the list of observation unit rows (represented as List of HashMap) that matches the search param.
