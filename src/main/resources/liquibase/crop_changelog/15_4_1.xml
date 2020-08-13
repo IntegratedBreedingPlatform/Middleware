@@ -134,12 +134,30 @@
 	<changeSet id="v15.4.1-5" author="corina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
-				SELECT COUNT(*) > 1 FROM projectprop WHERE variable_id=8251 AND project_id IN (SELECT project_id FROM project WHERE `name` LIKE '%Nursery Template%');
+				SELECT COUNT(*) FROM projectprop WHERE variable_id=8251 AND project_id IN (SELECT project_id FROM project WHERE `name` LIKE '%Nursery Template%');
 			</sqlCheck>
 		</preConditions>
 		<COMMENT>Remove variable STUDY_BM_CODE from nursery template. IBP-3928</COMMENT>
 		<SQL dbms="mysql">
 			DELETE FROM projectprop WHERE variable_id=8251 AND project_id IN (SELECT project_id FROM project WHERE `name` LIKE '%Nursery Template%');
+		</SQL>
+	</changeSet>
+
+	<changeSet id="v15.4.1-6" author="corina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM cvterm where cvterm_id=4021; 
+			</sqlCheck>
+		</preConditions>
+		<COMMENT>Change method of variables with same property-method-scale triplet. IBP-3800</COMMENT>
+		<SQL dbms="mysql">
+			SET FOREIGN_KEY_CHECKS=0;
+			
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (4021,1020,'Applied at plot level','Applied at plot level',NULL,0,0);
+
+			UPDATE cvterm_relationship SET object_id=4021 WHERE type_id=1210 AND subject_id IN (8258,8259,8253);
+			
+			SET FOREIGN_KEY_CHECKS=1;
 		</SQL>
 	</changeSet>
 
@@ -178,5 +196,27 @@
 			SET FOREIGN_KEY_CHECKS=1;
 		</sql>
 	</changeSet>
+
+	<changeSet id="v15.4.1-8" author="corina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM projectprop pp, project p where pp.variable_id=8265 and pp.project_id=p.project_id and p.deleted=0; 
+			</sqlCheck>
+		</preConditions>
+		<COMMENT>Delete dupe variable FertNTotal_kg_ha from CV tables if not used in a non-deleted study. IBP-3800</COMMENT>
+		<SQL dbms="mysql">
+			SET FOREIGN_KEY_CHECKS=0;
+			
+			DELETE FROM cvterm where cvterm_id=8265;
+
+			DELETE FROM cvterm_relationship where subject_id=8265;
+
+			DELETE FROM cvtermprop where cvterm_id=8265;
+			
+			SET FOREIGN_KEY_CHECKS=1;
+		</SQL>
+	</changeSet>
+
+	
 
 </databaseChangeLog>
