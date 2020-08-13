@@ -353,7 +353,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		final Optional<InstanceDescriptorData>
 			result = this.studyInstanceService
-			.getInstanceDescriptorData(addedDescriptorData.getInstanceId(), addedDescriptorData.getDescriptorDataId(),
+			.getInstanceDescriptorData(addedDescriptorData.getInstanceId(), addedDescriptorData.getInstanceDescriptorDataId(),
 				TermId.BLOCK_NAME.getId());
 
 		Assert.assertTrue(result.isPresent());
@@ -369,7 +369,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		final Optional<InstanceDescriptorData>
 			result = this.studyInstanceService
-			.getInstanceDescriptorData(addedDescriptorData.getInstanceId(), addedDescriptorData.getDescriptorDataId(),
+			.getInstanceDescriptorData(addedDescriptorData.getInstanceId(), addedDescriptorData.getInstanceDescriptorDataId(),
 				TermId.ALTITUDE.getId());
 
 		Assert.assertTrue(result.isPresent());
@@ -413,7 +413,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		final Optional<InstanceDescriptorData>
 			result = this.studyInstanceService
-			.getInstanceDescriptorData(addedDescriptorData.getInstanceId(), addedDescriptorData.getDescriptorDataId(),
+			.getInstanceDescriptorData(addedDescriptorData.getInstanceId(), addedDescriptorData.getInstanceDescriptorDataId(),
 				TermId.BLOCK_NAME.getId());
 
 		Assert.assertTrue(result.isPresent());

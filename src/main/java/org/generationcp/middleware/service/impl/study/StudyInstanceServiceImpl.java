@@ -287,7 +287,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		} else {
 			final GeolocationProperty property = new GeolocationProperty(geolocation, value, 1, instanceDescriptorData.getVariableId());
 			this.daoFactory.getGeolocationPropertyDao().save(property);
-			instanceDescriptorData.setDescriptorDataId(property.getGeolocationPropertyId());
+			instanceDescriptorData.setInstanceDescriptorDataId(property.getGeolocationPropertyId());
 		}
 
 		return instanceDescriptorData;
@@ -296,13 +296,13 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	@Override
 	public InstanceDescriptorData updateInstanceDescriptorData(final InstanceDescriptorData instanceDescriptorData) {
 
-		Preconditions.checkNotNull(instanceDescriptorData.getDescriptorDataId());
+		Preconditions.checkNotNull(instanceDescriptorData.getInstanceDescriptorDataId());
 		Preconditions.checkNotNull(instanceDescriptorData.getInstanceId());
 		Preconditions.checkNotNull(instanceDescriptorData.getVariableId());
 		Preconditions.checkNotNull(instanceDescriptorData.getValue());
 
 		final GeolocationPropertyDao propertyDao = this.daoFactory.getGeolocationPropertyDao();
-		final GeolocationProperty property = propertyDao.getById(instanceDescriptorData.getDescriptorDataId());
+		final GeolocationProperty property = propertyDao.getById(instanceDescriptorData.getInstanceDescriptorDataId());
 		Preconditions.checkNotNull(property);
 		property.setValue(this.getEnvironmentDataValue(instanceDescriptorData));
 		propertyDao.update(property);
