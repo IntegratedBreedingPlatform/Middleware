@@ -16,8 +16,9 @@ import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import static org.junit.Assert.assertEquals;
+
+import com.beust.jcommander.internal.Lists;
 
 /**
  * The class <code>QueryTest</code> contains tests for the class <code>{@link ObservationQuery}</code>.
