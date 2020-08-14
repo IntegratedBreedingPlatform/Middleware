@@ -598,18 +598,6 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
-		if (pageable != null && pageable.getSort() != null) {
-			final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
-			while (iterator.hasNext()) {
-				final Sort.Order sort = iterator.next();
-				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
-				if (term != null) {
-					pageable.getSort().and(new Sort(sort.getDirection(), term.getName()));
-					iterator.remove();
-				}
-			}
-		}
-
 		searchDTO.setDatasetId(datasetId);
 		searchDTO.setGenericGermplasmDescriptors(this.findGenericGermplasmDescriptors(studyId));
 		searchDTO.setAdditionalDesignFactors(this.findAdditionalDesignFactors(studyId));
