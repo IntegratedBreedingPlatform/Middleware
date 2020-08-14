@@ -39,6 +39,7 @@ import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -1183,4 +1184,8 @@ public interface GermplasmDataManager {
 	List<Attribute> getAttributeByIds(List<Integer> ids);
 
 	List<String> getNamesByGidsAndPrefixes(List<Integer> gids, List<String> prefixes);
+
+	List<Germplasm> getExistingCrosses(Integer femaleParent, List<Integer> maleParentIds, Optional<Integer> gid);
+
+	boolean hasExistingCrosses(Integer femaleParent, List<Integer> maleParentIds, Optional<Integer> gid);
 }
