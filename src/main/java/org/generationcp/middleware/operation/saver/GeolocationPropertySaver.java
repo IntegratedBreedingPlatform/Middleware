@@ -26,9 +26,6 @@ public class GeolocationPropertySaver extends Saver {
 					int locationId = trial.getInstanceId();
 					if (trial.getInstanceId() != null && trial.getInstanceId().intValue() == 1) {
 						locationId = this.getExperimentModelSaver().moveStudyToNewGeolocation(info.getFieldbookId());
-					}
-
-					if (trial.getLocationId() != null) {
 						this.saveOrUpdate(locationId, TermId.LOCATION_ID.getId(), trial.getLocationId().toString());
 					}
 
