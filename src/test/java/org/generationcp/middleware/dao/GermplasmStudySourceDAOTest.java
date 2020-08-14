@@ -109,7 +109,7 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		germplasmStudySourceSearchRequest.setFilter(filter);
 		final List<Integer> gids = new LinkedList<>();
 		for (final GermplasmStudySourceDto dto : this.daoFactory.getGermplasmStudySourceDAO()
-			.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, 1, Sort.Direction.ASC, "gid"))) {
+			.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, 1, Sort.Direction.ASC, "gid"))) {
 			gids.add(dto.getGid());
 		}
 
@@ -125,7 +125,7 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		germplasmStudySourceSearchRequest.setFilter(filter);
 		final List<Integer> gids = new LinkedList<>();
 		for (final GermplasmStudySourceDto dto : this.daoFactory.getGermplasmStudySourceDAO()
-			.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, 1, Sort.Direction.DESC, "gid"))) {
+			.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, 1, Sort.Direction.DESC, "gid"))) {
 			gids.add(dto.getGid());
 		}
 
@@ -141,15 +141,15 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		germplasmStudySourceSearchRequest.setStudyId(this.study.getProjectId());
 
 		Assert.assertEquals(1, this.daoFactory.getGermplasmStudySourceDAO()
-			.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, 1)).size());
-		Assert.assertEquals(1, this.daoFactory.getGermplasmStudySourceDAO()
 			.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, 1)).size());
-		Assert.assertEquals(0, this.daoFactory.getGermplasmStudySourceDAO()
+		Assert.assertEquals(1, this.daoFactory.getGermplasmStudySourceDAO()
 			.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(2, 1)).size());
-		Assert.assertEquals(2, this.daoFactory.getGermplasmStudySourceDAO()
-			.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, 2)).size());
 		Assert.assertEquals(0, this.daoFactory.getGermplasmStudySourceDAO()
+			.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(3, 1)).size());
+		Assert.assertEquals(2, this.daoFactory.getGermplasmStudySourceDAO()
 			.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, 2)).size());
+		Assert.assertEquals(0, this.daoFactory.getGermplasmStudySourceDAO()
+			.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(2, 2)).size());
 	}
 
 	@Test
@@ -162,14 +162,14 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		filter.setGidList(Collections.singletonList(this.germplasmStudySourceFirst.getGermplasm().getGid()));
 		Assert.assertEquals(1,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(1l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setGidList(Collections.singletonList(Integer.MAX_VALUE));
 		Assert.assertEquals(0,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 	}
@@ -184,14 +184,14 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		filter.setGroupIdList(Collections.singletonList(this.germplasmStudySourceFirst.getGermplasm().getMgid()));
 		Assert.assertEquals(2,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(2l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setGroupIdList(Collections.singletonList(Integer.MAX_VALUE));
 		Assert.assertEquals(0,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 	}
@@ -206,14 +206,14 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		filter.setBreedingLocationName("Afghanistan");
 		Assert.assertEquals(2,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(2l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setBreedingLocationName("Unknown Place");
 		Assert.assertEquals(0,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 	}
@@ -228,14 +228,14 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		filter.setTrialInstanceList(Arrays.asList("1", "2"));
 		Assert.assertEquals(2,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(2l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setTrialInstanceList(Collections.singletonList("2"));
 		Assert.assertEquals(0,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
@@ -251,14 +251,14 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		filter.setPlotNumberList(Arrays.asList(111, 333));
 		Assert.assertEquals(2,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(2l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setPlotNumberList(Collections.singletonList(999));
 		Assert.assertEquals(0,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
@@ -274,14 +274,14 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		filter.setReplicationNumberList(Arrays.asList(222, 444));
 		Assert.assertEquals(2,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(2l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setReplicationNumberList(Collections.singletonList(999));
 		Assert.assertEquals(0,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
@@ -297,14 +297,14 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		filter.setGermplasmDateList(Collections.singletonList(20150101));
 		Assert.assertEquals(2,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(2l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setGermplasmDateList(Collections.singletonList(20160102));
 		Assert.assertEquals(0,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 	}
@@ -319,21 +319,21 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		filter.setDesignation("Name " + this.germplasmStudySourceFirst.getGermplasm().getGid());
 		Assert.assertEquals(1,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(1l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setDesignation("Name " + this.germplasmStudySourceSecond.getGermplasm().getGid());
 		Assert.assertEquals(1,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(1l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setDesignation("Some Name");
 		Assert.assertEquals(0,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 	}
@@ -348,14 +348,14 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		filter.setBreedingMethodAbbreviation("UGM");
 		Assert.assertEquals(2,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(2l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setBreedingMethodAbbreviation("AAA");
 		Assert.assertEquals(0,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 	}
@@ -370,14 +370,14 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		filter.setBreedingMethodName("Unknown generative method");
 		Assert.assertEquals(2,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(2l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setBreedingMethodName("Unknown generative method 1111");
 		Assert.assertEquals(0,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
@@ -393,14 +393,14 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		filter.setBreedingMethodType("GEN");
 		Assert.assertEquals(2,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(2l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setBreedingMethodType("MAN");
 		Assert.assertEquals(0,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 	}
@@ -415,14 +415,14 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		filter.setNumberOfLotsList(Collections.singletonList(0));
 		Assert.assertEquals(2,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(2l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 
 		filter.setNumberOfLotsList(Collections.singletonList(1));
 		Assert.assertEquals(0,
 			this.daoFactory.getGermplasmStudySourceDAO()
-				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(0, Integer.MAX_VALUE)).size());
+				.getGermplasmStudySourceList(germplasmStudySourceSearchRequest, new PageRequest(1, Integer.MAX_VALUE)).size());
 		Assert.assertEquals(0l, this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(
 			germplasmStudySourceSearchRequest));
 	}
