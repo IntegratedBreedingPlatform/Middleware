@@ -13,6 +13,7 @@
 package org.generationcp.middleware.dao.dms;
 
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.pojos.LocdesType;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -96,7 +97,7 @@ public class ExperimentPropertyDaoTest {
 	private String getFieldmapsInBlockMainQuery() {
 		return " SELECT  p.project_id AS datasetId  , p.name AS datasetName "
 		+ " , st.name AS studyName , e.nd_geolocation_id AS instanceId "
-		+ " , site.value AS siteName , siteId.value AS siteId"
+		+ " , loc.lname AS siteName , loc.locid AS siteId"
 		+ " , e.nd_experiment_id AS experimentId , s.uniqueName AS entryNumber "
 		+ " , s.name AS germplasmName , epropRep.value AS rep "
 		+ " , epropPlot.value AS plotNo , row.value AS row , col.value AS col "
@@ -118,16 +119,15 @@ public class ExperimentPropertyDaoTest {
 		+ "  INNER JOIN nd_experimentprop epropPlot ON epropPlot.nd_experiment_id = e.nd_experiment_id "
 		+ "    AND epropPlot.type_id IN (" + TermId.PLOT_NO.getId()+ ", "
 		+ TermId.PLOT_NNO.getId() + ") AND epropPlot.value <> '' "
-		+ "  LEFT JOIN nd_geolocationprop site ON site.nd_geolocation_id = e.nd_geolocation_id "
-		+ "    AND site.type_id = " + TermId.TRIAL_LOCATION.getId()
-		+ "  LEFT JOIN nd_geolocationprop siteId ON siteId.nd_geolocation_id = e.nd_geolocation_id "
-		+ "    AND siteId.type_id = "+ TermId.LOCATION_ID.getId()
 		+ "  LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = e.nd_experiment_id "
 		+ "    AND row.type_id = "+ TermId.RANGE_NO.getId()
 		+ "  LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = e.nd_experiment_id "
 		+ "    AND col.type_id = "+ TermId.COLUMN_NO.getId()
 		+ "  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id "
 		+ "     AND gpSeason.type_id =  "+ TermId.SEASON_VAR.getId() + " "
+		+ " LEFT JOIN locdes field ON field.dtype = (SELECT u.fldno FROM udflds u WHERE u.fcode = '" + LocdesType.BLOCK_PARENT.getCode() + "')  AND field.locid = blk.value"
+		+ " LEFT JOIN locdes fieldParent ON fieldParent.dtype = (SELECT u.fldno FROM udflds u WHERE u.fcode = '" + LocdesType.FIELD_PARENT.getCode() + "')  AND fieldParent.locid = field.dval"
+		+ " LEFT JOIN location loc ON loc.locid = fieldParent.dval"
 		+ " WHERE blk.type_id = "+ TermId.BLOCK_ID.getId();
 	}
 	
