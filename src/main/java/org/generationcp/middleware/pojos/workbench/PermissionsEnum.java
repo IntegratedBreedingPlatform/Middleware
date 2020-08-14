@@ -1,5 +1,8 @@
 package org.generationcp.middleware.pojos.workbench;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum PermissionsEnum {
 	ADMIN,
 	ADMINISTRATION,
@@ -50,4 +53,6 @@ public enum PermissionsEnum {
 		+ ", 'MG_MANAGE_INVENTORY'"
 		+ ", 'MG_CREATE_LOTS'"
 		+ ", 'CREATE_LOTS')";
+
+	public static final List<String> SITE_ADMIN_PERMISSIONS = Arrays.asList(SITE_ADMIN.name(), ADMINISTRATION.name(), ADMIN.name());
 }
