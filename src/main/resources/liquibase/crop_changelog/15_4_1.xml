@@ -1,4 +1,4 @@
-<?xml VERSION=1.1 encoding=UTF-8 standalone=NO?>
+<?xml version=1.1 encoding=UTF-8 standalone=no?>
 <databaseChangeLog xmlns=http://www.liquibase.org/xml/ns/dbchangelog
 				   xmlns:xsi=http://www.w3.org/2001/XMLSchema-instance
 				   xsi:schemaLocation=http://www.liquibase.org/xml/ns/dbchangelog
@@ -39,9 +39,9 @@
 8186);
 			</sqlCheck>
 		</preConditions>
-		<COMMENT> REMOVE Study Detail AS DEFAULT TYPE FOR environment-LEVEL/plot-LEVEL variables. IBP-3889
-		</COMMENT>
-		<SQL dbms=mysql splitStatements=TRUE>
+		<comment> REMOVE Study Detail AS DEFAULT TYPE FOR environment-LEVEL/plot-LEVEL variables. IBP-3889
+		</comment>
+		<sql dbms=mysql splitStatements=TRUE>
 			SET FOREIGN_KEY_CHECKS=0;
 			
 			DELETE from cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583,
@@ -76,7 +76,7 @@
 8186);
 
 		    SET FOREIGN_KEY_CHECKS=1;
-		</SQL>
+		</sql>
 	</changeSet>
 	
 	<changeSet id="v15.4.1-2" author="rowena">
@@ -85,12 +85,12 @@
 				SELECT COUNT(*) FROM location WHERE location_id = 6000;
 			</sqlCheck>
 		</preConditions>
-		<COMMENT>ADD location ID 6000 AND SET AS DEFAULT</COMMENT>
-		<SQL dbms="mysql">
+		<comment>ADD location ID 6000 AND SET AS DEFAULT</comment>
+		<sql dbms="mysql">
 			INSERT INTO location (`locid`, `ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`, `program_uuid`) VALUES
 			(6000,1500,0,'Default Seed Store','DSS',0,0,0,0,0,0,NULL),
 			(6001,410,0,'Default Breeding Location','DBL',0,0,0,0,0,0,NULL);
-		</SQL>
+		</sql>
 	</changeSet>
 
 	<changeSet id="v15.4.1-3" author="rowena">
@@ -108,11 +108,11 @@
 			</AND>
 	</preConditions>
 
-	<COMMENT>SET DSS AS DEFAULT STORAGE location</COMMENT>
+	<comment>SET DSS AS DEFAULT STORAGE location</comment>
 
-        <SQL dbms="mysql">
+        <sql dbms="mysql">
 		UPDATE location SET ldefault = 1 WHERE locid=6000;
-	</SQL>
+	</sql>
 	</changeSet>
 	
 	<changeSet id="v15.4.1-4" author="rowena">
@@ -122,11 +122,11 @@
 		</sqlCheck>
 	</preConditions>
 
-	<COMMENT>SET to "ANCEST_DATA" to differentiate from "ANCEST" fcode in UDFLDS table </COMMENT>
+	<comment>SET to "ANCEST_DATA" to differentiate from "ANCEST" fcode in UDFLDS table </comment>
 
-        <SQL dbms="mysql">
+        <sql dbms="mysql">
 		UPDATE udflds SET fcode = "ANCEST_DATA" WHERE fcode = "ANCEST" AND ftable = "ATRIBUTS" AND fldno>1551;
-	</SQL>
+	</sql>
 	</changeSet>
 	
 
@@ -136,10 +136,10 @@
 				SELECT COUNT(*) FROM projectprop WHERE variable_id=8251 AND project_id IN (SELECT project_id FROM project WHERE `name` LIKE '%Nursery Template%');
 			</sqlCheck>
 		</preConditions>
-		<COMMENT>Remove variable STUDY_BM_CODE from nursery template. IBP-3928</COMMENT>
-		<SQL dbms="mysql">
+		<comment>Remove variable STUDY_BM_CODE from nursery template. IBP-3928</comment>
+		<sql dbms="mysql">
 			DELETE FROM projectprop WHERE variable_id=8251 AND project_id IN (SELECT project_id FROM project WHERE `name` LIKE '%Nursery Template%');
-		</SQL>
+		</sql>
 	</changeSet>
 
 	<changeSet id="v15.4.1-6" author="corina">
@@ -148,8 +148,8 @@
 				SELECT COUNT(*) FROM cvterm where cvterm_id=4021; 
 			</sqlCheck>
 		</preConditions>
-		<COMMENT>Change method of variables with same property-method-scale triplet. IBP-3800</COMMENT>
-		<SQL dbms="mysql">
+		<comment>Change method of variables with same property-method-scale triplet. IBP-3800</comment>
+		<sql dbms="mysql">
 			SET FOREIGN_KEY_CHECKS=0;
 			
 			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (4021,1020,'Applied at plot level','Applied at plot level',NULL,0,0);
@@ -157,7 +157,7 @@
 			UPDATE cvterm_relationship SET object_id=4021 WHERE type_id=1210 AND subject_id IN (8258,8259,8253);
 			
 			SET FOREIGN_KEY_CHECKS=1;
-		</SQL>
+		</sql>
 	</changeSet>
 
        <changeSet id="v15.4.1-7" author="corina">
@@ -202,8 +202,8 @@
 				SELECT COUNT(*) FROM projectprop pp, project p where pp.variable_id=8265 and pp.project_id=p.project_id and p.deleted=0; 
 			</sqlCheck>
 		</preConditions>
-		<COMMENT>Delete dupe variable FertNTotal_kg_ha from CV tables if not used in a non-deleted study. IBP-3800</COMMENT>
-		<SQL dbms="mysql">
+		<comment>Delete dupe variable FertNTotal_kg_ha from CV tables if not used in a non-deleted study. IBP-3800</comment>
+		<sql dbms="mysql">
 			SET FOREIGN_KEY_CHECKS=0;
 			
 			DELETE FROM cvterm where cvterm_id=8265;
@@ -213,7 +213,7 @@
 			DELETE FROM cvtermprop where cvterm_id=8265;
 			
 			SET FOREIGN_KEY_CHECKS=1;
-		</SQL>
+		</sql>
 	</changeSet>
 
 	
