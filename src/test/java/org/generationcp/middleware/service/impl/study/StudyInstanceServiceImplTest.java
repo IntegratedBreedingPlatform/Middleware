@@ -3,16 +3,15 @@ package org.generationcp.middleware.service.impl.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
-import org.generationcp.middleware.domain.dms.InstanceData;
+import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
+import org.generationcp.middleware.domain.dms.InstanceObservationData;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -22,7 +21,6 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -331,112 +329,126 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddInstanceData_EnvironmentDetail_GeolocationMetadata() {
+	public void testAddInstanceObservation() {
 
-		final boolean isEnvironmentCondition = false;
-		final InstanceData instanceData = this.createTestInstanceData(TermId.ALTITUDE.getId());
-		final InstanceData addedInstanceData = this.studyInstanceService.addInstanceData(instanceData, isEnvironmentCondition);
+		final InstanceObservationData observationData = this.createTestObservationData(TermId.BLOCK_NAME.getId());
+		final InstanceObservationData addedObservationData =
+			this.studyInstanceService.addInstanceObservation(observationData);
 
-		final Optional<InstanceData>
+		final Optional<InstanceObservationData>
 			result = this.studyInstanceService
-			.getInstanceData(addedInstanceData.getInstanceId(), addedInstanceData.getInstanceDataId(), TermId.ALTITUDE.getId(),
-				isEnvironmentCondition);
+			.getInstanceObservation(addedObservationData.getInstanceId(), addedObservationData.getInstanceObservationId(),
+				TermId.BLOCK_NAME.getId());
 
 		Assert.assertTrue(result.isPresent());
-		Assert.assertEquals(Double.valueOf(instanceData.getValue()).toString(), result.get().getValue());
+		Assert.assertEquals(observationData.getValue(), result.get().getValue());
 	}
 
 	@Test
-	public void testAddInstanceData_EnvironmentDetail() {
+	public void testAddInstanceDescriptor() {
 
-		final boolean isEnvironmentCondition = false;
-		final InstanceData instanceData = this.createTestInstanceData(TermId.BLOCK_NAME.getId());
-		final InstanceData addedInstanceData = this.studyInstanceService.addInstanceData(instanceData, isEnvironmentCondition);
+		final InstanceDescriptorData instanceDescriptorData = this.createTestDescriptorData(TermId.BLOCK_NAME.getId());
+		final InstanceDescriptorData addedDescriptorData =
+			this.studyInstanceService.addInstanceDescriptorData(instanceDescriptorData);
 
-		final Optional<InstanceData>
+		final Optional<InstanceDescriptorData>
 			result = this.studyInstanceService
-			.getInstanceData(addedInstanceData.getInstanceId(), addedInstanceData.getInstanceDataId(), TermId.BLOCK_NAME.getId(),
-				isEnvironmentCondition);
+			.getInstanceDescriptorData(addedDescriptorData.getInstanceId(), addedDescriptorData.getInstanceDescriptorDataId(),
+				TermId.BLOCK_NAME.getId());
 
 		Assert.assertTrue(result.isPresent());
-		Assert.assertEquals(instanceData.getValue(), result.get().getValue());
+		Assert.assertEquals(instanceDescriptorData.getValue(), result.get().getValue());
 	}
 
 	@Test
-	public void testAddInstanceData_EnvironmentCondition() {
+	public void testAddInstanceDescriptor_GeolocationMetadata() {
 
-		final boolean isEnvironmentCondition = true;
-		final InstanceData instanceData = this.createTestInstanceData(TermId.BLOCK_NAME.getId());
-		final InstanceData addedInstanceData = this.studyInstanceService.addInstanceData(instanceData, isEnvironmentCondition);
+		final InstanceDescriptorData instanceDescriptorData = this.createTestDescriptorData(TermId.ALTITUDE.getId());
+		final InstanceDescriptorData addedDescriptorData =
+			this.studyInstanceService.addInstanceDescriptorData(instanceDescriptorData);
 
-		final Optional<InstanceData>
+		final Optional<InstanceDescriptorData>
 			result = this.studyInstanceService
-			.getInstanceData(addedInstanceData.getInstanceId(), addedInstanceData.getInstanceDataId(), TermId.BLOCK_NAME.getId(),
-				isEnvironmentCondition);
+			.getInstanceDescriptorData(addedDescriptorData.getInstanceId(), addedDescriptorData.getInstanceDescriptorDataId(),
+				TermId.ALTITUDE.getId());
 
 		Assert.assertTrue(result.isPresent());
-		Assert.assertEquals(instanceData.getValue(), result.get().getValue());
+		Assert.assertEquals(Double.valueOf(instanceDescriptorData.getValue()).toString(), result.get().getValue());
 	}
 
 	@Test
-	public void testUpdateInstanceData_EnvironmentDetail() {
+	public void testUpdateInstanceObservation() {
 
-		final boolean isEnvironmentCondition = false;
-		final InstanceData instanceData = this.createTestInstanceData(TermId.BLOCK_NAME.getId());
-		final InstanceData addedInstanceData = this.studyInstanceService.addInstanceData(instanceData, isEnvironmentCondition);
+		final InstanceObservationData instanceObservationData = this.createTestObservationData(TermId.BLOCK_NAME.getId());
+		final InstanceObservationData addedObservationData =
+			this.studyInstanceService.addInstanceObservation(instanceObservationData);
 
-		final String oldValue = addedInstanceData.getValue();
+		final String oldValue = addedObservationData.getValue();
 		final String newValue = RandomStringUtils.randomNumeric(10);
 
-		addedInstanceData.setValue(newValue);
-		this.studyInstanceService.updateInstanceData(addedInstanceData, isEnvironmentCondition);
+		addedObservationData.setValue(newValue);
+		this.studyInstanceService.updateInstanceObservation(addedObservationData);
 
-		final Optional<InstanceData>
+		final Optional<InstanceObservationData>
 			result = this.studyInstanceService
-			.getInstanceData(addedInstanceData.getInstanceId(), addedInstanceData.getInstanceDataId(), TermId.BLOCK_NAME.getId(),
-				isEnvironmentCondition);
+			.getInstanceObservation(addedObservationData.getInstanceId(), addedObservationData.getInstanceObservationId(),
+				TermId.BLOCK_NAME.getId());
 
 		Assert.assertTrue(result.isPresent());
 		Assert.assertEquals(newValue, result.get().getValue());
 	}
 
 	@Test
-	public void testUpdateInstanceData_EnvironmentCondition() {
+	public void testUpdateInstanceDescriptor() {
 
-		final boolean isEnvironmentCondition = true;
-		final InstanceData instanceData = this.createTestInstanceData(TermId.BLOCK_NAME.getId());
-		final InstanceData addedInstanceData = this.studyInstanceService.addInstanceData(instanceData, isEnvironmentCondition);
+		final InstanceDescriptorData instanceDescriptorData = this.createTestDescriptorData(TermId.BLOCK_NAME.getId());
+		final InstanceDescriptorData addedDescriptorData =
+			this.studyInstanceService.addInstanceDescriptorData(instanceDescriptorData);
 
-		final String oldValue = addedInstanceData.getValue();
+		final String oldValue = addedDescriptorData.getValue();
 		final String newValue = RandomStringUtils.randomNumeric(10);
 
-		addedInstanceData.setValue(newValue);
-		this.studyInstanceService.updateInstanceData(addedInstanceData, isEnvironmentCondition);
+		addedDescriptorData.setValue(newValue);
+		this.studyInstanceService.updateInstanceDescriptorData(addedDescriptorData);
 
-		final Optional<InstanceData>
+		final Optional<InstanceDescriptorData>
 			result = this.studyInstanceService
-			.getInstanceData(addedInstanceData.getInstanceId(), addedInstanceData.getInstanceDataId(), TermId.BLOCK_NAME.getId(),
-				isEnvironmentCondition);
+			.getInstanceDescriptorData(addedDescriptorData.getInstanceId(), addedDescriptorData.getInstanceDescriptorDataId(),
+				TermId.BLOCK_NAME.getId());
 
 		Assert.assertTrue(result.isPresent());
 		Assert.assertEquals(newValue, result.get().getValue());
 
 	}
 
-	private InstanceData createTestInstanceData(final int variableId) {
+	private InstanceObservationData createTestObservationData(final int variableId) {
+		final StudyInstance studyInstance = this.createStudyInstance();
+		final String value = RandomStringUtils.randomNumeric(5);
+
+		final InstanceObservationData instanceObservationData = new InstanceObservationData();
+		instanceObservationData.setValue(value);
+		instanceObservationData.setInstanceId(studyInstance.getInstanceId());
+		instanceObservationData.setVariableId(variableId);
+		return instanceObservationData;
+	}
+
+	private InstanceDescriptorData createTestDescriptorData(final int variableId) {
+		final StudyInstance studyInstance = this.createStudyInstance();
+		final String value = RandomStringUtils.randomNumeric(5);
+
+		final InstanceDescriptorData instanceDescriptorData = new InstanceDescriptorData();
+		instanceDescriptorData.setValue(value);
+		instanceDescriptorData.setInstanceId(studyInstance.getInstanceId());
+		instanceDescriptorData.setVariableId(variableId);
+		return instanceDescriptorData;
+	}
+
+	private StudyInstance createStudyInstance() {
 		// Create an instance
 		final Integer studyId = this.studyReference.getId();
 		final List<StudyInstance> studyInstances =
 			this.studyInstanceService.createStudyInstances(this.cropType, studyId, this.environmentDataset.getId(), 1);
-		final StudyInstance studyInstance = studyInstances.get(0);
-
-		final String value = RandomStringUtils.randomNumeric(5);
-
-		final InstanceData instanceData = new InstanceData();
-		instanceData.setValue(value);
-		instanceData.setInstanceId(studyInstance.getInstanceId());
-		instanceData.setVariableId(variableId);
-		return instanceData;
+		return studyInstances.get(0);
 	}
 
 	private DmsProject createTestStudy() {

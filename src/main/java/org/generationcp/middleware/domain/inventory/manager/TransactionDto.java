@@ -28,7 +28,7 @@ public class TransactionDto {
 	}
 
 	public TransactionDto(
-		final Integer transactionId, final String createdByUsername, final String transactionType, final Double amount,
+		final Integer transactionId, final String createdByUsername, final String transactionType, final Double amount, final Double lotAvailableBalance,
 		final String notes,
 		final Date createdDate, final Integer lotId, final String lotUUID, final Integer gid, final String designation,
 		final String stockId,
@@ -55,6 +55,7 @@ public class TransactionDto {
 		this.lot.setNotes(comments);
 		this.lot.setUnitName(scaleName);
 		this.lot.setDesignation(designation);
+		this.lot.setAvailableBalance(lotAvailableBalance);
 	}
 
 	public Integer getTransactionId() {

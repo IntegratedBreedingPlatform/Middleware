@@ -255,6 +255,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "' WHEN trntype = " + TransactionType.ADJUSTMENT.getId() + "  THEN '" + TransactionType.ADJUSTMENT.getValue()
 		+ "' END) AS transactionType,"//
 		+ "    tr.trnqty AS amount,"//
+		+ "(SELECT SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
+		+ " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId() + ") "
+		+ "  THEN transaction.trnqty ELSE 0 END) FROM ims_transaction transaction WHERE  transaction.lotid = lot.lotid ) AS availableBalance, " //
 		+ "    tr.comments AS notes,"//
 		+ "    tr.trndate as createdDate, "//
 		+ "    lot.lotid AS lotLotId," //
@@ -530,6 +533,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				String.class,    // createdByUsername
 				String.class,    // transactionType
 				Double.class,    // amount
+				Double.class,	 // available Balance
 				String.class,    // notes
 				Date.class,      // createdDate
 				Integer.class,   // lotId
@@ -558,6 +562,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				String.class,    // createdByUsername
 				String.class,    // transactionType
 				Double.class,    // amount
+				Double.class,	 // available Balance
 				String.class,    // notes
 				Date.class,      // createdDate
 				Integer.class,   // lotId
@@ -584,6 +589,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("createdByUsername");
 		query.addScalar("transactionType");
 		query.addScalar("amount");
+		query.addScalar("availableBalance");
 		query.addScalar("notes");
 		query.addScalar("createdDate", Hibernate.DATE);
 		query.addScalar("lotLotId");
