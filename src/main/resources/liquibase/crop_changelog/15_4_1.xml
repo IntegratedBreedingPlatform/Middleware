@@ -140,20 +140,23 @@
 
 	<changeSet id="v15.4.1-8" author="corina">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">
-				SELECT COUNT(*) FROM projectprop pp, project p where pp.variable_id=8265 and pp.project_id=p.project_id and p.deleted=0; 
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 0 FROM projectprop WHERE variable_id IN (8265,8260); 
 			</sqlCheck>
 		</preConditions>
-		<comment>Delete dupe variable FertNTotal_kg_ha from CV tables if not used in a non-deleted study. IBP-3800</comment>
+		<comment>Update any usage of var 8265 (FertNTotal_kg_ha) to 8260 (NFert_kg_ha), then delete 8265 from ontology as it duplicates 8260. IBP-3800</comment>
 		<sql dbms="mysql">
 			SET FOREIGN_KEY_CHECKS=0;
 			
+			UPDATE projectprop SET variable_id=8260,alias="NFert_kg_ha" WHERE variable_id=8265;
+			UPDATE stockprop SET type_id=8260 WHERE type_id=8265;
+            UPDATE nd_experimentprop SET type_id=8260 WHERE type_id=8265;
+            UPDATE nd_geolocationprop SET type_id=8260 WHERE type_id=8265;
+
 			DELETE FROM cvterm where cvterm_id=8265;
-
 			DELETE FROM cvterm_relationship where subject_id=8265;
-
 			DELETE FROM cvtermprop where cvterm_id=8265;
-			
+	
 			SET FOREIGN_KEY_CHECKS=1;
 		</sql>
 	</changeSet>
