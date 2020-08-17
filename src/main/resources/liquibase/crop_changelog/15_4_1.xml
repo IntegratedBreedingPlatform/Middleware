@@ -118,11 +118,11 @@
 	<changeSet id="v15.4.1-4" author="rowena">
 	<preConditions onFail="CONTINUE">
 		<sqlCheck expectedResult="1">
-			SELECT COUNT(1) FROM udflds u WHERE fcode = "ANCEST" AND ftable = "ATRIBUTS" AND fldno>1551;
+			SELECT COUNT(1) FROM udflds WHERE fcode = "ANCEST" AND ftable = "ATRIBUTS" AND fldno>1551;
 		</sqlCheck>
 	</preConditions>
 
-	<COMMENT>SET </COMMENT>
+	<COMMENT>SET to "ANCEST_DATA" to differentiate from "ANCEST" fcode in UDFLDS table </COMMENT>
 
         <SQL dbms="mysql">
 		UPDATE udflds SET fcode = "ANCEST_DATA" WHERE fcode = "ANCEST" AND ftable = "ATRIBUTS" AND fldno>1551;
