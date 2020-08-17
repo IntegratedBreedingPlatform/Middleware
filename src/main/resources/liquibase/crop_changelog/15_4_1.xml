@@ -25,14 +25,13 @@
 	<changeSet id="v15.4.1-2" author="rowena">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
-				SELECT COUNT(*) FROM location WHERE location_id = 6000;
+				SELECT COUNT(*) FROM location WHERE location_id = 6000 AND ltype=1500;
 			</sqlCheck>
 		</preConditions>
-		<comment>ADD location ID 6000 AND SET AS DEFAULT</comment>
+		<comment>ADD location ID 6000 AND SET AS DEFAULT storage location</comment>
 		<sql dbms="mysql">
 			INSERT INTO location (`locid`, `ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`, `program_uuid`) VALUES
-			(6000,1500,0,'Default Seed Store','DSS',0,0,0,0,0,0,NULL),
-			(6001,410,0,'Default Breeding Location','DBL',0,0,0,0,0,0,NULL);
+			(6000,1500,0,'Default Seed Store','DSS',0,0,0,0,0,0,NULL);
 		</sql>
 	</changeSet>
 
@@ -156,6 +155,19 @@
 			DELETE FROM cvtermprop where cvterm_id=8265;
 			
 			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+	
+	<changeSet id="v15.4.1-9" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM location WHERE location_id = 6001 and ltype=410;
+			</sqlCheck>
+		</preConditions>
+		<comment>ADD Default Breeding Location (6001) if it does not exist</comment>
+		<sql dbms="mysql">
+			INSERT INTO location (`locid`, `ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`, `program_uuid`) VALUES
+			(6001,410,0,'Default Breeding Location','DBL',0,0,0,0,0,0,NULL);
 		</sql>
 	</changeSet>
 
