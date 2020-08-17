@@ -1,6 +1,5 @@
 package org.generationcp.middleware.service.api.study.germplasm.source;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

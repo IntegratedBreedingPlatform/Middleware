@@ -7,7 +7,6 @@ import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmS
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceInput;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

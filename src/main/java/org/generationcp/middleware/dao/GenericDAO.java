@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.dao;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
