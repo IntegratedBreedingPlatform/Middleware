@@ -140,7 +140,7 @@
 	<changeSet id="v15.4.1-8" author="corina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
-				SELECT COUNT(*) > 0 FROM projectprop WHERE variable_id IN (8265,8260); 
+				SELECT COUNT(*) from cvterm WHERE cv_id=1040 and cvterm_id=8265; 
 			</sqlCheck>
 		</preConditions>
 		<comment>Update any usage of var 8265 (FertNTotal_kg_ha) to 8260 (NFert_kg_ha), then delete 8265 from ontology as it duplicates 8260. IBP-3800</comment>
