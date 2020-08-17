@@ -107,7 +107,7 @@
 			</sqlCheck>
 		</preConditions>
 		<comment>
-			Apply correction on methods of variables EW_DW_kgPlot, EW_FW_gPlot, EW_FW_kgPlot. IBP-3930
+			Apply correction on methods of variables EW_DW_kgPlot, EW_FW_gPlot, EW_FW_kgPlot. IBP-3930.
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			SET FOREIGN_KEY_CHECKS=0;
