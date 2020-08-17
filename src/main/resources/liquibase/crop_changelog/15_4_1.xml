@@ -7,36 +7,8 @@
 	<changeSet id="v15.4.1-1" author="corina">
 		<preConditions onFail=MARK_RAN>
 			<sqlCheck expectedResult=1>
-				SELECT COUNT(*) > 1 FROM cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583,
-8584,
-8265,
-8690,
-8700,
-8830,
-8386,
-8720,
-8620,
-8740,
-8750,
-8760,
-8770,
-8780,
-8387,
-8790,
-8383,
-8194,
-8195,
-8193,
-8191,
-8192,
-8196,
-8800,
-8810,
-8820,
-8730,
-8384,
-8170,
-8186);
+				SELECT COUNT(*) > 1 FROM cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583,	8584,	8265,	8690,	8700,	8830,	8386,	8720,	8620,	8740,	8750,	8760,	8770,	8780,	8387,	8790,	8383,	8194,	8195,	8193,	8191,	8192,	8196,	8800,	8810,	8820,	8730,	8384,	8170,	8186);
+
 			</sqlCheck>
 		</preConditions>
 		<comment> REMOVE Study Detail AS DEFAULT TYPE FOR environment-LEVEL/plot-LEVEL variables. IBP-3889
@@ -44,36 +16,7 @@
 		<sql dbms=mysql splitStatements=TRUE>
 			SET FOREIGN_KEY_CHECKS=0;
 			
-			DELETE from cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583,
-8584,
-8265,
-8690,
-8700,
-8830,
-8386,
-8720,
-8620,
-8740,
-8750,
-8760,
-8770,
-8780,
-8387,
-8790,
-8383,
-8194,
-8195,
-8193,
-8191,
-8192,
-8196,
-8800,
-8810,
-8820,
-8730,
-8384,
-8170,
-8186);
+			DELETE from cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583,	8584,	8265,	8690,	8700,	8830,	8386,	8720,	8620,	8740,	8750,	8760,	8770,	8780,	8387,	8790,	8383,	8194,	8195,	8193,	8191,	8192,	8196,	8800,	8810,	8820,	8730,	8384,	8170,	8186);
 
 		    SET FOREIGN_KEY_CHECKS=1;
 		</sql>
