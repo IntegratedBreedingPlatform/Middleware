@@ -41,8 +41,7 @@
 			<columnExists tableName="location" columnName="ldefault"/>
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(1) FROM location l
-				WHERE l.ldefault = 1 AND l.ltype = 
-				(SELECT u.fldno FROM udflds u WHERE u.ftable='LOCATION' AND u.ftype='LTYPE' AND fcode='SSTORE')
+				WHERE l.ldefault = 1 AND l.ltype = 1500;
 			</sqlCheck>
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(1) FROM location WHERE locid=6000 AND ltype = 1500;
