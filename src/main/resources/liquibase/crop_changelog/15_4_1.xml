@@ -7,35 +7,35 @@
 	<changeSet id="v15.4.1-1" author="corina">
 		<preConditions onFail=MARK_RAN>
 			<sqlCheck expectedResult=1>
-				SELECT COUNT(*) > 1 FROM cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583 	,
-8584 	,
-8265 	,
-8690 	,
-8700 	,
-8830 	,
-8386 	,
-8720 	,
-8620 	,
-8740 	,
-8750 	,
-8760 	,
-8770 	,
-8780 	,
-8387 	,
-8790 	,
-8383 	,
-8194 	,
-8195 	,
-8193 	,
-8191 	,
-8192 	,
-8196 	,
-8800 	,
-8810 	,
-8820 	,
-8730 	,
-8384 	,
-8170 	,
+				SELECT COUNT(*) > 1 FROM cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583,
+8584,
+8265,
+8690,
+8700,
+8830,
+8386,
+8720,
+8620,
+8740,
+8750,
+8760,
+8770,
+8780,
+8387,
+8790,
+8383,
+8194,
+8195,
+8193,
+8191,
+8192,
+8196,
+8800,
+8810,
+8820,
+8730,
+8384,
+8170,
 8186);
 			</sqlCheck>
 		</preConditions>
@@ -43,47 +43,46 @@
 		</COMMENT>
 		<SQL dbms=mysql splitStatements=TRUE>
 			SET FOREIGN_KEY_CHECKS=0;
+			
+			DELETE from cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583,
+8584,
+8265,
+8690,
+8700,
+8830,
+8386,
+8720,
+8620,
+8740,
+8750,
+8760,
+8770,
+8780,
+8387,
+8790,
+8383,
+8194,
+8195,
+8193,
+8191,
+8192,
+8196,
+8800,
+8810,
+8820,
+8730,
+8384,
+8170,
+8186);
 
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8782'; 
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8172';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8174';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8112'; 
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8191';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8193'; 
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8218'; 
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8152';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8196';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8179'; 
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8200';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8202';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8204'; 
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8206';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8208';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8154'; 
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8210';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8146';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8080'; 
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8082';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8078';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8074'; 
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8076';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8084';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8212';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8214';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8216';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8198'; 
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8148';
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8062'; 
-			DELETE FROM `cvtermprop` WHERE `cvtermprop_id` = '8068';
-
-		       SET FOREIGN_KEY_CHECKS=1;
+		    SET FOREIGN_KEY_CHECKS=1;
 		</SQL>
 	</changeSet>
 	
 	<changeSet id="v15.4.1-2" author="rowena">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
-				SELECT COUNT(*) FROM cvterm WHERE cvterm_id = 6000;
+				SELECT COUNT(*) FROM location WHERE location_id = 6000;
 			</sqlCheck>
 		</preConditions>
 		<COMMENT>ADD location ID 6000 AND SET AS DEFAULT</COMMENT>
@@ -104,7 +103,7 @@
 				(SELECT u.fldno FROM udflds u WHERE u.ftable='LOCATION' AND u.ftype='LTYPE' AND fcode='SSTORE')
 			</sqlCheck>
 			<sqlCheck expectedResult="1">
-				SELECT COUNT(1) FROM location WHERE locid=6000 AND AND ltype = 1500;
+				SELECT COUNT(1) FROM location WHERE locid=6000 AND ltype = 1500;
 			</sqlCheck>
 			</AND>
 	</preConditions>
@@ -119,14 +118,14 @@
 	<changeSet id="v15.4.1-4" author="rowena">
 	<preConditions onFail="CONTINUE">
 		<sqlCheck expectedResult="1">
-			SELECT COUNT(1) FROM udflds u WHERE  fcode = "ANCEST";
+			SELECT COUNT(1) FROM udflds u WHERE fcode = "ANCEST" AND ftable = "ATRIBUTS" AND fldno>1551;
 		</sqlCheck>
 	</preConditions>
 
 	<COMMENT>SET </COMMENT>
 
         <SQL dbms="mysql">
-		UPDATE udflds SET fcode  = "ANCEST_DATA" WHERE fcode = "ANCEST" AND ftable = "ATRIBUTS" AND fldno>1551;
+		UPDATE udflds SET fcode = "ANCEST_DATA" WHERE fcode = "ANCEST" AND ftable = "ATRIBUTS" AND fldno>1551;
 	</SQL>
 	</changeSet>
 	
@@ -167,7 +166,7 @@
 			</sqlCheck>
 		</preConditions>
 		<comment>
-			Apply correction on methods of variables EW_DW_kgPlot, EW_FW_gPlot, EW_FW_kgPlot. IBP-3920
+			Apply correction on methods of variables EW_DW_kgPlot, EW_FW_gPlot, EW_FW_kgPlot. IBP-3930
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			SET FOREIGN_KEY_CHECKS=0;
