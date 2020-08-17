@@ -276,7 +276,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		if (pageable == null || query == null) {
 			return;
 		}
-		query.setFirstResult(pageable.getPageSize() * (pageable.getPageNumber() - 1));
+		query.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
 		query.setMaxResults(pageable.getPageSize());
 	}
 
