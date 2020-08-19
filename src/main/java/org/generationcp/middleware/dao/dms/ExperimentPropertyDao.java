@@ -391,8 +391,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 				trial.setInstanceId((Integer) row[3]);
 				trial.setSiteName((String) row[4]);
 				trial.setLocationName((String) row[4]);
-				if (row[5] != null && NumberUtils.isNumber(row[5].toString())) {
-					trial.setLocationId(Integer.valueOf((row[5].toString())));
+				if (row[5] != null && NumberUtils.isNumber((String) row[5])) {
+					trial.setLocationId(Integer.valueOf((String) row[5]));
 				}
 				if (row[13] != null && NumberUtils.isNumber((String) row[13])) {
 					trial.setBlockId(Integer.valueOf((String) row[13]));
