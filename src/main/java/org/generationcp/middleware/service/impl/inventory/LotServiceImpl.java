@@ -220,7 +220,7 @@ public class LotServiceImpl implements LotService {
 		transactionsSearchDto.setLotIds(lotIds);
 		transactionsSearchDto.setStatusIds(Collections.singletonList(TransactionStatus.PENDING.getIntValue()));
 		final List<TransactionDto> pendingTransactionsDtos =
-			this.daoFactory.getTransactionDAO().searchTransactions(transactionsSearchDto, null);
+			this.daoFactory.getTransactionDAO().searchTransactions(transactionsSearchDto, null, false);
 		this.transactionService.cancelPendingTransactions(pendingTransactionsDtos);
 
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();

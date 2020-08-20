@@ -7,10 +7,8 @@ import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
-import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -30,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -291,7 +288,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		transactionsSearchDto.setTransactionTypes(Lists.newArrayList(TransactionType.DEPOSIT.getId()));
 		transactionsSearchDto.setCreatedByUsername(user.getName());
 
-		final List<TransactionDto> transactionDtos = this.dao.searchTransactions(transactionsSearchDto, null);
+		final List<TransactionDto> transactionDtos = this.dao.searchTransactions(transactionsSearchDto, null, false);
 
 		for (final TransactionDto transactionDto : transactionDtos) {
 			Assert.assertTrue(transactionDto.getLot().getDesignation().equalsIgnoreCase(germplasm.getPreferredName().getNval()));

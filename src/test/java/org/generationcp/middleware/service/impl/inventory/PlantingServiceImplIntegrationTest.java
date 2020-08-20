@@ -305,7 +305,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		transactionsSearchDto.setPlantingStudyIds(Collections.singletonList(studyId));
 		transactionsSearchDto.setTransactionTypes(Collections.singletonList(TransactionType.WITHDRAWAL.getId()));
 		transactionsSearchDto.setTransactionStatus(Collections.singletonList(TransactionStatus.CONFIRMED.getIntValue()));
-		final List<TransactionDto> transactionDtos = transactionDAO.searchTransactions(transactionsSearchDto, null);
+		final List<TransactionDto> transactionDtos = transactionDAO.searchTransactions(transactionsSearchDto, null,false);
 
 		assertThat(transactionDtos.size(), equalTo(transactions.size()));
 		assertThat(transactionDtos.get(0).getTransactionId(), equalTo(transactions.get(0).getId()));
@@ -313,7 +313,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 
 		// Study transaction search
 		final StudyTransactionsRequest studyTransactionsRequest = new StudyTransactionsRequest();
-		final List<StudyTransactionsDto> studyTransactionsDtos = transactionDAO.searchStudyTransactions(studyId, studyTransactionsRequest);
+		final List<StudyTransactionsDto> studyTransactionsDtos = transactionDAO.searchStudyTransactions(studyId, studyTransactionsRequest, false);
 
 		assertThat(studyTransactionsDtos.size(), equalTo(transactions.size()));
 		assertThat(studyTransactionsDtos.get(0).getTransactionId(), equalTo(transactions.get(0).getId()));

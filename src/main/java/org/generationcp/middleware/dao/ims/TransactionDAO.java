@@ -254,9 +254,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "' WHEN trntype = " + TransactionType.ADJUSTMENT.getId() + "  THEN '" + TransactionType.ADJUSTMENT.getValue()
 		+ "' END) AS transactionType,"//
 		+ "    tr.trnqty AS amount,"//
-		+ "(SELECT SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
+		+ " IF (:lotAggregatedData, (SELECT SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
 		+ " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId() + ") "
-		+ "  THEN transaction.trnqty ELSE 0 END) FROM ims_transaction transaction WHERE  transaction.lotid = lot.lotid ) AS availableBalance, " //
+		+ "  THEN transaction.trnqty ELSE 0 END) FROM ims_transaction transaction WHERE  transaction.lotid = lot.lotid ), null) AS availableBalance, " //
 		+ "    tr.comments AS notes,"//
 		+ "    tr.trndate as createdDate, "//
 		+ "    lot.lotid AS lotLotId," //
@@ -441,7 +441,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
-	public List<TransactionDto> searchTransactions(final TransactionsSearchDto transactionsSearchDto, final Pageable pageable) {
+	public List<TransactionDto> searchTransactions(final TransactionsSearchDto transactionsSearchDto, final Pageable pageable, final boolean lotAggregatedData) {
 		try {
 			final StringBuilder filterTransactionsQuery = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
 			addSearchTransactionsFilters(new SqlQueryParamBuilder(filterTransactionsQuery), transactionsSearchDto);
@@ -449,6 +449,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(filterTransactionsQuery.toString());
 			addSearchTransactionsFilters(new SqlQueryParamBuilder(query), transactionsSearchDto);
+			query.setParameter("lotAggregatedData", lotAggregatedData);
 			this.addSearchTransactionsQueryScalars(query);
 
 			query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
@@ -464,13 +465,14 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	}
 
-	public long countSearchTransactions(final TransactionsSearchDto transactionsSearchDto) {
+	public long countSearchTransactions(final TransactionsSearchDto transactionsSearchDto, final boolean lotAggregatedData) {
 		try {
 			final StringBuilder filterTransactionsQuery = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
 			addSearchTransactionsFilters(new SqlQueryParamBuilder(filterTransactionsQuery), transactionsSearchDto);
 			final String countTransactionsQuery =
 				"Select count(1) from (" + filterTransactionsQuery.toString() + ") as filteredTransactions";
-			final SQLQuery query = this.getSession().createSQLQuery(countTransactionsQuery.toString());
+			final SQLQuery query = this.getSession().createSQLQuery(countTransactionsQuery);
+			query.setParameter("lotAggregatedData", lotAggregatedData);
 			addSearchTransactionsFilters(new SqlQueryParamBuilder(query), transactionsSearchDto);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
@@ -491,7 +493,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				sql.append(" and tr.lotid = ").append(lotId).append(" ");
 				final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 				this.addSearchTransactionsQueryScalars(query);
-
+				query.setParameter("lotAggregatedData", false);
 				query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getTransactionDtoConstructor()));
 
 				final List<TransactionDto> transactionDtos = query.list();
@@ -613,7 +615,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return transaction;
 	}
 
-	public long countStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest) {
+	public long countStudyTransactions(final Integer studyId, final StudyTransactionsRequest studyTransactionsRequest, boolean lotAggregatedData) {
 		TransactionsSearchDto transactionsSearch = null;
 		if (studyTransactionsRequest != null) {
 			transactionsSearch = studyTransactionsRequest.getTransactionsSearch();
@@ -626,6 +628,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final SQLQuery transactionsQuery =
 			this.getSession().createSQLQuery("select count(1) from ( " + transactionsQuerySql.toString() + ") T");
 		transactionsQuery.setParameter("studyId", studyId);
+		transactionsQuery.setParameter("lotAggregatedData", lotAggregatedData);
 		final SqlQueryParamBuilder paramBuilder = new SqlQueryParamBuilder(transactionsQuery);
 		addSearchTransactionsFilters(paramBuilder, transactionsSearch);
 		addObsUnitFilters(paramBuilder, studyTransactionsRequest);
@@ -641,7 +644,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	public List<StudyTransactionsDto> searchStudyTransactions(
 		final Integer studyId,
-		final StudyTransactionsRequest studyTransactionsRequest) {
+		final StudyTransactionsRequest studyTransactionsRequest, final boolean lotAggregatedData) {
 
 		final TransactionsSearchDto transactionsSearch = studyTransactionsRequest.getTransactionsSearch();
 
@@ -654,6 +657,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		// transactions data
 		final SQLQuery transactionsQuery = this.getSession().createSQLQuery(transactionsQuerySql.toString());
 		transactionsQuery.setParameter("studyId", studyId);
+		transactionsQuery.setParameter("lotAggregatedData", lotAggregatedData);
 		final SqlQueryParamBuilder paramBuilder = new SqlQueryParamBuilder(transactionsQuery);
 		addSearchTransactionsFilters(paramBuilder, transactionsSearch);
 		addObsUnitFilters(paramBuilder, studyTransactionsRequest);
