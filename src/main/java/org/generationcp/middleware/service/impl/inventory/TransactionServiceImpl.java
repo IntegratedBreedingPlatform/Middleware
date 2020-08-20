@@ -55,6 +55,14 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
+	public List<TransactionDto> searchTransactionsWithLotAggregatedData(final TransactionsSearchDto transactionsSearchDto,
+		final Pageable pageable) {
+		final List<TransactionDto> transactionDtos =
+			this.daoFactory.getTransactionDAO().searchTransactions(transactionsSearchDto, pageable, true);
+		return transactionDtos;
+	}
+
+	@Override
 	public long countSearchTransactions(final TransactionsSearchDto transactionsSearchDto) {
 		return this.daoFactory.getTransactionDAO().countSearchTransactions(transactionsSearchDto, false);
 	}
