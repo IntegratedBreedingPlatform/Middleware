@@ -65,6 +65,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
@@ -238,14 +239,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				// check of variable type list is not empty then get variables by variable types and add filter clause of it
 				if (!variableFilter.getVariableTypes().isEmpty()) {
 
-					final List<String> variableTypeNames =
-							Util.convertAll(variableFilter.getVariableTypes(), new Function<VariableType, String>() {
-
-								@Override
-								public String apply(final VariableType x) {
-									return x.getName();
-								}
-							});
+					final List<String> variableTypeNames = this.daoFactory.getCvTermDao().getTermByCvId(CvId.VARIABLE_TYPE.getId()).stream().map(Term::getName).collect(
+						Collectors.toList());
 
 					final SQLQuery vSQLQuery = this.getActiveSession()
 							.createSQLQuery("select cvterm_id from cvtermprop where type_id = 1800 and value in (:variableTypeNames)");

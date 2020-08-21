@@ -49,7 +49,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link CVTerm}.
@@ -1512,7 +1511,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			.getId());
 		stringBuilder.append("	  LEFT JOIN projectprop pp ON pp.variable_id = variable.cvterm_id");
 		stringBuilder.append("	  LEFT JOIN project dataset ON dataset.project_id = pp.project_id");
-		stringBuilder.append(" WHERE variableType.value in (:variableTypeNames) ");
+		stringBuilder.append(" WHERE variableType.value in (select te.name from cvterm te where te.cv_id = "+ CvId.VARIABLE_TYPE.getId() +") ");
 
 		if (datasetId != null) {
 			stringBuilder.append(" AND dataset.project_id = :datasetId ");
@@ -1520,9 +1519,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(stringBuilder.toString());
-		final List<String> variableTypeNames =
-			variableTypes.stream().map(i -> VariableType.getById(i).getName()).collect(Collectors.toList());
-		sqlQuery.setParameterList(VARIABLE_TYPE_NAMES, variableTypeNames);
 
 		if (datasetId != null) {
 			sqlQuery.setParameter("datasetId", datasetId);
@@ -1609,15 +1605,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		if (datasetId != null) {
 			stringBuilder.append("   AND dataset.project_id = :datasetId ");
-			stringBuilder.append("   AND pp.type_id in (:variableTypes) ");
+			stringBuilder.append("   AND pp.type_id in (select te.name from cvterm te where cv_id = "+ CvId.VARIABLE_TYPE.getId()+  ") ");
 		}
 
 		stringBuilder.append("   GROUP BY variable.cvterm_id, traitClass.propertyTermId, scale.cvterm_id ");
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(stringBuilder.toString());
-		final List<String> variableTypeNames =
-			variableTypes.stream().map(i -> VariableType.getById(i).getName()).collect(Collectors.toList());
-		sqlQuery.setParameterList(VARIABLE_TYPE_NAMES, variableTypeNames);
 
 		if (datasetId != null) {
 			sqlQuery.setParameter("datasetId", datasetId);
