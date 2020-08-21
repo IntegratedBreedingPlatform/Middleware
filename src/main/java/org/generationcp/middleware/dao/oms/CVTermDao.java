@@ -1601,11 +1601,11 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		// To get Min and Max override values per program
 		stringBuilder.append(
 			"	  LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id AND dataset.program_uuid = vo.program_uuid");
-		stringBuilder.append(" WHERE variableType.value in (:variableTypeNames) ");
+		stringBuilder.append(" WHERE variableType.value in (select te.name from cvterm te where te.cv_id = "+ CvId.VARIABLE_TYPE.getId()+  ")");
 
 		if (datasetId != null) {
 			stringBuilder.append("   AND dataset.project_id = :datasetId ");
-			stringBuilder.append("   AND pp.type_id in (select te.name from cvterm te where cv_id = "+ CvId.VARIABLE_TYPE.getId()+  ") ");
+			stringBuilder.append("   AND pp.type_id in (:variableTypes) ");
 		}
 
 		stringBuilder.append("   GROUP BY variable.cvterm_id, traitClass.propertyTermId, scale.cvterm_id ");
