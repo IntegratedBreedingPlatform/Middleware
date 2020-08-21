@@ -2,6 +2,8 @@
 package org.generationcp.middleware.dao.oms;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -9,10 +11,12 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,17 +128,62 @@ public class VariableOverridesDao extends GenericDAO<VariableOverrides, Integer>
 
 	}
 
-	public VariableType getDefaultVariableType(final Integer cvTermId) {
+	private VariableType getDefaultVariableType(final Integer cvTermId) {
 		final Criteria criteria = this.getSession().createCriteria(CVTermProperty.class);
 		criteria.add(Restrictions.eq("cvTermId", cvTermId));
 		criteria.add(Restrictions.eq("typeId", TermId.VARIABLE_TYPE.getId()));
 		criteria.addOrder(Order.asc("cvTermPropertyId"));
 		final List<CVTermProperty> variableTypes = criteria.list();
 		if (variableTypes != null) {
+			final List<Term> allVariableTypes = this.getTermByCvId(CvId.VARIABLE_TYPE.getId());
+			final Map<String, Integer> allVariableTypesByName = new HashMap<>();
+			for (final Term term: allVariableTypes) {
+				allVariableTypesByName.put(term.getName(), term.getId());
+			}
 			for (final CVTermProperty cvTermProperty : variableTypes) {
-				return VariableType.getByName(cvTermProperty.getValue());
+				return VariableType.getById(allVariableTypesByName.get(cvTermProperty.getValue()));
 			}
 		}
 		return null;
+	}
+
+	private List<Term> getTermByCvId(final int cvId) {
+
+		final List<Term> terms = new ArrayList<>();
+
+		try {
+
+			final StringBuilder sqlString = new StringBuilder()
+				.append("SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
+				.append("FROM cvterm cvt ").append("WHERE cvt.cv_id = :cvId");
+
+			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
+			query.setParameter("cvId", cvId);
+
+			final List<Object[]> results = query.list();
+
+			if (!results.isEmpty()) {
+
+				for (final Object[] row : results) {
+
+					final Integer cvtermId = (Integer) row[0];
+					final Integer cvtermCvId = (Integer) row[1];
+					final String cvtermName = (String) row[2];
+					final String cvtermDefinition = (String) row[3];
+
+					final Term term = new Term();
+					term.setId(cvtermId);
+					term.setName(cvtermName);
+					term.setDefinition(cvtermDefinition);
+					term.setVocabularyId(cvtermCvId);
+					terms.add(term);
+				}
+			}
+
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error at getTermByCvId=" + cvId + " query on CVTermDao: " + e.getMessage(), e);
+		}
+
+		return terms;
 	}
 }

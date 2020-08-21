@@ -396,6 +396,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				}
 			}
 
+
+			final Map<String, Integer> variableTypesByName = this.getVariableTypesByName();
+
 			// Fetch Property CropOntologyId, Scale min-max, Variable Type, Creation and Last Modified date of all terms
 			final SQLQuery pQuery = this.getActiveSession()
 					.createSQLQuery("select t.cvterm_id tid, t.cv_id cvid, tp.type_id typeid, tp.value value from cvtermprop tp "
@@ -423,7 +426,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				if (Objects.equals(typeId, TermId.CROP_ONTOLOGY_ID.getId()) && Objects.equals(cvId, CvId.PROPERTIES.getId())) {
 					pMap.get(cvTermId).setCropOntologyId(value);
 				} else if (Objects.equals(typeId, TermId.VARIABLE_TYPE.getId()) && Objects.equals(cvId, CvId.VARIABLES.getId())) {
-					map.get(cvTermId).addVariableType(VariableType.getByName(value));
+					map.get(cvTermId).addVariableType(VariableType.getById(variableTypesByName.get(value)));
 				} else if (Objects.equals(typeId, TermId.MIN_VALUE.getId()) && Objects.equals(cvId, CvId.SCALES.getId())) {
 					sMap.get(cvTermId).setMinValue(value);
 				} else if (Objects.equals(typeId, TermId.MAX_VALUE.getId()) && Objects.equals(cvId, CvId.SCALES.getId())) {
@@ -503,10 +506,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 			// Variable Types, Created, modified from CVTermProperty
 			final List<CVTermProperty> properties = daoFactory.getCvTermPropertyDao().getByCvTermId(term.getCvTermId());
+			final Map<String, Integer> variableTypesByName = this.getVariableTypesByName();
 
 			for (final CVTermProperty property : properties) {
 				if (property.getTypeId() == TermId.VARIABLE_TYPE.getId()) {
-					final VariableType variableType = VariableType.getByName(property.getValue());
+					final VariableType variableType = VariableType.getById(variableTypesByName.get(property.getValue()));
 					variable.addVariableType(variableType);
 					if (variableType.equals(VariableType.TRAIT)) {
 						variable.setAllowsFormula(true);
@@ -710,10 +714,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		final Map<VariableType, CVTermProperty> existingProperties = new HashMap<>();
 		final Set<VariableType> existingVariableTypes = new HashSet<>();
 
+		final Map<String, Integer> variableTypesByName = this.getVariableTypesByName();
+
 		// Variable Types from CVTermProperty
 		for (final CVTermProperty property : termProperties) {
 			if (Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())) {
-				final VariableType type = VariableType.getByName(property.getValue());
+				final VariableType type = VariableType.getById(variableTypesByName.get(property.getValue()));
 				existingVariableTypes.add(type);
 				existingProperties.put(type, property);
 			}
@@ -1000,10 +1006,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@Override
 	public List<VariableType> getVariableTypes(final Integer variableId) {
+		final Map<String, Integer> variableTypesByName = this.getVariableTypesByName();
 		final List<VariableType> variableTypes = new ArrayList<>();
 		final List<CVTermProperty> properties = daoFactory.getCvTermPropertyDao().getByCvTermAndType(variableId, TermId.VARIABLE_TYPE.getId());
 		for (final CVTermProperty property : properties) {
-			variableTypes.add(VariableType.getByName(property.getValue()));
+			variableTypes.add(VariableType.getById(variableTypesByName.get(property.getValue())));
 		}
 		return variableTypes;
 	}
@@ -1046,5 +1053,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public long countAllVariables(final List<Integer> variableTypes) {
 		return this.daoFactory.getCvTermDao().countAllVariables(variableTypes);
+	}
+
+	private Map<String, Integer> getVariableTypesByName(){
+		final List<Term> terms = this.daoFactory.getCvTermDao().getTermByCvId(CvId.VARIABLE_TYPE.getId());
+		final Map<String, Integer> variableTypesByName = new HashMap<>();
+		for (final Term term : terms) {
+			variableTypesByName.put(term.getName(), term.getId());
+		}
+		return variableTypesByName;
 	}
 }

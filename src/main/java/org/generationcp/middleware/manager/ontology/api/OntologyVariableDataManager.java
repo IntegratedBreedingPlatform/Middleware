@@ -12,8 +12,6 @@
 
 package org.generationcp.middleware.manager.ontology.api;
 
-import java.util.List;
-
 import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -22,6 +20,8 @@ import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariable
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.service.api.study.VariableDTO;
+
+import java.util.List;
 
 /**
  * This is the API for retrieving ontology variable data.
@@ -113,4 +113,5 @@ public interface OntologyVariableDataManager {
 		String cropname, Integer pageSize, Integer pageNumber);
 
 	long countAllVariables(List<Integer> variableTypes);
+
 }

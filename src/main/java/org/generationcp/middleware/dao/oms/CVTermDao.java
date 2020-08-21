@@ -183,8 +183,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		criteria.addOrder(Order.asc("cvTermPropertyId"));
 		final List<CVTermProperty> variableTypes = criteria.list();
 		if (variableTypes != null) {
+			final List<Term> allVariableTypes = this.getTermByCvId(CvId.VARIABLE_TYPE.getId());
+			final Map<String, Integer> allVariableTypesByName = new HashMap<>();
+			for (final Term term: allVariableTypes) {
+				allVariableTypesByName.put(term.getName(), term.getId());
+			}
 			for (final CVTermProperty cvTermProperty : variableTypes) {
-				return VariableType.getByName(cvTermProperty.getValue());
+				return VariableType.getById(allVariableTypesByName.get(cvTermProperty.getValue()));
 			}
 		}
 		return null;

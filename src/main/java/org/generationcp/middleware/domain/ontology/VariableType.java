@@ -60,16 +60,11 @@ public enum VariableType {
 	}
 
 	private static final Map<Integer, VariableType> byId = new HashMap<>();
-	private static final Map<String, VariableType> byName = new HashMap<>();
 
 	static {
 		for (final VariableType e : VariableType.values()) {
 			if (VariableType.byId.put(e.getId(), e) != null) {
 				throw new IllegalArgumentException("duplicate id: " + e.getId());
-			}
-
-			if (VariableType.byName.put(e.getName(), e) != null) {
-				throw new IllegalArgumentException("duplicate name: " + e.getName());
 			}
 		}
 	}
@@ -92,10 +87,6 @@ public enum VariableType {
 
 	public static VariableType getById(final Integer id) {
 		return VariableType.byId.get(id);
-	}
-
-	public static VariableType getByName(final String name) {
-		return VariableType.byName.get(name);
 	}
 
 	public static Set<Integer> getVariableTypesIdsByPhenotype(final PhenotypicType phenotype) {
