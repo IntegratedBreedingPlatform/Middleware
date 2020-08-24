@@ -741,6 +741,7 @@ public class WorkbookBuilder extends Builder {
 					for (final MeasurementVariable constant : constants) {
 						if (variate.getTermId() == constant.getTermId()) {
 							found = true;
+							break;
 						}
 					}
 				}
