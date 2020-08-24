@@ -257,7 +257,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "(SELECT SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
 		+ " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId() + ") "
 		+ "  THEN transaction.trnqty ELSE 0 END) FROM ims_transaction transaction WHERE  transaction.lotid = lot.lotid ) AS availableBalance, " //
-		+ "    tr.comments AS notes,"//
+		+ "    IFNULL(tr.comments,'') AS notes,"//
 		+ "    tr.trndate as createdDate, "//
 		+ "    lot.lotid AS lotLotId," //
 		+ "    lot.lot_uuid AS lotUUID," //
