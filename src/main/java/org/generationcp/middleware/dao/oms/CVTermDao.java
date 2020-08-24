@@ -1229,6 +1229,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	public boolean hasPossibleTreatmentPairs(final int cvTermId, final int propertyId,
 		final List<Integer> hiddenFields) {
 		try {
+			final String variableTypeName = this.getTermByCvId(CvId.VARIABLE_TYPE.getId()).stream().filter(f->VariableType.TREATMENT_FACTOR.getId().equals(f.getId())).findAny()                                      // If 'findAny' then return found
+				.get().getName();
 			final StringBuilder sqlString = new StringBuilder().append("SELECT count(c.cvterm_id) ")
 				.append(" FROM cvterm c ").append(" INNER JOIN cvterm_relationship pr ON pr.type_id = ")
 				.append(TermId.HAS_PROPERTY.getId()).append("   AND pr.subject_id = c.cvterm_id ")
@@ -1239,7 +1241,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append("   AND mr.subject_id = c.cvterm_id ")
 				.append(" INNER JOIN cvtermprop cvprop ON cvprop.type_id = ").append(TermId.VARIABLE_TYPE.getId())
 				.append("   AND cvprop.cvterm_id = c.cvterm_id AND cvprop.value = '")
-				.append(VariableType.TREATMENT_FACTOR.getName()).append("' WHERE c.cvterm_id <> ").append(cvTermId)
+				.append(variableTypeName).append("' WHERE c.cvterm_id <> ").append(cvTermId)
 				.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
@@ -1259,6 +1261,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		final List<StandardVariable> list = new ArrayList<>();
 
 		try {
+			final String variableTypeName = this.getTermByCvId(CvId.VARIABLE_TYPE.getId()).stream().filter(f->VariableType.TREATMENT_FACTOR.getId().equals(f.getId())).findAny()                                      // If 'findAny' then return found
+				.get().getName();
+
 			final StringBuilder sqlString = new StringBuilder()
 				.append(
 					"SELECT c.cvterm_id, c.name, c.definition, pr.object_id AS propertyId, sr.object_id AS scaleId, mr.object_id AS methodId ")
@@ -1271,7 +1276,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append("   AND mr.subject_id = c.cvterm_id ")
 				.append(" INNER JOIN cvtermprop cvprop ON cvprop.type_id = ").append(TermId.VARIABLE_TYPE.getId())
 				.append("   AND cvprop.cvterm_id = c.cvterm_id AND cvprop.value = '")
-				.append(VariableType.TREATMENT_FACTOR.getName()).append("' WHERE c.cvterm_id <> ").append(cvTermId)
+				.append(variableTypeName).append("' WHERE c.cvterm_id <> ").append(cvTermId)
 				.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString()).addScalar("cvterm_id")

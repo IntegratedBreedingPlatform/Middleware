@@ -587,6 +587,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		final CVTerm term = daoFactory.getCvTermDao().getByNameAndCvId(variableInfo.getName(), CvId.VARIABLES.getId());
 
+		final List<Term> variableTypes = daoFactory.getCvTermDao().getTermByCvId(CvId.VARIABLE_TYPE.getId());
+		final Map<Integer, String> variableTypesById = new HashMap<>();
+		for (final Term varTypeTerm: variableTypes) {
+			variableTypesById.put(varTypeTerm.getId(), varTypeTerm.getName());
+		}
+
 		if (term != null) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_EXIST_WITH_SAME_NAME);
 		}
@@ -618,7 +624,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			final CVTermProperty property = new CVTermProperty();
 			property.setCvTermId(variableInfo.getId());
 			property.setTypeId(TermId.VARIABLE_TYPE.getId());
-			property.setValue(type.getName());
+			property.setValue(variableTypesById.get(type.getId()));
 			property.setRank(rank++);
 			daoFactory.getCvTermPropertyDao().save(property);
 		}
@@ -644,6 +650,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@Override
 	public void updateVariable(final OntologyVariableInfo variableInfo) {
+
+		final List<Term> variableTypes = daoFactory.getCvTermDao().getTermByCvId(CvId.VARIABLE_TYPE.getId());
+		final Map<Integer, String> variableTypesById = new HashMap<>();
+		for (final Term varTypeTerm: variableTypes) {
+			variableTypesById.put(varTypeTerm.getId(), varTypeTerm.getName());
+		}
 
 		VariableCache.removeFromCache(variableInfo.getId());
 
@@ -731,7 +743,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			final CVTermProperty property = new CVTermProperty();
 			property.setCvTermId(variableInfo.getId());
 			property.setTypeId(TermId.VARIABLE_TYPE.getId());
-			property.setValue(type.getName());
+			property.setValue(variableTypesById.get(type.getId()));
 			property.setRank(rank++);
 			daoFactory.getCvTermPropertyDao().save(property);
 		}
