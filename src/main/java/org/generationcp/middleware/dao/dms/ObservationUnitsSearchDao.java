@@ -776,11 +776,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "          ) " //
 			+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId() //
 			// get the numericals whose value is not within bounds
-			+ "          then cast(ph2." + filterByDraftOrValue + " as unsigned) < scaleMinRange.value or cast(ph2." + filterByDraftOrValue
-			+ " as unsigned) > scaleMaxRange.value " //
-			+ "            or cast(ph2." + filterByDraftOrValue + " as unsigned) < vo.expected_min or cast(ph2." + filterByDraftOrValue
-			+ " as unsigned) > vo.expected_max "
-			//
+			// cast strings to decimal (+ 0) to compare
+			+ "          then ph2." + filterByDraftOrValue + " + 0 < scaleMinRange.value "  //
+			+ "            or ph2." + filterByDraftOrValue + " + 0 > scaleMaxRange.value " //
+			+ "            or ph2." + filterByDraftOrValue + " + 0 < vo.expected_min "  //
+			+ "            or ph2." + filterByDraftOrValue + " + 0 > vo.expected_max " //
 			+ "        else false " //
 			+ "        end " //
 			+ "    )"); //
