@@ -82,7 +82,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 			final StringBuilder sql =
 				new StringBuilder().append("Select lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
-					.append("tran.sourceid, tran.trnqty, lot.comments ")
+					.append("tran.trnqty, lot.comments ")
 					.append("FROM ims_transaction tran ")
 					.append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
 					.append("INNER JOIN stock s on s.dbxref_id = lot.eid ")
@@ -100,12 +100,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					final Integer gid = (Integer) row[2];
 					final Integer locationId = (Integer) row[3];
 					final Integer scaleId = (Integer) row[4];
-					final Integer sourceId = (Integer) row[5];
-					final Double amount = (Double) row[6];
-					final String comment = (String) row[7];
+					final Double amount = (Double) row[5];
+					final String comment = (String) row[6];
 
 					final InventoryDetails details =
-						new InventoryDetails(gid, null, lotId, locationId, null, userId, amount, sourceId, null, scaleId, null, comment);
+						new InventoryDetails(gid, null, lotId, locationId, null, userId, amount, scaleId, null, comment);
 					detailsList.add(details);
 				}
 			}
@@ -117,115 +116,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 
 		return detailsList;
-	}
-
-
-	@SuppressWarnings("unchecked")
-	public Map<Integer, BigInteger> countLotsWithReservationForListEntries(final List<Integer> listEntryIds) {
-		//FIXME delete because the value is never used. This query is wrong, should use gids instead of listEntryIds
-		final Map<Integer, BigInteger> lotCounts = new HashMap<>();
-
-		try {
-			final String sql =
-					"SELECT recordid, count(DISTINCT t.lotid) " + "FROM ims_transaction t " + "INNER JOIN ims_lot l ON l.lotid = t.lotid "
-							+ "WHERE trnstat = 0 AND trnqty < 0 AND recordid IN (:entryIds) "
-							+ "  AND l.status = 0 AND l.etype = 'GERMPLSM' " + "GROUP BY recordid " + "ORDER BY recordid ";
-			final Query query = this.getSession().createSQLQuery(sql).setParameterList("entryIds", listEntryIds);
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-				final Integer entryId = (Integer) row[0];
-				final BigInteger count = (BigInteger) row[1];
-
-				lotCounts.put(entryId, count);
-			}
-
-		} catch (final Exception e) {
-			final String message = "Error with countLotsWithReservationForListEntries=" + listEntryIds + " query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-		return lotCounts;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<Integer, Object[]> retrieveWithdrawalBalanceWithDistinctScale(final List<Integer> listEntryIds) {
-		final Map<Integer, Object[]> mapWithdrawalStatusEntryWise = new HashMap<>();
-
-		try {
-			final String sql =
-					"SELECT recordid, sum(trnqty)*-1 as withdrawal, count(distinct l.scaleid),l.scaleid "
-							+ "FROM ims_transaction t " + "INNER JOIN ims_lot l ON l.lotid = t.lotid "
-							+ "WHERE trnqty < 0 AND trnstat <> 9 AND recordid IN (:entryIds) "
-							+ "  AND l.status = 0 AND l.etype = 'GERMPLSM' " + "GROUP BY recordid " + "ORDER BY recordid ";
-			final Query query = this.getSession().createSQLQuery(sql).setParameterList("entryIds", listEntryIds);
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-				final Integer entryId = (Integer) row[0];
-				final Double withdrawalBalance = (Double) row[1];
-
-				final BigInteger distinctWithdrawalScale = (BigInteger) row[2];
-				final Integer withdrawalScale = (Integer) row[3];
-
-				mapWithdrawalStatusEntryWise.put(entryId, new Object[] {withdrawalBalance, distinctWithdrawalScale, withdrawalScale});
-			}
-
-		} catch (final Exception e) {
-			final String message = "Error with retrieveWithdrawalBalanceWithDistinctScale=" + listEntryIds + " query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-		return mapWithdrawalStatusEntryWise;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Object[]> retrieveWithdrawalStatus(final Integer sourceId, final List<Integer> listGids) {
-		final List<Object[]> listOfTransactionStatusForGermplsm = new ArrayList<>();
-
-		try {
-			final String sql =
-					"select lot.*,recordid,trnstat  from  (SELECT i.lotid, i.eid FROM ims_lot i "
-							+ " LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-							+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gIds) GROUP BY i.lotid ) lot "
-							+ " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid   AND trnstat in (0,1) AND trnqty < 0 "
-							+ " AND sourceid = :sourceid AND sourcetype = 'LIST'  ORDER by lot.eid; ";
-			final Query query = this.getSession().createSQLQuery(sql);
-			query.setParameterList("gIds", listGids);
-			query.setParameter("sourceid", sourceId);
-
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-
-				Integer lotId = null;
-				Integer germplsmId = null;
-				Integer recordId = null;
-				Integer tranStatus = null;
-
-				if(row[0] != null){
-					lotId = (Integer) row[0];
-				}
-
-				if(row[1] != null){
-					germplsmId = (Integer) row[1];
-				}
-				if(row[2] != null){
-					recordId = (Integer) row[2];
-				}
-				if(row[3] != null){
-					tranStatus = (Integer) row[3];
-				}
-
-				listOfTransactionStatusForGermplsm.add(new Object[]{ lotId, germplsmId, recordId, tranStatus });
-			}
-
-		} catch (final Exception e) {
-			final String message = "Error withretrieveWithdrawalStatus=" + listGids + " query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-		return listOfTransactionStatusForGermplsm;
 	}
 
 	public void cancelUnconfirmedTransactionsForListEntries(final List<Integer> listEntryIds) {
@@ -244,23 +134,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			query.executeUpdate();
 		} catch (final Exception e) {
 			final String message = "Error cancelUnconfirmedTransactionsForListEntries=" + listEntryIds + " query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	public void cancelUnconfirmedTransactionsForGermplasms(final List<Integer> gids) {
-		try {
-			final String sql =
-					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate "
-							+ "WHERE trnstat = 0 AND sourceType = 'LIST' " + "AND lotid in ( select lotid from ims_lot "
-							+ "WHERE status = 0 AND etype = 'GERMPLSM' " + "AND eid in (:gids))";
-			final Query query =
-					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDate())
-							.setParameterList("gids", gids);
-			query.executeUpdate();
-		} catch (final Exception e) {
-			final String message = "Error cancelUnconfirmedTransactionsForGermplasms=" + gids + ") query from Transaction: " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -304,6 +177,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return query.list();
 	}
 
+	// Used in Lot Details component
 	public List<TransactionReportRow> getTransactionDetailsForLot(final Integer lotId) {
 
 		final List<TransactionReportRow> transactions = new ArrayList<>();
@@ -380,6 +254,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ "' WHEN trntype = " + TransactionType.ADJUSTMENT.getId() + "  THEN '" + TransactionType.ADJUSTMENT.getValue()
 		+ "' END) AS transactionType,"//
 		+ "    tr.trnqty AS amount,"//
+		+ "(SELECT SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
+		+ " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId() + ") "
+		+ "  THEN transaction.trnqty ELSE 0 END) FROM ims_transaction transaction WHERE  transaction.lotid = lot.lotid ) AS availableBalance, " //
 		+ "    tr.comments AS notes,"//
 		+ "    tr.trndate as createdDate, "//
 		+ "    lot.lotid AS lotLotId," //
@@ -655,6 +532,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				String.class,    // createdByUsername
 				String.class,    // transactionType
 				Double.class,    // amount
+				Double.class,	 // available Balance
 				String.class,    // notes
 				Date.class,      // createdDate
 				Integer.class,   // lotId
@@ -683,6 +561,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				String.class,    // createdByUsername
 				String.class,    // transactionType
 				Double.class,    // amount
+				Double.class,	 // available Balance
 				String.class,    // notes
 				Date.class,      // createdDate
 				Integer.class,   // lotId
@@ -709,6 +588,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("createdByUsername");
 		query.addScalar("transactionType");
 		query.addScalar("amount");
+		query.addScalar("availableBalance");
 		query.addScalar("notes");
 		query.addScalar("createdDate", Hibernate.DATE);
 		query.addScalar("lotLotId");
@@ -746,10 +626,17 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final SQLQuery transactionsQuery =
 			this.getSession().createSQLQuery("select count(1) from ( " + transactionsQuerySql.toString() + ") T");
 		transactionsQuery.setParameter("studyId", studyId);
-		addSearchTransactionsFilters(new SqlQueryParamBuilder(transactionsQuery), transactionsSearch);
-		addObsUnitFilters(new SqlQueryParamBuilder(transactionsQuery), studyTransactionsRequest);
-
+		final SqlQueryParamBuilder paramBuilder = new SqlQueryParamBuilder(transactionsQuery);
+		addSearchTransactionsFilters(paramBuilder, transactionsSearch);
+		addObsUnitFilters(paramBuilder, studyTransactionsRequest);
+		this.excludeCancelledTransactions(paramBuilder);
 		return ((BigInteger) transactionsQuery.uniqueResult()).longValue();
+	}
+
+	private void excludeCancelledTransactions(final SqlQueryParamBuilder paramBuilder) {
+		// Exclude "Cancelled" study transactions from result
+		paramBuilder.append(" and trnstat != :cancelledStatus ");
+		paramBuilder.setParameter("cancelledStatus", TransactionStatus.CANCELLED.getIntValue());
 	}
 
 	public List<StudyTransactionsDto> searchStudyTransactions(
@@ -762,14 +649,15 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQueryFilterSql), studyTransactionsRequest);
 
 		final StringBuilder transactionsQuerySql = this.buildStudyTransactionsQuery(transactionsSearch, obsUnitsQueryFilterSql);
-
 		addSortedPageRequestOrderBy(transactionsQuerySql, studyTransactionsRequest.getSortedPageRequest());
 
 		// transactions data
 		final SQLQuery transactionsQuery = this.getSession().createSQLQuery(transactionsQuerySql.toString());
 		transactionsQuery.setParameter("studyId", studyId);
-		addSearchTransactionsFilters(new SqlQueryParamBuilder(transactionsQuery), transactionsSearch);
-		addObsUnitFilters(new SqlQueryParamBuilder(transactionsQuery), studyTransactionsRequest);
+		final SqlQueryParamBuilder paramBuilder = new SqlQueryParamBuilder(transactionsQuery);
+		addSearchTransactionsFilters(paramBuilder, transactionsSearch);
+		addObsUnitFilters(paramBuilder, studyTransactionsRequest);
+		this.excludeCancelledTransactions(paramBuilder);
 		addSortedPageRequestPagination(transactionsQuery, studyTransactionsRequest.getSortedPageRequest());
 		this.addSearchTransactionsQueryScalars(transactionsQuery);
 		transactionsQuery.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getStudyTransactionsDtoConstructor()));
@@ -805,8 +693,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final StringBuilder obsUnitsQuerySql) {
 
 		final StringBuilder searchTransactionsQuery = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
-		addSearchTransactionsFilters(new SqlQueryParamBuilder(searchTransactionsQuery), transactionsSearchDto);
-
+		final SqlQueryParamBuilder paramBuilder = new SqlQueryParamBuilder(searchTransactionsQuery);
+		addSearchTransactionsFilters(paramBuilder, transactionsSearchDto);
+		this.excludeCancelledTransactions(paramBuilder);
 		return new StringBuilder(""  //
 				+ " select SEARCH_TRANSACTIONS_QUERY.* " //
 				+ " from ( " //

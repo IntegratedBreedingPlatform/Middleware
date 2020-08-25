@@ -41,6 +41,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.InstanceDetailsDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -624,11 +625,16 @@ public class DatasetServiceImpl implements DatasetService {
 			studyId,
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
+		final List<MeasurementVariableDto> selectionMethodsAndTraits =
+			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
+				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
+
 		final ObservationUnitsSearchDTO searchDTO =
 			new ObservationUnitsSearchDTO(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<>());
 		searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
+		searchDTO.setSelectionMethodsAndTraits(selectionMethodsAndTraits);
 
 		final List<ObservationUnitRow> observationUnits = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
 		this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
@@ -1311,6 +1317,13 @@ public class DatasetServiceImpl implements DatasetService {
 	public Map<String, Long> countObservationsGroupedByInstance(final Integer datasetId) {
 		return this.daoFactory.getExperimentDao().countObservationsPerInstance(datasetId);
 	}
+
+
+	@Override
+	public List<InstanceDetailsDTO> getInstanceDetails(final Integer datasetId, final Integer studyId) {
+		return this.daoFactory.getExperimentDao().getInstanceInformation(datasetId, studyId);
+	}
+
 
 	@Override
 	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(

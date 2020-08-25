@@ -9,7 +9,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class StudyInstance {
 
 	private int instanceId;
-	private Integer locationInstanceDataId;
+	private Integer locationDescriptorDataId;
 	private Integer locationId;
 	private String locationName;
 	private String locationAbbreviation;
@@ -17,7 +17,9 @@ public class StudyInstance {
 	private int instanceNumber;
 	private boolean hasFieldmap;
 	private Boolean hasGeoJSON;
-	/** has X/Y coordinates */
+	/**
+	 * has X/Y coordinates
+	 */
 	private Boolean hasFieldLayout;
 	private Boolean hasInventory;
 	private Boolean hasExperimentalDesign;
@@ -156,12 +158,12 @@ public class StudyInstance {
 		this.canBeDeleted = canBeDeleted;
 	}
 
-	public Integer getLocationInstanceDataId() {
-		return this.locationInstanceDataId;
+	public Integer getLocationDescriptorDataId() {
+		return this.locationDescriptorDataId;
 	}
 
-	public void setLocationInstanceDataId(final Integer locationInstanceDataId) {
-		this.locationInstanceDataId = locationInstanceDataId;
+	public void setLocationDescriptorDataId(final Integer locationDescriptorDataId) {
+		this.locationDescriptorDataId = locationDescriptorDataId;
 	}
 
 	@Override
