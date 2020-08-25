@@ -13,7 +13,7 @@
 		</preConditions>
 		<comment> REMOVE Study Detail AS DEFAULT TYPE FOR environment-LEVEL/plot-LEVEL variables. IBP-3889
 		</comment>
-		<sql dbms="mysql" splitStatements="TRUE">
+		<sql dbms="mysql" splitStatements="true">
 			SET FOREIGN_KEY_CHECKS=0;
 			
 			DELETE from cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583,	8584,	8265,	8690,	8700,	8830,	8386,	8720,	8620,	8740,	8750,	8760,	8770,	8780,	8387,	8790,	8383,	8194,	8195,	8193,	8191,	8192,	8196,	8800,	8810,	8820,	8730,	8384,	8170,	8186);
@@ -37,16 +37,16 @@
 
 	<changeSet id="v15.4.1-3" author="rowena">
 		<preConditions onFail="MARK_RAN">
-			<AND>
-			<columnExists tableName="location" columnName="ldefault"/>
-			<sqlCheck expectedResult="0">
-				SELECT COUNT(1) FROM location l
-				WHERE l.ldefault = 1 AND l.ltype = 1500;
-			</sqlCheck>
-			<sqlCheck expectedResult="1">
-				SELECT COUNT(1) FROM location WHERE locid=6000 AND ltype = 1500;
-			</sqlCheck>
-			</AND>
+			<and>
+				<columnExists tableName="location" columnName="ldefault"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1) FROM location l
+					WHERE l.ldefault = 1 AND l.ltype = 1500;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1) FROM location WHERE locid=6000 AND ltype = 1500;
+				</sqlCheck>
+			</and>
 	</preConditions>
 
 	<comment>SET DSS AS DEFAULT STORAGE location</comment>
