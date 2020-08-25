@@ -94,10 +94,9 @@ public class DataSourceProperties {
 
 	private String getPropertyValue(final String envVariable, final Properties properties, final String defaultValue, final String property) {
 		final String valueInEnvironment = System.getenv(envVariable);
-		if (Strings.isNullOrEmpty(valueInEnvironment)) {
-			return getPropertyValue(properties, defaultValue, property);
-		}
-		return valueInEnvironment;
+		return (Strings.isNullOrEmpty(valueInEnvironment))
+				? getPropertyValue(properties, defaultValue, property)
+				: valueInEnvironment;
 	}
 
 	private String getPropertyValue(final Properties properties, final String defaultValue, final String property) {
