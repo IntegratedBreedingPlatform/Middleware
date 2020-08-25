@@ -1084,7 +1084,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				final Optional<DataType> dmsVariableType = this.variableDataManager.getDataType(prop.getVariableId());
 				final String value;
 				if (dmsVariableType.isPresent() && dmsVariableType.get().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
-					final Integer categoricalId = prop.getValue().equals("") ? 0 : Integer.parseInt(prop.getValue());
+					final Integer categoricalId = StringUtils.isNotBlank(prop.getValue()) ? Integer.parseInt(prop.getValue()) : 0;
 					value = this.variableDataManager.retrieveVariableCategoricalValue(dmsProject.getProgramUUID(), prop.getVariableId(), categoricalId);
  				} else {
 					value = prop.getValue();
