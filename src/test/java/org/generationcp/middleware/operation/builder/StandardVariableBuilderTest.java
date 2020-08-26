@@ -390,6 +390,24 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 
 	}
 
+	@Test
+	public void testSetRoleOfVariablesVariableTypeForExperimentalVariables() {
+
+		final StandardVariable nblks = standardVariableBuilder.create(TermId.NBLKS.getId(), null);
+		final List<StandardVariable> standardVariables = new ArrayList<>();
+		standardVariables.add(nblks);
+
+		// Assign the nblks to VariableType.EXPERIMENTAL_DESIGN
+		final Map<Integer, VariableType> variableTypeMap = new HashMap<>();
+		variableTypeMap.put(TermId.NBLKS.getId(), VariableType.EXPERIMENTAL_DESIGN);
+
+		standardVariableBuilder.setRoleOfVariables(standardVariables, variableTypeMap);
+
+		// The phenotypicType (role) of trialInstanceFactor should be from VariableType.ENVIRONMENT_DETAIL
+		Assert.assertEquals(VariableType.ENVIRONMENT_DETAIL.getRole(), nblks.getPhenotypicType());
+
+	}
+
 	private DmsProject createDMSProject() {
 
 		final DmsProject dmsProject = new DmsProject();

@@ -407,7 +407,11 @@ public class StandardVariableBuilder extends Builder {
 	protected void setRoleOfVariables(final List<StandardVariable> variables, final Map<Integer, VariableType> varIdsWithType) {
 		for (final StandardVariable standardVariable : variables) {
 			final VariableType type = varIdsWithType.get(standardVariable.getId());
-			if (type != null) {
+			// Experimental Design Variables will have Trial_Environment phenotypic type
+			final int standardVarialbeId = standardVariable.getId();
+			if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(standardVarialbeId)) {
+				standardVariable.setPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
+			} else if(type != null) {
 				standardVariable.setPhenotypicType(type.getRole());
 			}
 		}
