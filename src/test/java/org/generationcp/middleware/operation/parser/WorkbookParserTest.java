@@ -254,7 +254,7 @@ public class WorkbookParserTest {
 		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.ENVIRONMENTAL_CONDITIONS, measurementVariable);
 		assertEquals(PhenotypicType.TRIAL_ENVIRONMENT, measurementVariable.getRole());
 		assertEquals(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), measurementVariable.getLabel());
-		assertEquals(VariableType.STUDY_CONDITION, measurementVariable.getVariableType());
+		assertEquals(VariableType.ENVIRONMENT_CONDITION, measurementVariable.getVariableType());
 
 		this.workbookParser.assignVariableTypeAndRoleBasedOnSectionName(Section.GERMPLASM_DECRIPTORS, measurementVariable);
 		assertEquals(PhenotypicType.GERMPLASM, measurementVariable.getRole());

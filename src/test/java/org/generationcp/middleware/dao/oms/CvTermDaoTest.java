@@ -91,7 +91,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		varNameWithTypeMap.put("CROSS", VariableType.GERMPLASM_DESCRIPTOR);
 		varNameWithTypeMap.put("PLOT_NO", VariableType.EXPERIMENTAL_DESIGN);
 		varNameWithTypeMap.put("REP_NO", VariableType.EXPERIMENTAL_DESIGN);
-		varNameWithTypeMap.put("SITE_SOIL_PH", VariableType.STUDY_CONDITION);
+		varNameWithTypeMap.put("SITE_SOIL_PH", VariableType.ENVIRONMENT_CONDITION);
 		return varNameWithTypeMap;
 	}
 

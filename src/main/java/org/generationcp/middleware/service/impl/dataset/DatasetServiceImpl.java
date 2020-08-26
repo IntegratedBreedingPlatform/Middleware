@@ -99,7 +99,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private static final List<Integer> ENVIRONMENT_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.ENVIRONMENT_DETAIL.getId(),
-		VariableType.STUDY_CONDITION.getId());
+		VariableType.ENVIRONMENT_CONDITION.getId());
 
 	protected static final List<Integer> OBSERVATION_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.OBSERVATION_UNIT.getId(),
@@ -653,7 +653,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	List<MeasurementVariableDto> getEnvironmentConditionVariableNames(final Integer trialDatasetId) {
 		final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
-			.getObservationSetVariables(trialDatasetId, Lists.newArrayList(VariableType.STUDY_CONDITION.getId()));
+			.getObservationSetVariables(trialDatasetId, Lists.newArrayList(VariableType.ENVIRONMENT_CONDITION.getId()));
 		final List<MeasurementVariableDto> factors = new ArrayList<>();
 		for (final MeasurementVariable variable : environmentConditions) {
 			factors.add(new MeasurementVariableDto(variable.getTermId(), variable.getName()));
