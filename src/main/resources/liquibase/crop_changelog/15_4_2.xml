@@ -8,15 +8,15 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*) FROM cvterm
-				WHERE cvterm_id = 1802 AND cv_id = 1041 AND name ='Study Condition';
+				WHERE cvterm_id = 1802 AND cv_id = 1041 AND `name` ='Study Condition';
 			</sqlCheck>
 		</preConditions>
 		<comment>
 			Rename variable type Study Condition to Environment Condition
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE cvterm SET name='Environment Condition' WHERE cvterm_id=1802 AND cv_id=1041;
-			UPDATE cvtermprop SET value='Environment Condition' WHERE value='Study Condition' AND type_id=1800;
+			UPDATE cvterm SET `name`='Environment Condition' WHERE cvterm_id=1802 AND cv_id=1041;
+			UPDATE cvtermprop SET `value`='Environment Condition' WHERE `value`='Study Condition' AND type_id=1800;
 		</sql>
 	</changeSet>
 
