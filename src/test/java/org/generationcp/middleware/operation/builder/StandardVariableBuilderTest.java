@@ -69,7 +69,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testCreate() {
-		final StandardVariable standardVariable = standardVariableBuilder.create(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
+		final StandardVariable standardVariable = this.standardVariableBuilder.create(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
 		assertNotNull(standardVariable);
 		assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), standardVariable.getId());
 		assertEquals(TRIAL_INSTANCE_PROPERTY_ID, standardVariable.getProperty().getId());
@@ -88,7 +88,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		variable.setIsObsolete(true);
 		cvtermDao.update(variable);
 
-		final StandardVariable standardVariable = standardVariableBuilder.create(id, null);
+		final StandardVariable standardVariable = this.standardVariableBuilder.create(id, null);
 		assertNotNull(standardVariable);
 		assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), standardVariable.getId());
 		assertEquals(TRIAL_INSTANCE_PROPERTY_ID, standardVariable.getProperty().getId());
@@ -107,7 +107,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		standardVariableIds.add(TermId.ENTRY_NO.getId());
 		standardVariableIds.add(TermId.GID.getId());
 
-		final List<StandardVariable> standardVariables = standardVariableBuilder.create(standardVariableIds, null);
+		final List<StandardVariable> standardVariables = this.standardVariableBuilder.create(standardVariableIds, null);
 		assertNotNull(standardVariables);
 		assertEquals(standardVariableIds.size(), standardVariables.size());
 		for (final StandardVariable standardVariable : standardVariables) {
@@ -128,7 +128,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	public void testCreateEmptyList() {
 		final List<Integer> standardVariableIds = new ArrayList<Integer>();
 
-		final List<StandardVariable> standardVariables = standardVariableBuilder.create(standardVariableIds, null);
+		final List<StandardVariable> standardVariables = this.standardVariableBuilder.create(standardVariableIds, null);
 		assertNotNull(standardVariables);
 		assertEquals(0, standardVariables.size());
 	}
@@ -137,7 +137,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	public void testCreateNullList() {
 		final List<Integer> standardVariableIds = null;
 
-		final List<StandardVariable> standardVariables = standardVariableBuilder.create(standardVariableIds, null);
+		final List<StandardVariable> standardVariables = this.standardVariableBuilder.create(standardVariableIds, null);
 		assertNotNull(standardVariables);
 		assertEquals(0, standardVariables.size());
 	}
@@ -152,7 +152,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final String datatype = "N";
 		final PhenotypicType role = PhenotypicType.TRIAL_ENVIRONMENT;
 		final StandardVariable standardVariable =
-			standardVariableBuilder.findOrSave(name, description, property, scale, method, role, null, datatype, null);
+			this.standardVariableBuilder.findOrSave(name, description, property, scale, method, role, null, datatype, null);
 		assertNotNull(standardVariable);
 		assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), standardVariable.getId());
 		assertEquals(TRIAL_INSTANCE_PROPERTY_ID, standardVariable.getProperty().getId());
@@ -179,7 +179,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final String datatype = "N";
 		final PhenotypicType role = PhenotypicType.TRIAL_ENVIRONMENT;
 		final StandardVariable standardVariable =
-			standardVariableBuilder.findOrSave(name, description, property, scale, method, role, null, datatype, null);
+			this.standardVariableBuilder.findOrSave(name, description, property, scale, method, role, null, datatype, null);
 		assertNotNull(standardVariable);
 		assertEquals(name, standardVariable.getName());
 		assertEquals(description, standardVariable.getDescription());
@@ -195,7 +195,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	@Test
 	public void testGetByName() {
 		final String name = "TRIAL_INSTANCE";
-		final StandardVariable standardVariable = standardVariableBuilder.getByName(name, null);
+		final StandardVariable standardVariable = this.standardVariableBuilder.getByName(name, null);
 		assertNotNull(standardVariable);
 		assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), standardVariable.getId());
 		assertEquals(name, standardVariable.getName());
@@ -207,7 +207,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	@Test
 	public void testGetByNameNotFound() {
 		final String name = "VAR_123456";
-		final StandardVariable standardVariable = standardVariableBuilder.getByName(name, null);
+		final StandardVariable standardVariable = this.standardVariableBuilder.getByName(name, null);
 		assertNull(standardVariable);
 	}
 
@@ -216,7 +216,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final int propertyId = TRIAL_INSTANCE_PROPERTY_ID;
 		final int scaleId = TRIAL_INSTANCE_SCALE_ID;
 		final int methodId = TRIAL_INSTANCE_METHOD_ID;
-		final StandardVariable standardVariable = standardVariableBuilder.getByPropertyScaleMethod(propertyId, scaleId, methodId, null);
+		final StandardVariable standardVariable = this.standardVariableBuilder.getByPropertyScaleMethod(propertyId, scaleId, methodId, null);
 		assertNotNull(standardVariable);
 		assertEquals(TRIAL_INSTANCE_PROPERTY_ID, standardVariable.getProperty().getId());
 		assertEquals(TRIAL_INSTANCE_SCALE_ID, standardVariable.getScale().getId());
@@ -228,7 +228,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final int propertyId = 1;
 		final int scaleId = 2;
 		final int methodId = 3;
-		final StandardVariable standardVariable = standardVariableBuilder.getByPropertyScaleMethod(propertyId, scaleId, methodId, null);
+		final StandardVariable standardVariable = this.standardVariableBuilder.getByPropertyScaleMethod(propertyId, scaleId, methodId, null);
 		assertNull(standardVariable);
 	}
 
@@ -239,7 +239,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final int methodId = TRIAL_INSTANCE_METHOD_ID;
 		final PhenotypicType role = PhenotypicType.TRIAL_ENVIRONMENT;
 		final StandardVariable standardVariable =
-			standardVariableBuilder.getByPropertyScaleMethodRole(propertyId, scaleId, methodId, role, null);
+			this.standardVariableBuilder.getByPropertyScaleMethodRole(propertyId, scaleId, methodId, role, null);
 		assertNotNull(standardVariable);
 		assertEquals(TRIAL_INSTANCE_PROPERTY_ID, standardVariable.getProperty().getId());
 		assertEquals(TRIAL_INSTANCE_SCALE_ID, standardVariable.getScale().getId());
@@ -253,7 +253,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final int methodId = 3;
 		final PhenotypicType role = PhenotypicType.TRIAL_ENVIRONMENT;
 		final StandardVariable standardVariable =
-			standardVariableBuilder.getByPropertyScaleMethodRole(propertyId, scaleId, methodId, role, null);
+			this.standardVariableBuilder.getByPropertyScaleMethodRole(propertyId, scaleId, methodId, role, null);
 		assertNull(standardVariable);
 	}
 
@@ -357,7 +357,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	@Test
 	public void testSetRoleOfVariablesVariableTypeIsUnassigned() {
 
-		final StandardVariable trialInstanceFactor = standardVariableBuilder.create(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
+		final StandardVariable trialInstanceFactor = this.standardVariableBuilder.create(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
 		final List<StandardVariable> standardVariables = new ArrayList<>();
 		standardVariables.add(trialInstanceFactor);
 
@@ -365,7 +365,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final Map<Integer, VariableType> variableTypeMap = new HashMap<>();
 		variableTypeMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
 
-		standardVariableBuilder.setRoleOfVariables(standardVariables, variableTypeMap);
+		this.standardVariableBuilder.setRoleOfVariables(standardVariables, variableTypeMap);
 
 		// The trialInstanceFactor has no VariableType assigned to it, so the phenotypicType (role) is null
 		Assert.assertNull(trialInstanceFactor.getPhenotypicType());
@@ -375,7 +375,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	@Test
 	public void testSetRoleOfVariablesVariableTypeIsAssigned() {
 
-		final StandardVariable trialInstanceFactor = standardVariableBuilder.create(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
+		final StandardVariable trialInstanceFactor = this.standardVariableBuilder.create(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
 		final List<StandardVariable> standardVariables = new ArrayList<>();
 		standardVariables.add(trialInstanceFactor);
 
@@ -383,7 +383,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final Map<Integer, VariableType> variableTypeMap = new HashMap<>();
 		variableTypeMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), VariableType.ENVIRONMENT_DETAIL);
 
-		standardVariableBuilder.setRoleOfVariables(standardVariables, variableTypeMap);
+		this.standardVariableBuilder.setRoleOfVariables(standardVariables, variableTypeMap);
 
 		// The phenotypicType (role) of trialInstanceFactor should be from VariableType.ENVIRONMENT_DETAIL
 		Assert.assertEquals(VariableType.ENVIRONMENT_DETAIL.getRole(), trialInstanceFactor.getPhenotypicType());
@@ -393,7 +393,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	@Test
 	public void testSetRoleOfVariablesVariableTypeForExperimentalVariables() {
 
-		final StandardVariable nblks = standardVariableBuilder.create(TermId.NBLKS.getId(), null);
+		final StandardVariable nblks = this.standardVariableBuilder.create(TermId.NBLKS.getId(), null);
 		final List<StandardVariable> standardVariables = new ArrayList<>();
 		standardVariables.add(nblks);
 
@@ -401,7 +401,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final Map<Integer, VariableType> variableTypeMap = new HashMap<>();
 		variableTypeMap.put(TermId.NBLKS.getId(), VariableType.EXPERIMENTAL_DESIGN);
 
-		standardVariableBuilder.setRoleOfVariables(standardVariables, variableTypeMap);
+		this.standardVariableBuilder.setRoleOfVariables(standardVariables, variableTypeMap);
 
 		// The phenotypicType (role) of trialInstanceFactor should be from VariableType.ENVIRONMENT_DETAIL
 		Assert.assertEquals(VariableType.ENVIRONMENT_DETAIL.getRole(), nblks.getPhenotypicType());
