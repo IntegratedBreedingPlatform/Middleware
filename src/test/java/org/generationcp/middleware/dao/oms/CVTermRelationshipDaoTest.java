@@ -1,10 +1,5 @@
 package org.generationcp.middleware.dao.oms;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -36,6 +31,11 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	
@@ -403,7 +403,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		prop.setAlias(RandomStringUtils.randomAlphabetic(10));
 		prop.setVariableId(this.variable.getCvTermId());
 		prop.setRank(1);
-		prop.setTypeId(VariableType.STUDY_CONDITION.getId());
+		prop.setTypeId(VariableType.ENVIRONMENT_CONDITION.getId());
 		prop.setValue(String.valueOf(this.categories.get(2).getCvTermId()));
 		this.projectPropDao.save(prop);
 	}
