@@ -36,7 +36,7 @@ import java.util.Set;
 public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	public static final List<Integer> CALCULATED_VARIABLE_VARIABLE_TYPES = Collections.unmodifiableList(
-		Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
+		Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.ENVIRONMENT_CONDITION.getId()));
 
 	@Autowired
 	private FormulaService formulaService;
@@ -144,7 +144,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 		final List<MeasurementVariable> measurementVariables;
 		if (isPlotDataset) {
-			// If dataset is plot dataset, we should get all variables (ENVIRONMENT DETAIL, STUDY_CONDITION and TRAIT) across all datasets in study.
+			// If dataset is plot dataset, we should get all variables (ENVIRONMENT DETAIL, ENVIRONMENT_CONDITION and TRAIT) across all datasets in study.
 			measurementVariables =
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectIds,
 					CALCULATED_VARIABLE_VARIABLE_TYPES);
