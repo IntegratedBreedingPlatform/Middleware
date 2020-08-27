@@ -173,6 +173,37 @@
 		</sql>
 	</changeSet>
 
+	<changeSet id="v15.4.1-10" author="aldrin">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					-- Check if there are stocks that don't have GROUPGID stock property.
+					SELECT COUNT(*) FROM stock s
+					INNER JOIN germplsm g ON s.dbxref_id = g.gid
+					INNER JOIN project plotDataset ON plotDataset.parent_project_id = s.project_id AND plotDataset.dataset_type_id = 4
+            		INNER JOIN projectprop ppPlot ON ppPlot.project_id = plotDataset.project_id AND ppPlot.variable_id = 8330
+					LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id AND sp.type_id = 8330
+					WHERE sp.stockprop_id IS NULL;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Create GROUPGID stock property record for existing stocks (study germplasm entries) that don't have it.</comment>
+		<sql dbms="mysql">
+			-- Value of GROUPGID should be the mgid of the germplasm.
+			-- Only create GROUPGID stockprop for studies with GROUPGID variable in projectprop.
+			INSERT INTO stockprop (`stock_id`, `type_id`, `value`, `rank`)
+			SELECT s.stock_id, 8330, g.mgid, IFNULL(MAX(spRank.rank), 0) + 1
+			FROM stock s
+			INNER JOIN germplsm g ON s.dbxref_id = g.gid
+            INNER JOIN project plotDataset ON plotDataset.parent_project_id = s.project_id AND plotDataset.dataset_type_id = 4
+            INNER JOIN projectprop ppPlot ON ppPlot.project_id = plotDataset.project_id AND ppPlot.variable_id = 8330
+			LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id AND sp.type_id = 8330
+			LEFT JOIN stockprop spRank ON spRank.stock_id = s.stock_id
+			WHERE sp.stockprop_id IS NULL
+			GROUP BY s.stock_id;
+		</sql>
+	</changeSet>
+
 	
 
 </databaseChangeLog>
