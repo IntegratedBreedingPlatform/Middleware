@@ -179,11 +179,9 @@
 				<sqlCheck expectedResult="0">
 					-- Check if there are stocks that don't have GROUPGID stock property.
 					SELECT COUNT(*) FROM stock s
-					INNER JOIN germplsm g ON s.dbxref_id = g.gid
 					INNER JOIN project plotDataset ON plotDataset.parent_project_id = s.project_id AND plotDataset.dataset_type_id = 4
             		INNER JOIN projectprop ppPlot ON ppPlot.project_id = plotDataset.project_id AND ppPlot.variable_id = 8330
-					LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id AND sp.type_id = 8330
-					WHERE sp.stockprop_id IS NULL;
+					WHERE NOT EXISTS (select 1 from stockprop sp WHERE sp.stock_id = s.stock_id AND sp.type_id = 8330)
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -197,9 +195,8 @@
 			INNER JOIN germplsm g ON s.dbxref_id = g.gid
             INNER JOIN project plotDataset ON plotDataset.parent_project_id = s.project_id AND plotDataset.dataset_type_id = 4
             INNER JOIN projectprop ppPlot ON ppPlot.project_id = plotDataset.project_id AND ppPlot.variable_id = 8330
-			LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id AND sp.type_id = 8330
 			LEFT JOIN stockprop spRank ON spRank.stock_id = s.stock_id
-			WHERE sp.stockprop_id IS NULL
+			WHERE NOT EXISTS (select 1 from stockprop sp WHERE sp.stock_id = s.stock_id AND sp.type_id = 8330)
 			GROUP BY s.stock_id;
 		</sql>
 	</changeSet>
