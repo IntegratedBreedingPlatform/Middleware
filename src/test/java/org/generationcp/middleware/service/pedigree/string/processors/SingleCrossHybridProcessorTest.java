@@ -97,7 +97,7 @@ public class SingleCrossHybridProcessorTest {
 	}
 
 	@Test
-	public void testUnknownParentLevel2() {
+	public void testUnknownGrandParents() {
 		final SingleCrossHybridProcessor singleCrossHybridProcessor = new SingleCrossHybridProcessor();
 
 		final GermplasmNode femaleParent =

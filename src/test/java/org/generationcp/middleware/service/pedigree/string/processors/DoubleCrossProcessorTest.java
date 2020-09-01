@@ -115,6 +115,4 @@ public class DoubleCrossProcessorTest {
 		return germplasm;
 	}
 
-
-
 }

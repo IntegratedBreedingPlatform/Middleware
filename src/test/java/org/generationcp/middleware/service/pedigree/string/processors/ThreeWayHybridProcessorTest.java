@@ -141,4 +141,52 @@ public class ThreeWayHybridProcessorTest {
 		assertEquals("We have crated one cross.", 1, resultantPedigreeString.getNumberOfCrosses());
 
 	}
+
+	@Test
+	public void testCreationOfThreeWayCrossWhereBothGrandParentsAreMissing() {
+
+		final GermplasmNode femaleParent =
+			PedigreeStringTestUtil.createGermplasmNode(1, "FemaleParent1", PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,
+				PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+		femaleParent.setFemaleParent(getGrandParents("gFFemale", false));
+		femaleParent.setMaleParent(getGrandParents("gFMale", false));
+
+		final GermplasmNode maleParent =
+			PedigreeStringTestUtil.createGermplasmNode(1, "MaleParent1", PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,
+				PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+		maleParent.setFemaleParent(getGrandParents("gMFemale", false));
+		maleParent.setMaleParent(getGrandParents("gMMale", false));
+
+		final GermplasmNode threeWayCrossParentNode =
+			PedigreeStringTestUtil.createGermplasmNode(5, "E", PedigreeStringTestUtil.THREE_WAY_CROSS_METHOD_ID,
+				PedigreeStringTestUtil.THREE_WAY_CROSS_METHOD_ID_METHOD_NAME,
+				PedigreeStringTestUtil.THREE_WAY_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+		threeWayCrossParentNode.setFemaleParent(femaleParent);
+		threeWayCrossParentNode.setMaleParent(maleParent);
+
+		final ThreeWayHybridProcessor threeWayHybridProcessor = new ThreeWayHybridProcessor();
+
+		final PedigreeString resultantPedigreeString =
+			threeWayHybridProcessor.processGermplasmNode(threeWayCrossParentNode, 4, fixedLineNameResolver, false);
+		assertEquals("Incorrect three way cross generation where both parent is null ", "gFFemale/gFMale//MaleParent1",
+			resultantPedigreeString.getPedigree());
+		assertEquals("We have crated one cross.", 2, resultantPedigreeString.getNumberOfCrosses());
+
+	}
+
+	public GermplasmNode getGrandParents(final String name, boolean withParent) {
+		final GermplasmNode germplasm =
+			PedigreeStringTestUtil.createGermplasmNode(6, name, PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,
+				PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+		if(withParent) {
+			germplasm.setMaleParent(this.getGrandParents("GGParent1", false));
+			germplasm.setFemaleParent(this.getGrandParents("GGParent2", false));
+
+		} else {
+			germplasm.setMaleParent(null);
+			germplasm.setFemaleParent(null);
+		}
+
+		return germplasm;
+	}
 }
