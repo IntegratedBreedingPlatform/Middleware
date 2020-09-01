@@ -76,10 +76,8 @@ public class DoubleCrossProcessor implements BreedingMethodProcessor {
 
 	private PedigreeString getPedigreeString(final GermplasmNode node, final Integer level, final FixedLineNameResolver fixedLineNameResolver,
 			final boolean originatesFromComplexCross) {
-		if(node != null) {
-			if(node.getMaleParent()!=null && node.getFemaleParent()!=null) {
-				return this.pedigreeStringBuilder.buildPedigreeString(node, level - 1, fixedLineNameResolver, originatesFromComplexCross);
-			}
+		if(node != null && node.getMaleParent() != null && node.getFemaleParent() != null) {
+			return this.pedigreeStringBuilder.buildPedigreeString(node, level - 1, fixedLineNameResolver, originatesFromComplexCross);
 		}
 		return this.inbredProcessor.processGermplasmNode(node, level - 1, fixedLineNameResolver, originatesFromComplexCross);
 

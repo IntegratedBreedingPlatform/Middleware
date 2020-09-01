@@ -69,10 +69,8 @@ public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 	private PedigreeString getPedigreeString(final Integer level, final FixedLineNameResolver fixedLineNameResolver,
 			final GermplasmNode germplasmNode, final boolean originatesFromComplexCross) {
 		final boolean complexCross = this.levelSubtractor == 0 ? true : originatesFromComplexCross;
-		if (germplasmNode != null) {
-			if( germplasmNode.getFemaleParent() !=null && germplasmNode.getMaleParent() !=null) {
-				return this.pedigreeStringBuilder.buildPedigreeString(germplasmNode, level - this.levelSubtractor, fixedLineNameResolver, complexCross);
-			}
+		if (germplasmNode != null && germplasmNode.getFemaleParent() != null && germplasmNode.getMaleParent() != null) {
+			return this.pedigreeStringBuilder.buildPedigreeString(germplasmNode, level - this.levelSubtractor, fixedLineNameResolver, complexCross);
 		}
 		return this.inbredProcessor.processGermplasmNode(germplasmNode, level - this.levelSubtractor, fixedLineNameResolver, complexCross);
 	}
