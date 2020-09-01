@@ -55,7 +55,7 @@ public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 			LOG.debug("Germplasm with GID '{}' is being processed by an single cross processor. "
 					, germplasmNode.getGermplasm().getGid());
 		}
-		
+
 		final PedigreeString femalePedigreeString = this.getPedigreeString(level, fixedLineNameResolver, germplasmNode.getFemaleParent(), originatesFromComplexCross);
 
 		final PedigreeString malePedigreeString = this.getPedigreeString(level, fixedLineNameResolver, germplasmNode.getMaleParent(), originatesFromComplexCross);
@@ -70,7 +70,9 @@ public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 			final GermplasmNode germplasmNode, final boolean originatesFromComplexCross) {
 		boolean complexCross = levelSubtractor == 0 ? true : originatesFromComplexCross;
 		if (germplasmNode != null) {
-			return this.pedigreeStringBuilder.buildPedigreeString(germplasmNode, level - this.levelSubtractor, fixedLineNameResolver, complexCross);
+			if( germplasmNode.getFemaleParent() !=null && germplasmNode.getMaleParent() !=null) {
+				return this.pedigreeStringBuilder.buildPedigreeString(germplasmNode, level - this.levelSubtractor, fixedLineNameResolver, complexCross);
+			}
 		}
 		return this.inbredProcessor.processGermplasmNode(germplasmNode, level - this.levelSubtractor, fixedLineNameResolver, complexCross);
 	}
