@@ -77,4 +77,44 @@ public class DoubleCrossProcessorTest {
 		assertEquals("We have created 1 cross", 1, resultantPedigreeString.getNumberOfCrosses());
 
 	}
+
+	@Test
+	public void testCreationOfDoubleCrossWithNullGrandParents() throws Exception {
+
+		final GermplasmNode femaleGermplasmNode =
+			PedigreeStringTestUtil.createGermplasmNode(6, "FemaleParent", PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,
+				PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+		femaleGermplasmNode.setFemaleParent(getGrandParents("gpFFemale"));
+		femaleGermplasmNode.setMaleParent(getGrandParents("gpFMale"));
+
+		final GermplasmNode maleGermplasmNode =
+			PedigreeStringTestUtil.createGermplasmNode(6, "MaleParent", PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,
+				PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+		maleGermplasmNode.setFemaleParent(getGrandParents("gpMFemale"));
+		maleGermplasmNode.setMaleParent(getGrandParents("gpMMale"));
+
+
+		final GermplasmNode germplasmNode =
+			PedigreeStringTestUtil.createGermplasmNode(6, "G", PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_ID,
+				PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+		germplasmNode.setFemaleParent(femaleGermplasmNode);
+		germplasmNode.setMaleParent(maleGermplasmNode);
+
+		final PedigreeString resultantPedigreeString =
+			doubleCrossProcessor.processGermplasmNode(germplasmNode,2, fixedLineNameResolver, false);
+		assertEquals("Incorret double cross generationw with missing parents.", "gpFFemale/gpFMale//gpMFemale/gpMMale", resultantPedigreeString.getPedigree());
+		assertEquals("We have created 1 cross", 2, resultantPedigreeString.getNumberOfCrosses());
+
+	}
+
+	public GermplasmNode getGrandParents(final String name) {
+		final GermplasmNode germplasm =
+			PedigreeStringTestUtil.createGermplasmNode(6, name, PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,
+				PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+
+		return germplasm;
+	}
+
+
+
 }

@@ -92,4 +92,33 @@ public class SingleCrossHybridProcessorTest {
 
 	}
 
+	@Test
+	public void testUnknownParentLevel2() {
+		final SingleCrossHybridProcessor singleCrossHybridProcessor = new SingleCrossHybridProcessor();
+
+		final GermplasmNode femaleParent =
+			PedigreeStringTestUtil.createGermplasmNode(1, "FemaleParent1", PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,
+				PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+		femaleParent.setFemaleParent(null);
+		femaleParent.setMaleParent(null);
+
+		final GermplasmNode maleParent =
+			PedigreeStringTestUtil.createGermplasmNode(1, "MaleParent1", PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,
+				PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+		maleParent.setFemaleParent(null);
+		maleParent.setMaleParent(null);
+
+		final GermplasmNode germplasmNode =
+			PedigreeStringTestUtil.createGermplasmNode(1, "A", PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,
+				PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+		germplasmNode.setFemaleParent(femaleParent);
+		germplasmNode.setMaleParent(maleParent);
+
+		final PedigreeString resultantPedigreeString = singleCrossHybridProcessor.processGermplasmNode(germplasmNode, 2, fixedLineNameResolver, false);
+		assertEquals("Pedigree string is Unknown/Unknow since we cannot " + "determine the name or the GID", "FemaleParent1/MaleParent1",
+			resultantPedigreeString.getPedigree());
+		assertEquals("We have crated one cross.", 1, resultantPedigreeString.getNumberOfCrosses());
+
+	}
+
 }
