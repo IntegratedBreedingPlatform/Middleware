@@ -6,7 +6,7 @@
 
 	<changeSet author="cuenyad" id="v16.1.0-1">
 		<preConditions onFail="MARK_RAN">
-				<tableExists tableName="workbench_sidebar_category_link_role" />
+			<tableExists tableName="workbench_sidebar_category_link_role" />
 		</preConditions>
 		<comment>
 			drop the workbench_sidebar_category_link_role table.
