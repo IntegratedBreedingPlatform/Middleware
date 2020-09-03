@@ -510,7 +510,8 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void updateDependentPhenotypesAsOutOfSync(final Integer variableId, final Set<Integer> observationUnitIds) {
 		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputId(variableId);
-		if (!formulaList.isEmpty() && !observationUnitIds.isEmpty()) {
+		if (!org.springframework.util.CollectionUtils.isEmpty(formulaList) && !org.springframework.util.CollectionUtils
+			.isEmpty(observationUnitIds)) {
 			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
 
 				@Override
