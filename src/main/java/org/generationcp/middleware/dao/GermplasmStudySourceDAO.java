@@ -4,6 +4,9 @@ import liquibase.util.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.SortedPageRequest;
+import org.generationcp.middleware.pojos.ims.LotStatus;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
@@ -17,10 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, Integer> {
 
@@ -37,7 +37,10 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "rep_no.value as `replicationNumber`,\n"
 		+ "plot_no.value as `plotNumber`,\n"
 		+ "g.gdate as `germplasmDate`,\n"
-		+ "count(lot.lotid) as `numberOfLots` "
+		+ "count(distinct(lot.lotid)) as `numberOfLots`,\n"
+		+ "IF (COUNT(DISTINCT ifnull(LOT.scaleid, 'null')) = 1, FORMAT(SUM(CASE WHEN it.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue() + " OR (it.trnstat = "+ TransactionStatus.PENDING.getIntValue() +" AND it.trntype = "+ TransactionType.WITHDRAWAL.getId()
+		+") THEN it.trnqty ELSE 0 END),2) , 'Mixed') as `available`,\n"
+		+ "IF (COUNT(DISTINCT ifnull(LOT.scaleid, 'null')) = 1, c.name, 'Mixed') as `unit`"
 		+ "FROM germplasm_study_source gss \n"
 		+ "INNER JOIN germplsm g ON g.gid = gss.gid and g.deleted = 0 AND g.grplce = 0 \n"
 		+ "INNER JOIN project p ON p.project_id = gss.project_id\n"
@@ -53,7 +56,9 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "LEFT JOIN methods m ON m.mid = g.methn\n"
 		+ "LEFT JOIN location breedingLoc ON breedingLoc.locid = g.glocn\n"
 		+ "LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1\n"
-		+ "LEFT JOIN ims_lot lot ON lot.eid = gss.gid \n"
+		+ "LEFT JOIN ims_lot lot ON lot.eid = g.gid AND lot.status = "+ LotStatus.ACTIVE.getIntValue()  +"\n"
+		+ "LEFT JOIN ims_transaction it on lot.lotid = it.lotid\n"
+		+ "LEFT JOIN cvterm c on c.cvterm_id = lot.scaleid\n"
 		+ "WHERE gss.project_id = :studyId ";
 
 	public List<GermplasmStudySource> getByGids(final Set<Integer> gids) {
@@ -88,6 +93,8 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		query.addScalar("plotNumber", new IntegerType());
 		query.addScalar("germplasmDate");
 		query.addScalar("numberOfLots", new IntegerType());
+		query.addScalar("available");
+		query.addScalar("unit");
 		query.setParameter("studyId", germplasmStudySourceSearchRequest.getStudyId());
 
 		GenericDAO.addSortedPageRequestPagination(query, germplasmStudySourceSearchRequest.getSortedRequest());
