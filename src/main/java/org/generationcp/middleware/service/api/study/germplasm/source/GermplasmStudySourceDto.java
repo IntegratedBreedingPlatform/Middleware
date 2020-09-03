@@ -20,8 +20,7 @@ public class GermplasmStudySourceDto {
 	private Integer plotNumber;
 	private Integer replicationNumber;
 	private Integer germplasmDate;
-	private String available;
-	private String unit;
+
 
 	public Integer getGermplasmStudySourceId() {
 		return this.germplasmStudySourceId;
@@ -133,22 +132,6 @@ public class GermplasmStudySourceDto {
 
 	public void setGermplasmDate(final Integer germplasmDate) {
 		this.germplasmDate = germplasmDate;
-	}
-
-	public String getAvailable() {
-		return available;
-	}
-
-	public void setAvailable(final String available) {
-		this.available = available;
-	}
-
-	public String getUnit() {
-		return unit;
-	}
-
-	public void setUnit(final String unit) {
-		this.unit = unit;
 	}
 
 	@Override
