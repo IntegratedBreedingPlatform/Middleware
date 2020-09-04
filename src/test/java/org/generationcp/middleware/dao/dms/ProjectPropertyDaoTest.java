@@ -237,6 +237,27 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		Assert.assertTrue(germplasmDescriptors.contains(variable3.getName()));
 	}
 
+
+	@Test
+	public void testGetGermplasmDescriptorsAlias() {
+		final DmsProject plotDataset = this.saveDataset(DatasetTypeEnum.PLOT_DATA);
+		final CVTerm variable1 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
+		final CVTerm variable2 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
+
+		this.cvTermDao.save(variable1);
+		this.cvTermDao.save(variable2);
+
+		this.saveProjectVariableAlias(plotDataset, variable1, 1, VariableType.GERMPLASM_DESCRIPTOR);
+		this.saveProjectVariableAlias(plotDataset, variable2, 2, VariableType.GERMPLASM_DESCRIPTOR);
+
+		final List<String> germplasmDescriptors = this.projectPropDao.getGermplasmDescriptors(this.study.getProjectId());
+		Assert.assertNotNull(germplasmDescriptors);
+		Assert.assertEquals(2, germplasmDescriptors.size());
+		Assert.assertTrue(germplasmDescriptors.contains(variable1.getName()));
+		Assert.assertTrue(germplasmDescriptors.contains(variable2.getName()));
+
+	}
+
 	@Test
 	public void testGetByStudyAndStandardVariableIds() {
 		final DmsProject plotDataset = this.saveDataset(DatasetTypeEnum.PLOT_DATA);
@@ -299,6 +320,16 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	private ProjectProperty saveProjectVariable(final DmsProject project, final CVTerm variable, final int rank, final VariableType variableType) {
 		final ProjectProperty property1 = new ProjectProperty();
 		property1.setAlias(RandomStringUtils.randomAlphabetic(20));
+		property1.setRank(rank);
+		property1.setTypeId(variableType.getId());
+		property1.setProject(project);
+		property1.setVariableId(variable.getCvTermId());
+		return this.projectPropDao.save(property1);
+	}
+
+	private ProjectProperty saveProjectVariableAlias(final DmsProject project, final CVTerm variable, final int rank, final VariableType variableType) {
+		final ProjectProperty property1 = new ProjectProperty();
+		property1.setAlias(variable.getName());
 		property1.setRank(rank);
 		property1.setTypeId(variableType.getId());
 		property1.setProject(project);

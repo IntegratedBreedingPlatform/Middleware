@@ -420,6 +420,18 @@ public class DatasetServiceImplTest {
 		Assert.assertNotNull(observationUnitRow.getVariables().get(trialInstanceVariable.getName()));
 	}
 
+	@Test
+	public void testaddStudyVariablesAliasToUnitRows() {
+		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		final Map<String, ObservationUnitData> variables = new HashMap<>();
+		variables.put(OBS_UNIT_ID, new ObservationUnitData("obunit123"));
+		observationUnitRow.setVariables(variables);
+		final MeasurementVariable trialInstanceVariable = MeasurementVariableTestDataInitializer
+			.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(), "1", "Alias");
+		this.datasetService.addStudyVariablesToUnitRows(Arrays.asList(observationUnitRow), Arrays.asList(trialInstanceVariable));
+		Assert.assertNotNull(observationUnitRow.getVariables().get("Alias"));
+	}
+
 	private List<DatasetDTO> setUpDatasets(final Integer datasetTypeId) {
 		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
 		DatasetDTO datasetDTO;

@@ -280,7 +280,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 	private List<String> findPlotDatasetVariablesByTypesForStudy(final int studyIdentifier, final List<Integer> variableTypeIds) {
-		final String variablesQuery = " SELECT cvt.name" +
+		final String variablesQuery = " SELECT CASE WHEN pp.alias IS NOT NULL AND pp.alias != '' THEN pp.alias ELSE cvt.name END as name" +
 			" FROM  projectprop pp "
 			+ " INNER JOIN project ds ON ds.project_id = pp.project_ID AND ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 			+ " INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "

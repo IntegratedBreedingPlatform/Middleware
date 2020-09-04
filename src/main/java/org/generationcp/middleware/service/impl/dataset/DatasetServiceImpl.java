@@ -1177,8 +1177,14 @@ public class DatasetServiceImpl implements DatasetService {
 	void addStudyVariablesToUnitRows(final List<ObservationUnitRow> observationUnits, final List<MeasurementVariable> studyVariables) {
 		for (final ObservationUnitRow observationUnitRow : observationUnits) {
 			for (final MeasurementVariable measurementVariable : studyVariables) {
+				final String key;
+				if (measurementVariable.getAlias() != null && !measurementVariable.getAlias().equals("")) {
+					key = measurementVariable.getAlias();
+				} else {
+					key = measurementVariable.getName();
+				}
 				observationUnitRow.getVariables()
-					.put(measurementVariable.getName(), new ObservationUnitData(measurementVariable.getValue()));
+					.put(key, new ObservationUnitData(measurementVariable.getValue()));
 			}
 		}
 	}
