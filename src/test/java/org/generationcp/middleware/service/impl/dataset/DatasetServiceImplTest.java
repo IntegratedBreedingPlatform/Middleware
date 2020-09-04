@@ -1001,7 +1001,7 @@ public class DatasetServiceImplTest {
 		final DmsProject subobsDataset = new DmsProject();
 		final int subObsDatasetId = new Random().nextInt();
 		subobsDataset.setProjectId(subObsDatasetId);
-		final Integer numberOfSubObsUnits = 5;
+		final int numberOfSubObsUnits = 5;
 		this.datasetService
 			.saveSubObservationUnits(DatasetServiceImplTest.STUDY_ID, instanceIds, numberOfSubObsUnits, plotDataset, subobsDataset);
 		final ArgumentCaptor<ExperimentModel> experimentCaptor = ArgumentCaptor.forClass(ExperimentModel.class);
