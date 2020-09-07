@@ -1,0 +1,19 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="gelli" id="v16.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="ims_lot" columnName="stock_id" />
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE ims_lot MODIFY stock_id VARCHAR(35) NOT NULL collate utf8_bin;
+		</sql>
+		<comment>
+			Change ims_lot.stock_id collation from utf8_general_ci to utf8_bin to support case sensitive stock_id
+		</comment>
+	</changeSet>
+
+</databaseChangeLog>

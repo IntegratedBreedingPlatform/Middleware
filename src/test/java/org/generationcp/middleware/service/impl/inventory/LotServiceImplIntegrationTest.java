@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.util.Util;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +125,27 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(pendingTransactions, hasSize(0));
 		assertThat(discardedTrxsAfterClosingLot, equalTo(discardedTrxsBeforeClosingLot));
 
+	}
+
+	@Test
+	public void testCaseSensitivyOfStockId() {
+		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasm(Integer.MIN_VALUE);
+		germplasm1.setMgid(GROUP_ID);
+		this.germplasmDataManager.addGermplasm(germplasm1, germplasm1.getPreferredName());
+		final Lot lot1 = new Lot(null, userId, EntityType.GERMPLSM.name(), germplasm1.getGid(), storageLocationId, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0, "Lot", "AAA");
+		this.daoFactory.getLotDao().save(lot1);
+		Assert.assertNotNull(lot1.getId());
+		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasm(Integer.MIN_VALUE);
+		germplasm2.setMgid(GROUP_ID);
+		this.germplasmDataManager.addGermplasm(germplasm2, germplasm2.getPreferredName());
+		final Lot lot2 = new Lot(null, userId, EntityType.GERMPLSM.name(), germplasm2.getGid(), storageLocationId, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0, "Lot", "aaa");
+		try {
+			this.daoFactory.getLotDao().save(lot2);
+		} catch (final Exception e) {
+			Assert.fail("Stock_Id is case insensitive");
+		}
+
+		Assert.assertNotNull(lot2.getId());
 	}
 
 	private void createGermplasm() {
