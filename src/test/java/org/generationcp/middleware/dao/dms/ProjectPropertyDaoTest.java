@@ -247,8 +247,8 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		this.cvTermDao.save(variable1);
 		this.cvTermDao.save(variable2);
 
-		this.saveProjectVariableAlias(plotDataset, variable1, 1, VariableType.GERMPLASM_DESCRIPTOR);
-		this.saveProjectVariableAlias(plotDataset, variable2, 2, VariableType.GERMPLASM_DESCRIPTOR);
+		this.saveProjectVariable(plotDataset, variable1, 1, VariableType.GERMPLASM_DESCRIPTOR);
+		this.saveProjectVariable(plotDataset, variable2, 2, VariableType.GERMPLASM_DESCRIPTOR);
 
 		final List<String> germplasmDescriptors = this.projectPropDao.getGermplasmDescriptors(this.study.getProjectId());
 		Assert.assertNotNull(germplasmDescriptors);
@@ -319,17 +319,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 	private ProjectProperty saveProjectVariable(final DmsProject project, final CVTerm variable, final int rank, final VariableType variableType) {
 		final ProjectProperty property1 = new ProjectProperty();
-		property1.setAlias(RandomStringUtils.randomAlphabetic(20));
-		property1.setRank(rank);
-		property1.setTypeId(variableType.getId());
-		property1.setProject(project);
-		property1.setVariableId(variable.getCvTermId());
-		return this.projectPropDao.save(property1);
-	}
-
-	private ProjectProperty saveProjectVariableAlias(final DmsProject project, final CVTerm variable, final int rank, final VariableType variableType) {
-		final ProjectProperty property1 = new ProjectProperty();
-		property1.setAlias(variable.getName());
+		property1.setAlias(variable.getName());//alias of property
 		property1.setRank(rank);
 		property1.setTypeId(variableType.getId());
 		property1.setProject(project);
