@@ -1136,10 +1136,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "FROM projectprop pp "
 			+ "INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
 			+ "WHERE pp.project_id = :datasetId AND pp.alias = :variable";
-		SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
 		sqlQuery.setParameter("datasetId", datasetId);
 		sqlQuery.setParameter("variable", variableName);
-		List<Integer> list = sqlQuery.list();
+		final List<Integer> list = sqlQuery.list();
 		if (list == null || list.isEmpty()) {
 			return 0;
 		} else {
