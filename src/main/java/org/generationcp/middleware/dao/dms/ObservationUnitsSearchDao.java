@@ -529,10 +529,18 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (!CollectionUtils.isEmpty(searchDto.getGenericGermplasmDescriptors())) {
 			final String germplasmDescriptorClauseFormat =
-				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') AS '%s'";
+				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND %s) AS '%s'";
+
 			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
 				if (noFilterVariables || filterColumns.contains(gpFactor)) {
-					columns.add(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
+					final int cvtermId = this.getVariableIdbyName(gpFactor, searchDto.getDatasetId());
+					final String cvtermQuery;
+					if (cvtermId == 0) {
+						cvtermQuery = String.format(germplasmDescriptorClauseFormat, "spropcvt.name = '"+gpFactor+"'", gpFactor);
+					} else {
+						cvtermQuery = String.format(germplasmDescriptorClauseFormat, "spropcvt.cvterm_id = "+cvtermId, gpFactor);
+					}
+					columns.add(cvtermQuery);
 				}
 			}
 		}
@@ -1121,6 +1129,23 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 		}
 		return result;
+	}
+
+	private Integer getVariableIdbyName(final String variableName, final int datasetId) {
+		final String query = "SELECT cvt.cvterm_id "
+			+ "FROM projectprop pp "
+			+ "INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
+			+ "WHERE pp.project_id = :datasetId AND pp.alias = :variable";
+		SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
+		sqlQuery.setParameter("datasetId", datasetId);
+		sqlQuery.setParameter("variable", variableName);
+		List<Integer> list = sqlQuery.list();
+		if (list == null || list.isEmpty()) {
+			return 0;
+		} else {
+			return list.get(0);
+		}
+
 	}
 
 }
