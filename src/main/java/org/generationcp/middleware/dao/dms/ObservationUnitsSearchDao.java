@@ -23,7 +23,6 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
@@ -364,12 +363,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	public List<Map<String, Object>> getObservationUnitTableMapList(final ObservationUnitsSearchDTO searchDto,
-		final PageRequest pageRequest) {
+		final Pageable pageable) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
 			return this.getObservationUnitTableAsMapListResult(
 				searchDto,
-				observationVariableName, pageRequest);
+				observationVariableName, pageable);
 		} catch (final Exception e) {
 			ObservationUnitsSearchDao.LOG.error(e.getMessage(), e);
 			final String error =
@@ -1079,17 +1078,17 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private List<Map<String, Object>> getObservationUnitTableAsMapListResult(final ObservationUnitsSearchDTO searchDto,
-		final String observationVariableName, final PageRequest pageRequest) {
+		final String observationVariableName, final Pageable pageable) {
 		try {
 
-			final String sql = this.getObservationUnitTableQuery(searchDto, observationVariableName, pageRequest);
+			final String sql = this.getObservationUnitTableQuery(searchDto, observationVariableName, pageable);
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 
 			for (final String columnName : searchDto.getFilterColumns()) {
 				query.addScalar(columnName);
 			}
 
-			this.setParameters(searchDto, query, pageRequest);
+			this.setParameters(searchDto, query, pageable);
 			return this.convertSelectionAndTraitColumnsValueType(query.list(), searchDto.getSelectionMethodsAndTraits());
 
 		} catch (final Exception e) {

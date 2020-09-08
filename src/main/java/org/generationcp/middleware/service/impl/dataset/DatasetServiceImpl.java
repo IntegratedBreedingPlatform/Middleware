@@ -582,21 +582,21 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
 
-		this.fillSearchDTO(studyId, datasetId, searchDTO, pageable);
+		this.fillSearchDTO(studyId, datasetId, searchDTO);
 
 		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
 	}
 
 	@Override
 	public List<Map<String, Object>> getObservationUnitRowsAsMapList(
-		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final PageRequest pageRequest) {
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
 
-		this.fillSearchDTO(studyId, datasetId, searchDTO, pageRequest);
+		this.fillSearchDTO(studyId, datasetId, searchDTO);
 
-		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTableMapList(searchDTO, pageRequest);
+		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTableMapList(searchDTO, pageable);
 	}
 
-	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
+	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
 		searchDTO.setDatasetId(datasetId);
 		searchDTO.setGenericGermplasmDescriptors(this.findGenericGermplasmDescriptors(studyId));
 		searchDTO.setAdditionalDesignFactors(this.findAdditionalDesignFactors(studyId));
@@ -630,7 +630,8 @@ public class DatasetServiceImpl implements DatasetService {
 		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
 		searchDTO.setSelectionMethodsAndTraits(selectionMethodsAndTraits);
 
-		final List<ObservationUnitRow> observationUnits = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, new PageRequest(0, Integer.MAX_VALUE));
+		final List<ObservationUnitRow> observationUnits =
+			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, new PageRequest(0, Integer.MAX_VALUE));
 		this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 
 		return observationUnits;
@@ -879,7 +880,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final String variableId = searchDTO.getFilter().getVariableId().toString();
 		final List<Phenotype> phenotypes = new ArrayList<>();
-		this.fillSearchDTO(studyId, datasetId, searchDTO, null);
+		this.fillSearchDTO(studyId, datasetId, searchDTO);
 
 		final List<ObservationUnitRow> observationUnitsByVariable =
 			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitsByVariable(searchDTO);
@@ -923,8 +924,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final String variableId = paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId().toString();
 		final List<Phenotype> phenotypes = new ArrayList<>();
 
-		// TODO: IBP-3899
-		this.fillSearchDTO(studyId, datasetId, paramDTO.getObservationUnitsSearchDTO(), null);
+		this.fillSearchDTO(studyId, datasetId, paramDTO.getObservationUnitsSearchDTO());
 		final Boolean draftMode = paramDTO.getObservationUnitsSearchDTO().getDraftMode();
 		final List<ObservationUnitRow> observationUnitsByVariable =
 			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitsByVariable(paramDTO.getObservationUnitsSearchDTO());
@@ -977,7 +977,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer datasetId, final Set<Integer> instanceNumbers, final Set<Integer> plotNumbers) {
+	public Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer datasetId,
+		final Set<Integer> instanceNumbers, final Set<Integer> plotNumbers) {
 		return this.daoFactory.getExperimentDao().getTrialNumberPlotNumberObservationUnitIdTable(datasetId, instanceNumbers, plotNumbers);
 	}
 
@@ -1040,7 +1041,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 					// If allowDateAndCharacterBlankValue is true, allow to import blank value of Date and Character datatypes,
 					// otherwise, just ignore blank values.
-					if ((allowDateAndCharacterBlankValue && isDateOrCharacterDataType(measurementVariable)) || StringUtils.isNotBlank(importedVariableValue)) {
+					if ((allowDateAndCharacterBlankValue && isDateOrCharacterDataType(measurementVariable)) || StringUtils
+						.isNotBlank(importedVariableValue)) {
 						BigInteger categoricalValueId = null;
 						if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 							for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
@@ -1314,12 +1316,10 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getExperimentDao().countObservationsPerInstance(datasetId);
 	}
 
-
 	@Override
 	public List<InstanceDetailsDTO> getInstanceDetails(final Integer datasetId, final Integer studyId) {
 		return this.daoFactory.getExperimentDao().getInstanceInformation(datasetId, studyId);
 	}
-
 
 	@Override
 	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(

@@ -3,7 +3,7 @@ package org.generationcp.middleware.service.api.study;
 
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -75,7 +75,7 @@ public interface StudyService {
 
 	Integer getEnvironmentDatasetId(int studyId);
 
-	List<StudyDto> getStudies(StudySearchFilter studySearchFilter, PageRequest pageRequest);
+	List<StudyDto> getStudies(StudySearchFilter studySearchFilter, Pageable pageable);
 
 	long countStudies(StudySearchFilter studySearchFilter);
 

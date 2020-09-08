@@ -57,7 +57,6 @@ public class PlantingServiceImpl implements PlantingService {
 		this.processSearchComposite(searchDTO);
 
 		// observation units
-		// TODO: IBP-3899
 		final List<ObservationUnitRow> observationUnitRows =
 			this.datasetService.getObservationUnitRows(studyId, datasetId, searchDTO.getSearchRequest(), null);
 		Preconditions.checkArgument(!Util.isEmpty(observationUnitRows), "No results for observation units");
