@@ -11,10 +11,10 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /**
  * Contains the details of a Variable - type and value.
@@ -28,7 +28,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 	private String value;
 
 	// This can be geolocationPropertyId or phenotype ID depending on variable type
-	// (e.g. geolocationPropertyId for ENVIRONMENT_DETAIL, phenotypeID for TRAIT or STUDY_CONDITION).
+	// (e.g. geolocationPropertyId for ENVIRONMENT_DETAIL, phenotypeID for TRAIT or ENVIRONMENT_CONDITION).
 	private Integer variableDataId;
 
 	private boolean isCustomValue;

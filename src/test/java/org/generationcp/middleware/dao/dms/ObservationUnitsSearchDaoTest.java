@@ -441,15 +441,16 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final String traitName = "MyTrait";
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 3);
+		final List<ExperimentModel> instance1Units = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 4);
 		final Integer traitId = this.createTrait(traitName);
 		final List<ExperimentModel> unitsWithObservations = Collections.singletonList(instance1Units.get(0));
 		final List<ExperimentModel> unitsWithObservations2 = Collections.singletonList(instance1Units.get(1));
 		final List<ExperimentModel> unitsWithObservations3 = Collections.singletonList(instance1Units.get(2));
+		final List<ExperimentModel> unitsWithObservations4 = Collections.singletonList(instance1Units.get(3));
 		this.testDataInitializer.addPhenotypes(unitsWithObservations, traitId, "1000");
 		this.testDataInitializer.addPhenotypes(unitsWithObservations2, traitId, "3000");
 		this.testDataInitializer.addPhenotypes(unitsWithObservations3, traitId, "5");
-
+		this.testDataInitializer.addPhenotypes(unitsWithObservations4, traitId, "100.1");
 		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(traitId, traitName);
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		final Integer datasetId = this.plot.getProjectId();
@@ -466,7 +467,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<ObservationUnitRow> measurementRows = this.obsUnitSearchDao.getObservationUnitsByVariable(observationUnitsSearchDTO);
-		assertEquals(3, measurementRows.size());
+		assertEquals(4, measurementRows.size());
 	}
 
 	@Test

@@ -17,7 +17,12 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @Transactional
 public class StudyGermplasmServiceImpl implements StudyGermplasmService {
@@ -54,7 +59,8 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 			studyGermplasmDto.setSeedSource(this.findStockPropValue(TermId.SEED_SOURCE.getId(), stockModel.getProperties()));
 			studyGermplasmDto.setCheckType(Integer.valueOf(this.findStockPropValue(TermId.ENTRY_TYPE.getId(), stockModel.getProperties())));
 			studyGermplasmDto.setStockIds(stockIdsMap.getOrDefault(stockModel.getGermplasm().getGid(), ""));
-			studyGermplasmDto.setGroupId(stockModel.getGermplasm().getMgid());
+			final String groupGid = this.findStockPropValue(TermId.GROUPGID.getId(), stockModel.getProperties());
+			studyGermplasmDto.setGroupId(groupGid != null ? Integer.valueOf(groupGid) : 0);
 			studyGermplasmDtos.add(studyGermplasmDto);
 		}
 		return studyGermplasmDtos;
@@ -82,7 +88,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 			final StockModel stockModel = this.daoFactory.getStockDao().saveOrUpdate(new StockModel(studyId, studyGermplasm));
 			list.add(new StudyGermplasmDto(stockModel));
 		}
-		return  list;
+		return list;
 	}
 
 	@Override
@@ -135,12 +141,13 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		}
 		final StudyGermplasmDto newStudyGermplasm = new StudyGermplasmDto();
 		newStudyGermplasm.setEntryNumber(Integer.valueOf(stock.getUniqueName()));
-		Optional<StockProperty> entryType = stock.getProperties().stream().filter(prop -> TermId.ENTRY_TYPE.getId() == (prop.getTypeId())).findFirst();
-		entryType.ifPresent(entry -> newStudyGermplasm.setEntryType(entry.getValue()) );
+		Optional<StockProperty> entryType =
+			stock.getProperties().stream().filter(prop -> TermId.ENTRY_TYPE.getId() == (prop.getTypeId())).findFirst();
+		entryType.ifPresent(entry -> newStudyGermplasm.setEntryType(entry.getValue()));
 		newStudyGermplasm.setGermplasmId(gid);
 		newStudyGermplasm.setEntryCode(stock.getValue());
 		final Name preferredName = newGermplasm.getPreferredName();
-		newStudyGermplasm.setDesignation(preferredName != null? preferredName.getNval() : "");
+		newStudyGermplasm.setDesignation(preferredName != null ? preferredName.getNval() : "");
 		newStudyGermplasm.setCross(crossExpansion);
 		// Save also Group GID
 		newStudyGermplasm.setGroupId(newGermplasm.getMgid());

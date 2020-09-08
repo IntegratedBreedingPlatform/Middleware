@@ -503,7 +503,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final DmsProject environmentDataset =
 					this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyMetadata.getTrialDbId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 				final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
-					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.newArrayList(VariableType.STUDY_CONDITION.getId()));
+					.getObservationSetVariables(environmentDataset.getProjectId(), Lists.newArrayList(VariableType.ENVIRONMENT_CONDITION.getId()));
 				final List<MeasurementVariable> environmentParameters = new ArrayList<>();
 				List<Integer> variableIds = this.getVariableIds(environmentConditions);
 				if(!variableIds.isEmpty()) {

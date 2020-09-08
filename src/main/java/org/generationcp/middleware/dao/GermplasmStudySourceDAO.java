@@ -155,28 +155,28 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 			}
 			final String breedingMethodAbbreviation = filter.getBreedingMethodAbbreviation();
 			if (!StringUtils.isEmpty(breedingMethodAbbreviation)) {
-				paramBuilder.append(" and m.mcode = :breedingMethodAbbreviation");
-				paramBuilder.setParameter("breedingMethodAbbreviation", breedingMethodAbbreviation);
+				paramBuilder.append(" and m.mcode like :breedingMethodAbbreviation");
+				paramBuilder.setParameter("breedingMethodAbbreviation", '%' + breedingMethodAbbreviation + '%');
 			}
 			final String breedingMethodName = filter.getBreedingMethodName();
 			if (!StringUtils.isEmpty(breedingMethodName)) {
-				paramBuilder.append(" and m.mname = :breedingMethodName");
-				paramBuilder.setParameter("breedingMethodName", breedingMethodName);
+				paramBuilder.append(" and m.mname like :breedingMethodName");
+				paramBuilder.setParameter("breedingMethodName", '%' + breedingMethodName + '%');
 			}
 			final String breedingMethodType = filter.getBreedingMethodType();
 			if (!StringUtils.isEmpty(breedingMethodType)) {
-				paramBuilder.append(" and m.mtype = :breedingMethodType");
-				paramBuilder.setParameter("breedingMethodType", breedingMethodType);
+				paramBuilder.append(" and m.mtype like :breedingMethodType");
+				paramBuilder.setParameter("breedingMethodType", '%' + breedingMethodType + '%');
 			}
 			final String designation = filter.getDesignation();
 			if (!StringUtils.isEmpty(designation)) {
-				paramBuilder.append(" and n.nval = :designation");
-				paramBuilder.setParameter("designation", designation);
+				paramBuilder.append(" and n.nval like :designation"); //
+				paramBuilder.setParameter("designation", '%' + designation + '%');
 			}
 			final String breedingLocationName = filter.getBreedingLocationName();
 			if (!StringUtils.isEmpty(breedingLocationName)) {
-				paramBuilder.append(" and breedingLoc.lname = :breedingLocationName");
-				paramBuilder.setParameter("breedingLocationName", breedingLocationName);
+				paramBuilder.append(" and breedingLoc.lname like :breedingLocationName");
+				paramBuilder.setParameter("breedingLocationName", '%' + breedingLocationName + '%');
 			}
 			final List<String> trialInstanceList = filter.getTrialInstanceList();
 			if (!CollectionUtils.isEmpty(trialInstanceList)) {

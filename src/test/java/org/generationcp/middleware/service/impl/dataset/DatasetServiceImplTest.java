@@ -1060,13 +1060,13 @@ public class DatasetServiceImplTest {
 		final int termId = 100;
 		final String variableName = "VariableName";
 		measurementVariable.setTermId(termId);
-		measurementVariable.setVariableType(VariableType.STUDY_CONDITION);
+		measurementVariable.setVariableType(VariableType.ENVIRONMENT_CONDITION);
 		measurementVariable.setName(variableName);
 
 		final List<MeasurementVariable> observationSetVariables = Arrays.asList(measurementVariable);
 
 		when(this.dmsProjectDao.getObservationSetVariables(datasetId, Lists.newArrayList(
-			VariableType.STUDY_CONDITION.getId()))).thenReturn(observationSetVariables);
+			VariableType.ENVIRONMENT_CONDITION.getId()))).thenReturn(observationSetVariables);
 
 		final List<MeasurementVariableDto> result = this.datasetService.getEnvironmentConditionVariableNames(datasetId);
 

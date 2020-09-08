@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -430,8 +431,21 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					+ "	    inner join project study_filter_plotdata on study_filter_p.project_id = study_filter_plotdata.study_id \n" //
 					+ "     inner join nd_experiment study_filter_nde on study_filter_plotdata.project_id = study_filter_nde.project_id \n"
 					+ "     inner join ims_experiment_transaction study_filter_iet on study_filter_nde.nd_experiment_id = study_filter_iet.nd_experiment_id \n"
+					+ "                and study_filter_iet.type = " + ExperimentTransactionType.PLANTING.getId()
 					+ " where study_filter_p.project_id in (:plantingStudyIds) and study_filter_iet.trnid = tr.trnid)"); //
 				paramBuilder.setParameterList("plantingStudyIds", plantingStudyIds);
+			}
+
+			final List<Integer> harvestingStudyIds = transactionsSearchDto.getHarvestingStudyIds();
+			if (harvestingStudyIds != null && !harvestingStudyIds.isEmpty()) {
+				paramBuilder.append(" and exists(select 1 \n" //
+					+ " from project study_filter_p \n" //
+					+ "	    inner join project study_filter_plotdata on study_filter_p.project_id = study_filter_plotdata.study_id \n" //
+					+ "     inner join nd_experiment study_filter_nde on study_filter_plotdata.project_id = study_filter_nde.project_id \n"
+					+ "     inner join ims_experiment_transaction study_filter_iet on study_filter_nde.nd_experiment_id = study_filter_iet.nd_experiment_id \n"
+					+ "                and study_filter_iet.type = " + ExperimentTransactionType.HARVESTING.getId()
+					+ " where study_filter_p.project_id in (:harvestingStudyIds) and study_filter_iet.trnid = tr.trnid)"); //
+				paramBuilder.setParameterList("harvestingStudyIds", harvestingStudyIds);
 			}
 		}
 	}

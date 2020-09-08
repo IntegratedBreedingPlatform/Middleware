@@ -100,7 +100,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private static final List<Integer> ENVIRONMENT_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.ENVIRONMENT_DETAIL.getId(),
-		VariableType.STUDY_CONDITION.getId());
+		VariableType.ENVIRONMENT_CONDITION.getId());
 
 	protected static final List<Integer> OBSERVATION_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.OBSERVATION_UNIT.getId(),
@@ -511,7 +511,8 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void updateDependentPhenotypesAsOutOfSync(final Integer variableId, final Set<Integer> observationUnitIds) {
 		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputId(variableId);
-		if (!formulaList.isEmpty()) {
+		if (!org.springframework.util.CollectionUtils.isEmpty(formulaList) && !org.springframework.util.CollectionUtils
+			.isEmpty(observationUnitIds)) {
 			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
 
 				@Override
@@ -618,11 +619,16 @@ public class DatasetServiceImpl implements DatasetService {
 			studyId,
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
+		final List<MeasurementVariableDto> selectionMethodsAndTraits =
+			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
+				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
+
 		final ObservationUnitsSearchDTO searchDTO =
 			new ObservationUnitsSearchDTO(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<>());
 		searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
+		searchDTO.setSelectionMethodsAndTraits(selectionMethodsAndTraits);
 
 		final List<ObservationUnitRow> observationUnits = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, new PageRequest(0, Integer.MAX_VALUE));
 		this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
@@ -641,7 +647,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	List<MeasurementVariableDto> getEnvironmentConditionVariableNames(final Integer trialDatasetId) {
 		final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
-			.getObservationSetVariables(trialDatasetId, Lists.newArrayList(VariableType.STUDY_CONDITION.getId()));
+			.getObservationSetVariables(trialDatasetId, Lists.newArrayList(VariableType.ENVIRONMENT_CONDITION.getId()));
 		final List<MeasurementVariableDto> factors = new ArrayList<>();
 		for (final MeasurementVariable variable : environmentConditions) {
 			factors.add(new MeasurementVariableDto(variable.getTermId(), variable.getName()));

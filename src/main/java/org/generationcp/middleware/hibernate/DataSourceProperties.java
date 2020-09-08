@@ -73,10 +73,10 @@ public class DataSourceProperties {
 
 	public DataSourceProperties(final Properties properties) {
 
-		this.host = this.getPropertyValue(properties, this.host, DataSourceProperties.DB_HOST);
-		this.port = this.getPropertyValue(properties, this.port, DataSourceProperties.DB_PORT);
-		this.userName = this.getPropertyValue(properties, this.userName, DataSourceProperties.DB_USERNAME);
-		this.password = this.getPropertyValue(properties, this.password, DataSourceProperties.DB_PASSWORD);
+		this.host = this.getPropertyValue("BMS_DB_HOST",properties, this.host, DataSourceProperties.DB_HOST);
+		this.port = this.getPropertyValue("BMS_DB_PORT",properties, this.port, DataSourceProperties.DB_PORT);
+		this.userName = this.getPropertyValue("BMS_DB_USERNAME",properties, this.userName, DataSourceProperties.DB_USERNAME);
+		this.password = this.getPropertyValue("BMS_DB_PASSWORD",properties, this.password, DataSourceProperties.DB_PASSWORD);
 		this.workbenchDbName = this.getPropertyValue(properties, this.workbenchDbName, DataSourceProperties.DB_WORKBENCH_NAME);
 		this.xaDriverName = this.getPropertyValue(properties, this.xaDriverName, DataSourceProperties.CONNECTIONPOOL_XADRIVER_NAME);
 		this.borrowConnectionTimeout =
@@ -90,6 +90,13 @@ public class DataSourceProperties {
 		this.maxIdleTime = this.getPropertyValue(properties, this.maxIdleTime, DataSourceProperties.CONNECTIONPOOL_MAX_IDLE_TIME);
 		this.reapTimeout = this.getPropertyValue(properties, this.reapTimeout, DataSourceProperties.CONNECTIONPOOL_REAP_TIMEOUT);
 
+	}
+
+	private String getPropertyValue(final String envVariable, final Properties properties, final String defaultValue, final String property) {
+		final String valueInEnvironment = System.getenv(envVariable);
+		return (Strings.isNullOrEmpty(valueInEnvironment))
+				? getPropertyValue(properties, defaultValue, property)
+				: valueInEnvironment;
 	}
 
 	private String getPropertyValue(final Properties properties, final String defaultValue, final String property) {
