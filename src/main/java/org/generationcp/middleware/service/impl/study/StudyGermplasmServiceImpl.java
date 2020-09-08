@@ -1,8 +1,12 @@
 
 package org.generationcp.middleware.service.impl.study;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -12,13 +16,19 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +39,9 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 
 	@Resource
 	private InventoryDataManager inventoryDataManager;
+
+	@Resource
+	private DatasetService datasetService;
 
 	private final DaoFactory daoFactory;
 
@@ -67,17 +80,40 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
+	public List<StudyEntryDto> getStudyEntries(final int studyId, final Pageable pageable) {
+
+		final Integer plotDatasetId = datasetService.getDatasets( studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+
+		final List<MeasurementVariable> entryDescriptors =
+			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
+				.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
+
+		//Remove the ones that are stored in stock and that in the future will not be descriptors
+		final List<Integer> termsToRemove = Lists.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(),TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.OBS_UNIT_ID.getId());
+		for (Iterator<MeasurementVariable> i = entryDescriptors.iterator(); i.hasNext();) {
+			final MeasurementVariable measurementVariable = i.next();
+			if (termsToRemove.contains(measurementVariable.getTermId())) {
+				i.remove();
+			}
+		}
+
+		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStockDao().getStudyEntries(studyId, entryDescriptors, pageable);
+		return studyEntryDtos;
+	}
+
+
+	@Override
 	public List<StudyGermplasmDto> getGermplasmFromPlots(final int studyBusinessIdentifier, final Set<Integer> plotNos) {
 		return this.daoFactory.getStockDao().getStudyGermplasmDtoList(studyBusinessIdentifier, plotNos);
 	}
 
 	@Override
-	public long countStudyGermplasm(final int studyId) {
+	public long countStudyEntries(final int studyId) {
 		return this.daoFactory.getStockDao().countStocksForStudy(studyId);
 	}
 
 	@Override
-	public void deleteStudyGermplasm(final int studyId) {
+	public void deleteStudyEntries(final int studyId) {
 		this.daoFactory.getStockDao().deleteStocksForStudy(studyId);
 	}
 

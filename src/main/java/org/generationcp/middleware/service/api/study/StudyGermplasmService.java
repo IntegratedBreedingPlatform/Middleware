@@ -1,20 +1,25 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+//TODO rename to StudyEntryService
 public interface StudyGermplasmService {
 
 	List<StudyGermplasmDto> getGermplasm(final int studyBusinessIdentifier);
 
+	List<StudyEntryDto> getStudyEntries(final int studyId, final Pageable pageable);
+
 	List<StudyGermplasmDto> getGermplasmFromPlots(final int studyBusinessIdentifier, Set<Integer> plotNos);
 
-	long countStudyGermplasm(int studyId);
+	long countStudyEntries(int studyId);
 
-	void deleteStudyGermplasm(int studyId);
+	void deleteStudyEntries(int studyId);
 
 	List<StudyGermplasmDto> saveStudyGermplasm(Integer studyId, List<StudyGermplasmDto> studyGermplasmDtoList);
 
