@@ -133,20 +133,6 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public Map<Integer, String> getInventoryStockIdMap(final List<StudyGermplasmDto> studyGermplasmDtoList) {
-
-		final List<Integer> gids = new ArrayList<>();
-		if (studyGermplasmDtoList != null && !studyGermplasmDtoList.isEmpty()) {
-			for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-				gids.add(studyGermplasmDto.getGermplasmId());
-			}
-		}
-
-		return this.inventoryDataManager.retrieveStockIds(gids);
-
-	}
-
-	@Override
 	public Optional<StudyGermplasmDto> getStudyGermplasm(final int studyId, final int entryId) {
 		final StockModel stock = this.daoFactory.getStockDao().getById(entryId);
 		if (stock != null) {

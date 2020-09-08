@@ -4,7 +4,6 @@ package org.generationcp.middleware.service.api.study;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,8 +23,6 @@ public interface StudyGermplasmService {
 	List<StudyGermplasmDto> saveStudyGermplasm(Integer studyId, List<StudyGermplasmDto> studyGermplasmDtoList);
 
 	long countStudyGermplasmByEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
-
-	Map<Integer, String> getInventoryStockIdMap(List<StudyGermplasmDto> studyGermplasmDtoList);
 
 	Optional<StudyGermplasmDto> getStudyGermplasm(int studyId, int entryId);
 
