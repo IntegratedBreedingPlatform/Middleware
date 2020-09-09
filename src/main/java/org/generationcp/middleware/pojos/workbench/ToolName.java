@@ -45,7 +45,9 @@ public enum ToolName {
 	TRIAL_MANAGER_FIELDBOOK_WEB("trial_manager_fieldbook_web"),
 	STUDY_MANAGER_FIELDBOOK_WEB("study_manager_fieldbook_web"),
 	MANAGE_PROGRAMS("manage_program"),
-	INVENTORY_MANAGEMENT("inventory_manager");
+	GERMPLASM_LISTS("germplasm_lists"),
+	INVENTORY_MANAGEMENT("inventory_manager"),
+	HIGH_DENSITY("high_density");
 
 	private final String name;
 
@@ -70,7 +72,7 @@ public enum ToolName {
 	}
 
 	public static ToolName equivalentToolEnum(final String name) {
-		for (ToolName tool : ToolName.values()) {
+		for (final ToolName tool : ToolName.values()) {
 			if (tool.getName().equals(name)) {
 				return tool;
 			}
