@@ -60,6 +60,7 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
@@ -1457,11 +1458,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
-	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
+	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 
 		// TODO: Check if we can reuse this query/method in getStudyMetadataForGeolocationId()
 		final SQLQuery sqlQuery =
-			this.getSession().createSQLQuery(this.createStudySummaryQueryString(studySearchFilter));
+			this.getSession().createSQLQuery(this.createStudySummaryQueryString(studySearchFilter, pageable));
 
 		sqlQuery.addScalar(StudySearchFilter.STUDY_DB_ID);
 		sqlQuery.addScalar(StudySearchFilter.STUDY_NAME);
@@ -1481,13 +1482,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
 
-		final Integer pageSize = studySearchFilter.getSortedRequest().getPageSize();
-		final Integer pageNumber = studySearchFilter.getSortedRequest().getPageNumber();
-
-		if (pageNumber != null && pageSize != null) {
-			sqlQuery.setFirstResult(pageSize * (pageNumber - 1));
-			sqlQuery.setMaxResults(pageSize);
-		}
+		addPaginationToSQLQuery(sqlQuery, pageable);
 
 		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 		final List<Map<String, Object>> results = sqlQuery.list();
@@ -1556,7 +1551,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return sql.toString();
 	}
 
-	private String createStudySummaryQueryString(final StudySearchFilter studySearchFilter) {
+	private String createStudySummaryQueryString(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 		final StringBuilder sql = new StringBuilder(" SELECT  ");
 		sql.append("     geoloc.nd_geolocation_id AS " + StudySearchFilter.STUDY_DB_ID + ", ");
 		sql.append("		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS " + StudySearchFilter.STUDY_NAME + ", ");
@@ -1577,13 +1572,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		this.appendStudySearchFilter(sql, studySearchFilter);
 		sql.append(" GROUP BY geoloc.nd_geolocation_id ");
 
-		final String sortBy = studySearchFilter.getSortedRequest().getSortBy();
-		final String sortOrder = studySearchFilter.getSortedRequest().getSortOrder();
+		addPageRequestOrderBy(sql, pageable, StudySearchFilter.SORTABLE_FIELDS);
 
-		if (!StringUtils.isEmpty(sortBy) && StudySearchFilter.SORTABLE_FIELDS.contains(sortBy)) {
-			sql.append(
-				" ORDER BY " + sortBy + " " + (sortOrder == null ? "ASC" : sortOrder));
-		}
 		return sql.toString();
 	}
 

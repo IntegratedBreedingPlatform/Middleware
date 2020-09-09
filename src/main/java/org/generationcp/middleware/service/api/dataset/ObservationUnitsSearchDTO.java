@@ -1,6 +1,5 @@
 package org.generationcp.middleware.service.api.dataset;
 
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -20,7 +19,6 @@ public class ObservationUnitsSearchDTO {
 	private List<String> genericGermplasmDescriptors;
 	private List<String> additionalDesignFactors;
 	private List<MeasurementVariableDto> selectionMethodsAndTraits;
-	private SortedPageRequest sortedRequest;
 	private int datasetId;
 	private Integer instanceId;
 	private Integer environmentDatasetId;
@@ -213,14 +211,6 @@ public class ObservationUnitsSearchDTO {
 
 	public void setEnvironmentDatasetId(final Integer environmentDatasetId) {
 		this.environmentDatasetId = environmentDatasetId;
-	}
-
-	public SortedPageRequest getSortedRequest() {
-		return this.sortedRequest;
-	}
-
-	public void setSortedRequest(final SortedPageRequest sortedRequest) {
-		this.sortedRequest = sortedRequest;
 	}
 
 	public Boolean getDraftMode() {

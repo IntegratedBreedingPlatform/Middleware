@@ -1,8 +1,6 @@
 package org.generationcp.middleware.api.inventory.study;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -19,8 +17,6 @@ public class StudyTransactionsRequest {
 	private List<Integer> plotNoList;
 	private String entryType;
 	private List<Integer> entryNoList;
-
-	private SortedPageRequest sortedPageRequest;
 	private String draw;
 
 	public TransactionsSearchDto getTransactionsSearch() {
@@ -61,14 +57,6 @@ public class StudyTransactionsRequest {
 
 	public void setEntryNoList(final List<Integer> entryNoList) {
 		this.entryNoList = entryNoList;
-	}
-
-	public SortedPageRequest getSortedPageRequest() {
-		return this.sortedPageRequest;
-	}
-
-	public void setSortedPageRequest(final SortedPageRequest sortedPageRequest) {
-		this.sortedPageRequest = sortedPageRequest;
 	}
 
 	public String getDraw() {
