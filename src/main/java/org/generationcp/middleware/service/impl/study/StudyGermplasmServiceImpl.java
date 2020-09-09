@@ -18,6 +18,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.springframework.data.domain.Pageable;
@@ -82,15 +83,18 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	@Override
 	public List<StudyEntryDto> getStudyEntries(final int studyId, final Pageable pageable) {
 
-		final Integer plotDatasetId = datasetService.getDatasets( studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+		final Integer plotDatasetId =
+			datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
 
 		final List<MeasurementVariable> entryDescriptors =
 			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
 				.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
 		//Remove the ones that are stored in stock and that in the future will not be descriptors
-		final List<Integer> termsToRemove = Lists.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(),TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.OBS_UNIT_ID.getId());
-		for (Iterator<MeasurementVariable> i = entryDescriptors.iterator(); i.hasNext();) {
+		final List<Integer> termsToRemove = Lists
+			.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
+				TermId.OBS_UNIT_ID.getId());
+		for (Iterator<MeasurementVariable> i = entryDescriptors.iterator(); i.hasNext(); ) {
 			final MeasurementVariable measurementVariable = i.next();
 			if (termsToRemove.contains(measurementVariable.getTermId())) {
 				i.remove();
@@ -100,7 +104,6 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStockDao().getStudyEntries(studyId, entryDescriptors, pageable);
 		return studyEntryDtos;
 	}
-
 
 	@Override
 	public List<StudyGermplasmDto> getGermplasmFromPlots(final int studyBusinessIdentifier, final Set<Integer> plotNos) {
@@ -117,6 +120,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		this.daoFactory.getStockDao().deleteStocksForStudy(studyId);
 	}
 
+	// TODO: IBP-3833 Use StudyEntryDto instead of StudyGermplasmDto
 	@Override
 	public List<StudyGermplasmDto> saveStudyGermplasm(final Integer studyId, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 		final List<StudyGermplasmDto> list = new ArrayList<>();
@@ -132,6 +136,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		return this.daoFactory.getStockDao().countStocksByStudyAndEntryTypeIds(studyId, systemDefinedEntryTypeIds);
 	}
 
+	// TODO: IBP-3833 Use StudyEntryDto instead of StudyGermplasmDto
 	@Override
 	public Optional<StudyGermplasmDto> getStudyGermplasm(final int studyId, final int entryId) {
 		final StockModel stock = this.daoFactory.getStockDao().getById(entryId);
@@ -144,6 +149,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		return Optional.empty();
 	}
 
+	// TODO: IBP-3833 Use StudyEntryDto instead of StudyGermplasmDto
 	@Override
 	public StudyGermplasmDto replaceStudyGermplasm(final int studyId, final int entryId, final int gid, final String crossExpansion) {
 		// Check first that new GID is valid
@@ -179,6 +185,15 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		// Finally delete old stock
 		stockDao.makeTransient(stock);
 		return savedStudyGermplasm;
+	}
+
+	@Override
+	public void updateStudyEntryProperty(final int studyId, final StudyEntryPropertyData studyEntryPropertyData) {
+		final StockProperty stockProperty = this.daoFactory.getStockPropertyDao().getById(studyEntryPropertyData.getStudyEntryPropertyId());
+		if (stockProperty != null) {
+			stockProperty.setValue(studyEntryPropertyData.getValue());
+			this.daoFactory.getStockPropertyDao().saveOrUpdate(stockProperty);
+		}
 	}
 
 	private String findStockPropValue(final Integer termId, final Set<StockProperty> properties) {

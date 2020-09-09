@@ -28,4 +28,5 @@ public interface StudyGermplasmService {
 
 	StudyGermplasmDto replaceStudyGermplasm(int studyId, int entryId, int gid, String crossExpansion);
 
+	void updateStudyEntryProperty(int studyId, StudyEntryPropertyData studyEntryPropertyData);
 }
