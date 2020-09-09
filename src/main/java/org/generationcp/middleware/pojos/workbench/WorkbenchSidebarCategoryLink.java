@@ -51,6 +51,9 @@ public class WorkbenchSidebarCategoryLink implements Serializable, Comparable<Wo
 	@OneToMany(mappedBy = "sidebarLink", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<WorkbenchSidebarCategoryLinkRole> roles;
 
+	@Column(name = "rank")
+	private Integer rank;
+
 	public WorkbenchSidebarCategoryLink() {
 	}
 
@@ -112,6 +115,14 @@ public class WorkbenchSidebarCategoryLink implements Serializable, Comparable<Wo
 		this.roles = roles;
 	}
 
+	public Integer getRank() {
+		return rank;
+	}
+
+	public void setRank(Integer rank) {
+		this.rank = rank;
+	}
+
 	@Override
 	public String toString() {
 		return "WorkbenchSidebarCategoryLink [sidebarCategoryLinkId=" + sidebarCategoryLinkId + ", tool=" + tool
@@ -146,6 +157,6 @@ public class WorkbenchSidebarCategoryLink implements Serializable, Comparable<Wo
 
 	@Override
 	public int compareTo(WorkbenchSidebarCategoryLink d) {
-		return this.sidebarCategoryLinkId - d.getSidebarCategoryLinkId();
+		return this.getRank() - d.getRank();
 	}
 }
