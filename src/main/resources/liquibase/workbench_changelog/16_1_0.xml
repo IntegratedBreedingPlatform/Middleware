@@ -4,7 +4,89 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="cuenyad" id="v16.1.0-2">
+	<changeSet author="diego" id="v16.1.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1"> select count(rp.role_id) > 0 from role_permission rp inner join permission p on rp.permission_id = p.permission_id where p.name = 'BREEDING_ACTIVITIES'</sqlCheck>
+        </preConditions>
+        <comment>Removing Breeding activities permission from role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='MANAGE_GERMPLASM');
+			insert into role_permission(role_id,permission_id)
+			select rp.role_id, @permission_id from role_permission rp inner join permission p on rp.permission_id = p.permission_id
+					where p.name = 'BREEDING_ACTIVITIES';
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='MANAGE_SAMPLES');
+			insert into role_permission(role_id,permission_id)
+			select rp.role_id, @permission_id from role_permission rp inner join permission p on rp.permission_id = p.permission_id
+					where p.name = 'BREEDING_ACTIVITIES';
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='MANAGE_STUDIES');
+			insert into role_permission(role_id,permission_id)
+			select rp.role_id, @permission_id from role_permission rp inner join permission p on rp.permission_id = p.permission_id
+					where p.name = 'BREEDING_ACTIVITIES';
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='BREEDING_ACTIVITIES');
+			delete from role_permission where permission_id = @permission_id;
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1"> select count(rp.role_id) > 0 from role_permission rp inner join permission p on rp.permission_id = p.permission_id where p.name = 'INFORMATION_MANAGEMENT'</sqlCheck>
+        </preConditions>
+        <comment>Removing Information Management permission from role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='BROWSE_STUDIES');
+			insert into role_permission(role_id,permission_id)
+			select rp.role_id, @permission_id from role_permission rp inner join permission p on rp.permission_id = p.permission_id
+					where p.name = 'INFORMATION_MANAGEMENT';
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='HEAD_TO_HEAD_QUERY');
+			insert into role_permission(role_id,permission_id)
+			select rp.role_id, @permission_id from role_permission rp inner join permission p on rp.permission_id = p.permission_id
+					where p.name = 'INFORMATION_MANAGEMENT';
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='MULTI_TRAIT_QUERY');
+			insert into role_permission(role_id,permission_id)
+			select rp.role_id, @permission_id from role_permission rp inner join permission p on rp.permission_id = p.permission_id
+					where p.name = 'INFORMATION_MANAGEMENT';
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='IMPORT_DATASETS');
+			insert into role_permission(role_id,permission_id)
+			select rp.role_id, @permission_id from role_permission rp inner join permission p on rp.permission_id = p.permission_id
+					where p.name = 'INFORMATION_MANAGEMENT';
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='GRAPHICAL_QUERIES');
+			insert into role_permission(role_id,permission_id)
+			select rp.role_id, @permission_id from role_permission rp inner join permission p on rp.permission_id = p.permission_id
+					where p.name = 'INFORMATION_MANAGEMENT';
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='INFORMATION_MANAGEMENT');
+			delete from role_permission where permission_id = @permission_id;
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1"> select count(rp.role_id) > 0 from role_permission rp inner join permission p on rp.permission_id = p.permission_id where p.name = 'STATISTICAL_ANALYSIS'</sqlCheck>
+        </preConditions>
+        <comment>Removing Statical Analysis permission from role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='SINGLE_SITE_ANALYSIS');
+			insert into role_permission(role_id,permission_id)
+			select rp.role_id, @permission_id from role_permission rp inner join permission p on rp.permission_id = p.permission_id
+					where p.name = 'STATISTICAL_ANALYSIS';
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='MULTI_SITE_ANALYSIS');
+			insert into role_permission(role_id,permission_id)
+			select rp.role_id, @permission_id from role_permission rp inner join permission p on rp.permission_id = p.permission_id
+					where p.name = 'STATISTICAL_ANALYSIS';
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='STATISTICAL_ANALYSIS');
+			delete from role_permission where permission_id = @permission_id;
+        </sql>
+    </changeSet>
+	<changeSet author="diego" id="v16.1.0-5">
 		<preConditions onFail="MARK_RAN">
 			  <sqlCheck expectedResult="0">
                 SELECT count(*) FROM workbench_sidebar_category WHERE sidebar_category_name = 'queries'
@@ -15,7 +97,7 @@
 			INSERT INTO workbench_sidebar_category (sidebar_category_name, sidebar_category_label) VALUES ('queries', 'Queries');
 		</sql>
 	</changeSet>
-	<changeSet author="cuenyad" id="v16.1.0-3">
+	<changeSet author="diego" id="v16.1.0-6">
 		<preConditions onFail="MARK_RAN">
 			  <sqlCheck expectedResult="0">
                 SELECT count(*) FROM workbench_sidebar_category WHERE sidebar_category_name = 'genotyping'
@@ -26,7 +108,7 @@
 			INSERT INTO workbench_sidebar_category (sidebar_category_name, sidebar_category_label) VALUES ('genotyping', 'Genotyping');
 		</sql>
 	</changeSet>
-	<changeSet author="cuenyad" id="v16.1.0-4">
+	<changeSet author="diego" id="v16.1.0-7">
 		<preConditions onFail="MARK_RAN">
 			  <sqlCheck expectedResult="0">
                 SELECT count(*) FROM workbench_sidebar_category WHERE sidebar_category_name = 'crop_administration'
@@ -37,7 +119,7 @@
 			INSERT INTO workbench_sidebar_category (sidebar_category_name, sidebar_category_label) VALUES ('crop_administration', 'Crop Administration');
 		</sql>
 	</changeSet>
-	<changeSet author="cuenyad" id="v16.1.0-5">
+	<changeSet author="diego" id="v16.1.0-8">
 		<preConditions onFail="MARK_RAN">
 			  <sqlCheck expectedResult="0">
                 SELECT count(*) FROM workbench_tool WHERE name = 'germplasm_lists'
@@ -48,7 +130,7 @@
 			INSERT INTO workbench_tool (name, group_name, title, version, tool_type, path, parameter, user_tool) VALUES ('germplasm_lists', 'germplasm_lists', 'Germplasm lists', '16.1', 'WEB', 'ibpworkbench/bm/listmanager', '', '0');
 		</sql>
 	</changeSet>
-	<changeSet author="cuenyad" id="v16.1.0-6">
+	<changeSet author="diego" id="v16.1.0-9">
 		<preConditions onFail="MARK_RAN">
 			  <sqlCheck expectedResult="0">
                 SELECT count(*) FROM workbench_tool WHERE name = 'high_density'
@@ -59,7 +141,7 @@
 			INSERT INTO workbench_tool (name, group_name, title, version, tool_type, path, parameter, user_tool) VALUES ( 'high_density', 'high_density', 'High density', '16.1', 'WEB', '/ibpworkbench/controller/accessNotAvailable', '', '0');
 		</sql>
 	</changeSet>
-		<changeSet author="cuenyad" id="v16.1.0-7">
+		<changeSet author="diego" id="v16.1.0-10">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
                 SELECT count(*) FROM workbench_sidebar_category_link WHERE tool_name = 'germplasm_lists'
@@ -71,7 +153,7 @@
 			INSERT INTO workbench_sidebar_category_link (tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title) VALUES ('germplasm_lists', @sidebar_category_id, 'germplasm_lists', 'Germplasm Lists');
 		</sql>
 	</changeSet>
-    <changeSet author="cuenyad" id="v16.1.0-8">
+    <changeSet author="diego" id="v16.1.0-11">
 	    <preConditions onFail="MARK_RAN">
 		    <sqlCheck expectedResult="0">
                 SELECT count(*) FROM workbench_sidebar_category_link WHERE tool_name = 'high_density'
@@ -83,7 +165,7 @@
 			INSERT INTO workbench_sidebar_category_link (tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title) VALUES ('high_density', @sidebar_category_id, 'high_density', 'High density');
 		</sql>
 	</changeSet>
-	<changeSet author="cuenyad" id="v16.1.0-9">
+	<changeSet author="diego" id="v16.1.0-12">
 		<preConditions onFail="MARK_RAN">
 			<tableExists tableName="workbench_sidebar_category"/>
 			<not>
@@ -95,7 +177,7 @@
 			ALTER TABLE workbench_sidebar_category add column rank int null after sidebar_category_label;
 		</sql>
 	</changeSet>
-	<changeSet author="cuenyad" id="v16.1.0-10">
+	<changeSet author="diego" id="v16.1.0-13">
 		<preConditions onFail="MARK_RAN">
 			<tableExists tableName="workbench_sidebar_category"/>
 			<columnExists tableName="workbench_sidebar_category" columnName="rank"/>
@@ -130,7 +212,7 @@
 			UPDATE workbench_sidebar_category SET rank = 9 WHERE sidebar_category_id = @sidebar_category_id;
 		</sql>
 	</changeSet>
-	<changeSet author="cuenyad" id="v16.1.0-11">
+	<changeSet author="diego" id="v16.1.0-14">
     	<preConditions onFail="MARK_RAN">
 			<tableExists tableName="workbench_sidebar_category_link"/>
 			<not>
@@ -142,7 +224,7 @@
 			ALTER TABLE workbench_sidebar_category_link add column rank int null after sidebar_link_title;
 		</sql>
 	</changeSet>
-    <changeSet author="cuenyad" id="v16.1.0-12">
+    <changeSet author="diego" id="v16.1.0-15">
     	<preConditions onFail="MARK_RAN">
 			<tableExists tableName="workbench_sidebar_category_link"/>
     		<columnExists tableName="workbench_sidebar_category_link" columnName="rank"/>
@@ -210,7 +292,7 @@
 			UPDATE workbench_sidebar_category_link SET rank = '2' WHERE sidebar_category_link_id = @sidebar_category_link_id;
 		</sql>
 	</changeSet>
-    <changeSet author="diego" id="v16.1.0-13">
+    <changeSet author="diego" id="v16.1.0-16">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'QUERIES'</sqlCheck>
         </preConditions>
@@ -219,7 +301,7 @@
         	INSERT INTO permission (name, description, parent_id) VALUES ('QUERIES', 'Queries', '1');
         </sql>
     </changeSet>
-    <changeSet author="diego" id="v16.1.0-14">
+    <changeSet author="diego" id="v16.1.0-17">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'GENOTYPING'</sqlCheck>
         </preConditions>
@@ -228,7 +310,7 @@
         	INSERT INTO permission (name, description, parent_id) VALUES ('GENOTYPING', 'Genotyping', '1');
         </sql>
     </changeSet>
-    <changeSet author="diego" id="v16.1.0-15">
+    <changeSet author="diego" id="v16.1.0-18">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'CROP_ADMINISTRATION'</sqlCheck>
         </preConditions>
@@ -237,7 +319,7 @@
         	INSERT INTO permission (name, description, parent_id) VALUES ('CROP_ADMINISTRATION', 'Crop Administration', '1');
         </sql>
     </changeSet>
-    <changeSet author="diego" id="v16.1.0-16">
+    <changeSet author="diego" id="v16.1.0-19">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'HIGH_DENSITY'</sqlCheck>
         </preConditions>
@@ -248,7 +330,7 @@
         	INSERT INTO permission (name, description, parent_id, workbench_sidebar_category_link_id) VALUES ('HIGH_DENSITY', 'High Density', @parent_id, @sidebar_category_link_id);
         </sql>
     </changeSet>
-    <changeSet author="diego" id="v16.1.0-17">
+    <changeSet author="diego" id="v16.1.0-20">
         <preConditions onFail="MARK_RAN">
         </preConditions>
         <comment>Reorganize parent permissions</comment>
@@ -303,7 +385,7 @@
 			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
         </sql>
     </changeSet>
-	<changeSet author="diego" id="v16.1.0-18">
+	<changeSet author="diego" id="v16.1.0-21">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name ='GERMPLASM_LISTS'</sqlCheck>
         </preConditions>
@@ -315,7 +397,7 @@
 		</sql>
     </changeSet>
 
-	<changeSet author="diego" id="v16.1.0-19">
+	<changeSet author="diego" id="v16.1.0-22">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES')</sqlCheck>
         </preConditions>
@@ -327,37 +409,162 @@
 
         </sql>
     </changeSet>
-	<changeSet author="diego" id="v16.1.0-20">
+	<changeSet author="diego" id="v16.1.0-23">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING')</sqlCheck>
         </preConditions>
-        <comment>Adding role_type_permission permissions</comment>
+        <comment>Adding GENOTYPING permission in role_type_permission</comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING'), '1');
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING'), '1');
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING'), '1');
         </sql>
     </changeSet>
-	<changeSet author="diego" id="v16.1.0-21">
+	<changeSet author="diego" id="v16.1.0-24">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'HIGH_DENSITY')</sqlCheck>
         </preConditions>
-        <comment>Adding role_type_permission permissions</comment>
+        <comment>Adding HIGH_DENSITY permission in role_type_permission</comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', (SELECT permission_id FROM permission WHERE NAME = 'HIGH_DENSITY'), '1');
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', (SELECT permission_id FROM permission WHERE NAME = 'HIGH_DENSITY'), '1');
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', (SELECT permission_id FROM permission WHERE NAME = 'HIGH_DENSITY'), '1');
         </sql>
     </changeSet>
-	<changeSet author="diego" id="v16.1.0-22">
+	<changeSet author="diego" id="v16.1.0-25">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'GERMPLASM_LISTS')</sqlCheck>
         </preConditions>
-        <comment>Adding role_type_permission permissions</comment>
+        <comment>Adding GERMPLASM_LISTS permission in role_type_permission</comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', (SELECT permission_id FROM permission WHERE NAME = 'GERMPLASM_LISTS'), '1');
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', (SELECT permission_id FROM permission WHERE NAME = 'GERMPLASM_LISTS'), '1');
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', (SELECT permission_id FROM permission WHERE NAME = 'GERMPLASM_LISTS'), '1');
+        </sql>
+    </changeSet>
+<!--	<changeSet author="diego" id="v16.1.0-26">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+            	SELECT DISTINCT(COUNT(1)) > 0 FROM role_permission rp
+					INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name in ('GRAPHICAL_QUERIES','HEAD_TO_HEAD_QUERY','MULTI_TRAIT_QUERY')
+    				GROUP BY rp.role_id
+    				HAVING COUNT(DISTINCT p.permission_id) = 3
+            </sqlCheck>
+        </preConditions>
+        <comment>group by permissions for Queries in role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='QUERIES');
+			INSERT INTO role_permission(role_id,permission_id)
+				SELECT DISTINCT(rp.role_id), @permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name in ('GRAPHICAL_QUERIES','HEAD_TO_HEAD_QUERY','MULTI_TRAIT_QUERY')
+						GROUP BY rp.role_id
+						HAVING COUNT(DISTINCT p.permission_id) = 3;
+
+			DELETE rp FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name in ('GRAPHICAL_QUERIES','HEAD_TO_HEAD_QUERY','MULTI_TRAIT_QUERY');
+        </sql>
+    </changeSet>
+	<changeSet author="diego" id="v16.1.0-27">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+            	SELECT COUNT(1) > 0 FROM role_permission rp
+					INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name in ('MANAGE_GERMPLASM','IMPORT_GERMPLASM')
+    				GROUP BY rp.role_id
+    				HAVING COUNT(DISTINCT p.permission_id) = 2
+    		</sqlCheck>
+        </preConditions>
+        <comment>group by permissions for Germplasm in role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='GERMPLASM');
+			INSERT INTO role_permission(role_id,permission_id)
+				SELECT DISTINCT(rp.role_id), @permission_id FROM role_permission rp
+					INNER JOIN permission p ON rp.permission_id = p.permission_id
+						WHERE p.name in ('MANAGE_GERMPLASM','IMPORT_GERMPLASM')
+    					GROUP BY rp.role_id
+    					HAVING COUNT(DISTINCT p.permission_id) = 2;
+
+			DELETE rp FROM role_permission rp
+				INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name in ('MANAGE_GERMPLASM','IMPORT_GERMPLASM');
+        </sql>
+    </changeSet>
+	<changeSet author="diego" id="v16.1.0-28">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+            	SELECT DISTINCT(COUNT(1)) > 0 FROM role_permission rp
+					INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name in ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS')
+    				GROUP BY rp.role_id
+    				HAVING COUNT(DISTINCT p.permission_id) = 5
+            </sqlCheck>
+        </preConditions>
+        <comment>group by permissions for Studies in role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='STUDIES');
+			INSERT INTO role_permission(role_id,permission_id)
+				SELECT DISTINCT(rp.role_id), @permission_id FROM role_permission rp
+					INNER JOIN permission p ON rp.permission_id = p.permission_id
+						WHERE p.name in ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS')
+    					GROUP BY rp.role_id
+    					HAVING COUNT(DISTINCT p.permission_id) = 5;
+
+			DELETE rp FROM role_permission rp
+				INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name in ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS');
+        </sql>
+    </changeSet>-->
+	<changeSet author="diego" id="v16.1.0-29">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+				SELECT
+					COUNT(rp.role_id) > 0
+				FROM
+					role_permission rp
+						INNER JOIN
+					permission p ON rp.permission_id = p.permission_id
+				WHERE
+					p.name IN ('SAMPLE_LISTS')
+            </sqlCheck>
+        </preConditions>
+        <comment>group by permissions for Lists in role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='LISTS');
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT rp.role_id, @permission_id FROM role_permission rp
+				INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('SAMPLE_LISTS');
+
+			DELETE rp FROM role_permission rp
+				INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('SAMPLE_LISTS');
+        </sql>
+    </changeSet>
+	<changeSet author="diego" id="v16.1.0-30">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+				SELECT
+					COUNT(rp.role_id) > 0
+				FROM
+					role_permission rp
+						INNER JOIN
+					permission p ON rp.permission_id = p.permission_id
+				WHERE
+					p.name IN ('LOW_DENSITY')
+			</sqlCheck>
+        </preConditions>
+        <comment>group by permissions for Genotyping in role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='GENOTYPING');
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT rp.role_id, @permission_id FROM role_permission rp
+				INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('LOW_DENSITY');
+
+			DELETE rp FROM role_permission rp
+				INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('LOW_DENSITY');
         </sql>
     </changeSet>
 </databaseChangeLog>
