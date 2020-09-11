@@ -240,7 +240,7 @@
 
 			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'Genotyping');
 			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'gdms');
-			UPDATE workbench_sidebar_category_link SET rank = '1', sidebar_category_id = @sidebar_category_id, sidebar_link_title = 'Low density (GDMS)' where sidebar_category_link_id = @sidebar_category_link_id;
+			UPDATE workbench_sidebar_category_link SET rank = '1', sidebar_category_id = @sidebar_category_id, sidebar_link_title = 'Low Density' where sidebar_category_link_id = @sidebar_category_link_id;
 
 			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'crop_administration');
 			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'ontology_manager');
@@ -346,11 +346,11 @@
 			
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_GENOTYPING_DATA');
         	set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING');
-			UPDATE permission SET description = 'Low density (GDMS)', name= 'LOW_DENSITY' , parent_id = @parent_id WHERE permission_id = @permission_id;
+			UPDATE permission SET description = 'Low Density', name= 'LOW_DENSITY' , parent_id = @parent_id WHERE permission_id = @permission_id;
 			
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_SAMPLES');
 			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'LISTS');
-			UPDATE permission SET description = 'Samples lists', name= 'SAMPLE_LISTS', parent_id = @parent_id WHERE permission_id = @permission_id;
+			UPDATE permission SET description = 'Samples Lists', name= 'SAMPLE_LISTS', parent_id = @parent_id WHERE permission_id = @permission_id;
 			
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'GRAPHICAL_QUERIES');
 			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES');
