@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -10,11 +11,11 @@ import java.util.Set;
 //TODO rename to StudyEntryService
 public interface StudyGermplasmService {
 
-	List<StudyGermplasmDto> getGermplasm(final int studyBusinessIdentifier);
+	List<StudyGermplasmDto> getGermplasm(int studyBusinessIdentifier);
 
-	List<StudyEntryDto> getStudyEntries(final int studyId, final Pageable pageable);
+	List<StudyEntryDto> getStudyEntries(int studyId, StudyEntrySearchDto entrySearchDto, Pageable pageable);
 
-	List<StudyGermplasmDto> getGermplasmFromPlots(final int studyBusinessIdentifier, Set<Integer> plotNos);
+	List<StudyGermplasmDto> getGermplasmFromPlots(int studyBusinessIdentifier, Set<Integer> plotNos);
 
 	long countStudyEntries(int studyId);
 

@@ -408,4 +408,6 @@ public interface DatasetService {
 	 * @return List<InstanceDetailsDTO>
 	 */
 	List<InstanceDetailsDTO> getInstanceDetails(Integer datasetId, Integer studyId);
+
+	void replaceObservationUnitEntry(List<Integer> observationUnits, Integer newEntryId);
 }

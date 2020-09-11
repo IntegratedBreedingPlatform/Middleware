@@ -1081,4 +1081,18 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	public void updateEntryId(final List<Integer> observationUnitIds, final Integer newEntryId) {
+		try {
+			String hqlUpdate = "update ExperimentModel e set e.stock.id = :newEntryId where e.ndExperimentId in (:observationUnitIds)";
+			this.getSession().createQuery(hqlUpdate)
+				.setParameter("newEntryId", newEntryId)
+				.setParameterList("observationUnitIds", observationUnitIds)
+				.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error with updateEntryId query from ExperimentModel: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 }

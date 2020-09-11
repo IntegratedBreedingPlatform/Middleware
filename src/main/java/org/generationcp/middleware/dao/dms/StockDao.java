@@ -15,6 +15,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -158,7 +159,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
-	public List<StudyEntryDto> getStudyEntries(final int studyId, final List<MeasurementVariable> entryDescriptors, final Pageable pageable) {
+	public List<StudyEntryDto> getStudyEntries(final int studyId, final List<MeasurementVariable> entryDescriptors, final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
 		try {
 			final StringBuilder sqlQuery = new StringBuilder("SELECT s.stock_id AS entryId,\n"
 				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS entryNumber,\n"
@@ -190,10 +191,18 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "       LEFT JOIN cvterm c ON c.cvterm_id = l.scaleid\n"
 				+ "       LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id\n"
 				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id\n"
-				+ "WHERE s.project_id = :studyId\n"
-				+ "GROUP BY s.stock_id\n"
-				+ "ORDER BY CONVERT(S.uniquename, UNSIGNED INT)");
+				+ "WHERE s.project_id = :studyId\n");
 
+
+			if (studyEntrySearchDto!=null) {
+				if (studyEntrySearchDto.getEntryNumbers()!=null && !studyEntrySearchDto.getEntryNumbers().isEmpty()) {
+					sqlQuery.append(" AND s.uniquename in (:entryNumbers)" );
+				}
+				if (studyEntrySearchDto.getEntryIds()!=null && !studyEntrySearchDto.getEntryIds().isEmpty()) {
+					sqlQuery.append(" AND s.stock_id in (:entryIds)" );
+				}
+			}
+			sqlQuery.append(" GROUP BY s.stock_id ORDER BY CONVERT(S.uniquename, UNSIGNED INT) ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery.toString());
 			query.addScalar("entryId", new IntegerType());
@@ -212,6 +221,14 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 			query.setParameter("studyId", studyId);
+			if (studyEntrySearchDto!=null) {
+				if (studyEntrySearchDto.getEntryNumbers()!=null && !studyEntrySearchDto.getEntryNumbers().isEmpty()) {
+					query.setParameterList("entryNumbers", studyEntrySearchDto.getEntryNumbers());
+				}
+				if (studyEntrySearchDto.getEntryIds()!=null && !studyEntrySearchDto.getEntryIds().isEmpty()) {
+					query.setParameterList("entryIds", studyEntrySearchDto.getEntryIds());
+				}
+			}
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			GenericDAO.addPaginationToSQLQuery(query, pageable);
 
