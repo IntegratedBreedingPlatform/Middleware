@@ -19,6 +19,9 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.ims.LotStatus;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -163,7 +166,9 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "  s.name AS designation,\n"
 				+ "  s.value AS entryCode,\n"
 				+ "  COUNT(DISTINCT (l.eid)) AS activeLots,\n"
-				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, SUM(CASE WHEN it.trnstat = 1 OR (it.trnstat = 0 AND it.trntype = 1) THEN it.trnqty ELSE 0 END), 'Mixed') AS available,\n"
+				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, SUM(CASE WHEN it.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue()
+				+ "  OR (it.trnstat = " + TransactionStatus.PENDING.getIntValue()
+				+  " AND it.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN it.trnqty ELSE 0 END), 'Mixed') AS available,\n"
 				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, c.name, 'Mixed') AS unit\n");
 
 			final String entryClause = ",MAX(IF(cvterm_variable.name = '%s', sp.value, NULL)) AS '%s',"
@@ -180,7 +185,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 			sqlQuery.append(" FROM stock s\n"
-				+ "       LEFT JOIN ims_lot l ON l.eid = s.dbxref_id\n"
+				+ "       LEFT JOIN ims_lot l ON l.eid = s.dbxref_id and l.status = " + LotStatus.ACTIVE.getIntValue()
 				+ "       LEFT JOIN ims_transaction it ON l.lotid = it.lotid\n"
 				+ "       LEFT JOIN cvterm c ON c.cvterm_id = l.scaleid\n"
 				+ "       LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id\n"
@@ -212,7 +217,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 			final List<Map<String, Object>> results = query.list();
 			final List<StudyEntryDto> studyEntryDtos = new ArrayList<>();
-			for (final Map<String, Object> row: results) {
+			for (final Map<String, Object> row : results) {
 				final StudyEntryDto studyEntryDto = new StudyEntryDto();
 				studyEntryDto.setEntryId((Integer) row.get("entryId"));
 				studyEntryDto.setGid((Integer) row.get("gid"));
@@ -224,12 +229,19 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				studyEntryDto.setUnit((String) row.get("unit"));
 				final Map<String, StudyEntryPropertyData> variables = new HashMap<>();
 				for (final MeasurementVariable entryDescriptor : entryDescriptors) {
-					final StudyEntryPropertyData studyEntryPropertyData = new StudyEntryPropertyData();
-					studyEntryPropertyData.setValue((String) row.get(entryDescriptor.getName() + "_value"));
-					studyEntryPropertyData.setVariableId((Integer) row.get(entryDescriptor.getName() + "_variableId"));
-					studyEntryPropertyData.setStudyEntryPropertyId((Integer) row.get(entryDescriptor.getName() + "_propertyId"));
+					final StudyEntryPropertyData studyEntryPropertyData =
+						new StudyEntryPropertyData((Integer) row.get(entryDescriptor.getName() + "_propertyId"),
+							(Integer) row.get(entryDescriptor.getName() + "_variableId"),
+							(String) row.get(entryDescriptor.getName() + "_value"));
 					variables.put(entryDescriptor.getName(), studyEntryPropertyData);
 				}
+				//These elements should not be listed as germplasm descriptors, this is a way to match values between column
+				//and table cells. In the near future this block should be removed
+				variables.put("GID", new StudyEntryPropertyData(String.valueOf(studyEntryDto.getGid())));
+				variables.put("DESIGNATION", new StudyEntryPropertyData(studyEntryDto.getDesignation()));
+				variables.put("ENTRY_CODE", new StudyEntryPropertyData(studyEntryDto.getEntryCode()));
+				variables.put("ENTRY_NO", new StudyEntryPropertyData(String.valueOf(studyEntryDto.getEntryNumber())));
+
 				studyEntryDto.setVariables(variables);
 				studyEntryDtos.add(studyEntryDto);
 			}

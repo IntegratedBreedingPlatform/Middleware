@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.study;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -7,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class StudyEntryDto {
 
 	private Integer entryId;
