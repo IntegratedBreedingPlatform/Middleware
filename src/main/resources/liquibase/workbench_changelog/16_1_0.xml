@@ -8,7 +8,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1"> select count(rp.role_id) > 0 from role_permission rp inner join permission p on rp.permission_id = p.permission_id where p.name = 'BREEDING_ACTIVITIES'</sqlCheck>
         </preConditions>
-        <comment>Removing Breeding activities permission from role_permission table</comment>
+        <comment>Remove Breeding activities permission from role_permission table</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @permission_id = (SELECT permission_id FROM permission WHERE name ='MANAGE_GERMPLASM');
 			insert into role_permission(role_id,permission_id)
@@ -34,7 +34,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1"> select count(rp.role_id) > 0 from role_permission rp inner join permission p on rp.permission_id = p.permission_id where p.name = 'INFORMATION_MANAGEMENT'</sqlCheck>
         </preConditions>
-        <comment>Removing Information Management permission from role_permission table</comment>
+        <comment>Remove Information Management permission from role_permission table</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @permission_id = (SELECT permission_id FROM permission WHERE name ='BROWSE_STUDIES');
 			insert into role_permission(role_id,permission_id)
@@ -70,7 +70,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1"> select count(rp.role_id) > 0 from role_permission rp inner join permission p on rp.permission_id = p.permission_id where p.name = 'STATISTICAL_ANALYSIS'</sqlCheck>
         </preConditions>
-        <comment>Removing Statical Analysis permission from role_permission table</comment>
+        <comment>Remove Statical Analysis permission from role_permission table</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @permission_id = (SELECT permission_id FROM permission WHERE name ='SINGLE_SITE_ANALYSIS');
 			insert into role_permission(role_id,permission_id)
@@ -125,7 +125,7 @@
                 SELECT count(*) FROM workbench_tool WHERE name = 'germplasm_lists'
             </sqlCheck>
         </preConditions>
-        <comment>Add Germplasm lists side menu</comment>
+        <comment>Add Germplasm lists in workbench_tool</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO workbench_tool (name, group_name, title, version, tool_type, path, parameter, user_tool) VALUES ('germplasm_lists', 'germplasm_lists', 'Germplasm lists', '16.1', 'WEB', 'ibpworkbench/bm/listmanager', '', '0');
 		</sql>
@@ -136,7 +136,7 @@
                 SELECT count(*) FROM workbench_tool WHERE name = 'high_density'
             </sqlCheck>
         </preConditions>
-        <comment>Add High density side menu</comment>
+        <comment>Add High density in workbench_tool</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO workbench_tool (name, group_name, title, version, tool_type, path, parameter, user_tool) VALUES ( 'high_density', 'high_density', 'High density', '16.1', 'WEB', '/ibpworkbench/controller/accessNotAvailable', '', '0');
 		</sql>
@@ -147,7 +147,7 @@
                 SELECT count(*) FROM workbench_sidebar_category_link WHERE tool_name = 'germplasm_lists'
         </sqlCheck>
         </preConditions>
-        <comment>Add Germpalsm Lists side menu</comment>
+        <comment>Add Germpalsm Lists in workbench_sidebar_category_link</comment>
 		<sql dbms="mysql" splitStatements="true">
             set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'statistical_analysis');
 			INSERT INTO workbench_sidebar_category_link (tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title) VALUES ('germplasm_lists', @sidebar_category_id, 'germplasm_lists', 'Germplasm Lists');
@@ -159,7 +159,7 @@
                 SELECT count(*) FROM workbench_sidebar_category_link WHERE tool_name = 'high_density'
             </sqlCheck>
         </preConditions>
-        <comment>Add High Density side menu</comment>
+        <comment>Add High Density item in workbench_sidebar_category_link</comment>
 		<sql dbms="mysql" splitStatements="true">
             set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'genotyping');
 			INSERT INTO workbench_sidebar_category_link (tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title) VALUES ('high_density', @sidebar_category_id, 'high_density', 'High density');
@@ -182,7 +182,7 @@
 			<tableExists tableName="workbench_sidebar_category"/>
 			<columnExists tableName="workbench_sidebar_category" columnName="rank"/>
         </preConditions>
-                <comment>update Rank in workbench_sidebar_category</comment>
+                <comment>Update Rank in workbench_sidebar_category</comment>
 		<sql dbms="mysql" splitStatements="true">
 			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'statistical_analysis');
 			UPDATE workbench_sidebar_category SET sidebar_category_name = 'lists', sidebar_category_label = 'Lists', rank = 1 WHERE sidebar_category_id = @sidebar_category_id;
@@ -229,7 +229,7 @@
 			<tableExists tableName="workbench_sidebar_category_link"/>
     		<columnExists tableName="workbench_sidebar_category_link" columnName="rank"/>
         </preConditions>
-        <comment>update Rank in workbench_sidebar_category_link</comment>
+        <comment>Update Rank in workbench_sidebar_category_link</comment>
 		<sql dbms="mysql" splitStatements="true">
 			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'bm_list_manager_main');
 			UPDATE workbench_sidebar_category_link SET rank = '1' WHERE sidebar_category_link_id = @sidebar_category_link_id;
@@ -296,7 +296,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'QUERIES'</sqlCheck>
         </preConditions>
-        <comment>INSERT permission for QUERIES</comment>
+        <comment>Add QUERIES permission</comment>
         <sql dbms="mysql" splitStatements="true">
         	INSERT INTO permission (name, description, parent_id) VALUES ('QUERIES', 'Queries', '1');
         </sql>
@@ -305,7 +305,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'GENOTYPING'</sqlCheck>
         </preConditions>
-        <comment>INSERT permission for GENOTYPING</comment>
+        <comment>Add GENOTYPING permission</comment>
         <sql dbms="mysql" splitStatements="true">
         	INSERT INTO permission (name, description, parent_id) VALUES ('GENOTYPING', 'Genotyping', '1');
         </sql>
@@ -314,7 +314,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'CROP_ADMINISTRATION'</sqlCheck>
         </preConditions>
-        <comment>INSERT permission for CROP_ADMINISTRATION</comment>
+        <comment>Add CROP_ADMINISTRATION permission</comment>
         <sql dbms="mysql" splitStatements="true">
         	INSERT INTO permission (name, description, parent_id) VALUES ('CROP_ADMINISTRATION', 'Crop Administration', '1');
         </sql>
@@ -323,7 +323,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'HIGH_DENSITY'</sqlCheck>
         </preConditions>
-        <comment>INSERT permission for HIGH_DENSITY</comment>
+        <comment>Add HIGH_DENSITY permission</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @sidebar_category_link_id = (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link WHERE tool_name = 'GERMPLASM_LISTS');
 			set @parent_id = (SELECT permission_id FROM permission WHERE name = 'GENOTYPING');
@@ -333,7 +333,7 @@
     <changeSet author="diego" id="v16.1.0-20">
         <preConditions onFail="MARK_RAN">
         </preConditions>
-        <comment>Reorganize parent permissions</comment>
+        <comment>Refactor permissions</comment>
         <sql dbms="mysql" splitStatements="true">
         	set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'BREEDING_ACTIVITIES'); 
 			UPDATE permission SET description = 'Germplasm', name= 'GERMPLASM' WHERE permission_id = @permission_id;
@@ -389,7 +389,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name ='GERMPLASM_LISTS'</sqlCheck>
         </preConditions>
-        <comment>INSERT permission for GERMPLASM_LISTS</comment>
+        <comment>Add GERMPLASM_LISTS permission</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @sidebar_category_link_id = (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link WHERE tool_name = 'HIGH_DENSITY');
 			set @parent_id = (SELECT permission_id FROM permission WHERE name ='LISTS');
@@ -401,7 +401,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES')</sqlCheck>
         </preConditions>
-        <comment>Adding role_type_permission permissions</comment>
+        <comment>Add QUERIES permission in role_type_permission</comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', (SELECT permission_id FROM permission WHERE NAME = 'QUERIES'), '1');
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', (SELECT permission_id FROM permission WHERE NAME = 'QUERIES'), '1');
@@ -413,7 +413,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING')</sqlCheck>
         </preConditions>
-        <comment>Adding GENOTYPING permission in role_type_permission</comment>
+        <comment>Add GENOTYPING permission in role_type_permission</comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING'), '1');
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING'), '1');
@@ -424,7 +424,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'HIGH_DENSITY')</sqlCheck>
         </preConditions>
-        <comment>Adding HIGH_DENSITY permission in role_type_permission</comment>
+        <comment>Add HIGH_DENSITY permission in role_type_permission</comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', (SELECT permission_id FROM permission WHERE NAME = 'HIGH_DENSITY'), '1');
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', (SELECT permission_id FROM permission WHERE NAME = 'HIGH_DENSITY'), '1');
@@ -435,14 +435,14 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'GERMPLASM_LISTS')</sqlCheck>
         </preConditions>
-        <comment>Adding GERMPLASM_LISTS permission in role_type_permission</comment>
+        <comment>Add GERMPLASM_LISTS permission in role_type_permission</comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', (SELECT permission_id FROM permission WHERE NAME = 'GERMPLASM_LISTS'), '1');
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', (SELECT permission_id FROM permission WHERE NAME = 'GERMPLASM_LISTS'), '1');
             INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', (SELECT permission_id FROM permission WHERE NAME = 'GERMPLASM_LISTS'), '1');
         </sql>
     </changeSet>
-<!--	<changeSet author="diego" id="v16.1.0-26">
+	<changeSet author="diego" id="v16.1.0-26">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
             	SELECT DISTINCT(COUNT(1)) > 0 FROM role_permission rp
@@ -452,7 +452,7 @@
     				HAVING COUNT(DISTINCT p.permission_id) = 3
             </sqlCheck>
         </preConditions>
-        <comment>group by permissions for Queries in role_permission table</comment>
+        <comment>Regroup permissions for Queries in role_permission table</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @permission_id = (SELECT permission_id FROM permission WHERE name ='QUERIES');
 			INSERT INTO role_permission(role_id,permission_id)
@@ -482,7 +482,7 @@
     				HAVING COUNT(DISTINCT p.permission_id) = 2
     		</sqlCheck>
         </preConditions>
-        <comment>group by permissions for Germplasm in role_permission table</comment>
+        <comment>Regroup permissions for Germplasm in role_permission table</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @permission_id = (SELECT permission_id FROM permission WHERE name ='GERMPLASM');
 			INSERT INTO role_permission(role_id,permission_id)
@@ -513,7 +513,7 @@
     				HAVING COUNT(DISTINCT p.permission_id) = 5
             </sqlCheck>
         </preConditions>
-        <comment>group by permissions for Studies in role_permission table</comment>
+        <comment>Regroup permissions for Studies in role_permission table</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @permission_id = (SELECT permission_id FROM permission WHERE name ='STUDIES');
 			INSERT INTO role_permission(role_id,permission_id)
@@ -533,7 +533,7 @@
 					)
 					AND permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name IN ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS'));
         </sql>
-    </changeSet>-->
+    </changeSet>
 	<changeSet author="diego" id="v16.1.0-29">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
@@ -547,7 +547,7 @@
 					p.name IN ('SAMPLE_LISTS')
             </sqlCheck>
         </preConditions>
-        <comment>group by permissions for Lists in role_permission table</comment>
+        <comment>Regroup permissions for Lists in role_permission table</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @permission_id = (SELECT permission_id FROM permission WHERE name ='LISTS');
 			INSERT INTO role_permission(role_id,permission_id)
@@ -573,7 +573,7 @@
 					p.name IN ('LOW_DENSITY')
 			</sqlCheck>
         </preConditions>
-        <comment>group by permissions for Genotyping in role_permission table</comment>
+        <comment>Regroup permissions for Genotyping in role_permission table</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @permission_id = (SELECT permission_id FROM permission WHERE name ='GENOTYPING');
 			INSERT INTO role_permission(role_id,permission_id)
