@@ -461,8 +461,15 @@
 						GROUP BY rp.role_id
 						HAVING COUNT(DISTINCT p.permission_id) = 3;
 
-			DELETE rp FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
-				WHERE p.name in ('GRAPHICAL_QUERIES','HEAD_TO_HEAD_QUERY','MULTI_TRAIT_QUERY');
+			DELETE role_permission FROM role_permission
+				WHERE role_id IN (
+					SELECT sub.rid FROM (SELECT rp.role_id AS rid FROM role_permission rp
+										   INNER JOIN permission p ON rp.permission_id = p.permission_id
+											WHERE p.name IN ('GRAPHICAL_QUERIES','HEAD_TO_HEAD_QUERY','MULTI_TRAIT_QUERY')
+											GROUP BY rp.role_id
+											HAVING COUNT(DISTINCT p.permission_id) = 3) AS sub
+					)
+					AND permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name IN ('GRAPHICAL_QUERIES','HEAD_TO_HEAD_QUERY','MULTI_TRAIT_QUERY'));
         </sql>
     </changeSet>
 	<changeSet author="diego" id="v16.1.0-27">
@@ -485,9 +492,15 @@
     					GROUP BY rp.role_id
     					HAVING COUNT(DISTINCT p.permission_id) = 2;
 
-			DELETE rp FROM role_permission rp
-				INNER JOIN permission p ON rp.permission_id = p.permission_id
-					WHERE p.name in ('MANAGE_GERMPLASM','IMPORT_GERMPLASM');
+			DELETE role_permission FROM role_permission
+				WHERE role_id IN (
+					SELECT sub.rid FROM (SELECT rp.role_id AS rid FROM role_permission rp
+										   INNER JOIN permission p ON rp.permission_id = p.permission_id
+											WHERE p.name IN ('MANAGE_GERMPLASM','IMPORT_GERMPLASM')
+											GROUP BY rp.role_id
+											HAVING COUNT(DISTINCT p.permission_id) = 2) AS sub
+					)
+					AND permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name IN ('MANAGE_GERMPLASM','IMPORT_GERMPLASM'));
         </sql>
     </changeSet>
 	<changeSet author="diego" id="v16.1.0-28">
@@ -510,9 +523,15 @@
     					GROUP BY rp.role_id
     					HAVING COUNT(DISTINCT p.permission_id) = 5;
 
-			DELETE rp FROM role_permission rp
-				INNER JOIN permission p ON rp.permission_id = p.permission_id
-					WHERE p.name in ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS');
+			DELETE role_permission FROM role_permission
+				WHERE role_id IN (
+					SELECT sub.rid FROM (SELECT rp.role_id AS rid FROM role_permission rp
+										   INNER JOIN permission p ON rp.permission_id = p.permission_id
+											WHERE p.name IN ('MANAGE_GERMPLASM','IMPORT_GERMPLASM')
+											GROUP BY rp.role_id
+											HAVING COUNT(DISTINCT p.permission_id) = 5) AS sub
+					)
+					AND permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name IN ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS'));
         </sql>
     </changeSet>-->
 	<changeSet author="diego" id="v16.1.0-29">
