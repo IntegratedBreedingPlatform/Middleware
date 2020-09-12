@@ -44,6 +44,7 @@ import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -607,8 +608,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
-		return this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter);
+	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		return this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter, pageable);
 	}
 
 	@Override

@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.*;
 
@@ -112,7 +113,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO();
         searchDto.setInstanceId(this.instanceIds.get(0));
         final List<ObservationUnitRow> observationUnitRows = this.datasetService.getObservationUnitRows(this.studyId, this.subObsDatasetId,
-                searchDto);
+                searchDto, new PageRequest(0, Integer.MAX_VALUE));
         Assert.assertNotNull(observationUnitRows);
         Assert.assertEquals(80,
 			observationUnitRows
@@ -128,7 +129,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         searchDto.getFilterColumns().add("TRIAL_INSTANCE");
         searchDto.getFilterColumns().add(TRAIT_NAME);
         final List<Map<String, Object>> rowsAsListMap = this.datasetService.getObservationUnitRowsAsMapList(this.studyId, this.subObsDatasetId,
-            searchDto);
+            searchDto, new PageRequest(0, Integer.MAX_VALUE));
         Assert.assertNotNull(rowsAsListMap);
         Assert
 			.assertEquals(80, rowsAsListMap

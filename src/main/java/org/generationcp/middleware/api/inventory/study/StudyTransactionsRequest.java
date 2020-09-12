@@ -1,7 +1,6 @@
 package org.generationcp.middleware.api.inventory.study;
 
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
