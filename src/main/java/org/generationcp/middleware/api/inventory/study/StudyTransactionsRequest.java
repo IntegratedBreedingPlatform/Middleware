@@ -19,7 +19,6 @@ public class StudyTransactionsRequest {
 	private List<Integer> entryNoList;
 	private List<Integer> observationUnitIds;
 
-	private SortedPageRequest sortedPageRequest;
 	private String draw;
 
 	public TransactionsSearchDto getTransactionsSearch() {
@@ -68,14 +67,6 @@ public class StudyTransactionsRequest {
 
 	public void setObservationUnitIds(final List<Integer> observationUnitIds) {
 		this.observationUnitIds = observationUnitIds;
-	}
-
-	public SortedPageRequest getSortedPageRequest() {
-		return this.sortedPageRequest;
-	}
-
-	public void setSortedPageRequest(final SortedPageRequest sortedPageRequest) {
-		this.sortedPageRequest = sortedPageRequest;
 	}
 
 	public String getDraw() {
