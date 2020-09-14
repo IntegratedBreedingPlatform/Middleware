@@ -26,7 +26,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
-import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
@@ -165,7 +164,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			final StringBuilder sql =
 					new StringBuilder().append(" SELECT ").append(" p.project_id AS datasetId ").append(" , p.name AS datasetName ")
 							.append(" , st.name AS studyName ").append(" , e.nd_geolocation_id AS instanceId ")
-							.append(" , loc.lname AS siteName ").append(" , loc.locid AS siteId")
+							.append(" , site.value AS siteName ").append(" , siteId.value AS siteId")
 							.append(" , e.nd_experiment_id AS experimentId ").append(" , s.uniqueName AS entryNumber ")
 							.append(" , s.name AS germplasmName ").append(" , epropRep.value AS rep ")
 							.append(" , epropPlot.value AS plotNo ").append(" , row.value AS row ").append(" , col.value AS col ")
@@ -187,15 +186,16 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("  INNER JOIN nd_experimentprop epropPlot ON epropPlot.nd_experiment_id = e.nd_experiment_id ")
 							.append("    AND epropPlot.type_id IN (").append(TermId.PLOT_NO.getId()).append(", ")
 							.append(TermId.PLOT_NNO.getId()).append(") ").append(" AND epropPlot.value <> '' ")
+							.append("  LEFT JOIN nd_geolocationprop site ON site.nd_geolocation_id = e.nd_geolocation_id ")
+							.append("    AND site.type_id = ").append(TermId.TRIAL_LOCATION.getId())
+							.append("  LEFT JOIN nd_geolocationprop siteId ON siteId.nd_geolocation_id = e.nd_geolocation_id ")
+							.append("    AND siteId.type_id = ").append(TermId.LOCATION_ID.getId())
 							.append("  LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = e.nd_experiment_id ")
 							.append("    AND row.type_id = ").append(TermId.RANGE_NO.getId())
 							.append("  LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = e.nd_experiment_id ")
 							.append("    AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 							.append("  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 							.append("     AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
-							.append(" LEFT JOIN locdes field ON field.dtype = ").append("(SELECT u.fldno FROM udflds u WHERE u.fcode = '" + LocdesType.BLOCK_PARENT.getCode() + "') ").append(" AND field.locid = blk.value")
-							.append(" LEFT JOIN locdes fieldParent ON fieldParent.dtype = ").append("(SELECT u.fldno FROM udflds u WHERE u.fcode = '" + LocdesType.FIELD_PARENT.getCode() + "') ").append(" AND fieldParent.locid = field.dval")
-							.append(" LEFT JOIN location loc ON loc.locid = fieldParent.dval")
 							.append(" WHERE blk.type_id = ").append(TermId.BLOCK_ID.getId());
 
 			if (blockId != null) {

@@ -3,7 +3,6 @@ package org.generationcp.middleware.dao;
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
@@ -13,14 +12,12 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, Integer> {
 
@@ -64,12 +61,12 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 	}
 
 	public List<GermplasmStudySourceDto> getGermplasmStudySourceList(
-		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
+		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest, final Pageable pageable) {
 
 		final StringBuilder sql = new StringBuilder(GERMPLASM_STUDY_SOURCE_SEARCH_QUERY);
 		addSearchQueryFilters(new SqlQueryParamBuilder(sql), germplasmStudySourceSearchRequest.getFilter());
 		addGroupByAndLotsFilter(new SqlQueryParamBuilder(sql), germplasmStudySourceSearchRequest.getFilter());
-		addOrder(sql, germplasmStudySourceSearchRequest.getSortedRequest());
+		addPageRequestOrderBy(sql, pageable, GermplasmStudySourceSearchRequest.Filter.SORTABLE_FIELDS);
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 		addSearchQueryFilters(new SqlQueryParamBuilder(query), germplasmStudySourceSearchRequest.getFilter());
@@ -90,7 +87,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		query.addScalar("numberOfLots", new IntegerType());
 		query.setParameter("studyId", germplasmStudySourceSearchRequest.getStudyId());
 
-		GenericDAO.addSortedPageRequestPagination(query, germplasmStudySourceSearchRequest.getSortedRequest());
+		addPaginationToSQLQuery(query, pageable);
 
 		query.setResultTransformer(Transformers.aliasToBean(GermplasmStudySourceDto.class));
 		return query.list();
@@ -187,13 +184,6 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				paramBuilder.setParameterList("trialInstanceList", trialInstanceList);
 			}
 
-		}
-	}
-
-	private static void addOrder(final StringBuilder sql, final SortedPageRequest sortedPageRequest) {
-		if (sortedPageRequest != null && sortedPageRequest.getSortBy() != null && sortedPageRequest.getSortOrder() != null
-			&& GermplasmStudySourceSearchRequest.Filter.SORTABLE_FIELDS.contains(sortedPageRequest.getSortBy())) {
-			sql.append(" ORDER BY " + sortedPageRequest.getSortBy() + " " + sortedPageRequest.getSortOrder() + "\n ");
 		}
 	}
 

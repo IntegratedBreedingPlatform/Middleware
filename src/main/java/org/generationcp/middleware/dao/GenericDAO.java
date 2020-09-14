@@ -11,9 +11,7 @@
 
 package org.generationcp.middleware.dao;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockOptions;
@@ -33,6 +31,7 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public abstract class GenericDAO<T, ID extends Serializable> {
@@ -280,23 +279,29 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		query.setMaxResults(pageable.getPageSize());
 	}
 
-	public static void addSortedPageRequestPagination(final SQLQuery query, final SortedPageRequest sortedPageRequest) {
-		if (sortedPageRequest == null || query == null) {
+	public static void addPageRequestOrderBy(final StringBuilder query, final Pageable pageable) {
+		if (pageable == null || pageable.getSort() == null  || query == null) {
 			return;
 		}
-		if (sortedPageRequest.getPageSize() != null && sortedPageRequest.getPageNumber() != null) {
-			query.setFirstResult(sortedPageRequest.getPageSize() * (sortedPageRequest.getPageNumber() - 1));
-			query.setMaxResults(sortedPageRequest.getPageSize());
+		final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+		query.append(" ORDER BY ");
+		while (iterator.hasNext()) {
+			final Sort.Order order = iterator.next();
+			query.append(order.getProperty() + " " + order.getDirection().name() + (iterator.hasNext() ? "," : ""));
 		}
 	}
 
-	public static void addSortedPageRequestOrderBy(final StringBuilder query, final SortedPageRequest sortedPageRequest) {
-		if (sortedPageRequest == null || query == null) {
+	public static void addPageRequestOrderBy(final StringBuilder query, final Pageable pageable, final List<String> sortableFields) {
+		if (pageable == null || pageable.getSort() == null || query == null || sortableFields == null) {
 			return;
 		}
-		if (!StringUtils.isBlank(sortedPageRequest.getSortBy())) {
-			query.append(" ORDER BY " + sortedPageRequest.getSortBy() + " "
-				+ (sortedPageRequest.getSortOrder() == null ? "ASC" : sortedPageRequest.getSortOrder()));
+		final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+		query.append(" ORDER BY ");
+		while (iterator.hasNext()) {
+			final Sort.Order order = iterator.next();
+			if (sortableFields.contains(order.getProperty())) {
+				query.append(order.getProperty() + " " + order.getDirection().name() + (iterator.hasNext() ? "," : ""));
+			}
 		}
 	}
 }

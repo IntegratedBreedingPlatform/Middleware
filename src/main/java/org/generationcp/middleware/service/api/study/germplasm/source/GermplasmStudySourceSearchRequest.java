@@ -1,6 +1,5 @@
 package org.generationcp.middleware.service.api.study.germplasm.source;
 
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -12,7 +11,7 @@ import java.util.List;
 public class GermplasmStudySourceSearchRequest {
 
 	private int studyId;
-	private SortedPageRequest sortedRequest;
+
 	private GermplasmStudySourceSearchRequest.Filter filter;
 
 	public int getStudyId() {
@@ -29,14 +28,6 @@ public class GermplasmStudySourceSearchRequest {
 
 	public void setFilter(final GermplasmStudySourceSearchRequest.Filter filter) {
 		this.filter = filter;
-	}
-
-	public SortedPageRequest getSortedRequest() {
-		return this.sortedRequest;
-	}
-
-	public void setSortedRequest(final SortedPageRequest sortedRequest) {
-		this.sortedRequest = sortedRequest;
 	}
 
 	@Override
