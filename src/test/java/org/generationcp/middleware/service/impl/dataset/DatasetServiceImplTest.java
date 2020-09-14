@@ -409,7 +409,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testaddStudyVariablesToUnitRows() {
+	public void testAddStudyVariablesToUnitRows() {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		final Map<String, ObservationUnitData> variables = new HashMap<>();
 		variables.put(OBS_UNIT_ID, new ObservationUnitData("obunit123"));
@@ -421,7 +421,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testaddStudyVariablesAliasToUnitRows() {
+	public void testAddStudyVariablesAliasToUnitRows() {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		final Map<String, ObservationUnitData> variables = new HashMap<>();
 		variables.put(OBS_UNIT_ID, new ObservationUnitData("obunit123"));
