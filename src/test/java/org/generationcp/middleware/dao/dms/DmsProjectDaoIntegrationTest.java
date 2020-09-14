@@ -41,6 +41,7 @@ import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.data.domain.PageRequest;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -453,7 +454,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		final Long count = (Long) this.dmsProjectDao.countStudies(studySearchFilter);
-		final List<StudyDto> studyDtos = this.dmsProjectDao.getStudies(studySearchFilter);
+		final List<StudyDto> studyDtos = this.dmsProjectDao.getStudies(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
 		Assert.assertEquals(count.intValue(), studyDtos.size());
 
 	}
@@ -484,7 +485,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		studySearchFilter.setActive(true);
 
 		final Long count = (Long) this.dmsProjectDao.countStudies(studySearchFilter);
-		final List<StudyDto> studyDtos = this.dmsProjectDao.getStudies(studySearchFilter);
+		final List<StudyDto> studyDtos = this.dmsProjectDao.getStudies(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
 
 		Assert.assertEquals(1, count.intValue());
 		Assert.assertEquals(1, studyDtos.size());
