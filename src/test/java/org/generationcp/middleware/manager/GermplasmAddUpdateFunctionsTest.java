@@ -15,6 +15,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Test;
@@ -52,7 +53,9 @@ public class GermplasmAddUpdateFunctionsTest extends IntegrationTestBase {
 		n.setTypeId(Integer.valueOf(1));
 		n.setUserId(Integer.valueOf(1));
 
-		Integer addedGid = this.manager.addGermplasm(g, n, null);
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
+		Integer addedGid = this.manager.addGermplasm(g, n, cropType);
 
 		Debug.println(0, "Germplasm added: " + addedGid);
 

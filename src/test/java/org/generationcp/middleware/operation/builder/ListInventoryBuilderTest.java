@@ -52,12 +52,12 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
 		listInventoryBuilder = new ListInventoryBuilder(this.sessionProvder);
 		germplasmListManager = new GermplasmListManagerImpl(this.sessionProvder);
+		this.cropType = new CropType();
+		this.cropType.setUseUUID(false);
 		gids = this.createListOfGermplasmIds(NO_OF_ENTRIES);
 		this.initializeGermplasms(gids);
 		this.germplasmList = GermplasmListTestDataInitializer.createGermplasmListWithListData(LIST_ID, NO_OF_ENTRIES, gids);
 		germplasmListManager.addGermplasmList(this.germplasmList);
-		this.cropType = new CropType();
-		this.cropType.setUseUUID(false);
 	}
 
 	@Test
