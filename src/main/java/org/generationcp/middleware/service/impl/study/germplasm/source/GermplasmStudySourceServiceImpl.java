@@ -7,6 +7,7 @@ import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmS
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceInput;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -20,8 +21,8 @@ public class GermplasmStudySourceServiceImpl implements GermplasmStudySourceServ
 
 	@Override
 	public List<GermplasmStudySourceDto> getGermplasmStudySources(
-		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
-		return this.daoFactory.getGermplasmStudySourceDAO().getGermplasmStudySourceList(germplasmStudySourceSearchRequest);
+		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest, final Pageable pageable) {
+		return this.daoFactory.getGermplasmStudySourceDAO().getGermplasmStudySourceList(germplasmStudySourceSearchRequest, pageable);
 	}
 
 	@Override
