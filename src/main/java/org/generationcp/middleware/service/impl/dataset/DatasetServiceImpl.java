@@ -1178,7 +1178,7 @@ public class DatasetServiceImpl implements DatasetService {
 		for (final ObservationUnitRow observationUnitRow : observationUnits) {
 			for (final MeasurementVariable measurementVariable : studyVariables) {
 				final String key;
-				if (measurementVariable.getAlias() != null && !measurementVariable.getAlias().equals("")) {
+				if (StringUtils.isEmpty(measurementVariable.getAlias())) {
 					key = measurementVariable.getAlias();
 				} else {
 					key = measurementVariable.getName();
