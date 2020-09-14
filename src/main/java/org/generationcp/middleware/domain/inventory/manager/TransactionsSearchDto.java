@@ -38,6 +38,7 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	private Integer lotStatus;
 	private List<Integer> germplasmListIds;
 	private List<Integer> plantingStudyIds;
+	private List<Integer> harvestingStudyIds;
 
 	public List<Integer> getGermplasmListIds() {
 		return germplasmListIds;
@@ -53,6 +54,14 @@ public class TransactionsSearchDto extends SearchRequestDto {
 
 	public void setPlantingStudyIds(final List<Integer> plantingStudyIds) {
 		this.plantingStudyIds = plantingStudyIds;
+	}
+
+	public List<Integer> getHarvestingStudyIds() {
+		return this.harvestingStudyIds;
+	}
+
+	public void setHarvestingStudyIds(final List<Integer> harvestingStudyIds) {
+		this.harvestingStudyIds = harvestingStudyIds;
 	}
 
 	public String getDesignation() {

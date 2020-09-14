@@ -1,0 +1,206 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet id="v15.4.1-1" author="corina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 1 FROM cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583,	8584,	8265,	8690,	8700,	8830,	8386,	8720,	8620,	8740,	8750,	8760,	8770,	8780,	8387,	8790,	8383,	8194,	8195,	8193,	8191,	8192,	8196,	8800,	8810,	8820,	8730,	8384,	8170,	8186);
+
+			</sqlCheck>
+		</preConditions>
+		<comment> REMOVE Study Detail AS DEFAULT TYPE FOR environment-LEVEL/plot-LEVEL variables. IBP-3889
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+			
+			DELETE from cvtermprop WHERE `value`='Study Detail' AND type_id=1800 AND cvterm_id IN (8583,	8584,	8265,	8690,	8700,	8830,	8386,	8720,	8620,	8740,	8750,	8760,	8770,	8780,	8387,	8790,	8383,	8194,	8195,	8193,	8191,	8192,	8196,	8800,	8810,	8820,	8730,	8384,	8170,	8186);
+
+		    SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+	
+	<changeSet id="v15.4.1-2" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM location WHERE locid = 6000 AND ltype=1500;
+			</sqlCheck>
+		</preConditions>
+		<comment>ADD location ID 6000 AND SET AS DEFAULT storage location</comment>
+		<sql dbms="mysql">
+			INSERT INTO location (`locid`, `ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`, `program_uuid`) VALUES
+			(6000,1500,0,'Default Seed Store','DSS',0,0,0,0,0,0,NULL);
+		</sql>
+	</changeSet>
+
+	<changeSet id="v15.4.1-3" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="location" columnName="ldefault"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1) FROM location l
+					WHERE l.ldefault = 1 AND l.ltype = 1500;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1) FROM location WHERE locid=6000 AND ltype = 1500;
+				</sqlCheck>
+			</and>
+	</preConditions>
+
+	<comment>SET DSS AS DEFAULT STORAGE location</comment>
+
+        <sql dbms="mysql">
+		UPDATE location SET ldefault = 1 WHERE locid=6000;
+	</sql>
+	</changeSet>
+	
+	<changeSet id="v15.4.1-4" author="rowena">
+	<preConditions onFail="CONTINUE">
+		<sqlCheck expectedResult="1">
+			SELECT COUNT(1) FROM udflds WHERE fcode = "ANCEST" AND ftable = "ATRIBUTS" AND fldno>1551;
+		</sqlCheck>
+	</preConditions>
+
+	<comment>SET to "ANCEST_DATA" to differentiate from "ANCEST" fcode in UDFLDS table </comment>
+
+        <sql dbms="mysql">
+		UPDATE udflds SET fcode = "ANCEST_DATA" WHERE fcode = "ANCEST" AND ftable = "ATRIBUTS" AND fldno>1551;
+	</sql>
+	</changeSet>
+	
+
+	<changeSet id="v15.4.1-5" author="corina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) FROM projectprop WHERE variable_id=8251 AND project_id IN (SELECT project_id FROM project WHERE `name` LIKE '%Nursery Template%');
+			</sqlCheck>
+		</preConditions>
+		<comment>Remove variable STUDY_BM_CODE from nursery template. IBP-3928</comment>
+		<sql dbms="mysql">
+			DELETE FROM projectprop WHERE variable_id=8251 AND project_id IN (SELECT project_id FROM project WHERE `name` LIKE '%Nursery Template%');
+		</sql>
+	</changeSet>
+
+	<changeSet id="v15.4.1-6" author="corina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM cvterm where cvterm_id=4021; 
+			</sqlCheck>
+		</preConditions>
+		<comment>Change method of variables with same property-method-scale triplet. IBP-3800</comment>
+		<sql dbms="mysql">
+			SET FOREIGN_KEY_CHECKS=0;
+			
+			REPLACE INTO `cvterm`(`cvterm_id`,`cv_id`,`name`,`definition`,`dbxref_id`,`is_obsolete`,`is_relationshiptype`) VALUES (4021,1020,'Applied at plot level','Applied at plot level',NULL,0,0);
+
+			UPDATE cvterm_relationship SET object_id=4021 WHERE type_id=1210 AND subject_id IN (8258,8259,8253);
+			
+			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+       <changeSet id="v15.4.1-7" author="corina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) > 1 from cvterm WHERE `name` IN ('EW_DW_kgPlot','EW_FW_gPlot','EW_FW_kgPlot');
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Apply correction on methods of variables EW_DW_kgPlot, EW_FW_gPlot, EW_FW_kgPlot. IBP-3930.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET FOREIGN_KEY_CHECKS=0;
+			
+			UPDATE cvterm c1, cvterm_relationship c2
+			SET c2.object_id=61390,
+			c1.definition=REPLACE(definition,'Field weight','Dry weight')
+			WHERE c1.`name`='EW_DW_kgPlot' AND c1.cvterm_id=51574
+			AND c1.cvterm_id=c2.subject_id
+			AND c2.type_id=1210;
+
+			UPDATE cvterm c1, cvterm_relationship c2
+			SET c2.object_id=61398,
+			c1.definition=REPLACE(definition,'Dry weight','Field weight')
+			WHERE c1.`name`='EW_FW_gPlot' AND c1.cvterm_id=51675
+			AND c1.cvterm_id=c2.subject_id
+			AND c2.type_id=1210;
+			
+			UPDATE cvterm c1, cvterm_relationship c2
+			SET c2.object_id=61398,
+			c1.definition=REPLACE(definition,'Dry weight','Field weight')
+			WHERE c1.`name`='EW_FW_kgPlot' AND c1.cvterm_id=50854
+			AND c1.cvterm_id=c2.subject_id
+			AND c2.type_id=1210;
+
+			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+
+	<changeSet id="v15.4.1-8" author="corina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) from cvterm where cvterm_id=8265 and cv_id=1040; 
+			</sqlCheck>
+		</preConditions>
+		<comment>Update any usage of var 8265 (FertNTotal_kg_ha) to 8260 (NFert_kg_ha), then delete 8265 from ontology as it duplicates 8260. IBP-3800</comment>
+		<sql dbms="mysql">
+			SET FOREIGN_KEY_CHECKS=0;
+			
+			UPDATE projectprop SET variable_id=8260,alias="NFert_kg_ha" WHERE variable_id=8265;
+			UPDATE stockprop SET type_id=8260 WHERE type_id=8265;
+            UPDATE nd_experimentprop SET type_id=8260 WHERE type_id=8265;
+            UPDATE nd_geolocationprop SET type_id=8260 WHERE type_id=8265;
+
+			DELETE FROM cvterm where cvterm_id=8265;
+			DELETE FROM cvterm_relationship where subject_id=8265;
+			DELETE FROM cvtermprop where cvterm_id=8265;
+	
+			SET FOREIGN_KEY_CHECKS=1;
+		</sql>
+	</changeSet>
+	
+	<changeSet id="v15.4.1-9" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM location WHERE locid = 6001 and ltype=410;
+			</sqlCheck>
+		</preConditions>
+		<comment>ADD Default Breeding Location (6001) if it does not exist</comment>
+		<sql dbms="mysql">
+			INSERT INTO location (`locid`, `ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`, `program_uuid`) VALUES
+			(6001,410,0,'Default Breeding Location','DBL',0,0,0,0,0,0,NULL);
+		</sql>
+	</changeSet>
+
+	<changeSet id="v15.4.1-10" author="aldrin">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					-- Check if there are stocks that don't have GROUPGID stock property.
+					SELECT COUNT(*) FROM stock s
+					INNER JOIN project plotDataset ON plotDataset.parent_project_id = s.project_id AND plotDataset.dataset_type_id = 4
+            		INNER JOIN projectprop ppPlot ON ppPlot.project_id = plotDataset.project_id AND ppPlot.variable_id = 8330
+					WHERE NOT EXISTS (select 1 from stockprop sp WHERE sp.stock_id = s.stock_id AND sp.type_id = 8330)
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Create GROUPGID stock property record for existing stocks (study germplasm entries) that don't have it.</comment>
+		<sql dbms="mysql">
+			-- Value of GROUPGID should be the mgid of the germplasm.
+			-- Only create GROUPGID stockprop for studies with GROUPGID variable in projectprop.
+			INSERT INTO stockprop (`stock_id`, `type_id`, `value`, `rank`)
+			SELECT s.stock_id, 8330, g.mgid, IFNULL(MAX(spRank.rank), 0) + 1
+			FROM stock s
+			INNER JOIN germplsm g ON s.dbxref_id = g.gid
+            INNER JOIN project plotDataset ON plotDataset.parent_project_id = s.project_id AND plotDataset.dataset_type_id = 4
+            INNER JOIN projectprop ppPlot ON ppPlot.project_id = plotDataset.project_id AND ppPlot.variable_id = 8330
+			LEFT JOIN stockprop spRank ON spRank.stock_id = s.stock_id
+			WHERE NOT EXISTS (select 1 from stockprop sp WHERE sp.stock_id = s.stock_id AND sp.type_id = 8330)
+			GROUP BY s.stock_id;
+		</sql>
+	</changeSet>
+
+	
+
+</databaseChangeLog>

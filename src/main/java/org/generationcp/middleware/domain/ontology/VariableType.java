@@ -18,7 +18,7 @@ public enum VariableType {
 	ANALYSIS(1801, "Analysis",
 			"Variable to be used only in analysis (for example derived variables).",
 			PhenotypicType.VARIATE),
-	STUDY_CONDITION(1802, "Study Condition",
+	ENVIRONMENT_CONDITION(1802, "Environment Condition",
 			"Observations made of conditions in an individual environment involved in a study.",
 			PhenotypicType.VARIATE),
 	GERMPLASM_DESCRIPTOR(1804, "Germplasm Descriptor",

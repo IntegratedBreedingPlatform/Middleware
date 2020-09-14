@@ -38,20 +38,30 @@ public enum PermissionsEnum {
 		+ ",'VIEW_LOTS'"
 		+ ",'VIEW_TRANSACTIONS')";
 
-	public static final String HAS_PREPARE_PLANTING = " or hasAnyAuthority('ADMIN'"
+	/**
+	 * Indicates a group of permissions that enables access to the manage studies module
+	 * Enabling some services that are immediately called on load, in order to avoid
+	 * ajax errors and allow navigation. In a future, a proper "manage studies view" permission
+	 * might be combined with individual permission to make this constant unnecessary.
+	 * <br/>
+	 * E.g get datasets tabs
+	 */
+	public static final String HAS_MANAGE_STUDIES_VIEW = " or hasAnyAuthority('ADMIN'"
 		+ ", 'BREEDING_ACTIVITIES'"
 		+ ", 'MANAGE_STUDIES'"
 		+ ", 'MS_MANAGE_OBSERVATION_UNITS'"
 		+ ", 'MS_WITHDRAW_INVENTORY'"
 		+ ", 'MS_CREATE_PENDING_WITHDRAWALS'"
-		+ ", 'MS_MANAGE_OBSERVATION_UNITS'"
-		+ ", 'MS_CREATE_CONFIRMED_WITHDRAWALS')";
+		+ ", 'MS_CREATE_CONFIRMED_WITHDRAWALS'"
+		+ ", 'MS_CREATE_LOTS')";
 
 	public static final String HAS_CREATE_LOTS_BATCH = " or hasAnyAuthority('ADMIN'"
 		+ ", 'BREEDING_ACTIVITIES'"
 		+ ", 'MANAGE_GERMPLASM'"
 		+ ", 'MG_MANAGE_INVENTORY'"
 		+ ", 'MG_CREATE_LOTS'"
+		+ ", 'MANAGE_STUDIES'"
+		+ ", 'MS_CREATE_LOTS'"
 		+ ", 'CREATE_LOTS')";
 
 	public static final List<String> SITE_ADMIN_PERMISSIONS = Arrays.asList(SITE_ADMIN.name(), ADMINISTRATION.name(), ADMIN.name());
