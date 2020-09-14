@@ -29,6 +29,7 @@ import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.DatabaseBroker;
@@ -108,8 +109,10 @@ public class FieldbookServiceImplTest {
 	@Test
 	public void testSaveNurseryAdvanceGermplasmListSuccess() {
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(1);
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
 		final Integer out = this.fieldbookServiceImpl
-			.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList, this.germplasmAttributes, null);
+			.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList, this.germplasmAttributes, cropType);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
 
 		// Make sure a call to save various things occur.
