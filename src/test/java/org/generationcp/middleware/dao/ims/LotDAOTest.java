@@ -69,11 +69,10 @@ public class LotDAOTest extends IntegrationTestBase {
 		this.locationDAO.setSession(this.sessionProvder.getSession());
 		this.germplasmListDAO = new GermplasmListDAO();
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
-		this.createLocationForSearchLotTest();
-		this.createDataForSearchLotsTest();
-
 		this.cropType = new CropType();
 		this.cropType.setUseUUID(false);
+		this.createLocationForSearchLotTest();
+		this.createDataForSearchLotsTest();
 	}
 
 	@Test
