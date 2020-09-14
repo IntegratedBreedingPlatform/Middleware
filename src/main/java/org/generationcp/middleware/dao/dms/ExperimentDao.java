@@ -1083,7 +1083,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	public void updateEntryId(final List<Integer> observationUnitIds, final Integer newEntryId) {
 		try {
-			String hqlUpdate = "update ExperimentModel e set e.stock.id = :newEntryId where e.ndExperimentId in (:observationUnitIds)";
+			final String hqlUpdate = "update ExperimentModel e set e.stock.id = :newEntryId where e.ndExperimentId in (:observationUnitIds)";
 			this.getSession().createQuery(hqlUpdate)
 				.setParameter("newEntryId", newEntryId)
 				.setParameterList("observationUnitIds", observationUnitIds)
