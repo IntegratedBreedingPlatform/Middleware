@@ -102,7 +102,8 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 			}
 		}
 
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStockDao().getStudyEntries(studyId, entryDescriptors, entrySearchDto, pageable);
+		final List<StudyEntryDto> studyEntryDtos =
+			this.daoFactory.getStockDao().getStudyEntries(studyId, entryDescriptors, entrySearchDto, pageable);
 		return studyEntryDtos;
 	}
 
@@ -192,6 +193,19 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 			stockProperty.setValue(studyEntryPropertyData.getValue());
 			this.daoFactory.getStockPropertyDao().saveOrUpdate(stockProperty);
 		}
+	}
+
+	@Override
+	public Optional<StudyEntryPropertyData> getStudyEntryPropertyData(final int studyEntryPropertyId) {
+		final StockProperty stockProperty = this.daoFactory.getStockPropertyDao().getById(studyEntryPropertyId);
+		if (stockProperty != null) {
+			final StudyEntryPropertyData studyEntryPropertyData = new StudyEntryPropertyData();
+			studyEntryPropertyData.setVariableId(stockProperty.getTypeId());
+			studyEntryPropertyData.setStudyEntryPropertyId(stockProperty.getStockPropId());
+			studyEntryPropertyData.setValue(stockProperty.getValue());
+			return Optional.of(studyEntryPropertyData);
+		}
+		return Optional.empty();
 	}
 
 	private String findStockPropValue(final Integer termId, final Set<StockProperty> properties) {
