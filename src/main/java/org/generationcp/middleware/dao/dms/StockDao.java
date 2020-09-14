@@ -166,7 +166,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "  s.dbxref_id AS gid,\n"
 				+ "  s.name AS designation,\n"
 				+ "  s.value AS entryCode,\n"
-				+ "  COUNT(DISTINCT (l.eid)) AS activeLots,\n"
+				+ "  COUNT(DISTINCT (l.eid)) AS lots,\n"
 				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, (select SUM(CASE WHEN imt.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue()
 				+ "  OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue()
 				+  " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) from ims_transaction imt inner join ims_lot lo on lo.lotid = imt.lotid where lo.eid = l.eid), 'Mixed') AS available,\n"
@@ -241,7 +241,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				studyEntryDto.setEntryNumber((Integer) row.get("entryNumber"));
 				studyEntryDto.setDesignation((String) row.get("designation"));
 				studyEntryDto.setEntryCode((String) row.get("entryCode"));
-				studyEntryDto.setActiveLots((Integer) row.get("activeLots"));
+				studyEntryDto.setLots((Integer) row.get("lots"));
 				studyEntryDto.setAvailable((String) row.get("available"));
 				studyEntryDto.setUnit((String) row.get("unit"));
 				final Map<String, StudyEntryPropertyData> variables = new HashMap<>();
