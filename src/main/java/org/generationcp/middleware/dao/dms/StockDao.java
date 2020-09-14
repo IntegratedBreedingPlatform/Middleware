@@ -307,16 +307,17 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	public List<StudyEntryDto> getStudyEntries(final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
 		try {
-			final StringBuilder sqlQuery = new StringBuilder("SELECT s.stock_id AS entryId,\n"
-				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS entryNumber,\n"
-				+ "  s.dbxref_id AS gid,\n"
-				+ "  s.name AS designation,\n"
-				+ "  s.value AS entryCode,\n"
-				+ "  COUNT(DISTINCT (l.eid)) AS lots,\n"
-				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, (select SUM(CASE WHEN imt.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue()
+			final StringBuilder sqlQuery = new StringBuilder("SELECT s.stock_id AS entryId, "
+				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS entryNumber, "
+				+ "  s.dbxref_id AS gid, "
+				+ "  s.name AS designation, "
+				+ "  s.value AS entryCode, "
+				+ "  COUNT(DISTINCT (l.eid)) AS lots, "
+				+ "  IF(COUNT(DISTINCT IFNULL(l.scaleid, 'null')) = 1, IFNULL((SELECT SUM(CASE WHEN imt.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue()
 				+ "  OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue()
-				+  " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) from ims_transaction imt inner join ims_lot lo on lo.lotid = imt.lotid where lo.eid = l.eid), 'Mixed') AS available,\n"
-				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, c.name, 'Mixed') AS unit\n");
+				+  " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) "
+				+ "  FROM ims_transaction imt INNER JOIN ims_lot lo ON lo.lotid = imt.lotid WHERE lo.eid = l.eid),0), 'Mixed') AS available, "
+				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, IFNULL(c.name,'-'), 'Mixed') AS unit ");
 
 			final String entryClause = ",MAX(IF(cvterm_variable.name = '%s', sp.value, NULL)) AS '%s',"
 				+ " MAX(IF(cvterm_variable.name = '%s', sp.stockprop_id, NULL)) AS '%s',"
@@ -331,13 +332,13 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				));
 			}
 
-			sqlQuery.append(" FROM stock s\n"
+			sqlQuery.append(" FROM stock s "
 				+ "       LEFT JOIN ims_lot l ON l.eid = s.dbxref_id and l.status = " + LotStatus.ACTIVE.getIntValue()
-				+ "       LEFT JOIN ims_transaction it ON l.lotid = it.lotid\n"
-				+ "       LEFT JOIN cvterm c ON c.cvterm_id = l.scaleid\n"
-				+ "       LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id\n"
-				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id\n"
-				+ "WHERE s.project_id = :studyId\n");
+				+ "       LEFT JOIN ims_transaction it ON l.lotid = it.lotid "
+				+ "       LEFT JOIN cvterm c ON c.cvterm_id = l.scaleid "
+				+ "       LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
+				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id "
+				+ "WHERE s.project_id = :studyId ");
 
 
 			if (studyEntrySearchDto.getFilter()!=null) {
