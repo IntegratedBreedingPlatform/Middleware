@@ -305,7 +305,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	}
 
-	public List<StudyEntryDto> getStudyEntries(final int studyId, final List<MeasurementVariable> entryDescriptors, final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
+	public List<StudyEntryDto> getStudyEntries(final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
 		try {
 			final StringBuilder sqlQuery = new StringBuilder("SELECT s.stock_id AS entryId,\n"
 				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS entryNumber,\n"
@@ -323,7 +323,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ " MAX(IF(cvterm_variable.name = '%s', sp.type_id, NULL)) AS '%s' ,"
 				+ " MAX(IF(cvterm_variable.name = '%s', sp.value, NULL)) AS '%s' ";
 
-			for (final MeasurementVariable entryDescriptor : entryDescriptors) {
+			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
 				final String entryName = entryDescriptor.getName();
 				sqlQuery.append(String.format(entryClause, entryName, entryName, entryName, entryName + "_PropertyId",
 					entryName, entryName + "_variableId",
@@ -340,11 +340,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "WHERE s.project_id = :studyId\n");
 
 
-			if (studyEntrySearchDto!=null) {
-				if (studyEntrySearchDto.getEntryNumbers()!=null && !studyEntrySearchDto.getEntryNumbers().isEmpty()) {
+			if (studyEntrySearchDto.getFilter()!=null) {
+				if (studyEntrySearchDto.getFilter().getEntryNumbers()!=null && !studyEntrySearchDto.getFilter().getEntryNumbers().isEmpty()) {
 					sqlQuery.append(" AND s.uniquename in (:entryNumbers)" );
 				}
-				if (studyEntrySearchDto.getEntryIds()!=null && !studyEntrySearchDto.getEntryIds().isEmpty()) {
+				if (studyEntrySearchDto.getFilter().getEntryIds()!=null && !studyEntrySearchDto.getFilter().getEntryIds().isEmpty()) {
 					sqlQuery.append(" AND s.stock_id in (:entryIds)" );
 				}
 			}
@@ -359,20 +359,20 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.addScalar("lots", new IntegerType());
 			query.addScalar("available", new StringType());
 			query.addScalar("unit", new StringType());
-			for (final MeasurementVariable entryDescriptor : entryDescriptors) {
+			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
 				final String entryName = entryDescriptor.getName();
 				query.addScalar(entryName + "_propertyId", new IntegerType());
 				query.addScalar(entryName + "_variableId", new IntegerType());
 				query.addScalar(entryName + "_value", new StringType());
 			}
 
-			query.setParameter("studyId", studyId);
-			if (studyEntrySearchDto!=null) {
-				if (studyEntrySearchDto.getEntryNumbers()!=null && !studyEntrySearchDto.getEntryNumbers().isEmpty()) {
-					query.setParameterList("entryNumbers", studyEntrySearchDto.getEntryNumbers());
+			query.setParameter("studyId", studyEntrySearchDto.getStudyId());
+			if (studyEntrySearchDto.getFilter()!=null) {
+				if (studyEntrySearchDto.getFilter().getEntryNumbers()!=null && !studyEntrySearchDto.getFilter().getEntryNumbers().isEmpty()) {
+					query.setParameterList("entryNumbers", studyEntrySearchDto.getFilter().getEntryNumbers());
 				}
-				if (studyEntrySearchDto.getEntryIds()!=null && !studyEntrySearchDto.getEntryIds().isEmpty()) {
-					query.setParameterList("entryIds", studyEntrySearchDto.getEntryIds());
+				if (studyEntrySearchDto.getFilter().getEntryIds()!=null && !studyEntrySearchDto.getFilter().getEntryIds().isEmpty()) {
+					query.setParameterList("entryIds", studyEntrySearchDto.getFilter().getEntryIds());
 				}
 			}
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
@@ -391,7 +391,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				studyEntryDto.setAvailable((String) row.get("available"));
 				studyEntryDto.setUnit((String) row.get("unit"));
 				final Map<String, StudyEntryPropertyData> variables = new HashMap<>();
-				for (final MeasurementVariable entryDescriptor : entryDescriptors) {
+				for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
 					final StudyEntryPropertyData studyEntryPropertyData =
 						new StudyEntryPropertyData((Integer) row.get(entryDescriptor.getName() + "_propertyId"),
 							(Integer) row.get(entryDescriptor.getName() + "_variableId"),
@@ -411,7 +411,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return studyEntryDtos;
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error at getStudyEntries=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
+			final String errorMessage = "Error at getStudyEntries=" + studyEntrySearchDto.getStudyId() + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}

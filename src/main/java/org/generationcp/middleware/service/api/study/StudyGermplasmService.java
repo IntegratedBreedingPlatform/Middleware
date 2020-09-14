@@ -13,7 +13,7 @@ public interface StudyGermplasmService {
 
 	List<StudyGermplasmDto> getGermplasm(int studyBusinessIdentifier);
 
-	List<StudyEntryDto> getStudyEntries(int studyId, StudyEntrySearchDto entrySearchDto, Pageable pageable);
+	List<StudyEntryDto> getStudyEntries(int studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 
 	List<StudyGermplasmDto> getGermplasmFromPlots(int studyBusinessIdentifier, Set<Integer> plotNos);
 

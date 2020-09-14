@@ -81,7 +81,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public List<StudyEntryDto> getStudyEntries(final int studyId, final StudyEntrySearchDto entrySearchDto, final Pageable pageable) {
+	public List<StudyEntryDto> getStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 
 		final Integer plotDatasetId = datasetService.getDatasets( studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
 
@@ -98,7 +98,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 			}
 		}
 
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStockDao().getStudyEntries(studyId, entryDescriptors, entrySearchDto, pageable);
+		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStockDao().getStudyEntries(new StudyEntrySearchDto(studyId, entryDescriptors, filter), pageable);
 		return studyEntryDtos;
 	}
 
