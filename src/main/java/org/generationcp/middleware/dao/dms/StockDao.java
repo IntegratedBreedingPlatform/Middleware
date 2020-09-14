@@ -167,9 +167,9 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "  s.name AS designation,\n"
 				+ "  s.value AS entryCode,\n"
 				+ "  COUNT(DISTINCT (l.eid)) AS activeLots,\n"
-				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, SUM(CASE WHEN it.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue()
-				+ "  OR (it.trnstat = " + TransactionStatus.PENDING.getIntValue()
-				+  " AND it.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN it.trnqty ELSE 0 END), 'Mixed') AS available,\n"
+				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, (select SUM(CASE WHEN imt.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue()
+				+ "  OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue()
+				+  " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) from ims_transaction imt inner join ims_lot lo on lo.lotid = imt.lotid where lo.eid = l.eid), 'Mixed') AS available,\n"
 				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, c.name, 'Mixed') AS unit\n");
 
 			final String entryClause = ",MAX(IF(cvterm_variable.name = '%s', sp.value, NULL)) AS '%s',"
