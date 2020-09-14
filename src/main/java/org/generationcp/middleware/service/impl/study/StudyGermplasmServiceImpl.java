@@ -120,7 +120,6 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		this.daoFactory.getStockDao().deleteStocksForStudy(studyId);
 	}
 
-	// TODO: IBP-3833 Use StudyEntryDto instead of StudyGermplasmDto
 	@Override
 	public List<StudyGermplasmDto> saveStudyGermplasm(final Integer studyId, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 		final List<StudyGermplasmDto> list = new ArrayList<>();
@@ -136,7 +135,6 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		return this.daoFactory.getStockDao().countStocksByStudyAndEntryTypeIds(studyId, systemDefinedEntryTypeIds);
 	}
 
-	// TODO: IBP-3833 Use StudyEntryDto instead of StudyGermplasmDto
 	@Override
 	public Optional<StudyGermplasmDto> getStudyGermplasm(final int studyId, final int entryId) {
 		final StockModel stock = this.daoFactory.getStockDao().getById(entryId);
@@ -149,7 +147,6 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		return Optional.empty();
 	}
 
-	// TODO: IBP-3833 Use StudyEntryDto instead of StudyGermplasmDto
 	@Override
 	public StudyGermplasmDto replaceStudyGermplasm(final int studyId, final int entryId, final int gid, final String crossExpansion) {
 		// Check first that new GID is valid
