@@ -105,7 +105,8 @@ public class DatasetServiceImpl implements DatasetService {
 	protected static final List<Integer> OBSERVATION_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.OBSERVATION_UNIT.getId(),
 		VariableType.TRAIT.getId(),
-		VariableType.SELECTION_METHOD.getId());
+		VariableType.SELECTION_METHOD.getId(),
+		VariableType.GERMPLASM_DESCRIPTOR.getId());
 
 	protected static final List<Integer> MEASUREMENT_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.TRAIT.getId(),
