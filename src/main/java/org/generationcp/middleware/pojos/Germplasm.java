@@ -146,9 +146,9 @@ public class Germplasm implements Serializable {
 	public static final String GET_PROGENITOR = "getProgenitor";
 
 	public static final String GET_PROGENITORS_BY_GIDS_WITH_PREF_NAME =
-			"SELECT p.gid, {g.*}, {n.*}, (select pMale.grpName from listdata pMale where pMale.gid = g.gid limit 1) as malePedigree " 
+			"SELECT p.gid, {g.*}, {n.*}, (select pMale.grpName from listdata pMale where pMale.gid = g.gid limit 1) as malePedigree "
 					+ "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-					+ "JOIN progntrs p ON p.pid = g.gid " 
+					+ "JOIN progntrs p ON p.pid = g.gid "
 					+ "WHERE p.gid in (:gidList) and  g.deleted = 0  and g.grplce = 0 "
 					+ "ORDER BY p.gid, p.pno";
 
@@ -313,6 +313,9 @@ public class Germplasm implements Serializable {
 	@Column(name = "deleted", columnDefinition = "TINYINT")
 	private Boolean deleted;
 
+	@Column(name = "germplsm_uuid")
+	private String germplasmUUID;
+
 	/**
 	 * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
 	 **/
@@ -454,7 +457,7 @@ public class Germplasm implements Serializable {
 	 */
 	@Transient
 	private Map<String, String> attributeTypesValueMap = new HashMap<>();
-	
+
 	/**
 	 *
 	 * This variable is populated when the user tries to search germplasm list.
@@ -907,7 +910,7 @@ public class Germplasm implements Serializable {
 		}
 		this.attributeTypesValueMap = attributeTypesValueMap;
 	}
-	
+
 	public Map<String, String> getNameTypesValueMap() {
 		return ImmutableMap.copyOf(this.nameTypesValueMap);
 	}
@@ -949,5 +952,13 @@ public class Germplasm implements Serializable {
 
 	public void setImmediateSourceGID(String immediateSourceGID) {
 		this.immediateSourceGID = immediateSourceGID;
+	}
+
+	public String getGermplasmUUID() {
+		return this.germplasmUUID;
+	}
+
+	public void setGermplasmUUID(final String germplasmUUID) {
+		this.germplasmUUID = germplasmUUID;
 	}
 }

@@ -10,8 +10,10 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.base.Preconditions;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.dao.AttributeDAO;
@@ -47,11 +49,14 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -60,6 +65,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -72,6 +78,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	private DaoFactory daoFactory;
 
 	private static final String GID_SEPARATOR_FOR_STORED_PROCEDURE_CALL = ",";
+
+	public static final String MID_STRING = "G";
+	public static final int SUFFIX_LENGTH = 8;
 
 	public GermplasmDataManagerImpl() {
 	}
@@ -775,31 +784,30 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Integer addGermplasm(final Germplasm germplasm, final Name preferredName) {
+	public Integer addGermplasm(final Germplasm germplasm, final Name preferredName, final  CropType cropType) {
 		final List<Triple<Germplasm, Name, List<Progenitor>>> tripleList = new ArrayList<>();
 		final List<Progenitor> progenitors = new ArrayList<>();
 		final Triple<Germplasm, Name, List<Progenitor>> triple = new ImmutableTriple<>(germplasm, preferredName, progenitors);
 		tripleList.add(triple);
-		final List<Integer> ids = this.addGermplasm(tripleList);
+		final List<Integer> ids = this.addGermplasm(tripleList, cropType);
 		return !ids.isEmpty() ? ids.get(0) : null;
 	}
 
 	@Override
-	public List<Integer> addGermplasm(final Map<Germplasm, Name> germplasmNameMap) {
+	public List<Integer> addGermplasm(final Map<Germplasm, Name> germplasmNameMap, final CropType cropType) {
 		final List<Triple<Germplasm, Name, List<Progenitor>>> tripleList = new ArrayList<>();
 		final List<Progenitor> progenitors = new ArrayList<>();
 		for (final Map.Entry<Germplasm, Name> entry : germplasmNameMap.entrySet()) {
 			final Triple<Germplasm, Name, List<Progenitor>> triple = new ImmutableTriple<>(entry.getKey(), entry.getValue(), progenitors);
 			tripleList.add(triple);
 		}
-		return this.addGermplasm(tripleList);
+		return this.addGermplasm(tripleList, cropType);
 	}
 
 	@Override
-	public List<Integer> addGermplasm(final List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples) {
+	public List<Integer> addGermplasm(final List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples, final CropType cropType) {
 		final List<Integer> listOfGermplasm = new ArrayList<>();
 		try {
-
 			final GermplasmDAO dao = this.daoFactory.getGermplasmDao();
 			final NameDAO nameDao = this.daoFactory.getNameDao();
 			final ProgenitorDAO progenitorDao = this.daoFactory.getProgenitorDao();
@@ -819,6 +827,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				if (name.getNstat() == null) {
 					name.setNstat(1);
 				}
+
+				this.generateGermplasmUUID(cropType, Arrays.asList(germplasm));
 
 				final Germplasm germplasmSaved = dao.save(germplasm);
 				listOfGermplasm.add(germplasmSaved.getGid());
@@ -1586,6 +1596,25 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public boolean hasExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
 		return this.getGermplasmDao().hasExistingCrosses(femaleParent, maleParentIds, gid);
+	}
+
+	@Override
+	public void generateGermplasmUUID(final CropType crop, final List<Germplasm> germplasmList) {
+		Preconditions.checkNotNull(crop);
+		Preconditions.checkState(!CollectionUtils.isEmpty(germplasmList));
+
+		final boolean doUseUUID = crop.isUseUUID();
+		for (final Germplasm germplasm : germplasmList) {
+			if (germplasm.getGermplasmUUID() == null) {
+				if (doUseUUID) {
+					germplasm.setGermplasmUUID(UUID.randomUUID().toString());
+				} else {
+					final String cropPrefix = crop.getPlotCodePrefix();
+					germplasm.setGermplasmUUID(cropPrefix + MID_STRING
+						+ RandomStringUtils.randomAlphanumeric(SUFFIX_LENGTH));
+				}
+			}
+		}
 	}
 }
 

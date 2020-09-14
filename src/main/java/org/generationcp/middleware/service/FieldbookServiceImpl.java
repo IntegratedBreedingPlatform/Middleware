@@ -299,7 +299,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer saveNurseryAdvanceGermplasmList(final List<Pair<Germplasm, List<Name>>> germplasms,
 			final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
-			final List<Pair<Germplasm, List<Attribute>>> germplasmAttributes) {
+			final List<Pair<Germplasm, List<Attribute>>> germplasmAttributes, CropType cropType) {
 
 		final GermplasmDAO germplasmDao = this.getGermplasmDao();
 		final GermplasmListDAO germplasmListDao = this.daoFactory.getGermplasmListDAO();
@@ -340,7 +340,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					if (germplasm.getLgid() == null) {
 						germplasm.setLgid(germplasm.getGid() != null ? germplasm.getGid() : Integer.valueOf(0));
 					}
-
+					this.getGermplasmDataManager().generateGermplasmUUID(cropType, Arrays.asList(germplasm));
 					germplasm = germplasmDao.save(germplasm);
 
 					for (final Name name : nameList) {
@@ -789,20 +789,20 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Integer addGermplasm(final String nameValue, final int userId) {
+	public Integer addGermplasm(final String nameValue, final int userId, final CropType cropType) {
 		final Name name = new Name(null, null, 1, 1, userId, nameValue, 0, 0, 0);
 		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
-		return this.getGermplasmDataManager().addGermplasm(germplasm, name);
+		return this.getGermplasmDataManager().addGermplasm(germplasm, name, cropType);
 	}
 
 	@Override
-	public Integer addGermplasm(final Germplasm germplasm, final Name name) {
-		return this.getGermplasmDataManager().addGermplasm(germplasm, name);
+	public Integer addGermplasm(final Germplasm germplasm, final Name name, final CropType cropType) {
+		return this.getGermplasmDataManager().addGermplasm(germplasm, name, cropType);
 	}
 
 	@Override
-	public List<Integer> addGermplasm(final List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples) {
-		return this.getGermplasmDataManager().addGermplasm(germplasmTriples);
+	public List<Integer> addGermplasm(final List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples, final CropType cropType) {
+		return this.getGermplasmDataManager().addGermplasm(germplasmTriples, cropType);
 	}
 
 	@Override

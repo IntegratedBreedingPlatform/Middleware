@@ -67,7 +67,7 @@
 			SET germplsm_uuid = CONCAT((SELECT plot_code_prefix
 			FROM workbench.workbench_crop wc
 			WHERE db_name = DATABASE()),
-			'L',
+			'G',
 			left(sha1(CONCAT(uuid(), g.gid)), 8))
 			WHERE g.germplsm_uuid IS NULL;
 
