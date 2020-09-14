@@ -6,6 +6,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.workbench.CropType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +22,13 @@ public class GermplasmTestDataGenerator {
 	}
 
 	public Germplasm createGermplasmWithPreferredAndNonpreferredNames() {
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
+
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Name preferredName = germplasm.getPreferredName();
 		preferredName.setGermplasmId(germplasm.getGid());
-		this.germplasmDataManager.addGermplasm(germplasm, preferredName);
+		this.germplasmDataManager.addGermplasm(germplasm, preferredName, cropType);
 
 		final Name otherName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid(), "Other Name ");
 		otherName.setNstat(0);
@@ -34,6 +38,8 @@ public class GermplasmTestDataGenerator {
 	}
 
 	public Germplasm createChildGermplasm(final Germplasm parentGermplasm, final String name) {
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
 		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName(name);
 		final Name preferredName = germplasm.getPreferredName();
 		preferredName.setGermplasmId(germplasm.getGid());
@@ -42,7 +48,7 @@ public class GermplasmTestDataGenerator {
 		germplasm.setGpid2(parentGermplasm.getGid());
 		germplasm.setMethodId(GermplasmTestDataGenerator.TEST_METHOD_ID);
 
-		this.germplasmDataManager.addGermplasm(germplasm, preferredName);
+		this.germplasmDataManager.addGermplasm(germplasm, preferredName, cropType);
 
 		return germplasm;
 	}
@@ -60,12 +66,14 @@ public class GermplasmTestDataGenerator {
 
 	public Integer[] createGermplasmRecords(final int numberOfGermplasm, final String prefix)
 			throws MiddlewareQueryException {
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
 		final Integer[] gids = new Integer[numberOfGermplasm];
 		for (int i = 0; i < numberOfGermplasm; i++) {
 			final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName(prefix + i);
 			final Name preferredName = germplasm.getPreferredName();
 			preferredName.setGermplasmId(germplasm.getGid());
-			this.germplasmDataManager.addGermplasm(germplasm, preferredName);
+			this.germplasmDataManager.addGermplasm(germplasm, preferredName, cropType);
 
 			gids[i] = germplasm.getGid();
 		}
@@ -73,6 +81,8 @@ public class GermplasmTestDataGenerator {
 	}
 
 	public List<Germplasm> createGermplasmsList(final int numberOfGermplasm, final String prefix) throws MiddlewareQueryException {
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
 
 		final List<Germplasm> germplasms = new ArrayList<>();
 
@@ -80,7 +90,7 @@ public class GermplasmTestDataGenerator {
 			final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName(prefix + i);
 			final Name preferredName = germplasm.getPreferredName();
 			preferredName.setGermplasmId(germplasm.getGid());
-			this.germplasmDataManager.addGermplasm(germplasm, preferredName);
+			this.germplasmDataManager.addGermplasm(germplasm, preferredName, cropType);
 
 			germplasms.add(germplasm);
 		}
@@ -88,10 +98,11 @@ public class GermplasmTestDataGenerator {
 	}
 
 	public Germplasm createGermplasm(final String prefix) throws MiddlewareQueryException {
-
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
 		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName(prefix);
 		final Name preferredName = germplasm.getPreferredName();
-		this.germplasmDataManager.addGermplasm(germplasm, preferredName);
+		this.germplasmDataManager.addGermplasm(germplasm, preferredName, cropType);
 
 		return germplasm;
 	}

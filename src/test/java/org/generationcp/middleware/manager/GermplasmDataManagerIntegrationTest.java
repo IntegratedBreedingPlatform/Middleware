@@ -43,6 +43,7 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
@@ -112,6 +113,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	private KeySequenceRegisterDAO keySequenceRegisterDAO;
 
+	private CropType cropType;
+
 	@Before
 	public void setUp() throws Exception {
 		this.programFavoriteTestDataInitializer = new ProgramFavoriteTestDataInitializer();
@@ -159,6 +162,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			this.keySequenceRegisterDAO.setSession(this.sessionProvder.getSession());
 		}
 
+		this.cropType = new CropType();
+		this.cropType.setUseUUID(false);
 	}
 
 	@Test
@@ -676,7 +681,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 		final Triple<Germplasm, Name, List<Progenitor>>
 			germplasmTriple = ImmutableTriple.of(germplasm, germplasm.getPreferredName(), Arrays.asList(progenitor1, progenitor2));
-		final List<Integer> gids = this.germplasmDataManager.addGermplasm(Arrays.asList(germplasmTriple));
+		final List<Integer> gids = this.germplasmDataManager.addGermplasm(Arrays.asList(germplasmTriple), this.cropType);
 
 		final int savedGermplasmGid = gids.get(0);
 		final Germplasm savedGermplasm = this.germplasmDAO.getById(savedGermplasmGid);
@@ -903,7 +908,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	public void testSearchGermplasmWithInventory() throws MiddlewareQueryException {
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.lotDAO.save(lot);
@@ -1249,14 +1254,14 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final UserDefinedField nameType = this.createUserdefinedField("NAMES", "NAME", RandomStringUtils.randomAlphabetic(5).toUpperCase());
 		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		germplasm1.getPreferredName().setTypeId(nameType.getFldno());
-		final Integer gid1 = this.germplasmDataManager.addGermplasm(germplasm1, germplasm1.getPreferredName());
+		final Integer gid1 = this.germplasmDataManager.addGermplasm(germplasm1, germplasm1.getPreferredName(), this.cropType);
 
 		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		germplasm2.getPreferredName().setTypeId(nameType.getFldno());
-		final Integer gid2 = this.germplasmDataManager.addGermplasm(germplasm2, germplasm2.getPreferredName());
+		final Integer gid2 = this.germplasmDataManager.addGermplasm(germplasm2, germplasm2.getPreferredName(), this.cropType);
 
 		final Germplasm germplasm3 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer gid3 = this.germplasmDataManager.addGermplasm(germplasm3, germplasm3.getPreferredName());
+		final Integer gid3 = this.germplasmDataManager.addGermplasm(germplasm3, germplasm3.getPreferredName(), this.cropType);
 
 		final Map<Integer, String> namesMap = this.germplasmDataManager.getNamesByTypeAndGIDList(nameType.getFldno(), Arrays.asList(gid1, gid2, gid3));
 		Assert.assertNotNull(namesMap);

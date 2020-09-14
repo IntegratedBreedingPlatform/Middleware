@@ -109,7 +109,7 @@ public class FieldbookServiceImplTest {
 	public void testSaveNurseryAdvanceGermplasmListSuccess() {
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(1);
 		final Integer out = this.fieldbookServiceImpl
-			.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList, this.germplasmAttributes);
+			.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList, this.germplasmAttributes, null);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
 
 		// Make sure a call to save various things occur.

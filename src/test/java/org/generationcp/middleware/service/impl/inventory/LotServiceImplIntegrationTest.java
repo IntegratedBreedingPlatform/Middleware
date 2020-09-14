@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.Util;
 import org.junit.Before;
 import org.junit.Test;
@@ -127,9 +128,11 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void createGermplasm() {
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(Integer.MIN_VALUE);
 		germplasm.setMgid(GROUP_ID);
-		this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 		gid = germplasm.getGid();
 	}
 

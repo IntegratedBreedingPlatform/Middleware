@@ -18,6 +18,7 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +35,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	private static ListInventoryBuilder listInventoryBuilder;
 	private static GermplasmListManager germplasmListManager;
 	private static List<Integer> gids;
+	private CropType cropType;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -54,6 +56,8 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		this.initializeGermplasms(gids);
 		this.germplasmList = GermplasmListTestDataInitializer.createGermplasmListWithListData(LIST_ID, NO_OF_ENTRIES, gids);
 		germplasmListManager.addGermplasmList(this.germplasmList);
+		this.cropType = new CropType();
+		this.cropType.setUseUUID(false);
 	}
 
 	@Test
@@ -105,7 +109,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	public void testSetAvailableBalanceScaleForGermplasm() throws Exception {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
 				"LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		germplasm.setInventoryInfo(new GermplasmInventory(germplasmId));
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
@@ -127,7 +131,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		for (final Integer gid : gids) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(gid);
 			germplasm.setMgid(GROUP_ID);
-			this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+			this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		}
 	}
 

@@ -52,7 +52,7 @@ public class GermplasmAddUpdateFunctionsTest extends IntegrationTestBase {
 		n.setTypeId(Integer.valueOf(1));
 		n.setUserId(Integer.valueOf(1));
 
-		Integer addedGid = this.manager.addGermplasm(g, n);
+		Integer addedGid = this.manager.addGermplasm(g, n, null);
 
 		Debug.println(0, "Germplasm added: " + addedGid);
 

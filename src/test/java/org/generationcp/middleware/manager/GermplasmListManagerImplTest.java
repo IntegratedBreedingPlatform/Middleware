@@ -26,6 +26,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.utils.test.Debug;
@@ -101,7 +102,10 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.dataSetupTest.setGermplasmListManager(this.manager);
 		this.dataSetupTest.setMiddlewareFieldbookService(this.middlewareFieldbookService);
 		this.testGermplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
-		this.dataManager.addGermplasm(this.testGermplasm, this.testGermplasm.getPreferredName());
+
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
+		this.dataManager.addGermplasm(this.testGermplasm, this.testGermplasm.getPreferredName(), cropType);
 
 
 		final GermplasmList germplasmListOther = germplasmListTDI

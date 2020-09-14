@@ -11,6 +11,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.*;
 import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
@@ -61,6 +62,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
 
+	private CropType cropType;
+
 	static {
 		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("STUDY");
 		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("CHECK");
@@ -74,13 +77,17 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	public void setUp() throws Exception {
 		this.dao = new GermplasmListDAO();
 		this.dao.setSession(this.sessionProvder.getSession());
+
+		this.cropType = new CropType();
+		this.cropType.setUseUUID(false);
+
 		this.list = saveGermplasm(GermplasmListTestDataInitializer.createGermplasmListTestData(
 				TEST_GERMPLASM_LIST_NAME, GermplasmListDAOTest.TEST_GERMPLASM_LIST_DESC,
 				TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_LST,
 				GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE, GermplasmListDAOTest.PROGRAM_UUID, null));
 		final Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
 		this.germplasm = new Germplasm(null, GermplasmListDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
-		this.dataManager.addGermplasm(this.germplasm, name);
+		this.dataManager.addGermplasm(this.germplasm, name, this.cropType);
 		final GermplasmListData germplasmListData = new GermplasmListData(null, this.list, this.germplasm.getGid(), 1, "EntryCode",
 				"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
 		this.manager.addGermplasmListData(germplasmListData);
@@ -158,12 +165,12 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetAllListMetadata() {
 		final List<GermplasmList> germplasmLists = this.dao.getListsByProgramUUID(GermplasmListDAOTest.PROGRAM_UUID);
-		
+
 		final List<Integer> germplasmListIds = new ArrayList<>();
 		for (final GermplasmList germplasmList : germplasmLists) {
 			germplasmListIds.add(germplasmList.getId());
 		}
-		
+
 		final List<Object[]> listMetadata = this.dao.getAllListMetadata(germplasmListIds);
 		Assert.assertEquals("Meta data size must be the same as the list size", listMetadata.size(), germplasmLists.size());
 	}
@@ -207,7 +214,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 				this.dao.getGermplasmFolderMetadata(Collections.singletonList(testFolder.getId()));
 		final ListMetadata germplasmFolderMetadata = result.get(testFolder.getId());
 		Assert.assertNotNull("Newly created folder should not be null", germplasmFolderMetadata);
-		Assert.assertEquals("Newly created folder should have zero children", 
+		Assert.assertEquals("Newly created folder should have zero children",
 				new Integer(0), germplasmFolderMetadata.getNumberOfChildren());
 	}
 
@@ -219,7 +226,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		saveGermplasm(testList);
 		final List<GermplasmList> allGermplasmListsById = this.dao.getAllGermplasmListsById(Collections.singletonList(testList.getId()));
 		Assert.assertTrue("Returned results should not be empty", !allGermplasmListsById.isEmpty());
-		Assert.assertEquals("Returned results should contain one item", 
+		Assert.assertEquals("Returned results should contain one item",
 				1, allGermplasmListsById.size());
 
 	}
@@ -238,7 +245,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 			TEST_GERMPLASM_LIST_NAME, GermplasmListDAOTest.TEST_GERMPLASM_LIST_DESC,
 			TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_LST,
 			GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE, GermplasmListDAOTest.PROGRAM_UUID, null));
-		this.dataManager.addGermplasm(germplasm, name);
+		this.dataManager.addGermplasm(germplasm, name, this.cropType);
 		final GermplasmListData listData1 = new GermplasmListData(null, list1, germplasm.getGid(), 1, "EntryCode",
 			"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
 		this.manager.addGermplasmListData(listData1);
@@ -247,7 +254,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 			TEST_GERMPLASM_LIST_NAME, GermplasmListDAOTest.TEST_GERMPLASM_LIST_DESC,
 			TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_LST,
 			GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE, GermplasmListDAOTest.PROGRAM_UUID, null));
-		this.dataManager.addGermplasm(germplasm, name);
+		this.dataManager.addGermplasm(germplasm, name, this.cropType);
 		final GermplasmListData listData2 = new GermplasmListData(null, list2, germplasm.getGid(), 1, "EntryCode",
 			"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
 		this.manager.addGermplasmListData(listData2);

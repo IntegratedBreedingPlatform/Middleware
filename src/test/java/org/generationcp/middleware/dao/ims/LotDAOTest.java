@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,9 +54,10 @@ public class LotDAOTest extends IntegrationTestBase {
 	private Location location;
 	private Germplasm germplasm1, germplasm2;
 	private GermplasmList germplasmList;
+	private CropType cropType;
 
 	private static final String GERMPLASM = "GERMPLSM";
-	
+
 	private static final String LST = "LST";
 	private static final String LIST = "LIST";
 
@@ -69,13 +71,16 @@ public class LotDAOTest extends IntegrationTestBase {
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
 		this.createLocationForSearchLotTest();
 		this.createDataForSearchLotsTest();
+
+		this.cropType = new CropType();
+		this.cropType.setUseUUID(false);
 	}
 
 	@Test
 	public void testRetrieveLotScalesForGermplasms() throws Exception {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
@@ -98,7 +103,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	public void testGetAvailableBalanceCountAndTotalLotsCount() throws Exception {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.inventoryDataManager.addLots(Lists.newArrayList(lot));
@@ -126,7 +131,7 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
@@ -162,7 +167,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	public void testGetGermplasmsWithOpenLots() throws Exception {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot =
 			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
@@ -185,7 +190,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	public void testGetGermplasmsWithNoOpenLots() throws Exception {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot =
 			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 1, 1, "Comments", "InventoryId");
@@ -270,10 +275,10 @@ public class LotDAOTest extends IntegrationTestBase {
 	private void createDataForSearchLotsTest() {
 
 		germplasm1 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId1 = this.germplasmDataManager.addGermplasm(germplasm1, germplasm1.getPreferredName());
+		final Integer germplasmId1 = this.germplasmDataManager.addGermplasm(germplasm1, germplasm1.getPreferredName(), this.cropType);
 
 		germplasm2 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId2 = this.germplasmDataManager.addGermplasm(germplasm2, germplasm2.getPreferredName());
+		final Integer germplasmId2 = this.germplasmDataManager.addGermplasm(germplasm2, germplasm2.getPreferredName(), this.cropType);
 
 		lot1 = InventoryDetailsTestDataInitializer
 				.createLot(1, GERMPLASM, germplasmId1, location.getLocid(), 8264, 0, 1, "Comments", RandomStringUtils.randomAlphabetic(35));

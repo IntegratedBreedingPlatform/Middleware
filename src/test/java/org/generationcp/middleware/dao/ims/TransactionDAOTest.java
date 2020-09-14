@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
@@ -125,9 +126,11 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	}
 
 	private void initializeGermplasms(final int noOfEntries) {
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
 		for (int i = 1; i <= noOfEntries; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(i);
-			final Integer gidAfterAdd = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+			final Integer gidAfterAdd = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 			this.germplasmMap.put(gidAfterAdd, germplasm);
 		}
 	}
@@ -184,10 +187,11 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetTransactionDetailsForLot() throws ParseException {
-
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 
 		final WorkbenchUser user = this.getUserService().getUserById(1);
 
@@ -241,11 +245,13 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchTransactions() throws ParseException {
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
 
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1,
 				1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 
 		final WorkbenchUser user = this.getUserService().getUserById(1);
 
