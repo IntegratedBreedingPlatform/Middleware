@@ -86,7 +86,7 @@ public class ThreeWayHybridProcessor implements BreedingMethodProcessor {
 
 	private PedigreeString getPedigreeString(final Integer level, final FixedLineNameResolver fixedLineNameResolver,
 			final GermplasmNode singleCrossHybridFemaleParent, final boolean originatesFromComplexCross) {
-		if(singleCrossHybridFemaleParent != null) {
+		if(singleCrossHybridFemaleParent != null && singleCrossHybridFemaleParent.getFemaleParent() != null && singleCrossHybridFemaleParent.getMaleParent() != null) {
 			return this.pedigreeStringBuilder.buildPedigreeString(singleCrossHybridFemaleParent, level - 1, fixedLineNameResolver, originatesFromComplexCross);
 		}
 		return this.inbredProcessor.processGermplasmNode(singleCrossHybridFemaleParent, level - 1, fixedLineNameResolver, originatesFromComplexCross);
