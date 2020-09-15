@@ -3,19 +3,28 @@ package org.generationcp.middleware.dao;
 
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest.IncludePedigree;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -23,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -143,6 +153,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
     }
 
+    // TODO Remove (see searchGermplasm)
+    @Deprecated
     public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) {
 
         // actual searching here
@@ -402,12 +414,12 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                                                         final Map<String, Integer> attributeTypesMap, final Map<String, Integer> nameTypesMap) {
 
         final StringBuilder fromClause = new StringBuilder();
-        fromClause.append("FROM   germplsm g \n" + "       LEFT JOIN ims_lot gl \n"
-                + "              ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 \n"
-                + "       LEFT JOIN ims_transaction gt \n" + "              ON gt.lotid = gl.lotid AND gt.trnstat <> 9 \n"
-                + "       LEFT JOIN methods m \n" + "              ON m.mid = g.methn \n" + "       LEFT JOIN location l \n"
-                + "              ON l.locid = g.glocn \n" + "       LEFT JOIN `names` allNames  \n"
-                + "              ON g.gid = allNames.gid and allNames.nstat != 9 \n");
+        fromClause.append("FROM germplsm g \n" //
+            + " LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 \n" //
+            + " LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9 \n" //
+            + " LEFT JOIN methods m ON m.mid = g.methn \n" //
+            + " LEFT JOIN location l  ON l.locid = g.glocn \n" //
+            + " LEFT JOIN `names` allNames  ON g.gid = allNames.gid and allNames.nstat != 9 \n");
 
         for (final String propertyId : addedColumnsPropertyIds) {
             if (GermplasmSearchDAO.fromClauseColumnsMap.containsKey(propertyId)) {
@@ -431,15 +443,16 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                                                           final Map<String, Integer> attributeTypesMap, final Map<String, Integer> nameTypesMap) {
 
         final StringBuilder selectClause = new StringBuilder();
-        selectClause.append("SELECT g.*, \n" + " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nval SEPARATOR" + "       ', ')\n"
-                + "                                   AS `" + GermplasmSearchDAO.NAMES + "`, \n"
-                + "       Group_concat(DISTINCT gl.stock_id ORDER BY gl.stock_id SEPARATOR \n" + "       ', ') \n"
-                + "                                   AS `" + GermplasmSearchDAO.STOCK_IDS + "`, \n"
-                + "       g.gid                     AS `" + GermplasmSearchDAO.GID + "`, \n" + "       g.mgid                     AS `"
-                + GermplasmSearchDAO.GROUP_ID + "`, \n" + "       Count(DISTINCT gt.lotid)    AS `" + GermplasmSearchDAO.AVAIL_LOTS
-                + "`, \n" + "       Sum(gt.trnqty)/(Count(gt.trnid)/Count(DISTINCT gt.trnid))              AS `"
-                + GermplasmSearchDAO.AVAIL_BALANCE + "`, \n" + "       m.mname                     AS `" + GermplasmSearchDAO.METHOD_NAME
-                + "`, \n" + "       l.lname                     AS `" + GermplasmSearchDAO.LOCATION_NAME + "` \n");
+        selectClause.append("SELECT g.*, \n" //
+            // name ordering: preferred name > latest > oldest
+            + " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nstat = 1 desc, allNames.ndate desc SEPARATOR ', ') AS `" + GermplasmSearchDAO.NAMES + "`, \n"  //
+            + " Group_concat(DISTINCT gl.stock_id ORDER BY gl.stock_id SEPARATOR  ', ')  AS `" + GermplasmSearchDAO.STOCK_IDS + "`, \n" //
+            + " g.gid  AS `" + GermplasmSearchDAO.GID + "`, \n" //
+            + " g.mgid AS `" + GermplasmSearchDAO.GROUP_ID + "`, \n" //
+            + " Count(DISTINCT gt.lotid) AS `" + GermplasmSearchDAO.AVAIL_LOTS + "`, \n" //
+            + " Sum(gt.trnqty)/(Count(gt.trnid)/Count(DISTINCT gt.trnid)) AS `" + GermplasmSearchDAO.AVAIL_BALANCE + "`, \n"  //
+            + " m.mname AS `" + GermplasmSearchDAO.METHOD_NAME + "`, \n"  //
+            + " l.lname AS `" + GermplasmSearchDAO.LOCATION_NAME + "` \n");
 
         for (final String propertyId : addedColumnsPropertyIds) {
             if (GermplasmSearchDAO.selectClauseColumnsMap.containsKey(propertyId)) {
@@ -539,13 +552,6 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         germplasm.setMethodGroup(this.getValueOfAddedColumns(GermplasmSearchDAO.METHOD_GROUP, row, addedColumnsPropertyIds));
         germplasm.setGermplasmPeferredName(this.getValueOfAddedColumns(GermplasmSearchDAO.PREFERRED_NAME, row, addedColumnsPropertyIds));
         germplasm.setGermplasmPeferredId(this.getValueOfAddedColumns(GermplasmSearchDAO.PREFERRED_ID, row, addedColumnsPropertyIds));
-        germplasm
-                .setFemaleParentPreferredID(this.getValueOfAddedColumns(GermplasmSearchDAO.FEMALE_PARENT_ID, row, addedColumnsPropertyIds));
-        germplasm.setFemaleParentPreferredName(
-                this.getValueOfAddedColumns(GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds));
-        germplasm.setMaleParentPreferredID(this.getValueOfAddedColumns(GermplasmSearchDAO.MALE_PARENT_ID, row, addedColumnsPropertyIds));
-        germplasm.setMaleParentPreferredName(
-                this.getValueOfAddedColumns(GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds));
         germplasm.setGroupSourceGID(this.getValueOfAddedColumns(GermplasmSearchDAO.GROUP_SOURCE_GID, row, addedColumnsPropertyIds));
         germplasm.setGroupSourcePreferredName(
                 this.getValueOfAddedColumns(GermplasmSearchDAO.GROUP_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds));
@@ -651,4 +657,291 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
     }
 
 
+
+    /**
+     * New germplasm query (replaces {@link GermplasmSearchDAO#searchForGermplasms(GermplasmSearchParameter)}
+     * @return
+     */
+    public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable) {
+
+        try {
+            // list is used again in a query wrapper to paginate (filtered+included) gids
+            final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, pageable);
+
+            if (gids.isEmpty()) {
+                return Collections.EMPTY_LIST;
+            }
+
+            final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
+            final Map<String, Integer> attributeTypesMap = this.getAttributeTypesMap(addedColumnsPropertyIds);
+            final Map<String, Integer> nameTypesMap = this.getNameTypesMap(addedColumnsPropertyIds);
+
+            // main query
+            final StringBuilder queryBuilder =
+                new StringBuilder(this.createSelectClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+            queryBuilder.append(this.createFromClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+
+			queryBuilder.append(" where g.gid in (:gids) ");
+			queryBuilder.append(" and g.deleted = 0 and g.grplce = 0 ");
+            queryBuilder.append(" group by g.gid ");
+
+            final Map<String, Boolean> sortState = convertSort(pageable);
+            // TODO improve perf (e.g order by NAMES)
+            queryBuilder.append(this.addSortingColumns(sortState, attributeTypesMap, nameTypesMap));
+
+            final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.toString());
+
+            query.addEntity(GERMPLSM, Germplasm.class);
+            query.addScalar(NAMES);
+            query.addScalar(STOCK_IDS);
+            query.addScalar(GID);
+            query.addScalar(GROUP_ID);
+            query.addScalar(AVAIL_LOTS);
+            query.addScalar(AVAIL_BALANCE);
+            query.addScalar(METHOD_NAME);
+            query.addScalar(LOCATION_NAME);
+
+            for (final String addedColumnPropertyId : addedColumnsPropertyIds) {
+                if (!GERMPLASM_TREE_NODE_PROPERTY_IDS.contains(addedColumnPropertyId)) {
+                    query.addScalar(addedColumnPropertyId);
+                }
+            }
+
+            addPaginationToSQLQuery(query, pageable);
+            query.setParameterList("gids", gids);
+
+            final List<Object[]> result = query.list();
+
+            /* TODO
+             *  - rewrite mapToGermplasm after complete migration
+             *  - delete searchForGermplasms
+             */
+            final List<Germplasm> germplasmList =
+                this.convertObjectToGermplasmList(result, addedColumnsPropertyIds, attributeTypesMap, nameTypesMap);
+            final List<GermplasmSearchResponse> response = new ArrayList<>();
+            for (final Germplasm germplasm : germplasmList) {
+                response.add(new GermplasmSearchResponse(germplasm));
+            }
+            return response;
+        } catch (final HibernateException e) {
+            throw new MiddlewareQueryException("Error at GermplasmSearchDAO.searchGermplasm(): " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Filtered gids  + associated gids (e.g pedigree, group).
+	 * Paginated, for performance reasons.
+     */
+    private List<Integer> retrieveSearchGids(final GermplasmSearchRequest germplasmSearchRequest,
+        final Pageable pageable) {
+
+        final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
+        final Map<String, Integer> attributeTypesMap = this.getAttributeTypesMap(addedColumnsPropertyIds);
+        final Map<String, Integer> nameTypesMap = this.getNameTypesMap(addedColumnsPropertyIds);
+
+        // main query
+        final StringBuilder queryBuilder =
+            new StringBuilder(this.createSelectClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+        queryBuilder.append(this.createFromClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+
+        addFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequest);
+
+        queryBuilder.append(" group by g.gid ");
+
+        final Map<String, Boolean> sortState = convertSort(pageable);
+        // TODO improve perf (e.g order by NAMES)
+        queryBuilder.append(this.addSortingColumns(sortState, attributeTypesMap, nameTypesMap));
+
+        final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+        sqlQuery.addScalar(GID);
+        addPaginationToSQLQuery(sqlQuery, pageable);
+        addFilters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequest);
+
+        final List<Integer> gids = sqlQuery.list();
+
+        if (gids.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+
+        /*
+         * Included gids are only for the current page, for performance reasons.
+         * They are in separate queries instead of a subquery, because mysql cannot perform semijoin transformation with UNION
+         * https://dev.mysql.com/doc/refman/5.6/en/semijoins.html
+         */
+
+        gids.addAll(this.retrievePedigreeGids(gids, germplasmSearchRequest));
+        gids.addAll(this.retrieveGroupGids(gids, germplasmSearchRequest));
+
+        return gids;
+    }
+
+    private static Map<String, Boolean> convertSort(final Pageable pageable) {
+        final Map<String, Boolean> sortState = new HashMap<>();
+        final Sort sort = pageable.getSort();
+        if (sort == null) {
+            return Collections.EMPTY_MAP;
+        }
+        final Iterator<Sort.Order> iterator = sort.iterator();
+        while (iterator.hasNext()) {
+            final Sort.Order next = iterator.next();
+            sortState.put(next.getProperty(), next.getDirection().equals(Sort.Direction.ASC));
+        }
+        return sortState;
+    }
+
+    private static void addFilters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequest germplasmSearchRequest) {
+
+        paramBuilder.append(" where g.deleted = 0 AND g.grplce = 0 ");
+
+        final SqlTextFilter nameFilter = germplasmSearchRequest.getNameFilter();
+        if (nameFilter != null && nameFilter.getValue() != null) {
+            final String q = nameFilter.getValue();
+            String operator = "LIKE";
+            switch (nameFilter.getType()) {
+                case EXACTMATCH:
+                    operator = "=";
+                    paramBuilder.setParameter("q", q);
+                    paramBuilder.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
+                    paramBuilder.setParameter("qNoSpaces", q.replaceAll(" ", ""));
+                    break;
+                case STARTSWITH:
+                    paramBuilder.setParameter("q", q + "%");
+                    paramBuilder.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q) + "%");
+                    paramBuilder.setParameter("qNoSpaces", q.replaceAll(" ", "") + "%");
+                    break;
+                case CONTAINS:
+                    paramBuilder.setParameter("q", "%" + q + "%");
+                    paramBuilder.setParameter("qStandardized", "%" + GermplasmDataManagerUtil.standardizeName(q) + "%");
+                    paramBuilder.setParameter("qNoSpaces", "%" + q.replaceAll(" ", "") + "%");
+                    break;
+            }
+            paramBuilder.append(" AND (allNames.nval " + operator + " :q "
+                + "OR allNames.nval " + operator + " :qStandardized " 
+                + "OR allNames.nval " + operator + " :qNoSpaces) \n ");
+        }
+
+        // TODO complete filters
+    }
+
+    /**
+     * NOTE: This part of the query has performance implications. Please take this into consideration when making changes.
+     * The current setup has been tested on crop=brachiaria, #germplsm: ~ 6M, page size: 1000, include pedigree generative
+     * -> 5 levels: 7 sec, 20 levels: 30 sec
+     *
+     * STRAIGHT_JOIN joins the table in left to right order.
+     * For some reason, with "inner join" the query optimizer chooses a suboptimal order and instead of starting with P0 (limited by where)
+     * it starts with P1, and the query never finishes.With straight_join, it finishes in seconds.
+     *
+     * The gnpgs column also plays a key role in the running time.Some tested alternatives that don't make use of this column have shown
+     * poor performance.
+	 *
+     * The query doesn't exclude deleted germplasm (g.deleted and g.grplce), because it slows down the query considerably.
+     * Deleted germplasm should be excluded by the caller later.
+     *
+     */
+    private List<Integer> retrievePedigreeGids(final List<Integer> gids, final GermplasmSearchRequest germplasmSearchRequest) {
+
+        final StringBuilder queryBuilder = new StringBuilder();
+
+        final IncludePedigree includePedigree = germplasmSearchRequest.getIncludePedigree();
+
+        if (includePedigree != null && includePedigree.getGenerationLevel() > 0) {
+
+            // levels of pedigree to retrieve
+            final int generationLevel = includePedigree.getGenerationLevel();
+            // TODO extract max level as config (IBP-4013)
+            if (generationLevel > 10) {
+                throw new MiddlewareRequestException("", "error.pedigree.max.generation.level", new Integer[] {10});
+            }
+
+            int level = 1;
+            switch (includePedigree.getType()) {
+                // Consider germplasm generated using generative methods
+                case GENERATIVE:
+                    while (level <= generationLevel) {
+                        if (!StringUtils.isBlank(queryBuilder.toString())) {
+                            queryBuilder.append(UNION);
+                        }
+                        queryBuilder.append(" select P" + level + ".gid from germplsm P0 \n ");
+
+                        // using some abbreviations for short-lived variables
+                        int i = 1;
+                        while (i <= level) {
+                            final int prev = i - 1;
+                            queryBuilder.append(String.format(" straight_join germplsm PGROUP%s on P%s.gpid1 != 0", prev, prev) //
+                                // find the group source (last gid produced by a generative process)
+                                // join with itself if gid is already the group source
+                                + String.format(" and ((P%s.gnpgs < 0 and PGROUP%s.gid = P%s.gpid1)", prev, prev, prev) //
+                                + String.format("   or (P%s.gnpgs > 0 and PGROUP%s.gid = P%s.gid)) \n", prev, prev, prev) //
+                                // find the group source parents
+                                + String.format(" straight_join germplsm P%s on PGROUP%s.gnpgs > 0", i, prev)
+                                + String.format("  and PGROUP%s.gpid1 != 0 and PGROUP%s.gpid2 != 0", prev, prev)
+                                + String.format("  and (P%s.gid = PGROUP%s.gpid1 or P%s.gid = PGROUP%s.gpid2) \n ", i, prev, i, prev));
+                            // TODO other progenitors
+                            i++;
+                        }
+                        queryBuilder.append(" where P0.gid in (:gids) \n ");
+
+                        level++;
+                    }
+                    break;
+
+                case DERIVATIVE:
+                case BOTH:
+
+                    /*
+                     * DERIVATIVE:
+                     * Consider germplasm generated using derivative and maintenance methods (gnpgs < 0)
+                     * BOTH:
+                     * traverse the pedigree tree considering both derivative and generative,
+                     * without jumping to group source, considering every intermediate step.
+                     */
+
+                    while (level <= generationLevel) {
+                        if (!StringUtils.isBlank(queryBuilder.toString())) {
+                            queryBuilder.append(UNION);
+                        }
+                        queryBuilder.append(" select P" + level + ".gid from germplsm P0 \n ");
+
+                        // using some abbreviations for short-lived variables
+                        int i = 1;
+                        while (i <= level) {
+                            final int prev = i - 1;
+                            queryBuilder.append(String.format(" straight_join germplsm P%s", i));
+                            queryBuilder.append(String.format(" on P%s.gnpgs < 0 and (", prev));
+                            queryBuilder.append(String.format("  P%s.gid = P%s.gpid2", i, prev));
+                            // some (non-standard?) derivative germplasm has gpid2=0
+                            queryBuilder.append(String.format("  or P%s.gpid2 = 0 and P%s.gid = P%s.gpid1) \n ", prev, i, prev));
+                            if (IncludePedigree.Type.BOTH.equals(includePedigree.getType())) {
+                                queryBuilder.append(String.format("or P%s.gnpgs > 0 and (", prev));
+                                queryBuilder.append(String.format(" P%s.gid = P%s.gpid1 or P%s.gid = P%s.gpid2) \n ", i, prev, i, prev));
+                            }
+                            i++;
+                        }
+                        queryBuilder.append(" where P0.gid in (:gids) \n ");
+
+                        level++;
+                    }
+                    break;
+            }
+
+        }
+
+        if (queryBuilder.toString().isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+
+        final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+        sqlQuery.setParameterList("gids", gids);
+
+        return sqlQuery.list();
+    }
+
+    private List<Integer> retrieveGroupGids(final List<Integer> gids, final GermplasmSearchRequest germplasmSearchRequest) {
+        if (germplasmSearchRequest.isIncludeGroupMembers()) {
+            // TODO
+        }
+
+        return Collections.EMPTY_LIST;
+    }
 }

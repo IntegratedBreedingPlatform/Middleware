@@ -136,9 +136,10 @@ public class GermplasmInventory implements Serializable {
 	}
 
 	public String getAvailable() {
-		if (this.getDistinctScaleCountForGermplsm() == 0) {
+		final Integer distinctScaleCountForGermplsm = this.getDistinctScaleCountForGermplsm();
+		if (distinctScaleCountForGermplsm == null || distinctScaleCountForGermplsm == 0) {
 			return "-";
-		} else if (this.getDistinctScaleCountForGermplsm() == 1) {
+		} else if (distinctScaleCountForGermplsm == 1) {
 			StringBuilder available = new StringBuilder();
 			available.append(this.getTotalAvailableBalance());
 

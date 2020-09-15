@@ -82,6 +82,12 @@ public class DaoFactory {
 		return germplasmDao;
 	}
 
+	public GermplasmSearchDAO getGermplasmSearchDAO() {
+		final GermplasmSearchDAO germplasmSearchDAO = new GermplasmSearchDAO();
+		germplasmSearchDAO.setSession(this.sessionProvider.getSession());
+		return germplasmSearchDAO;
+	}
+
 	public GermplasmListDAO getGermplasmListDAO() {
 		final GermplasmListDAO germplasmListDao = new GermplasmListDAO();
 		germplasmListDao.setSession(this.sessionProvider.getSession());
