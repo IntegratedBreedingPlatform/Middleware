@@ -159,118 +159,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
-	public List<StudyEntryDto> getStudyEntries(final int studyId, final List<MeasurementVariable> entryDescriptors, final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
-		try {
-			final StringBuilder sqlQuery = new StringBuilder("SELECT s.stock_id AS entryId,\n"
-				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS entryNumber,\n"
-				+ "  s.dbxref_id AS gid,\n"
-				+ "  s.name AS designation,\n"
-				+ "  s.value AS entryCode,\n"
-				+ "  COUNT(DISTINCT (l.eid)) AS activeLots,\n"
-				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, SUM(CASE WHEN it.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue()
-				+ "  OR (it.trnstat = " + TransactionStatus.PENDING.getIntValue()
-				+  " AND it.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN it.trnqty ELSE 0 END), 'Mixed') AS available,\n"
-				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, c.name, 'Mixed') AS unit\n");
-
-			final String entryClause = ",MAX(IF(cvterm_variable.name = '%s', sp.value, NULL)) AS '%s',"
-				+ " MAX(IF(cvterm_variable.name = '%s', sp.stockprop_id, NULL)) AS '%s',"
-				+ " MAX(IF(cvterm_variable.name = '%s', sp.type_id, NULL)) AS '%s' ,"
-				+ " MAX(IF(cvterm_variable.name = '%s', sp.value, NULL)) AS '%s' ";
-
-			for (final MeasurementVariable entryDescriptor : entryDescriptors) {
-				final String entryName = entryDescriptor.getName();
-				sqlQuery.append(String.format(entryClause, entryName, entryName, entryName, entryName + "_PropertyId",
-					entryName, entryName + "_variableId",
-					entryName, entryName + "_value"
-				));
-			}
-
-			sqlQuery.append(" FROM stock s\n"
-				+ "       LEFT JOIN ims_lot l ON l.eid = s.dbxref_id and l.status = " + LotStatus.ACTIVE.getIntValue()
-				+ "       LEFT JOIN ims_transaction it ON l.lotid = it.lotid\n"
-				+ "       LEFT JOIN cvterm c ON c.cvterm_id = l.scaleid\n"
-				+ "       LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id\n"
-				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id\n"
-				+ "WHERE s.project_id = :studyId\n");
-
-
-			if (studyEntrySearchDto!=null) {
-				if (studyEntrySearchDto.getEntryNumbers()!=null && !studyEntrySearchDto.getEntryNumbers().isEmpty()) {
-					sqlQuery.append(" AND s.uniquename in (:entryNumbers)" );
-				}
-				if (studyEntrySearchDto.getEntryIds()!=null && !studyEntrySearchDto.getEntryIds().isEmpty()) {
-					sqlQuery.append(" AND s.stock_id in (:entryIds)" );
-				}
-			}
-			sqlQuery.append(" GROUP BY s.stock_id ORDER BY CONVERT(S.uniquename, UNSIGNED INT) ");
-
-			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery.toString());
-			query.addScalar("entryId", new IntegerType());
-			query.addScalar("entryNumber", new IntegerType());
-			query.addScalar("gid", new IntegerType());
-			query.addScalar("designation", new StringType());
-			query.addScalar("entryCode", new StringType());
-			query.addScalar("activeLots", new IntegerType());
-			query.addScalar("available", new StringType());
-			query.addScalar("unit", new StringType());
-			for (final MeasurementVariable entryDescriptor : entryDescriptors) {
-				final String entryName = entryDescriptor.getName();
-				query.addScalar(entryName + "_propertyId", new IntegerType());
-				query.addScalar(entryName + "_variableId", new IntegerType());
-				query.addScalar(entryName + "_value", new StringType());
-			}
-
-			query.setParameter("studyId", studyId);
-			if (studyEntrySearchDto!=null) {
-				if (studyEntrySearchDto.getEntryNumbers()!=null && !studyEntrySearchDto.getEntryNumbers().isEmpty()) {
-					query.setParameterList("entryNumbers", studyEntrySearchDto.getEntryNumbers());
-				}
-				if (studyEntrySearchDto.getEntryIds()!=null && !studyEntrySearchDto.getEntryIds().isEmpty()) {
-					query.setParameterList("entryIds", studyEntrySearchDto.getEntryIds());
-				}
-			}
-			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-			GenericDAO.addPaginationToSQLQuery(query, pageable);
-
-			final List<Map<String, Object>> results = query.list();
-			final List<StudyEntryDto> studyEntryDtos = new ArrayList<>();
-			for (final Map<String, Object> row : results) {
-				final StudyEntryDto studyEntryDto = new StudyEntryDto();
-				studyEntryDto.setEntryId((Integer) row.get("entryId"));
-				studyEntryDto.setGid((Integer) row.get("gid"));
-				studyEntryDto.setEntryNumber((Integer) row.get("entryNumber"));
-				studyEntryDto.setDesignation((String) row.get("designation"));
-				studyEntryDto.setEntryCode((String) row.get("entryCode"));
-				studyEntryDto.setActiveLots((Integer) row.get("activeLots"));
-				studyEntryDto.setAvailable((String) row.get("available"));
-				studyEntryDto.setUnit((String) row.get("unit"));
-				final Map<String, StudyEntryPropertyData> variables = new HashMap<>();
-				for (final MeasurementVariable entryDescriptor : entryDescriptors) {
-					final StudyEntryPropertyData studyEntryPropertyData =
-						new StudyEntryPropertyData((Integer) row.get(entryDescriptor.getName() + "_propertyId"),
-							(Integer) row.get(entryDescriptor.getName() + "_variableId"),
-							(String) row.get(entryDescriptor.getName() + "_value"));
-					variables.put(entryDescriptor.getName(), studyEntryPropertyData);
-				}
-				//These elements should not be listed as germplasm descriptors, this is a way to match values between column
-				//and table cells. In the near future this block should be removed
-				variables.put("GID", new StudyEntryPropertyData(String.valueOf(studyEntryDto.getGid())));
-				variables.put("DESIGNATION", new StudyEntryPropertyData(studyEntryDto.getDesignation()));
-				variables.put("ENTRY_CODE", new StudyEntryPropertyData(studyEntryDto.getEntryCode()));
-				variables.put("ENTRY_NO", new StudyEntryPropertyData(String.valueOf(studyEntryDto.getEntryNumber())));
-
-				studyEntryDto.setVariables(variables);
-				studyEntryDtos.add(studyEntryDto);
-			}
-			return studyEntryDtos;
-
-		} catch (final HibernateException e) {
-			final String errorMessage = "Error at getStudyEntries=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
-			LOG.error(errorMessage, e);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
-
 	public void deleteStocksForStudy(final int studyId) {
 		try {
 			final Query query = this.getSession().createQuery("DELETE FROM StockModel sm WHERE sm.project.projectId = :studyId");
@@ -415,6 +303,119 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 
+	}
+
+	public List<StudyEntryDto> getStudyEntries(final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
+		try {
+			final StringBuilder sqlQuery = new StringBuilder("SELECT s.stock_id AS entryId, "
+				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS entryNumber, "
+				+ "  s.dbxref_id AS gid, "
+				+ "  s.name AS designation, "
+				+ "  s.value AS entryCode, "
+				+ "  COUNT(DISTINCT (l.eid)) AS lots, "
+				+ "  IF(COUNT(DISTINCT IFNULL(l.scaleid, 'null')) = 1, IFNULL((SELECT SUM(CASE WHEN imt.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue()
+				+ "  OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue()
+				+  " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) "
+				+ "  FROM ims_transaction imt INNER JOIN ims_lot lo ON lo.lotid = imt.lotid WHERE lo.eid = l.eid),0), 'Mixed') AS available, "
+				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, IFNULL(c.name,'-'), 'Mixed') AS unit ");
+
+			final String entryClause = ",MAX(IF(cvterm_variable.name = '%s', sp.value, NULL)) AS '%s',"
+				+ " MAX(IF(cvterm_variable.name = '%s', sp.stockprop_id, NULL)) AS '%s',"
+				+ " MAX(IF(cvterm_variable.name = '%s', sp.type_id, NULL)) AS '%s' ,"
+				+ " MAX(IF(cvterm_variable.name = '%s', sp.value, NULL)) AS '%s' ";
+
+			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
+				final String entryName = entryDescriptor.getName();
+				sqlQuery.append(String.format(entryClause, entryName, entryName, entryName, entryName + "_PropertyId",
+					entryName, entryName + "_variableId",
+					entryName, entryName + "_value"
+				));
+			}
+
+			sqlQuery.append(" FROM stock s "
+				+ "       LEFT JOIN ims_lot l ON l.eid = s.dbxref_id and l.status = " + LotStatus.ACTIVE.getIntValue()
+				+ "       LEFT JOIN ims_transaction it ON l.lotid = it.lotid "
+				+ "       LEFT JOIN cvterm c ON c.cvterm_id = l.scaleid "
+				+ "       LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
+				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id "
+				+ "WHERE s.project_id = :studyId ");
+
+
+			if (studyEntrySearchDto.getFilter()!=null) {
+				if (studyEntrySearchDto.getFilter().getEntryNumbers()!=null && !studyEntrySearchDto.getFilter().getEntryNumbers().isEmpty()) {
+					sqlQuery.append(" AND s.uniquename in (:entryNumbers)" );
+				}
+				if (studyEntrySearchDto.getFilter().getEntryIds()!=null && !studyEntrySearchDto.getFilter().getEntryIds().isEmpty()) {
+					sqlQuery.append(" AND s.stock_id in (:entryIds)" );
+				}
+			}
+			sqlQuery.append(" GROUP BY s.stock_id ORDER BY CONVERT(S.uniquename, UNSIGNED INT) ");
+
+			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery.toString());
+			query.addScalar("entryId", new IntegerType());
+			query.addScalar("entryNumber", new IntegerType());
+			query.addScalar("gid", new IntegerType());
+			query.addScalar("designation", new StringType());
+			query.addScalar("entryCode", new StringType());
+			query.addScalar("lots", new IntegerType());
+			query.addScalar("available", new StringType());
+			query.addScalar("unit", new StringType());
+			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
+				final String entryName = entryDescriptor.getName();
+				query.addScalar(entryName + "_propertyId", new IntegerType());
+				query.addScalar(entryName + "_variableId", new IntegerType());
+				query.addScalar(entryName + "_value", new StringType());
+			}
+
+			query.setParameter("studyId", studyEntrySearchDto.getStudyId());
+			if (studyEntrySearchDto.getFilter()!=null) {
+				if (studyEntrySearchDto.getFilter().getEntryNumbers()!=null && !studyEntrySearchDto.getFilter().getEntryNumbers().isEmpty()) {
+					query.setParameterList("entryNumbers", studyEntrySearchDto.getFilter().getEntryNumbers());
+				}
+				if (studyEntrySearchDto.getFilter().getEntryIds()!=null && !studyEntrySearchDto.getFilter().getEntryIds().isEmpty()) {
+					query.setParameterList("entryIds", studyEntrySearchDto.getFilter().getEntryIds());
+				}
+			}
+			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			GenericDAO.addPaginationToSQLQuery(query, pageable);
+
+			final List<Map<String, Object>> results = query.list();
+			final List<StudyEntryDto> studyEntryDtos = new ArrayList<>();
+			for (final Map<String, Object> row : results) {
+				final StudyEntryDto studyEntryDto = new StudyEntryDto();
+				studyEntryDto.setEntryId((Integer) row.get("entryId"));
+				studyEntryDto.setGid((Integer) row.get("gid"));
+				studyEntryDto.setEntryNumber((Integer) row.get("entryNumber"));
+				studyEntryDto.setDesignation((String) row.get("designation"));
+				studyEntryDto.setEntryCode((String) row.get("entryCode"));
+				studyEntryDto.setLots((Integer) row.get("lots"));
+				studyEntryDto.setAvailable((String) row.get("available"));
+				studyEntryDto.setUnit((String) row.get("unit"));
+				final Map<String, StudyEntryPropertyData> variables = new HashMap<>();
+				for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
+					final StudyEntryPropertyData studyEntryPropertyData =
+						new StudyEntryPropertyData((Integer) row.get(entryDescriptor.getName() + "_propertyId"),
+							(Integer) row.get(entryDescriptor.getName() + "_variableId"),
+							(String) row.get(entryDescriptor.getName() + "_value"));
+					variables.put(entryDescriptor.getName(), studyEntryPropertyData);
+				}
+				//These elements should not be listed as germplasm descriptors, this is a way to match values between column
+				//and table cells. In the near future this block should be removed
+				variables.put("GID", new StudyEntryPropertyData(String.valueOf(studyEntryDto.getGid())));
+				variables.put("DESIGNATION", new StudyEntryPropertyData(studyEntryDto.getDesignation()));
+				variables.put("ENTRY_CODE", new StudyEntryPropertyData(studyEntryDto.getEntryCode()));
+				variables.put("ENTRY_NO", new StudyEntryPropertyData(String.valueOf(studyEntryDto.getEntryNumber())));
+
+				studyEntryDto.setVariables(variables);
+				studyEntryDtos.add(studyEntryDto);
+			}
+			return studyEntryDtos;
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error at getStudyEntries=" + studyEntrySearchDto.getStudyId() + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
 	}
 
 
