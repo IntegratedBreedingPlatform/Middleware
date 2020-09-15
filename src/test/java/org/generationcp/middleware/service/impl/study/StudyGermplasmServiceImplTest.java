@@ -125,7 +125,7 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 		final int index = StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM + 1;
 		final StudyGermplasmDto newStudyGermplasm = createTestStudyGermplasm(index, gid);
 		final List<StudyGermplasmDto> addedStudyGermplasmList =
-			this.service.saveStudyGermplasm(this.studyId, Collections.singletonList(newStudyGermplasm));
+			this.service.saveStudyEntries(this.studyId, Collections.singletonList(newStudyGermplasm));
 		Assert.assertEquals(1, addedStudyGermplasmList.size());
 		final StudyGermplasmDto dto = addedStudyGermplasmList.get(0);
 		this.verifyStudyGermplasmDetails(gid, index, dto);

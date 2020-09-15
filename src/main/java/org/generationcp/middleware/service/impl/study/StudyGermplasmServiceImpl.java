@@ -123,7 +123,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public List<StudyGermplasmDto> saveStudyGermplasm(final Integer studyId, final List<StudyGermplasmDto> studyGermplasmDtoList) {
+	public List<StudyGermplasmDto> saveStudyEntries(final Integer studyId, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 		final List<StudyGermplasmDto> list = new ArrayList<>();
 		for (final StudyGermplasmDto studyGermplasm : studyGermplasmDtoList) {
 			final StockModel stockModel = this.daoFactory.getStockDao().saveOrUpdate(new StockModel(studyId, studyGermplasm));
@@ -179,7 +179,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		// Save also Group GID
 		newStudyGermplasm.setGroupId(newGermplasm.getMgid());
 
-		final StudyGermplasmDto savedStudyGermplasm = this.saveStudyGermplasm(studyId, Collections.singletonList(newStudyGermplasm)).get(0);
+		final StudyGermplasmDto savedStudyGermplasm = this.saveStudyEntries(studyId, Collections.singletonList(newStudyGermplasm)).get(0);
 		stockDao.replaceExperimentStocks(entryId, savedStudyGermplasm.getEntryId());
 		// Finally delete old stock
 		stockDao.makeTransient(stock);
