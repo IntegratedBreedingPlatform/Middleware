@@ -15,7 +15,7 @@
 		</comment>
 		<addColumn tableName="germplsm">
 			<column name="germplsm_uuid" type="VARCHAR(36)">
-				<constraints nullable="true" unique="true"/>
+				<constraints nullable="true"/>
 			</column>
 		</addColumn>
 	</changeSet>
@@ -49,19 +49,25 @@
 				AND specific_name = 'populate_germplsm_uuid_values';
 			</sqlCheck>
 		</preConditions>
+		<comment>
+			Create Stored procedure that populate the germplsm_uuid values
+		</comment>
 		<sql dbms="mysql" splitStatements="false">
 			CREATE PROCEDURE populate_germplsm_uuid_values()
 			BEGIN
 
 			DECLARE useUuid INT DEFAULT 1;
+			DECLARE hasNullUuidCount INT DEFAULT 1;
+			DECLARE duplicates INT DEFAULT 1;
 
 			SELECT use_uuid
 			INTO useUuid
 			FROM workbench.workbench_crop
 			WHERE db_name = DATABASE();
 
-			IF useUuid = 0
-			THEN
+			IF useUuid = 0	THEN
+
+			WHILE(hasNullUuidCount > 0) DO
 
 			UPDATE germplsm g
 			SET germplsm_uuid = CONCAT((SELECT plot_code_prefix
@@ -70,6 +76,39 @@
 			'G',
 			left(sha1(CONCAT(uuid(), g.gid)), 8))
 			WHERE g.germplsm_uuid IS NULL;
+
+			SELECT sum(c)
+			into duplicates
+			FROM (SELECT count(1) c
+			FROM germplsm
+			WHERE germplsm_uuid IS NOT NULL
+			GROUP BY germplsm_uuid
+			HAVING count(1) >= 2) T;
+
+			IF duplicates > 0 THEN
+
+			UPDATE germplsm
+			SET germplsm_uuid = NULL
+			WHERE gid IN (
+			SELECT gid
+			FROM (
+			SELECT g1.gid
+			FROM germplsm g1
+			WHERE EXISTS
+			(
+			SELECT 1
+			FROM germplsm g2
+			WHERE g1.germplsm_uuid = g2.germplsm_uuid
+			LIMIT 1, 1
+			) AND g1.germplsm_uuid IS NOT NULL) AS G);
+
+			END IF;
+
+			SELECT count(*) into hasNullUuidCount
+			FROM germplsm where germplsm_uuid IS NULL;
+
+			END WHILE;
+
 
 			ELSE
 
@@ -115,6 +154,13 @@
 		<sql dbms="mysql" splitStatements="false">
 			DROP PROCEDURE populate_germplsm_uuid_values;
 		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v16.1.0-6">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'germplsm' AND CONSTRAINT_NAME='germplsm_uuid_unique' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+		<addUniqueConstraint tableName="germplsm" columnNames="germplsm_uuid" constraintName="germplsm_uuid_unique"/>
 	</changeSet>
 
 </databaseChangeLog>
