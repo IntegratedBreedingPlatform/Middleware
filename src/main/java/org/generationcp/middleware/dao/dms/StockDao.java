@@ -312,7 +312,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "  s.dbxref_id AS gid, "
 				+ "  s.name AS designation, "
 				+ "  s.value AS entryCode, "
-				+ "  COUNT(DISTINCT (l.eid)) AS lots, "
+				+ "  COUNT(DISTINCT (l.lotid)) AS lots, "
 				+ "  IF(COUNT(DISTINCT IFNULL(l.scaleid, 'null')) = 1, IFNULL((SELECT SUM(CASE WHEN imt.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue()
 				+ "  OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue()
 				+  " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) "
