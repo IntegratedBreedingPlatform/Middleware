@@ -80,7 +80,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	private static final String GID_SEPARATOR_FOR_STORED_PROCEDURE_CALL = ",";
 
 	public static final String MID_STRING = "G";
-	public static final int SUFFIX_LENGTH = 31;
+	public static final int SUFFIX_LENGTH = 15;
 
 	public GermplasmDataManagerImpl() {
 	}
