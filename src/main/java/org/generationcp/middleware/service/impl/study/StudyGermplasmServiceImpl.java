@@ -12,7 +12,6 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -37,9 +36,6 @@ import java.util.Set;
 
 @Transactional
 public class StudyGermplasmServiceImpl implements StudyGermplasmService {
-
-	@Resource
-	private InventoryDataManager inventoryDataManager;
 
 	@Resource
 	private DatasetService datasetService;
@@ -83,22 +79,26 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	@Override
 	public List<StudyEntryDto> getStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 
-		final Integer plotDatasetId = datasetService.getDatasets( studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+		final Integer plotDatasetId =
+			datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
 
 		final List<MeasurementVariable> entryDescriptors =
 			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
 				.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
 		//Remove the ones that are stored in stock and that in the future will not be descriptors
-		final List<Integer> termsToRemove = Lists.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(),TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.OBS_UNIT_ID.getId());
-		for (Iterator<MeasurementVariable> i = entryDescriptors.iterator(); i.hasNext();) {
+		final List<Integer> termsToRemove = Lists
+			.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
+				TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
+		for (Iterator<MeasurementVariable> i = entryDescriptors.iterator(); i.hasNext(); ) {
 			final MeasurementVariable measurementVariable = i.next();
 			if (termsToRemove.contains(measurementVariable.getTermId())) {
 				i.remove();
 			}
 		}
 
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStockDao().getStudyEntries(new StudyEntrySearchDto(studyId, entryDescriptors, filter), pageable);
+		final List<StudyEntryDto> studyEntryDtos =
+			this.daoFactory.getStockDao().getStudyEntries(new StudyEntrySearchDto(studyId, entryDescriptors, filter), pageable);
 		return studyEntryDtos;
 	}
 

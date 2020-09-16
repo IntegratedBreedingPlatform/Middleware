@@ -12,6 +12,7 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
@@ -19,6 +20,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,7 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 
 	private ExperimentDao experimentDao;
 	private DmsProjectDao dmsProjectDao;
+	private StockDao stockDao;
 
 	private IntegrationTestDataInitializer testDataInitializer;
 
@@ -46,6 +49,8 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 		this.experimentDao.setSession(this.sessionProvder.getSession());
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		this.stockDao = new StockDao();
+		this.stockDao.setSession(this.sessionProvder.getSession());
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
@@ -199,6 +204,23 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 		assertEquals(sample.getSampleId(), sampleDTO.getSampleId());
 		assertEquals(1, sampleDTO.getSampleNumber().intValue());
 
+	}
+
+	@Test
+	public void testUpdateEntryId() {
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 5);
+		final List<StockModel> entries = this.stockDao.getStocksForStudy(study.getProjectId());
+		final ExperimentModel experimentModelToModify = experimentModels.get(0);
+		final List<ExperimentModel> children = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, experimentModelToModify, geolocation, 5);
+		final Integer newStockModelId = entries.stream().filter(i->!i.getStockId().equals(experimentModelToModify.getStock().getStockId())).findFirst().get().getStockId();
+		this.experimentDao.updateEntryId(Collections.singletonList(experimentModelToModify.getNdExperimentId()), newStockModelId);
+		this.experimentDao.refresh(experimentModelToModify);
+		assertEquals(newStockModelId, experimentModelToModify.getStock().getStockId());
+		for (final ExperimentModel model: children) {
+			this.experimentDao.refresh(model);
+			assertEquals(newStockModelId, model.getStock().getStockId());
+		}
 	}
 
 }
