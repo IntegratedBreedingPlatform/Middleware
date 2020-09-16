@@ -1296,7 +1296,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	public void testGenerateGermplasmUUIDUseUUIDFalse() {
 		final Germplasm germplasm = this.createGermplasm();
 		final CropType cropType = new CropType();
-		cropType.setUseUUID(true);
+		cropType.setUseUUID(false);
 		cropType.setPlotCodePrefix("AXDG");
 		this.germplasmDataManager.generateGermplasmUUID(cropType, Arrays.asList(germplasm));
 		Assert.assertEquals(20, germplasm.getGermplasmUUID().length());
