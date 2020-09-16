@@ -74,7 +74,7 @@
 			FROM workbench.workbench_crop wc
 			WHERE db_name = DATABASE()),
 			'G',
-			left(sha1(CONCAT(uuid(), g.gid)), 8))
+			RIGHT(sha1(CONCAT(uuid(), g.gid)), 31))
 			WHERE g.germplsm_uuid IS NULL;
 
 			SELECT sum(c)
