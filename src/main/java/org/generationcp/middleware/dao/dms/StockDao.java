@@ -349,7 +349,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					sqlQuery.append(" AND s.stock_id in (:entryIds)" );
 				}
 			}
-			sqlQuery.append(" GROUP BY s.stock_id ORDER BY CONVERT(S.uniquename, UNSIGNED INT) ");
+			sqlQuery.append(" GROUP BY s.stock_id ");
+			GenericDAO.addPageRequestOrderBy(sqlQuery, pageable);
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery.toString());
 			query.addScalar("entryId", new IntegerType());
