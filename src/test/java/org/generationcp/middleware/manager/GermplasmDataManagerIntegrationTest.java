@@ -1281,7 +1281,26 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final List<String> names = this.germplasmDataManager.getNamesByGidsAndPrefixes(Collections.singletonList(germplasm.getGid()), Collections.singletonList("PREF"));
 		Assert.assertEquals(1, names.size());
 		Assert.assertEquals(name1.getNval(), names.get(0));
+	}
 
+	@Test
+	public void testGenerateGermplasmUUIDUseUUIDTrue() {
+		final Germplasm germplasm = this.createGermplasm();
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(true);
+		this.germplasmDataManager.generateGermplasmUUID(cropType, Arrays.asList(germplasm));
+		Assert.assertEquals(36, germplasm.getGermplasmUUID().length());
+	}
+
+	@Test
+	public void testGenerateGermplasmUUIDUseUUIDFalse() {
+		final Germplasm germplasm = this.createGermplasm();
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(true);
+		cropType.setPlotCodePrefix("AXDG");
+		this.germplasmDataManager.generateGermplasmUUID(cropType, Arrays.asList(germplasm));
+		Assert.assertEquals(20, germplasm.getGermplasmUUID().length());
+		Assert.assertTrue(germplasm.getGermplasmUUID().startsWith(cropType.getPlotCodePrefix() + "G"));
 	}
 
 	private Attribute createAttribute(final Germplasm germplasm, final UserDefinedField userDefinedField, final String aval) {
