@@ -4,21 +4,24 @@ package org.generationcp.middleware.dao;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest.IncludePedigree;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.slf4j.Logger;
@@ -27,9 +30,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -91,6 +96,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
     private static final int LOT_INDEX = 5;
     private static final int AVAIL_BALANCE_INDEX = 6;
     private static final Map<String, String> selectClauseColumnsMap = new HashMap<>();
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
 
     //Excluding Parents Property from SQL
     private static final List<String> GERMPLASM_TREE_NODE_PROPERTY_IDS = Collections.unmodifiableList(Arrays.asList(GermplasmSearchDAO.MALE_PARENT_ID,
@@ -450,6 +457,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             + " g.gid  AS `" + GermplasmSearchDAO.GID + "`, \n" //
             + " g.mgid AS `" + GermplasmSearchDAO.GROUP_ID + "`, \n" //
             + " Count(DISTINCT gt.lotid) AS `" + GermplasmSearchDAO.AVAIL_LOTS + "`, \n" //
+            /*
+             * Sum of transaction (duplicated because of joins)
+             * -----divided by----
+             * ( count of tr / count of distinct tr) = how many times the real sum is repeated
+             * ===================
+             * Real sum = Available balance (not considering status)
+             */
             + " Sum(gt.trnqty)/(Count(gt.trnid)/Count(DISTINCT gt.trnid)) AS `" + GermplasmSearchDAO.AVAIL_BALANCE + "`, \n"  //
             + " m.mname AS `" + GermplasmSearchDAO.METHOD_NAME + "`, \n"  //
             + " l.lname AS `" + GermplasmSearchDAO.LOCATION_NAME + "` \n");
@@ -660,13 +674,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
     /**
      * New germplasm query (replaces {@link GermplasmSearchDAO#searchForGermplasms(GermplasmSearchParameter)}
-     * @return
      */
-    public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable) {
+    public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
+        final String programUUID) {
 
         try {
             // list is used again in a query wrapper to paginate (filtered+included) gids
-            final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, pageable);
+            final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, pageable, programUUID);
 
             if (gids.isEmpty()) {
                 return Collections.EMPTY_LIST;
@@ -729,11 +743,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
     }
 
     /**
-     * Filtered gids  + associated gids (e.g pedigree, group).
-	 * Paginated, for performance reasons.
+     * Filtered gids + associated gids (e.g pedigree, group).
      */
     private List<Integer> retrieveSearchGids(final GermplasmSearchRequest germplasmSearchRequest,
-        final Pageable pageable) {
+        final Pageable pageable, final String programUUID) {
 
         final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
         final Map<String, Integer> attributeTypesMap = this.getAttributeTypesMap(addedColumnsPropertyIds);
@@ -744,9 +757,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             new StringBuilder(this.createSelectClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
         queryBuilder.append(this.createFromClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
 
-        addFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequest);
-
-        queryBuilder.append(" group by g.gid ");
+        final List<Integer> preFilteredGids = this.retrievePreFilteredGids(germplasmSearchRequest);
+        // group by inside filters
+        addFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequest, preFilteredGids, programUUID);
 
         final Map<String, Boolean> sortState = convertSort(pageable);
         // TODO improve perf (e.g order by NAMES)
@@ -755,7 +768,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
         sqlQuery.addScalar(GID);
         addPaginationToSQLQuery(sqlQuery, pageable);
-        addFilters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequest);
+        addFilters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequest, preFilteredGids, programUUID);
 
         final List<Integer> gids = sqlQuery.list();
 
@@ -789,7 +802,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         return sortState;
     }
 
-    private static void addFilters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequest germplasmSearchRequest) {
+    private static void addFilters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequest germplasmSearchRequest,
+        final List<Integer> preFilteredGids, final String programUUID) {
 
         paramBuilder.append(" where g.deleted = 0 AND g.grplce = 0 ");
 
@@ -820,7 +834,231 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 + "OR allNames.nval " + operator + " :qNoSpaces) \n ");
         }
 
-        // TODO complete filters
+        final Integer gid = germplasmSearchRequest.getGid();
+        if (gid != null) {
+            paramBuilder.append(" and g.gid = :gid");
+            paramBuilder.setParameter("gid", gid);
+        }
+
+        /* TODO IBP-3937
+        final String germplasmUUID = germplasmSearchRequest.getGermplasmUUID();
+        if (germplasmUUID != null) {
+            paramBuilder.append(" and g.germplsm_uuid = :germplasmUUID");
+            paramBuilder.setParameter("germplasmUUID", germplasmUUID);
+        }
+        */
+
+        final Integer groupId = germplasmSearchRequest.getGroupId();
+        if (groupId != null) {
+            paramBuilder.append(" and g.mgid = :groupId ");
+            paramBuilder.setParameter("groupId", groupId);
+        }
+
+        final String sampleUID = germplasmSearchRequest.getSampleUID();
+        if (sampleUID != null) {
+            paramBuilder.append(" and exists(select 1" //
+                + " from nd_experiment filter_nde" //
+                + "  inner join stock filter_stock on filter_nde.stock_id = filter_stock.stock_id" //
+                + "  inner join sample filter_sample on filter_nde.nd_experiment_id = filter_sample.nd_experiment_id"
+                + " where filter_stock.dbxref_id = g.gid and filter_sample.sample_bk = :sampleUID) \n ");
+            paramBuilder.setParameter("sampleUID", sampleUID);
+        }
+
+        final List<Integer> germplasmListIds = germplasmSearchRequest.getGermplasmListIds();
+        if (germplasmListIds != null) {
+            paramBuilder.append(" and exists(select 1 from listdata filter_l "  //
+                + "where filter_l.listid in (:germplasmListIds) and filter_l.gid = g.gid) ");
+            paramBuilder.setParameterList("germplasmListIds", germplasmListIds);
+        }
+
+        final String stockId = germplasmSearchRequest.getStockId();
+        if (stockId != null) {
+            paramBuilder.append(" and gl.stock_id like :stockId ");
+            paramBuilder.setParameter("stockId", stockId + '%');
+        }
+
+        final String locationOfOrigin = germplasmSearchRequest.getLocationOfOrigin();
+        if (locationOfOrigin != null) {
+            paramBuilder.append(" and l.lname like :locationOfOrigin ");
+            paramBuilder.setParameter("locationOfOrigin", '%' + locationOfOrigin + '%');
+        }
+
+        final String locationOfUse = germplasmSearchRequest.getLocationOfUse();
+        if (locationOfUse != null) {
+            paramBuilder.append(" and exists(select 1 from nd_experiment filter_nde" //
+                + " inner join nd_geolocation filter_ndgeo on filter_nde.nd_geolocation_id = filter_ndgeo.nd_geolocation_id"
+                + " inner join nd_geolocationprop filter_gp on filter_gp.nd_geolocation_id = filter_ndgeo.nd_geolocation_id "
+                + "            AND filter_gp.type_id = " + + TermId.LOCATION_ID.getId() //
+                + " inner join location filter_location on filter_location.locid =  filter_gp.value" //
+                + " inner join stock filter_stock on filter_nde.stock_id = filter_stock.stock_id" //
+                + " where filter_stock.dbxref_id = g.gid and filter_location.lname like :locationOfUse) \n ");
+            paramBuilder.setParameter("locationOfUse", '%' + locationOfUse + '%');
+        }
+
+        final Integer reference = germplasmSearchRequest.getReference();
+        if (reference != null) {
+            paramBuilder.append(" and g.gref = :reference ");
+            paramBuilder.setParameter("reference", reference);
+        }
+
+        final List<Integer> harvestingStudyIds = germplasmSearchRequest.getHarvestingStudyIds();
+        if (harvestingStudyIds != null) {
+            paramBuilder.append(" and exists(select 1" //
+                + " from project filter_p" //
+                + "	 inner join project filter_plotdata on filter_p.project_id = filter_plotdata.study_id" //
+                + "  inner join nd_experiment filter_nde on filter_plotdata.project_id = filter_nde.project_id" //
+                + "  inner join ims_experiment_transaction filter_iet on filter_nde.nd_experiment_id = filter_iet.nd_experiment_id" //
+                + "   and filter_iet.type = " + ExperimentTransactionType.HARVESTING.getId() //
+                + "  inner join ims_transaction filter_transaction on filter_iet.trnid = filter_transaction.trnid" //
+                + "  inner join ims_lot filter_lot on filter_transaction.lotid = filter_lot.lotid" //
+                + " where filter_p.project_id in (:harvestingStudyIds) and filter_lot.lotid = gl.lotid) \n"); //
+            paramBuilder.setParameterList("harvestingStudyIds", harvestingStudyIds);
+        }
+
+        final List<Integer> plantingStudyIds = germplasmSearchRequest.getPlantingStudyIds();
+        if (plantingStudyIds != null) {
+            paramBuilder.append(" and exists(select 1" //
+                + " from project filter_p" //
+                + "	 inner join project filter_plotdata on filter_p.project_id = filter_plotdata.study_id" //
+                + "  inner join nd_experiment filter_nde on filter_plotdata.project_id = filter_nde.project_id" //
+                + "  inner join ims_experiment_transaction filter_iet on filter_nde.nd_experiment_id = filter_iet.nd_experiment_id" //
+                + "   and filter_iet.type = " + ExperimentTransactionType.PLANTING.getId() //
+                + "  inner join ims_transaction filter_transaction on filter_iet.trnid = filter_transaction.trnid" //
+                + "  inner join ims_lot filter_lot on filter_transaction.lotid = filter_lot.lotid" //
+                + " where filter_p.project_id in (:plantingStudyIds) and filter_lot.lotid = gl.lotid) \n"); //
+            paramBuilder.setParameterList("plantingStudyIds", plantingStudyIds);
+        }
+
+        final String breedingMethodName = germplasmSearchRequest.getBreedingMethodName();
+        if (breedingMethodName != null) {
+            paramBuilder.append(" and m.mname like :breedingMethodName");
+            paramBuilder.setParameter("breedingMethodName", '%' + breedingMethodName + '%');
+        }
+
+        final Date harvestDateFrom = germplasmSearchRequest.getHarvestDateFrom();
+        if (harvestDateFrom != null) {
+            paramBuilder.append(" and g.gdate >= :harvestDateFrom ");
+            paramBuilder.setParameter("harvestDateFrom", DATE_FORMAT.format(harvestDateFrom));
+        }
+
+        final Date harvestDateTo = germplasmSearchRequest.getHarvestDateTo();
+        if (harvestDateTo != null) {
+            paramBuilder.append(" and g.gdate <= :harvestDateTo ");
+            paramBuilder.setParameter("harvestDateTo", DATE_FORMAT.format(harvestDateTo));
+        }
+
+        final Boolean withRawObservationsOnly = germplasmSearchRequest.getWithRawObservationsOnly();
+        if (withRawObservationsOnly != null) {
+            paramBuilder.append(" and exists(select 1 from nd_experiment filter_nde" //
+                + "  inner join phenotype filter_phenotype on filter_phenotype.nd_experiment_id = filter_nde.nd_experiment_id" //
+                + "  inner join stock filter_stock on filter_nde.stock_id = filter_stock.stock_id" //
+                + " where filter_stock.dbxref_id = g.gid) \n ");
+        }
+
+        final Boolean withAnalyzedDataOnly = germplasmSearchRequest.getWithAnalyzedDataOnly();
+        if (withAnalyzedDataOnly != null) {
+            // TODO
+            paramBuilder.append("");
+            paramBuilder.setParameter("withAnalyzedDataOnly", withAnalyzedDataOnly);
+        }
+
+        final Boolean withSampleOnly = germplasmSearchRequest.getWithSampleOnly();
+        if (withSampleOnly != null) {
+            paramBuilder.append(" and exists(select 1" //
+                + " from nd_experiment filter_nde" //
+                + "  inner join stock filter_stock on filter_nde.stock_id = filter_stock.stock_id" //
+                + "  inner join sample filter_sample on filter_nde.nd_experiment_id = filter_sample.nd_experiment_id"
+                + " where filter_stock.dbxref_id = g.gid) \n ");
+        }
+
+        final Boolean inProgramListOnly = germplasmSearchRequest.getInProgramListOnly();
+        if (inProgramListOnly != null) {
+            paramBuilder.append(" and exists(select 1 from listdata filter_l "  //
+                + "  inner join listnms filter_listnms on filter_l.listid = filter_listnms.listid"
+                + " where filter_l.gid = g.gid and filter_listnms.program_uuid = :programUUID) ");
+            paramBuilder.setParameter("programUUID", programUUID);
+        }
+
+        final Map<String, String> attributes = germplasmSearchRequest.getAttributes();
+        if (attributes != null) {
+            // TODO
+            paramBuilder.append("");
+            paramBuilder.setParameter("attributes", attributes);
+        }
+
+        if (preFilteredGids != null && !preFilteredGids.isEmpty()) {
+            paramBuilder.append(" and g.gid in (:preFilteredGids) ");
+            paramBuilder.setParameterList("preFilteredGids", preFilteredGids);
+        }
+
+        paramBuilder.append(" group by g.gid having 1 = 1 ");
+
+        // Post-group-by filtering
+
+        // TODO improve perf (brachiaria - 6M germplsm - 3.8 min)
+        final Boolean withInventoryOnly = germplasmSearchRequest.getWithInventoryOnly();
+        if (Boolean.TRUE.equals(withInventoryOnly)) {
+            paramBuilder.append(" and " + AVAIL_BALANCE + " > 0");
+        }
+
+    }
+
+    /**
+     * This query contains those filters that don't perform well in the main query
+     */
+    private List<Integer> retrievePreFilteredGids(final GermplasmSearchRequest germplasmSearchRequest) {
+
+        final List<Integer> prefilteredGids = new ArrayList<>();
+
+        final String femaleParentName = germplasmSearchRequest.getFemaleParentName();
+        if (femaleParentName != null) {
+            final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
+                + "   straight_join germplsm female_parent on n.gid = female_parent.gid \n" //
+                + "   straight_join germplsm group_source on female_parent.gid = group_source.gpid1 \n" //
+                + "   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n"  //
+                + "                            or g.gnpgs > 0 and group_source.gid = g.gid \n" //
+                + " where n.nval like :femaleParentName " + LIMIT_CLAUSE) //
+                .setParameter("femaleParentName", '%' + femaleParentName + '%') //
+                .list();
+            prefilteredGids.addAll(gids);
+        }
+
+        final String maleParentName = germplasmSearchRequest.getMaleParentName();
+        if (maleParentName != null) {
+            final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
+                + "   straight_join germplsm female_parent on n.gid = female_parent.gid \n" //
+                + "   straight_join germplsm group_source on female_parent.gid = group_source.gpid2 \n" //
+                + "   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n" //
+                + "                            or g.gnpgs > 0 and group_source.gid = g.gid \n" //
+                + " where n.nval like :maleParentName " + LIMIT_CLAUSE) //
+                .setParameter("maleParentName", '%' + maleParentName + '%') //
+                .list();
+            prefilteredGids.addAll(gids);
+        }
+
+        final String groupSourceName = germplasmSearchRequest.getGroupSourceName();
+        if (groupSourceName != null) {
+            final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
+                + " straight_join germplsm group_source on n.gid = group_source.gid \n" //
+                + " straight_join germplsm g on group_source.gid = g.gpid1 and g.gnpgs < 0 \n" //
+                + " where n.nval like :groupSourceName " + LIMIT_CLAUSE) //
+                .setParameter("groupSourceName", '%' + groupSourceName + '%')
+                .list();
+            prefilteredGids.addAll(gids);
+        }
+
+        final String immediateSourceName = germplasmSearchRequest.getImmediateSourceName();
+        if (immediateSourceName != null) {
+            final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n"
+                + " straight_join germplsm immediate_source on n.gid = immediate_source.gid \n"
+                + " straight_join germplsm g on immediate_source.gid = g.gpid2 and g.gnpgs < 0 \n"
+                + " where n.nval like :immediateSourceName " + LIMIT_CLAUSE) //
+                .setParameter("immediateSourceName", '%' + immediateSourceName + '%')
+                .list();
+            prefilteredGids.addAll(gids);
+        }
+
+        return prefilteredGids;
     }
 
     /**
@@ -830,12 +1068,12 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
      *
      * STRAIGHT_JOIN joins the table in left to right order.
      * For some reason, with "inner join" the query optimizer chooses a suboptimal order and instead of starting with P0 (limited by where)
-     * it starts with P1, and the query never finishes.With straight_join, it finishes in seconds.
+     * it starts with P1, and the query never finishes. With straight_join, it finishes in seconds.
      *
-     * The gnpgs column also plays a key role in the running time.Some tested alternatives that don't make use of this column have shown
+     * The gnpgs column also plays a key role in the running time. Some tested alternatives that don't make use of this column have shown
      * poor performance.
-	 *
-     * The query doesn't exclude deleted germplasm (g.deleted and g.grplce), because it slows down the query considerably.
+     *
+     * The query doesn't exclude deleted germplasm (g.deleted and g.grplce), because it slows it down considerably.
      * Deleted germplasm should be excluded by the caller later.
      *
      */

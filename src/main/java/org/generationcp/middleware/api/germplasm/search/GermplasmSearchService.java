@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface GermplasmSearchService {
 
-	List<GermplasmSearchResponse> searchGermplasm(GermplasmSearchRequest germplasmSearchRequest, Pageable pageable);
+	List<GermplasmSearchResponse> searchGermplasm(GermplasmSearchRequest germplasmSearchRequest, Pageable pageable,
+		final String programUUID);
 }

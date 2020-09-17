@@ -7,7 +7,7 @@ public class SqlTextFilter {
 	}
 
 	private String value;
-	private Type type;
+	private Type type = Type.STARTSWITH;
 
 	public String getValue() {
 		return this.value;
