@@ -29,6 +29,21 @@ public class StudyEntryDto {
 
 	private Map<String, StudyEntryPropertyData> variables = new HashMap<>();
 
+	public StudyEntryDto(){
+
+	}
+
+	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final String entryCode, final Integer gid, final String designation, final Integer lotCount, final String available, final String unit){
+		this.entryId = entryId;
+		this.entryNumber = entryNumber;
+		this.entryCode = entryCode;
+		this.gid = gid;
+		this.designation = designation;
+		this.lotCount = lotCount;
+		this.available = available;
+		this.unit = unit;
+	}
+
 	public Integer getEntryId() {
 		return entryId;
 	}

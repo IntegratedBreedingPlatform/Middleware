@@ -383,15 +383,17 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			final List<Map<String, Object>> results = query.list();
 			final List<StudyEntryDto> studyEntryDtos = new ArrayList<>();
 			for (final Map<String, Object> row : results) {
-				final StudyEntryDto studyEntryDto = new StudyEntryDto();
-				studyEntryDto.setEntryId((Integer) row.get("entryId"));
-				studyEntryDto.setGid((Integer) row.get("gid"));
-				studyEntryDto.setEntryNumber((Integer) row.get("entryNumber"));
-				studyEntryDto.setDesignation((String) row.get("designation"));
-				studyEntryDto.setEntryCode((String) row.get("entryCode"));
-				studyEntryDto.setLotCount((Integer) row.get("lotCount"));
-				studyEntryDto.setAvailable((String) row.get("available"));
-				studyEntryDto.setUnit((String) row.get("unit"));
+				final Integer entryId = (Integer) row.get("entryId");
+				final Integer entryNumber = (Integer) row.get("entryNumber");
+				final String entryCode = (String) row.get("entryCode");
+				final Integer gid = (Integer) row.get("gid");
+				final String designation = (String) row.get("designation");
+				final Integer lotCount = (Integer) row.get("lotCount");
+				final String available = (String) row.get("available");
+				final String unit = (String) row.get("unit");
+
+				final StudyEntryDto studyEntryDto =
+					new StudyEntryDto(entryId, entryNumber, entryCode, gid, designation, lotCount, available, unit);
 				final Map<String, StudyEntryPropertyData> variables = new HashMap<>();
 				for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
 					final StudyEntryPropertyData studyEntryPropertyData =
