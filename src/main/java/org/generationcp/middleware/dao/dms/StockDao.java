@@ -312,7 +312,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "  s.dbxref_id AS gid, "
 				+ "  s.name AS designation, "
 				+ "  s.value AS entryCode, "
-				+ "  COUNT(DISTINCT (l.lotid)) AS lots, "
+				+ "  COUNT(DISTINCT (l.lotid)) AS lotCount, "
 				+ "  IF(COUNT(DISTINCT IFNULL(l.scaleid, 'null')) = 1, IFNULL((SELECT SUM(CASE WHEN imt.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue()
 				+ "  OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue()
 				+  " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) "
@@ -358,7 +358,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.addScalar("gid", new IntegerType());
 			query.addScalar("designation", new StringType());
 			query.addScalar("entryCode", new StringType());
-			query.addScalar("lots", new IntegerType());
+			query.addScalar("lotCount", new IntegerType());
 			query.addScalar("available", new StringType());
 			query.addScalar("unit", new StringType());
 			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
@@ -389,7 +389,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				studyEntryDto.setEntryNumber((Integer) row.get("entryNumber"));
 				studyEntryDto.setDesignation((String) row.get("designation"));
 				studyEntryDto.setEntryCode((String) row.get("entryCode"));
-				studyEntryDto.setLots((Integer) row.get("lots"));
+				studyEntryDto.setLotCount((Integer) row.get("lotCount"));
 				studyEntryDto.setAvailable((String) row.get("available"));
 				studyEntryDto.setUnit((String) row.get("unit"));
 				final Map<String, StudyEntryPropertyData> variables = new HashMap<>();

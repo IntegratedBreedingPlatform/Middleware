@@ -21,7 +21,7 @@ public class StudyEntryDto {
 
 	private String designation;
 
-	private Integer lots;
+	private Integer lotCount;
 
 	private String available;
 
@@ -69,12 +69,12 @@ public class StudyEntryDto {
 		this.entryCode = entryCode;
 	}
 
-	public Integer getLots() {
-		return lots;
+	public Integer getLotCount() {
+		return lotCount;
 	}
 
-	public void setLots(final Integer lots) {
-		this.lots = lots;
+	public void setLotCount(final Integer lotCount) {
+		this.lotCount = lotCount;
 	}
 
 	public String getAvailable() {
