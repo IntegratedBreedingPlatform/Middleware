@@ -25,14 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 public class StudyGermplasmServiceImpl implements StudyGermplasmService {
@@ -41,6 +40,13 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	private DatasetService datasetService;
 
 	private final DaoFactory daoFactory;
+
+	private static List<Integer> FIXED_GERMPLASM_DESCRIPTOR_IDS = Lists
+		.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId());
+
+	private static List<Integer> REMOVABLE_GERMPLASM_DESCRIPTOR_IDS = Lists
+		.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
+			TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
 
 	public StudyGermplasmServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -86,15 +92,17 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
 				.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
-		//Remove the ones that are stored in stock and that in the future will not be descriptors
-		final List<Integer> termsToRemove = Lists
-			.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
-				TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
-		entryDescriptors.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
+		final List<MeasurementVariable> fixedEntryDescriptors =
+			entryDescriptors.stream().filter(d -> FIXED_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
+				Collectors.toList());
 
-		final List<StudyEntryDto> studyEntryDtos =
-			this.daoFactory.getStockDao().getStudyEntries(new StudyEntrySearchDto(studyId, entryDescriptors, filter), pageable);
-		return studyEntryDtos;
+		//Remove the ones that are stored in stock and that in the future will not be descriptors
+		final List<MeasurementVariable> variableEntryDescriptors =
+			entryDescriptors.stream().filter(d -> !REMOVABLE_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
+				Collectors.toList());
+
+		return this.daoFactory.getStockDao()
+			.getStudyEntries(new StudyEntrySearchDto(studyId, fixedEntryDescriptors, variableEntryDescriptors, filter), pageable);
 	}
 
 

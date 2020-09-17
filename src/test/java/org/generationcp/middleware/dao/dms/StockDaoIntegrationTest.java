@@ -302,7 +302,8 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetStudyEntries_EntryProps() {
-		final List<StudyEntryDto> studyEntryDtos = this.stockDao.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(),germplasmDescriptors, null), null);
+		final List<StudyEntryDto> studyEntryDtos = this.stockDao
+			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), germplasmDescriptors, null), null);
 		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
 		for (final StudyEntryDto studyEntryDto: studyEntryDtos) {
 			for (final MeasurementVariable measurementVariable: germplasmDescriptors) {
@@ -356,7 +357,8 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction1, transaction2, transaction3, transaction4));
 
 		//Assertions
-		final List<StudyEntryDto> studyEntryDtos = this.stockDao.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), null), null);
+		final List<StudyEntryDto> studyEntryDtos = this.stockDao
+			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), new ArrayList<>(), null), null);
 		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
 
 		final StudyEntryDto studyEntryDtoGidMixed = studyEntryDtos.stream().filter(i->i.getGid().equals(gidMixed)).findAny().get();

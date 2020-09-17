@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -324,7 +325,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ " MAX(IF(cvterm_variable.name = '%s', sp.type_id, NULL)) AS '%s' ,"
 				+ " MAX(IF(cvterm_variable.name = '%s', sp.value, NULL)) AS '%s' ";
 
-			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
+			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
 				final String entryName = entryDescriptor.getName();
 				sqlQuery.append(String.format(entryClause, entryName, entryName, entryName, entryName + "_PropertyId",
 					entryName, entryName + "_variableId",
@@ -360,7 +361,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.addScalar("lotCount", new IntegerType());
 			query.addScalar("availableBalance", new StringType());
 			query.addScalar("unit", new StringType());
-			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
+			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
 				final String entryName = entryDescriptor.getName();
 				query.addScalar(entryName + "_propertyId", new IntegerType());
 				query.addScalar(entryName + "_variableId", new IntegerType());
@@ -394,7 +395,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				final StudyEntryDto studyEntryDto =
 					new StudyEntryDto(entryId, entryNumber, entryCode, gid, designation, lotCount, availableBalance, unit);
 				final Map<String, StudyEntryPropertyData> variables = new HashMap<>();
-				for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
+				for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
 					final StudyEntryPropertyData studyEntryPropertyData =
 						new StudyEntryPropertyData((Integer) row.get(entryDescriptor.getName() + "_propertyId"),
 							(Integer) row.get(entryDescriptor.getName() + "_variableId"),
@@ -403,10 +404,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				}
 				//These elements should not be listed as germplasm descriptors, this is a way to match values between column
 				//and table cells. In the near future this block should be removed
-				variables.put("GID", new StudyEntryPropertyData(String.valueOf(studyEntryDto.getGid())));
-				variables.put("DESIGNATION", new StudyEntryPropertyData(studyEntryDto.getDesignation()));
-				variables.put("ENTRY_CODE", new StudyEntryPropertyData(studyEntryDto.getEntryCode()));
-				variables.put("ENTRY_NO", new StudyEntryPropertyData(String.valueOf(studyEntryDto.getEntryNumber())));
+				this.addFixedVariableIfPresent(TermId.GID, String.valueOf(studyEntryDto.getGid()), studyEntrySearchDto, variables);
+				this.addFixedVariableIfPresent(TermId.DESIG, studyEntryDto.getDesignation(), studyEntrySearchDto, variables);
+				this.addFixedVariableIfPresent(TermId.ENTRY_CODE, studyEntryDto.getEntryCode(), studyEntrySearchDto, variables);
+				this.addFixedVariableIfPresent(TermId.ENTRY_NO, String.valueOf(studyEntryDto.getEntryNumber()), studyEntrySearchDto,
+					variables);
 
 				studyEntryDto.setVariables(variables);
 				studyEntryDtos.add(studyEntryDto);
@@ -420,5 +422,15 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
-
+	private void addFixedVariableIfPresent(final TermId termId, final String value, final StudyEntrySearchDto studyEntrySearchDto,
+		final Map<String, StudyEntryPropertyData> variables) {
+		final Optional<MeasurementVariable>
+			entryCodeMV =
+			studyEntrySearchDto.getFixedEntryDescriptors().stream().filter(v -> v.getTermId() == termId.getId())
+				.findFirst();
+		if (entryCodeMV.isPresent()) {
+			variables.put(
+				entryCodeMV.get().getName(), new StudyEntryPropertyData(value));
+		}
+	}
 }

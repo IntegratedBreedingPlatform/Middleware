@@ -12,17 +12,21 @@ public class StudyEntrySearchDto {
 
 	private int studyId;
 
-	private List<MeasurementVariable> entryDescriptors;
+	//In the near future the fixed descriptors will be removed
+	private List<MeasurementVariable> fixedEntryDescriptors;
+
+	private List<MeasurementVariable> variableEntryDescriptors;
 
 	private Filter filter;
 
 	public StudyEntrySearchDto() {
 	}
 
-	public StudyEntrySearchDto(final int studyId, final List<MeasurementVariable> entryDescriptors,
-		final Filter filter) {
+	public StudyEntrySearchDto(final int studyId, final List<MeasurementVariable> fixedEntryDescriptors,
+		final List<MeasurementVariable> variableEntryDescriptors, final Filter filter) {
 		this.studyId = studyId;
-		this.entryDescriptors = entryDescriptors;
+		this.fixedEntryDescriptors = fixedEntryDescriptors;
+		this.variableEntryDescriptors = variableEntryDescriptors;
 		this.filter = filter;
 	}
 
@@ -61,12 +65,20 @@ public class StudyEntrySearchDto {
 		this.studyId = studyId;
 	}
 
-	public List<MeasurementVariable> getEntryDescriptors() {
-		return entryDescriptors;
+	public List<MeasurementVariable> getFixedEntryDescriptors() {
+		return fixedEntryDescriptors;
 	}
 
-	public void setEntryDescriptors(final List<MeasurementVariable> entryDescriptors) {
-		this.entryDescriptors = entryDescriptors;
+	public void setFixedEntryDescriptors(final List<MeasurementVariable> fixedEntryDescriptors) {
+		this.fixedEntryDescriptors = fixedEntryDescriptors;
+	}
+
+	public List<MeasurementVariable> getVariableEntryDescriptors() {
+		return variableEntryDescriptors;
+	}
+
+	public void setVariableEntryDescriptors(final List<MeasurementVariable> variableEntryDescriptors) {
+		this.variableEntryDescriptors = variableEntryDescriptors;
 	}
 
 	public Filter getFilter() {
