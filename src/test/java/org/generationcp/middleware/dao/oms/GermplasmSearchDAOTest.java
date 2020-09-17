@@ -42,10 +42,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 	private static final Integer GROUP_ID = 10;
@@ -104,7 +100,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsExactMatchGID() throws Exception {
+	public void testSearchForGermplasmsExactMatchGID() {
 		final List<Germplasm> results =
 				this.dao.searchForGermplasms(this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, false));
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
@@ -113,7 +109,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsExactMatchGermplasmName() throws Exception {
+	public void testSearchForGermplasmsExactMatchGermplasmName() {
 		final List<Germplasm> results =
 				this.dao.searchForGermplasms(this.createSearchParam(this.preferredName.getNval(), Operation.EQUAL, false, false, false));
 		Assert.assertEquals(
@@ -124,7 +120,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsStartsWithGID() throws Exception {
+	public void testSearchForGermplasmsStartsWithGID() {
 		final List<Germplasm> results = this.dao.searchForGermplasms(
 				this.createSearchParam(this.germplasmGID.toString() + "%", Operation.LIKE, false, false, false));
 		Assert.assertEquals(
@@ -135,7 +131,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsStartsWithGermplasmName() throws Exception {
+	public void testSearchForGermplasmsStartsWithGermplasmName() {
 
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 12, 13, 1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
@@ -152,7 +148,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 	@Ignore // FIXME IBP-2634
 	@Test
-	public void testSearchForGermplasmsContainsGID() throws Exception {
+	public void testSearchForGermplasmsContainsGID() {
 		final List<Germplasm> results = this.dao.searchForGermplasms(
 				this.createSearchParam("%" + this.germplasmGID.toString() + "%", Operation.LIKE, false, false, false));
 		Assert.assertEquals(
@@ -163,7 +159,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsContainsGermplasmName() throws Exception {
+	public void testSearchForGermplasmsContainsGermplasmName() {
 		final List<Germplasm> results = this.dao.searchForGermplasms(
 				this.createSearchParam("%" + this.preferredName.getNval() + "%", Operation.LIKE, false, false, false));
 		Assert.assertTrue(
@@ -174,7 +170,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsIncludeParents() throws Exception {
+	public void testSearchForGermplasmsIncludeParents() {
 
 		final Germplasm parentGermplasm =
 				GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
@@ -198,13 +194,13 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsEmptyKeyword() throws Exception {
+	public void testSearchForGermplasmsEmptyKeyword() {
 		final List<Germplasm> results = this.dao.searchForGermplasms(this.createSearchParam("", Operation.EQUAL, false, false, false));
 		Assert.assertTrue(results.isEmpty());
 	}
 
 	@Test
-	public void testSearchForGermplasmsIncludeMGMembers() throws Exception {
+	public void testSearchForGermplasmsIncludeMGMembers() {
 		final List<Germplasm> results =
 				this.dao.searchForGermplasms(this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, true));
 		Assert.assertEquals("The result should contain 2 germplasms (one is the actual result and the other is the MG member)", 2,
@@ -223,7 +219,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsWithAllAddedColumns() throws Exception {
+	public void testSearchForGermplasmsWithAllAddedColumns() {
 
 		final GermplasmSearchParameter searchParameter =
 				this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
@@ -258,7 +254,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsWithImmediateSourceGIDAndName() throws Exception {
+	public void testSearchForGermplasmsWithImmediateSourceGIDAndName() {
 		//Create a new germplasm with -1 gnpgs
 		final Germplasm germplasm = GermplasmTestDataInitializer
 				.createGermplasm(this.germplasmDate, this.femaleParentGID, this.maleParentGID, -1, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID, 1, 1,
@@ -285,7 +281,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsWithGermplasmDetailsColumnsOnly() throws Exception {
+	public void testSearchForGermplasmsWithGermplasmDetailsColumnsOnly() {
 
 		final GermplasmSearchParameter searchParameter =
 				this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
@@ -308,7 +304,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsWithMethodDetailsColumnsOnly() throws Exception {
+	public void testSearchForGermplasmsWithMethodDetailsColumnsOnly() {
 
 		final GermplasmSearchParameter searchParameter =
 				this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
@@ -331,7 +327,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsWithParentDetailsColumnsOnly() throws Exception {
+	public void testSearchForGermplasmsWithParentDetailsColumnsOnly() {
 
 		final GermplasmSearchParameter searchParameter =
 				this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
@@ -355,7 +351,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsWithAttributeTypeAddedColumnOnly() throws Exception {
+	public void testSearchForGermplasmsWithAttributeTypeAddedColumnOnly() {
 
 		final GermplasmSearchParameter searchParameter =
 				this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
@@ -375,7 +371,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsWithGermplasmNameTypeAddedColumnOnly() throws Exception {
+	public void testSearchForGermplasmsWithGermplasmNameTypeAddedColumnOnly() {
 
 		final GermplasmSearchParameter searchParameter =
 				this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);

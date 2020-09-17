@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 public class InventoryDataManagerImplTest {
 
-	public static final String UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
+	private static final String UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
 	private static final int CROP_PREFIX_LENGTH = 10;
 	private static final String SUFFIX_REGEX = "[a-zA-Z0-9]{" + InventoryDataManagerImpl.SUFFIX_LENGTH + "}";
 
@@ -60,7 +60,7 @@ public class InventoryDataManagerImplTest {
 		assertNotNull(lotId);
 		assertFalse(lotId.matches(UUID_REGEX));
 		assertEquals(this.crop.getPlotCodePrefix() + InventoryDataManagerImpl.MID_STRING, lotId.substring(0, CROP_PREFIX_LENGTH + 1));
-		final String suffix = lotId.substring(CROP_PREFIX_LENGTH + 1, lotId.length());
+		final String suffix = lotId.substring(CROP_PREFIX_LENGTH + 1);
 		assertTrue(suffix.matches(SUFFIX_REGEX));
 	}
 

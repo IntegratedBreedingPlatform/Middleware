@@ -7,10 +7,8 @@ import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
-import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -31,7 +29,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -70,7 +67,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	private IntegrationTestDataInitializer testDataInitializer;
 
 	private Integer germplasmListId;
-	private final Map<Integer, Transaction> listDataIdTransactionMap = new HashMap<Integer, Transaction>();
+	private final Map<Integer, Transaction> listDataIdTransactionMap = new HashMap<>();
 	private UserService userService;
 
 	@Before
@@ -89,12 +86,12 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		this.initializeGermplasmsListAndListData(this.germplasmMap);
 		this.initLotsAndTransactions(this.germplasmListId);
 
-		this.userService = new UserServiceImpl(workbenchSessionProvider);
+		this.userService = new UserServiceImpl(this.workbenchSessionProvider);
 
 	}
 
 	public UserService getUserService() {
-		return userService;
+		return this.userService;
 	}
 
 	public void setUserService(final UserService userService) {
@@ -115,7 +112,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetSimilarStockIdsEmptyListParam() {
-		final boolean emptyListParamCondition = this.dao.getSimilarStockIds(new ArrayList<String>()).isEmpty();
+		final boolean emptyListParamCondition = this.dao.getSimilarStockIds(new ArrayList<>()).isEmpty();
 		Assert.assertTrue("List of returned similar stock ids should be empty given empty list", emptyListParamCondition);
 	}
 
@@ -155,8 +152,8 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 		lots.clear();
 
-		final Map<Integer, Integer> lotIdLrecIdMap = new HashMap<Integer, Integer>();
-		final Map<Integer, Integer> gidLotIdMap = new HashMap<Integer, Integer>();
+		final Map<Integer, Integer> lotIdLrecIdMap = new HashMap<>();
+		final Map<Integer, Integer> gidLotIdMap = new HashMap<>();
 
 		this.germplasmListData = this.germplasmListManager.getGermplasmListDataByListId(germplasmListId);
 
@@ -197,7 +194,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments",
 			"InventoryId");
-		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
+		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
 
 		final String sDate1 = "01/01/2015";
 		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
@@ -258,7 +255,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1,
 			8264, 0, 1, "Comments", "ABC-1");
 
-		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
+		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
 
 		final String sDate1 = "01/01/2015";
 		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);

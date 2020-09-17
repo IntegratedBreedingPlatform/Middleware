@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GermplasmTestDataGenerator {
-	public static final Integer TEST_METHOD_ID = 101;
+	private static final Integer TEST_METHOD_ID = 101;
 	public static final String TEST_METHOD_NAME = "Single cross";
 
-	GermplasmDataManager germplasmDataManager;
+	private GermplasmDataManager germplasmDataManager;
 
 	public GermplasmTestDataGenerator(final GermplasmDataManager manager) {
 		this.germplasmDataManager = manager;
@@ -40,7 +40,7 @@ public class GermplasmTestDataGenerator {
 	public Germplasm createChildGermplasm(final Germplasm parentGermplasm, final String name) {
 		final CropType cropType = new CropType();
 		cropType.setUseUUID(false);
-		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName(name);
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName(name);
 		final Name preferredName = germplasm.getPreferredName();
 		preferredName.setGermplasmId(germplasm.getGid());
 
@@ -64,7 +64,7 @@ public class GermplasmTestDataGenerator {
 		return gids;
 	}
 
-	public Integer[] createGermplasmRecords(final int numberOfGermplasm, final String prefix)
+	Integer[] createGermplasmRecords(final int numberOfGermplasm, final String prefix)
 			throws MiddlewareQueryException {
 		final CropType cropType = new CropType();
 		cropType.setUseUUID(false);
@@ -87,7 +87,7 @@ public class GermplasmTestDataGenerator {
 		final List<Germplasm> germplasms = new ArrayList<>();
 
 		for (int i = 0; i < numberOfGermplasm; i++) {
-			final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName(prefix + i);
+			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName(prefix + i);
 			final Name preferredName = germplasm.getPreferredName();
 			preferredName.setGermplasmId(germplasm.getGid());
 			this.germplasmDataManager.addGermplasm(germplasm, preferredName, cropType);
@@ -100,7 +100,7 @@ public class GermplasmTestDataGenerator {
 	public Germplasm createGermplasm(final String prefix) throws MiddlewareQueryException {
 		final CropType cropType = new CropType();
 		cropType.setUseUUID(false);
-		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName(prefix);
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName(prefix);
 		final Name preferredName = germplasm.getPreferredName();
 		this.germplasmDataManager.addGermplasm(germplasm, preferredName, cropType);
 

@@ -515,7 +515,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final long result1 = this.dao.countMatchGermplasmInList(null);
 		Assert.assertEquals("The count should be zero because the gid list is null", 0, (int) result1);
 
-		final long result2 = this.dao.countMatchGermplasmInList(new HashSet<Integer>());
+		final long result2 = this.dao.countMatchGermplasmInList(new HashSet<>());
 		Assert.assertEquals("The count should be zero because the gid list is empty", 0, (int) result2);
 
 	}

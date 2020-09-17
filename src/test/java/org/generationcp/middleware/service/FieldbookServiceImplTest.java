@@ -97,7 +97,7 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.setGermplasmListManager(this.germplasmListManager);
 		this.fieldbookServiceImpl.setWorkbookSaver(this.workbookSaver);
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
-		Mockito.doReturn(this.query).when(this.session).createSQLQuery(Matchers.anyString());
+		Mockito.doReturn(this.query).when(this.session).createSQLQuery(ArgumentMatchers.anyString());
 		this.dbBroker.setSessionProvider(this.sessionProvider);
 		this.germplasms = this.createGermplasms();
 		this.listDataItems = this.createListDataItems();
@@ -177,7 +177,7 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.saveOrUpdateTrialDesignData(experimentPropertySaver, new ExperimentModel(), measurementData, termId);
 
 		Mockito.verify(experimentPropertySaver)
-			.saveOrUpdateProperty(ArgumentMatchers.any(ExperimentModel.class), ArgumentMatchers.eq(termId), Matchers.eq(cValueId));
+			.saveOrUpdateProperty(ArgumentMatchers.any(ExperimentModel.class), ArgumentMatchers.eq(termId), ArgumentMatchers.eq(cValueId));
 
 	}
 
@@ -199,7 +199,7 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.saveOrUpdateTrialDesignData(experimentPropertySaver, new ExperimentModel(), measurementData, termId);
 
 		Mockito.verify(experimentPropertySaver)
-			.saveOrUpdateProperty(ArgumentMatchers.any(ExperimentModel.class), ArgumentMatchers.eq(termId), Matchers.eq(value));
+			.saveOrUpdateProperty(ArgumentMatchers.any(ExperimentModel.class), ArgumentMatchers.eq(termId), ArgumentMatchers.eq(value));
 
 	}
 

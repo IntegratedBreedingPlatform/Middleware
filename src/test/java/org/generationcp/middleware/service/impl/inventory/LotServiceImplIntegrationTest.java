@@ -50,7 +50,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private static final int GROUP_ID = 0;
 
-	public static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
+	private static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -63,9 +63,9 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		this.transactionService = new TransactionServiceImpl(this.sessionProvder);
 		this.lotService = new LotServiceImpl(this.sessionProvder);
 		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.lotService.setTransactionService(transactionService);
+		this.lotService.setTransactionService(this.transactionService);
 		this.createGermplasm();
-		userId = this.findAdminUser();
+		this.userId = this.findAdminUser();
 		this.resolveStorageLocation();
 		this.createLot();
 		this.createTransactions();
@@ -73,20 +73,20 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void lotWithOpenBalanceClosed_Ok() {
-		this.lotService.closeLots(userId, Collections.singletonList(lot.getId()));
+		this.lotService.closeLots(this.userId, Collections.singletonList(this.lot.getId()));
 		final LotsSearchDto searchDto = new LotsSearchDto();
-		searchDto.setLotIds(Collections.singletonList(lot.getId()));
+		searchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 
 		final TransactionsSearchDto pendingTransactionSearch = new TransactionsSearchDto();
-		pendingTransactionSearch.setLotIds(Collections.singletonList(lot.getId()));
+		pendingTransactionSearch.setLotIds(Collections.singletonList(this.lot.getId()));
 		pendingTransactionSearch.setTransactionStatus(Collections.singletonList(TransactionStatus.PENDING.getIntValue()));
-		final List<TransactionDto> pendingTransactions = transactionService.searchTransactions(pendingTransactionSearch, null);
+		final List<TransactionDto> pendingTransactions = this.transactionService.searchTransactions(pendingTransactionSearch, null);
 
 		final TransactionsSearchDto discardedTransactionSearch = new TransactionsSearchDto();
-		discardedTransactionSearch.setLotIds(Collections.singletonList(lot.getId()));
+		discardedTransactionSearch.setLotIds(Collections.singletonList(this.lot.getId()));
 		discardedTransactionSearch.setTransactionTypes(Collections.singletonList(TransactionType.DISCARD.getId()));
-		final List<TransactionDto> discardedTransactions = transactionService.searchTransactions(discardedTransactionSearch, null);
+		final List<TransactionDto> discardedTransactions = this.transactionService.searchTransactions(discardedTransactionSearch, null);
 		discardedTransactions.sort((TransactionDto t1, TransactionDto t2) -> t2.getTransactionId().compareTo(t1.getTransactionId()));
 
 		assertThat(extendedLotDtos.get(0).getStatus(), hasToString(LotStatus.CLOSED.name()));
@@ -98,27 +98,27 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void lotWithNoOpenBalanceClosed_Ok() {
 		final Transaction confirmedWithdrawal =
-			new Transaction(null, userId, lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
+			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
 				-20D, "Transaction 3", 0, null, null, null,
-				Double.valueOf(0), userId, TransactionType.WITHDRAWAL.getId());
+				Double.valueOf(0), this.userId, TransactionType.WITHDRAWAL.getId());
 		this.daoFactory.getTransactionDAO().save(confirmedWithdrawal);
 
 		final TransactionsSearchDto discardedTransactionSearch = new TransactionsSearchDto();
-		discardedTransactionSearch.setLotIds(Collections.singletonList(lot.getId()));
+		discardedTransactionSearch.setLotIds(Collections.singletonList(this.lot.getId()));
 		discardedTransactionSearch.setTransactionTypes(Collections.singletonList(TransactionType.DISCARD.getId()));
 		final Integer discardedTrxsBeforeClosingLot = this.transactionService.searchTransactions(discardedTransactionSearch, null).size();
 
-		this.lotService.closeLots(userId, Collections.singletonList(lot.getId()));
+		this.lotService.closeLots(this.userId, Collections.singletonList(this.lot.getId()));
 		final Integer discardedTrxsAfterClosingLot = this.transactionService.searchTransactions(discardedTransactionSearch, null).size();
 
 		final LotsSearchDto searchDto = new LotsSearchDto();
-		searchDto.setLotIds(Collections.singletonList(lot.getId()));
+		searchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 
 		final TransactionsSearchDto pendingTransactionSearch = new TransactionsSearchDto();
-		pendingTransactionSearch.setLotIds(Collections.singletonList(lot.getId()));
+		pendingTransactionSearch.setLotIds(Collections.singletonList(this.lot.getId()));
 		pendingTransactionSearch.setTransactionStatus(Collections.singletonList(TransactionStatus.PENDING.getIntValue()));
-		final List<TransactionDto> pendingTransactions = transactionService.searchTransactions(pendingTransactionSearch, null);
+		final List<TransactionDto> pendingTransactions = this.transactionService.searchTransactions(pendingTransactionSearch, null);
 
 		assertThat(extendedLotDtos.get(0).getStatus(), hasToString(LotStatus.CLOSED.name()));
 		assertThat(extendedLotDtos.get(0).getAvailableBalance(), equalTo(0D));
@@ -133,26 +133,26 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(Integer.MIN_VALUE);
 		germplasm.setMgid(GROUP_ID);
 		this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
-		gid = germplasm.getGid();
+		this.gid = germplasm.getGid();
 	}
 
 	private void createLot() {
-		lot = new Lot(null, userId, EntityType.GERMPLSM.name(), gid, storageLocationId, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
+		this.lot = new Lot(null, this.userId, EntityType.GERMPLSM.name(), this.gid, this.storageLocationId, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
 			"Lot", RandomStringUtils.randomAlphabetic(35));
-		this.daoFactory.getLotDao().save(lot);
+		this.daoFactory.getLotDao().save(this.lot);
 	}
 
 	private void createTransactions() {
 
 		final Transaction confirmedDeposit =
-			new Transaction(null, userId, lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
+			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
 				20D, "Transaction 1", Util.getCurrentDateAsIntegerValue(), null, null, null,
-				Double.valueOf(0), userId, TransactionType.DEPOSIT.getId());
+				Double.valueOf(0), this.userId, TransactionType.DEPOSIT.getId());
 
 		final Transaction pendingDeposit =
-			new Transaction(null, userId, lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
+			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
 				20D, "Transaction 2", 0, null, null, null,
-				Double.valueOf(0), userId, TransactionType.DEPOSIT.getId());
+				Double.valueOf(0), this.userId, TransactionType.DEPOSIT.getId());
 
 		this.daoFactory.getTransactionDAO().save(confirmedDeposit);
 		this.daoFactory.getTransactionDAO().save(pendingDeposit);
@@ -160,8 +160,8 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void resolveStorageLocation() {
-		final Integer id = locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.name());
-		storageLocationId = this.daoFactory.getLocationDAO().getDefaultLocationByType(id).getLocid();
+		final Integer id = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.name());
+		this.storageLocationId = this.daoFactory.getLocationDAO().getDefaultLocationByType(id).getLocid();
 	}
 
 }

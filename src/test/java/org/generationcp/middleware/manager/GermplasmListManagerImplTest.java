@@ -59,7 +59,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	private static final String TEST_GERMPLASM_LIST_DESC = "TestGermplasmListDesc";
 	private static final long TEST_GERMPLASM_LIST_DATE = 20141103;
 	private static final String TEST_GERMPLASM_LIST_TYPE_LST = "LST";
-	private static final String GERMPLASM_PREFERRED_NAME_PREFIX = DataSetupTest.GERMPLSM_PREFIX + "PR-";
 	private static final Integer OWNER_ID = 1;
 
 	private static final int TEST_GERMPLASM_LIST_USER_ID = 1;
@@ -91,7 +90,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	private Integer lrecId;
 
 	private Germplasm testGermplasm;
-	private Germplasm parentGermplasm;
 	private DataSetupTest dataSetupTest;
 
 	@Before
@@ -431,9 +429,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testDeleteSelecteGermplasms() {
-		final int userId = 2;
-		final long noOfTestEntries = 3;
-		final long noOfCheckEntries = 4;
 		final List<Germplasm> germplasms = this.germplasmTestDataGenerator.createGermplasmsList(10, "Germ");
 		final List<Integer> gidsNews = (List<Integer>) CollectionUtils.collect(germplasms, TransformerUtils.invokerTransformer("getGid"));
 
@@ -477,16 +472,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		list.setStatus(GermplasmListManagerImplTest.STATUS_ACTIVE);
 		list.setProgramUUID(PROGRAM_UUID);
 		return list;
-	}
-
-	private FeatureMatcher<Germplasm, Boolean> isDeleted(final Matcher<Boolean> matcher) {
-		return new FeatureMatcher<Germplasm, Boolean>(matcher, "isDeleted", "isDeleted") {
-
-			@Override
-			protected Boolean featureValueOf(final Germplasm germplasm) {
-				return germplasm.getDeleted();
-			}
-		};
 	}
 
 	@Test

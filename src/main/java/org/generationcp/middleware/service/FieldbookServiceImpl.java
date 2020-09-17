@@ -299,7 +299,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer saveNurseryAdvanceGermplasmList(final List<Pair<Germplasm, List<Name>>> germplasms,
 			final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
-			final List<Pair<Germplasm, List<Attribute>>> germplasmAttributes, CropType cropType) {
+			final List<Pair<Germplasm, List<Attribute>>> germplasmAttributes, final CropType cropType) {
 
 		final GermplasmDAO germplasmDao = this.getGermplasmDao();
 		final GermplasmListDAO germplasmListDao = this.daoFactory.getGermplasmListDAO();
