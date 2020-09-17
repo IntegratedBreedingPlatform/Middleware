@@ -334,7 +334,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 			sqlQuery.append(" FROM stock s "
 				+ "       LEFT JOIN ims_lot l ON l.eid = s.dbxref_id and l.status = " + LotStatus.ACTIVE.getIntValue()
-				+ "       LEFT JOIN ims_transaction it ON l.lotid = it.lotid "
 				+ "       LEFT JOIN cvterm c ON c.cvterm_id = l.scaleid "
 				+ "       LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
 				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id "
