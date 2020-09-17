@@ -90,12 +90,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		final List<Integer> termsToRemove = Lists
 			.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
 				TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
-		for (Iterator<MeasurementVariable> i = entryDescriptors.iterator(); i.hasNext(); ) {
-			final MeasurementVariable measurementVariable = i.next();
-			if (termsToRemove.contains(measurementVariable.getTermId())) {
-				i.remove();
-			}
-		}
+		entryDescriptors.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
 
 		final List<StudyEntryDto> studyEntryDtos =
 			this.daoFactory.getStockDao().getStudyEntries(new StudyEntrySearchDto(studyId, entryDescriptors, filter), pageable);
