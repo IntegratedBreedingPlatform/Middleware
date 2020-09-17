@@ -316,7 +316,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "  IF(COUNT(DISTINCT IFNULL(l.scaleid, 'null')) = 1, IFNULL((SELECT SUM(CASE WHEN imt.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue()
 				+ "  OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue()
 				+  " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) "
-				+ "  FROM ims_transaction imt INNER JOIN ims_lot lo ON lo.lotid = imt.lotid WHERE lo.eid = l.eid),0), 'Mixed') AS available, "
+				+ "  FROM ims_transaction imt INNER JOIN ims_lot lo ON lo.lotid = imt.lotid WHERE lo.eid = l.eid),0), 'Mixed') AS availableBalance, "
 				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, IFNULL(c.name,'-'), 'Mixed') AS unit ");
 
 			final String entryClause = ",MAX(IF(cvterm_variable.name = '%s', sp.value, NULL)) AS '%s',"
@@ -359,7 +359,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.addScalar("designation", new StringType());
 			query.addScalar("entryCode", new StringType());
 			query.addScalar("lotCount", new IntegerType());
-			query.addScalar("available", new StringType());
+			query.addScalar("availableBalance", new StringType());
 			query.addScalar("unit", new StringType());
 			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
 				final String entryName = entryDescriptor.getName();
@@ -389,11 +389,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				final Integer gid = (Integer) row.get("gid");
 				final String designation = (String) row.get("designation");
 				final Integer lotCount = (Integer) row.get("lotCount");
-				final String available = (String) row.get("available");
+				final String availableBalance = (String) row.get("availableBalance");
 				final String unit = (String) row.get("unit");
 
 				final StudyEntryDto studyEntryDto =
-					new StudyEntryDto(entryId, entryNumber, entryCode, gid, designation, lotCount, available, unit);
+					new StudyEntryDto(entryId, entryNumber, entryCode, gid, designation, lotCount, availableBalance, unit);
 				final Map<String, StudyEntryPropertyData> variables = new HashMap<>();
 				for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getEntryDescriptors()) {
 					final StudyEntryPropertyData studyEntryPropertyData =

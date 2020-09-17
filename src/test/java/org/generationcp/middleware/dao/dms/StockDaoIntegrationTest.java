@@ -361,12 +361,12 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 
 		final StudyEntryDto studyEntryDtoGidMixed = studyEntryDtos.stream().filter(i->i.getGid().equals(gidMixed)).findAny().get();
 		Assert.assertEquals(studyEntryDtoGidMixed.getUnit(), "Mixed");
-		Assert.assertEquals(studyEntryDtoGidMixed.getAvailable(), "Mixed");
+		Assert.assertEquals(studyEntryDtoGidMixed.getAvailableBalance(), "Mixed");
 		Assert.assertEquals(studyEntryDtoGidMixed.getLotCount(), new Integer(2));
 
 		final StudyEntryDto studyEntryDtoGidUnique = studyEntryDtos.stream().filter(i->i.getGid().equals(gidUniqueUnit)).findAny().get();
 		Assert.assertEquals(studyEntryDtoGidUnique.getUnit(), units.get(0).getName());
-		Assert.assertEquals(studyEntryDtoGidUnique.getAvailable(), "60");
+		Assert.assertEquals(studyEntryDtoGidUnique.getAvailableBalance(), "60");
 		Assert.assertEquals(studyEntryDtoGidUnique.getLotCount(), new Integer(2));
 
 	}
