@@ -369,11 +369,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 			query.setParameter("studyId", studyEntrySearchDto.getStudyId());
-			if (studyEntrySearchDto.getFilter()!=null) {
-				if (studyEntrySearchDto.getFilter().getEntryNumbers()!=null && !studyEntrySearchDto.getFilter().getEntryNumbers().isEmpty()) {
+			if (studyEntrySearchDto.getFilter() != null) {
+				if (!CollectionUtils.isEmpty(studyEntrySearchDto.getFilter().getEntryNumbers())) {
 					query.setParameterList("entryNumbers", studyEntrySearchDto.getFilter().getEntryNumbers());
 				}
-				if (studyEntrySearchDto.getFilter().getEntryIds()!=null && !studyEntrySearchDto.getFilter().getEntryIds().isEmpty()) {
+				if (!CollectionUtils.isEmpty(studyEntrySearchDto.getFilter().getEntryIds())) {
 					query.setParameterList("entryIds", studyEntrySearchDto.getFilter().getEntryIds());
 				}
 			}
