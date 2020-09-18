@@ -87,7 +87,8 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	public List<StudyEntryDto> getStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 
 		final Integer plotDatasetId =
-			datasetService.getDatasets(studyId, new HashSet<>(Collections.singletonList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+			datasetService.getDatasets(studyId, new HashSet<>(Collections.singletonList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
+				.getDatasetId();
 
 		final List<MeasurementVariable> entryDescriptors =
 			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
@@ -103,7 +104,8 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 				Collectors.toList());
 
 		return
-			this.daoFactory.getStockDao().getStudyEntries(new StudyEntrySearchDto(studyId, fixedEntryDescriptors, variableEntryDescriptors, filter), pageable);
+			this.daoFactory.getStockDao()
+				.getStudyEntries(new StudyEntrySearchDto(studyId, fixedEntryDescriptors, variableEntryDescriptors, filter), pageable);
 	}
 
 	@Override
@@ -198,11 +200,8 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	public Optional<StudyEntryPropertyData> getStudyEntryPropertyData(final int studyEntryPropertyId) {
 		final StockProperty stockProperty = this.daoFactory.getStockPropertyDao().getById(studyEntryPropertyId);
 		if (stockProperty != null) {
-			final StudyEntryPropertyData studyEntryPropertyData = new StudyEntryPropertyData();
-			studyEntryPropertyData.setVariableId(stockProperty.getTypeId());
-			studyEntryPropertyData.setStudyEntryPropertyId(stockProperty.getStockPropId());
-			studyEntryPropertyData.setValue(stockProperty.getValue());
-			return Optional.of(studyEntryPropertyData);
+			return Optional
+				.of(new StudyEntryPropertyData(stockProperty.getStockPropId(), stockProperty.getTypeId(), stockProperty.getValue()));
 		}
 		return Optional.empty();
 	}
