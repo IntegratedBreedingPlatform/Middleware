@@ -957,9 +957,11 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
         final Boolean withAnalyzedDataOnly = germplasmSearchRequest.getWithAnalyzedDataOnly();
         if (withAnalyzedDataOnly != null) {
-            // TODO
-            paramBuilder.append("");
-            paramBuilder.setParameter("withAnalyzedDataOnly", withAnalyzedDataOnly);
+            paramBuilder.append(" and exists(select 1 from project filter_project" //
+                + " inner join nd_experiment filter_nde on filter_project.project_id = filter_nde.project_id" //
+                + " inner join stock filter_stock on filter_nde.stock_id = filter_stock.stock_id" //
+                + " where filter_stock.dbxref_id = g.gid "  //
+                + "   and filter_project.dataset_type_id =  " + DatasetTypeEnum.MEANS_DATA.getId() + ") \n ");
         }
 
         final Boolean withSampleOnly = germplasmSearchRequest.getWithSampleOnly();
