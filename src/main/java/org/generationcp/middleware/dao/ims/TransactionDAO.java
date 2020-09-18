@@ -785,5 +785,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			paramBuilder.append(" and entryType like :entryType ");
 			paramBuilder.setParameter("entryType", "%" + entryType + "%");
 		}
+
+		final List<Integer> observationUnitIds = studyTransactionsRequest.getObservationUnitIds();
+		if (observationUnitIds != null && !observationUnitIds.isEmpty()) {
+			paramBuilder.append(" and ndExperimentId in (:observationUnitList) ");
+			paramBuilder.setParameterList("observationUnitList", observationUnitIds);
+		}
 	}
 }

@@ -58,40 +58,6 @@ public class InventoryDetailsTestDataInitializer {
 	}
 
 	/**
-	 * This method creates set of transactions with the following parameters:
-	 * 
-	 * @param lots
-	 * @param listId
-	 * @param lotIdLrecIdMap - Map of Lot Id and Germplasm List Data Id
-	 * @param inventoryIdPrefix
-	 * @return
-	 */
-	public List<Transaction> createTransactions(final List<Lot> lots, final Integer listId, final Map<Integer, Integer> lotIdLrecIdMap,
-			final String inventoryIdPrefix, final Integer type) {
-		final List<Transaction> transactions = new ArrayList<>();
-
-		for (final Lot lot : lots) {
-			lot.setStockId(inventoryIdPrefix + lot.getId());
-
-			final Transaction transaction = new Transaction();
-			transaction.setUserId(USER_ID);
-			transaction.setPersonId(PERSON_ID);
-			transaction.setLot(lot);
-			transaction.setTransactionDate(new Date(20160101));
-			transaction.setStatus(0);
-			transaction.setQuantity(Math.random() * lots.size());
-			transaction.setSourceType(LIST_SOURCE_TYPE);
-			transaction.setSourceRecordId(lotIdLrecIdMap.get(lot.getId()));
-			transaction.setSourceId(listId);
-			transaction.setType(type);
-
-			transactions.add(transaction);
-		}
-
-		return transactions;
-	}
-
-	/**
 	 * This method creates set of reserved transactions with the following parameters:
 	 *
 	 * @param lots
@@ -125,7 +91,8 @@ public class InventoryDetailsTestDataInitializer {
 		return transactions;
 	}
 
-	public static Transaction createReservationTransaction(
+	//FIXME This function is not needed, just call the constructor o create a new one
+	public static Transaction createTransaction(
 		final Double quantity, final Integer status, final String comments, final Lot lot, final Integer personId,
 		final Integer sourceId, final Integer sourceRecordId, final String sourceType, final Integer type) {
 		final Transaction transaction = new Transaction();
@@ -142,25 +109,7 @@ public class InventoryDetailsTestDataInitializer {
 		return transaction;
 	}
 
-	public static Transaction createDepositTransaction(
-		final Double quantity, final Integer status, final String comments, final Lot lot, final Integer personId,
-			final Integer sourceId, final Integer sourceRecordId, final String sourceType, final String inventoryID){
-		final Transaction transaction = new Transaction();
-		transaction.setQuantity(quantity);
-		transaction.setStatus(status);
-		transaction.setComments(comments);
-		transaction.setLot(lot);
-		transaction.setPersonId(personId);
-		transaction.setSourceId(sourceId);
-		transaction.setSourceRecordId(sourceRecordId);
-		transaction.setSourceType(sourceType);
-		lot.setStockId(inventoryID);
-
-		return  transaction;
-	}
-
-
-
+	//FIXME This function is not needed, just call the constructor o create a new one
 	public static Lot createLot(
 		final Integer userId, final String entityType, final Integer entityId, final Integer locationId, final Integer scaleId,
 		final Integer status,
