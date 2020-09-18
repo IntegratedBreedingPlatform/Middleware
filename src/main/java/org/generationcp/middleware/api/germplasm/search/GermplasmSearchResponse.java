@@ -6,6 +6,7 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Map;
+import java.util.Objects;
 
 @AutoProperty
 public class GermplasmSearchResponse {
@@ -59,7 +60,9 @@ public class GermplasmSearchResponse {
 		final GermplasmInventory inventoryInfo = germplasm.getInventoryInfo();
 		if (inventoryInfo != null) {
 			this.stockIds = inventoryInfo.getStockIDs();
-			this.availableBalance = inventoryInfo.getAvailable();
+			// TODO units
+			// this.availableBalance = inventoryInfo.getAvailable();
+			this.availableBalance = Objects.toString(inventoryInfo.getTotalAvailableBalance(), "-");
 		}
 		this.methodName = germplasm.getMethodName();
 		this.locationName = germplasm.getLocationName();
