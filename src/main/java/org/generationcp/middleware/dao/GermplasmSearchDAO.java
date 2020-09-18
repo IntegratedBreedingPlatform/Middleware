@@ -1124,7 +1124,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                                 + String.format(" straight_join germplsm P%s on PGROUP%s.gnpgs > 0", i, prev)
                                 + String.format("  and PGROUP%s.gpid1 != 0 and PGROUP%s.gpid2 != 0", prev, prev)
                                 + String.format("  and (P%s.gid = PGROUP%s.gpid1 or P%s.gid = PGROUP%s.gpid2) \n ", i, prev, i, prev));
-                            // TODO other progenitors
+                            /*
+                             * trying to include other progenitors associated with PGROUP won't perform well here:
+                             *    or PGROUP%s.gnpgs > 2 and exists(select 1 from progntrs ...
+                             */
                             i++;
                         }
                         queryBuilder.append(" where P0.gid in (:gids) \n ");
