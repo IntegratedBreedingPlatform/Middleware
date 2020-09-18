@@ -4,6 +4,17 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
+	<changeSet author="cuenyad" id="v16.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_sidebar_category_link_role" />
+		</preConditions>
+		<comment>
+			drop the workbench_sidebar_category_link_role table.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE workbench_sidebar_category_link_role;
+		</sql>
+	</changeSet>
 	<changeSet author="diego" id="v16.1.0-2">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1"> select count(rp.role_id) > 0 from role_permission rp inner join permission p on rp.permission_id = p.permission_id where p.name = 'BREEDING_ACTIVITIES'</sqlCheck>
@@ -309,23 +320,23 @@
         </preConditions>
         <comment>Refactor permissions</comment>
         <sql dbms="mysql" splitStatements="true">
-        	set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'BREEDING_ACTIVITIES'); 
+        	set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'BREEDING_ACTIVITIES');
 			UPDATE permission SET description = 'Germplasm', name= 'GERMPLASM' WHERE permission_id = @permission_id;
-			
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'INFORMATION_MANAGEMENT'); 
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'INFORMATION_MANAGEMENT');
 			UPDATE permission SET description = 'Studies', name= 'STUDIES' WHERE permission_id = @permission_id;
-			
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'STATISTICAL_ANALYSIS'); 
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'STATISTICAL_ANALYSIS');
 			UPDATE permission SET description = 'Lists', name= 'LISTS' WHERE permission_id = @permission_id;
-			
+
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_GENOTYPING_DATA');
         	set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING');
 			UPDATE permission SET description = 'Low Density', name= 'LOW_DENSITY' , parent_id = @parent_id WHERE permission_id = @permission_id;
-			
+
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_SAMPLES');
 			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'LISTS');
 			UPDATE permission SET description = 'Samples Lists', name= 'SAMPLE_LISTS', parent_id = @parent_id WHERE permission_id = @permission_id;
-			
+
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'GRAPHICAL_QUERIES');
 			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES');
 			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
@@ -333,27 +344,27 @@
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING');
 			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'CROP_MANAGEMENT');
 			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-			
+
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_STUDIES');
 			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'STUDIES');
 			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-			
+
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'HEAD_TO_HEAD_QUERY');
 			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES');
 			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-			
+
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MULTI_TRAIT_QUERY');
 			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES');
 			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-			
+
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'SINGLE_SITE_ANALYSIS');
 			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'STUDIES');
 			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-			
+
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MULTI_SITE_ANALYSIS');
 			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'STUDIES');
 			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-			
+
 			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'IMPORT_GERMPLASM');
 			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'GERMPLASM');
 			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
