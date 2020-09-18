@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -721,7 +722,11 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 }
             }
 
-            addPaginationToSQLQuery(query, pageable);
+            /*
+             * The outer query does not apply PAGINATION.
+             * It will return a PAGE of results + associated gids (e.g pedigree, group members),
+             * which don't count for the Total results
+             */
             query.setParameterList("gids", gids);
 
             final List<Object[]> result = query.list();
