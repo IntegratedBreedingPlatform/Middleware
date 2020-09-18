@@ -21,13 +21,28 @@ public class StudyEntryDto {
 
 	private String designation;
 
-	private Integer lots;
+	private Integer lotCount;
 
-	private String available;
+	private String availableBalance;
 
 	private String unit;
 
 	private Map<String, StudyEntryPropertyData> variables = new HashMap<>();
+
+	public StudyEntryDto(){
+
+	}
+
+	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final String entryCode, final Integer gid, final String designation, final Integer lotCount, final String availableBalance, final String unit){
+		this.entryId = entryId;
+		this.entryNumber = entryNumber;
+		this.entryCode = entryCode;
+		this.gid = gid;
+		this.designation = designation;
+		this.lotCount = lotCount;
+		this.availableBalance = availableBalance;
+		this.unit = unit;
+	}
 
 	public Integer getEntryId() {
 		return entryId;
@@ -69,20 +84,20 @@ public class StudyEntryDto {
 		this.entryCode = entryCode;
 	}
 
-	public Integer getLots() {
-		return lots;
+	public Integer getLotCount() {
+		return lotCount;
 	}
 
-	public void setLots(final Integer lots) {
-		this.lots = lots;
+	public void setLotCount(final Integer lotCount) {
+		this.lotCount = lotCount;
 	}
 
-	public String getAvailable() {
-		return available;
+	public String getAvailableBalance() {
+		return availableBalance;
 	}
 
-	public void setAvailable(final String available) {
-		this.available = available;
+	public void setAvailableBalance(final String availableBalance) {
+		this.availableBalance = availableBalance;
 	}
 
 	public String getUnit() {

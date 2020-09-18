@@ -411,5 +411,5 @@ public interface DatasetService {
 	 */
 	List<InstanceDetailsDTO> getInstanceDetails(Integer datasetId, Integer studyId);
 
-	void replaceObservationUnitEntry(List<Integer> observationUnits, Integer newEntryId);
+	void replaceObservationUnitEntry(List<Integer> observationUnitIds, Integer newEntryId);
 }
