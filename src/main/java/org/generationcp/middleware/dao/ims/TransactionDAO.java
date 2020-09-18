@@ -28,7 +28,12 @@ import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanConstructorResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -41,7 +46,13 @@ import org.springframework.data.domain.Sort;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -655,7 +666,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	public List<StudyTransactionsDto> searchStudyTransactions(
 		final Integer studyId,
-		final StudyTransactionsRequest studyTransactionsRequest) {
+		final StudyTransactionsRequest studyTransactionsRequest, final Pageable pageable) {
 
 		final TransactionsSearchDto transactionsSearch = studyTransactionsRequest.getTransactionsSearch();
 
@@ -663,7 +674,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQueryFilterSql), studyTransactionsRequest);
 
 		final StringBuilder transactionsQuerySql = this.buildStudyTransactionsQuery(transactionsSearch, obsUnitsQueryFilterSql);
-		addSortedPageRequestOrderBy(transactionsQuerySql, studyTransactionsRequest.getSortedPageRequest());
+		addPageRequestOrderBy(transactionsQuerySql, pageable);
 
 		// transactions data
 		final SQLQuery transactionsQuery = this.getSession().createSQLQuery(transactionsQuerySql.toString());
@@ -672,7 +683,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		addSearchTransactionsFilters(paramBuilder, transactionsSearch);
 		addObsUnitFilters(paramBuilder, studyTransactionsRequest);
 		this.excludeCancelledTransactions(paramBuilder);
-		addSortedPageRequestPagination(transactionsQuery, studyTransactionsRequest.getSortedPageRequest());
+		addPaginationToSQLQuery(transactionsQuery, pageable);
 		this.addSearchTransactionsQueryScalars(transactionsQuery);
 		transactionsQuery.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getStudyTransactionsDtoConstructor()));
 		final List<StudyTransactionsDto> transactions = transactionsQuery.list();
@@ -773,6 +784,12 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		if (!StringUtils.isBlank(entryType)) {
 			paramBuilder.append(" and entryType like :entryType ");
 			paramBuilder.setParameter("entryType", "%" + entryType + "%");
+		}
+
+		final List<Integer> observationUnitIds = studyTransactionsRequest.getObservationUnitIds();
+		if (observationUnitIds != null && !observationUnitIds.isEmpty()) {
+			paramBuilder.append(" and ndExperimentId in (:observationUnitList) ");
+			paramBuilder.setParameterList("observationUnitList", observationUnitIds);
 		}
 	}
 }

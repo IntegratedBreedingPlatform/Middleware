@@ -31,15 +31,20 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
-import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 
@@ -255,7 +260,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		this.manager.addLots(Lists.<Lot>newArrayList(lot));
 
 		final Transaction transaction = InventoryDetailsTestDataInitializer
-			.createReservationTransaction(
+			.createTransaction(
 				2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
 		this.manager.addTransactions(Lists.<Transaction>newArrayList(transaction));
 
@@ -288,13 +293,13 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 			"InventoryId");
 		final Lot lotTwo = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Second Lot for Gemrplasm",
 			"InventoryId");
-		this.manager.addLots(Lists.<Lot>newArrayList(lotOne, lotTwo));
+		this.manager.addLots(Lists.newArrayList(lotOne, lotTwo));
 
 
 		final Transaction depositTransactionForLotOne =  InventoryDetailsTestDataInitializer
-				.createDepositTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lotOne, 1, 1, germplasmListData.getId(), "LIST", "StockID1");
+				.createTransaction(5.0, TransactionStatus.PENDING.getIntValue(), TransactionType.DEPOSIT.getValue(), lotOne, 1, 1, germplasmListData.getId(), "LIST", TransactionType.DEPOSIT.getId());
 		final Transaction depositTransactionForLotTwo =  InventoryDetailsTestDataInitializer
-				.createDepositTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lotTwo, 1, 1, germplasmListData.getId(), "LIST", "StockID2");
+				.createTransaction(5.0, TransactionStatus.PENDING.getIntValue(), TransactionType.DEPOSIT.getValue(), lotTwo, 1, 1, germplasmListData.getId(), "LIST", TransactionType.DEPOSIT.getId());
 		this.manager.addTransactions(Lists.<Transaction>newArrayList(depositTransactionForLotOne, depositTransactionForLotTwo));
 
 

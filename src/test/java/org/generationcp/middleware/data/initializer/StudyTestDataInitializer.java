@@ -306,14 +306,6 @@ public class StudyTestDataInitializer {
 		return this.gid;
 	}
 
-	public Integer getStockId() {
-		return stockId;
-	}
-
-	public Integer getGeolocationId() {
-		return geolocationId;
-	}
-
 	public Integer addTestLocation(final String locationName) {
 		final Location location = new Location();
 		location.setCntryid(1);
