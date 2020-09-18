@@ -13,7 +13,7 @@ public class GermplasmSearchResponse {
 	// canonical columns
 
 	private int gid;
-	private String groupId;
+	private Integer groupId;
 	private String names;
 	private String methodName;
 	private String locationName;
@@ -54,6 +54,7 @@ public class GermplasmSearchResponse {
 		this();
 
 		this.gid = germplasm.getGid();
+		this.groupId = germplasm.getMgid();
 		this.names = germplasm.getGermplasmNamesString();
 		final GermplasmInventory inventoryInfo = germplasm.getInventoryInfo();
 		if (inventoryInfo != null) {
@@ -85,11 +86,11 @@ public class GermplasmSearchResponse {
 		this.gid = gid;
 	}
 
-	public String getGroupId() {
+	public Integer getGroupId() {
 		return this.groupId;
 	}
 
-	public void setGroupId(final String groupId) {
+	public void setGroupId(final Integer groupId) {
 		this.groupId = groupId;
 	}
 
