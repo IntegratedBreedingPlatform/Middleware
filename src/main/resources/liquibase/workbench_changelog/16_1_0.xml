@@ -407,11 +407,18 @@
 	<changeSet author="diego" id="v16.1.0-22">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
-            	SELECT DISTINCT(COUNT(1)) > 0 FROM role_permission rp
+				SELECT
+					COUNT(DISTINCT 1) > 0
+				FROM
+					(SELECT
+						rp.role_id AS rid
+					FROM
+						role_permission rp
 					INNER JOIN permission p ON rp.permission_id = p.permission_id
-					WHERE p.name in ('GRAPHICAL_QUERIES','HEAD_TO_HEAD_QUERY','MULTI_TRAIT_QUERY')
-    				GROUP BY rp.role_id
-    				HAVING COUNT(DISTINCT p.permission_id) = 3
+					WHERE
+						p.name IN ('GRAPHICAL_QUERIES','HEAD_TO_HEAD_QUERY','MULTI_TRAIT_QUERY')
+					GROUP BY rp.role_id
+					HAVING COUNT(DISTINCT p.permission_id) = 3) AS role
             </sqlCheck>
         </preConditions>
         <comment>Regroup permissions for Queries in role_permission table</comment>
@@ -437,11 +444,18 @@
 	<changeSet author="diego" id="v16.1.0-23">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
-            	SELECT COUNT(1) > 0 FROM role_permission rp
+            	SELECT
+					COUNT(DISTINCT 1) > 0
+				FROM
+					(SELECT
+						rp.role_id AS rid
+					FROM
+						role_permission rp
 					INNER JOIN permission p ON rp.permission_id = p.permission_id
-					WHERE p.name in ('MANAGE_GERMPLASM','IMPORT_GERMPLASM')
-    				GROUP BY rp.role_id
-    				HAVING COUNT(DISTINCT p.permission_id) = 2
+					WHERE
+						p.name IN ('MANAGE_GERMPLASM' , 'IMPORT_GERMPLASM')
+					GROUP BY rp.role_id
+					HAVING COUNT(DISTINCT p.permission_id) = 2) AS role
     		</sqlCheck>
         </preConditions>
         <comment>Regroup permissions for Germplasm in role_permission table</comment>
@@ -468,11 +482,18 @@
 	<changeSet author="diego" id="v16.1.0-24">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
-            	SELECT DISTINCT(COUNT(1)) > 0 FROM role_permission rp
+				SELECT
+					COUNT(DISTINCT 1) > 0
+				FROM
+					(SELECT
+						rp.role_id AS rid
+					FROM
+						role_permission rp
 					INNER JOIN permission p ON rp.permission_id = p.permission_id
-					WHERE p.name in ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS')
-    				GROUP BY rp.role_id
-    				HAVING COUNT(DISTINCT p.permission_id) = 5
+					WHERE
+						p.name IN ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS')
+					GROUP BY rp.role_id
+					HAVING COUNT(DISTINCT p.permission_id) = 5) AS role
             </sqlCheck>
         </preConditions>
         <comment>Regroup permissions for Studies in role_permission table</comment>
