@@ -21,7 +21,7 @@ public interface StudyGermplasmService {
 
 	void deleteStudyEntries(int studyId);
 
-	List<StudyGermplasmDto> saveStudyGermplasm(Integer studyId, List<StudyGermplasmDto> studyGermplasmDtoList);
+	List<StudyGermplasmDto> saveStudyEntries(Integer studyId, List<StudyGermplasmDto> studyGermplasmDtoList);
 
 	long countStudyGermplasmByEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
 
@@ -29,4 +29,7 @@ public interface StudyGermplasmService {
 
 	StudyGermplasmDto replaceStudyGermplasm(int studyId, int entryId, int gid, String crossExpansion);
 
+	void updateStudyEntryProperty(int studyId, StudyEntryPropertyData studyEntryPropertyData);
+
+	Optional<StudyEntryPropertyData> getStudyEntryPropertyData(int studyEntryPropertyId);
 }

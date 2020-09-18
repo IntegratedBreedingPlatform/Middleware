@@ -18,6 +18,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.springframework.data.domain.Pageable;
@@ -86,7 +87,8 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	public List<StudyEntryDto> getStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 
 		final Integer plotDatasetId =
-			datasetService.getDatasets(studyId, new HashSet<>(Collections.singletonList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+			datasetService.getDatasets(studyId, new HashSet<>(Collections.singletonList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
+				.getDatasetId();
 
 		final List<MeasurementVariable> entryDescriptors =
 			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
@@ -101,10 +103,10 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 			entryDescriptors.stream().filter(d -> !REMOVABLE_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
 				Collectors.toList());
 
-		return this.daoFactory.getStockDao()
-			.getStudyEntries(new StudyEntrySearchDto(studyId, fixedEntryDescriptors, variableEntryDescriptors, filter), pageable);
+		return
+			this.daoFactory.getStockDao()
+				.getStudyEntries(new StudyEntrySearchDto(studyId, fixedEntryDescriptors, variableEntryDescriptors, filter), pageable);
 	}
-
 
 	@Override
 	public List<StudyGermplasmDto> getGermplasmFromPlots(final int studyBusinessIdentifier, final Set<Integer> plotNos) {
@@ -122,7 +124,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public List<StudyGermplasmDto> saveStudyGermplasm(final Integer studyId, final List<StudyGermplasmDto> studyGermplasmDtoList) {
+	public List<StudyGermplasmDto> saveStudyEntries(final Integer studyId, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 		final List<StudyGermplasmDto> list = new ArrayList<>();
 		for (final StudyGermplasmDto studyGermplasm : studyGermplasmDtoList) {
 			final StockModel stockModel = this.daoFactory.getStockDao().saveOrUpdate(new StockModel(studyId, studyGermplasm));
@@ -178,11 +180,30 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		// Save also Group GID
 		newStudyGermplasm.setGroupId(newGermplasm.getMgid());
 
-		final StudyGermplasmDto savedStudyGermplasm = this.saveStudyGermplasm(studyId, Collections.singletonList(newStudyGermplasm)).get(0);
+		final StudyGermplasmDto savedStudyGermplasm = this.saveStudyEntries(studyId, Collections.singletonList(newStudyGermplasm)).get(0);
 		stockDao.replaceExperimentStocks(entryId, savedStudyGermplasm.getEntryId());
 		// Finally delete old stock
 		stockDao.makeTransient(stock);
 		return savedStudyGermplasm;
+	}
+
+	@Override
+	public void updateStudyEntryProperty(final int studyId, final StudyEntryPropertyData studyEntryPropertyData) {
+		final StockProperty stockProperty = this.daoFactory.getStockPropertyDao().getById(studyEntryPropertyData.getStudyEntryPropertyId());
+		if (stockProperty != null) {
+			stockProperty.setValue(studyEntryPropertyData.getValue());
+			this.daoFactory.getStockPropertyDao().saveOrUpdate(stockProperty);
+		}
+	}
+
+	@Override
+	public Optional<StudyEntryPropertyData> getStudyEntryPropertyData(final int studyEntryPropertyId) {
+		final StockProperty stockProperty = this.daoFactory.getStockPropertyDao().getById(studyEntryPropertyId);
+		if (stockProperty != null) {
+			return Optional
+				.of(new StudyEntryPropertyData(stockProperty.getStockPropId(), stockProperty.getTypeId(), stockProperty.getValue()));
+		}
+		return Optional.empty();
 	}
 
 	private String findStockPropValue(final Integer termId, final Set<StockProperty> properties) {
