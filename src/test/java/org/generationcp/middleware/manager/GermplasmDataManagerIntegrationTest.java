@@ -24,7 +24,11 @@ import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
-import org.generationcp.middleware.data.initializer.*;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
+import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
+import org.generationcp.middleware.data.initializer.ProgramFavoriteTestDataInitializer;
+import org.generationcp.middleware.data.initializer.UserDefinedFieldTestDataInitializer;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -910,7 +914,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 		final Transaction transaction =
 			InventoryDetailsTestDataInitializer
-				.createReservationTransaction(2.0, 0, "2 reserved", lot, 1, 1, 1, "LIST", TransactionType.WITHDRAWAL.getId());
+				.createTransaction(2.0, 0, "2 reserved", lot, 1, 1, 1, "LIST", TransactionType.WITHDRAWAL.getId());
 		this.transactionDAO.save(transaction);
 
 		final GermplasmSearchParameter searchParameter =

@@ -17,6 +17,8 @@ public class StudyTransactionsRequest {
 	private List<Integer> plotNoList;
 	private String entryType;
 	private List<Integer> entryNoList;
+	private List<Integer> observationUnitIds;
+
 	private String draw;
 
 	public TransactionsSearchDto getTransactionsSearch() {
@@ -57,6 +59,14 @@ public class StudyTransactionsRequest {
 
 	public void setEntryNoList(final List<Integer> entryNoList) {
 		this.entryNoList = entryNoList;
+	}
+
+	public List<Integer> getObservationUnitIds() {
+		return observationUnitIds;
+	}
+
+	public void setObservationUnitIds(final List<Integer> observationUnitIds) {
+		this.observationUnitIds = observationUnitIds;
 	}
 
 	public String getDraw() {

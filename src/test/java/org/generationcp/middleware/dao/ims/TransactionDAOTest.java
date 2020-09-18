@@ -7,10 +7,8 @@ import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
-import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -30,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -199,7 +196,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
 		final Transaction depositTransaction =
 			InventoryDetailsTestDataInitializer
-				.createReservationTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST",
+				.createTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST",
 					TransactionType.DEPOSIT.getId());
 		depositTransaction.setTransactionDate(date1);
 		depositTransaction.setUserId(user.getUserid());
@@ -208,7 +205,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate2);
 		final Transaction closedTransaction =
 			InventoryDetailsTestDataInitializer
-				.createReservationTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST", TransactionType.DISCARD.getId());
+				.createTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST", TransactionType.DISCARD.getId());
 		closedTransaction.setTransactionDate(date2);
 		closedTransaction.setUserId(user.getUserid());
 
@@ -257,7 +254,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final String sDate1 = "01/01/2015";
 		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
 		final Transaction depositTransaction =
-			InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, "Deposit", lot, 1,
+			InventoryDetailsTestDataInitializer.createTransaction(5.0, 0, "Deposit", lot, 1,
 				1, 1, "LIST", TransactionType.DEPOSIT.getId());
 		depositTransaction.setType(TransactionType.DEPOSIT.getId());
 		depositTransaction.setTransactionDate(date1);
@@ -266,7 +263,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final String sDate2 = "10/10/2015";
 		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate2);
 		final Transaction closedTransaction =
-			InventoryDetailsTestDataInitializer.createReservationTransaction(-5.0, 1, "Discard", lot, 1,
+			InventoryDetailsTestDataInitializer.createTransaction(-5.0, 1, "Discard", lot, 1,
 				1, 1, "LIST", TransactionType.DEPOSIT.getId());
 		closedTransaction.setType(TransactionType.DISCARD.getId());
 		closedTransaction.setTransactionDate(date2);

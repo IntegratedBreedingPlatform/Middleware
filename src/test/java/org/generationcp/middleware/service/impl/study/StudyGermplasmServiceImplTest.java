@@ -115,13 +115,13 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountStudyGermplasm() {
-		Assert.assertEquals(StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM.intValue(), this.service.countStudyGermplasm(this.studyId));
+		Assert.assertEquals(StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM.intValue(), this.service.countStudyEntries(this.studyId));
 	}
 
 	@Test
 	public void testDeleteStudyGermplasm() {
-		this.service.deleteStudyGermplasm(this.studyId);
-		Assert.assertTrue(this.service.countStudyGermplasm(this.studyId) == 0);
+		this.service.deleteStudyEntries(this.studyId);
+		Assert.assertTrue(this.service.countStudyEntries(this.studyId) == 0);
 	}
 
 	@Test
@@ -133,7 +133,7 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(1, addedStudyGermplasmList.size());
 		final StudyGermplasmDto dto = addedStudyGermplasmList.get(0);
 		this.verifyStudyGermplasmDetails(gid, index, dto);
-		Assert.assertEquals(index, this.service.countStudyGermplasm(this.studyId));
+		Assert.assertEquals(index, this.service.countStudyEntries(this.studyId));
 	}
 
 	@Test
