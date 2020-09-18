@@ -783,7 +783,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
          */
 
         gids.addAll(this.retrievePedigreeGids(gids, germplasmSearchRequest));
-        gids.addAll(this.retrieveGroupGids(gids, germplasmSearchRequest));
+        if (germplasmSearchRequest.isIncludeGroupMembers()) {
+            gids.addAll(this.retrieveGIDGroupMemberResults(new HashSet<>(gids)));
+        }
 
         return gids;
     }
@@ -1175,13 +1177,5 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         sqlQuery.setParameterList("gids", gids);
 
         return sqlQuery.list();
-    }
-
-    private List<Integer> retrieveGroupGids(final List<Integer> gids, final GermplasmSearchRequest germplasmSearchRequest) {
-        if (germplasmSearchRequest.isIncludeGroupMembers()) {
-            // TODO
-        }
-
-        return Collections.EMPTY_LIST;
     }
 }
