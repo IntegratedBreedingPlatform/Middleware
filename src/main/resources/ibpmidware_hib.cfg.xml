@@ -69,7 +69,6 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.UserInfo"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLinkRole"/>
         <mapping class="org.generationcp.middleware.pojos.naming.NamingConfiguration"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.CropPerson"/>
          <mapping class="org.generationcp.middleware.pojos.workbench.RPackage"/>

@@ -1,29 +1,35 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+//TODO rename to StudyEntryService
 public interface StudyGermplasmService {
 
-	List<StudyGermplasmDto> getGermplasm(final int studyBusinessIdentifier);
+	List<StudyGermplasmDto> getGermplasm(int studyBusinessIdentifier);
 
-	List<StudyGermplasmDto> getGermplasmFromPlots(final int studyBusinessIdentifier, Set<Integer> plotNos);
+	List<StudyEntryDto> getStudyEntries(int studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 
-	long countStudyGermplasm(int studyId);
+	List<StudyGermplasmDto> getGermplasmFromPlots(int studyBusinessIdentifier, Set<Integer> plotNos);
 
-	void deleteStudyGermplasm(int studyId);
+	long countStudyEntries(int studyId);
 
-	List<StudyGermplasmDto> saveStudyGermplasm(Integer studyId, List<StudyGermplasmDto> studyGermplasmDtoList);
+	void deleteStudyEntries(int studyId);
+
+	List<StudyGermplasmDto> saveStudyEntries(Integer studyId, List<StudyGermplasmDto> studyGermplasmDtoList);
 
 	long countStudyGermplasmByEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
-
-	Map<Integer, String> getInventoryStockIdMap(List<StudyGermplasmDto> studyGermplasmDtoList);
 
 	Optional<StudyGermplasmDto> getStudyGermplasm(int studyId, int entryId);
 
 	StudyGermplasmDto replaceStudyGermplasm(int studyId, int entryId, int gid, String crossExpansion);
 
+	void updateStudyEntryProperty(int studyId, StudyEntryPropertyData studyEntryPropertyData);
+
+	Optional<StudyEntryPropertyData> getStudyEntryPropertyData(int studyEntryPropertyId);
 }

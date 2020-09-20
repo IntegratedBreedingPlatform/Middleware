@@ -105,7 +105,8 @@ public class DatasetServiceImpl implements DatasetService {
 	protected static final List<Integer> OBSERVATION_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.OBSERVATION_UNIT.getId(),
 		VariableType.TRAIT.getId(),
-		VariableType.SELECTION_METHOD.getId());
+		VariableType.SELECTION_METHOD.getId(),
+		VariableType.GERMPLASM_DESCRIPTOR.getId());
 
 	protected static final List<Integer> MEASUREMENT_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.TRAIT.getId(),
@@ -1170,6 +1171,11 @@ public class DatasetServiceImpl implements DatasetService {
 			instanceMap.put(instanceId, observationUnits);
 		}
 		return instanceMap;
+	}
+
+	@Override
+	public void replaceObservationUnitEntry(final List<Integer> observationUnitIds, final Integer newEntryId) {
+		this.daoFactory.getExperimentDao().updateEntryId(observationUnitIds, newEntryId);
 	}
 
 	void addStudyVariablesToUnitRows(final List<ObservationUnitRow> observationUnits, final List<MeasurementVariable> studyVariables) {

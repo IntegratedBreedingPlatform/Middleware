@@ -76,6 +76,12 @@ public class DaoFactory {
 		return stockDao;
 	}
 
+	public StockPropertyDao getStockPropertyDao() {
+		final StockPropertyDao stockPropertyDao = new StockPropertyDao();
+		stockPropertyDao.setSession(this.sessionProvider.getSession());
+		return stockPropertyDao;
+	}
+
 	public GermplasmDAO getGermplasmDao() {
 		final GermplasmDAO germplasmDao = new GermplasmDAO();
 		germplasmDao.setSession(this.sessionProvider.getSession());
