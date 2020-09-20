@@ -23,8 +23,10 @@ import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Projections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -455,7 +457,6 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             // name ordering: preferred name > latest > oldest
             + " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nstat = 1 desc, allNames.ndate desc SEPARATOR ', ') AS `" + GermplasmSearchDAO.NAMES + "`, \n"  //
             + " Group_concat(DISTINCT gl.stock_id ORDER BY gl.stock_id SEPARATOR  ', ')  AS `" + GermplasmSearchDAO.STOCK_IDS + "`, \n" //
-            + " g.gid  AS `" + GermplasmSearchDAO.GID + "`, \n" //
             + " g.mgid AS `" + GermplasmSearchDAO.GROUP_ID + "`, \n" //
             + " Count(DISTINCT gt.lotid) AS `" + GermplasmSearchDAO.AVAIL_LOTS + "`, \n" //
             /*
@@ -793,6 +794,42 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         }
 
         return gids;
+    }
+
+    public long countSearchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+
+        try {
+            // Reusing the same query without filters is expensive. We create a simpler one for count all
+            if (germplasmSearchRequest == null) {
+                final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+                criteria.setProjection(Projections.rowCount());
+                return (Long) criteria.uniqueResult();
+            }
+
+            final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
+            final Map<String, Integer> attributeTypesMap = this.getAttributeTypesMap(addedColumnsPropertyIds);
+            final Map<String, Integer> nameTypesMap = this.getNameTypesMap(addedColumnsPropertyIds);
+
+            // main query
+            final StringBuilder queryBuilder =
+                new StringBuilder(this.createSelectClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+            queryBuilder.append(this.createFromClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+
+            final List<Integer> preFilteredGids = this.retrievePreFilteredGids(germplasmSearchRequest);
+            // group by inside filters
+            addFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequest, preFilteredGids, programUUID);
+
+            // Filtered count is limited for performance
+            // It's not possible to know the exact count if count > LIMIT
+            final SQLQuery sqlQuery = this.getSession().createSQLQuery("select count(1) from ("
+                + queryBuilder.toString() + LIMIT_CLAUSE
+                + ") T");
+            addFilters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequest, preFilteredGids, programUUID);
+
+            return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+        } catch (final HibernateException e) {
+            throw new MiddlewareQueryException("Error at GermplasmSearchDAO.countSearchGermplasm(): " + e.getMessage(), e);
+        }
     }
 
     private static Map<String, Boolean> convertSort(final Pageable pageable) {

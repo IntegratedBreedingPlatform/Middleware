@@ -23,4 +23,9 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 		final String programUUID) {
 		return this.daoFactory.getGermplasmSearchDAO().searchGermplasm(germplasmSearchRequest, pageable, programUUID);
 	}
+
+	@Override
+	public long countSearchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+		return this.daoFactory.getGermplasmSearchDAO().countSearchGermplasm(germplasmSearchRequest, programUUID);
+	}
 }
