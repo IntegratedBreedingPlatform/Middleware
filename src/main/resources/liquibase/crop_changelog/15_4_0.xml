@@ -137,7 +137,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet id="aldrin" author="v15.4.0-5">
+	<changeSet author="aldrin" id="v15.4.0-5">
 		 <preConditions onFail="MARK_RAN">
 			 <sqlCheck expectedResult="0">
 				 SELECT COUNT(*)

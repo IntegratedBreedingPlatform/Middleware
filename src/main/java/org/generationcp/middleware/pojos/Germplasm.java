@@ -180,7 +180,7 @@ public class Germplasm implements Serializable {
 					+ "( nval = :name OR nval = :noSpaceName OR nval = :standardizedName )";
 
 	public static final String COUNT_BY_NAME_ALL_MODES_USING_EQUAL =
-			"SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE  g.deleted = 0  AND g.grplce = 0 AND "
+			"SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid and n.nstat != 9 WHERE  g.deleted = 0  AND g.grplce = 0 AND "
 					+ "( nval = :name OR nval = :noSpaceName OR nval = :standardizedName )";
 
 	public static final String GET_BY_NAME_ALL_MODES_USING_LIKE =
@@ -188,7 +188,7 @@ public class Germplasm implements Serializable {
 					+ "( nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName )";
 
 	public static final String COUNT_BY_NAME_ALL_MODES_USING_LIKE =
-			"SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE  g.deleted = 0  AND g.grplce = 0 AND "
+			"SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid and n.nstat != 9 WHERE  g.deleted = 0  AND g.grplce = 0 AND "
 					+ "( nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName )";
 
 	public static final String GET_BY_GID_WITH_METHOD_TYPE =

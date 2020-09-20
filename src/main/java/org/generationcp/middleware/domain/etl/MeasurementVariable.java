@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.domain.etl;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -20,6 +18,8 @@ import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.util.Debug;
+
+import java.util.List;
 
 public class MeasurementVariable {
 
@@ -85,6 +85,10 @@ public class MeasurementVariable {
 	private String cropOntology;
 
 	public MeasurementVariable() {
+	}
+
+	public MeasurementVariable(final Integer termId) {
+		this.termId = termId;
 	}
 
 	public MeasurementVariable(final String name, final String description, final String scale, final String method, final String property, final String dataType,

@@ -407,7 +407,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 + "       LEFT JOIN ims_transaction gt \n" + "              ON gt.lotid = gl.lotid AND gt.trnstat <> 9 \n"
                 + "       LEFT JOIN methods m \n" + "              ON m.mid = g.methn \n" + "       LEFT JOIN location l \n"
                 + "              ON l.locid = g.glocn \n" + "       LEFT JOIN `names` allNames  \n"
-                + "              ON g.gid = allNames.gid \n");
+                + "              ON g.gid = allNames.gid and allNames.nstat != 9 \n");
 
         for (final String propertyId : addedColumnsPropertyIds) {
             if (GermplasmSearchDAO.fromClauseColumnsMap.containsKey(propertyId)) {

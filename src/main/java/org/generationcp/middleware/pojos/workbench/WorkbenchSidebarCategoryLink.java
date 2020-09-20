@@ -44,12 +44,6 @@ public class WorkbenchSidebarCategoryLink implements Serializable, Comparable<Wo
 
 	@Column(name = "sidebar_link_title")
 	private String sidebarLinkTitle;
-	
-	/**
-	 * List of Roles with permission to access link
-	 */
-	@OneToMany(mappedBy = "sidebarLink", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<WorkbenchSidebarCategoryLinkRole> roles;
 
 	public WorkbenchSidebarCategoryLink() {
 	}
@@ -102,21 +96,12 @@ public class WorkbenchSidebarCategoryLink implements Serializable, Comparable<Wo
 		this.workbenchSidebarCategory = workbenchSidebarCategory;
 	}
 
-	
-	public List<WorkbenchSidebarCategoryLinkRole> getRoles() {
-		return roles;
-	}
-
-	
-	public void setRoles(List<WorkbenchSidebarCategoryLinkRole> roles) {
-		this.roles = roles;
-	}
 
 	@Override
 	public String toString() {
 		return "WorkbenchSidebarCategoryLink [sidebarCategoryLinkId=" + sidebarCategoryLinkId + ", tool=" + tool
 				+ ", workbenchSidebarCategory=" + workbenchSidebarCategory + ", sidebarLinkName=" + sidebarLinkName + ", sidebarLinkTitle="
-				+ sidebarLinkTitle + ", roles=" + roles + "]";
+				+ sidebarLinkTitle + "]";
 	}
 
 	@Override

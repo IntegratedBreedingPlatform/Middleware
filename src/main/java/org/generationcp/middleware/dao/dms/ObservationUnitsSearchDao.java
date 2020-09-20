@@ -23,6 +23,7 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -347,12 +348,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return result;
 	}
 
-	public List<ObservationUnitRow> getObservationUnitTable(final ObservationUnitsSearchDTO searchDto) {
+	public List<ObservationUnitRow> getObservationUnitTable(final ObservationUnitsSearchDTO searchDto, final Pageable pageable) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
 				searchDto,
-				observationVariableName);
+				observationVariableName, pageable);
 			return this.convertToObservationUnitRows(results, searchDto, observationVariableName);
 		} catch (final Exception e) {
 			ObservationUnitsSearchDao.LOG.error(e.getMessage(), e);
@@ -361,12 +362,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	public List<Map<String, Object>> getObservationUnitTableMapList(final ObservationUnitsSearchDTO searchDto) {
+	public List<Map<String, Object>> getObservationUnitTableMapList(final ObservationUnitsSearchDTO searchDto,
+		final Pageable pageable) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
 			return this.getObservationUnitTableAsMapListResult(
 				searchDto,
-				observationVariableName);
+				observationVariableName, pageable);
 		} catch (final Exception e) {
 			ObservationUnitsSearchDao.LOG.error(e.getMessage(), e);
 			final String error =
@@ -376,12 +378,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO searchDto,
-		final String observationVariableName) {
+		final String observationVariableName, final Pageable pageable) {
 		try {
 
-			final String observationUnitTableQuery = this.getObservationUnitTableQuery(searchDto, observationVariableName);
+			final String observationUnitTableQuery = this.getObservationUnitTableQuery(searchDto, observationVariableName, pageable);
 			final SQLQuery query = this.createQueryAndAddScalar(searchDto, observationUnitTableQuery);
-			this.setParameters(searchDto, query);
+			this.setParameters(searchDto, query, pageable);
 			return query.list();
 
 		} catch (final Exception e) {
@@ -391,7 +393,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	private void setParameters(final ObservationUnitsSearchDTO searchDto, final SQLQuery query) {
+	private void setParameters(final ObservationUnitsSearchDTO searchDto, final SQLQuery query, final Pageable pageable) {
 		query.setParameter("datasetId", searchDto.getDatasetId());
 
 		if (searchDto.getInstanceId() != null) {
@@ -404,12 +406,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		addQueryParams(query, searchDto.getFilter());
 
-		final Integer pageNumber = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageNumber() : null;
-		final Integer pageSize = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageSize() : null;
-		if (pageNumber != null && pageSize != null) {
-			query.setFirstResult(pageSize * (pageNumber - 1));
-			query.setMaxResults(pageSize);
-		}
+		addPaginationToSQLQuery(query, pageable);
 
 		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 	}
@@ -464,7 +461,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private String getObservationUnitTableQuery(
-		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
+		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName, final Pageable pageable) {
 
 		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
 		//  same for columns -> DatasetServiceImpl.getSubObservationSetColumns
@@ -597,7 +594,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		sql.append(" GROUP BY nde.nd_experiment_id ");
 
 		if (noFilterVariables) {
-			this.addOrder(sql, searchDto, observationUnitNoName);
+			this.addOrder(sql, searchDto, observationUnitNoName, pageable);
 		} else {
 			sql.append(") T ");
 		}
@@ -686,10 +683,17 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	}
 
-	private void addOrder(final StringBuilder sql, final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
+	private void addOrder(final StringBuilder sql, final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName,
+		final Pageable pageable) {
 
 		String orderColumn;
-		final String sortBy = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortBy() : "";
+		String sortBy = "";
+		String direction = "asc";
+		if (pageable != null && pageable.getSort() != null) {
+			sortBy = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getProperty() : "";
+			String sortOrder = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getDirection().name() : "";
+			direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
+		}
 		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)
 			&& !ObservationUnitsSearchDao.PLOT_NO.equals(observationUnitNoName)) {
 			orderColumn = ObservationUnitsSearchDao.OBSERVATION_UNIT_NO;
@@ -698,9 +702,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		} else {
 			orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : ObservationUnitsSearchDao.PLOT_NO;
 		}
-
-		final String sortOrder = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortOrder() : "";
-		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
 
 		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
 			for (final MeasurementVariableDto selectionMethodsAndTrait : searchDto.getSelectionMethodsAndTraits()) {
@@ -776,11 +777,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "          ) " //
 			+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId() //
 			// get the numericals whose value is not within bounds
-			+ "          then cast(ph2." + filterByDraftOrValue + " as unsigned) < scaleMinRange.value or cast(ph2." + filterByDraftOrValue
-			+ " as unsigned) > scaleMaxRange.value " //
-			+ "            or cast(ph2." + filterByDraftOrValue + " as unsigned) < vo.expected_min or cast(ph2." + filterByDraftOrValue
-			+ " as unsigned) > vo.expected_max "
-			//
+			// cast strings to decimal (+ 0) to compare
+			+ "          then ph2." + filterByDraftOrValue + " + 0 < scaleMinRange.value "  //
+			+ "            or ph2." + filterByDraftOrValue + " + 0 > scaleMaxRange.value " //
+			+ "            or ph2." + filterByDraftOrValue + " + 0 < vo.expected_min "  //
+			+ "            or ph2." + filterByDraftOrValue + " + 0 > vo.expected_max " //
 			+ "        else false " //
 			+ "        end " //
 			+ "    )"); //
@@ -1077,17 +1078,17 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private List<Map<String, Object>> getObservationUnitTableAsMapListResult(final ObservationUnitsSearchDTO searchDto,
-		final String observationVariableName) {
+		final String observationVariableName, final Pageable pageable) {
 		try {
 
-			final String sql = this.getObservationUnitTableQuery(searchDto, observationVariableName);
+			final String sql = this.getObservationUnitTableQuery(searchDto, observationVariableName, pageable);
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 
 			for (final String columnName : searchDto.getFilterColumns()) {
 				query.addScalar(columnName);
 			}
 
-			this.setParameters(searchDto, query);
+			this.setParameters(searchDto, query, pageable);
 			return this.convertSelectionAndTraitColumnsValueType(query.list(), searchDto.getSelectionMethodsAndTraits());
 
 		} catch (final Exception e) {

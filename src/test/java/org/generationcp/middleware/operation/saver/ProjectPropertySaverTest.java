@@ -513,7 +513,7 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 				PhenotypicType.TRIAL_DESIGN, PhenotypicType.TRIAL_DESIGN, PhenotypicType.VARIATE, null, PhenotypicType.VARIATE);
 		final List<VariableType> testVarVariableTypes =
 			Arrays.asList(null, VariableType.STUDY_DETAIL, null, VariableType.GERMPLASM_DESCRIPTOR, VariableType.EXPERIMENTAL_DESIGN,
-				VariableType.TREATMENT_FACTOR, VariableType.STUDY_CONDITION, VariableType.STUDY_CONDITION, null);
+				VariableType.TREATMENT_FACTOR, VariableType.ENVIRONMENT_CONDITION, VariableType.ENVIRONMENT_CONDITION, null);
 
 		final DmsProject dmsProject = this.createDMSProject();
 

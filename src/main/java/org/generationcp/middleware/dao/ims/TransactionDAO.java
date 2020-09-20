@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -27,7 +28,12 @@ import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanConstructorResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -40,7 +46,13 @@ import org.springframework.data.domain.Sort;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -419,8 +431,21 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					+ "	    inner join project study_filter_plotdata on study_filter_p.project_id = study_filter_plotdata.study_id \n" //
 					+ "     inner join nd_experiment study_filter_nde on study_filter_plotdata.project_id = study_filter_nde.project_id \n"
 					+ "     inner join ims_experiment_transaction study_filter_iet on study_filter_nde.nd_experiment_id = study_filter_iet.nd_experiment_id \n"
+					+ "                and study_filter_iet.type = " + ExperimentTransactionType.PLANTING.getId()
 					+ " where study_filter_p.project_id in (:plantingStudyIds) and study_filter_iet.trnid = tr.trnid)"); //
 				paramBuilder.setParameterList("plantingStudyIds", plantingStudyIds);
+			}
+
+			final List<Integer> harvestingStudyIds = transactionsSearchDto.getHarvestingStudyIds();
+			if (harvestingStudyIds != null && !harvestingStudyIds.isEmpty()) {
+				paramBuilder.append(" and exists(select 1 \n" //
+					+ " from project study_filter_p \n" //
+					+ "	    inner join project study_filter_plotdata on study_filter_p.project_id = study_filter_plotdata.study_id \n" //
+					+ "     inner join nd_experiment study_filter_nde on study_filter_plotdata.project_id = study_filter_nde.project_id \n"
+					+ "     inner join ims_experiment_transaction study_filter_iet on study_filter_nde.nd_experiment_id = study_filter_iet.nd_experiment_id \n"
+					+ "                and study_filter_iet.type = " + ExperimentTransactionType.HARVESTING.getId()
+					+ " where study_filter_p.project_id in (:harvestingStudyIds) and study_filter_iet.trnid = tr.trnid)"); //
+				paramBuilder.setParameterList("harvestingStudyIds", harvestingStudyIds);
 			}
 		}
 	}
@@ -641,7 +666,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	public List<StudyTransactionsDto> searchStudyTransactions(
 		final Integer studyId,
-		final StudyTransactionsRequest studyTransactionsRequest) {
+		final StudyTransactionsRequest studyTransactionsRequest, final Pageable pageable) {
 
 		final TransactionsSearchDto transactionsSearch = studyTransactionsRequest.getTransactionsSearch();
 
@@ -649,7 +674,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		addObsUnitFilters(new SqlQueryParamBuilder(obsUnitsQueryFilterSql), studyTransactionsRequest);
 
 		final StringBuilder transactionsQuerySql = this.buildStudyTransactionsQuery(transactionsSearch, obsUnitsQueryFilterSql);
-		addSortedPageRequestOrderBy(transactionsQuerySql, studyTransactionsRequest.getSortedPageRequest());
+		addPageRequestOrderBy(transactionsQuerySql, pageable);
 
 		// transactions data
 		final SQLQuery transactionsQuery = this.getSession().createSQLQuery(transactionsQuerySql.toString());
@@ -658,7 +683,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		addSearchTransactionsFilters(paramBuilder, transactionsSearch);
 		addObsUnitFilters(paramBuilder, studyTransactionsRequest);
 		this.excludeCancelledTransactions(paramBuilder);
-		addSortedPageRequestPagination(transactionsQuery, studyTransactionsRequest.getSortedPageRequest());
+		addPaginationToSQLQuery(transactionsQuery, pageable);
 		this.addSearchTransactionsQueryScalars(transactionsQuery);
 		transactionsQuery.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getStudyTransactionsDtoConstructor()));
 		final List<StudyTransactionsDto> transactions = transactionsQuery.list();
@@ -759,6 +784,12 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		if (!StringUtils.isBlank(entryType)) {
 			paramBuilder.append(" and entryType like :entryType ");
 			paramBuilder.setParameter("entryType", "%" + entryType + "%");
+		}
+
+		final List<Integer> observationUnitIds = studyTransactionsRequest.getObservationUnitIds();
+		if (observationUnitIds != null && !observationUnitIds.isEmpty()) {
+			paramBuilder.append(" and ndExperimentId in (:observationUnitList) ");
+			paramBuilder.setParameterList("observationUnitList", observationUnitIds);
 		}
 	}
 }

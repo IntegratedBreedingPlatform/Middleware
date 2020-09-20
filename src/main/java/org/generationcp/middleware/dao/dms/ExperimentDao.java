@@ -874,7 +874,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			} else if (VariableType.GERMPLASM_DESCRIPTOR.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP;
 			} else if (VariableType.TRAIT.getId() == variableTypeId || VariableType.ANALYSIS.getId() == variableTypeId
-				|| VariableType.STUDY_CONDITION.getId() == variableTypeId || VariableType.SELECTION_METHOD.getId() == variableTypeId) {
+				|| VariableType.ENVIRONMENT_CONDITION.getId() == variableTypeId || VariableType.SELECTION_METHOD.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE;
 			}
 
@@ -1078,6 +1078,46 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 						+ " as no other environments will remain for the study.");
 				}
 			}
+		}
+	}
+
+	public List<ExperimentModel> getExperimentsByParentIds(final List<Integer> parentIds) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.in("parent.ndExperimentId", parentIds));
+
+			return criteria.list();
+
+		} catch (final HibernateException e) {
+			final String message =
+				"Error at getExperimentsByParentID=" + parentIds + "query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	/**
+	 * Replace stock_id from the parent row and its children recursively
+	 * @param observationUnitIds from the parent (plot, observation) dataset
+	 * @param newEntryId
+	 */
+	public void updateEntryId(final List<Integer> observationUnitIds, final Integer newEntryId) {
+		if (observationUnitIds.isEmpty()) {
+			return;
+		}
+		try {
+			final String hqlUpdate = "update ExperimentModel e set e.stock.id = :newEntryId where e.ndExperimentId in (:observationUnitIds)";
+			this.getSession().createQuery(hqlUpdate)
+				.setParameter("newEntryId", newEntryId)
+				.setParameterList("observationUnitIds", observationUnitIds)
+				.executeUpdate();
+			final List<Integer> children = this.getExperimentsByParentIds(observationUnitIds).stream().map(ExperimentModel::getNdExperimentId).collect(
+				Collectors.toList());
+			this.updateEntryId(children, newEntryId);
+		} catch (final HibernateException e) {
+			final String message = "Error with updateEntryId query from ExperimentModel: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
