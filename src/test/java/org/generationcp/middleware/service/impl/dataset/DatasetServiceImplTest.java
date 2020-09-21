@@ -409,7 +409,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testaddStudyVariablesToUnitRows() {
+	public void testAddStudyVariablesToUnitRows() {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		final Map<String, ObservationUnitData> variables = new HashMap<>();
 		variables.put(OBS_UNIT_ID, new ObservationUnitData("obunit123"));
@@ -418,6 +418,18 @@ public class DatasetServiceImplTest {
 			.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(), "1");
 		this.datasetService.addStudyVariablesToUnitRows(Arrays.asList(observationUnitRow), Arrays.asList(trialInstanceVariable));
 		Assert.assertNotNull(observationUnitRow.getVariables().get(trialInstanceVariable.getName()));
+	}
+
+	@Test
+	public void testAddStudyVariablesAliasToUnitRows() {
+		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		final Map<String, ObservationUnitData> variables = new HashMap<>();
+		variables.put(OBS_UNIT_ID, new ObservationUnitData("obunit123"));
+		observationUnitRow.setVariables(variables);
+		final MeasurementVariable trialInstanceVariable = MeasurementVariableTestDataInitializer
+			.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(), "1", "Alias");
+		this.datasetService.addStudyVariablesToUnitRows(Arrays.asList(observationUnitRow), Arrays.asList(trialInstanceVariable));
+		Assert.assertNotNull(observationUnitRow.getVariables().get("Alias"));
 	}
 
 	private List<DatasetDTO> setUpDatasets(final Integer datasetTypeId) {
@@ -989,7 +1001,7 @@ public class DatasetServiceImplTest {
 		final DmsProject subobsDataset = new DmsProject();
 		final int subObsDatasetId = new Random().nextInt();
 		subobsDataset.setProjectId(subObsDatasetId);
-		final Integer numberOfSubObsUnits = 5;
+		final int numberOfSubObsUnits = 5;
 		this.datasetService
 			.saveSubObservationUnits(DatasetServiceImplTest.STUDY_ID, instanceIds, numberOfSubObsUnits, plotDataset, subobsDataset);
 		final ArgumentCaptor<ExperimentModel> experimentCaptor = ArgumentCaptor.forClass(ExperimentModel.class);
