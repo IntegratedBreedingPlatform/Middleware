@@ -33,6 +33,7 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
@@ -61,6 +62,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 
 	private Integer lotId;
 	private Lot lot;
+	private CropType cropType;
 
 	@Before
 	public void setUpBefore() {
@@ -86,6 +88,9 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		this.manager.addTransactions(transactions);
 
 		this.germplasmListTestDataInitializer = new GermplasmListTestDataInitializer();
+
+		this.cropType = new CropType();
+		this.cropType.setUseUUID(false);
 	}
 
 	@Test
@@ -254,7 +259,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	public void testGetAvailableBalanceForGermplasms() {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
 				"LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.manager.addLots(Lists.<Lot>newArrayList(lot));
@@ -277,7 +282,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	public void testRetrieveStockIds() {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
 				"LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 
 		final GermplasmList germplasmList = this.germplasmListTestDataInitializer.createGermplasmList(

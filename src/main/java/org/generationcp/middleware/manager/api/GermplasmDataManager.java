@@ -36,6 +36,7 @@ import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
+import org.generationcp.middleware.pojos.workbench.CropType;
 
 import java.util.List;
 import java.util.Map;
@@ -673,7 +674,7 @@ public interface GermplasmDataManager {
 	 * @param preferredName the preferred name
 	 * @return the id of the {@code Germplasm} record added
 	 */
-	Integer addGermplasm(Germplasm germplasm, Name preferredName);
+	Integer addGermplasm(Germplasm germplasm, Name preferredName, final CropType cropType);
 
 	/**
 	 * Given a map of valid Germplasm and Name objects, add new records for the given parameters.
@@ -686,9 +687,9 @@ public interface GermplasmDataManager {
 	 * @param germplasmNameMap the germplasm name map
 	 * @return the ids of the {@code Germplasm} records added
 	 */
-	List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap);
+	List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap, CropType cropType);
 
-	List<Integer> addGermplasm(List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples);
+	List<Integer> addGermplasm(List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples, CropType cropType);
 
 	/**
 	 * Given a UserDefinedField object, add new record for the given parameter.
@@ -1188,4 +1189,6 @@ public interface GermplasmDataManager {
 	List<Germplasm> getExistingCrosses(Integer femaleParent, List<Integer> maleParentIds, Optional<Integer> gid);
 
 	boolean hasExistingCrosses(Integer femaleParent, List<Integer> maleParentIds, Optional<Integer> gid);
+
+	void generateGermplasmUUID(final CropType crop, final List<Germplasm> germplasmList);
 }

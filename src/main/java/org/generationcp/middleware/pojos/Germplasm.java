@@ -146,9 +146,9 @@ public class Germplasm implements Serializable {
 	public static final String GET_PROGENITOR = "getProgenitor";
 
 	public static final String GET_PROGENITORS_BY_GIDS_WITH_PREF_NAME =
-			"SELECT p.gid, {g.*}, {n.*}, (select pMale.grpName from listdata pMale where pMale.gid = g.gid limit 1) as malePedigree " 
+			"SELECT p.gid, {g.*}, {n.*}, (select pMale.grpName from listdata pMale where pMale.gid = g.gid limit 1) as malePedigree "
 					+ "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-					+ "JOIN progntrs p ON p.pid = g.gid " 
+					+ "JOIN progntrs p ON p.pid = g.gid "
 					+ "WHERE p.gid in (:gidList) and  g.deleted = 0  and g.grplce = 0 "
 					+ "ORDER BY p.gid, p.pno";
 
@@ -313,6 +313,9 @@ public class Germplasm implements Serializable {
 	@Column(name = "deleted", columnDefinition = "TINYINT")
 	private Boolean deleted;
 
+	@Column(name = "germplsm_uuid")
+	private String germplasmUUID;
+
 	/**
 	 * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
 	 **/
@@ -454,7 +457,7 @@ public class Germplasm implements Serializable {
 	 */
 	@Transient
 	private Map<String, String> attributeTypesValueMap = new HashMap<>();
-	
+
 	/**
 	 *
 	 * This variable is populated when the user tries to search germplasm list.
@@ -668,7 +671,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getMethodName() {
-		return methodName;
+		return this.methodName;
 	}
 
 	public void setMethodName(final String methodName) {
@@ -676,7 +679,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getLocationName() {
-		return locationName;
+		return this.locationName;
 	}
 
 	public void setLocationName(final String locationName) {
@@ -802,7 +805,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public Boolean getDeleted() {
-		return deleted;
+		return this.deleted;
 	}
 
 	public void setDeleted(final Boolean deleted) {
@@ -810,7 +813,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getMethodNumber() {
-		return methodNumber;
+		return this.methodNumber;
 	}
 
 	public void setMethodNumber(final String methodNumber) {
@@ -818,7 +821,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getMethodGroup() {
-		return methodGroup;
+		return this.methodGroup;
 	}
 
 	public void setMethodGroup(final String methodGroup) {
@@ -826,7 +829,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getGermplasmPeferredName() {
-		return germplasmPeferredName;
+		return this.germplasmPeferredName;
 	}
 
 	public void setGermplasmPeferredName(final String germplasmPeferredName) {
@@ -834,7 +837,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getFemaleParentPreferredName() {
-		return femaleParentPreferredName;
+		return this.femaleParentPreferredName;
 	}
 
 	public void setFemaleParentPreferredName(final String femaleParentPreferredName) {
@@ -842,7 +845,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getFemaleParentPreferredID() {
-		return femaleParentPreferredID;
+		return this.femaleParentPreferredID;
 	}
 
 	public void setFemaleParentPreferredID(final String femaleParentPreferredID) {
@@ -850,7 +853,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getMaleParentPreferredName() {
-		return maleParentPreferredName;
+		return this.maleParentPreferredName;
 	}
 
 	public void setMaleParentPreferredName(final String maleParentPreferredName) {
@@ -858,7 +861,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getMaleParentPreferredID() {
-		return maleParentPreferredID;
+		return this.maleParentPreferredID;
 	}
 
 	public void setMaleParentPreferredID(final String maleParentPreferredID) {
@@ -866,7 +869,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getMethodCode() {
-		return methodCode;
+		return this.methodCode;
 	}
 
 	public void setMethodCode(final String methodCode) {
@@ -874,7 +877,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getGermplasmPeferredId() {
-		return germplasmPeferredId;
+		return this.germplasmPeferredId;
 	}
 
 	public void setGermplasmPeferredId(final String germplasmPeferredId) {
@@ -882,7 +885,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getGermplasmNamesString() {
-		return germplasmNamesString;
+		return this.germplasmNamesString;
 	}
 
 	public void setGermplasmNamesString(final String germplasmNamesString) {
@@ -890,7 +893,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public String getGermplasmDate() {
-		return germplasmDate;
+		return this.germplasmDate;
 	}
 
 	public void setGermplasmDate(final String germplasmDate) {
@@ -898,7 +901,7 @@ public class Germplasm implements Serializable {
 	}
 
 	public Map<String, String> getAttributeTypesValueMap() {
-		return ImmutableMap.copyOf(attributeTypesValueMap);
+		return ImmutableMap.copyOf(this.attributeTypesValueMap);
 	}
 
 	public void setAttributeTypesValueMap(final Map<String, String> attributeTypesValueMap) {
@@ -907,47 +910,55 @@ public class Germplasm implements Serializable {
 		}
 		this.attributeTypesValueMap = attributeTypesValueMap;
 	}
-	
+
 	public Map<String, String> getNameTypesValueMap() {
 		return ImmutableMap.copyOf(this.nameTypesValueMap);
 	}
 
 	public void setNameTypesValueMap(final Map<String, String> nameTypesValueMap) {
-		if (attributeTypesValueMap == null) {
+		if (this.attributeTypesValueMap == null) {
 			throw new NullArgumentException("nameTypesValueMap must not be null");
 		}
 		this.nameTypesValueMap = nameTypesValueMap;
 	}
 
 	public String getGroupSourcePreferredName() {
-		return groupSourcePreferredName;
+		return this.groupSourcePreferredName;
 	}
 
-	public void setGroupSourcePreferredName(String groupSourcePreferredName) {
+	public void setGroupSourcePreferredName(final String groupSourcePreferredName) {
 		this.groupSourcePreferredName = groupSourcePreferredName;
 	}
 
 	public String getGroupSourceGID() {
-		return groupSourceGID;
+		return this.groupSourceGID;
 	}
 
-	public void setGroupSourceGID(String groupSourceGID) {
+	public void setGroupSourceGID(final String groupSourceGID) {
 		this.groupSourceGID = groupSourceGID;
 	}
 
 	public String getImmediateSourcePreferredName() {
-		return immediateSourcePreferredName;
+		return this.immediateSourcePreferredName;
 	}
 
-	public void setImmediateSourcePreferredName(String immediateSourcePreferredName) {
+	public void setImmediateSourcePreferredName(final String immediateSourcePreferredName) {
 		this.immediateSourcePreferredName = immediateSourcePreferredName;
 	}
 
 	public String getImmediateSourceGID() {
-		return immediateSourceGID;
+		return this.immediateSourceGID;
 	}
 
-	public void setImmediateSourceGID(String immediateSourceGID) {
+	public void setImmediateSourceGID(final String immediateSourceGID) {
 		this.immediateSourceGID = immediateSourceGID;
+	}
+
+	public String getGermplasmUUID() {
+		return this.germplasmUUID;
+	}
+
+	public void setGermplasmUUID(final String germplasmUUID) {
+		this.germplasmUUID = germplasmUUID;
 	}
 }

@@ -29,6 +29,7 @@ import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.DatabaseBroker;
@@ -96,7 +97,7 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.setGermplasmListManager(this.germplasmListManager);
 		this.fieldbookServiceImpl.setWorkbookSaver(this.workbookSaver);
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
-		Mockito.doReturn(this.query).when(this.session).createSQLQuery(Matchers.anyString());
+		Mockito.doReturn(this.query).when(this.session).createSQLQuery(ArgumentMatchers.anyString());
 		this.dbBroker.setSessionProvider(this.sessionProvider);
 		this.germplasms = this.createGermplasms();
 		this.listDataItems = this.createListDataItems();
@@ -108,8 +109,10 @@ public class FieldbookServiceImplTest {
 	@Test
 	public void testSaveNurseryAdvanceGermplasmListSuccess() {
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(1);
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
 		final Integer out = this.fieldbookServiceImpl
-			.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList, this.germplasmAttributes);
+			.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList, this.germplasmAttributes, cropType);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
 
 		// Make sure a call to save various things occur.
@@ -174,7 +177,7 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.saveOrUpdateTrialDesignData(experimentPropertySaver, new ExperimentModel(), measurementData, termId);
 
 		Mockito.verify(experimentPropertySaver)
-			.saveOrUpdateProperty(ArgumentMatchers.any(ExperimentModel.class), ArgumentMatchers.eq(termId), Matchers.eq(cValueId));
+			.saveOrUpdateProperty(ArgumentMatchers.any(ExperimentModel.class), ArgumentMatchers.eq(termId), ArgumentMatchers.eq(cValueId));
 
 	}
 
@@ -196,7 +199,7 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.saveOrUpdateTrialDesignData(experimentPropertySaver, new ExperimentModel(), measurementData, termId);
 
 		Mockito.verify(experimentPropertySaver)
-			.saveOrUpdateProperty(ArgumentMatchers.any(ExperimentModel.class), ArgumentMatchers.eq(termId), Matchers.eq(value));
+			.saveOrUpdateProperty(ArgumentMatchers.any(ExperimentModel.class), ArgumentMatchers.eq(termId), ArgumentMatchers.eq(value));
 
 	}
 
