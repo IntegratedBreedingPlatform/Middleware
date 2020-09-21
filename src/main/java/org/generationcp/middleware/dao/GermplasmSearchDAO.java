@@ -568,6 +568,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         germplasm.setMethodGroup(this.getValueOfAddedColumns(GermplasmSearchDAO.METHOD_GROUP, row, addedColumnsPropertyIds));
         germplasm.setGermplasmPeferredName(this.getValueOfAddedColumns(GermplasmSearchDAO.PREFERRED_NAME, row, addedColumnsPropertyIds));
         germplasm.setGermplasmPeferredId(this.getValueOfAddedColumns(GermplasmSearchDAO.PREFERRED_ID, row, addedColumnsPropertyIds));
+        germplasm
+            .setFemaleParentPreferredID(this.getValueOfAddedColumns(GermplasmSearchDAO.FEMALE_PARENT_ID, row, addedColumnsPropertyIds));
+        germplasm.setFemaleParentPreferredName(
+            this.getValueOfAddedColumns(GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds));
+        germplasm.setMaleParentPreferredID(this.getValueOfAddedColumns(GermplasmSearchDAO.MALE_PARENT_ID, row, addedColumnsPropertyIds));
+        germplasm.setMaleParentPreferredName(
+            this.getValueOfAddedColumns(GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds));
         germplasm.setGroupSourceGID(this.getValueOfAddedColumns(GermplasmSearchDAO.GROUP_SOURCE_GID, row, addedColumnsPropertyIds));
         germplasm.setGroupSourcePreferredName(
                 this.getValueOfAddedColumns(GermplasmSearchDAO.GROUP_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds));
