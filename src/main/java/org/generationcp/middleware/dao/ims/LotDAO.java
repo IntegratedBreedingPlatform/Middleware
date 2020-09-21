@@ -821,8 +821,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public List<String> getInventoryIDsWithBreederIdentifier(final String identifier) {
 		try {
-			final String queryString = "select stock_id FROM ims_lot WHERE stock_id "
-				+ "RLIKE '^:identifier[0-9][0-9]*.*'".replace(":identifier", identifier);
+			final String queryString = "select stock_id FROM ims_lot WHERE UPPER(stock_id) "
+				+ "RLIKE UPPER('^:identifier[0-9][0-9]*.*')".replace(":identifier", identifier);
 			final Query query = this.getSession().createSQLQuery(queryString);
 			return query.list();
 		} catch (final HibernateException e) {

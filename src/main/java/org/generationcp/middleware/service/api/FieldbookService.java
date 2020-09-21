@@ -226,7 +226,7 @@ public interface FieldbookService {
 
 	Integer saveNurseryAdvanceGermplasmList(List<Pair<Germplasm, List<Name>>> germplasms,
 			List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList,
-			List<Pair<Germplasm, List<Attribute>>> germplasmAttributes);
+			List<Pair<Germplasm, List<Attribute>>> germplasmAttributes, CropType cropType);
 
 	/**
 	 * Used for retrieving the breeding method id given a method id.
@@ -543,7 +543,7 @@ public interface FieldbookService {
 	 *            the user id
 	 * @return the integer
 	 */
-	Integer addGermplasm(String nameValue, int userId);
+	Integer addGermplasm(String nameValue, int userId, CropType cropType);
 
 	/**
 	 * Adds the germplasm.
@@ -554,14 +554,14 @@ public interface FieldbookService {
 	 *            the name
 	 * @return the integer
 	 */
-	Integer addGermplasm(Germplasm germplasm, Name name);
+	Integer addGermplasm(Germplasm germplasm, Name name, CropType cropType);
 
 	/**
 	 *
 	 * @param germplasmTriples
 	 * @return
 	 */
-	List<Integer> addGermplasm(List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples);
+	List<Integer> addGermplasm(List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples, CropType cropType);
 
 	/**
 	 * Get an id from the project table that matches the name (regardless if

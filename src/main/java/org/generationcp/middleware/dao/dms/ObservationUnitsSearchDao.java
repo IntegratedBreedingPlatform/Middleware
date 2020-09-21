@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -525,11 +526,30 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getGenericGermplasmDescriptors())) {
+			final List<Integer> fixedGermplasmDescriptors =
+				Lists.newArrayList(TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.ENTRY_TYPE.getId(), TermId.ENTRY_CODE.getId(), TermId.OBS_UNIT_ID.getId());
+
 			final String germplasmDescriptorClauseFormat =
-				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') AS '%s'";
+				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND %s) AS '%s'";
+
 			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
+
 				if (noFilterVariables || filterColumns.contains(gpFactor)) {
-					columns.add(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
+					final int cvtermId = this.getVariableIdbyName(gpFactor, searchDto.getDatasetId());
+					final String cvtermQuery;
+					if (fixedGermplasmDescriptors.contains(cvtermId)) {
+						final String germplasmDescriptorClauseFormatFixed =
+							"    s.value AS '%s'";
+						columns.add(String.format(germplasmDescriptorClauseFormatFixed, gpFactor));
+					} else {
+						if (cvtermId == 0) {
+							cvtermQuery = String.format(germplasmDescriptorClauseFormat, "spropcvt.name = '"+gpFactor+"'", gpFactor);
+						} else {
+							cvtermQuery = String.format(germplasmDescriptorClauseFormat, "spropcvt.cvterm_id = "+cvtermId, gpFactor);
+						}
+						columns.add(cvtermQuery);
+					}
+
 				}
 			}
 		}
@@ -1122,6 +1142,23 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 		}
 		return result;
+	}
+
+	private Integer getVariableIdbyName(final String variableName, final int datasetId) {
+		final String query = "SELECT cvt.cvterm_id "
+			+ "FROM projectprop pp "
+			+ "INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
+			+ "WHERE pp.project_id = :datasetId AND pp.alias = :variable";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
+		sqlQuery.setParameter("datasetId", datasetId);
+		sqlQuery.setParameter("variable", variableName);
+		final List<Integer> list = sqlQuery.list();
+		if (list == null || list.isEmpty()) {
+			return 0;
+		} else {
+			return list.get(0);
+		}
+
 	}
 
 }
