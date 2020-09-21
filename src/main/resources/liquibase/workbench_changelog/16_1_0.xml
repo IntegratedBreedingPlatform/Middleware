@@ -17,27 +17,6 @@
 	</changeSet>
 
 	<changeSet author="diego" id="v16.1.0-2">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1"> SELECT COUNT(rp.role_id) > 0 FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id WHERE p.name IN ('BREEDING_ACTIVITIES', 'INFORMATION_MANAGEMENT', 'STATISTICAL_ANALYSIS')</sqlCheck>
-        </preConditions>
-        <comment>Remove BREEDING_ACTIVITIES, INFORMATION_MANAGEMENT, STATISTICAL_ANALYSIS permissions assignment for role_permission table and giving permissions to their children</comment>
-        <sql dbms="mysql" splitStatements="true">
-			INSERT INTO role_permission(role_id, permission_id)
-			SELECT rp.role_id, p.permission_id
-			FROM role_permission rp
-				   INNER JOIN permission p ON rp.permission_id = p.parent_id
-			WHERE rp.permission_id IN (SELECT ip.permission_id
-										   FROM permission ip
-										   WHERE ip.name IN ('BREEDING_ACTIVITIES', 'INFORMATION_MANAGEMENT', 'STATISTICAL_ANALYSIS'));
-			DELETE
-			FROM role_permission
-			WHERE permission_id IN (SELECT ip.permission_id
-									 FROM permission ip
-									 WHERE ip.name IN ('BREEDING_ACTIVITIES', 'INFORMATION_MANAGEMENT', 'STATISTICAL_ANALYSIS'));
-        </sql>
-    </changeSet>
-
-	<changeSet author="diego" id="v16.1.0-3">
 		<preConditions onFail="MARK_RAN">
 			  <sqlCheck expectedResult="0">
                 SELECT count(*) FROM workbench_sidebar_category WHERE sidebar_category_name = 'queries'
@@ -49,7 +28,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="diego" id="v16.1.0-4">
+	<changeSet author="diego" id="v16.1.0-3">
 		<preConditions onFail="MARK_RAN">
 			  <sqlCheck expectedResult="0">
                 SELECT count(*) FROM workbench_sidebar_category WHERE sidebar_category_name = 'genotyping'
@@ -61,7 +40,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="diego" id="v16.1.0-5">
+	<changeSet author="diego" id="v16.1.0-4">
 		<preConditions onFail="MARK_RAN">
 			  <sqlCheck expectedResult="0">
                 SELECT count(*) FROM workbench_sidebar_category WHERE sidebar_category_name = 'crop_administration'
@@ -73,7 +52,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="diego" id="v16.1.0-6">
+	<changeSet author="diego" id="v16.1.0-5">
 		<preConditions onFail="MARK_RAN">
 			  <sqlCheck expectedResult="0">
                 SELECT count(*) FROM workbench_tool WHERE name = 'high_density'
@@ -85,7 +64,7 @@
 		</sql>
 	</changeSet>
 
-    <changeSet author="diego" id="v16.1.0-7">
+    <changeSet author="diego" id="v16.1.0-6">
 	    <preConditions onFail="MARK_RAN">
 		    <sqlCheck expectedResult="0">
                 SELECT count(*) FROM workbench_sidebar_category_link WHERE tool_name = 'high_density'
@@ -98,7 +77,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="diego" id="v16.1.0-8">
+	<changeSet author="diego" id="v16.1.0-7">
 		<preConditions onFail="MARK_RAN">
 			<tableExists tableName="workbench_sidebar_category"/>
 			<not>
@@ -111,7 +90,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="diego" id="v16.1.0-9">
+	<changeSet author="diego" id="v16.1.0-8">
 		<preConditions onFail="MARK_RAN">
 			<tableExists tableName="workbench_sidebar_category"/>
 			<columnExists tableName="workbench_sidebar_category" columnName="rank"/>
@@ -147,7 +126,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="diego" id="v16.1.0-10">
+	<changeSet author="diego" id="v16.1.0-9">
     	<preConditions onFail="MARK_RAN">
 			<tableExists tableName="workbench_sidebar_category_link"/>
 			<not>
@@ -160,7 +139,7 @@
 		</sql>
 	</changeSet>
 
-    <changeSet author="diego" id="v16.1.0-11">
+    <changeSet author="diego" id="v16.1.0-10">
     	<preConditions onFail="MARK_RAN">
 			<tableExists tableName="workbench_sidebar_category_link"/>
     		<columnExists tableName="workbench_sidebar_category_link" columnName="rank"/>
@@ -226,6 +205,27 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="diego" id="v16.1.0-11">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1"> SELECT COUNT(rp.role_id) > 0 FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id WHERE p.name IN ('BREEDING_ACTIVITIES', 'INFORMATION_MANAGEMENT', 'STATISTICAL_ANALYSIS')</sqlCheck>
+        </preConditions>
+        <comment>Remove BREEDING_ACTIVITIES, INFORMATION_MANAGEMENT, STATISTICAL_ANALYSIS permissions assignment for role_permission table and giving permissions to their children</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO role_permission(role_id, permission_id)
+			SELECT rp.role_id, p.permission_id
+			FROM role_permission rp
+				   INNER JOIN permission p ON rp.permission_id = p.parent_id
+			WHERE rp.permission_id IN (SELECT ip.permission_id
+										   FROM permission ip
+										   WHERE ip.name IN ('BREEDING_ACTIVITIES', 'INFORMATION_MANAGEMENT', 'STATISTICAL_ANALYSIS'));
+			DELETE
+			FROM role_permission
+			WHERE permission_id IN (SELECT ip.permission_id
+									 FROM permission ip
+									 WHERE ip.name IN ('BREEDING_ACTIVITIES', 'INFORMATION_MANAGEMENT', 'STATISTICAL_ANALYSIS'));
+        </sql>
+    </changeSet>
+
     <changeSet author="diego" id="v16.1.0-12">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'QUERIES'</sqlCheck>
@@ -270,61 +270,90 @@
 
     <changeSet author="diego" id="v16.1.0-16">
         <preConditions onFail="MARK_RAN">
+           <sqlCheck expectedResult="1">SELECT count(*) FROM permission WHERE NAME = 'BREEDING_ACTIVITIES'</sqlCheck>
         </preConditions>
-        <comment>Refactor permissions</comment>
+        <comment>Rename BREEDING_ACTIVITIES permission to GERMPLASM and associate their permission as a parent of IMPORT_GERMPLASM permission</comment>
         <sql dbms="mysql" splitStatements="true">
-        	set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'BREEDING_ACTIVITIES');
-			UPDATE permission SET description = 'Germplasm', name= 'GERMPLASM' WHERE permission_id = @permission_id;
+       	    set @breeding_activities_id = (SELECT permission_id FROM permission WHERE NAME = 'BREEDING_ACTIVITIES');
+            set @import_germplasm_id = (SELECT permission_id FROM permission WHERE NAME = 'IMPORT_GERMPLASM');
 
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'INFORMATION_MANAGEMENT');
-			UPDATE permission SET description = 'Studies', name= 'STUDIES' WHERE permission_id = @permission_id;
+			UPDATE permission SET parent_id = @breeding_activities_id WHERE permission_id = @import_germplasm_id;
+			UPDATE permission SET description = 'Germplasm', name= 'GERMPLASM' WHERE permission_id = @breeding_activities_id;
 
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'STATISTICAL_ANALYSIS');
-			UPDATE permission SET description = 'Lists', name= 'LISTS' WHERE permission_id = @permission_id;
-
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_GENOTYPING_DATA');
-        	set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING');
-			UPDATE permission SET description = 'Low Density', name= 'LOW_DENSITY' , parent_id = @parent_id WHERE permission_id = @permission_id;
-
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_SAMPLES');
-			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'LISTS');
-			UPDATE permission SET description = 'Samples Lists', name= 'SAMPLE_LISTS', parent_id = @parent_id WHERE permission_id = @permission_id;
-
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'GRAPHICAL_QUERIES');
-			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES');
-			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING');
-			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'CROP_MANAGEMENT');
-			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_STUDIES');
-			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'STUDIES');
-			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'HEAD_TO_HEAD_QUERY');
-			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES');
-			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MULTI_TRAIT_QUERY');
-			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES');
-			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'SINGLE_SITE_ANALYSIS');
-			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'STUDIES');
-			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MULTI_SITE_ANALYSIS');
-			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'STUDIES');
-			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
-
-			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'IMPORT_GERMPLASM');
-			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'GERMPLASM');
-			UPDATE permission SET parent_id = @parent_id WHERE permission_id = @permission_id;
         </sql>
     </changeSet>
 
 	<changeSet author="diego" id="v16.1.0-17">
+        <preConditions onFail="MARK_RAN">
+           <sqlCheck expectedResult="1">SELECT count(*) FROM permission WHERE NAME = 'STATISTICAL_ANALYSIS'</sqlCheck>
+        </preConditions>
+        <comment>Rename STATISTICAL_ANALYSIS and MANAGE_SAMPLES permissions and associate LISTS permission as a parent of SAMPLE_LISTS permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @statistical_analysis_id = (SELECT permission_id FROM permission WHERE NAME = 'STATISTICAL_ANALYSIS');
+			set @manage_samples_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_SAMPLES');
+
+			UPDATE permission SET description = 'Samples Lists', name= 'SAMPLE_LISTS', parent_id = @statistical_analysis_id WHERE permission_id = @manage_samples_id;
+			UPDATE permission SET description = 'Lists', name= 'LISTS' WHERE permission_id = @statistical_analysis_id;
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-18">
+        <preConditions onFail="MARK_RAN">
+           <sqlCheck expectedResult="1">SELECT count(*) FROM permission WHERE NAME = 'MANAGE_GENOTYPING_DATA'</sqlCheck>
+        </preConditions>
+        <comment>Rename MANAGE_GENOTYPING_DATA permission to GENOTYPING and associate CROP_MANAGEMENT permission as a parent of GENOTYPING permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @manage_genotyping_data_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_GENOTYPING_DATA');
+        	set @genotyping_id = (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING');
+			UPDATE permission SET description = 'Low Density', name= 'LOW_DENSITY' , parent_id = @genotyping_id WHERE permission_id = @manage_genotyping_data_id;
+
+			set @crop_management_id = (SELECT permission_id FROM permission WHERE NAME = 'CROP_MANAGEMENT');
+			UPDATE permission SET parent_id = @crop_management_id WHERE permission_id = @genotyping_id;
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-19">
+        <preConditions onFail="MARK_RAN">
+           <sqlCheck expectedResult="0">SELECT count(*) FROM permission WHERE parent_id in (SELECT permission_id FROM permission where NAME = 'QUERIES')</sqlCheck>
+        </preConditions>
+        <comment>Associate QUERIES permission as a parent of GRAPHICAL_QUERIES, HEAD_TO_HEAD_QUERY and MULTI_TRAIT_QUERY permissions</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @queries_id = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES');
+
+			set @graphical_queries_id = (SELECT permission_id FROM permission WHERE NAME = 'GRAPHICAL_QUERIES');
+			UPDATE permission SET parent_id = @queries_id WHERE permission_id = @graphical_queries_id;
+
+			set @head_to_head_query_id = (SELECT permission_id FROM permission WHERE NAME = 'HEAD_TO_HEAD_QUERY');
+			UPDATE permission SET parent_id = @queries_id WHERE permission_id = @head_to_head_query_id;
+
+			set @multi_trait_query_id = (SELECT permission_id FROM permission WHERE NAME = 'MULTI_TRAIT_QUERY');
+			UPDATE permission SET parent_id = @queries_id WHERE permission_id = @multi_trait_query_id;
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-20">
+        <preConditions onFail="MARK_RAN">
+           <sqlCheck expectedResult="1">SELECT count(*) FROM permission WHERE NAME = 'INFORMATION_MANAGEMENT'</sqlCheck>
+        </preConditions>
+        <comment>Rename INFORMATION_MANAGEMENT permission to STUDIES and associate STUDIES permission as a parent of MANAGE_STUDIES, SINGLE_SITE_ANALYSIS and MULTI_SITE_ANALYSIS permissions</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @information_management_id = (SELECT permission_id FROM permission WHERE NAME = 'INFORMATION_MANAGEMENT');
+			UPDATE permission SET description = 'Studies', name= 'STUDIES' WHERE permission_id = @information_management_id;
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_STUDIES');
+			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'STUDIES');
+			UPDATE permission SET parent_id = @information_management_id WHERE permission_id = @permission_id;
+
+			set @single_site_analysis_id = (SELECT permission_id FROM permission WHERE NAME = 'SINGLE_SITE_ANALYSIS');
+			UPDATE permission SET parent_id = @information_management_id WHERE permission_id = @single_site_analysis_id;
+
+			set @multi_site_analysis_id = (SELECT permission_id FROM permission WHERE NAME = 'MULTI_SITE_ANALYSIS');
+			UPDATE permission SET parent_id = @information_management_id WHERE permission_id = @multi_site_analysis_id;
+        </sql>
+    </changeSet>
+
+
+	<changeSet author="diego" id="v16.1.0-22">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES')</sqlCheck>
         </preConditions>
@@ -337,7 +366,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="diego" id="v16.1.0-18">
+	<changeSet author="diego" id="v16.1.0-23">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING')</sqlCheck>
         </preConditions>
@@ -349,7 +378,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="diego" id="v16.1.0-19">
+	<changeSet author="diego" id="v16.1.0-24">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'HIGH_DENSITY')</sqlCheck>
         </preConditions>
@@ -361,7 +390,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="diego" id="v16.1.0-20">
+	<changeSet author="diego" id="v16.1.0-25">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
 				SELECT
@@ -399,7 +428,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="diego" id="v16.1.0-21">
+	<changeSet author="diego" id="v16.1.0-26">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
             	SELECT
@@ -438,7 +467,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="diego" id="v16.1.0-22">
+	<changeSet author="diego" id="v16.1.0-27">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
 				SELECT
@@ -477,7 +506,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="diego" id="v16.1.0-23">
+	<changeSet author="diego" id="v16.1.0-28">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
 				SELECT
@@ -504,7 +533,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="diego" id="v16.1.0-24">
+	<changeSet author="diego" id="v16.1.0-29">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
 				SELECT
