@@ -15,7 +15,7 @@
 		</comment>
 		<addColumn tableName="germplsm">
 			<column name="germplsm_uuid" type="VARCHAR(36)">
-				<constraints nullable="true"/>
+				<constraints nullable="true" unique="true"/>
 			</column>
 		</addColumn>
 	</changeSet>
@@ -117,13 +117,6 @@
 		<sql dbms="mysql" splitStatements="false">
 			DROP PROCEDURE populate_germplsm_uuid_values;
 		</sql>
-	</changeSet>
-
-	<changeSet author="mderamos" id="v16.1.0-6">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'germplsm' AND CONSTRAINT_NAME='germplsm_uuid_unique' and TABLE_SCHEMA = DATABASE();</sqlCheck>
-		</preConditions>
-		<addUniqueConstraint tableName="germplsm" columnNames="germplsm_uuid" constraintName="germplsm_uuid_unique"/>
 	</changeSet>
 
 </databaseChangeLog>
