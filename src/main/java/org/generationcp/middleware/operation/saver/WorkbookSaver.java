@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.saver;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -25,6 +26,7 @@ import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
@@ -75,6 +77,9 @@ public class WorkbookSaver extends Saver {
 
 	@Resource
 	private StudyDataManager studyDataManager;
+
+	@Resource
+	private OntologyDataManager ontologyDataManager;
 
 	public WorkbookSaver() {
 
@@ -136,6 +141,8 @@ public class WorkbookSaver extends Saver {
 		variableTypeMap.put(WorkbookSaver.TRIALVARIABLES, trialVariables);
 		variableTypeMap.put(WorkbookSaver.EFFECTVARIABLE, effectVariables);
 		// -- measurementVariables
+
+		this.setRMAPValueIfNecessary(trialMV, programUUID);
 		measurementVariableMap.put(WorkbookSaver.TRIALMV, trialMV);
 
 		final List<MeasurementVariable> effectMV = workbook.getMeasurementDatasetVariables();
@@ -520,6 +527,10 @@ public class WorkbookSaver extends Saver {
 				if (geolocationId == 0) {
 					// if geolocationId does not exist, create the geolocation
 					// and set to row.locationId
+
+					//Set RMAP Value if Necessary
+					this.setRMAPValueObservationIfNecessary(row.getDataList(), programUUID);
+
 					final TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations");
 					final VariableList geolocation =
 						this.getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
@@ -1346,5 +1357,42 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
+	private void setRMAPValueIfNecessary(final List<MeasurementVariable> mvarList, final String programUUID) {
+		final List<MeasurementVariable> catVar = mvarList.stream().filter(variable -> variable.getTermId() == TermId.REPLICATIONS_MAP
+			.getId()).collect(Collectors.toList());
+		if (catVar != null) {
+			for (final MeasurementVariable mVar : catVar) {
+				final StandardVariable strdVariable = this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames(mVar.getProperty(), mVar.getScale(), mVar.getMethod(), programUUID);
+				if (strdVariable != null && strdVariable.getEnumerations() !=null) {
+					final List<Enumeration> possibleValues = strdVariable.getEnumerations().stream().filter(enumeration -> enumeration.getName().equals(mVar.getValue())).collect(
+						Collectors.toList());
+					if (possibleValues != null && possibleValues.size() > 0) {
+						mVar.setValue(String.valueOf(possibleValues.get(0).getId()));
+					}
+				}
+			}
+		}
+	}
+
+	private void setRMAPValueObservationIfNecessary(final List<MeasurementData> mvarList, final String programUUID) {
+		final List<MeasurementData> catVar = mvarList.stream().filter(variable -> variable.getMeasurementVariable().getTermId() == TermId.REPLICATIONS_MAP
+			.getId()).collect(Collectors.toList());
+		if (catVar != null) {
+			for (final MeasurementData mData : catVar) {
+				final MeasurementVariable mVar = mData.getMeasurementVariable();
+				final StandardVariable strdVariable;
+				strdVariable =
+					this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames(mVar.getProperty(), mVar.getScale(), mVar.getMethod(), programUUID);
+				if (strdVariable != null && strdVariable.getEnumerations() !=null) {
+					final List<Enumeration> possibleValues = strdVariable.getEnumerations().stream().filter(enumeration -> enumeration.getName().equals(mData.getValue())).collect(
+						Collectors.toList());
+					if (possibleValues != null && possibleValues.size() > 0) {
+						mVar.setValue(String.valueOf(possibleValues.get(0).getId()));
+						mData.setValue(String.valueOf(possibleValues.get(0).getId()));
+					}
+				}
+			}
+		}
+	}
 
 }
