@@ -287,12 +287,12 @@
         <preConditions onFail="MARK_RAN">
            <sqlCheck expectedResult="1">SELECT count(*) FROM permission WHERE NAME = 'STATISTICAL_ANALYSIS'</sqlCheck>
         </preConditions>
-        <comment>Rename STATISTICAL_ANALYSIS and MANAGE_SAMPLES permissions and associate LISTS permission as a parent of SAMPLE_LISTS permission</comment>
+        <comment>Rename STATISTICAL_ANALYSIS and MANAGE_SAMPLES permissions and associate LISTS permission as a parent of SAMPLES_LISTS permission</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @statistical_analysis_id = (SELECT permission_id FROM permission WHERE NAME = 'STATISTICAL_ANALYSIS');
 			set @manage_samples_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_SAMPLES');
 
-			UPDATE permission SET description = 'Samples Lists', name= 'SAMPLE_LISTS', parent_id = @statistical_analysis_id WHERE permission_id = @manage_samples_id;
+			UPDATE permission SET description = 'Samples Lists', name= 'SAMPLES_LISTS', parent_id = @statistical_analysis_id WHERE permission_id = @manage_samples_id;
 			UPDATE permission SET description = 'Lists', name= 'LISTS' WHERE permission_id = @statistical_analysis_id;
         </sql>
     </changeSet>
@@ -516,7 +516,7 @@
 						INNER JOIN
 					permission p ON rp.permission_id = p.permission_id
 				WHERE
-					p.name IN ('SAMPLE_LISTS')
+					p.name IN ('SAMPLES_LISTS')
             </sqlCheck>
         </preConditions>
         <comment>Regroup permissions for Lists in role_permission table</comment>
@@ -525,11 +525,11 @@
 			INSERT INTO role_permission(role_id,permission_id)
 			SELECT rp.role_id, @permission_id FROM role_permission rp
 				INNER JOIN permission p ON rp.permission_id = p.permission_id
-					WHERE p.name IN ('SAMPLE_LISTS');
+					WHERE p.name IN ('SAMPLES_LISTS');
 
 			DELETE rp FROM role_permission rp
 				INNER JOIN permission p ON rp.permission_id = p.permission_id
-					WHERE p.name IN ('SAMPLE_LISTS');
+					WHERE p.name IN ('SAMPLES_LISTS');
         </sql>
     </changeSet>
 
