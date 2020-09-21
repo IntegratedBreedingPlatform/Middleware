@@ -1375,7 +1375,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 	private void setRMAPValueObservationIfNecessary(final List<MeasurementData> mvarList, final String programUUID) {
-		final List<MeasurementData> catVar = mvarList.stream().filter(variable -> variable.getMeasurementVariable().getTermId() == TermId.REPLICATIONS_MAP
+		final List<MeasurementData> catVar = mvarList.stream().filter(variable -> variable.getMeasurementVariable() != null && variable.getMeasurementVariable().getTermId() == TermId.REPLICATIONS_MAP
 			.getId()).collect(Collectors.toList());
 		if (catVar != null) {
 			for (final MeasurementData mData : catVar) {
