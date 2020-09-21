@@ -11,10 +11,10 @@
 
 package org.generationcp.middleware.domain.oms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /**
  * Contains the details of a Term - id, vocabularyId, name, definition, nameSynonyms, obsolete.
@@ -34,6 +34,10 @@ public class Term implements Serializable {
 	private Boolean obsolete;
 
 	public Term() {
+	}
+
+	public Term(final int id) {
+		this.id = id;
 	}
 
 	public Term(int id, String name, String definition) {

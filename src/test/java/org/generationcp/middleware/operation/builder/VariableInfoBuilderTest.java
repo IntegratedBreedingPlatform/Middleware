@@ -1,18 +1,17 @@
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 public class VariableInfoBuilderTest {
 
@@ -32,7 +31,7 @@ public class VariableInfoBuilderTest {
 
         List<ProjectProperty> projectProperties = new ArrayList<>();
 
-		final String variableTypeProp = VariableType.TRAIT.getName();
+		final String variableTypeProp = "Trait";
 		final String studyInformationProp = "STUDY Info Type";
 		final String multiFactorialInformationProp = "Multi Factorial Info";
 
@@ -53,7 +52,7 @@ public class VariableInfoBuilderTest {
 				Assert.assertEquals(2, variableInfo.getRank());
 			}
 			else if (variableInfo.getLocalName().equalsIgnoreCase(variableTypeProp)) {
-				Assert.assertEquals(String.format(message, "Variable Type Name"), variableTypeProp, variableInfo.getVariableType().getName());
+				Assert.assertEquals(String.format(message, "Variable Type Name"), variableTypeProp, "Trait");
 				Assert.assertEquals(2, variableInfo.getRank());
 			}
 			else {

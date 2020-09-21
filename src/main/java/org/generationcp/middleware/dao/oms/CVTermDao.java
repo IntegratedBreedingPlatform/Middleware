@@ -49,7 +49,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link CVTerm}.
@@ -183,8 +182,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		criteria.addOrder(Order.asc("cvTermPropertyId"));
 		final List<CVTermProperty> variableTypes = criteria.list();
 		if (variableTypes != null) {
+			final List<Term> allVariableTypes = this.getTermByCvId(CvId.VARIABLE_TYPE.getId());
+			final Map<String, Integer> allVariableTypesByName = new HashMap<>();
+			for (final Term term: allVariableTypes) {
+				allVariableTypesByName.put(term.getName(), term.getId());
+			}
 			for (final CVTermProperty cvTermProperty : variableTypes) {
-				return VariableType.getByName(cvTermProperty.getValue());
+				return VariableType.getById(allVariableTypesByName.get(cvTermProperty.getValue()));
 			}
 		}
 		return null;
@@ -1225,6 +1229,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	public boolean hasPossibleTreatmentPairs(final int cvTermId, final int propertyId,
 		final List<Integer> hiddenFields) {
 		try {
+			final String variableTypeName = this.getTermByCvId(CvId.VARIABLE_TYPE.getId()).stream().filter(f->VariableType.TREATMENT_FACTOR.getId().equals(f.getId())).findAny()                                      // If 'findAny' then return found
+				.get().getName();
 			final StringBuilder sqlString = new StringBuilder().append("SELECT count(c.cvterm_id) ")
 				.append(" FROM cvterm c ").append(" INNER JOIN cvterm_relationship pr ON pr.type_id = ")
 				.append(TermId.HAS_PROPERTY.getId()).append("   AND pr.subject_id = c.cvterm_id ")
@@ -1235,7 +1241,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append("   AND mr.subject_id = c.cvterm_id ")
 				.append(" INNER JOIN cvtermprop cvprop ON cvprop.type_id = ").append(TermId.VARIABLE_TYPE.getId())
 				.append("   AND cvprop.cvterm_id = c.cvterm_id AND cvprop.value = '")
-				.append(VariableType.TREATMENT_FACTOR.getName()).append("' WHERE c.cvterm_id <> ").append(cvTermId)
+				.append(variableTypeName).append("' WHERE c.cvterm_id <> ").append(cvTermId)
 				.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
@@ -1255,6 +1261,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		final List<StandardVariable> list = new ArrayList<>();
 
 		try {
+			final String variableTypeName = this.getTermByCvId(CvId.VARIABLE_TYPE.getId()).stream().filter(f->VariableType.TREATMENT_FACTOR.getId().equals(f.getId())).findAny()                                      // If 'findAny' then return found
+				.get().getName();
+
 			final StringBuilder sqlString = new StringBuilder()
 				.append(
 					"SELECT c.cvterm_id, c.name, c.definition, pr.object_id AS propertyId, sr.object_id AS scaleId, mr.object_id AS methodId ")
@@ -1267,7 +1276,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append("   AND mr.subject_id = c.cvterm_id ")
 				.append(" INNER JOIN cvtermprop cvprop ON cvprop.type_id = ").append(TermId.VARIABLE_TYPE.getId())
 				.append("   AND cvprop.cvterm_id = c.cvterm_id AND cvprop.value = '")
-				.append(VariableType.TREATMENT_FACTOR.getName()).append("' WHERE c.cvterm_id <> ").append(cvTermId)
+				.append(variableTypeName).append("' WHERE c.cvterm_id <> ").append(cvTermId)
 				.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString()).addScalar("cvterm_id")
@@ -1507,7 +1516,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			.getId());
 		stringBuilder.append("	  LEFT JOIN projectprop pp ON pp.variable_id = variable.cvterm_id");
 		stringBuilder.append("	  LEFT JOIN project dataset ON dataset.project_id = pp.project_id");
-		stringBuilder.append(" WHERE variableType.value in (:variableTypeNames) ");
+		stringBuilder.append(" WHERE variableType.value in (select te.name from cvterm te where te.cv_id = "+ CvId.VARIABLE_TYPE.getId() +") ");
 
 		if (datasetId != null) {
 			stringBuilder.append(" AND dataset.project_id = :datasetId ");
@@ -1515,9 +1524,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(stringBuilder.toString());
-		final List<String> variableTypeNames =
-			variableTypes.stream().map(i -> VariableType.getById(i).getName()).collect(Collectors.toList());
-		sqlQuery.setParameterList(VARIABLE_TYPE_NAMES, variableTypeNames);
 
 		if (datasetId != null) {
 			sqlQuery.setParameter("datasetId", datasetId);
@@ -1600,7 +1606,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		// To get Min and Max override values per program
 		stringBuilder.append(
 			"	  LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id AND dataset.program_uuid = vo.program_uuid");
-		stringBuilder.append(" WHERE variableType.value in (:variableTypeNames) ");
+		stringBuilder.append(" WHERE variableType.value in (select te.name from cvterm te where te.cv_id = "+ CvId.VARIABLE_TYPE.getId()+  ")");
 
 		if (datasetId != null) {
 			stringBuilder.append("   AND dataset.project_id = :datasetId ");
@@ -1610,9 +1616,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append("   GROUP BY variable.cvterm_id, traitClass.propertyTermId, scale.cvterm_id ");
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(stringBuilder.toString());
-		final List<String> variableTypeNames =
-			variableTypes.stream().map(i -> VariableType.getById(i).getName()).collect(Collectors.toList());
-		sqlQuery.setParameterList(VARIABLE_TYPE_NAMES, variableTypeNames);
 
 		if (datasetId != null) {
 			sqlQuery.setParameter("datasetId", datasetId);
