@@ -132,7 +132,7 @@ public class InventoryServiceImpl implements InventoryService {
 			return 0;
 		}
 
-		final String expression = breederIdentifier + "([0-9]+)";
+		final String expression = "(?i)"+ breederIdentifier + "([0-9]+)";
 		final Pattern pattern = Pattern.compile(expression);
 
 		return this.findCurrentMaxNotationNumberInInventoryIDs(inventoryIDs, pattern);
