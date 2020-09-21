@@ -340,7 +340,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					if (germplasm.getLgid() == null) {
 						germplasm.setLgid(germplasm.getGid() != null ? germplasm.getGid() : Integer.valueOf(0));
 					}
-					this.getGermplasmDataManager().generateGermplasmUUID(cropType, Arrays.asList(germplasm));
+					this.getGermplasmDataManager().generateGermplasmUUID(cropType, Collections.singletonList(germplasm));
 					germplasm = germplasmDao.save(germplasm);
 
 					for (final Name name : nameList) {
