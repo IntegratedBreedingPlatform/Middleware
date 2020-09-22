@@ -23,10 +23,8 @@ import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Projections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -808,9 +806,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         try {
             // Reusing the same query without filters is expensive. We create a simpler one for count all
             if (germplasmSearchRequest == null) {
-                final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-                criteria.setProjection(Projections.rowCount());
-                return (Long) criteria.uniqueResult();
+                final SQLQuery sqlQuery = this.getSession().createSQLQuery(" select count(1) from germplsm ");
+                return ((BigInteger) sqlQuery.uniqueResult()).longValue();
             }
 
             final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
