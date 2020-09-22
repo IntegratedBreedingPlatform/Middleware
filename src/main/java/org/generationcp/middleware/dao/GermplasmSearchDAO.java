@@ -709,8 +709,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             queryBuilder.append(" group by g.gid ");
 
             final Map<String, Boolean> sortState = convertSort(pageable);
-            // TODO improve perf (e.g order by NAMES)
-            queryBuilder.append(this.addSortingColumns(sortState, attributeTypesMap, nameTypesMap));
+            if (!sortState.isEmpty()) {
+                queryBuilder.append(this.addSortingColumns(sortState, attributeTypesMap, nameTypesMap));
+            }
 
             final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.toString());
 
@@ -731,10 +732,17 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             }
 
             /*
-             * The outer query does not apply PAGINATION.
-             * It will return a PAGE of results + associated gids (e.g pedigree, group members),
+             * For big databases (e.g brachiaria, ~6M germplsm), sorting is slow.
+             * If sort is needed, we limit the inner query to 5000 records and sort only that.
+             * In this mode, it's not possible to paginate past
+             * Otherwise, Pagination is done in the inner query without a limit.
+             *
+             * The outer query returns a PAGE of results + associated gids (e.g pedigree, group members),
              * which don't count for the Total results
              */
+            if (!sortState.isEmpty()) {
+            	addPaginationToSQLQuery(query, pageable);
+            }
             query.setParameterList("gids", gids);
 
             final List<Object[]> result = query.list();
@@ -775,13 +783,17 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         addFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequest, preFilteredGids, programUUID);
 
         final Map<String, Boolean> sortState = convertSort(pageable);
-        // TODO improve perf (e.g order by NAMES)
-        queryBuilder.append(this.addSortingColumns(sortState, attributeTypesMap, nameTypesMap));
+		if (!sortState.isEmpty()) {
+            queryBuilder.append(LIMIT_CLAUSE);
+        }
 
         final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
         sqlQuery.addScalar(GID);
-        addPaginationToSQLQuery(sqlQuery, pageable);
-        addFilters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequest, preFilteredGids, programUUID);
+
+        if (sortState.isEmpty()) {
+            addPaginationToSQLQuery(sqlQuery, pageable);
+        }
+		addFilters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequest, preFilteredGids, programUUID);
 
         final List<Integer> gids = sqlQuery.list();
 
