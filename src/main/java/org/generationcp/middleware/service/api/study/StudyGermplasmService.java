@@ -11,6 +11,9 @@ import java.util.Set;
 //TODO rename to StudyEntryService
 public interface StudyGermplasmService {
 
+	@Deprecated
+		// TODO: This method will be replaced with getStudyEntries. This method is only used in displaying Germplasm tab in Fieldbook. Delete this once
+		// Germplasm Table is already refactored.
 	List<StudyGermplasmDto> getGermplasm(int studyBusinessIdentifier);
 
 	List<StudyEntryDto> getStudyEntries(int studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
@@ -21,13 +24,11 @@ public interface StudyGermplasmService {
 
 	void deleteStudyEntries(int studyId);
 
-	List<StudyGermplasmDto> saveStudyEntries(Integer studyId, List<StudyGermplasmDto> studyGermplasmDtoList);
+	List<StudyEntryDto> saveStudyEntries(Integer studyId, List<StudyEntryDto> studyEntryDtoList);
 
 	long countStudyGermplasmByEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
 
-	Optional<StudyGermplasmDto> getStudyGermplasm(int studyId, int entryId);
-
-	StudyGermplasmDto replaceStudyGermplasm(int studyId, int entryId, int gid, String crossExpansion);
+	StudyEntryDto replaceStudyEntry(int studyId, int entryId, int gid, String crossExpansion);
 
 	void updateStudyEntryProperty(int studyId, StudyEntryPropertyData studyEntryPropertyData);
 

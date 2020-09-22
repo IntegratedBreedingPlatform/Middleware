@@ -53,6 +53,9 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
+	@Deprecated
+	// TODO: This method will be replaced with getStudyEntries. This method is only used in displaying Germplasm tab in Fieldbook. Delete this once
+	// Germplasm Table is already refactored.
 	@Override
 	public List<StudyGermplasmDto> getGermplasm(final int studyBusinessIdentifier) {
 
@@ -124,13 +127,11 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public List<StudyGermplasmDto> saveStudyEntries(final Integer studyId, final List<StudyGermplasmDto> studyGermplasmDtoList) {
-		final List<StudyGermplasmDto> list = new ArrayList<>();
-		for (final StudyGermplasmDto studyGermplasm : studyGermplasmDtoList) {
-			final StockModel stockModel = this.daoFactory.getStockDao().saveOrUpdate(new StockModel(studyId, studyGermplasm));
-			list.add(new StudyGermplasmDto(stockModel));
+	public List<StudyEntryDto> saveStudyEntries(final Integer studyId, final List<StudyEntryDto> studyEntryDtoList) {
+		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
+			this.daoFactory.getStockDao().saveOrUpdate(new StockModel(studyId, studyEntryDto));
 		}
-		return list;
+		return this.getStudyEntries(studyId, null, null);
 	}
 
 	@Override
@@ -139,19 +140,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public Optional<StudyGermplasmDto> getStudyGermplasm(final int studyId, final int entryId) {
-		final StockModel stock = this.daoFactory.getStockDao().getById(entryId);
-		if (stock != null) {
-			if (studyId != stock.getProject().getProjectId()) {
-				throw new MiddlewareRequestException("", "invalid.entryid.for.study");
-			}
-			return Optional.of(new StudyGermplasmDto(stock));
-		}
-		return Optional.empty();
-	}
-
-	@Override
-	public StudyGermplasmDto replaceStudyGermplasm(final int studyId, final int entryId, final int gid, final String crossExpansion) {
+	public StudyEntryDto replaceStudyEntry(final int studyId, final int entryId, final int gid, final String crossExpansion) {
 		// Check first that new GID is valid
 		final Germplasm newGermplasm = this.daoFactory.getGermplasmDao().getById(gid);
 		if (newGermplasm == null) {
@@ -167,24 +156,37 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		} else if (stock.getGermplasm().getGid() == gid) {
 			throw new MiddlewareRequestException("", "new.gid.matches.old.gid");
 		}
-		final StudyGermplasmDto newStudyGermplasm = new StudyGermplasmDto();
-		newStudyGermplasm.setEntryNumber(Integer.valueOf(stock.getUniqueName()));
-		Optional<StockProperty> entryType =
-			stock.getProperties().stream().filter(prop -> TermId.ENTRY_TYPE.getId() == (prop.getTypeId())).findFirst();
-		entryType.ifPresent(entry -> newStudyGermplasm.setEntryType(entry.getValue()));
-		newStudyGermplasm.setGermplasmId(gid);
-		newStudyGermplasm.setEntryCode(stock.getValue());
-		final Name preferredName = newGermplasm.getPreferredName();
-		newStudyGermplasm.setDesignation(preferredName != null ? preferredName.getNval() : "");
-		newStudyGermplasm.setCross(crossExpansion);
-		// Save also Group GID
-		newStudyGermplasm.setGroupId(newGermplasm.getMgid());
+		final StudyEntryDto studyEntryDto = new StudyEntryDto();
+		studyEntryDto.setEntryNumber(Integer.valueOf(stock.getUniqueName()));
+		studyEntryDto.setGid(gid);
+		studyEntryDto.setEntryCode(stock.getValue());
 
-		final StudyGermplasmDto savedStudyGermplasm = this.saveStudyEntries(studyId, Collections.singletonList(newStudyGermplasm)).get(0);
-		stockDao.replaceExperimentStocks(entryId, savedStudyGermplasm.getEntryId());
+		final Name preferredName = newGermplasm.getPreferredName();
+		studyEntryDto.setDesignation(preferredName != null ? preferredName.getNval() : "");
+
+		final Optional<StockProperty> entryType =
+			stock.getProperties().stream().filter(prop -> TermId.ENTRY_TYPE.getId() == (prop.getTypeId())).findFirst();
+		entryType.ifPresent(stockProperty -> {
+				final String variableName = this.daoFactory.getCvTermDao().getById(stockProperty.getTypeId()).getName();
+				studyEntryDto.getVariables().put(variableName,
+					new StudyEntryPropertyData(null, stockProperty.getTypeId(), stockProperty.getValue()));
+			}
+		);
+
+		// Save the Cross
+		studyEntryDto.getVariables().put(this.daoFactory.getCvTermDao().getById(TermId.CROSS.getId()).getName(),
+			new StudyEntryPropertyData(null, TermId.CROSS.getId(), crossExpansion));
+		// Save also Group GID
+		studyEntryDto.getVariables().put(this.daoFactory.getCvTermDao().getById(TermId.GROUPGID.getId()).getName(),
+			new StudyEntryPropertyData(null, TermId.GROUPGID.getId(), String.valueOf(newGermplasm.getMgid())));
+
+		final StudyEntryDto savedStudyEntryDto = this.saveStudyEntries(studyId, Collections.singletonList(studyEntryDto)).get(0);
+
+		stockDao.replaceExperimentStocks(entryId, savedStudyEntryDto.getEntryId());
 		// Finally delete old stock
 		stockDao.makeTransient(stock);
-		return savedStudyGermplasm;
+
+		return savedStudyEntryDto;
 	}
 
 	@Override
