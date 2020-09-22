@@ -504,8 +504,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             if (attributeTypesMap.containsKey(sortCondition.getKey()) || nameTypesMap.containsKey(sortCondition.getKey())) {
                 sortingQuery.append(String.format(" `%s`", sortCondition.getKey()));
 
-            } else {
+            } else if (GermplasmSortableColumn.get(sortCondition.getKey()) != null) {
                 sortingQuery.append(String.format(" `%s`", GermplasmSortableColumn.get(sortCondition.getKey()).getDbColumnName()));
+            } else {
+                throw new MiddlewareRequestException(null, "error.sort.invalid.key", new String[] {sortCondition.getKey()});
             }
 
             sortingQuery.append(" " + order);
