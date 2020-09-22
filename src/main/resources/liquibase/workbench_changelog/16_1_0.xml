@@ -431,6 +431,30 @@
 	<changeSet author="diego" id="v16.1.0-26">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
+				SELECT
+					COUNT(rp.role_id) > 0
+				FROM
+					role_permission rp
+						INNER JOIN
+					permission p ON rp.permission_id = p.permission_id
+				WHERE
+					p.name IN ('CROP_MANAGEMENT')
+            </sqlCheck>
+        </preConditions>
+        <comment>insert IMPORT_GERMPLASM permission in role_permission table where exists roles with CROP_MANAGEMENT permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='IMPORT_GERMPLASM');
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT rp.role_id, @permission_id FROM role_permission rp
+				INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('CROP_MANAGEMENT');
+
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-27">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
             	SELECT
 					COUNT(DISTINCT 1) > 0
 				FROM
@@ -467,7 +491,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="diego" id="v16.1.0-27">
+	<changeSet author="diego" id="v16.1.0-28">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
 				SELECT
@@ -506,7 +530,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="diego" id="v16.1.0-28">
+	<changeSet author="diego" id="v16.1.0-29">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
 				SELECT
@@ -533,7 +557,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="diego" id="v16.1.0-29">
+	<changeSet author="diego" id="v16.1.0-30">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
 				SELECT
