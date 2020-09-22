@@ -98,10 +98,10 @@
                 <comment>Update Rank in workbench_sidebar_category</comment>
 		<sql dbms="mysql" splitStatements="true">
 			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'statistical_analysis');
-			UPDATE workbench_sidebar_category SET sidebar_category_name = 'lists', sidebar_category_label = 'Lists', rank = 1 WHERE sidebar_category_id = @sidebar_category_id;
+			UPDATE workbench_sidebar_category SET sidebar_category_name = 'lists', sidebar_category_label = 'Lists', rank = 2 WHERE sidebar_category_id = @sidebar_category_id;
 
 			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'activities');
-			UPDATE workbench_sidebar_category SET sidebar_category_name = 'germplasm', sidebar_category_label = 'Germplasm', rank = 2 WHERE sidebar_category_id = @sidebar_category_id;
+			UPDATE workbench_sidebar_category SET sidebar_category_name = 'germplasm', sidebar_category_label = 'Germplasm', rank = 1 WHERE sidebar_category_id = @sidebar_category_id;
 
 			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'information_mgt');
 			UPDATE workbench_sidebar_category SET sidebar_category_name = 'studies', sidebar_category_label = 'Studies', rank = 3 WHERE sidebar_category_id = @sidebar_category_id;
