@@ -498,7 +498,7 @@
 				WHERE role_id IN (
 					SELECT sub.rid FROM (SELECT rp.role_id AS rid FROM role_permission rp
 										   INNER JOIN permission p ON rp.permission_id = p.permission_id
-											WHERE p.name IN ('MANAGE_GERMPLASM','IMPORT_GERMPLASM')
+											WHERE p.name IN ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS')
 											GROUP BY rp.role_id
 											HAVING COUNT(DISTINCT p.permission_id) = 5) AS sub
 					)
