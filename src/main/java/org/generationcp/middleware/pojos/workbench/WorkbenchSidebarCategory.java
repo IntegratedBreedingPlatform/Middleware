@@ -36,6 +36,9 @@ public class WorkbenchSidebarCategory implements Serializable, Comparable<Workbe
 	@OneToMany(mappedBy = "workbenchSidebarCategory", cascade = CascadeType.ALL)
 	private List<WorkbenchSidebarCategoryLink> workbenchSidebarCategoryLinks;
 
+	@Column(name = "rank")
+	private Integer rank;
+
 	public WorkbenchSidebarCategory() {
 	}
 
@@ -83,6 +86,14 @@ public class WorkbenchSidebarCategory implements Serializable, Comparable<Workbe
 
 	@Override
 	public int compareTo(WorkbenchSidebarCategory d) {
-		return this.sidebarCategoryId - d.getSidebarCategoryId();
+		return this.getRank() - d.getRank();
+	}
+
+	public Integer getRank() {
+		return rank;
+	}
+
+	public void setRank(Integer rank) {
+		this.rank = rank;
 	}
 }

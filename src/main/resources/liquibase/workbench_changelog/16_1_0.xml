@@ -1,8 +1,8 @@
-<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 	<changeSet author="cuenyad" id="v16.1.0-1">
 		<preConditions onFail="MARK_RAN">
@@ -16,4 +16,571 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="diego" id="v16.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="0">
+                SELECT count(*) FROM workbench_sidebar_category WHERE sidebar_category_name = 'queries'
+            </sqlCheck>
+        </preConditions>
+        <comment>Add Queries in workbench_sidebar_category</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_sidebar_category (sidebar_category_name, sidebar_category_label) VALUES ('queries', 'Queries');
+		</sql>
+	</changeSet>
+
+	<changeSet author="diego" id="v16.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="0">
+                SELECT count(*) FROM workbench_sidebar_category WHERE sidebar_category_name = 'genotyping'
+            </sqlCheck>
+        </preConditions>
+        <comment>Add Genotyping in workbench_sidebar_category</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_sidebar_category (sidebar_category_name, sidebar_category_label) VALUES ('genotyping', 'Genotyping');
+		</sql>
+	</changeSet>
+
+	<changeSet author="diego" id="v16.1.0-4">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="0">
+                SELECT count(*) FROM workbench_sidebar_category WHERE sidebar_category_name = 'crop_administration'
+            </sqlCheck>
+        </preConditions>
+        <comment>Add Crop Administration in workbench_sidebar_category</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_sidebar_category (sidebar_category_name, sidebar_category_label) VALUES ('crop_administration', 'Crop Administration');
+		</sql>
+	</changeSet>
+
+	<changeSet author="diego" id="v16.1.0-5">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="0">
+                SELECT count(*) FROM workbench_tool WHERE name = 'high_density'
+            </sqlCheck>
+        </preConditions>
+        <comment>Add High density in workbench_tool</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_tool (name, group_name, title, version, tool_type, path, parameter, user_tool) VALUES ( 'high_density', 'high_density', 'High density', '16.1', 'WEB', '/ibpworkbench/controller/accessNotAvailable', '', '0');
+		</sql>
+	</changeSet>
+
+    <changeSet author="diego" id="v16.1.0-6">
+	    <preConditions onFail="MARK_RAN">
+		    <sqlCheck expectedResult="0">
+                SELECT count(*) FROM workbench_sidebar_category_link WHERE tool_name = 'high_density'
+            </sqlCheck>
+        </preConditions>
+        <comment>Add High Density item in workbench_sidebar_category_link</comment>
+		<sql dbms="mysql" splitStatements="true">
+            set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'genotyping');
+			INSERT INTO workbench_sidebar_category_link (tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title) VALUES ('high_density', @sidebar_category_id, 'high_density', 'High density');
+		</sql>
+	</changeSet>
+
+	<changeSet author="diego" id="v16.1.0-7">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_sidebar_category"/>
+			<not>
+				<columnExists tableName="workbench_sidebar_category" columnName="rank"/>
+			</not>
+        </preConditions>
+                <comment>Add Rank column in workbench_sidebar_category</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE workbench_sidebar_category add column rank int null after sidebar_category_label;
+		</sql>
+	</changeSet>
+
+	<changeSet author="diego" id="v16.1.0-8">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_sidebar_category"/>
+			<columnExists tableName="workbench_sidebar_category" columnName="rank"/>
+        </preConditions>
+                <comment>Update Rank in workbench_sidebar_category</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'statistical_analysis');
+			UPDATE workbench_sidebar_category SET sidebar_category_name = 'lists', sidebar_category_label = 'Lists', rank = 2 WHERE sidebar_category_id = @sidebar_category_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'activities');
+			UPDATE workbench_sidebar_category SET sidebar_category_name = 'germplasm', sidebar_category_label = 'Germplasm', rank = 1 WHERE sidebar_category_id = @sidebar_category_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'information_mgt');
+			UPDATE workbench_sidebar_category SET sidebar_category_name = 'studies', sidebar_category_label = 'Studies', rank = 3 WHERE sidebar_category_id = @sidebar_category_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'inventory_manager');
+			UPDATE workbench_sidebar_category SET sidebar_category_name = 'inventory', sidebar_category_label = 'Inventory', rank = 4 WHERE sidebar_category_id = @sidebar_category_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'Queries');
+			UPDATE workbench_sidebar_category SET rank = 5 WHERE  sidebar_category_id = @sidebar_category_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'Genotyping');
+			UPDATE workbench_sidebar_category SET rank = 6 WHERE sidebar_category_id = @sidebar_category_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'crop_administration');
+			UPDATE workbench_sidebar_category SET rank = 7 WHERE sidebar_category_id = @sidebar_category_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'admin');
+			UPDATE workbench_sidebar_category SET sidebar_category_name = 'program_administration', rank = 8 WHERE sidebar_category_id = @sidebar_category_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'additional_tools');
+			UPDATE workbench_sidebar_category SET rank = 9 WHERE sidebar_category_id = @sidebar_category_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="diego" id="v16.1.0-9">
+    	<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_sidebar_category_link"/>
+			<not>
+				<columnExists tableName="workbench_sidebar_category_link" columnName="rank"/>
+			</not>
+        </preConditions>
+        <comment>Add Rank column in workbench_sidebar_category_link</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE workbench_sidebar_category_link add column rank int null after sidebar_link_title;
+		</sql>
+	</changeSet>
+
+    <changeSet author="diego" id="v16.1.0-10">
+    	<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_sidebar_category_link"/>
+    		<columnExists tableName="workbench_sidebar_category_link" columnName="rank"/>
+        </preConditions>
+        <comment>Update Rank in workbench_sidebar_category_link</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'bm_list_manager_main');
+			UPDATE workbench_sidebar_category_link SET rank = '1' WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'Germplasm');
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'germplasm_import');
+			UPDATE workbench_sidebar_category_link SET rank = '2', sidebar_category_id = @sidebar_category_id WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'Genotyping');
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'gdms');
+			UPDATE workbench_sidebar_category_link SET rank = '1', sidebar_category_id = @sidebar_category_id, sidebar_link_title = 'Low Density' where sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'crop_administration');
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'ontology_manager');
+			UPDATE workbench_sidebar_category_link SET rank = '1', sidebar_category_id = @sidebar_category_id WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'Queries');
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'graphical_queries');
+			UPDATE workbench_sidebar_category_link SET rank = '1', sidebar_category_id = @sidebar_category_id WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'germplasm_mainheadtohead');
+			UPDATE workbench_sidebar_category_link SET rank = '2', sidebar_category_id = @sidebar_category_id WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'trait_donor_query');
+			UPDATE workbench_sidebar_category_link SET rank = '3', sidebar_category_id = @sidebar_category_id  WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'Studies');
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'study_manager_fieldbook_web');
+			UPDATE workbench_sidebar_category_link SET rank = '1', sidebar_category_id = @sidebar_category_id WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'study_browser');
+			UPDATE workbench_sidebar_category_link SET rank = '2' WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'dataset_importer');
+			UPDATE workbench_sidebar_category_link SET rank = '3' WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'breeding_view_wb');
+			UPDATE workbench_sidebar_category_link SET rank = '4', sidebar_category_id = @sidebar_category_id WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'breeding_gxe');
+			UPDATE workbench_sidebar_category_link SET rank = '5', sidebar_category_id = @sidebar_category_id WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'manage_program');
+			UPDATE workbench_sidebar_category_link SET rank = '1' WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'backup_restore');
+			UPDATE workbench_sidebar_category_link SET rank = '2' WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'lists');
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'sample_manager');
+			UPDATE workbench_sidebar_category_link SET rank = '2', sidebar_category_id = @sidebar_category_id, sidebar_link_title = 'Samples Lists' WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'inventory_manager');
+			UPDATE workbench_sidebar_category_link SET rank = '1' WHERE sidebar_category_link_id = @sidebar_category_link_id;
+
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'high_density');
+			UPDATE workbench_sidebar_category_link SET rank = '2' WHERE sidebar_category_link_id = @sidebar_category_link_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="diego" id="v16.1.0-11">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1"> SELECT COUNT(rp.role_id) > 0 FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id WHERE p.name IN ('BREEDING_ACTIVITIES', 'INFORMATION_MANAGEMENT', 'STATISTICAL_ANALYSIS')</sqlCheck>
+        </preConditions>
+        <comment>Remove BREEDING_ACTIVITIES, INFORMATION_MANAGEMENT, STATISTICAL_ANALYSIS permissions assignment for role_permission table and giving permissions to their children</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO role_permission(role_id, permission_id)
+			SELECT rp.role_id, p.permission_id
+			FROM role_permission rp
+				   INNER JOIN permission p ON rp.permission_id = p.parent_id
+			WHERE rp.permission_id IN (SELECT ip.permission_id
+										   FROM permission ip
+										   WHERE ip.name IN ('BREEDING_ACTIVITIES', 'INFORMATION_MANAGEMENT', 'STATISTICAL_ANALYSIS'));
+			DELETE
+			FROM role_permission
+			WHERE permission_id IN (SELECT ip.permission_id
+									 FROM permission ip
+									 WHERE ip.name IN ('BREEDING_ACTIVITIES', 'INFORMATION_MANAGEMENT', 'STATISTICAL_ANALYSIS'));
+        </sql>
+    </changeSet>
+
+    <changeSet author="diego" id="v16.1.0-12">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'QUERIES'</sqlCheck>
+        </preConditions>
+        <comment>Add QUERIES permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+        	INSERT INTO permission (name, description, parent_id) VALUES ('QUERIES', 'Queries', '1');
+        </sql>
+    </changeSet>
+
+    <changeSet author="diego" id="v16.1.0-13">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'GENOTYPING'</sqlCheck>
+        </preConditions>
+        <comment>Add GENOTYPING permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+        	INSERT INTO permission (name, description, parent_id) VALUES ('GENOTYPING', 'Genotyping', '1');
+        </sql>
+    </changeSet>
+
+    <changeSet author="diego" id="v16.1.0-14">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'CROP_ADMINISTRATION'</sqlCheck>
+        </preConditions>
+        <comment>Add CROP_ADMINISTRATION permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+        	INSERT INTO permission (name, description, parent_id) VALUES ('CROP_ADMINISTRATION', 'Crop Administration', '1');
+        </sql>
+    </changeSet>
+
+    <changeSet author="diego" id="v16.1.0-15">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name = 'HIGH_DENSITY'</sqlCheck>
+        </preConditions>
+        <comment>Add HIGH_DENSITY permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @sidebar_category_link_id = (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link WHERE tool_name = 'HIGH_DENSITY');
+			set @parent_id = (SELECT permission_id FROM permission WHERE name = 'GENOTYPING');
+        	INSERT INTO permission (name, description, parent_id, workbench_sidebar_category_link_id) VALUES ('HIGH_DENSITY', 'High Density', @parent_id, @sidebar_category_link_id);
+        </sql>
+    </changeSet>
+
+    <changeSet author="diego" id="v16.1.0-16">
+        <preConditions onFail="MARK_RAN">
+           <sqlCheck expectedResult="1">SELECT count(*) FROM permission WHERE NAME = 'BREEDING_ACTIVITIES'</sqlCheck>
+        </preConditions>
+        <comment>Rename BREEDING_ACTIVITIES permission to GERMPLASM and associate their permission as a parent of IMPORT_GERMPLASM permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+       	    set @breeding_activities_id = (SELECT permission_id FROM permission WHERE NAME = 'BREEDING_ACTIVITIES');
+            set @import_germplasm_id = (SELECT permission_id FROM permission WHERE NAME = 'IMPORT_GERMPLASM');
+
+			UPDATE permission SET parent_id = @breeding_activities_id WHERE permission_id = @import_germplasm_id;
+			UPDATE permission SET description = 'Germplasm', name= 'GERMPLASM' WHERE permission_id = @breeding_activities_id;
+
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-17">
+        <preConditions onFail="MARK_RAN">
+           <sqlCheck expectedResult="1">SELECT count(*) FROM permission WHERE NAME = 'STATISTICAL_ANALYSIS'</sqlCheck>
+        </preConditions>
+        <comment>Rename STATISTICAL_ANALYSIS and MANAGE_SAMPLES permissions and associate LISTS permission as a parent of SAMPLES_LISTS permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @statistical_analysis_id = (SELECT permission_id FROM permission WHERE NAME = 'STATISTICAL_ANALYSIS');
+			set @manage_samples_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_SAMPLES');
+
+			UPDATE permission SET description = 'Samples Lists', name= 'SAMPLES_LISTS', parent_id = @statistical_analysis_id WHERE permission_id = @manage_samples_id;
+			UPDATE permission SET description = 'Lists', name= 'LISTS' WHERE permission_id = @statistical_analysis_id;
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-18">
+        <preConditions onFail="MARK_RAN">
+           <sqlCheck expectedResult="1">SELECT count(*) FROM permission WHERE NAME = 'MANAGE_GENOTYPING_DATA'</sqlCheck>
+        </preConditions>
+        <comment>Rename MANAGE_GENOTYPING_DATA permission to GENOTYPING and associate CROP_MANAGEMENT permission as a parent of GENOTYPING permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @manage_genotyping_data_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_GENOTYPING_DATA');
+        	set @genotyping_id = (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING');
+			UPDATE permission SET description = 'Low Density', name= 'LOW_DENSITY' , parent_id = @genotyping_id WHERE permission_id = @manage_genotyping_data_id;
+
+			set @crop_management_id = (SELECT permission_id FROM permission WHERE NAME = 'CROP_MANAGEMENT');
+			UPDATE permission SET parent_id = @crop_management_id WHERE permission_id = @genotyping_id;
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-19">
+        <preConditions onFail="MARK_RAN">
+           <sqlCheck expectedResult="0">SELECT count(*) FROM permission WHERE parent_id in (SELECT permission_id FROM permission where NAME = 'QUERIES')</sqlCheck>
+        </preConditions>
+        <comment>Associate QUERIES permission as a parent of GRAPHICAL_QUERIES, HEAD_TO_HEAD_QUERY and MULTI_TRAIT_QUERY permissions</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @queries_id = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES');
+
+			set @graphical_queries_id = (SELECT permission_id FROM permission WHERE NAME = 'GRAPHICAL_QUERIES');
+			UPDATE permission SET parent_id = @queries_id WHERE permission_id = @graphical_queries_id;
+
+			set @head_to_head_query_id = (SELECT permission_id FROM permission WHERE NAME = 'HEAD_TO_HEAD_QUERY');
+			UPDATE permission SET parent_id = @queries_id WHERE permission_id = @head_to_head_query_id;
+
+			set @multi_trait_query_id = (SELECT permission_id FROM permission WHERE NAME = 'MULTI_TRAIT_QUERY');
+			UPDATE permission SET parent_id = @queries_id WHERE permission_id = @multi_trait_query_id;
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-20">
+        <preConditions onFail="MARK_RAN">
+           <sqlCheck expectedResult="1">SELECT count(*) FROM permission WHERE NAME = 'INFORMATION_MANAGEMENT'</sqlCheck>
+        </preConditions>
+        <comment>Rename INFORMATION_MANAGEMENT permission to STUDIES and associate STUDIES permission as a parent of MANAGE_STUDIES, SINGLE_SITE_ANALYSIS and MULTI_SITE_ANALYSIS permissions</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @information_management_id = (SELECT permission_id FROM permission WHERE NAME = 'INFORMATION_MANAGEMENT');
+			UPDATE permission SET description = 'Studies', name= 'STUDIES' WHERE permission_id = @information_management_id;
+
+			set @permission_id = (SELECT permission_id FROM permission WHERE NAME = 'MANAGE_STUDIES');
+			set @parent_id = (SELECT permission_id FROM permission WHERE NAME = 'STUDIES');
+			UPDATE permission SET parent_id = @information_management_id WHERE permission_id = @permission_id;
+
+			set @single_site_analysis_id = (SELECT permission_id FROM permission WHERE NAME = 'SINGLE_SITE_ANALYSIS');
+			UPDATE permission SET parent_id = @information_management_id WHERE permission_id = @single_site_analysis_id;
+
+			set @multi_site_analysis_id = (SELECT permission_id FROM permission WHERE NAME = 'MULTI_SITE_ANALYSIS');
+			UPDATE permission SET parent_id = @information_management_id WHERE permission_id = @multi_site_analysis_id;
+        </sql>
+    </changeSet>
+
+
+	<changeSet author="diego" id="v16.1.0-22">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'QUERIES')</sqlCheck>
+        </preConditions>
+        <comment>Add QUERIES permission in role_type_permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', (SELECT permission_id FROM permission WHERE NAME = 'QUERIES'), '1');
+            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', (SELECT permission_id FROM permission WHERE NAME = 'QUERIES'), '1');
+            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', (SELECT permission_id FROM permission WHERE NAME = 'QUERIES'), '1');
+
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-23">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING')</sqlCheck>
+        </preConditions>
+        <comment>Add GENOTYPING permission in role_type_permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING'), '1');
+            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING'), '1');
+            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', (SELECT permission_id FROM permission WHERE NAME = 'GENOTYPING'), '1');
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-24">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT count(*) FROM role_type_permission where permission_id  = (SELECT permission_id FROM permission WHERE NAME = 'HIGH_DENSITY')</sqlCheck>
+        </preConditions>
+        <comment>Add HIGH_DENSITY permission in role_type_permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', (SELECT permission_id FROM permission WHERE NAME = 'HIGH_DENSITY'), '1');
+            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', (SELECT permission_id FROM permission WHERE NAME = 'HIGH_DENSITY'), '1');
+            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', (SELECT permission_id FROM permission WHERE NAME = 'HIGH_DENSITY'), '1');
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-25">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+				SELECT
+					COUNT(DISTINCT 1) > 0
+				FROM
+					(SELECT
+						rp.role_id AS rid
+					FROM
+						role_permission rp
+					INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE
+						p.name IN ('GRAPHICAL_QUERIES','HEAD_TO_HEAD_QUERY','MULTI_TRAIT_QUERY')
+					GROUP BY rp.role_id
+					HAVING COUNT(DISTINCT p.permission_id) = 3) AS role
+            </sqlCheck>
+        </preConditions>
+        <comment>Regroup permissions for Queries in role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='QUERIES');
+			INSERT INTO role_permission(role_id,permission_id)
+				SELECT DISTINCT(rp.role_id), @permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name in ('GRAPHICAL_QUERIES','HEAD_TO_HEAD_QUERY','MULTI_TRAIT_QUERY')
+						GROUP BY rp.role_id
+						HAVING COUNT(DISTINCT p.permission_id) = 3;
+
+			DELETE role_permission FROM role_permission
+				WHERE role_id IN (
+					SELECT sub.rid FROM (SELECT rp.role_id AS rid FROM role_permission rp
+										   INNER JOIN permission p ON rp.permission_id = p.permission_id
+											WHERE p.name IN ('GRAPHICAL_QUERIES','HEAD_TO_HEAD_QUERY','MULTI_TRAIT_QUERY')
+											GROUP BY rp.role_id
+											HAVING COUNT(DISTINCT p.permission_id) = 3) AS sub
+					)
+					AND permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name IN ('GRAPHICAL_QUERIES','HEAD_TO_HEAD_QUERY','MULTI_TRAIT_QUERY'));
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-26">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+				SELECT
+					COUNT(rp.role_id) > 0
+				FROM
+					role_permission rp
+						INNER JOIN
+					permission p ON rp.permission_id = p.permission_id
+				WHERE
+					p.name IN ('CROP_MANAGEMENT')
+            </sqlCheck>
+        </preConditions>
+        <comment>insert IMPORT_GERMPLASM permission in role_permission table where exists roles with CROP_MANAGEMENT permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='IMPORT_GERMPLASM');
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT rp.role_id, @permission_id FROM role_permission rp
+				INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('CROP_MANAGEMENT');
+
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-27">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+            	SELECT
+					COUNT(DISTINCT 1) > 0
+				FROM
+					(SELECT
+						rp.role_id AS rid
+					FROM
+						role_permission rp
+					INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE
+						p.name IN ('MANAGE_GERMPLASM' , 'IMPORT_GERMPLASM')
+					GROUP BY rp.role_id
+					HAVING COUNT(DISTINCT p.permission_id) = 2) AS role
+    		</sqlCheck>
+        </preConditions>
+        <comment>Regroup permissions for Germplasm in role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='GERMPLASM');
+			INSERT INTO role_permission(role_id,permission_id)
+				SELECT DISTINCT(rp.role_id), @permission_id FROM role_permission rp
+					INNER JOIN permission p ON rp.permission_id = p.permission_id
+						WHERE p.name in ('MANAGE_GERMPLASM','IMPORT_GERMPLASM')
+    					GROUP BY rp.role_id
+    					HAVING COUNT(DISTINCT p.permission_id) = 2;
+
+			DELETE role_permission FROM role_permission
+				WHERE role_id IN (
+					SELECT sub.rid FROM (SELECT rp.role_id AS rid FROM role_permission rp
+										   INNER JOIN permission p ON rp.permission_id = p.permission_id
+											WHERE p.name IN ('MANAGE_GERMPLASM','IMPORT_GERMPLASM')
+											GROUP BY rp.role_id
+											HAVING COUNT(DISTINCT p.permission_id) = 2) AS sub
+					)
+					AND permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name IN ('MANAGE_GERMPLASM','IMPORT_GERMPLASM'));
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-28">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+				SELECT
+					COUNT(DISTINCT 1) > 0
+				FROM
+					(SELECT
+						rp.role_id AS rid
+					FROM
+						role_permission rp
+					INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE
+						p.name IN ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS')
+					GROUP BY rp.role_id
+					HAVING COUNT(DISTINCT p.permission_id) = 5) AS role
+            </sqlCheck>
+        </preConditions>
+        <comment>Regroup permissions for Studies in role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='STUDIES');
+			INSERT INTO role_permission(role_id,permission_id)
+				SELECT DISTINCT(rp.role_id), @permission_id FROM role_permission rp
+					INNER JOIN permission p ON rp.permission_id = p.permission_id
+						WHERE p.name in ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS')
+    					GROUP BY rp.role_id
+    					HAVING COUNT(DISTINCT p.permission_id) = 5;
+
+			DELETE role_permission FROM role_permission
+				WHERE role_id IN (
+					SELECT sub.rid FROM (SELECT rp.role_id AS rid FROM role_permission rp
+										   INNER JOIN permission p ON rp.permission_id = p.permission_id
+											WHERE p.name IN ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS')
+											GROUP BY rp.role_id
+											HAVING COUNT(DISTINCT p.permission_id) = 5) AS sub
+					)
+					AND permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name IN ('MANAGE_STUDIES','BROWSE_STUDIES','IMPORT_DATASETS','SINGLE_SITE_ANALYSIS','MULTI_SITE_ANALYSIS'));
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-29">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+				SELECT
+					COUNT(rp.role_id) > 0
+				FROM
+					role_permission rp
+						INNER JOIN
+					permission p ON rp.permission_id = p.permission_id
+				WHERE
+					p.name IN ('SAMPLES_LISTS')
+            </sqlCheck>
+        </preConditions>
+        <comment>Regroup permissions for Lists in role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='LISTS');
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT rp.role_id, @permission_id FROM role_permission rp
+				INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('SAMPLES_LISTS');
+
+			DELETE rp FROM role_permission rp
+				INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('SAMPLES_LISTS');
+        </sql>
+    </changeSet>
+
+	<changeSet author="diego" id="v16.1.0-30">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+				SELECT
+					COUNT(rp.role_id) > 0
+				FROM
+					role_permission rp
+						INNER JOIN
+					permission p ON rp.permission_id = p.permission_id
+				WHERE
+					p.name IN ('LOW_DENSITY')
+			</sqlCheck>
+        </preConditions>
+        <comment>Regroup permissions for Genotyping in role_permission table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @permission_id = (SELECT permission_id FROM permission WHERE name ='GENOTYPING');
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT rp.role_id, @permission_id FROM role_permission rp
+				INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('LOW_DENSITY');
+
+			DELETE rp FROM role_permission rp
+				INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('LOW_DENSITY');
+        </sql>
+    </changeSet>
 </databaseChangeLog>
