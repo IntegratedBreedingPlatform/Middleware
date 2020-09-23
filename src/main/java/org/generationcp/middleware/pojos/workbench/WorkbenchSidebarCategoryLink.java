@@ -45,6 +45,9 @@ public class WorkbenchSidebarCategoryLink implements Serializable, Comparable<Wo
 	@Column(name = "sidebar_link_title")
 	private String sidebarLinkTitle;
 
+	@Column(name = "rank")
+	private Integer rank;
+
 	public WorkbenchSidebarCategoryLink() {
 	}
 
@@ -97,6 +100,14 @@ public class WorkbenchSidebarCategoryLink implements Serializable, Comparable<Wo
 	}
 
 
+	public Integer getRank() {
+		return rank;
+	}
+
+	public void setRank(Integer rank) {
+		this.rank = rank;
+	}
+
 	@Override
 	public String toString() {
 		return "WorkbenchSidebarCategoryLink [sidebarCategoryLinkId=" + sidebarCategoryLinkId + ", tool=" + tool
@@ -131,6 +142,6 @@ public class WorkbenchSidebarCategoryLink implements Serializable, Comparable<Wo
 
 	@Override
 	public int compareTo(WorkbenchSidebarCategoryLink d) {
-		return this.sidebarCategoryLinkId - d.getSidebarCategoryLinkId();
+		return this.getRank() - d.getRank();
 	}
 }
