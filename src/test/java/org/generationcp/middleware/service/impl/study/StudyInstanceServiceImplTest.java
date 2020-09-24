@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
+import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,6 +36,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -76,6 +78,9 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private StudyInstanceService studyInstanceService;
+
+	@Resource
+	private ExperimentDesignService experimentDesignService;
 
 	private final Random random = new Random();
 	private DaoFactory daoFactory;
@@ -296,6 +301,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		List<StudyInstance> studyInstances =
 			this.studyInstanceService.getStudyInstances(studyId);
+		Assert.assertTrue(studyInstances.get(0).isHasExperimentalDesign());
 		Assert.assertEquals(2, studyInstances.size());
 		final Integer instance1LocationId = instance1.getLocationId();
 		Assert.assertEquals(instance1LocationId,
@@ -326,6 +332,51 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		} catch (final MiddlewareQueryException e) {
 			// Perform assertions outside
 		}
+	}
+
+	@Test
+	public void testDeleteStudyInstances1NoExperimentalDesign() {
+		final DmsProject study =
+			this.testDataInitializer
+				.createDmsProject("Study1", "Study-Description", null, this.daoFactory.getDmsProjectDAO().getById(1), null);
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Summary Dataset", "Summary Dataset-Description", study, study, DatasetTypeEnum.SUMMARY_DATA);
+		final DmsProject plotDataset =
+			this.testDataInitializer
+				.createDmsProject("Plot Dataset", "Plot Dataset-Description", study, study, DatasetTypeEnum.PLOT_DATA);
+
+		final Geolocation instance1 = this.testDataInitializer.createTestGeolocation("1", 1);
+		final Geolocation instance2 = this.testDataInitializer.createTestGeolocation("2", 2);
+		final Geolocation instance3 = this.testDataInitializer.createTestGeolocation("3", 3);
+
+		this.testDataInitializer.addGeolocationProp(instance1, TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), 1);
+		this.testDataInitializer.addGeolocationProp(instance2, TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), 1);
+		this.testDataInitializer.addGeolocationProp(instance3, TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+			ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId().toString(), 1);
+
+		final Integer studyExperimentId =
+			this.createTestExperiments(study, environmentDataset, plotDataset, instance1, instance2, instance3);
+		final Integer studyId = study.getProjectId();
+
+		this.sessionProvder.getSession().flush();
+
+		// Delete Instance 1,2,3
+		final Integer instance1InstanceId = instance1.getLocationId();
+		final Integer instance2InstanceId = instance2.getLocationId();
+		this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance1InstanceId,instance2InstanceId));
+		this.sessionProvder.getSession().flush();
+
+		final List<StudyInstance> studyInstances =
+			this.studyInstanceService.getStudyInstances(studyId);
+
+		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
+		Assert.assertFalse(hasExperimentalDesign);
+		Assert.assertFalse(studyInstances.get(0).isHasExperimentalDesign());
+		Assert.assertEquals(1, studyInstances.size());
+
 	}
 
 	@Test
