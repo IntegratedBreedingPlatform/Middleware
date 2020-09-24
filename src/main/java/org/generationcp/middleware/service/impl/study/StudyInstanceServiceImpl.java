@@ -168,6 +168,10 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		// Delete geolocation and its properties
 		this.daoFactory.getGeolocationDao().deleteGeolocations(instanceIds);
 
+		final List<Integer> remainingInstances = allEnvironments.stream().filter(instance -> !instanceIds.contains(instance.getLocationId())).map(Geolocation::getLocationId).collect(
+			Collectors.toList());
+		this.deleteExperimentalDesign(studyId, remainingInstances, environmentDatasetId);
+
 		// IF experimental design is not yet generated, re-number succeeding trial instances
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
 		if (!hasExperimentalDesign) {
@@ -364,6 +368,17 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			geolocation.setGeodeticDatum(value);
 		} else if (TermId.ALTITUDE.getId() == variableId) {
 			geolocation.setAltitude(Double.valueOf(value));
+		}
+	}
+
+	private void deleteExperimentalDesign(final int studyId, final List<Integer> remainingInstances, final int environmentDatasetId) {
+		//Check if Remaining Instances has ExperimentalDesign
+		final List<StudyInstance> instances = this.daoFactory.getDmsProjectDAO().getDatasetInstances(environmentDatasetId, remainingInstances);
+		final List<StudyInstance> withExpDesign = instances.stream().filter(studyInstance -> studyInstance.isHasExperimentalDesign()).collect(
+			Collectors.toList());
+		final boolean deleteExperimentalDesign = withExpDesign == null || withExpDesign.isEmpty();
+		if (deleteExperimentalDesign) {
+			this.experimentDesignService.deleteStudyExperimentDesign(studyId);
 		}
 	}
 
