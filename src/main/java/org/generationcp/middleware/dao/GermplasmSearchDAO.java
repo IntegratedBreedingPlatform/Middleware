@@ -34,6 +34,7 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1041,13 +1042,6 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             paramBuilder.setParameter("programUUID", programUUID);
         }
 
-        final Map<String, String> attributes = germplasmSearchRequest.getAttributes();
-        if (attributes != null) {
-            // TODO
-            paramBuilder.append("");
-            paramBuilder.setParameter("attributes", attributes);
-        }
-
         if (preFilteredGids != null && !preFilteredGids.isEmpty()) {
             paramBuilder.append(" and g.gid in (:preFilteredGids) ");
             paramBuilder.setParameterList("preFilteredGids", preFilteredGids);
@@ -1117,6 +1111,32 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 + " where n.nval like :immediateSourceName " + LIMIT_CLAUSE) //
                 .setParameter("immediateSourceName", '%' + immediateSourceName + '%')
                 .list();
+            prefilteredGids.addAll(gids);
+        }
+
+        final Map<String, String> attributes = germplasmSearchRequest.getAttributes();
+        if (attributes != null && !attributes.isEmpty()) {
+            final StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append(" select distinct a.gid from atributs a \n"
+                + "  inner join udflds u on a.atype = u.fldno \n"
+                + " where ");
+            final Iterator<Map.Entry<String, String>> iterator = attributes.entrySet().iterator();
+            while (iterator.hasNext()) {
+                final Map.Entry<String, String> entry = iterator.next();
+                queryBuilder.append(String.format(" atype = :attributeKey%s and aval like :attributeValue%<s ", entry.getKey()));
+                if (iterator.hasNext()) {
+                    queryBuilder.append(" or ");
+                }
+            }
+            queryBuilder.append(LIMIT_CLAUSE);
+
+            final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+            for (final Map.Entry<String, String> entry : attributes.entrySet()) {
+                sqlQuery.setParameter("attributeKey" + entry.getKey(), entry.getKey());
+                sqlQuery.setParameter("attributeValue" + entry.getKey(), '%' + entry.getValue() + '%');
+			}
+
+            final List<Integer> gids = sqlQuery.list();
             prefilteredGids.addAll(gids);
         }
 
