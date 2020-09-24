@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v16.2.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'MERGE_LOTS'
+            </sqlCheck>
+        </preConditions>
+        <comment>MERGE_LOTS granular permissions</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_lots_id = (select permission_id from permission where name = 'MANAGE_LOTS');
+
+			# Merge Lots Permissions
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MERGE_LOTS', 'Merge Lots', @manage_lots_id, null);
+			set @merge_lots_inventory_id = (select last_insert_id());
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
