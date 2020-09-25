@@ -178,8 +178,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		final Optional<StockProperty> entryType =
 			stock.getProperties().stream().filter(prop -> variableId.equals(prop.getTypeId())).findFirst();
 		entryType.ifPresent(stockProperty -> {
-				final String variableName = this.daoFactory.getCvTermDao().getById(stockProperty.getTypeId()).getName();
-				studyEntryDto.getVariables().put(variableName,
+				studyEntryDto.getVariables().put(variableId,
 					new StudyEntryPropertyData(null, stockProperty.getTypeId(), value.isPresent()? value.get() : stockProperty.getValue()));
 			}
 		);

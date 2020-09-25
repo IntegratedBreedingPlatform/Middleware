@@ -394,13 +394,13 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 				final StudyEntryDto studyEntryDto =
 					new StudyEntryDto(entryId, entryNumber, entryCode, gid, designation, lotCount, availableBalance, unit);
-				final Map<String, StudyEntryPropertyData> variables = new HashMap<>();
+				final Map<Integer, StudyEntryPropertyData> variables = new HashMap<>();
 				for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
 					final StudyEntryPropertyData studyEntryPropertyData =
 						new StudyEntryPropertyData((Integer) row.get(entryDescriptor.getName() + "_propertyId"),
 							(Integer) row.get(entryDescriptor.getName() + "_variableId"),
 							(String) row.get(entryDescriptor.getName() + "_value"));
-					variables.put(entryDescriptor.getName(), studyEntryPropertyData);
+					variables.put(entryDescriptor.getTermId(), studyEntryPropertyData);
 				}
 				//These elements should not be listed as germplasm descriptors, this is a way to match values between column
 				//and table cells. In the near future this block should be removed
@@ -423,14 +423,14 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	private void addFixedVariableIfPresent(final TermId termId, final String value, final StudyEntrySearchDto studyEntrySearchDto,
-		final Map<String, StudyEntryPropertyData> variables) {
+		final Map<Integer, StudyEntryPropertyData> variables) {
 		final Optional<MeasurementVariable>
-			entryCodeMV =
+			measurementVariable =
 			studyEntrySearchDto.getFixedEntryDescriptors().stream().filter(v -> v.getTermId() == termId.getId())
 				.findFirst();
-		if (entryCodeMV.isPresent()) {
+		if (measurementVariable.isPresent()) {
 			variables.put(
-				entryCodeMV.get().getName(), new StudyEntryPropertyData(value));
+				measurementVariable.get().getTermId(), new StudyEntryPropertyData(value));
 		}
 	}
 }

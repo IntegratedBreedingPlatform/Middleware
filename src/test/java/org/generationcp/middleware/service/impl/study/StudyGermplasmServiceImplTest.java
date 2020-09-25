@@ -93,12 +93,12 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 		studyEntryDto.setEntryCode(StudyGermplasmServiceImplTest.ENTRYCODE + gid);
 
 		studyEntryDto.getVariables()
-			.put("CROSS", new StudyEntryPropertyData(null, TermId.CROSS.getId(), StudyGermplasmServiceImplTest.CROSS + i));
+			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), StudyGermplasmServiceImplTest.CROSS + i));
 		studyEntryDto.getVariables()
-			.put("ENTRY_TYPE", new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
+			.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
 				String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
 		studyEntryDto.getVariables()
-			.put("SEED_SOURCE", new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(),
+			.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(),
 				StudyGermplasmServiceImplTest.SEEDSOURCE + i));
 
 		return studyEntryDto;
@@ -191,8 +191,8 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 	private void verifyStudyGermplasmDetails(Integer gid, int index, StudyEntryDto dto) {
 		Assert.assertEquals(index, dto.getEntryNumber().intValue());
 		Assert.assertEquals(StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + index, dto.getDesignation());
-		Assert.assertEquals(StudyGermplasmServiceImplTest.SEEDSOURCE + index, dto.getVariables().get("SEED_SOURCE").getValue());
-		Assert.assertEquals(StudyGermplasmServiceImplTest.CROSS + index, dto.getVariables().get("CROSS").getValue());
+		Assert.assertEquals(StudyGermplasmServiceImplTest.SEEDSOURCE + index, dto.getVariables().get(TermId.SEED_SOURCE.getId()).getValue());
+		Assert.assertEquals(StudyGermplasmServiceImplTest.CROSS + index, dto.getVariables().get(TermId.CROSS.getId()).getValue());
 		Assert.assertEquals(gid, dto.getGid());
 		Assert.assertEquals(StudyGermplasmServiceImplTest.ENTRYCODE + gid, dto.getEntryCode());
 		Assert.assertNotNull(dto.getEntryId());

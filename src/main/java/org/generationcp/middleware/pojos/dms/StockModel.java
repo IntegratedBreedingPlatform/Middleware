@@ -132,7 +132,7 @@ public class StockModel implements Serializable {
 
 		int rank = 1;
 		final Set<StockProperty> stockProperties = new HashSet<>();
-		final Iterator<Map.Entry<String, StudyEntryPropertyData>> iterator = studyEntryDto.getVariables().entrySet().iterator();
+		final Iterator<Map.Entry<Integer, StudyEntryPropertyData>> iterator = studyEntryDto.getVariables().entrySet().iterator();
 		while (iterator.hasNext()) {
 			final StudyEntryPropertyData studyEntryPropertyData = iterator.next().getValue();
 			final StockProperty stockProperty = new StockProperty();

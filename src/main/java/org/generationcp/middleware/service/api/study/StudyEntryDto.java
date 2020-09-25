@@ -27,7 +27,7 @@ public class StudyEntryDto {
 
 	private String unit;
 
-	private Map<String, StudyEntryPropertyData> variables = new HashMap<>();
+	private Map<Integer, StudyEntryPropertyData> variables = new HashMap<>();
 
 	public StudyEntryDto(){
 
@@ -108,11 +108,11 @@ public class StudyEntryDto {
 		this.unit = unit;
 	}
 
-	public Map<String, StudyEntryPropertyData> getVariables() {
+	public Map<Integer, StudyEntryPropertyData> getVariables() {
 		return variables;
 	}
 
-	public void setVariables(final Map<String, StudyEntryPropertyData> variables) {
+	public void setVariables(final Map<Integer, StudyEntryPropertyData> variables) {
 		this.variables = variables;
 	}
 
