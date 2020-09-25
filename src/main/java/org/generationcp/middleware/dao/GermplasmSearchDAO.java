@@ -1134,7 +1134,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             for (final Map.Entry<String, String> entry : attributes.entrySet()) {
                 sqlQuery.setParameter("attributeKey" + entry.getKey(), entry.getKey());
                 sqlQuery.setParameter("attributeValue" + entry.getKey(), '%' + entry.getValue() + '%');
-			}
+            }
 
             final List<Integer> gids = sqlQuery.list();
             prefilteredGids.addAll(gids);
