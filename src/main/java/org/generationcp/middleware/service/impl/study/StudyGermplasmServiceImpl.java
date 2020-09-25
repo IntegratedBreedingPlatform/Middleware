@@ -77,7 +77,10 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 			studyGermplasmDto.setGermplasmId(stockModel.getGermplasm().getGid());
 			studyGermplasmDto.setPosition(String.valueOf(++index));
 			studyGermplasmDto.setSeedSource(this.findStockPropValue(TermId.SEED_SOURCE.getId(), stockModel.getProperties()));
-			studyGermplasmDto.setCheckType(Integer.valueOf(this.findStockPropValue(TermId.ENTRY_TYPE.getId(), stockModel.getProperties())));
+			final String entryType = this.findStockPropValue(TermId.ENTRY_TYPE.getId(), stockModel.getProperties());
+			if (entryType != null) {
+				studyGermplasmDto.setCheckType(Integer.valueOf(entryType));
+			}
 			studyGermplasmDto.setStockIds(stockIdsMap.getOrDefault(stockModel.getGermplasm().getGid(), ""));
 			final String groupGid = this.findStockPropValue(TermId.GROUPGID.getId(), stockModel.getProperties());
 			studyGermplasmDto.setGroupId(groupGid != null ? Integer.valueOf(groupGid) : 0);
