@@ -25,13 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -150,7 +144,6 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 			throw new MiddlewareException("Invalid GID: " + gid);
 		}
 		final StockDao stockDao = this.daoFactory.getStockDao();
-		// Copy from old entry: entry type, entry #, entry code
 		final StockModel stock = stockDao.getById(entryId);
 		if (stock == null) {
 			throw new MiddlewareRequestException("", "invalid.entryid");
@@ -159,6 +152,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		} else if (stock.getGermplasm().getGid() == gid) {
 			throw new MiddlewareRequestException("", "new.gid.matches.old.gid");
 		}
+		// Copy from old entry: entry #, entry code
 		final StudyEntryDto studyEntryDto = new StudyEntryDto();
 		studyEntryDto.setEntryNumber(Integer.valueOf(stock.getUniqueName()));
 		studyEntryDto.setGid(gid);
@@ -167,29 +161,28 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		final Name preferredName = newGermplasm.getPreferredName();
 		studyEntryDto.setDesignation(preferredName != null ? preferredName.getNval() : "");
 
-		final Optional<StockProperty> entryType =
-			stock.getProperties().stream().filter(prop -> TermId.ENTRY_TYPE.getId() == (prop.getTypeId())).findFirst();
-		entryType.ifPresent(stockProperty -> {
-				final String variableName = this.daoFactory.getCvTermDao().getById(stockProperty.getTypeId()).getName();
-				studyEntryDto.getVariables().put(variableName,
-					new StudyEntryPropertyData(null, stockProperty.getTypeId(), stockProperty.getValue()));
-			}
-		);
-
-		// Save the Cross
-		studyEntryDto.getVariables().put(this.daoFactory.getCvTermDao().getById(TermId.CROSS.getId()).getName(),
-			new StudyEntryPropertyData(null, TermId.CROSS.getId(), crossExpansion));
-		// Save also Group GID
-		studyEntryDto.getVariables().put(this.daoFactory.getCvTermDao().getById(TermId.GROUPGID.getId()).getName(),
-			new StudyEntryPropertyData(null, TermId.GROUPGID.getId(), String.valueOf(newGermplasm.getMgid())));
+		// If germplasm descriptors exist for previous entry, copy ENTRY_TYPE value and set cross expansion and MGID of new germplasm
+		this.addStudyEntryPropertyDataIfApplicable(stock, studyEntryDto, TermId.ENTRY_TYPE.getId(), Optional.empty());
+		this.addStudyEntryPropertyDataIfApplicable(stock, studyEntryDto, TermId.CROSS.getId(), Optional.of(crossExpansion));
+		this.addStudyEntryPropertyDataIfApplicable(stock, studyEntryDto, TermId.GROUPGID.getId(), Optional.of(String.valueOf(newGermplasm.getMgid())));
 
 		final StudyEntryDto savedStudyEntryDto = this.saveStudyEntries(studyId, Collections.singletonList(studyEntryDto)).get(0);
-
 		stockDao.replaceExperimentStocks(entryId, savedStudyEntryDto.getEntryId());
-		// Finally delete old stock
+		// Finally delete old study entry
 		stockDao.makeTransient(stock);
 
 		return savedStudyEntryDto;
+	}
+
+	private void addStudyEntryPropertyDataIfApplicable(final StockModel stock, final StudyEntryDto studyEntryDto, final Integer variableId, final Optional<String> value) {
+		final Optional<StockProperty> entryType =
+			stock.getProperties().stream().filter(prop -> variableId.equals(prop.getTypeId())).findFirst();
+		entryType.ifPresent(stockProperty -> {
+				final String variableName = this.daoFactory.getCvTermDao().getById(stockProperty.getTypeId()).getName();
+				studyEntryDto.getVariables().put(variableName,
+					new StudyEntryPropertyData(null, stockProperty.getTypeId(), value.isPresent()? value.get() : stockProperty.getValue()));
+			}
+		);
 	}
 
 	@Override
