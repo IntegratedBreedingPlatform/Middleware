@@ -16,6 +16,8 @@ public interface StudyGermplasmService {
 		// Germplasm Table is already refactored.
 	List<StudyGermplasmDto> getGermplasm(int studyBusinessIdentifier);
 
+	List<StudyEntryDto> getStudyEntries(int studyI);
+
 	List<StudyEntryDto> getStudyEntries(int studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 
 	List<StudyGermplasmDto> getGermplasmFromPlots(int studyBusinessIdentifier, Set<Integer> plotNos);

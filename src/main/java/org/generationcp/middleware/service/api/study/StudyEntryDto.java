@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class StudyEntryDto {
+public class StudyEntryDto implements Serializable {
 
 	private Integer entryId;
 
@@ -27,6 +29,7 @@ public class StudyEntryDto {
 
 	private String unit;
 
+	// TODO rename to properties
 	private Map<Integer, StudyEntryPropertyData> variables = new HashMap<>();
 
 	public StudyEntryDto(){
@@ -129,6 +132,14 @@ public class StudyEntryDto {
 	@Override
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
+	}
+
+
+	public Optional<String> getStudyEntryPropertyValue(final Integer variableId) {
+		if (this.variables.containsKey(variableId)) {
+			return Optional.of(this.variables.get(variableId).getValue());
+		}
+		return Optional.empty();
 	}
 
 }

@@ -21,6 +21,7 @@ import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,6 +82,12 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 			studyGermplasmDtos.add(studyGermplasmDto);
 		}
 		return studyGermplasmDtos;
+	}
+
+
+	@Override
+	public List<StudyEntryDto> getStudyEntries(final int studyId) {
+		return this.getStudyEntries(studyId, null, new PageRequest(0, Integer.MAX_VALUE));
 	}
 
 	@Override
