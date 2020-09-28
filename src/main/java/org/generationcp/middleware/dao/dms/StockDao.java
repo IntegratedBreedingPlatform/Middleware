@@ -347,11 +347,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "WHERE s.project_id = :studyId ");
 
 
-			if (studyEntrySearchDto.getFilter()!=null) {
-				if (studyEntrySearchDto.getFilter().getEntryNumbers()!=null && !studyEntrySearchDto.getFilter().getEntryNumbers().isEmpty()) {
+			if (studyEntrySearchDto.getFilter() != null) {
+				if (!CollectionUtils.isEmpty(studyEntrySearchDto.getFilter().getEntryNumbers())) {
 					sqlQuery.append(" AND s.uniquename in (:entryNumbers)" );
 				}
-				if (studyEntrySearchDto.getFilter().getEntryIds()!=null && !studyEntrySearchDto.getFilter().getEntryIds().isEmpty()) {
+				if (!CollectionUtils.isEmpty(studyEntrySearchDto.getFilter().getEntryIds())) {
 					sqlQuery.append(" AND s.stock_id in (:entryIds)" );
 				}
 			}

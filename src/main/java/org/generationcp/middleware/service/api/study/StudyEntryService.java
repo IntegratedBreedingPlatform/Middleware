@@ -11,7 +11,7 @@ import java.util.Set;
 
 public interface StudyEntryService {
 
-	List<StudyEntryDto> getStudyEntries(int studyI);
+	List<StudyEntryDto> getStudyEntries(int studyId);
 
 	List<StudyEntryDto> getStudyEntries(int studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 

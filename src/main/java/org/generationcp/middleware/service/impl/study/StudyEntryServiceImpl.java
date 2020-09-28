@@ -94,10 +94,15 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public List<StudyEntryDto> saveStudyEntries(final Integer studyId, final List<StudyEntryDto> studyEntryDtoList) {
+		final List<Integer> entryIds = new ArrayList<>();
 		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
-			this.daoFactory.getStockDao().saveOrUpdate(new StockModel(studyId, studyEntryDto));
+			final StockModel entry = new StockModel(studyId, studyEntryDto);
+			this.daoFactory.getStockDao().saveOrUpdate(entry);
+			entryIds.add(entry.getStockId());
 		}
-		return this.getStudyEntries(studyId, null, null);
+		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+		filter.setEntryIds(entryIds);
+		return this.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
 	}
 
 	@Override
