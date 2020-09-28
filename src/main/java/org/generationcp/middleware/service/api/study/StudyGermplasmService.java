@@ -12,11 +12,6 @@ import java.util.Set;
 //TODO rename to StudyEntryService
 public interface StudyGermplasmService {
 
-	@Deprecated
-		// TODO: This method will be replaced with getStudyEntries. This method is only used in displaying Germplasm tab in Fieldbook. Delete this once
-		// Germplasm Table is already refactored.
-	List<StudyGermplasmDto> getGermplasm(int studyBusinessIdentifier);
-
 	List<StudyEntryDto> getStudyEntries(int studyI);
 
 	List<StudyEntryDto> getStudyEntries(int studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
