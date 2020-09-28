@@ -1137,7 +1137,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         if (inProgramListOnly != null) {
             paramBuilder.append(" and exists(select 1 from listdata filter_l "  //
                 + "  inner join listnms filter_listnms on filter_l.listid = filter_listnms.listid"
-                + " where filter_l.gid = g.gid and filter_listnms.program_uuid = :programUUID) ");
+                + " where filter_listnms.liststatus != 9 and filter_l.gid = g.gid and filter_listnms.program_uuid = :programUUID) ");
             paramBuilder.setParameter("programUUID", programUUID);
         }
 
