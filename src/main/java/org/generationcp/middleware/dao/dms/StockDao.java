@@ -259,6 +259,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
 			query.setParameterList("PLOT_NO_TERM_IDS",
 				new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
+			query.addScalar("entryId", new IntegerType());
+			query.addScalar("position", new IntegerType());
+			query.addScalar("designation", new StringType());
+			query.addScalar("germplasmId", new IntegerType());
+
 
 			final Map<Integer, StudyEntryDto> map = new HashMap<>();
 			final List<Object[]> results = query.list();
