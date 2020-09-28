@@ -400,23 +400,23 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 				final StudyEntryDto studyEntryDto =
 					new StudyEntryDto(entryId, entryNumber, entryCode, gid, designation, lotCount, availableBalance, unit);
-				final Map<Integer, StudyEntryPropertyData> variables = new HashMap<>();
+				final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 				for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
 					final StudyEntryPropertyData studyEntryPropertyData =
 						new StudyEntryPropertyData((Integer) row.get(entryDescriptor.getName() + "_propertyId"),
 							(Integer) row.get(entryDescriptor.getName() + "_variableId"),
 							(String) row.get(entryDescriptor.getName() + "_value"));
-					variables.put(entryDescriptor.getTermId(), studyEntryPropertyData);
+					properties.put(entryDescriptor.getTermId(), studyEntryPropertyData);
 				}
 				//These elements should not be listed as germplasm descriptors, this is a way to match values between column
 				//and table cells. In the near future this block should be removed
-				this.addFixedVariableIfPresent(TermId.GID, String.valueOf(studyEntryDto.getGid()), studyEntrySearchDto, variables);
-				this.addFixedVariableIfPresent(TermId.DESIG, studyEntryDto.getDesignation(), studyEntrySearchDto, variables);
-				this.addFixedVariableIfPresent(TermId.ENTRY_CODE, studyEntryDto.getEntryCode(), studyEntrySearchDto, variables);
+				this.addFixedVariableIfPresent(TermId.GID, String.valueOf(studyEntryDto.getGid()), studyEntrySearchDto, properties);
+				this.addFixedVariableIfPresent(TermId.DESIG, studyEntryDto.getDesignation(), studyEntrySearchDto, properties);
+				this.addFixedVariableIfPresent(TermId.ENTRY_CODE, studyEntryDto.getEntryCode(), studyEntrySearchDto, properties);
 				this.addFixedVariableIfPresent(TermId.ENTRY_NO, String.valueOf(studyEntryDto.getEntryNumber()), studyEntrySearchDto,
-					variables);
+					properties);
 
-				studyEntryDto.setVariables(variables);
+				studyEntryDto.setProperties(properties);
 				studyEntryDtos.add(studyEntryDto);
 			}
 			return studyEntryDtos;

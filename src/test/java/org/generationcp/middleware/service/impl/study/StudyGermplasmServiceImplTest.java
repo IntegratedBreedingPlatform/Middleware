@@ -92,12 +92,12 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 		studyEntryDto.setDesignation(StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + i);
 		studyEntryDto.setEntryCode(StudyGermplasmServiceImplTest.ENTRYCODE + gid);
 
-		studyEntryDto.getVariables()
+		studyEntryDto.getProperties()
 			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), StudyGermplasmServiceImplTest.CROSS + i));
-		studyEntryDto.getVariables()
+		studyEntryDto.getProperties()
 			.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
 				String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
-		studyEntryDto.getVariables()
+		studyEntryDto.getProperties()
 			.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(),
 				StudyGermplasmServiceImplTest.SEEDSOURCE + i));
 
@@ -139,10 +139,10 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 		final StudyEntryDto dto = this.service.getStudyEntries(this.studyId, null, null).get(1);
 		Assert.assertNotEquals(oldEntry.getEntryId(), dto.getEntryId());
 		Assert.assertEquals(StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + 1, dto.getDesignation());
-		Assert.assertEquals(crossExpansion, dto.getVariables().get("CROSS").getValue());
+		Assert.assertEquals(crossExpansion, dto.getProperties().get("CROSS").getValue());
 		Assert.assertEquals(newGid, dto.getGid());
 		// Some fields should have been copied from old entry
-		Assert.assertEquals(oldEntry.getVariables().get("ENTRY_TYPE").getValue(), dto.getVariables().get("ENTRY_TYPE").getValue());
+		Assert.assertEquals(oldEntry.getProperties().get("ENTRY_TYPE").getValue(), dto.getProperties().get("ENTRY_TYPE").getValue());
 		Assert.assertEquals(oldEntry.getEntryNumber(), dto.getEntryNumber());
 		Assert.assertEquals(oldEntry.getEntryCode(), dto.getEntryCode());
 	}
@@ -191,8 +191,8 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 	private void verifyStudyGermplasmDetails(Integer gid, int index, StudyEntryDto dto) {
 		Assert.assertEquals(index, dto.getEntryNumber().intValue());
 		Assert.assertEquals(StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + index, dto.getDesignation());
-		Assert.assertEquals(StudyGermplasmServiceImplTest.SEEDSOURCE + index, dto.getVariables().get(TermId.SEED_SOURCE.getId()).getValue());
-		Assert.assertEquals(StudyGermplasmServiceImplTest.CROSS + index, dto.getVariables().get(TermId.CROSS.getId()).getValue());
+		Assert.assertEquals(StudyGermplasmServiceImplTest.SEEDSOURCE + index, dto.getProperties().get(TermId.SEED_SOURCE.getId()).getValue());
+		Assert.assertEquals(StudyGermplasmServiceImplTest.CROSS + index, dto.getProperties().get(TermId.CROSS.getId()).getValue());
 		Assert.assertEquals(gid, dto.getGid());
 		Assert.assertEquals(StudyGermplasmServiceImplTest.ENTRYCODE + gid, dto.getEntryCode());
 		Assert.assertNotNull(dto.getEntryId());

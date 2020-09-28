@@ -297,7 +297,7 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
 		for (final StudyEntryDto studyEntryDto: studyEntryDtos) {
 			for (final MeasurementVariable measurementVariable: germplasmDescriptors) {
-				Assert.assertEquals(Boolean.TRUE, studyEntryDto.getVariables().containsKey(measurementVariable.getTermId()));
+				Assert.assertEquals(Boolean.TRUE, studyEntryDto.getProperties().containsKey(measurementVariable.getTermId()));
 			}
 		}
 	}

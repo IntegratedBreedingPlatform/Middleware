@@ -147,7 +147,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		final Optional<StockProperty> entryType =
 			stock.getProperties().stream().filter(prop -> variableId.equals(prop.getTypeId())).findFirst();
 		entryType.ifPresent(stockProperty -> {
-				studyEntryDto.getVariables().put(variableId,
+				studyEntryDto.getProperties().put(variableId,
 					new StudyEntryPropertyData(null, stockProperty.getTypeId(), value.isPresent()? value.get() : stockProperty.getValue()));
 			}
 		);

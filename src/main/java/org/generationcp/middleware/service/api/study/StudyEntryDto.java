@@ -29,8 +29,7 @@ public class StudyEntryDto implements Serializable {
 
 	private String unit;
 
-	// TODO rename to properties
-	private Map<Integer, StudyEntryPropertyData> variables = new HashMap<>();
+	private Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 
 	public StudyEntryDto(){
 
@@ -38,6 +37,14 @@ public class StudyEntryDto implements Serializable {
 
 	public StudyEntryDto(final Integer entryId, final Integer gid, final String designation) {
 		this.entryId = entryId;
+		this.gid = gid;
+		this.designation = designation;
+	}
+
+	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final String entryCode, final Integer gid, final String designation) {
+		this.entryId = entryId;
+		this.entryNumber = entryNumber;
+		this.entryCode = entryCode;
 		this.gid = gid;
 		this.designation = designation;
 	}
@@ -117,12 +124,12 @@ public class StudyEntryDto implements Serializable {
 		this.unit = unit;
 	}
 
-	public Map<Integer, StudyEntryPropertyData> getVariables() {
-		return variables;
+	public Map<Integer, StudyEntryPropertyData> getProperties() {
+		return properties;
 	}
 
-	public void setVariables(final Map<Integer, StudyEntryPropertyData> variables) {
-		this.variables = variables;
+	public void setProperties(final Map<Integer, StudyEntryPropertyData> properties) {
+		this.properties = properties;
 	}
 
 	@Override
@@ -142,8 +149,8 @@ public class StudyEntryDto implements Serializable {
 
 
 	public Optional<String> getStudyEntryPropertyValue(final Integer variableId) {
-		if (this.variables.containsKey(variableId)) {
-			return Optional.of(this.variables.get(variableId).getValue());
+		if (this.properties.containsKey(variableId)) {
+			return Optional.of(this.properties.get(variableId).getValue());
 		}
 		return Optional.empty();
 	}
