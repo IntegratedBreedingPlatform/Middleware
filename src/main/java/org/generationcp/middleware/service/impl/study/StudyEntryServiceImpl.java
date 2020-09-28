@@ -19,7 +19,7 @@ import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmService;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Transactional
-public class StudyGermplasmServiceImpl implements StudyGermplasmService {
+public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private DatasetService datasetService;
@@ -43,7 +43,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
 			TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
 
-	public StudyGermplasmServiceImpl(final HibernateSessionProvider sessionProvider) {
+	public StudyEntryServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 

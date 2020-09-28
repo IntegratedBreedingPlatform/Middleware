@@ -9,8 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-//TODO rename to StudyEntryService
-public interface StudyGermplasmService {
+public interface StudyEntryService {
 
 	List<StudyEntryDto> getStudyEntries(int studyI);
 

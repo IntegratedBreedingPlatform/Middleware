@@ -17,7 +17,7 @@ import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmService;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The class <code>StudyGermplasmListServiceImplTest</code> contains tests for the class <code>{@link StudyGermplasmServiceImpl}</code>.
+ * The class <code>StudyGermplasmListServiceImplTest</code> contains tests for the class <code>{@link StudyEntryServiceImpl}</code>.
  */
-public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
+public class StudyEntryServiceImplTest extends IntegrationTestBase {
 
 	private static final Integer NUMBER_OF_GERMPLASM = 5;
 
@@ -44,7 +44,7 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 	private GermplasmDataManager germplasmManager;
 
 	@Autowired
-	private StudyGermplasmService service;
+	private StudyEntryService service;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 	private Integer studyId;
@@ -75,11 +75,11 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 	private void createTestGermplasm() {
 		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 		final Integer[] gids = this.germplasmTestDataGenerator
-			.createChildrenGermplasm(StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM,
-				StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX,
+			.createChildrenGermplasm(StudyEntryServiceImplTest.NUMBER_OF_GERMPLASM,
+				StudyEntryServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX,
 				parentGermplasm);
 		this.gids = Arrays.asList(gids);
-		for (int i = 1; i <= StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM; i++) {
+		for (int i = 1; i <= StudyEntryServiceImplTest.NUMBER_OF_GERMPLASM; i++) {
 			final Integer gid = gids[i - 1];
 			this.daoFactory.getStockDao().save(new StockModel(studyId, this.createTestStudyEntry(i, gid)));
 		}
@@ -89,24 +89,24 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 		final StudyEntryDto studyEntryDto = new StudyEntryDto();
 		studyEntryDto.setGid(gid);
 		studyEntryDto.setEntryNumber(i);
-		studyEntryDto.setDesignation(StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + i);
-		studyEntryDto.setEntryCode(StudyGermplasmServiceImplTest.ENTRYCODE + gid);
+		studyEntryDto.setDesignation(StudyEntryServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + i);
+		studyEntryDto.setEntryCode(StudyEntryServiceImplTest.ENTRYCODE + gid);
 
 		studyEntryDto.getProperties()
-			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), StudyGermplasmServiceImplTest.CROSS + i));
+			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), StudyEntryServiceImplTest.CROSS + i));
 		studyEntryDto.getProperties()
 			.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
 				String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
 		studyEntryDto.getProperties()
 			.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(),
-				StudyGermplasmServiceImplTest.SEEDSOURCE + i));
+				StudyEntryServiceImplTest.SEEDSOURCE + i));
 
 		return studyEntryDto;
 	}
 
 	@Test
 	public void testCountStudyGermplasm() {
-		Assert.assertEquals(StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM.intValue(), this.service.countStudyEntries(this.studyId));
+		Assert.assertEquals(StudyEntryServiceImplTest.NUMBER_OF_GERMPLASM.intValue(), this.service.countStudyEntries(this.studyId));
 	}
 
 	@Test
@@ -118,7 +118,7 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testSaveStudyGermplasm() {
 		final Integer gid = gids.get(0);
-		final int index = StudyGermplasmServiceImplTest.NUMBER_OF_GERMPLASM + 1;
+		final int index = StudyEntryServiceImplTest.NUMBER_OF_GERMPLASM + 1;
 		final StudyEntryDto studyEntryDto = createTestStudyEntry(index, gid);
 		final List<StudyEntryDto> addedStudyEntries =
 			this.service.saveStudyEntries(this.studyId, Collections.singletonList(studyEntryDto));
@@ -138,7 +138,7 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 
 		final StudyEntryDto dto = this.service.getStudyEntries(this.studyId, null, null).get(1);
 		Assert.assertNotEquals(oldEntry.getEntryId(), dto.getEntryId());
-		Assert.assertEquals(StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + 1, dto.getDesignation());
+		Assert.assertEquals(StudyEntryServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + 1, dto.getDesignation());
 		Assert.assertEquals(crossExpansion, dto.getProperties().get("CROSS").getValue());
 		Assert.assertEquals(newGid, dto.getGid());
 		// Some fields should have been copied from old entry
@@ -190,11 +190,11 @@ public class StudyGermplasmServiceImplTest extends IntegrationTestBase {
 
 	private void verifyStudyGermplasmDetails(Integer gid, int index, StudyEntryDto dto) {
 		Assert.assertEquals(index, dto.getEntryNumber().intValue());
-		Assert.assertEquals(StudyGermplasmServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + index, dto.getDesignation());
-		Assert.assertEquals(StudyGermplasmServiceImplTest.SEEDSOURCE + index, dto.getProperties().get(TermId.SEED_SOURCE.getId()).getValue());
-		Assert.assertEquals(StudyGermplasmServiceImplTest.CROSS + index, dto.getProperties().get(TermId.CROSS.getId()).getValue());
+		Assert.assertEquals(StudyEntryServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + index, dto.getDesignation());
+		Assert.assertEquals(StudyEntryServiceImplTest.SEEDSOURCE + index, dto.getProperties().get(TermId.SEED_SOURCE.getId()).getValue());
+		Assert.assertEquals(StudyEntryServiceImplTest.CROSS + index, dto.getProperties().get(TermId.CROSS.getId()).getValue());
 		Assert.assertEquals(gid, dto.getGid());
-		Assert.assertEquals(StudyGermplasmServiceImplTest.ENTRYCODE + gid, dto.getEntryCode());
+		Assert.assertEquals(StudyEntryServiceImplTest.ENTRYCODE + gid, dto.getEntryCode());
 		Assert.assertNotNull(dto.getEntryId());
 	}
 
