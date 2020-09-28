@@ -20,6 +20,8 @@ import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
@@ -34,7 +36,6 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -71,11 +72,14 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
     private static final String Q_STANDARDIZED = "qStandardized";
 
     public static final String NAMES = "NAMES";
+    private static final String MIXED_UNITS_LABEL = "Mixed";
+
     public static final String GID = ColumnLabels.GID.getName();
     public static final String GROUP_ID = ColumnLabels.GROUP_ID.getName();
     public static final String STOCK_IDS = ColumnLabels.STOCKID.getName();
     public static final String AVAIL_LOTS = ColumnLabels.AVAILABLE_INVENTORY.getName();
     public static final String AVAIL_BALANCE = ColumnLabels.TOTAL.getName();
+    public static final String LOT_UNITS = ColumnLabels.UNITS.getName();
     public static final String METHOD_NAME = ColumnLabels.BREEDING_METHOD_NAME.getName();
     public static final String LOCATION_NAME = ColumnLabels.GERMPLASM_LOCATION.getName();
     public static final String METHOD_ABBREVIATION = ColumnLabels.BREEDING_METHOD_ABBREVIATION.getName();
@@ -552,37 +556,31 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                                        final Map<String, Integer> attributeTypesMap, final Map<String, Integer> nameTypesMap) {
         final Germplasm germplasm = (Germplasm) row[0];
         final GermplasmInventory inventoryInfo = new GermplasmInventory(germplasm.getGid());
-        germplasm.setGermplasmNamesString(
-                row[GermplasmSearchDAO.GERMPLASM_NAMES_INDEX] != null ? String.valueOf(row[GermplasmSearchDAO.GERMPLASM_NAMES_INDEX]) : "");
+        germplasm.setGermplasmNamesString(row[GermplasmSearchDAO.GERMPLASM_NAMES_INDEX] != null ? String.valueOf(row[GermplasmSearchDAO.GERMPLASM_NAMES_INDEX]) : "");
         inventoryInfo.setStockIDs((String) row[GermplasmSearchDAO.STOCKID_INDEX]);
-        inventoryInfo.setActualInventoryLotCount(
-                row[GermplasmSearchDAO.LOT_INDEX] != null ? ((BigInteger) row[GermplasmSearchDAO.LOT_INDEX]).intValue() : 0);
-        inventoryInfo.setTotalAvailableBalance(
-                row[GermplasmSearchDAO.AVAIL_BALANCE_INDEX] != null ? (Double) row[GermplasmSearchDAO.AVAIL_BALANCE_INDEX] : 0d);
+        inventoryInfo.setActualInventoryLotCount(row[GermplasmSearchDAO.LOT_INDEX] != null ? ((BigInteger) row[GermplasmSearchDAO.LOT_INDEX]).intValue() : 0);
+        inventoryInfo.setTotalAvailableBalance(row[GermplasmSearchDAO.AVAIL_BALANCE_INDEX] != null ? (Double) row[GermplasmSearchDAO.AVAIL_BALANCE_INDEX] : 0d);
         germplasm.setInventoryInfo(inventoryInfo);
         germplasm.setMethodName(row[7] != null ? String.valueOf(row[7]) : "");
         germplasm.setLocationName(row[8] != null ? String.valueOf(row[8]) : "");
 
-        germplasm.setGermplasmDate(this.getValueOfAddedColumns(GermplasmSearchDAO.GERMPLASM_DATE, row, addedColumnsPropertyIds));
-        germplasm.setMethodCode(this.getValueOfAddedColumns(GermplasmSearchDAO.METHOD_ABBREVIATION, row, addedColumnsPropertyIds));
-        germplasm.setMethodNumber(this.getValueOfAddedColumns(GermplasmSearchDAO.METHOD_NUMBER, row, addedColumnsPropertyIds));
-        germplasm.setMethodGroup(this.getValueOfAddedColumns(GermplasmSearchDAO.METHOD_GROUP, row, addedColumnsPropertyIds));
-        germplasm.setGermplasmPeferredName(this.getValueOfAddedColumns(GermplasmSearchDAO.PREFERRED_NAME, row, addedColumnsPropertyIds));
-        germplasm.setGermplasmPeferredId(this.getValueOfAddedColumns(GermplasmSearchDAO.PREFERRED_ID, row, addedColumnsPropertyIds));
-        germplasm
-            .setFemaleParentPreferredID(this.getValueOfAddedColumns(GermplasmSearchDAO.FEMALE_PARENT_ID, row, addedColumnsPropertyIds));
-        germplasm.setFemaleParentPreferredName(
-            this.getValueOfAddedColumns(GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds));
-        germplasm.setMaleParentPreferredID(this.getValueOfAddedColumns(GermplasmSearchDAO.MALE_PARENT_ID, row, addedColumnsPropertyIds));
-        germplasm.setMaleParentPreferredName(
-            this.getValueOfAddedColumns(GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds));
-        germplasm.setGroupSourceGID(this.getValueOfAddedColumns(GermplasmSearchDAO.GROUP_SOURCE_GID, row, addedColumnsPropertyIds));
-        germplasm.setGroupSourcePreferredName(
-                this.getValueOfAddedColumns(GermplasmSearchDAO.GROUP_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds));
-        germplasm.setImmediateSourceGID(this.getValueOfAddedColumns(GermplasmSearchDAO.IMMEDIATE_SOURCE_GID, row, addedColumnsPropertyIds));
-        germplasm.setImmediateSourcePreferredName(
-                this.getValueOfAddedColumns(GermplasmSearchDAO.IMMEDIATE_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds));
-        this.setValuesMapForAttributeAndNameTypes(germplasm, row, addedColumnsPropertyIds, attributeTypesMap, nameTypesMap);
+        final int indexOffset = 9;
+        germplasm.setGermplasmDate(this.getValueOfAddedColumns(GERMPLASM_DATE, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setMethodCode(this.getValueOfAddedColumns(METHOD_ABBREVIATION, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setMethodNumber(this.getValueOfAddedColumns(METHOD_NUMBER, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setMethodGroup(this.getValueOfAddedColumns(METHOD_GROUP, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setGermplasmPeferredName(this.getValueOfAddedColumns(PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setGermplasmPeferredId(this.getValueOfAddedColumns(PREFERRED_ID, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setFemaleParentPreferredID(this.getValueOfAddedColumns(FEMALE_PARENT_ID, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setFemaleParentPreferredName(this.getValueOfAddedColumns(FEMALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setMaleParentPreferredID(this.getValueOfAddedColumns(MALE_PARENT_ID, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setMaleParentPreferredName(this.getValueOfAddedColumns(MALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setGroupSourceGID(this.getValueOfAddedColumns(GROUP_SOURCE_GID, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setGroupSourcePreferredName(this.getValueOfAddedColumns(GROUP_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setImmediateSourceGID(this.getValueOfAddedColumns(IMMEDIATE_SOURCE_GID, row, addedColumnsPropertyIds, indexOffset));
+        germplasm.setImmediateSourcePreferredName(this.getValueOfAddedColumns(IMMEDIATE_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
+        
+        this.setValuesMapForAttributeAndNameTypes(germplasm, row, addedColumnsPropertyIds, attributeTypesMap, nameTypesMap, indexOffset);
 
         return germplasm;
     }
@@ -590,23 +588,23 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
     /**
      * Creates a map that contains the values of 'Attribute' columns.
      *
+     * @param indexOffset
      * @param row
      * @param addedColumnsPropertyIds
      * @param attributeTypesMap
      * @return
      */
     protected void setValuesMapForAttributeAndNameTypes(final Germplasm germplasm, final Object[] row,
-                                                        final List<String> addedColumnsPropertyIds, final Map<String, Integer> attributeTypesMap,
-                                                        final Map<String, Integer> nameTypesMap) {
+        final List<String> addedColumnsPropertyIds, final Map<String, Integer> attributeTypesMap,
+        final Map<String, Integer> nameTypesMap, final int indexOffset) {
 
         final Map<String, String> attributeTypesValueMap = new HashMap<>();
         final Map<String, String> nameTypesValueMap = new HashMap<>();
         for (final String propertyId : addedColumnsPropertyIds) {
             if (attributeTypesMap.containsKey(propertyId)) {
-                attributeTypesValueMap.put(propertyId, this.getValueOfAddedColumns(propertyId, row, addedColumnsPropertyIds));
-
+                attributeTypesValueMap.put(propertyId, this.getValueOfAddedColumns(propertyId, row, addedColumnsPropertyIds, indexOffset));
             } else if (nameTypesMap.containsKey(propertyId)) {
-                nameTypesValueMap.put(propertyId, this.getValueOfAddedColumns(propertyId, row, addedColumnsPropertyIds));
+                nameTypesValueMap.put(propertyId, this.getValueOfAddedColumns(propertyId, row, addedColumnsPropertyIds, indexOffset));
             }
 
         }
@@ -622,12 +620,14 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
      * @param propertyId
      * @param row
      * @param addedColumnsPropertyIds
+     * @param indexOffset
      * @return
      */
-    protected String getValueOfAddedColumns(final String propertyId, final Object[] row, final List<String> addedColumnsPropertyIds) {
+    protected String getValueOfAddedColumns(final String propertyId, final Object[] row, final List<String> addedColumnsPropertyIds,
+        final int indexOffset) {
 
         if (addedColumnsPropertyIds.contains(propertyId)) {
-            final int addedColumnIndex = addedColumnsPropertyIds.indexOf(propertyId) + 9;
+            final int addedColumnIndex = addedColumnsPropertyIds.indexOf(propertyId) + indexOffset;
 
             return row[addedColumnIndex] != null ? String.valueOf(row[addedColumnIndex]) : "";
         } else {
@@ -680,7 +680,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         return typesMap;
     }
 
-
+    // +++++++++++++++++++++++++++++++++++++++New Germplasm search ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     /**
      * New germplasm query (replaces {@link GermplasmSearchDAO#searchForGermplasms(GermplasmSearchParameter)}
@@ -702,8 +702,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
             // main query
             final StringBuilder queryBuilder =
-                new StringBuilder(this.createSelectClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
-            queryBuilder.append(this.createFromClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+                new StringBuilder(this.createSelectClause(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+            queryBuilder.append(this.createFromClause(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
 
 			queryBuilder.append(" where g.gid in (:gids) ");
 			queryBuilder.append(" and g.deleted = 0 and g.grplce = 0 ");
@@ -718,11 +718,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
             query.addEntity(GERMPLSM, Germplasm.class);
             query.addScalar(NAMES);
-            query.addScalar(STOCK_IDS);
-            query.addScalar(GID);
             query.addScalar(GROUP_ID);
             query.addScalar(AVAIL_LOTS);
             query.addScalar(AVAIL_BALANCE);
+            query.addScalar(LOT_UNITS);
             query.addScalar(METHOD_NAME);
             query.addScalar(LOCATION_NAME);
 
@@ -746,22 +745,122 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             }
             query.setParameterList("gids", gids);
 
-            final List<Object[]> result = query.list();
+            final List<Object[]> results = query.list();
 
-            /* TODO
-             *  - rewrite mapToGermplasm after complete migration
-             *  - delete searchForGermplasms
-             */
-            final List<Germplasm> germplasmList =
-                this.convertObjectToGermplasmList(result, addedColumnsPropertyIds, attributeTypesMap, nameTypesMap);
+            if (results == null) {
+                return Collections.EMPTY_LIST;
+            }
+
             final List<GermplasmSearchResponse> response = new ArrayList<>();
-            for (final Germplasm germplasm : germplasmList) {
-                response.add(new GermplasmSearchResponse(germplasm));
+            for (final Object[] result : results) {
+                response.add(this.mapToGermplasmSearchResponse(result, addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
             }
             return response;
         } catch (final HibernateException e) {
             throw new MiddlewareQueryException("Error at GermplasmSearchDAO.searchGermplasm(): " + e.getMessage(), e);
         }
+    }
+
+    private String createFromClause(final List<String> addedColumnsPropertyIds,
+        final Map<String, Integer> attributeTypesMap, final Map<String, Integer> nameTypesMap) {
+
+        final StringBuilder fromClause = new StringBuilder();
+        fromClause.append("FROM germplsm g \n" //
+            + " LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 \n" //
+            + " LEFT JOIN cvterm scale ON scale.cvterm_id = gl.scaleid \n" //
+            + " LEFT JOIN methods m ON m.mid = g.methn \n" //
+            + " LEFT JOIN location l ON l.locid = g.glocn \n" //
+            + " LEFT JOIN `names` allNames ON g.gid = allNames.gid and allNames.nstat != 9 \n");
+
+        for (final String propertyId : addedColumnsPropertyIds) {
+            if (GermplasmSearchDAO.fromClauseColumnsMap.containsKey(propertyId)) {
+                fromClause.append(GermplasmSearchDAO.fromClauseColumnsMap.get(propertyId));
+
+            } else if (attributeTypesMap.containsKey(propertyId)) {
+                fromClause.append(String.format("LEFT JOIN `atributs` `%s` on `%<s`.gid = g.gid and `%<s`.atype = %s \n", propertyId,
+                    attributeTypesMap.get(propertyId)));
+
+            } else if (nameTypesMap.containsKey(propertyId)) {
+                fromClause.append(String.format("LEFT JOIN `names` `%s` on `%<s`.gid = g.gid and `%<s`.ntype = %s \n", propertyId,
+                    nameTypesMap.get(propertyId)));
+            }
+        }
+
+        return fromClause.toString();
+
+    }
+
+    private String createSelectClause(final List<String> addedColumnsPropertyIds,
+        final Map<String, Integer> attributeTypesMap, final Map<String, Integer> nameTypesMap) {
+
+        final StringBuilder selectClause = new StringBuilder();
+        selectClause.append("SELECT g.*, \n" //
+            // name ordering: preferred name > latest > oldest
+            + " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nstat = 1 desc, allNames.ndate desc SEPARATOR ', ') AS `" + GermplasmSearchDAO.NAMES + "`, \n"  //
+            + " g.mgid AS `" + GermplasmSearchDAO.GROUP_ID + "`, \n" //
+            + " Count(DISTINCT gl.lotid) AS `" + GermplasmSearchDAO.AVAIL_LOTS + "`, \n" //
+            + " IF(COUNT(DISTINCT IFNULL(gl.scaleid, 'null')) = 1, " //
+            + "  IFNULL((SELECT SUM(CASE WHEN imt.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() //
+            + "    OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue() //
+            + "    AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) " //
+            + "   FROM ims_transaction imt WHERE imt.lotid = gl.lotid), 0)," //
+            + " '" + MIXED_UNITS_LABEL + "') AS  `" + GermplasmSearchDAO.AVAIL_BALANCE + "`, \n"  //
+            + " IF(COUNT(DISTINCT IFNULL(gl.scaleid, 'null')) = 1, scale.name, '" + MIXED_UNITS_LABEL + "') AS `" + LOT_UNITS + "`, \n"  //
+            + " m.mname AS `" + GermplasmSearchDAO.METHOD_NAME + "`, \n"  //
+            + " l.lname AS `" + GermplasmSearchDAO.LOCATION_NAME + "` \n");
+
+        for (final String propertyId : addedColumnsPropertyIds) {
+            if (GermplasmSearchDAO.selectClauseColumnsMap.containsKey(propertyId)) {
+                selectClause.append(",");
+                selectClause.append(GermplasmSearchDAO.selectClauseColumnsMap.get(propertyId));
+            } else if (attributeTypesMap.containsKey(propertyId)) {
+                selectClause.append(",");
+                selectClause.append(String.format("`%s`.aval as `%<s` \n", propertyId));
+
+            } else if (nameTypesMap.containsKey(propertyId)) {
+                selectClause.append(",");
+                selectClause.append(String.format("`%s`.nval as `%<s` \n", propertyId));
+            }
+        }
+
+        return selectClause.toString();
+    }
+
+    protected GermplasmSearchResponse mapToGermplasmSearchResponse(final Object[] row, final List<String> addedColumnsPropertyIds,
+        final Map<String, Integer> attributeTypesMap, final Map<String, Integer> nameTypesMap) {
+
+        final GermplasmSearchResponse response = new GermplasmSearchResponse();
+
+        final Germplasm germplasm = (Germplasm) row[0];
+
+        response.setGid(germplasm.getGid());
+        response.setNames((String) row[1]);
+        response.setGroupId(germplasm.getMgid());
+        response.setLotCount(row[3] != null ? ((BigInteger) row[3]).intValue() : 0);
+        response.setAvailableBalance((String) row[4]);
+        response.setUnit((String) row[5]);
+        response.setMethodName((String) row[6]);
+        response.setLocationName((String) row[7]);
+
+        final int indexOffset = 8;
+        response.setGermplasmDate(this.getValueOfAddedColumns(GERMPLASM_DATE, row, addedColumnsPropertyIds, indexOffset));
+        response.setMethodCode(this.getValueOfAddedColumns(METHOD_ABBREVIATION, row, addedColumnsPropertyIds, indexOffset));
+        response.setMethodNumber(this.getValueOfAddedColumns(METHOD_NUMBER, row, addedColumnsPropertyIds, indexOffset));
+        response.setMethodGroup(this.getValueOfAddedColumns(METHOD_GROUP, row, addedColumnsPropertyIds, indexOffset));
+        response.setGermplasmPeferredName(this.getValueOfAddedColumns(PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
+        response.setGermplasmPeferredId(this.getValueOfAddedColumns(PREFERRED_ID, row, addedColumnsPropertyIds, indexOffset));
+        response.setFemaleParentPreferredID(this.getValueOfAddedColumns(FEMALE_PARENT_ID, row, addedColumnsPropertyIds, indexOffset));
+        response.setFemaleParentPreferredName(this.getValueOfAddedColumns(FEMALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
+        response.setMaleParentPreferredID(this.getValueOfAddedColumns(MALE_PARENT_ID, row, addedColumnsPropertyIds, indexOffset));
+        response.setMaleParentPreferredName(this.getValueOfAddedColumns(MALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
+        response.setGroupSourceGID(this.getValueOfAddedColumns(GROUP_SOURCE_GID, row, addedColumnsPropertyIds, indexOffset));
+        response.setGroupSourcePreferredName(this.getValueOfAddedColumns(GROUP_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
+        response.setImmediateSourceGID(this.getValueOfAddedColumns(IMMEDIATE_SOURCE_GID, row, addedColumnsPropertyIds, indexOffset));
+        response.setImmediateSourcePreferredName(this.getValueOfAddedColumns(IMMEDIATE_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
+
+        this.setValuesMapForAttributeAndNameTypes(germplasm, row, addedColumnsPropertyIds, attributeTypesMap, nameTypesMap, indexOffset);
+
+        return response;
     }
 
     /**
@@ -776,8 +875,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
         // main query
         final StringBuilder queryBuilder =
-            new StringBuilder(this.createSelectClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
-        queryBuilder.append(this.createFromClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+            new StringBuilder(this.createSelectClause(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+        queryBuilder.append(this.createFromClause(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
 
         final List<Integer> preFilteredGids = this.retrievePreFilteredGids(germplasmSearchRequest);
         // group by inside filters
@@ -831,8 +930,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
             // main query
             final StringBuilder queryBuilder =
-                new StringBuilder(this.createSelectClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
-            queryBuilder.append(this.createFromClauseForGermplasmSearch(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+                new StringBuilder(this.createSelectClause(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+            queryBuilder.append(this.createFromClause(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
 
             final List<Integer> preFilteredGids = this.retrievePreFilteredGids(germplasmSearchRequest);
             // group by inside filters
@@ -1051,16 +1150,18 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
         // Post-group-by filtering
 
-        // TODO improve perf (brachiaria - 6M germplsm - 3.8 min)
+        // TODO improve perf (brachiaria - 6M germplsm - 3.8 min -  Faster if combined with other filters)
         final Boolean withInventoryOnly = germplasmSearchRequest.getWithInventoryOnly();
         if (Boolean.TRUE.equals(withInventoryOnly)) {
-            paramBuilder.append(" and " + AVAIL_BALANCE + " > 0");
+            paramBuilder.append(" and (" + AVAIL_BALANCE + " > 0 or " + AVAIL_BALANCE + " = '" + MIXED_UNITS_LABEL + "')");
         }
 
     }
 
     /**
-     * This query contains those filters that don't perform well in the main query
+     * This query contains those filters that don't perform well in the main query.
+	 * The queries are bounded by the LIMIT clause, and therefore they are less appropriate for filters
+     * that match a lot of records.
      */
     private List<Integer> retrievePreFilteredGids(final GermplasmSearchRequest germplasmSearchRequest) {
 

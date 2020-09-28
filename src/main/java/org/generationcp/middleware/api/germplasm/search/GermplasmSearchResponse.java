@@ -1,12 +1,9 @@
 package org.generationcp.middleware.api.germplasm.search;
 
-import org.generationcp.middleware.domain.inventory.GermplasmInventory;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Map;
-import java.util.Objects;
 
 @AutoProperty
 public class GermplasmSearchResponse {
@@ -18,8 +15,11 @@ public class GermplasmSearchResponse {
 	private String names;
 	private String methodName;
 	private String locationName;
-	private String stockIds;
+	// includes 'Mixed'
 	private String availableBalance;
+	// includes 'Mixed'
+	private String unit;
+	private Integer lotCount;
 
 	// added columns
 
@@ -49,36 +49,6 @@ public class GermplasmSearchResponse {
 	private Map<String, String> nameTypesValueMap;
 
 	public GermplasmSearchResponse() {
-	}
-
-	public GermplasmSearchResponse(final Germplasm germplasm) {
-		this();
-
-		this.gid = germplasm.getGid();
-		this.groupId = germplasm.getMgid();
-		this.names = germplasm.getGermplasmNamesString();
-		final GermplasmInventory inventoryInfo = germplasm.getInventoryInfo();
-		if (inventoryInfo != null) {
-			this.stockIds = inventoryInfo.getStockIDs();
-			// TODO units
-			// this.availableBalance = inventoryInfo.getAvailable();
-			this.availableBalance = Objects.toString(inventoryInfo.getTotalAvailableBalance(), "-");
-		}
-		this.methodName = germplasm.getMethodName();
-		this.locationName = germplasm.getLocationName();
-		this.germplasmDate = germplasm.getGermplasmDate();
-		this.methodCode = germplasm.getMethodCode();
-		this.methodNumber = germplasm.getMethodNumber();
-		this.methodGroup = germplasm.getMethodGroup();
-		this.germplasmPeferredName = germplasm.getGermplasmPeferredName();
-		this.germplasmPeferredId = germplasm.getGermplasmPeferredId();
-		this.groupSourceGID = germplasm.getGroupSourceGID();
-		this.groupSourcePreferredName = germplasm.getGroupSourcePreferredName();
-		this.immediateSourceGID = germplasm.getImmediateSourceGID();
-		this.immediateSourcePreferredName = germplasm.getImmediateSourcePreferredName();
-
-		this.attributeTypesValueMap = germplasm.getAttributeTypesValueMap();
-		this.nameTypesValueMap = germplasm.getNameTypesValueMap();
 	}
 
 	public int getGid() {
@@ -121,20 +91,28 @@ public class GermplasmSearchResponse {
 		this.locationName = locationName;
 	}
 
-	public String getStockIds() {
-		return this.stockIds;
-	}
-
-	public void setStockIds(final String stockIds) {
-		this.stockIds = stockIds;
-	}
-
 	public String getAvailableBalance() {
 		return this.availableBalance;
 	}
 
 	public void setAvailableBalance(final String availableBalance) {
 		this.availableBalance = availableBalance;
+	}
+
+	public String getUnit() {
+		return this.unit;
+	}
+
+	public void setUnit(final String unit) {
+		this.unit = unit;
+	}
+
+	public Integer getLotCount() {
+		return this.lotCount;
+	}
+
+	public void setLotCount(final Integer lotCount) {
+		this.lotCount = lotCount;
 	}
 
 	public String getGermplasmDate() {
