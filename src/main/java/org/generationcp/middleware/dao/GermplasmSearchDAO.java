@@ -770,7 +770,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             + " LEFT JOIN cvterm scale ON scale.cvterm_id = gl.scaleid \n" //
             + " LEFT JOIN methods m ON m.mid = g.methn \n" //
             + " LEFT JOIN location l ON l.locid = g.glocn \n" //
-            + " LEFT JOIN `names` allNames ON g.gid = allNames.gid and allNames.nstat != 9 \n");
+            + " LEFT JOIN `names` allNames ON g.gid = allNames.gid and allNames.nstat != " + STATUS_DELETED + " \n");
 
         for (final String propertyId : addedColumnsPropertyIds) {
             if (GermplasmSearchDAO.fromClauseColumnsMap.containsKey(propertyId)) {
@@ -1171,10 +1171,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         if (femaleParentName != null) {
             final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
                 + "   straight_join germplsm female_parent on n.gid = female_parent.gid \n" //
-                + "   straight_join germplsm group_source on female_parent.gid = group_source.gpid1 \n" //
+                + "   straight_join germplsm group_source on female_parent.gid = group_source.gpid1 and group_source.gnpgs > 0 \n" //
                 + "   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n"  //
                 + "                            or g.gnpgs > 0 and group_source.gid = g.gid \n" //
-                + " where n.nval like :femaleParentName " + LIMIT_CLAUSE) //
+                + " where n.nstat != " + STATUS_DELETED + " and n.nval like :femaleParentName " + LIMIT_CLAUSE) //
                 .setParameter("femaleParentName", '%' + femaleParentName + '%') //
                 .list();
             prefilteredGids.addAll(gids);
@@ -1183,11 +1183,11 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         final String maleParentName = germplasmSearchRequest.getMaleParentName();
         if (maleParentName != null) {
             final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
-                + "   straight_join germplsm female_parent on n.gid = female_parent.gid \n" //
-                + "   straight_join germplsm group_source on female_parent.gid = group_source.gpid2 \n" //
+                + "   straight_join germplsm male_parent on n.gid = male_parent.gid \n" //
+                + "   straight_join germplsm group_source on male_parent.gid = group_source.gpid2 and group_source.gnpgs > 0 \n" //
                 + "   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n" //
                 + "                            or g.gnpgs > 0 and group_source.gid = g.gid \n" //
-                + " where n.nval like :maleParentName " + LIMIT_CLAUSE) //
+                + " where n.nstat != " + STATUS_DELETED + " and n.nval like :maleParentName " + LIMIT_CLAUSE) //
                 .setParameter("maleParentName", '%' + maleParentName + '%') //
                 .list();
             prefilteredGids.addAll(gids);
@@ -1198,7 +1198,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
                 + " straight_join germplsm group_source on n.gid = group_source.gid \n" //
                 + " straight_join germplsm g on group_source.gid = g.gpid1 and g.gnpgs < 0 \n" //
-                + " where n.nval like :groupSourceName " + LIMIT_CLAUSE) //
+                + " where n.nstat != " + STATUS_DELETED + " and n.nval like :groupSourceName " + LIMIT_CLAUSE) //
                 .setParameter("groupSourceName", '%' + groupSourceName + '%')
                 .list();
             prefilteredGids.addAll(gids);
@@ -1209,7 +1209,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n"
                 + " straight_join germplsm immediate_source on n.gid = immediate_source.gid \n"
                 + " straight_join germplsm g on immediate_source.gid = g.gpid2 and g.gnpgs < 0 \n"
-                + " where n.nval like :immediateSourceName " + LIMIT_CLAUSE) //
+                + " where n.nstat != " + STATUS_DELETED + " and n.nval like :immediateSourceName " + LIMIT_CLAUSE) //
                 .setParameter("immediateSourceName", '%' + immediateSourceName + '%')
                 .list();
             prefilteredGids.addAll(gids);
