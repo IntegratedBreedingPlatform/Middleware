@@ -36,9 +36,9 @@ public class GermplasmSearchResponse {
 
 	// Pedigree-related fields
 
-	private String femaleParentPreferredID;
+	private String femaleParentGID;
 	private String femaleParentPreferredName;
-	private String maleParentPreferredID;
+	private String maleParentGID;
 	private String maleParentPreferredName;
 	// a.k.a crossExpansion
 	private String pedigreeString;
@@ -195,12 +195,12 @@ public class GermplasmSearchResponse {
 		this.immediateSourcePreferredName = immediateSourcePreferredName;
 	}
 
-	public String getFemaleParentPreferredID() {
-		return this.femaleParentPreferredID;
+	public String getFemaleParentGID() {
+		return this.femaleParentGID;
 	}
 
-	public void setFemaleParentPreferredID(final String femaleParentPreferredID) {
-		this.femaleParentPreferredID = femaleParentPreferredID;
+	public void setFemaleParentGID(final String femaleParentGID) {
+		this.femaleParentGID = femaleParentGID;
 	}
 
 	public String getFemaleParentPreferredName() {
@@ -211,12 +211,12 @@ public class GermplasmSearchResponse {
 		this.femaleParentPreferredName = femaleParentPreferredName;
 	}
 
-	public String getMaleParentPreferredID() {
-		return this.maleParentPreferredID;
+	public String getMaleParentGID() {
+		return this.maleParentGID;
 	}
 
-	public void setMaleParentPreferredID(final String maleParentPreferredID) {
-		this.maleParentPreferredID = maleParentPreferredID;
+	public void setMaleParentGID(final String maleParentGID) {
+		this.maleParentGID = maleParentGID;
 	}
 
 	public String getMaleParentPreferredName() {

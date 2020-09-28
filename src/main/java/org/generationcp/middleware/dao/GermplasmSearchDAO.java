@@ -849,9 +849,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         response.setMethodGroup(this.getValueOfAddedColumns(METHOD_GROUP, row, addedColumnsPropertyIds, indexOffset));
         response.setGermplasmPeferredName(this.getValueOfAddedColumns(PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
         response.setGermplasmPeferredId(this.getValueOfAddedColumns(PREFERRED_ID, row, addedColumnsPropertyIds, indexOffset));
-        response.setFemaleParentPreferredID(this.getValueOfAddedColumns(FEMALE_PARENT_ID, row, addedColumnsPropertyIds, indexOffset));
+        response.setFemaleParentGID(this.getValueOfAddedColumns(FEMALE_PARENT_ID, row, addedColumnsPropertyIds, indexOffset));
         response.setFemaleParentPreferredName(this.getValueOfAddedColumns(FEMALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
-        response.setMaleParentPreferredID(this.getValueOfAddedColumns(MALE_PARENT_ID, row, addedColumnsPropertyIds, indexOffset));
+        response.setMaleParentGID(this.getValueOfAddedColumns(MALE_PARENT_ID, row, addedColumnsPropertyIds, indexOffset));
         response.setMaleParentPreferredName(this.getValueOfAddedColumns(MALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
         response.setGroupSourceGID(this.getValueOfAddedColumns(GROUP_SOURCE_GID, row, addedColumnsPropertyIds, indexOffset));
         response.setGroupSourcePreferredName(this.getValueOfAddedColumns(GROUP_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
