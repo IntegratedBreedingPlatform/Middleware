@@ -25,7 +25,6 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -34,7 +33,6 @@ import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
-import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
@@ -43,12 +41,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * DAO class for {@link StockModel}.
@@ -242,7 +235,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockModels;
 	}
 
-	public List<StudyGermplasmDto> getStudyGermplasmDtoList(final Integer studyId, final Set<Integer> plotNos) {
+	public Map<Integer, StudyEntryDto> getPlotEntriesMap(final Integer studyId, final Set<Integer> plotNos) {
 		try {
 
 			final String queryString = "select distinct(nd_ep.value) AS position, s.stock_id AS entryId, s.name AS designation, s.dbxref_id AS germplasmId "
@@ -266,14 +259,22 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
 			query.setParameterList("PLOT_NO_TERM_IDS",
 				new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
-			query.addScalar("entryId", new IntegerType());
-			query.addScalar("position", new StringType());
-			query.addScalar("designation", new StringType());
-			query.addScalar("germplasmId", new IntegerType());
-			query.setResultTransformer(Transformers.aliasToBean(StudyGermplasmDto.class));
-			return query.list();
+
+			final Map<Integer, StudyEntryDto> map = new HashMap<>();
+			final List<Object[]> results = query.list();
+			for (final Object[] row : results) {
+				if (row[0] == null) {
+					continue;
+				}
+				final Integer plotNumber = (Integer) row[0];
+				final Integer entryId = (Integer) row[1];
+				final String designation = (String) row[2];
+				final Integer gid = (Integer) row[3];
+				map.put(plotNumber, new StudyEntryDto(entryId, gid, designation));
+			}
+			return map;
 		} catch (HibernateException e) {
-			final String errorMessage = "Error in getStudyGermplasmDtoList " + e.getMessage();
+			final String errorMessage = "Error in getPlotEntriesMap " + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}

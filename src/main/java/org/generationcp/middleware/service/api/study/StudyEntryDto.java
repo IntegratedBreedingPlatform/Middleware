@@ -36,6 +36,12 @@ public class StudyEntryDto implements Serializable {
 
 	}
 
+	public StudyEntryDto(final Integer entryId, final Integer gid, final String designation) {
+		this.entryId = entryId;
+		this.gid = gid;
+		this.designation = designation;
+	}
+
 	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final String entryCode, final Integer gid, final String designation, final Integer lotCount, final String availableBalance, final String unit){
 		this.entryId = entryId;
 		this.entryNumber = entryNumber;

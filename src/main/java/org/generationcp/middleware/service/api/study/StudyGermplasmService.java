@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ public interface StudyGermplasmService {
 
 	List<StudyEntryDto> getStudyEntries(int studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 
-	List<StudyGermplasmDto> getGermplasmFromPlots(int studyBusinessIdentifier, Set<Integer> plotNos);
+	Map<Integer, StudyEntryDto> getPlotEntriesMap(int studyBusinessIdentifier, Set<Integer> plotNos);
 
 	long countStudyEntries(int studyId);
 

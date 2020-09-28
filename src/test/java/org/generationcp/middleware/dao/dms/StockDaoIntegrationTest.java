@@ -42,12 +42,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.dms.StockModel;
-import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.pojos.dms.*;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -55,18 +50,13 @@ import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class StockDaoIntegrationTest extends IntegrationTestBase {
@@ -284,19 +274,19 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetPlotNoToImportedGermplasmParentMap() {
-		List<StudyGermplasmDto> studyGermplasmDtoList = this.stockDao.getStudyGermplasmDtoList(this.project.getProjectId(), new HashSet<>(Arrays.asList(1, 2, 3, 4, 5)));
+	public void testGetPlotEntriesMap() {
+		Map<Integer, StudyEntryDto> plotEntriesMap = this.stockDao.getPlotEntriesMap(this.project.getProjectId(), new HashSet<>(Arrays.asList(1, 2, 3, 4, 5)));
 
 		final List<Integer> gids = this.testStocks.stream().map(s -> s.getGermplasm().getGid()).collect(Collectors.toList());
-		for (final StudyGermplasmDto dto : studyGermplasmDtoList) {
-			final String plot = dto.getPosition();
-			Assert.assertEquals(DataSetupTest.GERMPLSM_PREFIX + plot, dto.getDesignation());
-			Assert.assertTrue(gids.contains(dto.getGermplasmId()));
+		for (final Map.Entry<Integer, StudyEntryDto> entry : plotEntriesMap.entrySet()) {
+			final Integer plot = entry.getKey();
+			Assert.assertEquals(DataSetupTest.GERMPLSM_PREFIX + plot, entry.getValue().getDesignation());
+			Assert.assertTrue(gids.contains(entry.getValue().getGid()));
 		}
 
 		//Retrieve non existent plots in study
-		studyGermplasmDtoList = this.stockDao.getStudyGermplasmDtoList(this.project.getProjectId(), new HashSet<>(Arrays.asList(51, 49)));
-		Assert.assertTrue(studyGermplasmDtoList.isEmpty());
+		plotEntriesMap = this.stockDao.getPlotEntriesMap(this.project.getProjectId(), new HashSet<>(Arrays.asList(51, 49)));
+		Assert.assertTrue(plotEntriesMap.isEmpty());
 
 	}
 
@@ -307,7 +297,7 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
 		for (final StudyEntryDto studyEntryDto: studyEntryDtos) {
 			for (final MeasurementVariable measurementVariable: germplasmDescriptors) {
-				Assert.assertEquals(Boolean.TRUE, studyEntryDto.getVariables().containsKey(measurementVariable.getName()));
+				Assert.assertEquals(Boolean.TRUE, studyEntryDto.getVariables().containsKey(measurementVariable.getTermId()));
 			}
 		}
 	}
