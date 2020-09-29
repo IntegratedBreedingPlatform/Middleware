@@ -106,6 +106,12 @@ public class DaoFactory {
 		return germplasmListDataDao;
 	}
 
+	public AttributeDAO getAttributeDAO() {
+		final AttributeDAO attributeDAO = new AttributeDAO();
+		attributeDAO.setSession(this.sessionProvider.getSession());
+		return attributeDAO;
+	}
+
 	public LocationDAO getLocationDAO() {
 		final LocationDAO locationDao = new LocationDAO();
 		locationDao.setSession(this.sessionProvider.getSession());
