@@ -1,13 +1,17 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
+import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
+import org.generationcp.middleware.domain.inventory.manager.LotSingleUpdateRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -115,21 +119,66 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest) {
+	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto) {
+		if (lotUpdateRequestDto.getSingleInput() != null) {
+			this.updateLots(lotDtos, lotUpdateRequestDto.getSingleInput());
+		} else {
+			this.updateLots(lotDtos, lotUpdateRequestDto.getMultiInput());
+		}
+	}
+
+	private void updateLots(final List<ExtendedLotDto> lotDtos, final LotSingleUpdateRequestDto lotSingleUpdateRequestDto){
 		final LotDAO lotDao = this.daoFactory.getLotDao();
 		for (final LotDto lotDto : lotDtos) {
 			final Lot lot = lotDao.getById(lotDto.getLotId());
-			if (lotRequest.getGid() != null) {
-				lot.setEntityId(lotRequest.getGid());
+			if (lotSingleUpdateRequestDto.getGid() != null) {
+				lot.setEntityId(lotSingleUpdateRequestDto.getGid());
 			}
-			if (lotRequest.getLocationId() != null) {
-				lot.setLocationId(lotRequest.getLocationId());
+			if (lotSingleUpdateRequestDto.getLocationId() != null) {
+				lot.setLocationId(lotSingleUpdateRequestDto.getLocationId());
 			}
-			if (lotRequest.getUnitId() != null) {
-				lot.setScaleId(lotRequest.getUnitId());
+			if (lotSingleUpdateRequestDto.getUnitId() != null) {
+				lot.setScaleId(lotSingleUpdateRequestDto.getUnitId());
 			}
-			if (!StringUtils.isBlank(lotRequest.getNotes())) {
-				lot.setComments(lotRequest.getNotes());
+			if (!StringUtils.isBlank(lotSingleUpdateRequestDto.getNotes())) {
+				lot.setComments(lotSingleUpdateRequestDto.getNotes());
+			}
+			lotDao.save(lot);
+		}
+	}
+
+	private void updateLots(final List<ExtendedLotDto> lotDtos, final LotMultiUpdateRequestDto lotMultiUpdateRequestDto) {
+		final LotDAO lotDao = this.daoFactory.getLotDao();
+
+		final List<Location> locations = this.daoFactory.getLocationDAO()
+			.filterLocations(STORAGE_LOCATION_TYPE, null, lotMultiUpdateRequestDto.getLotList().stream()
+				.map(LotUpdateDto::getStorageLocationAbbr)
+				.collect(Collectors.toList()));
+		// locationsMapByLocationAbbr
+		final Map<String, Integer> locationsMapByLocationAbbr =
+			locations.stream().collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+		final List<Variable> unitVariables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+		// unitMapByName
+		final Map<String, Integer> unitMapByName =
+			unitVariables.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
+		final Map<String, LotUpdateDto> LotUpdateMapByLotUID =
+			Maps.uniqueIndex(lotMultiUpdateRequestDto.getLotList(), LotUpdateDto::getLotUID);
+
+		for (final LotDto lotDto : lotDtos) {
+			final Lot lot = lotDao.getById(lotDto.getLotId());
+			final LotUpdateDto lotUpdateDto = LotUpdateMapByLotUID.get(lotDto.getLotUUID());
+
+			if (!StringUtils.isBlank(lotUpdateDto.getStorageLocationAbbr())) {
+				lot.setLocationId(locationsMapByLocationAbbr.get(lotUpdateDto.getStorageLocationAbbr()));
+			}
+			if (!StringUtils.isBlank(lotUpdateDto.getUnitName())) {
+				lot.setScaleId(unitMapByName.get(lotUpdateDto.getUnitName()));
+			}
+			if (!StringUtils.isBlank(lotUpdateDto.getNotes())) {
+				lot.setComments(lotUpdateDto.getNotes());
 			}
 			lotDao.save(lot);
 		}
