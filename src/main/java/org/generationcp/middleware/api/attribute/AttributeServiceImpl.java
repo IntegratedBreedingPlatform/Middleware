@@ -1,6 +1,5 @@
 package org.generationcp.middleware.api.attribute;
 
-import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.springframework.stereotype.Service;

@@ -12,7 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.germplasm.AttributeDTO;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UDTableType;
@@ -50,16 +50,16 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return toReturn;
 	}
 
-	public List<AttributeDTO> searchAttributes(final String query) {
+	public List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(final String query) {
 		if (StringUtils.isBlank(query)) {
 			return Collections.EMPTY_LIST;
 		}
 		try {
 			// Attributes will be migrated out of user defined fields later
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery("SELECT " //
-				+ "   u.fcode AS attributeCode," //
-				+ "   u.fldno AS attributeDbId," //
-				+ "   u.fname AS attributeName" //
+				+ "   u.fcode AS code," //
+				+ "   u.fldno AS id," //
+				+ "   u.fname AS name" //
 				+ " FROM  udflds u " //
 				+ " WHERE u.ftable = '" + UDTableType.ATRIBUTS_ATTRIBUTE.getTable() + "'" //
 				+ "   and u.ftype = '" + UDTableType.ATRIBUTS_ATTRIBUTE.getType() + "'"
@@ -67,10 +67,10 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 				+ " LIMIT 100 ");
 			sqlQuery.setParameter("fname", '%' + query + '%');
 			sqlQuery.setParameter("fcode", '%' + query + '%');
-			sqlQuery.addScalar("attributeCode");
-			sqlQuery.addScalar("attributeDbId");
-			sqlQuery.addScalar("attributeName");
-			sqlQuery.setResultTransformer(Transformers.aliasToBean(AttributeDTO.class));
+			sqlQuery.addScalar("code");
+			sqlQuery.addScalar("id");
+			sqlQuery.addScalar("name");
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(org.generationcp.middleware.api.attribute.AttributeDTO.class));
 
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
