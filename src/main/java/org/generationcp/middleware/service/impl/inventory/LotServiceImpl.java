@@ -119,17 +119,21 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto) {
+		final LotDAO lotDao = this.daoFactory.getLotDao();
+		final List<Lot> lots =
+			lotDao.filterByColumnValues("lotUuId", lotDtos.stream().map(extendedLotDto -> extendedLotDto.getLotUUID()).collect(
+				Collectors.toList()));
 		if (lotUpdateRequestDto.getSingleInput() != null) {
-			this.updateLots(lotDtos, lotUpdateRequestDto.getSingleInput());
+			this.updateLots(lots, lotUpdateRequestDto.getSingleInput());
 		} else {
-			this.updateLots(lotDtos, lotUpdateRequestDto.getMultiInput());
+			this.updateLots(lots, lotUpdateRequestDto.getMultiInput());
 		}
 	}
 
-	private void updateLots(final List<ExtendedLotDto> lotDtos, final LotSingleUpdateRequestDto lotSingleUpdateRequestDto){
+	private void updateLots(final List<Lot> lots, final LotSingleUpdateRequestDto lotSingleUpdateRequestDto){
 		final LotDAO lotDao = this.daoFactory.getLotDao();
-		for (final LotDto lotDto : lotDtos) {
-			final Lot lot = lotDao.getById(lotDto.getLotId());
+
+		for (final Lot lot : lots) {
 			if (lotSingleUpdateRequestDto.getGid() != null) {
 				lot.setEntityId(lotSingleUpdateRequestDto.getGid());
 			}
@@ -146,32 +150,21 @@ public class LotServiceImpl implements LotService {
 		}
 	}
 
-	private void updateLots(final List<ExtendedLotDto> lotDtos, final LotMultiUpdateRequestDto lotMultiUpdateRequestDto) {
+	private void updateLots(final List<Lot> lots, final LotMultiUpdateRequestDto lotMultiUpdateRequestDto) {
 		final LotDAO lotDao = this.daoFactory.getLotDao();
 
-		final List<Location> locations = this.daoFactory.getLocationDAO()
-			.filterLocations(STORAGE_LOCATION_TYPE, null, lotMultiUpdateRequestDto.getLotList().stream()
+		final Map<String, Integer> locationsByLocationAbbrMap =
+			buildLocationsByLocationAbbrMap(lotMultiUpdateRequestDto.getLotList().stream()
 				.map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr)
 				.collect(Collectors.toList()));
-		// locationsMapByLocationAbbr
-		final Map<String, Integer> locationsMapByLocationAbbr =
-			locations.stream().collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
-
-		final VariableFilter variableFilter = new VariableFilter();
-		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		final List<Variable> unitVariables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
-		// unitMapByName
-		final Map<String, Integer> unitMapByName =
-			unitVariables.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
-		final Map<String, LotMultiUpdateRequestDto.LotUpdateDto> LotUpdateMapByLotUID =
+		final Map<String, Integer> unitMapByName = buildUnitsByNameMap();
+		final Map<String, LotMultiUpdateRequestDto.LotUpdateDto> lotUpdateMapByLotUID =
 			Maps.uniqueIndex(lotMultiUpdateRequestDto.getLotList(), LotMultiUpdateRequestDto.LotUpdateDto::getLotUID);
 
-		for (final LotDto lotDto : lotDtos) {
-			final Lot lot = lotDao.getById(lotDto.getLotId());
-			final LotMultiUpdateRequestDto.LotUpdateDto lotUpdateDto = LotUpdateMapByLotUID.get(lotDto.getLotUUID());
-
+		for (final Lot lot : lots) {
+			final LotMultiUpdateRequestDto.LotUpdateDto lotUpdateDto = lotUpdateMapByLotUID.get(lot.getLotUuId());
 			if (!StringUtils.isBlank(lotUpdateDto.getStorageLocationAbbr())) {
-				lot.setLocationId(locationsMapByLocationAbbr.get(lotUpdateDto.getStorageLocationAbbr()));
+				lot.setLocationId(locationsByLocationAbbrMap.get(lotUpdateDto.getStorageLocationAbbr()));
 			}
 			if (!StringUtils.isBlank(lotUpdateDto.getUnitName())) {
 				lot.setScaleId(unitMapByName.get(lotUpdateDto.getUnitName()));
@@ -183,23 +176,26 @@ public class LotServiceImpl implements LotService {
 		}
 	}
 
+	private Map<String, Integer> buildLocationsByLocationAbbrMap(final List<String> locationAbbreviations) {
+		final List<Location> locations = this.daoFactory.getLocationDAO().filterLocations(STORAGE_LOCATION_TYPE, null, locationAbbreviations);
+		return locations.stream().collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
+	}
+
+	private Map<String, Integer> buildUnitsByNameMap() {
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+		final List<Variable> unitVariables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+		return unitVariables.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
+	}
+
 	@Override
 	public List<String> saveLots(final CropType cropType, final Integer userId, final List<LotItemDto> lotItemDtos) {
 		try {
-			// locationsByAbbreviationMap
-			final List<Location> locations = this.daoFactory.getLocationDAO()
-				.filterLocations(STORAGE_LOCATION_TYPE, null, lotItemDtos.stream()
-					.map(LotItemDto::getStorageLocationAbbr)
-					.collect(Collectors.toList()));
-			final Map<String, Integer> locationsByAbbreviationMap =
-				locations.stream().collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
+			final Map<String, Integer> locationsByLocationAbbrMap = buildLocationsByLocationAbbrMap(lotItemDtos.stream()
+				.map(LotItemDto::getStorageLocationAbbr)
+				.collect(Collectors.toList()));
 
-			// scaleVariablesByNameMap
-			final VariableFilter variableFilter = new VariableFilter();
-			variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-			final List<Variable> scaleVariables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
-			final Map<String, Integer> scaleVariablesByNameMap =
-				scaleVariables.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
+			final Map<String, Integer> unitsByNameMap = buildUnitsByNameMap();
 
 			final List<String> lotUUIDs = new ArrayList<>();
 
@@ -213,7 +209,7 @@ public class LotServiceImpl implements LotService {
 				if (lotItemDto.getStorageLocationId() != null) {
 					lot.setLocationId(lotItemDto.getStorageLocationId());
 				} else {
-					lot.setLocationId(locationsByAbbreviationMap.get(lotItemDto.getStorageLocationAbbr()));
+					lot.setLocationId(locationsByLocationAbbrMap.get(lotItemDto.getStorageLocationAbbr()));
 				}
 				lot.setStockId(lotItemDto.getStockId());
 				lot.setStatus(0);
@@ -222,7 +218,7 @@ public class LotServiceImpl implements LotService {
 				if (lotItemDto.getUnitId() != null) {
 					lot.setScaleId(lotItemDto.getUnitId());
 				} else {
-					lot.setScaleId(scaleVariablesByNameMap.get(lotItemDto.getUnitName()));
+					lot.setScaleId(unitsByNameMap.get(lotItemDto.getUnitName()));
 				}
 
 				this.inventoryDataManager.generateLotIds(cropType, Lists.newArrayList(lot));
