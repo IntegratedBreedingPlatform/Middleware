@@ -3,7 +3,15 @@ package org.generationcp.middleware.service.impl.inventory;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.ims.LotDAO;
-import org.generationcp.middleware.domain.inventory.manager.*;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
+import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
@@ -14,7 +22,11 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.ims.*;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionSourceType;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
@@ -26,7 +38,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -233,7 +252,7 @@ public class LotServiceImpl implements LotService {
 	@Override
 	public void mergeLots(final Integer userId, final Integer keepLotId, final LotsSearchDto lotsSearchDto) {
 		//Search selected lots to be merged and remove the one to keep
-		List<ExtendedLotDto> extendedLotDtos = this.searchLots(lotsSearchDto, null).stream()
+		final List<ExtendedLotDto> extendedLotDtos = this.searchLots(lotsSearchDto, null).stream()
 				.filter(extendedLotDto -> extendedLotDto.getLotId().intValue() != keepLotId.intValue())
 				.collect(Collectors.toList());
 		//Create a transaction for each of the discarded lots
@@ -247,7 +266,7 @@ public class LotServiceImpl implements LotService {
 			});
 
 		//Close the discarded lots
-		List<Integer> lotIds = extendedLotDtos.stream()
+		final List<Integer> lotIds = extendedLotDtos.stream()
 				.map(ExtendedLotDto::getLotId).collect(Collectors.toList());
 		this.closeLots(userId, lotIds);
 	}

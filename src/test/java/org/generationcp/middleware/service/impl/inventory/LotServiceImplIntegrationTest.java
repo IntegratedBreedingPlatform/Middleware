@@ -14,7 +14,13 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.ims.*;
+import org.generationcp.middleware.pojos.ims.EntityType;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.LotStatus;
+import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionSourceType;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.Util;
 import org.junit.Before;
@@ -26,7 +32,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.hasToString;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 
 public class LotServiceImplIntegrationTest extends IntegrationTestBase {
@@ -123,7 +132,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void shouldMergeLots() {
+	public void testMergeLots_Ok() {
 		final Integer keepLotId = this.lot.getId();
 		assertThat(this.lot.getStatus(), is(LotStatus.ACTIVE.getIntValue()));
 		//Check that the lot to keep has not 'merged' transactions
@@ -226,8 +235,8 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		this.storageLocationId = this.daoFactory.getLocationDAO().getDefaultLocationByType(id).getLocid();
 	}
 
-	private void assertTransaction(Transaction actualTransaction, TransactionType type, TransactionStatus status,
-								   double amount, TransactionSourceType sourceType, Integer sourceId) {
+	private void assertTransaction(final Transaction actualTransaction, final TransactionType type, final TransactionStatus status,
+		final double amount, final TransactionSourceType sourceType, final Integer sourceId) {
 		assertNotNull(actualTransaction);
 		assertThat(actualTransaction.getType(), is(type.getId()));
 		assertThat(actualTransaction.getStatus(), is(status.getIntValue()));
