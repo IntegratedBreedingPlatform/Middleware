@@ -118,6 +118,12 @@ public class DaoFactory {
 		return locationDao;
 	}
 
+	public MethodDAO getMethodDAO() {
+		final MethodDAO methodDAO = new MethodDAO();
+		methodDAO.setSession(this.sessionProvider.getSession());
+		return methodDAO;
+	}
+
 	public PhenotypeDao getPhenotypeDAO() {
 		final PhenotypeDao phenotypeDao = new PhenotypeDao();
 		phenotypeDao.setSession(this.sessionProvider.getSession());

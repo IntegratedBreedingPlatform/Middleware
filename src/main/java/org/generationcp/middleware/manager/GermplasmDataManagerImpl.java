@@ -1100,6 +1100,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return results;
 	}
 
+	/** See {@link org.generationcp.middleware.pojos.MethodClass} */
+	@Deprecated
 	@Override
 	public List<Term> getMethodClasses() {
 		final List<Integer> ids = new ArrayList<>();

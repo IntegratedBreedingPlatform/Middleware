@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.attribute;
 
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,7 @@ public class AttributeServiceImpl implements AttributeService {
 
 	private final DaoFactory daoFactory;
 
-	public AttributeServiceImpl(final HibernateSessionPerRequestProvider sessionProvider) {
+	public AttributeServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
