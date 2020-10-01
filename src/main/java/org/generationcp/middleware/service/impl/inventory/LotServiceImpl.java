@@ -11,7 +11,6 @@ import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotSingleUpdateRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotUpdateDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -152,7 +151,7 @@ public class LotServiceImpl implements LotService {
 
 		final List<Location> locations = this.daoFactory.getLocationDAO()
 			.filterLocations(STORAGE_LOCATION_TYPE, null, lotMultiUpdateRequestDto.getLotList().stream()
-				.map(LotUpdateDto::getStorageLocationAbbr)
+				.map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr)
 				.collect(Collectors.toList()));
 		// locationsMapByLocationAbbr
 		final Map<String, Integer> locationsMapByLocationAbbr =
@@ -164,12 +163,12 @@ public class LotServiceImpl implements LotService {
 		// unitMapByName
 		final Map<String, Integer> unitMapByName =
 			unitVariables.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
-		final Map<String, LotUpdateDto> LotUpdateMapByLotUID =
-			Maps.uniqueIndex(lotMultiUpdateRequestDto.getLotList(), LotUpdateDto::getLotUID);
+		final Map<String, LotMultiUpdateRequestDto.LotUpdateDto> LotUpdateMapByLotUID =
+			Maps.uniqueIndex(lotMultiUpdateRequestDto.getLotList(), LotMultiUpdateRequestDto.LotUpdateDto::getLotUID);
 
 		for (final LotDto lotDto : lotDtos) {
 			final Lot lot = lotDao.getById(lotDto.getLotId());
-			final LotUpdateDto lotUpdateDto = LotUpdateMapByLotUID.get(lotDto.getLotUUID());
+			final LotMultiUpdateRequestDto.LotUpdateDto lotUpdateDto = LotUpdateMapByLotUID.get(lotDto.getLotUUID());
 
 			if (!StringUtils.isBlank(lotUpdateDto.getStorageLocationAbbr())) {
 				lot.setLocationId(locationsMapByLocationAbbr.get(lotUpdateDto.getStorageLocationAbbr()));
