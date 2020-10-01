@@ -119,9 +119,8 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto) {
-		final LotDAO lotDao = this.daoFactory.getLotDao();
 		final List<Lot> lots =
-			lotDao.filterByColumnValues("lotUuId", lotDtos.stream().map(extendedLotDto -> extendedLotDto.getLotUUID()).collect(
+			this.daoFactory.getLotDao().filterByColumnValues("lotUuId", lotDtos.stream().map(extendedLotDto -> extendedLotDto.getLotUUID()).collect(
 				Collectors.toList()));
 		if (lotUpdateRequestDto.getSingleInput() != null) {
 			this.updateLots(lots, lotUpdateRequestDto.getSingleInput());
@@ -131,7 +130,6 @@ public class LotServiceImpl implements LotService {
 	}
 
 	private void updateLots(final List<Lot> lots, final LotSingleUpdateRequestDto lotSingleUpdateRequestDto){
-		final LotDAO lotDao = this.daoFactory.getLotDao();
 
 		for (final Lot lot : lots) {
 			if (lotSingleUpdateRequestDto.getGid() != null) {
@@ -146,12 +144,11 @@ public class LotServiceImpl implements LotService {
 			if (!StringUtils.isBlank(lotSingleUpdateRequestDto.getNotes())) {
 				lot.setComments(lotSingleUpdateRequestDto.getNotes());
 			}
-			lotDao.save(lot);
+			this.daoFactory.getLotDao().save(lot);
 		}
 	}
 
 	private void updateLots(final List<Lot> lots, final LotMultiUpdateRequestDto lotMultiUpdateRequestDto) {
-		final LotDAO lotDao = this.daoFactory.getLotDao();
 
 		final Map<String, Integer> locationsByLocationAbbrMap =
 			buildLocationsByLocationAbbrMap(lotMultiUpdateRequestDto.getLotList().stream()
@@ -172,7 +169,7 @@ public class LotServiceImpl implements LotService {
 			if (!StringUtils.isBlank(lotUpdateDto.getNotes())) {
 				lot.setComments(lotUpdateDto.getNotes());
 			}
-			lotDao.save(lot);
+			this.daoFactory.getLotDao().save(lot);
 		}
 	}
 
