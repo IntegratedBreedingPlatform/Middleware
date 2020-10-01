@@ -36,4 +36,6 @@ public interface LotService {
 
 	void closeLots(Integer userId, List<Integer> lotIds);
 
+	void mergeLots(Integer userId, Integer keepLotId, LotsSearchDto lotsSearchDto);
+
 }
