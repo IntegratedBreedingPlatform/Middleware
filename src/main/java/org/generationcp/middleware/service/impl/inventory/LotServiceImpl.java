@@ -292,4 +292,8 @@ public class LotServiceImpl implements LotService {
 	public void setTransactionService(final TransactionService transactionService) {
 		this.transactionService = transactionService;
 	}
+
+	public void setOntologyVariableDataManager( final OntologyVariableDataManager ontologyVariableDataManager) {
+		this.ontologyVariableDataManager = ontologyVariableDataManager;
+	}
 }
