@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.breedingmethod;
 
+import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -9,12 +10,18 @@ public class MethodClassDTO {
 
 	private Integer id;
 	private String name;
-	private final String description;
+	private String description;
+	private String methodTypeCode;
 
-	public MethodClassDTO(final CVTerm cvTerm) {
+	public MethodClassDTO() {
+	}
+
+	public MethodClassDTO(final CVTerm cvTerm, final MethodType methodType) {
+		this();
 		this.id = cvTerm.getCvTermId();
 		this.name = cvTerm.getName();
 		this.description = cvTerm.getDefinition();
+		this.methodTypeCode = methodType.getCode();
 	}
 
 	public Integer getId() {
@@ -35,6 +42,18 @@ public class MethodClassDTO {
 
 	public String getDescription() {
 		return this.description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
+	}
+
+	public String getMethodTypeCode() {
+		return this.methodTypeCode;
+	}
+
+	public void setMethodTypeCode(final String methodTypeCode) {
+		this.methodTypeCode = methodTypeCode;
 	}
 
 	@Override
