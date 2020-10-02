@@ -131,7 +131,7 @@ public interface FieldbookService {
 	 *            the geolocation id
 	 * @return all field maps in block by trial instance id
 	 */
-	List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId,
+	List<FieldMapInfo> getAllFieldMapsByTrialInstanceId(int datasetId, int geolocationId,
 			CrossExpansionProperties crossExpansionProperties);
 
 	/**
@@ -371,15 +371,6 @@ public interface FieldbookService {
 	 * @return the id
 	 */
 	int addBlockLocation(String blockName, Integer parentFieldId, Integer currentUserId);
-
-	/**
-	 * Get all field maps in the same block.
-	 *
-	 * @param blockId
-	 *            the block id
-	 * @return the field maps in the given block
-	 */
-	List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId);
 
 	/**
 	 * Fetch all the possible pairs of the treatment level variable.

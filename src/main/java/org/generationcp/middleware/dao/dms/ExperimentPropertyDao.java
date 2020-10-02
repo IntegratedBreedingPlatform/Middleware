@@ -155,7 +155,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int instanceId, final Integer blockId)
+	public List<FieldMapInfo> getAllFieldMapsByTrialInstanceId(final int datasetId, final int instanceId)
 			{
 		List<FieldMapInfo> fieldmaps = new ArrayList<>();
 
@@ -196,17 +196,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("    AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 							.append("  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 							.append("     AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
-							.append(" WHERE blk.type_id = ").append(TermId.BLOCK_ID.getId());
-
-			if (blockId != null) {
-				sql.append(" AND blk.value = :blockId ");
-			} else {
-				sql.append(" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval ")
-						.append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
-						.append(" AND bexp.nd_geolocation_id = :instanceId ")
-						.append(" AND bexp.project_id = :datasetId ").append(" WHERE bval.type_id = ").append(TermId.BLOCK_ID.getId())
-						.append(")");
-			}
+							.append(" WHERE blk.type_id = ").append(TermId.BLOCK_ID.getId())
+							.append(" AND p.project_id = :datasetId")
+							.append(" AND e.nd_geolocation_id = :instanceId ");
 			sql.append(" ORDER BY e.nd_experiment_id ").append(order);
 
 			final SQLQuery query =
@@ -217,12 +209,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.addScalar("col").addScalar("blockId").addScalar("studyId").addScalar("trialInstance").addScalar("gid")
 							.addScalar("startDate").addScalar("season").addScalar("blockNo").addScalar("obsUnitId", Hibernate.STRING);
 
-			if (blockId != null) {
-				query.setParameter("blockId", blockId);
-			} else {
-				query.setParameter("datasetId", datasetId);
-				query.setParameter("instanceId", instanceId);
-			}
+			query.setParameter("datasetId", datasetId);
+			query.setParameter("instanceId", instanceId);
 
 			final List<Object[]> list = query.list();
 

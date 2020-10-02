@@ -169,9 +169,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId,
+	public List<FieldMapInfo> getAllFieldMapsByTrialInstanceId(final int datasetId, final int geolocationId,
 			final CrossExpansionProperties crossExpansionProperties) {
-		return this.studyDataManager.getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, crossExpansionProperties);
+		return this.studyDataManager.getAllFieldMapsByTrialInstanceId(datasetId, geolocationId, crossExpansionProperties);
 	}
 
 	@Override
@@ -629,11 +629,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		location.setLdefault(false);
 		return manager.addLocationAndLocdes(location, locdes);
-	}
-
-	@Override
-	public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(final int blockId) {
-		return this.studyDataManager.getAllFieldMapsInBlockByBlockId(blockId);
 	}
 
 	@Override
