@@ -259,8 +259,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
 			query.setParameterList("PLOT_NO_TERM_IDS",
 				new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
-			query.addScalar("entryId", new IntegerType());
 			query.addScalar("position", new IntegerType());
+			query.addScalar("entryId", new IntegerType());
 			query.addScalar("designation", new StringType());
 			query.addScalar("germplasmId", new IntegerType());
 
@@ -275,7 +275,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				final Integer entryId = (Integer) row[1];
 				final String designation = (String) row[2];
 				final Integer gid = (Integer) row[3];
-				map.put(plotNumber, new StudyEntryDto(entryId, gid, designation));
+				map.putIfAbsent(plotNumber, new StudyEntryDto(entryId, gid, designation));
 			}
 			return map;
 		} catch (HibernateException e) {
