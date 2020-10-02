@@ -169,7 +169,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 
 	@Test(expected = MiddlewareRequestException.class)
 	public void testReplaceStudyEntry_InvalidEntryId() {
-		final StudyEntryDto dto = this.service.getStudyEntries(this.studyId, null, null).get(1);
+		final StudyEntryDto dto = this.service.getStudyEntries(this.studyId).get(1);
 		Assert.assertNotNull(dto);
 		final Integer newGid = gids.get(0);
 		this.service.replaceStudyEntry(this.studyId, dto.getEntryId() + 10, newGid, RandomStringUtils.random(5));
@@ -177,7 +177,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 
 	@Test(expected = MiddlewareRequestException.class)
 	public void testReplaceStudyEntry_InvalidEntryIdForStudy() {
-		final StudyEntryDto dto = this.service.getStudyEntries(this.studyId, null, null).get(1);
+		final StudyEntryDto dto = this.service.getStudyEntries(this.studyId).get(1);
 		Assert.assertNotNull(dto);
 		final Integer newGid = gids.get(0);
 		this.service.replaceStudyEntry(this.studyId + 1, dto.getEntryId(), newGid, RandomStringUtils.random(5));
@@ -185,7 +185,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 
 	@Test(expected = MiddlewareRequestException.class)
 	public void testReplaceStudyEntry_SameGidAsExistingEntry() {
-		final StudyEntryDto dto = this.service.getStudyEntries(this.studyId, null, null).get(1);
+		final StudyEntryDto dto = this.service.getStudyEntries(this.studyId).get(1);
 		Assert.assertNotNull(dto);
 		this.service.replaceStudyEntry(this.studyId + 1, dto.getEntryId(), dto.getGid(), RandomStringUtils.random(5));
 	}
@@ -208,7 +208,17 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 
 	}
 
-	private void verifyStudyEntryDetails(Integer gid, int index, StudyEntryDto dto) {
+	@Test
+	public void testGetStudyEntries() {
+		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(this.studyId);
+		int index = 0;
+		for (final StudyEntryDto dto : studyEntries) {
+			this.verifyStudyEntryDetails(this.gids.get(index), index + 1, dto);
+			index++;
+		}
+	}
+
+	private void verifyStudyEntryDetails(final Integer gid, final int index, final StudyEntryDto dto) {
 		Assert.assertEquals(index, dto.getEntryNumber().intValue());
 		Assert.assertEquals(StudyEntryServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + index, dto.getDesignation());
 		Assert.assertEquals(StudyEntryServiceImplTest.SEEDSOURCE + index, dto.getProperties().get(TermId.SEED_SOURCE.getId()).getValue());

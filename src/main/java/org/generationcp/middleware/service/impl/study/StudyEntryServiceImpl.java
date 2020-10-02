@@ -22,6 +22,7 @@ import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -49,7 +50,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public List<StudyEntryDto> getStudyEntries(final int studyId) {
-		return this.getStudyEntries(studyId, null, new PageRequest(0, Integer.MAX_VALUE));
+		// Return by ascending order of entry number. We need to perform cast first on uniquename since it's stored as string
+		return this.getStudyEntries(studyId, null, new PageRequest(0, Integer.MAX_VALUE,
+				new Sort(Sort.Direction.ASC, "CAST(uniquename AS UNSIGNED)")));
 	}
 
 	@Override
