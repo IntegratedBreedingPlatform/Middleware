@@ -1,16 +1,25 @@
 package org.generationcp.middleware.service.impl.inventory;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotSingleUpdateRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.UDTableType;
@@ -27,9 +36,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -62,12 +74,16 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	@Autowired
 	private LocationDataManager locationDataManager;
 
+	@Autowired
+	private OntologyVariableDataManager ontologyVariableDataManager;
+
 	@Before
 	public void setUp() {
 		this.transactionService = new TransactionServiceImpl(this.sessionProvder);
 		this.lotService = new LotServiceImpl(this.sessionProvder);
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.lotService.setTransactionService(this.transactionService);
+		this.lotService.setOntologyVariableDataManager(this.ontologyVariableDataManager);
 		this.createGermplasm();
 		this.userId = this.findAdminUser();
 		this.resolveStorageLocation();
@@ -129,6 +145,71 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(pendingTransactions, hasSize(0));
 		assertThat(discardedTrxsAfterClosingLot, equalTo(discardedTrxsBeforeClosingLot));
 
+	}
+
+	@Test
+	public void lotSingleUpdateNotes_Ok() {
+		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
+		final LotSingleUpdateRequestDto singleInput = new LotSingleUpdateRequestDto();
+		singleInput.setNotes("Test1");
+		lotUpdateRequestDto.setSingleInput(singleInput);
+
+		final Set<String> itemIds = Sets.newHashSet(this.lot.getLotUuId());
+		SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
+		lotUpdateRequestDto.getSingleInput().setSearchComposite(new SearchCompositeDto());
+		lotUpdateRequestDto.getSingleInput().getSearchComposite().setItemIds(itemIds);
+		final LotsSearchDto searchDto = new LotsSearchDto();
+		searchDto.setLotIds(Collections.singletonList(this.lot.getId()));
+		List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
+
+		this.lotService.updateLots(extendedLotDtos, lotUpdateRequestDto);
+		assertThat(this.lot.getComments(), hasToString("Test1"));
+	}
+
+	@Test
+	public void lotSingleUpdateNotesUnit_Ok() {
+		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
+		final LotSingleUpdateRequestDto singleInput = new LotSingleUpdateRequestDto();
+		singleInput.setNotes("Test2");
+		singleInput.setUnitId(8267);
+		lotUpdateRequestDto.setSingleInput(singleInput);
+
+		final Set<String> itemIds = Sets.newHashSet(this.lot.getLotUuId());
+		SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
+		lotUpdateRequestDto.getSingleInput().setSearchComposite(new SearchCompositeDto());
+		lotUpdateRequestDto.getSingleInput().getSearchComposite().setItemIds(itemIds);
+		final LotsSearchDto searchDto = new LotsSearchDto();
+		searchDto.setLotIds(Collections.singletonList(this.lot.getId()));
+		List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
+
+		this.lotService.updateLots(extendedLotDtos, lotUpdateRequestDto);
+		assertThat(this.lot.getComments(), hasToString("Test2"));
+		assertThat(this.lot.getScaleId(), equalTo(8267));
+	}
+
+	@Test
+	public void lotMultiUpdateNotesUnit_Ok() {
+		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
+		final LotMultiUpdateRequestDto multiInput = new LotMultiUpdateRequestDto();
+		final List<LotMultiUpdateRequestDto.LotUpdateDto> lotList = new ArrayList<>();
+		LotMultiUpdateRequestDto.LotUpdateDto lot = new LotMultiUpdateRequestDto.LotUpdateDto();
+		lot.setLotUID(this.lot.getLotUuId());
+		lot.setUnitName("SEED_AMOUNT_kg");
+		lot.setNotes("Test3");
+		lotList.add(lot);
+		multiInput.setLotList(lotList);
+		lotUpdateRequestDto.setMultiInput(multiInput);
+
+		final LotsSearchDto searchDto = new LotsSearchDto();
+		searchDto.setLotIds(Collections.singletonList(this.lot.getId()));
+		assertThat(this.lot.getScaleId(), equalTo(8264));
+		assertThat(this.lot.getComments(), hasToString("Lot"));
+
+		List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
+
+		this.lotService.updateLots(extendedLotDtos, lotUpdateRequestDto);
+		assertThat(this.lot.getComments(), hasToString("Test3"));
+		assertThat(this.lot.getScaleId(), equalTo(8267));
 	}
 
 	@Test
@@ -210,6 +291,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	private void createLot() {
 		this.lot = new Lot(null, this.userId, EntityType.GERMPLSM.name(), this.gid, this.storageLocationId, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
 			"Lot", RandomStringUtils.randomAlphabetic(35));
+		this.lot.setLotUuId(RandomStringUtils.randomAlphabetic(35));
 		this.daoFactory.getLotDao().save(this.lot);
 	}
 
