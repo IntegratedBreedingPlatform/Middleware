@@ -33,7 +33,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -454,8 +454,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		final Long count = (Long) this.dmsProjectDao.countStudies(studySearchFilter);
-		final List<StudyDto> studyDtos = this.dmsProjectDao.getStudies(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
-		Assert.assertEquals(count.intValue(), studyDtos.size());
+		final List<StudyInstanceDto> studyInstanceDtos = this.dmsProjectDao.getStudies(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
+		Assert.assertEquals(count.intValue(), studyInstanceDtos.size());
 
 	}
 
@@ -485,26 +485,26 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		studySearchFilter.setActive(true);
 
 		final Long count = (Long) this.dmsProjectDao.countStudies(studySearchFilter);
-		final List<StudyDto> studyDtos = this.dmsProjectDao.getStudies(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
+		final List<StudyInstanceDto> studyInstanceDtos = this.dmsProjectDao.getStudies(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
 
 		Assert.assertEquals(1, count.intValue());
-		Assert.assertEquals(1, studyDtos.size());
-		final StudyDto studyDto = studyDtos.get(0);
+		Assert.assertEquals(1, studyInstanceDtos.size());
+		final StudyInstanceDto studyInstanceDto = studyInstanceDtos.get(0);
 		final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
-		Assert.assertEquals(String.valueOf(study.getProjectId()), studyDto.getTrialDbId());
-		Assert.assertEquals(String.valueOf(study.getName()), studyDto.getTrialName());
-		Assert.assertEquals(study.getStartDate(), dateFormat.format(studyDto.getStartDate()));
-		Assert.assertEquals(study.getEndDate(), dateFormat.format(studyDto.getEndDate()));
-		Assert.assertEquals(String.valueOf(study.getStudyType().getStudyTypeId()), studyDto.getStudyTypeDbId());
-		Assert.assertEquals(study.getStudyType().getLabel(), studyDto.getStudyTypeName());
-		Assert.assertEquals(String.valueOf(instance1.getLocationId()), studyDto.getStudyDbId());
-		Assert.assertEquals(study.getName() + " Environment Number 1", studyDto.getStudyName());
-		Assert.assertEquals("true", studyDto.getActive());
-		Assert.assertEquals("1", studyDto.getLocationDbId());
-		Assert.assertEquals("Afghanistan", studyDto.getLocationName());
-		Assert.assertEquals(String.valueOf(TermId.SEASON_DRY.getId()), studyDto.getSeasons().get(0).getSeasonDbId());
-		Assert.assertEquals("Dry season", studyDto.getSeasons().get(0).getSeason());
+		Assert.assertEquals(String.valueOf(study.getProjectId()), studyInstanceDto.getTrialDbId());
+		Assert.assertEquals(String.valueOf(study.getName()), studyInstanceDto.getTrialName());
+		Assert.assertEquals(study.getStartDate(), dateFormat.format(studyInstanceDto.getStartDate()));
+		Assert.assertEquals(study.getEndDate(), dateFormat.format(studyInstanceDto.getEndDate()));
+		Assert.assertEquals(String.valueOf(study.getStudyType().getStudyTypeId()), studyInstanceDto.getStudyTypeDbId());
+		Assert.assertEquals(study.getStudyType().getLabel(), studyInstanceDto.getStudyTypeName());
+		Assert.assertEquals(String.valueOf(instance1.getLocationId()), studyInstanceDto.getStudyDbId());
+		Assert.assertEquals(study.getName() + " Environment Number 1", studyInstanceDto.getStudyName());
+		Assert.assertEquals("true", studyInstanceDto.getActive());
+		Assert.assertEquals("1", studyInstanceDto.getLocationDbId());
+		Assert.assertEquals("Afghanistan", studyInstanceDto.getLocationName());
+		Assert.assertEquals(String.valueOf(TermId.SEASON_DRY.getId()), studyInstanceDto.getSeasons().get(0).getSeasonDbId());
+		Assert.assertEquals("Dry season", studyInstanceDto.getSeasons().get(0).getSeason());
 
 	}
 

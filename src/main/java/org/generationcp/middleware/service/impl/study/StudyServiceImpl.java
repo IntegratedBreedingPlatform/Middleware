@@ -28,7 +28,7 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestD
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
@@ -608,12 +608,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+	public List<StudyInstanceDto> getStudyInstances(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 		return this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter, pageable);
 	}
 
 	@Override
-	public long countStudies(final StudySearchFilter studySearchFilter) {
+	public long countStudyInstances(final StudySearchFilter studySearchFilter) {
 		return this.daoFactory.getDmsProjectDAO().countStudies(studySearchFilter);
 	}
 

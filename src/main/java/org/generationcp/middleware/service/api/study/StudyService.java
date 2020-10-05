@@ -75,9 +75,9 @@ public interface StudyService {
 
 	Integer getEnvironmentDatasetId(int studyId);
 
-	List<StudyDto> getStudies(StudySearchFilter studySearchFilter, Pageable pageable);
+	List<StudyInstanceDto> getStudyInstances(StudySearchFilter studySearchFilter, Pageable pageable);
 
-	long countStudies(StudySearchFilter studySearchFilter);
+	long countStudyInstances(StudySearchFilter studySearchFilter);
 
 	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
 }

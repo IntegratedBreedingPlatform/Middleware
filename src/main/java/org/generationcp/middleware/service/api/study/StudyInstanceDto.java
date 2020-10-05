@@ -11,7 +11,7 @@ import java.util.Map;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class StudyDto {
+public class StudyInstanceDto {
 
 	private String active;
 
@@ -244,7 +244,7 @@ public class StudyDto {
 	 * @param value Value of the optional info
 	 * @return this
 	 */
-	public StudyDto addOptionalInfo(final String name, final String value) {
+	public StudyInstanceDto addOptionalInfo(final String name, final String value) {
 		this.optionalInfo.put(name, value);
 		return this;
 	}
@@ -253,7 +253,7 @@ public class StudyDto {
 	 * @param optionalInfo
 	 * @return this
 	 */
-	public StudyDto setOptionalInfo(final Map<String, String> optionalInfo) {
+	public StudyInstanceDto setOptionalInfo(final Map<String, String> optionalInfo) {
 		this.optionalInfo = optionalInfo;
 		return this;
 	}

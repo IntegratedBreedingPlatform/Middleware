@@ -34,7 +34,7 @@ import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.service.api.study.SeasonDto;
-import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -1453,16 +1453,16 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public long countStudies(final StudySearchFilter studySearchFilter) {
 		final SQLQuery sqlQuery =
-			this.getSession().createSQLQuery(this.createCountStudyQueryString(studySearchFilter));
+			this.getSession().createSQLQuery(this.createCountStudyInstanceQueryString(studySearchFilter));
 		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
-	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+	public List<StudyInstanceDto> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 
 		// TODO: Check if we can reuse this query/method in getStudyMetadataForGeolocationId()
 		final SQLQuery sqlQuery =
-			this.getSession().createSQLQuery(this.createStudySummaryQueryString(studySearchFilter, pageable));
+			this.getSession().createSQLQuery(this.createStudyInstanceQueryString(studySearchFilter, pageable));
 
 		sqlQuery.addScalar(StudySearchFilter.STUDY_DB_ID);
 		sqlQuery.addScalar(StudySearchFilter.STUDY_NAME);
@@ -1487,35 +1487,35 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 		final List<Map<String, Object>> results = sqlQuery.list();
 
-		final List<StudyDto> studyDtoList = new ArrayList<>();
+		final List<StudyInstanceDto> studyInstanceDtoList = new ArrayList<>();
 		for (final Map<String, Object> result : results) {
-			final StudyDto studyDto = new StudyDto();
-			studyDto.setCommonCropName(studySearchFilter.getCommonCropName());
-			studyDto.setStudyDbId(String.valueOf(result.get(StudySearchFilter.STUDY_DB_ID)));
-			studyDto.setStudyName(String.valueOf(result.get(StudySearchFilter.STUDY_NAME)));
-			studyDto.setTrialDbId(String.valueOf(result.get(StudySearchFilter.TRIAL_DB_ID)));
-			studyDto.setTrialName(String.valueOf(result.get(StudySearchFilter.TRIAL_NAME)));
-			studyDto.setStudyTypeDbId(String.valueOf(result.get(StudySearchFilter.STUDY_TYPE_DB_ID)));
-			studyDto.setStudyTypeName(String.valueOf(result.get(StudySearchFilter.STUDY_TYPE_NAME)));
-			studyDto.setStartDate(Util.tryParseDate((String) result.get(StudySearchFilter.START_DATE)));
-			studyDto.setEndDate(Util.tryParseDate((String) result.get(StudySearchFilter.END_DATE)));
-			studyDto.setLocationDbId(String.valueOf(result.get(StudySearchFilter.LOCATION_DB_ID)));
-			studyDto.setLocationName(String.valueOf(result.get(StudySearchFilter.LOCATION_NAME)));
-			studyDto.setProgramDbId(String.valueOf(result.get(StudySearchFilter.PROGRAM_DB_ID)));
-			studyDto.setProgramName(String.valueOf(result.get(StudySearchFilter.PROGRAM_NAME)));
+			final StudyInstanceDto studyInstanceDto = new StudyInstanceDto();
+			studyInstanceDto.setCommonCropName(studySearchFilter.getCommonCropName());
+			studyInstanceDto.setStudyDbId(String.valueOf(result.get(StudySearchFilter.STUDY_DB_ID)));
+			studyInstanceDto.setStudyName(String.valueOf(result.get(StudySearchFilter.STUDY_NAME)));
+			studyInstanceDto.setTrialDbId(String.valueOf(result.get(StudySearchFilter.TRIAL_DB_ID)));
+			studyInstanceDto.setTrialName(String.valueOf(result.get(StudySearchFilter.TRIAL_NAME)));
+			studyInstanceDto.setStudyTypeDbId(String.valueOf(result.get(StudySearchFilter.STUDY_TYPE_DB_ID)));
+			studyInstanceDto.setStudyTypeName(String.valueOf(result.get(StudySearchFilter.STUDY_TYPE_NAME)));
+			studyInstanceDto.setStartDate(Util.tryParseDate((String) result.get(StudySearchFilter.START_DATE)));
+			studyInstanceDto.setEndDate(Util.tryParseDate((String) result.get(StudySearchFilter.END_DATE)));
+			studyInstanceDto.setLocationDbId(String.valueOf(result.get(StudySearchFilter.LOCATION_DB_ID)));
+			studyInstanceDto.setLocationName(String.valueOf(result.get(StudySearchFilter.LOCATION_NAME)));
+			studyInstanceDto.setProgramDbId(String.valueOf(result.get(StudySearchFilter.PROGRAM_DB_ID)));
+			studyInstanceDto.setProgramName(String.valueOf(result.get(StudySearchFilter.PROGRAM_NAME)));
 
 			final List<SeasonDto> seasons = new ArrayList<>();
 			if (!StringUtils.isEmpty((String) result.get(StudySearchFilter.SEASON_DB_ID))) {
 				seasons.add(new SeasonDto(String.valueOf(result.get(StudySearchFilter.SEASON)),
 					String.valueOf(result.get(StudySearchFilter.SEASON_DB_ID))));
 			}
-			studyDto.setSeasons(seasons);
+			studyInstanceDto.setSeasons(seasons);
 
-			studyDto
+			studyInstanceDto
 				.setActive(((Integer) result.get(StudySearchFilter.ACTIVE)) == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
-			studyDtoList.add(studyDto);
+			studyInstanceDtoList.add(studyInstanceDto);
 		}
-		return studyDtoList;
+		return studyInstanceDtoList;
 	}
 
 	private void addstudySearchFilterParameters(final SQLQuery sqlQuery, final StudySearchFilter studySearchFilter) {
@@ -1544,14 +1544,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	private String createCountStudyQueryString(final StudySearchFilter studySearchFilter) {
+	private String createCountStudyInstanceQueryString(final StudySearchFilter studySearchFilter) {
 		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT geoloc.nd_geolocation_id) ");
 		this.appendStudySummaryFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
 		return sql.toString();
 	}
 
-	private String createStudySummaryQueryString(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+	private String createStudyInstanceQueryString(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 		final StringBuilder sql = new StringBuilder(" SELECT  ");
 		sql.append("     geoloc.nd_geolocation_id AS " + StudySearchFilter.STUDY_DB_ID + ", ");
 		sql.append("		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS " + StudySearchFilter.STUDY_NAME + ", ");
