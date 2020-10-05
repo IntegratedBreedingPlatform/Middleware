@@ -27,6 +27,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -287,6 +288,28 @@ public class LotServiceImpl implements LotService {
 		}
 
 		this.daoFactory.getLotDao().closeLots(lotIds);
+	}
+
+	@Override
+	public void mergeLots(final Integer userId, final Integer keepLotId, final LotsSearchDto lotsSearchDto) {
+		//Search selected lots to be merged and remove the one to keep
+		final List<ExtendedLotDto> extendedLotDtos = this.searchLots(lotsSearchDto, null).stream()
+				.filter(extendedLotDto -> extendedLotDto.getLotId().intValue() != keepLotId.intValue())
+				.collect(Collectors.toList());
+		//Create a transaction for each of the discarded lots
+		extendedLotDtos.stream()
+			.forEach(extendedLotDto -> {
+				final Transaction transaction = new Transaction(TransactionType.DEPOSIT, TransactionStatus.CONFIRMED,
+						userId, null, keepLotId, extendedLotDto.getActualBalance());
+				transaction.setSourceType(TransactionSourceType.MERGED_LOT.name());
+				transaction.setSourceId(extendedLotDto.getLotId());
+				daoFactory.getTransactionDAO().save(transaction);
+			});
+
+		//Close the discarded lots
+		final List<Integer> lotIds = extendedLotDtos.stream()
+				.map(ExtendedLotDto::getLotId).collect(Collectors.toList());
+		this.closeLots(userId, lotIds);
 	}
 
 	public void setTransactionService(final TransactionService transactionService) {
