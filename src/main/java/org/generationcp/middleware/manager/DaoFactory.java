@@ -224,6 +224,12 @@ public class DaoFactory {
 		return countryDAO;
 	}
 
+	public UserDefinedFieldDAO getUserDefinedFieldDAO() {
+		final UserDefinedFieldDAO userDefinedFieldDAO = new UserDefinedFieldDAO();
+		userDefinedFieldDAO.setSession(this.sessionProvider.getSession());
+		return userDefinedFieldDAO;
+	}
+
 	public ProgramFavoriteDAO getProgramFavoriteDao() {
 		final ProgramFavoriteDAO programFavoriteDao = new ProgramFavoriteDAO();
 		programFavoriteDao.setSession(this.sessionProvider.getSession());
