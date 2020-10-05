@@ -454,7 +454,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		final Long count = (Long) this.dmsProjectDao.countStudyInstances(studySearchFilter);
-		final List<StudyInstanceDto> studyInstanceDtos = this.dmsProjectDao.getStudies(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
+		final List<StudyInstanceDto> studyInstanceDtos = this.dmsProjectDao.getStudyInstances(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
 		Assert.assertEquals(count.intValue(), studyInstanceDtos.size());
 
 	}
@@ -484,8 +484,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		studySearchFilter.setSeasonDbId(String.valueOf(TermId.SEASON_DRY.getId()));
 		studySearchFilter.setActive(true);
 
-		final Long count = (Long) this.dmsProjectDao.countStudies(studySearchFilter);
-		final List<StudyInstanceDto> studyInstanceDtos = this.dmsProjectDao.getStudies(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
+		final Long count = (Long) this.dmsProjectDao.countStudyInstances(studySearchFilter);
+		final List<StudyInstanceDto> studyInstanceDtos = this.dmsProjectDao.getStudyInstances(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
 
 		Assert.assertEquals(1, count.intValue());
 		Assert.assertEquals(1, studyInstanceDtos.size());

@@ -14,13 +14,7 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.FolderReference;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -32,10 +26,8 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
-import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -45,13 +37,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
@@ -64,14 +50,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -701,64 +680,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException("Error with getAllSharedProjectNames()" + e.getMessage(), e);
 		}
-	}
-
-	public List<DmsProject> findPagedProjects(final Map<StudyFilters, String> filters, final Integer pageSize, final Integer pageNumber) {
-
-		final Criteria criteria = this.buildCoreCriteria(filters, this.getOrderBy(filters));
-		if (pageNumber != null && pageSize != null) {
-			criteria.setFirstResult(pageSize * (pageNumber - 1));
-			criteria.setMaxResults(pageSize);
-		}
-		return criteria.list();
-	}
-
-	private Order getOrderBy(final Map<StudyFilters, String> filters) {
-		if (filters.containsKey(StudyFilters.SORT_BY_FIELD)) {
-			if ("asc".equals(filters.get(StudyFilters.ORDER))) {
-				return Order.asc(filters.get(StudyFilters.SORT_BY_FIELD));
-			} else {
-				return Order.desc(filters.get(StudyFilters.SORT_BY_FIELD));
-			}
-		}
-		return Order.asc(DmsProjectDao.PROJECT_ID);
-	}
-
-	public long countStudies(final Map<StudyFilters, String> filters) {
-		final Criteria criteria = this.buildCoreCriteria(filters, this.getOrderBy(filters));
-		criteria.setProjection(Projections.rowCount());
-		return (long) criteria.uniqueResult();
-	}
-
-	private Criteria buildCoreCriteria(final Map<StudyFilters, String> parameters, final Order orderBy) {
-		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-		criteria.add(Restrictions.isNotNull("studyType"));
-
-		criteria.add(Restrictions.ne(DmsProjectDao.DELETED, true));
-
-		if (parameters.containsKey(StudyFilters.PROGRAM_ID)) {
-			criteria.add(Restrictions.eq(StudyFilters.PROGRAM_ID.getParameter(), parameters.get(StudyFilters.PROGRAM_ID)));
-		} else {
-			criteria.add(Restrictions.isNotNull(StudyFilters.PROGRAM_ID.getParameter()));
-		}
-
-		if (parameters.containsKey(StudyFilters.LOCATION_ID)) {
-			// Find environments with specified location (saved in GeolocationProperty)
-			final DetachedCriteria locationCriteria = DetachedCriteria.forClass(ExperimentModel.class);
-			locationCriteria.add(Restrictions.eq("typeId", TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()));
-			locationCriteria.createAlias("geoLocation", "g");
-			locationCriteria.createAlias("g.properties", "gp");
-			locationCriteria.createAlias("project", "p");
-			locationCriteria.createAlias("p.study", "st");
-			locationCriteria.add(Restrictions.and(
-				Restrictions.eq("gp.typeId", DmsProjectDao.LOCATION_ID),
-				Restrictions.eq("gp.value", parameters.get(StudyFilters.LOCATION_ID))));
-			locationCriteria.setProjection(Projections.property("st.projectId"));
-			criteria.add(Property.forName("projectId").in(locationCriteria));
-		}
-
-		criteria.addOrder(orderBy);
-		return criteria;
 	}
 
 	public StudyMetadata getStudyMetadataForInstanceId(final Integer instanceId) {
@@ -1454,7 +1375,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public long countStudyInstances(final StudySearchFilter studySearchFilter) {
 		final SQLQuery sqlQuery =
 			this.getSession().createSQLQuery(this.createCountStudyInstanceQueryString(studySearchFilter));
-		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
+		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	public long countStudies(final StudySearchFilter studySearchFilter) {
+		final SQLQuery sqlQuery =
+				this.getSession().createSQLQuery(this.createCountStudyQueryString(studySearchFilter));
+		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
@@ -1480,7 +1408,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sqlQuery.addScalar(StudySearchFilter.PROGRAM_DB_ID);
 		sqlQuery.addScalar(StudySearchFilter.PROGRAM_NAME);
 
-		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
+		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
 
 		addPaginationToSQLQuery(sqlQuery, pageable);
 
@@ -1518,7 +1446,44 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return studyInstanceDtoList;
 	}
 
-	private void addstudySearchFilterParameters(final SQLQuery sqlQuery, final StudySearchFilter studySearchFilter) {
+
+	public List<StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		final SQLQuery sqlQuery =
+				this.getSession().createSQLQuery(this.createStudyQueryString(studySearchFilter, pageable));
+
+		sqlQuery.addScalar("trialDbId");
+		sqlQuery.addScalar("trialName");
+		sqlQuery.addScalar("trialDescription");
+		sqlQuery.addScalar("startDate");
+		sqlQuery.addScalar("endDate");
+		sqlQuery.addScalar("active", new IntegerType());
+		sqlQuery.addScalar("programDbId");
+		sqlQuery.addScalar("programName");
+
+		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
+
+		addPaginationToSQLQuery(sqlQuery, pageable);
+
+		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+		final List<Map<String, Object>> results = sqlQuery.list();
+
+		final List<StudySummary> studyList = new ArrayList<>();
+		for (final Map<String, Object> result : results) {
+			final StudySummary studySummary = new StudySummary();
+			studySummary.setStudyDbid((Integer)result.get("trialDbId"));
+			studySummary.setName(String.valueOf(result.get("trialName")));
+			studySummary.setDescription(String.valueOf(result.get("trialDescription")));
+			studySummary.setStartDate((String) result.get("startDate"));
+			studySummary.setEndDate((String) result.get("endDate"));
+			studySummary.setProgramDbId(String.valueOf(result.get("programDbId")));
+			studySummary.setProgramName(String.valueOf(result.get("programName")));
+			studySummary.setActive(((Integer) result.get("active")) == 1);
+			studyList.add(studySummary);
+		}
+		return studyList;
+	}
+
+	private void addStudySearchFilterParameters(final SQLQuery sqlQuery, final StudySearchFilter studySearchFilter) {
 
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
 			sqlQuery.setParameter(StudySearchFilter.STUDY_DB_ID, studySearchFilter.getStudyDbId());
@@ -1546,7 +1511,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private String createCountStudyInstanceQueryString(final StudySearchFilter studySearchFilter) {
 		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT geoloc.nd_geolocation_id) ");
-		this.appendStudySummaryFromQuery(sql);
+		this.appendStudyInstanceFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
 		return sql.toString();
 	}
@@ -1568,6 +1533,32 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     location.lname AS " + StudySearchFilter.LOCATION_NAME + ", ");
 		sql.append("     wp.project_name AS " + StudySearchFilter.PROGRAM_NAME + ", ");
 		sql.append("     wp.project_uuid AS " + StudySearchFilter.PROGRAM_DB_ID + " ");
+		this.appendStudyInstanceFromQuery(sql);
+		this.appendStudySearchFilter(sql, studySearchFilter);
+		sql.append(" GROUP BY geoloc.nd_geolocation_id ");
+
+		addPageRequestOrderBy(sql, pageable, StudySearchFilter.SORTABLE_FIELDS);
+
+		return sql.toString();
+	}
+
+	private String createCountStudyQueryString(final StudySearchFilter studySearchFilter) {
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT pmain.project_id) ");
+		this.appendStudySummaryFromQuery(sql);
+		this.appendStudySearchFilter(sql, studySearchFilter);
+		return sql.toString();
+	}
+
+	private String createStudyQueryString(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		final StringBuilder sql = new StringBuilder(" SELECT  ");
+		sql.append("     pmain.project_id AS trialDbId, ");
+		sql.append(" 	 pmain.name AS trialName, ");
+		sql.append(" 	 pmain.description AS trialDescription, ");
+		sql.append("     MAX(pmain.start_date) AS startDate, ");
+		sql.append("     MAX(pmain.end_date) AS endDate, ");
+		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS active, ");
+		sql.append("     wp.project_name AS programName, ");
+		sql.append("     wp.project_uuid AS programDbId ");
 		this.appendStudySummaryFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
 		sql.append(" GROUP BY geoloc.nd_geolocation_id ");
@@ -1577,7 +1568,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return sql.toString();
 	}
 
-	private void appendStudySummaryFromQuery(final StringBuilder sql) {
+	private void appendStudyInstanceFromQuery(final StringBuilder sql) {
 		sql.append(" FROM ");
 		sql.append("     nd_geolocation geoloc ");
 		sql.append("         INNER JOIN ");
@@ -1602,6 +1593,26 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value");
+		sql.append(" WHERE ");
+		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
+	}
+
+	private void appendStudySummaryFromQuery(final StringBuilder sql) {
+		sql.append(" FROM ");
+		sql.append("     nd_geolocation geoloc ");
+		sql.append("         INNER JOIN ");
+		sql.append("     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id ");
+		sql.append("         INNER JOIN ");
+		sql.append("     project proj ON proj.project_id = nde.project_id ");
+		sql.append("         INNER JOIN ");
+		sql.append("     project pmain ON pmain.project_id = proj.study_id ");
+		sql.append("         INNER JOIN ");
+		sql.append("     nd_experiment study_exp ON study_exp.project_id = pmain.project_id AND study_exp.type_id = " + TermId.STUDY_EXPERIMENT.getId());
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = "
+						+ TermId.LOCATION_ID.getId());
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
 		sql.append(" WHERE ");
 		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
 	}

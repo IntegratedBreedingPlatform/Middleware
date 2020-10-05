@@ -79,5 +79,9 @@ public interface StudyService {
 
 	long countStudyInstances(StudySearchFilter studySearchFilter);
 
+	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(StudySearchFilter studySearchFilter, Pageable pageable);
+
+	long countStudies(StudySearchFilter studySearchFilter);
+
 	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
 }

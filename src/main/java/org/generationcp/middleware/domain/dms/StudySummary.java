@@ -19,6 +19,8 @@ public class StudySummary implements Serializable {
 
 	private String name;
 
+	private String description;
+
 	private String type;
 
 	private List<String> years = Lists.newArrayList();
@@ -57,6 +59,14 @@ public class StudySummary implements Serializable {
 	public StudySummary setName(final String name) {
 		this.name = name;
 		return this;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
 	}
 
 	public String getType() {
@@ -166,5 +176,6 @@ public class StudySummary implements Serializable {
 	public void setInstanceMetaData(List<InstanceMetadata> instanceMetaData) {
 		this.instanceMetaData = instanceMetaData;
 	}
+
 
 }

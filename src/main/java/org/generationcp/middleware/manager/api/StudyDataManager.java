@@ -13,23 +13,7 @@ package org.generationcp.middleware.manager.api;
 
 import com.google.common.collect.BiMap;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.FolderReference;
-import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.domain.dms.Stocks;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -38,13 +22,11 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -655,24 +637,6 @@ public interface StudyDataManager {
 	 * @return
 	 */
 	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, int datasetTypeId, List<Integer> locationIds);
-
-	/**
-	 * Retrieves all the StudySummaries of the DMS Project that matches the conditions: SeasonDbId, LocationDbId and ProgramDbId
-	 *
-	 * @param filters    - the filters that to be included in the query
-	 * @param pageSize   Page Size
-	 * @param pageNumber Page Number
-	 * @return List of StudySummary
-	 */
-	List<StudySummary> findPagedProjects(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber);
-
-	/**
-	 * Count how many DMS Project matches the conditions: programDBid, locationDbId
-	 *
-	 * @param filters - the filters that to be included in the query
-	 * @return Number of programs
-	 */
-	Long countAllStudies(final Map<StudyFilters, String> filters);
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
 
