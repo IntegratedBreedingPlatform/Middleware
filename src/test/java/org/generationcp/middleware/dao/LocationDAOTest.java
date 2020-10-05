@@ -6,7 +6,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.util.StringUtil;
 import org.hamcrest.MatcherAssert;
