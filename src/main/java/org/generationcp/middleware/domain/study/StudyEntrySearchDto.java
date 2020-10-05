@@ -30,7 +30,7 @@ public class StudyEntrySearchDto {
 		this.filter = filter;
 	}
 
-	public class Filter {
+	public static class Filter {
 		private List<String> entryNumbers;
 
 		private List<Integer> entryIds;

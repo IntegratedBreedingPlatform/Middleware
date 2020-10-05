@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.io.Serializable;
+
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class StudyEntryPropertyData {
+public class StudyEntryPropertyData implements Serializable {
 
 	private Integer studyEntryPropertyId;
 	private Integer variableId;

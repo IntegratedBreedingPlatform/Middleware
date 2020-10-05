@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class StudyEntryDto {
+public class StudyEntryDto implements Serializable {
 
 	private Integer entryId;
 
@@ -27,10 +29,24 @@ public class StudyEntryDto {
 
 	private String unit;
 
-	private Map<String, StudyEntryPropertyData> variables = new HashMap<>();
+	private Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 
 	public StudyEntryDto(){
 
+	}
+
+	public StudyEntryDto(final Integer entryId, final Integer gid, final String designation) {
+		this.entryId = entryId;
+		this.gid = gid;
+		this.designation = designation;
+	}
+
+	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final String entryCode, final Integer gid, final String designation) {
+		this.entryId = entryId;
+		this.entryNumber = entryNumber;
+		this.entryCode = entryCode;
+		this.gid = gid;
+		this.designation = designation;
 	}
 
 	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final String entryCode, final Integer gid, final String designation, final Integer lotCount, final String availableBalance, final String unit){
@@ -108,12 +124,12 @@ public class StudyEntryDto {
 		this.unit = unit;
 	}
 
-	public Map<String, StudyEntryPropertyData> getVariables() {
-		return variables;
+	public Map<Integer, StudyEntryPropertyData> getProperties() {
+		return properties;
 	}
 
-	public void setVariables(final Map<String, StudyEntryPropertyData> variables) {
-		this.variables = variables;
+	public void setProperties(final Map<Integer, StudyEntryPropertyData> properties) {
+		this.properties = properties;
 	}
 
 	@Override
@@ -129,6 +145,14 @@ public class StudyEntryDto {
 	@Override
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
+	}
+
+
+	public Optional<String> getStudyEntryPropertyValue(final Integer variableId) {
+		if (this.properties.containsKey(variableId)) {
+			return Optional.of(this.properties.get(variableId).getValue());
+		}
+		return Optional.empty();
 	}
 
 }
