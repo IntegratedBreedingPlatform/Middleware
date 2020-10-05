@@ -1451,14 +1451,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public long countStudies(final StudySearchFilter studySearchFilter) {
+	public long countStudyInstances(final StudySearchFilter studySearchFilter) {
 		final SQLQuery sqlQuery =
 			this.getSession().createSQLQuery(this.createCountStudyInstanceQueryString(studySearchFilter));
 		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
-	public List<StudyInstanceDto> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+	public List<StudyInstanceDto> getStudyInstances(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 
 		// TODO: Check if we can reuse this query/method in getStudyMetadataForGeolocationId()
 		final SQLQuery sqlQuery =

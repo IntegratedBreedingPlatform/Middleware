@@ -609,12 +609,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public List<StudyInstanceDto> getStudyInstances(final StudySearchFilter studySearchFilter, final Pageable pageable) {
-		return this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter, pageable);
+		return this.daoFactory.getDmsProjectDAO().getStudyInstances(studySearchFilter, pageable);
 	}
 
 	@Override
 	public long countStudyInstances(final StudySearchFilter studySearchFilter) {
-		return this.daoFactory.getDmsProjectDAO().countStudies(studySearchFilter);
+		return this.daoFactory.getDmsProjectDAO().countStudyInstances(studySearchFilter);
 	}
 
 	@Override

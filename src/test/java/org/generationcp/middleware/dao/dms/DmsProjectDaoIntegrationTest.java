@@ -453,7 +453,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		this.testDataInitializer.addGeolocationProp(instance1, TermId.SEASON_VAR.getId(), String.valueOf(TermId.SEASON_DRY.getId()), 1);
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		final Long count = (Long) this.dmsProjectDao.countStudies(studySearchFilter);
+		final Long count = (Long) this.dmsProjectDao.countStudyInstances(studySearchFilter);
 		final List<StudyInstanceDto> studyInstanceDtos = this.dmsProjectDao.getStudies(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
 		Assert.assertEquals(count.intValue(), studyInstanceDtos.size());
 
