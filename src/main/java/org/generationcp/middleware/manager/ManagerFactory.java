@@ -29,7 +29,7 @@ import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.gdms.DatasetService;
-import org.generationcp.middleware.service.api.study.StudyGermplasmService;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
@@ -42,7 +42,7 @@ import org.generationcp.middleware.service.impl.derived_variables.FormulaService
 import org.generationcp.middleware.service.impl.gdms.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
-import org.generationcp.middleware.service.impl.study.StudyGermplasmServiceImpl;
+import org.generationcp.middleware.service.impl.study.StudyEntryServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
 import org.generationcp.middleware.service.impl.study.germplasm.source.GermplasmStudySourceServiceImpl;
@@ -314,8 +314,8 @@ public class ManagerFactory implements Serializable {
 		return new WorkbookSaver(this.sessionProvider);
 	}
 
-	public StudyGermplasmService getStudyGermplasmService() {
-		return new StudyGermplasmServiceImpl(this.sessionProvider);
+	public StudyEntryService getStudyEntryService() {
+		return new StudyEntryServiceImpl(this.sessionProvider);
 	}
 
 	public GermplasmStudySourceService getGermplasmStudySourceService() {

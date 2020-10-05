@@ -13,23 +13,37 @@ package org.generationcp.middleware.pojos.dms;
 
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_stock
- *
+ * <p>
  * Any stock can be globally identified by the combination of organism, uniquename and stock type. A stock is the physical entities, either
  * living or preserved, held by collections. Stocks belong to a collection; they have IDs, type, organism, description and may have a
  * genotype.
  *
  * @author Joyce Avestro
- *
  */
 @Entity
 @Table(name = "stock", uniqueConstraints = {@UniqueConstraint(columnNames = {"organism_id", "uniquename", "type_id"})})
@@ -38,12 +52,11 @@ public class StockModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "stock_id")
 	private Integer stockId;
 
-	
 	@ManyToOne(targetEntity = Germplasm.class)
 	@JoinColumn(name = "dbxref_id", nullable = true)
 	private Germplasm germplasm;
@@ -96,7 +109,7 @@ public class StockModel implements Serializable {
 	}
 
 	public StockModel(final Integer stockId, final Integer organismId, final String name, final String uniqueName, final String value,
-			final String description, final Integer typeId, final Boolean isObsolete) {
+		final String description, final Integer typeId, final Boolean isObsolete) {
 		super();
 		this.stockId = stockId;
 		this.organismId = organismId;
@@ -108,47 +121,27 @@ public class StockModel implements Serializable {
 		this.isObsolete = isObsolete;
 	}
 
-	public StockModel (final Integer studyId, final StudyGermplasmDto studyGermplasmDto) {
+	public StockModel(final Integer studyId, final StudyEntryDto studyEntryDto) {
 		this.setProject(new DmsProject(studyId));
-		this.setName(studyGermplasmDto.getDesignation());
-		this.setGermplasm(new Germplasm(Integer.valueOf(studyGermplasmDto.getGermplasmId())));
+		this.setName(studyEntryDto.getDesignation());
+		this.setGermplasm(new Germplasm(Integer.valueOf(studyEntryDto.getGid())));
 		this.setTypeId(TermId.ENTRY_CODE.getId());
-		this.setValue(studyGermplasmDto.getEntryCode());
-		this.setUniqueName(studyGermplasmDto.getEntryNumber().toString());
+		this.setValue(studyEntryDto.getEntryCode());
+		this.setUniqueName(studyEntryDto.getEntryNumber().toString());
 		this.setIsObsolete(false);
 
+		int rank = 1;
 		final Set<StockProperty> stockProperties = new HashSet<>();
-		final StockProperty entryTypeProperty = new StockProperty();
-		entryTypeProperty.setStock(this);
-		entryTypeProperty.setRank(1);
-		entryTypeProperty.setTypeId(TermId.ENTRY_TYPE.getId());
-		entryTypeProperty.setValue(studyGermplasmDto.getEntryType());
-		stockProperties.add(entryTypeProperty);
-
-		final StockProperty seedSourceProperty = new StockProperty();
-		seedSourceProperty.setStock(this);
-		seedSourceProperty.setRank(2);
-		seedSourceProperty.setTypeId(TermId.SEED_SOURCE.getId());
-		seedSourceProperty.setValue(studyGermplasmDto.getSeedSource());
-		stockProperties.add(seedSourceProperty);
-
-		final StockProperty crossProperty = new StockProperty();
-		crossProperty.setStock(this);
-		crossProperty.setRank(3);
-		crossProperty.setTypeId(TermId.CROSS.getId());
-		crossProperty.setValue(studyGermplasmDto.getCross());
-		stockProperties.add(crossProperty);
-
-		final Integer groupId = studyGermplasmDto.getGroupId();
-		if (groupId != null) {
-			final StockProperty groupIdProperty = new StockProperty();
-			groupIdProperty.setStock(this);
-			groupIdProperty.setRank(4);
-			groupIdProperty.setTypeId(TermId.GROUPGID.getId());
-			groupIdProperty.setValue(groupId.toString());
-			stockProperties.add(groupIdProperty);
+		final Iterator<Map.Entry<Integer, StudyEntryPropertyData>> iterator = studyEntryDto.getProperties().entrySet().iterator();
+		while (iterator.hasNext()) {
+			final StudyEntryPropertyData studyEntryPropertyData = iterator.next().getValue();
+			final StockProperty stockProperty = new StockProperty();
+			stockProperty.setStock(this);
+			stockProperty.setRank(rank++);
+			stockProperty.setTypeId(studyEntryPropertyData.getVariableId());
+			stockProperty.setValue(studyEntryPropertyData.getValue());
+			stockProperties.add(stockProperty);
 		}
-
 		this.setProperties(stockProperties);
 	}
 
@@ -160,12 +153,10 @@ public class StockModel implements Serializable {
 		this.stockId = stockId;
 	}
 
-	
 	public Germplasm getGermplasm() {
 		return germplasm;
 	}
 
-	
 	public void setGermplasm(Germplasm germplasm) {
 		this.germplasm = germplasm;
 	}
