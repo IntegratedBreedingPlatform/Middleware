@@ -1108,7 +1108,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         }
 
         final Boolean withRawObservationsOnly = germplasmSearchRequest.getWithRawObservationsOnly();
-        if (withRawObservationsOnly != null) {
+        if (Boolean.TRUE.equals(withRawObservationsOnly)) {
             paramBuilder.append(" and exists(select 1 from nd_experiment filter_nde" //
                 + "  inner join phenotype filter_phenotype on filter_phenotype.nd_experiment_id = filter_nde.nd_experiment_id" //
                 + "  inner join stock filter_stock on filter_nde.stock_id = filter_stock.stock_id" //
@@ -1116,7 +1116,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         }
 
         final Boolean withAnalyzedDataOnly = germplasmSearchRequest.getWithAnalyzedDataOnly();
-        if (withAnalyzedDataOnly != null) {
+        if (Boolean.TRUE.equals(withAnalyzedDataOnly)) {
             paramBuilder.append(" and exists(select 1 from project filter_project" //
                 + " inner join nd_experiment filter_nde on filter_project.project_id = filter_nde.project_id" //
                 + " inner join stock filter_stock on filter_nde.stock_id = filter_stock.stock_id" //
@@ -1125,7 +1125,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         }
 
         final Boolean withSampleOnly = germplasmSearchRequest.getWithSampleOnly();
-        if (withSampleOnly != null) {
+        if (Boolean.TRUE.equals(withSampleOnly)) {
             paramBuilder.append(" and exists(select 1" //
                 + " from nd_experiment filter_nde" //
                 + "  inner join stock filter_stock on filter_nde.stock_id = filter_stock.stock_id" //
@@ -1134,7 +1134,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         }
 
         final Boolean inProgramListOnly = germplasmSearchRequest.getInProgramListOnly();
-        if (inProgramListOnly != null) {
+        if (Boolean.TRUE.equals(inProgramListOnly)) {
             paramBuilder.append(" and exists(select 1 from listdata filter_l "  //
                 + "  inner join listnms filter_listnms on filter_l.listid = filter_listnms.listid"
                 + " where filter_listnms.liststatus != 9 and filter_l.gid = g.gid and filter_listnms.program_uuid = :programUUID) ");
