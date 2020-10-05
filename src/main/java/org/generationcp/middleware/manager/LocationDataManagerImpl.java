@@ -10,6 +10,7 @@
 
 package org.generationcp.middleware.manager;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -138,8 +139,15 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final List<String> locationAbbreviations) {
-		return this.daoFactory.getLocationDAO().filterLocations(types, locationIds, locationAbbreviations);
+	public List<Location> getFilteredLocations(final String programUUID, final Set<Integer> types, List<Integer> locationIds,
+		final List<String> locationAbbreviations, final boolean favourites) {
+		if (!StringUtils.isEmpty(programUUID) && favourites) {
+			if (locationIds == null) {
+				locationIds = new ArrayList<>();
+			}
+			locationIds.addAll(this.getFavoriteProjectLocationIds(programUUID));
+		}
+		return this.daoFactory.getLocationDAO().filterLocations(programUUID, types, locationIds, locationAbbreviations);
 	}
 
 	@Override
