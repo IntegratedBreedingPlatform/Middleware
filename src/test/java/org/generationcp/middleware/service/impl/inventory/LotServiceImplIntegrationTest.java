@@ -27,6 +27,7 @@ import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -36,6 +37,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -45,6 +47,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.hasToString;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
 
 public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
@@ -208,6 +212,73 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(this.lot.getScaleId(), equalTo(8267));
 	}
 
+	@Test
+	public void testMergeLots_Ok() {
+		final Integer keepLotId = this.lot.getId();
+		assertThat(this.lot.getStatus(), is(LotStatus.ACTIVE.getIntValue()));
+		//Check that the lot to keep has not 'merged' transactions
+		final List<Transaction> keepLotIdMergedTransactions = this.sessionProvder.getSession().createQuery(
+				String.format("select T from %s T where lotId=%s and sourceType='%s'",
+						Transaction.class.getCanonicalName(),
+						keepLotId,
+						TransactionSourceType.MERGED_LOT))
+				.list();
+		assertThat(keepLotIdMergedTransactions, hasSize(0));
+		
+		//Check that the lot to keep has 20 as actual amount
+		List<TransactionDto> availableBalanceTransactions = this.transactionService.getAvailableBalanceTransactions(this.lot.getId());
+		assertNotNull(availableBalanceTransactions);
+		assertThat(availableBalanceTransactions, hasSize(1));
+
+		TransactionDto transactionDto = availableBalanceTransactions.get(0);
+		assertThat(transactionDto.getLot().getLotId(), is(keepLotId));
+		assertThat(transactionDto.getAmount(), is(20d));
+
+		//Create lot 1 to be discarded on merge
+		this.createLot();
+		assertThat(this.lot.getStatus(), is(LotStatus.ACTIVE.getIntValue()));
+		final Integer lotMergeDiscarded1 = this.lot.getId();
+		this.createTransactions();
+
+		//Create lot 2 to be discarded on merge
+		this.createLot();
+		assertThat(this.lot.getStatus(), is(LotStatus.ACTIVE.getIntValue()));
+		final Integer lotMergeDiscarded2 = this.lot.getId();
+		this.createTransactions();
+
+		//Merge lots
+		final LotsSearchDto mergeSearchDto = new LotsSearchDto();
+		mergeSearchDto.setLotIds(Arrays.asList(keepLotId, lotMergeDiscarded1, lotMergeDiscarded2));
+		this.lotService.mergeLots(this.userId, keepLotId, mergeSearchDto);
+
+		//Check the actual balance of the merged lot should be the sum of the keep and discarded amounts
+		final LotsSearchDto searchDto = new LotsSearchDto();
+		searchDto.setLotIds(Arrays.asList(keepLotId));
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
+		assertThat(extendedLotDtos, hasSize(1));
+		assertThat(extendedLotDtos.get(0).getActualBalance(), is(60D));
+
+		//Check transactions on the keep lot
+		final List<Transaction> keepLotIdMergedTransactions2 = this.sessionProvder.getSession().createQuery(
+				String.format("select T from %s T where lotId=%s and sourceType='%s'",
+						Transaction.class.getCanonicalName(),
+						keepLotId,
+						TransactionSourceType.MERGED_LOT))
+				.list();
+		assertThat(keepLotIdMergedTransactions2, hasSize(2));
+		this.assertTransaction(keepLotIdMergedTransactions2.get(0), TransactionType.DEPOSIT, TransactionStatus.CONFIRMED,
+				20D, TransactionSourceType.MERGED_LOT, lotMergeDiscarded1);
+		this.assertTransaction(keepLotIdMergedTransactions2.get(1), TransactionType.DEPOSIT, TransactionStatus.CONFIRMED,
+				20D, TransactionSourceType.MERGED_LOT, lotMergeDiscarded2);
+
+		final LotsSearchDto searchClosedLots = new LotsSearchDto();
+		searchClosedLots.setLotIds(Arrays.asList(lotMergeDiscarded1, lotMergeDiscarded2));
+		final List<ExtendedLotDto> closedLotsSearch = this.lotService.searchLots(searchClosedLots, null);
+		assertThat(closedLotsSearch, hasSize(2));
+		assertThat(closedLotsSearch.get(0).getStatus(), is(LotStatus.CLOSED.name()));
+		assertThat(closedLotsSearch.get(1).getStatus(), is(LotStatus.CLOSED.name()));
+	}
+
 	private void createGermplasm() {
 		final CropType cropType = new CropType();
 		cropType.setUseUUID(false);
@@ -244,6 +315,16 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	private void resolveStorageLocation() {
 		final Integer id = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.name());
 		this.storageLocationId = this.daoFactory.getLocationDAO().getDefaultLocationByType(id).getLocid();
+	}
+
+	private void assertTransaction(final Transaction actualTransaction, final TransactionType type, final TransactionStatus status,
+		final double amount, final TransactionSourceType sourceType, final Integer sourceId) {
+		assertNotNull(actualTransaction);
+		assertThat(actualTransaction.getType(), is(type.getId()));
+		assertThat(actualTransaction.getStatus(), is(status.getIntValue()));
+		assertThat(actualTransaction.getQuantity(), is(amount));
+		assertThat(actualTransaction.getSourceType(), is(sourceType.name()));
+		assertThat(actualTransaction.getSourceId(), is(sourceId));
 	}
 
 }

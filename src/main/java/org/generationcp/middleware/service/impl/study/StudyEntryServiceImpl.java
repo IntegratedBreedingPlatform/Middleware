@@ -19,23 +19,18 @@ import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmService;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Transactional
-public class StudyGermplasmServiceImpl implements StudyGermplasmService {
+public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private DatasetService datasetService;
@@ -49,41 +44,15 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
 			TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
 
-	public StudyGermplasmServiceImpl(final HibernateSessionProvider sessionProvider) {
+	public StudyEntryServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
-	public List<StudyGermplasmDto> getGermplasm(final int studyBusinessIdentifier) {
-
-		final List<StockModel> stockModelList = this.daoFactory.getStockDao().getStocksForStudy(studyBusinessIdentifier);
-		final List<Integer> gids = new ArrayList<>();
-		for (final StockModel stockModel : stockModelList) {
-			gids.add(stockModel.getGermplasm().getGid());
-		}
-		final Map<Integer, String> stockIdsMap = this.daoFactory.getTransactionDAO().retrieveStockIds(gids);
-		final List<StudyGermplasmDto> studyGermplasmDtos = new ArrayList<>();
-		int index = 0;
-		for (final StockModel stockModel : stockModelList) {
-			final StudyGermplasmDto studyGermplasmDto = new StudyGermplasmDto();
-			studyGermplasmDto.setEntryId(stockModel.getStockId());
-			studyGermplasmDto.setCross(this.findStockPropValue(TermId.CROSS.getId(), stockModel.getProperties()));
-			studyGermplasmDto.setDesignation(stockModel.getName());
-			studyGermplasmDto.setEntryCode(stockModel.getValue());
-			studyGermplasmDto.setEntryNumber(Integer.valueOf(stockModel.getUniqueName()));
-			studyGermplasmDto.setGermplasmId(stockModel.getGermplasm().getGid());
-			studyGermplasmDto.setPosition(String.valueOf(++index));
-			studyGermplasmDto.setSeedSource(this.findStockPropValue(TermId.SEED_SOURCE.getId(), stockModel.getProperties()));
-			final String entryType = this.findStockPropValue(TermId.ENTRY_TYPE.getId(), stockModel.getProperties());
-			if (entryType != null) {
-				studyGermplasmDto.setCheckType(Integer.valueOf(entryType));
-			}
-			studyGermplasmDto.setStockIds(stockIdsMap.getOrDefault(stockModel.getGermplasm().getGid(), ""));
-			final String groupGid = this.findStockPropValue(TermId.GROUPGID.getId(), stockModel.getProperties());
-			studyGermplasmDto.setGroupId(groupGid != null ? Integer.valueOf(groupGid) : 0);
-			studyGermplasmDtos.add(studyGermplasmDto);
-		}
-		return studyGermplasmDtos;
+	public List<StudyEntryDto> getStudyEntries(final int studyId) {
+		// Return by ascending order of entry number. We need to perform cast first on uniquename since it's stored as string
+		return this.getStudyEntries(studyId, null, new PageRequest(0, Integer.MAX_VALUE,
+				new Sort(Sort.Direction.ASC, "CAST(uniquename AS UNSIGNED)")));
 	}
 
 	@Override
@@ -112,8 +81,8 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public List<StudyGermplasmDto> getGermplasmFromPlots(final int studyBusinessIdentifier, final Set<Integer> plotNos) {
-		return this.daoFactory.getStockDao().getStudyGermplasmDtoList(studyBusinessIdentifier, plotNos);
+	public Map<Integer, StudyEntryDto> getPlotEntriesMap(final int studyBusinessIdentifier, final Set<Integer> plotNos) {
+		return this.daoFactory.getStockDao().getPlotEntriesMap(studyBusinessIdentifier, plotNos);
 	}
 
 	@Override
@@ -127,13 +96,16 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public List<StudyGermplasmDto> saveStudyEntries(final Integer studyId, final List<StudyGermplasmDto> studyGermplasmDtoList) {
-		final List<StudyGermplasmDto> list = new ArrayList<>();
-		for (final StudyGermplasmDto studyGermplasm : studyGermplasmDtoList) {
-			final StockModel stockModel = this.daoFactory.getStockDao().saveOrUpdate(new StockModel(studyId, studyGermplasm));
-			list.add(new StudyGermplasmDto(stockModel));
+	public List<StudyEntryDto> saveStudyEntries(final Integer studyId, final List<StudyEntryDto> studyEntryDtoList) {
+		final List<Integer> entryIds = new ArrayList<>();
+		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
+			final StockModel entry = new StockModel(studyId, studyEntryDto);
+			this.daoFactory.getStockDao().saveOrUpdate(entry);
+			entryIds.add(entry.getStockId());
 		}
-		return list;
+		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+		filter.setEntryIds(entryIds);
+		return this.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
 	}
 
 	@Override
@@ -142,26 +114,13 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public Optional<StudyGermplasmDto> getStudyGermplasm(final int studyId, final int entryId) {
-		final StockModel stock = this.daoFactory.getStockDao().getById(entryId);
-		if (stock != null) {
-			if (studyId != stock.getProject().getProjectId()) {
-				throw new MiddlewareRequestException("", "invalid.entryid.for.study");
-			}
-			return Optional.of(new StudyGermplasmDto(stock));
-		}
-		return Optional.empty();
-	}
-
-	@Override
-	public StudyGermplasmDto replaceStudyGermplasm(final int studyId, final int entryId, final int gid, final String crossExpansion) {
+	public StudyEntryDto replaceStudyEntry(final int studyId, final int entryId, final int gid, final String crossExpansion) {
 		// Check first that new GID is valid
 		final Germplasm newGermplasm = this.daoFactory.getGermplasmDao().getById(gid);
 		if (newGermplasm == null) {
 			throw new MiddlewareException("Invalid GID: " + gid);
 		}
 		final StockDao stockDao = this.daoFactory.getStockDao();
-		// Copy from old entry: entry type, entry #, entry code
 		final StockModel stock = stockDao.getById(entryId);
 		if (stock == null) {
 			throw new MiddlewareRequestException("", "invalid.entryid");
@@ -170,24 +129,36 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		} else if (stock.getGermplasm().getGid() == gid) {
 			throw new MiddlewareRequestException("", "new.gid.matches.old.gid");
 		}
-		final StudyGermplasmDto newStudyGermplasm = new StudyGermplasmDto();
-		newStudyGermplasm.setEntryNumber(Integer.valueOf(stock.getUniqueName()));
-		Optional<StockProperty> entryType =
-			stock.getProperties().stream().filter(prop -> TermId.ENTRY_TYPE.getId() == (prop.getTypeId())).findFirst();
-		entryType.ifPresent(entry -> newStudyGermplasm.setEntryType(entry.getValue()));
-		newStudyGermplasm.setGermplasmId(gid);
-		newStudyGermplasm.setEntryCode(stock.getValue());
-		final Name preferredName = newGermplasm.getPreferredName();
-		newStudyGermplasm.setDesignation(preferredName != null ? preferredName.getNval() : "");
-		newStudyGermplasm.setCross(crossExpansion);
-		// Save also Group GID
-		newStudyGermplasm.setGroupId(newGermplasm.getMgid());
+		// Copy from old entry: entry #, entry code
+		final StudyEntryDto studyEntryDto = new StudyEntryDto();
+		studyEntryDto.setEntryNumber(Integer.valueOf(stock.getUniqueName()));
+		studyEntryDto.setGid(gid);
+		studyEntryDto.setEntryCode(stock.getValue());
 
-		final StudyGermplasmDto savedStudyGermplasm = this.saveStudyEntries(studyId, Collections.singletonList(newStudyGermplasm)).get(0);
-		stockDao.replaceExperimentStocks(entryId, savedStudyGermplasm.getEntryId());
-		// Finally delete old stock
+		final Name preferredName = newGermplasm.getPreferredName();
+		studyEntryDto.setDesignation(preferredName != null ? preferredName.getNval() : "");
+
+		// If germplasm descriptors exist for previous entry, copy ENTRY_TYPE value and set cross expansion and MGID of new germplasm
+		this.addStudyEntryPropertyDataIfApplicable(stock, studyEntryDto, TermId.ENTRY_TYPE.getId(), Optional.empty());
+		this.addStudyEntryPropertyDataIfApplicable(stock, studyEntryDto, TermId.CROSS.getId(), Optional.of(crossExpansion));
+		this.addStudyEntryPropertyDataIfApplicable(stock, studyEntryDto, TermId.GROUPGID.getId(), Optional.of(String.valueOf(newGermplasm.getMgid())));
+
+		final StudyEntryDto savedStudyEntryDto = this.saveStudyEntries(studyId, Collections.singletonList(studyEntryDto)).get(0);
+		stockDao.replaceExperimentStocks(entryId, savedStudyEntryDto.getEntryId());
+		// Finally delete old study entry
 		stockDao.makeTransient(stock);
-		return savedStudyGermplasm;
+
+		return savedStudyEntryDto;
+	}
+
+	private void addStudyEntryPropertyDataIfApplicable(final StockModel stock, final StudyEntryDto studyEntryDto, final Integer variableId, final Optional<String> value) {
+		final Optional<StockProperty> entryType =
+			stock.getProperties().stream().filter(prop -> variableId.equals(prop.getTypeId())).findFirst();
+		entryType.ifPresent(stockProperty -> {
+				studyEntryDto.getProperties().put(variableId,
+					new StudyEntryPropertyData(null, stockProperty.getTypeId(), value.isPresent()? value.get() : stockProperty.getValue()));
+			}
+		);
 	}
 
 	@Override
@@ -207,17 +178,6 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 				.of(new StudyEntryPropertyData(stockProperty.getStockPropId(), stockProperty.getTypeId(), stockProperty.getValue()));
 		}
 		return Optional.empty();
-	}
-
-	private String findStockPropValue(final Integer termId, final Set<StockProperty> properties) {
-		if (properties != null) {
-			for (final StockProperty property : properties) {
-				if (termId.equals(property.getTypeId())) {
-					return property.getValue();
-				}
-			}
-		}
-		return null;
 	}
 
 }
