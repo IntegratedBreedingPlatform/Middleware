@@ -78,7 +78,6 @@ import org.generationcp.middleware.util.PlotUtil;
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -1362,6 +1361,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
 		return this.daoFactory.getGeolocationPropertyDao().getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
+	}
+
+	@Override
+	public boolean checkIfAnyLocationIDsExistInExperiments(final Integer datasetId, final List<Integer> locationIds) {
+		return this.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(datasetId, locationIds);
 	}
 
 	void setDataSetBuilder(final DataSetBuilder dataSetBuilder) {
