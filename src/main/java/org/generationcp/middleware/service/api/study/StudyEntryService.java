@@ -15,6 +15,8 @@ public interface StudyEntryService {
 
 	List<StudyEntryDto> getStudyEntries(int studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 
+	Boolean hasStudyEntries(int studyId);
+
 	Map<Integer, StudyEntryDto> getPlotEntriesMap(int studyBusinessIdentifier, Set<Integer> plotNos);
 
 	long countStudyEntries(int studyId);

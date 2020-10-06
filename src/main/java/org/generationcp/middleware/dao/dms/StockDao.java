@@ -428,6 +428,12 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
+	public Boolean hasStudyEntries(final Integer studyId) {
+		final String sql = "SELECT COUNT(1) FROM stock WHERE project_id = " + studyId;
+		final Query query = this.getSession().createSQLQuery(sql);
+		return ((BigInteger) query.uniqueResult()).longValue() > 0;
+	}
+
 	private void addFixedVariableIfPresent(final TermId termId, final String value, final StudyEntrySearchDto studyEntrySearchDto,
 		final Map<Integer, StudyEntryPropertyData> variables) {
 		final Optional<MeasurementVariable>
