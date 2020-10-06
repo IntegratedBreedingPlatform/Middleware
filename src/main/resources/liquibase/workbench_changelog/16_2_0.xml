@@ -35,16 +35,16 @@
 		<sql dbms="mysql" splitStatements="true">
 
 		INSERT INTO workbench_tool (`name`, `group_name`, `title`, `version`, `tool_type`, `path`, `parameter`, `user_tool`)
-		VALUES ('germplasm_search', 'germplasm search', 'Germplasm Search', '1.0', 'WEB', '/ibpworkbench/controller/jhipster#germplasm-tab', '', 0);
+		VALUES ('search_germplasm', 'search_germplasm', 'Search Germplasm', '1.0', 'WEB', '/ibpworkbench/controller/jhipster#germplasm-manager', '', 0);
 
 		INSERT INTO workbench_sidebar_category_link (`tool_name`, `sidebar_category_id`, `sidebar_link_name`, `sidebar_link_title`, `rank`)
-		VALUES ('germplasm_search', 1, 'germplasm_search', 'Germplasm Search', 3);
+		VALUES ('search_germplasm', 1, 'search_germplasm', 'Search Germplasm', 3);
 
 		SET @permission_id = (SELECT permission_id FROM permission where name = 'GERMPLASM');
-		SET @workbench_sidebar_category_link_id =  (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'germplasm_search');
+		SET @workbench_sidebar_category_link_id =  (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'search_germplasm');
 
 		INSERT INTO permission (`name`, `description`, `parent_id`, `workbench_sidebar_category_link_id`)
-		VALUES ('GERMPLASM_SEARCH', 'Germplasm Search', @permission_id , @workbench_sidebar_category_link_id);
+		VALUES ('SEARCH_GERMPLASM', 'Search Germplasm', @permission_id , @workbench_sidebar_category_link_id);
 
 		</sql>
 	</changeSet>
