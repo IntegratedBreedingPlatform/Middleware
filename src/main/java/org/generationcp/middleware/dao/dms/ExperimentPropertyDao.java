@@ -155,7 +155,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<FieldMapInfo> getAllFieldMapsByTrialInstanceId(final int datasetId, final int instanceId)
+	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int instanceId, final Integer locationId)
 			{
 		List<FieldMapInfo> fieldmaps = new ArrayList<>();
 

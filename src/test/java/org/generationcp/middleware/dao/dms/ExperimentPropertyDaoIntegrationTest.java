@@ -136,7 +136,7 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 
 		final List<FieldMapInfo> fieldMapInfos2 = this.experimentPropertyDao
 			.getAllFieldMapsInBlockByTrialInstanceId(this.study.getProjectId(), geolocation.getLocationId(), 0);
-		assertEquals(0, fieldMapInfos2.size());
+		assertEquals(1, fieldMapInfos2.size());
 
 	}
 

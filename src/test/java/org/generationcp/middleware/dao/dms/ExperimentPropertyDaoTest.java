@@ -62,10 +62,14 @@ public class ExperimentPropertyDaoTest {
 	public void testGetAllFieldMapsInBlockByTrialInstanceId_WithNullBlockId() {
 		final int datasetId = 11;
 		final int geolocationId = 22;
-		this.dao.getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, geolocationId);
+		this.dao.getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
 
 		final String expectedSql = this.getFieldmapsInBlockMainQuery() +
-				" ORDER BY e.nd_experiment_id ASC";
+				" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval " +
+				" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id " +
+				" AND bexp.nd_geolocation_id = :instanceId " +
+				" AND bexp.project_id = :datasetId  WHERE bval.type_id = " + TermId.BLOCK_ID.getId() +
+				") ORDER BY e.nd_experiment_id ASC";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql.replace(" ", ""), sqlCaptor.getValue().replace(" ", ""));
@@ -109,9 +113,7 @@ public class ExperimentPropertyDaoTest {
 		+ "    AND col.type_id = "+ TermId.COLUMN_NO.getId()
 		+ "  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id "
 		+ "     AND gpSeason.type_id =  "+ TermId.SEASON_VAR.getId() + " "
-		+ " WHERE blk.type_id = "+ TermId.BLOCK_ID.getId()
-		+ " AND p.project_id = :datasetId"
-		+ " AND e.nd_geolocation_id = :instanceId";
+		+ " WHERE blk.type_id = "+ TermId.BLOCK_ID.getId();
 	}
 
 	private String getFieldmapLabelsQuery() {
