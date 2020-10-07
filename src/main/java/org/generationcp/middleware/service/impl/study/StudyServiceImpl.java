@@ -1,15 +1,18 @@
 
 package org.generationcp.middleware.service.impl.study;
 
+import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -22,6 +25,7 @@ import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerI
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -43,6 +47,7 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -605,8 +610,44 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
-		// TODO add project properties and instance meta data from original StudyDM#findPagedProjects
-		return this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter, pageable);
+		final List<org.generationcp.middleware.domain.dms.StudySummary> studies = this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter, pageable);
+		final List<Integer> studyIds = studies.stream().map(org.generationcp.middleware.domain.dms.StudySummary::getStudyDbid).collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(studyIds)) {
+			final ListIterator<org.generationcp.middleware.domain.dms.StudySummary> studySummaryIterator = studies.listIterator();
+			final List<DmsProject> projects = this.daoFactory.getDmsProjectDAO().getByIds(studyIds);
+			for (final DmsProject dmsProject : projects) {
+				final org.generationcp.middleware.domain.dms.StudySummary studySummary = studySummaryIterator.next();
+				final Map<String, String> additionalProps = Maps.newHashMap();
+				for (final ProjectProperty prop : dmsProject.getProperties()) {
+					final Integer variableId = prop.getVariableId();
+					final Optional<DataType> dmsVariableType = this.ontologyVariableDataManager.getDataType(prop.getVariableId());
+					final String value;
+					if (dmsVariableType.isPresent() && dmsVariableType.get().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
+						final Integer categoricalId = StringUtils.isNotBlank(prop.getValue()) ? Integer.parseInt(prop.getValue()) : 0;
+						value = this.ontologyVariableDataManager.retrieveVariableCategoricalValue(dmsProject.getProgramUUID(), prop.getVariableId(), categoricalId);
+					} else {
+						value = prop.getValue();
+					}
+
+					if (variableId.equals(TermId.SEASON_VAR_TEXT.getId())) {
+						studySummary.addSeason(value);
+					} else if (variableId.equals(TermId.LOCATION_ID.getId())) {
+						studySummary.setLocationId(!StringUtils.isEmpty(value) ? value : null);
+					} else {
+						additionalProps.put(prop.getAlias(), value);
+					}
+				}
+
+				studySummary.setOptionalInfo(additionalProps).setName(dmsProject.getName()).setProgramDbId(dmsProject.getProgramUUID())
+						.setStudyDbid(dmsProject.getProjectId());
+				final List<Integer> locationIds = studySearchFilter.getLocationDbId() != null ? Collections.singletonList(Integer.parseInt(studySearchFilter.getLocationDbId())) :
+						Collections.emptyList();
+				studySummary.setInstanceMetaData(this.daoFactory.getGeolocationDao().getInstanceMetadata(dmsProject.getProjectId(), locationIds));
+			}
+
+
+		}
+		return studies;
 	}
 
 	@Override

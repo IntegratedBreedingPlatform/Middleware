@@ -35,7 +35,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
@@ -66,9 +65,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;
-
-	@Resource
-	private OntologyVariableDataManager variableDataManager;
 
 	@Resource
 	private UserService userService;
@@ -1035,105 +1031,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	}
 
-//	@Override
-//	public List<StudySummary> findPagedProjects(final Map<StudyFilters, String> filters, final Integer pageSize, final Integer pageNumber) {
-//
-//		final List<DmsProject> dmsProjects = this.getDmsProjectDao().findPagedProjects(filters, pageSize, pageNumber);
-//
-//		final List<StudySummary> studySummaries = Lists.newArrayList();
-//
-//		for (final DmsProject dmsProject : dmsProjects) {
-//			final StudySummary studySummary = new StudySummary();
-//
-//			studySummary.setActive(!dmsProject.isDeleted());
-//			studySummary.setStartDate(Util.tryConvertDate(dmsProject.getStartDate(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
-//			studySummary.setEndDate(Util.tryConvertDate(dmsProject.getEndDate(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
-//
-//			final Map<String, String> additionalProps = Maps.newHashMap();
-//
-//			for (final ProjectProperty prop : dmsProject.getProperties()) {
-//
-//				final Integer variableId = prop.getVariableId();
-//				final Optional<DataType> dmsVariableType = this.variableDataManager.getDataType(prop.getVariableId());
-//				final String value;
-//				if (dmsVariableType.isPresent() && dmsVariableType.get().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
-//					final Integer categoricalId = StringUtils.isNotBlank(prop.getValue()) ? Integer.parseInt(prop.getValue()) : 0;
-//					value = this.variableDataManager.retrieveVariableCategoricalValue(dmsProject.getProgramUUID(), prop.getVariableId(), categoricalId);
-// 				} else {
-//					value = prop.getValue();
-//				}
-//
-//				if (variableId.equals(TermId.SEASON_VAR_TEXT.getId())) {
-//					studySummary.addSeason(value);
-//				} else if (variableId.equals(TermId.LOCATION_ID.getId())) {
-//					studySummary.setLocationId(!StringUtils.isEmpty(value) ? value : null);
-//				} else {
-//					additionalProps.put(prop.getAlias(), value);
-//				}
-//			}
-//
-//			studySummary.setOptionalInfo(additionalProps).setName(dmsProject.getName()).setProgramDbId(dmsProject.getProgramUUID())
-//				.setStudyDbid(dmsProject.getProjectId());
-//			final List<Integer> locationIds =
-//				filters.get(StudyFilters.LOCATION_ID) != null ?
-//					Collections.singletonList(Integer.parseInt(filters.get(StudyFilters.LOCATION_ID))) :
-//					new ArrayList<Integer>();
-//			studySummary.setInstanceMetaData(this.getInstanceMetadata(dmsProject.getProjectId(), locationIds));
-//			studySummaries.add(studySummary);
-//		}
-//		return studySummaries;final List<DmsProject> dmsProjects = this.getDmsProjectDao().findPagedProjects(filters, pageSize, pageNumber);
-//
-//		final List<StudySummary> studySummaries = Lists.newArrayList();
-//
-//		for (final DmsProject dmsProject : dmsProjects) {
-//			final StudySummary studySummary = new StudySummary();
-//
-//			studySummary.setActive(!dmsProject.isDeleted());
-//			studySummary.setStartDate(Util.tryConvertDate(dmsProject.getStartDate(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
-//			studySummary.setEndDate(Util.tryConvertDate(dmsProject.getEndDate(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
-//
-//			final Map<String, String> additionalProps = Maps.newHashMap();
-//
-//			for (final ProjectProperty prop : dmsProject.getProperties()) {
-//
-//				final Integer variableId = prop.getVariableId();
-//				final Optional<DataType> dmsVariableType = this.variableDataManager.getDataType(prop.getVariableId());
-//				final String value;
-//				if (dmsVariableType.isPresent() && dmsVariableType.get().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
-//					final Integer categoricalId = StringUtils.isNotBlank(prop.getValue()) ? Integer.parseInt(prop.getValue()) : 0;
-//					value = this.variableDataManager.retrieveVariableCategoricalValue(dmsProject.getProgramUUID(), prop.getVariableId(), categoricalId);
-// 				} else {
-//					value = prop.getValue();
-//				}
-//
-//				if (variableId.equals(TermId.SEASON_VAR_TEXT.getId())) {
-//					studySummary.addSeason(value);
-//				} else if (variableId.equals(TermId.LOCATION_ID.getId())) {
-//					studySummary.setLocationId(!StringUtils.isEmpty(value) ? value : null);
-//				} else {
-//					additionalProps.put(prop.getAlias(), value);
-//				}
-//			}
-//
-//			studySummary.setOptionalInfo(additionalProps).setName(dmsProject.getName()).setProgramDbId(dmsProject.getProgramUUID())
-//				.setStudyDbid(dmsProject.getProjectId());
-//			final List<Integer> locationIds =
-//				filters.get(StudyFilters.LOCATION_ID) != null ?
-//					Collections.singletonList(Integer.parseInt(filters.get(StudyFilters.LOCATION_ID))) :
-//					new ArrayList<Integer>();
-//			studySummary.setInstanceMetaData(this.getInstanceMetadata(dmsProject.getProjectId(), locationIds));
-//			studySummaries.add(studySummary);
-//		}
-//		return studySummaries;
-//	}
-
 	@Override
 	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
-		return this.getGeolocationDao().getInstanceMetadata(studyId, new ArrayList<Integer>());
-	}
-
-	List<InstanceMetadata> getInstanceMetadata(final int studyId, final List<Integer> locationIds) {
-		return this.getGeolocationDao().getInstanceMetadata(studyId, locationIds);
+		return this.getGeolocationDao().getInstanceMetadata(studyId, new ArrayList<>());
 	}
 
 	@Override
@@ -1381,9 +1281,5 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	void setTrialEnvironmentBuilder(final TrialEnvironmentBuilder trialEnvironmentBuilder) {
 		this.trialEnvironmentBuilder = trialEnvironmentBuilder;
-	}
-
-	void setVariableDataManager(final OntologyVariableDataManager ontologyVariableDataManager) {
-		this.variableDataManager = ontologyVariableDataManager;
 	}
 }

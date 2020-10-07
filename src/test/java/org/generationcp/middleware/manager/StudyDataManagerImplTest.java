@@ -64,13 +64,7 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
 
 import static org.generationcp.middleware.operation.saver.WorkbookSaver.ENVIRONMENT;
 import static org.generationcp.middleware.operation.saver.WorkbookSaver.PLOTDATA;
@@ -141,8 +135,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.cvTermDao.save(this.option);
 		Mockito.when(this.variableDataManager.retrieveVariableCategoricalValue(Matchers.anyString(), Matchers.any(), Matchers.anyInt())).thenReturn(
 			this.option.getName());
-
-		this.manager.setVariableDataManager(this.variableDataManager);
 
 		this.standardVariableSaver = new StandardVariableSaver(this.sessionProvder);
 

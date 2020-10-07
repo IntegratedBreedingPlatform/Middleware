@@ -1568,7 +1568,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     wp.project_uuid AS programDbId ");
 		this.appendStudySummaryFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
-		sql.append(" GROUP BY geoloc.nd_geolocation_id ");
+		sql.append(" GROUP BY pmain.project_id ");
 
 		addPageRequestOrderBy(sql, pageable, DmsProjectDao.BRAPI_STUDIES_SORTABLE_FIELDS);
 
