@@ -30,6 +30,7 @@ public class GeolocationPropertySaver extends Saver {
 
 					if (trial.getLocationId() != null) {
 						this.saveOrUpdate(locationId, TermId.LOCATION_ID.getId(), trial.getLocationId().toString());
+						this.saveOrUpdate(locationId, TermId.TRIAL_LOCATION.getId(), trial.getLocationName());
 					}
 
 					if (trial.getBlockId() != null) {

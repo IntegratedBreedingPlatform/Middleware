@@ -387,7 +387,7 @@ public interface StudyDataManager {
 	 * @param geolocationId the geolocation id
 	 * @return the all field maps in block by trial instance id
 	 */
-	List<FieldMapInfo> getAllFieldMapsByTrialInstanceId(
+	List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(
 		int datasetId, int geolocationId,
 		CrossExpansionProperties crossExpansionProperties);
 
@@ -540,6 +540,15 @@ public interface StudyDataManager {
 	 * @return the int
 	 */
 	int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds);
+
+
+	/**
+	 * Gets the all field maps in block by block id.
+	 *
+	 * @param blockId the block id
+	 * @return List of all field maps in the block
+	 */
+	List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId);
 
 	/**
 	 * Gets the folder name by id.

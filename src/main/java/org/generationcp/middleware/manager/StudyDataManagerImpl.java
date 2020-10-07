@@ -78,6 +78,7 @@ import org.generationcp.middleware.util.PlotUtil;
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -572,11 +573,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<FieldMapInfo> getAllFieldMapsByTrialInstanceId(
+	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(
 		final int datasetId, final int geolocationId,
 		final CrossExpansionProperties crossExpansionProperties) {
 		final List<FieldMapInfo> fieldMapInfos =
-			this.getExperimentPropertyDao().getAllFieldMapsByTrialInstanceId(datasetId, geolocationId);
+			this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
 
 		this.updateFieldMapWithBlockInformation(fieldMapInfos, true);
 		final Map<Integer, String> pedigreeStringMap = new HashMap<>();
@@ -587,6 +588,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				this.setPedigree(datasetInfoList, crossExpansionProperties, pedigreeStringMap);
 			}
 		}
+
+		return fieldMapInfos;
+	}
+
+	@Override
+	public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(final int blockId) {
+
+		final List<FieldMapInfo> fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
+
+		this.updateFieldMapWithBlockInformation(fieldMapInfos);
 
 		return fieldMapInfos;
 	}

@@ -62,7 +62,7 @@ public class ExperimentPropertyDaoTest {
 	public void testGetAllFieldMapsInBlockByTrialInstanceId_WithNullBlockId() {
 		final int datasetId = 11;
 		final int geolocationId = 22;
-		this.dao.getAllFieldMapsByTrialInstanceId(datasetId, geolocationId);
+		this.dao.getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, geolocationId);
 
 		final String expectedSql = this.getFieldmapsInBlockMainQuery() +
 				" ORDER BY e.nd_experiment_id ASC";

@@ -129,13 +129,13 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<FieldMapInfo> fieldMapInfos1 = this.experimentPropertyDao
-			.getAllFieldMapsByTrialInstanceId(this.plot.getProjectId(), geolocation.getLocationId());
+			.getAllFieldMapsInBlockByTrialInstanceId(this.plot.getProjectId(), geolocation.getLocationId(), 0);
 
 		assertEquals(1, fieldMapInfos1.size());
 		assertEquals(1, fieldMapInfos1.get(0).getDatasets().size());
 
 		final List<FieldMapInfo> fieldMapInfos2 = this.experimentPropertyDao
-			.getAllFieldMapsByTrialInstanceId(this.study.getProjectId(), geolocation.getLocationId());
+			.getAllFieldMapsInBlockByTrialInstanceId(this.study.getProjectId(), geolocation.getLocationId(), 0);
 		assertEquals(0, fieldMapInfos2.size());
 
 	}
