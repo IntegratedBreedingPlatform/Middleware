@@ -168,9 +168,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		// Delete geolocation and its properties
 		this.daoFactory.getGeolocationDao().deleteGeolocations(instanceIds);
 
-		final List<Integer> remainingInstances = allEnvironments.stream().filter(instance -> !instanceIds.contains(instance.getLocationId())).map(Geolocation::getLocationId).collect(
-			Collectors.toList());
-		this.deleteExperimentalDesignIfApplicable(studyId,remainingInstances,plotDatasetId);
+		this.deleteExperimentalDesignIfApplicable(studyId,plotDatasetId);
 
 		// IF experimental design is not yet generated, re-number succeeding trial instances
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
@@ -371,8 +369,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		}
 	}
 
-	private void deleteExperimentalDesignIfApplicable(final int studyId, final List<Integer> remainingInstances, final int plotDatasetId) {
-		final boolean hasExperimentalDesign = this.daoFactory.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(plotDatasetId, remainingInstances);
+	private void deleteExperimentalDesignIfApplicable(final int studyId, final int plotDatasetId) {
+		final boolean hasExperimentalDesign = this.daoFactory.getExperimentDao().count(plotDatasetId) > 0;
 		if (!hasExperimentalDesign) {
 			this.experimentDesignService.deleteStudyExperimentDesign(studyId);
 		}

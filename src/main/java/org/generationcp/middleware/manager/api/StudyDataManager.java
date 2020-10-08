@@ -782,6 +782,4 @@ public interface StudyDataManager {
 
 	List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
 
-	boolean checkIfAnyLocationIDsExistInExperiments(Integer datasetId, List<Integer> locationIds);
-
 }
