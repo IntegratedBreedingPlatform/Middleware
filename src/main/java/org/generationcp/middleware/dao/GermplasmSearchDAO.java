@@ -860,6 +860,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
         this.setValuesMapForAttributeAndNameTypes(germplasm, row, addedColumnsPropertyIds, attributeTypesMap, nameTypesMap, indexOffset);
 
+        response.setAttributeTypesValueMap(germplasm.getAttributeTypesValueMap());
+        response.setNameTypesValueMap(germplasm.getNameTypesValueMap());
+
         return response;
     }
 
