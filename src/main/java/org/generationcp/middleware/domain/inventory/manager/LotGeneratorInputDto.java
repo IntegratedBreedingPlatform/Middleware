@@ -13,6 +13,18 @@ public class LotGeneratorInputDto extends LotDto {
 
 	private String stockPrefix;
 
+	public LotGeneratorInputDto() {
+	}
+
+	public LotGeneratorInputDto(final Integer gid, final Integer unitId, final LotSplitRequestDto.NewLotSplitDto newLotSplitDto) {
+		this.setGid(gid);
+		this.setUnitId(unitId);
+		this.setLocationId(newLotSplitDto.getLocationId());
+		this.setNotes(newLotSplitDto.getNotes());
+		this.setGenerateStock(newLotSplitDto.getGenerateStock());
+		this.setStockPrefix(newLotSplitDto.getStockPrefix());
+	}
+
 	public Boolean getGenerateStock() {
 		return this.generateStock;
 	}
