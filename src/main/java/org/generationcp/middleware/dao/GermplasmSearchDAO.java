@@ -1227,7 +1227,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             final Iterator<Map.Entry<String, String>> iterator = attributes.entrySet().iterator();
             while (iterator.hasNext()) {
                 final Map.Entry<String, String> entry = iterator.next();
-                queryBuilder.append(String.format(" atype = :attributeKey%s and aval like :attributeValue%<s ", entry.getKey()));
+                queryBuilder.append(String.format(" u.fcode = :attributeKey%s and aval like :attributeValue%<s ", entry.getKey()));
                 if (iterator.hasNext()) {
                     queryBuilder.append(" or ");
                 }
