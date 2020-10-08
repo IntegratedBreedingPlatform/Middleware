@@ -26,10 +26,10 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class ExperimentPropertyDaoTest {
-	
+
 	@Mock
 	private Session mockSession;
-	
+
 	@Mock
 	private SQLQuery mockQuery;
 
@@ -38,7 +38,7 @@ public class ExperimentPropertyDaoTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		
+
 		this.dao = new ExperimentPropertyDao();
 		this.dao.setSession(this.mockSession);
 		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockQuery);
@@ -50,35 +50,20 @@ public class ExperimentPropertyDaoTest {
 	public void testGetFieldMapLabels() {
 		final int projectId = 112;
 		this.dao.getFieldMapLabels(projectId);
-		
+
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(this.getFieldmapLabelsQuery(), sqlCaptor.getValue());
 		Mockito.verify(this.mockQuery).setParameter("projectId", projectId);
 	}
-	
-	@Test
-	public void testGetAllFieldMapsInBlockByTrialInstanceId_WithBlockId() {
-		final int datasetId = 11;
-		final int instanceId = 22;
-		final int blockId = 33;
-		this.dao.getAllFieldMapsInBlockByTrialInstanceId(datasetId, instanceId, blockId);
-		
-		final String expectedSql = this.getFieldmapsInBlockMainQuery() + " AND blk.value = :blockId  ORDER BY e.nd_experiment_id ASC";
-		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
-		Assert.assertEquals(expectedSql.replace(" ", ""), sqlCaptor.getValue().replace(" ", ""));
-		Mockito.verify(this.mockQuery).setParameter("blockId", blockId);
-		Mockito.verify(this.mockQuery, Mockito.never()).setParameter("datasetId", datasetId);
-		Mockito.verify(this.mockQuery, Mockito.never()).setParameter("instanceId", instanceId);
-	}
-	
+
+
 	@Test
 	public void testGetAllFieldMapsInBlockByTrialInstanceId_WithNullBlockId() {
 		final int datasetId = 11;
 		final int geolocationId = 22;
 		this.dao.getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
-		
+
 		final String expectedSql = this.getFieldmapsInBlockMainQuery() +
 				" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval " +
 				" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id " +
@@ -92,7 +77,7 @@ public class ExperimentPropertyDaoTest {
 		Mockito.verify(this.mockQuery).setParameter("datasetId", datasetId);
 		Mockito.verify(this.mockQuery).setParameter("instanceId", geolocationId);
 	}
-	
+
 	private String getFieldmapsInBlockMainQuery() {
 		return " SELECT  p.project_id AS datasetId  , p.name AS datasetName "
 		+ " , st.name AS studyName , e.nd_geolocation_id AS instanceId "
@@ -130,7 +115,7 @@ public class ExperimentPropertyDaoTest {
 		+ "     AND gpSeason.type_id =  "+ TermId.SEASON_VAR.getId() + " "
 		+ " WHERE blk.type_id = "+ TermId.BLOCK_ID.getId();
 	}
-	
+
 	private String getFieldmapLabelsQuery() {
 		return " SELECT " +
 				" nde.project_id AS datasetId " +

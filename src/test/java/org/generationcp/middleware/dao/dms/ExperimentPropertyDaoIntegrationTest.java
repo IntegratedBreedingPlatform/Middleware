@@ -114,12 +114,12 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllFieldMapsInBlockByTrialInstanceId() {
+	public void testGetAllFieldMapsTrialInstanceId() {
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 		this.testDataInitializer.addGeolocationProp(geolocation, TermId.SEASON_VAR.getId(), "10101", 1);
 		this.testDataInitializer.addGeolocationProp(geolocation, TermId.TRIAL_LOCATION.getId(), "India", 2);
-		this.testDataInitializer.addGeolocationProp(geolocation, TermId.BLOCK_ID.getId(), "1234", 3);
+		this.testDataInitializer.addGeolocationProp(geolocation, TermId.BLOCK_ID.getId(), "0", 3);
 
 		final ExperimentModel experimentModel =
 			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), "1", null);
@@ -129,14 +129,14 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<FieldMapInfo> fieldMapInfos1 = this.experimentPropertyDao
-			.getAllFieldMapsInBlockByTrialInstanceId(this.study.getProjectId(), geolocation.getLocationId(), 1234);
+			.getAllFieldMapsInBlockByTrialInstanceId(this.plot.getProjectId(), geolocation.getLocationId(), 0);
 
 		assertEquals(1, fieldMapInfos1.size());
 		assertEquals(1, fieldMapInfos1.get(0).getDatasets().size());
 
 		final List<FieldMapInfo> fieldMapInfos2 = this.experimentPropertyDao
-			.getAllFieldMapsInBlockByTrialInstanceId(this.study.getProjectId(), geolocation.getLocationId(), 9999);
-		assertEquals(0, fieldMapInfos2.size());
+			.getAllFieldMapsInBlockByTrialInstanceId(this.study.getProjectId(), geolocation.getLocationId(), 0);
+		assertEquals(1, fieldMapInfos2.size());
 
 	}
 

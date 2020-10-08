@@ -375,11 +375,11 @@ public interface FieldbookService {
 	/**
 	 * Get all field maps in the same block.
 	 *
-	 * @param blockId
+	 * @param locationId
 	 *            the block id
 	 * @return the field maps in the given block
 	 */
-	List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId);
+	List<FieldMapInfo> getAllFieldMapsInBlockByLocationId(int locationId);
 
 	/**
 	 * Fetch all the possible pairs of the treatment level variable.

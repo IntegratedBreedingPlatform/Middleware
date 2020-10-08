@@ -155,7 +155,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int instanceId, final Integer blockId)
+	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int instanceId, final Integer locationId)
 			{
 		List<FieldMapInfo> fieldmaps = new ArrayList<>();
 
@@ -198,7 +198,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("     AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
 							.append(" WHERE blk.type_id = ").append(TermId.BLOCK_ID.getId());
 
-			if (blockId != null) {
+			if (locationId != null) {
 				sql.append(" AND blk.value = :blockId ");
 			} else {
 				sql.append(" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval ")
@@ -217,8 +217,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.addScalar("col").addScalar("blockId").addScalar("studyId").addScalar("trialInstance").addScalar("gid")
 							.addScalar("startDate").addScalar("season").addScalar("blockNo").addScalar("obsUnitId", Hibernate.STRING);
 
-			if (blockId != null) {
-				query.setParameter("blockId", blockId);
+			if (locationId != null) {
+				query.setParameter("blockId", locationId);
 			} else {
 				query.setParameter("datasetId", datasetId);
 				query.setParameter("instanceId", instanceId);

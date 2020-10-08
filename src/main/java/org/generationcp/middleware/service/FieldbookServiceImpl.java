@@ -632,8 +632,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(final int blockId) {
-		return this.studyDataManager.getAllFieldMapsInBlockByBlockId(blockId);
+	public List<FieldMapInfo> getAllFieldMapsInBlockByLocationId(final int locationId) {
+		return this.studyDataManager.getAllFieldMapsInBlockByBlockId(locationId);
 	}
 
 	@Override
