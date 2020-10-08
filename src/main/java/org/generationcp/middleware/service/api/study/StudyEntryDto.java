@@ -149,7 +149,7 @@ public class StudyEntryDto implements Serializable {
 
 
 	public Optional<String> getStudyEntryPropertyValue(final Integer variableId) {
-		if (this.properties.containsKey(variableId)) {
+		if (this.properties.containsKey(variableId) && this.properties.get(variableId).getValue() != null) {
 			return Optional.of(this.properties.get(variableId).getValue());
 		}
 		return Optional.empty();
