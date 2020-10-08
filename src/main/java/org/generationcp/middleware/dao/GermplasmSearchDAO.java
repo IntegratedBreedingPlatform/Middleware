@@ -1221,15 +1221,15 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         final Map<String, String> attributes = germplasmSearchRequest.getAttributes();
         if (attributes != null && !attributes.isEmpty()) {
             final StringBuilder queryBuilder = new StringBuilder();
-            queryBuilder.append(" select distinct a.gid from atributs a \n"
-                + "  inner join udflds u on a.atype = u.fldno \n"
-                + " where ");
+            queryBuilder.append(" select distinct a.gid from atributs a  where ");
             final Iterator<Map.Entry<String, String>> iterator = attributes.entrySet().iterator();
             while (iterator.hasNext()) {
                 final Map.Entry<String, String> entry = iterator.next();
-                queryBuilder.append(String.format(" u.fcode = :attributeKey%s and aval like :attributeValue%<s ", entry.getKey()));
+                queryBuilder.append(String.format("a.gid in (select a.gid from atributs a \n"
+                    + " inner join udflds u on a.atype = u.fldno \n"
+                    + " where u.fcode = :attributeKey%s and aval like :attributeValue%<s )", entry.getKey()));
                 if (iterator.hasNext()) {
-                    queryBuilder.append(" or ");
+                    queryBuilder.append(" and ");
                 }
             }
             queryBuilder.append(LIMIT_CLAUSE);
