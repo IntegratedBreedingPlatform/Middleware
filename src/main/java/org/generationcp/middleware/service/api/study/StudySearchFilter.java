@@ -13,7 +13,10 @@ public class StudySearchFilter {
 	private String programDbId;
 	private String locationDbId;
 	private String seasonDbId;
+	private String trialPUI;
 	private String trialDbId;
+	private String trialName;
+	private String contactDbId;
 	private String studyDbId;
 	private Boolean active;
 
@@ -94,6 +97,30 @@ public class StudySearchFilter {
 
 	public void setCommonCropName(final String commonCropName) {
 		this.commonCropName = commonCropName;
+	}
+
+	public String getTrialPUI() {
+		return trialPUI;
+	}
+
+	public void setTrialPUI(String trialPUI) {
+		this.trialPUI = trialPUI;
+	}
+
+	public String getTrialName() {
+		return trialName;
+	}
+
+	public void setTrialName(String trialName) {
+		this.trialName = trialName;
+	}
+
+	public String getContactDbId() {
+		return contactDbId;
+	}
+
+	public void setContactDbId(String contactDbId) {
+		this.contactDbId = contactDbId;
 	}
 
 	@Override

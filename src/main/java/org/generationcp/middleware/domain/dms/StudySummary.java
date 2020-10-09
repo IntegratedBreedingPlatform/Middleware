@@ -1,15 +1,12 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.generationcp.middleware.dao.dms.InstanceMetadata;
-
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.dao.dms.InstanceMetadata;
+import org.generationcp.middleware.service.api.user.ContactDto;
+
+import java.io.Serializable;
+import java.util.*;
 
 public class StudySummary implements Serializable {
 
@@ -23,6 +20,8 @@ public class StudySummary implements Serializable {
 
 	private String type;
 
+	private String observationUnitId;
+
 	private List<String> years = Lists.newArrayList();
 
 	private List<String> seasons = Lists.newArrayList();
@@ -33,15 +32,17 @@ public class StudySummary implements Serializable {
 
 	private String programName;
 
-	private String startDate;
+	private Date startDate;
 
-	private String endDate;
+	private Date endDate;
 
 	private boolean active;
 
 	private List<InstanceMetadata> instanceMetaData = new ArrayList<>();
 
 	private Map<String, String> optionalInfo = new HashMap<>();
+
+	private List<ContactDto> contacts;
 
 	public Integer getStudyDbid() {
 		return this.studyDbid;
@@ -133,20 +134,20 @@ public class StudySummary implements Serializable {
 		return this;
 	}
 
-	public String getStartDate() {
+	public Date getStartDate() {
 		return this.startDate;
 	}
 
-	public StudySummary setStartDate(final String startDate) {
+	public StudySummary setStartDate(final Date startDate) {
 		this.startDate = startDate;
 		return this;
 	}
 
-	public String getEndDate() {
+	public Date getEndDate() {
 		return this.endDate;
 	}
 
-	public StudySummary setEndDate(final String endDate) {
+	public StudySummary setEndDate(final Date endDate) {
 		this.endDate = endDate;
 		return this;
 	}
@@ -173,9 +174,23 @@ public class StudySummary implements Serializable {
 		return this.instanceMetaData;
 	}
 
+	public List<ContactDto> getContacts() {
+		return contacts;
+	}
+
+	public void setContacts(final List<ContactDto> contacts) {
+		this.contacts = contacts;
+	}
+
 	public void setInstanceMetaData(List<InstanceMetadata> instanceMetaData) {
 		this.instanceMetaData = instanceMetaData;
 	}
 
+	public String getObservationUnitId() {
+		return observationUnitId;
+	}
 
+	public void setObservationUnitId(final String observationUnitId) {
+		this.observationUnitId = observationUnitId;
+	}
 }
