@@ -413,5 +413,5 @@ public interface DatasetService {
 
 	void replaceObservationUnitEntry(List<Integer> observationUnitIds, Integer newEntryId);
 
-	Long getDatasetObservationUnitCount(Integer datasetId);
+	Long countObservationUnits(Integer datasetId);
 }

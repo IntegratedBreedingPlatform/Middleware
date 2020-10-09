@@ -335,7 +335,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testDeleteStudyInstances1NoExperimentalDesign() {
+	public void testDeleteStudyInstances_NoInstancesWithExpDesignRemaining() {
 		final DmsProject study =
 			this.testDataInitializer
 				.createDmsProject("Study1", "Study-Description", null, this.daoFactory.getDmsProjectDAO().getById(1), null);
