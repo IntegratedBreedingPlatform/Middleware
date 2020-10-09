@@ -168,6 +168,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		// Delete geolocation and its properties
 		this.daoFactory.getGeolocationDao().deleteGeolocations(instanceIds);
 
+		this.deleteExperimentalDesignIfApplicable(studyId,plotDatasetId);
+
 		// IF experimental design is not yet generated, re-number succeeding trial instances
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
 		if (!hasExperimentalDesign) {
@@ -364,6 +366,13 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			geolocation.setGeodeticDatum(value);
 		} else if (TermId.ALTITUDE.getId() == variableId) {
 			geolocation.setAltitude(Double.valueOf(value));
+		}
+	}
+
+	private void deleteExperimentalDesignIfApplicable(final int studyId, final int plotDatasetId) {
+		final boolean hasExperimentalDesign = this.daoFactory.getExperimentDao().count(plotDatasetId) > 0;
+		if (!hasExperimentalDesign) {
+			this.experimentDesignService.deleteStudyExperimentDesign(studyId);
 		}
 	}
 
