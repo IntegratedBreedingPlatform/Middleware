@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.ims.ExperimentTransaction;
 import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
@@ -30,6 +31,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -183,7 +185,8 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public void depositLots(final Integer userId, final Set<Integer> lotIds, final LotDepositRequestDto lotDepositRequestDto,
-		final TransactionStatus transactionStatus) {
+		final TransactionStatus transactionStatus, final TransactionSourceType transactionSourceType,
+		final Integer sourceId) {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
 		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
@@ -199,6 +202,12 @@ public class TransactionServiceImpl implements TransactionService {
 				new Transaction(TransactionType.DEPOSIT, transactionStatus, userId, lotDepositRequestDto.getNotes(),
 					extendedLotDto.getLotId(),
 					amount);
+			if (!Objects.isNull(transactionSourceType)) {
+				transaction.setSourceType(transactionSourceType.name());
+			}
+			if (!Objects.isNull(sourceId)) {
+				transaction.setSourceId(sourceId);
+			}
 			daoFactory.getTransactionDAO().save(transaction);
 
 			if (lotDepositRequestDto.getSourceStudyId() != null) {
