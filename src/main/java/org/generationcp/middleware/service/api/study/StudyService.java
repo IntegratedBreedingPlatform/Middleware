@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface StudyService {
 
-	List<StudySummary> search(StudySearchParameters serchParameters);
-
 	boolean hasMeasurementDataOnEnvironment(int studyIdentifier, int instanceId);
 
 	boolean hasCrossesOrSelections(int studyId);

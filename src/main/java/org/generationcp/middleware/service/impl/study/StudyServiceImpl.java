@@ -14,7 +14,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -33,7 +32,6 @@ import org.generationcp.middleware.service.api.study.*;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
@@ -121,79 +119,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 	StudyServiceImpl(final StudyMeasurements trialMeasurements) {
 		this.studyMeasurements = trialMeasurements;
 		this.daoFactory = new DaoFactory(this.sessionProvider);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<StudySummary> search(final StudySearchParameters serchParameters) {
-
-		final List<StudySummary> studySummaries = new ArrayList<>();
-
-		final StringBuffer sql = new StringBuffer().append("SELECT p.project_id AS id, p.name AS name, p.description AS title, ").append(
-			"	p.program_uuid AS programUUID, st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, st.visible ")
-			.append("as visible, st.cvterm_id as cvtermId, p.objective AS objective, ")
-			.append("	p.start_date AS startDate, p.end_date AS endDate, ppPI.value AS piName, ppLocation.value AS location, ppSeason")
-			.append(".value AS season ").append(" FROM project p ")
-			.append("  LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.type_id = ").append(TermId.PI_NAME.getId())
-			.append("  LEFT JOIN projectprop ppLocation ON p.project_id = ppLocation.project_id AND ppLocation.type_id = ")
-			.append(TermId.TRIAL_LOCATION.getId())
-			.append("  LEFT JOIN projectprop ppSeason ON p.project_id = ppSeason.project_id AND ppSeason.type_id = ")
-			.append(TermId.SEASON_VAR_TEXT.getId()).append(" INNER JOIN study_type st ON p.study_type_id = st.study_type_id ")
-			.append(" WHERE p.deleted = 0");
-
-		if (!StringUtils.isEmpty(serchParameters.getProgramUniqueId())) {
-			sql.append(" AND p.program_uuid = '").append(serchParameters.getProgramUniqueId().trim()).append("'");
-		}
-		if (!StringUtils.isEmpty(serchParameters.getPrincipalInvestigator())) {
-			sql.append(" AND ppPI.value LIKE '%").append(serchParameters.getPrincipalInvestigator().trim()).append("%'");
-		}
-		if (!StringUtils.isEmpty(serchParameters.getLocation())) {
-			sql.append(" AND ppLocation.value LIKE '%").append(serchParameters.getLocation().trim()).append("%'");
-		}
-		if (!StringUtils.isEmpty(serchParameters.getSeason())) {
-			sql.append(" AND ppSeason.value LIKE '%").append(serchParameters.getSeason().trim()).append("%'");
-		}
-
-		final List<Object[]> list;
-		try {
-
-			final Query query = this.getCurrentSession().createSQLQuery(sql.toString()).addScalar("id").addScalar("name").addScalar("title")
-				.addScalar("programUUID").addScalar("studyType").addScalar("label").addScalar("studyTypeName").addScalar("visible")
-				.addScalar("cvTermId").addScalar("objective").addScalar("startDate").addScalar("endDate").addScalar("piName")
-				.addScalar("location").addScalar("season");
-
-			list = query.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in listAllStudies() query in StudyServiceImpl: " + e.getMessage(), e);
-		}
-
-		if (list != null && !list.isEmpty()) {
-			for (final Object[] row : list) {
-				final Integer id = (Integer) row[0];
-				final String name = (String) row[1];
-				final String title = (String) row[2];
-				final String programUUID = (String) row[3];
-				final Integer studyTypeId = (Integer) row[4];
-				final String label = (String) row[5];
-				final String studyTypeName = (String) row[6];
-				final boolean visible = ((Byte) row[7]) == 1;
-				final Integer cvtermId = (Integer) row[8];
-				final String objective = (String) row[9];
-				final String startDate = (String) row[10];
-				final String endDate = (String) row[11];
-				final String pi = (String) row[12];
-				final String location = (String) row[13];
-				final String season = (String) row[14];
-
-				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
-
-				final StudySummary studySummary =
-					new StudySummary(id, name, title, objective, studyTypeDto, startDate, endDate, programUUID, pi, location, season);
-
-				studySummaries.add(studySummary);
-			}
-		}
-		return studySummaries;
 	}
 
 	@Override
