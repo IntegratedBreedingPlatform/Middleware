@@ -42,7 +42,7 @@ public class StudySummary implements Serializable {
 
 	private Map<String, String> optionalInfo = new HashMap<>();
 
-	private List<ContactDto> contacts;
+	private List<ContactDto> contacts = new ArrayList<>();
 
 	public Integer getStudyDbid() {
 		return this.studyDbid;
