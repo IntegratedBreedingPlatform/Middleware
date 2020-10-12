@@ -1510,7 +1510,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sqlQuery.setParameter("programDbId", studySearchFilter.getProgramDbId());
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getSeasonDbId())) {
-			sqlQuery.setParameter("season", studySearchFilter.getSeasonDbId());
+			sqlQuery.setParameter("seasonDbId", studySearchFilter.getSeasonDbId());
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyTypeDbId())) {
 			sqlQuery.setParameter("studyTypeDbId", studySearchFilter.getStudyTypeDbId());
@@ -1556,7 +1556,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     geopropSeason.value AS seasonDbId, ");
 		sql.append("     cvtermSeason.definition AS season, ");
 		sql.append("     pmain.project_id AS trialDbId, ");
-		sql.append(" 	 pmain.name AS " + "trialName" + ", ");
+		sql.append(" 	 pmain.name AS trialName, ");
 		sql.append("     MAX(pmain.start_date) AS startDate, ");
 		sql.append("     MAX(pmain.end_date) AS endDate, ");
 		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS active, ");
