@@ -10,6 +10,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -534,20 +535,20 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
-		final List<org.generationcp.middleware.domain.dms.StudySummary> studies = this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter, pageable);
-		final List<Integer> studyIds = studies.stream().map(org.generationcp.middleware.domain.dms.StudySummary::getStudyDbid).collect(Collectors.toList());
+	public List<StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		final List<StudySummary> studies = this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter, pageable);
+		final List<Integer> studyIds = studies.stream().map(StudySummary::getStudyDbid).collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(studyIds)) {
-			final ListIterator<org.generationcp.middleware.domain.dms.StudySummary> studySummaryIterator = studies.listIterator();
+			final ListIterator<StudySummary> studySummaryIterator = studies.listIterator();
 			final List<DmsProject> projects = this.daoFactory.getDmsProjectDAO().getByIds(studyIds);
 			for (final DmsProject dmsProject : projects) {
-				final org.generationcp.middleware.domain.dms.StudySummary studySummary = studySummaryIterator.next();
+				final StudySummary studySummary = studySummaryIterator.next();
 				final Map<String, String> additionalProps = Maps.newHashMap();
 				for (final ProjectProperty prop : dmsProject.getProperties()) {
 					final Integer variableId = prop.getVariableId();
-					final Optional<DataType> dmsVariableType = this.ontologyVariableDataManager.getDataType(prop.getVariableId());
+					final Optional<DataType> dataType = this.ontologyVariableDataManager.getDataType(prop.getVariableId());
 					final String value;
-					if (dmsVariableType.isPresent() && dmsVariableType.get().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
+					if (dataType.isPresent() &&  DataType.CATEGORICAL_VARIABLE.getId().equals(dataType.get().getId())) {
 						final Integer categoricalId = StringUtils.isNotBlank(prop.getValue()) ? Integer.parseInt(prop.getValue()) : 0;
 						value = this.ontologyVariableDataManager.retrieveVariableCategoricalValue(dmsProject.getProgramUUID(), prop.getVariableId(), categoricalId);
 					} else {
