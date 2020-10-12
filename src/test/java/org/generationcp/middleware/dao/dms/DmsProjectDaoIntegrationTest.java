@@ -23,7 +23,14 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.dms.*;
+import org.generationcp.middleware.pojos.dms.DatasetType;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
@@ -384,14 +391,14 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetStudyDetails() {
-		final StudyDetails studyDetails = this.dmsProjectDao.getStudyDetails(study.getProjectId());
-		Assert.assertEquals(study.getProjectId(), studyDetails.getId());
-		Assert.assertEquals(study.getDescription(), studyDetails.getDescription());
-		Assert.assertEquals(study.getObjective(), studyDetails.getObjective());
-		Assert.assertEquals(study.getStartDate(), studyDetails.getStartDate());
-		Assert.assertEquals(study.getEndDate(), studyDetails.getEndDate());
-		Assert.assertEquals(study.getProgramUUID(), studyDetails.getProgramUUID());
-		Assert.assertEquals(study.getStudyType().getStudyTypeId(), studyDetails.getStudyType().getId());
+		final StudyDetails studyDetails = this.dmsProjectDao.getStudyDetails(this.study.getProjectId());
+		Assert.assertEquals(this.study.getProjectId(), studyDetails.getId());
+		Assert.assertEquals(this.study.getDescription(), studyDetails.getDescription());
+		Assert.assertEquals(this.study.getObjective(), studyDetails.getObjective());
+		Assert.assertEquals(this.study.getStartDate(), studyDetails.getStartDate());
+		Assert.assertEquals(this.study.getEndDate(), studyDetails.getEndDate());
+		Assert.assertEquals(this.study.getProgramUUID(), studyDetails.getProgramUUID());
+		Assert.assertEquals(this.study.getStudyType().getStudyTypeId(), studyDetails.getStudyType().getId());
 		Assert.assertEquals(DmsProject.SYSTEM_FOLDER_ID.longValue(), studyDetails.getParentFolderId());
 		Assert.assertFalse(studyDetails.getIsLocked());
 	}
@@ -400,7 +407,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	public void testGetStudyMetadataForInstanceId() {
 		final DmsProject plot =
 			this.createDataset(this.study.getName() + " - Plot Dataset", this.study.getProgramUUID(), DatasetTypeEnum.PLOT_DATA.getId(),
-				study, study);
+				this.study, this.study);
 		final Integer locationId = 3;
 		final Integer instanceId = this.createEnvironmentData(plot, "1", locationId, Optional.<String>absent(), Optional.<Integer>absent());
 		final StudyMetadata studyMetadata = this.dmsProjectDao.getStudyMetadataForInstanceId(instanceId);
@@ -447,7 +454,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		final Long count = (Long) this.dmsProjectDao.countStudyInstances(studySearchFilter);
-		final List<StudyInstanceDto> studyInstanceDtos = this.dmsProjectDao.getStudyInstances(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
+		final List<StudyInstanceDto> studyInstanceDtos =
+			this.dmsProjectDao.getStudyInstances(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
 		Assert.assertEquals(count.intValue(), studyInstanceDtos.size());
 
 	}
@@ -470,11 +478,13 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		this.testDataInitializer.addGeolocationProp(instance1, TermId.SEASON_VAR.getId(), String.valueOf(TermId.SEASON_DRY.getId()), 1);
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter().withTrialDbId(study.getProjectId().toString())
-				.withStudyDbId(String.valueOf(instance1.getLocationId())).withLocationDbId(locationId).withStudyTypeDbId(String.valueOf(STUDY_TYPE_ID))
-				.withSeasonDbId(String.valueOf(TermId.SEASON_DRY.getId())).withActive(true);
+			.withStudyDbId(String.valueOf(instance1.getLocationId())).withLocationDbId(locationId)
+			.withStudyTypeDbId(String.valueOf(STUDY_TYPE_ID))
+			.withSeasonDbId(String.valueOf(TermId.SEASON_DRY.getId())).withActive(true);
 
 		final Long count = (Long) this.dmsProjectDao.countStudyInstances(studySearchFilter);
-		final List<StudyInstanceDto> studyInstanceDtos = this.dmsProjectDao.getStudyInstances(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
+		final List<StudyInstanceDto> studyInstanceDtos =
+			this.dmsProjectDao.getStudyInstances(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
 
 		Assert.assertEquals(1, count.intValue());
 		Assert.assertEquals(1, studyInstanceDtos.size());

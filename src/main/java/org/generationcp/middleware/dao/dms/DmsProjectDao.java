@@ -14,7 +14,14 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -38,7 +45,11 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
@@ -51,7 +62,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -228,11 +247,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "where project_id in (:projectIds) and type_id = " + VariableType.TRAIT.getId();
 
 	private static final List<String> BRAPI_INSTANCES_SORTABLE_FIELDS = Arrays
-			.asList("programDbId", "programName", "studyDbId", "studyName", "trialDbId", "trialName", "studyTypeId", "studyTypeName",
-					"seasonDbId", "season", "startDate", "endDate", "locationDbId", "locationName");
+		.asList("programDbId", "programName", "studyDbId", "studyName", "trialDbId", "trialName", "studyTypeId", "studyTypeName",
+			"seasonDbId", "season", "startDate", "endDate", "locationDbId", "locationName");
 
 	private static final List<String> BRAPI_STUDIES_SORTABLE_FIELDS = Arrays
-			.asList("programDbId", "programName", "trialDbId", "trialName", "startDate", "endDate", "locationDbId");
+		.asList("programDbId", "programName", "trialDbId", "trialName", "startDate", "endDate", "locationDbId");
 
 	private List<Reference> getChildrenNodesList(final List<Object[]> list) {
 		final List<Reference> childrenNodes = new ArrayList<>();
@@ -1389,7 +1408,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public long countStudies(final StudySearchFilter studySearchFilter) {
 		final SQLQuery sqlQuery =
-				this.getSession().createSQLQuery(this.createCountStudyQueryString(studySearchFilter));
+			this.getSession().createSQLQuery(this.createCountStudyQueryString(studySearchFilter));
 		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
@@ -1454,10 +1473,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return studyInstanceDtoList;
 	}
 
-
 	public List<StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 		final SQLQuery sqlQuery =
-				this.getSession().createSQLQuery(this.createStudyQueryString(studySearchFilter, pageable));
+			this.getSession().createSQLQuery(this.createStudyQueryString(studySearchFilter, pageable));
 
 		sqlQuery.addScalar("trialDbId");
 		sqlQuery.addScalar("trialName");
@@ -1482,7 +1500,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final List<StudySummary> studyList = new ArrayList<>();
 		for (final Map<String, Object> result : results) {
 			final StudySummary studySummary = new StudySummary();
-			studySummary.setStudyDbid((Integer)result.get("trialDbId"));
+			studySummary.setStudyDbid((Integer) result.get("trialDbId"));
 			studySummary.setName(String.valueOf(result.get("trialName")));
 			studySummary.setDescription(String.valueOf(result.get("trialDescription")));
 			studySummary.setObservationUnitId(String.valueOf(result.get("trialPUI")));
@@ -1491,8 +1509,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studySummary.setProgramDbId(String.valueOf(result.get("programDbId")));
 			studySummary.setProgramName(String.valueOf(result.get("programName")));
 			studySummary.setActive(((Integer) result.get("active")) == 1);
-			studySummary.setContacts(Collections.singletonList(new ContactDto((Integer)result.get("contactDbId"),
-					(String)result.get("contactName"), (String)result.get("email"), "Creator")));
+			studySummary.setContacts(Collections.singletonList(new ContactDto((Integer) result.get("contactDbId"),
+				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
 			studyList.add(studySummary);
 		}
 		return studyList;
@@ -1531,11 +1549,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sqlQuery.setParameter("contactDbId", studySearchFilter.getContactDbId());
 		}
 		// Search Date Range
-		if (studySearchFilter.getSearchDateRangeStart() != null ) {
-			sqlQuery.setParameter("searchTrialDateStart", Util.formatDateAsStringValue(studySearchFilter.getSearchDateRangeStart(), Util.DATE_AS_NUMBER_FORMAT));
+		if (studySearchFilter.getSearchDateRangeStart() != null) {
+			sqlQuery.setParameter("searchTrialDateStart",
+				Util.formatDateAsStringValue(studySearchFilter.getSearchDateRangeStart(), Util.DATE_AS_NUMBER_FORMAT));
 
 		} else if (studySearchFilter.getSearchDateRangeEnd() != null) {
-			sqlQuery.setParameter("searchTrialDateEnd", Util.formatDateAsStringValue(studySearchFilter.getSearchDateRangeEnd(), Util.DATE_AS_NUMBER_FORMAT));
+			sqlQuery.setParameter("searchTrialDateEnd",
+				Util.formatDateAsStringValue(studySearchFilter.getSearchDateRangeEnd(), Util.DATE_AS_NUMBER_FORMAT));
 		}
 
 	}
@@ -1642,10 +1662,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("         INNER JOIN ");
 		sql.append("     project pmain ON pmain.project_id = proj.study_id ");
 		sql.append("         INNER JOIN ");
-		sql.append("     nd_experiment study_exp ON study_exp.project_id = pmain.project_id AND study_exp.type_id = " + TermId.STUDY_EXPERIMENT.getId());
+		sql.append(
+			"     nd_experiment study_exp ON study_exp.project_id = pmain.project_id AND study_exp.type_id = " + TermId.STUDY_EXPERIMENT
+				.getId());
 		sql.append("         LEFT OUTER JOIN ");
-		sql.append("     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = "
-						+ TermId.LOCATION_ID.getId());
+		sql.append(
+			"     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = "
+				+ TermId.LOCATION_ID.getId());
 		sql.append("         LEFT OUTER JOIN workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
 		sql.append("         LEFT JOIN workbench.users wu ON wu.userid = pmain.created_by ");
 		sql.append("         LEFT JOIN workbench.persons wper ON wper.personid = wu.personid ");
@@ -1685,7 +1708,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sql.append("AND pmain.deleted = :active ");
 		}
 		// Search Date Range
-		if (studySearchFilter.getSearchDateRangeStart() != null ) {
+		if (studySearchFilter.getSearchDateRangeStart() != null) {
 			sql.append("AND :searchTrialDateStart <= pmain.end_date");
 
 		} else if (studySearchFilter.getSearchDateRangeEnd() != null) {
@@ -1719,7 +1742,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return count > 0;
 	}
 
-	public boolean allDatasetIdsBelongToStudy(final Integer studyId, final List<Integer> datasetIds){
+	public boolean allDatasetIdsBelongToStudy(final Integer studyId, final List<Integer> datasetIds) {
 
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.in("projectId", datasetIds));

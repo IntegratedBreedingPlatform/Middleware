@@ -108,7 +108,7 @@ public class StudySearchFilter {
 	}
 
 	public String getTrialPUI() {
-		return trialPUI;
+		return this.trialPUI;
 	}
 
 	public StudySearchFilter withTrialPUI(final String trialPUI) {
@@ -117,7 +117,7 @@ public class StudySearchFilter {
 	}
 
 	public String getTrialName() {
-		return trialName;
+		return this.trialName;
 	}
 
 	public StudySearchFilter withTrialName(final String trialName) {
@@ -126,7 +126,7 @@ public class StudySearchFilter {
 	}
 
 	public String getContactDbId() {
-		return contactDbId;
+		return this.contactDbId;
 	}
 
 	public StudySearchFilter withContactDbId(final String contactDbId) {
@@ -135,7 +135,7 @@ public class StudySearchFilter {
 	}
 
 	public Date getSearchDateRangeStart() {
-		return searchDateRangeStart;
+		return this.searchDateRangeStart;
 	}
 
 	public StudySearchFilter withSearchDateRangeStart(final Date searchDateRangeStart) {
@@ -144,7 +144,7 @@ public class StudySearchFilter {
 	}
 
 	public Date getSearchDateRangeEnd() {
-		return searchDateRangeEnd;
+		return this.searchDateRangeEnd;
 	}
 
 	public StudySearchFilter withSearchDateRangeEnd(final Date searchDateRangeEnd) {

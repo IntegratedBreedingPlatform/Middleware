@@ -6,7 +6,11 @@ import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.service.api.user.ContactDto;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class StudySummary implements Serializable {
 
@@ -63,7 +67,7 @@ public class StudySummary implements Serializable {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(final String description) {
@@ -175,19 +179,19 @@ public class StudySummary implements Serializable {
 	}
 
 	public List<ContactDto> getContacts() {
-		return contacts;
+		return this.contacts;
 	}
 
 	public void setContacts(final List<ContactDto> contacts) {
 		this.contacts = contacts;
 	}
 
-	public void setInstanceMetaData(List<InstanceMetadata> instanceMetaData) {
+	public void setInstanceMetaData(final List<InstanceMetadata> instanceMetaData) {
 		this.instanceMetaData = instanceMetaData;
 	}
 
 	public String getObservationUnitId() {
-		return observationUnitId;
+		return this.observationUnitId;
 	}
 
 	public void setObservationUnitId(final String observationUnitId) {

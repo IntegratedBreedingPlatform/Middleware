@@ -13,7 +13,22 @@ package org.generationcp.middleware.manager.api;
 
 import com.google.common.collect.BiMap;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.Stocks;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -149,8 +164,8 @@ public interface StudyDataManager {
 	/**
 	 * Returns the list of study references for a particular search filter.
 	 *
-	 * @param filter    The filter for the search - could be an instance of BrowseStudyQueryFilter, GidStudyQueryFilter,
-	 *                  ParentFolderStudyQueryFilter.
+	 * @param filter The filter for the search - could be an instance of BrowseStudyQueryFilter, GidStudyQueryFilter,
+	 *               ParentFolderStudyQueryFilter.
 	 * @return list of matching studies
 	 */
 	List<StudyReference> searchStudies(StudyQueryFilter filter);
@@ -296,7 +311,7 @@ public interface StudyDataManager {
 	 * Returns a single dataset belonging to the study with the given type. If there is more than one matching dataset, only one is
 	 * returned. If there are none, null is returned.
 	 *
-	 * @param studyId the study id
+	 * @param studyId       the study id
 	 * @param datasetTypeId the dataset type id
 	 * @return the data set
 	 */
@@ -431,12 +446,12 @@ public interface StudyDataManager {
 	/**
 	 * Returns the datasetId of dataset to which the studyDbId (nd_geolocation_id) belongs to.
 	 * In Brapi, studyDbId is the environment/instance (nd_geolocation_id)
+	 *
 	 * @param studyDbId
 	 * @param datasetType
 	 * @return
 	 */
 	Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType);
-
 
 	/**
 	 * Returns the dms project. Accepts a project id.
@@ -522,7 +537,6 @@ public interface StudyDataManager {
 	 * @return the int
 	 */
 	int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds);
-
 
 	/**
 	 * Gets the all field maps in block by block id.
@@ -729,20 +743,19 @@ public interface StudyDataManager {
 	boolean renameStudy(final String newStudyName, final int studyId, final String programUUID);
 
 	/**
-	 *
 	 * @param studyId
 	 * @return
 	 */
-	List<UserDto> getUsersAssociatedToStudy (final Integer studyId);
+	List<UserDto> getUsersAssociatedToStudy(final Integer studyId);
 
 	/**
-	 *
 	 * @param instanceId
 	 * @return
 	 */
 	List<UserDto> getUsersForEnvironment(final Integer instanceId);
 
-	List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
+	List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId,
+		List<Integer> variableIds);
 
 	List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
 
