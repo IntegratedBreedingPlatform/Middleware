@@ -40,11 +40,17 @@
 		INSERT INTO workbench_sidebar_category_link (`tool_name`, `sidebar_category_id`, `sidebar_link_name`, `sidebar_link_title`, `rank`)
 		VALUES ('search_germplasm', 1, 'search_germplasm', 'Search Germplasm', 3);
 
-		SET @permission_id = (SELECT permission_id FROM permission where name = 'GERMPLASM');
+		SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM');
 		SET @workbench_sidebar_category_link_id =  (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'search_germplasm');
 
 		INSERT INTO permission (`name`, `description`, `parent_id`, `workbench_sidebar_category_link_id`)
 		VALUES ('SEARCH_GERMPLASM', 'Search Germplasm', @permission_id , @workbench_sidebar_category_link_id);
+
+		SET @search_germplasm_permission_id = (SELECT permission_id FROM permission where name = 'SEARCH_GERMPLASM');
+
+		INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @search_germplasm_permission_id, '1');
+        INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @search_germplasm_permission_id, '1');
+        INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @search_germplasm_permission_id, '1');
 
 		</sql>
 	</changeSet>
