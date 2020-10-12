@@ -23,14 +23,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.dms.DatasetType;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
-import org.generationcp.middleware.pojos.dms.StockModel;
-import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.pojos.dms.*;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
@@ -476,13 +469,9 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final Geolocation instance1 = this.testDataInitializer.createInstance(summary, locationId, 1);
 		this.testDataInitializer.addGeolocationProp(instance1, TermId.SEASON_VAR.getId(), String.valueOf(TermId.SEASON_DRY.getId()), 1);
 
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setTrialDbId(study.getProjectId().toString());
-		studySearchFilter.setStudyDbId(String.valueOf(instance1.getLocationId()));
-		studySearchFilter.setLocationDbId(locationId);
-		studySearchFilter.setStudyTypeDbId(String.valueOf(STUDY_TYPE_ID));
-		studySearchFilter.setSeasonDbId(String.valueOf(TermId.SEASON_DRY.getId()));
-		studySearchFilter.setActive(true);
+		final StudySearchFilter studySearchFilter = new StudySearchFilter().withTrialDbId(study.getProjectId().toString())
+				.withStudyDbId(String.valueOf(instance1.getLocationId())).withLocationDbId(locationId).withStudyTypeDbId(String.valueOf(STUDY_TYPE_ID))
+				.withSeasonDbId(String.valueOf(TermId.SEASON_DRY.getId())).withActive(true);
 
 		final Long count = (Long) this.dmsProjectDao.countStudyInstances(studySearchFilter);
 		final List<StudyInstanceDto> studyInstanceDtos = this.dmsProjectDao.getStudyInstances(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));

@@ -2,9 +2,7 @@ package org.generationcp.middleware.service.api.study;
 
 import org.pojomatic.Pojomatic;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.Date;
 
 public class StudySearchFilter {
 
@@ -19,6 +17,8 @@ public class StudySearchFilter {
 	private String contactDbId;
 	private String studyDbId;
 	private Boolean active;
+	private Date searchDateRangeStart;
+	private Date searchDateRangeEnd;
 
 	public StudySearchFilter() {
 
@@ -39,88 +39,117 @@ public class StudySearchFilter {
 		return this.studyTypeDbId;
 	}
 
-	public void setStudyTypeDbId(final String studyTypeDbId) {
+	public StudySearchFilter withStudyTypeDbId(final String studyTypeDbId) {
 		this.studyTypeDbId = studyTypeDbId;
+		return this;
 	}
 
 	public String getProgramDbId() {
 		return this.programDbId;
 	}
 
-	public void setProgramDbId(final String programDbId) {
+	public StudySearchFilter withProgramDbId(final String programDbId) {
 		this.programDbId = programDbId;
+		return this;
 	}
 
 	public String getLocationDbId() {
 		return this.locationDbId;
 	}
 
-	public void setLocationDbId(final String locationDbId) {
+	public StudySearchFilter withLocationDbId(final String locationDbId) {
 		this.locationDbId = locationDbId;
+		return this;
 	}
 
 	public String getSeasonDbId() {
 		return this.seasonDbId;
 	}
 
-	public void setSeasonDbId(final String seasonDbId) {
+	public StudySearchFilter withSeasonDbId(final String seasonDbId) {
 		this.seasonDbId = seasonDbId;
+		return this;
 	}
 
 	public String getTrialDbId() {
 		return this.trialDbId;
 	}
 
-	public void setTrialDbId(final String trialDbId) {
+	public StudySearchFilter withTrialDbId(final String trialDbId) {
 		this.trialDbId = trialDbId;
+		return this;
 	}
 
 	public String getStudyDbId() {
 		return this.studyDbId;
 	}
 
-	public void setStudyDbId(final String studyDbId) {
+	public StudySearchFilter withStudyDbId(final String studyDbId) {
 		this.studyDbId = studyDbId;
+		return this;
 	}
 
 	public Boolean getActive() {
 		return this.active;
 	}
 
-	public void setActive(final Boolean active) {
+	public StudySearchFilter withActive(final Boolean active) {
 		this.active = active;
+		return this;
 	}
 
 	public String getCommonCropName() {
 		return this.commonCropName;
 	}
 
-	public void setCommonCropName(final String commonCropName) {
+	public StudySearchFilter withCommonCropName(final String commonCropName) {
 		this.commonCropName = commonCropName;
+		return this;
 	}
 
 	public String getTrialPUI() {
 		return trialPUI;
 	}
 
-	public void setTrialPUI(String trialPUI) {
+	public StudySearchFilter withTrialPUI(final String trialPUI) {
 		this.trialPUI = trialPUI;
+		return this;
 	}
 
 	public String getTrialName() {
 		return trialName;
 	}
 
-	public void setTrialName(String trialName) {
+	public StudySearchFilter withTrialName(final String trialName) {
 		this.trialName = trialName;
+		return this;
 	}
 
 	public String getContactDbId() {
 		return contactDbId;
 	}
 
-	public void setContactDbId(String contactDbId) {
+	public StudySearchFilter withContactDbId(final String contactDbId) {
 		this.contactDbId = contactDbId;
+		return this;
+	}
+
+	public Date getSearchDateRangeStart() {
+		return searchDateRangeStart;
+	}
+
+	public StudySearchFilter withSearchDateRangeStart(final Date searchDateRangeStart) {
+		this.searchDateRangeStart = searchDateRangeStart;
+		return this;
+	}
+
+	public Date getSearchDateRangeEnd() {
+		return searchDateRangeEnd;
+	}
+
+	public StudySearchFilter withSearchDateRangeEnd(final Date searchDateRangeEnd) {
+		this.searchDateRangeEnd = searchDateRangeEnd;
+		return this;
 	}
 
 	@Override

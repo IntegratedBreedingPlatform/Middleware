@@ -1530,6 +1530,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (!StringUtils.isEmpty(studySearchFilter.getContactDbId())) {
 			sqlQuery.setParameter("contactDbId", studySearchFilter.getContactDbId());
 		}
+		// Search Date Range
+		if (studySearchFilter.getSearchDateRangeStart() != null ) {
+			sqlQuery.setParameter("searchTrialDateStart", Util.formatDateAsStringValue(studySearchFilter.getSearchDateRangeStart(), Util.DATE_AS_NUMBER_FORMAT));
+
+		} else if (studySearchFilter.getSearchDateRangeEnd() != null) {
+			sqlQuery.setParameter("searchTrialDateEnd", Util.formatDateAsStringValue(studySearchFilter.getSearchDateRangeEnd(), Util.DATE_AS_NUMBER_FORMAT));
+		}
 
 	}
 
@@ -1676,6 +1683,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		if (studySearchFilter.getActive() != null) {
 			sql.append("AND pmain.deleted = :active ");
+		}
+		// Search Date Range
+		if (studySearchFilter.getSearchDateRangeStart() != null ) {
+			sql.append("AND :searchTrialDateStart <= pmain.end_date");
+
+		} else if (studySearchFilter.getSearchDateRangeEnd() != null) {
+			sql.append("AND :searchTrialDateEnd >= pmain.start_date");
 		}
 	}
 
