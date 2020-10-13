@@ -73,6 +73,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
     public static final String NAMES = "NAMES";
     private static final String MIXED_UNITS_LABEL = "Mixed";
+    public static final String LOCATION_ID = "LOCATION_ID";
+    public static final String METHOD_ID = "METHOD_ID";
 
     public static final String GID = ColumnLabels.GID.getName();
     public static final String GROUP_ID = ColumnLabels.GROUP_ID.getName();
@@ -724,6 +726,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             query.addScalar(LOT_UNITS);
             query.addScalar(METHOD_NAME);
             query.addScalar(LOCATION_NAME);
+            query.addScalar(LOCATION_ID);
+            query.addScalar(METHOD_ID);
 
             for (final String addedColumnPropertyId : addedColumnsPropertyIds) {
                 if (!GERMPLASM_TREE_NODE_PROPERTY_IDS.contains(addedColumnPropertyId)) {
@@ -807,7 +811,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             + " '" + MIXED_UNITS_LABEL + "') AS  `" + GermplasmSearchDAO.AVAIL_BALANCE + "`, \n"  //
             + " IF(COUNT(DISTINCT IFNULL(gl.scaleid, 'null')) = 1, scale.name, '" + MIXED_UNITS_LABEL + "') AS `" + LOT_UNITS + "`, \n"  //
             + " m.mname AS `" + GermplasmSearchDAO.METHOD_NAME + "`, \n"  //
-            + " l.lname AS `" + GermplasmSearchDAO.LOCATION_NAME + "` \n");
+            + " l.lname AS `" + GermplasmSearchDAO.LOCATION_NAME + "`, \n"
+            + " m.mid AS `" + GermplasmSearchDAO.METHOD_ID + "`, \n"  //
+            + " l.locid AS `" + GermplasmSearchDAO.LOCATION_ID + "` \n")
+            ;
 
         for (final String propertyId : addedColumnsPropertyIds) {
             if (GermplasmSearchDAO.selectClauseColumnsMap.containsKey(propertyId)) {
@@ -841,8 +848,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         response.setUnit((String) row[5]);
         response.setMethodName((String) row[6]);
         response.setLocationName((String) row[7]);
+        response.setLocationId((Integer) row[8]);
+        response.setBreedingMethodId((Integer) row[9]);
 
-        final int indexOffset = 8;
+        final int indexOffset = 10;
         response.setGermplasmDate(this.getValueOfAddedColumns(GERMPLASM_DATE, row, addedColumnsPropertyIds, indexOffset));
         response.setMethodCode(this.getValueOfAddedColumns(METHOD_ABBREVIATION, row, addedColumnsPropertyIds, indexOffset));
         response.setMethodNumber(this.getValueOfAddedColumns(METHOD_NUMBER, row, addedColumnsPropertyIds, indexOffset));

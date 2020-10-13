@@ -48,6 +48,9 @@ public class GermplasmSearchResponse {
 	private Map<String, String> attributeTypesValueMap;
 	private Map<String, String> nameTypesValueMap;
 
+	private Integer locationId;
+	private Integer breedingMethodId;
+
 	public GermplasmSearchResponse() {
 	}
 
@@ -249,6 +252,22 @@ public class GermplasmSearchResponse {
 
 	public void setNameTypesValueMap(final Map<String, String> nameTypesValueMap) {
 		this.nameTypesValueMap = nameTypesValueMap;
+	}
+
+	public Integer getLocationId() {
+		return this.locationId;
+	}
+
+	public void setLocationId(final Integer locationId) {
+		this.locationId = locationId;
+	}
+
+	public Integer getBreedingMethodId() {
+		return this.breedingMethodId;
+	}
+
+	public void setBreedingMethodId(final Integer breedingMethodId) {
+		this.breedingMethodId = breedingMethodId;
 	}
 
 	@Override
