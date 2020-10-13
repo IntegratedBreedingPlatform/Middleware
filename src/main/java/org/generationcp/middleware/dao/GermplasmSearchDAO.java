@@ -890,7 +890,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             new StringBuilder(this.createSelectClause(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
         queryBuilder.append(this.createFromClause(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
 
-        final List<Integer> preFilteredGids = this.retrievePreFilteredGids(germplasmSearchRequest);
+        final List<Integer> preFilteredGids = new ArrayList<>();
+        final boolean isPrefilterEmpty = this.addPreFilteredGids(germplasmSearchRequest, preFilteredGids);
+
+        if (isPrefilterEmpty) {
+            return Collections.EMPTY_LIST;
+        }
+
         // group by inside filters
         addFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequest, preFilteredGids, programUUID);
 
@@ -945,7 +951,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 new StringBuilder(this.createSelectClause(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
             queryBuilder.append(this.createFromClause(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
 
-            final List<Integer> preFilteredGids = this.retrievePreFilteredGids(germplasmSearchRequest);
+            final List<Integer> preFilteredGids = new ArrayList<>();
+
+            final boolean isPrefilterEmpty = this.addPreFilteredGids(germplasmSearchRequest, preFilteredGids);
+            if (isPrefilterEmpty) {
+                return 0;
+            }
+
             // group by inside filters
             addFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequest, preFilteredGids, programUUID);
 
@@ -1174,10 +1186,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
      * This query contains those filters that don't perform well in the main query.
 	 * The queries are bounded by the LIMIT clause, and therefore they are less appropriate for filters
      * that match a lot of records.
+     * @return true if request contains prefiltering and it has no matches.
      */
-    private List<Integer> retrievePreFilteredGids(final GermplasmSearchRequest germplasmSearchRequest) {
-
-        final List<Integer> prefilteredGids = new ArrayList<>();
+    private boolean addPreFilteredGids(final GermplasmSearchRequest germplasmSearchRequest, final List<Integer> prefilteredGids) {
 
         final String femaleParentName = germplasmSearchRequest.getFemaleParentName();
         if (femaleParentName != null) {
@@ -1189,6 +1200,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 + " where n.nstat != " + STATUS_DELETED + " and n.nval like :femaleParentName " + LIMIT_CLAUSE) //
                 .setParameter("femaleParentName", '%' + femaleParentName + '%') //
                 .list();
+            if (gids == null || gids.isEmpty()) {
+                return true;
+            }
             prefilteredGids.addAll(gids);
         }
 
@@ -1202,6 +1216,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 + " where n.nstat != " + STATUS_DELETED + " and n.nval like :maleParentName " + LIMIT_CLAUSE) //
                 .setParameter("maleParentName", '%' + maleParentName + '%') //
                 .list();
+            if (gids == null || gids.isEmpty()) {
+                return true;
+            }
             prefilteredGids.addAll(gids);
         }
 
@@ -1213,6 +1230,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 + " where n.nstat != " + STATUS_DELETED + " and n.nval like :groupSourceName " + LIMIT_CLAUSE) //
                 .setParameter("groupSourceName", '%' + groupSourceName + '%')
                 .list();
+            if (gids == null || gids.isEmpty()) {
+                return true;
+            }
             prefilteredGids.addAll(gids);
         }
 
@@ -1224,6 +1244,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 + " where n.nstat != " + STATUS_DELETED + " and n.nval like :immediateSourceName " + LIMIT_CLAUSE) //
                 .setParameter("immediateSourceName", '%' + immediateSourceName + '%')
                 .list();
+            if (gids == null || gids.isEmpty()) {
+                return true;
+            }
             prefilteredGids.addAll(gids);
         }
 
@@ -1250,10 +1273,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             }
 
             final List<Integer> gids = sqlQuery.list();
+            if (gids == null || gids.isEmpty()) {
+                return true;
+            }
             prefilteredGids.addAll(gids);
         }
 
-        return prefilteredGids;
+        return false;
     }
 
     /**
