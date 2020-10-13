@@ -21,7 +21,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -56,10 +55,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -93,6 +93,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private StudyMeasurements studyMeasurements;
 
+	@Resource
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Resource
@@ -110,8 +111,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		super(sessionProvider);
 		final Session currentSession = this.getCurrentSession();
 		this.studyMeasurements = new StudyMeasurements(currentSession);
-		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(),
-			this.getOntologyPropertyDataManager(), this.getOntologyScaleDataManager(), this.getFormulaService(), sessionProvider);
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
 
 		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {
@@ -554,12 +553,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 		final List<StudySummary> studies = this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter, pageable);
-		final List<Integer> studyIds = studies.stream().map(StudySummary::getStudyDbid).collect(Collectors.toList());
+		final Map<Integer, StudySummary> studiesMap = studies.stream().collect(Collectors.toMap(StudySummary::getStudyDbid, Function.identity()));
+		final Set<Integer> studyIds = studiesMap.keySet();
 		if (!CollectionUtils.isEmpty(studyIds)) {
-			final ListIterator<StudySummary> studySummaryIterator = studies.listIterator();
 			final List<DmsProject> projects = this.daoFactory.getDmsProjectDAO().getByIds(studyIds);
 			for (final DmsProject dmsProject : projects) {
-				final StudySummary studySummary = studySummaryIterator.next();
+				final StudySummary studySummary = studiesMap.get(dmsProject.getProjectId());
 				final Map<String, String> additionalProps = Maps.newHashMap();
 				for (final ProjectProperty prop : dmsProject.getProperties()) {
 					final Integer variableId = prop.getVariableId();

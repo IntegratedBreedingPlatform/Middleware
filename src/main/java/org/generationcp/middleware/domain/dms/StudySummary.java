@@ -4,6 +4,8 @@ package org.generationcp.middleware.domain.dms;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.service.api.user.ContactDto;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@AutoProperty
 public class StudySummary implements Serializable {
 
 	private static final long serialVersionUID = -515769070343491680L;
@@ -201,4 +204,21 @@ public class StudySummary implements Serializable {
 		this.observationUnitId = observationUnitId;
 		return this;
 	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
+
 }

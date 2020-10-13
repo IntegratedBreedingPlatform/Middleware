@@ -1486,6 +1486,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sqlQuery.addScalar("active", new IntegerType());
 		sqlQuery.addScalar("programDbId");
 		sqlQuery.addScalar("programName");
+		sqlQuery.addScalar("locationDbId");
 		sqlQuery.addScalar("contactDbId");
 		sqlQuery.addScalar("contactName");
 		sqlQuery.addScalar("email");
@@ -1611,6 +1612,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS active, ");
 		sql.append("     wp.project_name AS programName, ");
 		sql.append("     wp.project_uuid AS programDbId, ");
+		sql.append("     geopropLocation.value as locationDbId, ");
 		sql.append("     wper.personid AS contactDbid, ");
 		sql.append("     CONCAT(fname, ' ', lname) AS contactName, ");
 		sql.append("     wper.pemail AS email ");
