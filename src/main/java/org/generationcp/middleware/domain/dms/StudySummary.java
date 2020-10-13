@@ -70,8 +70,9 @@ public class StudySummary implements Serializable {
 		return this.description;
 	}
 
-	public void setDescription(final String description) {
+	public StudySummary setDescription(final String description) {
 		this.description = description;
+		return this;
 	}
 
 	public String getType() {
@@ -182,19 +183,22 @@ public class StudySummary implements Serializable {
 		return this.contacts;
 	}
 
-	public void setContacts(final List<ContactDto> contacts) {
+	public StudySummary setContacts(final List<ContactDto> contacts) {
 		this.contacts = contacts;
+		return this;
 	}
 
-	public void setInstanceMetaData(final List<InstanceMetadata> instanceMetaData) {
+	public StudySummary setInstanceMetaData(final List<InstanceMetadata> instanceMetaData) {
 		this.instanceMetaData = instanceMetaData;
+		return this;
 	}
 
 	public String getObservationUnitId() {
 		return this.observationUnitId;
 	}
 
-	public void setObservationUnitId(final String observationUnitId) {
+	public StudySummary setObservationUnitId(final String observationUnitId) {
 		this.observationUnitId = observationUnitId;
+		return this;
 	}
 }
