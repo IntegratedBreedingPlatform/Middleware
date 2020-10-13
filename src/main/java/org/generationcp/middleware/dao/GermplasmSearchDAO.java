@@ -708,7 +708,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             queryBuilder.append(this.createFromClause(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
 
 			queryBuilder.append(" where g.gid in (:gids) ");
-			queryBuilder.append(" and g.deleted = 0 and g.grplce = 0 ");
+			queryBuilder.append(GERMPLASM_NOT_DELETED_CLAUSE);
             queryBuilder.append(" group by g.gid ");
 
             final Map<String, Boolean> sortState = convertSort(pageable);
@@ -938,7 +938,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         try {
             // Reusing the same query without filters is expensive. We create a simpler one for count all
             if (germplasmSearchRequest == null) {
-                final SQLQuery sqlQuery = this.getSession().createSQLQuery(" select count(1) from germplsm ");
+                final SQLQuery sqlQuery =
+                    this.getSession().createSQLQuery(" select count(gid) from germplsm g where 1 = 1 " + GERMPLASM_NOT_DELETED_CLAUSE);
                 return ((BigInteger) sqlQuery.uniqueResult()).longValue();
             }
 
@@ -991,7 +992,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
     private static void addFilters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequest germplasmSearchRequest,
         final List<Integer> preFilteredGids, final String programUUID) {
 
-        paramBuilder.append(" where g.deleted = 0 AND g.grplce = 0 ");
+        paramBuilder.append(" where 1 = 1 " + GERMPLASM_NOT_DELETED_CLAUSE);
 
         final SqlTextFilter nameFilter = germplasmSearchRequest.getNameFilter();
         if (nameFilter != null && nameFilter.getValue() != null) {
