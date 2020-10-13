@@ -1,7 +1,5 @@
 package org.generationcp.middleware.service.impl.inventory;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -17,7 +15,6 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDt
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -39,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -155,14 +151,13 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		lotUpdateRequestDto.setSingleInput(singleInput);
 
 		final Set<String> itemIds = Sets.newHashSet(this.lot.getLotUuId());
-		SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
 		lotUpdateRequestDto.getSingleInput().setSearchComposite(new SearchCompositeDto());
 		lotUpdateRequestDto.getSingleInput().getSearchComposite().setItemIds(itemIds);
 		final LotsSearchDto searchDto = new LotsSearchDto();
 		searchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 
-		this.lotService.updateLots(extendedLotDtos, lotUpdateRequestDto);
+		this.lotService.updateLots(null, extendedLotDtos, lotUpdateRequestDto);
 		assertThat(this.lot.getComments(), hasToString("Test1"));
 	}
 
@@ -175,14 +170,13 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		lotUpdateRequestDto.setSingleInput(singleInput);
 
 		final Set<String> itemIds = Sets.newHashSet(this.lot.getLotUuId());
-		SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
 		lotUpdateRequestDto.getSingleInput().setSearchComposite(new SearchCompositeDto());
 		lotUpdateRequestDto.getSingleInput().getSearchComposite().setItemIds(itemIds);
 		final LotsSearchDto searchDto = new LotsSearchDto();
 		searchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 
-		this.lotService.updateLots(extendedLotDtos, lotUpdateRequestDto);
+		this.lotService.updateLots(null, extendedLotDtos, lotUpdateRequestDto);
 		assertThat(this.lot.getComments(), hasToString("Test2"));
 		assertThat(this.lot.getScaleId(), equalTo(8267));
 	}
@@ -207,7 +201,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
 		List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 
-		this.lotService.updateLots(extendedLotDtos, lotUpdateRequestDto);
+		this.lotService.updateLots(null, extendedLotDtos, lotUpdateRequestDto);
 		assertThat(this.lot.getComments(), hasToString("Test3"));
 		assertThat(this.lot.getScaleId(), equalTo(8267));
 	}

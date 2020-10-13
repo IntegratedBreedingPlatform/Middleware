@@ -285,11 +285,20 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<Location> filterLocations(final Set<Integer> types, final List<Integer> locationIds, final List<String> locationAbbreviations) {
+	public List<Location> filterLocations(final String programUUID, final Set<Integer> types, final List<Integer> locationIds,
+		final List<String> locationAbbreviations) {
 		final List<Location> locations;
 		try {
 
 			final Criteria criteria = this.getSession().createCriteria(Location.class);
+
+			if (programUUID != null) {
+				criteria.add(Restrictions.disjunction()
+					.add(Restrictions.eq("uniqueID", programUUID))
+					.add(Restrictions.isNull("uniqueID")));
+			} else {
+				criteria.add(Restrictions.isNull("uniqueID"));
+			}
 
 			if (types != null && !types.isEmpty()) {
 				criteria.add(Restrictions.in(LocationDAO.LTYPE, types));
@@ -614,33 +623,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
 					this.getLogExceptionMessage("getLocationNamesMapByGIDs", "gids", gids.toString(), e.getMessage(),
-							LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-
-		return toreturn;
-	}
-
-	public Map<Integer, LocationDto> getLocationNamesByGIDs(final List<Integer> gids) {
-		final Map<Integer, LocationDto> toreturn = new HashMap<>();
-		for (final Integer gid : gids) {
-			toreturn.put(gid, null);
-		}
-
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery(Location.GET_LOCATION_NAMES_BY_GIDS);
-			query.setParameterList("gids", gids);
-
-			final List<Object> results = query.list();
-			for (final Object result : results) {
-				final Object[] resultArray = (Object[]) result;
-				final Integer gid = (Integer) resultArray[0];
-				final Integer locid = (Integer) resultArray[1];
-				final String locationName = (String) resultArray[2];
-				toreturn.put(gid, new LocationDto(locid, locationName));
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getLocationNamesByGIDs", "gids", gids.toString(), e.getMessage(),
 							LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 
