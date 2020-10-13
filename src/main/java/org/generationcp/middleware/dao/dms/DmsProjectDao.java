@@ -59,6 +59,7 @@ import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
@@ -1612,7 +1613,15 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS active, ");
 		sql.append("     wp.project_name AS programName, ");
 		sql.append("     wp.project_uuid AS programDbId, ");
-		sql.append("     geopropLocation.value as locationDbId, ");
+		// locationDbId is not unique to study but can have different value per environment.
+		// Get the MIN or MAX depending on sort parameter and direction
+		if (pageable != null && pageable.getSort() != null && pageable.getSort().getOrderFor("locationDbId") != null
+			&& Sort.Direction.DESC.equals(pageable.getSort().getOrderFor("locationDbId").getDirection())) {
+			sql.append("     MAX(geopropLocation.value) as locationDbId, ");
+		} else {
+			sql.append("     MIN(geopropLocation.value) as locationDbId, ");
+		}
+
 		sql.append("     wper.personid AS contactDbid, ");
 		sql.append("     CONCAT(fname, ' ', lname) AS contactName, ");
 		sql.append("     wper.pemail AS email ");
