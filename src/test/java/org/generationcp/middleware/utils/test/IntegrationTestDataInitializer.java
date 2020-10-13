@@ -1,6 +1,8 @@
 package org.generationcp.middleware.utils.test;
 
+import liquibase.util.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.bouncycastle.asn1.esf.CrlValidatedID;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.SampleDao;
@@ -111,6 +113,18 @@ public class IntegrationTestDataInitializer {
 		this.nameDAO.setSession(hibernateSessionProvider.getSession());
 	}
 
+	public DmsProject createStudy(final String name, final String description, final int studyTypeId, final String programUUID, final String createdBy) {
+		final DmsProject dmsProject = new DmsProject();
+		dmsProject.setName(name);
+		dmsProject.setDescription(description);
+		dmsProject.setStudyType(this.studyTypeDAO.getById(studyTypeId));
+		dmsProject.setProgramUUID(programUUID);
+		dmsProject.setCreatedBy(createdBy);
+		this.dmsProjectDao.save(dmsProject);
+		this.dmsProjectDao.refresh(dmsProject);
+		return dmsProject;
+	}
+
 	public DmsProject createStudy(final String name, final String description, final int studyTypeId) {
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setName(name);
@@ -189,19 +203,25 @@ public class IntegrationTestDataInitializer {
 		experimentModel.setParent(parent);
 		this.experimentDao.saveOrUpdate(experimentModel);
 
-		final ExperimentProperty experimentProperty = new ExperimentProperty();
-		experimentProperty.setExperiment(experimentModel);
-		experimentProperty.setTypeId(TermId.PLOT_NO.getId());
-		experimentProperty.setValue(value);
-		experimentProperty.setRank(1);
-		this.experimentPropertyDao.saveOrUpdate(experimentProperty);
-		this.experimentDao.refresh(experimentModel);
+		if (!StringUtils.isEmpty(value)) {
+			final ExperimentProperty experimentProperty = new ExperimentProperty();
+			experimentProperty.setExperiment(experimentModel);
+			experimentProperty.setTypeId(TermId.PLOT_NO.getId());
+			experimentProperty.setValue(value);
+			experimentProperty.setRank(1);
+			this.experimentPropertyDao.saveOrUpdate(experimentProperty);
+			this.experimentDao.refresh(experimentModel);
+		}
 
 		return experimentModel;
 	}
 
 	public CVTerm createTrait(final String name) {
-		final CVTerm trait = CVTermTestDataInitializer.createTerm(name, CvId.VARIABLES.getId());
+		return this.createCVTerm(name, CvId.VARIABLES.getId());
+	}
+
+	public CVTerm createCVTerm(final String name, final Integer cvId) {
+		final CVTerm trait = CVTermTestDataInitializer.createTerm(name, cvId);
 		this.cvTermDao.save(trait);
 		return trait;
 	}
@@ -291,7 +311,6 @@ public class IntegrationTestDataInitializer {
 
 		this.projectPropertyDao.save(projectProperty);
 		this.projectPropertyDao.refresh(projectProperty);
-
 	}
 
 	public void addGeolocationProp(final Geolocation geolocation, final int type, final String value, final int rank) {
