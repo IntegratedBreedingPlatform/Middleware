@@ -498,7 +498,7 @@ public class Util {
 	public static boolean isDateMatchPattern(final String value, final String dateFormat) {
 		final String strPattern;
 		if (Util.DATE_AS_NUMBER_FORMAT_KSU.equals(dateFormat)) {// d/M/yy|yyyy
-			strPattern = "^(0?[1-9]|[12][0-9]|3[01])\\/(0?[1-9]|1[012])\\/((19|20)\\d\\d|(19|20)\\d\\d)";
+			strPattern = "^(0?[1-9]|[12][0-9]|3[01])\\/(0?[1-9]|1[012])\\/((19|20)\\d\\d|\\d\\d)";
 		} else {// yyyyyMMdd
 			strPattern = "^((19|20)\\d\\d)(0?[1-9]|1[012])(0?[1-9]|[12][0-9]|3[01])";
 		}
