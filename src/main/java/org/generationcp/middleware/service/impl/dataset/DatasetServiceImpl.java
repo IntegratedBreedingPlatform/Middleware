@@ -1178,6 +1178,11 @@ public class DatasetServiceImpl implements DatasetService {
 		this.daoFactory.getExperimentDao().updateEntryId(observationUnitIds, newEntryId);
 	}
 
+	@Override
+	public Long countObservationUnits(final Integer datasetId) {
+		return this.daoFactory.getExperimentDao().count(datasetId);
+	}
+
 	void addStudyVariablesToUnitRows(final List<ObservationUnitRow> observationUnits, final List<MeasurementVariable> studyVariables) {
 		for (final ObservationUnitRow observationUnitRow : observationUnits) {
 			for (final MeasurementVariable measurementVariable : studyVariables) {
