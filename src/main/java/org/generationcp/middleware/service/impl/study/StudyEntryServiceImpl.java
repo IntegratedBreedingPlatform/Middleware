@@ -81,11 +81,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public Boolean hasStudyEntries(final int studyId) {
-		return this.daoFactory.getStockDao().hasStudyEntries(studyId);
-	}
-
-	@Override
 	public Map<Integer, StudyEntryDto> getPlotEntriesMap(final int studyBusinessIdentifier, final Set<Integer> plotNos) {
 		return this.daoFactory.getStockDao().getPlotEntriesMap(studyBusinessIdentifier, plotNos);
 	}
