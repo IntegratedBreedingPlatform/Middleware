@@ -1,16 +1,20 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import com.google.common.collect.Lists;
+import org.generationcp.middleware.dao.dms.InstanceMetadata;
+import org.generationcp.middleware.service.api.user.ContactDto;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.dao.dms.InstanceMetadata;
-
-import com.google.common.collect.Lists;
-
+@AutoProperty
 public class StudySummary implements Serializable {
 
 	private static final long serialVersionUID = -515769070343491680L;
@@ -19,7 +23,11 @@ public class StudySummary implements Serializable {
 
 	private String name;
 
+	private String description;
+
 	private String type;
+
+	private String observationUnitId;
 
 	private List<String> years = Lists.newArrayList();
 
@@ -31,15 +39,17 @@ public class StudySummary implements Serializable {
 
 	private String programName;
 
-	private String startDate;
+	private Date startDate;
 
-	private String endDate;
+	private Date endDate;
 
 	private boolean active;
 
 	private List<InstanceMetadata> instanceMetaData = new ArrayList<>();
 
 	private Map<String, String> optionalInfo = new HashMap<>();
+
+	private List<ContactDto> contacts = new ArrayList<>();
 
 	public Integer getStudyDbid() {
 		return this.studyDbid;
@@ -56,6 +66,15 @@ public class StudySummary implements Serializable {
 
 	public StudySummary setName(final String name) {
 		this.name = name;
+		return this;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public StudySummary setDescription(final String description) {
+		this.description = description;
 		return this;
 	}
 
@@ -123,20 +142,20 @@ public class StudySummary implements Serializable {
 		return this;
 	}
 
-	public String getStartDate() {
+	public Date getStartDate() {
 		return this.startDate;
 	}
 
-	public StudySummary setStartDate(final String startDate) {
+	public StudySummary setStartDate(final Date startDate) {
 		this.startDate = startDate;
 		return this;
 	}
 
-	public String getEndDate() {
+	public Date getEndDate() {
 		return this.endDate;
 	}
 
-	public StudySummary setEndDate(final String endDate) {
+	public StudySummary setEndDate(final Date endDate) {
 		this.endDate = endDate;
 		return this;
 	}
@@ -163,8 +182,43 @@ public class StudySummary implements Serializable {
 		return this.instanceMetaData;
 	}
 
-	public void setInstanceMetaData(List<InstanceMetadata> instanceMetaData) {
-		this.instanceMetaData = instanceMetaData;
+	public List<ContactDto> getContacts() {
+		return this.contacts;
 	}
+
+	public StudySummary setContacts(final List<ContactDto> contacts) {
+		this.contacts = contacts;
+		return this;
+	}
+
+	public StudySummary setInstanceMetaData(final List<InstanceMetadata> instanceMetaData) {
+		this.instanceMetaData = instanceMetaData;
+		return this;
+	}
+
+	public String getObservationUnitId() {
+		return this.observationUnitId;
+	}
+
+	public StudySummary setObservationUnitId(final String observationUnitId) {
+		this.observationUnitId = observationUnitId;
+		return this;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
 
 }
