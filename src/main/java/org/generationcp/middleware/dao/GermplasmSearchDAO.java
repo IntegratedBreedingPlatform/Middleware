@@ -913,9 +913,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         }
 		addFilters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequest, preFilteredGids, programUUID);
 
-        final List<Integer> gids = sqlQuery.list();
+        final List<Integer> filteredGids = sqlQuery.list();
 
-        if (gids.isEmpty()) {
+        if (filteredGids.isEmpty()) {
             return Collections.EMPTY_LIST;
         }
 
@@ -924,13 +924,14 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
          * They are in separate queries instead of a subquery, because mysql cannot perform semijoin transformation with UNION
          * https://dev.mysql.com/doc/refman/5.6/en/semijoins.html
          */
+        final List<Integer> pageGids = new ArrayList<>(filteredGids);
+        pageGids.addAll(this.retrievePedigreeGids(filteredGids, germplasmSearchRequest));
 
-        gids.addAll(this.retrievePedigreeGids(gids, germplasmSearchRequest));
         if (germplasmSearchRequest.isIncludeGroupMembers()) {
-            gids.addAll(this.retrieveGIDGroupMemberResults(new HashSet<>(gids)));
+            pageGids.addAll(this.retrieveGIDGroupMemberResults(new HashSet<>(filteredGids)));
         }
 
-        return gids;
+        return pageGids;
     }
 
     public long countSearchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
@@ -1396,7 +1397,21 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
         final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
         sqlQuery.setParameterList("gids", gids);
+        final List<Integer> pedigreeGids = sqlQuery.list();
 
-        return sqlQuery.list();
+        final List<Integer> gidsWithPedigree = new ArrayList<>(gids);
+        gidsWithPedigree.addAll(pedigreeGids);
+        pedigreeGids.addAll(this.retrieveOtherProgenitors(gidsWithPedigree));
+
+        return pedigreeGids;
+    }
+
+    private List<Integer> retrieveOtherProgenitors(final List<Integer> gids) {
+        if (gids == null || gids.isEmpty()) {
+            return Collections.EMPTY_LIST;
+		}
+        return this.getSession().createSQLQuery("select p.pid from progntrs p where p.gid in (:gids)") //
+            .setParameterList("gids", gids) //
+            .list();
     }
 }
