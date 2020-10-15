@@ -503,7 +503,7 @@ public class Util {
 	 */
 	public static Message validateVariableValues(final MeasurementVariable variable, final String value) {
 
-		if ((variable.getDataTypeId() != null && variable.getDataTypeId() == DataType.NUMERIC_VARIABLE.getId()) || variable.getDataType().equals(DataType.NUMERIC_VARIABLE.getDataTypeCode())) {
+		if ((variable.getDataTypeId() != null && variable.getDataTypeId().equals(DataType.NUMERIC_VARIABLE.getId())) || variable.getDataType().equals(DataType.NUMERIC_VARIABLE.getDataTypeCode())) {
 			if (!StringUtils.isNumeric(value)) {
 				return new Message(Constants.INVALID_NUMERIC_VALUE_MESSAGE, variable.getLabel(), value);
 			}
