@@ -42,6 +42,7 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.TimerWatch;
+import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -1098,6 +1099,16 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final Map<String, List<Message>> errors = new HashMap<>();
 
 		this.checkForExistingTrialInstance(workbook, errors, programUUID);
+
+		// Validate Trial Instance Value
+		if (workbook.getAllVariables() != null) {
+			final List<Message> messages = Util.validateVariableValues(workbook.getAllVariables(), TermId.TRIAL_INSTANCE_FACTOR.getId());
+			if (errors.containsKey(Constants.INVALID_TRIAL)) {
+				errors.get(Constants.INVALID_TRIAL).addAll(messages);
+			} else {
+				errors.put(Constants.INVALID_TRIAL, messages);
+			}
+		}
 
 		// the following code is a workaround versus the current state
 		// management in the ETL Wizard

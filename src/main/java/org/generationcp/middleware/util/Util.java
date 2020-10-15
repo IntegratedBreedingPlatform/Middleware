@@ -23,6 +23,9 @@ package org.generationcp.middleware.util;
 
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.etl.Constants;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +44,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * A utility class used to get primitive values of wrapper classes, check for null values, and list functions such as getting the max,
@@ -64,7 +68,7 @@ public class Util {
 
 	/**
 	 * Get the boolean value of <code>value</code>.
-	 * 
+	 *
 	 * @param value
 	 * @return the boolean value of <code>value</code>. If <code>value</code> is null, this method returns false.
 	 */
@@ -78,7 +82,7 @@ public class Util {
 
 	/**
 	 * Test whether <code>obj</code> is equal to one of the specified objects.
-	 * 
+	 *
 	 * @param obj
 	 * @param objs
 	 * @return true if the obj is one of the objects
@@ -99,7 +103,7 @@ public class Util {
 
 	/**
 	 * Returns true if all values are null.
-	 * 
+	 *
 	 * @param args
 	 * @return true if all values are null.
 	 */
@@ -114,7 +118,7 @@ public class Util {
 
 	/**
 	 * Test whether <code>value</code> is equal to all of the specified values.
-	 * 
+	 *
 	 * @param value
 	 * @param values
 	 * @return true if value is equal to all values.
@@ -135,7 +139,7 @@ public class Util {
 
 	/**
 	 * Test whether the specified list is "empty". A <code>null</code> value is considered "empty".
-	 * 
+	 *
 	 * @param list
 	 * @return true if the given list is empty.
 	 */
@@ -145,7 +149,7 @@ public class Util {
 
 	/**
 	 * Returns the maximum among the input values.
-	 * 
+	 *
 	 * @param value1
 	 * @param values
 	 * @return Maximum of the given values.
@@ -164,7 +168,7 @@ public class Util {
 
 	/**
 	 * Makes the given objects in the list unmodifiable.
-	 * 
+	 *
 	 * @param objects
 	 * @return the read-only list.
 	 */
@@ -231,7 +235,7 @@ public class Util {
 
 	/**
 	 * Returns the current date in format "yyyyMMdd" as Integer
-	 * 
+	 *
 	 * @return current date as Integer
 	 */
 	public static Integer getCurrentDateAsIntegerValue() {
@@ -240,7 +244,7 @@ public class Util {
 
 	/**
 	 * Returns the current date in format "yyyyMMdd" as Long
-	 * 
+	 *
 	 * @return current date as Long
 	 */
 	public static Long getCurrentDateAsLongValue() {
@@ -249,7 +253,7 @@ public class Util {
 
 	/**
 	 * Returns the current date in format "yyyyMMdd" as String
-	 * 
+	 *
 	 * @return current date as String
 	 */
 	public static String getCurrentDateAsStringValue() {
@@ -258,7 +262,7 @@ public class Util {
 
 	/**
 	 * Returns the current date
-	 * 
+	 *
 	 * @return current date as Date
 	 */
 	public static Date getCurrentDate() {
@@ -267,7 +271,7 @@ public class Util {
 
 	/**
 	 * Returns the calendar instance
-	 * 
+	 *
 	 * @return calendar instance
 	 */
 	public static Calendar getCalendarInstance() {
@@ -277,7 +281,7 @@ public class Util {
 
 	/**
 	 * Returns the current date in the specified format as String
-	 * 
+	 *
 	 * @return current date as String
 	 */
 	public static String getCurrentDateAsStringValue(final String format) {
@@ -286,7 +290,7 @@ public class Util {
 
 	/**
 	 * Returns the SimpleDateFormat of the current display locale
-	 * 
+	 *
 	 * @return SimpleDateFormat
 	 */
 	public static SimpleDateFormat getSimpleDateFormat(final String format) {
@@ -298,7 +302,7 @@ public class Util {
 
 	/**
 	 * Returns the date in the specified format as String
-	 * 
+	 *
 	 * @return date in the specified format as String
 	 */
 	public static String formatDateAsStringValue(final Date date, final String format) {
@@ -317,7 +321,7 @@ public class Util {
 
 	/**
 	 * Returns the date object from the specified format
-	 * 
+	 *
 	 * @return date object
 	 * @throws ParseException
 	 */
@@ -488,6 +492,21 @@ public class Util {
 			isLeapYear = false;
 		}
 		return isLeapYear;
+	}
+
+	public static List<Message> validateVariableValues(final List<MeasurementVariable> variables, final Integer termId) {
+		final List<MeasurementVariable> selectedTerm = variables.stream().filter(measurementVariable -> measurementVariable.getTermId() == termId).collect(Collectors.toList());
+		final List<Message> errorMessages = new ArrayList<>();
+		if (selectedTerm != null && !selectedTerm.isEmpty()) {
+			for (final MeasurementVariable variable : selectedTerm) {
+				if (variable.getDataTypeId() != null && variable.getDataTypeId() == DataType.NUMERIC_VARIABLE.getId() || variable.getDataType().equals(DataType.NUMERIC_VARIABLE.getDataTypeCode())) {
+					if (!StringUtils.isNumeric(variable.getValue())) {
+						errorMessages.add(new Message(Constants.INVALID_NUMERIC_VALUE_MESSAGE, variable.getLabel(), variable.getValue()));
+					}
+				}
+			}
+		}
+		return errorMessages;
 	}
 
 }
