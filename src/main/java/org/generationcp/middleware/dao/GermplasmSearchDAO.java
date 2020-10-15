@@ -1163,6 +1163,17 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             paramBuilder.setParameter("programUUID", programUUID);
         }
 
+        // TODO improve perf (brachiaria - 6M germplsm - Faster if combined with other filters)
+        //  - in pre-group by: ~ 1.8
+        //  - in post-group by (using AVAILABLE column):  - 9.8 min
+        final Boolean withInventoryOnly = germplasmSearchRequest.getWithInventoryOnly();
+        if (Boolean.TRUE.equals(withInventoryOnly)) {
+            paramBuilder.append(" and exists(SELECT l.eid as GID from ims_lot l "
+                + " INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' "
+                + " WHERE l.eid = g.gid"
+                + " GROUP BY l.eid HAVING SUM(t.trnqty) > 0 )");
+        }
+
         if (preFilteredGids != null && !preFilteredGids.isEmpty()) {
             paramBuilder.append(" and g.gid in (:preFilteredGids) ");
             paramBuilder.setParameterList("preFilteredGids", preFilteredGids);
@@ -1170,13 +1181,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
         paramBuilder.append(" group by g.gid having 1 = 1 ");
 
-        // Post-group-by filtering
+        // Post-group-by filtering section
 
-        // TODO improve perf (brachiaria - 6M germplsm - 3.8 min -  Faster if combined with other filters)
-        final Boolean withInventoryOnly = germplasmSearchRequest.getWithInventoryOnly();
-        if (Boolean.TRUE.equals(withInventoryOnly)) {
-            paramBuilder.append(" and (" + AVAIL_BALANCE + " > 0 or " + AVAIL_BALANCE + " = '" + MIXED_UNITS_LABEL + "')");
-        }
+        // withInventoryOnly moved to pre-group-by
 
     }
 
