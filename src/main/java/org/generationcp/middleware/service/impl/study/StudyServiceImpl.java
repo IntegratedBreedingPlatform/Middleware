@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -563,13 +564,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 				for (final ProjectProperty prop : dmsProject.getProperties()) {
 					final Integer variableId = prop.getVariableId();
 					final Optional<DataType> dataType = this.ontologyVariableDataManager.getDataType(prop.getVariableId());
-					final String value;
-					if (dataType.isPresent() && DataType.CATEGORICAL_VARIABLE.getId().equals(dataType.get().getId())) {
-						final Integer categoricalId = StringUtils.isNotBlank(prop.getValue()) ? Integer.parseInt(prop.getValue()) : 0;
+					String value = prop.getValue();
+					if (dataType.isPresent() && DataType.CATEGORICAL_VARIABLE.getId().equals(dataType.get().getId())
+							&& StringUtils.isNotBlank(value) && NumberUtils.isDigits(value)) {
+						final Integer categoricalId = Integer.parseInt(value);
 						value = this.ontologyVariableDataManager
 							.retrieveVariableCategoricalValue(dmsProject.getProgramUUID(), prop.getVariableId(), categoricalId);
-					} else {
-						value = prop.getValue();
 					}
 
 					if (variableId.equals(TermId.SEASON_VAR_TEXT.getId())) {
