@@ -50,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1101,13 +1102,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		this.checkForExistingTrialInstance(workbook, errors, programUUID);
 
 		// Validate Trial Instance Value
-		if (workbook.getAllVariables() != null) {
-			final List<Message> messages = Util.validateVariableValues(workbook.getAllVariables(), TermId.TRIAL_INSTANCE_FACTOR.getId());
-			if (errors.containsKey(Constants.INVALID_TRIAL)) {
-				errors.get(Constants.INVALID_TRIAL).addAll(messages);
-			} else {
-				errors.put(Constants.INVALID_TRIAL, messages);
-			}
+		if (workbook.getObservations() != null) {
+			this.validateTrialInstanceValueInObservation(workbook.getObservations(), errors);
 		}
 
 		// the following code is a workaround versus the current state
@@ -1199,5 +1195,22 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	public void setMaxRowLimit(final int maxRowLimit) {
 		this.maxRowLimit = maxRowLimit;
+	}
+
+	private void validateTrialInstanceValueInObservation (final List<MeasurementRow> observations, final Map<String, List<Message>> errors) {
+		for (final MeasurementRow row : observations) {
+			for (final MeasurementData data : row.getDataList()) {
+				if (data.getMeasurementVariable().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+					final Message message = Util.validateVariableValues(data.getMeasurementVariable(), data.getValue());
+					if (message != null) {
+						if (errors.containsKey(Constants.INVALID_TRIAL)) {
+							errors.get(Constants.INVALID_TRIAL).add(message);
+						} else {
+							errors.put(Constants.INVALID_TRIAL, Arrays.asList(message));
+						}
+					}
+				}
+			}
+		}
 	}
 }

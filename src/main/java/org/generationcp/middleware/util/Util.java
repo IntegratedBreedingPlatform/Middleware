@@ -25,6 +25,7 @@ import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.etl.Constants;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.slf4j.Logger;
@@ -494,19 +495,21 @@ public class Util {
 		return isLeapYear;
 	}
 
-	public static List<Message> validateVariableValues(final List<MeasurementVariable> variables, final Integer termId) {
-		final List<MeasurementVariable> selectedTerm = variables.stream().filter(measurementVariable -> measurementVariable.getTermId() == termId).collect(Collectors.toList());
-		final List<Message> errorMessages = new ArrayList<>();
-		if (selectedTerm != null && !selectedTerm.isEmpty()) {
-			for (final MeasurementVariable variable : selectedTerm) {
-				if (variable.getDataTypeId() != null && variable.getDataTypeId() == DataType.NUMERIC_VARIABLE.getId() || variable.getDataType().equals(DataType.NUMERIC_VARIABLE.getDataTypeCode())) {
-					if (!StringUtils.isNumeric(variable.getValue())) {
-						errorMessages.add(new Message(Constants.INVALID_NUMERIC_VALUE_MESSAGE, variable.getLabel(), variable.getValue()));
-					}
-				}
+	/**
+	 * Use to validate measurementVariable if using correct value for it's dataType
+	 * @param measurementVariable
+	 * @param value
+	 * @return Message object
+	 */
+	public static Message validateVariableValues(final MeasurementVariable variable, final String value) {
+
+		if ((variable.getDataTypeId() != null && variable.getDataTypeId() == DataType.NUMERIC_VARIABLE.getId()) || variable.getDataType().equals(DataType.NUMERIC_VARIABLE.getDataTypeCode())) {
+			if (!StringUtils.isNumeric(value)) {
+				return new Message(Constants.INVALID_NUMERIC_VALUE_MESSAGE, variable.getLabel(), value);
 			}
 		}
-		return errorMessages;
+
+		return null;
 	}
 
 }
