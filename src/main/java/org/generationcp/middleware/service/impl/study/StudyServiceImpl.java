@@ -43,6 +43,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
+import org.olap4j.metadata.Datatype;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -558,14 +559,20 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final Set<Integer> studyIds = studiesMap.keySet();
 		if (!CollectionUtils.isEmpty(studyIds)) {
 			final List<DmsProject> projects = this.daoFactory.getDmsProjectDAO().getByIds(studyIds);
+			final Map<Integer, Optional<DataType>> variableDataTypeMap = Maps.newHashMap();
+			// Add study settings in optionalInfo map
 			for (final DmsProject dmsProject : projects) {
 				final StudySummary studySummary = studiesMap.get(dmsProject.getProjectId());
 				final Map<String, String> additionalProps = Maps.newHashMap();
 				for (final ProjectProperty prop : dmsProject.getProperties()) {
 					final Integer variableId = prop.getVariableId();
-					final Optional<DataType> dataType = this.ontologyVariableDataManager.getDataType(prop.getVariableId());
+					if (!variableDataTypeMap.containsKey(variableId)) {
+						final Optional<DataType> dataType = this.ontologyVariableDataManager.getDataType(prop.getVariableId());
+						variableDataTypeMap.put(variableId, dataType);
+					}
+					final Optional<DataType> variableDataType = variableDataTypeMap.get(variableId);
 					String value = prop.getValue();
-					if (dataType.isPresent() && DataType.CATEGORICAL_VARIABLE.getId().equals(dataType.get().getId())
+					if (variableDataType.isPresent() && DataType.CATEGORICAL_VARIABLE.getId().equals(variableDataType.get().getId())
 							&& StringUtils.isNotBlank(value) && NumberUtils.isDigits(value)) {
 						final Integer categoricalId = Integer.parseInt(value);
 						value = this.ontologyVariableDataManager
