@@ -23,6 +23,7 @@ package org.generationcp.middleware.util;
 
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.xmlbeans.impl.regex.Match;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,8 @@ public class Util {
 	public static final String FRONTEND_DATE_FORMAT_3 = "dd/MM/yyyy";
 	public static final String FRONTEND_TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
 	public static final String DATE_AS_NUMBER_FORMAT_KSU = "d/M/yy";
-	public static Pattern pattern;
+	public static Pattern ksuDatePattern = Pattern.compile("^(0?[1-9]|[12][0-9]|3[01])\\/(0?[1-9]|1[012])\\/((19|20)\\d\\d|\\d\\d)");
+	public static Pattern defaultDatePattern = Pattern.compile("^((19|20)\\d\\d)(0?[1-9]|1[012])(0?[1-9]|[12][0-9]|3[01])");
 
 	private Util() {
 		// make a private constructor to hide the implicit public one
@@ -497,17 +499,13 @@ public class Util {
 
 
 	public static boolean isDateMatchPattern(final String value, final String dateFormat) {
-		final String strPattern;
 		if (Util.DATE_AS_NUMBER_FORMAT_KSU.equals(dateFormat)) {// d/M/yy|yyyy
-			strPattern = "^(0?[1-9]|[12][0-9]|3[01])\\/(0?[1-9]|1[012])\\/((19|20)\\d\\d|\\d\\d)";
+			final Matcher matcher = ksuDatePattern.matcher(value);
+			return matcher.matches();
 		} else {// yyyyyMMdd
-			strPattern = "^((19|20)\\d\\d)(0?[1-9]|1[012])(0?[1-9]|[12][0-9]|3[01])";
+			final Matcher matcher = defaultDatePattern.matcher(value);
+			return matcher.matches();
 		}
-		if (pattern == null || pattern.pattern().equals(strPattern)) {
-			pattern = Pattern.compile(strPattern);
-		}
-		final Matcher matcher =  pattern.matcher(value);
-		return matcher.matches();
 	}
 
 	public static Date tryParseDateAccurately(final String date, final String format) {
