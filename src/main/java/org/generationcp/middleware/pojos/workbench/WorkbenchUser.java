@@ -410,4 +410,28 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		}
 		return false;
 	}
+
+	/**
+	 * @param cropName
+	 * @return True if the user has only program role types for the specified cropName
+	 */
+	public boolean hasOnlyProgramRoles(final String cropName) {
+		if (this.roles == null) {
+			return false;
+		}
+		boolean hasProgramRole = false;
+		for (final UserRole userRole : this.roles) {
+			final Integer roleTypeId = userRole.getRole().getRoleType().getId();
+			if (roleTypeId == null || roleTypeId.equals(RoleType.INSTANCE.getId())) {
+				return false;
+			} else if (userRole.getCropType().getCropName().equals(cropName)) {
+				if (roleTypeId.equals(RoleType.CROP.getId())) {
+					return false;
+				} else if (roleTypeId.equals(RoleType.PROGRAM.getId())) {
+					hasProgramRole = true;
+				}
+			}
+		}
+		return hasProgramRole;
+	}
 }

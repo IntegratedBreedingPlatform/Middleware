@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.germplasm.search;
 
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 
 	private final DaoFactory daoFactory;
 
-	public GermplasmSearchServiceImpl(final HibernateSessionPerRequestProvider sessionProvider) {
+	public GermplasmSearchServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 

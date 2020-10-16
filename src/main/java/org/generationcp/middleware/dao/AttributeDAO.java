@@ -11,9 +11,11 @@
 
 package org.generationcp.middleware.dao;
 
-import org.generationcp.middleware.domain.germplasm.AttributeDTO;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -24,6 +26,7 @@ import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -45,6 +48,34 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			throw new MiddlewareQueryException("Error with getByGID(gid=" + gid + ") query from Attributes: " + e.getMessage(), e);
 		}
 		return toReturn;
+	}
+
+	public List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(final String query) {
+		if (StringUtils.isBlank(query)) {
+			return Collections.EMPTY_LIST;
+		}
+		try {
+			// Attributes will be migrated out of user defined fields later
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("SELECT " //
+				+ "   u.fcode AS code," //
+				+ "   u.fldno AS id," //
+				+ "   u.fname AS name" //
+				+ " FROM  udflds u " //
+				+ " WHERE u.ftable = '" + UDTableType.ATRIBUTS_ATTRIBUTE.getTable() + "'" //
+				+ "   and u.ftype = '" + UDTableType.ATRIBUTS_ATTRIBUTE.getType() + "'"
+				+ "   and (u.fname like :fname or u.fcode like :fcode)"
+				+ " LIMIT 100 ");
+			sqlQuery.setParameter("fname", '%' + query + '%');
+			sqlQuery.setParameter("fcode", '%' + query + '%');
+			sqlQuery.addScalar("code");
+			sqlQuery.addScalar("id");
+			sqlQuery.addScalar("name");
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(org.generationcp.middleware.api.attribute.AttributeDTO.class));
+
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with searchAttributes(query=" + query + "): " + e.getMessage(), e);
+		}
 	}
 
 	public List<Attribute> getAttributeValuesGIDList(final List<Integer> gidList) {

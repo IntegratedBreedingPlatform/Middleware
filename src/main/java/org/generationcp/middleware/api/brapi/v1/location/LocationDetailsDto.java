@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.service.api.location;
+package org.generationcp.middleware.api.brapi.v1.location;
 
 import java.io.Serializable;
 import java.util.Comparator;

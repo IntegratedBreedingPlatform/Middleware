@@ -106,10 +106,22 @@ public class DaoFactory {
 		return germplasmListDataDao;
 	}
 
+	public AttributeDAO getAttributeDAO() {
+		final AttributeDAO attributeDAO = new AttributeDAO();
+		attributeDAO.setSession(this.sessionProvider.getSession());
+		return attributeDAO;
+	}
+
 	public LocationDAO getLocationDAO() {
 		final LocationDAO locationDao = new LocationDAO();
 		locationDao.setSession(this.sessionProvider.getSession());
 		return locationDao;
+	}
+
+	public MethodDAO getMethodDAO() {
+		final MethodDAO methodDAO = new MethodDAO();
+		methodDAO.setSession(this.sessionProvider.getSession());
+		return methodDAO;
 	}
 
 	public PhenotypeDao getPhenotypeDAO() {
@@ -210,6 +222,12 @@ public class DaoFactory {
 		final CountryDAO countryDAO = new CountryDAO();
 		countryDAO.setSession(this.sessionProvider.getSession());
 		return countryDAO;
+	}
+
+	public UserDefinedFieldDAO getUserDefinedFieldDAO() {
+		final UserDefinedFieldDAO userDefinedFieldDAO = new UserDefinedFieldDAO();
+		userDefinedFieldDAO.setSession(this.sessionProvider.getSession());
+		return userDefinedFieldDAO;
 	}
 
 	public ProgramFavoriteDAO getProgramFavoriteDao() {
