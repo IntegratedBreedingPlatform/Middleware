@@ -575,8 +575,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 					if (variableDataType.isPresent() && DataType.CATEGORICAL_VARIABLE.getId().equals(variableDataType.get().getId())
 							&& StringUtils.isNotBlank(value) && NumberUtils.isDigits(value)) {
 						final Integer categoricalId = Integer.parseInt(value);
-						value = this.ontologyVariableDataManager
+						final String categoricalValue = this.ontologyVariableDataManager
 							.retrieveVariableCategoricalValue(dmsProject.getProgramUUID(), prop.getVariableId(), categoricalId);
+						if (!StringUtils.isEmpty(categoricalValue)) {
+							value = categoricalValue;
+						}
 					}
 
 					if (variableId.equals(TermId.SEASON_VAR_TEXT.getId())) {
