@@ -1201,12 +1201,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		for (final MeasurementRow row : observations) {
 			for (final MeasurementData data : row.getDataList()) {
 				if (data.getMeasurementVariable().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-					final Message message = Util.validateVariableValues(data.getMeasurementVariable(), data.getValue());
-					if (message != null) {
+					final Optional<Message> message = Util.validateVariableValues(data.getMeasurementVariable(), data.getValue());
+					if (message.isPresent()) {
 						if (errors.containsKey(Constants.INVALID_TRIAL)) {
-							errors.get(Constants.INVALID_TRIAL).add(message);
+							errors.get(Constants.INVALID_TRIAL).add(message.get());
 						} else {
-							errors.put(Constants.INVALID_TRIAL, Arrays.asList(message));
+							errors.put(Constants.INVALID_TRIAL, Arrays.asList(message.get()));
 						}
 					}
 				}

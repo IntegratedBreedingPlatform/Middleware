@@ -22,10 +22,10 @@
 package org.generationcp.middleware.util;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.etl.Constants;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.slf4j.Logger;
@@ -501,15 +501,15 @@ public class Util {
 	 * @param value
 	 * @return Message object
 	 */
-	public static Message validateVariableValues(final MeasurementVariable variable, final String value) {
+	public static Optional<Message> validateVariableValues(final MeasurementVariable variable, final String value) {
 
 		if ((variable.getDataTypeId() != null && variable.getDataTypeId().equals(DataType.NUMERIC_VARIABLE.getId())) || variable.getDataType().equals(DataType.NUMERIC_VARIABLE.getDataTypeCode())) {
 			if (!StringUtils.isNumeric(value)) {
-				return new Message(Constants.INVALID_NUMERIC_VALUE_MESSAGE, variable.getLabel(), value);
+				return Optional.of(new Message(Constants.INVALID_NUMERIC_VALUE_MESSAGE, variable.getLabel(), value));
 			}
 		}
 
-		return null;
+		return Optional.absent();
 	}
 
 }
