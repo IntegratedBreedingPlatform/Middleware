@@ -989,6 +989,18 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
     private static void addFilters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequest germplasmSearchRequest,
         final List<Integer> preFilteredGids, final String programUUID) {
 
+        // Pre-WHERE filtering
+
+        final Boolean withInventoryOnly = germplasmSearchRequest.getWithInventoryOnly();
+        if (Boolean.TRUE.equals(withInventoryOnly)) {
+            paramBuilder.append(" inner join (SELECT l.eid as GID from ims_lot l INNER JOIN ims_transaction t on l.lotid = t.lotid "
+                + "AND l.etype = 'GERMPLSM' GROUP BY l.eid HAVING SUM(t.trnqty) > 0 )"
+                + " GermplasmWithInventory ON GermplasmWithInventory.GID = g.gid");
+        }
+
+        // WHERE filtering section
+        // TODO verify which filters could perform better in the main join
+
         paramBuilder.append(" where 1 = 1 " + GERMPLASM_NOT_DELETED_CLAUSE);
 
         final SqlTextFilter nameFilter = germplasmSearchRequest.getNameFilter();
@@ -1163,17 +1175,6 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             paramBuilder.setParameter("programUUID", programUUID);
         }
 
-        // TODO improve perf (brachiaria - 6M germplsm - Faster if combined with other filters)
-        //  - in pre-group by: ~ 1.8
-        //  - in post-group by (using AVAILABLE column):  - 9.8 min
-        final Boolean withInventoryOnly = germplasmSearchRequest.getWithInventoryOnly();
-        if (Boolean.TRUE.equals(withInventoryOnly)) {
-            paramBuilder.append(" and exists(SELECT l.eid as GID from ims_lot l "
-                + " INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' "
-                + " WHERE l.eid = g.gid"
-                + " GROUP BY l.eid HAVING SUM(t.trnqty) > 0 )");
-        }
-
         if (preFilteredGids != null && !preFilteredGids.isEmpty()) {
             paramBuilder.append(" and g.gid in (:preFilteredGids) ");
             paramBuilder.setParameterList("preFilteredGids", preFilteredGids);
@@ -1183,7 +1184,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
         // Post-group-by filtering section
 
-        // withInventoryOnly moved to pre-group-by
+        // withInventoryOnly moved to pre-where
 
     }
 
