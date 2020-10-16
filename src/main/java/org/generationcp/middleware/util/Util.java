@@ -499,13 +499,13 @@ public class Util {
 
 
 	public static boolean isDateMatchPattern(final String value, final String dateFormat) {
+		final Matcher matcher;
 		if (Util.DATE_AS_NUMBER_FORMAT_KSU.equals(dateFormat)) {// d/M/yy|yyyy
-			final Matcher matcher = ksuDatePattern.matcher(value);
-			return matcher.matches();
+			matcher = ksuDatePattern.matcher(value);
 		} else {// yyyyyMMdd
-			final Matcher matcher = defaultDatePattern.matcher(value);
-			return matcher.matches();
+			matcher = defaultDatePattern.matcher(value);
 		}
+		return matcher.matches();
 	}
 
 	public static Date tryParseDateAccurately(final String date, final String format) {
