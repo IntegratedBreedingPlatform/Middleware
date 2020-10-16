@@ -61,6 +61,7 @@ public class Util {
 	public static final String FRONTEND_DATE_FORMAT_3 = "dd/MM/yyyy";
 	public static final String FRONTEND_TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
 	public static final String DATE_AS_NUMBER_FORMAT_KSU = "d/M/yy";
+	public static Pattern pattern;
 
 	private Util() {
 		// make a private constructor to hide the implicit public one
@@ -502,7 +503,9 @@ public class Util {
 		} else {// yyyyyMMdd
 			strPattern = "^((19|20)\\d\\d)(0?[1-9]|1[012])(0?[1-9]|[12][0-9]|3[01])";
 		}
-		final Pattern pattern = Pattern.compile(strPattern);
+		if (pattern == null || pattern.pattern().equals(strPattern)) {
+			pattern = Pattern.compile(strPattern);
+		}
 		final Matcher matcher =  pattern.matcher(value);
 		return matcher.matches();
 	}
