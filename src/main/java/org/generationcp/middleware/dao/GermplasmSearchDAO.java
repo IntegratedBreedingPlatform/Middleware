@@ -993,8 +993,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
         final Boolean withInventoryOnly = germplasmSearchRequest.getWithInventoryOnly();
         if (Boolean.TRUE.equals(withInventoryOnly)) {
-            paramBuilder.append(" inner join (SELECT l.eid as GID from ims_lot l INNER JOIN ims_transaction t on l.lotid = t.lotid "
-                + "AND l.etype = 'GERMPLSM' GROUP BY l.eid HAVING SUM(t.trnqty) > 0 )"
+            paramBuilder.append(" inner join (SELECT l.eid as GID from ims_lot l "
+                + " INNER JOIN ims_transaction t on l.lotid = t.lotid and t.trnstat <> " + STATUS_DELETED
+                + " AND l.etype = 'GERMPLSM' GROUP BY l.eid HAVING SUM(t.trnqty) > 0 )"
                 + " GermplasmWithInventory ON GermplasmWithInventory.GID = g.gid");
         }
 
@@ -1095,31 +1096,51 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             paramBuilder.setParameter("reference", reference);
         }
 
+        final List<Integer> studyOfOriginIds = germplasmSearchRequest.getStudyOfOriginIds();
+        if (studyOfOriginIds != null) {
+            paramBuilder.append(" and exists(select 1" //
+                + " from project p" //
+                + "  inner join germplasm_study_source gss on gss.project_id = p.project_id " //
+                + " where p.project_id in (:studyOfOriginIds) and gss.gid = g.gid) \n"); //
+            paramBuilder.setParameterList("studyOfOriginIds", studyOfOriginIds);
+        }
+
+        final List<Integer> studyOfUseIds = germplasmSearchRequest.getStudyOfUseIds();
+        if (studyOfUseIds != null) {
+            paramBuilder.append(" and exists(select 1" //
+                + " from project p" //
+                + "	 inner join project plotdata on p.project_id = plotdata.study_id" //
+                + "  inner join nd_experiment nde on plotdata.project_id = nde.project_id" //
+                + "  inner join stock s on nde.stock_id = s.stock_id " //
+                + " where p.project_id in (:studyOfUseIds) and s.dbxref_id = g.gid) \n"); //
+            paramBuilder.setParameterList("studyOfUseIds", studyOfUseIds);
+        }
+
         final List<Integer> harvestingStudyIds = germplasmSearchRequest.getHarvestingStudyIds();
         if (harvestingStudyIds != null) {
             paramBuilder.append(" and exists(select 1" //
-                + " from project filter_p" //
-                + "	 inner join project filter_plotdata on filter_p.project_id = filter_plotdata.study_id" //
-                + "  inner join nd_experiment filter_nde on filter_plotdata.project_id = filter_nde.project_id" //
-                + "  inner join ims_experiment_transaction filter_iet on filter_nde.nd_experiment_id = filter_iet.nd_experiment_id" //
-                + "   and filter_iet.type = " + ExperimentTransactionType.HARVESTING.getId() //
-                + "  inner join ims_transaction filter_transaction on filter_iet.trnid = filter_transaction.trnid" //
-                + "  inner join ims_lot filter_lot on filter_transaction.lotid = filter_lot.lotid" //
-                + " where filter_p.project_id in (:harvestingStudyIds) and filter_lot.lotid = gl.lotid) \n"); //
+                + " from project p" //
+                + "	 inner join project plotdata on p.project_id = plotdata.study_id" //
+                + "  inner join nd_experiment nde on plotdata.project_id = nde.project_id" //
+                + "  inner join ims_experiment_transaction iet on nde.nd_experiment_id = iet.nd_experiment_id" //
+                + "   and iet.type = " + ExperimentTransactionType.HARVESTING.getId() //
+                + "  inner join ims_transaction tr on iet.trnid = tr.trnid and tr.trnstat <> " + STATUS_DELETED //
+                + "  inner join ims_lot lot on tr.lotid = lot.lotid" //
+                + " where p.project_id in (:harvestingStudyIds) and lot.lotid = gl.lotid) \n"); //
             paramBuilder.setParameterList("harvestingStudyIds", harvestingStudyIds);
         }
 
         final List<Integer> plantingStudyIds = germplasmSearchRequest.getPlantingStudyIds();
         if (plantingStudyIds != null) {
             paramBuilder.append(" and exists(select 1" //
-                + " from project filter_p" //
-                + "	 inner join project filter_plotdata on filter_p.project_id = filter_plotdata.study_id" //
-                + "  inner join nd_experiment filter_nde on filter_plotdata.project_id = filter_nde.project_id" //
-                + "  inner join ims_experiment_transaction filter_iet on filter_nde.nd_experiment_id = filter_iet.nd_experiment_id" //
-                + "   and filter_iet.type = " + ExperimentTransactionType.PLANTING.getId() //
-                + "  inner join ims_transaction filter_transaction on filter_iet.trnid = filter_transaction.trnid" //
-                + "  inner join ims_lot filter_lot on filter_transaction.lotid = filter_lot.lotid" //
-                + " where filter_p.project_id in (:plantingStudyIds) and filter_lot.lotid = gl.lotid) \n"); //
+                + " from project p" //
+                + "	 inner join project plotdata on p.project_id = plotdata.study_id" //
+                + "  inner join nd_experiment nde on plotdata.project_id = nde.project_id" //
+                + "  inner join ims_experiment_transaction iet on nde.nd_experiment_id = iet.nd_experiment_id" //
+                + "   and iet.type = " + ExperimentTransactionType.PLANTING.getId() //
+                + "  inner join ims_transaction tr on iet.trnid = tr.trnid and tr.trnstat <> " + STATUS_DELETED //
+                + "  inner join ims_lot lot on tr.lotid = lot.lotid" //
+                + " where p.project_id in (:plantingStudyIds) and lot.lotid = gl.lotid) \n"); //
             paramBuilder.setParameterList("plantingStudyIds", plantingStudyIds);
         }
 
