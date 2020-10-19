@@ -55,8 +55,10 @@ public class GermplasmSearchRequest {
 	private String locationOfOrigin;
 	private String locationOfUse;
 	private Integer reference;
-	private List<Integer> harvestingStudyIds;
+	private List<Integer> studyOfUseIds;
+	private List<Integer> studyOfOriginIds;
 	private List<Integer> plantingStudyIds;
+	private List<Integer> harvestingStudyIds;
 	private String breedingMethodName;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date harvestDateFrom;
@@ -171,12 +173,20 @@ public class GermplasmSearchRequest {
 		this.reference = reference;
 	}
 
-	public List<Integer> getHarvestingStudyIds() {
-		return this.harvestingStudyIds;
+	public List<Integer> getStudyOfUseIds() {
+		return this.studyOfUseIds;
 	}
 
-	public void setHarvestingStudyIds(final List<Integer> harvestingStudyIds) {
-		this.harvestingStudyIds = harvestingStudyIds;
+	public void setStudyOfUseIds(final List<Integer> studyOfUseIds) {
+		this.studyOfUseIds = studyOfUseIds;
+	}
+
+	public List<Integer> getStudyOfOriginIds() {
+		return this.studyOfOriginIds;
+	}
+
+	public void setStudyOfOriginIds(final List<Integer> studyOfOriginIds) {
+		this.studyOfOriginIds = studyOfOriginIds;
 	}
 
 	public List<Integer> getPlantingStudyIds() {
@@ -185,6 +195,14 @@ public class GermplasmSearchRequest {
 
 	public void setPlantingStudyIds(final List<Integer> plantingStudyIds) {
 		this.plantingStudyIds = plantingStudyIds;
+	}
+
+	public List<Integer> getHarvestingStudyIds() {
+		return this.harvestingStudyIds;
+	}
+
+	public void setHarvestingStudyIds(final List<Integer> harvestingStudyIds) {
+		this.harvestingStudyIds = harvestingStudyIds;
 	}
 
 	public Date getHarvestDateFrom() {

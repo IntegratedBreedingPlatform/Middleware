@@ -17,12 +17,6 @@ public enum TransactionType {
 	private final Integer id;
 	private String value;
 
-	private static final List<TransactionType> LIST;
-
-	static {
-		LIST = Arrays.asList(TransactionType.values());
-	}
-
 	TransactionType(String type, Integer id) {
 		this.value = type;
 		this.id = id;
@@ -37,6 +31,6 @@ public enum TransactionType {
 	}
 
 	public static List<TransactionType> getAll() {
-		return LIST;
+		return Arrays.asList(TransactionType.values());
 	}
 }

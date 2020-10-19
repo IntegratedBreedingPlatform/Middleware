@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.*;
 import org.generationcp.middleware.manager.ontology.*;
@@ -326,5 +328,9 @@ public class ManagerFactory implements Serializable {
 
 	public SearchRequestService getSearchRequestService() {
 		return new SearchRequestServiceImpl(this.sessionProvider);
+	}
+
+	public BreedingMethodService getBreedingMethodService() {
+		return new BreedingMethodServiceImpl(this.sessionProvider);
 	}
 }

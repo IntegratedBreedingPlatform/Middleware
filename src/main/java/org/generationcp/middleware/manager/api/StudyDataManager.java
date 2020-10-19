@@ -25,7 +25,6 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -38,13 +37,11 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -167,8 +164,8 @@ public interface StudyDataManager {
 	/**
 	 * Returns the list of study references for a particular search filter.
 	 *
-	 * @param filter    The filter for the search - could be an instance of BrowseStudyQueryFilter, GidStudyQueryFilter,
-	 *                  ParentFolderStudyQueryFilter.
+	 * @param filter The filter for the search - could be an instance of BrowseStudyQueryFilter, GidStudyQueryFilter,
+	 *               ParentFolderStudyQueryFilter.
 	 * @return list of matching studies
 	 */
 	List<StudyReference> searchStudies(StudyQueryFilter filter);
@@ -314,7 +311,7 @@ public interface StudyDataManager {
 	 * Returns a single dataset belonging to the study with the given type. If there is more than one matching dataset, only one is
 	 * returned. If there are none, null is returned.
 	 *
-	 * @param studyId the study id
+	 * @param studyId       the study id
 	 * @param datasetTypeId the dataset type id
 	 * @return the data set
 	 */
@@ -449,12 +446,12 @@ public interface StudyDataManager {
 	/**
 	 * Returns the datasetId of dataset to which the studyDbId (nd_geolocation_id) belongs to.
 	 * In Brapi, studyDbId is the environment/instance (nd_geolocation_id)
+	 *
 	 * @param studyDbId
 	 * @param datasetType
 	 * @return
 	 */
 	Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType);
-
 
 	/**
 	 * Returns the dms project. Accepts a project id.
@@ -540,7 +537,6 @@ public interface StudyDataManager {
 	 * @return the int
 	 */
 	int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds);
-
 
 	/**
 	 * Gets the all field maps in block by block id.
@@ -656,24 +652,6 @@ public interface StudyDataManager {
 	 */
 	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, int datasetTypeId, List<Integer> locationIds);
 
-	/**
-	 * Retrieves all the StudySummaries of the DMS Project that matches the conditions: SeasonDbId, LocationDbId and ProgramDbId
-	 *
-	 * @param filters    - the filters that to be included in the query
-	 * @param pageSize   Page Size
-	 * @param pageNumber Page Number
-	 * @return List of StudySummary
-	 */
-	List<StudySummary> findPagedProjects(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber);
-
-	/**
-	 * Count how many DMS Project matches the conditions: programDBid, locationDbId
-	 *
-	 * @param filters - the filters that to be included in the query
-	 * @return Number of programs
-	 */
-	Long countAllStudies(final Map<StudyFilters, String> filters);
-
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
 
 	Phenotype getPhenotypeById(int phenotypeId);
@@ -765,20 +743,19 @@ public interface StudyDataManager {
 	boolean renameStudy(final String newStudyName, final int studyId, final String programUUID);
 
 	/**
-	 *
 	 * @param studyId
 	 * @return
 	 */
-	List<UserDto> getUsersAssociatedToStudy (final Integer studyId);
+	List<UserDto> getUsersAssociatedToStudy(final Integer studyId);
 
 	/**
-	 *
 	 * @param instanceId
 	 * @return
 	 */
 	List<UserDto> getUsersForEnvironment(final Integer instanceId);
 
-	List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
+	List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId,
+		List<Integer> variableIds);
 
 	List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
 

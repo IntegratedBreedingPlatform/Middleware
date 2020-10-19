@@ -2,43 +2,23 @@ package org.generationcp.middleware.service.api.study;
 
 import org.pojomatic.Pojomatic;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.Date;
 
 public class StudySearchFilter {
-
-	// Study DTO fields
-	public static final String ACTIVE = "active";
-	public static final String PROGRAM_DB_ID = "programDbId";
-	public static final String PROGRAM_NAME = "programName";
-	public static final String STUDY_DB_ID = "studyDbId";
-	public static final String STUDY_NAME = "studyName";
-	public static final String TRIAL_DB_ID = "trialDbId";
-	public static final String TRIAL_NAME = "trialName";
-	public static final String STUDY_TYPE_DB_ID = "studyTypeDbId";
-	public static final String STUDY_TYPE_NAME = "studyTypeName";
-	public static final String SEASON_DB_ID = "seasonDbId";
-	public static final String SEASON = "season";
-	public static final String YEAR = "year";
-	public static final String START_DATE = "startDate";
-	public static final String END_DATE = "endDate";
-	public static final String LOCATION_DB_ID = "locationDbId";
-	public static final String LOCATION_NAME = "locationName";
-	public static final String COMMON_CROP_NAME = "commonCropName";
-
-	public static final List<String> SORTABLE_FIELDS = Collections.unmodifiableList(Arrays
-		.asList(PROGRAM_DB_ID, PROGRAM_NAME, STUDY_DB_ID, STUDY_NAME, TRIAL_DB_ID, TRIAL_NAME, STUDY_TYPE_DB_ID, STUDY_TYPE_NAME,
-			SEASON_DB_ID, SEASON, START_DATE, END_DATE, LOCATION_DB_ID, LOCATION_NAME));
 
 	private String commonCropName;
 	private String studyTypeDbId;
 	private String programDbId;
 	private String locationDbId;
 	private String seasonDbId;
+	private String trialPUI;
 	private String trialDbId;
+	private String trialName;
+	private String contactDbId;
 	private String studyDbId;
 	private Boolean active;
+	private Date searchDateRangeStart;
+	private Date searchDateRangeEnd;
 
 	public StudySearchFilter() {
 
@@ -59,64 +39,117 @@ public class StudySearchFilter {
 		return this.studyTypeDbId;
 	}
 
-	public void setStudyTypeDbId(final String studyTypeDbId) {
+	public StudySearchFilter withStudyTypeDbId(final String studyTypeDbId) {
 		this.studyTypeDbId = studyTypeDbId;
+		return this;
 	}
 
 	public String getProgramDbId() {
 		return this.programDbId;
 	}
 
-	public void setProgramDbId(final String programDbId) {
+	public StudySearchFilter withProgramDbId(final String programDbId) {
 		this.programDbId = programDbId;
+		return this;
 	}
 
 	public String getLocationDbId() {
 		return this.locationDbId;
 	}
 
-	public void setLocationDbId(final String locationDbId) {
+	public StudySearchFilter withLocationDbId(final String locationDbId) {
 		this.locationDbId = locationDbId;
+		return this;
 	}
 
 	public String getSeasonDbId() {
 		return this.seasonDbId;
 	}
 
-	public void setSeasonDbId(final String seasonDbId) {
+	public StudySearchFilter withSeasonDbId(final String seasonDbId) {
 		this.seasonDbId = seasonDbId;
+		return this;
 	}
 
 	public String getTrialDbId() {
 		return this.trialDbId;
 	}
 
-	public void setTrialDbId(final String trialDbId) {
+	public StudySearchFilter withTrialDbId(final String trialDbId) {
 		this.trialDbId = trialDbId;
+		return this;
 	}
 
 	public String getStudyDbId() {
 		return this.studyDbId;
 	}
 
-	public void setStudyDbId(final String studyDbId) {
+	public StudySearchFilter withStudyDbId(final String studyDbId) {
 		this.studyDbId = studyDbId;
+		return this;
 	}
 
 	public Boolean getActive() {
 		return this.active;
 	}
 
-	public void setActive(final Boolean active) {
+	public StudySearchFilter withActive(final Boolean active) {
 		this.active = active;
+		return this;
 	}
 
 	public String getCommonCropName() {
 		return this.commonCropName;
 	}
 
-	public void setCommonCropName(final String commonCropName) {
+	public StudySearchFilter withCommonCropName(final String commonCropName) {
 		this.commonCropName = commonCropName;
+		return this;
+	}
+
+	public String getTrialPUI() {
+		return this.trialPUI;
+	}
+
+	public StudySearchFilter withTrialPUI(final String trialPUI) {
+		this.trialPUI = trialPUI;
+		return this;
+	}
+
+	public String getTrialName() {
+		return this.trialName;
+	}
+
+	public StudySearchFilter withTrialName(final String trialName) {
+		this.trialName = trialName;
+		return this;
+	}
+
+	public String getContactDbId() {
+		return this.contactDbId;
+	}
+
+	public StudySearchFilter withContactDbId(final String contactDbId) {
+		this.contactDbId = contactDbId;
+		return this;
+	}
+
+	public Date getSearchDateRangeStart() {
+		return this.searchDateRangeStart;
+	}
+
+	public StudySearchFilter withSearchDateRangeStart(final Date searchDateRangeStart) {
+		this.searchDateRangeStart = searchDateRangeStart;
+		return this;
+	}
+
+	public Date getSearchDateRangeEnd() {
+		return this.searchDateRangeEnd;
+	}
+
+	public StudySearchFilter withSearchDateRangeEnd(final Date searchDateRangeEnd) {
+		this.searchDateRangeEnd = searchDateRangeEnd;
+		return this;
 	}
 
 	@Override
