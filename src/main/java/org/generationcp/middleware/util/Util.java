@@ -62,8 +62,8 @@ public class Util {
 	public static final String FRONTEND_DATE_FORMAT_3 = "dd/MM/yyyy";
 	public static final String FRONTEND_TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
 	public static final String DATE_AS_NUMBER_FORMAT_KSU = "d/M/yy";
-	public static Pattern ksuDatePattern = Pattern.compile("^(0?[1-9]|[12][0-9]|3[01])\\/(0?[1-9]|1[012])\\/((19|20)\\d\\d|\\d\\d)");
-	public static Pattern defaultDatePattern = Pattern.compile("^((19|20)\\d\\d)(0?[1-9]|1[012])(0?[1-9]|[12][0-9]|3[01])");
+	public static final Pattern ksuDatePattern = Pattern.compile("^(0?[1-9]|[12][0-9]|3[01])\\/(0?[1-9]|1[012])\\/((19|20)\\d\\d|\\d\\d)");
+	public static final Pattern defaultDatePattern = Pattern.compile("^((19|20)\\d\\d)(0?[1-9]|1[012])(0?[1-9]|[12][0-9]|3[01])");
 
 	private Util() {
 		// make a private constructor to hide the implicit public one
