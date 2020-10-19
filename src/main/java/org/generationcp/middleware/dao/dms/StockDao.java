@@ -15,6 +15,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -25,6 +26,7 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
+import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -41,7 +43,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link StockModel}.
@@ -51,7 +59,23 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StockDao.class);
 	private static final String IN_STOCK_DAO = " in StockDao: ";
+	private static final Map<String, String> factorsFilterMap = new HashMap(){{
+		put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
+		put(String.valueOf(TermId.DESIG.getId()), "s.name");
+		put(String.valueOf(TermId.ENTRY_NO.getId()), "s.uniquename");
+		put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), "lotCount");
+	}};
+	private static final List<String> factorsFilterHavingCollection = new ArrayList(){{
+		add(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()));
+	}};
 	static final String DBXREF_ID = "dbxrefId";
+
+//	static {
+//		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
+//		factorsFilterMap.put(String.valueOf(TermId.DESIG.getId()), "s.name");
+//		factorsFilterMap.put(String.valueOf(TermId.ENTRY_NO.getId()), "s.uniquename");
+//		factorsFilterMap.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), "lotCount");
+//	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
@@ -315,7 +339,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public List<StudyEntryDto> getStudyEntries(final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
 		try {
 			final StringBuilder sqlQuery = new StringBuilder("SELECT s.stock_id AS entryId, "
-				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS entryNumber, "
+				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS ENTRY_NO, "
 				+ "  s.dbxref_id AS gid, "
 				+ "  s.name AS designation, "
 				+ "  s.value AS entryCode, "
@@ -345,22 +369,44 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "       LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
 				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id "
 				+ "WHERE s.project_id = :studyId ");
-
-
-			if (studyEntrySearchDto.getFilter() != null) {
-				if (!CollectionUtils.isEmpty(studyEntrySearchDto.getFilter().getEntryNumbers())) {
+//			SqlQueryParamBuilder sqlQueryParamBuilder = new SqlQueryParamBuilder(sqlQuery);
+			StudyEntrySearchDto.Filter filter = studyEntrySearchDto.getFilter();
+			List<String> havingConditions = new ArrayList<>();
+			if (filter != null) {
+				if (!CollectionUtils.isEmpty(filter.getEntryNumbers())) {
 					sqlQuery.append(" AND s.uniquename in (:entryNumbers)" );
 				}
-				if (!CollectionUtils.isEmpty(studyEntrySearchDto.getFilter().getEntryIds())) {
+				if (!CollectionUtils.isEmpty(filter.getEntryIds())) {
 					sqlQuery.append(" AND s.stock_id in (:entryIds)" );
 				}
+
+				if (!CollectionUtils.isEmpty(filter.getFilteredValues())) {
+					// Perform IN operation on variable values
+					this.appendVariableIdAndOperationToFilterQuery(sqlQuery, havingConditions, filter,
+						filter.getFilteredValues().keySet(), false);
+				}
+
+				if (filter.getFilteredTextValues() != null && !filter.getFilteredTextValues().isEmpty()) {
+					// Perform LIKE operation on variable value
+					this.appendVariableIdAndOperationToFilterQuery(sqlQuery, havingConditions, filter, filter.getFilteredTextValues().keySet(), true);
+				}
+
 			}
 			sqlQuery.append(" GROUP BY s.stock_id ");
+			
+			if (!havingConditions.isEmpty()) {
+				sqlQuery.append(" HAVING ");
+				sqlQuery.append(havingConditions.stream().collect(Collectors.joining(",")));
+			}
+			
 			GenericDAO.addPageRequestOrderBy(sqlQuery, pageable);
+
+			System.out.println("QUERY -----------------------------");
+			System.out.println(sqlQuery.toString());
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery.toString());
 			query.addScalar("entryId", new IntegerType());
-			query.addScalar("entryNumber", new IntegerType());
+			query.addScalar("ENTRY_NO", new IntegerType());
 			query.addScalar("gid", new IntegerType());
 			query.addScalar("designation", new StringType());
 			query.addScalar("entryCode", new StringType());
@@ -375,14 +421,51 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 			query.setParameter("studyId", studyEntrySearchDto.getStudyId());
-			if (studyEntrySearchDto.getFilter() != null) {
-				if (!CollectionUtils.isEmpty(studyEntrySearchDto.getFilter().getEntryNumbers())) {
-					query.setParameterList("entryNumbers", studyEntrySearchDto.getFilter().getEntryNumbers());
+			if (filter != null) {
+				if (!CollectionUtils.isEmpty(filter.getEntryNumbers())) {
+					query.setParameterList("entryNumbers", filter.getEntryNumbers());
 				}
-				if (!CollectionUtils.isEmpty(studyEntrySearchDto.getFilter().getEntryIds())) {
-					query.setParameterList("entryIds", studyEntrySearchDto.getFilter().getEntryIds());
+				if (!CollectionUtils.isEmpty(filter.getEntryIds())) {
+					query.setParameterList("entryIds", filter.getEntryIds());
+				}
+
+				if (!CollectionUtils.isEmpty(filter.getFilteredValues())) {
+					final Map<String, List<String>> filteredValues = filter.getFilteredValues();
+					final Integer variableId = filter.getVariableId();
+					for (final Map.Entry<String, List<String>> entry : filteredValues.entrySet()) {
+						final String observableId = entry.getKey();
+						if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
+							continue;
+						}
+						final String variableType = filter.getVariableTypeMap().get(observableId);
+						if (!VariableType.OBSERVATION_UNIT.name().equals(variableType) && factorsFilterMap.get(observableId) == null) {
+							query.setParameter(observableId + "_Id", observableId);
+						}
+						// Sum of Samples, whose Id is -2, will cause an error as query parameter. Remove the "-" from the ID as workaround
+						final String finalId = observableId.replace("-", "");
+						final List<String> values = filteredValues.get(observableId);
+						// Treat "-" as "0: for Sum of Samples variable value
+						query.setParameterList(finalId + "_values", values);
+					}
+				}
+
+				if (!CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
+					final Integer variableId = filter.getVariableId();
+					Map<String, String> filteredTextValues = filter.getFilteredTextValues();
+					for (final Map.Entry<String, String> entry : filteredTextValues.entrySet()) {
+						final String observableId = entry.getKey();
+						if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
+							continue;
+						}
+						final String variableType = filter.getVariableTypeMap().get(observableId);
+						if (!VariableType.OBSERVATION_UNIT.name().equals(variableType) && factorsFilterMap.get(observableId) == null) {
+							query.setParameter(observableId + "_Id", observableId);
+						}
+						query.setParameter(observableId + "_text", "%" + filteredTextValues.get(observableId) + "%");
+					}
 				}
 			}
+
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			GenericDAO.addPaginationToSQLQuery(query, pageable);
 
@@ -390,7 +473,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			final List<StudyEntryDto> studyEntryDtos = new ArrayList<>();
 			for (final Map<String, Object> row : results) {
 				final Integer entryId = (Integer) row.get("entryId");
-				final Integer entryNumber = (Integer) row.get("entryNumber");
+				final Integer entryNumber = (Integer) row.get("ENTRY_NO");
 				final String entryCode = (String) row.get("entryCode");
 				final Integer gid = (Integer) row.get("gid");
 				final String designation = (String) row.get("designation");
@@ -439,4 +522,63 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				measurementVariable.get().getTermId(), new StudyEntryPropertyData(value));
 		}
 	}
+
+	private void appendVariableIdAndOperationToFilterQuery(final StringBuilder sql, final List<String> havingConditions,
+		final StudyEntrySearchDto.Filter filter,
+		final Set<String> variableIds, final boolean performLikeOperation) {
+		final Integer variableId = filter.getVariableId();
+		for (final String observableId : variableIds) {
+			if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
+				continue;
+			}
+			if (factorsFilterHavingCollection.contains(observableId)) {
+				this.addHavingCondition(havingConditions, observableId, performLikeOperation);
+			} else {
+				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
+				this.applyFactorsFilter(sql, observableId, variableTypeString, performLikeOperation);
+			}
+		}
+	}
+
+	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType,
+		final boolean performLikeOperation) {
+		// Check if the variable to be filtered is in one of the columns in stock, nd_experiment, geolocation or sum of samples
+		final String observationUnitClause = VariableType.OBSERVATION_UNIT.name().equals(variableType) ? "nde.observation_unit_no" : null;
+		final String filterClause = factorsFilterMap.get(variableId);
+		// Sum of Samples, whose Id is -2, will cause an error as query parameter. Remove the "-" from the ID as workaround
+		final String finalId = variableId.replace("-", "");
+		final String matchClause = performLikeOperation ? " LIKE :" + finalId + "_text " : " IN (:" + finalId + "_values) ";
+		if (filterClause != null || observationUnitClause != null) {
+			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(matchClause);
+			return;
+		}
+
+		// Otherwise, look in "props" tables
+		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
+		if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
+			// IF searching by list of values, search for the values in:
+			// 1)cvterm.name (for categorical variables) or
+			// 2)perform IN operation on stockprop.value
+			// Otherwise, search the value like a text by LIKE operation
+			final String stockMatchClause = performLikeOperation ? "sp.value LIKE :" + variableId + "_text " :
+				" (cvt.name IN (:" + variableId + "_values) OR sp.value IN (:" + variableId + "_values ))";
+			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp "
+				+ "LEFT JOIN cvterm cvt ON cvt.cvterm_id = sp.value "
+				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
+				+ "_Id AND ").append(stockMatchClause).append(" )");
+		}
+	}
+
+	private void addHavingCondition(final List<String> havingClauses, final String variableId, final boolean performLikeOperation) {
+		StringBuilder sb = new StringBuilder()
+			.append(factorsFilterMap.get(variableId));
+		final String finalId = variableId.replace("-", "");
+		if (performLikeOperation) {
+			sb.append(" LIKE :").append(finalId).append("_text");
+		} else {
+			sb.append(" IN (:").append(finalId).append("_values)");
+		}
+		havingClauses.add(sb.toString());
+	}
+
 }
