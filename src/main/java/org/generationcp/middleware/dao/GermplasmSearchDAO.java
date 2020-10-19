@@ -729,10 +729,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             query.addScalar(LOCATION_ID);
             query.addScalar(METHOD_ID);
 
-            for (final String addedColumnPropertyId : addedColumnsPropertyIds) {
-                if (!GERMPLASM_TREE_NODE_PROPERTY_IDS.contains(addedColumnPropertyId)) {
-                    query.addScalar(addedColumnPropertyId);
-                }
+            final List<String> filteredProperties = addedColumnsPropertyIds.stream()
+                .filter(s -> !this.GERMPLASM_TREE_NODE_PROPERTY_IDS.contains(s)).collect(Collectors.toList());
+            for (final String propertyId : filteredProperties) {
+                query.addScalar(propertyId);
             }
 
             /*
@@ -757,7 +757,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
             final List<GermplasmSearchResponse> response = new ArrayList<>();
             for (final Object[] result : results) {
-                response.add(this.mapToGermplasmSearchResponse(result, addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+                response.add(this.mapToGermplasmSearchResponse(result, filteredProperties, attributeTypesMap, nameTypesMap));
             }
             return response;
         } catch (final HibernateException e) {
