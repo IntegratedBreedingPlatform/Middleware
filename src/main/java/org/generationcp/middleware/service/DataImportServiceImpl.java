@@ -195,6 +195,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 		// Only parses the description sheet.
 		final Workbook workbook = parser.parseFile(excelWorkbook, false, currentIbdbUserId.toString());
+		this.setMeasurementIdIfNecessary(workbook.getAllVariables());
 		return workbook;
 	}
 
@@ -1210,6 +1211,15 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 						}
 					}
 				}
+			}
+		}
+	}
+
+	private void setMeasurementIdIfNecessary(final List<MeasurementVariable> measurementVariables) {
+		for (final MeasurementVariable measurementVariable : measurementVariables) {
+			if (measurementVariable.getTermId() == 0) {
+				final Integer measurementVariableId = this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod());
+				measurementVariable.setTermId(measurementVariableId);
 			}
 		}
 	}
