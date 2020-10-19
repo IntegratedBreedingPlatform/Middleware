@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -26,7 +28,6 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -47,6 +48,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -60,22 +62,21 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(StockDao.class);
 	private static final String IN_STOCK_DAO = " in StockDao: ";
 	private static final Map<String, String> factorsFilterMap = new HashMap(){{
+		put(String.valueOf(TermId.CHECK.getId()), "s.value");
 		put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
 		put(String.valueOf(TermId.DESIG.getId()), "s.name");
 		put(String.valueOf(TermId.ENTRY_NO.getId()), "s.uniquename");
+		put(String.valueOf(TermId.CROSS.getId()), "CROSS_value");
 		put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), "lotCount");
+		put(String.valueOf(TermId.GID_UNIT.getId()), "unit");
 	}};
+
 	private static final List<String> factorsFilterHavingCollection = new ArrayList(){{
 		add(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()));
+		add(String.valueOf(TermId.GID_UNIT.getId()));
+		add(String.valueOf(TermId.CROSS.getId()));
 	}};
 	static final String DBXREF_ID = "dbxrefId";
-
-//	static {
-//		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
-//		factorsFilterMap.put(String.valueOf(TermId.DESIG.getId()), "s.name");
-//		factorsFilterMap.put(String.valueOf(TermId.ENTRY_NO.getId()), "s.uniquename");
-//		factorsFilterMap.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), "lotCount");
-//	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
@@ -339,7 +340,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public List<StudyEntryDto> getStudyEntries(final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
 		try {
 			final StringBuilder sqlQuery = new StringBuilder("SELECT s.stock_id AS entryId, "
-				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS ENTRY_NO, "
+				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS entry_no, "
 				+ "  s.dbxref_id AS gid, "
 				+ "  s.name AS designation, "
 				+ "  s.value AS entryCode, "
@@ -369,7 +370,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "       LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
 				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id "
 				+ "WHERE s.project_id = :studyId ");
-//			SqlQueryParamBuilder sqlQueryParamBuilder = new SqlQueryParamBuilder(sqlQuery);
+
 			StudyEntrySearchDto.Filter filter = studyEntrySearchDto.getFilter();
 			List<String> havingConditions = new ArrayList<>();
 			if (filter != null) {
@@ -386,9 +387,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 						filter.getFilteredValues().keySet(), false);
 				}
 
-				if (filter.getFilteredTextValues() != null && !filter.getFilteredTextValues().isEmpty()) {
+				if (!CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
 					// Perform LIKE operation on variable value
-					this.appendVariableIdAndOperationToFilterQuery(sqlQuery, havingConditions, filter, filter.getFilteredTextValues().keySet(), true);
+					this.appendVariableIdAndOperationToFilterQuery(sqlQuery, havingConditions, filter,
+						filter.getFilteredTextValues().keySet(), true);
 				}
 
 			}
@@ -396,17 +398,14 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			
 			if (!havingConditions.isEmpty()) {
 				sqlQuery.append(" HAVING ");
-				sqlQuery.append(havingConditions.stream().collect(Collectors.joining(",")));
+				sqlQuery.append(havingConditions.stream().collect(Collectors.joining(" AND ")));
 			}
 			
-			GenericDAO.addPageRequestOrderBy(sqlQuery, pageable);
-
-			System.out.println("QUERY -----------------------------");
-			System.out.println(sqlQuery.toString());
+			this.addOrder(sqlQuery, pageable);
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery.toString());
 			query.addScalar("entryId", new IntegerType());
-			query.addScalar("ENTRY_NO", new IntegerType());
+			query.addScalar("entry_no", new IntegerType());
 			query.addScalar("gid", new IntegerType());
 			query.addScalar("designation", new StringType());
 			query.addScalar("entryCode", new StringType());
@@ -437,15 +436,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 						if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
 							continue;
 						}
-						final String variableType = filter.getVariableTypeMap().get(observableId);
-						if (!VariableType.OBSERVATION_UNIT.name().equals(variableType) && factorsFilterMap.get(observableId) == null) {
+						if (factorsFilterMap.get(observableId) == null) {
 							query.setParameter(observableId + "_Id", observableId);
 						}
-						// Sum of Samples, whose Id is -2, will cause an error as query parameter. Remove the "-" from the ID as workaround
 						final String finalId = observableId.replace("-", "");
-						final List<String> values = filteredValues.get(observableId);
-						// Treat "-" as "0: for Sum of Samples variable value
-						query.setParameterList(finalId + "_values", values);
+						query.setParameterList(finalId + "_values", filteredValues.get(observableId));
 					}
 				}
 
@@ -457,11 +452,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 						if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
 							continue;
 						}
-						final String variableType = filter.getVariableTypeMap().get(observableId);
-						if (!VariableType.OBSERVATION_UNIT.name().equals(variableType) && factorsFilterMap.get(observableId) == null) {
+						if (factorsFilterMap.get(observableId) == null) {
 							query.setParameter(observableId + "_Id", observableId);
 						}
-						query.setParameter(observableId + "_text", "%" + filteredTextValues.get(observableId) + "%");
+						final String finalId = observableId.replace("-", "");
+						query.setParameter(finalId + "_text", "%" + filteredTextValues.get(observableId) + "%");
 					}
 				}
 			}
@@ -473,7 +468,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			final List<StudyEntryDto> studyEntryDtos = new ArrayList<>();
 			for (final Map<String, Object> row : results) {
 				final Integer entryId = (Integer) row.get("entryId");
-				final Integer entryNumber = (Integer) row.get("ENTRY_NO");
+				final Integer entryNumber = (Integer) row.get("entry_no");
 				final String entryCode = (String) row.get("entryCode");
 				final Integer gid = (Integer) row.get("gid");
 				final String designation = (String) row.get("designation");
@@ -579,6 +574,31 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			sb.append(" IN (:").append(finalId).append("_values)");
 		}
 		havingClauses.add(sb.toString());
+	}
+
+	private void addOrder(final StringBuilder sql, final Pageable pageable) {
+
+		if (Objects.isNull(pageable) || Objects.isNull(pageable.getSort()) || Objects.isNull(sql)) {
+			return;
+		}
+
+		String sortBy = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getProperty() : "";
+		String sortOrder = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getDirection().name() : "";
+		String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
+
+		Optional<String> orderColumn = Optional.empty();
+		if (NumberUtils.isNumber(sortBy)) {
+			final TermId termId = TermId.getById(Integer.valueOf(sortBy));
+			if (!Objects.isNull(termId)) {
+				orderColumn = Optional.of(factorsFilterMap.get(String.valueOf(termId.getId())));
+			}
+		} else if (StringUtils.isNotBlank(sortBy)) {
+			orderColumn = Optional.of(sortBy);
+		}
+
+		if (orderColumn.isPresent()) {
+			sql.append(" ORDER BY " + orderColumn.get() + " " + direction);
+		}
 	}
 
 }

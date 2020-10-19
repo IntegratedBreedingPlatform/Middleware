@@ -42,7 +42,12 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.dms.*;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -55,9 +60,20 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class StockDaoIntegrationTest extends IntegrationTestBase {
 
@@ -361,6 +377,49 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(studyEntryDtoGidUnique.getAvailableBalance(), "60");
 		Assert.assertEquals(studyEntryDtoGidUnique.getLotCount(), new Integer(2));
 
+		//Sort by gid asc
+		final Pageable sortedByGidsAscPageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, String.valueOf(TermId.GID.getId())));
+		final List<StudyEntryDto> studyEntryDtosSortedByGidsAsc = this.stockDao
+			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), new ArrayList<>(), null), sortedByGidsAscPageable);
+		Assert.assertEquals(studyEntryDtosSortedByGidsAsc.size(), TEST_COUNT);
+		assertThat(studyEntryDtosSortedByGidsAsc.get(0).getGid(), is(this.gids.get(0)));
+		assertThat(studyEntryDtosSortedByGidsAsc.get(1).getGid(), is(this.gids.get(1)));
+		assertThat(studyEntryDtosSortedByGidsAsc.get(2).getGid(), is(this.gids.get(2)));
+
+		//Sort by gid desc
+		final Pageable sortedByGidsDescPageable = new PageRequest(0, 20, new Sort(Sort.Direction.DESC, String.valueOf(TermId.GID.getId())));
+		final List<StudyEntryDto> studyEntryDtosSortedByGidsDesc = this.stockDao
+			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), new ArrayList<>(), null), sortedByGidsDescPageable);
+		Assert.assertEquals(studyEntryDtosSortedByGidsDesc.size(), TEST_COUNT);
+		assertThat(studyEntryDtosSortedByGidsDesc.get(0).getGid(), is(this.gids.get(2)));
+		assertThat(studyEntryDtosSortedByGidsDesc.get(1).getGid(), is(this.gids.get(1)));
+		assertThat(studyEntryDtosSortedByGidsDesc.get(2).getGid(), is(this.gids.get(0)));
+
+		//Filter by gid
+		final StudyEntrySearchDto.Filter filterByGid = new StudyEntrySearchDto.Filter();
+		filterByGid.setFilteredValues(new HashMap() {{
+			put(String.valueOf(TermId.GID.getId()), Arrays.asList(gids.get(1)));
+		}});
+		filterByGid.setVariableTypeMap(new HashMap() {{
+			put(String.valueOf(TermId.GID.getId()), null);
+		}});
+		final List<StudyEntryDto> studyEntryDtosFilterByGid = this.stockDao
+			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByGid), null);
+		Assert.assertEquals(studyEntryDtosFilterByGid.size(), 1);
+		assertThat(studyEntryDtosFilterByGid.get(0).getGid(), is(this.gids.get(1)));
+
+		//Filter by lot count
+		final StudyEntrySearchDto.Filter filterByLotCount = new StudyEntrySearchDto.Filter();
+		filterByLotCount.setFilteredValues(new HashMap() {{
+			put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), Arrays.asList(0));
+		}});
+		filterByLotCount.setVariableTypeMap(new HashMap() {{
+			put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), null);
+		}});
+		final List<StudyEntryDto> studyEntryDtosFilterByLotCount = this.stockDao
+			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByLotCount), null);
+		Assert.assertEquals(studyEntryDtosFilterByLotCount.size(), 1);
+		assertThat(studyEntryDtosFilterByLotCount.get(0).getGid(), is(this.gids.get(2)));
 	}
 
 	private void createTestObservations(final ExperimentModel experiment, final CVTerm variateTerm) {
