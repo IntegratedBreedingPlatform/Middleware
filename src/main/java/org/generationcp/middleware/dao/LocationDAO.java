@@ -12,6 +12,7 @@ package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -20,8 +21,8 @@ import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
-import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
-import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.api.brapi.v1.location.AdditionalInfoDto;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -32,6 +33,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -445,6 +447,34 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
 					this.getLogExceptionMessage("countAllBreedingLocations", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+	}
+
+	public LocationDTO getLocationDTO(final Integer locationId) {
+		try {
+			final StringBuilder query = new StringBuilder("select l.locid as id," //
+				+ "  l.lname as name," //
+				+ "  l.ltype as type," //
+				+ "  l.labbr as abbreviation," //
+				+ "  g.lat as latitude," //
+				+ "  g.lon as longitude," //
+				+ "  g.alt as altitude," //
+				+ "  l.cntryid as countryId," //
+				+ "  l.snl1id as provinceId," //
+				+ "  l.program_uuid as programUUID" //
+				+ " from location l" //
+				+ "  left join georef g on l.locid = g.locid" //
+				+ " where l.locid = :locationId");
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query.toString());
+			sqlQuery.setParameter("locationId", locationId);
+			sqlQuery.addScalar("id").addScalar("name").addScalar("type").addScalar("abbreviation").addScalar("latitude")
+				.addScalar("longitude").addScalar("altitude").addScalar("countryId").addScalar("provinceId").addScalar("programUUID");
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(LocationDTO.class));
+
+			return (LocationDTO) sqlQuery.uniqueResult();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getLocationDTO(locationId=" + locationId + "): " + e.getMessage(), e);
 		}
 	}
 

@@ -13,6 +13,7 @@ public enum GermplasmSortableColumn {
 
     // Make sure to add another constant for new sortable column in Germplasm Search Table
     AVAILABLE_BALANCE("AVAILABLE", GermplasmSearchDAO.AVAIL_BALANCE),
+    LOT_UNITS("LOT_UNITS", GermplasmSearchDAO.LOT_UNITS),
     AVAILABLE_LOTS("LOTS", GermplasmSearchDAO.AVAIL_LOTS),
     STOCK_IDS("STOCKID", GermplasmSearchDAO.STOCK_IDS),
     SEED_RES("SEED RES", "seedRes"),

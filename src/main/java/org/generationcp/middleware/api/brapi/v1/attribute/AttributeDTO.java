@@ -1,4 +1,4 @@
-package org.generationcp.middleware.domain.germplasm;
+package org.generationcp.middleware.api.brapi.v1.attribute;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
