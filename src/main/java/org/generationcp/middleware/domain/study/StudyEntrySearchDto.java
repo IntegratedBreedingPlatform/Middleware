@@ -40,14 +40,12 @@ public class StudyEntrySearchDto {
 		private Map<String, List<String>> filteredValues;
 		private Map<String, String> filteredTextValues;
 		private Map<String, String> variableTypeMap;
-		private Integer variableId;
 
 		public Filter() {
 			this.entryNumbers = new ArrayList<>();
 			this.entryIds = new ArrayList<>();
 			this.filteredValues = new ArrayMap<>();
 			this.filteredTextValues = new HashMap<>();
-			this.variableId = null;
 		}
 
 		public List<String> getEntryNumbers() {
@@ -90,13 +88,6 @@ public class StudyEntrySearchDto {
 			this.variableTypeMap = variableTypeMap;
 		}
 
-		public Integer getVariableId() {
-			return variableId;
-		}
-
-		public void setVariableId(final Integer variableId) {
-			this.variableId = variableId;
-		}
 	}
 
 	public int getStudyId() {

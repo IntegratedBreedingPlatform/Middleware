@@ -430,33 +430,25 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 				if (!CollectionUtils.isEmpty(filter.getFilteredValues())) {
 					final Map<String, List<String>> filteredValues = filter.getFilteredValues();
-					final Integer variableId = filter.getVariableId();
 					for (final Map.Entry<String, List<String>> entry : filteredValues.entrySet()) {
-						final String observableId = entry.getKey();
-						if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
-							continue;
+						final String variableId = entry.getKey();
+						if (factorsFilterMap.get(variableId) == null) {
+							query.setParameter(variableId + "_Id", variableId);
 						}
-						if (factorsFilterMap.get(observableId) == null) {
-							query.setParameter(observableId + "_Id", observableId);
-						}
-						final String finalId = observableId.replace("-", "");
-						query.setParameterList(finalId + "_values", filteredValues.get(observableId));
+						final String finalId = variableId.replace("-", "");
+						query.setParameterList(finalId + "_values", filteredValues.get(variableId));
 					}
 				}
 
 				if (!CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
-					final Integer variableId = filter.getVariableId();
 					Map<String, String> filteredTextValues = filter.getFilteredTextValues();
 					for (final Map.Entry<String, String> entry : filteredTextValues.entrySet()) {
-						final String observableId = entry.getKey();
-						if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
-							continue;
+						final String variableId = entry.getKey();
+						if (factorsFilterMap.get(variableId) == null) {
+							query.setParameter(variableId + "_Id", variableId);
 						}
-						if (factorsFilterMap.get(observableId) == null) {
-							query.setParameter(observableId + "_Id", observableId);
-						}
-						final String finalId = observableId.replace("-", "");
-						query.setParameter(finalId + "_text", "%" + filteredTextValues.get(observableId) + "%");
+						final String finalId = variableId.replace("-", "");
+						query.setParameter(finalId + "_text", "%" + filteredTextValues.get(variableId) + "%");
 					}
 				}
 			}
@@ -521,16 +513,12 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	private void appendVariableIdAndOperationToFilterQuery(final StringBuilder sql, final List<String> havingConditions,
 		final StudyEntrySearchDto.Filter filter,
 		final Set<String> variableIds, final boolean performLikeOperation) {
-		final Integer variableId = filter.getVariableId();
-		for (final String observableId : variableIds) {
-			if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
-				continue;
-			}
-			if (factorsFilterHavingCollection.contains(observableId)) {
-				this.addHavingCondition(havingConditions, observableId, performLikeOperation);
+		for (final String variableId : variableIds) {
+			if (factorsFilterHavingCollection.contains(variableId)) {
+				this.addHavingCondition(havingConditions, variableId, performLikeOperation);
 			} else {
-				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
-				this.applyFactorsFilter(sql, observableId, variableTypeString, performLikeOperation);
+				final String variableTypeString = filter.getVariableTypeMap().get(variableId);
+				this.applyFactorsFilter(sql, variableId, variableTypeString, performLikeOperation);
 			}
 		}
 	}
