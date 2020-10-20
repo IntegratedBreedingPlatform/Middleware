@@ -62,7 +62,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(StockDao.class);
 	private static final String IN_STOCK_DAO = " in StockDao: ";
 	private static final Map<String, String> factorsFilterMap = new HashMap(){{
-		put(String.valueOf(TermId.CHECK.getId()), "s.value");
 		put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
 		put(String.valueOf(TermId.DESIG.getId()), "s.name");
 		put(String.valueOf(TermId.ENTRY_NO.getId()), "s.uniquename");
@@ -572,9 +571,16 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 		Optional<String> orderColumn = Optional.empty();
 		if (NumberUtils.isNumber(sortBy)) {
-			final TermId termId = TermId.getById(Integer.valueOf(sortBy));
-			if (!Objects.isNull(termId)) {
-				orderColumn = Optional.of(factorsFilterMap.get(String.valueOf(termId.getId())));
+
+			//TODO: FIX ME!! Remove this hardcode once the duplicated enum value for termId 8255 is removed (https://ibplatform.atlassian.net/browse/IBP-4128)
+			if (Integer.valueOf(sortBy) == 8255) {
+				orderColumn = Optional.of("ENTRY_TYPE");
+			} else {
+				final TermId termId = TermId.getById(Integer.valueOf(sortBy));
+				final String value = factorsFilterMap.get(String.valueOf(termId.getId()));
+				if (!Objects.isNull(termId) && !Objects.isNull(value)) {
+					orderColumn = Optional.of(value);
+				}
 			}
 		} else if (StringUtils.isNotBlank(sortBy)) {
 			orderColumn = Optional.of(sortBy);
