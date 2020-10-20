@@ -538,9 +538,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType,
 		final boolean performLikeOperation) {
 		final String filterClause = factorsFilterMap.get(variableId);
-		// Sum of Samples, whose Id is -2, will cause an error as query parameter. Remove the "-" from the ID as workaround
-		final String finalId = variableId.replace("-", "");
-		final String matchClause = performLikeOperation ? " LIKE :" + finalId + "_text " : " IN (:" + finalId + "_values) ";
+		final String matchClause = performLikeOperation ? " LIKE :" + variableId + "_text " : " IN (:" + variableId + "_values) ";
 		if (filterClause != null) {
 			sql.append(" AND ").append(filterClause).append(matchClause);
 			return;
