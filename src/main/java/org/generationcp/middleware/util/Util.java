@@ -23,12 +23,10 @@ package org.generationcp.middleware.util;
 
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.xmlbeans.impl.regex.Match;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,8 +41,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * A utility class used to get primitive values of wrapper classes, check for null values, and list functions such as getting the max,
