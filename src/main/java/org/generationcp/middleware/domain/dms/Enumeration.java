@@ -65,14 +65,6 @@ public class Enumeration implements Serializable, Comparable<Enumeration> {
 		return this.description;
 	}
 
-	public int getRank(){
-		return this.rank;
-	}
-
-	public void setRank(final int rank) {
-		this.rank = rank;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
