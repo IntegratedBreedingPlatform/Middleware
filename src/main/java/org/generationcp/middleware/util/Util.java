@@ -57,6 +57,7 @@ public class Util {
 	public static final String FRONTEND_DATE_FORMAT_2 = "MM/dd/yyyy";
 	public static final String FRONTEND_DATE_FORMAT_3 = "dd/MM/yyyy";
 	public static final String FRONTEND_TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
+	public static final String DATE_AS_NUMBER_FORMAT_KSU = "d/M/yy";
 
 	private Util() {
 		// make a private constructor to hide the implicit public one
