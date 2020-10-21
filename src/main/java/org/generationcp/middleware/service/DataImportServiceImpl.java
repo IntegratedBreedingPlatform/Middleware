@@ -42,6 +42,7 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.TimerWatch;
+import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -193,6 +194,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 		// Only parses the description sheet.
 		final Workbook workbook = parser.parseFile(excelWorkbook, false, currentIbdbUserId.toString());
+		this.setMeasurementIdIfNecessary(workbook.getAllVariables());
 		return workbook;
 	}
 
@@ -1097,7 +1099,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public Map<String, List<Message>> validateProjectData(final Workbook workbook, final String programUUID) {
 		final Map<String, List<Message>> errors = new HashMap<>();
 
-		this.checkForExistingTrialInstance(workbook, errors, programUUID);
+		// Check that trial instance values are not yet existing and are numeric
+		this.validateTrialInstanceValue(workbook, errors, programUUID);
 
 		// the following code is a workaround versus the current state
 		// management in the ETL Wizard
@@ -1122,12 +1125,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		this.setRequiredField(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getTrialVariables());
 	}
 
-	private void checkForExistingTrialInstance(final Workbook workbook, final Map<String, List<Message>> errors, final String programUUID) {
+	private void validateTrialInstanceValue(final Workbook workbook, final Map<String, List<Message>> errors, final String programUUID) {
 
 		final String studyName = workbook.getStudyDetails().getStudyName();
 
 		// get local variable name of the trial instance number
 		String trialInstanceHeader = null;
+		MeasurementVariable trialInstanceVariable = null;
 		final List<MeasurementVariable> trialVariables = workbook.getTrialFactors();
 		trialVariables.addAll(workbook.getConditions());
 		for (final MeasurementVariable mvar : trialVariables) {
@@ -1136,6 +1140,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			if (varId != null) {
 				final StandardVariable svar = this.ontologyDataManager.getStandardVariable(varId, programUUID);
 				if (svar.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+					trialInstanceVariable = mvar;
 					trialInstanceHeader = mvar.getName();
 					break;
 				}
@@ -1151,6 +1156,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		for (int i = 0; i < maxNumOfIterations; i++) {
 			final MeasurementRow row = workbook.getObservations().get(i);
 			final String trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader);
+			final Optional<Message> errorMessage = Util.validateVariableValues(trialInstanceVariable, trialInstanceNumber);
+			if (errorMessage.isPresent()) {
+				errors.putIfAbsent(Constants.INVALID_TRIAL, new ArrayList<>());
+				errors.get(Constants.INVALID_TRIAL).add(errorMessage.get());
+			}
 			if (instancesFromWorkbook.add(trialInstanceNumber)) {
 				final Integer locationId =
 					this.getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName, trialInstanceNumber, programUUID);
@@ -1188,5 +1198,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	public void setMaxRowLimit(final int maxRowLimit) {
 		this.maxRowLimit = maxRowLimit;
+	}
+
+	private void setMeasurementIdIfNecessary(final List<MeasurementVariable> measurementVariables) {
+		for (final MeasurementVariable measurementVariable : measurementVariables) {
+			if (measurementVariable.getTermId() == 0) {
+				final Integer measurementVariableId = this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod());
+				measurementVariable.setTermId(measurementVariableId);
+			}
+		}
 	}
 }
