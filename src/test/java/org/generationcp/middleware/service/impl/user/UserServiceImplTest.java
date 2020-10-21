@@ -3,6 +3,8 @@ package org.generationcp.middleware.service.impl.user;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.data.initializer.UserDtoTestDataInitializer;
+import org.generationcp.middleware.data.initializer.UserRoleDataInitializer;
+import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
@@ -32,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -435,6 +438,26 @@ public class UserServiceImplTest extends IntegrationTestBase {
 
 		Assert.assertFalse(this.userService.isSuperAdminUser(savedUser1.getUserid()));
 		assertTrue(this.userService.isSuperAdminUser(savedUser2.getUserid()));
+	}
+
+	@Test
+	public void testWorkbenchUserHasOnlyProgramRoles() {
+		final String cropName = "maize";
+		final WorkbenchUser user = UserTestDataInitializer.createWorkbenchUser();
+
+		List<UserRole> roles = new ArrayList<>();
+		roles.add(UserRoleDataInitializer.createUserRole(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM));
+		user.setRoles(roles);
+		Assert.assertThat(user.hasOnlyProgramRoles(cropName), is(true));
+
+		user.getRoles().add(UserRoleDataInitializer.createUserRole(org.generationcp.middleware.domain.workbench.RoleType.CROP));
+		Assert.assertThat(user.hasOnlyProgramRoles(cropName), is(false));
+
+		roles = new ArrayList<>();
+		roles.add(UserRoleDataInitializer.createUserRole(org.generationcp.middleware.domain.workbench.RoleType.INSTANCE));
+		user.setRoles(roles);
+		Assert.assertThat(user.hasOnlyProgramRoles(cropName), is(false));
+
 	}
 
 	@Test

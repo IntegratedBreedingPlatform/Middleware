@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -32,12 +33,11 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.service.api.study.SeasonDto;
-import org.generationcp.middleware.service.api.study.StudyDto;
-import org.generationcp.middleware.service.api.study.StudyFilters;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
+import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.FormulaUtils;
 import org.generationcp.middleware.util.Util;
@@ -46,11 +46,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -61,10 +59,12 @@ import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -246,6 +246,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	static final String COUNT_CALCULATED_VARIABLES_IN_DATASETS = "SELECT COUNT(1) FROM projectprop pp\n"
 		+ "INNER JOIN formula f ON pp.variable_id = f.target_variable_id\n"
 		+ "where project_id in (:projectIds) and type_id = " + VariableType.TRAIT.getId();
+
+	private static final List<String> BRAPI_INSTANCES_SORTABLE_FIELDS = Arrays
+		.asList("programDbId", "programName", "studyDbId", "studyName", "trialDbId", "trialName", "studyTypeId", "studyTypeName",
+			"seasonDbId", "season", "startDate", "endDate", "locationDbId", "locationName");
+
+	private static final List<String> BRAPI_STUDIES_SORTABLE_FIELDS = Arrays
+		.asList("programDbId", "programName", "trialDbId", "trialName", "startDate", "endDate", "locationDbId");
 
 	private List<Reference> getChildrenNodesList(final List<Object[]> list) {
 		final List<Reference> childrenNodes = new ArrayList<>();
@@ -703,64 +710,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public List<DmsProject> findPagedProjects(final Map<StudyFilters, String> filters, final Integer pageSize, final Integer pageNumber) {
-
-		final Criteria criteria = this.buildCoreCriteria(filters, this.getOrderBy(filters));
-		if (pageNumber != null && pageSize != null) {
-			criteria.setFirstResult(pageSize * (pageNumber - 1));
-			criteria.setMaxResults(pageSize);
-		}
-		return criteria.list();
-	}
-
-	private Order getOrderBy(final Map<StudyFilters, String> filters) {
-		if (filters.containsKey(StudyFilters.SORT_BY_FIELD)) {
-			if ("asc".equals(filters.get(StudyFilters.ORDER))) {
-				return Order.asc(filters.get(StudyFilters.SORT_BY_FIELD));
-			} else {
-				return Order.desc(filters.get(StudyFilters.SORT_BY_FIELD));
-			}
-		}
-		return Order.asc(DmsProjectDao.PROJECT_ID);
-	}
-
-	public long countStudies(final Map<StudyFilters, String> filters) {
-		final Criteria criteria = this.buildCoreCriteria(filters, this.getOrderBy(filters));
-		criteria.setProjection(Projections.rowCount());
-		return (long) criteria.uniqueResult();
-	}
-
-	private Criteria buildCoreCriteria(final Map<StudyFilters, String> parameters, final Order orderBy) {
-		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-		criteria.add(Restrictions.isNotNull("studyType"));
-
-		criteria.add(Restrictions.ne(DmsProjectDao.DELETED, true));
-
-		if (parameters.containsKey(StudyFilters.PROGRAM_ID)) {
-			criteria.add(Restrictions.eq(StudyFilters.PROGRAM_ID.getParameter(), parameters.get(StudyFilters.PROGRAM_ID)));
-		} else {
-			criteria.add(Restrictions.isNotNull(StudyFilters.PROGRAM_ID.getParameter()));
-		}
-
-		if (parameters.containsKey(StudyFilters.LOCATION_ID)) {
-			// Find environments with specified location (saved in GeolocationProperty)
-			final DetachedCriteria locationCriteria = DetachedCriteria.forClass(ExperimentModel.class);
-			locationCriteria.add(Restrictions.eq("typeId", TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()));
-			locationCriteria.createAlias("geoLocation", "g");
-			locationCriteria.createAlias("g.properties", "gp");
-			locationCriteria.createAlias("project", "p");
-			locationCriteria.createAlias("p.study", "st");
-			locationCriteria.add(Restrictions.and(
-				Restrictions.eq("gp.typeId", DmsProjectDao.LOCATION_ID),
-				Restrictions.eq("gp.value", parameters.get(StudyFilters.LOCATION_ID))));
-			locationCriteria.setProjection(Projections.property("st.projectId"));
-			criteria.add(Property.forName("projectId").in(locationCriteria));
-		}
-
-		criteria.addOrder(orderBy);
-		return criteria;
-	}
-
 	public StudyMetadata getStudyMetadataForInstanceId(final Integer instanceId) {
 		Preconditions.checkNotNull(instanceId);
 		try {
@@ -830,11 +779,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		// Check if the variable is used in trial level and/or environment level of studies except for the specified programUUID.
 		final SQLQuery query = this.getSession().createSQLQuery(
-			"SELECT CASE WHEN\n" + "            (EXISTS( SELECT project.* FROM\n" + "                    projectprop INNER JOIN\n"
+			"SELECT CASE WHEN\n            (EXISTS( SELECT project.* FROM\n                    projectprop INNER JOIN\n"
 				+ "                    project ON project.project_id = projectprop.project_id WHERE\n"
 				+ "                    projectprop.variable_id = :variableId AND projectprop.value = :variableValue\n"
-				+ "                        AND project.program_uuid <> :programUUID AND project.deleted = 0)) = 1 " + "						OR "
-				+ "				(EXISTS( SELECT \n" + "                    project.* FROM project\n"
+				+ "                        AND project.program_uuid <> :programUUID AND project.deleted = 0)) = 1 						OR "
+				+ "				(EXISTS( SELECT \n                    project.* FROM project\n"
 				+ "                        INNER JOIN\n"
 				+ "                    nd_experiment ON nd_experiment.project_id = project.project_id\n"
 				+ "                        INNER JOIN\n"
@@ -1167,7 +1116,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<StudyInstance> getDatasetInstances(final int datasetId, final List<Integer> instanceIds) {
 
 		try {
-			final String sql = "select \n" + "	geoloc.nd_geolocation_id as instanceId, \n"
+			final String sql = "select \n	geoloc.nd_geolocation_id as instanceId, \n"
 				+ " geoloc.description as instanceNumber, \n"
 				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as locationId, \n"  // 8190 = cvterm for LOCATION_ID
 				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as locationName, \n" +
@@ -1281,7 +1230,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			// Delete experiments
 			SQLQuery statement =
 				this.getSession().createSQLQuery(
-					"delete e, pheno, eprop " + "from nd_experiment e, "
+					"delete e, pheno, eprop from nd_experiment e, "
 						+ "phenotype pheno, nd_experimentprop eprop "
 						+ "where e.project_id = " + datasetId
 						+ "  and e.nd_experiment_id = pheno.nd_experiment_id "
@@ -1291,7 +1240,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			// Delete project stuff
 			statement =
 				this.getSession().createSQLQuery(
-					"delete p, pp " + "from project p, projectprop pp " + "where p.project_id = " + datasetId
+					"delete p, pp from project p, projectprop pp where p.project_id = " + datasetId
 						+ "  and p.project_id = pp.project_id");
 			statement.executeUpdate();
 
@@ -1451,133 +1400,241 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public long countStudies(final StudySearchFilter studySearchFilter) {
+	public long countStudyInstances(final StudySearchFilter studySearchFilter) {
 		final SQLQuery sqlQuery =
-			this.getSession().createSQLQuery(this.createCountStudyQueryString(studySearchFilter));
-		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
+			this.getSession().createSQLQuery(this.createCountStudyInstanceQueryString(studySearchFilter));
+		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
-	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+	public long countStudies(final StudySearchFilter studySearchFilter) {
+		final SQLQuery sqlQuery =
+			this.getSession().createSQLQuery(this.createCountStudyQueryString(studySearchFilter));
+		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	public List<StudyInstanceDto> getStudyInstances(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 
 		// TODO: Check if we can reuse this query/method in getStudyMetadataForGeolocationId()
 		final SQLQuery sqlQuery =
-			this.getSession().createSQLQuery(this.createStudySummaryQueryString(studySearchFilter, pageable));
+			this.getSession().createSQLQuery(this.createStudyInstanceQueryString(studySearchFilter, pageable));
 
-		sqlQuery.addScalar(StudySearchFilter.STUDY_DB_ID);
-		sqlQuery.addScalar(StudySearchFilter.STUDY_NAME);
-		sqlQuery.addScalar(StudySearchFilter.TRIAL_DB_ID);
-		sqlQuery.addScalar(StudySearchFilter.TRIAL_NAME);
-		sqlQuery.addScalar(StudySearchFilter.STUDY_TYPE_DB_ID);
-		sqlQuery.addScalar(StudySearchFilter.STUDY_TYPE_NAME);
-		sqlQuery.addScalar(StudySearchFilter.SEASON_DB_ID);
-		sqlQuery.addScalar(StudySearchFilter.SEASON);
-		sqlQuery.addScalar(StudySearchFilter.START_DATE);
-		sqlQuery.addScalar(StudySearchFilter.END_DATE);
-		sqlQuery.addScalar(StudySearchFilter.ACTIVE, new IntegerType());
-		sqlQuery.addScalar(StudySearchFilter.LOCATION_DB_ID);
-		sqlQuery.addScalar(StudySearchFilter.LOCATION_NAME);
-		sqlQuery.addScalar(StudySearchFilter.PROGRAM_DB_ID);
-		sqlQuery.addScalar(StudySearchFilter.PROGRAM_NAME);
+		sqlQuery.addScalar("studyDbId");
+		sqlQuery.addScalar("studyName");
+		sqlQuery.addScalar("trialDbId");
+		sqlQuery.addScalar("trialName");
+		sqlQuery.addScalar("studyTypeDbId");
+		sqlQuery.addScalar("studyTypeName");
+		sqlQuery.addScalar("seasonDbId");
+		sqlQuery.addScalar("season");
+		sqlQuery.addScalar("startDate");
+		sqlQuery.addScalar("endDate");
+		sqlQuery.addScalar("active", new IntegerType());
+		sqlQuery.addScalar("locationDbId");
+		sqlQuery.addScalar("locationName");
+		sqlQuery.addScalar("programDbId");
+		sqlQuery.addScalar("programName");
 
-		this.addstudySearchFilterParameters(sqlQuery, studySearchFilter);
+		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
 
 		addPaginationToSQLQuery(sqlQuery, pageable);
 
 		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 		final List<Map<String, Object>> results = sqlQuery.list();
 
-		final List<StudyDto> studyDtoList = new ArrayList<>();
+		final List<StudyInstanceDto> studyInstanceDtoList = new ArrayList<>();
 		for (final Map<String, Object> result : results) {
-			final StudyDto studyDto = new StudyDto();
-			studyDto.setCommonCropName(studySearchFilter.getCommonCropName());
-			studyDto.setStudyDbId(String.valueOf(result.get(StudySearchFilter.STUDY_DB_ID)));
-			studyDto.setStudyName(String.valueOf(result.get(StudySearchFilter.STUDY_NAME)));
-			studyDto.setTrialDbId(String.valueOf(result.get(StudySearchFilter.TRIAL_DB_ID)));
-			studyDto.setTrialName(String.valueOf(result.get(StudySearchFilter.TRIAL_NAME)));
-			studyDto.setStudyTypeDbId(String.valueOf(result.get(StudySearchFilter.STUDY_TYPE_DB_ID)));
-			studyDto.setStudyTypeName(String.valueOf(result.get(StudySearchFilter.STUDY_TYPE_NAME)));
-			studyDto.setStartDate(Util.tryParseDate((String) result.get(StudySearchFilter.START_DATE)));
-			studyDto.setEndDate(Util.tryParseDate((String) result.get(StudySearchFilter.END_DATE)));
-			studyDto.setLocationDbId(String.valueOf(result.get(StudySearchFilter.LOCATION_DB_ID)));
-			studyDto.setLocationName(String.valueOf(result.get(StudySearchFilter.LOCATION_NAME)));
-			studyDto.setProgramDbId(String.valueOf(result.get(StudySearchFilter.PROGRAM_DB_ID)));
-			studyDto.setProgramName(String.valueOf(result.get(StudySearchFilter.PROGRAM_NAME)));
+			final StudyInstanceDto studyInstanceDto = new StudyInstanceDto();
+			studyInstanceDto.setCommonCropName(studySearchFilter.getCommonCropName());
+			studyInstanceDto.setStudyDbId(String.valueOf(result.get("studyDbId")));
+			studyInstanceDto.setStudyName(String.valueOf(result.get("studyName")));
+			studyInstanceDto.setTrialDbId(String.valueOf(result.get("trialDbId")));
+			studyInstanceDto.setTrialName(String.valueOf(result.get("trialName")));
+			studyInstanceDto.setStudyTypeDbId(String.valueOf(result.get("studyTypeDbId")));
+			studyInstanceDto.setStudyTypeName(String.valueOf(result.get("studyTypeName")));
+			studyInstanceDto.setStartDate(Util.tryParseDate((String) result.get("startDate")));
+			studyInstanceDto.setEndDate(Util.tryParseDate((String) result.get("endDate")));
+			studyInstanceDto.setLocationDbId(String.valueOf(result.get("locationDbId")));
+			studyInstanceDto.setLocationName(String.valueOf(result.get("locationName")));
+			studyInstanceDto.setProgramDbId(String.valueOf(result.get("programDbId")));
+			studyInstanceDto.setProgramName(String.valueOf(result.get("programName")));
 
 			final List<SeasonDto> seasons = new ArrayList<>();
-			if (!StringUtils.isEmpty((String) result.get(StudySearchFilter.SEASON_DB_ID))) {
-				seasons.add(new SeasonDto(String.valueOf(result.get(StudySearchFilter.SEASON)),
-					String.valueOf(result.get(StudySearchFilter.SEASON_DB_ID))));
+			final String seasonDbId = (String) result.get("seasonDbId");
+			if (!StringUtils.isEmpty(seasonDbId)) {
+				seasons.add(new SeasonDto(String.valueOf(result.get("season")), seasonDbId));
 			}
-			studyDto.setSeasons(seasons);
+			studyInstanceDto.setSeasons(seasons);
 
-			studyDto
-				.setActive(((Integer) result.get(StudySearchFilter.ACTIVE)) == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
-			studyDtoList.add(studyDto);
+			studyInstanceDto
+				.setActive(((Integer) result.get("active")) == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
+			studyInstanceDtoList.add(studyInstanceDto);
 		}
-		return studyDtoList;
+		return studyInstanceDtoList;
 	}
 
-	private void addstudySearchFilterParameters(final SQLQuery sqlQuery, final StudySearchFilter studySearchFilter) {
+	public List<StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		final SQLQuery sqlQuery =
+			this.getSession().createSQLQuery(this.createStudyQueryString(studySearchFilter, pageable));
+
+		sqlQuery.addScalar("trialDbId");
+		sqlQuery.addScalar("trialName");
+		sqlQuery.addScalar("trialDescription");
+		sqlQuery.addScalar("trialPUI");
+		sqlQuery.addScalar("startDate");
+		sqlQuery.addScalar("endDate");
+		sqlQuery.addScalar("active", new IntegerType());
+		sqlQuery.addScalar("programDbId");
+		sqlQuery.addScalar("programName");
+		sqlQuery.addScalar("locationDbId");
+		sqlQuery.addScalar("contactDbId");
+		sqlQuery.addScalar("contactName");
+		sqlQuery.addScalar("email");
+
+		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
+
+		addPaginationToSQLQuery(sqlQuery, pageable);
+
+		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+		final List<Map<String, Object>> results = sqlQuery.list();
+
+		final List<StudySummary> studyList = new ArrayList<>();
+		for (final Map<String, Object> result : results) {
+			final StudySummary studySummary = new StudySummary();
+			studySummary.setStudyDbid((Integer) result.get("trialDbId"));
+			studySummary.setName(String.valueOf(result.get("trialName")));
+			studySummary.setDescription(String.valueOf(result.get("trialDescription")));
+			studySummary.setObservationUnitId(String.valueOf(result.get("trialPUI")));
+			studySummary.setStartDate(Util.tryParseDate((String) result.get("startDate")));
+			studySummary.setEndDate(Util.tryParseDate((String) result.get("endDate")));
+			studySummary.setProgramDbId(String.valueOf(result.get("programDbId")));
+			studySummary.setProgramName(String.valueOf(result.get("programName")));
+			studySummary.setActive(((Integer) result.get("active")) == 1);
+			studySummary.setContacts(Collections.singletonList(new ContactDto((Integer) result.get("contactDbId"),
+				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
+			studyList.add(studySummary);
+		}
+		return studyList;
+	}
+
+	private void addStudySearchFilterParameters(final SQLQuery sqlQuery, final StudySearchFilter studySearchFilter) {
 
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
-			sqlQuery.setParameter(StudySearchFilter.STUDY_DB_ID, studySearchFilter.getStudyDbId());
+			sqlQuery.setParameter("studyDbId", studySearchFilter.getStudyDbId());
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
-			sqlQuery.setParameter(StudySearchFilter.LOCATION_DB_ID, studySearchFilter.getLocationDbId());
+			sqlQuery.setParameter("locationDbId", studySearchFilter.getLocationDbId());
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getProgramDbId())) {
-			sqlQuery.setParameter(StudySearchFilter.PROGRAM_DB_ID, studySearchFilter.getProgramDbId());
+			sqlQuery.setParameter("programDbId", studySearchFilter.getProgramDbId());
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getSeasonDbId())) {
-			sqlQuery.setParameter(StudySearchFilter.SEASON_DB_ID, studySearchFilter.getSeasonDbId());
+			sqlQuery.setParameter("seasonDbId", studySearchFilter.getSeasonDbId());
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyTypeDbId())) {
-			sqlQuery.setParameter(StudySearchFilter.STUDY_TYPE_DB_ID, studySearchFilter.getStudyTypeDbId());
+			sqlQuery.setParameter("studyTypeDbId", studySearchFilter.getStudyTypeDbId());
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialDbId())) {
-			sqlQuery.setParameter(StudySearchFilter.TRIAL_DB_ID, studySearchFilter.getTrialDbId());
+			sqlQuery.setParameter("trialDbId", studySearchFilter.getTrialDbId());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getTrialName())) {
+			sqlQuery.setParameter("trialName", studySearchFilter.getTrialName());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getTrialPUI())) {
+			sqlQuery.setParameter("trialPUI", studySearchFilter.getTrialPUI());
 		}
 		if (studySearchFilter.getActive() != null) {
-			sqlQuery.setParameter(StudySearchFilter.ACTIVE, (studySearchFilter.getActive().booleanValue() ? 0 : 1));
+			sqlQuery.setParameter("active", (studySearchFilter.getActive().booleanValue() ? 0 : 1));
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getContactDbId())) {
+			sqlQuery.setParameter("contactDbId", studySearchFilter.getContactDbId());
+		}
+		// Search Date Range
+		if (studySearchFilter.getSearchDateRangeStart() != null) {
+			sqlQuery.setParameter("searchTrialDateStart",
+				Util.formatDateAsStringValue(studySearchFilter.getSearchDateRangeStart(), Util.DATE_AS_NUMBER_FORMAT));
+
+		} else if (studySearchFilter.getSearchDateRangeEnd() != null) {
+			sqlQuery.setParameter("searchTrialDateEnd",
+				Util.formatDateAsStringValue(studySearchFilter.getSearchDateRangeEnd(), Util.DATE_AS_NUMBER_FORMAT));
 		}
 
 	}
 
-	private String createCountStudyQueryString(final StudySearchFilter studySearchFilter) {
+	private String createCountStudyInstanceQueryString(final StudySearchFilter studySearchFilter) {
 		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT geoloc.nd_geolocation_id) ");
-		this.appendStudySummaryFromQuery(sql);
+		this.appendStudyInstanceFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
 		return sql.toString();
 	}
 
-	private String createStudySummaryQueryString(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+	private String createStudyInstanceQueryString(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 		final StringBuilder sql = new StringBuilder(" SELECT  ");
-		sql.append("     geoloc.nd_geolocation_id AS " + StudySearchFilter.STUDY_DB_ID + ", ");
-		sql.append("		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS " + StudySearchFilter.STUDY_NAME + ", ");
-		sql.append("     pmain.study_type_id AS " + StudySearchFilter.STUDY_TYPE_DB_ID + ", ");
-		sql.append("     studyType.label AS " + StudySearchFilter.STUDY_TYPE_NAME + ", ");
-		sql.append("     geopropSeason.value AS " + StudySearchFilter.SEASON_DB_ID + ", ");
-		sql.append("     cvtermSeason.definition AS " + StudySearchFilter.SEASON + ", ");
-		sql.append("     pmain.project_id AS " + StudySearchFilter.TRIAL_DB_ID + ", ");
-		sql.append(" 	 pmain.name AS " + StudySearchFilter.TRIAL_NAME + ", ");
-		sql.append("     MAX(pmain.start_date) AS " + StudySearchFilter.START_DATE + ", ");
-		sql.append("     MAX(pmain.end_date) AS " + StudySearchFilter.END_DATE + ", ");
-		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS " + StudySearchFilter.ACTIVE + ", ");
-		sql.append("     location.locid AS " + StudySearchFilter.LOCATION_DB_ID + ", ");
-		sql.append("     location.lname AS " + StudySearchFilter.LOCATION_NAME + ", ");
-		sql.append("     wp.project_name AS " + StudySearchFilter.PROGRAM_NAME + ", ");
-		sql.append("     wp.project_uuid AS " + StudySearchFilter.PROGRAM_DB_ID + " ");
-		this.appendStudySummaryFromQuery(sql);
+		sql.append("     geoloc.nd_geolocation_id AS studyDbId, ");
+		sql.append("		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS studyName, ");
+		sql.append("     pmain.study_type_id AS studyTypeDbId, ");
+		sql.append("     studyType.label AS studyTypeName, ");
+		sql.append("     geopropSeason.value AS seasonDbId, ");
+		sql.append("     cvtermSeason.definition AS season, ");
+		sql.append("     pmain.project_id AS trialDbId, ");
+		sql.append(" 	 pmain.name AS trialName, ");
+		sql.append("     MAX(pmain.start_date) AS startDate, ");
+		sql.append("     MAX(pmain.end_date) AS endDate, ");
+		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS active, ");
+		sql.append("     location.locid AS locationDbId, ");
+		sql.append("     location.lname AS locationName, ");
+		sql.append("     wp.project_name AS programName, ");
+		sql.append("     wp.project_uuid AS programDbId ");
+		this.appendStudyInstanceFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
 		sql.append(" GROUP BY geoloc.nd_geolocation_id ");
 
-		addPageRequestOrderBy(sql, pageable, StudySearchFilter.SORTABLE_FIELDS);
+		addPageRequestOrderBy(sql, pageable, DmsProjectDao.BRAPI_INSTANCES_SORTABLE_FIELDS);
 
 		return sql.toString();
 	}
 
-	private void appendStudySummaryFromQuery(final StringBuilder sql) {
+	private String createCountStudyQueryString(final StudySearchFilter studySearchFilter) {
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT pmain.project_id) ");
+		this.appendStudySummaryFromQuery(sql);
+		this.appendStudySearchFilter(sql, studySearchFilter);
+		return sql.toString();
+	}
+
+	private String createStudyQueryString(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		final StringBuilder sql = new StringBuilder(" SELECT  ");
+		sql.append("     pmain.project_id AS trialDbId, ");
+		sql.append(" 	 pmain.name AS trialName, ");
+		sql.append(" 	 pmain.description AS trialDescription, ");
+		sql.append(" 	 study_exp.obs_unit_id AS trialPUI, ");
+		sql.append("     pmain.start_date AS startDate, ");
+		sql.append("     pmain.end_date AS endDate, ");
+		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS active, ");
+		sql.append("     wp.project_name AS programName, ");
+		sql.append("     wp.project_uuid AS programDbId, ");
+		// locationDbId is not unique to study but can have different value per environment.
+		// Get the MIN or MAX depending on sort parameter and direction
+		if (pageable != null && pageable.getSort() != null && pageable.getSort().getOrderFor("locationDbId") != null
+			&& Sort.Direction.DESC.equals(pageable.getSort().getOrderFor("locationDbId").getDirection())) {
+			sql.append("     MAX(geopropLocation.value) as locationDbId, ");
+		} else {
+			sql.append("     MIN(geopropLocation.value) as locationDbId, ");
+		}
+
+		sql.append("     wper.personid AS contactDbid, ");
+		sql.append("     CONCAT(fname, ' ', lname) AS contactName, ");
+		sql.append("     wper.pemail AS email ");
+		this.appendStudySummaryFromQuery(sql);
+		this.appendStudySearchFilter(sql, studySearchFilter);
+		sql.append(" GROUP BY pmain.project_id ");
+
+		addPageRequestOrderBy(sql, pageable, DmsProjectDao.BRAPI_STUDIES_SORTABLE_FIELDS);
+
+		return sql.toString();
+	}
+
+	private void appendStudyInstanceFromQuery(final StringBuilder sql) {
 		sql.append(" FROM ");
 		sql.append("     nd_geolocation geoloc ");
 		sql.append("         INNER JOIN ");
@@ -1606,6 +1663,30 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
 	}
 
+	private void appendStudySummaryFromQuery(final StringBuilder sql) {
+		sql.append(" FROM ");
+		sql.append("     nd_geolocation geoloc ");
+		sql.append("         INNER JOIN ");
+		sql.append("     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id ");
+		sql.append("         INNER JOIN ");
+		sql.append("     project proj ON proj.project_id = nde.project_id ");
+		sql.append("         INNER JOIN ");
+		sql.append("     project pmain ON pmain.project_id = proj.study_id ");
+		sql.append("         INNER JOIN ");
+		sql.append(
+			"     nd_experiment study_exp ON study_exp.project_id = pmain.project_id AND study_exp.type_id = " + TermId.STUDY_EXPERIMENT
+				.getId());
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append(
+			"     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = "
+				+ TermId.LOCATION_ID.getId());
+		sql.append("         LEFT OUTER JOIN workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
+		sql.append("         LEFT JOIN workbench.users wu ON wu.userid = pmain.created_by ");
+		sql.append("         LEFT JOIN workbench.persons wper ON wper.personid = wu.personid ");
+		sql.append(" WHERE ");
+		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
+	}
+
 	private void appendStudySearchFilter(final StringBuilder sql, final StudySearchFilter studySearchFilter) {
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
 			sql.append("AND geoloc.nd_geolocation_id = :studyDbId ");
@@ -1625,8 +1706,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialDbId())) {
 			sql.append("AND pmain.project_id = :trialDbId ");
 		}
+		if (!StringUtils.isEmpty(studySearchFilter.getTrialName())) {
+			sql.append("AND pmain.name = :trialName ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getTrialPUI())) {
+			sql.append("AND study_exp.obs_unit_id = :trialPUI ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getContactDbId())) {
+			sql.append("AND wper.personid = :contactDbId ");
+		}
 		if (studySearchFilter.getActive() != null) {
 			sql.append("AND pmain.deleted = :active ");
+		}
+		// Search Date Range
+		if (studySearchFilter.getSearchDateRangeStart() != null) {
+			sql.append("AND :searchTrialDateStart <= pmain.end_date");
+
+		} else if (studySearchFilter.getSearchDateRangeEnd() != null) {
+			sql.append("AND :searchTrialDateEnd >= pmain.start_date");
 		}
 	}
 
@@ -1656,7 +1753,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return count > 0;
 	}
 
-	public boolean allDatasetIdsBelongToStudy(final Integer studyId, final List<Integer> datasetIds){
+	public boolean allDatasetIdsBelongToStudy(final Integer studyId, final List<Integer> datasetIds) {
 
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.in("projectId", datasetIds));

@@ -3,6 +3,7 @@ package org.generationcp.middleware.pojos.ims;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,12 +11,6 @@ import java.util.List;
 public enum TransactionStatus {
 
 	PENDING(0, "Pending"), CONFIRMED(1, "Confirmed"), CANCELLED(9, "Cancelled");
-
-	private static final List<TransactionStatus> LIST;
-
-	static {
-		LIST = Arrays.asList(TransactionStatus.values());
-	}
 
 	private int id;
 	private String status;
@@ -34,6 +29,6 @@ public enum TransactionStatus {
 	}
 
 	public static List<TransactionStatus> getAll() {
-		return LIST;
+		return Arrays.asList(TransactionStatus.values());
 	}
 }
