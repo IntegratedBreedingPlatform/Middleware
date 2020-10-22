@@ -373,7 +373,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id "
 				+ "WHERE s.project_id = :studyId ");
 
-			StudyEntrySearchDto.Filter filter = studyEntrySearchDto.getFilter();
+			final StudyEntrySearchDto.Filter filter = studyEntrySearchDto.getFilter();
 			if (filter != null) {
 				if (!CollectionUtils.isEmpty(filter.getEntryNumbers())) {
 					sqlQuery.append(" AND s.uniquename in (:entryNumbers)" );
@@ -550,9 +550,9 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return;
 		}
 
-		String sortBy = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getProperty() : "";
-		String sortOrder = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getDirection().name() : "";
-		String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
+		final String sortBy = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getProperty() : "";
+		final String sortOrder = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getDirection().name() : "";
+		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
 
 		Optional<String> orderColumn = Optional.empty();
 		if (NumberUtils.isNumber(sortBy)) {
