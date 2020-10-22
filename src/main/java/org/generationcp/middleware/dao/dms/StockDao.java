@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  *
@@ -51,7 +52,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link StockModel}.
@@ -59,22 +59,25 @@ import java.util.stream.Collectors;
  */
 public class StockDao extends GenericDAO<StockModel, Integer> {
 
+	private static final String LOTS_COUNT = "lotCount";
+	private static final String UNIT = "unit";
+
 	private static final Logger LOG = LoggerFactory.getLogger(StockDao.class);
 	private static final String IN_STOCK_DAO = " in StockDao: ";
 	private static final Map<String, String> factorsFilterMap = new HashMap(){{
 		put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
 		put(String.valueOf(TermId.DESIG.getId()), "s.name");
-		put(String.valueOf(TermId.ENTRY_NO.getId()), "s.uniquename");
-		put(String.valueOf(TermId.CROSS.getId()), "CROSS_value");
-		put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), "lotCount");
-		put(String.valueOf(TermId.GID_UNIT.getId()), "unit");
+		put(String.valueOf(TermId.ENTRY_NO.getId()), "uniquename");
+		put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), "EXISTS (SELECT 1 FROM ims_lot l1 WHERE l1.eid = s.dbxref_id and l1.status = " +
+			LotStatus.ACTIVE.getIntValue() + " HAVING COUNT(l1.lotid)");
+		put(String.valueOf(TermId.GID_UNIT.getId()), "EXISTS("
+			+ "select l1.eid, IF(COUNT(DISTINCT IFNULL(l1.scaleid, 'null')) = 1, IFNULL(c1.name, '-'), 'Mixed') as unit1 "
+			+ "             from  stock s1"
+			+ "                       left join ims_lot l1 on s1.dbxref_id = l1.eid and l1.status = " + LotStatus.ACTIVE.getIntValue()
+			+ "                       left join cvterm c1 ON c1.cvterm_id = l1.scaleid where s1.dbxref_id = s.dbxref_id group by l1.eid"
+			+ "             having unit1");
 	}};
 
-	private static final List<String> factorsFilterHavingCollection = new ArrayList(){{
-		add(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()));
-		add(String.valueOf(TermId.GID_UNIT.getId()));
-		add(String.valueOf(TermId.CROSS.getId()));
-	}};
 	static final String DBXREF_ID = "dbxrefId";
 
 	@SuppressWarnings("unchecked")
@@ -371,7 +374,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "WHERE s.project_id = :studyId ");
 
 			StudyEntrySearchDto.Filter filter = studyEntrySearchDto.getFilter();
-			List<String> havingConditions = new ArrayList<>();
 			if (filter != null) {
 				if (!CollectionUtils.isEmpty(filter.getEntryNumbers())) {
 					sqlQuery.append(" AND s.uniquename in (:entryNumbers)" );
@@ -382,23 +384,18 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 				if (!CollectionUtils.isEmpty(filter.getFilteredValues())) {
 					// Perform IN operation on variable values
-					this.appendVariableIdAndOperationToFilterQuery(sqlQuery, havingConditions, filter,
+					this.appendVariableIdAndOperationToFilterQuery(sqlQuery, filter,
 						filter.getFilteredValues().keySet(), false);
 				}
 
 				if (!CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
 					// Perform LIKE operation on variable value
-					this.appendVariableIdAndOperationToFilterQuery(sqlQuery, havingConditions, filter,
+					this.appendVariableIdAndOperationToFilterQuery(sqlQuery, filter,
 						filter.getFilteredTextValues().keySet(), true);
 				}
 
 			}
 			sqlQuery.append(" GROUP BY s.stock_id ");
-			
-			if (!havingConditions.isEmpty()) {
-				sqlQuery.append(" HAVING ");
-				sqlQuery.append(havingConditions.stream().collect(Collectors.joining(" AND ")));
-			}
 			
 			this.addOrder(sqlQuery, pageable);
 
@@ -509,25 +506,25 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
-	private void appendVariableIdAndOperationToFilterQuery(final StringBuilder sql, final List<String> havingConditions,
+	private void appendVariableIdAndOperationToFilterQuery(final StringBuilder sql,
 		final StudyEntrySearchDto.Filter filter,
 		final Set<String> variableIds, final boolean performLikeOperation) {
 		for (final String variableId : variableIds) {
-			if (factorsFilterHavingCollection.contains(variableId)) {
-				this.addHavingCondition(havingConditions, variableId, performLikeOperation);
-			} else {
-				final String variableTypeString = filter.getVariableTypeMap().get(variableId);
-				this.applyFactorsFilter(sql, variableId, variableTypeString, performLikeOperation);
-			}
+			final String variableTypeString = filter.getVariableTypeMap().get(variableId);
+			this.applyFactorsFilter(sql, variableId, variableTypeString, performLikeOperation);
 		}
 	}
 
 	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType,
 		final boolean performLikeOperation) {
 		final String filterClause = factorsFilterMap.get(variableId);
-		final String matchClause = performLikeOperation ? " LIKE :" + variableId + "_text " : " IN (:" + variableId + "_values) ";
 		if (filterClause != null) {
+			final String finalId = variableId.replace("-", "");
+			final String matchClause = performLikeOperation ? " LIKE :" + finalId + "_text " : " IN (:" + finalId + "_values) ";
 			sql.append(" AND ").append(filterClause).append(matchClause);
+			if (variableId.equalsIgnoreCase(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId())) ||
+				variableId.equalsIgnoreCase(String.valueOf(TermId.GID_UNIT.getId())))
+				sql.append(") ");
 			return;
 		}
 
@@ -547,18 +544,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
-	private void addHavingCondition(final List<String> havingClauses, final String variableId, final boolean performLikeOperation) {
-		StringBuilder sb = new StringBuilder()
-			.append(factorsFilterMap.get(variableId));
-		final String finalId = variableId.replace("-", "");
-		if (performLikeOperation) {
-			sb.append(" LIKE :").append(finalId).append("_text");
-		} else {
-			sb.append(" IN (:").append(finalId).append("_values)");
-		}
-		havingClauses.add(sb.toString());
-	}
-
 	private void addOrder(final StringBuilder sql, final Pageable pageable) {
 
 		if (Objects.isNull(pageable) || Objects.isNull(pageable.getSort()) || Objects.isNull(sql)) {
@@ -571,23 +556,17 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 		Optional<String> orderColumn = Optional.empty();
 		if (NumberUtils.isNumber(sortBy)) {
-
-			//TODO: FIX ME!! Remove this hardcode once the duplicated enum value for termId 8255 is removed (https://ibplatform.atlassian.net/browse/IBP-4128)
-			if (Integer.valueOf(sortBy) == 8255) {
-				orderColumn = Optional.of("ENTRY_TYPE");
-			} else {
-				final TermId termId = TermId.getById(Integer.valueOf(sortBy));
-				final String value = factorsFilterMap.get(String.valueOf(termId.getId()));
-				if (!Objects.isNull(termId) && !Objects.isNull(value)) {
-					orderColumn = Optional.of(value);
-				}
+			if (String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()).equalsIgnoreCase(sortBy)) {
+				orderColumn = Optional.of(LOTS_COUNT);
+			} else if (String.valueOf(TermId.GID_UNIT.getId()).equalsIgnoreCase(sortBy)) {
+				orderColumn = Optional.of(UNIT);
 			}
 		} else if (StringUtils.isNotBlank(sortBy)) {
 			orderColumn = Optional.of(sortBy);
 		}
 
 		if (orderColumn.isPresent()) {
-			sql.append(" ORDER BY " + orderColumn.get() + " " + direction);
+			sql.append(" ORDER BY `" + orderColumn.get() + "` " + direction);
 		}
 	}
 
