@@ -378,7 +378,7 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(studyEntryDtoGidUnique.getLotCount(), new Integer(2));
 
 		//Sort by gid asc
-		final Pageable sortedByGidsAscPageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, String.valueOf(TermId.GID.getId())));
+		final Pageable sortedByGidsAscPageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, TermId.GID.name()));
 		final List<StudyEntryDto> studyEntryDtosSortedByGidsAsc = this.stockDao
 			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), new ArrayList<>(), null), sortedByGidsAscPageable);
 		Assert.assertEquals(studyEntryDtosSortedByGidsAsc.size(), TEST_COUNT);
@@ -387,7 +387,7 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		assertThat(studyEntryDtosSortedByGidsAsc.get(2).getGid(), is(this.gids.get(2)));
 
 		//Sort by gid desc
-		final Pageable sortedByGidsDescPageable = new PageRequest(0, 20, new Sort(Sort.Direction.DESC, String.valueOf(TermId.GID.getId())));
+		final Pageable sortedByGidsDescPageable = new PageRequest(0, 20, new Sort(Sort.Direction.DESC, TermId.GID.name()));
 		final List<StudyEntryDto> studyEntryDtosSortedByGidsDesc = this.stockDao
 			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), new ArrayList<>(), null), sortedByGidsDescPageable);
 		Assert.assertEquals(studyEntryDtosSortedByGidsDesc.size(), TEST_COUNT);
