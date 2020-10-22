@@ -42,7 +42,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	private static List<Integer> REMOVABLE_GERMPLASM_DESCRIPTOR_IDS = Lists
 		.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
-			TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
+			TermId.OBS_UNIT_ID.getId());
 
 	public StudyEntryServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
