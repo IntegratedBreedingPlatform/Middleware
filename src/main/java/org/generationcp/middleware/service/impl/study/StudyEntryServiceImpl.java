@@ -52,7 +52,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public List<StudyEntryDto> getStudyEntries(final int studyId) {
 		// Return by ascending order of entry number. We need to perform cast first on uniquename since it's stored as string
 		return this.getStudyEntries(studyId, null, new PageRequest(0, Integer.MAX_VALUE,
-				new Sort(Sort.Direction.ASC, "CAST(uniquename AS UNSIGNED)")));
+				new Sort(Sort.Direction.ASC, String.valueOf(TermId.ENTRY_NO.getId()))));
 	}
 
 	@Override
