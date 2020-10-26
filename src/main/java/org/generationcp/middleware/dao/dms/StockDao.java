@@ -11,10 +11,13 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -41,7 +44,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * DAO class for {@link StockModel}.
@@ -49,8 +58,25 @@ import java.util.*;
  */
 public class StockDao extends GenericDAO<StockModel, Integer> {
 
+	private static final String LOTS_COUNT = "lotCount";
+	private static final String UNIT = "unit";
+
 	private static final Logger LOG = LoggerFactory.getLogger(StockDao.class);
 	private static final String IN_STOCK_DAO = " in StockDao: ";
+	private static final Map<String, String> factorsFilterMap = new HashMap(){{
+		put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
+		put(String.valueOf(TermId.DESIG.getId()), "s.name");
+		put(String.valueOf(TermId.ENTRY_NO.getId()), "uniquename");
+		put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), "EXISTS (SELECT 1 FROM ims_lot l1 WHERE l1.eid = s.dbxref_id and l1.status = " +
+			LotStatus.ACTIVE.getIntValue() + " HAVING COUNT(l1.lotid)");
+		put(String.valueOf(TermId.GID_UNIT.getId()), "EXISTS("
+			+ "select l1.eid, IF(COUNT(DISTINCT IFNULL(l1.scaleid, 'null')) = 1, IFNULL(c1.name, '-'), 'Mixed') as unit1 "
+			+ "             from  stock s1"
+			+ "                       left join ims_lot l1 on s1.dbxref_id = l1.eid and l1.status = " + LotStatus.ACTIVE.getIntValue()
+			+ "                       left join cvterm c1 ON c1.cvterm_id = l1.scaleid where s1.dbxref_id = s.dbxref_id group by l1.eid"
+			+ "             having unit1");
+	}};
+
 	static final String DBXREF_ID = "dbxrefId";
 
 	@SuppressWarnings("unchecked")
@@ -315,7 +341,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public List<StudyEntryDto> getStudyEntries(final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
 		try {
 			final StringBuilder sqlQuery = new StringBuilder("SELECT s.stock_id AS entryId, "
-				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS entryNumber, "
+				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS entry_no, "
 				+ "  s.dbxref_id AS gid, "
 				+ "  s.name AS designation, "
 				+ "  s.value AS entryCode, "
@@ -346,21 +372,35 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id "
 				+ "WHERE s.project_id = :studyId ");
 
-
-			if (studyEntrySearchDto.getFilter() != null) {
-				if (!CollectionUtils.isEmpty(studyEntrySearchDto.getFilter().getEntryNumbers())) {
+			final StudyEntrySearchDto.Filter filter = studyEntrySearchDto.getFilter();
+			if (filter != null) {
+				if (!CollectionUtils.isEmpty(filter.getEntryNumbers())) {
 					sqlQuery.append(" AND s.uniquename in (:entryNumbers)" );
 				}
-				if (!CollectionUtils.isEmpty(studyEntrySearchDto.getFilter().getEntryIds())) {
+				if (!CollectionUtils.isEmpty(filter.getEntryIds())) {
 					sqlQuery.append(" AND s.stock_id in (:entryIds)" );
 				}
+
+				if (!CollectionUtils.isEmpty(filter.getFilteredValues())) {
+					// Perform IN operation on variable values
+					this.appendVariableIdAndOperationToFilterQuery(sqlQuery, filter,
+						filter.getFilteredValues().keySet(), false);
+				}
+
+				if (!CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
+					// Perform LIKE operation on variable value
+					this.appendVariableIdAndOperationToFilterQuery(sqlQuery, filter,
+						filter.getFilteredTextValues().keySet(), true);
+				}
+
 			}
 			sqlQuery.append(" GROUP BY s.stock_id ");
-			GenericDAO.addPageRequestOrderBy(sqlQuery, pageable);
+			
+			this.addOrder(sqlQuery, pageable);
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery.toString());
 			query.addScalar("entryId", new IntegerType());
-			query.addScalar("entryNumber", new IntegerType());
+			query.addScalar("entry_no", new IntegerType());
 			query.addScalar("gid", new IntegerType());
 			query.addScalar("designation", new StringType());
 			query.addScalar("entryCode", new StringType());
@@ -375,14 +415,39 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 			query.setParameter("studyId", studyEntrySearchDto.getStudyId());
-			if (studyEntrySearchDto.getFilter() != null) {
-				if (!CollectionUtils.isEmpty(studyEntrySearchDto.getFilter().getEntryNumbers())) {
-					query.setParameterList("entryNumbers", studyEntrySearchDto.getFilter().getEntryNumbers());
+			if (filter != null) {
+				if (!CollectionUtils.isEmpty(filter.getEntryNumbers())) {
+					query.setParameterList("entryNumbers", filter.getEntryNumbers());
 				}
-				if (!CollectionUtils.isEmpty(studyEntrySearchDto.getFilter().getEntryIds())) {
-					query.setParameterList("entryIds", studyEntrySearchDto.getFilter().getEntryIds());
+				if (!CollectionUtils.isEmpty(filter.getEntryIds())) {
+					query.setParameterList("entryIds", filter.getEntryIds());
+				}
+
+				if (!CollectionUtils.isEmpty(filter.getFilteredValues())) {
+					final Map<String, List<String>> filteredValues = filter.getFilteredValues();
+					for (final Map.Entry<String, List<String>> entry : filteredValues.entrySet()) {
+						final String variableId = entry.getKey();
+						if (factorsFilterMap.get(variableId) == null) {
+							query.setParameter(variableId + "_Id", variableId);
+						}
+						final String finalId = variableId.replace("-", "");
+						query.setParameterList(finalId + "_values", filteredValues.get(variableId));
+					}
+				}
+
+				if (!CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
+					Map<String, String> filteredTextValues = filter.getFilteredTextValues();
+					for (final Map.Entry<String, String> entry : filteredTextValues.entrySet()) {
+						final String variableId = entry.getKey();
+						if (factorsFilterMap.get(variableId) == null) {
+							query.setParameter(variableId + "_Id", variableId);
+						}
+						final String finalId = variableId.replace("-", "");
+						query.setParameter(finalId + "_text", "%" + filteredTextValues.get(variableId) + "%");
+					}
 				}
 			}
+
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			GenericDAO.addPaginationToSQLQuery(query, pageable);
 
@@ -390,7 +455,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			final List<StudyEntryDto> studyEntryDtos = new ArrayList<>();
 			for (final Map<String, Object> row : results) {
 				final Integer entryId = (Integer) row.get("entryId");
-				final Integer entryNumber = (Integer) row.get("entryNumber");
+				final Integer entryNumber = (Integer) row.get("entry_no");
 				final String entryCode = (String) row.get("entryCode");
 				final Integer gid = (Integer) row.get("gid");
 				final String designation = (String) row.get("designation");
@@ -439,4 +504,69 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				measurementVariable.get().getTermId(), new StudyEntryPropertyData(value));
 		}
 	}
+
+	private void appendVariableIdAndOperationToFilterQuery(final StringBuilder sql,
+		final StudyEntrySearchDto.Filter filter,
+		final Set<String> variableIds, final boolean performLikeOperation) {
+		for (final String variableId : variableIds) {
+			final String variableTypeString = filter.getVariableTypeMap().get(variableId);
+			this.applyFactorsFilter(sql, variableId, variableTypeString, performLikeOperation);
+		}
+	}
+
+	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType,
+		final boolean performLikeOperation) {
+		final String filterClause = factorsFilterMap.get(variableId);
+		if (filterClause != null) {
+			final String finalId = variableId.replace("-", "");
+			final String matchClause = performLikeOperation ? " LIKE :" + finalId + "_text " : " IN (:" + finalId + "_values) ";
+			sql.append(" AND ").append(filterClause).append(matchClause);
+			if (variableId.equalsIgnoreCase(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId())) ||
+				variableId.equalsIgnoreCase(String.valueOf(TermId.GID_UNIT.getId())))
+				sql.append(") ");
+			return;
+		}
+
+		// Otherwise, look in "props" tables
+		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
+		if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
+			// IF searching by list of values, search for the values in:
+			// 1)cvterm.name (for categorical variables) or
+			// 2)perform IN operation on stockprop.value
+			// Otherwise, search the value like a text by LIKE operation
+			final String stockMatchClause = performLikeOperation ? "sp.value LIKE :" + variableId + "_text " :
+				" (cvt.name IN (:" + variableId + "_values) OR sp.value IN (:" + variableId + "_values ))";
+			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp "
+				+ "LEFT JOIN cvterm cvt ON cvt.cvterm_id = sp.value "
+				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
+				+ "_Id AND ").append(stockMatchClause).append(" )");
+		}
+	}
+
+	private void addOrder(final StringBuilder sql, final Pageable pageable) {
+
+		if (Objects.isNull(pageable) || Objects.isNull(pageable.getSort()) || Objects.isNull(sql)) {
+			return;
+		}
+
+		final String sortBy = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getProperty() : "";
+		final String sortOrder = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getDirection().name() : "";
+		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
+
+		Optional<String> orderColumn = Optional.empty();
+		if (NumberUtils.isNumber(sortBy)) {
+			if (String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()).equalsIgnoreCase(sortBy)) {
+				orderColumn = Optional.of(LOTS_COUNT);
+			} else if (String.valueOf(TermId.GID_UNIT.getId()).equalsIgnoreCase(sortBy)) {
+				orderColumn = Optional.of(UNIT);
+			}
+		} else if (StringUtils.isNotBlank(sortBy)) {
+			orderColumn = Optional.of(sortBy);
+		}
+
+		if (orderColumn.isPresent()) {
+			sql.append(" ORDER BY `" + orderColumn.get() + "` " + direction);
+		}
+	}
+
 }
