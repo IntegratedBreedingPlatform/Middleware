@@ -61,7 +61,6 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	public static final Integer STATUS_DELETED = 9;
 	public static final Integer STATUS_ACTIVE = 0;
 	public static final String SOURCE_UNKNOWN = "Unknown";
-	public static final String GROUP_NAME_DEFAULT = "-";
 
 	@SuppressWarnings("unchecked")
 	public List<GermplasmListData> getByListId(final Integer id) {
