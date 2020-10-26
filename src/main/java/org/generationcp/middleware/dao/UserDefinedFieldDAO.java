@@ -12,10 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -91,26 +88,17 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Integer> getByCodesInMap(final String table, final String type, final List<String> codes) {
+	public List<UserDefinedField> getByCodes(final String table, final String type, final Set<String> codes) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 			criteria.add(Restrictions.eq("ftable", table));
-			criteria.add(Restrictions.like("ftype", type));
+			criteria.add(Restrictions.eq("ftype", type));
 			criteria.add(Restrictions.in("fcode", codes));
-			final List<UserDefinedField> list = criteria.list();
-			if (list != null && !list.isEmpty()) {
-				final Map<String, Integer> map = new HashMap<>();
-				for (final UserDefinedField field : list) {
-					map.put(field.getFcode(), field.getFldno());
-				}
-				return map;
-			}
-
+			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error with getByCodesInMap(name=" + table + " type= " + type + " ) query from UserDefinedField: " + e.getMessage(), e);
+				"Error with getByCodes(name=" + table + " type= " + type + " ) query from UserDefinedField: " + e.getMessage(), e);
 		}
-		return new HashMap<>();
 	}
 
 	public UserDefinedField getByLocalFieldNo(final Integer lfldno) {
@@ -180,19 +168,4 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		return returnList;
 	}
 
-	public List<UserDefinedField> getByTableTypeAndCodes(final String table, final String type, final Set<String> codes) {
-		try {
-			if (StringUtils.isNotBlank(table) && StringUtils.isNotBlank(type) && !CollectionUtils.isEmpty(codes)) {
-				final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
-				criteria.add(Restrictions.eq("ftable", table));
-				criteria.add(Restrictions.eq("ftype", type));
-				criteria.add(Restrictions.in("fcode", codes));
-				return (List<UserDefinedField>) criteria.list();
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				String.format("Error executing getByTableTypeAndCodes(table={%s}, type={%s}, codes={%s})) : {}", table, type, codes, e.getMessage()), e);
-		}
-		return null;
-	}
 }

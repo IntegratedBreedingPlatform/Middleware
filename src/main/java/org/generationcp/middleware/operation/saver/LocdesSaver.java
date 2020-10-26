@@ -4,8 +4,10 @@ package org.generationcp.middleware.operation.saver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -14,6 +16,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.Util;
 
 public class LocdesSaver extends Saver {
@@ -48,13 +51,15 @@ public class LocdesSaver extends Saver {
 	}
 
 	private Map<String, Integer> getUdfldMap() throws MiddlewareQueryException {
-		return this.getUserDefinedFieldDao()
-				.getByCodesInMap(
-						"LOCDES",
-						"DTYPE",
-						Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode(), LocdesType.RANGES_IN_BLOCK.getCode(),
-								LocdesType.ROWS_IN_PLOT.getCode(), LocdesType.MACHINE_ROW_CAPACITY.getCode(),
-								LocdesType.PLANTING_ORDER.getCode(), LocdesType.DELETED_PLOTS.getCode()));
+		final List<String> codes = Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode(), LocdesType.RANGES_IN_BLOCK.getCode(),
+			LocdesType.ROWS_IN_PLOT.getCode(), LocdesType.MACHINE_ROW_CAPACITY.getCode(),
+			LocdesType.PLANTING_ORDER.getCode(), LocdesType.DELETED_PLOTS.getCode());
+		return getUserDefinedFieldDao()
+			.getByCodes(
+				"LOCDES",
+				"DTYPE",
+				new HashSet<>(codes)).stream().collect(
+				Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
 	}
 
 	private int getId(final Map<String, Integer> map, final LocdesType type) throws MiddlewareQueryException {
