@@ -73,10 +73,12 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+import static org.junit.Assert.assertNotNull;
 
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
@@ -690,12 +692,12 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final int savedGermplasmGid = gids.get(0);
 		final Germplasm savedGermplasm = this.germplasmDAO.getById(savedGermplasmGid);
 		final Name savedName = this.nameDAO.getNamesByGids(Arrays.asList(savedGermplasmGid)).get(0);
-		Assert.assertNotNull(savedGermplasm);
+		assertNotNull(savedGermplasm);
 		Assert.assertEquals(4, savedGermplasm.getGnpgs().intValue());
-		Assert.assertNotNull(savedName);
+		assertNotNull(savedName);
 		Assert.assertEquals(1, savedName.getNstat().intValue());
-		Assert.assertNotNull(this.progenitorDAO.getByGIDAndPID(savedGermplasmGid, progenitor1.getProgenitorGid()));
-		Assert.assertNotNull(this.progenitorDAO.getByGIDAndPID(savedGermplasmGid, progenitor2.getProgenitorGid()));
+		assertNotNull(this.progenitorDAO.getByGIDAndPID(savedGermplasmGid, progenitor1.getProgenitorGid()));
+		assertNotNull(this.progenitorDAO.getByGIDAndPID(savedGermplasmGid, progenitor2.getProgenitorGid()));
 
 	}
 
@@ -1203,7 +1205,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final UserDefinedField udfld = UserDefinedFieldTestDataInitializer.createUserDefinedField("NAMES", "NAME", "FNAME12345");
 		this.germplasmDataManager.addUserDefinedField(udfld);
 		final List<UserDefinedField> userDefinedFields = this.germplasmDataManager.getUserDefinedFieldByFieldTableNameAndFTypeAndFName(udfld.getFtable(), udfld.getFtype(), udfld.getFname());
-		Assert.assertNotNull(userDefinedFields);
+		assertNotNull(userDefinedFields);
 		Assert.assertFalse(userDefinedFields.isEmpty());
 		for(final UserDefinedField userDefinedField: userDefinedFields) {
 			Assert.assertEquals(udfld.getFtable(), userDefinedField.getFtable());
@@ -1268,7 +1270,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Integer gid3 = this.germplasmDataManager.addGermplasm(germplasm3, germplasm3.getPreferredName(), this.cropType);
 
 		final Map<Integer, String> namesMap = this.germplasmDataManager.getNamesByTypeAndGIDList(nameType.getFldno(), Arrays.asList(gid1, gid2, gid3));
-		Assert.assertNotNull(namesMap);
+		assertNotNull(namesMap);
 		Assert.assertEquals(3, namesMap.size());
 		Assert.assertEquals(germplasm1.getPreferredName().getNval(), namesMap.get(gid1));
 		Assert.assertEquals(germplasm2.getPreferredName().getNval(), namesMap.get(gid2));
@@ -1305,6 +1307,22 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		this.germplasmDataManager.generateGermplasmUUID(cropType, Arrays.asList(germplasm));
 		Assert.assertTrue(germplasm.getGermplasmUUID().startsWith(cropType.getPlotCodePrefix() + "G"));
 		Assert.assertEquals(20, germplasm.getGermplasmUUID().length());
+	}
+
+	@Test
+	public void shouldGetUserDefinedFieldByTableTypeAndCodes() {
+
+		final String fname1 = UUID.randomUUID().toString();
+		this.userDefinedFieldDAO.save(UserDefinedFieldTestDataInitializer.createUserDefinedField("NAMES", "NAME", fname1));
+
+		final HashSet codes = new HashSet() {{
+			add(UserDefinedFieldTestDataInitializer.CODE);
+		}};
+		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes("NAMES", "NAME", codes);
+		assertNotNull(fields);
+		assertThat(fields, hasSize(1));
+		assertThat(fields.get(0).getFcode(), is(UserDefinedFieldTestDataInitializer.CODE));
+		assertThat(fields.get(0).getFname(), is(fname1));
 	}
 
 	private Attribute createAttribute(final Germplasm germplasm, final UserDefinedField userDefinedField, final String aval) {
