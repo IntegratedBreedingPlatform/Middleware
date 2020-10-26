@@ -12,9 +12,11 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -27,6 +29,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 /**
  * DAO class for {@link UserDefinedField}.
@@ -175,5 +178,21 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			}
 		}
 		return returnList;
+	}
+
+	public List<UserDefinedField> getByTableTypeAndCodes(final String table, final String type, final Set<String> codes) {
+		try {
+			if (StringUtils.isNotBlank(table) && StringUtils.isNotBlank(type) && !CollectionUtils.isEmpty(codes)) {
+				final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
+				criteria.add(Restrictions.eq("ftable", table));
+				criteria.add(Restrictions.eq("ftype", type));
+				criteria.add(Restrictions.in("fcode", codes));
+				return (List<UserDefinedField>) criteria.list();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				String.format("Error executing getByTableTypeAndCodes(table={%s}, type={%s}, codes={%s})) : {}", table, type, codes, e.getMessage()), e);
+		}
+		return null;
 	}
 }
