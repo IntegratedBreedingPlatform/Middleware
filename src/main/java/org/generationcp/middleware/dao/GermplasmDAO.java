@@ -28,11 +28,14 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.generationcp.middleware.pojos.workbench.CropPerson;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -1054,6 +1057,32 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error with getByGIDList(gids=" + gids.toString() + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<Germplasm> getByUUIDList(final Set<String> uuids) {
+
+		if (uuids.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT {g.*} FROM germplsm g WHERE ");
+			queryString.append("g.germplsm_uuid IN( :uuids ) ");
+			queryString.append(" AND g.deleted = 0");
+			queryString.append(" AND g.grplce = 0");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("uuids", uuids);
+			query.addEntity("g", Germplasm.class);
+
+			return query.list();
+
+		} catch (final HibernateException e) {
+			final String message = "Error with getByUUIDList(gids=" + uuids.toString() + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

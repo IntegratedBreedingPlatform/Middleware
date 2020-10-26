@@ -790,9 +790,17 @@ public interface GermplasmDataManager {
 	 * Given a List of GIDs, return the list of all Germplasm.
 	 *
 	 * @param gids the gids
-	 * @return the germplasms
+	 * @return list of germplasm
 	 */
 	List<Germplasm> getGermplasms(List<Integer> gids);
+
+	/**
+	 * Given a List of Germplasm UUIDs, return the list of all Germplasm.
+	 *
+	 * @param uuids the UUIDs
+	 * @return the set of germplasm
+	 */
+	List<Germplasm> getGermplasmByUUIDs(Set<String> uuids);
 
 	/**
 	 * Given a List of GIDs, return the list of Germplasm without group assigned (mgid = 0 or mgid is null).

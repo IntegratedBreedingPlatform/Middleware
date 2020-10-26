@@ -1022,6 +1022,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public List<Germplasm> getGermplasmByUUIDs(final Set<String> uuids) {
+		return this.getGermplasmDao().getByUUIDList(uuids);
+	}
+
+	@Override
 	public List<Germplasm> getGermplasmWithoutGroup(final List<Integer> gids) {
 		return this.getGermplasmDao().getGermplasmWithoutGroup(gids);
 	}
