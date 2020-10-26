@@ -1318,7 +1318,9 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final HashSet codes = new HashSet() {{
 			add(UserDefinedFieldTestDataInitializer.CODE);
 		}};
-		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes("NAMES", "NAME", codes);
+		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes("NAMES",
+			Collections.singleton("NAME"),
+			codes);
 		assertNotNull(fields);
 		assertThat(fields, hasSize(1));
 		assertThat(fields.get(0).getFcode(), is(UserDefinedFieldTestDataInitializer.CODE));

@@ -1619,8 +1619,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final String type, final Set<String> codes) {
-		return this.getUserDefinedFieldDao().getByCodes(table, type, codes);
+	public List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types, final Set<String> codes) {
+		return this.getUserDefinedFieldDao().getByCodes(table, types, codes);
 	}
 
 }

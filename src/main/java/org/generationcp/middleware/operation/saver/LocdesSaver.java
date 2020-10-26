@@ -1,14 +1,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
@@ -18,6 +10,15 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.Util;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class LocdesSaver extends Saver {
 
@@ -57,7 +58,7 @@ public class LocdesSaver extends Saver {
 		return getUserDefinedFieldDao()
 			.getByCodes(
 				"LOCDES",
-				"DTYPE",
+				Collections.singleton("DTYPE"),
 				new HashSet<>(codes)).stream().collect(
 				Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
 	}

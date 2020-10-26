@@ -1191,6 +1191,6 @@ public interface GermplasmDataManager {
 
 	void generateGermplasmUUID(final CropType crop, final List<Germplasm> germplasmList);
 
-	List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final String type, final Set<String> codes);
+	List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types, final Set<String> codes);
 
 }
