@@ -40,6 +40,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			request.getType(), currentUserId, description, parent, status, request.getNotes());
 		germplasmList.setProgramUUID(programUUID);
 		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+		request.setId(germplasmList.getId());
 
 		// save germplasm list data
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
