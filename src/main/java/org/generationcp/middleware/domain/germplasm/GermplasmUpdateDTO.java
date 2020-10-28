@@ -3,6 +3,7 @@ package org.generationcp.middleware.domain.germplasm;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @AutoProperty
@@ -16,7 +17,7 @@ public class GermplasmUpdateDTO {
 	private String breedingMethod;
 
 	// Contains Names and Attributes data
-	private Map<String, String> data;
+	private Map<String, String> data = new HashMap<>();
 
 	public Integer getGid() {
 		return this.gid;

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
 import org.hibernate.Criteria;
@@ -554,5 +555,11 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("getNoBulkingMethodsByType", "", null, e.getMessage(), "Method"),
 					e);
 		}
+	}
+
+	public List<Method> getByCodes(final Set<String> breedingMethodCodes) {
+		Criteria criteria = this.getSession().createCriteria(Method.class);
+		criteria.add(Restrictions.in("mcode", breedingMethodCodes));
+		return criteria.list();
 	}
 }

@@ -545,4 +545,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		final Integer id = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locationType.getCode());
 		return this.daoFactory.getLocationDAO().getDefaultLocationByType(id);
 	}
+
+	@Override
+	public List<Location> getLocationsByAbbreviation(final Set<String> locationAbbreviationSet) {
+		return this.daoFactory.getLocationDAO().getLocationsByAbbreviation(locationAbbreviationSet);
+	}
 }

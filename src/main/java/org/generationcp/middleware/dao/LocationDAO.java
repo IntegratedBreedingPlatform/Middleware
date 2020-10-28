@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1072,4 +1073,12 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	}
 
+	public List<Location> getLocationsByAbbreviation(final Set<String> locationAbbreviationSet) {
+		if (locationAbbreviationSet == null || locationAbbreviationSet.isEmpty()) {
+			return new ArrayList<>();
+		}
+		final Criteria criteria = this.getSession().createCriteria(Location.class);
+		criteria.add(Restrictions.in("labbr", locationAbbreviationSet));
+		return criteria.list();
+	}
 }

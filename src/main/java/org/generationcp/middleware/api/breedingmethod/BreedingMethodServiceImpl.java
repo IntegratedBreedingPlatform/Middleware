@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -43,5 +44,11 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	public BreedingMethodDTO getBreedingMethod(final Integer breedingMethodDbId) {
 		final Method methodEntity = this.daoFactory.getMethodDAO().getById(breedingMethodDbId);
 		return new BreedingMethodDTO(methodEntity);
+	}
+
+	@Override
+	public List<BreedingMethodDTO> getBreedingMethodsByCodes(final Set<String> breedingMethodCodes) {
+		return this.daoFactory.getMethodDAO().getByCodes(breedingMethodCodes).stream().map(o -> new BreedingMethodDTO(o))
+			.collect(Collectors.toList());
 	}
 }
