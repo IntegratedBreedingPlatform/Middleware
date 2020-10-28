@@ -61,7 +61,7 @@ public class StudyEntryDto implements Serializable {
 	}
 
 	public Integer getEntryId() {
-		return entryId;
+		return this.entryId;
 	}
 
 	public void setEntryId(final Integer entryId) {
@@ -69,7 +69,7 @@ public class StudyEntryDto implements Serializable {
 	}
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
 
 	public void setGid(final Integer gid) {
@@ -77,7 +77,7 @@ public class StudyEntryDto implements Serializable {
 	}
 
 	public String getDesignation() {
-		return designation;
+		return this.designation;
 	}
 
 	public void setDesignation(final String designation) {
@@ -85,7 +85,7 @@ public class StudyEntryDto implements Serializable {
 	}
 
 	public Integer getEntryNumber() {
-		return entryNumber;
+		return this.entryNumber;
 	}
 
 	public void setEntryNumber(final Integer entryNumber) {
@@ -93,7 +93,7 @@ public class StudyEntryDto implements Serializable {
 	}
 
 	public String getEntryCode() {
-		return entryCode;
+		return this.entryCode;
 	}
 
 	public void setEntryCode(final String entryCode) {
@@ -101,7 +101,7 @@ public class StudyEntryDto implements Serializable {
 	}
 
 	public Integer getLotCount() {
-		return lotCount;
+		return this.lotCount;
 	}
 
 	public void setLotCount(final Integer lotCount) {
@@ -109,7 +109,7 @@ public class StudyEntryDto implements Serializable {
 	}
 
 	public String getAvailableBalance() {
-		return availableBalance;
+		return this.availableBalance;
 	}
 
 	public void setAvailableBalance(final String availableBalance) {
@@ -117,7 +117,7 @@ public class StudyEntryDto implements Serializable {
 	}
 
 	public String getUnit() {
-		return unit;
+		return this.unit;
 	}
 
 	public void setUnit(final String unit) {
@@ -125,7 +125,7 @@ public class StudyEntryDto implements Serializable {
 	}
 
 	public Map<Integer, StudyEntryPropertyData> getProperties() {
-		return properties;
+		return this.properties;
 	}
 
 	public void setProperties(final Map<Integer, StudyEntryPropertyData> properties) {
