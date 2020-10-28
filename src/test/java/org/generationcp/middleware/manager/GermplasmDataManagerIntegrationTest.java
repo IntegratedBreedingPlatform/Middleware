@@ -42,6 +42,7 @@ import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -1313,13 +1314,14 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	public void shouldGetUserDefinedFieldByTableTypeAndCodes() {
 
 		final String fname1 = UUID.randomUUID().toString();
-		this.userDefinedFieldDAO.save(UserDefinedFieldTestDataInitializer.createUserDefinedField("NAMES", "NAME", fname1));
+		this.userDefinedFieldDAO.save(UserDefinedFieldTestDataInitializer.createUserDefinedField(UDTableType.NAMES_NAME.getTable(),
+			UDTableType.NAMES_NAME.getType(), fname1));
 
 		final HashSet codes = new HashSet() {{
 			add(UserDefinedFieldTestDataInitializer.CODE);
 		}};
-		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes("NAMES",
-			Collections.singleton("NAME"),
+		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
+			Collections.singleton(UDTableType.NAMES_NAME.getType()),
 			codes);
 		assertNotNull(fields);
 		assertThat(fields, hasSize(1));
