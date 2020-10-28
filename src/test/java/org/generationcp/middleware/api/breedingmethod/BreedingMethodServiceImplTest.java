@@ -7,18 +7,13 @@ import org.generationcp.middleware.data.initializer.ProgramFavoriteTestDataIniti
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.internal.verification.Times;
-import org.mockito.verification.VerificationMode;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
@@ -26,8 +21,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class BreedingMethodServiceImplTest {
 
