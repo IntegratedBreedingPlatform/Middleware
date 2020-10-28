@@ -32,21 +32,24 @@
 			BEGIN
 				DECLARE projectId INT;
 				DECLARE done INT DEFAULT FALSE;
-				DECLARE cur1 CURSOR FOR SELECT project_Id FROM projectprop WHERE variable_id = 8269 order by rank;
+				DECLARE cur1 CURSOR FOR SELECT project_id FROM projects_with_stock_id;
 				DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
+				CREATE TEMPORARY TABLE projects_with_stock_id select project_id from projectprop where variable_id = termId;
+				DELETE FROM Projectprop WHERE variable_id = termId;
+
 				OPEN cur1;
-					read_loop: LOOP FETCH cur1 INTO projectId;
-						set @newRank = 0;
+					project_loop: LOOP FETCH cur1 INTO projectId;
+						set @NEW_ORDER = 0;
 						IF done THEN
-							LEAVE read_loop;
+							LEAVE project_loop;
 						END IF;
 
-						DELETE FROM projectprop WHERE project_id = projectId AND variable_id = termId;
-						UPDATE projectprop set rank= @newRank:=@newRank+1 WHERE project_id = projectId order by rank;
+						UPDATE Projectprop SET RANK= @NEW_ORDER:=@NEW_ORDER+1 WHERE project_id = projectId ORDER BY RANK;
 
-					END LOOP read_loop;
+					END LOOP project_loop;
 				CLOSE cur1;
+				DROP TEMPORARY TABLE projects_with_stock_id;
 			END
 		</sql>
 	</changeSet>
@@ -95,39 +98,16 @@
 	<changeSet author="diego" id="v16.3.0-6">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
-				SELECT COUNT(*) > 0 FROM cvterm_relationship WHERE subject_id = 8269;
+				SELECT COUNT(*) > 0 FROM cvterm WHERE cvterm_id = 8269 and name = 'StockID';
 			</sqlCheck>
 		</preConditions>
-		<comment>Delete TermId 8269 (StockId) from cvterm_relationship and cvterm tables</comment>
+		<comment>Delete TermId 8269 (StockID) from cvterm_relationship, cvterm, cvtermsynonym and cvtermprop tables</comment>
 		<sql dbms="mysql" splitStatements="true">
 			DELETE FROM cvterm_relationship WHERE subject_id = 8269;
 			DELETE FROM cvterm WHERE cvterm_id = 8269;
-		</sql>
-	</changeSet>
-
-	<changeSet author="diego" id="v16.3.0-7">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT COUNT(*) > 0
-					FROM cvtermsynonym WHERE cvterm_id = 8269;
-			</sqlCheck>
-		</preConditions>
-		<comment>Delete TermId 8269 (StockId) from cvtermsynonym table</comment>
-		<sql dbms="mysql" splitStatements="true">
 			DELETE FROM cvtermsynonym WHERE cvterm_id = 8269;
-		</sql>
-	</changeSet>
-
-	<changeSet author="diego" id="v16.3.0-8">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT COUNT(*) > 0
-					FROM cvtermprop where cvterm_id = 8269;
-			</sqlCheck>
-		</preConditions>
-		<comment>Delete TermId 8269 (StockId) from cvtermprop table</comment>
-		<sql dbms="mysql" splitStatements="true">
 			DELETE FROM cvtermprop where cvterm_id = 8269;
 		</sql>
 	</changeSet>
+
 </databaseChangeLog>
