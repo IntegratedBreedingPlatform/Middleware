@@ -28,7 +28,12 @@ import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearc
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
@@ -46,7 +51,15 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -283,9 +296,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetPedigree() throws ParseException {
 
-		final Method generativeMethod = this.methodDAO.getByCode("C2W");
-		final Method derivativeMethod = this.methodDAO.getByCode("UDM");
-		final Method maintenanceMethod = this.methodDAO.getByCode("SMP");
+		final Method generativeMethod = this.methodDAO.getByCode(Collections.singletonList("C2W")).get(0);
+		final Method derivativeMethod = this.methodDAO.getByCode(Collections.singletonList("UDM")).get(0);
+		final Method maintenanceMethod = this.methodDAO.getByCode(Collections.singletonList("SMP")).get(0);
 
 		final Germplasm femaleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Germplasm maleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();

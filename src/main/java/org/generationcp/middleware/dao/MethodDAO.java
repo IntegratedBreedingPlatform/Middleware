@@ -11,10 +11,6 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
 import org.hibernate.Criteria;
@@ -29,6 +25,10 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * DAO class for {@link Method}.
@@ -330,15 +330,16 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		return new Method();
 	}
 
-	public Method getByCode(String code) throws MiddlewareQueryException {
+	public List<Method> getByCode(List<String> codes) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.eq("mcode", code));
-			return (Method) criteria.uniqueResult();
+			criteria.add(Restrictions.in("mcode", codes));
+			return criteria.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException(this.getLogExceptionMessage("getMethodsByCode", "code", code, e.getMessage(), "Method"), e);
+			this.logAndThrowException(this.getLogExceptionMessage("getMethodsByCode", "codes", codes.toString(), e.getMessage(), "Method"),
+				e);
 		}
-		return new Method();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")

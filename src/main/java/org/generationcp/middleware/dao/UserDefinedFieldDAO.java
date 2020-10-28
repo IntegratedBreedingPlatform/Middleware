@@ -11,11 +11,6 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -27,6 +22,10 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * DAO class for {@link UserDefinedField}.
@@ -70,44 +69,17 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		return new ArrayList<>();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<UserDefinedField> getByTableNameAndNameLike(final String tableName, final String nameLike) {
-		try {
-			if (tableName != null && nameLike != null) {
-				final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
-				criteria.add(Restrictions.eq("ftable", tableName));
-				criteria.add(Restrictions.like("fname", nameLike));
-				criteria.addOrder(Order.asc("fname"));
-				return criteria.list();
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getByTableNameAndNameLike(name=" + tableName + " nameLike= " + nameLike
-					+ " ) query from UserDefinedField: " + e.getMessage(), e);
-		}
-		return new ArrayList<>();
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<String, Integer> getByCodesInMap(final String table, final String type, final List<String> codes) {
+	public List<UserDefinedField> getByCodes(final String table, final Set<String> types, final Set<String> codes) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 			criteria.add(Restrictions.eq("ftable", table));
-			criteria.add(Restrictions.like("ftype", type));
+			criteria.add(Restrictions.in("ftype", types));
 			criteria.add(Restrictions.in("fcode", codes));
-			final List<UserDefinedField> list = criteria.list();
-			if (list != null && !list.isEmpty()) {
-				final Map<String, Integer> map = new HashMap<>();
-				for (final UserDefinedField field : list) {
-					map.put(field.getFcode(), field.getFldno());
-				}
-				return map;
-			}
-
+			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error with getByCodesInMap(name=" + table + " type= " + type + " ) query from UserDefinedField: " + e.getMessage(), e);
+				"Error with getByCodes(name=" + table + " types= " + types + " ) query from UserDefinedField: " + e.getMessage(), e);
 		}
-		return new HashMap<>();
 	}
 
 	public UserDefinedField getByLocalFieldNo(final Integer lfldno) {

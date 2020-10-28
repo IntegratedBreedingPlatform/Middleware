@@ -34,10 +34,8 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +43,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 /**
  * A utility class used to get primitive values of wrapper classes, check for null values, and list functions such as getting the max,
@@ -104,42 +101,6 @@ public class Util {
 	}
 
 	/**
-	 * Returns true if all values are null.
-	 *
-	 * @param args
-	 * @return true if all values are null.
-	 */
-	public static boolean isAllNull(final Object... args) {
-		for (final Object obj : args) {
-			if (obj != null) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Test whether <code>value</code> is equal to all of the specified values.
-	 *
-	 * @param value
-	 * @param values
-	 * @return true if value is equal to all values.
-	 */
-	public static boolean isAllEqualTo(final Double value, final Double... values) {
-		if (values == null) {
-			return false;
-		}
-
-		for (final Double val : values) {
-			if (!value.equals(val)) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
 	 * Test whether the specified list is "empty". A <code>null</code> value is considered "empty".
 	 *
 	 * @param list
@@ -166,29 +127,6 @@ public class Util {
 		}
 
 		return max;
-	}
-
-	/**
-	 * Makes the given objects in the list unmodifiable.
-	 *
-	 * @param objects
-	 * @return the read-only list.
-	 */
-	public static <T> List<T> makeReadOnlyList(final T... objects) {
-		if (objects == null) {
-			return Collections.unmodifiableList(new ArrayList<T>());
-		}
-
-		return Arrays.asList(objects);
-	}
-
-	public static Integer getCurrentDateAsInteger() {
-		final Calendar now = Calendar.getInstance();
-		final SimpleDateFormat formatter = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
-		final String dateNowStr = formatter.format(now.getTime());
-		final Integer dateNowInt = Integer.valueOf(dateNowStr);
-		return dateNowInt;
-
 	}
 
 	/**
@@ -231,10 +169,6 @@ public class Util {
 		return results;
 	}
 
-	public static boolean isNonNullValidNumericString(final Object value) {
-		return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));
-	}
-
 	/**
 	 * Returns the current date in format "yyyyMMdd" as Integer
 	 *
@@ -242,6 +176,10 @@ public class Util {
 	 */
 	public static Integer getCurrentDateAsIntegerValue() {
 		return Integer.valueOf(Util.getCurrentDateAsStringValue());
+	}
+
+	public static Integer convertDateToIntegerValue(final Date date) {
+		return Integer.valueOf(Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).format(date.getTime()));
 	}
 
 	/**

@@ -16,6 +16,7 @@ import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -24,7 +25,6 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
-import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -123,6 +123,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	@Deprecated
 	public long countGermplasmByLocationName(final String name, final Operation op) {
 		long count = 0;
 		final GermplasmDAO dao = this.getGermplasmDao();
@@ -135,6 +136,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	@Deprecated
 	public List<Germplasm> getGermplasmByMethodName(final String name, final int start, final int numOfRows, final Operation op) {
 		List<Germplasm> germplasms = new ArrayList<>();
 		final GermplasmDAO dao = this.getGermplasmDao();
@@ -147,6 +149,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	@Deprecated
 	public long countGermplasmByMethodName(final String name, final Operation op) {
 		long count = 0;
 		final GermplasmDAO dao = this.getGermplasmDao();
@@ -1126,7 +1129,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Method getMethodByCode(final String code) {
-		return this.getMethodDao().getByCode(code);
+		return this.getMethodDao().getByCode(Collections.singletonList(code)).get(0);
 	}
 
 	@Override
@@ -1600,6 +1603,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.getGermplasmDao().hasExistingCrosses(femaleParent, maleParentIds, gid);
 	}
 
+	//FIXME To use: GermplasmGuidGeneratorImpl
 	@Override
 	public void generateGermplasmUUID(final CropType crop, final List<Germplasm> germplasmList) {
 		Preconditions.checkNotNull(crop);
