@@ -9,7 +9,6 @@ public class AttributeDTO {
 	private String code;
 	private Integer id;
 	private String name;
-	private String value;
 
 	public String getCode() {
 		return this.code;
@@ -33,14 +32,6 @@ public class AttributeDTO {
 
 	public void setName(final String name) {
 		this.name = name;
-	}
-
-	public String getValue() {
-		return this.value;
-	}
-
-	public void setValue(final String value) {
-		this.value = value;
 	}
 
 	@Override
