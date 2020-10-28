@@ -5,14 +5,19 @@ import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.util.Util;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -22,6 +27,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private final DaoFactory daoFactory;
 
+	@Autowired
+	private GermplasmDataManager germplasmDataManager;
+
 	public GermplasmListServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
@@ -29,6 +37,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request, final int status, final String programUUID,
 		final WorkbenchUser loggedInUser) {
+
+		final List<Integer> gids = request.getEntries()
+			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
+		final Map<Integer, String> preferrredNamesMap = this.germplasmDataManager.getPreferredNamesByGids(gids);
 
 		final Integer currentUserId = loggedInUser.getUserid();
 		final GermplasmList parent = request.getParentFolderId() != null ?
@@ -44,8 +56,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		// save germplasm list data
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
-			final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, entry.getGid(), entry.getEntryNo(),
-				entry.getEntryCode(), entry.getSeedSource(), entry.getDesignation(), entry.getGroupName(),
+			final Integer gid = entry.getGid();
+			final String preferredName = preferrredNamesMap.get(gid);
+			final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
+				entry.getEntryCode(), entry.getSeedSource(), preferredName, entry.getGroupName(),
 				GermplasmListDataDAO.STATUS_ACTIVE, null);
 			this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 		}
