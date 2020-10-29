@@ -340,7 +340,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	public Integer getNextEntryNumber(final Integer studyId) {
 		try {
-			final Query query = this.getSession().createQuery("SELECT MAX(Convert(uniquename, SIGNED)) FROM stock where project_id = :studyId");
+			final String queryString = "SELECT MAX(Convert(s.uniquename, SIGNED)) FROM stock s where s.project_id = :studyId";
+			final SQLQuery query = this.getSession().createSQLQuery(queryString);
 			query.setParameter("studyId", studyId);
 			final Integer highestEntryNumber = (Integer) query.uniqueResult();
 			if(highestEntryNumber == null) {
