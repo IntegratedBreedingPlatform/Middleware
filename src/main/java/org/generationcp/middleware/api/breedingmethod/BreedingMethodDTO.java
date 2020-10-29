@@ -7,6 +7,7 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class BreedingMethodDTO {
 
+	private Integer id;
 	private String code;
 	private String name;
 	private String description;
@@ -19,12 +20,21 @@ public class BreedingMethodDTO {
 
 	public BreedingMethodDTO(final Method method) {
 		this();
+		this.id = method.getMid();
 		this.code = method.getMcode();
 		this.name = method.getMname();
 		this.description = method.getMdesc();
 		this.type = method.getMtype();
 		this.group = method.getMgrp();
 		this.methodClass = method.getGeneq();
+	}
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(final Integer id) {
+		this.id = id;
 	}
 
 	public String getCode() {
