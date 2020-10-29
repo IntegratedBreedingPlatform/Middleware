@@ -68,6 +68,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasm.setGpid1(0);
 			germplasm.setGpid2(0);
 
+			//Research progntrs table
+
+
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
 
