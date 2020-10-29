@@ -62,13 +62,6 @@ public class StockBuilderTest {
 		Assert.assertEquals(stockModel.getProperties().iterator().next().getValue(), value);
 	}
 	
-	@Test
-	public void testGetValueForNonExistingStockProperty() {
-		final StockModel stockModel = this.createStockModel();
-		final String value = this.stockBuilder.getValue(stockModel, this.createDMSVariableType(TermId.STOCKID));
-		Assert.assertNull(value);
-	}
-	
 	private StockModel createStockModel() {
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(20));
