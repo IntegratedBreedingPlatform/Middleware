@@ -1,27 +1,20 @@
 package org.generationcp.middleware.api.germplasmlist;
 
-import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
-import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -76,45 +69,34 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String username,
+	public Optional<GermplasmList> getGermplasmListById(final Integer parentId) {
+		return Optional.ofNullable(this.daoFactory.getGermplasmListDAO().getById(parentId));
+	}
+
+	@Override
+	public Optional<GermplasmList> getGermplasmListByParentAndName(final String germplasmListName, final Integer parentId,
+		final String programUUID) {
+		return Optional.ofNullable(this.daoFactory.getGermplasmListDAO().getGermplasmListByParentAndName(germplasmListName, parentId, programUUID));
+	}
+
+	@Override
+	public Integer createGermplasmListFolder(final Integer userId, final String folderName, final Integer parentId,
 		final String programUUID) {
 
-//		Preconditions.checkNotNull(folderName);
-//		Preconditions.checkNotNull(parentId);
-//		Preconditions.checkNotNull(username, "username can not be empty");
-//		Preconditions.checkNotNull(programUUID);
-//		Preconditions.checkArgument(!folderName.isEmpty(), "folderName can not be empty");
-//		Preconditions.checkArgument(!programUUID.isEmpty(), "programUUID can not be empty");
+		final GermplasmList parentFolder =
+			this.getGermplasmListById(parentId).orElseThrow(() -> new MiddlewareException("Parent Folder does not exist"));
 
-		final GermplasmList parentList = Optional.of(this.daoFactory.getGermplasmListDAO().getById(parentId))
-			.orElseThrow(() -> new MiddlewareException("Parent Folder does not exist"));
-
-//		Preconditions.checkArgument(parentList.isFolder(), "Specified parentID is not a folder");
-
-		final SampleList uniqueSampleListName =
-			this.daoFactory.getGermplasmListDAO().getSampleListByParentAndName(folderName, parentList.getId(), programUUID);
-
-		Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
-
-		try {
-
-			final WorkbenchUser workbenchUser = this.userService.getUserByUsername(username);
-			final SampleList sampleFolder = new SampleList();
-			sampleFolder.setCreatedDate(new Date());
-			sampleFolder.setCreatedByUserId(workbenchUser.getUserid());
-			sampleFolder.setDescription(null);
-			sampleFolder.setListName(folderName);
-			sampleFolder.setNotes(null);
-			sampleFolder.setHierarchy(parentList);
-			sampleFolder.setType(SampleListType.FOLDER);
-			sampleFolder.setProgramUUID(programUUID);
-			return this.daoFactory.getSampleListDao().save(sampleFolder).getId();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in createSampleListFolder in SampleListServiceImpl: " + e.getMessage(), e);
-		}
-
-		return null;
+		final GermplasmList folder = new GermplasmList();
+		folder.setDate(Util.getCurrentDateAsLongValue());
+		folder.setUserId(userId);
+		folder.setDescription(folderName);
+		folder.setName(folderName);
+		folder.setNotes(null);
+		folder.setParent(parentFolder);
+		folder.setType(GermplasmList.FOLDER_TYPE);
+		folder.setProgramUUID(programUUID);
+		folder.setStatus(GermplasmList.Status.FOLDER.getCode());
+		return this.daoFactory.getGermplasmListDAO().save(folder).getId();
 	}
 
 }

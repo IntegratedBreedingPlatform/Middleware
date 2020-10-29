@@ -37,6 +37,8 @@ import java.util.*;
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	private static final String PROGRAM_UUID = "programUUID";
+	private static final String NAME = "name";
+	private static final String PARENT = "parent";
 
 	private static final String STATUS = "status";
 
@@ -643,4 +645,22 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			}
 		});
 	}
+
+	public GermplasmList getGermplasmListByParentAndName(final String germplasmListName, final Integer parentId, final String programUUID) {
+		try {
+			final GermplasmList parent = new GermplasmList();
+			parent.setId(parentId);
+			final DetachedCriteria criteria = DetachedCriteria.forClass(GermplasmList.class);
+			criteria.add(Restrictions.eq(NAME, germplasmListName));
+			criteria.add(Restrictions.eq(PARENT, parent));
+			criteria.add(Restrictions.eq(PROGRAM_UUID, programUUID));
+			return (GermplasmList) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
+		} catch (final Exception e) {
+			final String message = "Error with getGermplasmListByParentAndName(germplasmListName=" + germplasmListName + ", parentId= " + parentId
+				+ " ) query from GermplasmList: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
+	}
+
 }
