@@ -81,6 +81,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
+	public Integer getNextEntryNumber(final Integer studyId) {
+		return this.daoFactory.getStockDao().getNextEntryNumber(studyId);
+	}
+
+	@Override
 	public Map<Integer, StudyEntryDto> getPlotEntriesMap(final int studyBusinessIdentifier, final Set<Integer> plotNos) {
 		return this.daoFactory.getStockDao().getPlotEntriesMap(studyBusinessIdentifier, plotNos);
 	}

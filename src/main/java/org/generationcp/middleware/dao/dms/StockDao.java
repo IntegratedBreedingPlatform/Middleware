@@ -338,6 +338,23 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	}
 
+	public Integer getNextEntryNumber(final Integer studyId) {
+		try {
+			final Query query = this.getSession().createQuery("SELECT MAX(Convert(uniquename, SIGNED)) FROM stock where project_id = :studyId");
+			query.setParameter("studyId", studyId);
+			final Integer highestEntryNumber = (Integer) query.uniqueResult();
+			if(highestEntryNumber == null) {
+				return 1;
+			} else {
+				return highestEntryNumber + 1;
+			}
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in getNextEntryNumber for studyId=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
 	public List<StudyEntryDto> getStudyEntries(final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
 		try {
 			final StringBuilder sqlQuery = new StringBuilder("SELECT s.stock_id AS entryId, "
@@ -395,7 +412,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 			}
 			sqlQuery.append(" GROUP BY s.stock_id ");
-			
+
 			this.addOrder(sqlQuery, pageable);
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery.toString());

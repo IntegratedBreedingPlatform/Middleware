@@ -21,6 +21,8 @@ public interface StudyEntryService {
 
 	void deleteStudyEntries(int studyId);
 
+	Integer getNextEntryNumber(Integer studyId);
+
 	List<StudyEntryDto> saveStudyEntries(Integer studyId, List<StudyEntryDto> studyEntryDtoList);
 
 	long countStudyGermplasmByEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
