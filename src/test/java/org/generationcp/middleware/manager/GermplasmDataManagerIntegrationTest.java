@@ -1338,6 +1338,19 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
 			Collections.singleton(UDTableType.NAMES_NAME.getType()),
+			new HashSet<>());
+		assertNotNull(fields);
+		assertThat(fields.size(), is(namesUserDefined.size()));
+	}
+
+	@Test
+	public void shouldGetAllUserDefinedFieldByTableAndTypeWithNullCodes() {
+
+		final List<UserDefinedField> namesUserDefined = this.germplasmDataManager
+			.getUserDefinedFieldByFieldTableNameAndType(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType());
+
+		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
+			Collections.singleton(UDTableType.NAMES_NAME.getType()),
 			null);
 		assertNotNull(fields);
 		assertThat(fields.size(), is(namesUserDefined.size()));
