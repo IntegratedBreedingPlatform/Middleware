@@ -26,6 +26,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 /**
  * DAO class for {@link UserDefinedField}.
@@ -92,7 +93,10 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 			criteria.add(Restrictions.eq("ftable", table));
 			criteria.add(Restrictions.in("ftype", type));
-			criteria.add(Restrictions.in("fcode", codes));
+
+			if (!CollectionUtils.isEmpty(codes)) {
+				criteria.add(Restrictions.in("fcode", codes));
+			}
 			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(

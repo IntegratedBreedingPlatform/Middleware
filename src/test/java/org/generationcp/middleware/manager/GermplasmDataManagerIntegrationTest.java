@@ -80,6 +80,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
@@ -1327,6 +1328,19 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		assertThat(fields, hasSize(1));
 		assertThat(fields.get(0).getFcode(), is(UserDefinedFieldTestDataInitializer.CODE));
 		assertThat(fields.get(0).getFname(), is(fname1));
+	}
+
+	@Test
+	public void shouldGetAllUserDefinedFieldByTableAndTypeWithEmptyCodes() {
+
+		final List<UserDefinedField> namesUserDefined = this.germplasmDataManager
+			.getUserDefinedFieldByFieldTableNameAndType(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType());
+
+		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
+			Collections.singleton(UDTableType.NAMES_NAME.getType()),
+			null);
+		assertNotNull(fields);
+		assertThat(fields.size(), is(namesUserDefined.size()));
 	}
 
 	private Attribute createAttribute(final Germplasm germplasm, final UserDefinedField userDefinedField, final String aval) {
