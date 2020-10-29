@@ -343,11 +343,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			final String queryString = "SELECT MAX(Convert(s.uniquename, SIGNED)) FROM stock s where s.project_id = :studyId";
 			final SQLQuery query = this.getSession().createSQLQuery(queryString);
 			query.setParameter("studyId", studyId);
-			final Integer highestEntryNumber = (Integer) query.uniqueResult();
+			final BigInteger highestEntryNumber = (BigInteger) query.uniqueResult();
 			if(highestEntryNumber == null) {
 				return 1;
 			} else {
-				return highestEntryNumber + 1;
+				return highestEntryNumber.intValue() + 1;
 			}
 		} catch (final HibernateException e) {
 			final String errorMessage = "Error in getNextEntryNumber for studyId=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
