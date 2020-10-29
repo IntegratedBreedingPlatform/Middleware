@@ -787,6 +787,14 @@ public interface GermplasmDataManager {
 	List<Germplasm> getGermplasmByGidRange(int startGID, int endGID);
 
 	/**
+	 * Given a List of GIDs, return the list of all Germplasm with preferred name.
+	 *
+	 * @param gids the gids
+	 * @return the germplasms
+	 */
+	List<Germplasm> getGermplasmWithPreferredNameByGIDs(List<Integer> gids);
+
+	/**
 	 * Given a List of GIDs, return the list of all Germplasm.
 	 *
 	 * @param gids the gids

@@ -1017,6 +1017,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public List<Germplasm> getGermplasmWithPreferredNameByGIDs(final List<Integer> gids) {
+		return this.getGermplasmDao().getGermplasmWithPreferredNameByGIDs(gids);
+	}
+
+	@Override
 	public List<Germplasm> getGermplasms(final List<Integer> gids) {
 		return this.getGermplasmDao().getByGIDList(gids);
 	}
