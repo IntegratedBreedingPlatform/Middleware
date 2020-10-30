@@ -686,6 +686,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
     /**
      * New germplasm query (replaces {@link GermplasmSearchDAO#searchForGermplasms(GermplasmSearchParameter)}
+     * @param germplasmSearchRequest
+     * @param pageable if null -> returns 5000 + included gids
+     * @param programUUID
      */
     public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
         final String programUUID) {
@@ -744,7 +747,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
              * The outer query returns a PAGE of results + associated gids (e.g pedigree, group members),
              * which don't count for the Total results
              */
-            if (!sortState.isEmpty()) {
+            if (!sortState.isEmpty() && pageable != null) {
             	addPaginationToSQLQuery(query, pageable);
             }
             query.setParameterList("gids", gids);
@@ -897,14 +900,14 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         addFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequest, preFilteredGids, programUUID);
 
         final Map<String, Boolean> sortState = convertSort(pageable);
-		if (!sortState.isEmpty()) {
+		if (!sortState.isEmpty() || pageable == null) {
             queryBuilder.append(LIMIT_CLAUSE);
         }
 
         final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
         sqlQuery.addScalar(GID);
 
-        if (sortState.isEmpty()) {
+        if (sortState.isEmpty() && pageable != null) {
             addPaginationToSQLQuery(sqlQuery, pageable);
         }
 		addFilters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequest, preFilteredGids, programUUID);
@@ -974,10 +977,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
     private static Map<String, Boolean> convertSort(final Pageable pageable) {
         final Map<String, Boolean> sortState = new HashMap<>();
-        final Sort sort = pageable.getSort();
-        if (sort == null) {
+        if (pageable == null || pageable.getSort() == null) {
             return Collections.EMPTY_MAP;
         }
+        final Sort sort = pageable.getSort();
         final Iterator<Sort.Order> iterator = sort.iterator();
         while (iterator.hasNext()) {
             final Sort.Order next = iterator.next();
