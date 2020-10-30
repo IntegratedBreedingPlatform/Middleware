@@ -99,4 +99,17 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.daoFactory.getGermplasmListDAO().save(folder).getId();
 	}
 
+	@Override
+	public Integer updateGermplasmListFolder(final Integer userId, final String folderName, final Integer folderId,
+		final String programUUID) {
+
+		final GermplasmList folder =
+			this.getGermplasmListById(folderId).orElseThrow(() -> new MiddlewareException("Folder does not exist"));
+
+		folder.setName(folderName);
+		folder.setDescription(folderName);
+
+		return this.daoFactory.getGermplasmListDAO().save(folder).getId();
+	}
+
 }

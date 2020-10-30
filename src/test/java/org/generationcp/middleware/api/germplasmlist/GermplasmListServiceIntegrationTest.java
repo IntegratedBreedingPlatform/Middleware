@@ -44,7 +44,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void shouldCreateAndGetGermplasmListFolder_OK() {
+	public void shouldCreateAndUpdateAndGetGermplasmListFolder_OK() {
 
 		final String folderName = "NewFolder";
 
@@ -54,26 +54,41 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 			this.germplasmListService.createGermplasmListFolder(USER_ID, folderName, this.parentFolderId, PROGRAM_UUID);
 		assertNotNull(germplasmListNewFolderId);
 
-		final Optional<GermplasmList> germplasmListById = this.germplasmListService.getGermplasmListById(germplasmListNewFolderId);
-		assertTrue(germplasmListById.isPresent());
-		final GermplasmList newGermplasmList = germplasmListById.get();
-		assertNotNull(newGermplasmList);
-		assertThat(newGermplasmList.getId(), is(germplasmListNewFolderId));
-		assertNotNull(newGermplasmList.getDate());
-		assertThat(newGermplasmList.getUserId(), is(USER_ID));
-		assertThat(newGermplasmList.getDescription(), is(folderName));
-		assertThat(newGermplasmList.getName(), is(folderName));
-		assertNull(newGermplasmList.getNotes());
-		assertNotNull(newGermplasmList.getParent());
-		assertThat(newGermplasmList.getParent().getId(), is(this.parentFolderId));
-		assertThat(newGermplasmList.getType(), is(GermplasmList.FOLDER_TYPE));
-		assertThat(newGermplasmList.getProgramUUID(), is(PROGRAM_UUID));
-		assertThat(newGermplasmList.getStatus(), is(GermplasmList.Status.FOLDER.getCode()));
+		final Optional<GermplasmList> newGermplasmListById = this.germplasmListService.getGermplasmListById(germplasmListNewFolderId);
+		assertTrue(newGermplasmListById.isPresent());
+		final GermplasmList newGermplasmList = newGermplasmListById.get();
+		this.assertGermplasmList(newGermplasmList, germplasmListNewFolderId, folderName);
 
 		final Optional<GermplasmList> germplasmListByParentAndName =
 			this.germplasmListService.getGermplasmListByParentAndName(folderName, this.parentFolderId, PROGRAM_UUID);
 		assertTrue(germplasmListByParentAndName.isPresent());
 		assertThat(germplasmListByParentAndName.get().getId(), is(germplasmListNewFolderId));
+
+		String updatedFolderName = "updatedFolderName";
+		final Integer germplasmListUpdatedFolderId =
+			this.germplasmListService.updateGermplasmListFolder(USER_ID, updatedFolderName, germplasmListNewFolderId, PROGRAM_UUID);
+		assertNotNull(germplasmListUpdatedFolderId);
+		assertThat(germplasmListUpdatedFolderId, is(germplasmListNewFolderId));
+
+		final Optional<GermplasmList> updatedGermplasmListById = this.germplasmListService.getGermplasmListById(germplasmListUpdatedFolderId);
+		assertTrue(updatedGermplasmListById.isPresent());
+		final GermplasmList updatedGermplasmList = updatedGermplasmListById.get();
+		this.assertGermplasmList(updatedGermplasmList, germplasmListUpdatedFolderId, updatedFolderName);
+	}
+
+	private void assertGermplasmList(final GermplasmList germplasmList, final Integer id, final String name) {
+		assertNotNull(germplasmList);
+		assertThat(germplasmList.getId(), is(id));
+		assertNotNull(germplasmList.getDate());
+		assertThat(germplasmList.getUserId(), is(USER_ID));
+		assertThat(germplasmList.getDescription(), is(name));
+		assertThat(germplasmList.getName(), is(name));
+		assertNull(germplasmList.getNotes());
+		assertNotNull(germplasmList.getParent());
+		assertThat(germplasmList.getParent().getId(), is(this.parentFolderId));
+		assertThat(germplasmList.getType(), is(GermplasmList.FOLDER_TYPE));
+		assertThat(germplasmList.getProgramUUID(), is(PROGRAM_UUID));
+		assertThat(germplasmList.getStatus(), is(GermplasmList.Status.FOLDER.getCode()));
 	}
 
 }
