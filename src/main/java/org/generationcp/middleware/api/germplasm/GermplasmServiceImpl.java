@@ -74,14 +74,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
-
 			germplasm.setUserId(userId);
-
 			germplasm.setLgid(0);
-
 			germplasm.setLocationId(locationsMapByAbbr.get(germplasmDto.getLocationAbbr().toUpperCase()));
 			germplasm.setDeleted(Boolean.FALSE);
-
 			germplasm.setGdate(Util.convertDateToIntegerValue(germplasmDto.getCreationDate()));
 
 			if (StringUtils.isEmpty(germplasmDto.getGuid())) {
