@@ -67,6 +67,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 			//Given that parents are not provided, gnpgs = method.mprgn
 			//If parents are provided and method type = GEN and mprgn = 0, then, gnpgs = number or parents provided
 			germplasm.setGnpgs(method.getMprgn());
+
+			//First iteration, parents not provided, default = 0
 			germplasm.setGpid1(0);
 			germplasm.setGpid2(0);
 
