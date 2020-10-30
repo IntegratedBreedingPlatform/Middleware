@@ -1,10 +1,12 @@
 package org.generationcp.middleware.api.breedingmethod;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodClass;
 import org.generationcp.middleware.pojos.MethodType;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,5 +45,25 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	public BreedingMethodDTO getBreedingMethod(final Integer breedingMethodDbId) {
 		final Method methodEntity = this.daoFactory.getMethodDAO().getById(breedingMethodDbId);
 		return new BreedingMethodDTO(methodEntity);
+	}
+
+	@Override
+	public List<BreedingMethodDTO> getBreedingMethods(final String programUUID, final boolean favorites) {
+		final List<Integer> breedingMethodIds = new ArrayList<>();
+		if (!StringUtils.isEmpty(programUUID) && favorites) {
+			breedingMethodIds.addAll(this.getFavoriteProjectMethodsIds(programUUID));
+		}
+
+		return this.daoFactory.getMethodDAO().filterMethods(programUUID, breedingMethodIds).stream()
+			.map(BreedingMethodDTO::new)
+			.collect(Collectors.toList());
+	}
+
+	private List<Integer> getFavoriteProjectMethodsIds(final String programUUID) {
+		return this.daoFactory.getProgramFavoriteDao()
+			.getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, programUUID)
+			.stream()
+			.map(ProgramFavorite::getEntityId)
+			.collect(Collectors.toList());
 	}
 }
