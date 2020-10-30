@@ -1,17 +1,17 @@
-package org.generationcp.middleware.api.attribute;
+package org.generationcp.middleware.domain.germplasm;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class AttributeDTO {
+public class GermplasmListTypeDTO {
 
 	private String code;
 	private Integer id;
 	private String name;
 
 	public String getCode() {
-		return this.code;
+		return code;
 	}
 
 	public void setCode(final String code) {
@@ -19,7 +19,7 @@ public class AttributeDTO {
 	}
 
 	public Integer getId() {
-		return this.id;
+		return id;
 	}
 
 	public void setId(final Integer id) {
@@ -27,16 +27,11 @@ public class AttributeDTO {
 	}
 
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
 	public void setName(final String name) {
 		this.name = name;
-	}
-
-	@Override
-	public boolean equals(final Object o) {
-		return Pojomatic.equals(this, o);
 	}
 
 	@Override
@@ -48,4 +43,10 @@ public class AttributeDTO {
 	public String toString() {
 		return Pojomatic.toString(this);
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
 }

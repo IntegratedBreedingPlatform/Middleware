@@ -54,8 +54,6 @@ public enum NonEditableFactors {
 
 	GROUPGID(TermId.GROUPGID.getId()),
 
-	STOCKID(TermId.STOCKID.getId()),
-
 	/** The observation unit id. */
 	OBS_UNIT_ID(TermId.OBS_UNIT_ID.getId());
 

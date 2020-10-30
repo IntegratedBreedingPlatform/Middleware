@@ -1085,7 +1085,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Returns the list of favorite methods in the current program
 	 *
-	 * @param mType
+	 * @param methodType
 	 * @param programUUID
 	 * @return list of favorite methods
 	 */
@@ -1198,4 +1198,7 @@ public interface GermplasmDataManager {
 	boolean hasExistingCrosses(Integer femaleParent, List<Integer> maleParentIds, Optional<Integer> gid);
 
 	void generateGermplasmUUID(final CropType crop, final List<Germplasm> germplasmList);
+
+	List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types, final Set<String> codes);
+
 }

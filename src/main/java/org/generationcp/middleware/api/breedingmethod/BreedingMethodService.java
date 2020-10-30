@@ -10,4 +10,6 @@ public interface BreedingMethodService {
 	BreedingMethodDTO getBreedingMethod(Integer breedingMethodDbId);
 
 	List<BreedingMethodDTO> getBreedingMethodsByCodes(Set<String> breedingMethodCodes);
+
+	List<BreedingMethodDTO> getBreedingMethods(String programUUID, boolean favorites);
 }

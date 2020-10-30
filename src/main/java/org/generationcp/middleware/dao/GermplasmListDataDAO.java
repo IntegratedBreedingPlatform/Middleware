@@ -58,7 +58,9 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 	static final String GERMPLASM_DELETED_COLUMN = GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS + ".deleted";
 
-	static final Integer STATUS_DELETED = 9;
+	public static final Integer STATUS_DELETED = 9;
+	public static final Integer STATUS_ACTIVE = 0;
+	public static final String SOURCE_UNKNOWN = "Unknown";
 
 	@SuppressWarnings("unchecked")
 	public List<GermplasmListData> getByListId(final Integer id) {

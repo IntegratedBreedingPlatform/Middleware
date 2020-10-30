@@ -1425,7 +1425,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public Map<Integer, String> getGroupSourcePreferredNamesByGids(final List<Integer> gids) {
 		return this.getNameDao().getSourcePreferredNamesByGids(gids);
-
 	}
 
 	@Override
@@ -1623,5 +1622,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			}
 		}
 	}
+
+	@Override
+	public List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types, final Set<String> codes) {
+		return this.getUserDefinedFieldDao().getByCodes(table, types, codes);
+	}
+
 }
 

@@ -42,7 +42,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	private static List<Integer> REMOVABLE_GERMPLASM_DESCRIPTOR_IDS = Lists
 		.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
-			TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
+			TermId.OBS_UNIT_ID.getId());
 
 	public StudyEntryServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -52,7 +52,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public List<StudyEntryDto> getStudyEntries(final int studyId) {
 		// Return by ascending order of entry number. We need to perform cast first on uniquename since it's stored as string
 		return this.getStudyEntries(studyId, null, new PageRequest(0, Integer.MAX_VALUE,
-				new Sort(Sort.Direction.ASC, "CAST(uniquename AS UNSIGNED)")));
+				new Sort(Sort.Direction.ASC, String.valueOf(TermId.ENTRY_NO.getId()))));
 	}
 
 	@Override
