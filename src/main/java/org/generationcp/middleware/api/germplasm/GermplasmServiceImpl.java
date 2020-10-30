@@ -51,7 +51,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public Map<Integer, Integer> importGermplasmSet(final Integer userId, final String cropName,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final Map<Integer, Integer> results = new HashMap<>();
-		final Map<String, Integer> methodsMapByAbbr = this.getBreedingMethodsMapByAbbr(germplasmImportRequestDto.getGermplasmSet());
+		final Map<String, Method> methodsMapByAbbr = this.getBreedingMethodsMapByAbbr(germplasmImportRequestDto.getGermplasmSet());
 		final Map<String, Integer> locationsMapByAbbr = this.getLocationsMapByAbbr(germplasmImportRequestDto.getGermplasmSet());
 		final Map<String, Integer> attributesMapByName = this.getAttributesMapByName(germplasmImportRequestDto.getGermplasmSet());
 		final Map<String, Integer> nameTypesMapByName = this.getNameTypesMapByName(germplasmImportRequestDto.getGermplasmSet());
@@ -61,15 +61,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 		for (final GermplasmImportRequestDto.GermplasmDto germplasmDto : germplasmImportRequestDto.getGermplasmSet()) {
 			final Germplasm germplasm = new Germplasm();
 
-			germplasm.setMethodId(methodsMapByAbbr.get(germplasmDto.getBreedingMethodAbbr().toUpperCase()));
+			final Method method = methodsMapByAbbr.get(germplasmDto.getBreedingMethodAbbr().toUpperCase());
+			germplasm.setMethodId(method.getMid());
 
-			// RESEARCH A BIT MORE
-			germplasm.setGnpgs(0);
+			//Given that parents are not provided, gnpgs = method.mprgn
+			//If parents are provided and method type = GEN and mprgn = 0, then, gnpgs = number or parents provided
+			germplasm.setGnpgs(method.getMprgn());
 			germplasm.setGpid1(0);
 			germplasm.setGpid2(0);
-
-			//Research progntrs table
-
 
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
@@ -128,10 +127,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 			.collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
 	}
 
-	private Map<String, Integer> getBreedingMethodsMapByAbbr(final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtos) {
+	private Map<String, Method> getBreedingMethodsMapByAbbr(final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtos) {
 		final Set<String> breedingMethods = germplasmDtos.stream().map(g -> g.getBreedingMethodAbbr()).collect(Collectors.toSet());
 		return this.daoFactory.getMethodDAO().getByCode(new ArrayList<>(breedingMethods)).stream()
-			.collect(Collectors.toMap(Method::getMcode, Method::getMid));
+			.collect(Collectors.toMap(Method::getMcode, method -> method));
 	}
 
 	private Map<String, Integer> getNameTypesMapByName(final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtos) {
