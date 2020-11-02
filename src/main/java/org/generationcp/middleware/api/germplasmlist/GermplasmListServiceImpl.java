@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasmlist;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -7,6 +8,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Transactional
 @Service
@@ -39,7 +43,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final List<Integer> gids = request.getEntries()
 			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
-		final Map<Integer, String> preferrredNamesMap = this.germplasmDataManager.getPreferredNamesByGids(gids);
+		final Map<Integer, String> preferredNamesMap = this.germplasmDataManager.getPreferredNamesByGids(gids);
+		final Map<Integer, List<Name>> namesByGid = this.daoFactory.getNameDao().getNamesByGids(gids)
+			.stream().collect(groupingBy(Name::getGermplasmId));
 
 		final Integer currentUserId = loggedInUser.getUserid();
 		final GermplasmList parent = request.getParentFolderId() != null ?
@@ -56,9 +62,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		// save germplasm list data
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			final Integer gid = entry.getGid();
-			final String preferredName = preferrredNamesMap.get(gid);
+			final String preferredName = preferredNamesMap.get(gid);
+			final List<Name> names = namesByGid.get(gid);
+			Preconditions.checkArgument(preferredName != null || names != null, "No name found for gid=" + gid);
+			final String designation = preferredName != null ? preferredName : names.get(0).getNval();
 			final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
-				entry.getEntryCode(), entry.getSeedSource(), preferredName, entry.getGroupName(),
+				entry.getEntryCode(), entry.getSeedSource(), designation, entry.getGroupName(),
 				GermplasmListDataDAO.STATUS_ACTIVE, null);
 			this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 		}
