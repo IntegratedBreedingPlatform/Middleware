@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasmlist;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -10,6 +11,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.util.Util;
+import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,4 +114,30 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.daoFactory.getGermplasmListDAO().save(folder).getId();
 	}
 
+	@Override
+	public Integer moveGermplasmList(final Integer germplasmListId, final Integer newParentFolderId, final boolean isCropList,
+		final String programUUID) {
+
+		final GermplasmList listToMove = this.getGermplasmListById(germplasmListId)
+			.orElseThrow(() -> new MiddlewareException("GermplasmList does not exist"));
+
+		final GermplasmList newParentFolder = this.getGermplasmListById(newParentFolderId)
+			.orElseThrow(() -> new MiddlewareException("Specified newParentFolderId does not exist"));
+
+		// if the list is moved to the crop list, set the program uuid to null so that
+		// it will be accessible to all programs of the same crop.
+		if (isCropList) {
+			listToMove.setProgramUUID(null);
+		} else {
+			// else, just set the current programUUID
+			listToMove.setProgramUUID(programUUID);
+		}
+
+		listToMove.setParent(newParentFolder);
+		try {
+			return this.daoFactory.getGermplasmListDAO().saveOrUpdate(listToMove).getId();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in moveGermplasmList in GermplasmListServiceImpl: " + e.getMessage(), e);
+		}
+	}
 }
