@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Iterables;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -79,12 +81,12 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 
 	@Override
 	public Map<Integer, String> getCrossExpansions(Set<Integer> gids, Integer level, CrossExpansionProperties crossExpansionProperties) {
-		
-		if(gids.size() > 5000) {
-			throw new IllegalArgumentException("Max set size has to be less than 5000."
-					+ " Any thing about this might casue caching and performace issues.");
+
+		if (gids.size() > PedigreeServiceImpl.MAX_GID_LIST_SIZE) {
+			throw new IllegalArgumentException("Max set size has to be less than " + PedigreeServiceImpl.MAX_GID_LIST_SIZE + "."
+				+ " Anything above this might cause caching and performance issues.");
 		}
-		
+
 		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.service.pedigree.PedigreeCimmytWheatServiceImpl.getCrossExpansions(Set<Integer>, Integer, CrossExpansionProperties)");
 		final Map<Integer, String> pedigreeStrings = new HashMap<>();
 		try {
@@ -102,6 +104,20 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 		} finally {
 			monitor.stop();
 		}
+	}
+
+	@Override
+	public Map<Integer, String> getCrossExpansionsBulk(final Set<Integer> gids, final Integer level,
+		final CrossExpansionProperties crossExpansionProperties) {
+
+		final Iterable<List<Integer>> partition = Iterables.partition(gids, PedigreeServiceImpl.MAX_GID_LIST_SIZE);
+		final Map<Integer, String> crossExpansions = new HashMap<>();
+
+		for (final List<Integer> partitionedGidList : partition) {
+			final Set<Integer> partitionedGidSet = new HashSet<>(partitionedGidList);
+			crossExpansions.putAll(this.getCrossExpansions(gids, level, crossExpansionProperties));
+		}
+		return crossExpansions;
 	}
 
 	private int getNumberOfLevelsToTraverseInDb(final int numberOfLevelsToTraverse) {
