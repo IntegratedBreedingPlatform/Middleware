@@ -115,7 +115,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public Integer moveGermplasmList(final Integer germplasmListId, final Integer newParentFolderId, final boolean isCropList,
+	public Integer moveGermplasmListFolder(final Integer germplasmListId, final Integer newParentFolderId, final boolean isCropList,
 		final String programUUID) {
 
 		final GermplasmList listToMove = this.getGermplasmListById(germplasmListId)
@@ -140,4 +140,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new MiddlewareQueryException("Error in moveGermplasmList in GermplasmListServiceImpl: " + e.getMessage(), e);
 		}
 	}
+
+	@Override
+	public void deleteGermplasmListFolder(final Integer folderId) {
+		final GermplasmList folder = this.getGermplasmListById(folderId)
+			.orElseThrow(() -> new MiddlewareException("FolderId does not exist"));
+
+		this.daoFactory.getGermplasmListDAO().makeTransient(folder);
+	}
+
 }

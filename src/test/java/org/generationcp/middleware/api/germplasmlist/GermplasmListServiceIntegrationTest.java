@@ -44,36 +44,48 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void shouldCreateAndUpdateAndGetGermplasmListFolder_OK() {
+	public void shouldCreateAndUpdateAndGetAndDeleteGermplasmListFolder_OK() {
 
 		final String folderName = "NewFolder";
 
 		assertFalse(this.germplasmListService.getGermplasmListByParentAndName(folderName, this.parentFolderId, PROGRAM_UUID).isPresent());
 
+		//Create germplasm folder
 		final Integer germplasmListNewFolderId =
 			this.germplasmListService.createGermplasmListFolder(USER_ID, folderName, this.parentFolderId, PROGRAM_UUID);
 		assertNotNull(germplasmListNewFolderId);
 
+		//Get the created germplasm folder by id
 		final Optional<GermplasmList> newGermplasmListById = this.germplasmListService.getGermplasmListById(germplasmListNewFolderId);
 		assertTrue(newGermplasmListById.isPresent());
 		final GermplasmList newGermplasmList = newGermplasmListById.get();
 		this.assertGermplasmList(newGermplasmList, germplasmListNewFolderId, folderName);
 
+		//Get the created germplasm folder by folder name and parent id
 		final Optional<GermplasmList> germplasmListByParentAndName =
 			this.germplasmListService.getGermplasmListByParentAndName(folderName, this.parentFolderId, PROGRAM_UUID);
 		assertTrue(germplasmListByParentAndName.isPresent());
 		assertThat(germplasmListByParentAndName.get().getId(), is(germplasmListNewFolderId));
 
+		//Update germplasm folder
 		String updatedFolderName = "updatedFolderName";
 		final Integer germplasmListUpdatedFolderId =
 			this.germplasmListService.updateGermplasmListFolder(USER_ID, updatedFolderName, germplasmListNewFolderId, PROGRAM_UUID);
 		assertNotNull(germplasmListUpdatedFolderId);
 		assertThat(germplasmListUpdatedFolderId, is(germplasmListNewFolderId));
 
+		//Get the updated germplasm folder by id
 		final Optional<GermplasmList> updatedGermplasmListById = this.germplasmListService.getGermplasmListById(germplasmListUpdatedFolderId);
 		assertTrue(updatedGermplasmListById.isPresent());
 		final GermplasmList updatedGermplasmList = updatedGermplasmListById.get();
 		this.assertGermplasmList(updatedGermplasmList, germplasmListUpdatedFolderId, updatedFolderName);
+
+		//Delete the germplasm folder
+		this.germplasmListService.deleteGermplasmListFolder(germplasmListUpdatedFolderId);
+
+		//Should not get the deleted germplasm folder
+		final Optional<GermplasmList> deletedGermplasmListById = this.germplasmListService.getGermplasmListById(germplasmListUpdatedFolderId);
+		assertFalse(deletedGermplasmListById.isPresent());
 	}
 
 	private void assertGermplasmList(final GermplasmList germplasmList, final Integer id, final String name) {

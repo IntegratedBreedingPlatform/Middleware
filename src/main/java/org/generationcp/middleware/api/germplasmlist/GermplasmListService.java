@@ -18,6 +18,8 @@ public interface GermplasmListService {
 
 	Integer updateGermplasmListFolder(Integer userId, String folderName, Integer folderId, String programUUID);
 
-	Integer moveGermplasmList(Integer germplasmListId, Integer newParentFolderId, boolean isCropList, String programUUID);
+	Integer moveGermplasmListFolder(Integer germplasmListId, Integer newParentFolderId, boolean isCropList, String programUUID);
+
+	void deleteGermplasmListFolder(Integer folderId);
 
 }
