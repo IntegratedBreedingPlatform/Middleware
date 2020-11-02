@@ -1008,29 +1008,15 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         paramBuilder.append(" where 1 = 1 " + GERMPLASM_NOT_DELETED_CLAUSE);
 
         final SqlTextFilter nameFilter = germplasmSearchRequest.getNameFilter();
-        if (nameFilter != null && nameFilter.getValue() != null) {
+        if (nameFilter != null && nameFilter.getValue() != null && nameFilter.getType() != null) {
             final String q = nameFilter.getValue();
-            String operator = "LIKE";
-            switch (nameFilter.getType()) {
-                case EXACTMATCH:
-                    operator = "=";
-                    paramBuilder.setParameter("q", q);
-                    paramBuilder.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
-                    paramBuilder.setParameter("qNoSpaces", q.replaceAll(" ", ""));
-                    break;
-                case STARTSWITH:
-                    paramBuilder.setParameter("q", q + "%");
-                    paramBuilder.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q) + "%");
-                    paramBuilder.setParameter("qNoSpaces", q.replaceAll(" ", "") + "%");
-                    break;
-                case CONTAINS:
-                    paramBuilder.setParameter("q", "%" + q + "%");
-                    paramBuilder.setParameter("qStandardized", "%" + GermplasmDataManagerUtil.standardizeName(q) + "%");
-                    paramBuilder.setParameter("qNoSpaces", "%" + q.replaceAll(" ", "") + "%");
-                    break;
-            }
+            final SqlTextFilter.Type type = nameFilter.getType();
+            final String operator = getOperator(type);
+            paramBuilder.setParameter("q", getParameter(type, q));
+            paramBuilder.setParameter("qStandardized", getParameter(type, GermplasmDataManagerUtil.standardizeName(q)));
+            paramBuilder.setParameter("qNoSpaces", getParameter(type, q.replaceAll(" ", "")));
             paramBuilder.append(" AND (allNames.nval " + operator + " :q "
-                + "OR allNames.nval " + operator + " :qStandardized " 
+                + "OR allNames.nval " + operator + " :qStandardized "
                 + "OR allNames.nval " + operator + " :qNoSpaces) \n ");
         }
 
@@ -1220,15 +1206,17 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
      */
     private boolean addPreFilteredGids(final GermplasmSearchRequest germplasmSearchRequest, final List<Integer> prefilteredGids) {
 
-        final String femaleParentName = germplasmSearchRequest.getFemaleParentName();
+        final SqlTextFilter femaleParentName = germplasmSearchRequest.getFemaleParentName();
         if (femaleParentName != null) {
+            final SqlTextFilter.Type type = femaleParentName.getType();
+            final String value = femaleParentName.getValue();
             final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
                 + "   straight_join germplsm female_parent on n.gid = female_parent.gid \n" //
                 + "   straight_join germplsm group_source on female_parent.gid = group_source.gpid1 and group_source.gnpgs > 0 \n" //
                 + "   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n"  //
                 + "                            or g.gnpgs > 0 and group_source.gid = g.gid \n" //
-                + " where n.nstat != " + STATUS_DELETED + " and n.nval like :femaleParentName " + LIMIT_CLAUSE) //
-                .setParameter("femaleParentName", '%' + femaleParentName + '%') //
+                + " where n.nstat != " + STATUS_DELETED + " and n.nval " + getOperator(type) + " :femaleParentName " + LIMIT_CLAUSE) //
+                .setParameter("femaleParentName", getParameter(type, value)) //
                 .list();
             if (gids == null || gids.isEmpty()) {
                 return true;
@@ -1236,15 +1224,17 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             prefilteredGids.addAll(gids);
         }
 
-        final String maleParentName = germplasmSearchRequest.getMaleParentName();
+        final SqlTextFilter maleParentName = germplasmSearchRequest.getMaleParentName();
         if (maleParentName != null) {
+            final SqlTextFilter.Type type = maleParentName.getType();
+            final String value = maleParentName.getValue();
             final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
                 + "   straight_join germplsm male_parent on n.gid = male_parent.gid \n" //
                 + "   straight_join germplsm group_source on male_parent.gid = group_source.gpid2 and group_source.gnpgs > 0 \n" //
                 + "   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n" //
                 + "                            or g.gnpgs > 0 and group_source.gid = g.gid \n" //
-                + " where n.nstat != " + STATUS_DELETED + " and n.nval like :maleParentName " + LIMIT_CLAUSE) //
-                .setParameter("maleParentName", '%' + maleParentName + '%') //
+                + " where n.nstat != " + STATUS_DELETED + " and n.nval " + getOperator(type) + " :maleParentName " + LIMIT_CLAUSE) //
+                .setParameter("maleParentName", getParameter(type, value)) //
                 .list();
             if (gids == null || gids.isEmpty()) {
                 return true;
@@ -1252,13 +1242,15 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             prefilteredGids.addAll(gids);
         }
 
-        final String groupSourceName = germplasmSearchRequest.getGroupSourceName();
+        final SqlTextFilter groupSourceName = germplasmSearchRequest.getGroupSourceName();
         if (groupSourceName != null) {
+            final SqlTextFilter.Type type = groupSourceName.getType();
+            final String value = groupSourceName.getValue();
             final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
                 + " straight_join germplsm group_source on n.gid = group_source.gid \n" //
                 + " straight_join germplsm g on group_source.gid = g.gpid1 and g.gnpgs < 0 \n" //
-                + " where n.nstat != " + STATUS_DELETED + " and n.nval like :groupSourceName " + LIMIT_CLAUSE) //
-                .setParameter("groupSourceName", '%' + groupSourceName + '%')
+                + " where n.nstat != " + STATUS_DELETED + " and n.nval " + getOperator(type) + " :groupSourceName " + LIMIT_CLAUSE) //
+                .setParameter("groupSourceName", getParameter(type, value))
                 .list();
             if (gids == null || gids.isEmpty()) {
                 return true;
@@ -1266,13 +1258,15 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             prefilteredGids.addAll(gids);
         }
 
-        final String immediateSourceName = germplasmSearchRequest.getImmediateSourceName();
+        final SqlTextFilter immediateSourceName = germplasmSearchRequest.getImmediateSourceName();
         if (immediateSourceName != null) {
+            final SqlTextFilter.Type type = immediateSourceName.getType();
+            final String value = immediateSourceName.getValue();
             final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n"
                 + " straight_join germplsm immediate_source on n.gid = immediate_source.gid \n"
                 + " straight_join germplsm g on immediate_source.gid = g.gpid2 and g.gnpgs < 0 \n"
-                + " where n.nstat != " + STATUS_DELETED + " and n.nval like :immediateSourceName " + LIMIT_CLAUSE) //
-                .setParameter("immediateSourceName", '%' + immediateSourceName + '%')
+                + " where n.nstat != " + STATUS_DELETED + " and n.nval " + getOperator(type) + " :immediateSourceName " + LIMIT_CLAUSE) //
+                .setParameter("immediateSourceName", getParameter(type, value))
                 .list();
             if (gids == null || gids.isEmpty()) {
                 return true;
