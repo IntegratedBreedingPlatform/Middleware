@@ -11,6 +11,11 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
 import org.hibernate.Criteria;
@@ -25,10 +30,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import org.springframework.util.CollectionUtils;
 
 /**
  * DAO class for {@link Method}.
@@ -37,13 +39,14 @@ import java.util.Set;
 public class MethodDAO extends GenericDAO<Method, Integer> {
 
 	private static final String UNIQUE_ID = "uniqueID";
+	private static final String METHOD_NAME = "mname";
 
 	private static final Logger LOG = LoggerFactory.getLogger(MethodDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Method> getMethodsByIds(List<Integer> ids) throws MiddlewareQueryException {
 		try {
-			return this.getSession().createCriteria(Method.class).add(Restrictions.in("mid", ids)).addOrder(Order.asc("mname")).list();
+			return this.getSession().createCriteria(Method.class).add(Restrictions.in("mid", ids)).addOrder(Order.asc(METHOD_NAME)).list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(this.getLogExceptionMessage("getMethodsByIds", "", null, e.getMessage(), "Method"), e);
 		}
@@ -66,7 +69,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	public List<Method> getAllMethodOrderByMname() throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(this.getLogExceptionMessage("getAllMethodOrderByMname", "", null, e.getMessage(), "Method"), e);
@@ -79,7 +82,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Method.class);
 			criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(
@@ -93,7 +96,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Method.class);
 			criteria.add(Restrictions.eq("mtype", type));
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(this.getLogExceptionMessage("getMethodsByType", "type", type, e.getMessage(), "Method"), e);
@@ -107,7 +110,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			Criteria criteria = this.getSession().createCriteria(Method.class);
 			criteria.add(Restrictions.eq("mtype", type));
 			criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(this.getLogExceptionMessage("getMethodsByType", "type", type, e.getMessage(), "Method"), e);
@@ -120,7 +123,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Method.class);
 			criteria.add(Restrictions.eq("mtype", type));
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
 			return criteria.list();
@@ -173,7 +176,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Method.class);
 			criteria.add(Restrictions.eq("mgrp", group));
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(this.getLogExceptionMessage("getMethodsByGroup", "group", group, e.getMessage(), "Method"), e);
@@ -189,7 +192,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			Criterion group2 = Restrictions.eq("mgrp", "G");
 			LogicalExpression orExp = Restrictions.or(group1, group2);
 			criteria.add(orExp);
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(this.getLogExceptionMessage("getMethodsByGroup", "group", group, e.getMessage(), "Method"), e);
@@ -202,7 +205,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Method.class);
 			criteria.add(Restrictions.eq("mgrp", group));
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
 			return criteria.list();
@@ -224,7 +227,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			LogicalExpression andExp = Restrictions.and(orExp, filterType);
 
 			criteria.add(andExp);
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(
@@ -244,7 +247,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			}
 
 			if (name != null && !name.isEmpty()) {
-				criteria.add(Restrictions.like("mname", "%" + name.trim() + "%"));
+				criteria.add(Restrictions.like(METHOD_NAME, "%" + name.trim() + "%"));
 			}
 
 			if (group != null && !group.isEmpty()) {
@@ -255,7 +258,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 				criteria.add(orExp);
 			}
 
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(
@@ -274,7 +277,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			Criteria criteria = this.getSession().createCriteria(Method.class);
 			criteria.add(Restrictions.ne("mtype", "GEN"));
 			criteria.add(Restrictions.in("geneq", validMethodClasses));
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 
 			return criteria.list();
 		} catch (HibernateException e) {
@@ -296,7 +299,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			if (ids.size() > 0) {
 				criteria.add(Restrictions.in("mid", ids));
 			}
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 
 			return criteria.list();
 		} catch (final HibernateException e) {
@@ -351,7 +354,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 					"SELECT mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, program_uuid ")
 					.append("FROM methods m WHERE m.mname = :mname");
 			SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setParameter("mname", name);
+			query.setParameter(METHOD_NAME, name);
 
 			List<Object[]> list = query.list();
 
@@ -393,7 +396,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 					.append("SELECT mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, program_uuid ")
 					.append("FROM methods m WHERE m.mname = :mname ").append("AND m.program_uuid = :uniqueId");
 			SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setParameter("mname", name);
+			query.setParameter(METHOD_NAME, name);
 			query.setParameter("uniqueId", uniqueId);
 
 			List<Object[]> list = query.list();
@@ -456,7 +459,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 				criteria.add(Restrictions.in("mid", ids));
 			}
 			criteria.add(Restrictions.in("geneq", validMethodClasses));
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 
 			return criteria.list();
 		} catch (final HibernateException e) {
@@ -495,7 +498,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 
 			final Criteria criteria = this.getSession().createCriteria(Method.class);
 			criteria.add(Restrictions.in("geneq", Method.NON_BULKED_CLASSES));
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();
 
 		} catch (final HibernateException e) {
@@ -530,7 +533,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(Method.class);
 			criteria.add(Restrictions.in("geneq", Method.NON_BULKED_CLASSES));
 			criteria.add(Restrictions.ne("mtype", "GEN"));
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();
 
 		} catch (final HibernateException e) {
@@ -547,7 +550,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			criteria.add(Restrictions.in("geneq", Method.NON_BULKED_CLASSES));
 			criteria.add(Restrictions.eq("mtype", type));
 			criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
-			criteria.addOrder(Order.asc("mname"));
+			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();
 
 		} catch (final HibernateException e) {
@@ -556,4 +559,28 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 					e);
 		}
 	}
+
+	public List<Method> filterMethods(final String programUUID, final List<Integer> methodIds) {
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Method.class);
+			if (StringUtils.isEmpty(programUUID)) {
+				criteria.add(Restrictions.isNull(MethodDAO.UNIQUE_ID));
+			} else {
+				criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
+			}
+
+			if (!CollectionUtils.isEmpty(methodIds)) {
+				criteria.add(Restrictions.in("mid", methodIds));
+			}
+
+			criteria.addOrder(Order.asc(METHOD_NAME));
+			return criteria.list();
+		} catch (Exception e) {
+			MethodDAO.LOG.error(this.getLogExceptionMessage("filterMethods", "", null, e.getMessage(), "Method"), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("filterMethods", "", null, e.getMessage(), "Method"),
+				e);
+		}
+	}
+
 }

@@ -11,6 +11,10 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -22,10 +26,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import org.springframework.util.CollectionUtils;
 
 /**
  * DAO class for {@link UserDefinedField}.
@@ -74,7 +75,10 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 			criteria.add(Restrictions.eq("ftable", table));
 			criteria.add(Restrictions.in("ftype", types));
-			criteria.add(Restrictions.in("fcode", codes));
+
+			if (!CollectionUtils.isEmpty(codes)) {
+				criteria.add(Restrictions.in("fcode", codes));
+			}
 			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
@@ -148,4 +152,5 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		}
 		return returnList;
 	}
+
 }

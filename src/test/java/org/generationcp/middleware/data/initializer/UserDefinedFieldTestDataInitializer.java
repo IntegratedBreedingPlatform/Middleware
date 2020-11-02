@@ -10,6 +10,8 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 
 public class UserDefinedFieldTestDataInitializer {
 
+	public static final String CODE = "FCODE12345";
+
 	public static Map<String, String> validListTypeMap = new HashMap<String, String>();
 	private List<UserDefinedField> validListType;
 	
@@ -32,7 +34,7 @@ public class UserDefinedFieldTestDataInitializer {
 	}
 
 	public static UserDefinedField createUserDefinedField(final String tableName, final String ftype, final String fname) {
-		final UserDefinedField udField = UserDefinedFieldTestDataInitializer.createUserDefinedField("FCODE12345", fname);
+		final UserDefinedField udField = UserDefinedFieldTestDataInitializer.createUserDefinedField(CODE, fname);
 		udField.setFtable(tableName);
 		udField.setFtype(ftype);
 		udField.setFdate(20060123);
