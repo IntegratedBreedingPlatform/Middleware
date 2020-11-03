@@ -6,6 +6,7 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
+import org.generationcp.middleware.exceptions.GermplasmUpdateConflictException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -27,7 +28,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Transactional
+@Transactional(rollbackFor = GermplasmUpdateConflictException.class)
 public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 	@Autowired
@@ -46,8 +47,10 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 	}
 
 	@Override
-	public void saveGermplasmUpdates(final int userId, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public void saveGermplasmUpdates(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) throws
+		GermplasmUpdateConflictException {
 
+		final List<String> conflictErrors = new ArrayList<>();
 		final GermplasmDAO germplasmDAO = this.daoFactory.getGermplasmDao();
 		final NameDAO nameDAO = this.daoFactory.getNameDao();
 		final AttributeDAO attributeDAO = this.daoFactory.getAttributeDAO();
@@ -91,18 +94,22 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 			attributes.stream().collect(Collectors.groupingBy(Attribute::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
 
 		for (final Germplasm germplasm : germplasmList) {
-			this.saveGermplasmUpdateDTO(userId, germplasmDAO, nameDAO, attributeDAO, attributeCodesFieldNoMap, nameCodesFieldNoMap,
+			this.saveGermplasmUpdateDTO(germplasmDAO, nameDAO, attributeDAO, attributeCodesFieldNoMap, nameCodesFieldNoMap,
 				germplasmUpdateDTOMap,
-				locationAbbreviationIdMap, methodCodeIdMap, namesMap, attributesMap, germplasm);
+				locationAbbreviationIdMap, methodCodeIdMap, namesMap, attributesMap, germplasm, conflictErrors);
+		}
+
+		if (!conflictErrors.isEmpty()) {
+			throw new GermplasmUpdateConflictException(conflictErrors);
 		}
 
 	}
 
-	private void saveGermplasmUpdateDTO(final int userId, final GermplasmDAO germplasmDAO, final NameDAO nameDAO,
+	private void saveGermplasmUpdateDTO(final GermplasmDAO germplasmDAO, final NameDAO nameDAO,
 		final AttributeDAO attributeDAO, final Map<String, Integer> attributeCodes, final Map<String, Integer> nameCodes,
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Integer> methodCodeIdMap, final Map<Integer, List<Name>> namesMap,
-		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm) {
+		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm, final List<String> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
 		if (optionalGermplasmUpdateDTO.isPresent()) {
@@ -115,9 +122,10 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 			for (final Map.Entry<String, String> entryData : germplasmUpdateDTO.getData().entrySet()) {
 				// Save or update the Names
-				this.saveOrUpdateName(userId, nameDAO, nameCodes, namesMap, germplasm, locationId, germplasmDate, entryData);
-				this.saveOrUpdateAttribute(userId, attributeDAO, attributeCodes, attributesMap, germplasm, locationId, germplasmDate,
-					entryData);
+				this.saveOrUpdateName(nameDAO, nameCodes, namesMap, germplasm, entryData,
+					conflictErrors);
+				this.saveOrUpdateAttribute(attributeDAO, attributeCodes, attributesMap, germplasm,
+					entryData, conflictErrors);
 
 			}
 		}
@@ -131,47 +139,65 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 		germplasmDAO.update(germplasm);
 	}
 
-	private void saveOrUpdateName(final int userId, final NameDAO nameDAO, final Map<String, Integer> nameCodes,
-		final Map<Integer, List<Name>> namesMap, final Germplasm germplasm, final int locationId, final int germplasmDate,
-		final Map.Entry<String, String> entryData) {
+	private void saveOrUpdateName(final NameDAO nameDAO, final Map<String, Integer> nameCodes,
+		final Map<Integer, List<Name>> namesMap, final Germplasm germplasm,
+		final Map.Entry<String, String> entryData, final List<String> conflictErrors) {
 		if (nameCodes.containsKey(entryData.getKey())) {
 			final String nameCode = entryData.getKey();
 			final Integer nameTypeId = nameCodes.get(nameCode);
 
+			// TODO: Update Reference
 			// TODO: Determine the preferred name
-			// TODO: Add check if there are multiple names with same type
-			final Optional<Name> optionalName =
-				namesMap.get(germplasm.getGid()).stream().filter(n -> n.getTypeId().equals(nameTypeId)).findFirst();
-			if (optionalName.isPresent()) {
-				final Name name = optionalName.get();
+			final List<Name> germplasmNames = namesMap.get(germplasm.getGid());
+			final List<Name> namesByType =
+				germplasmNames.stream().filter(n -> n.getTypeId().equals(nameTypeId)).collect(Collectors.toList());
+
+			// Check if there are multiple names with same type
+			if (namesByType.size() > 1) {
+				conflictErrors.add(String.format(
+					"Multiple names for the %s where found for germplasm %s. Name cannot be updated via this batch process.",
+					nameCode, germplasm.getGid()));
+			} else if (namesByType.size() == 1) {
+				// Update if name is existing
+				final Name name = namesByType.get(0);
 				name.setNval(entryData.getValue());
 				nameDAO.update(name);
 			} else {
-				nameDAO.save(new Name(null, germplasm.getGid(), nameTypeId, 0, userId,
-					entryData.getValue(), locationId, germplasmDate, 0));
+				// Create new record if name not yet exists
+				nameDAO.save(new Name(null, germplasm.getGid(), nameTypeId, 0, germplasm.getUserId(),
+					entryData.getValue(), germplasm.getLocationId(), germplasm.getGdate(), 0));
 			}
 		}
 	}
 
-	private void saveOrUpdateAttribute(final int userId, final AttributeDAO attributeDAO, final Map<String, Integer> attributeCodes,
-		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm, final int locationId, final int germplasmDate,
-		final Map.Entry<String, String> entryData) {
+	private void saveOrUpdateAttribute(final AttributeDAO attributeDAO, final Map<String, Integer> attributeCodes,
+		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
+		final Map.Entry<String, String> entryData, final List<String> conflictErrors) {
 		// Save or update the Attributes
 		if (attributeCodes.containsKey(entryData.getKey())) {
 			final String attributeCode = entryData.getKey();
 			final Integer attributeTypeId = attributeCodes.get(attributeCode);
+			final List<Attribute> germplasmAttributes = attributesMap.get(germplasm.getGid());
+			final List<Attribute> attributesByType =
+				germplasmAttributes.stream().filter(n -> n.getTypeId().equals(attributeTypeId)).collect(Collectors.toList());
 
-			// TODO: Add check if there are multiple attributes with same type
-			final Optional<Attribute> optionalAttribute =
-				attributesMap.get(germplasm.getGid()).stream().filter(n -> n.getTypeId().equals(attributeTypeId)).findFirst();
-			if (optionalAttribute.isPresent()) {
-				final Attribute attribute = optionalAttribute.get();
+			// Check if there are multiple attributes with same type
+			if (attributesByType.size() > 1) {
+				conflictErrors.add(String.format(
+					"Multiple attribute for the %s where found for germplasm %s. Attribute cannot be updated via this batch process.",
+					attributeCode, germplasm.getGid()));
+			} else if (attributesByType.size() == 1) {
+				final Attribute attribute = attributesByType.get(0);
+				attribute.setLocationId(germplasm.getLocationId());
+				attribute.setUserId(germplasm.getUserId());
+				attribute.setAdate(germplasm.getGdate());
 				attribute.setAval(entryData.getValue());
 				attributeDAO.update(attribute);
 			} else {
 				attributeDAO
-					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, userId, entryData.getValue(), locationId,
-						0, germplasmDate));
+					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, germplasm.getGid(), entryData.getValue(),
+						germplasm.getLocationId(),
+						0, germplasm.getGdate()));
 			}
 		}
 	}
