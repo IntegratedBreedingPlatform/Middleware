@@ -114,8 +114,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 		final Map<Integer, String> crossExpansions = new HashMap<>();
 
 		for (final List<Integer> partitionedGidList : partition) {
-			final Set<Integer> partitionedGidSet = new HashSet<>(partitionedGidList);
-			crossExpansions.putAll(this.getCrossExpansions(gids, level, crossExpansionProperties));
+			crossExpansions.putAll(this.getCrossExpansions(new HashSet<>(partitionedGidList), level, crossExpansionProperties));
 		}
 		return crossExpansions;
 	}
