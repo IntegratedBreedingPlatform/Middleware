@@ -48,6 +48,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
+	public List<Germplasm> getGermplasmByGUIDs(final List<String> guids) {
+		return daoFactory.getGermplasmDao().getGermplasmByGUIDs(guids);
+	}
+
+	@Override
 	public Map<Integer, Integer> importGermplasmSet(final Integer userId, final String cropName,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final Map<Integer, Integer> results = new HashMap<>();
@@ -93,6 +98,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 						DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH);
 				this.daoFactory.getBibrefDAO().save(bibref);
 				germplasm.setReferenceId(bibref.getRefid());
+			} else {
+				germplasm.setReferenceId(0);
 			}
 
 			this.daoFactory.getGermplasmDao().save(germplasm);

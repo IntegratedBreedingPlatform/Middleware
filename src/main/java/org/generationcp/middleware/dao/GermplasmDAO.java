@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -1678,6 +1679,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public List<Germplasm> getGermplasmByGUIDs(final List<String> guids) {
+		final List<Germplasm> locations;
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Germplasm.class);
+			criteria.add(Restrictions.in("germplasmUUID", guids));
+			criteria.add(Restrictions.eq("deleted", Boolean.FALSE));
+			locations = criteria.list();
+		} catch (final HibernateException e) {
+			GermplasmDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("getGermplasmByGUIDs", "guids", "", e.getMessage(),
+					"Germplasm"), e);
+		}
+		return locations;
 	}
 
 	StringBuilder buildGetExistingCrossesQueryString(final List<Integer> maleParentIds, final Optional<Integer> gid) {
