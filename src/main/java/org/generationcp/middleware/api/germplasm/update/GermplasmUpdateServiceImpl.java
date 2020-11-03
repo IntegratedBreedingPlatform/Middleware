@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Transactional(rollbackFor = GermplasmUpdateConflictException.class)
@@ -83,7 +84,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 		// Retrieve location and method IDs in one go
 		final Map<String, Integer> locationAbbreviationIdMap = this.getLocationAbbreviationIdMap(germplasmUpdateDTOList);
-		final Map<String, Integer> methodCodeIdMap = this.getMethodCodeIdMap(germplasmUpdateDTOList);
+		final Map<String, BreedingMethodDTO> codeBreedingMethodDTOMap = this.getCodeBreedingMethodDTOMap(germplasmUpdateDTOList);
 
 		// Retrieve the names and attributes associated to GIDs in one go.
 		final Map<Integer, List<Name>> namesMap =
@@ -96,7 +97,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 		for (final Germplasm germplasm : germplasmList) {
 			this.saveGermplasmUpdateDTO(germplasmDAO, nameDAO, attributeDAO, attributeCodesFieldNoMap, nameCodesFieldNoMap,
 				germplasmUpdateDTOMap,
-				locationAbbreviationIdMap, methodCodeIdMap, namesMap, attributesMap, germplasm, conflictErrors);
+				locationAbbreviationIdMap, codeBreedingMethodDTOMap, namesMap, attributesMap, germplasm, conflictErrors);
 		}
 
 		if (!conflictErrors.isEmpty()) {
@@ -108,17 +109,17 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 	private void saveGermplasmUpdateDTO(final GermplasmDAO germplasmDAO, final NameDAO nameDAO,
 		final AttributeDAO attributeDAO, final Map<String, Integer> attributeCodes, final Map<String, Integer> nameCodes,
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
-		final Map<String, Integer> methodCodeIdMap, final Map<Integer, List<Name>> namesMap,
+		final Map<String, BreedingMethodDTO> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm, final List<String> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
 		if (optionalGermplasmUpdateDTO.isPresent()) {
 			final GermplasmUpdateDTO germplasmUpdateDTO = optionalGermplasmUpdateDTO.get();
+			final BreedingMethodDTO breedingMethodDTO = codeBreedingMethodDTOMap.get(germplasmUpdateDTO.getBreedingMethod());
 			final int locationId = locationAbbreviationIdMap.get(germplasmUpdateDTO.getLocationAbbreviation());
-			final int methodId = methodCodeIdMap.get(germplasmUpdateDTO.getBreedingMethod());
 			final int germplasmDate = Integer.parseInt(germplasmUpdateDTO.getCreationDate());
 
-			this.saveGermplasm(germplasmDAO, germplasm, locationId, methodId, germplasmDate);
+			this.saveGermplasm(germplasmDAO, germplasm, locationId, breedingMethodDTO, germplasmDate, conflictErrors);
 
 			for (final Map.Entry<String, String> entryData : germplasmUpdateDTO.getData().entrySet()) {
 				// Save or update the Names
@@ -131,10 +132,22 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 		}
 	}
 
-	private void saveGermplasm(final GermplasmDAO germplasmDAO, final Germplasm germplasm, final int locationId, final int methodId,
-		final int germplasmDate) {
+	private void saveGermplasm(final GermplasmDAO germplasmDAO, final Germplasm germplasm, final int locationId,
+		final BreedingMethodDTO breedingMethodDTO,
+		final int germplasmDate, final List<String> conflictErrors) {
+		final String oldMethodType = germplasm.getMethod().getMtype();
+		final String newMethodType = breedingMethodDTO.getType();
+
+		// Only uopdate the method if the new method has same type of the old method.
+		if (this.isMethodTypeMatch(newMethodType, oldMethodType)) {
+			germplasm.setMethodId(breedingMethodDTO.getId());
+		} else {
+			// TODO: Move to poperty file
+			conflictErrors.add(String
+				.format("Cannot change method for germplasm %s, the breeding method should be the same type as %", germplasm.getGid(),
+					germplasm.getMethod().getMtype()));
+		}
 		germplasm.setLocationId(locationId);
-		germplasm.setMethodId(methodId);
 		germplasm.setGdate(germplasmDate);
 		germplasmDAO.update(germplasm);
 	}
@@ -154,6 +167,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 			// Check if there are multiple names with same type
 			if (namesByType.size() > 1) {
+				// TODO: Move to poperty file
 				conflictErrors.add(String.format(
 					"Multiple names for the %s where found for germplasm %s. Name cannot be updated via this batch process.",
 					nameCode, germplasm.getGid()));
@@ -183,6 +197,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 			// Check if there are multiple attributes with same type
 			if (attributesByType.size() > 1) {
+				// TODO: Move to poperty file
 				conflictErrors.add(String.format(
 					"Multiple attribute for the %s where found for germplasm %s. Attribute cannot be updated via this batch process.",
 					attributeCode, germplasm.getGid()));
@@ -220,11 +235,24 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 				.collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
 	}
 
-	private Map<String, Integer> getMethodCodeIdMap(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	private Map<String, BreedingMethodDTO> getCodeBreedingMethodDTOMap(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		final Set<String> breedingMethodCodes =
 			germplasmUpdateDTOList.stream().map(dto -> dto.getBreedingMethod()).collect(Collectors.toSet());
 		return this.breedingMethodService.getBreedingMethodsByCodes(breedingMethodCodes).stream()
-			.collect(Collectors.toMap(BreedingMethodDTO::getCode, BreedingMethodDTO::getId));
+			.collect(Collectors.toMap(BreedingMethodDTO::getCode, Function.identity()));
+	}
+
+	private boolean isMethodTypeMatch(final String newMethodType, final String oldMethodType) {
+		return this.isGenerative(newMethodType) && this.isGenerative(oldMethodType)
+			|| this.isMaintenanceOrDerivative(newMethodType) && this.isMaintenanceOrDerivative(oldMethodType);
+	}
+
+	private boolean isGenerative(final String methodType) {
+		return methodType.equals("GEN");
+	}
+
+	private boolean isMaintenanceOrDerivative(final String methodType) {
+		return methodType.equals("DER") || methodType.equals("MAN");
 	}
 
 }
