@@ -1351,14 +1351,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                         int i = 1;
                         while (i <= level) {
                             final int prev = i - 1;
-                            queryBuilder.append(String.format(" straight_join germplsm PGROUP%s on P%s.gpid1 != 0", prev, prev) //
+                            queryBuilder.append(String.format(" straight_join germplsm PGROUP%s", prev, prev) //
                                 // find the group source (last gid produced by a generative process)
                                 // join with itself if gid is already the group source
-                                + String.format(" and ((P%s.gnpgs < 0 and PGROUP%s.gid = P%s.gpid1)", prev, prev, prev) //
-                                + String.format("   or (P%s.gnpgs > 0 and PGROUP%s.gid = P%s.gid)) \n", prev, prev, prev) //
+                                + String.format(" on ((P%s.gnpgs < 0 and PGROUP%s.gid = P%s.gpid1)", prev, prev, prev) //
+                                + String.format("  or (P%s.gnpgs > 0 and PGROUP%s.gid = P%s.gid)) \n", prev, prev, prev) //
                                 // find the group source parents
                                 + String.format(" straight_join germplsm P%s on PGROUP%s.gnpgs > 0", i, prev)
-                                + String.format("  and PGROUP%s.gpid1 != 0 and PGROUP%s.gpid2 != 0", prev, prev)
                                 + String.format("  and (P%s.gid = PGROUP%s.gpid1 or P%s.gid = PGROUP%s.gpid2) \n ", i, prev, i, prev));
                             /*
                              * trying to include other progenitors associated with PGROUP won't perform well here:
@@ -1396,7 +1395,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                             queryBuilder.append(String.format(" straight_join germplsm P%s", i));
                             queryBuilder.append(String.format(" on P%s.gnpgs < 0 and (", prev));
                             queryBuilder.append(String.format("  P%s.gid = P%s.gpid2", i, prev));
-                            // some (non-standard?) derivative germplasm has gpid2=0
+                            // some derivative/maintenance methods may produce gpid2=0
+                            // for that scenario, try to get the source using gpid1
                             queryBuilder.append(String.format("  or P%s.gpid2 = 0 and P%s.gid = P%s.gpid1) \n ", prev, i, prev));
                             if (IncludePedigree.Type.BOTH.equals(includePedigree.getType())) {
                                 queryBuilder.append(String.format("or P%s.gnpgs > 0 and (", prev));
