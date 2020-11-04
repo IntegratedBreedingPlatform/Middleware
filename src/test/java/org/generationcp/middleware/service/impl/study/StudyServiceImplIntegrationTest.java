@@ -241,4 +241,103 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(String.valueOf(location1), study1.getInstanceMetaData().get(0).getLocationDbId().toString());
 	}
 
+	@Test
+	public void testGetStudiesWithDeletedStudy() throws Exception {
+		// Add new study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString());
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+		final Random random = new Random();
+		final Integer location1 = random.nextInt();
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", location1);
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Create deleted study
+		this.createDeletedStudy();
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID, sorted by descending study name
+		List<StudySummary> studies =
+			this.studyService.getStudies(new StudySearchFilter().withProgramDbId(this.commonTestProject.getUniqueID()), new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
+		Assert.assertEquals("Deleted study is not included",2, studies.size());
+		StudySummary study1 = studies.get(1);
+		Assert.assertEquals(this.study.getProjectId(), study1.getStudyDbid());
+		Assert.assertEquals(this.study.getName(), study1.getName());
+		Assert.assertEquals(this.study.getDescription(), study1.getDescription());
+		Assert.assertEquals(this.study.getProgramUUID(), study1.getProgramDbId());
+		Assert.assertEquals(this.studyExperiment.getObsUnitId(), study1.getObservationUnitId());
+		Assert.assertEquals(1, study1.getContacts().size());
+		// Workbench person details cannot be retrieved properly from this service
+		Assert.assertEquals("Creator", study1.getContacts().get(0).getType());
+		final StudySummary study2 = studies.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), study2.getStudyDbid());
+		Assert.assertEquals(newStudy.getName(), study2.getName());
+		Assert.assertEquals(newStudy.getDescription(), study2.getDescription());
+		Assert.assertEquals(newStudy.getProgramUUID(), study2.getProgramDbId());
+		Assert.assertEquals(newStudyExperiment.getObsUnitId(), study2.getObservationUnitId());
+		Assert.assertEquals(1, study2.getInstanceMetaData().size());
+		Assert.assertEquals(1, study2.getContacts().size());
+		Assert.assertEquals("Creator", study2.getContacts().get(0).getType());
+
+		// Expecting only one study to be retrieved when filtered by location
+		studies = this.studyService.getStudies(new StudySearchFilter().withLocationDbId(String.valueOf(location1)), null);
+		Assert.assertEquals(1, studies.size());
+		study1 = studies.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), study1.getStudyDbid());
+		// Expecting environments of retrieved study to also be filtered by location
+		Assert.assertEquals(1, study1.getInstanceMetaData().size());
+		Assert.assertEquals(String.valueOf(location1), study1.getInstanceMetaData().get(0).getLocationDbId().toString());
+	}
+
+	@Test
+	public void testCountStudiesWithDeletedStudy() throws Exception {
+		// Empty filter will retrieve all studies in crop
+		final Long initialCount = this.studyService.countStudies(new StudySearchFilter());
+
+		// Add new study with new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString());
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+		final Random random = new Random();
+		final Integer location1 = random.nextInt();
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", location1);
+		this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Create deleted study
+		this.createDeletedStudy();
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		// New study should be retrieved for empty filter
+		Assert.assertEquals(initialCount.intValue() + 1, this.studyService.countStudies(new StudySearchFilter()));
+		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
+		Assert
+			.assertEquals(2, this.studyService.countStudies(new StudySearchFilter().withProgramDbId(this.commonTestProject.getUniqueID())));
+		// Expecting only one to be retrieved when filtered by location
+		Assert.assertEquals(1, this.studyService.countStudies(new StudySearchFilter().withLocationDbId(String.valueOf(location1))));
+	}
+
+	private void createDeletedStudy() {
+		final DmsProject deletedStudy = this.testDataInitializer
+			.createStudy("StudyDeleted", "StudyDeleted-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString());
+		deletedStudy.setDeleted(true);
+		final DmsProject environmentDatasetDeleted =
+			this.testDataInitializer
+				.createDmsProject("Environment Dataset Deleted", "Environment Dataset-Description Deleted", deletedStudy, deletedStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+		final Random random = new Random();
+		final Integer location1 = random.nextInt();
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDatasetDeleted, "2", location1);
+		this.testDataInitializer.createTestExperiment(deletedStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+	}
+
 }
