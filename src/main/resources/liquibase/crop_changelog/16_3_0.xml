@@ -110,4 +110,17 @@
 		</sql>
 	</changeSet>
 
+
+	<changeSet author="clarysabel" id="v16.3.0-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 0 FROM germplsm WHERE deleted = 1 and germplsm_uuid is not null;
+			</sqlCheck>
+		</preConditions>
+		<comment>Set germplsm_uuid to null for the deleted germplasm</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE germplsm SET germplsm_uuid = null WHERE deleted = 1;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
