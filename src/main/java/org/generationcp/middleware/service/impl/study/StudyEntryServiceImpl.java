@@ -81,11 +81,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public List<Integer> getGidsUsedInStudy(final Integer studyId, final List<Integer> gids) {
-		return this.daoFactory.getStockDao().getGidsUsedInStudy(studyId, gids);
-	}
-
-	@Override
 	public Integer getNextEntryNumber(final Integer studyId) {
 		return this.daoFactory.getStockDao().getNextEntryNumber(studyId);
 	}

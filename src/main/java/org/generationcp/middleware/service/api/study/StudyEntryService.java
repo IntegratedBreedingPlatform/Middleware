@@ -21,8 +21,6 @@ public interface StudyEntryService {
 
 	void deleteStudyEntries(int studyId);
 
-	List<Integer> getGidsUsedInStudy(Integer studyId, List<Integer> gids);
-
 	Integer getNextEntryNumber(Integer studyId);
 
 	List<StudyEntryDto> saveStudyEntries(Integer studyId, List<StudyEntryDto> studyEntryDtoList);
