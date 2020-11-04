@@ -72,7 +72,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", this.study, this.study,
 					DatasetTypeEnum.SUMMARY_DATA);
 		final Random random = new Random();
-		final Integer location1 = random.nextInt();
+		final int location1 = random.nextInt();
 		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", location1);
 		this.studyExperiment =
 			this.testDataInitializer.createTestExperiment(this.study, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
@@ -164,7 +164,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testCountStudies() throws Exception {
 		// Empty filter will retrieve all studies in crop
-		final Long initialCount = this.studyService.countStudies(new StudySearchFilter());
+		final long initialCount = this.studyService.countStudies(new StudySearchFilter());
 
 		// Add new study with new location ID
 		final DmsProject newStudy = this.testDataInitializer
@@ -174,7 +174,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
 					DatasetTypeEnum.SUMMARY_DATA);
 		final Random random = new Random();
-		final Integer location1 = random.nextInt();
+		final int location1 = random.nextInt();
 		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", location1);
 		this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
 
@@ -182,7 +182,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// New study should be retrieved for empty filter
-		Assert.assertEquals(initialCount.intValue() + 1, this.studyService.countStudies(new StudySearchFilter()));
+		Assert.assertEquals((int) initialCount + 1, this.studyService.countStudies(new StudySearchFilter()));
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
 		Assert
 			.assertEquals(2, this.studyService.countStudies(new StudySearchFilter().withProgramDbId(this.commonTestProject.getUniqueID())));
@@ -297,7 +297,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testCountStudiesWithDeletedStudy() throws Exception {
 		// Empty filter will retrieve all studies in crop
-		final Long initialCount = this.studyService.countStudies(new StudySearchFilter());
+		final long initialCount = this.studyService.countStudies(new StudySearchFilter());
 
 		// Add new study with new location ID
 		final DmsProject newStudy = this.testDataInitializer
@@ -307,7 +307,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
 					DatasetTypeEnum.SUMMARY_DATA);
 		final Random random = new Random();
-		final Integer location1 = random.nextInt();
+		final int location1 = random.nextInt();
 		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", location1);
 		this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
 
@@ -318,7 +318,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// New study should be retrieved for empty filter
-		Assert.assertEquals(initialCount.intValue() + 1, this.studyService.countStudies(new StudySearchFilter()));
+		Assert.assertEquals((int) initialCount + 1, this.studyService.countStudies(new StudySearchFilter()));
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
 		Assert
 			.assertEquals(2, this.studyService.countStudies(new StudySearchFilter().withProgramDbId(this.commonTestProject.getUniqueID())));
@@ -335,7 +335,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 				.createDmsProject("Environment Dataset Deleted", "Environment Dataset-Description Deleted", deletedStudy, deletedStudy,
 					DatasetTypeEnum.SUMMARY_DATA);
 		final Random random = new Random();
-		final Integer location1 = random.nextInt();
+		final int location1 = random.nextInt();
 		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDatasetDeleted, "2", location1);
 		this.testDataInitializer.createTestExperiment(deletedStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
 	}
