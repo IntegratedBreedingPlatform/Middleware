@@ -1133,22 +1133,23 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		final List<Integer> testGermplasmGIDs = new ArrayList<>();
 		final Integer tempGermplasmDate = 20150101;
 
-		for (int counter = 1; counter <= 5; counter++) {
+		for (int i = 1; i <= 5; i++) {
+			final int random = RandomUtils.nextInt();
 
 			final Germplasm fParent = GermplasmTestDataInitializer
-					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1, "MethodName" + counter, "LocationName" + counter);
+					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1, "MethodName" + random, "LocationName" + random);
 			final Integer tempFemaleParentGID = this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName(), this.cropType);
 
 			final Germplasm mParent = GermplasmTestDataInitializer
-					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1, "MethodName" + counter, "LocationName" + counter);
+					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1, "MethodName" + random, "LocationName" + random);
 			final Integer tempMaleParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName(), this.cropType);
 
 			final Germplasm germplasm = GermplasmTestDataInitializer
-					.createGermplasm(tempGermplasmDate, tempFemaleParentGID, tempMaleParentGID, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, counter, 1, 1,
+					.createGermplasm(tempGermplasmDate, tempFemaleParentGID, tempMaleParentGID, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, random, 1, 1,
 							"MethodName", "LocationName");
 
 			// Create Germplasm and add Preferred Name
-			germplasm.getPreferredName().setNval("GermplasmForSorting" + counter);
+			germplasm.getPreferredName().setNval("GermplasmForSorting" + random);
 			final Integer tempGermplasmGid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 			testGermplasmGIDs.add(tempGermplasmGid);
 
