@@ -10,6 +10,6 @@ public interface GermplasmService {
 
 	List<Germplasm> getGermplasmByGUIDs(List<String> guids);
 
-	Map<Integer, Integer> importGermplasmSet(Integer userId, String cropName, GermplasmImportRequestDto germplasmImportRequestDto);
+	Map<Integer, Integer> importGermplasm(Integer userId, String cropName, GermplasmImportRequestDto germplasmImportRequestDto);
 
 }

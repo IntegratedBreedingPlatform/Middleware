@@ -53,7 +53,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Map<Integer, Integer> importGermplasmSet(final Integer userId, final String cropName,
+	public Map<Integer, Integer> importGermplasm(final Integer userId, final String cropName,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final Map<Integer, Integer> results = new HashMap<>();
 		final Map<String, Method> methodsMapByAbbr = this.getBreedingMethodsMapByAbbr(germplasmImportRequestDto.getGermplasmSet());
@@ -128,7 +128,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private Map<String, Integer> getLocationsMapByAbbr(final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtos) {
 		final Set<String> locationAbbreviations = germplasmDtos.stream().map(g -> g.getLocationAbbr()).collect(Collectors.toSet());
-		return this.daoFactory.getLocationDAO().filterLocations(null, null, null, new ArrayList<>(locationAbbreviations)).stream()
+		return this.daoFactory.getLocationDAO().getByAbbreviations(new ArrayList<>(locationAbbreviations)).stream()
 			.collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
 	}
 
