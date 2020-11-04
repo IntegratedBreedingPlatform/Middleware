@@ -18,6 +18,8 @@ import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
@@ -34,6 +36,7 @@ import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -316,6 +319,15 @@ public class Germplasm implements Serializable {
 	@Column(name = "germplsm_uuid")
 	private String germplasmUUID;
 
+	@OneToOne(fetch = FetchType.LAZY)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "gref", insertable = false, updatable = false)
+	private Bibref bibref;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "methn", insertable = false, updatable = false)
+	private Method method;
+
 	/**
 	 * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
 	 **/
@@ -334,12 +346,6 @@ public class Germplasm implements Serializable {
 	@Transient
 	private String preferredAbbreviation = null;
 
-	/**
-	 * This variable is populated only when the Germplasm POJO is retrieved by using GermplasmDataManager.getGermplasmWithMethodType(), getByGIDListWithMetho()d, getByUUIDListWithMethod().
-	 * Otherwise it is null always.
-	 */
-	@Transient
-	private Method method = null;
 
 	/**
 	 * This variable is populated only when the Germplasm POJO is retrieved by using GermplasmDataManager.searchForGermplasm(). Otherwise it
@@ -960,5 +966,13 @@ public class Germplasm implements Serializable {
 
 	public void setGermplasmUUID(final String germplasmUUID) {
 		this.germplasmUUID = germplasmUUID;
+	}
+
+	public Bibref getBibref() {
+		return this.bibref;
+	}
+
+	public void setBibref(final Bibref bibref) {
+		this.bibref = bibref;
 	}
 }

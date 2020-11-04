@@ -33,6 +33,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -1062,53 +1063,47 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<Germplasm> getByGIDListWithMethod(final Set<Integer> gids) {
+	public List<Germplasm> getByGIDListWithMethodAndBibref(final Set<Integer> gids) {
 
 		if (gids.isEmpty()) {
 			return new ArrayList<>();
 		}
 
 		try {
-			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT {g.*}, {m.*} FROM germplsm g LEFT JOIN methods m ON g.methn = m.mid WHERE ");
-			queryString.append(" g.gid IN( :gids ) ");
-			queryString.append(" AND g.deleted = 0");
-			queryString.append(" AND g.grplce = 0");
+			final Criteria criteria = this.getSession().createCriteria(Germplasm.class);
+			criteria.createAlias("method", "method", CriteriaSpecification.LEFT_JOIN );
+			criteria.createAlias("bibref", "bibref", CriteriaSpecification.LEFT_JOIN );
+			criteria.add(Restrictions.in("gid", gids));
+			criteria.add(Restrictions.eq("deleted", false));
+			criteria.add(Restrictions.eq("grplce", 0));
 
-			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setParameterList("gids", gids);
-			query.addEntity("g", Germplasm.class);
-			query.addEntity("m", Method.class);
-			return this.mapGermplasmWithMethod(query.list());
+			return criteria.list();
 
 		} catch (final HibernateException e) {
-			final String message = "Error with getByGIDListWithMethod(gids=" + gids.toString() + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+			final String message = "Error with getByGIDListWithMethodAndBibref(gids=" + gids.toString() + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public List<Germplasm> getByUUIDListWithMethod(final Set<String> uuids) {
+	public List<Germplasm> getByUUIDListWithMethodAndBibref(final Set<String> uuids) {
 
 		if (uuids.isEmpty()) {
 			return new ArrayList<>();
 		}
 
 		try {
-			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT {g.*}, {m.*} FROM germplsm g LEFT JOIN methods m ON g.methn = m.mid WHERE ");
-			queryString.append(" g.germplsm_uuid IN( :uuids ) ");
-			queryString.append(" AND g.deleted = 0");
-			queryString.append(" AND g.grplce = 0");
+			final Criteria criteria = this.getSession().createCriteria(Germplasm.class);
+			criteria.createAlias("method", "method", CriteriaSpecification.LEFT_JOIN );
+			criteria.createAlias("bibref", "bibref", CriteriaSpecification.LEFT_JOIN );
+			criteria.add(Restrictions.in("germplasmUUID", uuids));
+			criteria.add(Restrictions.eq("deleted", false));
+			criteria.add(Restrictions.eq("grplce", 0));
 
-			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setParameterList("uuids", uuids);
-			query.addEntity("g", Germplasm.class);
-			query.addEntity("m", Method.class);
-			return this.mapGermplasmWithMethod(query.list());
+			return criteria.list();
 
 		} catch (final HibernateException e) {
-			final String message = "Error with getByUUIDListWithMethod(gids=" + uuids.toString() + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+			final String message = "Error with getByUUIDListWithMethodAndBibref(gids=" + uuids.toString() + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
