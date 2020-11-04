@@ -741,8 +741,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             /*
              * For big databases (e.g brachiaria, ~6M germplsm), sorting is slow.
              * If sort is needed, we limit the inner query to 5000 records and sort only that.
-             * In this mode, it's not possible to paginate past
-             * Otherwise, Pagination is done in the inner query without a limit.
+             * Otherwise, Pagination is done in the inner query.
              *
              * The outer query returns a PAGE of results + associated gids (e.g pedigree, group members),
              * which don't count for the Total results
@@ -975,6 +974,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         }
     }
 
+    // TODO remove sortState dependency
     private static Map<String, Boolean> convertSort(final Pageable pageable) {
         final Map<String, Boolean> sortState = new HashMap<>();
         if (pageable == null || pageable.getSort() == null) {
