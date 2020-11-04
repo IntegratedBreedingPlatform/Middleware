@@ -56,14 +56,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public Map<Integer, Integer> importGermplasm(final Integer userId, final String cropName,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final Map<Integer, Integer> results = new HashMap<>();
-		final Map<String, Method> methodsMapByAbbr = this.getBreedingMethodsMapByAbbr(germplasmImportRequestDto.getGermplasmSet());
-		final Map<String, Integer> locationsMapByAbbr = this.getLocationsMapByAbbr(germplasmImportRequestDto.getGermplasmSet());
-		final Map<String, Integer> attributesMapByName = this.getAttributesMapByName(germplasmImportRequestDto.getGermplasmSet());
-		final Map<String, Integer> nameTypesMapByName = this.getNameTypesMapByName(germplasmImportRequestDto.getGermplasmSet());
+		final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtoList = germplasmImportRequestDto.getGermplasmList();
+		final Map<String, Method> methodsMapByAbbr = this.getBreedingMethodsMapByAbbr(germplasmDtoList);
+		final Map<String, Integer> locationsMapByAbbr = this.getLocationsMapByAbbr(germplasmDtoList);
+		final Map<String, Integer> attributesMapByName = this.getAttributesMapByName(germplasmDtoList);
+		final Map<String, Integer> nameTypesMapByName = this.getNameTypesMapByName(germplasmDtoList);
 
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
-		for (final GermplasmImportRequestDto.GermplasmDto germplasmDto : germplasmImportRequestDto.getGermplasmSet()) {
+		for (final GermplasmImportRequestDto.GermplasmDto germplasmDto : germplasmDtoList) {
 			final Germplasm germplasm = new Germplasm();
 
 			final Method method = methodsMapByAbbr.get(germplasmDto.getBreedingMethodAbbr().toUpperCase());

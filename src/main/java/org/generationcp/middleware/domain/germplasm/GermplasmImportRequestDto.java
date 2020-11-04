@@ -143,14 +143,14 @@ public class GermplasmImportRequestDto {
 	}
 
 
-	private List<GermplasmDto> germplasmSet;
+	private List<GermplasmDto> germplasmList;
 
-	public List<GermplasmDto> getGermplasmSet() {
-		return germplasmSet;
+	public List<GermplasmDto> getGermplasmList() {
+		return germplasmList;
 	}
 
-	public void setGermplasmSet(final List<GermplasmDto> germplasmSet) {
-		this.germplasmSet = germplasmSet;
+	public void setGermplasmList(final List<GermplasmDto> germplasmList) {
+		this.germplasmList = germplasmList;
 	}
 
 	public GermplasmImportRequestDto() {
