@@ -372,7 +372,13 @@ public class WorkbookBuilder extends Builder {
 					if (PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
 						value = projectProperty.getValue();
 						if (value == null) {
-							value = StringUtils.EMPTY;
+							// During import of study, experiment design values are not set in ProjectProperty so we resolve them from GeolocationProperty
+							if (VariableType.ENVIRONMENT_DETAIL.equals(varType)) {
+								final GeolocationPropertyDao geolocationPropertyDao = this.daoFactory.getGeolocationPropertyDao();
+								value = geolocationPropertyDao.getGeolocationPropValue(stdVariable.getId(), id);
+							} else {
+								value = StringUtils.EMPTY;
+							}
 						}
 					} else if (PhenotypicType.VARIATE == varType.getRole()) {// TODO traits
 						// constants, no need to retrieve the value if it's a trial study
@@ -735,6 +741,7 @@ public class WorkbookBuilder extends Builder {
 					for (final MeasurementVariable constant : constants) {
 						if (variate.getTermId() == constant.getTermId()) {
 							found = true;
+							break;
 						}
 					}
 				}
