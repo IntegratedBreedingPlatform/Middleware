@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface GermplasmGuidGenerator {
 
-	void generateObservationUnitIds(final CropType crop, final List<Germplasm> germplasmsList);
+	void generateObservationUnitIds(CropType crop, List<Germplasm> germplasmsList);
 
 }
