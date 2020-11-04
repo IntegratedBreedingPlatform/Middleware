@@ -10,13 +10,12 @@
 
 package org.generationcp.middleware.manager;
 
-import com.google.common.base.Preconditions;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -53,7 +52,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,7 +63,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -831,7 +828,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 					name.setNstat(1);
 				}
 
-				this.generateGermplasmUUID(cropType, Arrays.asList(germplasm));
+				GermplasmGuidGenerator.generateGermplasmGuids(cropType, Arrays.asList(germplasm));
 
 				final Germplasm germplasmSaved = dao.save(germplasm);
 				listOfGermplasm.add(germplasmSaved.getGid());
@@ -1600,26 +1597,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public boolean hasExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
 		return this.getGermplasmDao().hasExistingCrosses(femaleParent, maleParentIds, gid);
-	}
-
-	//FIXME To use: GermplasmGuidGeneratorImpl
-	@Override
-	public void generateGermplasmUUID(final CropType crop, final List<Germplasm> germplasmList) {
-		Preconditions.checkNotNull(crop);
-		Preconditions.checkState(!CollectionUtils.isEmpty(germplasmList));
-
-		final boolean doUseUUID = crop.isUseUUID();
-		for (final Germplasm germplasm : germplasmList) {
-			if (germplasm.getGermplasmUUID() == null) {
-				if (doUseUUID) {
-					germplasm.setGermplasmUUID(UUID.randomUUID().toString());
-				} else {
-					final String cropPrefix = crop.getPlotCodePrefix();
-					germplasm.setGermplasmUUID(cropPrefix + MID_STRING
-						+ RandomStringUtils.randomAlphanumeric(SUFFIX_LENGTH));
-				}
-			}
-		}
 	}
 
 	@Override

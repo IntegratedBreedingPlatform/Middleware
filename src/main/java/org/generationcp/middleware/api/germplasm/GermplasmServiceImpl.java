@@ -40,11 +40,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
-	private GermplasmGuidGenerator germplasmGuidGenerator;
-
 	public GermplasmServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
-		germplasmGuidGenerator = new GermplasmGuidGeneratorImpl();
 	}
 
 	@Override
@@ -87,7 +84,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasm.setGdate(Util.convertDateToIntegerValue(germplasmDto.getCreationDate()));
 
 			if (StringUtils.isEmpty(germplasmDto.getGuid())) {
-				this.germplasmGuidGenerator.generateObservationUnitIds(cropType, Collections.singletonList(germplasm));
+				GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(germplasm));
 			} else {
 				germplasm.setGermplasmUUID(germplasmDto.getGuid());
 			}
