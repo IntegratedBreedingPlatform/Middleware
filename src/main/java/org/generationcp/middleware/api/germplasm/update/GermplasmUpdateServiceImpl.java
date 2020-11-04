@@ -258,7 +258,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 		// Check first if the code to save is a valid Name
 		if (nameCodes.containsKey(code)) {
 			final Integer nameTypeId = nameCodes.get(code);
-			final List<Name> germplasmNames = namesMap.get(germplasm.getGid());
+			final List<Name> germplasmNames = namesMap.getOrDefault(germplasm.getGid(), new ArrayList<>());
 			final List<Name> namesByType =
 				germplasmNames.stream().filter(n -> n.getTypeId().equals(nameTypeId)).collect(Collectors.toList());
 
@@ -289,7 +289,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 		// Check first if the code to save is a valid Attribute
 		if (attributeCodes.containsKey(code)) {
 			final Integer attributeTypeId = attributeCodes.get(code);
-			final List<Attribute> germplasmAttributes = attributesMap.get(germplasm.getGid());
+			final List<Attribute> germplasmAttributes = attributesMap.getOrDefault(germplasm.getGid(), new ArrayList<>());
 			final List<Attribute> attributesByType =
 				germplasmAttributes.stream().filter(n -> n.getTypeId().equals(attributeTypeId)).collect(Collectors.toList());
 
