@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -86,6 +87,19 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		assertThat(favoriteBreedingMethods, hasItem(hasProperty("code", is(newMethodCode))));
 	}
 
-	//TODO Add test for codes
+	@Test
+	public void testGetBreedingMethodsByCodes_Ok() {
+		final String newMethodCode = "NEWMETHO";
+
+		final Method newMethod = new Method(null, "NEW", "S", newMethodCode, "New Method", "New Method", 0, 0, 0, 0, 0, 0, 0, 0, null);
+		this.germplasmDataManager.addMethod(newMethod);
+
+		//Should get all methods without program and also the method previously created
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(null,
+			Collections.singleton(newMethodCode), false);
+		assertNotNull(breedingMethods);
+		assertThat(breedingMethods.size(), is(1));
+		assertThat(breedingMethods, hasItem(hasProperty("code", is(newMethodCode))));
+	}
 
 }
