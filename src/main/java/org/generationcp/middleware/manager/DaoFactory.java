@@ -254,4 +254,9 @@ public class DaoFactory {
 		return germplasmStudySourceDAO;
 	}
 
+	public BibrefDAO getBibrefDAO() {
+		final BibrefDAO bibrefDAO = new BibrefDAO();
+		bibrefDAO.setSession(this.sessionProvider.getSession());
+		return bibrefDAO;
+	}
 }

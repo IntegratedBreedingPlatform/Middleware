@@ -16,6 +16,8 @@ public class GermplasmUpdateDTO {
 	private String creationDate;
 	private String breedingMethod;
 
+	private String reference;
+
 	// Contains Names and Attributes data
 	private Map<String, String> data = new HashMap<>();
 
@@ -73,6 +75,14 @@ public class GermplasmUpdateDTO {
 
 	public void setData(final Map<String, String> attributes) {
 		this.data = attributes;
+	}
+
+	public String getReference() {
+		return this.reference;
+	}
+
+	public void setReference(final String reference) {
+		this.reference = reference;
 	}
 
 	@Override
