@@ -335,7 +335,7 @@ public class Germplasm implements Serializable {
 	private String preferredAbbreviation = null;
 
 	/**
-	 * This variable is populated only when the Germplasm POJO is retrieved by using GermplasmDataManager.getGermplasmWithMethodType().
+	 * This variable is populated only when the Germplasm POJO is retrieved by using GermplasmDataManager.getGermplasmWithMethodType(), getByGIDListWithMetho()d, getByUUIDListWithMethod().
 	 * Otherwise it is null always.
 	 */
 	@Transient

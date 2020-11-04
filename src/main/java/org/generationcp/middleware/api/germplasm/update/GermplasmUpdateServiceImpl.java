@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasm.update;
 
+import liquibase.util.StringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.dao.AttributeDAO;
@@ -21,9 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -56,7 +59,10 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 		final NameDAO nameDAO = this.daoFactory.getNameDao();
 		final AttributeDAO attributeDAO = this.daoFactory.getAttributeDAO();
 
-		final Set<String> attributesAndNamesCodes = germplasmUpdateDTOList.get(0).getData().keySet();
+		// Get the codes specified in the headers as well as the codes specified in the preferred name column.
+		final Set<String> attributesAndNamesCodes = new HashSet<>(germplasmUpdateDTOList.get(0).getData().keySet());
+		attributesAndNamesCodes
+			.addAll(germplasmUpdateDTOList.stream().map(o -> o.getPreferredName()).filter(Objects::nonNull).collect(Collectors.toSet()));
 
 		// Retrieve the field id of attributes and names
 		final Map<String, Integer> attributeCodesFieldNoMap =
@@ -66,13 +72,18 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 			this.userDefinedFieldService
 				.getByTableAndCodesInMap(UDTableType.NAMES_NAME.getTable(), new ArrayList<>(attributesAndNamesCodes));
 
-		final Set<Integer> gids = germplasmUpdateDTOList.stream().map(o -> o.getGid()).collect(Collectors.toSet());
+		// germplasm UUID should be the priority in getting germplasm
 		final Set<String> germplasmUUIDs =
-			germplasmUpdateDTOList.stream().map(o -> (o.getGid() == null) ? o.getGermplasmUUID() : "").collect(Collectors.toSet());
+			germplasmUpdateDTOList.stream().map(o -> o.getGermplasmUUID()).collect(Collectors.toSet());
+		// If there's no UUID, use GID
+		final Set<Integer> gids =
+			germplasmUpdateDTOList.stream().map(o -> StringUtils.isEmpty(o.getGermplasmUUID()) ? o.getGid() : null).filter(
+				Objects::nonNull)
+				.collect(Collectors.toSet());
 
 		final List<Germplasm> germplasmList = new ArrayList<>();
-		germplasmList.addAll(germplasmDAO.getByGIDList(new ArrayList<>(gids)));
-		germplasmList.addAll(germplasmDAO.getByUUIDList(germplasmUUIDs));
+		germplasmList.addAll(germplasmDAO.getByUUIDListWithMethod(germplasmUUIDs));
+		germplasmList.addAll(germplasmDAO.getByGIDListWithMethod(gids));
 
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap = new HashMap<>();
 		for (final GermplasmUpdateDTO germplasmUpdateDTO : germplasmUpdateDTOList) {
@@ -119,32 +130,70 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 			final int locationId = locationAbbreviationIdMap.get(germplasmUpdateDTO.getLocationAbbreviation());
 			final int germplasmDate = Integer.parseInt(germplasmUpdateDTO.getCreationDate());
 
-			this.saveGermplasm(germplasmDAO, germplasm, locationId, breedingMethodDTO, germplasmDate, conflictErrors);
+			this.updateGermplasm(germplasmDAO, germplasm, locationId, breedingMethodDTO, germplasmDate, conflictErrors);
+			this.saveAttributesAndNames(nameDAO, attributeDAO, attributeCodes, nameCodes, namesMap, attributesMap, germplasm,
+				conflictErrors,
+				germplasmUpdateDTO);
+			this.updatePreferredName(nameDAO, nameCodes, namesMap, germplasm, germplasmUpdateDTO, conflictErrors);
 
-			for (final Map.Entry<String, String> entryData : germplasmUpdateDTO.getData().entrySet()) {
-				// Save or update the Names
-				this.saveOrUpdateName(nameDAO, nameCodes, namesMap, germplasm, entryData,
-					conflictErrors);
-				this.saveOrUpdateAttribute(attributeDAO, attributeCodes, attributesMap, germplasm,
-					entryData, conflictErrors);
-
-			}
 		}
 	}
 
-	private void saveGermplasm(final GermplasmDAO germplasmDAO, final Germplasm germplasm, final int locationId,
+	private void saveAttributesAndNames(final NameDAO nameDAO, final AttributeDAO attributeDAO, final Map<String, Integer> attributeCodes,
+		final Map<String, Integer> nameCodes, final Map<Integer, List<Name>> namesMap, final Map<Integer, List<Attribute>> attributesMap,
+		final Germplasm germplasm, final List<String> conflictErrors, final GermplasmUpdateDTO germplasmUpdateDTO) {
+		for (final Map.Entry<String, String> codeValuesEntry : germplasmUpdateDTO.getData().entrySet()) {
+			final String code = codeValuesEntry.getKey();
+			final String value = codeValuesEntry.getValue();
+			this.saveOrUpdateName(nameDAO, nameCodes, namesMap, germplasm, code, value,
+				conflictErrors);
+			this.saveOrUpdateAttribute(attributeDAO, attributeCodes, attributesMap, germplasm,
+				code, value, conflictErrors);
+		}
+	}
+
+	private void updatePreferredName(final NameDAO nameDAO, final Map<String, Integer> nameCodes, final Map<Integer, List<Name>> namesMap,
+		final Germplasm germplasm, final GermplasmUpdateDTO germplasmUpdateDTO, final List<String> conflictErrors) {
+		// Update preferred name
+		final Integer preferredNameTypeId = nameCodes.get(germplasmUpdateDTO.getPreferredName());
+		final List<Name> names = namesMap.get(germplasm.getGid());
+		final List<Name> preferredNames =
+			names.stream().filter(n -> n.getTypeId().equals(preferredNameTypeId)).collect(Collectors.toList());
+
+		if (preferredNames.size() == 1) {
+			for (final Name name : names) {
+				if (preferredNameTypeId != null) {
+					name.setNstat(name.getTypeId().equals(preferredNameTypeId) ? 1 : 0);
+					nameDAO.save(name);
+				}
+			}
+		} else if (preferredNames.size() > 1) {
+			// TODO: Move to poperty file
+			conflictErrors.add(String
+				.format("Multiple names for the %s where found for germplasm %s. Name cannot be set as preferred via this batch process.",
+					germplasmUpdateDTO.getPreferredName(),
+					germplasm.getGid()));
+		} else if (!StringUtils.isEmpty(germplasmUpdateDTO.getPreferredName())) {
+			// TODO: Move to poperty file
+			conflictErrors.add(String
+				.format("Name %s not found in germplasm %s. Can’t be assigned as preferred name", germplasmUpdateDTO.getPreferredName(),
+					germplasm.getGid()));
+		}
+	}
+
+	private void updateGermplasm(final GermplasmDAO germplasmDAO, final Germplasm germplasm, final int locationId,
 		final BreedingMethodDTO breedingMethodDTO,
 		final int germplasmDate, final List<String> conflictErrors) {
 		final String oldMethodType = germplasm.getMethod().getMtype();
 		final String newMethodType = breedingMethodDTO.getType();
 
-		// Only uopdate the method if the new method has same type of the old method.
+		// Only update the method if the new method has the same type as the old method.
 		if (this.isMethodTypeMatch(newMethodType, oldMethodType)) {
 			germplasm.setMethodId(breedingMethodDTO.getId());
 		} else {
 			// TODO: Move to poperty file
 			conflictErrors.add(String
-				.format("Cannot change method for germplasm %s, the breeding method should be the same type as %", germplasm.getGid(),
+				.format("Cannot change method for germplasm %s, the breeding method should be the same type as %s", germplasm.getGid(),
 					germplasm.getMethod().getMtype()));
 		}
 		germplasm.setLocationId(locationId);
@@ -154,13 +203,11 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 	private void saveOrUpdateName(final NameDAO nameDAO, final Map<String, Integer> nameCodes,
 		final Map<Integer, List<Name>> namesMap, final Germplasm germplasm,
-		final Map.Entry<String, String> entryData, final List<String> conflictErrors) {
-		if (nameCodes.containsKey(entryData.getKey())) {
-			final String nameCode = entryData.getKey();
-			final Integer nameTypeId = nameCodes.get(nameCode);
+		final String code, final String value, final List<String> conflictErrors) {
 
-			// TODO: Update Reference
-			// TODO: Determine the preferred name
+		// Check first if the code to save is a valid Name
+		if (nameCodes.containsKey(code)) {
+			final Integer nameTypeId = nameCodes.get(code);
 			final List<Name> germplasmNames = namesMap.get(germplasm.getGid());
 			final List<Name> namesByType =
 				germplasmNames.stream().filter(n -> n.getTypeId().equals(nameTypeId)).collect(Collectors.toList());
@@ -170,27 +217,28 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 				// TODO: Move to poperty file
 				conflictErrors.add(String.format(
 					"Multiple names for the %s where found for germplasm %s. Name cannot be updated via this batch process.",
-					nameCode, germplasm.getGid()));
+					code, germplasm.getGid()));
 			} else if (namesByType.size() == 1) {
 				// Update if name is existing
 				final Name name = namesByType.get(0);
-				name.setNval(entryData.getValue());
+				name.setNval(value);
 				nameDAO.update(name);
 			} else {
 				// Create new record if name not yet exists
-				nameDAO.save(new Name(null, germplasm.getGid(), nameTypeId, 0, germplasm.getUserId(),
-					entryData.getValue(), germplasm.getLocationId(), germplasm.getGdate(), 0));
+				final Name name = new Name(null, germplasm.getGid(), nameTypeId, 0, germplasm.getUserId(),
+					value, germplasm.getLocationId(), germplasm.getGdate(), 0);
+				nameDAO.save(name);
+				germplasmNames.add(name);
 			}
 		}
 	}
 
 	private void saveOrUpdateAttribute(final AttributeDAO attributeDAO, final Map<String, Integer> attributeCodes,
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
-		final Map.Entry<String, String> entryData, final List<String> conflictErrors) {
-		// Save or update the Attributes
-		if (attributeCodes.containsKey(entryData.getKey())) {
-			final String attributeCode = entryData.getKey();
-			final Integer attributeTypeId = attributeCodes.get(attributeCode);
+		final String code, final String value, final List<String> conflictErrors) {
+		// Check first if the code to save is a valid Attribute
+		if (attributeCodes.containsKey(code)) {
+			final Integer attributeTypeId = attributeCodes.get(code);
 			final List<Attribute> germplasmAttributes = attributesMap.get(germplasm.getGid());
 			final List<Attribute> attributesByType =
 				germplasmAttributes.stream().filter(n -> n.getTypeId().equals(attributeTypeId)).collect(Collectors.toList());
@@ -200,17 +248,17 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 				// TODO: Move to poperty file
 				conflictErrors.add(String.format(
 					"Multiple attribute for the %s where found for germplasm %s. Attribute cannot be updated via this batch process.",
-					attributeCode, germplasm.getGid()));
+					code, germplasm.getGid()));
 			} else if (attributesByType.size() == 1) {
 				final Attribute attribute = attributesByType.get(0);
 				attribute.setLocationId(germplasm.getLocationId());
 				attribute.setUserId(germplasm.getUserId());
 				attribute.setAdate(germplasm.getGdate());
-				attribute.setAval(entryData.getValue());
+				attribute.setAval(value);
 				attributeDAO.update(attribute);
 			} else {
 				attributeDAO
-					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, germplasm.getGid(), entryData.getValue(),
+					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, germplasm.getGid(), value,
 						germplasm.getLocationId(),
 						0, germplasm.getGdate()));
 			}

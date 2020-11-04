@@ -1062,7 +1062,33 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<Germplasm> getByUUIDList(final Set<String> uuids) {
+	public List<Germplasm> getByGIDListWithMethod(final Set<Integer> gids) {
+
+		if (gids.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT {g.*}, {m.*} FROM germplsm g LEFT JOIN methods m ON g.methn = m.mid WHERE ");
+			queryString.append(" g.gid IN( :gids ) ");
+			queryString.append(" AND g.deleted = 0");
+			queryString.append(" AND g.grplce = 0");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("gids", gids);
+			query.addEntity("g", Germplasm.class);
+			query.addEntity("m", Method.class);
+			return this.mapGermplasmWithMethod(query.list());
+
+		} catch (final HibernateException e) {
+			final String message = "Error with getByGIDListWithMethod(gids=" + gids.toString() + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<Germplasm> getByUUIDListWithMethod(final Set<String> uuids) {
 
 		if (uuids.isEmpty()) {
 			return new ArrayList<>();
@@ -1070,19 +1096,19 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		try {
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT {g.*} FROM germplsm g WHERE ");
-			queryString.append("g.germplsm_uuid IN( :uuids ) ");
+			queryString.append("SELECT {g.*}, {m.*} FROM germplsm g LEFT JOIN methods m ON g.methn = m.mid WHERE ");
+			queryString.append(" g.germplsm_uuid IN( :uuids ) ");
 			queryString.append(" AND g.deleted = 0");
 			queryString.append(" AND g.grplce = 0");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("uuids", uuids);
 			query.addEntity("g", Germplasm.class);
-
-			return query.list();
+			query.addEntity("m", Method.class);
+			return this.mapGermplasmWithMethod(query.list());
 
 		} catch (final HibernateException e) {
-			final String message = "Error with getByUUIDList(gids=" + uuids.toString() + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+			final String message = "Error with getByUUIDListWithMethod(gids=" + uuids.toString() + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -1763,6 +1789,20 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	private List<Germplasm> mapGermplasmWithMethod(final List<Object[]> results) {
+		final List<Germplasm> germplasmList = new ArrayList<>();
+		if (!results.isEmpty()) {
+			final Object[] result = results.get(0);
+			if (result != null) {
+				final Germplasm germplasm = (Germplasm) result[0];
+				final Method method = (Method) result[1];
+				germplasm.setMethod(method);
+				germplasmList.add(germplasm);
+			}
+		}
+		return germplasmList;
 	}
 
 }
