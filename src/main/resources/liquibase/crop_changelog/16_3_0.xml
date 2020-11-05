@@ -129,7 +129,7 @@
 		</preConditions>
 		<comment>Concat hash and date to germplsm_uuid for the deleted germplasm</comment>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE germplsm SET germplsm_uuid = CONCAT(germplsm_uuid, '#', DATE_FORMAT(current_timestamp, "%Y%m%d%H%i%s%f")) WHERE deleted = 1;
+			UPDATE germplsm SET germplsm_uuid = CONCAT(germplsm_uuid, '#', DATE_FORMAT(current_timestamp, "%Y%m%d%H%i%s%f")) WHERE deleted = 1 and germplsm_uuid is not null;
 		</sql>
 	</changeSet>
 
