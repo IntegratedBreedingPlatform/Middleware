@@ -64,12 +64,12 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(StockDao.class);
 	private static final String IN_STOCK_DAO = " in StockDao: ";
 	private static final Map<String, String> factorsFilterMap = new HashMap(){{
-		put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
-		put(String.valueOf(TermId.DESIG.getId()), "s.name");
-		put(String.valueOf(TermId.ENTRY_NO.getId()), "uniquename");
-		put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), "EXISTS (SELECT 1 FROM ims_lot l1 WHERE l1.eid = s.dbxref_id and l1.status = " +
+		this.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
+		this.put(String.valueOf(TermId.DESIG.getId()), "s.name");
+		this.put(String.valueOf(TermId.ENTRY_NO.getId()), "uniquename");
+		this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), "EXISTS (SELECT 1 FROM ims_lot l1 WHERE l1.eid = s.dbxref_id and l1.status = " +
 			LotStatus.ACTIVE.getIntValue() + " HAVING COUNT(l1.lotid)");
-		put(String.valueOf(TermId.GID_UNIT.getId()), "EXISTS("
+		this.put(String.valueOf(TermId.GID_UNIT.getId()), "EXISTS("
 			+ "select l1.eid, IF(COUNT(DISTINCT IFNULL(l1.scaleid, 'null')) = 1, IFNULL(c1.name, '-'), 'Mixed') as unit1 "
 			+ "             from  stock s1"
 			+ "                       left join ims_lot l1 on s1.dbxref_id = l1.eid and l1.status = " + LotStatus.ACTIVE.getIntValue()
@@ -182,7 +182,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			// Return by ascending order of entry number. We need to perform cast first on uniquename since it's stored as string
 			criteria.addOrder(new org.hibernate.criterion.Order("uniquename", true) {
 				@Override
-				public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws HibernateException {
+				public String toSqlString(final Criteria criteria, final CriteriaQuery criteriaQuery) throws HibernateException {
 					return "CAST(uniquename AS UNSIGNED)";
 				}
 			});
@@ -319,7 +319,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				map.putIfAbsent(plotNumber, new StudyEntryDto(entryId, gid, designation));
 			}
 			return map;
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			final String errorMessage = "Error in getPlotEntriesMap " + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
@@ -468,7 +468,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				}
 
 				if (!CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
-					Map<String, String> filteredTextValues = filter.getFilteredTextValues();
+					final Map<String, String> filteredTextValues = filter.getFilteredTextValues();
 					for (final Map.Entry<String, String> entry : filteredTextValues.entrySet()) {
 						final String variableId = entry.getKey();
 						if (factorsFilterMap.get(variableId) == null) {

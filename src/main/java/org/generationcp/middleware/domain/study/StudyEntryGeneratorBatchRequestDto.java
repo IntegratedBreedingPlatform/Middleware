@@ -13,7 +13,7 @@ public class StudyEntryGeneratorBatchRequestDto {
 	private SearchCompositeDto<Integer, Integer> searchComposite;
 
 	public Integer getEntryTypeId() {
-		return entryTypeId;
+		return this.entryTypeId;
 	}
 
 	public void setEntryTypeId(final Integer entryTypeId) {
@@ -22,7 +22,7 @@ public class StudyEntryGeneratorBatchRequestDto {
 
 
 	public Integer getListId() {
-		return listId;
+		return this.listId;
 	}
 
 	public void setListId(final Integer listId) {
