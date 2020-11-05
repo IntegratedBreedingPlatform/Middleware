@@ -1193,4 +1193,14 @@ public interface GermplasmDataManager {
 
 	List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types, final Set<String> codes);
 
+
+	/**
+	 * Returns the udfld records identified by the given tablename and field type.
+	 *
+	 * @param tableName - the value of the ftable record
+	 * @param fieldTypes - the values of the ftype record
+	 * @return the Udflds POJO representing the record
+	 */
+	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final Set<String> fieldTypes);
+
 }
