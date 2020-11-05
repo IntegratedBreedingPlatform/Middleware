@@ -11,6 +11,9 @@
 
 package org.generationcp.middleware.exceptions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Exception for Client request errors
  */
@@ -18,20 +21,19 @@ public class MiddlewareRequestException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	private final String errorCode;
-	private final Object[] params;
+	private final Map<String, Object[]> errorCodeParamsMap = new HashMap<>();
 
 	public MiddlewareRequestException(final String logMessage, final String errorCode, final Object... params) {
 		super(logMessage);
-		this.errorCode = errorCode;
-		this.params = params;
+		this.errorCodeParamsMap.put(errorCode, params);
 	}
 
-	public String getErrorCode() {
-		return this.errorCode;
+	public MiddlewareRequestException(final String logMessage, final Map<String, Object[]> errorCodeParamsMap) {
+		super(logMessage);
+		this.errorCodeParamsMap.putAll(errorCodeParamsMap);
 	}
 
-	public Object[] getParams() {
-		return this.params;
+	public Map<String, Object[]> getErrorCodeParamsMap() {
+		return this.errorCodeParamsMap;
 	}
 }

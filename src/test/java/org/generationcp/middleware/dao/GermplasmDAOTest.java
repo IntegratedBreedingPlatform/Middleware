@@ -10,6 +10,8 @@
 
 package org.generationcp.middleware.dao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +22,7 @@ import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -936,6 +939,46 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		//Check if self is excluded
 		existingCrosses = this.dao.getExistingCrosses(femaleParent.getGid(),Arrays.asList(maleParent1.getGid(), maleParent2.getGid()),  Optional.of(existingCross.getGid()));
 		Assert.assertTrue(existingCrosses.isEmpty());
+	}
+
+	@Test
+	public void test() throws JsonProcessingException {
+
+		final List<GermplasmUpdateDTO> list = new ArrayList<>();
+		for (final Germplasm germplasm : this.dao.test()) {
+
+			if (germplasm.getMethod() != null) {
+				final GermplasmUpdateDTO dto = new GermplasmUpdateDTO();
+				dto.setGid(germplasm.getGid());
+				dto.setCreationDate("20200101");
+				dto.setReference("Some reference for gid " + germplasm.getGid());
+				dto.setPreferredName("DRVNM");
+				dto.setLocationAbbreviation("ARG");
+				dto.setBreedingMethod(germplasm.getMethod().getMcode());
+				dto.setGermplasmUUID(germplasm.getGermplasmUUID());
+				// Names
+				dto.getData().put("DRVNM", "Derivative Name for " + germplasm.getGid());
+				dto.getData().put("ACCNO", "Germplasm Bank Access Name for " + germplasm.getGid());
+				dto.getData().put("CRSNM", "Cross Name for " + germplasm.getGid());
+				dto.getData().put("RELNM", "Release Name for " + germplasm.getGid());
+				dto.getData().put("VARNM", "Variety Name for " + germplasm.getGid());
+				// Attributes
+				dto.getData().put("NOTE", "NOTE Attribute for " + germplasm.getGid());
+				dto.getData().put("RELEASE", "RELEASE Attribute for " + germplasm.getGid());
+				dto.getData().put("PROGM", "INSTITUTE AND BREEDING PROGRAM Attribute for " + germplasm.getGid());
+				dto.getData().put("MCOLL", "METHODS OF COLLECTION for " + germplasm.getGid());
+				dto.getData().put("MTA", "MTA Number for " + germplasm.getGid());
+				list.add(dto);
+			}
+
+		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		//Converting the Object to JSONString
+		String jsonString = mapper.writeValueAsString(list);
+		System.out.println(jsonString);
+
+
 	}
 
 }

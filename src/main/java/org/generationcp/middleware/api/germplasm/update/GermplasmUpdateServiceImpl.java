@@ -8,7 +8,7 @@ import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
-import org.generationcp.middleware.exceptions.GermplasmUpdateConflictException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Transactional(rollbackFor = GermplasmUpdateConflictException.class)
+@Transactional
 public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 	@Autowired
@@ -49,10 +49,6 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 	private final DaoFactory daoFactory;
 
-	public GermplasmUpdateServiceImpl(final HibernateSessionProvider sessionProvider) {
-		this.daoFactory = new DaoFactory(sessionProvider);
-	}
-
 	private GermplasmDAO germplasmDAO;
 
 	private NameDAO nameDAO;
@@ -61,16 +57,19 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 	private BibrefDAO bibrefDAO;
 
+	public GermplasmUpdateServiceImpl(final HibernateSessionProvider sessionProvider) {
+		this.daoFactory = new DaoFactory(sessionProvider);
+	}
+
 	@Override
-	public void saveGermplasmUpdates(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) throws
-		GermplasmUpdateConflictException {
+	public void saveGermplasmUpdates(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		this.germplasmDAO = this.daoFactory.getGermplasmDao();
 		this.nameDAO = this.daoFactory.getNameDao();
 		this.attributeDAO = this.daoFactory.getAttributeDAO();
 		this.bibrefDAO = this.daoFactory.getBibrefDAO();
 
-		final List<String> conflictErrors = new ArrayList<>();
+		final Map<String, Object[]> conflictErrors = new HashMap<>();
 
 		// Get the codes specified in the headers as well as the codes specified in the preferred name column.
 		final Set<String> attributesAndNamesCodes = new HashSet<>(germplasmUpdateDTOList.get(0).getData().keySet());
@@ -95,8 +94,8 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 				.collect(Collectors.toSet());
 
 		final List<Germplasm> germplasmList = new ArrayList<>();
-		germplasmList.addAll(germplasmDAO.getByUUIDListWithMethodAndBibref(germplasmUUIDs));
-		germplasmList.addAll(germplasmDAO.getByGIDListWithMethodAndBibref(gids));
+		germplasmList.addAll(this.germplasmDAO.getByUUIDListWithMethodAndBibref(germplasmUUIDs));
+		germplasmList.addAll(this.germplasmDAO.getByGIDListWithMethodAndBibref(gids));
 
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap = new HashMap<>();
 		for (final GermplasmUpdateDTO germplasmUpdateDTO : germplasmUpdateDTOList) {
@@ -112,9 +111,9 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 		// Retrieve the names and attributes associated to GIDs in one go.
 		final Map<Integer, List<Name>> namesMap =
-			nameDAO.getNamesByGidsInMap(germplasmList.stream().map(g -> g.getGid()).collect(Collectors.toList()));
+			this.nameDAO.getNamesByGidsInMap(germplasmList.stream().map(g -> g.getGid()).collect(Collectors.toList()));
 		final List<Attribute> attributes =
-			attributeDAO.getAttributeValuesGIDList(germplasmList.stream().map(g -> g.getGid()).collect(Collectors.toList()));
+			this.attributeDAO.getAttributeValuesGIDList(germplasmList.stream().map(g -> g.getGid()).collect(Collectors.toList()));
 		final Map<Integer, List<Attribute>> attributesMap =
 			attributes.stream().collect(Collectors.groupingBy(Attribute::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
 
@@ -125,7 +124,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 		}
 
 		if (!conflictErrors.isEmpty()) {
-			throw new GermplasmUpdateConflictException(conflictErrors);
+			throw new MiddlewareRequestException(null, conflictErrors);
 		}
 
 	}
@@ -133,7 +132,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 	private void saveGermplasmUpdateDTO(final Map<String, Integer> attributeCodes, final Map<String, Integer> nameCodes,
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, BreedingMethodDTO> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
-		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm, final List<String> conflictErrors) {
+		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm, final Map<String, Object[]> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
 		if (optionalGermplasmUpdateDTO.isPresent()) {
@@ -160,7 +159,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 	private void saveAttributesAndNames(final Map<String, Integer> attributeCodes,
 		final Map<String, Integer> nameCodes, final Map<Integer, List<Name>> namesMap, final Map<Integer, List<Attribute>> attributesMap,
-		final Germplasm germplasm, final List<String> conflictErrors, final GermplasmUpdateDTO germplasmUpdateDTO) {
+		final Germplasm germplasm, final Map<String, Object[]> conflictErrors, final GermplasmUpdateDTO germplasmUpdateDTO) {
 		for (final Map.Entry<String, String> codeValuesEntry : germplasmUpdateDTO.getData().entrySet()) {
 			final String code = codeValuesEntry.getKey();
 			final String value = codeValuesEntry.getValue();
@@ -172,7 +171,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 	}
 
 	private void updatePreferredName(final Map<String, Integer> nameCodes, final Map<Integer, List<Name>> namesMap,
-		final Germplasm germplasm, final GermplasmUpdateDTO germplasmUpdateDTO, final List<String> conflictErrors) {
+		final Germplasm germplasm, final GermplasmUpdateDTO germplasmUpdateDTO, final Map<String, Object[]> conflictErrors) {
 		// Update preferred name
 		final Integer preferredNameTypeId = nameCodes.get(germplasmUpdateDTO.getPreferredName());
 		final List<Name> names = namesMap.get(germplasm.getGid());
@@ -183,27 +182,25 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 			for (final Name name : names) {
 				if (preferredNameTypeId != null) {
 					name.setNstat(name.getTypeId().equals(preferredNameTypeId) ? 1 : 0);
-					nameDAO.save(name);
+					this.nameDAO.save(name);
 				}
 			}
 		} else if (preferredNames.size() > 1) {
-			// TODO: Move to poperty file
-			conflictErrors.add(String
-				.format("Multiple names for the %s where found for germplasm %s. Name cannot be set as preferred via this batch process.",
-					germplasmUpdateDTO.getPreferredName(),
-					germplasm.getGid()));
+			conflictErrors.put("import.germplasm.update.preferred.name.duplicate.names", new Object[] {
+				germplasmUpdateDTO.getPreferredName(),
+				germplasm.getGid()});
 		} else if (!StringUtils.isEmpty(germplasmUpdateDTO.getPreferredName())) {
-			// TODO: Move to poperty file
-			conflictErrors.add(String
-				.format("Name %s not found in germplasm %s. Can’t be assigned as preferred name", germplasmUpdateDTO.getPreferredName(),
-					germplasm.getGid()));
+			conflictErrors.put("import.germplasm.update.preferred.name.doesnt.exist", new Object[] {
+				germplasmUpdateDTO.getPreferredName(),
+				germplasm.getGid()});
 		}
 	}
 
 	private void updateGermplasm(final Germplasm germplasm,
 		final Optional<Integer> locationIdOptional,
 		final Optional<BreedingMethodDTO> breedingMethodDtoOptional,
-		final Optional<Integer> germplasmDateOptional, final Optional<String> referenceOptional, final List<String> conflictErrors) {
+		final Optional<Integer> germplasmDateOptional, final Optional<String> referenceOptional,
+		final Map<String, Object[]> conflictErrors) {
 
 		if (breedingMethodDtoOptional.isPresent()) {
 			final String oldMethodType = germplasm.getMethod().getMtype();
@@ -213,10 +210,9 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 			if (this.isMethodTypeMatch(newMethodType, oldMethodType)) {
 				germplasm.setMethodId(breedingMethodDtoOptional.get().getId());
 			} else {
-				// TODO: Move to poperty file
-				conflictErrors.add(String
-					.format("Cannot change method for germplasm %s, the breeding method should be the same type as %s", germplasm.getGid(),
-						germplasm.getMethod().getMtype()));
+				conflictErrors.put("import.germplasm.update.breeding.method.mismatch", new Object[] {
+					germplasm.getGid(),
+					germplasm.getMethod().getMtype()});
 			}
 		}
 
@@ -230,7 +226,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 		this.saveOrUpdateReference(germplasm, referenceOptional);
 
-		germplasmDAO.update(germplasm);
+		this.germplasmDAO.update(germplasm);
 	}
 
 	private void saveOrUpdateReference(final Germplasm germplasm, final Optional<String> referenceOptional) {
@@ -238,13 +234,13 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 			if (germplasm.getBibref() != null) {
 				final Bibref bibref = germplasm.getBibref();
 				bibref.setAnalyt(referenceOptional.get());
-				bibrefDAO.save(bibref);
+				this.bibrefDAO.save(bibref);
 			} else {
 				final Bibref bibref = new Bibref(null, "-", "-", referenceOptional.get(), "-", "-", "-", "-",
 					"-", "-", "-", "-");
 				final Integer fielbookBibrefCode = 1923;
 				bibref.setType(new UserDefinedField(fielbookBibrefCode));
-				bibrefDAO.save(bibref);
+				this.bibrefDAO.save(bibref);
 				germplasm.setReferenceId(bibref.getRefid());
 			}
 
@@ -253,7 +249,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 	private void saveOrUpdateName(final Map<String, Integer> nameCodes,
 		final Map<Integer, List<Name>> namesMap, final Germplasm germplasm,
-		final String code, final String value, final List<String> conflictErrors) {
+		final String code, final String value, final Map<String, Object[]> conflictErrors) {
 
 		// Check first if the code to save is a valid Name
 		if (nameCodes.containsKey(code)) {
@@ -264,20 +260,18 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 			// Check if there are multiple names with same type
 			if (namesByType.size() > 1) {
-				// TODO: Move to poperty file
-				conflictErrors.add(String.format(
-					"Multiple names for the %s where found for germplasm %s. Name cannot be updated via this batch process.",
-					code, germplasm.getGid()));
+				conflictErrors.put("import.germplasm.update.duplicate.names", new Object[] {
+					code, germplasm.getGid()});
 			} else if (namesByType.size() == 1) {
 				// Update if name is existing
 				final Name name = namesByType.get(0);
 				name.setNval(value);
-				nameDAO.update(name);
+				this.nameDAO.update(name);
 			} else {
 				// Create new record if name not yet exists
 				final Name name = new Name(null, germplasm.getGid(), nameTypeId, 0, germplasm.getUserId(),
 					value, germplasm.getLocationId(), germplasm.getGdate(), 0);
-				nameDAO.save(name);
+				this.nameDAO.save(name);
 				germplasmNames.add(name);
 			}
 		}
@@ -285,7 +279,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 	private void saveOrUpdateAttribute(final Map<String, Integer> attributeCodes,
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
-		final String code, final String value, final List<String> conflictErrors) {
+		final String code, final String value, final Map<String, Object[]> conflictErrors) {
 		// Check first if the code to save is a valid Attribute
 		if (attributeCodes.containsKey(code)) {
 			final Integer attributeTypeId = attributeCodes.get(code);
@@ -295,19 +289,17 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 			// Check if there are multiple attributes with same type
 			if (attributesByType.size() > 1) {
-				// TODO: Move to poperty file
-				conflictErrors.add(String.format(
-					"Multiple attribute for the %s where found for germplasm %s. Attribute cannot be updated via this batch process.",
-					code, germplasm.getGid()));
+				conflictErrors.put("import.germplasm.update.duplicate.attributes", new Object[] {
+					code, germplasm.getGid()});
 			} else if (attributesByType.size() == 1) {
 				final Attribute attribute = attributesByType.get(0);
 				attribute.setLocationId(germplasm.getLocationId());
 				attribute.setUserId(germplasm.getUserId());
 				attribute.setAdate(germplasm.getGdate());
 				attribute.setAval(value);
-				attributeDAO.update(attribute);
+				this.attributeDAO.update(attribute);
 			} else {
-				attributeDAO
+				this.attributeDAO
 					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, germplasm.getGid(), value,
 						germplasm.getLocationId(),
 						0, germplasm.getGdate()));

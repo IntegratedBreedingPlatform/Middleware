@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 
@@ -166,7 +167,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		try {
 			this.plantingService.savePlanting(userId, studyId, observationDatasetId, plantingRequestDto, TransactionStatus.CONFIRMED);
 		} catch (final MiddlewareRequestException e) {
-			assertThat(e.getErrorCode(), equalTo("planting.confirmed.transactions.found"));
+			assertTrue(e.getErrorCodeParamsMap().containsKey("planting.confirmed.transactions.found"));
 		}
 	}
 
@@ -203,7 +204,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		try {
 			this.plantingService.savePlanting(userId, studyId, observationDatasetId, plantingRequestDto, TransactionStatus.CONFIRMED);
 		} catch (final MiddlewareRequestException e) {
-			assertThat(e.getErrorCode(), equalTo("planting.not.enough.inventory"));
+			assertTrue(e.getErrorCodeParamsMap().containsKey("planting.not.enough.inventory"));
 		}
 	}
 
