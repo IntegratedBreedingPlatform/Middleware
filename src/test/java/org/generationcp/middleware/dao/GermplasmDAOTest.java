@@ -941,44 +941,4 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertTrue(existingCrosses.isEmpty());
 	}
 
-	@Test
-	public void test() throws JsonProcessingException {
-
-		final List<GermplasmUpdateDTO> list = new ArrayList<>();
-		for (final Germplasm germplasm : this.dao.test()) {
-
-			if (germplasm.getMethod() != null) {
-				final GermplasmUpdateDTO dto = new GermplasmUpdateDTO();
-				dto.setGid(germplasm.getGid());
-				dto.setCreationDate("20200101");
-				dto.setReference("Some reference for gid " + germplasm.getGid());
-				dto.setPreferredName("DRVNM");
-				dto.setLocationAbbreviation("ARG");
-				dto.setBreedingMethod(germplasm.getMethod().getMcode());
-				dto.setGermplasmUUID(germplasm.getGermplasmUUID());
-				// Names
-				dto.getData().put("DRVNM", "Derivative Name for " + germplasm.getGid());
-				dto.getData().put("ACCNO", "Germplasm Bank Access Name for " + germplasm.getGid());
-				dto.getData().put("CRSNM", "Cross Name for " + germplasm.getGid());
-				dto.getData().put("RELNM", "Release Name for " + germplasm.getGid());
-				dto.getData().put("VARNM", "Variety Name for " + germplasm.getGid());
-				// Attributes
-				dto.getData().put("NOTE", "NOTE Attribute for " + germplasm.getGid());
-				dto.getData().put("RELEASE", "RELEASE Attribute for " + germplasm.getGid());
-				dto.getData().put("PROGM", "INSTITUTE AND BREEDING PROGRAM Attribute for " + germplasm.getGid());
-				dto.getData().put("MCOLL", "METHODS OF COLLECTION for " + germplasm.getGid());
-				dto.getData().put("MTA", "MTA Number for " + germplasm.getGid());
-				list.add(dto);
-			}
-
-		}
-
-		ObjectMapper mapper = new ObjectMapper();
-		//Converting the Object to JSONString
-		String jsonString = mapper.writeValueAsString(list);
-		System.out.println(jsonString);
-
-
-	}
-
 }

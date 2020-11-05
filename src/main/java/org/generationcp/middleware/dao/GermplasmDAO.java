@@ -1800,13 +1800,4 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return germplasmList;
 	}
 
-	public List<Germplasm> test() {
-			final Criteria criteria = this.getSession().createCriteria(Germplasm.class);
-			criteria.createAlias("method", "method", CriteriaSpecification.LEFT_JOIN );
-			criteria.createAlias("bibref", "bibref", CriteriaSpecification.LEFT_JOIN );
-			criteria.add(Restrictions.eq("deleted", false));
-			criteria.add(Restrictions.eq("grplce", 0));
-			return criteria.list();
-	}
-
 }
