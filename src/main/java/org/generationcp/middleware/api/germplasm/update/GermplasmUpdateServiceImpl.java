@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
+	public static final String DEFAULT_DASH = "-";
 	@Autowired
 	private UserDefinedFieldService userDefinedFieldService;
 
@@ -236,9 +237,10 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 				bibref.setAnalyt(referenceOptional.get());
 				this.bibrefDAO.save(bibref);
 			} else {
-				final Bibref bibref = new Bibref(null, "-", "-", referenceOptional.get(), "-", "-", "-", "-",
-					"-", "-", "-", "-");
+				final Bibref bibref = new Bibref(null, DEFAULT_DASH, DEFAULT_DASH, referenceOptional.get(), DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH,
+					DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH);
 				final Integer fielbookBibrefCode = 1923;
+				// TODO: Check bibref type
 				bibref.setType(new UserDefinedField(fielbookBibrefCode));
 				this.bibrefDAO.save(bibref);
 				germplasm.setReferenceId(bibref.getRefid());
