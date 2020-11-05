@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -85,7 +86,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public Integer createGermplasmListFolder(final Integer userId, final String folderName, final Integer parentId,
 		final String programUUID) {
 
-		final GermplasmList parentFolder =
+		final GermplasmList parentFolder = (Objects.isNull(parentId)) ? null :
 			this.getGermplasmListById(parentId).orElseThrow(() -> new MiddlewareException("Parent Folder does not exist"));
 
 		final GermplasmList folder = new GermplasmList();

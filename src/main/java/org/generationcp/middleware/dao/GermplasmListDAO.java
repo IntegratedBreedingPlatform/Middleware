@@ -648,12 +648,21 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public GermplasmList getGermplasmListByParentAndName(final String germplasmListName, final Integer parentId, final String programUUID) {
 		try {
-			final GermplasmList parent = new GermplasmList();
-			parent.setId(parentId);
+
 			final DetachedCriteria criteria = DetachedCriteria.forClass(GermplasmList.class);
 			criteria.add(Restrictions.eq(NAME, germplasmListName));
-			criteria.add(Restrictions.eq(PARENT, parent));
 			criteria.add(Restrictions.eq(PROGRAM_UUID, programUUID));
+			criteria.add(Restrictions.not(Restrictions.eq(STATUS, STATUS_DELETED)));
+
+			if (Objects.isNull(parentId)) {
+				criteria.add(Restrictions.isNull(PARENT));
+			} else {
+				final GermplasmList parent = new GermplasmList();
+				parent.setId(parentId);
+
+				criteria.add(Restrictions.eq(PARENT, parent));
+			}
+
 			return (GermplasmList) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
 		} catch (final Exception e) {
 			final String message = "Error with getGermplasmListByParentAndName(germplasmListName=" + germplasmListName + ", parentId= " + parentId
