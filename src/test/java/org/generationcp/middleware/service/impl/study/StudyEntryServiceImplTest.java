@@ -52,8 +52,8 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	private Integer studyId;
 	private List<Integer> gids;
 	private DaoFactory daoFactory;
+	private DmsProject study;
 	private DmsProject plotDataset;
-
 
 	@Before
 	public void setup() {
@@ -64,20 +64,20 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		if (this.studyId == null) {
-			final DmsProject study = new DmsProject(
+			this.study = new DmsProject(
 				"TEST STUDY", "TEST DESCRIPTION", null, Collections.emptyList(),
 				false,
 				false, new StudyType(6), "20200606", null, null,
 				null, "1");
-			this.daoFactory.getDmsProjectDAO().save(study);
-			this.studyId = study.getProjectId();
+			this.daoFactory.getDmsProjectDAO().save(this.study);
+			this.studyId = this.study.getProjectId();
 			this.plotDataset = new DmsProject(
 					"TEST DATASET", "TEST DATASET DESC", null, Collections.emptyList(),
 					false,
 					false, new StudyType(6), "20200606", null, null,
 					null, "1");
 			this.plotDataset.setDatasetType(new DatasetType(DatasetTypeEnum.PLOT_DATA.getId()));
-			this.plotDataset.setStudy(study);
+			this.plotDataset.setStudy(this.study);
 			this.daoFactory.getDmsProjectDAO().save(this.plotDataset);
 
 
@@ -171,18 +171,9 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testHasUnassignedStudyEntriesToPlot() {
 		Assert.assertTrue(this.service.hasUnassignedStudyEntriesToPlot(this.studyId));
+		this.service.deleteStudyEntries(this.studyId);
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(this.studyId);
-		for(final StockModel stock: stocks) {
-			final ExperimentModel experimentModel = new ExperimentModel();
-			experimentModel.setGeoLocation(geolocation);
-			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-			experimentModel.setProject(this.plotDataset);
-			experimentModel.setStock(stock);
-			final String customUnitID = RandomStringUtils.randomAlphabetic(10);
-			experimentModel.setObsUnitId(customUnitID);
-			this.daoFactory.getExperimentDao().save(experimentModel);
-		}
+		this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plotDataset, null, geolocation, 5);
 		Assert.assertFalse(this.service.hasUnassignedStudyEntriesToPlot(this.studyId));
 	}
 
