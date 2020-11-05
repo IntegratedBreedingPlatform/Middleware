@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -1210,7 +1211,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		try {
 			this.getSession().flush();
-			queryString.append("UPDATE germplsm SET deleted = 1 where gid in (:gids)");
+			queryString.append("UPDATE germplsm SET deleted = 1, germplsm_uuid = CONCAT (germplsm_uuid, '#', '" + Util
+				.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS") + "')  where gid in (:gids)");
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gids);
 			query.executeUpdate();

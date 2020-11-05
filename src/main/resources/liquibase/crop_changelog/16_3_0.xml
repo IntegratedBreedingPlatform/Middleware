@@ -110,4 +110,27 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="clarysabel" id="v16.3.0-7">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="germplsm"/>
+				<columnExists tableName="germplsm" columnName="germplsm_uuid"/>
+			</and>
+		</preConditions>
+		<comment>Alter germplsm.germplsm_uuid column to extend varchar length </comment>
+		<modifyDataType tableName="germplsm" columnName="germplsm_uuid" newDataType="VARCHAR(56) DEFAULT NULL"></modifyDataType>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v16.3.0-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 0 FROM germplsm WHERE deleted = 1 and germplsm_uuid is not null;
+			</sqlCheck>
+		</preConditions>
+		<comment>Concat hash and date to germplsm_uuid for the deleted germplasm</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE germplsm SET germplsm_uuid = CONCAT(germplsm_uuid, '#', DATE_FORMAT(current_timestamp, "%Y%m%d%H%i%s%f")) WHERE deleted = 1;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
