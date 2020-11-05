@@ -265,6 +265,8 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 			} else if (namesByType.size() == 1) {
 				// Update if name is existing
 				final Name name = namesByType.get(0);
+				name.setLocationId(germplasm.getLocationId());
+				name.setNdate(germplasm.getGdate());
 				name.setNval(value);
 				this.nameDAO.update(name);
 			} else {
@@ -294,13 +296,12 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 			} else if (attributesByType.size() == 1) {
 				final Attribute attribute = attributesByType.get(0);
 				attribute.setLocationId(germplasm.getLocationId());
-				attribute.setUserId(germplasm.getUserId());
 				attribute.setAdate(germplasm.getGdate());
 				attribute.setAval(value);
 				this.attributeDAO.update(attribute);
 			} else {
 				this.attributeDAO
-					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, germplasm.getGid(), value,
+					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, germplasm.getUserId(), value,
 						germplasm.getLocationId(),
 						0, germplasm.getGdate()));
 			}
