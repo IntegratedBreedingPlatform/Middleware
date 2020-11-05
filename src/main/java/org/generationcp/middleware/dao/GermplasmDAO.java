@@ -1059,37 +1059,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<Germplasm> getGermplasmWithPreferredNameByGIDs(final List<Integer> gids) {
-		try {
-			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT {g.*}, {n.*} FROM germplsm g ");
-			queryString.append("LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 ");
-			queryString.append("WHERE g.gid IN( :gids ) ");
-			queryString.append(" AND g.deleted = 0");
-			queryString.append(" AND g.grplce = 0");
-
-			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.addEntity("g", Germplasm.class);
-			query.addEntity("n", Name.class);
-			query.setParameterList("gids", gids);
-
-
-			final List results = query.list();
-			final List<Germplasm> germplasmWithPreferredName = new ArrayList<>();
-			for (final Object result : results) {
-				final Object[] resultArray = (Object[]) result;
-				final Germplasm germplasm = (Germplasm) resultArray[0];
-				germplasm.setPreferredName((Name) resultArray[1]);
-				germplasmWithPreferredName.add(germplasm);
-			}
-			return germplasmWithPreferredName;
-		} catch (final HibernateException e) {
-			final String message = "Error with getGermplasmWithPreferredNameByGIDs(gids=" + gids.toString() + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
-			GermplasmDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	public Map<Integer, Integer> getGermplasmDatesByGids(final List<Integer> gids) {
 		final Map<Integer, Integer> resultMap = new HashMap<>();
 		final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_GERMPLASM_DATES_BY_GIDS);
