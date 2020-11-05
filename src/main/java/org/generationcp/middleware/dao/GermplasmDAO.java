@@ -1210,7 +1210,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		try {
 			this.getSession().flush();
-			queryString.append("UPDATE germplsm SET deleted = 1, germplsm_uuid = null where gid in (:gids)");
+			queryString.append("UPDATE germplsm SET deleted = 1 where gid in (:gids)");
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gids);
 			query.executeUpdate();
