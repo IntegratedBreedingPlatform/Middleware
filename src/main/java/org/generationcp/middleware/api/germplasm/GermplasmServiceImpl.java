@@ -36,7 +36,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private final DaoFactory daoFactory;
 
-	private static final String DEFAULT_DASH = "-";
+	private static final String DEFAULT_BIBREF_FIELD = "-";
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -92,9 +92,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			if (!StringUtils.isEmpty(germplasmDto.getReference())) {
 				final Bibref bibref =
-					new Bibref(null, DEFAULT_DASH, DEFAULT_DASH, germplasmDto.getReference(), DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH,
-						DEFAULT_DASH,
-						DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH);
+					new Bibref(null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, germplasmDto.getReference(), DEFAULT_BIBREF_FIELD,
+						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD,
+						DEFAULT_BIBREF_FIELD,
+						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD);
 				this.daoFactory.getBibrefDAO().save(bibref);
 				germplasm.setReferenceId(bibref.getRefid());
 			} else {
