@@ -117,6 +117,21 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
+	public boolean hasUnassignedStudyEntriesToPlot(final int studyId) {
+		try {
+			final SQLQuery query = this.getSession()
+				.createSQLQuery("SELECT COUNT(*) FROM ibdbv2_wheat_merged.stock s "
+					+ "WHERE s.project_id= :studyId AND NOT EXISTS (SELECT 1 FROM nd_experiment e WHERE e.stock_id=s.stock_id)");
+			query.setParameter("studyId", studyId);
+			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in hasUnassignedStudyEntriesToPlot=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<StudyReference> getStudiesByGid(final int gid) {
 		final List<StudyReference> studyReferences = new ArrayList<>();
