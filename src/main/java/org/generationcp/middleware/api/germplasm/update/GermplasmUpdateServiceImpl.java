@@ -212,7 +212,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 			} else {
 				conflictErrors.put("import.germplasm.update.breeding.method.mismatch", new Object[] {
 					germplasm.getGid(),
-					germplasm.getMethod().getMtype()});
+					String.format("%s (%s)", germplasm.getMethod().getMname(), germplasm.getMethod().getMtype())});
 			}
 		}
 
