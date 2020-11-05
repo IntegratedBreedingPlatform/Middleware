@@ -85,6 +85,12 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	@Autowired
 	private InventoryDataManager inventoryDataManager;
 
+	// pedigree tests
+	private Germplasm greatGrandParentGermplasm;
+	private Germplasm grandParentGermplasm;
+	private Germplasm groupSource;
+	private Germplasm descendant;
+
 	@Before
 	public void setUp() throws Exception {
 		if (this.dao == null) {
@@ -192,6 +198,121 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		Assert.assertTrue("Parent germplasm should be included in search result", resultGIDs.contains(parentGermplasmId));
 		Assert.assertTrue("Child germplasm should be included in search result", resultGIDs.contains(childGermplasmId));
+	}
+
+	@Test
+	public void testSearchGermplasmIncludePedigreeGenerative() {
+		this.createPedigree();
+
+		final GermplasmSearchRequest request = this.createSearchRequest(descendant.getGid());
+		final GermplasmSearchRequest.IncludePedigree includePedigree = new GermplasmSearchRequest.IncludePedigree();
+		includePedigree.setGenerationLevel(1);
+		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.GENERATIVE);
+		request.setIncludePedigree(includePedigree);
+
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
+
+		final List<Integer> resultGIDs = Lists.newArrayList();
+		for (final GermplasmSearchResponse germplasm : results) {
+			resultGIDs.add(germplasm.getGid());
+		}
+
+		Assert.assertFalse(resultGIDs.contains(this.greatGrandParentGermplasm.getGid()));
+		Assert.assertTrue(resultGIDs.contains(this.grandParentGermplasm.getGid()));
+		Assert.assertFalse(resultGIDs.contains(this.groupSource.getGid()));
+		Assert.assertTrue(resultGIDs.contains(this.descendant.getGid()));
+	}
+
+	@Test
+	public void testSearchGermplasmIncludePedigreeGenerativeLevelTwo() {
+		this.createPedigree();
+
+		final GermplasmSearchRequest request = this.createSearchRequest(descendant.getGid());
+		final GermplasmSearchRequest.IncludePedigree includePedigree = new GermplasmSearchRequest.IncludePedigree();
+		includePedigree.setGenerationLevel(2);
+		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.GENERATIVE);
+		request.setIncludePedigree(includePedigree);
+
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
+
+		final List<Integer> resultGIDs = Lists.newArrayList();
+		for (final GermplasmSearchResponse germplasm : results) {
+			resultGIDs.add(germplasm.getGid());
+		}
+
+		Assert.assertTrue(resultGIDs.contains(this.greatGrandParentGermplasm.getGid()));
+		Assert.assertTrue(resultGIDs.contains(this.grandParentGermplasm.getGid()));
+		Assert.assertFalse(resultGIDs.contains(this.groupSource.getGid()));
+		Assert.assertTrue(resultGIDs.contains(this.descendant.getGid()));
+	}
+
+	@Test
+	public void testSearchGermplasmIncludePedigreeDerivative() {
+		this.createPedigree();
+
+		final GermplasmSearchRequest request = this.createSearchRequest(descendant.getGid());
+		final GermplasmSearchRequest.IncludePedigree includePedigree = new GermplasmSearchRequest.IncludePedigree();
+		includePedigree.setGenerationLevel(1);
+		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.DERIVATIVE);
+		request.setIncludePedigree(includePedigree);
+
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
+
+		final List<Integer> resultGIDs = Lists.newArrayList();
+		for (final GermplasmSearchResponse germplasm : results) {
+			resultGIDs.add(germplasm.getGid());
+		}
+
+		Assert.assertFalse(resultGIDs.contains(this.greatGrandParentGermplasm.getGid()));
+		Assert.assertFalse(resultGIDs.contains(this.grandParentGermplasm.getGid()));
+		Assert.assertTrue(resultGIDs.contains(this.groupSource.getGid()));
+		Assert.assertTrue(resultGIDs.contains(this.descendant.getGid()));
+	}
+
+	@Test
+	public void testSearchGermplasmIncludePedigreeBoth() {
+		this.createPedigree();
+
+		final GermplasmSearchRequest request = this.createSearchRequest(descendant.getGid());
+		final GermplasmSearchRequest.IncludePedigree includePedigree = new GermplasmSearchRequest.IncludePedigree();
+		includePedigree.setGenerationLevel(2);
+		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.BOTH);
+		request.setIncludePedigree(includePedigree);
+
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
+
+		final List<Integer> resultGIDs = Lists.newArrayList();
+		for (final GermplasmSearchResponse germplasm : results) {
+			resultGIDs.add(germplasm.getGid());
+		}
+
+		Assert.assertFalse(resultGIDs.contains(this.greatGrandParentGermplasm.getGid()));
+		Assert.assertTrue(resultGIDs.contains(this.grandParentGermplasm.getGid()));
+		Assert.assertTrue(resultGIDs.contains(this.groupSource.getGid()));
+		Assert.assertTrue(resultGIDs.contains(this.descendant.getGid()));
+	}
+
+	@Test
+	public void testSearchGermplasmIncludePedigreeBothLevelThree() {
+		this.createPedigree();
+
+		final GermplasmSearchRequest request = this.createSearchRequest(descendant.getGid());
+		final GermplasmSearchRequest.IncludePedigree includePedigree = new GermplasmSearchRequest.IncludePedigree();
+		includePedigree.setGenerationLevel(3);
+		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.BOTH);
+		request.setIncludePedigree(includePedigree);
+
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
+
+		final List<Integer> resultGIDs = Lists.newArrayList();
+		for (final GermplasmSearchResponse germplasm : results) {
+			resultGIDs.add(germplasm.getGid());
+		}
+
+		Assert.assertTrue(resultGIDs.contains(this.greatGrandParentGermplasm.getGid()));
+		Assert.assertTrue(resultGIDs.contains(this.grandParentGermplasm.getGid()));
+		Assert.assertTrue(resultGIDs.contains(this.groupSource.getGid()));
+		Assert.assertTrue(resultGIDs.contains(this.descendant.getGid()));
 	}
 
 	@Test
@@ -1299,6 +1420,20 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			Assert.assertFalse("Result germplasm should not contain CODE1 Name",
 					germplasm.getNameTypesValueMap().containsKey(DERIVATIVE_NAME));
 		}
+	}
+
+	private void createPedigree() {
+		greatGrandParentGermplasm = GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDataDM.addGermplasm(greatGrandParentGermplasm, greatGrandParentGermplasm.getPreferredName(), this.cropType);
+
+		grandParentGermplasm = GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, greatGrandParentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDataDM.addGermplasm(grandParentGermplasm, grandParentGermplasm.getPreferredName(), this.cropType);
+
+		groupSource = GermplasmTestDataInitializer .createGermplasm(this.germplasmDate, grandParentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDataDM.addGermplasm(groupSource, groupSource.getPreferredName(), this.cropType);
+
+		descendant = GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, groupSource.getGid(), groupSource.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDataDM.addGermplasm(descendant, descendant.getPreferredName(), this.cropType);
 	}
 
 }
