@@ -1682,19 +1682,20 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public List<Germplasm> getGermplasmByGUIDs(final List<String> guids) {
-		final List<Germplasm> locations;
+		if (guids == null || guids.isEmpty()) {
+			return new ArrayList<>();
+		}
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Germplasm.class);
 			criteria.add(Restrictions.in("germplasmUUID", guids));
 			criteria.add(Restrictions.eq("deleted", Boolean.FALSE));
-			locations = criteria.list();
+			return criteria.list();
 		} catch (final HibernateException e) {
 			GermplasmDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("getGermplasmByGUIDs", "guids", "", e.getMessage(),
 					"Germplasm"), e);
 		}
-		return locations;
 	}
 
 	StringBuilder buildGetExistingCrossesQueryString(final List<Integer> maleParentIds, final Optional<Integer> gid) {

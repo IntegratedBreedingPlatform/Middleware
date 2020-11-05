@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasm;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -50,9 +51,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Map<Integer, Integer> importGermplasm(final Integer userId, final String cropName,
+	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final Integer userId, final String cropName,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
-		final Map<Integer, Integer> results = new HashMap<>();
+		final Map<Integer, GermplasmImportResponseDto> results = new HashMap<>();
 		final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtoList = germplasmImportRequestDto.getGermplasmList();
 		final Map<String, Method> methodsMapByAbbr = this.getBreedingMethodsMapByAbbr(germplasmDtoList);
 		final Map<String, Integer> locationsMapByAbbr = this.getLocationsMapByAbbr(germplasmDtoList);
@@ -117,8 +118,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 					this.daoFactory.getAttributeDAO().save(attribute);
 				});
 			}
-
-			results.put(germplasmDto.getClientId(), germplasm.getGid());
+			results.put(germplasmDto.getClientId(),
+				new GermplasmImportResponseDto(GermplasmImportResponseDto.Status.CREATED, Collections.singletonList(germplasm.getGid())));
 		}
 
 		return results;
