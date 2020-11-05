@@ -98,6 +98,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			if (!CollectionUtils.isEmpty(codes)) {
 				criteria.add(Restrictions.in("fcode", codes));
 			}
+			criteria.addOrder(Order.asc("fname"));
 			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
