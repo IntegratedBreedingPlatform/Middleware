@@ -8,7 +8,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 /*
- * Currently this service is configured to work with Fieldbook and BreedingManager. It is important that for the
+ * It is important that for the
  * managerFactory.getPedigreeService to work properly that the pedigree.profile should BE SET properly when setting up
  * DynamicManagerFactoryProviderConcurrency
  */
@@ -38,6 +38,20 @@ public interface PedigreeService {
 	 * @return The cross expansion based on the given gid and level
 	 */
 	Map<Integer, String> getCrossExpansions(Set<Integer> gids, Integer level, CrossExpansionProperties crossExpansionProperties);
+
+	/**
+	 * Gets the cross expansion i.e build the pedigree string.
+	 * This method is a workaround for the 5000 limitation. It invokes {@link #getCrossExpansions(Set, Integer, CrossExpansionProperties)}
+	 * with batches of 5000 gids until it gets the full list.
+	 *
+	 * TODO continue investigation of the 5000 limitation.
+	 *
+	 * @param gids Set of gids to build a pedigree string for.
+	 * @param level the number of generation traversed to generate the pedigree
+	 * @param level the level
+	 * @return The cross expansion based on the given gid and level
+	 */
+	Map<Integer, String> getCrossExpansionsBulk(Set<Integer> gids, Integer level, CrossExpansionProperties crossExpansionProperties);
 
 	/**
 	 * Gets the cross expansion i.e build the pedigree string.

@@ -594,6 +594,12 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 
 	@Override
 	public Map<Integer, String> getCrossExpansions(Set<Integer> gids, Integer level, CrossExpansionProperties crossExpansionProperties) {
-		throw new UnsupportedOperationException("Bulk pedigree string genration is not current supported in the test method.");
+		throw new UnsupportedOperationException("Bulk pedigree string generation is not current supported in the test method.");
+	}
+
+	@Override
+	public Map<Integer, String> getCrossExpansionsBulk(final Set<Integer> gids, final Integer level,
+		final CrossExpansionProperties crossExpansionProperties) {
+		throw new UnsupportedOperationException("Bulk pedigree string generation is not current supported in the test method.");
 	}
 }

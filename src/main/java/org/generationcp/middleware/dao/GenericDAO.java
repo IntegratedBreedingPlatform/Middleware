@@ -11,7 +11,9 @@
 
 package org.generationcp.middleware.dao;
 
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockOptions;
@@ -304,4 +306,28 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 			}
 		}
 	}
+
+	protected static String getOperator(final SqlTextFilter.Type filterType) {
+		if (SqlTextFilter.Type.EXACTMATCH.equals(filterType)) {
+			return "=";
+		} else {
+			return "LIKE";
+		}
+	}
+
+	protected static String getParameter(final SqlTextFilter.Type type, final String value) {
+		if (type == null) {
+			return value;
+		}
+		switch (type) {
+			case STARTSWITH:
+				return value + "%";
+			case CONTAINS:
+				return "%" + value + "%";
+			case EXACTMATCH:
+			default:
+				return value;
+		}
+	}
+
 }
