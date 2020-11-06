@@ -171,9 +171,16 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testHasUnassignedStudyEntriesToPlot() {
 		Assert.assertTrue(this.service.hasUnassignedStudyEntriesToPlot(this.studyId));
-		this.service.deleteStudyEntries(this.studyId);
+		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(this.studyId);
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plotDataset, null, geolocation, 5);
+		for(StockModel stock: stocks) {
+			final ExperimentModel experimentModel = new ExperimentModel();
+			experimentModel.setGeoLocation(geolocation);
+			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+			experimentModel.setProject(this.study);
+			experimentModel.setStock(stock);
+			this.daoFactory.getExperimentDao().save(experimentModel);
+		}
 		Assert.assertFalse(this.service.hasUnassignedStudyEntriesToPlot(this.studyId));
 	}
 
