@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.location;
 
+import com.google.common.collect.ImmutableSet;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -29,7 +30,7 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public List<LocationTypeDTO> getLocationTypes() {
 		final List<UserDefinedField> userDefinedFields = this.daoFactory.getUserDefinedFieldDAO()
-			.getByFieldTableNameAndType(UDTableType.LOCATION_LTYPE.getTable(), UDTableType.LOCATION_LTYPE.getType());
+			.getByFieldTableNameAndType(UDTableType.LOCATION_LTYPE.getTable(), ImmutableSet.of(UDTableType.LOCATION_LTYPE.getType()));
 		final List<LocationTypeDTO> locationTypes = new ArrayList<>();
 		for (final UserDefinedField userDefinedField : userDefinedFields) {
 			locationTypes.add(new LocationTypeDTO(userDefinedField));
