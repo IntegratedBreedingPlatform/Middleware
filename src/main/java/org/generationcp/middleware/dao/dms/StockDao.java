@@ -120,7 +120,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public boolean hasUnassignedStudyEntriesToPlot(final int studyId) {
 		try {
 			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT COUNT(*) FROM ibdbv2_wheat_merged.stock s "
+				.createSQLQuery("SELECT COUNT(*) FROM stock s "
 					+ "WHERE s.project_id= :studyId AND NOT EXISTS (SELECT 1 FROM nd_experiment e WHERE e.stock_id=s.stock_id)");
 			query.setParameter("studyId", studyId);
 			return ((BigInteger) query.uniqueResult()).longValue() > 0;
