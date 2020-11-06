@@ -686,6 +686,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
     /**
      * New germplasm query (replaces {@link GermplasmSearchDAO#searchForGermplasms(GermplasmSearchParameter)}
+     * @param germplasmSearchRequest
+     * @param pageable if null -> returns 5000 + included gids
+     * @param programUUID
      */
     public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
         final String programUUID) {
@@ -729,22 +732,21 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             query.addScalar(LOCATION_ID);
             query.addScalar(METHOD_ID);
 
-            for (final String addedColumnPropertyId : addedColumnsPropertyIds) {
-                if (!GERMPLASM_TREE_NODE_PROPERTY_IDS.contains(addedColumnPropertyId)) {
-                    query.addScalar(addedColumnPropertyId);
-                }
+            final List<String> filteredProperties = addedColumnsPropertyIds.stream()
+                .filter(s -> !this.GERMPLASM_TREE_NODE_PROPERTY_IDS.contains(s)).collect(Collectors.toList());
+            for (final String propertyId : filteredProperties) {
+                query.addScalar(propertyId);
             }
 
             /*
              * For big databases (e.g brachiaria, ~6M germplsm), sorting is slow.
              * If sort is needed, we limit the inner query to 5000 records and sort only that.
-             * In this mode, it's not possible to paginate past
-             * Otherwise, Pagination is done in the inner query without a limit.
+             * Otherwise, Pagination is done in the inner query.
              *
              * The outer query returns a PAGE of results + associated gids (e.g pedigree, group members),
              * which don't count for the Total results
              */
-            if (!sortState.isEmpty()) {
+            if (!sortState.isEmpty() && pageable != null) {
             	addPaginationToSQLQuery(query, pageable);
             }
             query.setParameterList("gids", gids);
@@ -757,7 +759,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
             final List<GermplasmSearchResponse> response = new ArrayList<>();
             for (final Object[] result : results) {
-                response.add(this.mapToGermplasmSearchResponse(result, addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
+                response.add(this.mapToGermplasmSearchResponse(result, filteredProperties, attributeTypesMap, nameTypesMap));
             }
             return response;
         } catch (final HibernateException e) {
@@ -897,14 +899,14 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         addFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequest, preFilteredGids, programUUID);
 
         final Map<String, Boolean> sortState = convertSort(pageable);
-		if (!sortState.isEmpty()) {
+		if (!sortState.isEmpty() || pageable == null) {
             queryBuilder.append(LIMIT_CLAUSE);
         }
 
         final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
         sqlQuery.addScalar(GID);
 
-        if (sortState.isEmpty()) {
+        if (sortState.isEmpty() && pageable != null) {
             addPaginationToSQLQuery(sqlQuery, pageable);
         }
 		addFilters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequest, preFilteredGids, programUUID);
@@ -972,12 +974,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         }
     }
 
+    // TODO remove sortState dependency
     private static Map<String, Boolean> convertSort(final Pageable pageable) {
         final Map<String, Boolean> sortState = new HashMap<>();
-        final Sort sort = pageable.getSort();
-        if (sort == null) {
+        if (pageable == null || pageable.getSort() == null) {
             return Collections.EMPTY_MAP;
         }
+        final Sort sort = pageable.getSort();
         final Iterator<Sort.Order> iterator = sort.iterator();
         while (iterator.hasNext()) {
             final Sort.Order next = iterator.next();
@@ -1005,29 +1008,15 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
         paramBuilder.append(" where 1 = 1 " + GERMPLASM_NOT_DELETED_CLAUSE);
 
         final SqlTextFilter nameFilter = germplasmSearchRequest.getNameFilter();
-        if (nameFilter != null && nameFilter.getValue() != null) {
+        if (nameFilter != null && nameFilter.getValue() != null && nameFilter.getType() != null) {
             final String q = nameFilter.getValue();
-            String operator = "LIKE";
-            switch (nameFilter.getType()) {
-                case EXACTMATCH:
-                    operator = "=";
-                    paramBuilder.setParameter("q", q);
-                    paramBuilder.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
-                    paramBuilder.setParameter("qNoSpaces", q.replaceAll(" ", ""));
-                    break;
-                case STARTSWITH:
-                    paramBuilder.setParameter("q", q + "%");
-                    paramBuilder.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q) + "%");
-                    paramBuilder.setParameter("qNoSpaces", q.replaceAll(" ", "") + "%");
-                    break;
-                case CONTAINS:
-                    paramBuilder.setParameter("q", "%" + q + "%");
-                    paramBuilder.setParameter("qStandardized", "%" + GermplasmDataManagerUtil.standardizeName(q) + "%");
-                    paramBuilder.setParameter("qNoSpaces", "%" + q.replaceAll(" ", "") + "%");
-                    break;
-            }
+            final SqlTextFilter.Type type = nameFilter.getType();
+            final String operator = getOperator(type);
+            paramBuilder.setParameter("q", getParameter(type, q));
+            paramBuilder.setParameter("qStandardized", getParameter(type, GermplasmDataManagerUtil.standardizeName(q)));
+            paramBuilder.setParameter("qNoSpaces", getParameter(type, q.replaceAll(" ", "")));
             paramBuilder.append(" AND (allNames.nval " + operator + " :q "
-                + "OR allNames.nval " + operator + " :qStandardized " 
+                + "OR allNames.nval " + operator + " :qStandardized "
                 + "OR allNames.nval " + operator + " :qNoSpaces) \n ");
         }
 
@@ -1217,15 +1206,17 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
      */
     private boolean addPreFilteredGids(final GermplasmSearchRequest germplasmSearchRequest, final List<Integer> prefilteredGids) {
 
-        final String femaleParentName = germplasmSearchRequest.getFemaleParentName();
+        final SqlTextFilter femaleParentName = germplasmSearchRequest.getFemaleParentName();
         if (femaleParentName != null) {
+            final SqlTextFilter.Type type = femaleParentName.getType();
+            final String value = femaleParentName.getValue();
             final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
                 + "   straight_join germplsm female_parent on n.gid = female_parent.gid \n" //
                 + "   straight_join germplsm group_source on female_parent.gid = group_source.gpid1 and group_source.gnpgs > 0 \n" //
                 + "   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n"  //
                 + "                            or g.gnpgs > 0 and group_source.gid = g.gid \n" //
-                + " where n.nstat != " + STATUS_DELETED + " and n.nval like :femaleParentName " + LIMIT_CLAUSE) //
-                .setParameter("femaleParentName", '%' + femaleParentName + '%') //
+                + " where n.nstat != " + STATUS_DELETED + " and n.nval " + getOperator(type) + " :femaleParentName " + LIMIT_CLAUSE) //
+                .setParameter("femaleParentName", getParameter(type, value)) //
                 .list();
             if (gids == null || gids.isEmpty()) {
                 return true;
@@ -1233,15 +1224,17 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             prefilteredGids.addAll(gids);
         }
 
-        final String maleParentName = germplasmSearchRequest.getMaleParentName();
+        final SqlTextFilter maleParentName = germplasmSearchRequest.getMaleParentName();
         if (maleParentName != null) {
+            final SqlTextFilter.Type type = maleParentName.getType();
+            final String value = maleParentName.getValue();
             final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
                 + "   straight_join germplsm male_parent on n.gid = male_parent.gid \n" //
                 + "   straight_join germplsm group_source on male_parent.gid = group_source.gpid2 and group_source.gnpgs > 0 \n" //
                 + "   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n" //
                 + "                            or g.gnpgs > 0 and group_source.gid = g.gid \n" //
-                + " where n.nstat != " + STATUS_DELETED + " and n.nval like :maleParentName " + LIMIT_CLAUSE) //
-                .setParameter("maleParentName", '%' + maleParentName + '%') //
+                + " where n.nstat != " + STATUS_DELETED + " and n.nval " + getOperator(type) + " :maleParentName " + LIMIT_CLAUSE) //
+                .setParameter("maleParentName", getParameter(type, value)) //
                 .list();
             if (gids == null || gids.isEmpty()) {
                 return true;
@@ -1249,13 +1242,15 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             prefilteredGids.addAll(gids);
         }
 
-        final String groupSourceName = germplasmSearchRequest.getGroupSourceName();
+        final SqlTextFilter groupSourceName = germplasmSearchRequest.getGroupSourceName();
         if (groupSourceName != null) {
+            final SqlTextFilter.Type type = groupSourceName.getType();
+            final String value = groupSourceName.getValue();
             final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
                 + " straight_join germplsm group_source on n.gid = group_source.gid \n" //
                 + " straight_join germplsm g on group_source.gid = g.gpid1 and g.gnpgs < 0 \n" //
-                + " where n.nstat != " + STATUS_DELETED + " and n.nval like :groupSourceName " + LIMIT_CLAUSE) //
-                .setParameter("groupSourceName", '%' + groupSourceName + '%')
+                + " where n.nstat != " + STATUS_DELETED + " and n.nval " + getOperator(type) + " :groupSourceName " + LIMIT_CLAUSE) //
+                .setParameter("groupSourceName", getParameter(type, value))
                 .list();
             if (gids == null || gids.isEmpty()) {
                 return true;
@@ -1263,13 +1258,15 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             prefilteredGids.addAll(gids);
         }
 
-        final String immediateSourceName = germplasmSearchRequest.getImmediateSourceName();
+        final SqlTextFilter immediateSourceName = germplasmSearchRequest.getImmediateSourceName();
         if (immediateSourceName != null) {
+            final SqlTextFilter.Type type = immediateSourceName.getType();
+            final String value = immediateSourceName.getValue();
             final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n"
                 + " straight_join germplsm immediate_source on n.gid = immediate_source.gid \n"
                 + " straight_join germplsm g on immediate_source.gid = g.gpid2 and g.gnpgs < 0 \n"
-                + " where n.nstat != " + STATUS_DELETED + " and n.nval like :immediateSourceName " + LIMIT_CLAUSE) //
-                .setParameter("immediateSourceName", '%' + immediateSourceName + '%')
+                + " where n.nstat != " + STATUS_DELETED + " and n.nval " + getOperator(type) + " :immediateSourceName " + LIMIT_CLAUSE) //
+                .setParameter("immediateSourceName", getParameter(type, value))
                 .list();
             if (gids == null || gids.isEmpty()) {
                 return true;
@@ -1354,14 +1351,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                         int i = 1;
                         while (i <= level) {
                             final int prev = i - 1;
-                            queryBuilder.append(String.format(" straight_join germplsm PGROUP%s on P%s.gpid1 != 0", prev, prev) //
+                            queryBuilder.append(String.format(" straight_join germplsm PGROUP%s", prev, prev) //
                                 // find the group source (last gid produced by a generative process)
                                 // join with itself if gid is already the group source
-                                + String.format(" and ((P%s.gnpgs < 0 and PGROUP%s.gid = P%s.gpid1)", prev, prev, prev) //
-                                + String.format("   or (P%s.gnpgs > 0 and PGROUP%s.gid = P%s.gid)) \n", prev, prev, prev) //
+                                + String.format(" on ((P%s.gnpgs < 0 and PGROUP%s.gid = P%s.gpid1)", prev, prev, prev) //
+                                + String.format("  or (P%s.gnpgs > 0 and PGROUP%s.gid = P%s.gid)) \n", prev, prev, prev) //
                                 // find the group source parents
                                 + String.format(" straight_join germplsm P%s on PGROUP%s.gnpgs > 0", i, prev)
-                                + String.format("  and PGROUP%s.gpid1 != 0 and PGROUP%s.gpid2 != 0", prev, prev)
                                 + String.format("  and (P%s.gid = PGROUP%s.gpid1 or P%s.gid = PGROUP%s.gpid2) \n ", i, prev, i, prev));
                             /*
                              * trying to include other progenitors associated with PGROUP won't perform well here:
@@ -1399,7 +1395,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                             queryBuilder.append(String.format(" straight_join germplsm P%s", i));
                             queryBuilder.append(String.format(" on P%s.gnpgs < 0 and (", prev));
                             queryBuilder.append(String.format("  P%s.gid = P%s.gpid2", i, prev));
-                            // some (non-standard?) derivative germplasm has gpid2=0
+                            // some derivative/maintenance methods may produce gpid2=0
+                            // for that scenario, try to get the source using gpid1
                             queryBuilder.append(String.format("  or P%s.gpid2 = 0 and P%s.gid = P%s.gpid1) \n ", prev, i, prev));
                             if (IncludePedigree.Type.BOTH.equals(includePedigree.getType())) {
                                 queryBuilder.append(String.format("or P%s.gnpgs > 0 and (", prev));
