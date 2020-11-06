@@ -118,7 +118,7 @@
 			</and>
 		</preConditions>
 		<comment>Alter germplsm.germplsm_uuid column to extend varchar length </comment>
-		<modifyDataType tableName="germplsm" columnName="germplsm_uuid" newDataType="VARCHAR(56) DEFAULT NULL"></modifyDataType>
+		<modifyDataType tableName="germplsm" columnName="germplsm_uuid" newDataType="VARCHAR(60) DEFAULT NULL"></modifyDataType>
 	</changeSet>
 
 	<changeSet author="clarysabel" id="v16.3.0-8">
