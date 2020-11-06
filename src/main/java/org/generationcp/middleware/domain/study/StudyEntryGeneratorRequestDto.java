@@ -4,12 +4,10 @@ import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class StudyEntryGeneratorBatchRequestDto {
+public class StudyEntryGeneratorRequestDto {
 
 	private Integer entryTypeId;
-	private Integer listId;
 
-	//TODO: move SearchCompositeDto to common package
 	private SearchCompositeDto<Integer, Integer> searchComposite;
 
 	public Integer getEntryTypeId() {
@@ -18,15 +16,6 @@ public class StudyEntryGeneratorBatchRequestDto {
 
 	public void setEntryTypeId(final Integer entryTypeId) {
 		this.entryTypeId = entryTypeId;
-	}
-
-
-	public Integer getListId() {
-		return this.listId;
-	}
-
-	public void setListId(final Integer listId) {
-		this.listId = listId;
 	}
 
 	public SearchCompositeDto<Integer, Integer> getSearchComposite() {
