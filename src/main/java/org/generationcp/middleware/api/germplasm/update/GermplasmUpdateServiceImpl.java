@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
@@ -19,11 +20,11 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.service.api.userdefinedfield.UserDefinedFieldService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -39,14 +40,15 @@ import java.util.stream.Collectors;
 public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 	public static final String DEFAULT_DASH = "-";
-	@Autowired
-	private UserDefinedFieldService userDefinedFieldService;
 
 	@Autowired
 	private LocationDataManager locationDataManager;
 
 	@Autowired
 	private BreedingMethodService breedingMethodService;
+
+	@Autowired
+	private GermplasmDataManager germplasmDataManager;
 
 	private final DaoFactory daoFactory;
 
@@ -79,11 +81,14 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 
 		// Retrieve the field id of attributes and names
 		final Map<String, Integer> attributeCodesFieldNoMap =
-			this.userDefinedFieldService
-				.getByTableAndCodesInMap(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), new ArrayList<>(attributesAndNamesCodes));
+			this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
+				Collections.singleton(UDTableType.ATRIBUTS_ATTRIBUTE.getType()), attributesAndNamesCodes).stream().collect(Collectors.toMap(
+				UserDefinedField::getFcode, UserDefinedField::getLfldno));
 		final Map<String, Integer> nameCodesFieldNoMap =
-			this.userDefinedFieldService
-				.getByTableAndCodesInMap(UDTableType.NAMES_NAME.getTable(), new ArrayList<>(attributesAndNamesCodes));
+			this.germplasmDataManager
+				.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
+					Collections.singleton(UDTableType.NAMES_NAME.getType()), attributesAndNamesCodes).stream().collect(Collectors.toMap(
+				UserDefinedField::getFcode, UserDefinedField::getLfldno));
 
 		// germplasm UUID should be the priority in getting germplasm
 		final Set<String> germplasmUUIDs =

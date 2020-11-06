@@ -106,27 +106,6 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		}
 	}
 
-	public Map<String, Integer> getByTableAndCodesInMap(final String table, final List<String> codes) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
-			criteria.add(Restrictions.eq("ftable", table));
-			criteria.add(Restrictions.in("fcode", codes));
-			final List<UserDefinedField> list = criteria.list();
-			if (list != null && !list.isEmpty()) {
-				final Map<String, Integer> map = new HashMap<>();
-				for (final UserDefinedField field : list) {
-					map.put(field.getFcode(), field.getFldno());
-				}
-				return map;
-			}
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error with getByTableAndCodesInMap(name=" + " ) query from UserDefinedField: " + e.getMessage(), e);
-		}
-		return new HashMap<>();
-	}
-
 	public UserDefinedField getByLocalFieldNo(final Integer lfldno) {
 		final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 		criteria.add(Restrictions.eq("lfldno", lfldno));

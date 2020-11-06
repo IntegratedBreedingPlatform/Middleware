@@ -1786,18 +1786,4 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	private List<Germplasm> mapGermplasmWithMethod(final List<Object[]> results) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		if (!results.isEmpty()) {
-			final Object[] result = results.get(0);
-			if (result != null) {
-				final Germplasm germplasm = (Germplasm) result[0];
-				final Method method = (Method) result[1];
-				germplasm.setMethod(method);
-				germplasmList.add(germplasm);
-			}
-		}
-		return germplasmList;
-	}
-
 }
