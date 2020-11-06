@@ -122,8 +122,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final GermplasmList listToMove = this.getGermplasmListById(germplasmListId)
 			.orElseThrow(() -> new MiddlewareException("GermplasmList does not exist"));
 
-		final GermplasmList newParentFolder = this.getGermplasmListById(newParentFolderId)
-			.orElseThrow(() -> new MiddlewareException("Specified newParentFolderId does not exist"));
+		final GermplasmList newParentFolder = (Objects.isNull(newParentFolderId)) ? null :
+			this.getGermplasmListById(newParentFolderId).orElseThrow(() -> new MiddlewareException("Parent Folder does not exist"));
 
 		// if the list is moved to the crop list, set the program uuid to null so that
 		// it will be accessible to all programs of the same crop.
