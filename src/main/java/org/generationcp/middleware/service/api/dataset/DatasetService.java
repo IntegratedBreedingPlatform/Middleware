@@ -100,7 +100,7 @@ public interface DatasetService {
 	 * @param draftMode Will only retrieve variables with draft data if TRUE
 	 * @return List of Measurement Variables
 	 */
-	List<MeasurementVariable> getObservationSetColumns(Integer subObservationSetId, Boolean draftMode);
+	List<MeasurementVariable> getObservationSetColumns(Integer studyId, Integer subObservationSetId, Boolean draftMode);
 
 	/**
 	 * Given a dataset, it will retrieve the union between the parent dataset variables and the dataset variables
