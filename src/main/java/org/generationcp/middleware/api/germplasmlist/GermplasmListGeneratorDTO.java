@@ -1,6 +1,8 @@
 package org.generationcp.middleware.api.germplasmlist;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 
 import java.util.Date;
 import java.util.List;
@@ -67,7 +69,10 @@ public class GermplasmListGeneratorDTO {
 
 	private String parentFolderId;
 
+	// for direct import scenarios
 	private List<GermplasmEntryDTO> entries;
+	// Retrieve entries from filter or list of selected ids
+	private SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite;
 
 	public Integer getId() {
 		return this.id;
@@ -131,5 +136,14 @@ public class GermplasmListGeneratorDTO {
 
 	public void setEntries(final List<GermplasmEntryDTO> entries) {
 		this.entries = entries;
+	}
+
+	public SearchCompositeDto<GermplasmSearchRequest, Integer> getSearchComposite() {
+		return this.searchComposite;
+	}
+
+	public void setSearchComposite(
+		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite) {
+		this.searchComposite = searchComposite;
 	}
 }

@@ -1685,6 +1685,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("         LEFT JOIN workbench.persons wper ON wper.personid = wu.personid ");
 		sql.append(" WHERE ");
 		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
+		sql.append(" 	 AND pmain.deleted = 0 ");//Exclude Deleted Studies
 	}
 
 	private void appendStudySearchFilter(final StringBuilder sql, final StudySearchFilter studySearchFilter) {

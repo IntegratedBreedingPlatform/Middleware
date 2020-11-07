@@ -5,6 +5,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Iterables;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 @Transactional
 public class PedigreeServiceImpl implements PedigreeService {
 
+	public static final int MAX_GID_LIST_SIZE = 5000;
 	private static final Logger LOG = LoggerFactory.getLogger(PedigreeServiceImpl.class);
 
 	private PedigreeDataManagerFactory pedigreeDataManagerFactory;
@@ -117,9 +120,9 @@ public class PedigreeServiceImpl implements PedigreeService {
 	public Map<Integer, String> getCrossExpansions(final Set<Integer> gids, final Integer level,
 			final CrossExpansionProperties crossExpansionProperties) {
 
-		if (gids.size() > 5000) {
-			throw new IllegalArgumentException(
-					"Max set size has to be less than 5000." + " Any thing about this might casue caching and performace issues.");
+		if (gids.size() > MAX_GID_LIST_SIZE) {
+			throw new IllegalArgumentException("Max set size has to be less than " + MAX_GID_LIST_SIZE + "."
+				+ " Anything above this might cause caching and performance issues.");
 		}
 
 		final Monitor monitor = MonitorFactory.start(
@@ -147,7 +150,20 @@ public class PedigreeServiceImpl implements PedigreeService {
 			monitor.stop();
 		}
 	}
-	
+
+	@Override
+	public Map<Integer, String> getCrossExpansionsBulk(final Set<Integer> gids, final Integer level,
+		final CrossExpansionProperties crossExpansionProperties) {
+
+		final Iterable<List<Integer>> partition = Iterables.partition(gids, MAX_GID_LIST_SIZE);
+		final Map<Integer, String> crossExpansions = new HashMap<>();
+
+		for (final List<Integer> partitionedGidList : partition) {
+			crossExpansions.putAll(this.getCrossExpansions(new HashSet<>(partitionedGidList), level, crossExpansionProperties));
+		}
+		return crossExpansions;
+	}
+
 	/**
 	 * (non-Javadoc)
 	 *
