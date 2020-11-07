@@ -59,6 +59,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	protected static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 	static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
 	protected static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
+	protected static final String STOCK_ID = "STOCK_ID";
 	private static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
@@ -74,6 +75,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		factorsFilterMap.put(SUM_OF_SAMPLES_ID,
 			"EXISTS ( SELECT 1 FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id HAVING count(sample_id)");
 		factorsFilterMap.put(String.valueOf(TermId.OBS_UNIT_ID.getId()), "nde.obs_unit_id");
+		factorsFilterMap.put(String.valueOf(TermId.STOCK_ID.getId()),
+			"EXISTS ( SELECT 1 FROM ims_experiment_transaction ndt \n"
+			+ "   inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = 1 and tr.trntype = 1 \n"
+			+ "   inner join ims_lot lot on lot.lotid = tr.lotid \n"
+			+ "    WHERE ndt.nd_experiment_id = nde.nd_experiment_id \n"
+			+ "     and lot.stock_id");
 	}
 
 	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
@@ -121,6 +128,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "        FROM sample sp "
 			+ "        WHERE sp.nd_experiment_id = nde.nd_experiment_id) "
 			+ "         + coalesce(child_sample_count.count, 0), 0), '-') AS 'SUM_OF_SAMPLES'");
+		mainVariablesMap.put(STOCK_ID,"    coalesce(nullif((SELECT distinct(lot.stock_id) "
+			+ "        FROM ims_experiment_transaction  ndt "
+			+ "			inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = 1 and tr.trntype = 1 \n"
+			+ "			inner join ims_lot lot on lot.lotid = tr.lotid \n"
+			+ "        WHERE ndt.nd_experiment_id = nde.nd_experiment_id), '-') ) AS 'STOCK_ID'");
 
 	}
 
@@ -459,6 +471,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.PARENT_OBS_UNIT_ID, new StringType());
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.OBS_UNIT_ID, new StringType());
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.SUM_OF_SAMPLES);
+		createSQLQuery.addScalar(ObservationUnitsSearchDao.STOCK_ID, new StringType());
 	}
 
 	private String getObservationUnitTableQuery(
@@ -719,6 +732,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			orderColumn = ObservationUnitsSearchDao.OBSERVATION_UNIT_NO;
 		} else if (SUM_OF_SAMPLES_ID.equals(sortBy)) {
 			orderColumn = ObservationUnitsSearchDao.SUM_OF_SAMPLES;
+		} else if (String.valueOf(TermId.STOCK_ID.getId()).equals(sortBy)) {
+			orderColumn = ObservationUnitsSearchDao.STOCK_ID;
 		} else {
 			orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : ObservationUnitsSearchDao.PLOT_NO;
 		}
@@ -843,6 +858,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			if (SUM_OF_SAMPLES_ID.equals(variableId)) {
 				sql.append(") ");
 			}
+			if (String.valueOf(TermId.STOCK_ID.getId()).equals(variableId)) {
+				sql.append(") ");
+			}
 			return;
 		}
 
@@ -907,6 +925,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				final String variableType = filter.getVariableTypeMap().get(observableId);
 				if (!VariableType.OBSERVATION_UNIT.name().equals(variableType) && factorsFilterMap.get(observableId) == null) {
 					query.setParameter(observableId + "_Id", observableId);
+				}
+
+				if(String.valueOf(TermId.STOCK_ID.getId()).equals(observableId)){
+					// Stock_Id, whose Id is -1727, will cause an error as query parameter. Remove the "-" from the ID as workaround
+					final String finalId = observableId.replace("-", "");
+					query.setParameter(finalId + "_text", "%" + filteredTextValues.get(observableId) + "%");
+					continue;
 				}
 				query.setParameter(observableId + "_text", "%" + filteredTextValues.get(observableId) + "%");
 			}
@@ -1035,6 +1060,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final String designation = (String) row.get(DESIGNATION);
 		observationUnitRow.setDesignation(designation);
 		observationVariables.put(DESIGNATION, new ObservationUnitData(designation));
+
+		if (row.containsKey(STOCK_ID)) {
+			final String stockId = (String) row.get(STOCK_ID);
+			observationUnitRow.setStockId(stockId);
+			observationVariables.put(STOCK_ID, new ObservationUnitData(stockId));
+		}
 
 		final String trialInstance = (String) row.get(TRIAL_INSTANCE);
 		if (NumberUtils.isDigits(trialInstance)) {
