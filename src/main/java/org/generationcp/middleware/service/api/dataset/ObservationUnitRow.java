@@ -29,6 +29,8 @@ public class ObservationUnitRow {
 
 	private String samplesCount;
 
+	private String stockId;
+
 	public ObservationUnitRow() {
 
 	}
@@ -112,6 +114,14 @@ public class ObservationUnitRow {
 
 	public void setEntryNumber(final Integer entryNumber) {
 		this.entryNumber = entryNumber;
+	}
+
+	public String getStockId() {
+		return this.stockId;
+	}
+
+	public void setStockId(final String stockId) {
+		this.stockId = stockId;
 	}
 
 	@Override
