@@ -12,6 +12,8 @@ package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.api.brapi.v1.location.AdditionalInfoDto;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -21,8 +23,6 @@ import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
-import org.generationcp.middleware.api.brapi.v1.location.AdditionalInfoDto;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -281,6 +281,21 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			throw new MiddlewareQueryException(
 					this.getLogExceptionMessage(LocationDAO.GET_BY_TYPE, "type", String.valueOf(type), e.getMessage(),
 							LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+		return new ArrayList<>();
+	}
+
+	public List<Location> getByAbbreviations(final List<String> abbreviations) {
+		try {
+			if (abbreviations != null && !abbreviations.isEmpty()) {
+				final Criteria criteria = this.getSession().createCriteria(Location.class);
+				criteria.add(Restrictions.in(LocationDAO.LABBREVIATION, abbreviations));
+				return criteria.list();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("getByAbbreviations", "abbreviations", abbreviations.toString(), e.getMessage(),
+					LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 		return new ArrayList<>();
 	}

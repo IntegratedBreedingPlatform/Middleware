@@ -1,7 +1,38 @@
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.dao.*;
-import org.generationcp.middleware.dao.dms.*;
+import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.BibrefDAO;
+import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.FormulaDAO;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.GermplasmSearchDAO;
+import org.generationcp.middleware.dao.GermplasmStudySourceDAO;
+import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
+import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.MethodDAO;
+import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.ProgramPresetDAO;
+import org.generationcp.middleware.dao.SampleDao;
+import org.generationcp.middleware.dao.SampleListDao;
+import org.generationcp.middleware.dao.SearchRequestDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
+import org.generationcp.middleware.dao.dms.GeolocationDao;
+import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
+import org.generationcp.middleware.dao.dms.LocationSearchDao;
+import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
+import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.dao.dms.StockPropertyDao;
+import org.generationcp.middleware.dao.dms.StudySearchDao;
 import org.generationcp.middleware.dao.ims.ExperimentTransactionDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -254,4 +285,9 @@ public class DaoFactory {
 		return germplasmStudySourceDAO;
 	}
 
+	public BibrefDAO getBibrefDAO() {
+		final BibrefDAO bibrefDAO = new BibrefDAO();
+		bibrefDAO.setSession(this.sessionProvider.getSession());
+		return bibrefDAO;
+	}
 }
