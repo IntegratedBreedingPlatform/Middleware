@@ -17,7 +17,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
@@ -71,7 +71,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Created by clarysabel on 10/22/18.
@@ -167,9 +166,10 @@ public class DatasetServiceImpl implements DatasetService {
 			factorColumns = this.daoFactory.getDmsProjectDAO()
 				.getObservationSetVariables(observationSetId, PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
 			//STOCK ID
-			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-			lotsSearchDto.setPlantingStudyIds(Arrays.asList(studyId));
-			if (this.daoFactory.getLotDao().countSearchLots(lotsSearchDto) > 0) {
+			final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+			transactionsSearchDto.setTransactionStatus(Arrays.asList(0,1));
+			transactionsSearchDto.setPlantingStudyIds(Arrays.asList(studyId));
+			if (this.daoFactory.getTransactionDAO().countSearchTransactions(transactionsSearchDto) > 0) {
 				final Optional<MeasurementVariable>
 					designation = factorColumns.stream().filter(measurementVariable -> measurementVariable.getName().equals("DESIGNATION")).findFirst();
 				factorColumns.add(factorColumns.indexOf(designation.get()) + 1, this.buildStockIdColumn());
