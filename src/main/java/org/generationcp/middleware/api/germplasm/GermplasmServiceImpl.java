@@ -325,9 +325,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD);
-				final Integer fielbookBibrefCode = 1923;
-				// TODO: Check bibref type
-				bibref.setType(new UserDefinedField(fielbookBibrefCode));
 				this.daoFactory.getBibrefDAO().save(bibref);
 				germplasm.setReferenceId(bibref.getRefid());
 			}
