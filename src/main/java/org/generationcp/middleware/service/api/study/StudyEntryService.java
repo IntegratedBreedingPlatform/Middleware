@@ -21,6 +21,8 @@ public interface StudyEntryService {
 
 	void deleteStudyEntries(int studyId);
 
+	Integer getNextEntryNumber(Integer studyId);
+
 	List<StudyEntryDto> saveStudyEntries(Integer studyId, List<StudyEntryDto> studyEntryDtoList);
 
 	long countStudyGermplasmByEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
@@ -28,6 +30,8 @@ public interface StudyEntryService {
 	StudyEntryDto replaceStudyEntry(int studyId, int entryId, int gid, String crossExpansion);
 
 	void updateStudyEntryProperty(int studyId, StudyEntryPropertyData studyEntryPropertyData);
+
+	Boolean hasUnassignedEntries(int studyId);
 
 	Optional<StudyEntryPropertyData> getStudyEntryPropertyData(int studyEntryPropertyId);
 }
