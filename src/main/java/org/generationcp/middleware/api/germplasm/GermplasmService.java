@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasm;
 
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.pojos.Germplasm;
 
 import java.util.List;
@@ -13,5 +14,7 @@ public interface GermplasmService {
 
 	Map<Integer, GermplasmImportResponseDto> importGermplasm(Integer userId, String cropName,
 		GermplasmImportRequestDto germplasmImportRequestDto);
+
+	void importGermplasmUpdates(List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
 }
