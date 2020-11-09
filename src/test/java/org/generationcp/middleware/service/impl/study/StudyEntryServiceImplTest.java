@@ -89,7 +89,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 			final ProjectProperty entryTypeProp = new ProjectProperty(this.plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 6, TermId.ENTRY_TYPE.getId(), "ENTRY_TYPE");
 			this.daoFactory.getProjectPropertyDAO().save(gidProp);
 			this.daoFactory.getProjectPropertyDAO().save(desigProp);
-			this.daoFactory.getProjectPropertyDAO().save(entryTypeProp);
+			this.daoFactory.getProjectPropertyDAO().save(entryNoProp);
 			this.daoFactory.getProjectPropertyDAO().save(seedSourceProp);
 			this.daoFactory.getProjectPropertyDAO().save(crossProp);
 			this.daoFactory.getProjectPropertyDAO().save(entryTypeProp);
@@ -173,7 +173,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 		Assert.assertTrue(this.service.hasUnassignedEntries(this.studyId));
 		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(this.studyId);
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		for(StockModel stock: stocks) {
+		for (final StockModel stock: stocks) {
 			final ExperimentModel experimentModel = new ExperimentModel();
 			experimentModel.setGeoLocation(geolocation);
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
@@ -181,6 +181,8 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 			experimentModel.setStock(stock);
 			this.daoFactory.getExperimentDao().save(experimentModel);
 		}
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
 		Assert.assertFalse(this.service.hasUnassignedEntries(this.studyId));
 	}
 
