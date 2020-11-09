@@ -18,7 +18,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -57,18 +59,23 @@ public class BreedingMethodServiceImplTest {
 	@Test
 	public void getBreedingMethods() {
 		final List<Method> methods = new ArrayList<>();
+		final Set<String> abbreviations = new HashSet<>();
+
 		final Method method = MethodTestDataInitializer.createMethod();
 		methods.add(method);
-		Mockito.when(this.methodDAO.filterMethods(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.anyList()))
+		Mockito.when(
+			this.methodDAO.filterMethods(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.eq(abbreviations), ArgumentMatchers.anyList()))
 			.thenReturn(methods);
 
-		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(PROGRAM_UUID, false);
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(PROGRAM_UUID, abbreviations
+			, false);
 		assertNotNull(breedingMethods);
 		assertThat(breedingMethods, hasSize(1));
 		final BreedingMethodDTO actualBreedingMethodDTO = breedingMethods.get(0);
 		this.assertBreedingMethodDTO(actualBreedingMethodDTO, method);
 
-		Mockito.verify(this.methodDAO).filterMethods(ArgumentMatchers.eq(PROGRAM_UUID), this.listArgumentCaptor.capture());
+		Mockito.verify(this.methodDAO)
+			.filterMethods(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.eq(abbreviations), this.listArgumentCaptor.capture());
 		final List<Integer> actualBreedingMethodIds = this.listArgumentCaptor.getValue();
 		assertNotNull(actualBreedingMethodIds);
 		assertThat(actualBreedingMethodIds, hasSize(0));
@@ -82,9 +89,10 @@ public class BreedingMethodServiceImplTest {
 	@Test
 	public void shouldGetBreedingMethodsFilteredByFavorites() {
 		final List<Method> methods = new ArrayList<>();
+		final Set<String> abbreviations = new HashSet<>();
 		final Method method = MethodTestDataInitializer.createMethod();
 		methods.add(method);
-		Mockito.when(this.methodDAO.filterMethods(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.anyList()))
+		Mockito.when(this.methodDAO.filterMethods(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.any(), ArgumentMatchers.anyList()))
 			.thenReturn(methods);
 
 		final ProgramFavorite programFavorite =
@@ -92,13 +100,14 @@ public class BreedingMethodServiceImplTest {
 		Mockito.when(this.programFavoriteDAO.getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, PROGRAM_UUID))
 			.thenReturn(Arrays.asList(programFavorite));
 
-		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(PROGRAM_UUID, true);
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(PROGRAM_UUID, abbreviations, true);
 		assertNotNull(breedingMethods);
 		assertThat(breedingMethods, hasSize(1));
 		final BreedingMethodDTO actualBreedingMethodDTO = breedingMethods.get(0);
 		this.assertBreedingMethodDTO(actualBreedingMethodDTO, method);
 
-		Mockito.verify(this.methodDAO).filterMethods(ArgumentMatchers.eq(PROGRAM_UUID), this.listArgumentCaptor.capture());
+		Mockito.verify(this.methodDAO)
+			.filterMethods(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.eq(abbreviations), this.listArgumentCaptor.capture());
 		final List<Integer> actualBreedingMethodIds = this.listArgumentCaptor.getValue();
 		assertNotNull(actualBreedingMethodIds);
 		assertThat(actualBreedingMethodIds, hasSize(1));
