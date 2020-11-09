@@ -171,7 +171,8 @@ public class DatasetServiceImpl implements DatasetService {
 			transactionsSearchDto.setPlantingStudyIds(Arrays.asList(studyId));
 			if (this.daoFactory.getTransactionDAO().countSearchTransactions(transactionsSearchDto) > 0) {
 				final Optional<MeasurementVariable>
-					designation = factorColumns.stream().filter(measurementVariable -> measurementVariable.getName().equals("DESIGNATION")).findFirst();
+					designation = factorColumns.stream().filter(measurementVariable -> 
+					measurementVariable.getTermId() == TermId.DESIG.getId()).findFirst();
 				factorColumns.add(factorColumns.indexOf(designation.get()) + 1, this.buildStockIdColumn());
 			}
 		} else {
