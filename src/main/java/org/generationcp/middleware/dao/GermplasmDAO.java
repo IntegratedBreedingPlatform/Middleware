@@ -28,8 +28,9 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
-import org.generationcp.middleware.pojos.workbench.CropPerson;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
+import org.generationcp.middleware.pojos.workbench.CropPerson;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -1259,7 +1260,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		try {
 			this.getSession().flush();
-			queryString.append("UPDATE germplsm SET deleted = 1 where gid in (:gids)");
+			queryString.append("UPDATE germplsm SET deleted = 1, germplsm_uuid = CONCAT (germplsm_uuid, '#', '" + Util
+				.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS") + "')  where gid in (:gids)");
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gids);
 			query.executeUpdate();
@@ -1727,6 +1729,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final String message = "Error with getExistingCrosses" + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<Germplasm> getGermplasmByGUIDs(final List<String> guids) {
+		if (guids == null || guids.isEmpty()) {
+			return new ArrayList<>();
+		}
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Germplasm.class);
+			criteria.add(Restrictions.in("germplasmUUID", guids));
+			criteria.add(Restrictions.eq("deleted", Boolean.FALSE));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			GermplasmDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("getGermplasmByGUIDs", "guids", "", e.getMessage(),
+					"Germplasm"), e);
 		}
 	}
 

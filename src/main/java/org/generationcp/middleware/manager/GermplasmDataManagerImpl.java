@@ -11,11 +11,14 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -24,7 +27,6 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
-import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -53,7 +55,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,7 +66,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -123,6 +123,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	@Deprecated
 	public long countGermplasmByLocationName(final String name, final Operation op) {
 		long count = 0;
 		final GermplasmDAO dao = this.getGermplasmDao();
@@ -135,6 +136,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	@Deprecated
 	public List<Germplasm> getGermplasmByMethodName(final String name, final int start, final int numOfRows, final Operation op) {
 		List<Germplasm> germplasms = new ArrayList<>();
 		final GermplasmDAO dao = this.getGermplasmDao();
@@ -147,6 +149,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	@Deprecated
 	public long countGermplasmByMethodName(final String name, final Operation op) {
 		long count = 0;
 		final GermplasmDAO dao = this.getGermplasmDao();
@@ -828,7 +831,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 					name.setNstat(1);
 				}
 
-				this.generateGermplasmUUID(cropType, Arrays.asList(germplasm));
+				GermplasmGuidGenerator.generateGermplasmGuids(cropType, Arrays.asList(germplasm));
 
 				final Germplasm germplasmSaved = dao.save(germplasm);
 				listOfGermplasm.add(germplasmSaved.getGid());
@@ -950,7 +953,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final String fieldType) {
-		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, fieldType);
+		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, ImmutableSet.of(fieldType));
 	}
 
 	@Override
@@ -1131,7 +1134,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Method getMethodByCode(final String code) {
-		return this.getMethodDao().getByCode(code);
+		return this.getMethodDao().getByCode(Collections.singletonList(code)).get(0);
 	}
 
 	@Override
@@ -1605,27 +1608,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public void generateGermplasmUUID(final CropType crop, final List<Germplasm> germplasmList) {
-		Preconditions.checkNotNull(crop);
-		Preconditions.checkState(!CollectionUtils.isEmpty(germplasmList));
-
-		final boolean doUseUUID = crop.isUseUUID();
-		for (final Germplasm germplasm : germplasmList) {
-			if (germplasm.getGermplasmUUID() == null) {
-				if (doUseUUID) {
-					germplasm.setGermplasmUUID(UUID.randomUUID().toString());
-				} else {
-					final String cropPrefix = crop.getPlotCodePrefix();
-					germplasm.setGermplasmUUID(cropPrefix + MID_STRING
-						+ RandomStringUtils.randomAlphanumeric(SUFFIX_LENGTH));
-				}
-			}
-		}
-	}
-
-	@Override
 	public List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types, final Set<String> codes) {
 		return this.getUserDefinedFieldDao().getByCodes(table, types, codes);
+	}
+
+
+	@Override
+	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final Set<String> fieldTypes) {
+		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, fieldTypes);
 	}
 
 }

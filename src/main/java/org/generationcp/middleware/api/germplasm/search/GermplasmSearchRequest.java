@@ -64,10 +64,10 @@ public class GermplasmSearchRequest {
 	private Date harvestDateFrom;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date harvestDateTo;
-	private String femaleParentName;
-	private String maleParentName;
-	private String groupSourceName;
-	private String immediateSourceName;
+	private SqlTextFilter femaleParentName;
+	private SqlTextFilter maleParentName;
+	private SqlTextFilter groupSourceName;
+	private SqlTextFilter immediateSourceName;
 	private Boolean withInventoryOnly;
 	private Boolean withRawObservationsOnly;
 	private Boolean withAnalyzedDataOnly;
@@ -221,35 +221,35 @@ public class GermplasmSearchRequest {
 		this.harvestDateTo = harvestDateTo;
 	}
 
-	public String getFemaleParentName() {
+	public SqlTextFilter getFemaleParentName() {
 		return this.femaleParentName;
 	}
 
-	public void setFemaleParentName(final String femaleParentName) {
+	public void setFemaleParentName(final SqlTextFilter femaleParentName) {
 		this.femaleParentName = femaleParentName;
 	}
 
-	public String getMaleParentName() {
+	public SqlTextFilter getMaleParentName() {
 		return this.maleParentName;
 	}
 
-	public void setMaleParentName(final String maleParentName) {
+	public void setMaleParentName(final SqlTextFilter maleParentName) {
 		this.maleParentName = maleParentName;
 	}
 
-	public String getGroupSourceName() {
+	public SqlTextFilter getGroupSourceName() {
 		return this.groupSourceName;
 	}
 
-	public void setGroupSourceName(final String groupSourceName) {
+	public void setGroupSourceName(final SqlTextFilter groupSourceName) {
 		this.groupSourceName = groupSourceName;
 	}
 
-	public String getImmediateSourceName() {
+	public SqlTextFilter getImmediateSourceName() {
 		return this.immediateSourceName;
 	}
 
-	public void setImmediateSourceName(final String immediateSourceName) {
+	public void setImmediateSourceName(final SqlTextFilter immediateSourceName) {
 		this.immediateSourceName = immediateSourceName;
 	}
 

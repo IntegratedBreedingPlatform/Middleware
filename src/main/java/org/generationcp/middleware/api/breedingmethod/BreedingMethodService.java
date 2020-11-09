@@ -11,5 +11,5 @@ public interface BreedingMethodService {
 
 	List<BreedingMethodDTO> getBreedingMethodsByCodes(Set<String> breedingMethodCodes);
 
-	List<BreedingMethodDTO> getBreedingMethods(String programUUID, boolean favorites);
+	List<BreedingMethodDTO> getBreedingMethods(String programUUID, Set<String> abbreviations, boolean favorites);
 }
