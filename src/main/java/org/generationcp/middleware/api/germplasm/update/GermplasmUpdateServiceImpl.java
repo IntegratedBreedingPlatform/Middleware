@@ -7,11 +7,11 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
@@ -47,9 +47,6 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 	@Autowired
 	private BreedingMethodService breedingMethodService;
 
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
 	private final DaoFactory daoFactory;
 
 	private GermplasmDAO germplasmDAO;
@@ -59,6 +56,8 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 	private AttributeDAO attributeDAO;
 
 	private BibrefDAO bibrefDAO;
+
+	private UserDefinedFieldDAO userDefinedFieldDAO;
 
 	public GermplasmUpdateServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -71,23 +70,30 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 		this.nameDAO = this.daoFactory.getNameDao();
 		this.attributeDAO = this.daoFactory.getAttributeDAO();
 		this.bibrefDAO = this.daoFactory.getBibrefDAO();
+		this.userDefinedFieldDAO = this.daoFactory.getUserDefinedFieldDAO();
 
 		final Map<String, Object[]> conflictErrors = new HashMap<>();
 
-		// Get the codes specified in the headers as well as the codes specified in the preferred name column.
-		final Set<String> attributesAndNamesCodes = new HashSet<>(germplasmUpdateDTOList.get(0).getData().keySet());
-		attributesAndNamesCodes
+		// Get the names as well as the codes specified in the preferred name property.
+		final Set<String> namesCode = new HashSet<>();
+		germplasmUpdateDTOList.forEach(
+			g -> namesCode.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
+		namesCode
 			.addAll(germplasmUpdateDTOList.stream().map(o -> o.getPreferredName()).filter(Objects::nonNull).collect(Collectors.toSet()));
+
+		final Set<String> attributesCode = new HashSet<>();
+		germplasmUpdateDTOList.forEach(
+			g -> attributesCode.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 
 		// Retrieve the field id of attributes and names
 		final Map<String, Integer> attributeCodesFieldNoMap =
-			this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				Collections.singleton(UDTableType.ATRIBUTS_ATTRIBUTE.getType()), attributesAndNamesCodes).stream().collect(Collectors.toMap(
+			this.userDefinedFieldDAO.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
+				Collections.singleton(UDTableType.ATRIBUTS_ATTRIBUTE.getType()), attributesCode).stream().collect(Collectors.toMap(
 				UserDefinedField::getFcode, UserDefinedField::getLfldno));
 		final Map<String, Integer> nameCodesFieldNoMap =
-			this.germplasmDataManager
-				.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
-					Collections.singleton(UDTableType.NAMES_NAME.getType()), attributesAndNamesCodes).stream().collect(Collectors.toMap(
+			this.userDefinedFieldDAO
+				.getByCodes(UDTableType.NAMES_NAME.getTable(),
+					Collections.singleton(UDTableType.NAMES_NAME.getType()), namesCode).stream().collect(Collectors.toMap(
 				UserDefinedField::getFcode, UserDefinedField::getLfldno));
 
 		// germplasm UUID should be the priority in getting germplasm
@@ -167,14 +173,19 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 	private void saveAttributesAndNames(final Map<String, Integer> attributeCodes,
 		final Map<String, Integer> nameCodes, final Map<Integer, List<Name>> namesMap, final Map<Integer, List<Attribute>> attributesMap,
 		final Germplasm germplasm, final Map<String, Object[]> conflictErrors, final GermplasmUpdateDTO germplasmUpdateDTO) {
-		for (final Map.Entry<String, String> codeValuesEntry : germplasmUpdateDTO.getData().entrySet()) {
+		for (final Map.Entry<String, String> codeValuesEntry : germplasmUpdateDTO.getNames().entrySet()) {
 			final String code = codeValuesEntry.getKey();
 			final String value = codeValuesEntry.getValue();
 			this.saveOrUpdateName(nameCodes, namesMap, germplasm, code, value,
 				conflictErrors);
+		}
+		for (final Map.Entry<String, String> codeValuesEntry : germplasmUpdateDTO.getAttributes().entrySet()) {
+			final String code = codeValuesEntry.getKey();
+			final String value = codeValuesEntry.getValue();
 			this.saveOrUpdateAttribute(attributeCodes, attributesMap, germplasm,
 				code, value, conflictErrors);
 		}
+
 	}
 
 	private void updatePreferredName(final Map<String, Integer> nameCodes, final Map<Integer, List<Name>> namesMap,

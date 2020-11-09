@@ -16,9 +16,8 @@ public class GermplasmUpdateDTO {
 	private String creationDate;
 	private String breedingMethod;
 	private String reference;
-
-	// Contains Names and Attributes data
-	private Map<String, String> data = new HashMap<>();
+	private Map<String, String> names = new HashMap<>();
+	private Map<String, String> attributes = new HashMap<>();
 
 	public Integer getGid() {
 		return this.gid;
@@ -68,20 +67,28 @@ public class GermplasmUpdateDTO {
 		this.breedingMethod = breedingMethod;
 	}
 
-	public Map<String, String> getData() {
-		return this.data;
-	}
-
-	public void setData(final Map<String, String> attributes) {
-		this.data = attributes;
-	}
-
 	public String getReference() {
 		return this.reference;
 	}
 
 	public void setReference(final String reference) {
 		this.reference = reference;
+	}
+
+	public Map<String, String> getNames() {
+		return this.names;
+	}
+
+	public void setNames(final Map<String, String> names) {
+		this.names = names;
+	}
+
+	public Map<String, String> getAttributes() {
+		return this.attributes;
+	}
+
+	public void setAttributes(final Map<String, String> attributes) {
+		this.attributes = attributes;
 	}
 
 	@Override
