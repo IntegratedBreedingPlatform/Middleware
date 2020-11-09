@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
@@ -68,6 +69,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -154,7 +156,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getObservationSetColumns(final Integer observationSetId, final Boolean draftMode) {
+	public List<MeasurementVariable> getObservationSetColumns(final Integer studyId, final Integer observationSetId, final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
 		final List<MeasurementVariable> factorColumns;
 		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
@@ -163,6 +165,18 @@ public class DatasetServiceImpl implements DatasetService {
 			//PLOTDATA
 			factorColumns = this.daoFactory.getDmsProjectDAO()
 				.getObservationSetVariables(observationSetId, PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
+			//STOCK ID
+			final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+			transactionsSearchDto.setTransactionStatus(Arrays.asList(0,1));
+			transactionsSearchDto.setPlantingStudyIds(Arrays.asList(studyId));
+			if (this.daoFactory.getTransactionDAO().countSearchTransactions(transactionsSearchDto) > 0) {
+				final Optional<MeasurementVariable>
+					designation = factorColumns.stream().filter(measurementVariable -> 
+					measurementVariable.getTermId() == TermId.DESIG.getId()).findFirst();
+				// Set the variable name of this virtual Column to STOCK_ID, to match the stock of planting inventory
+				factorColumns.add(factorColumns.indexOf(designation.get()) + 1,
+					this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR, null, true));
+			}
 		} else {
 			//SUBOBS
 			final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(observationSetId).getParent();
@@ -199,7 +213,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 		// Virtual columns
 		if (this.daoFactory.getSampleDao().countByDatasetId(observationSetId) > 0) {
-			factorColumns.add(this.buildSampleColumn());
+			// Set the the variable name of this virtual Sample Column to SUM_OF_SAMPLES, to match
+			// the Sample field name in observation query.
+			factorColumns.add(this.addTermIdColumn(TermId.SAMPLES,null,SUM_OF_SAMPLES, true));
 		}
 
 		// Other edge cases
@@ -216,15 +232,14 @@ public class DatasetServiceImpl implements DatasetService {
 		return factorColumns;
 	}
 
-	private MeasurementVariable buildSampleColumn() {
-		final MeasurementVariable sampleColumn = new MeasurementVariable();
-		// Set the the variable name of this virtual Sample Column to SUM_OF_SAMPLES, to match
-		// the Sample field name in observation query.
-		sampleColumn.setName(SUM_OF_SAMPLES);
-		sampleColumn.setAlias(TermId.SAMPLES.name());
-		sampleColumn.setTermId(TermId.SAMPLES.getId());
-		sampleColumn.setFactor(true);
-		return sampleColumn;
+	private MeasurementVariable addTermIdColumn(final TermId TermId, final VariableType VariableType, final String name, final boolean factor) {
+		final MeasurementVariable MeasurementVariable = new MeasurementVariable();
+		MeasurementVariable.setName(StringUtils.isBlank(name) ? TermId.name() : name);
+		MeasurementVariable.setAlias(TermId.name());
+		MeasurementVariable.setTermId(TermId.getId());
+		MeasurementVariable.setVariableType(VariableType);
+		MeasurementVariable.setFactor(factor);
+		return MeasurementVariable;
 	}
 
 	@Override

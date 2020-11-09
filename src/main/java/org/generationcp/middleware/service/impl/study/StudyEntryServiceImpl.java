@@ -37,10 +37,10 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	private final DaoFactory daoFactory;
 
-	private static List<Integer> FIXED_GERMPLASM_DESCRIPTOR_IDS = Lists
+	private static final List<Integer> FIXED_GERMPLASM_DESCRIPTOR_IDS = Lists
 		.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId());
 
-	private static List<Integer> REMOVABLE_GERMPLASM_DESCRIPTOR_IDS = Lists
+	private static final List<Integer> REMOVABLE_GERMPLASM_DESCRIPTOR_IDS = Lists
 		.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
 			TermId.OBS_UNIT_ID.getId());
 
@@ -59,7 +59,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public List<StudyEntryDto> getStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 
 		final Integer plotDatasetId =
-			datasetService.getDatasets(studyId, new HashSet<>(Collections.singletonList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
+			this.datasetService.getDatasets(studyId, new HashSet<>(Collections.singletonList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
 				.getDatasetId();
 
 		final List<MeasurementVariable> entryDescriptors =
@@ -78,6 +78,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		return
 			this.daoFactory.getStockDao()
 				.getStudyEntries(new StudyEntrySearchDto(studyId, fixedEntryDescriptors, variableEntryDescriptors, filter), pageable);
+	}
+
+	@Override
+	public Integer getNextEntryNumber(final Integer studyId) {
+		return this.daoFactory.getStockDao().getNextEntryNumber(studyId);
 	}
 
 	@Override
@@ -168,6 +173,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			stockProperty.setValue(studyEntryPropertyData.getValue());
 			this.daoFactory.getStockPropertyDao().saveOrUpdate(stockProperty);
 		}
+	}
+
+	@Override
+	public Boolean hasUnassignedEntries(final int studyId) {
+		return this.daoFactory.getStockDao().hasUnassignedEntries(studyId);
 	}
 
 	@Override
