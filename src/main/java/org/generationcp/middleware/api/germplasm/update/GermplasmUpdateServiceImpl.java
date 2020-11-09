@@ -65,7 +65,7 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 	}
 
 	@Override
-	public void saveGermplasmUpdates(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public void saveGermplasmUpdates(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		this.germplasmDAO = this.daoFactory.getGermplasmDao();
 		this.nameDAO = this.daoFactory.getNameDao();
@@ -112,8 +112,9 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 		}
 
 		// Retrieve location and method IDs in one go
-		final Map<String, Integer> locationAbbreviationIdMap = this.getLocationAbbreviationIdMap(germplasmUpdateDTOList);
-		final Map<String, BreedingMethodDTO> codeBreedingMethodDTOMap = this.getCodeBreedingMethodDTOMap(germplasmUpdateDTOList);
+		final Map<String, Integer> locationAbbreviationIdMap = this.getLocationAbbreviationIdMap(programUUID, germplasmUpdateDTOList);
+		final Map<String, BreedingMethodDTO> codeBreedingMethodDTOMap =
+			this.getCodeBreedingMethodDTOMap(programUUID, germplasmUpdateDTOList);
 
 		// Retrieve the names and attributes associated to GIDs in one go.
 		final Map<Integer, List<Name>> namesMap =
@@ -242,8 +243,10 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 				bibref.setAnalyt(referenceOptional.get());
 				this.bibrefDAO.save(bibref);
 			} else {
-				final Bibref bibref = new Bibref(null, DEFAULT_DASH, DEFAULT_DASH, referenceOptional.get(), DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH,
-					DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH);
+				final Bibref bibref =
+					new Bibref(null, DEFAULT_DASH, DEFAULT_DASH, referenceOptional.get(), DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH,
+						DEFAULT_DASH,
+						DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH, DEFAULT_DASH);
 				final Integer fielbookBibrefCode = 1923;
 				// TODO: Check bibref type
 				bibref.setType(new UserDefinedField(fielbookBibrefCode));
@@ -325,18 +328,20 @@ public class GermplasmUpdateServiceImpl implements GermplasmUpdateService {
 		return Optional.empty();
 	}
 
-	private Map<String, Integer> getLocationAbbreviationIdMap(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
-		final Set<String> locationAbbreviationSet =
+	private Map<String, Integer> getLocationAbbreviationIdMap(final String programUUID,
+		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+		final Set<String> locationAbbrs =
 			germplasmUpdateDTOList.stream().map(dto -> dto.getLocationAbbreviation()).collect(Collectors.toSet());
 		return
-			this.locationDataManager.getLocationsByAbbreviation(locationAbbreviationSet).stream()
+			this.locationDataManager.getFilteredLocations(programUUID, null, null, new ArrayList<>(locationAbbrs), false).stream()
 				.collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
 	}
 
-	private Map<String, BreedingMethodDTO> getCodeBreedingMethodDTOMap(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
-		final Set<String> breedingMethodCodes =
+	private Map<String, BreedingMethodDTO> getCodeBreedingMethodDTOMap(final String programUUID,
+		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+		final Set<String> breedingMethodsAbbrs =
 			germplasmUpdateDTOList.stream().map(dto -> dto.getBreedingMethod()).collect(Collectors.toSet());
-		return this.breedingMethodService.getBreedingMethodsByCodes(breedingMethodCodes).stream()
+		return this.breedingMethodService.getBreedingMethods(programUUID, breedingMethodsAbbrs, false).stream()
 			.collect(Collectors.toMap(BreedingMethodDTO::getCode, Function.identity()));
 	}
 

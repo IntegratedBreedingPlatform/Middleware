@@ -547,8 +547,4 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return this.daoFactory.getLocationDAO().getDefaultLocationByType(id);
 	}
 
-	@Override
-	public List<Location> getLocationsByAbbreviation(final Set<String> locationAbbreviationSet) {
-		return this.daoFactory.getLocationDAO().getLocationsByAbbreviation(locationAbbreviationSet);
-	}
 }

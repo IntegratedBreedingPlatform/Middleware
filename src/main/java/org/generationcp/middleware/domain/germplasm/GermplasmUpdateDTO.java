@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @AutoProperty
-// TODO: Reuse GermplasmDto from IBP-4097
 public class GermplasmUpdateDTO {
 
 	private Integer gid;

@@ -513,6 +513,4 @@ public interface LocationDataManager {
 	List<Integer> getFavoriteProjectLocationIds(String programUUID);
 
 	Location getDefaultLocationByType(LocationType locationType);
-
-	List<Location> getLocationsByAbbreviation(Set<String> locationAbbreviationSet);
 }

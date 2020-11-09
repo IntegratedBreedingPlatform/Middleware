@@ -1088,12 +1088,4 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	}
 
-	public List<Location> getLocationsByAbbreviation(final Set<String> locationAbbreviationSet) {
-		if (locationAbbreviationSet == null || locationAbbreviationSet.isEmpty()) {
-			return new ArrayList<>();
-		}
-		final Criteria criteria = this.getSession().createCriteria(Location.class);
-		criteria.add(Restrictions.in("labbr", locationAbbreviationSet));
-		return criteria.list();
-	}
 }

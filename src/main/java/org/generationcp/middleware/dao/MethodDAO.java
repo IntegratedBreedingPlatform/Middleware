@@ -565,15 +565,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		}
 	}
 
-	public List<Method> getByCodes(final Set<String> breedingMethodCodes) {
-		if (breedingMethodCodes.isEmpty()) {
-			return new ArrayList<>();
-		}
-		final Criteria criteria = this.getSession().createCriteria(Method.class);
-		criteria.add(Restrictions.in("mcode", breedingMethodCodes));
-		return criteria.list();
-	}
-
 	public List<Method> filterMethods(final String programUUID, final Set<String> abbreviations, final List<Integer> methodIds) {
 
 		try {

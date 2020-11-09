@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface GermplasmUpdateService {
 
-	void saveGermplasmUpdates(List<GermplasmUpdateDTO> germplasmUpdateDTOList);
+	void saveGermplasmUpdates(String programUUID, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
 }
