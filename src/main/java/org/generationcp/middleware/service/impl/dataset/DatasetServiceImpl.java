@@ -238,7 +238,7 @@ public class DatasetServiceImpl implements DatasetService {
 		MeasurementVariable.setAlias(TermId.name());
 		MeasurementVariable.setTermId(TermId.getId());
 		MeasurementVariable.setVariableType(VariableType);
-		MeasurementVariable.setFactor(true);
+		MeasurementVariable.setFactor(factor);
 		return MeasurementVariable;
 	}
 
