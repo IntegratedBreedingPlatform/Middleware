@@ -176,8 +176,8 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public Boolean hasUnassignedStudyEntriesToPlot(final int studyId) {
-		return this.daoFactory.getStockDao().hasUnassignedStudyEntriesToPlot(studyId);
+	public Boolean hasUnassignedEntries(final int studyId) {
+		return this.daoFactory.getStockDao().hasUnassignedEntries(studyId);
 	}
 
 	@Override

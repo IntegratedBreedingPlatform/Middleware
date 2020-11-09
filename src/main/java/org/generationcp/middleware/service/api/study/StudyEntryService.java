@@ -31,7 +31,7 @@ public interface StudyEntryService {
 
 	void updateStudyEntryProperty(int studyId, StudyEntryPropertyData studyEntryPropertyData);
 
-	Boolean hasUnassignedStudyEntriesToPlot(int studyId);
+	Boolean hasUnassignedEntries(int studyId);
 
 	Optional<StudyEntryPropertyData> getStudyEntryPropertyData(int studyEntryPropertyId);
 }

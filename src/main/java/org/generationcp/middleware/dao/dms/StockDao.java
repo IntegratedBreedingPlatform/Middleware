@@ -117,7 +117,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
-	public boolean hasUnassignedStudyEntriesToPlot(final int studyId) {
+	public boolean hasUnassignedEntries(final int studyId) {
 		try {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("SELECT COUNT(*) FROM stock s "
@@ -126,7 +126,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue() > 0;
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error in hasUnassignedStudyEntriesToPlot=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
+			final String errorMessage = "Error in hasUnassignedEntries=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
