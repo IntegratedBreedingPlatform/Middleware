@@ -4,11 +4,11 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.util.StringUtil;
 import org.hamcrest.MatcherAssert;
@@ -20,6 +20,7 @@ import org.junit.Test;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -404,6 +405,23 @@ public class LocationDAOTest extends IntegrationTestBase {
 			Assert.assertFalse(location.getLtype().intValue() == countryLocationType);
 		}
 
+	}
+
+	@Test
+	public void testGetByAbbreviations() {
+		final String labbr = RandomStringUtils.randomAlphabetic(6);
+		final String lname = RandomStringUtils.randomAlphabetic(10);
+
+		final Location location = LocationTestDataInitializer.createLocation(null, lname, 0, labbr, null);
+		location.setCntryid(0);
+		location.setLdefault(Boolean.FALSE);
+		locationDAO.saveOrUpdate(location);
+
+		final List<Location> locations =
+			locationDAO.getByAbbreviations(Collections.singletonList(labbr));
+
+		Assert.assertEquals(locations.size(), 1);
+		Assert.assertEquals(locations.get(0).getLabbr(), labbr);
 	}
 
 }

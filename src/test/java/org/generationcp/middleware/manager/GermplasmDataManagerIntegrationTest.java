@@ -80,7 +80,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
@@ -1289,26 +1288,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final List<String> names = this.germplasmDataManager.getNamesByGidsAndPrefixes(Collections.singletonList(germplasm.getGid()), Collections.singletonList("PREF"));
 		Assert.assertEquals(1, names.size());
 		Assert.assertEquals(name1.getNval(), names.get(0));
-	}
-
-	@Test
-	public void testGenerateGermplasmUUIDUseUUIDTrue() {
-		final Germplasm germplasm = this.createGermplasm();
-		final CropType cropType = new CropType();
-		cropType.setUseUUID(true);
-		this.germplasmDataManager.generateGermplasmUUID(cropType, Arrays.asList(germplasm));
-		Assert.assertEquals(36, germplasm.getGermplasmUUID().length());
-	}
-
-	@Test
-	public void testGenerateGermplasmUUIDUseUUIDFalse() {
-		final Germplasm germplasm = this.createGermplasm();
-		final CropType cropType = new CropType();
-		cropType.setUseUUID(false);
-		cropType.setPlotCodePrefix("AXDG");
-		this.germplasmDataManager.generateGermplasmUUID(cropType, Arrays.asList(germplasm));
-		Assert.assertTrue(germplasm.getGermplasmUUID().startsWith(cropType.getPlotCodePrefix() + "G"));
-		Assert.assertEquals(20, germplasm.getGermplasmUUID().length());
 	}
 
 	@Test

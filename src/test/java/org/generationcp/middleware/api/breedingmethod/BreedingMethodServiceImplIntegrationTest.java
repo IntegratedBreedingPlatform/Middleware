@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,7 +42,7 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		final List<Method> methodsWithoutProgram = this.germplasmDataManager.getMethodsByUniqueID(null);
 
 		//Should get all breeding methods without program
-		final List<BreedingMethodDTO> actualMethodsWithoutProgram = this.breedingMethodService.getBreedingMethods(null, false);
+		final List<BreedingMethodDTO> actualMethodsWithoutProgram = this.breedingMethodService.getBreedingMethods(null, null, false);
 		assertNotNull(actualMethodsWithoutProgram);
 		assertThat(actualMethodsWithoutProgram, hasSize(methodsWithoutProgram.size()));
 	}
@@ -61,7 +62,7 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		this.germplasmDataManager.saveProgramFavorite(programFavorite);
 
 		//Should get only the favorite breeding method
-		final List<BreedingMethodDTO> favoriteBreedingMethods = this.breedingMethodService.getBreedingMethods(programUUID, true);
+		final List<BreedingMethodDTO> favoriteBreedingMethods = this.breedingMethodService.getBreedingMethods(programUUID, null, true);
 		assertNotNull(favoriteBreedingMethods);
 		assertThat(favoriteBreedingMethods, hasSize(1));
 		assertThat(favoriteBreedingMethods.get(0).getCode(), is(favoriteBreedingMethod.getMcode()));
@@ -80,10 +81,25 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		this.germplasmDataManager.addMethod(newMethod);
 
 		//Should get all methods without program and also the method previously created
-		final List<BreedingMethodDTO> favoriteBreedingMethods = this.breedingMethodService.getBreedingMethods(programUUID, false);
+		final List<BreedingMethodDTO> favoriteBreedingMethods = this.breedingMethodService.getBreedingMethods(programUUID, null, false);
 		assertNotNull(favoriteBreedingMethods);
 		assertThat(favoriteBreedingMethods.size(), is(methodsByUniqueID.size() + 1));
 		assertThat(favoriteBreedingMethods, hasItem(hasProperty("code", is(newMethodCode))));
+	}
+
+	@Test
+	public void testGetBreedingMethodsByCodes_Ok() {
+		final String newMethodCode = "NEWMETHO";
+
+		final Method newMethod = new Method(null, "NEW", "S", newMethodCode, "New Method", "New Method", 0, 0, 0, 0, 0, 0, 0, 0, null);
+		this.germplasmDataManager.addMethod(newMethod);
+
+		//Should get all methods without program and also the method previously created
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(null,
+			Collections.singleton(newMethodCode), false);
+		assertNotNull(breedingMethods);
+		assertThat(breedingMethods.size(), is(1));
+		assertThat(breedingMethods, hasItem(hasProperty("code", is(newMethodCode))));
 	}
 
 }
