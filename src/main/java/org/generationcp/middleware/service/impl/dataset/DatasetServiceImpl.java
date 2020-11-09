@@ -173,7 +173,9 @@ public class DatasetServiceImpl implements DatasetService {
 				final Optional<MeasurementVariable>
 					designation = factorColumns.stream().filter(measurementVariable -> 
 					measurementVariable.getTermId() == TermId.DESIG.getId()).findFirst();
-				factorColumns.add(factorColumns.indexOf(designation.get()) + 1, this.buildStockIdColumn());
+				// Set the variable name of this virtual Column to STOCK_ID, to match the stock of planting inventory
+				factorColumns.add(factorColumns.indexOf(designation.get()) + 1,
+					this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR, null, true));
 			}
 		} else {
 			//SUBOBS
@@ -211,7 +213,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 		// Virtual columns
 		if (this.daoFactory.getSampleDao().countByDatasetId(observationSetId) > 0) {
-			factorColumns.add(this.buildSampleColumn());
+			// Set the the variable name of this virtual Sample Column to SUM_OF_SAMPLES, to match
+			// the Sample field name in observation query.
+			factorColumns.add(this.addTermIdColumn(TermId.SAMPLES,null,SUM_OF_SAMPLES, true));
 		}
 
 		// Other edge cases
@@ -228,26 +232,14 @@ public class DatasetServiceImpl implements DatasetService {
 		return factorColumns;
 	}
 
-	private MeasurementVariable buildSampleColumn() {
-		final MeasurementVariable sampleColumn = new MeasurementVariable();
-		// Set the the variable name of this virtual Sample Column to SUM_OF_SAMPLES, to match
-		// the Sample field name in observation query.
-		sampleColumn.setName(SUM_OF_SAMPLES);
-		sampleColumn.setAlias(TermId.SAMPLES.name());
-		sampleColumn.setTermId(TermId.SAMPLES.getId());
-		sampleColumn.setFactor(true);
-		return sampleColumn;
-	}
-
-	private MeasurementVariable buildStockIdColumn() {
-		final MeasurementVariable stockIdColumn = new MeasurementVariable();
-		// Set the variable name of this virtual Column to STOCK_ID, to match the stock of planting inventory
-		stockIdColumn.setName(TermId.STOCK_ID.name());
-		stockIdColumn.setAlias(TermId.STOCK_ID.name());
-		stockIdColumn.setTermId(TermId.STOCK_ID.getId());
-		stockIdColumn.setVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-		stockIdColumn.setFactor(true);
-		return stockIdColumn;
+	private MeasurementVariable addTermIdColumn(final TermId TermId, final VariableType VariableType, final String name, final boolean factor) {
+		final MeasurementVariable MeasurementVariable = new MeasurementVariable();
+		MeasurementVariable.setName(StringUtils.isBlank(name) ? TermId.name() : name);
+		MeasurementVariable.setAlias(TermId.name());
+		MeasurementVariable.setTermId(TermId.getId());
+		MeasurementVariable.setVariableType(VariableType);
+		MeasurementVariable.setFactor(true);
+		return MeasurementVariable;
 	}
 
 	@Override
