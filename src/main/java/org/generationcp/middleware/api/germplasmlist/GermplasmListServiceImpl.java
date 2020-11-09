@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -129,10 +130,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final String programUUID) {
 
 		final GermplasmList listToMove = this.getGermplasmListById(germplasmListId)
-			.orElseThrow(() -> new MiddlewareException("GermplasmList does not exist"));
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.folder.not.found"));
 
 		final GermplasmList newParentFolder = (Objects.isNull(newParentFolderId)) ? null :
-			this.getGermplasmListById(newParentFolderId).orElseThrow(() -> new MiddlewareException("Parent Folder does not exist"));
+			this.getGermplasmListById(newParentFolderId).orElseThrow(() -> new MiddlewareRequestException("", "list.parent.folder.not.found"));
 
 		// if the list is moved to the crop list, set the program uuid to null so that
 		// it will be accessible to all programs of the same crop.
@@ -154,7 +155,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public void deleteGermplasmListFolder(final Integer folderId) {
 		final GermplasmList folder = this.getGermplasmListById(folderId)
-			.orElseThrow(() -> new MiddlewareException("FolderId does not exist"));
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.folder.not.found"));
 
 		this.daoFactory.getGermplasmListDAO().makeTransient(folder);
 	}
