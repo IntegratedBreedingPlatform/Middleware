@@ -175,7 +175,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap = new HashMap<>();
 		for (final GermplasmUpdateDTO germplasmUpdateDTO : germplasmUpdateDTOList) {
 			germplasmUpdateDTOMap
-				.put(germplasmUpdateDTO.getGid() == null ? germplasmUpdateDTO.getGermplasmUUID() :
+				.put(StringUtils.isNotEmpty(germplasmUpdateDTO.getGermplasmUUID()) ? germplasmUpdateDTO.getGermplasmUUID() :
 						String.valueOf(germplasmUpdateDTO.getGid()),
 					germplasmUpdateDTO);
 		}
