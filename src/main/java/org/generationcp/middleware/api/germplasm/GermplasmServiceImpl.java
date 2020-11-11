@@ -215,7 +215,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (optionalGermplasmUpdateDTO.isPresent()) {
 			final GermplasmUpdateDTO germplasmUpdateDTO = optionalGermplasmUpdateDTO.get();
 			final Optional<Method> breedingMethodDtoOptional =
-				Optional.ofNullable(codeBreedingMethodDTOMap.getOrDefault(germplasmUpdateDTO.getBreedingMethod(), null));
+				Optional.ofNullable(codeBreedingMethodDTOMap.getOrDefault(germplasmUpdateDTO.getBreedingMethodAbbr(), null));
 			final Optional<Integer> locationIdOptional =
 				Optional.ofNullable(locationAbbreviationIdMap.getOrDefault(germplasmUpdateDTO.getLocationAbbreviation(), null));
 			final Optional<Integer> germplasmDateOptional =
@@ -413,7 +413,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private Map<String, Method> getCodeBreedingMethodDTOMap(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		final Set<String> breedingMethodsAbbrs =
-			germplasmUpdateDTOList.stream().map(dto -> dto.getBreedingMethod()).collect(Collectors.toSet());
+			germplasmUpdateDTOList.stream().map(dto -> dto.getBreedingMethodAbbr()).collect(Collectors.toSet());
 		return this.daoFactory.getMethodDAO().getByCode(new ArrayList<>(breedingMethodsAbbrs)).stream()
 			.collect(Collectors.toMap(Method::getMcode, Function.identity()));
 	}

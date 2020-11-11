@@ -14,7 +14,7 @@ public class GermplasmUpdateDTO {
 	private String preferredName;
 	private String locationAbbreviation;
 	private String creationDate;
-	private String breedingMethod;
+	private String breedingMethodAbbr;
 	private String reference;
 	private Map<String, String> names = new HashMap<>();
 	private Map<String, String> attributes = new HashMap<>();
@@ -59,12 +59,12 @@ public class GermplasmUpdateDTO {
 		this.creationDate = creationDate;
 	}
 
-	public String getBreedingMethod() {
-		return this.breedingMethod;
+	public String getBreedingMethodAbbr() {
+		return this.breedingMethodAbbr;
 	}
 
-	public void setBreedingMethod(final String breedingMethod) {
-		this.breedingMethod = breedingMethod;
+	public void setBreedingMethodAbbr(final String breedingMethodAbbr) {
+		this.breedingMethodAbbr = breedingMethodAbbr;
 	}
 
 	public String getReference() {
