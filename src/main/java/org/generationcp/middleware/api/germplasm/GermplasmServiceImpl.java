@@ -151,7 +151,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		// Retrieve the field id of attributes and names
 		final Map<String, Integer> attributeCodesFieldNoMap =
 			this.daoFactory.getUserDefinedFieldDAO().getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				Collections.singleton(UDTableType.ATRIBUTS_ATTRIBUTE.getType()), attributesCode).stream().collect(Collectors.toMap(
+				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType())),
+				attributesCode).stream().collect(Collectors.toMap(
 				UserDefinedField::getFcode, UserDefinedField::getFldno));
 		final Map<String, Integer> nameCodesFieldNoMap =
 			this.daoFactory.getUserDefinedFieldDAO()
