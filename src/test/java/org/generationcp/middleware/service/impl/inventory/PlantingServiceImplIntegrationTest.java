@@ -167,7 +167,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		try {
 			this.plantingService.savePlanting(userId, studyId, observationDatasetId, plantingRequestDto, TransactionStatus.CONFIRMED);
 		} catch (final MiddlewareRequestException e) {
-			assertTrue(e.getErrorCodeParamsMap().containsKey("planting.confirmed.transactions.found"));
+			assertTrue(e.getErrorCodeParamsMultiMap().containsKey("planting.confirmed.transactions.found"));
 		}
 	}
 
@@ -204,7 +204,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		try {
 			this.plantingService.savePlanting(userId, studyId, observationDatasetId, plantingRequestDto, TransactionStatus.CONFIRMED);
 		} catch (final MiddlewareRequestException e) {
-			assertTrue(e.getErrorCodeParamsMap().containsKey("planting.not.enough.inventory"));
+			assertTrue(e.getErrorCodeParamsMultiMap().containsKey("planting.not.enough.inventory"));
 		}
 	}
 

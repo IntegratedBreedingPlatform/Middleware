@@ -1,5 +1,7 @@
 package org.generationcp.middleware.api.germplasm;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
@@ -135,7 +137,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public void importGermplasmUpdates(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
-		final Map<String, Object[]> conflictErrors = new HashMap<>();
+		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 
 		// Get the names as well as the codes specified in the preferred name property.
 		final Set<String> namesCode = new HashSet<>();
@@ -210,7 +212,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private void saveGermplasmUpdateDTO(final Map<String, Integer> attributeCodes, final Map<String, Integer> nameCodes,
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
-		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm, final Map<String, Object[]> conflictErrors) {
+		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm, final Multimap<String, Object[]> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
 		if (optionalGermplasmUpdateDTO.isPresent()) {
@@ -239,7 +241,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private void saveAttributesAndNames(final Map<String, Integer> attributeCodes,
 		final Map<String, Integer> nameCodes, final Map<Integer, List<Name>> namesMap, final Map<Integer, List<Attribute>> attributesMap,
-		final Germplasm germplasm, final Map<String, Object[]> conflictErrors, final GermplasmUpdateDTO germplasmUpdateDTO) {
+		final Germplasm germplasm, final Multimap<String, Object[]> conflictErrors, final GermplasmUpdateDTO germplasmUpdateDTO) {
 		for (final Map.Entry<String, String> codeValuesEntry : germplasmUpdateDTO.getNames().entrySet()) {
 			final String code = codeValuesEntry.getKey();
 			final String value = codeValuesEntry.getValue();
@@ -256,7 +258,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void updatePreferredName(final Map<String, Integer> nameCodes, final Map<Integer, List<Name>> namesMap,
-		final Germplasm germplasm, final GermplasmUpdateDTO germplasmUpdateDTO, final Map<String, Object[]> conflictErrors) {
+		final Germplasm germplasm, final GermplasmUpdateDTO germplasmUpdateDTO, final Multimap<String, Object[]> conflictErrors) {
 		// Update preferred name
 		final Integer preferredNameTypeId = nameCodes.get(germplasmUpdateDTO.getPreferredName());
 		final List<Name> names = namesMap.get(germplasm.getGid());
@@ -285,7 +287,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Optional<Integer> locationIdOptional,
 		final Optional<Method> breedingMethodDtoOptional,
 		final Optional<Integer> germplasmDateOptional, final Optional<String> referenceOptional,
-		final Map<String, Object[]> conflictErrors) {
+		final Multimap<String, Object[]> conflictErrors) {
 
 		if (breedingMethodDtoOptional.isPresent()) {
 			final String oldMethodType = germplasm.getMethod().getMtype();
@@ -335,7 +337,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private void saveOrUpdateName(final Map<String, Integer> nameCodes,
 		final Map<Integer, List<Name>> namesMap, final Germplasm germplasm,
-		final String code, final String value, final Map<String, Object[]> conflictErrors) {
+		final String code, final String value, final Multimap<String, Object[]> conflictErrors) {
 
 		// Check first if the code to save is a valid Name
 		if (nameCodes.containsKey(code) && liquibase.util.StringUtils.isNotEmpty(value)) {
@@ -367,7 +369,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private void saveOrUpdateAttribute(final Map<String, Integer> attributeCodes,
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
-		final String code, final String value, final Map<String, Object[]> conflictErrors) {
+		final String code, final String value, final Multimap<String, Object[]> conflictErrors) {
 		// Check first if the code to save is a valid Attribute
 		if (attributeCodes.containsKey(code) && liquibase.util.StringUtils.isNotEmpty(value)) {
 			final Integer attributeTypeId = attributeCodes.get(code);

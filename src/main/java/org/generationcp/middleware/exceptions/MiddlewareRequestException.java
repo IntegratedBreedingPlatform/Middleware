@@ -11,8 +11,8 @@
 
 package org.generationcp.middleware.exceptions;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Exception for Client request errors
@@ -21,19 +21,19 @@ public class MiddlewareRequestException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	private final Map<String, Object[]> errorCodeParamsMap = new HashMap<>();
+	private final Multimap<String, Object[]> errorCodeParamsMap = ArrayListMultimap.create();
 
 	public MiddlewareRequestException(final String logMessage, final String errorCode, final Object... params) {
 		super(logMessage);
 		this.errorCodeParamsMap.put(errorCode, params);
 	}
 
-	public MiddlewareRequestException(final String logMessage, final Map<String, Object[]> errorCodeParamsMap) {
+	public MiddlewareRequestException(final String logMessage, final Multimap<String, Object[]> errorCodeParamsMultiMap) {
 		super(logMessage);
-		this.errorCodeParamsMap.putAll(errorCodeParamsMap);
+		this.errorCodeParamsMap.putAll(errorCodeParamsMultiMap);
 	}
 
-	public Map<String, Object[]> getErrorCodeParamsMap() {
+	public Multimap<String, Object[]> getErrorCodeParamsMultiMap() {
 		return this.errorCodeParamsMap;
 	}
 }
