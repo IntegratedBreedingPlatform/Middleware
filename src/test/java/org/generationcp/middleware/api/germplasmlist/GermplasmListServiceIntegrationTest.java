@@ -88,6 +88,74 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		assertFalse(deletedGermplasmListById.isPresent());
 	}
 
+	@Test
+	public void shouldMoveGermplasmListFolder_OK() {
+
+		//Create germplasm folder 1
+		final String folderName1 = "folderName1";
+		final Integer newFolderId1 =
+			this.germplasmListService.createGermplasmListFolder(USER_ID, folderName1, this.parentFolderId, PROGRAM_UUID);
+		assertNotNull(newFolderId1);
+
+		//Get the created germplasm folder by id
+		final Optional<GermplasmList> newGermplasmListById1 = this.germplasmListService.getGermplasmListById(newFolderId1);
+		assertTrue(newGermplasmListById1.isPresent());
+		final GermplasmList newGermplasmList1 = newGermplasmListById1.get();
+		this.assertGermplasmList(newGermplasmList1, newFolderId1, folderName1);
+		assertThat(newGermplasmList1.getParentId(), is(this.parentFolderId));
+
+		//Create germplasm folder 2
+		final String folderName2 = "folderName2";
+		final Integer newFolderId2 =
+			this.germplasmListService.createGermplasmListFolder(USER_ID, folderName2, this.parentFolderId, PROGRAM_UUID);
+		assertNotNull(newFolderId2);
+
+		//Get the created germplasm folder by id
+		final Optional<GermplasmList> newGermplasmListById2 = this.germplasmListService.getGermplasmListById(newFolderId2);
+		assertTrue(newGermplasmListById2.isPresent());
+		final GermplasmList newGermplasmList2 = newGermplasmListById2.get();
+		this.assertGermplasmList(newGermplasmList2, newFolderId2, folderName2);
+		assertThat(newGermplasmList2.getParentId(), is(this.parentFolderId));
+
+		//Move folder 1 to folder 2
+		final Integer movedListId =
+			this.germplasmListService.moveGermplasmListFolder(newFolderId1, newFolderId2, PROGRAM_UUID);
+		assertNotNull(movedListId);
+		assertThat(movedListId, is(newFolderId1));
+
+		//Get the moved folder
+		final Optional<GermplasmList> movedFolderById = this.germplasmListService.getGermplasmListById(newFolderId1);
+		assertTrue(movedFolderById.isPresent());
+		final GermplasmList movedFolder = movedFolderById.get();
+		assertThat(movedFolder.getParentId(), is(newFolderId2));
+	}
+
+	@Test
+	public void shouldGetGermplasmListByIdAndProgramUUID_OK() {
+		final Optional<GermplasmList> germplasmListByIdAndProgramUUID =
+			this.germplasmListService.getGermplasmListByIdAndProgramUUID(this.parentFolderId, PROGRAM_UUID);
+		assertTrue(germplasmListByIdAndProgramUUID.isPresent());
+		final GermplasmList parentGermplasmList = germplasmListByIdAndProgramUUID.get();
+		assertThat(parentGermplasmList.getId(), is(this.parentFolderId));
+		assertThat(parentGermplasmList.getProgramUUID(), is(PROGRAM_UUID));
+	}
+
+	@Test
+	public void shouldGetGermplasmListByIdAndNullProgramUUID_OK() {
+		final String folderName1 = "folderName1";
+		final Integer newFolderId1 =
+			this.germplasmListService.createGermplasmListFolder(USER_ID, folderName1, this.parentFolderId, null);
+		assertNotNull(newFolderId1);
+
+		final Optional<GermplasmList> germplasmListByIdAndProgramUUID =
+			this.germplasmListService.getGermplasmListByIdAndProgramUUID(newFolderId1, null);
+		assertTrue(germplasmListByIdAndProgramUUID.isPresent());
+		final GermplasmList newGermplasmList = germplasmListByIdAndProgramUUID.get();
+		assertThat(newGermplasmList.getId(), is(newFolderId1));
+		assertNull(newGermplasmList.getProgramUUID());
+	}
+
+
 	private void assertGermplasmList(final GermplasmList germplasmList, final Integer id, final String name) {
 		assertNotNull(germplasmList);
 		assertThat(germplasmList.getId(), is(id));

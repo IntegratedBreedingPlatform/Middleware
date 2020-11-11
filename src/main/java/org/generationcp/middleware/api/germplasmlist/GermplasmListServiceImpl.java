@@ -82,8 +82,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public Optional<GermplasmList> getGermplasmListById(final Integer parentId) {
-		return Optional.ofNullable(this.daoFactory.getGermplasmListDAO().getById(parentId));
+	public Optional<GermplasmList> getGermplasmListById(final Integer id) {
+		return Optional.ofNullable(this.daoFactory.getGermplasmListDAO().getById(id));
+	}
+
+	@Override
+	public Optional<GermplasmList> getGermplasmListByIdAndProgramUUID(final Integer id, final String programUUID) {
+		return Optional.ofNullable(this.daoFactory.getGermplasmListDAO().getByIdAndProgramUUID(id, programUUID));
 	}
 
 	@Override
@@ -126,7 +131,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public Integer moveGermplasmListFolder(final Integer germplasmListId, final Integer newParentFolderId, final boolean isCropList,
+	public Integer moveGermplasmListFolder(final Integer germplasmListId, final Integer newParentFolderId,
 		final String programUUID) {
 
 		final GermplasmList listToMove = this.getGermplasmListById(germplasmListId)
@@ -135,16 +140,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final GermplasmList newParentFolder = (Objects.isNull(newParentFolderId)) ? null :
 			this.getGermplasmListById(newParentFolderId).orElseThrow(() -> new MiddlewareRequestException("", "list.parent.folder.not.found"));
 
-		// if the list is moved to the crop list, set the program uuid to null so that
-		// it will be accessible to all programs of the same crop.
-		if (isCropList) {
-			listToMove.setProgramUUID(null);
-		} else {
-			// else, just set the current programUUID
-			listToMove.setProgramUUID(programUUID);
-		}
-
+		listToMove.setProgramUUID(programUUID);
 		listToMove.setParent(newParentFolder);
+
 		try {
 			return this.daoFactory.getGermplasmListDAO().saveOrUpdate(listToMove).getId();
 		} catch (final HibernateException e) {
