@@ -3,6 +3,9 @@ package org.generationcp.middleware.api.germplasmlist;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -11,6 +14,7 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.util.Util;
+import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -74,4 +80,82 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		return request;
 	}
+
+	@Override
+	public Optional<GermplasmList> getGermplasmListById(final Integer id) {
+		return Optional.ofNullable(this.daoFactory.getGermplasmListDAO().getById(id));
+	}
+
+	@Override
+	public Optional<GermplasmList> getGermplasmListByIdAndProgramUUID(final Integer id, final String programUUID) {
+		return Optional.ofNullable(this.daoFactory.getGermplasmListDAO().getByIdAndProgramUUID(id, programUUID));
+	}
+
+	@Override
+	public Optional<GermplasmList> getGermplasmListByParentAndName(final String germplasmListName, final Integer parentId,
+		final String programUUID) {
+		return Optional.ofNullable(this.daoFactory.getGermplasmListDAO().getGermplasmListByParentAndName(germplasmListName, parentId, programUUID));
+	}
+
+	@Override
+	public Integer createGermplasmListFolder(final Integer userId, final String folderName, final Integer parentId,
+		final String programUUID) {
+
+		final GermplasmList parentFolder = (Objects.isNull(parentId)) ? null :
+			this.getGermplasmListById(parentId).orElseThrow(() -> new MiddlewareException("Parent Folder does not exist"));
+
+		final GermplasmList folder = new GermplasmList();
+		folder.setDate(Util.getCurrentDateAsLongValue());
+		folder.setUserId(userId);
+		folder.setDescription(folderName);
+		folder.setName(folderName);
+		folder.setNotes(null);
+		folder.setParent(parentFolder);
+		folder.setType(GermplasmList.FOLDER_TYPE);
+		folder.setProgramUUID(programUUID);
+		folder.setStatus(GermplasmList.Status.FOLDER.getCode());
+		return this.daoFactory.getGermplasmListDAO().save(folder).getId();
+	}
+
+	@Override
+	public Integer updateGermplasmListFolder(final Integer userId, final String folderName, final Integer folderId,
+		final String programUUID) {
+
+		final GermplasmList folder =
+			this.getGermplasmListById(folderId).orElseThrow(() -> new MiddlewareException("Folder does not exist"));
+
+		folder.setName(folderName);
+		folder.setDescription(folderName);
+
+		return this.daoFactory.getGermplasmListDAO().save(folder).getId();
+	}
+
+	@Override
+	public Integer moveGermplasmListFolder(final Integer germplasmListId, final Integer newParentFolderId,
+		final String programUUID) {
+
+		final GermplasmList listToMove = this.getGermplasmListById(germplasmListId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.folder.not.found"));
+
+		final GermplasmList newParentFolder = (Objects.isNull(newParentFolderId)) ? null :
+			this.getGermplasmListById(newParentFolderId).orElseThrow(() -> new MiddlewareRequestException("", "list.parent.folder.not.found"));
+
+		listToMove.setProgramUUID(programUUID);
+		listToMove.setParent(newParentFolder);
+
+		try {
+			return this.daoFactory.getGermplasmListDAO().saveOrUpdate(listToMove).getId();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in moveGermplasmList in GermplasmListServiceImpl: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public void deleteGermplasmListFolder(final Integer folderId) {
+		final GermplasmList folder = this.getGermplasmListById(folderId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.folder.not.found"));
+
+		this.daoFactory.getGermplasmListDAO().makeTransient(folder);
+	}
+
 }
