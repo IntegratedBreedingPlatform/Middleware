@@ -66,5 +66,6 @@
 	<include file="crop_changelog/16_1_0.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/16_2_0.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/16_3_0.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/16_4_0.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
