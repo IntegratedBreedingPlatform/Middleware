@@ -1,25 +1,19 @@
 package org.generationcp.middleware.domain.germplasm;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 @AutoProperty
+@JsonPropertyOrder({
+	"clientId", "germplasmUUID", "locationAbbr", "breedingMethodAbbr", "reference", "preferredName", "names", "attributes", "creationDate"})
 public class GermplasmImportRequestDto {
-
-	@AutoProperty
-	@JsonPropertyOrder({
-		"clientId", "guid", "locationAbbr", "breedingMethodAbbr", "reference", "preferredName", "names", "attributes", "creationDate"})
-	public static class GermplasmDto {
 
 		private Integer clientId;
 
-		private String guid;
+	private String germplasmUUID;
 
 		private String locationAbbr;
 
@@ -33,17 +27,17 @@ public class GermplasmImportRequestDto {
 
 		private Map<String, String> attributes;
 
-		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-		private Date creationDate;
+	private String creationDate;
 
-		public GermplasmDto() {
+	public GermplasmImportRequestDto() {
 		}
 
-		public GermplasmDto(final Integer clientId, final String guid, final String locationAbbr, final String breedingMethodAbbr,
+	public GermplasmImportRequestDto(final Integer clientId, final String germplasmUUID, final String locationAbbr,
+		final String breedingMethodAbbr,
 			final String reference,
-			final String preferredName, final Map<String, String> names, final Map<String, String> attributes, final Date creationDate) {
+		final String preferredName, final Map<String, String> names, final Map<String, String> attributes, final String creationDate) {
 			this.clientId = clientId;
-			this.guid = guid;
+		this.germplasmUUID = germplasmUUID;
 			this.locationAbbr = locationAbbr;
 			this.breedingMethodAbbr = breedingMethodAbbr;
 			this.reference = reference;
@@ -77,12 +71,12 @@ public class GermplasmImportRequestDto {
 			this.breedingMethodAbbr = breedingMethodAbbr;
 		}
 
-		public String getGuid() {
-			return guid;
+	public String getGermplasmUUID() {
+		return germplasmUUID;
 		}
 
-		public void setGuid(final String guid) {
-			this.guid = guid;
+	public void setGermplasmUUID(final String germplasmUUID) {
+		this.germplasmUUID = germplasmUUID;
 		}
 
 		public String getReference() {
@@ -117,11 +111,11 @@ public class GermplasmImportRequestDto {
 			this.attributes = attributes;
 		}
 
-		public Date getCreationDate() {
+	public String getCreationDate() {
 			return creationDate;
 		}
 
-		public void setCreationDate(final Date creationDate) {
+	public void setCreationDate(final String creationDate) {
 			this.creationDate = creationDate;
 		}
 
@@ -140,34 +134,4 @@ public class GermplasmImportRequestDto {
 			return Pojomatic.equals(this, o);
 		}
 
-	}
-
-
-	private List<GermplasmDto> germplasmList;
-
-	public List<GermplasmDto> getGermplasmList() {
-		return germplasmList;
-	}
-
-	public void setGermplasmList(final List<GermplasmDto> germplasmList) {
-		this.germplasmList = germplasmList;
-	}
-
-	public GermplasmImportRequestDto() {
-	}
-
-	@Override
-	public int hashCode() {
-		return Pojomatic.hashCode(this);
-	}
-
-	@Override
-	public String toString() {
-		return Pojomatic.toString(this);
-	}
-
-	@Override
-	public boolean equals(final Object o) {
-		return Pojomatic.equals(this, o);
-	}
 }
