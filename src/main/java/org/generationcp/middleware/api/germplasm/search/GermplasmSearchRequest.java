@@ -48,6 +48,8 @@ public class GermplasmSearchRequest {
 	private SqlTextFilter nameFilter;
 	private String germplasmUUID;
 	private Integer gid;
+	private Integer gidFrom;
+	private Integer gidTo;
 	private Integer groupId;
 	private String sampleUID;
 	private List<Integer> germplasmListIds;
@@ -115,6 +117,22 @@ public class GermplasmSearchRequest {
 
 	public void setGid(final Integer gid) {
 		this.gid = gid;
+	}
+
+	public Integer getGidFrom() {
+		return this.gidFrom;
+	}
+
+	public void setGidFrom(final Integer gidFrom) {
+		this.gidFrom = gidFrom;
+	}
+
+	public Integer getGidTo() {
+		return this.gidTo;
+	}
+
+	public void setGidTo(final Integer gidTo) {
+		this.gidTo = gidTo;
 	}
 
 	public Integer getGroupId() {

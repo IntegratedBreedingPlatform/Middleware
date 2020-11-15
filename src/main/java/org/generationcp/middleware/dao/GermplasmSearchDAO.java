@@ -1026,6 +1026,18 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             paramBuilder.setParameter("gid", gid);
         }
 
+        final Integer gidFrom = germplasmSearchRequest.getGidFrom();
+        if (gidFrom != null) {
+            paramBuilder.append(" and g.gid >= :gidFrom");
+            paramBuilder.setParameter("gidFrom", gidFrom);
+        }
+
+        final Integer gidTo = germplasmSearchRequest.getGidTo();
+        if (gidTo != null) {
+            paramBuilder.append(" and g.gid <= :gidTo");
+            paramBuilder.setParameter("gidTo", gidTo);
+        }
+
         final String germplasmUUID = germplasmSearchRequest.getGermplasmUUID();
         if (germplasmUUID != null) {
             paramBuilder.append(" and g.germplsm_uuid = :germplasmUUID");
