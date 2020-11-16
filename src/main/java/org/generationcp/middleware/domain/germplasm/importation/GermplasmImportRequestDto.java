@@ -1,4 +1,4 @@
-package org.generationcp.middleware.domain.germplasm;
+package org.generationcp.middleware.domain.germplasm.importation;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.pojomatic.Pojomatic;
