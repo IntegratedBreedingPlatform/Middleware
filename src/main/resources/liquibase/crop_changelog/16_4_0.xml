@@ -93,6 +93,9 @@
 
 			IF useUuid = 0	THEN
 
+			ALTER TABLE germplsm
+			ADD  INDEX germplsm_uuid_idx (germplsm_uuid ASC);
+
 			WHILE(hasNullUuidCount > 0) DO
 
 			UPDATE germplsm g
@@ -137,6 +140,9 @@
 			FROM germplsm where germplsm_uuid IS NULL;
 
 			END WHILE;
+
+			ALTER TABLE germplsm
+			DROP  INDEX germplsm_uuid_idx;
 
 			ELSE
 
