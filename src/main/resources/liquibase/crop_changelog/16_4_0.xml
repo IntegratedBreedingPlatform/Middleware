@@ -183,18 +183,16 @@
 
 	<changeSet author="mderamos" id="v16.4.0-7">
 		<preConditions onFail="MARK_RAN">
-			<not>
-				<sqlCheck expectedResult="0">
-					SELECT
-					COUNT(*)
-					FROM
-					INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-					WHERE
-					TABLE_NAME = 'germplsm'
-					AND CONSTRAINT_NAME = 'germplsm_uuid_UNIQUE'
-					AND TABLE_SCHEMA = DATABASE();
-				</sqlCheck>
-			</not>
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE
+				TABLE_NAME = 'germplsm'
+				AND CONSTRAINT_NAME = 'germplsm_uuid_UNIQUE'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
 		</preConditions>
 		<comment>Add unique constraint</comment>
 		<sql dbms="mysql" splitStatements="true">
