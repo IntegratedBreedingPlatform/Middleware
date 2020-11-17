@@ -12,7 +12,7 @@ import java.util.UUID;
 public class GermplasmGuidGenerator {
 
 	public static final String MID_STRING = "G";
-	public static final int SUFFIX_LENGTH = 15;
+	public static final int SUFFIX_LENGTH = 8;
 
 	public static void generateGermplasmGuids(final CropType crop, final List<Germplasm> germplasmList) {
 		Preconditions.checkNotNull(crop);
