@@ -116,11 +116,7 @@
 
 			IF duplicates > 0 THEN
 
-			UPDATE germplsm
-			SET germplsm_uuid = NULL
-			WHERE gid IN (
-			SELECT gid
-			FROM (
+			CREATE TEMPORARY TABLE duplicate_guuids
 			SELECT g1.gid
 			FROM germplsm g1
 			WHERE EXISTS
@@ -129,7 +125,14 @@
 			FROM germplsm g2
 			WHERE g1.germplsm_uuid = g2.germplsm_uuid
 			LIMIT 1, 1
-			) AND g1.germplsm_uuid IS NOT NULL) AS G);
+			) AND g1.germplsm_uuid IS NOT NULL;
+
+			UPDATE germplsm
+			SET germplsm_uuid = NULL
+			WHERE gid IN (
+			SELECT gid FROM duplicate_guuids);
+
+			DROP TABLE duplicate_guuids;
 
 			END IF;
 
