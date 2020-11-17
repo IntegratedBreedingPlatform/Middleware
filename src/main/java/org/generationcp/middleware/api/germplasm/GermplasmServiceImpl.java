@@ -52,9 +52,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final Integer userId, final String cropName,
-		final GermplasmImportRequestDto germplasmImportRequestDto) {
+		final List<GermplasmImportRequestDto> germplasmDtoList) {
 		final Map<Integer, GermplasmImportResponseDto> results = new HashMap<>();
-		final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtoList = germplasmImportRequestDto.getGermplasmList();
 		final Map<String, Method> methodsMapByAbbr = this.getBreedingMethodsMapByAbbr(germplasmDtoList);
 		final Map<String, Integer> locationsMapByAbbr = this.getLocationsMapByAbbr(germplasmDtoList);
 		final Map<String, Integer> attributesMapByName = this.getAttributesMapByName(germplasmDtoList);
@@ -62,7 +61,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
-		for (final GermplasmImportRequestDto.GermplasmDto germplasmDto : germplasmDtoList) {
+		for (final GermplasmImportRequestDto germplasmDto : germplasmDtoList) {
 			final Germplasm germplasm = new Germplasm();
 
 			final Method method = methodsMapByAbbr.get(germplasmDto.getBreedingMethodAbbr().toUpperCase());
@@ -82,12 +81,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasm.setLgid(0);
 			germplasm.setLocationId(locationsMapByAbbr.get(germplasmDto.getLocationAbbr().toUpperCase()));
 			germplasm.setDeleted(Boolean.FALSE);
-			germplasm.setGdate(Util.convertDateToIntegerValue(germplasmDto.getCreationDate()));
+			germplasm.setGdate(Integer.valueOf(germplasmDto.getCreationDate()));
 
-			if (StringUtils.isEmpty(germplasmDto.getGuid())) {
+			if (StringUtils.isEmpty(germplasmDto.getGermplasmUUID())) {
 				GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(germplasm));
 			} else {
-				germplasm.setGermplasmUUID(germplasmDto.getGuid());
+				germplasm.setGermplasmUUID(germplasmDto.getGermplasmUUID());
 			}
 
 			if (!StringUtils.isEmpty(germplasmDto.getReference())) {
@@ -126,19 +125,19 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return results;
 	}
 
-	private Map<String, Integer> getLocationsMapByAbbr(final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtos) {
+	private Map<String, Integer> getLocationsMapByAbbr(final List<GermplasmImportRequestDto> germplasmDtos) {
 		final Set<String> locationAbbreviations = germplasmDtos.stream().map(g -> g.getLocationAbbr()).collect(Collectors.toSet());
 		return this.daoFactory.getLocationDAO().getByAbbreviations(new ArrayList<>(locationAbbreviations)).stream()
 			.collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
 	}
 
-	private Map<String, Method> getBreedingMethodsMapByAbbr(final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtos) {
+	private Map<String, Method> getBreedingMethodsMapByAbbr(final List<GermplasmImportRequestDto> germplasmDtos) {
 		final Set<String> breedingMethods = germplasmDtos.stream().map(g -> g.getBreedingMethodAbbr()).collect(Collectors.toSet());
 		return this.daoFactory.getMethodDAO().getByCode(new ArrayList<>(breedingMethods)).stream()
 			.collect(Collectors.toMap(Method::getMcode, method -> method));
 	}
 
-	private Map<String, Integer> getNameTypesMapByName(final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtos) {
+	private Map<String, Integer> getNameTypesMapByName(final List<GermplasmImportRequestDto> germplasmDtos) {
 		final Set<String> nameTypes = new HashSet<>();
 		germplasmDtos.forEach(g -> nameTypes.addAll(g.getNames().keySet()));
 		final List<UserDefinedField> nameTypesUdfldList = this.daoFactory.getUserDefinedFieldDAO()
@@ -146,7 +145,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return nameTypesUdfldList.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
 	}
 
-	private Map<String, Integer> getAttributesMapByName(final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtos) {
+	private Map<String, Integer> getAttributesMapByName(final List<GermplasmImportRequestDto> germplasmDtos) {
 		final Set<String> attributes = new HashSet<>();
 		germplasmDtos.forEach(g -> {
 			if (g.getAttributes() != null && !g.getAttributes().isEmpty()) {
