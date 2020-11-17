@@ -1151,16 +1151,16 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             paramBuilder.setParameter("breedingMethodName", '%' + breedingMethodName + '%');
         }
 
-        final Date harvestDateFrom = germplasmSearchRequest.getHarvestDateFrom();
-        if (harvestDateFrom != null) {
-            paramBuilder.append(" and g.gdate >= :harvestDateFrom ");
-            paramBuilder.setParameter("harvestDateFrom", DATE_FORMAT.format(harvestDateFrom));
+        final Date germplasmDateFrom = germplasmSearchRequest.getGermplasmDateFrom();
+        if (germplasmDateFrom != null) {
+            paramBuilder.append(" and g.gdate >= :germplasmDateFrom ");
+            paramBuilder.setParameter("germplasmDateFrom", DATE_FORMAT.format(germplasmDateFrom));
         }
 
-        final Date harvestDateTo = germplasmSearchRequest.getHarvestDateTo();
-        if (harvestDateTo != null) {
-            paramBuilder.append(" and g.gdate <= :harvestDateTo ");
-            paramBuilder.setParameter("harvestDateTo", DATE_FORMAT.format(harvestDateTo));
+        final Date germplasmDateTo = germplasmSearchRequest.getGermplasmDateTo();
+        if (germplasmDateTo != null) {
+            paramBuilder.append(" and g.gdate <= :germplasmDateTo ");
+            paramBuilder.setParameter("germplasmDateTo", DATE_FORMAT.format(germplasmDateTo));
         }
 
         final Boolean withRawObservationsOnly = germplasmSearchRequest.getWithRawObservationsOnly();

@@ -63,9 +63,9 @@ public class GermplasmSearchRequest {
 	private List<Integer> harvestingStudyIds;
 	private String breedingMethodName;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date harvestDateFrom;
+	private Date germplasmDateFrom;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date harvestDateTo;
+	private Date germplasmDateTo;
 	private SqlTextFilter femaleParentName;
 	private SqlTextFilter maleParentName;
 	private SqlTextFilter groupSourceName;
@@ -223,20 +223,20 @@ public class GermplasmSearchRequest {
 		this.harvestingStudyIds = harvestingStudyIds;
 	}
 
-	public Date getHarvestDateFrom() {
-		return this.harvestDateFrom;
+	public Date getGermplasmDateFrom() {
+		return this.germplasmDateFrom;
 	}
 
-	public void setHarvestDateFrom(final Date harvestDateFrom) {
-		this.harvestDateFrom = harvestDateFrom;
+	public void setGermplasmDateFrom(final Date germplasmDateFrom) {
+		this.germplasmDateFrom = germplasmDateFrom;
 	}
 
-	public Date getHarvestDateTo() {
-		return this.harvestDateTo;
+	public Date getGermplasmDateTo() {
+		return this.germplasmDateTo;
 	}
 
-	public void setHarvestDateTo(final Date harvestDateTo) {
-		this.harvestDateTo = harvestDateTo;
+	public void setGermplasmDateTo(final Date germplasmDateTo) {
+		this.germplasmDateTo = germplasmDateTo;
 	}
 
 	public SqlTextFilter getFemaleParentName() {
