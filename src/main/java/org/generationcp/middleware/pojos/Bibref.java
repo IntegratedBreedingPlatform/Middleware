@@ -11,11 +11,13 @@
 
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,9 +29,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import java.io.Serializable;
 
 /**
  * POJO for bibrefs table.
@@ -54,8 +54,8 @@ public class Bibref implements Serializable {
 	@XmlElement(name = "bibrefId")
 	private Integer refid;
 
-	@ManyToOne(targetEntity = UserDefinedField.class)
-	@JoinColumn(name = "pubtype", nullable = false)
+	@ManyToOne(targetEntity = UserDefinedField.class, optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "pubtype", nullable = true)
 	@NotFound(action = NotFoundAction.IGNORE)
 	private UserDefinedField type;
 

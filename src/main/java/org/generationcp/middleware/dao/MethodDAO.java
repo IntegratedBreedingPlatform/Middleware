@@ -11,10 +11,6 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
@@ -31,6 +27,10 @@ import org.hibernate.criterion.SimpleExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * DAO class for {@link Method}.
@@ -333,15 +333,16 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		return new Method();
 	}
 
-	public Method getByCode(String code) throws MiddlewareQueryException {
+	public List<Method> getByCode(List<String> codes) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.eq("mcode", code));
-			return (Method) criteria.uniqueResult();
+			criteria.add(Restrictions.in("mcode", codes));
+			return criteria.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException(this.getLogExceptionMessage("getMethodsByCode", "code", code, e.getMessage(), "Method"), e);
+			this.logAndThrowException(this.getLogExceptionMessage("getMethodsByCode", "codes", codes.toString(), e.getMessage(), "Method"),
+				e);
 		}
-		return new Method();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -559,7 +560,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		}
 	}
 
-	public List<Method> filterMethods(final String programUUID, final List<Integer> methodIds) {
+	public List<Method> filterMethods(final String programUUID, final Set<String> abbreviations, final List<Integer> methodIds) {
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Method.class);
@@ -572,6 +573,11 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			if (!CollectionUtils.isEmpty(methodIds)) {
 				criteria.add(Restrictions.in("mid", methodIds));
 			}
+
+			if (!CollectionUtils.isEmpty(abbreviations)) {
+				criteria.add(Restrictions.in("mcode", abbreviations));
+			}
+
 
 			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();

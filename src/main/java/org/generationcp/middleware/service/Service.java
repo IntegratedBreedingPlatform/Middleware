@@ -55,8 +55,6 @@ import org.slf4j.Logger;
 
 public abstract class Service extends DatabaseBroker {
 
-	private LocationDataManager locationDataManager = new LocationDataManagerImpl(this.sessionProvider);
-
 	public Service() {
 	}
 
@@ -161,12 +159,9 @@ public abstract class Service extends DatabaseBroker {
 		return new StudyDestroyer(this.sessionProvider);
 	}
 
-	protected void setLocationDataManager(LocationDataManager locationDataManager) {
-		this.locationDataManager = locationDataManager;
-	}
 
 	protected LocationDataManager getLocationDataManager() {
-		return locationDataManager;
+		return new LocationDataManagerImpl(this.sessionProvider);
 	}
 
 	protected final SampleListService getSampleListService() {

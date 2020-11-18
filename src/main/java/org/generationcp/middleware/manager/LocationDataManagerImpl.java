@@ -10,7 +10,9 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -26,7 +28,6 @@ import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -201,7 +203,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final String fieldType) {
-		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, fieldType);
+		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, ImmutableSet.of(fieldType));
 	}
 
 	@Override
@@ -391,11 +393,13 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		}
 
 		for (final Location location : locations) {
-			final Location tempParent = namesMap.get(location.getParentLocationId());
-			location.setParentLocationName(tempParent.getLname());
-			location.setParentLocationAbbr(tempParent.getLabbr());
-		}
+			final Optional<Location> tempParent = Optional.ofNullable(namesMap.get(location.getParentLocationId()));
+			if (tempParent.isPresent()) {
+				location.setParentLocationName(tempParent.get().getLname());
+				location.setParentLocationAbbr(tempParent.get().getLabbr());
+			}
 
+		}
 		return locations;
 	}
 

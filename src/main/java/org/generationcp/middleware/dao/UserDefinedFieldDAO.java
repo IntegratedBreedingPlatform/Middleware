@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -37,12 +38,12 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(UserDefinedFieldDAO.class);
 
 	@SuppressWarnings("unchecked")
-	public List<UserDefinedField> getByFieldTableNameAndType(final String tableName, final String fieldType) {
+	public List<UserDefinedField> getByFieldTableNameAndType(final String tableName, final Set<String> fieldType) {
 		try {
 			if (tableName != null && fieldType != null) {
 				final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 				criteria.add(Restrictions.eq("ftable", tableName));
-				criteria.add(Restrictions.eq("ftype", fieldType));
+				criteria.add(Restrictions.in("ftype", fieldType));
 				criteria.addOrder(Order.asc("fname"));
 				return criteria.list();
 			}
@@ -70,37 +71,20 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		return new ArrayList<>();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<UserDefinedField> getByTableNameAndNameLike(final String tableName, final String nameLike) {
-		try {
-			if (tableName != null && nameLike != null) {
-				final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
-				criteria.add(Restrictions.eq("ftable", tableName));
-				criteria.add(Restrictions.like("fname", nameLike));
-				criteria.addOrder(Order.asc("fname"));
-				return criteria.list();
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getByTableNameAndNameLike(name=" + tableName + " nameLike= " + nameLike
-					+ " ) query from UserDefinedField: " + e.getMessage(), e);
-		}
-		return new ArrayList<>();
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<UserDefinedField> getByCodes(final String table, final Set<String> type, final Set<String> codes) {
+	public List<UserDefinedField> getByCodes(final String table, final Set<String> types, final Set<String> codes) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 			criteria.add(Restrictions.eq("ftable", table));
-			criteria.add(Restrictions.in("ftype", type));
+			criteria.add(Restrictions.in("ftype", types));
 
 			if (!CollectionUtils.isEmpty(codes)) {
 				criteria.add(Restrictions.in("fcode", codes));
 			}
+			criteria.addOrder(Order.asc("fname"));
 			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error with getByCodes(name=" + table + " type= " + type + " ) query from UserDefinedField: " + e.getMessage(), e);
+				"Error with getByCodes(name=" + table + " types= " + types + " ) query from UserDefinedField: " + e.getMessage(), e);
 		}
 	}
 
