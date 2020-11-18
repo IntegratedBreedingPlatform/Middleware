@@ -513,4 +513,11 @@ public class Util {
 		return Optional.absent();
 	}
 
+	public static int getIntValue(final Integer value) {
+		if (value == null) {
+			return 0;
+		}
+		return value;
+	}
+
 }
