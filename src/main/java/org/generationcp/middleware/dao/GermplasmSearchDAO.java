@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
@@ -1306,6 +1307,35 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
             for (final Map.Entry<String, String> entry : attributes.entrySet()) {
                 sqlQuery.setParameter("attributeKey" + entry.getKey(), entry.getKey());
                 sqlQuery.setParameter("attributeValue" + entry.getKey(), '%' + entry.getValue() + '%');
+            }
+
+            final List<Integer> gids = sqlQuery.list();
+            if (gids == null || gids.isEmpty()) {
+                return true;
+            }
+            prefilteredGids.addAll(gids);
+        }
+
+        final Map<String, String> nameTypes = germplasmSearchRequest.getNameTypes();
+        if (!CollectionUtils.isEmpty(nameTypes)) {
+            final StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append(" select distinct g.gid from germplsm g where  ");
+            final Iterator<Map.Entry<String, String>> iterator = nameTypes.entrySet().iterator();
+            while (iterator.hasNext()) {
+                final Map.Entry<String, String> entry = iterator.next();
+                queryBuilder.append(String.format("EXISTS (select 1 from names n \n"
+                        + " inner join udflds u on n.ntype = u.fldno \n"
+                        + " where n.gid = g.gid and u.fcode = :nameTypeKey%s and n.nval like :nameValue%<s )", entry.getKey()));
+                if (iterator.hasNext()) {
+                    queryBuilder.append(" and ");
+                }
+            }
+            queryBuilder.append(LIMIT_CLAUSE);
+
+            final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+            for (final Map.Entry<String, String> entry : nameTypes.entrySet()) {
+                sqlQuery.setParameter("nameTypeKey" + entry.getKey(), entry.getKey());
+                sqlQuery.setParameter("nameValue" + entry.getKey(), '%' + entry.getValue() + '%');
             }
 
             final List<Integer> gids = sqlQuery.list();

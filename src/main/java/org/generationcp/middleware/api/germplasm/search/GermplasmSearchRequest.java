@@ -16,7 +16,7 @@ public class GermplasmSearchRequest {
 
 	public static class IncludePedigree {
 
-		public static enum Type {
+		public enum Type {
 			GENERATIVE, DERIVATIVE, BOTH
 		}
 
@@ -76,6 +76,7 @@ public class GermplasmSearchRequest {
 	private Boolean withSampleOnly;
 	private Boolean inProgramListOnly;
 	private Map<String, String> attributes;
+	private Map<String, String> nameTypes;
 
 	// Include associated gids
 
@@ -317,6 +318,14 @@ public class GermplasmSearchRequest {
 
 	public void setAttributes(final Map<String, String> attributes) {
 		this.attributes = attributes;
+	}
+
+	public Map<String, String> getNameTypes() {
+		return nameTypes;
+	}
+
+	public void setNameTypes(final Map<String, String> nameTypes) {
+		this.nameTypes = nameTypes;
 	}
 
 	public IncludePedigree getIncludePedigree() {
