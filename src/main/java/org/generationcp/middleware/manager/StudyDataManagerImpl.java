@@ -85,11 +85,13 @@ import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -930,6 +932,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			for (final FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
 				if (trial.getBlockId() != null) {
 					trial.updateBlockInformation(this.locationDataManager.getBlockInformation(trial.getBlockId()));
+				} else {
+					final List<FieldMapLabel> rowsInBlock = trial.getFieldMapLabels().stream().sorted(Comparator.comparingInt(FieldMapLabel::getColumn).reversed()).collect(
+						Collectors.toList());
+					final List<FieldMapLabel> range = trial.getFieldMapLabels().stream().sorted(Comparator.comparingInt(FieldMapLabel::getRange).reversed()).collect(
+						Collectors.toList());
+					trial.setRowsInBlock(rowsInBlock.get(0).getColumn());
+					trial.setRangesInBlock(range.get(0).getRange());
+					trial.setRowsPerPlot(1); //Default
+					trial.setMachineRowCapacity(1); //Default
+					trial.setPlantingOrder(1); // Default
+
 				}
 				if (isGetLocation) {
 					trial.setLocationName(this.getLocationName(locationMap, trial.getLocationId()));

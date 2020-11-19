@@ -161,7 +161,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 		try {
 			final String order = instanceId > 0 ? "ASC" : "DESC";
-			StringBuilder blkSql = new StringBuilder();
+			final StringBuilder blkSql = new StringBuilder();
 			if (blockId != null) {
 				blkSql.append(" AND blk.value = :blockId ");
 			} else {
@@ -221,10 +221,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 			if (blockId != null) {
 				query.setParameter("blockId", blockId);
-			} else {
-				query.setParameter("datasetId", datasetId);
-				query.setParameter("instanceId", instanceId);
 			}
+			query.setParameter("datasetId", datasetId);
+			query.setParameter("instanceId", instanceId);
+
 
 			final List<Object[]> list = query.list();
 
