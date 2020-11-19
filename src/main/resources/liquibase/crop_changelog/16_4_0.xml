@@ -6,20 +6,19 @@
 
 	<changeSet author="mderamos" id="v16.4.0-1">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">
-				SELECT
-				COUNT(*)
-				FROM
-				germplsm
-				WHERE
-				germplsm_uuid IS NULL;
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 0
+				FROM germplsm
+				WHERE germplsm_uuid IS NOT NULL;
 			</sqlCheck>
 		</preConditions>
 		<comment>
 			Set germplsm_uuid values to NULL
+			(This is for the case when a previous 16.1 changeset was deployed to test/dev environments.
+			This should not run for production deployments.)
 		</comment>
 		<sql dbms="mysql" splitStatements="false">
-			UPDATE germplsm SET germplsm_uuid = NULL;
+			UPDATE germplsm SET germplsm_uuid = NULL WHERE germplsm_uuid IS NOT NULL;
 		</sql>
 	</changeSet>
 
