@@ -47,7 +47,7 @@ public class GermplasmSearchRequest {
 	 */
 	private SqlTextFilter nameFilter;
 	private String germplasmUUID;
-	private Integer gid;
+	private List<Integer> gids;
 	private Integer groupId;
 	private String sampleUID;
 	private List<Integer> germplasmListIds;
@@ -109,12 +109,12 @@ public class GermplasmSearchRequest {
 		this.germplasmUUID = germplasmUUID;
 	}
 
-	public Integer getGid() {
-		return this.gid;
+	public List<Integer> getGids() {
+		return this.gids;
 	}
 
-	public void setGid(final Integer gid) {
-		this.gid = gid;
+	public void setGids(final List<Integer> gids) {
+		this.gids = gids;
 	}
 
 	public Integer getGroupId() {

@@ -7,6 +7,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface GermplasmService {
 
@@ -15,6 +16,6 @@ public interface GermplasmService {
 	Map<Integer, GermplasmImportResponseDto> importGermplasm(Integer userId, String cropName,
 		List<GermplasmImportRequestDto> germplasmImportRequestDto);
 
-	void importGermplasmUpdates(List<GermplasmUpdateDTO> germplasmUpdateDTOList);
+	Set<Integer> importGermplasmUpdates(List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
 }

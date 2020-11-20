@@ -44,6 +44,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -1319,7 +1320,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private GermplasmSearchRequest createSearchRequest(final Integer germplasmGID) {
 
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
-		request.setGid(germplasmGID);
+		request.setGids(Arrays.asList(germplasmGID));
 		return request;
 	}
 

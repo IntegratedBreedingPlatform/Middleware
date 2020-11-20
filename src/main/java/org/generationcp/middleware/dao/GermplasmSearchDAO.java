@@ -1020,10 +1020,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 + "OR allNames.nval " + operator + " :qNoSpaces) \n ");
         }
 
-        final Integer gid = germplasmSearchRequest.getGid();
-        if (gid != null) {
-            paramBuilder.append(" and g.gid = :gid");
-            paramBuilder.setParameter("gid", gid);
+        final List<Integer> gids = germplasmSearchRequest.getGids();
+        if (gids != null && !gids.isEmpty()) {
+            paramBuilder.append(" and g.gid in (:gids)");
+            paramBuilder.setParameterList("gids", gids);
         }
 
         final String germplasmUUID = germplasmSearchRequest.getGermplasmUUID();

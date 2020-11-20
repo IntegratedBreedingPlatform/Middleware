@@ -134,7 +134,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public void importGermplasmUpdates(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public Set<Integer> importGermplasmUpdates(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 
@@ -201,10 +201,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 				germplasmUpdateDTOMap,
 				locationAbbreviationIdMap, codeBreedingMethodDTOMap, namesMap, attributesMap, germplasm, conflictErrors);
 		}
-
+		
 		if (!conflictErrors.isEmpty()) {
 			throw new MiddlewareRequestException(null, conflictErrors);
 		}
+		return germplasmList.stream().map(g -> g.getGid()).collect(Collectors.toSet());
 
 	}
 
