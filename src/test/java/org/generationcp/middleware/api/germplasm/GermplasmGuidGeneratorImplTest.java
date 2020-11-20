@@ -26,7 +26,7 @@ public class GermplasmGuidGeneratorImplTest {
 		cropType.setPlotCodePrefix("AXDG");
 		GermplasmGuidGenerator.generateGermplasmGuids(cropType, Arrays.asList(germplasm));
 		Assert.assertTrue(germplasm.getGermplasmUUID().startsWith(cropType.getPlotCodePrefix() + "G"));
-		Assert.assertEquals(20, germplasm.getGermplasmUUID().length());
+		Assert.assertEquals(13, germplasm.getGermplasmUUID().length());
 	}
 
 	private Germplasm createGermplasm() {
