@@ -76,6 +76,7 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
+import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -932,13 +933,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			for (final FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
 				if (trial.getBlockId() != null) {
 					trial.updateBlockInformation(this.locationDataManager.getBlockInformation(trial.getBlockId()));
-				} else {
+				} else if (!Util.isEmpty(trial.getFieldMapLabels())){
+					// If fieldMapLabels is not empty but no blockId, set rowsInBlock
+					// and rangeInBlock value based fieldMapLabels
 					final List<FieldMapLabel> rowsInBlock = trial.getFieldMapLabels().stream().sorted(Comparator.comparingInt(FieldMapLabel::getColumn).reversed()).collect(
 						Collectors.toList());
 					final List<FieldMapLabel> range = trial.getFieldMapLabels().stream().sorted(Comparator.comparingInt(FieldMapLabel::getRange).reversed()).collect(
 						Collectors.toList());
 					trial.setRowsInBlock(rowsInBlock.get(0).getColumn());
 					trial.setRangesInBlock(range.get(0).getRange());
+
+					// To properly display plot layout, set default values
 					trial.setRowsPerPlot(1); //Default
 					trial.setMachineRowCapacity(1); //Default
 					trial.setPlantingOrder(1); // Default

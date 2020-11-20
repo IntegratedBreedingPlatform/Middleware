@@ -161,16 +161,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 		try {
 			final String order = instanceId > 0 ? "ASC" : "DESC";
-			final StringBuilder blkSql = new StringBuilder();
-			if (blockId != null) {
-				blkSql.append(" AND blk.value = :blockId ");
-			} else {
-				blkSql.append(" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval ")
-					.append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
-					.append(" AND bexp.nd_geolocation_id = :instanceId ")
-					.append(" AND bexp.project_id = :datasetId ").append(" WHERE bval.type_id = ").append(TermId.BLOCK_ID.getId())
-					.append(")");
-			}
 			final StringBuilder sql =
 					new StringBuilder().append(" SELECT ").append(" p.project_id AS datasetId ").append(" , p.name AS datasetName ")
 							.append(" , st.name AS studyName ").append(" , e.nd_geolocation_id AS instanceId ")
@@ -183,9 +173,19 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" , st.start_date as startDate ").append(" , gpSeason.value as season ")
 							.append(" , epropBlock.value AS blockNo ")
 							.append(" , e.obs_unit_id as obsUnitId ")
-							.append(" FROM ").append("  nd_geolocationprop blk ")
-							.append("  RIGHT JOIN nd_experiment e ON  blk.nd_geolocation_id = e.nd_geolocation_id AND blk.type_id = ").append(TermId.BLOCK_ID.getId()).append(blkSql.toString())
-							.append("  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id ")
+							.append(" FROM ").append("  nd_geolocationprop blk ");
+			if (blockId != null){
+					sql.append("  INNER JOIN nd_experiment e ON e.nd_geolocation_id = blk.nd_geolocation_id ");
+
+			} else {
+					sql.append("  RIGHT JOIN nd_experiment e ON  blk.nd_geolocation_id = e.nd_geolocation_id AND blk.type_id = ").append(TermId.BLOCK_ID.getId())
+						.append("  AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval ")
+						.append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
+						.append(" AND bexp.nd_geolocation_id = :instanceId ")
+						.append(" AND bexp.project_id = :datasetId ").append(" WHERE bval.type_id = ").append(TermId.BLOCK_ID.getId())
+						.append(")");
+			}
+				sql.append("  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id ")
 							.append("  INNER JOIN project p ON p.project_id = e.project_id ")
 							.append("  INNER JOIN project st ON st.project_id = p.study_id ")
 							.append("  INNER JOIN stock s ON e.stock_id = s.stock_id ")
@@ -205,10 +205,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("  LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = e.nd_experiment_id ")
 							.append("    AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 							.append("  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
-							.append("     AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
-							.append(" WHERE e.project_id = :datasetId ").append(" AND e.nd_geolocation_id = :instanceId");
-
-
+							.append("     AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" "); // -- 8371 (2452)
+			if(blockId != null) {
+				sql.append(" WHERE blk.type_id = ").append(TermId.BLOCK_ID.getId())
+					.append(" AND blk.value = :blockId ");
+			} else {
+				sql.append(" WHERE e.project_id = :datasetId ").append(" AND e.nd_geolocation_id = :instanceId ");
+			}
 			sql.append(" ORDER BY e.nd_experiment_id ").append(order);
 
 			final SQLQuery query =
@@ -221,10 +224,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 			if (blockId != null) {
 				query.setParameter("blockId", blockId);
+			} else {
+				query.setParameter("datasetId", datasetId);
+				query.setParameter("instanceId", instanceId);
 			}
-			query.setParameter("datasetId", datasetId);
-			query.setParameter("instanceId", instanceId);
-
 
 			final List<Object[]> list = query.list();
 
