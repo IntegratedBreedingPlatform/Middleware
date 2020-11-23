@@ -201,7 +201,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				germplasmUpdateDTOMap,
 				locationAbbreviationIdMap, codeBreedingMethodDTOMap, namesMap, attributesMap, germplasm, conflictErrors);
 		}
-		
+
 		if (!conflictErrors.isEmpty()) {
 			throw new MiddlewareRequestException(null, conflictErrors);
 		}
@@ -220,12 +220,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final Optional<Method> breedingMethodDtoOptional =
 				Optional.ofNullable(codeBreedingMethodDTOMap.getOrDefault(germplasmUpdateDTO.getBreedingMethodAbbr(), null));
 			final Optional<Integer> locationIdOptional =
-				Optional.ofNullable(locationAbbreviationIdMap.getOrDefault(germplasmUpdateDTO.getLocationAbbreviation(), null));
+				Optional.ofNullable(locationAbbreviationIdMap.getOrDefault(
+					StringUtils.isNotEmpty(germplasmUpdateDTO.getLocationAbbreviation()) ?
+						germplasmUpdateDTO.getLocationAbbreviation().toUpperCase() : StringUtils.EMPTY, null));
 			final Optional<Integer> germplasmDateOptional =
-				liquibase.util.StringUtils.isEmpty(germplasmUpdateDTO.getCreationDate()) ? Optional.empty() :
+				StringUtils.isEmpty(germplasmUpdateDTO.getCreationDate()) ? Optional.empty() :
 					Optional.ofNullable(Integer.parseInt(germplasmUpdateDTO.getCreationDate()));
 			final Optional<String> referenceOptional =
-				liquibase.util.StringUtils.isEmpty(germplasmUpdateDTO.getReference()) ? Optional.empty() :
+				StringUtils.isEmpty(germplasmUpdateDTO.getReference()) ? Optional.empty() :
 					Optional.ofNullable(germplasmUpdateDTO.getReference());
 
 			this.updateGermplasm(germplasm, locationIdOptional, breedingMethodDtoOptional, germplasmDateOptional,
@@ -260,7 +262,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private void updatePreferredName(final Map<String, Integer> nameCodes, final Map<Integer, List<Name>> namesMap,
 		final Germplasm germplasm, final GermplasmUpdateDTO germplasmUpdateDTO, final Multimap<String, Object[]> conflictErrors) {
 		// Update preferred name
-		final Integer preferredNameTypeId = nameCodes.get(germplasmUpdateDTO.getPreferredName());
+		final Integer preferredNameTypeId = nameCodes.get(
+			StringUtils.isNotEmpty(germplasmUpdateDTO.getPreferredName()) ? germplasmUpdateDTO.getPreferredName().toUpperCase() :
+				StringUtils.EMPTY);
 		final List<Name> names = namesMap.get(germplasm.getGid());
 		final List<Name> preferredNames =
 			names.stream().filter(n -> n.getTypeId().equals(preferredNameTypeId)).collect(Collectors.toList());
