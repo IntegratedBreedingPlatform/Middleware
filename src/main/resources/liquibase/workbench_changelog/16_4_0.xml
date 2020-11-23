@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="aldrin" id="v16.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission WHERE name = 'IMPORT_GERMPLASM_UPDATES'
+            </sqlCheck>
+        </preConditions>
+		<comment>
+			Add Import Germplasm Updates permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+		SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM');
+
+		INSERT INTO permission (`name`, `description`, `parent_id`, `workbench_sidebar_category_link_id`)
+		VALUES ('IMPORT_GERMPLASM_UPDATES', 'Import Germplasm Updates', @permission_id , null);
+
+		SET @import_germplasm_updates_id = (SELECT permission_id FROM permission where name = 'IMPORT_GERMPLASM_UPDATES');
+
+		INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @import_germplasm_updates_id, '1');
+        INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @import_germplasm_updates_id, '1');
+        INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @import_germplasm_updates_id, '1');
+
+		</sql>
+	</changeSet>
+
+
+</databaseChangeLog>
