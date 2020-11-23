@@ -119,6 +119,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Resource
 	private StockBuilder stockBuilder;
 
+	@Resource
+	private LocationDataManager locationDataManager;
+
 	private GermplasmGuidGenerator germplasmGuidGenerator = new GermplasmGuidGenerator();
 
 	private DaoFactory daoFactory;
@@ -148,26 +151,26 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Location> getLocationsByProgramUUID(final String programUUID) {
-		return this.getLocationDataManager().getLocationsByUniqueID(programUUID);
+		return this.locationDataManager.getLocationsByUniqueID(programUUID);
 	}
 
 	@Override
 	public List<Location> getAllBreedingLocations() {
-		return this.getLocationDataManager().getAllBreedingLocations();
+		return this.locationDataManager.getAllBreedingLocations();
 	}
 
 	@Override
 	public List<Location> getAllBreedingLocationsByProgramUUID(final String programUUID) {
 
-		return this.getLocationDataManager().getAllBreedingLocationsByUniqueID(programUUID);
+		return this.locationDataManager.getAllBreedingLocationsByUniqueID(programUUID);
 
 	}
 
 	@Override
 	public List<Location> getAllSeedLocations() {
 		final Integer seedLType =
-				this.getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.getCode());
-		return this.getLocationDataManager().getLocationsByType(seedLType);
+				this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.getCode());
+		return this.locationDataManager.getLocationsByType(seedLType);
 	}
 
 	@Override
@@ -188,16 +191,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		if (isBreedingLocation) {
-			return this.getLocationDataManager().getAllBreedingLocations(locationIds);
+			return this.locationDataManager.getAllBreedingLocations(locationIds);
 		}
 
-		return this.getLocationDataManager().getAllSeedingLocations(locationIds);
+		return this.locationDataManager.getAllSeedingLocations(locationIds);
 
 	}
 
 	@Override
 	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds) {
-		return this.getLocationDataManager().getLocationsByIDs(locationIds);
+		return this.locationDataManager.getLocationsByIDs(locationIds);
 	}
 
 	@Override
@@ -620,22 +623,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Location> getAllFieldLocations(final int locationId) {
-		return this.getLocationDataManager().getAllFieldLocations(locationId);
+		return this.locationDataManager.getAllFieldLocations(locationId);
 	}
 
 	@Override
 	public List<Location> getAllBlockLocations(final int fieldId) {
-		return this.getLocationDataManager().getAllBlockLocations(fieldId);
+		return this.locationDataManager.getAllBlockLocations(fieldId);
 	}
 
 	@Override
 	public FieldmapBlockInfo getBlockInformation(final int blockId) {
-		return this.getLocationDataManager().getBlockInformation(blockId);
+		return this.locationDataManager.getBlockInformation(blockId);
 	}
 
 	@Override
 	public List<Location> getAllFields() {
-		return this.getLocationDataManager().getAllFields();
+		return this.locationDataManager.getAllFields();
 	}
 
 	@Override
@@ -651,16 +654,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	public int addLocation(final String locationName, final Integer parentId, final Integer currentUserId, final String locCode,
 			final String parentCode) {
-		final LocationDataManager manager = this.getLocationDataManager();
 
-		final Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locCode);
+		final Integer lType = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locCode);
 		final Location location = new Location(null, lType, 0, locationName, null, 0, 0, 0, 0, 0);
 
-		final Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, parentCode);
+		final Integer dType = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, parentCode);
 		final Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentId), 0, 0);
 
 		location.setLdefault(false);
-		return manager.addLocationAndLocdes(location, locdes);
+		return this.locationDataManager.addLocationAndLocdes(location, locdes);
 	}
 
 	@Override
@@ -703,12 +705,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Location getLocationById(final int id) {
-		return this.getLocationDataManager().getLocationByID(id);
+		return this.locationDataManager.getLocationByID(id);
 	}
 
 	@Override
 	public Location getLocationByName(final String locationName, final Operation op) {
-		final List<Location> locations = this.getLocationDataManager().getLocationsByName(locationName, 0, 1, op);
+		final List<Location> locations = this.locationDataManager.getLocationsByName(locationName, 0, 1, op);
 		if (locations != null && !locations.isEmpty()) {
 			return locations.get(0);
 		}
@@ -1026,6 +1028,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
 		this.germplasmListManager = germplasmListManager;
+	}
+
+	protected void setLocationDataManager(LocationDataManager locationDataManager) {
+		this.locationDataManager = locationDataManager;
 	}
 
 	@Override
