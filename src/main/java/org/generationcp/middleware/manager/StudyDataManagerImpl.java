@@ -934,20 +934,26 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				if (trial.getBlockId() != null) {
 					trial.updateBlockInformation(this.locationDataManager.getBlockInformation(trial.getBlockId()));
 				} else if (!Util.isEmpty(trial.getFieldMapLabels())){
-					// If fieldMapLabels is not empty but no blockId, set rowsInBlock
-					// and rangeInBlock value based fieldMapLabels
-					final List<FieldMapLabel> rowsInBlock = trial.getFieldMapLabels().stream().sorted(Comparator.comparingInt(FieldMapLabel::getColumn).reversed()).collect(
+					// Row and Column should not be empty
+					final List<FieldMapLabel> rows = trial.getFieldMapLabels().stream().filter(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getColumn()) > 0).collect(
 						Collectors.toList());
-					final List<FieldMapLabel> range = trial.getFieldMapLabels().stream().sorted(Comparator.comparingInt(FieldMapLabel::getRange).reversed()).collect(
+					final List<FieldMapLabel> ranges = trial.getFieldMapLabels().stream().filter(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getRange()) > 0).collect(
 						Collectors.toList());
-					trial.setRowsInBlock(rowsInBlock.get(0).getColumn());
-					trial.setRangesInBlock(range.get(0).getRange());
+					if (!Util.isEmpty(rows) && !Util.isEmpty(ranges)) {
+						// If fieldMapLabels is not empty but no blockId, set rowsInBlock
+						// and rangeInBlock value based fieldMapLabels
+						final List<FieldMapLabel> rowsInBlock = rows.stream().sorted(Comparator.comparingInt(FieldMapLabel::getColumn).reversed()).collect(
+							Collectors.toList());
+						final List<FieldMapLabel> range = ranges.stream().sorted(Comparator.comparingInt(FieldMapLabel::getRange).reversed()).collect(
+							Collectors.toList());
+						trial.setRowsInBlock(rowsInBlock.get(0).getColumn());
+						trial.setRangesInBlock(range.get(0).getRange());
 
-					// To properly display plot layout, set default values
-					trial.setRowsPerPlot(1); //Default
-					trial.setMachineRowCapacity(1); //Default
-					trial.setPlantingOrder(1); // Default
-
+						// To properly display plot layout, set default values
+						trial.setRowsPerPlot(1); //Default
+						trial.setMachineRowCapacity(1); //Default
+						trial.setPlantingOrder(1); // Default
+					}
 				}
 				if (isGetLocation) {
 					trial.setLocationName(this.getLocationName(locationMap, trial.getLocationId()));
