@@ -103,6 +103,10 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	/** The deleted plot coordintes in (row, range) format */
 	private List<String> deletedPlots;
 
+	private boolean inValidValue;
+
+	private boolean overlappingCoordinates;
+
 	/**
 	 * Instantiates a new field map trial instance info.
 	 */
@@ -400,7 +404,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -652,5 +656,22 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 
 	public void setLabelsNeeded(Integer labelsNeeded) {
 		this.labelsNeeded = labelsNeeded;
+	}
+
+
+	public boolean isInValidValue() {
+		return this.inValidValue;
+	}
+
+	public void setInValidValue(final boolean inValidValue) {
+		this.inValidValue = inValidValue;
+	}
+
+	public boolean isOverlappingCoordinates() {
+		return this.overlappingCoordinates;
+	}
+
+	public void setOverlappingCoordinates(final boolean overlappingCoordinates) {
+		this.overlappingCoordinates = overlappingCoordinates;
 	}
 }
