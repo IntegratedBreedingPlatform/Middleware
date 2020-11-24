@@ -28,7 +28,7 @@
 
 			#Insert GERMPLASM_LISTS permission
 			INSERT INTO permission (name, description, parent_id, workbench_sidebar_category_link_id)
-			VALUES ('GERMPLASM_LISTS', 'Germplasm Lists', @lists_permission_id, @germplasm_search_sidebar_link_id);
+			VALUES ('GERMPLASM_LISTS', 'Germplasm Lists', @lists_permission_id, @manage_germplasm_sidebar_link_id);
 
 			SET @germplasm_lists_permission_id = (SELECT permission_id FROM permission where name = 'GERMPLASM_LISTS');
 
