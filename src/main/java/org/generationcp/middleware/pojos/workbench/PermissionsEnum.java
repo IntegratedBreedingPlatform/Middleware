@@ -57,8 +57,9 @@ public enum PermissionsEnum {
 		+ ", 'MS_CREATE_LOTS')";
 
 	public static final String HAS_CREATE_LOTS_BATCH = " or hasAnyAuthority('ADMIN'"
+		+ ", 'LISTS'"
+		+ ", 'GERMPLASM_LISTS'"
 		+ ", 'STUDIES'"
-		+ ", 'MANAGE_GERMPLASM'"
 		+ ", 'MG_MANAGE_INVENTORY'"
 		+ ", 'MG_CREATE_LOTS'"
 		+ ", 'MANAGE_STUDIES'"
