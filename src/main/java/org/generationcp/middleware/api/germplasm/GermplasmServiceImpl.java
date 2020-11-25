@@ -265,7 +265,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Integer preferredNameTypeId = nameCodes.get(
 			StringUtils.isNotEmpty(germplasmUpdateDTO.getPreferredName()) ? germplasmUpdateDTO.getPreferredName().toUpperCase() :
 				StringUtils.EMPTY);
-		final List<Name> names = namesMap.get(germplasm.getGid());
+		final List<Name> names = namesMap.getOrDefault(germplasm.getGid(), new ArrayList<>());
 		final List<Name> preferredNames =
 			names.stream().filter(n -> n.getTypeId().equals(preferredNameTypeId)).collect(Collectors.toList());
 
@@ -367,6 +367,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 					value, germplasm.getLocationId(), germplasm.getGdate(), 0);
 				this.daoFactory.getNameDao().save(name);
 				germplasmNames.add(name);
+				namesMap.putIfAbsent(germplasm.getGid(), germplasmNames);
 			}
 		}
 	}
