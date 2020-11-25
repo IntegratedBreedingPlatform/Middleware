@@ -2,6 +2,7 @@ package org.generationcp.middleware.domain.germplasm.importation;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -41,6 +42,13 @@ public class GermplasmMatchRequestDto {
 	@Override
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
+	}
+
+	public boolean isValid() {
+		if (CollectionUtils.isEmpty(germplasmUUIDs) && CollectionUtils.isEmpty(names)) {
+			return false;
+		}
+		return true;
 	}
 
 }

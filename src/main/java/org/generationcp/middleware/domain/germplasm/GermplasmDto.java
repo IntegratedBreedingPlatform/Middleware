@@ -12,23 +12,27 @@ public class GermplasmDto {
 
 	private String germplasmUUID;
 
-	private String designation;
-
-	private List<GermplasmNameDto> names;
+	private String preferredName;
 
 	private String creationDate;
 
 	private String reference;
 
-	private List<GermplasmAttributeDto> attributes;
+	private Integer breedingLocationId;
 
 	private String breedingLocation;
+
+	private Integer breedingMethodId;
 
 	private String breedingMethod;
 
 	private boolean isGroupedLine;
 
 	private Integer groupId;
+
+	private List<GermplasmNameDto> names;
+
+	private List<GermplasmAttributeDto> attributes;
 
 	public Integer getGid() {
 		return gid;
@@ -46,12 +50,12 @@ public class GermplasmDto {
 		this.germplasmUUID = germplasmUUID;
 	}
 
-	public String getDesignation() {
-		return designation;
+	public String getPreferredName() {
+		return preferredName;
 	}
 
-	public void setDesignation(final String designation) {
-		this.designation = designation;
+	public void setPreferredName(final String preferredName) {
+		this.preferredName = preferredName;
 	}
 
 	public List<GermplasmNameDto> getNames() {
@@ -116,6 +120,22 @@ public class GermplasmDto {
 
 	public void setGroupId(final Integer groupId) {
 		this.groupId = groupId;
+	}
+
+	public Integer getBreedingLocationId() {
+		return breedingLocationId;
+	}
+
+	public void setBreedingLocationId(final Integer breedingLocationId) {
+		this.breedingLocationId = breedingLocationId;
+	}
+
+	public Integer getBreedingMethodId() {
+		return breedingMethodId;
+	}
+
+	public void setBreedingMethodId(final Integer breedingMethodId) {
+		this.breedingMethodId = breedingMethodId;
 	}
 
 	@Override
