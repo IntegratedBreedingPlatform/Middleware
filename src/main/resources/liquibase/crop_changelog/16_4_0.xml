@@ -221,4 +221,17 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="clarysabel" id="v16.4.0-9">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="germplsm" indexName="germplsm_idx14"></indexExists>
+			</not>
+		</preConditions>
+		<comment>Add index for germplsm gid and germplsm_uuid columns</comment>
+		<createIndex indexName="germplsm_idx14" tableName="germplsm" unique="false">
+			<column name="gid"></column>
+			<column name="germplsm_uuid"></column>
+		</createIndex>
+	</changeSet>
+
 </databaseChangeLog>
