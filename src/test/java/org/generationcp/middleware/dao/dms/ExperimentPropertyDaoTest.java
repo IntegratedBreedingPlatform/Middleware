@@ -167,7 +167,8 @@ public class ExperimentPropertyDaoTest {
 				+ " AND bexp.nd_geolocation_id = :instanceId "
 				+ " AND bexp.project_id = :datasetId "
 				+ " WHERE bval.type_id = " + TermId.BLOCK_ID.getId()
-				+ ")";
+				+ ") THEN 1 "
+				+ "ELSE 0 END ";
 	}
 
 

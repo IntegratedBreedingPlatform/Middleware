@@ -206,7 +206,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 								.append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
 								.append(" AND bexp.nd_geolocation_id = :instanceId ")
 								.append(" AND bexp.project_id = :datasetId ").append(" WHERE bval.type_id = ").append(TermId.BLOCK_ID.getId())
-								.append(")");
+								.append(") THEN 1 ")
+								.append("ELSE 0 END");
 			}
 			sql.append(" ORDER BY e.nd_experiment_id ").append(order);
 
