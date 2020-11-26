@@ -3,6 +3,7 @@ package org.generationcp.middleware.dao;
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
+import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
@@ -50,7 +51,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "LEFT JOIN methods m ON m.mid = g.methn\n"
 		+ "LEFT JOIN location breedingLoc ON breedingLoc.locid = g.glocn\n"
 		+ "LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1\n"
-		+ "LEFT JOIN ims_lot lot ON lot.eid = gss.gid \n"
+		+ "LEFT JOIN ims_lot lot ON lot.eid = gss.gid and lot.status = " + LotStatus.ACTIVE.getIntValue() + " "
 		+ "WHERE gss.project_id = :studyId ";
 
 	public List<GermplasmStudySource> getByGids(final Set<Integer> gids) {
