@@ -76,13 +76,12 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) FROM workbench_sidebar_category_link where
-                tool_name="high_density";
+                tool_name = 'high_density';
             </sqlCheck>
         </preConditions>
         <comment>Update sidebar_link_title from workbench_sidebar_category_link for High Density</comment>
 		<sql dbms="mysql" splitStatements="true">
-			SET @high_density_sidebar_link_id = (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'high_density');
-			UPDATE workbench_sidebar_category_link SET sidebar_link_title = 'High Density' WHERE sidebar_category_link_id = @high_density_sidebar_link_id;
+			UPDATE workbench_sidebar_category_link SET sidebar_link_title = 'High Density' WHERE tool_name = 'high_density';
 		</sql>
 	</changeSet>
 </databaseChangeLog>
