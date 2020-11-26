@@ -485,7 +485,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<LocationDetails> getFilteredLocationsDetails(final Integer countryId, final Integer locationType, final String locationName,
-			final String programUUID) {
+		final String programUUID) {
 		return this.daoFactory.getLocationDAO().getFilteredLocations(countryId, locationType, locationName, programUUID);
 	}
 
@@ -533,7 +533,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Integer> getFavoriteProjectLocationIds(final String programUUID) {
 		final List<ProgramFavorite> programFavorites =
-			this.daoFactory.getProgramFavoriteDao().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
+			this.daoFactory.getProgramFavoriteDao()
+				.getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
 		final List<Integer> favoriteLocationIds = new ArrayList<>();
 		if (programFavorites != null && !programFavorites.isEmpty()) {
 			for (final ProgramFavorite programFavorite : programFavorites) {

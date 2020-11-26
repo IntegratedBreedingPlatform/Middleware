@@ -11,11 +11,6 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
@@ -39,7 +34,6 @@ import java.util.Set;
 
 /**
  * DAO class for {@link Method}.
- *
  */
 public class MethodDAO extends GenericDAO<Method, Integer> {
 
@@ -91,7 +85,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-					this.getLogExceptionMessage("getMethodsByType", "programUUID", programUUID, e.getMessage(), "Method"), e);
+				this.getLogExceptionMessage("getMethodsByType", "programUUID", programUUID, e.getMessage(), "Method"), e);
 		}
 		return new ArrayList<Method>();
 	}
@@ -171,7 +165,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			return ((Long) criteria.uniqueResult()).longValue(); // count
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-					this.getLogExceptionMessage("countMethodsByType", "programUUID", programUUID, e.getMessage(), "Method"), e);
+				this.getLogExceptionMessage("countMethodsByType", "programUUID", programUUID, e.getMessage(), "Method"), e);
 		}
 		return 0;
 	}
@@ -236,7 +230,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-					this.getLogExceptionMessage("getMethodsByGroupAndType", "group|type", group + "|" + type, e.getMessage(), "Method"), e);
+				this.getLogExceptionMessage("getMethodsByGroupAndType", "group|type", group + "|" + type, e.getMessage(), "Method"), e);
 		}
 		return new ArrayList<Method>();
 	}
@@ -267,7 +261,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-					this.getLogExceptionMessage("getMethodsByGroupAndType", "group|type", group + "|" + type, e.getMessage(), "Method"), e);
+				this.getLogExceptionMessage("getMethodsByGroupAndType", "group|type", group + "|" + type, e.getMessage(), "Method"), e);
 		}
 		return new ArrayList<Method>();
 	}
@@ -310,7 +304,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		} catch (final HibernateException e) {
 			MethodDAO.LOG.error(this.getLogExceptionMessage("getMethodsNotGenerativeById", "", null, e.getMessage(), "Method"), e);
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsNotGenerativeById", "", null, e.getMessage(),
-					"Method"), e);
+				"Method"), e);
 		}
 	}
 
@@ -356,8 +350,8 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		try {
 			StringBuilder queryString = new StringBuilder();
 			queryString.append(
-					"SELECT mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, program_uuid ")
-					.append("FROM methods m WHERE m.mname = :mname");
+				"SELECT mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, program_uuid ")
+				.append("FROM methods m WHERE m.mname = :mname");
 			SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter(METHOD_NAME, name);
 
@@ -381,7 +375,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 				String programUUID = (String) row[14];
 
 				Method method =
-						new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, programUUID);
+					new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, programUUID);
 				methods.add(method);
 			}
 
@@ -398,8 +392,8 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		try {
 			StringBuilder queryString = new StringBuilder();
 			queryString
-					.append("SELECT mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, program_uuid ")
-					.append("FROM methods m WHERE m.mname = :mname ").append("AND m.program_uuid = :uniqueId");
+				.append("SELECT mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, program_uuid ")
+				.append("FROM methods m WHERE m.mname = :mname ").append("AND m.program_uuid = :uniqueId");
 			SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter(METHOD_NAME, name);
 			query.setParameter("uniqueId", uniqueId);
@@ -424,7 +418,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 				String programUUID = (String) row[14];
 
 				Method method =
-						new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, programUUID);
+					new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, programUUID);
 				methods.add(method);
 			}
 
@@ -444,11 +438,11 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			method = criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-					this.getLogExceptionMessage("getProgramMethods", "programUUID", programUUID, e.getMessage(), "Method"), e);
+				this.getLogExceptionMessage("getProgramMethods", "programUUID", programUUID, e.getMessage(), "Method"), e);
 		}
 		return method;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) throws MiddlewareQueryException {
 		try {
@@ -470,10 +464,10 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		} catch (final HibernateException e) {
 			MethodDAO.LOG.error(this.getLogExceptionMessage("getMethodsNotGenerativeById", "", null, e.getMessage(), "Method"), e);
 			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getAllMethodsDerivativeAndManintenance", "", null, e.getMessage(), "Method"), e);
+				this.getLogExceptionMessage("getAllMethodsDerivativeAndManintenance", "", null, e.getMessage(), "Method"), e);
 		}
 	}
-	
+
 	public List<Method> getFavoriteMethodsByMethodType(final String methodType, final String programUUID) throws MiddlewareQueryException {
 		try {
 			Query query = this.getSession().getNamedQuery(Method.GET_FAVORITE_METHODS_BY_TYPE);
@@ -485,9 +479,9 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		}
 		return new ArrayList<Method>();
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public List<String> getMethodCodeByMethodIds(final Set<Integer> methodIds){
+	public List<String> getMethodCodeByMethodIds(final Set<Integer> methodIds) {
 		List<String> methodsCodes = new ArrayList<String>();
 		final StringBuilder queryString = new StringBuilder();
 		queryString.append("SELECT mcode FROM methods WHERE mid  IN (:mids)");
@@ -509,7 +503,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		} catch (final HibernateException e) {
 			MethodDAO.LOG.error(this.getLogExceptionMessage("getAllNoBulkingMethods", "", null, e.getMessage(), "Method"), e);
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("getAllNoBulkingMethods", "", null, e.getMessage(), "Method"),
-					e);
+				e);
 		}
 	}
 
@@ -525,7 +519,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			} catch (final HibernateException e) {
 				MethodDAO.LOG.error(this.getLogExceptionMessage("getNoBulkingMethodsByIdList", "", null, e.getMessage(), "Method"), e);
 				throw new MiddlewareQueryException(
-						this.getLogExceptionMessage("getNoBulkingMethodsByIdList", "", null, e.getMessage(), "Method"), e);
+					this.getLogExceptionMessage("getNoBulkingMethodsByIdList", "", null, e.getMessage(), "Method"), e);
 			}
 		} else {
 			return new ArrayList<>();
@@ -544,7 +538,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		} catch (final HibernateException e) {
 			MethodDAO.LOG.error(this.getLogExceptionMessage("getAllMethodsNotBulkingNotGenerative", "", null, e.getMessage(), "Method"), e);
 			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getAllMethodsNotBulkingNotGenerative", "", null, e.getMessage(), "Method"), e);
+				this.getLogExceptionMessage("getAllMethodsNotBulkingNotGenerative", "", null, e.getMessage(), "Method"), e);
 		}
 	}
 
@@ -561,7 +555,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		} catch (final HibernateException e) {
 			MethodDAO.LOG.error(this.getLogExceptionMessage("getNoBulkingMethodsByType", "", null, e.getMessage(), "Method"), e);
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("getNoBulkingMethodsByType", "", null, e.getMessage(), "Method"),
-					e);
+				e);
 		}
 	}
 
@@ -582,7 +576,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			if (!CollectionUtils.isEmpty(abbreviations)) {
 				criteria.add(Restrictions.in("mcode", abbreviations));
 			}
-
 
 			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();

@@ -20,6 +20,7 @@ public class GermplasmSearchRequest {
 			GENERATIVE, DERIVATIVE, BOTH
 		}
 
+
 		private int generationLevel = 1;
 		private Type type = Type.GENERATIVE;
 
@@ -82,7 +83,7 @@ public class GermplasmSearchRequest {
 
 	// added columns
 	private List<String> addedColumnsPropertyIds = new LinkedList<>();
-	
+
 	// getter / setter
 
 	public SqlTextFilter getNameFilter() {
