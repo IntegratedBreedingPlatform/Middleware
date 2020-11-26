@@ -14,12 +14,12 @@
 		<sql dbms="mysql" splitStatements="true">
 			SET @germplasm_search_sidebar_link_id = (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'search_germplasm');
 			SET @manage_germplasm_sidebar_link_id = (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'bm_list_manager_main');
-			SET @lists_sidebar_category_id = (SELECT sidebar_category_id FROM workbench_sidebar_category WHERE sidebar_category_name='lists');
-			SET @lists_permission_id = (SELECT permission_id FROM permission WHERE name='LISTS');
-			SET @samples_lists_permission_id = (SELECT permission_id FROM permission WHERE name='SAMPLES_LISTS');
+			SET @lists_sidebar_category_id = (SELECT sidebar_category_id FROM workbench_sidebar_category WHERE sidebar_category_name = 'lists');
+			SET @lists_permission_id = (SELECT permission_id FROM permission WHERE name = 'LISTS');
+			SET @samples_lists_permission_id = (SELECT permission_id FROM permission WHERE name = 'SAMPLES_LISTS');
 
 			#Rename Search Germplasm as Manage Germplasm in Sidebar Menu
-			UPDATE workbench_sidebar_category_link SET sidebar_link_name = 'manage_germplasm', sidebar_link_title = 'Manage Germplasm', rank = '1'
+			UPDATE workbench_sidebar_category_link SET sidebar_link_name = 'manage_germplasm', sidebar_link_title = 'Manage Germplasm', rank = 1
 				WHERE sidebar_category_link_id = @germplasm_search_sidebar_link_id;
 
 			#Rename Manage Germplasm as Germplasm Lists in Sidebar Menu
@@ -32,14 +32,14 @@
 
 			SET @germplasm_lists_permission_id = (SELECT permission_id FROM permission where name = 'GERMPLASM_LISTS');
 
-			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @germplasm_lists_permission_id, '1');
-			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @germplasm_lists_permission_id, '1');
-			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @germplasm_lists_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES (1, @germplasm_lists_permission_id, 1);
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES (2, @germplasm_lists_permission_id, 1);
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES (3, @germplasm_lists_permission_id, 1);
 
 			#Update parent permission of MG_MANAGE_INVENTORY to GERMPLASM_LISTS
-			UPDATE permission SET parent_id = @germplasm_lists_permission_id WHERE (name = 'MG_MANAGE_INVENTORY');
+			UPDATE permission SET parent_id = @germplasm_lists_permission_id WHERE name = 'MG_MANAGE_INVENTORY';
 
-			# Insert GERMPLASM_LISTS permission. Case: Role permission where exists SAMPLES_LISTS or MANAGE_GERMPLASM associated permissions.
+			# Insert GERMPLASM_LISTS permission. Case: Role permission where exists SAMPLES_LISTS and MANAGE_GERMPLASM associated permissions.
 			INSERT INTO role_permission(role_id,permission_id)
 				SELECT DISTINCT(rp.role_id), @germplasm_lists_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
 					WHERE p.name in ('SAMPLES_LISTS', 'MANAGE_GERMPLASM')
@@ -48,27 +48,27 @@
 
 			# Insert SAMPLES_LISTS and delete LISTS permission. Case: Role permission where not exists GERMPLASM or MANAGE_GERMPLASM associated permissions.
 			INSERT INTO role_permission(role_id,permission_id)
-			SELECT DISTINCT(RR.role_id), @samples_lists_permission_id FROM role_permission RR
-				WHERE RR.Role_id IN (
+			SELECT DISTINCT(rp.role_id), @samples_lists_permission_id FROM role_permission rp
+				WHERE rp.role_id IN (
 					SELECT sub.rid FROM (SELECT rp.role_id AS rid FROM role_permission rp
 										   INNER JOIN permission p ON rp.permission_id = p.permission_id
-											WHERE p.name IN ('LISTS')
+											WHERE p.name = 'LISTS'
 											GROUP BY rp.role_id) AS sub
 					)
-					AND NOT EXISTS (SELECT 1 FROM role_permission R
-										WHERE RR.Role_id= R.Role_id AND R.permission_id IN (SELECT permission_id FROM permission WHERE name IN ('GERMPLASM' , 'MANAGE_GERMPLASM')));
+					AND NOT EXISTS (SELECT 1 FROM role_permission r
+										WHERE rp.role_id = r.role_id AND r.permission_id IN (SELECT permission_id FROM permission WHERE name IN ('GERMPLASM' , 'MANAGE_GERMPLASM')));
 
 			DELETE role_permission FROM role_permission
 				WHERE
-					permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name IN ('LISTS'))
-					AND role_id IN (SELECT subA.role_id FROM (SELECT RR.role_id AS role_id FROM role_permission RR
-						WHERE RR.Role_id IN ( SELECT subB.rid FROM (
+					permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name = 'LISTS')
+					AND role_id IN (SELECT subA.role_id FROM (SELECT rp.role_id AS role_id FROM role_permission rp
+						WHERE rp.role_id IN ( SELECT subB.rid FROM (
 								SELECT rp.role_id AS rid FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
-									WHERE p.name IN ('LISTS')
+									WHERE p.name = 'LISTS'
 										GROUP BY rp.role_id ) AS subB )
-								AND NOT EXISTS (SELECT 1 FROM role_permission R
-									WHERE RR.Role_id= R.Role_id
-									AND R.permission_id IN (SELECT permission_id FROM permission WHERE name IN ('GERMPLASM' , 'MANAGE_GERMPLASM'))) ) AS subA
+								AND NOT EXISTS (SELECT 1 FROM role_permission r
+									WHERE rp.role_id = r.role_id
+									AND r.permission_id IN (SELECT permission_id FROM permission WHERE name IN ('GERMPLASM' , 'MANAGE_GERMPLASM'))) ) AS subA
 					);
 		</sql>
 	</changeSet>
