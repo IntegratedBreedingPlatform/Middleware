@@ -955,8 +955,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 						trial.setPlantingOrder(1); // Default
 					}
 				}
-				trial.setOverlappingCoordinates(this.hasOverlapping(trial.getFieldMapLabels()));
-				trial.setInValidValue(this.hasInvalidValues(trial.getFieldMapLabels()));
+				trial.setHasOverlappingCoordinates(this.hasOverlappingCoordinates(trial.getFieldMapLabels()));
+				trial.setHasInValidValue(this.hasInvalidCoordinateValue(trial.getFieldMapLabels()));
 				if (isGetLocation) {
 					trial.setLocationName(this.getLocationName(locationMap, trial.getLocationId()));
 					trial.setSiteName(trial.getLocationName());
@@ -1345,26 +1345,24 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		this.trialEnvironmentBuilder = trialEnvironmentBuilder;
 	}
 
-	private boolean hasInvalidValues(List<FieldMapLabel> labels) {
+	private boolean hasInvalidCoordinateValue(final List<FieldMapLabel> labels) {
 		if (!CollectionUtils.isEmpty(labels)) {
-			List<FieldMapLabel> invalid = labels.stream().filter(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getColumn()) <= 0 || Util.getIntValue(fieldMapLabel.getRange()) <= 0).collect(Collectors.toList());
-			return !CollectionUtils.isEmpty(invalid);
+			return labels.stream().anyMatch(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getColumn()) <= 0 || Util.getIntValue(fieldMapLabel.getRange()) <= 0);
 		}
 		return false;
 	}
 
-	private boolean hasOverlapping(List<FieldMapLabel> labels) {
-		boolean hasOverlapping = false;
+	private boolean hasOverlappingCoordinates(final List<FieldMapLabel> labels) {
 		if (!CollectionUtils.isEmpty(labels)) {
-			List<String> existing = new ArrayList<>();
+			final List<String> existing = new ArrayList<>();
 			for (final FieldMapLabel label : labels) {
 				if (existing.contains(label.getRange()+"-"+label.getColumn())) {
-					hasOverlapping = true;
+					return true;
 				} else {
 					existing.add(label.getRange()+"-"+label.getColumn());
 				}
 			}
 		}
-		return hasOverlapping;
+		return false;
 	}
 }
