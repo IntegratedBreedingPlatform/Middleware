@@ -182,7 +182,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyInstances() {
 
-		final DmsProject study = this.createTestStudy();
+		final DmsProject study = this.createTestStudy(false);
 
 		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(study.getProjectId());
 
@@ -226,7 +226,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyInstance() {
 
-		final DmsProject study = this.createTestStudy();
+		final DmsProject study = this.createTestStudy(false);
 
 		final StudyInstance studyInstance1 =
 			this.studyInstanceService.getStudyInstance(study.getProjectId(), this.instance1.getLocationId()).get();
@@ -502,7 +502,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		return studyInstances.get(0);
 	}
 
-	private DmsProject createTestStudy() {
+	private DmsProject createTestStudy(final boolean hasMeansDataset) {
 		final DmsProject study =
 			this.testDataInitializer
 				.createDmsProject("Study1", "Study-Description", null, this.daoFactory.getDmsProjectDAO().getById(1), null);
@@ -533,6 +533,13 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		final ExperimentModel instance1SubObsExperiment2 = this.testDataInitializer
 			.createTestExperiment(subObsDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", instance1PlotExperiment);
 		this.savePhenotype(instance1SubObsExperiment2);
+
+		if (hasMeansDataset) {
+			final DmsProject meansDataset =
+				this.testDataInitializer
+					.createDmsProject("Means Dataset", "Means Dataset-Description", study, study, DatasetTypeEnum.MEANS_DATA);
+			this.testDataInitializer.createTestExperiment(meansDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", null);
+		}
 
 		// Instance 2
 		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
@@ -571,4 +578,48 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		this.testDataInitializer.addPhenotypes(Collections.singletonList(experiment), trait1.getCvTermId(), "100");
 	}
 
+	@Test
+	public void testGetStudyInstancesWithMeansDataset() {
+
+		final DmsProject study = this.createTestStudy(true);
+
+		final StudyInstance studyInstance1 =
+			this.studyInstanceService.getStudyInstance(study.getProjectId(), this.instance1.getLocationId()).get();
+		Assert.assertEquals(this.instance1.getLocationId().intValue(), studyInstance1.getInstanceId());
+		Assert.assertEquals(1, studyInstance1.getInstanceNumber());
+		Assert.assertNull(studyInstance1.getCustomLocationAbbreviation());
+		Assert.assertEquals("AFG", studyInstance1.getLocationAbbreviation());
+		Assert.assertEquals("Afghanistan", studyInstance1.getLocationName());
+		Assert.assertFalse(studyInstance1.isHasFieldmap());
+		Assert.assertTrue(studyInstance1.isHasExperimentalDesign());
+		// Instance deletion not allowed because instance has subobservation
+		Assert.assertFalse(studyInstance1.getCanBeDeleted());
+		Assert.assertTrue(studyInstance1.isHasMeasurements());
+
+		final StudyInstance studyInstance2 =
+			this.studyInstanceService.getStudyInstance(study.getProjectId(), this.instance2.getLocationId()).get();
+		Assert.assertEquals(this.instance2.getLocationId().intValue(), studyInstance2.getInstanceId());
+		Assert.assertEquals(2, studyInstance2.getInstanceNumber());
+		Assert.assertNull(studyInstance2.getCustomLocationAbbreviation());
+		Assert.assertEquals("ALB", studyInstance2.getLocationAbbreviation());
+		Assert.assertEquals("Albania", studyInstance2.getLocationName());
+		Assert.assertTrue(studyInstance2.isHasFieldmap());
+		Assert.assertTrue(studyInstance2.isHasExperimentalDesign());
+		// Instance deletion not allowed because instance has means dataset
+		Assert.assertFalse(studyInstance2.getCanBeDeleted());
+		Assert.assertFalse(studyInstance2.isHasMeasurements());
+
+		final StudyInstance studyInstance3 =
+			this.studyInstanceService.getStudyInstance(study.getProjectId(), this.instance3.getLocationId()).get();
+		Assert.assertEquals(this.instance3.getLocationId().intValue(), studyInstance3.getInstanceId());
+		Assert.assertEquals(3, studyInstance3.getInstanceNumber());
+		Assert.assertNull(studyInstance3.getCustomLocationAbbreviation());
+		Assert.assertEquals("DZA", studyInstance3.getLocationAbbreviation());
+		Assert.assertEquals("Algeria", studyInstance3.getLocationName());
+		Assert.assertFalse(studyInstance3.isHasFieldmap());
+		Assert.assertFalse(studyInstance3.isHasExperimentalDesign());
+		// Instance deletion not allowed because instance has means dataset
+		Assert.assertFalse(studyInstance3.getCanBeDeleted());
+		Assert.assertFalse(studyInstance3.isHasMeasurements());
+	}
 }
