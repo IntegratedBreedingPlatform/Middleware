@@ -200,8 +200,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			if (blockId != null) {
 				sql.append(" WHERE blk.value = :blockId ");
 			} else {
-				sql.append("WHERE 1 = CASE ")
-								.append("WHEN blk.value is NULL AND e.project_id = :datasetId THEN 1")
+				sql.append(" WHERE 1 = CASE ")
+								.append("WHEN blk.value is NULL AND e.project_id = :datasetId THEN 1 ")
 								.append("WHEN blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval ")
 								.append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
 								.append(" AND bexp.nd_geolocation_id = :instanceId ")

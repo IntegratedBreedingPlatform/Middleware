@@ -64,7 +64,7 @@ public class ExperimentPropertyDaoTest {
 		final int blockId = 33;
 		this.dao.getAllFieldMapsInBlockByTrialInstanceId(datasetId, instanceId, blockId);
 
-		final String expectedSql = this.getFieldmapsInBlockMainQuery() + " AND blk.value = :blockId  ORDER BY e.nd_experiment_id ASC";
+		final String expectedSql = this.getFieldmapsInBlockMainQuery() + " WHERE blk.value = :blockId  ORDER BY e.nd_experiment_id ASC";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql.replace(" ", ""), sqlCaptor.getValue().replace(" ", ""));
@@ -100,8 +100,8 @@ public class ExperimentPropertyDaoTest {
 		+ " , st.start_date as startDate , gpSeason.value as season "
 		+ " , epropBlock.value AS blockNo "
 		+ " , e.obs_unit_id as obsUnitId "
-		+ " FROM nd_geolocationprop blk "
-		+ "  INNER JOIN nd_experiment e ON e.nd_geolocation_id = blk.nd_geolocation_id "
+		+ " FROM nd_experiment e "
+		+ "  LEFT JOIN nd_geolocationprop blk ON e.nd_geolocation_id = blk.nd_geolocation_id  AND blk.type_id =8583"
 		+ "  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id "
 		+ "  INNER JOIN project p ON p.project_id = e.project_id "
 		+ "  INNER JOIN project st ON st.project_id = p.study_id "
@@ -122,8 +122,7 @@ public class ExperimentPropertyDaoTest {
 		+ "  LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = e.nd_experiment_id "
 		+ "    AND col.type_id = "+ TermId.COLUMN_NO.getId()
 		+ "  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id "
-		+ "     AND gpSeason.type_id =  "+ TermId.SEASON_VAR.getId() + " "
-		+ " WHERE blk.type_id = "+ TermId.BLOCK_ID.getId();
+		+ "     AND gpSeason.type_id =  "+ TermId.SEASON_VAR.getId();
 	}
 
 	private String getFieldmapsInBlockMainQueryNullBlockId() {
@@ -138,13 +137,8 @@ public class ExperimentPropertyDaoTest {
 			+ " , st.start_date as startDate , gpSeason.value as season "
 			+ " , epropBlock.value AS blockNo "
 			+ " , e.obs_unit_id as obsUnitId "
-			+ " FROM nd_geolocationprop blk "
-			+ "  RIGHT JOIN nd_experiment e ON  blk.nd_geolocation_id = e.nd_geolocation_id AND blk.type_id = " + TermId.BLOCK_ID.getId()
-			+ "   AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval "
-			+ "  INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id "
-			+ "   AND bexp.nd_geolocation_id = :instanceId "
-			+ "   AND bexp.project_id = :datasetId "
-			+ "   WHERE bval.type_id = " +TermId.BLOCK_ID.getId() +")"
+			+ " FROM nd_experiment e "
+			+ "  LEFT JOIN nd_geolocationprop blk ON e.nd_geolocation_id = blk.nd_geolocation_id  AND blk.type_id =8583"
 			+ "  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id "
 			+ "  INNER JOIN project p ON p.project_id = e.project_id "
 			+ "  INNER JOIN project st ON st.project_id = p.study_id "
@@ -165,8 +159,15 @@ public class ExperimentPropertyDaoTest {
 			+ "  LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = e.nd_experiment_id "
 			+ "    AND col.type_id = "+ TermId.COLUMN_NO.getId()
 			+ "  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id "
-			+ "     AND gpSeason.type_id =  "+ TermId.SEASON_VAR.getId() + " "
-			+ " WHERE e.project_id = :datasetId  AND e.nd_geolocation_id = :instanceId ";
+			+ "     AND gpSeason.type_id =  "+ TermId.SEASON_VAR.getId()
+			+ " WHERE 1 = CASE "
+				+ "WHEN blk.value is NULL AND e.project_id = :datasetId THEN 1 "
+				+ "WHEN blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval "
+				+ " INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id "
+				+ " AND bexp.nd_geolocation_id = :instanceId "
+				+ " AND bexp.project_id = :datasetId "
+				+ " WHERE bval.type_id = " + TermId.BLOCK_ID.getId()
+				+ ")";
 	}
 
 
