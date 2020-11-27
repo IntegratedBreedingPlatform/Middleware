@@ -84,4 +84,15 @@
 			UPDATE workbench_sidebar_category_link SET sidebar_link_title = 'High Density' WHERE tool_name = 'high_density';
 		</sql>
 	</changeSet>
+	<changeSet author="cuenyad" id="v16.4.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM permission where name = 'MANAGE_GERMPLASM';
+            </sqlCheck>
+        </preConditions>
+        <comment>remove workbench_sidebar_category_link_id from permission for MANAGE_GERMPLASM</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE permission SET workbench_sidebar_category_link_id = null WHERE name = 'MANAGE_GERMPLASM';
+		</sql>
+	</changeSet>
 </databaseChangeLog>
