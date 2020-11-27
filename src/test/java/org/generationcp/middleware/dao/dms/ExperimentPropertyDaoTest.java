@@ -161,7 +161,7 @@ public class ExperimentPropertyDaoTest {
 			+ "  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id "
 			+ "     AND gpSeason.type_id =  "+ TermId.SEASON_VAR.getId()
 			+ " WHERE 1 = CASE "
-				+ "WHEN blk.value is NULL AND e.project_id = :datasetId THEN 1 "
+				+ "WHEN blk.value is NULL AND e.project_id = :datasetId AND e.nd_geolocation_id = :instanceId THEN 1 "
 				+ "WHEN blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval "
 				+ " INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id "
 				+ " AND bexp.nd_geolocation_id = :instanceId "
