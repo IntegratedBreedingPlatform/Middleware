@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasm;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
@@ -130,12 +131,24 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public long countGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto) {
-		return 0;
+		return this.daoFactory.getGermplasmDao().countGermplasmMatches(germplasmMatchRequestDto);
 	}
 
 	@Override
 	public List<GermplasmDto> findGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto, final Pageable pageable) {
-		return null;
+		final List<GermplasmDto> germplasmDtos = this.daoFactory.getGermplasmDao().findGermplasmMatches(germplasmMatchRequestDto, pageable);
+
+		if (!germplasmDtos.isEmpty()) {
+			final List<Integer> gids = germplasmDtos.stream().map(GermplasmDto::getGid).collect(Collectors.toList());
+			final List<GermplasmNameDto> names = this.daoFactory.getNameDao().getGermplasmNamesByGids(gids);
+
+			final Map<Integer, List<GermplasmNameDto>> namesByGid = names.stream().collect(
+				Collectors.groupingBy(GermplasmNameDto::getGid, HashMap::new, Collectors.toCollection(ArrayList::new))
+			);
+			germplasmDtos.forEach(g -> g.setNames(namesByGid.get(g.getGid())));
+		}
+
+		return germplasmDtos;
 	}
 
 	private Map<String, Integer> getLocationsMapByAbbr(final List<GermplasmImportRequestDto> germplasmDtos) {

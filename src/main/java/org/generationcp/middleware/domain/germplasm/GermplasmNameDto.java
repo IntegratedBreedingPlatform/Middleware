@@ -1,10 +1,14 @@
 package org.generationcp.middleware.domain.germplasm;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
 public class GermplasmNameDto {
+
+	@JsonIgnore
+	private Integer gid;
 
 	private String name;
 
@@ -64,6 +68,14 @@ public class GermplasmNameDto {
 
 	public void setNameTypeDescription(final String nameTypeDescription) {
 		this.nameTypeDescription = nameTypeDescription;
+	}
+
+	public Integer getGid() {
+		return gid;
+	}
+
+	public void setGid(final Integer gid) {
+		this.gid = gid;
 	}
 
 	@Override

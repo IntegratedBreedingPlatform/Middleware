@@ -1,11 +1,13 @@
 package org.generationcp.middleware.domain.germplasm;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.List;
 
 @AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GermplasmDto {
 
 	private Integer gid;
