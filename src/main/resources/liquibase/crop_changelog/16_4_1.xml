@@ -1,0 +1,124 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="corina" id="v16.4.1-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'populate_entry_type';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE populate_entry_type;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v16.4.1-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'populate_entry_type';
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Create SP that adds ENTRY_TYPE variable and value for existing studies without it
+		</comment>
+		<sql dbms="mysql" splitStatements="false">
+			CREATE PROCEDURE populate_entry_type()
+			BEGIN
+			
+DECLARE proj VARCHAR(11);
+DECLARE rankno VARCHAR(11);
+DECLARE loop0_eof BOOLEAN DEFAULT FALSE;	
+DECLARE cur0 CURSOR FOR SELECT p1.project_id,MAX(p2.rank)+1 FROM project p1,projectprop p2 WHERE p1.project_id=p2.project_id AND p1.dataset_type_id=4 AND p1.deleted=0 
+AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.variable_id=8255 AND pp.project_id=p1.project_id)
+GROUP BY p1.project_id;
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET loop0_eof = TRUE; 
+
+	
+	OPEN cur0;
+	loop0: LOOP 
+	FETCH cur0 INTO proj,rankno;
+	IF loop0_eof THEN 
+		LEAVE loop0;
+	END IF;
+	
+	
+	SET @s = CONCAT('INSERT INTO projectprop(project_id,type_id,rank,variable_id,alias) VALUES (',proj,',1804,',rankno,',8255,"ENTRY_TYPE");');
+	SELECT @s;
+	PREPARE stmt FROM @s;
+	EXECUTE stmt;	
+	DEALLOCATE PREPARE stmt;
+	
+	SELECT COUNT(*) > 0 INTO @c FROM project p,stock s WHERE p.project_id=proj AND p.parent_project_id=s.project_id;
+
+	IF (@c = 1) THEN
+	
+		SET @s = CONCAT('INSERT INTO stockprop(stock_id,type_id,`value`,rank) SELECT s.stock_id,8255,"10170",',rankno,' FROM project p, stock s WHERE p.project_id=',proj,' AND p.parent_project_id=s.project_id
+AND NOT EXISTS (SELECT 1 FROM stockprop sp WHERE sp.stock_id=s.stock_id AND sp.type_id=8255);');
+
+		SELECT @s;
+		PREPARE stmt FROM @s;
+		EXECUTE stmt;	
+		DEALLOCATE PREPARE stmt;
+	
+	END IF;
+	
+	END LOOP loop0; 
+	CLOSE cur0; 
+
+
+
+			END;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v16.4.1-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'populate_entry_type';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			call populate_entry_type();
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v16.4.1-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'populate_entry_type';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE populate_entry_type;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
