@@ -24,7 +24,6 @@ import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
@@ -1034,9 +1033,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<Germplasm> getByGIDListWithMethodAndBibref(final Set<Integer> gids) {
+	public List<Germplasm> getByGIDsOrUUIDListWithMethodAndBibref(final Set<Integer> gids, final Set<String> uuids) {
 
-		if (gids.isEmpty()) {
+		if (uuids.isEmpty() && gids.isEmpty()) {
 			return new ArrayList<>();
 		}
 
@@ -1044,31 +1043,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(Germplasm.class);
 			criteria.createAlias("method", "method", CriteriaSpecification.LEFT_JOIN);
 			criteria.createAlias("bibref", "bibref", CriteriaSpecification.LEFT_JOIN);
-			criteria.add(Restrictions.in("gid", gids));
-			criteria.add(Restrictions.eq("deleted", false));
-			criteria.add(Restrictions.eq("grplce", 0));
-
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			final String message =
-				"Error with getByGIDListWithMethodAndBibref(gids=" + gids.toString() + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
-			GermplasmDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	public List<Germplasm> getByUUIDListWithMethodAndBibref(final Set<String> uuids) {
-
-		if (uuids.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Germplasm.class);
-			criteria.createAlias("method", "method", CriteriaSpecification.LEFT_JOIN);
-			criteria.createAlias("bibref", "bibref", CriteriaSpecification.LEFT_JOIN);
-			criteria.add(Restrictions.in("germplasmUUID", uuids));
+			if (gids.isEmpty()) {
+				criteria.add(Restrictions.in("germplasmUUID", uuids));
+			} else if (uuids.isEmpty()) {
+				criteria.add(Restrictions.in("gid", gids));
+			} else {
+				criteria.add(Restrictions.or(Restrictions.in("germplasmUUID", uuids), Restrictions.in("gid", gids)));
+			}
 			criteria.add(Restrictions.eq("deleted", false));
 			criteria.add(Restrictions.eq("grplce", 0));
 
