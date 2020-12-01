@@ -140,7 +140,10 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final boolean hasMeansDataset = this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
 		if (hasCrossesOrSelections || hasMeansDataset) {
 			for (final StudyInstance instance : instances) {
-				if (instance.isHasExperimentalDesign() || hasMeansDataset) {
+				final boolean instanceHasMeansDataset = this.studyService.environmentHasGivenDatasetType(instance.getInstanceId(), DatasetTypeEnum.MEANS_DATA);
+				if (hasCrossesOrSelections && instance.isHasExperimentalDesign()) {
+					instance.setCanBeDeleted(false);
+				} else if (hasMeansDataset && instanceHasMeansDataset) {
 					instance.setCanBeDeleted(false);
 				}
 			}

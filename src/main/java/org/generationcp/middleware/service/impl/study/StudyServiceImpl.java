@@ -39,6 +39,7 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -614,6 +615,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO()
 			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.MEANS_DATA.getId());
 		return (!org.springframework.util.CollectionUtils.isEmpty(datasets));
+	}
+
+	@Override
+	public boolean environmentHasGivenDatasetType(final Integer environmentId, final DatasetTypeEnum datasetTypeId) {
+		return Util.getIntValue(this.studyDataManager.getDatasetIdByEnvironmentIdAndDatasetType(environmentId, datasetTypeId)) > 0;
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
