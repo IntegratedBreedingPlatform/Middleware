@@ -606,7 +606,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertTrue(studyInstance2.isHasFieldmap());
 		Assert.assertTrue(studyInstance2.isHasExperimentalDesign());
 		// Instance deletion not allowed because instance has means dataset
-		Assert.assertFalse(studyInstance2.getCanBeDeleted());
+		Assert.assertTrue(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
 
 		final StudyInstance studyInstance3 =
@@ -619,7 +619,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertFalse(studyInstance3.isHasFieldmap());
 		Assert.assertFalse(studyInstance3.isHasExperimentalDesign());
 		// Instance deletion not allowed because instance has means dataset
-		Assert.assertFalse(studyInstance3.getCanBeDeleted());
+		Assert.assertTrue(studyInstance3.getCanBeDeleted());
 		Assert.assertFalse(studyInstance3.isHasMeasurements());
 	}
 }
