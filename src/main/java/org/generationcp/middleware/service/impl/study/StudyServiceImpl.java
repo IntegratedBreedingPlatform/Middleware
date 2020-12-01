@@ -11,6 +11,7 @@ import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -469,6 +470,80 @@ public class StudyServiceImpl extends Service implements StudyService {
 			return null;
 		} catch (final MiddlewareQueryException e) {
 			final String message = "Error with getStudyDetailsForGeolocation() query with instanceId: " + instanceId;
+			StudyServiceImpl.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	@Override
+	public List<StudyDetailsDto> getStudyDetails(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		try {
+			final List<StudyMetadata> studyMetadataList = this.studyDataManager.getStudyMetadata(studySearchFilter, pageable);
+			final List<StudyDetailsDto> studyDetailsDtos = new ArrayList<>();
+			final Map<Integer, List<DatasetDTO>> trialIdToDatasetDtoMap = new HashMap<>();
+			for(final StudyMetadata studyMetadata: studyMetadataList) {
+				final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
+				studyDetailsDto.setMetadata(studyMetadata);
+				final UserDto userDto = new UserDto();
+				userDto.setUserId(studyMetadata.getOwnerId());
+				userDto.setFirstName(studyMetadata.getOwner());
+				userDto.setEmail(studyMetadata.getOwnerEmail());
+				studyDetailsDto.setContacts(Collections.singletonList(userDto));
+
+				final DmsProject environmentDataset =
+					this.daoFactory.getDmsProjectDAO()
+						.getDatasetsByTypeForStudy(studyMetadata.getTrialDbId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
+				final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
+					.getObservationSetVariables(
+						environmentDataset.getProjectId(),
+						Lists.newArrayList(VariableType.ENVIRONMENT_CONDITION.getId()));
+				final List<MeasurementVariable> environmentParameters = new ArrayList<>();
+				List<Integer> variableIds = this.getVariableIds(environmentConditions);
+				if (!variableIds.isEmpty()) {
+					environmentParameters.addAll(
+						this.studyDataManager
+							.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(studyMetadata.getStudyDbId(), variableIds));
+				}
+				final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
+					.getObservationSetVariables(
+						environmentDataset.getProjectId(),
+						Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
+				variableIds = this.getVariableIds(environmentDetails);
+				if (!variableIds.isEmpty()) {
+					environmentParameters.addAll(
+						this.studyDataManager
+							.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(studyMetadata.getStudyDbId(), variableIds));
+				}
+
+				final List<MeasurementVariable> environmentVariables = new ArrayList<>(environmentConditions);
+				environmentVariables.addAll(environmentDetails);
+				environmentParameters.addAll(this.createGeolocationVariables(environmentVariables, studyMetadata.getStudyDbId()));
+				studyDetailsDto.setEnvironmentParameters(environmentParameters);
+
+				final Map<String, String> properties = new HashMap<>();
+				variableIds = this.getVariableIds(environmentVariables);
+				properties.put("studyObjective", studyMetadata.getStudyObjective());
+				properties
+					.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(studyMetadata.getStudyDbId(), variableIds));
+				properties
+					.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId(), variableIds));
+				studyDetailsDto.setAdditionalInfo(properties);
+
+				if(trialIdToDatasetDtoMap.get(studyMetadata.getNurseryOrTrialId()) == null) {
+					List<DatasetDTO> datasetDTOs = this.daoFactory.getDmsProjectDAO().getDatasets(studyMetadata.getTrialDbId());
+					datasetDTOs =
+						datasetDTOs.stream().filter(datasetDTO -> (datasetDTO.getDatasetTypeId() != DatasetTypeEnum.SUMMARY_DATA.getId()))
+							.collect(Collectors.toList());
+					studyDetailsDto.setDatasets(datasetDTOs);
+					trialIdToDatasetDtoMap.put(studyMetadata.getNurseryOrTrialId(), datasetDTOs);
+				} else {
+					studyDetailsDto.setDatasets(trialIdToDatasetDtoMap.get(studyMetadata.getNurseryOrTrialId()));
+				}
+				studyDetailsDtos.add(studyDetailsDto);
+			}
+			return studyDetailsDtos;
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with getStudyDetails()";
 			StudyServiceImpl.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

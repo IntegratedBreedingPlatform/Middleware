@@ -2,7 +2,9 @@ package org.generationcp.middleware.service.api.study;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.user.UserDto;
 
 import java.util.List;
@@ -18,15 +20,19 @@ public class StudyDetailsDto {
 
 	private List<MeasurementVariable> environmentParameters;
 
+	private List<DatasetDTO> datasets;
+
 	private transient int hashCode;
 
 	public StudyDetailsDto() {
 	}
 
-	public StudyDetailsDto(final StudyMetadata metadata, final List<UserDto> contacts, final Map<String, String> additionalInfo) {
+	public StudyDetailsDto(final StudyMetadata metadata, final List<UserDto> contacts, final Map<String, String> additionalInfo,
+		final List<DatasetDTO> datasets) {
 		this.metadata = metadata;
 		this.contacts = contacts;
 		this.additionalInfo = additionalInfo;
+		this.datasets = datasets;
 	}
 
 	public StudyMetadata getMetadata() {
@@ -64,6 +70,15 @@ public class StudyDetailsDto {
 		this.additionalInfo = additionalInfo;
 		return this;
 	}
+
+	public List<DatasetDTO> getDatasets() {
+		return datasets;
+	}
+
+	public void setDatasets(final List<DatasetDTO> datasets) {
+		this.datasets = datasets;
+	}
+
 
 	@Override public boolean equals(final Object other) {
 		if (!(other instanceof StudyDetailsDto))

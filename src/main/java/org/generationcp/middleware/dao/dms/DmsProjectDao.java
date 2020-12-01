@@ -202,6 +202,65 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "         AND geoloc.nd_geolocation_id = :instanceId "
 		+ " GROUP BY geoloc.nd_geolocation_id ";
 
+	private static final String GET_STUDY_METADATA = " SELECT  "
+		+ "     geoloc.nd_geolocation_id AS studyDbId, "
+		+ "     pmain.project_id AS trialOrNurseryId, "
+		+ "		CONCAT(pmain.name, ' ', geoloc.description) AS studyName, "
+		+ "     study_type.study_type_id AS studyType, "
+		+ "     study_type.label AS studyTypeName, "
+		+ "     MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR.getId() + ", "
+		+ "                 geoprop.value, "
+		+ "                 NULL)) AS seasonId, "
+		+ "     pmain.project_id AS trialDbId, "
+		+ " 	pmain.name AS trialName, "
+		+ "     MAX(pmain.start_date) AS startDate, "
+		+ "     MAX(pmain.end_date) AS endDate, "
+		+ "     pmain.deleted, "
+		+ "     MAX(IF(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", "
+		+ "                 geoprop.value, "
+		+ "                 NULL)) "
+		+ "     AS locationDbId,"
+		+ "		pmain.description AS studyDescription, "
+		+ "     pmain.objective AS studyObjective, "
+		+ "     (Select definition from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId()
+		+ ", "
+		+ "			geoprop.value, "
+		+ "			NULL)))) "
+		+ "     AS experimentalDesign, "
+		+ "		pmain.study_update AS lastUpdate, "
+		+ "		nde.obs_unit_id AS studyPUI, "
+		+ "     study_type.name AS studyCode, "
+		+ "     MAX(IF(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", "
+		+ "                 loc.lname, "
+		+ "                 NULL)) AS locationName, "
+		+ " 	wper.personid AS contactDbid, "
+		+ " 	CONCAT(wper.fname, ' ', wper.lname) AS contactName, "
+		+ "     wper.pemail AS email, "
+		+ " 	pmain.program_uuid AS programDbId, "
+		+ " 	pmain.name AS programName "
+		+ " FROM "
+		+ "     nd_geolocation geoloc "
+		+ "         INNER JOIN "
+		+ "     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id "
+		+ "         INNER JOIN "
+		+ "     project proj ON proj.project_id = nde.project_id "
+		+ "         INNER JOIN "
+		+ "     project pmain ON pmain.project_id = proj.study_id "
+		+ "			INNER JOIN "
+		+ " 	project plot ON plot.study_id = pmain.project_id AND plot.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
+		+ "         INNER JOIN "
+		+ "     study_type ON study_type.study_type_id = pmain.study_type_id "
+		+ "         LEFT OUTER JOIN "
+		+ "     nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id "
+		+ "         LEFT OUTER JOIN "
+		+ "     projectprop pProp ON pmain.project_id = pProp.project_id "
+	 	+ "  		LEFT OUTER JOIN "
+		+ " 	location loc ON geoprop.value = loc.locid AND geoprop.type_id = " + TermId.LOCATION_ID.getId()
+		+ " 		LEFT JOIN workbench.users wu ON wu.userid = pmain.created_by "
+		+ "         LEFT JOIN workbench.persons wper ON wper.personid = wu.personid "
+		+ " WHERE "
+		+ "     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId();
+
 	private static final String GET_PROJECTID_BY_STUDYDBID =
 		"SELECT DISTINCT p.study_id"
 			+ " FROM project p "
@@ -760,6 +819,84 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 		} catch (final HibernateException e) {
 			final String message = "Error with getStudyMetadataForInstanceId() query from study with instanceId: " + instanceId;
+			DmsProjectDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<StudyMetadata> getStudyMetadata(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		Preconditions.checkNotNull(studySearchFilter);
+		try {
+			final List<StudyMetadata> studyMetadataList = new ArrayList<>();
+			final StringBuilder queryStringBuilder = new StringBuilder();
+			queryStringBuilder.append(DmsProjectDao.GET_STUDY_METADATA);
+			this.appendStudySearchFilter(queryStringBuilder, studySearchFilter);
+			queryStringBuilder.append(" GROUP BY geoloc.nd_geolocation_id ");
+			addPageRequestOrderBy(queryStringBuilder, pageable, DmsProjectDao.BRAPI_STUDIES_SORTABLE_FIELDS);
+			final SQLQuery query = this.getSession().createSQLQuery(queryStringBuilder.toString());
+			query.addScalar("studyDbId");
+			query.addScalar("trialOrNurseryId");
+			query.addScalar("studyName");
+			query.addScalar("studyType");
+			query.addScalar("studyTypeName");
+			query.addScalar("seasonId");
+			query.addScalar("trialDbId");
+			query.addScalar("trialName");
+			query.addScalar("startDate");
+			query.addScalar("endDate");
+			query.addScalar("deleted");
+			query.addScalar("locationDbId");
+			query.addScalar("studyDescription");
+			query.addScalar("studyObjective");
+			query.addScalar("experimentalDesign");
+			query.addScalar("lastUpdate");
+			query.addScalar("studyPUI");
+			query.addScalar("studyCode");
+			query.addScalar("locationName");
+			query.addScalar("contactDbid");
+			query.addScalar("contactName");
+			query.addScalar("email");
+			query.addScalar("programDbId");
+			query.addScalar("programName");
+			this.addStudySearchFilterParameters(query, studySearchFilter);
+
+			final List<Object[]> list = query.list();
+			if (list != null && !list.isEmpty()) {
+				for (final Object[] row : list) {
+					final StudyMetadata studyMetadata = new StudyMetadata();
+					studyMetadata.setStudyDbId((row[0] instanceof Integer) ? (Integer) row[0] : null);
+					studyMetadata.setNurseryOrTrialId((row[1] instanceof Integer) ? (Integer) row[1] : null);
+					studyMetadata.setStudyName((row[2] instanceof String) ? (String) row[2] : null);
+					studyMetadata.setStudyType((row[3] instanceof Integer) ? ((Integer) row[3]).toString() : null);
+					studyMetadata.setStudyTypeName((row[4] instanceof String) ? (String) row[4] : null);
+					if (row[5] instanceof String && !StringUtils.isBlank((String) row[5])) {
+						studyMetadata.addSeason(TermId.getById(Integer.parseInt((String) row[5])).toString());
+					}
+					studyMetadata.setTrialDbId(
+						(row[6] instanceof Integer) ? (Integer) row[6] : null);
+					studyMetadata.setTrialName((row[7] instanceof String) ? (String) row[7] : null);
+					studyMetadata.setStartDate(Util.tryParseDate((String) row[8]));
+					studyMetadata.setEndDate(Util.tryParseDate((String) row[9]));
+					studyMetadata.setActive(Boolean.FALSE.equals(row[10]));
+					studyMetadata.setLocationId((row[11] instanceof String) ? Integer.parseInt((String) row[11]) : null);
+					studyMetadata.setStudyDescription((row[12] instanceof String) ? (String) row[12] : null);
+					studyMetadata.setStudyObjective((row[13] instanceof String) ? (String) row[13] : null);
+					studyMetadata.setExperimentalDesign((row[14] instanceof String) ? (String) row[14] : null);
+					studyMetadata.setLastUpdate((row[15] instanceof String) ? (String) row[15] : null);
+					studyMetadata.setStudyPUI((row[16] instanceof String) ? (String) row[16] : null);
+					studyMetadata.setStudyCode((row[17] instanceof String) ? (String) row[17] : null);
+					studyMetadata.setLocationName((row[18] instanceof String) ? (String) row[18] : null);
+					studyMetadata.setOwnerId((row[19] instanceof Integer) ? (Integer) row[19] : null);
+					studyMetadata.setOwner((row[20] instanceof String) ? (String) row[20] : null);
+					studyMetadata.setOwnerEmail((row[21] instanceof String) ? (String) row[21] : null);
+					studyMetadataList.add(studyMetadata);
+				}
+				return studyMetadataList;
+			} else {
+				return null;
+			}
+		} catch (final HibernateException e) {
+			final String message = "Error with getStudyMetadata() query";
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -1544,6 +1681,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialPUI())) {
 			sqlQuery.setParameter("trialPUI", studySearchFilter.getTrialPUI());
 		}
+		if (studySearchFilter.getGermplasmDbId() != null) {
+			sqlQuery.setParameter("germplasmDbId", studySearchFilter.getGermplasmDbId());
+		}
+		if (studySearchFilter.getObservationVariableDbId() != null) {
+			sqlQuery.setParameter("observationVariableDbId", studySearchFilter.getObservationVariableDbId());
+		}
 		if (studySearchFilter.getActive() != null) {
 			sqlQuery.setParameter("active", (studySearchFilter.getActive().booleanValue() ? 0 : 1));
 		}
@@ -1643,6 +1786,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     project proj ON proj.project_id = nde.project_id ");
 		sql.append("         INNER JOIN ");
 		sql.append("     project pmain ON pmain.project_id = proj.study_id ");
+		sql.append("         INNER JOIN ");
+		sql.append("     project plot ON plot.study_id = pmain.project_id AND plot.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId());
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     study_type studyType ON studyType.study_type_id = pmain.study_type_id ");
 		sql.append("         LEFT OUTER JOIN ");
@@ -1690,41 +1835,49 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private void appendStudySearchFilter(final StringBuilder sql, final StudySearchFilter studySearchFilter) {
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
-			sql.append("AND geoloc.nd_geolocation_id = :studyDbId ");
+			sql.append(" AND geoloc.nd_geolocation_id = :studyDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
-			sql.append("AND geopropLocation.value = :locationDbId ");
+			sql.append(" AND geopropLocation.value = :locationDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getProgramDbId())) {
-			sql.append("AND pmain.program_uuid = :programDbId ");
+			sql.append(" AND pmain.program_uuid = :programDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getSeasonDbId())) {
-			sql.append("AND cvtermSeason.cvterm_id = :seasonDbId ");
+			sql.append(" AND cvtermSeason.cvterm_id = :seasonDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyTypeDbId())) {
-			sql.append("AND pmain.study_type_id = :studyTypeDbId ");
+			sql.append(" AND pmain.study_type_id = :studyTypeDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialDbId())) {
-			sql.append("AND pmain.project_id = :trialDbId ");
+			sql.append(" AND pmain.project_id = :trialDbId ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialName())) {
-			sql.append("AND pmain.name = :trialName ");
+			sql.append(" AND pmain.name = :trialName ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialPUI())) {
-			sql.append("AND study_exp.obs_unit_id = :trialPUI ");
+			sql.append(" AND study_exp.obs_unit_id = :trialPUI ");
+		}
+		if (studySearchFilter.getGermplasmDbId() != null) {
+			sql.append(" AND exists (SELECT 1 from stock where dbxref_id = :germplasmDbId AND project_id = pmain.project_id) ");
+		}
+		if (studySearchFilter.getObservationVariableDbId() != null) {
+			sql.append(" AND exists (SELECT 1 from projectprop where variable_id = :observationVariableDbId");
+			sql.append(" AND project_id = plot.project_id");
+			sql.append(" AND type_id in (" + VariableType.TRAIT.getId() + ", " + VariableType.SELECTION_METHOD.getId() + "))");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getContactDbId())) {
-			sql.append("AND wper.personid = :contactDbId ");
+			sql.append(" AND wper.personid = :contactDbId ");
 		}
 		if (studySearchFilter.getActive() != null) {
-			sql.append("AND pmain.deleted = :active ");
+			sql.append(" AND pmain.deleted = :active ");
 		}
 		// Search Date Range
 		if (studySearchFilter.getSearchDateRangeStart() != null) {
-			sql.append("AND :searchTrialDateStart <= pmain.end_date");
+			sql.append(" AND :searchTrialDateStart <= pmain.end_date");
 
 		} else if (studySearchFilter.getSearchDateRangeEnd() != null) {
-			sql.append("AND :searchTrialDateEnd >= pmain.start_date");
+			sql.append(" AND :searchTrialDateEnd >= pmain.start_date");
 		}
 	}
 

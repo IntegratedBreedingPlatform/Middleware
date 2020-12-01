@@ -71,6 +71,7 @@ import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
@@ -79,6 +80,7 @@ import org.generationcp.middleware.util.PlotUtil;
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -1103,6 +1105,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public StudyMetadata getStudyMetadataForInstance(final Integer instanceId) {
 		return this.getDmsProjectDao().getStudyMetadataForInstanceId(instanceId);
+	}
+
+	@Override
+	public List<StudyMetadata> getStudyMetadata(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		return this.getDmsProjectDao().getStudyMetadata(studySearchFilter, pageable);
 	}
 
 	@Override

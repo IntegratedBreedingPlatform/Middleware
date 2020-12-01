@@ -16,6 +16,8 @@ public class StudySearchFilter {
 	private String trialName;
 	private String contactDbId;
 	private String studyDbId;
+	private Integer germplasmDbId;
+	private Integer observationVariableDbId;
 	private Boolean active;
 	private Date searchDateRangeStart;
 	private Date searchDateRangeEnd;
@@ -149,6 +151,32 @@ public class StudySearchFilter {
 
 	public StudySearchFilter withSearchDateRangeEnd(final Date searchDateRangeEnd) {
 		this.searchDateRangeEnd = searchDateRangeEnd;
+		return this;
+	}
+
+	public Integer getGermplasmDbId() {
+		return germplasmDbId;
+	}
+
+	public void setGermplasmDbId(final Integer germplasmDbId) {
+		this.germplasmDbId = germplasmDbId;
+	}
+
+	public StudySearchFilter withGermplasmDbid(final Integer germplasmDbId) {
+		this.germplasmDbId = germplasmDbId;
+		return this;
+	}
+
+	public Integer getObservationVariableDbId() {
+		return observationVariableDbId;
+	}
+
+	public void setObservationVariableDbId(final Integer observationVariableDbId) {
+		this.observationVariableDbId = observationVariableDbId;
+	}
+
+	public StudySearchFilter withObservationVariableDbId(final Integer observationVariableDbId) {
+		this.observationVariableDbId = observationVariableDbId;
 		return this;
 	}
 

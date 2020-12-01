@@ -23,6 +23,10 @@ public class StudyMetadata {
 
 	private String studyTypeName;
 
+	private String studyPUI;
+
+	private String studyCode;
+
 	private List<String> seasons = new ArrayList<>();
 
 	private Integer trialDbId;
@@ -37,9 +41,17 @@ public class StudyMetadata {
 
 	private Integer locationId;
 
+	private String locationName;
+
 	private String experimentalDesign;
 
 	private String lastUpdate;
+
+	private Integer ownerId;
+
+	private String owner;
+
+	private String ownerEmail;
 
 	private transient int hashCode;
 
@@ -166,6 +178,14 @@ public class StudyMetadata {
 		return this;
 	}
 
+	public String getLocationName() {
+		return locationName;
+	}
+
+	public void setLocationName(final String locationName) {
+		this.locationName = locationName;
+	}
+
 	public String getStudyDescription() {
 		return studyDescription;
 	}
@@ -213,6 +233,46 @@ public class StudyMetadata {
 	public StudyMetadata setLastUpdate(final String lastUpdate) {
 		this.lastUpdate = lastUpdate;
 		return this;
+	}
+
+	public String getStudyCode() {
+		return studyCode;
+	}
+
+	public void setStudyCode(final String studyCode) {
+		this.studyCode = studyCode;
+	}
+
+	public String getStudyPUI() {
+		return studyPUI;
+	}
+
+	public void setStudyPUI(final String studyPUI) {
+		this.studyPUI = studyPUI;
+	}
+
+	public Integer getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(final Integer ownerId) {
+		this.ownerId = ownerId;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(final String owner) {
+		this.owner = owner;
+	}
+
+	public String getOwnerEmail() {
+		return ownerEmail;
+	}
+
+	public void setOwnerEmail(final String ownerEmail) {
+		this.ownerEmail = ownerEmail;
 	}
 
 	@Override public boolean equals(final Object other) {
