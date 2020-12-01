@@ -179,7 +179,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	}
 
-	private void saveGermplasmUpdateDTO(final Integer userId, final Map<String, Integer> attributeCodes, final Map<String, Integer> nameCodes,
+	private void saveGermplasmUpdateDTO(final Integer userId, final Map<String, Integer> attributeCodes,
+		final Map<String, Integer> nameCodes,
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm, final Multimap<String, Object[]> conflictErrors) {
@@ -187,27 +188,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
 		if (optionalGermplasmUpdateDTO.isPresent()) {
 			final GermplasmUpdateDTO germplasmUpdateDTO = optionalGermplasmUpdateDTO.get();
-			final Optional<Method> breedingMethodDtoOptional =
-				Optional.ofNullable(codeBreedingMethodDTOMap.getOrDefault(germplasmUpdateDTO.getBreedingMethodAbbr(), null));
-			final Optional<Integer> locationIdOptional =
-				Optional.ofNullable(locationAbbreviationIdMap.getOrDefault(
-					StringUtils.isNotEmpty(germplasmUpdateDTO.getLocationAbbreviation()) ?
-						germplasmUpdateDTO.getLocationAbbreviation().toUpperCase() : StringUtils.EMPTY, null));
-			final Optional<Integer> germplasmDateOptional =
-				StringUtils.isEmpty(germplasmUpdateDTO.getCreationDate()) ? Optional.empty() :
-					Optional.ofNullable(Integer.parseInt(germplasmUpdateDTO.getCreationDate()));
-			final Optional<String> referenceOptional =
-				StringUtils.isEmpty(germplasmUpdateDTO.getReference()) ? Optional.empty() :
-					Optional.ofNullable(germplasmUpdateDTO.getReference());
-
-			this.updateGermplasm(germplasm, locationIdOptional, breedingMethodDtoOptional, germplasmDateOptional,
-				referenceOptional,
+			this.updateGermplasm(germplasm, germplasmUpdateDTO, locationAbbreviationIdMap, codeBreedingMethodDTOMap,
 				conflictErrors);
 			this.saveAttributesAndNames(userId, attributeCodes, nameCodes, namesMap, attributesMap, germplasm,
 				conflictErrors,
 				germplasmUpdateDTO);
 			this.updatePreferredName(nameCodes, namesMap, germplasm, germplasmUpdateDTO, conflictErrors);
-
 		}
 	}
 
@@ -257,11 +243,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private void updateGermplasm(final Germplasm germplasm,
-		final Optional<Integer> locationIdOptional,
-		final Optional<Method> breedingMethodDtoOptional,
-		final Optional<Integer> germplasmDateOptional, final Optional<String> referenceOptional,
+	private void updateGermplasm(final Germplasm germplasm, final GermplasmUpdateDTO germplasmUpdateDTO,
+		final Map<String, Integer> locationAbbreviationIdMap,
+		final Map<String, Method> codeBreedingMethodDTOMap,
 		final Multimap<String, Object[]> conflictErrors) {
+
+		final Optional<Method> breedingMethodDtoOptional =
+			Optional.ofNullable(codeBreedingMethodDTOMap.getOrDefault(germplasmUpdateDTO.getBreedingMethodAbbr(), null));
+		final Optional<Integer> locationIdOptional =
+			Optional.ofNullable(locationAbbreviationIdMap.getOrDefault(
+				StringUtils.isNotEmpty(germplasmUpdateDTO.getLocationAbbreviation()) ?
+					germplasmUpdateDTO.getLocationAbbreviation().toUpperCase() : StringUtils.EMPTY, null));
+		final Optional<Integer> germplasmDateOptional =
+			StringUtils.isEmpty(germplasmUpdateDTO.getCreationDate()) ? Optional.empty() :
+				Optional.ofNullable(Integer.parseInt(germplasmUpdateDTO.getCreationDate()));
+		final Optional<String> referenceOptional = Optional.ofNullable(germplasmUpdateDTO.getReference());
 
 		if (breedingMethodDtoOptional.isPresent()) {
 			final String oldMethodType = germplasm.getMethod().getMtype();
@@ -277,13 +273,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 			}
 		}
 
-		if (locationIdOptional.isPresent()) {
-			germplasm.setLocationId(locationIdOptional.get());
-		}
-
-		if (germplasmDateOptional.isPresent()) {
-			germplasm.setGdate(germplasmDateOptional.get());
-		}
+		locationIdOptional.ifPresent(germplasm::setLocationId);
+		germplasmDateOptional.ifPresent(germplasm::setGdate);
 
 		this.saveOrUpdateReference(germplasm, referenceOptional);
 
@@ -426,11 +417,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				Objects::nonNull)
 				.collect(Collectors.toSet());
 
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		germplasmList.addAll(this.daoFactory.getGermplasmDao().getByUUIDListWithMethodAndBibref(germplasmUUIDs));
-		germplasmList.addAll(this.daoFactory.getGermplasmDao().getByGIDListWithMethodAndBibref(gids));
-
-		return germplasmList;
+		return this.daoFactory.getGermplasmDao().getByGIDsOrUUIDListWithMethodAndBibref(gids, germplasmUUIDs);
 
 	}
 
@@ -446,7 +433,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		germplasmUpdateDTOList.forEach(
 			g -> namesCode.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 		namesCode
-			.addAll(germplasmUpdateDTOList.stream().map(o -> o.getPreferredNameType()).filter(Objects::nonNull).collect(Collectors.toSet()));
+			.addAll(
+				germplasmUpdateDTOList.stream().map(o -> o.getPreferredNameType()).filter(Objects::nonNull).collect(Collectors.toSet()));
 		return this.daoFactory.getUserDefinedFieldDAO()
 			.getByCodes(UDTableType.NAMES_NAME.getTable(),
 				Collections.singleton(UDTableType.NAMES_NAME.getType()), namesCode).stream().collect(Collectors.toMap(
