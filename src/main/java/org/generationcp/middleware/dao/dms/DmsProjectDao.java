@@ -832,7 +832,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			queryStringBuilder.append(DmsProjectDao.GET_STUDY_METADATA);
 			this.appendStudySearchFilter(queryStringBuilder, studySearchFilter);
 			queryStringBuilder.append(" GROUP BY geoloc.nd_geolocation_id ");
-			addPageRequestOrderBy(queryStringBuilder, pageable, DmsProjectDao.BRAPI_STUDIES_SORTABLE_FIELDS);
+			addPageRequestOrderBy(queryStringBuilder, pageable, DmsProjectDao.BRAPI_INSTANCES_SORTABLE_FIELDS);
 			final SQLQuery query = this.getSession().createSQLQuery(queryStringBuilder.toString());
 			query.addScalar("studyDbId");
 			query.addScalar("trialOrNurseryId");
