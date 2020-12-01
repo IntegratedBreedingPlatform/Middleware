@@ -11,7 +11,7 @@ public class GermplasmUpdateDTO {
 
 	private Integer gid;
 	private String germplasmUUID;
-	private String preferredName;
+	private String preferredNameType;
 	private String locationAbbreviation;
 	private String creationDate;
 	private String breedingMethodAbbr;
@@ -35,12 +35,12 @@ public class GermplasmUpdateDTO {
 		this.germplasmUUID = germplasmUUID;
 	}
 
-	public String getPreferredName() {
-		return this.preferredName;
+	public String getPreferredNameType() {
+		return this.preferredNameType;
 	}
 
-	public void setPreferredName(final String preferredName) {
-		this.preferredName = preferredName;
+	public void setPreferredNameType(final String preferredNameType) {
+		this.preferredNameType = preferredNameType;
 	}
 
 	public String getLocationAbbreviation() {

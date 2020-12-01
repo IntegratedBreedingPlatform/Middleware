@@ -233,7 +233,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Germplasm germplasm, final GermplasmUpdateDTO germplasmUpdateDTO, final Multimap<String, Object[]> conflictErrors) {
 		// Update preferred name
 		final Integer preferredNameTypeId = nameCodes.get(
-			StringUtils.isNotEmpty(germplasmUpdateDTO.getPreferredName()) ? germplasmUpdateDTO.getPreferredName().toUpperCase() :
+			StringUtils.isNotEmpty(germplasmUpdateDTO.getPreferredNameType()) ? germplasmUpdateDTO.getPreferredNameType().toUpperCase() :
 				StringUtils.EMPTY);
 		final List<Name> names = namesMap.getOrDefault(germplasm.getGid(), new ArrayList<>());
 		final List<Name> preferredNames =
@@ -248,11 +248,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 			}
 		} else if (preferredNames.size() > 1) {
 			conflictErrors.put("import.germplasm.update.preferred.name.duplicate.names", new Object[] {
-				germplasmUpdateDTO.getPreferredName(),
+				germplasmUpdateDTO.getPreferredNameType(),
 				germplasm.getGid()});
-		} else if (!liquibase.util.StringUtils.isEmpty(germplasmUpdateDTO.getPreferredName())) {
+		} else if (!liquibase.util.StringUtils.isEmpty(germplasmUpdateDTO.getPreferredNameType())) {
 			conflictErrors.put("import.germplasm.update.preferred.name.doesnt.exist", new Object[] {
-				germplasmUpdateDTO.getPreferredName(),
+				germplasmUpdateDTO.getPreferredNameType(),
 				germplasm.getGid()});
 		}
 	}
@@ -446,7 +446,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		germplasmUpdateDTOList.forEach(
 			g -> namesCode.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 		namesCode
-			.addAll(germplasmUpdateDTOList.stream().map(o -> o.getPreferredName()).filter(Objects::nonNull).collect(Collectors.toSet()));
+			.addAll(germplasmUpdateDTOList.stream().map(o -> o.getPreferredNameType()).filter(Objects::nonNull).collect(Collectors.toSet()));
 		return this.daoFactory.getUserDefinedFieldDAO()
 			.getByCodes(UDTableType.NAMES_NAME.getTable(),
 				Collections.singleton(UDTableType.NAMES_NAME.getType()), namesCode).stream().collect(Collectors.toMap(

@@ -201,7 +201,7 @@ public class GermplasmServiceImplTest extends IntegrationTestBase {
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), newMethod, newLocation, creationDate);
 		// Set invalid preferred name code.
-		germplasmUpdateDTO.setPreferredName("Some Non Existing Code");
+		germplasmUpdateDTO.setPreferredNameType("Some Non Existing Code");
 
 		try {
 			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
@@ -277,7 +277,7 @@ public class GermplasmServiceImplTest extends IntegrationTestBase {
 		germplasmUpdateDTO.setGermplasmUUID(uuid);
 		germplasmUpdateDTO.setLocationAbbreviation(location.getLabbr());
 		germplasmUpdateDTO.setBreedingMethodAbbr(method.getMcode());
-		germplasmUpdateDTO.setPreferredName(DRVNM);
+		germplasmUpdateDTO.setPreferredNameType(DRVNM);
 		germplasmUpdateDTO.setCreationDate(String.valueOf(creationDate));
 		germplasmUpdateDTO.setReference("Reference gid " + gid);
 		germplasmUpdateDTO.getAttributes().put(NOTE, "Note for " + gid);
