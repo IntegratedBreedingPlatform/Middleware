@@ -569,15 +569,18 @@ public class StudyServiceImpl extends Service implements StudyService {
 				variableMap.put(mvar.getTermId(), mvar);
 			}
 			if (variableIds.contains(TermId.ALTITUDE.getId())) {
-				variableMap.get(TermId.ALTITUDE.getId()).setValue(geolocation.getAltitude().toString());
+				final String value = geolocation.getAltitude() == null ? "" : geolocation.getAltitude().toString();
+				variableMap.get(TermId.ALTITUDE.getId()).setValue(value);
 				geolocationVariables.add(variableMap.get(TermId.ALTITUDE.getId()));
 			}
 			if (variableIds.contains(TermId.LATITUDE.getId())) {
-				variableMap.get(TermId.LATITUDE.getId()).setValue(geolocation.getLatitude().toString());
+				final String value = geolocation.getLatitude() == null ? "" : geolocation.getLatitude().toString();
+				variableMap.get(TermId.LATITUDE.getId()).setValue(value);
 				geolocationVariables.add(variableMap.get(TermId.LATITUDE.getId()));
 			}
 			if (variableIds.contains(TermId.LONGITUDE.getId())) {
-				variableMap.get(TermId.LONGITUDE.getId()).setValue(geolocation.getLongitude().toString());
+				final String value = geolocation.getLongitude() == null ? "" : geolocation.getLongitude().toString();
+				variableMap.get(TermId.LONGITUDE.getId()).setValue(value);
 				geolocationVariables.add(variableMap.get(TermId.LONGITUDE.getId()));
 			}
 			if (variableIds.contains(TermId.GEODETIC_DATUM.getId())) {
