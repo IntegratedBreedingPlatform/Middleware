@@ -16,6 +16,6 @@ public interface GermplasmService {
 	Map<Integer, GermplasmImportResponseDto> importGermplasm(Integer userId, String cropName,
 		List<GermplasmImportRequestDto> germplasmImportRequestDto);
 
-	Set<Integer> importGermplasmUpdates(List<GermplasmUpdateDTO> germplasmUpdateDTOList);
+	Set<Integer> importGermplasmUpdates(Integer userId, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
 }

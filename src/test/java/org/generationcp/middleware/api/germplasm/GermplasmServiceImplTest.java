@@ -64,7 +64,7 @@ public class GermplasmServiceImplTest extends IntegrationTestBase {
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), newMethod, newLocation, creationDate);
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao().getByGIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid())).get(0);
@@ -121,7 +121,7 @@ public class GermplasmServiceImplTest extends IntegrationTestBase {
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), newMethod, newLocation, creationDate);
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao().getByGIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid())).get(0);
@@ -175,7 +175,7 @@ public class GermplasmServiceImplTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), newMethod, newLocation, creationDate);
 
 		try {
-			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.preferred.name.duplicate.names"));
 		}
@@ -204,7 +204,7 @@ public class GermplasmServiceImplTest extends IntegrationTestBase {
 		germplasmUpdateDTO.setPreferredName("Some Non Existing Code");
 
 		try {
-			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.preferred.name.doesnt.exist"));
 		}
@@ -230,7 +230,7 @@ public class GermplasmServiceImplTest extends IntegrationTestBase {
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), newMethod, newLocation, creationDate);
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
 		// Create duplicate names and attributes
 		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0, germplasm.getUserId(),
@@ -248,7 +248,7 @@ public class GermplasmServiceImplTest extends IntegrationTestBase {
 				0, germplasm.getGdate()));
 
 		try {
-			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.duplicate.names"));
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.duplicate.attributes"));
