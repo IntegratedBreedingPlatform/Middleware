@@ -15,6 +15,7 @@ import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -138,41 +139,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 
-		// Get the names as well as the codes specified in the preferred name property.
-		final Set<String> namesCode = new HashSet<>();
-		germplasmUpdateDTOList.forEach(
-			g -> namesCode.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
-		namesCode
-			.addAll(germplasmUpdateDTOList.stream().map(o -> o.getPreferredName()).filter(Objects::nonNull).collect(Collectors.toSet()));
-
-		final Set<String> attributesCode = new HashSet<>();
-		germplasmUpdateDTOList.forEach(
-			g -> attributesCode.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
-
-		// Retrieve the field id of attributes and names
-		final Map<String, Integer> attributeCodesFieldNoMap =
-			this.daoFactory.getUserDefinedFieldDAO().getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType())),
-				attributesCode).stream().collect(Collectors.toMap(
-				UserDefinedField::getFcode, UserDefinedField::getFldno));
-		final Map<String, Integer> nameCodesFieldNoMap =
-			this.daoFactory.getUserDefinedFieldDAO()
-				.getByCodes(UDTableType.NAMES_NAME.getTable(),
-					Collections.singleton(UDTableType.NAMES_NAME.getType()), namesCode).stream().collect(Collectors.toMap(
-				UserDefinedField::getFcode, UserDefinedField::getFldno));
-
-		// germplasm UUID should be the priority in getting germplasm
-		final Set<String> germplasmUUIDs =
-			germplasmUpdateDTOList.stream().map(o -> o.getGermplasmUUID()).collect(Collectors.toSet());
-		// If there's no UUID, use GID
-		final Set<Integer> gids =
-			germplasmUpdateDTOList.stream().map(o -> liquibase.util.StringUtils.isEmpty(o.getGermplasmUUID()) ? o.getGid() : null).filter(
-				Objects::nonNull)
-				.collect(Collectors.toSet());
-
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		germplasmList.addAll(this.daoFactory.getGermplasmDao().getByUUIDListWithMethodAndBibref(germplasmUUIDs));
-		germplasmList.addAll(this.daoFactory.getGermplasmDao().getByGIDListWithMethodAndBibref(gids));
+		final Map<String, Integer> nameCodesFieldNoMap = this.getNameTypesMapByCodes(germplasmUpdateDTOList);
+		final Map<String, Integer> attributeCodesFieldNoMap = this.getAttributesMapByCodes(germplasmUpdateDTOList);
+		final List<Germplasm> germplasmList = this.getGermplasmListByGIDorGermplasmUUID(germplasmUpdateDTOList);
 
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap = new HashMap<>();
 		for (final GermplasmUpdateDTO germplasmUpdateDTO : germplasmUpdateDTOList) {
@@ -188,11 +157,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.getCodeBreedingMethodDTOMap(germplasmUpdateDTOList);
 
 		// Retrieve the names and attributes associated to GIDs in one go.
+		final List<Integer> gids = germplasmList.stream().map(g -> g.getGid()).collect(Collectors.toList());
 		final Map<Integer, List<Name>> namesMap =
-			this.daoFactory.getNameDao().getNamesByGidsInMap(germplasmList.stream().map(g -> g.getGid()).collect(Collectors.toList()));
+			this.daoFactory.getNameDao().getNamesByGidsInMap(gids);
 		final List<Attribute> attributes =
 			this.daoFactory.getAttributeDAO()
-				.getAttributeValuesGIDList(germplasmList.stream().map(g -> g.getGid()).collect(Collectors.toList()));
+				.getAttributeValuesGIDList(gids);
 		final Map<Integer, List<Attribute>> attributesMap =
 			attributes.stream().collect(Collectors.groupingBy(Attribute::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
 
@@ -432,11 +402,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private boolean isGenerative(final String methodType) {
-		return methodType.equals("GEN");
+		return methodType.equals(MethodType.GENERATIVE.getCode());
 	}
 
 	private boolean isMaintenanceOrDerivative(final String methodType) {
-		return methodType.equals("DER") || methodType.equals("MAN");
+		return methodType.equals(MethodType.DERIVATIVE.getCode()) || methodType.equals(MethodType.MAINTENANCE.getCode());
 	}
 
 	private Map<String, Integer> getLocationsMapByAbbr(final List<GermplasmImportRequestDto> germplasmDtos) {
@@ -445,10 +415,55 @@ public class GermplasmServiceImpl implements GermplasmService {
 			.collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
 	}
 
+	private List<Germplasm> getGermplasmListByGIDorGermplasmUUID(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+
+		// germplasm UUID should be the priority in getting germplasm
+		final Set<String> germplasmUUIDs =
+			germplasmUpdateDTOList.stream().map(o -> o.getGermplasmUUID()).collect(Collectors.toSet());
+		// If there's no UUID, use GID
+		final Set<Integer> gids =
+			germplasmUpdateDTOList.stream().map(o -> liquibase.util.StringUtils.isEmpty(o.getGermplasmUUID()) ? o.getGid() : null).filter(
+				Objects::nonNull)
+				.collect(Collectors.toSet());
+
+		final List<Germplasm> germplasmList = new ArrayList<>();
+		germplasmList.addAll(this.daoFactory.getGermplasmDao().getByUUIDListWithMethodAndBibref(germplasmUUIDs));
+		germplasmList.addAll(this.daoFactory.getGermplasmDao().getByGIDListWithMethodAndBibref(gids));
+
+		return germplasmList;
+
+	}
+
 	private Map<String, Method> getBreedingMethodsMapByAbbr(final List<GermplasmImportRequestDto> germplasmDtos) {
 		final Set<String> breedingMethods = germplasmDtos.stream().map(g -> g.getBreedingMethodAbbr()).collect(Collectors.toSet());
 		return this.daoFactory.getMethodDAO().getByCode(new ArrayList<>(breedingMethods)).stream()
 			.collect(Collectors.toMap(Method::getMcode, method -> method));
+	}
+
+	private Map<String, Integer> getNameTypesMapByCodes(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+		// Get the names as well as the codes specified in the preferred name property.
+		final Set<String> namesCode = new HashSet<>();
+		germplasmUpdateDTOList.forEach(
+			g -> namesCode.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
+		namesCode
+			.addAll(germplasmUpdateDTOList.stream().map(o -> o.getPreferredName()).filter(Objects::nonNull).collect(Collectors.toSet()));
+		return this.daoFactory.getUserDefinedFieldDAO()
+			.getByCodes(UDTableType.NAMES_NAME.getTable(),
+				Collections.singleton(UDTableType.NAMES_NAME.getType()), namesCode).stream().collect(Collectors.toMap(
+				UserDefinedField::getFcode, UserDefinedField::getFldno));
+	}
+
+	private Map<String, Integer> getAttributesMapByCodes(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+		final Set<String> attributesCode = new HashSet<>();
+		germplasmUpdateDTOList.forEach(
+			g -> attributesCode.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
+
+		// Retrieve the field id of attributes and names
+		return
+			this.daoFactory.getUserDefinedFieldDAO().getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
+				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType())),
+				attributesCode).stream().collect(Collectors.toMap(
+				UserDefinedField::getFcode, UserDefinedField::getFldno));
 	}
 
 	private Map<String, Integer> getNameTypesMapByName(final List<GermplasmImportRequestDto> germplasmDtos) {

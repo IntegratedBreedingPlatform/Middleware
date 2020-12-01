@@ -196,10 +196,6 @@ public class Germplasm implements Serializable {
 		"SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid and n.nstat != 9 WHERE  g.deleted = 0  AND g.grplce = 0 AND "
 			+ "( nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName )";
 
-	public static final String GET_BY_GID_WITH_METHOD_TYPE =
-		"SELECT {g.*}, {m.*} " + "FROM germplsm g LEFT JOIN methods m ON g.methn = m.mid "
-			+ "WHERE g.gid = :gid AND  g.deleted = 0  AND g.grplce = 0";
-
 	/**
 	 * Used in germplasm data manager searchForGermplasm
 	 */

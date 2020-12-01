@@ -984,34 +984,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	public Germplasm getByGIDWithMethodType(final Integer gid) {
-		try {
-			if (gid != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_BY_GID_WITH_METHOD_TYPE);
-				query.addEntity("g", Germplasm.class);
-				query.addEntity("m", Method.class);
-				query.setParameter("gid", gid);
-				final List results = query.list();
-
-				if (!results.isEmpty()) {
-					final Object[] result = (Object[]) results.get(0);
-					if (result != null) {
-						final Germplasm germplasm = (Germplasm) result[0];
-						final Method method = (Method) result[1];
-						germplasm.setMethod(method);
-						return germplasm;
-					}
-				}
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with getByGIDWithMethodType(gid=" + gid + ") from Germplasm: " + e.getMessage();
-			GermplasmDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return null;
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<Germplasm> getByGIDRange(final int startGID, final int endGID) {
 		try {

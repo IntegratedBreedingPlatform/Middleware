@@ -767,14 +767,6 @@ public interface GermplasmDataManager {
 	List<Germplasm> getGermplasmByLocationId(String name, int locationID);
 
 	/**
-	 * Given a gid, return the Germplasm POJO representing the record identified by the id with its method type.
-	 *
-	 * @param gid - the id of the germplasm record to be retrieved
-	 * @return the Germplasm POJO representing the record
-	 */
-	Germplasm getGermplasmWithMethodType(Integer gid);
-
-	/**
 	 * Given a range of gid, return the list of all Germplasm.
 	 *
 	 * @param startGID - the start ID of the range of germplasm gids
