@@ -538,13 +538,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
 			this.manager.updateFieldMapWithBlockInformation(infos, false);
 
-			Assert.assertNull("Expected null but got " + trialInstance.getRowsInBlock() + " instead.", trialInstance.getRowsInBlock());
-			Assert.assertNull("Expected null but got " + trialInstance.getRangesInBlock() + " instead.", trialInstance.getRangesInBlock());
-			Assert.assertNull("Expected null but got " + trialInstance.getRowsPerPlot() + " instead.", trialInstance.getRowsPerPlot());
-			Assert.assertNull("Expected null but got " + trialInstance.getPlantingOrder() + " instead.", trialInstance.getPlantingOrder());
-			Assert.assertNull(
-				"Expected null but got " + trialInstance.getMachineRowCapacity() + " instead.",
-				trialInstance.getMachineRowCapacity());
+			Assert.assertNotNull("Expected maximum number of rows " + trialInstance.getRowsInBlock() + " instead.", trialInstance.getRowsInBlock());
+			Assert.assertNotNull("Expected maximum number of range " + trialInstance.getRangesInBlock() + " instead.", trialInstance.getRangesInBlock());
+			Assert.assertEquals("Expected with default value of 1 ", 1, (int) trialInstance.getRowsPerPlot());
+			Assert.assertEquals("Expected with default value of 1", 1, (int) trialInstance.getPlantingOrder());
+			Assert.assertEquals("Expected with default value of 1", 1, (int) trialInstance.getMachineRowCapacity());
+
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
 		}
