@@ -32,7 +32,7 @@ public interface StudyInstanceService {
 	Optional<InstanceDescriptorData> getInstanceDescriptorData(Integer instanceId, final Integer descriptorDataId, final Integer variableId);
 
 	/**
-	 * Returns the datasetId of dataset to which the studyDbId (nd_geolocation_id) belongs to.
+	 * Returns the Optional<Integer> (datasetId) of dataset to which the studyDbId (nd_geolocation_id) belongs to.
 	 * In Brapi, studyDbId is the environment/instance (nd_geolocation_id)
 	 *
 	 * @param studyDbId
@@ -40,5 +40,5 @@ public interface StudyInstanceService {
 	 * @return
 	 */
 
-	Integer instanceHasGivenDatasetType(Integer instanceId, DatasetTypeEnum datasetTypeEnum);
+	Optional<Integer> instanceHasGivenDatasetType(Integer instanceId, DatasetTypeEnum datasetTypeEnum);
 }

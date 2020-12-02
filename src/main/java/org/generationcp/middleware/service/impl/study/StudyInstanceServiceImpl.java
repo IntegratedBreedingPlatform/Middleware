@@ -141,10 +141,10 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final boolean hasMeansDataset = this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
 		if (hasCrossesOrSelections || hasMeansDataset) {
 			for (final StudyInstance instance : instances) {
-				final boolean instanceHasMeansDataset = Util.getIntValue(this.instanceHasGivenDatasetType(instance.getInstanceId(), DatasetTypeEnum.MEANS_DATA)) > 0;
+				final Optional<Integer> instanceHasGivenDatasetType = this.instanceHasGivenDatasetType(instance.getInstanceId(), DatasetTypeEnum.MEANS_DATA);
 				if (hasCrossesOrSelections && instance.isHasExperimentalDesign()) {
 					instance.setCanBeDeleted(false);
-				} else if (hasMeansDataset && instanceHasMeansDataset) {
+				} else if (hasMeansDataset && instanceHasGivenDatasetType.isPresent()) {
 					instance.setCanBeDeleted(false);
 				}
 			}
@@ -343,9 +343,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public Integer instanceHasGivenDatasetType(final Integer instanceId, final DatasetTypeEnum datasetTypeEnum) {
-		final Integer datasetTypeId =
-			this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, datasetTypeEnum);
+	public Optional<Integer> instanceHasGivenDatasetType(final Integer instanceId, final DatasetTypeEnum datasetTypeEnum) {
+		final Optional<Integer> datasetTypeId =
+			Optional.ofNullable(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, datasetTypeEnum));
 		return datasetTypeId;
 	}
 
