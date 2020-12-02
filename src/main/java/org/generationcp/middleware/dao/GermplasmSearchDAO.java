@@ -702,6 +702,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
                 return Collections.EMPTY_LIST;
             }
 
+            //Transform all added columns to upper case as attribute and name types will be stored as uppercase in map key
+            germplasmSearchRequest.getAddedColumnsPropertyIds().replaceAll(String::toUpperCase);
+
             final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
             final Map<String, Integer> attributeTypesMap = this.getAttributeTypesMap(addedColumnsPropertyIds);
             final Map<String, Integer> nameTypesMap = this.getNameTypesMap(addedColumnsPropertyIds);
