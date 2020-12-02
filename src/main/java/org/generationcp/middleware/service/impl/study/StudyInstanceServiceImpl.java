@@ -141,9 +141,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		if (hasCrossesOrSelections || hasMeansDataset) {
 			for (final StudyInstance instance : instances) {
 				final Optional<Integer> instanceHasGivenDatasetType = this.getDatasetIdForInstanceIdAndDatasetType(instance.getInstanceId(), DatasetTypeEnum.MEANS_DATA);
-				if (hasCrossesOrSelections && instance.isHasExperimentalDesign()) {
-					instance.setCanBeDeleted(false);
-				} else if (hasMeansDataset && instanceHasGivenDatasetType.isPresent()) {
+				if ((hasCrossesOrSelections && instance.isHasExperimentalDesign()) || (hasMeansDataset && instanceHasGivenDatasetType.isPresent())) {
 					instance.setCanBeDeleted(false);
 				}
 			}
@@ -343,9 +341,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Override
 	public Optional<Integer> getDatasetIdForInstanceIdAndDatasetType(final Integer instanceId, final DatasetTypeEnum datasetTypeEnum) {
-		final Optional<Integer> datasetTypeId =
+		return
 			Optional.ofNullable(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, datasetTypeEnum));
-		return datasetTypeId;
 	}
 
 	protected Optional<Location> getUnspecifiedLocation() {
