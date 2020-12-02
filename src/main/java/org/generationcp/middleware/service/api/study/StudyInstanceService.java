@@ -36,9 +36,9 @@ public interface StudyInstanceService {
 	 * In Brapi, studyDbId is the environment/instance (nd_geolocation_id)
 	 *
 	 * @param studyDbId
-	 * @param datasetType
+	 * @param datasetTypeEnum
 	 * @return
 	 */
 
-	Optional<Integer> instanceHasGivenDatasetType(Integer instanceId, DatasetTypeEnum datasetTypeEnum);
+	Optional<Integer> getDatasetIdForInstanceIdAndDatasetType(Integer instanceId, DatasetTypeEnum datasetTypeEnum);
 }

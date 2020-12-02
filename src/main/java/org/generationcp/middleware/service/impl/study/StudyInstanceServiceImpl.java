@@ -26,7 +26,6 @@ import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
-import org.generationcp.middleware.util.Util;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -141,7 +140,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final boolean hasMeansDataset = this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
 		if (hasCrossesOrSelections || hasMeansDataset) {
 			for (final StudyInstance instance : instances) {
-				final Optional<Integer> instanceHasGivenDatasetType = this.instanceHasGivenDatasetType(instance.getInstanceId(), DatasetTypeEnum.MEANS_DATA);
+				final Optional<Integer> instanceHasGivenDatasetType = this.getDatasetIdForInstanceIdAndDatasetType(instance.getInstanceId(), DatasetTypeEnum.MEANS_DATA);
 				if (hasCrossesOrSelections && instance.isHasExperimentalDesign()) {
 					instance.setCanBeDeleted(false);
 				} else if (hasMeansDataset && instanceHasGivenDatasetType.isPresent()) {
@@ -343,7 +342,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public Optional<Integer> instanceHasGivenDatasetType(final Integer instanceId, final DatasetTypeEnum datasetTypeEnum) {
+	public Optional<Integer> getDatasetIdForInstanceIdAndDatasetType(final Integer instanceId, final DatasetTypeEnum datasetTypeEnum) {
 		final Optional<Integer> datasetTypeId =
 			Optional.ofNullable(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, datasetTypeEnum));
 		return datasetTypeId;
