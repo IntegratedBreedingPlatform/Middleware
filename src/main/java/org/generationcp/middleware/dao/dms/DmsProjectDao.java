@@ -1163,7 +1163,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setScale((String) result.get(OBS_SET_SCALE));
 					measurementVariable.setMethod((String) result.get(OBS_SET_METHOD));
 					measurementVariable.setProperty((String) result.get(OBS_SET_PROPERTY));
-					measurementVariable.setScaleId(String.valueOf(result.get(OBS_SET_SCALE_ID)));
+					measurementVariable.setScaleId((Integer) result.get(OBS_SET_SCALE_ID));
 					final VariableType variableType = VariableType.getById((Integer) result.get(OBS_SET_VARIABLE_TYPE_ID));
 					measurementVariable.setVariableType(variableType);
 					//TODO: fix the saving of Treatment Factor Variables in the projectprop table.
