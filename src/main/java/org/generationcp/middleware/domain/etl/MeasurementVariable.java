@@ -525,7 +525,7 @@ public class MeasurementVariable {
 	}
 
 	public Integer getScaleId() {
-		return scaleId;
+		return this.scaleId;
 	}
 
 	public void setScaleId(final Integer scaleId) {

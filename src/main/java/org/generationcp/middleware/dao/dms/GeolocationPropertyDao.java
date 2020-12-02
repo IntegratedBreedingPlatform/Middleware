@@ -194,8 +194,8 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		return criteria.list();
 	}
 
-	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
-		List<MeasurementVariable> studyVariables = new ArrayList<>();
+	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
+		final List<MeasurementVariable> studyVariables = new ArrayList<>();
 		final List<Integer> standardEnvironmentFactors = Lists.newArrayList(
 			TermId.LOCATION_ID.getId(),
 			TermId.TRIAL_INSTANCE_FACTOR.getId(),
@@ -219,7 +219,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			query.setParameterList("standardEnvironmentFactors", standardEnvironmentFactors);
 
 			final List<Object> results = query.list();
-			for(Object result: results) {
+			for(final Object result: results) {
 
 				final Object[] row = (Object[]) result;
 				final MeasurementVariable measurementVariable = new MeasurementVariable();

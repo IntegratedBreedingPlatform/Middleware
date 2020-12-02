@@ -75,7 +75,7 @@ public class StudySearchFilter {
 	}
 
 	public String getStudyPUI() {
-		return studyPUI;
+		return this.studyPUI;
 	}
 
 	public void setStudyPUI(final String studyPUI) {
@@ -169,7 +169,7 @@ public class StudySearchFilter {
 	}
 
 	public Integer getGermplasmDbId() {
-		return germplasmDbId;
+		return this.germplasmDbId;
 	}
 
 	public void setGermplasmDbId(final Integer germplasmDbId) {
@@ -182,7 +182,7 @@ public class StudySearchFilter {
 	}
 
 	public Integer getObservationVariableDbId() {
-		return observationVariableDbId;
+		return this.observationVariableDbId;
 	}
 
 	public void setObservationVariableDbId(final Integer observationVariableDbId) {

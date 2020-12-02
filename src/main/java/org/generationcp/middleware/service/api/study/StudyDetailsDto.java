@@ -36,7 +36,7 @@ public class StudyDetailsDto {
 	}
 
 	public StudyMetadata getMetadata() {
-		return metadata;
+		return this.metadata;
 	}
 
 	public StudyDetailsDto setMetadata(final StudyMetadata metadata) {
@@ -54,7 +54,7 @@ public class StudyDetailsDto {
 	}
 
 	public List<UserDto> getContacts() {
-		return contacts;
+		return this.contacts;
 	}
 
 	public StudyDetailsDto setContacts(final List<UserDto> contacts) {
@@ -63,7 +63,7 @@ public class StudyDetailsDto {
 	}
 
 	public Map<String, String> getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 
 	public StudyDetailsDto setAdditionalInfo(final Map<String, String> additionalInfo) {
@@ -72,7 +72,7 @@ public class StudyDetailsDto {
 	}
 
 	public List<DatasetDTO> getDatasets() {
-		return datasets;
+		return this.datasets;
 	}
 
 	public void setDatasets(final List<DatasetDTO> datasets) {
@@ -83,16 +83,16 @@ public class StudyDetailsDto {
 	@Override public boolean equals(final Object other) {
 		if (!(other instanceof StudyDetailsDto))
 			return false;
-		StudyDetailsDto castOther = (StudyDetailsDto) other;
+		final StudyDetailsDto castOther = (StudyDetailsDto) other;
 		return new EqualsBuilder().append(this.additionalInfo, castOther.getAdditionalInfo()).append(this.contacts, castOther.getContacts())
 				.append(this.metadata, castOther.getMetadata()).isEquals();
 	}
 
 	@Override public int hashCode() {
-		if (hashCode == 0) {
-			hashCode = new HashCodeBuilder().append(additionalInfo).append(contacts).append(metadata).toHashCode();
+		if (this.hashCode == 0) {
+			this.hashCode = new HashCodeBuilder().append(this.additionalInfo).append(this.contacts).append(this.metadata).toHashCode();
 		}
-		return hashCode;
+		return this.hashCode;
 	}
 
 }

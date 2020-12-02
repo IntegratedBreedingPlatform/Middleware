@@ -82,7 +82,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getNurseryOrTrialId() {
-		return nurseryOrTrialId;
+		return this.nurseryOrTrialId;
 	}
 
 	public StudyMetadata setNurseryOrTrialId(final Integer nurseryOrTrialId) {
@@ -91,7 +91,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getStudyDbId() {
-		return studyDbId;
+		return this.studyDbId;
 	}
 
 	public StudyMetadata setStudyDbId(final Integer studyDbId) {
@@ -100,7 +100,7 @@ public class StudyMetadata {
 	}
 
 	public String getStudyName() {
-		return studyName;
+		return this.studyName;
 	}
 
 	public StudyMetadata setStudyName(final String studyName) {
@@ -109,7 +109,7 @@ public class StudyMetadata {
 	}
 
 	public String getStudyType() {
-		return studyType;
+		return this.studyType;
 	}
 
 	public StudyMetadata setStudyType(final String studyType) {
@@ -118,7 +118,7 @@ public class StudyMetadata {
 	}
 
 	public List<String> getSeasons() {
-		return seasons;
+		return this.seasons;
 	}
 
 	public StudyMetadata setSeasons(final List<String> seasons) {
@@ -127,7 +127,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getTrialDbId() {
-		return trialDbId;
+		return this.trialDbId;
 	}
 
 	public StudyMetadata setTrialDbId(final Integer trialDbId) {
@@ -136,7 +136,7 @@ public class StudyMetadata {
 	}
 
 	public String getTrialName() {
-		return trialName;
+		return this.trialName;
 	}
 
 	public StudyMetadata setTrialName(final String trialName) {
@@ -145,7 +145,7 @@ public class StudyMetadata {
 	}
 
 	public Date getStartDate() {
-		return startDate;
+		return this.startDate;
 	}
 
 	public StudyMetadata setStartDate(final Date startDate) {
@@ -154,7 +154,7 @@ public class StudyMetadata {
 	}
 
 	public Date getEndDate() {
-		return endDate;
+		return this.endDate;
 	}
 
 	public StudyMetadata setEndDate(final Date endDate) {
@@ -163,7 +163,7 @@ public class StudyMetadata {
 	}
 
 	public Boolean getActive() {
-		return active;
+		return this.active;
 	}
 
 	public StudyMetadata setActive(final Boolean active) {
@@ -172,7 +172,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getLocationId() {
-		return locationId;
+		return this.locationId;
 	}
 
 	public StudyMetadata setLocationId(final Integer locationId) {
@@ -181,7 +181,7 @@ public class StudyMetadata {
 	}
 
 	public String getLocationName() {
-		return locationName;
+		return this.locationName;
 	}
 
 	public void setLocationName(final String locationName) {
@@ -189,7 +189,7 @@ public class StudyMetadata {
 	}
 
 	public String getStudyDescription() {
-		return studyDescription;
+		return this.studyDescription;
 	}
 
 	public StudyMetadata setStudyDescription(final String studyDescription) {
@@ -215,7 +215,7 @@ public class StudyMetadata {
 		this.studyTypeName = studyTypeName;
 	}
 
-	public void addSeason(String season) {
+	public void addSeason(final String season) {
 		this.seasons.add(season);
 	}
 
@@ -233,7 +233,7 @@ public class StudyMetadata {
 	}
 
 	public String getExperimentalDesignId() {
-		return experimentalDesignId;
+		return this.experimentalDesignId;
 	}
 
 	public void setExperimentalDesignId(final String experimentalDesignId) {
@@ -246,7 +246,7 @@ public class StudyMetadata {
 	}
 
 	public String getStudyCode() {
-		return studyCode;
+		return this.studyCode;
 	}
 
 	public void setStudyCode(final String studyCode) {
@@ -254,7 +254,7 @@ public class StudyMetadata {
 	}
 
 	public String getStudyPUI() {
-		return studyPUI;
+		return this.studyPUI;
 	}
 
 	public void setStudyPUI(final String studyPUI) {
@@ -262,7 +262,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getOwnerId() {
-		return ownerId;
+		return this.ownerId;
 	}
 
 	public void setOwnerId(final Integer ownerId) {
@@ -270,7 +270,7 @@ public class StudyMetadata {
 	}
 
 	public String getOwner() {
-		return owner;
+		return this.owner;
 	}
 
 	public void setOwner(final String owner) {
@@ -278,7 +278,7 @@ public class StudyMetadata {
 	}
 
 	public String getOwnerEmail() {
-		return ownerEmail;
+		return this.ownerEmail;
 	}
 
 	public void setOwnerEmail(final String ownerEmail) {
@@ -288,7 +288,7 @@ public class StudyMetadata {
 	@Override public boolean equals(final Object other) {
 		if (!(other instanceof StudyMetadata))
 			return false;
-		StudyMetadata castOther = (StudyMetadata) other;
+		final StudyMetadata castOther = (StudyMetadata) other;
 		return new EqualsBuilder().append(this.nurseryOrTrialId, castOther.getNurseryOrTrialId())
 				.append(this.studyDbId, castOther.getStudyDbId()).append(this.studyName, castOther.getStudyName())
 				.append(this.studyDescription, castOther.getStudyDescription())
@@ -300,11 +300,14 @@ public class StudyMetadata {
 	}
 
 	@Override public int hashCode() {
-		if (hashCode == 0) {
-			hashCode = new HashCodeBuilder().append(nurseryOrTrialId).append(studyDbId).append(studyName).append(studyType).append(seasons)
-					.append(trialDbId).append(trialName).append(startDate).append(endDate).append(active).append(locationId).toHashCode();
+		if (this.hashCode == 0) {
+			this.hashCode = new HashCodeBuilder().append(this.nurseryOrTrialId).append(this.studyDbId).append(this.studyName).append(
+				this.studyType).append(
+				this.seasons)
+					.append(this.trialDbId).append(this.trialName).append(this.startDate).append(this.endDate).append(this.active).append(
+					this.locationId).toHashCode();
 		}
-		return hashCode;
+		return this.hashCode;
 	}
 
 }
