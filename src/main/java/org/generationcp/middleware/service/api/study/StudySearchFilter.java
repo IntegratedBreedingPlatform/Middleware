@@ -12,6 +12,7 @@ public class StudySearchFilter {
 	private String locationDbId;
 	private String seasonDbId;
 	private String trialPUI;
+	private String studyPUI;
 	private String trialDbId;
 	private String trialName;
 	private String contactDbId;
@@ -70,6 +71,19 @@ public class StudySearchFilter {
 
 	public StudySearchFilter withSeasonDbId(final String seasonDbId) {
 		this.seasonDbId = seasonDbId;
+		return this;
+	}
+
+	public String getStudyPUI() {
+		return studyPUI;
+	}
+
+	public void setStudyPUI(final String studyPUI) {
+		this.studyPUI = studyPUI;
+	}
+
+	public StudySearchFilter withStudyPUI(final String studyPUI) {
+		this.studyPUI = studyPUI;
 		return this;
 	}
 
