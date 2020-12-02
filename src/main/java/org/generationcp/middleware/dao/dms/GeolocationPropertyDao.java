@@ -203,7 +203,8 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		try{
 			final SQLQuery query =
 				this.getSession().createSQLQuery("SELECT ispcvt.name as name, ispcvt.definition as definition, "
-					+ "		cvt_scale.name AS scaleName, gprop.value AS value, cvt_scale.cvterm_id AS scaleId FROM nd_geolocationprop gprop "
+					+ "		cvt_scale.name AS scaleName, gprop.value AS value, cvt_scale.cvterm_id AS scaleId, "
+					+ "		ispcvt.cvterm_id AS variableId FROM nd_geolocationprop gprop "
 					+ "		INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.cvterm_id in (:variableIds) "
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = ispcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "		INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id "
@@ -214,6 +215,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			query.addScalar("scaleName", new StringType());
 			query.addScalar("value", new StringType());
 			query.addScalar("scaleId", new IntegerType());
+			query.addScalar("variableId", new IntegerType());
 			query.setParameterList("variableIds", variableIds);
 			query.setParameter("geolocationId", geolocationId);
 			query.setParameterList("standardEnvironmentFactors", standardEnvironmentFactors);
@@ -228,6 +230,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 				measurementVariable.setScale((row[2] instanceof String) ? (String) row[2] : null);
 				measurementVariable.setValue((row[3] instanceof String) ? (String) row[3] : null);
 				measurementVariable.setScaleId((row[4] instanceof Integer) ? (Integer) row[4] : null);
+				measurementVariable.setTermId((row[5] instanceof Integer) ? (Integer) row[5] : 0);
 				studyVariables.add(measurementVariable);
 			}
 		} catch (final MiddlewareQueryException e) {

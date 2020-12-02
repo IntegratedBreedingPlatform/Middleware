@@ -24,7 +24,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * POJO for persons table.
- * 
+ *
  */
 @Entity
 @Table(name = "persons")
@@ -70,7 +70,7 @@ public class Contact implements Serializable {
 		return this.contactId;
 	}
 
-	public void setContactId(Long contactId) {
+	public void setContactId(final Long contactId) {
 		this.contactId = contactId;
 	}
 
@@ -78,7 +78,7 @@ public class Contact implements Serializable {
 		return this.title;
 	}
 
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		this.title = title;
 	}
 
@@ -86,7 +86,7 @@ public class Contact implements Serializable {
 		return this.firstName;
 	}
 
-	public void setFirstName(String firstName) {
+	public void setFirstName(final String firstName) {
 		this.firstName = firstName;
 	}
 
@@ -94,7 +94,7 @@ public class Contact implements Serializable {
 		return this.lastName;
 	}
 
-	public void setLastName(String lastName) {
+	public void setLastName(final String lastName) {
 		this.lastName = lastName;
 	}
 
@@ -102,7 +102,7 @@ public class Contact implements Serializable {
 		return this.email;
 	}
 
-	public void setEmail(String email) {
+	public void setEmail(final String email) {
 		this.email = email;
 	}
 
@@ -110,7 +110,7 @@ public class Contact implements Serializable {
 		return this.phoneNumber;
 	}
 
-	public void setPhoneNumber(String phoneNumber) {
+	public void setPhoneNumber(final String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
 
@@ -118,7 +118,7 @@ public class Contact implements Serializable {
 		return this.institution;
 	}
 
-	public void setInstitution(String institution) {
+	public void setInstitution(final String institution) {
 		this.institution = institution;
 	}
 
@@ -126,7 +126,7 @@ public class Contact implements Serializable {
 		return this.address1;
 	}
 
-	public void setAddress1(String address) {
+	public void setAddress1(final String address) {
 		this.address1 = address;
 	}
 
@@ -134,7 +134,7 @@ public class Contact implements Serializable {
 		return this.address2;
 	}
 
-	public void setAddress2(String address2) {
+	public void setAddress2(final String address2) {
 		this.address2 = address2;
 	}
 
@@ -142,7 +142,7 @@ public class Contact implements Serializable {
 		return this.skypeId;
 	}
 
-	public void setSkypeId(String skypeId) {
+	public void setSkypeId(final String skypeId) {
 		this.skypeId = skypeId;
 	}
 
@@ -150,7 +150,7 @@ public class Contact implements Serializable {
 		return this.description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -160,25 +160,25 @@ public class Contact implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
 		if (obj == this) {
 			return true;
 		}
-		if (!Contact.class.isInstance(obj)) {
+		if (!(obj instanceof Contact)) {
 			return false;
 		}
 
-		Contact otherObj = (Contact) obj;
+		final Contact otherObj = (Contact) obj;
 
 		return new EqualsBuilder().append(this.contactId, otherObj.contactId).isEquals();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Contact [contactId=");
 		builder.append(this.contactId);
 		builder.append(", title=");
