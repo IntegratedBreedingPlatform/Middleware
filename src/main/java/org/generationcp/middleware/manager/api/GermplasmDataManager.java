@@ -302,11 +302,14 @@ public interface GermplasmDataManager {
 	List<UserDefinedField> getAllAttributesTypes();
 
 	/**
+	 * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasm.GermplasmService#getAttributesByGID(Integer)}
+	 *
 	 * Returns all the attributes of the Germplasm identified by the given id.
 	 *
 	 * @param gid - id of the Germplasm
 	 * @return List of Atributs POJOs
 	 */
+	@Deprecated
 	List<Attribute> getAttributesByGID(Integer gid);
 
 	/**
@@ -1017,15 +1020,21 @@ public interface GermplasmDataManager {
 	Germplasm getGermplasmByLocalGid(Integer lgid);
 
 	/**
+	 * * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasm.GermplasmService#getPlotCodeField()}
+	 *
 	 * @return the UDFLD table record that represents "plot code": ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE. If no record matching
 	 *         these critria is found, an empty record with fldno=0 is returned. Never returns null.
 	 */
+	@Deprecated
 	UserDefinedField getPlotCodeField();
 
 	/**
+	 * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasm.GermplasmService#getPlotCodeValue(Integer)}
+	 *
 	 * Returns value of the plot code (seed source) where the germplasm was created, identified by the given gid. Returns "Unknown" if plot
 	 * code attribute is not present. Never returns null.
 	 */
+	@Deprecated
 	String getPlotCodeValue(Integer gid);
 
 	/**
