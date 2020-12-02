@@ -441,7 +441,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(this.study.getProjectId(), studyMetadata.getTrialDbId());
 		Assert.assertEquals(this.study.getProjectId(), studyMetadata.getNurseryOrTrialId());
 		Assert.assertEquals(this.study.getName(), studyMetadata.getTrialName());
-		Assert.assertEquals(this.study.getName() + " " + 1, studyMetadata.getStudyName());
+		Assert.assertEquals(this.study.getName() + 1, studyMetadata.getStudyName());
 		Assert.assertEquals(String.valueOf(STUDY_TYPE_ID), studyMetadata.getStudyType());
 	}
 
