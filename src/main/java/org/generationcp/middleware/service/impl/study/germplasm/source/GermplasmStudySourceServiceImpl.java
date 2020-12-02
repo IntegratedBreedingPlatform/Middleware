@@ -27,7 +27,7 @@ public class GermplasmStudySourceServiceImpl implements GermplasmStudySourceServ
 
 	@Override
 	public long countGermplasmStudySources(final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
-		return this.daoFactory.getGermplasmStudySourceDAO().countFilteredGermplasmStudySourceList(germplasmStudySourceSearchRequest);
+		return this.daoFactory.getGermplasmStudySourceDAO().countGermplasmStudySourceList(germplasmStudySourceSearchRequest);
 	}
 
 	@Override
