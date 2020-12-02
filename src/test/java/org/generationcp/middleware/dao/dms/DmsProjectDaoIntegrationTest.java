@@ -469,6 +469,9 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		// Afghanistan location
 		final String locationId = "1";
 		final DmsProject study = this.createProject(studyName, workbenchProject.getUniqueID(), true);
+		final DmsProject plot =
+			this.createDataset(studyName + " - Plot Dataset", workbenchProject.getUniqueID(), DatasetTypeEnum.PLOT_DATA.getId(),
+				study, study);
 		final DmsProject summary =
 			this.createDataset(studyName + " - Summary Dataset", workbenchProject.getUniqueID(), DatasetTypeEnum.SUMMARY_DATA.getId(),
 				study, study);
