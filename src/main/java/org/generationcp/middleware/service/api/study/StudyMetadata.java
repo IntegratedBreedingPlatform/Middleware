@@ -45,6 +45,8 @@ public class StudyMetadata {
 
 	private String experimentalDesign;
 
+	private String experimentalDesignId;
+
 	private String lastUpdate;
 
 	private Integer ownerId;
@@ -228,6 +230,14 @@ public class StudyMetadata {
 
 	public String getLastUpdate() {
 		return this.lastUpdate;
+	}
+
+	public String getExperimentalDesignId() {
+		return experimentalDesignId;
+	}
+
+	public void setExperimentalDesignId(final String experimentalDesignId) {
+		this.experimentalDesignId = experimentalDesignId;
 	}
 
 	public StudyMetadata setLastUpdate(final String lastUpdate) {
