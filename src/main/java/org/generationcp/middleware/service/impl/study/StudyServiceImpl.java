@@ -617,11 +617,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return (!org.springframework.util.CollectionUtils.isEmpty(datasets));
 	}
 
-	@Override
-	public boolean environmentHasGivenDatasetType(final Integer environmentId, final DatasetTypeEnum datasetTypeId) {
-		return Util.getIntValue(this.studyDataManager.getDatasetIdByEnvironmentIdAndDatasetType(environmentId, datasetTypeId)) > 0;
-	}
-
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
 	}

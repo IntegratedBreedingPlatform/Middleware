@@ -26,6 +26,7 @@ import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
+import org.generationcp.middleware.util.Util;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -140,7 +141,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final boolean hasMeansDataset = this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
 		if (hasCrossesOrSelections || hasMeansDataset) {
 			for (final StudyInstance instance : instances) {
-				final boolean instanceHasMeansDataset = this.studyService.environmentHasGivenDatasetType(instance.getInstanceId(), DatasetTypeEnum.MEANS_DATA);
+				final boolean instanceHasMeansDataset = Util.getIntValue(this.instanceHasGivenDatasetType(instance.getInstanceId(), DatasetTypeEnum.MEANS_DATA)) > 0;
 				if (hasCrossesOrSelections && instance.isHasExperimentalDesign()) {
 					instance.setCanBeDeleted(false);
 				} else if (hasMeansDataset && instanceHasMeansDataset) {
@@ -341,6 +342,13 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		return Optional.empty();
 	}
 
+	@Override
+	public Integer instanceHasGivenDatasetType(final Integer instanceId, final DatasetTypeEnum datasetTypeEnum) {
+		final Integer datasetTypeId =
+			this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, datasetTypeEnum);
+		return datasetTypeId;
+	}
+
 	protected Optional<Location> getUnspecifiedLocation() {
 		final List<Location> locations = this.daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 		if (!locations.isEmpty()) {
@@ -380,5 +388,4 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			this.experimentDesignService.deleteStudyExperimentDesign(studyId);
 		}
 	}
-
 }

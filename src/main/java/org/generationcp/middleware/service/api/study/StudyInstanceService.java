@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.study;
 
 import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.InstanceObservationData;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 
@@ -30,5 +31,14 @@ public interface StudyInstanceService {
 
 	Optional<InstanceDescriptorData> getInstanceDescriptorData(Integer instanceId, final Integer descriptorDataId, final Integer variableId);
 
+	/**
+	 * Returns the datasetId of dataset to which the studyDbId (nd_geolocation_id) belongs to.
+	 * In Brapi, studyDbId is the environment/instance (nd_geolocation_id)
+	 *
+	 * @param studyDbId
+	 * @param datasetType
+	 * @return
+	 */
 
+	Integer instanceHasGivenDatasetType(Integer instanceId, DatasetTypeEnum datasetTypeEnum);
 }
