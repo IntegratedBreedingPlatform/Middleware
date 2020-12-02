@@ -13,6 +13,8 @@ public interface GermplasmService {
 
 	List<Germplasm> getGermplasmByGUIDs(List<String> guids);
 
+	List<Germplasm> getGermplasmByGIDs(List<Integer> gids);
+
 	Map<Integer, GermplasmImportResponseDto> importGermplasm(Integer userId, String cropName,
 		List<GermplasmImportRequestDto> germplasmImportRequestDto);
 

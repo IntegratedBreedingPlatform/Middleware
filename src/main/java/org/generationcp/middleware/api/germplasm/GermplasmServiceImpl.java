@@ -60,6 +60,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
+	public List<Germplasm> getGermplasmByGIDs(final List<Integer> gids) {
+		return daoFactory.getGermplasmDao().getByGIDList(gids);
+	}
+
+	@Override
 	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final Integer userId, final String cropName,
 		final List<GermplasmImportRequestDto> germplasmDtoList) {
 		final Map<Integer, GermplasmImportResponseDto> results = new HashMap<>();
