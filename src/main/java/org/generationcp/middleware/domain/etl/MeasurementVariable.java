@@ -37,6 +37,8 @@ public class MeasurementVariable {
 
 	private String scale;
 
+	private String scaleId;
+
 	private String method;
 
 	private String property;
@@ -520,6 +522,14 @@ public class MeasurementVariable {
 
 	public void setPossibleValuesString(final String possibleValuesString) {
 		this.possibleValuesString = possibleValuesString;
+	}
+
+	public String getScaleId() {
+		return scaleId;
+	}
+
+	public void setScaleId(final String scaleId) {
+		this.scaleId = scaleId;
 	}
 
 	@Override

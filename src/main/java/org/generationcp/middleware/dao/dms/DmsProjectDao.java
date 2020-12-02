@@ -111,6 +111,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String OBS_SET_EXPECTED_MAX = "expectedMax";
 	private static final String OBS_SET_CROP_ONTOLOGY_ID = "cropOntologyId";
 	private static final String OBS_SET_VARIABLE_VALUE = "variableValue";
+	private static final String OBS_SET_SCALE_ID = "scaleId";
 
 	/**
 	 * Type of study is stored in project.study_type_id
@@ -206,7 +207,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     geoloc.nd_geolocation_id AS studyDbId, "
 		+ "     pmain.project_id AS trialOrNurseryId, "
 		+ "		CONCAT(pmain.name, ' ', geoloc.description) AS studyName, "
-		+ "     study_type.study_type_id AS studyType, "
+		+ "     study_type.study_type_id AS studyTypeId, "
 		+ "     study_type.label AS studyTypeName, "
 		+ "     MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR.getId() + ", "
 		+ "                 geoprop.value, "
@@ -223,8 +224,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "		pmain.description AS studyDescription, "
 		+ "     pmain.objective AS studyObjective, "
 		+ "     (Select definition from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId()
-		+ ", "
-		+ "			geoprop.value, "
+		+ ", 		geoprop.value, "
 		+ "			NULL)))) "
 		+ "     AS experimentalDesign, "
 		+ "		pmain.study_update AS lastUpdate, "
@@ -236,8 +236,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ " 	wper.personid AS contactDbid, "
 		+ " 	CONCAT(wper.fname, ' ', wper.lname) AS contactName, "
 		+ "     wper.pemail AS email, "
+		+ " 	(Select cvterm_id from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId()
+		+ ", 		geoprop.value, "
+		+ "			NULL)))) "
+		+ "     AS experimentalDesignId, "
 		+ " 	pmain.program_uuid AS programDbId, "
-		+ " 	pmain.name AS programName "
+		+ " 	wp.project_name AS programName, "
+		+ "		geopropSeason.value AS seasonDbId "
 		+ " FROM "
 		+ "     nd_geolocation geoloc "
 		+ "         INNER JOIN "
@@ -256,8 +261,17 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     projectprop pProp ON pmain.project_id = pProp.project_id "
 	 	+ "  		LEFT OUTER JOIN "
 		+ " 	location loc ON geoprop.value = loc.locid AND geoprop.type_id = " + TermId.LOCATION_ID.getId()
+		+ " 		LEFT OUTER JOIN workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid "
 		+ " 		LEFT JOIN workbench.users wu ON wu.userid = pmain.created_by "
 		+ "         LEFT JOIN workbench.persons wper ON wper.personid = wu.personid "
+		+ " 		LEFT OUTER JOIN "
+		+ "     nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropSeason.type_id = "
+		+		TermId.SEASON_VAR.getId()
+		+ " 		LEFT OUTER JOIN "
+		+ "     cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value "
+		+ "         LEFT OUTER JOIN "
+		+ "     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = "
+		+ 		TermId.LOCATION_ID.getId()
 		+ " WHERE "
 		+ "     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId();
 
@@ -837,7 +851,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("studyDbId");
 			query.addScalar("trialOrNurseryId");
 			query.addScalar("studyName");
-			query.addScalar("studyType");
+			query.addScalar("studyTypeId");
 			query.addScalar("studyTypeName");
 			query.addScalar("seasonId");
 			query.addScalar("trialDbId");
@@ -856,10 +870,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("contactDbid");
 			query.addScalar("contactName");
 			query.addScalar("email");
+			query.addScalar("experimentalDesignId");
 			query.addScalar("programDbId");
 			query.addScalar("programName");
+			query.addScalar("seasonDbId");
 			this.addStudySearchFilterParameters(query, studySearchFilter);
-
+			this.addPaginationToSQLQuery(query, pageable);
 			final List<Object[]> list = query.list();
 			if (list != null && !list.isEmpty()) {
 				for (final Object[] row : list) {
@@ -889,6 +905,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					studyMetadata.setOwnerId((row[19] instanceof Integer) ? (Integer) row[19] : null);
 					studyMetadata.setOwner((row[20] instanceof String) ? (String) row[20] : null);
 					studyMetadata.setOwnerEmail((row[21] instanceof String) ? (String) row[21] : null);
+					studyMetadata.setExperimentalDesignId((row[22] instanceof Integer) ? String.valueOf( row[22] ) : null);
+					LOG.error("EXPERIMENTAL DESIGN ID: " + studyMetadata.getExperimentalDesignId());
 					studyMetadataList.add(studyMetadata);
 				}
 				return studyMetadataList;
@@ -1064,7 +1082,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   vo.expected_min AS " + OBS_SET_EXPECTED_MIN + ", "  //
 				+ "   vo.expected_max AS " + OBS_SET_EXPECTED_MAX + ", "  //
 				+ "   cropOntology.value AS " + OBS_SET_CROP_ONTOLOGY_ID + ","
-				+ "   pp.value as " + OBS_SET_VARIABLE_VALUE
+				+ "   pp.value as " + OBS_SET_VARIABLE_VALUE + ","
+				+ "	  scale.cvterm_id as " + OBS_SET_SCALE_ID
 				+ " FROM project dataset "  //
 				+ "   INNER JOIN projectprop pp ON dataset.project_id = pp.project_id "  //
 				+ "   INNER JOIN cvterm variable ON pp.variable_id = variable.cvterm_id "  //
@@ -1120,7 +1139,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.addScalar(OBS_SET_EXPECTED_MAX, new DoubleType())
 				.addScalar(OBS_SET_FORMULA_ID, new IntegerType())
 				.addScalar(OBS_SET_CROP_ONTOLOGY_ID)
-				.addScalar(OBS_SET_VARIABLE_VALUE);
+				.addScalar(OBS_SET_VARIABLE_VALUE)
+				.addScalar(OBS_SET_SCALE_ID);
 
 			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = sqlQuery.list();
@@ -1143,6 +1163,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setScale((String) result.get(OBS_SET_SCALE));
 					measurementVariable.setMethod((String) result.get(OBS_SET_METHOD));
 					measurementVariable.setProperty((String) result.get(OBS_SET_PROPERTY));
+					measurementVariable.setScaleId(String.valueOf(result.get(OBS_SET_SCALE_ID)));
 					final VariableType variableType = VariableType.getById((Integer) result.get(OBS_SET_VARIABLE_TYPE_ID));
 					measurementVariable.setVariableType(variableType);
 					//TODO: fix the saving of Treatment Factor Variables in the projectprop table.
@@ -1681,6 +1702,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialPUI())) {
 			sqlQuery.setParameter("trialPUI", studySearchFilter.getTrialPUI());
 		}
+		if (!StringUtils.isEmpty(studySearchFilter.getStudyPUI())) {
+			sqlQuery.setParameter("studyPUI", studySearchFilter.getStudyPUI());
+		}
 		if (studySearchFilter.getGermplasmDbId() != null) {
 			sqlQuery.setParameter("germplasmDbId", studySearchFilter.getGermplasmDbId());
 		}
@@ -1857,6 +1881,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialPUI())) {
 			sql.append(" AND study_exp.obs_unit_id = :trialPUI ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getStudyPUI())) {
+			sql.append(" AND nde.obs_unit_id = :studyPUI ");
 		}
 		if (studySearchFilter.getGermplasmDbId() != null) {
 			sql.append(" AND exists (SELECT 1 from stock where dbxref_id = :germplasmDbId AND project_id = pmain.project_id) ");
