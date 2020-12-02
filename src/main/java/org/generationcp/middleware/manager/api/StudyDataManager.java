@@ -444,16 +444,6 @@ public interface StudyDataManager {
 	DmsProject getParentFolder(int id);
 
 	/**
-	 * Returns the datasetId of dataset to which the studyDbId (nd_geolocation_id) belongs to.
-	 * In Brapi, studyDbId is the environment/instance (nd_geolocation_id)
-	 *
-	 * @param studyDbId
-	 * @param datasetType
-	 * @return
-	 */
-	Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer studyDbId, final DatasetTypeEnum datasetType);
-
-	/**
 	 * Returns the dms project. Accepts a project id.
 	 *
 	 * @param id the id

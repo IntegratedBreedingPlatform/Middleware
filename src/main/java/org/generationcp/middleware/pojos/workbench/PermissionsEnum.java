@@ -18,7 +18,7 @@ public enum PermissionsEnum {
 	ADD_PROGRAM,
 	MANAGE_PROGRAM_SETTINGS,
 	MANAGE_GERMPLASM,
-	SAMPLE_LISTS,
+	SAMPLES_LISTS,
 	MANAGE_STUDIES,
 	BROWSE_STUDIES,
 	HEAD_TO_HEAD_QUERY,
@@ -57,8 +57,9 @@ public enum PermissionsEnum {
 		+ ", 'MS_CREATE_LOTS')";
 
 	public static final String HAS_CREATE_LOTS_BATCH = " or hasAnyAuthority('ADMIN'"
+		+ ", 'LISTS'"
+		+ ", 'GERMPLASM_LISTS'"
 		+ ", 'STUDIES'"
-		+ ", 'MANAGE_GERMPLASM'"
 		+ ", 'MG_MANAGE_INVENTORY'"
 		+ ", 'MG_CREATE_LOTS'"
 		+ ", 'MANAGE_STUDIES'"

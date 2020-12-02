@@ -10,6 +10,16 @@ public class GermplasmNameTypeDTO {
 	private String code;
 	private String name;
 
+	public GermplasmNameTypeDTO() {
+
+	}
+
+	public GermplasmNameTypeDTO(final Integer id, final String code, final String name) {
+		this.id = id;
+		this.code = code;
+		this.name = name;
+	}
+
 	public Integer getId() {
 		return id;
 	}
