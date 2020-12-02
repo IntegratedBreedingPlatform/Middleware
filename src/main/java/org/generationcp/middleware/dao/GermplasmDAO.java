@@ -24,7 +24,6 @@ import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
@@ -33,6 +32,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -57,7 +57,6 @@ import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link Germplasm}.
- *
  */
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
@@ -238,7 +237,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return query.list();
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with getByMethodNameUsingEqual(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with getByMethodNameUsingEqual(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -251,7 +250,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return ((Long) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with countByMethodNameUsingEqual(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with countByMethodNameUsingEqual(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -268,7 +267,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return query.list();
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with getByMethodNameUsingLike(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with getByMethodNameUsingLike(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -281,7 +280,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return ((Long) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with countByMethodNameUsingLike(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with countByMethodNameUsingLike(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -298,7 +297,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return query.list();
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with getByLocationNameUsingEqual(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with getByLocationNameUsingEqual(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -311,7 +310,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return ((Long) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with countByLocationNameUsingEqual(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with countByLocationNameUsingEqual(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -328,7 +327,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return query.list();
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with getByLocationNameUsingLike(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with getByLocationNameUsingLike(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -341,7 +340,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return ((Long) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with countByLocationNameUsingLike(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with countByLocationNameUsingLike(name=" + name + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -429,7 +428,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return progenitors;
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with getProgenitorsByGIDWithPrefName(gid=" + gid + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with getProgenitorsByGIDWithPrefName(gid=" + gid + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -456,7 +455,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				if (lastGid == 0) {
 					lastGid = crossGid;
 				}
-				if (!crossGid.equals(lastGid)){
+				if (!crossGid.equals(lastGid)) {
 					map.put(lastGid, progenitors);
 					lastGid = crossGid;
 					progenitors = new ArrayList<>();
@@ -473,7 +472,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return map;
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with getProgenitorsForGIDsMap(gids=" + gids + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with getProgenitorsForGIDsMap(gids=" + gids + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -491,7 +490,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with getGermplasmDescendantByGID(gid=" + gid + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with getGermplasmDescendantByGID(gid=" + gid + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -536,7 +535,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with countGermplasmDescendantByGID(gid=" + gid + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with countGermplasmDescendantByGID(gid=" + gid + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -582,7 +581,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 		} catch (final HibernateException e) {
 			final String errorMessage =
-					"Error with countManagementNeighbors(gid=" + gid + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				"Error with countManagementNeighbors(gid=" + gid + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -727,8 +726,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			// = Record is not deleted or replaced.
 			criteria.add(Restrictions.eq(GermplasmDAO.DELETED, Boolean.FALSE));
 
-			@SuppressWarnings("unchecked")
-			final List<Germplasm> groupMembers = criteria.getExecutableCriteria(this.getSession()).list();
+			@SuppressWarnings("unchecked") final List<Germplasm> groupMembers = criteria.getExecutableCriteria(this.getSession()).list();
 			// Prime the names collection before returning ;)
 			for (final Germplasm g : groupMembers) {
 				g.getNames().size();
@@ -753,11 +751,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				// If germplasmDbId is a cross (gnpgs > 0), the parents' type should be FEMALE and MALE
 				// If germplasmDbId is advanced (gnpgs < 0), the parents type should be POPULATION and SELF
 				+ "   CASE WHEN femaleParent.gid is not null AND g.gnpgs > 0 THEN '" + ParentType.FEMALE.name() + "' "
-				+ "	  WHEN femaleParent.gid is not null AND g.gnpgs < 0 THEN '" + ParentType.POPULATION.name() + "' ELSE NULL END as parent1Type," //
+				+ "	  WHEN femaleParent.gid is not null AND g.gnpgs < 0 THEN '" + ParentType.POPULATION.name()
+				+ "' ELSE NULL END as parent1Type," //
 				+ "   maleParent.gid as parent2DbId," //
 				+ "   maleParentName.nval as parent2Name," //
 				+ "   CASE WHEN maleParent.gid is not null AND g.gnpgs > 0 THEN '" + ParentType.MALE.name() + "' "
-				+ "	  WHEN maleParent.gid is not null AND g.gnpgs < 0  THEN '" + ParentType.SELF.name() + "' ELSE NULL END as parent2Type" //
+				+ "	  WHEN maleParent.gid is not null AND g.gnpgs < 0  THEN '" + ParentType.SELF.name()
+				+ "' ELSE NULL END as parent2Type" //
 				+ " FROM germplsm g" //
 				+ "   LEFT JOIN methods m ON m.mid = g.methn" //
 				+ "   LEFT JOIN germplsm femaleParent ON g.gpid1 = femaleParent.gid" //
@@ -830,7 +830,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "   END as parentType" //
 				+ " FROM germplsm parent" //
 				+ "   LEFT JOIN germplsm progeny ON (progeny.gnpgs = -1 AND progeny.gpid2 = parent.gid)" //
-				+ "                                 OR (progeny.gnpgs >= 2 AND (progeny.gpid1 = parent.gid OR progeny.gpid2 = parent.gid))" //
+				+ "                                 OR (progeny.gnpgs >= 2 AND (progeny.gpid1 = parent.gid OR progeny.gpid2 = parent.gid))"
+				//
 				+ "   LEFT JOIN names name ON progeny.gid = name.gid AND name.nstat = 1" //
 				+ " WHERE parent.gid = :gid" //
 				+ "       AND parent.deleted = 0 AND parent.grplce = 0" //
@@ -916,8 +917,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			// Oldest created cross will be first in list.
 			criteria.addOrder(Order.asc("gid"));
 
-			@SuppressWarnings("unchecked")
-			final List<Germplasm> previousCrosses = criteria.getExecutableCriteria(this.getSession()).list();
+			@SuppressWarnings("unchecked") final List<Germplasm> previousCrosses = criteria.getExecutableCriteria(this.getSession()).list();
 			return previousCrosses;
 		} catch (final HibernateException e) {
 			final String message = "Error executing GermplasmDAO.getPreviousCrosses(female = {}, male = {}): {}";
@@ -937,7 +937,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 				// We used LIKE when matching names by prefix
 				sb.append(" FROM ( " + " 	SELECT  distinct nval " + "		FROM names " + "		WHERE names.nval LIKE :prefixLike "
-						+ "   	AND NOT EXISTS (select 1 from germplsm g where g.gid = names.gid and g.deleted = 1)" + " ) matches ");
+					+ "   	AND NOT EXISTS (select 1 from germplsm g where g.gid = names.gid and g.deleted = 1)" + " ) matches ");
 				sb.append(" ORDER BY next_number desc LIMIT 1");
 
 				final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
@@ -977,38 +977,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error with getByLocationId(name=" + name + ", locationID=" + locationID
-					+ GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				+ GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-	}
-
-	@SuppressWarnings("rawtypes")
-	public Germplasm getByGIDWithMethodType(final Integer gid) {
-		try {
-			if (gid != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_BY_GID_WITH_METHOD_TYPE);
-				query.addEntity("g", Germplasm.class);
-				query.addEntity("m", Method.class);
-				query.setParameter("gid", gid);
-				final List results = query.list();
-
-				if (!results.isEmpty()) {
-					final Object[] result = (Object[]) results.get(0);
-					if (result != null) {
-						final Germplasm germplasm = (Germplasm) result[0];
-						final Method method = (Method) result[1];
-						germplasm.setMethod(method);
-						return germplasm;
-					}
-				}
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with getByGIDWithMethodType(gid=" + gid + ") from Germplasm: " + e.getMessage();
-			GermplasmDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1028,7 +1000,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error with getByGIDRange(startGID=" + startGID + ", endGID=" + endGID
-					+ GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+				+ GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -1061,12 +1033,41 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+	public List<Germplasm> getByGIDsOrUUIDListWithMethodAndBibref(final Set<Integer> gids, final Set<String> uuids) {
+
+		if (uuids.isEmpty() && gids.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Germplasm.class);
+			criteria.createAlias("method", "method", CriteriaSpecification.LEFT_JOIN);
+			criteria.createAlias("bibref", "bibref", CriteriaSpecification.LEFT_JOIN);
+			if (gids.isEmpty()) {
+				criteria.add(Restrictions.in("germplasmUUID", uuids));
+			} else if (uuids.isEmpty()) {
+				criteria.add(Restrictions.in("gid", gids));
+			} else {
+				criteria.add(Restrictions.or(Restrictions.in("germplasmUUID", uuids), Restrictions.in("gid", gids)));
+			}
+			criteria.add(Restrictions.eq("deleted", false));
+			criteria.add(Restrictions.eq("grplce", 0));
+
+			return criteria.list();
+
+		} catch (final HibernateException e) {
+			final String message =
+				"Error with getByUUIDListWithMethodAndBibref(gids=" + uuids.toString() + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 	public Map<Integer, Integer> getGermplasmDatesByGids(final List<Integer> gids) {
 		final Map<Integer, Integer> resultMap = new HashMap<>();
 		final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_GERMPLASM_DATES_BY_GIDS);
 		query.setParameterList("gids", gids);
-		@SuppressWarnings("rawtypes")
-		final List results = query.list();
+		@SuppressWarnings("rawtypes") final List results = query.list();
 		for (final Object result : results) {
 			final Object[] resultArray = (Object[]) result;
 			final Integer gid = (Integer) resultArray[0];
@@ -1080,8 +1081,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final Map<Integer, Integer> resultMap = new HashMap<>();
 		final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_METHOD_IDS_BY_GIDS);
 		query.setParameterList("gids", gids);
-		@SuppressWarnings("rawtypes")
-		final List results = query.list();
+		@SuppressWarnings("rawtypes") final List results = query.list();
 		for (final Object result : results) {
 			final Object[] resultArray = (Object[]) result;
 			final Integer gid = (Integer) resultArray[0];
@@ -1105,8 +1105,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final SQLQuery queryNames = this.getSession().createSQLQuery(Germplasm.GET_PARENT_NAMES_BY_STUDY_ID);
 		queryNames.setParameter("projId", studyId);
 
-		@SuppressWarnings("rawtypes")
-		final List resultNames = queryNames.list();
+		@SuppressWarnings("rawtypes") final List resultNames = queryNames.list();
 
 		Name name;
 		final Map<Integer, Map<GermplasmNameType, Name>> names = new HashMap<>();
@@ -1149,8 +1148,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final List<Germplasm> germplasms = new ArrayList<>();
 		Germplasm g;
 
-		@SuppressWarnings("rawtypes")
-		final List resultGermplasms = queryGermplasms.list();
+		@SuppressWarnings("rawtypes") final List resultGermplasms = queryGermplasms.list();
 		for (final Object result : resultGermplasms) {
 			final Object[] resultArray = (Object[]) result;
 			g = new Germplasm(Integer.valueOf(resultArray[0].toString()));
@@ -1276,6 +1274,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	/**
 	 * Only return germplasm with no group assigned (mgid = 0 or mgid is null)
+	 *
 	 * @param gids
 	 * @return
 	 */
@@ -1305,15 +1304,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	/**
 	 * Resets the mgids of a given list of germplasm to zero.
+	 *
 	 * @param gids
 	 */
 	public void resetGermplasmGroup(final List<Integer> gids) {
 
 		try {
 
-		final SQLQuery query = this.getSession().createSQLQuery("UPDATE germplsm SET mgid = 0 WHERE gid IN (:gids)");
-		query.setParameterList("gids", gids);
-		query.executeUpdate();
+			final SQLQuery query = this.getSession().createSQLQuery("UPDATE germplsm SET mgid = 0 WHERE gid IN (:gids)");
+			query.setParameterList("gids", gids);
+			query.executeUpdate();
 
 		} catch (final HibernateException e) {
 			final String message = "Error with resetGermplasmGroup(gids=" + gids.toString() + ") " + e.getMessage();
@@ -1327,37 +1327,37 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		try {
 			final String sql = "SELECT convert(g.gid, char) AS germplasmDbId, reference.btable AS germplasmPUI, " //
-					+ "  (SELECT n.nval FROM names n " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'ACCNO' AND u.fldno = n.ntype)" //
-					+ "   WHERE (n.gid = g.gid) LIMIT 1) AS accessionNumber, " //
-					+ "   STR_TO_DATE (convert(g.gdate,char), '%Y%m%d') AS acquisitionDate," //
-					+ "  (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'ORI_COUN' AND u.fldno = a.atype)" //
-					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS countryOfOriginCode, " //
-					+ "   (SELECT n.nval FROM names n WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) AS germplasmName," //
-					+ "  (SELECT n.nval FROM names n " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'GENUS' AND u.fldno = n.ntype)" //
-					+ "   WHERE (n.gid = g.gid) LIMIT 1) AS genus," //
-					+ "   (SELECT ld.source FROM listdata ld" //
-					+ "   WHERE ld.gid = g.gid LIMIT 1) AS germplasmSeedSource, " //
-					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPNAM' AND u.fldno = a.atype)" //
-					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS species, " //
-					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPAUTH' AND u.fldno = a.atype)" //
-					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS speciesAuthority, " //
-					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SUBTAX' AND u.fldno = a.atype)" //
-					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxa, " //
-					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'STAUTH' AND u.fldno = a.atype)" //
-					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority, " //
-					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'PROGM' AND u.fldno = a.atype)" //
-					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS instituteCode " //
-					+ "  FROM germplsm g " //
-					+ "     LEFT JOIN reflinks reference ON reference.brefid = g.gref " //
-					+ "  WHERE g.gid = :gid and g.deleted = 0 AND g.grplce = 0";
+				+ "  (SELECT n.nval FROM names n " //
+				+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'ACCNO' AND u.fldno = n.ntype)" //
+				+ "   WHERE (n.gid = g.gid) LIMIT 1) AS accessionNumber, " //
+				+ "   STR_TO_DATE (convert(g.gdate,char), '%Y%m%d') AS acquisitionDate," //
+				+ "  (SELECT a.aval FROM atributs a " //
+				+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'ORI_COUN' AND u.fldno = a.atype)" //
+				+ "   WHERE (a.gid = g.gid) LIMIT 1) AS countryOfOriginCode, " //
+				+ "   (SELECT n.nval FROM names n WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) AS germplasmName," //
+				+ "  (SELECT n.nval FROM names n " //
+				+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'GENUS' AND u.fldno = n.ntype)" //
+				+ "   WHERE (n.gid = g.gid) LIMIT 1) AS genus," //
+				+ "   (SELECT ld.source FROM listdata ld" //
+				+ "   WHERE ld.gid = g.gid LIMIT 1) AS germplasmSeedSource, " //
+				+ "   (SELECT a.aval FROM atributs a " //
+				+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPNAM' AND u.fldno = a.atype)" //
+				+ "   WHERE (a.gid = g.gid) LIMIT 1) AS species, " //
+				+ "   (SELECT a.aval FROM atributs a " //
+				+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPAUTH' AND u.fldno = a.atype)" //
+				+ "   WHERE (a.gid = g.gid) LIMIT 1) AS speciesAuthority, " //
+				+ "   (SELECT a.aval FROM atributs a " //
+				+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SUBTAX' AND u.fldno = a.atype)" //
+				+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxa, " //
+				+ "   (SELECT a.aval FROM atributs a " //
+				+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'STAUTH' AND u.fldno = a.atype)" //
+				+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority, " //
+				+ "   (SELECT a.aval FROM atributs a " //
+				+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'PROGM' AND u.fldno = a.atype)" //
+				+ "   WHERE (a.gid = g.gid) LIMIT 1) AS instituteCode " //
+				+ "  FROM germplsm g " //
+				+ "     LEFT JOIN reflinks reference ON reference.brefid = g.gref " //
+				+ "  WHERE g.gid = :gid and g.deleted = 0 AND g.grplce = 0";
 
 			final Object object = this.getSession().createSQLQuery(sql) //
 				.addScalar("germplasmDbId").addScalar("germplasmPUI").addScalar("accessionNumber").addScalar("acquisitionDate")
@@ -1661,7 +1661,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(builder.toString());
 			sqlQuery.setParameterList("maleParentIds", maleParentIds);
 			sqlQuery.setParameter("femaleParentId", femaleParent);
-			if(gid.isPresent()) {
+			if (gid.isPresent()) {
 				sqlQuery.setParameter("gid", gid.get());
 			}
 			sqlQuery.addScalar("gid");
@@ -1704,7 +1704,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("SELECT g.gid as gid, (select n.nval from names n where n.nstat=1 and n.gid = g.gid limit 1) as nval ");
 		builder.append(" FROM germplsm g ");
-		if(maleParentIds.size() > 1) {
+		if (maleParentIds.size() > 1) {
 			// For Polycrosses
 			builder.append("INNER JOIN progntrs p ON p.gid = g.gid ");
 			this.addCommonWhereConditions(gid, builder);
@@ -1713,7 +1713,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			builder.append("AND g.gpid2 IN ( ");
 			// Create a "temporary table" that contains all the specified male parents and return the one that's not in the progenitors table
 			builder.append("SELECT parentId FROM ( ");
-			builder.append(maleParentIds.stream().map(maleParent -> " (SELECT " + maleParent + " AS parentId) ").collect(Collectors.joining("UNION ALL ")));
+			builder.append(maleParentIds.stream().map(maleParent -> " (SELECT " + maleParent + " AS parentId) ")
+				.collect(Collectors.joining("UNION ALL ")));
 			builder.append(") AS maleParentGIDs ");
 			builder.append("WHERE parentId not IN (select prog.pid from progntrs prog where prog.gid = g.gid)) ");
 			// Make sure that the number of progenitors are the same as the number of male parents specified
@@ -1729,7 +1730,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		builder.append("WHERE g.deleted = 0 AND g.gpid1 = :femaleParentId ");
 		// Crosses created using design crosses are saved before going back to the FB module,
 		// this code excludes the pre-created germplasm from the results
-		if(gid.isPresent()) {
+		if (gid.isPresent()) {
 			builder.append("AND g.gid <> :gid ");
 		}
 	}
@@ -1744,7 +1745,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(builder.toString());
 			sqlQuery.setParameterList("maleParentIds", maleParentIds);
 			sqlQuery.setParameter("femaleParentId", femaleParent);
-			if(gid.isPresent()) {
+			if (gid.isPresent()) {
 				sqlQuery.setParameter("gid", gid.get());
 			}
 

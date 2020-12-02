@@ -1102,12 +1102,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmWithMethodType() {
-		final Integer gid = 1;
-		this.germplasmDataManager.getGermplasmWithMethodType(gid);
-	}
-
-	@Test
 	public void testGetFavoriteMethodsByMethodType() {
 		final Method method = this.germplasmDataManager.getMethodByID(154);
 
