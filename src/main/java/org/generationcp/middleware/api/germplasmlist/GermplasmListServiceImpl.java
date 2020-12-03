@@ -35,7 +35,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -358,6 +360,23 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		//This is in order to improve performance in order to get all germplasm only once
 		final List<Germplasm> germplasms = this.getGermplasms(propertyNames, gids);
 
+		final Set<String> knownPropertyes =
+			Arrays.stream(GermplasmListDataPropertyName.values()).map(GermplasmListDataPropertyName::getName).collect(Collectors.toSet());
+
+		//Check if there is an unknown property in order to get attr and names info only once
+		final Set<String> allKnownPropertyNames = Arrays.stream(GermplasmListDataPropertyName.values())
+			.map(GermplasmListDataPropertyName::getName).collect(Collectors.toSet());
+		final boolean anyUnknownProperty = propertyNames.stream().anyMatch(property -> !allKnownPropertyNames.contains(property));
+		final Map<String, Integer> attributeTypesMap;
+		final Map<String, Integer> nameTypesMap;
+		if (anyUnknownProperty) {
+			attributeTypesMap = this.getAllAttributeTypesMap();
+			nameTypesMap = this.getAllNameTypesMap();
+		} else {
+			attributeTypesMap = new HashMap<>();
+			nameTypesMap = new HashMap<>();
+		}
+
 		propertyNames
 			.forEach(property -> {
 
@@ -470,7 +489,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				}
 
 				// Check if any of the columns are attribute types
-				final Map<String, Integer> attributeTypesMap = this.getAllAttributeTypesMap();
 				final Integer attributeTypeId = attributeTypesMap.get(property);
 				if (!Objects.isNull(attributeTypeId)) {
 					this.addListDataProperties(property,
@@ -480,7 +498,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				}
 
 				// Check if any of the columns are name types
-				final Map<String, Integer> nameTypesMap = this.getAllNameTypesMap();
 				final Integer nameTypeId = nameTypesMap.get(property);
 				if (!Objects.isNull(nameTypeId)) {
 					this.addListDataProperties(property,
