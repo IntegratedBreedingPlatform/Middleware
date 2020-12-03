@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.dao;
 
 import com.jamonapi.Monitor;
@@ -31,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
@@ -713,6 +713,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 				return Collections.EMPTY_LIST;
 			}
 
+			//Transform all added columns to upper case as attribute and name types will be stored as uppercase in map key
+			germplasmSearchRequest.getAddedColumnsPropertyIds().replaceAll(String::toUpperCase);
+
 			final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
 			final Map<String, Integer> attributeTypesMap = this.getAttributeTypesMap(addedColumnsPropertyIds);
 			final Map<String, Integer> nameTypesMap = this.getNameTypesMap(addedColumnsPropertyIds);
@@ -1041,6 +1044,18 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			paramBuilder.setParameterList("gids", gids);
 		}
 
+		final Integer gidFrom = germplasmSearchRequest.getGidFrom();
+		if (gidFrom != null) {
+			paramBuilder.append(" and g.gid >= :gidFrom");
+			paramBuilder.setParameter("gidFrom", gidFrom);
+		}
+
+		final Integer gidTo = germplasmSearchRequest.getGidTo();
+		if (gidTo != null) {
+			paramBuilder.append(" and g.gid <= :gidTo");
+			paramBuilder.setParameter("gidTo", gidTo);
+		}
+
 		final String germplasmUUID = germplasmSearchRequest.getGermplasmUUID();
 		if (germplasmUUID != null) {
 			paramBuilder.append(" and g.germplsm_uuid = :germplasmUUID");
@@ -1154,16 +1169,16 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			paramBuilder.setParameter("breedingMethodName", '%' + breedingMethodName + '%');
 		}
 
-		final Date harvestDateFrom = germplasmSearchRequest.getHarvestDateFrom();
-		if (harvestDateFrom != null) {
-			paramBuilder.append(" and g.gdate >= :harvestDateFrom ");
-			paramBuilder.setParameter("harvestDateFrom", DATE_FORMAT.format(harvestDateFrom));
+		final Date germplasmDateFrom = germplasmSearchRequest.getGermplasmDateFrom();
+		if (germplasmDateFrom != null) {
+			paramBuilder.append(" and g.gdate >= :germplasmDateFrom ");
+			paramBuilder.setParameter("germplasmDateFrom", DATE_FORMAT.format(germplasmDateFrom));
 		}
 
-		final Date harvestDateTo = germplasmSearchRequest.getHarvestDateTo();
-		if (harvestDateTo != null) {
-			paramBuilder.append(" and g.gdate <= :harvestDateTo ");
-			paramBuilder.setParameter("harvestDateTo", DATE_FORMAT.format(harvestDateTo));
+		final Date germplasmDateTo = germplasmSearchRequest.getGermplasmDateTo();
+		if (germplasmDateTo != null) {
+			paramBuilder.append(" and g.gdate <= :germplasmDateTo ");
+			paramBuilder.setParameter("germplasmDateTo", DATE_FORMAT.format(germplasmDateTo));
 		}
 
 		final Boolean withRawObservationsOnly = germplasmSearchRequest.getWithRawObservationsOnly();
@@ -1310,6 +1325,35 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			for (final Map.Entry<String, String> entry : attributes.entrySet()) {
 				sqlQuery.setParameter("attributeKey" + entry.getKey(), entry.getKey());
 				sqlQuery.setParameter("attributeValue" + entry.getKey(), '%' + entry.getValue() + '%');
+			}
+
+			final List<Integer> gids = sqlQuery.list();
+			if (gids == null || gids.isEmpty()) {
+				return true;
+			}
+			prefilteredGids.addAll(gids);
+		}
+
+		final Map<String, String> nameTypes = germplasmSearchRequest.getNameTypes();
+		if (!CollectionUtils.isEmpty(nameTypes)) {
+			final StringBuilder queryBuilder = new StringBuilder();
+			queryBuilder.append(" select distinct g.gid from germplsm g where  ");
+			final Iterator<Map.Entry<String, String>> iterator = nameTypes.entrySet().iterator();
+			while (iterator.hasNext()) {
+				final Map.Entry<String, String> entry = iterator.next();
+				queryBuilder.append(String.format("EXISTS (select 1 from names n \n"
+					+ " inner join udflds u on n.ntype = u.fldno \n"
+					+ " where n.gid = g.gid and u.fcode = :nameTypeKey%s and n.nval like :nameValue%<s )", entry.getKey()));
+				if (iterator.hasNext()) {
+					queryBuilder.append(" and ");
+				}
+			}
+			queryBuilder.append(LIMIT_CLAUSE);
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+			for (final Map.Entry<String, String> entry : nameTypes.entrySet()) {
+				sqlQuery.setParameter("nameTypeKey" + entry.getKey(), entry.getKey());
+				sqlQuery.setParameter("nameValue" + entry.getKey(), '%' + entry.getValue() + '%');
 			}
 
 			final List<Integer> gids = sqlQuery.list();
