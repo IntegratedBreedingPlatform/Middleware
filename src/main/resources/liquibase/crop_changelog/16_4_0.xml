@@ -47,6 +47,29 @@
 
 	<changeSet author="mderamos" id="v16.4.0-11">
 		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT
+					COUNT(*)
+					FROM
+					INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+					WHERE
+					TABLE_NAME = 'germplsm'
+					AND CONSTRAINT_NAME = 'germplsm_uuid_UNIQUE'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Drop the germplsm_uuid unique index for instances where 16.4 was previously deployed.
+		</comment>
+		<sql dbms="mysql" splitStatements="false">
+			ALTER TABLE germplsm DROP INDEX germplsm_uuid_UNIQUE;
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v16.4.0-12">
+		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
 				COUNT(*)
@@ -62,7 +85,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.0-12">
+	<changeSet author="mderamos" id="v16.4.0-13">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -155,7 +178,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.0-13">
+	<changeSet author="mderamos" id="v16.4.0-14">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -172,7 +195,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.0-14">
+	<changeSet author="mderamos" id="v16.4.0-15">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -189,7 +212,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.0-15">
+	<changeSet author="mderamos" id="v16.4.0-16">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -209,7 +232,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.0-16">
+	<changeSet author="mderamos" id="v16.4.0-17">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*) > 0 FROM germplsm WHERE deleted = 1 and germplsm_uuid is not null;
