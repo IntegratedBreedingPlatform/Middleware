@@ -20,6 +20,7 @@ public class GermplasmSearchRequest {
 			GENERATIVE, DERIVATIVE, BOTH
 		}
 
+
 		private int generationLevel = 1;
 		private Type type = Type.GENERATIVE;
 
@@ -47,6 +48,7 @@ public class GermplasmSearchRequest {
 	 */
 	private SqlTextFilter nameFilter;
 	private String germplasmUUID;
+	private List<Integer> gids;
 	private Integer gid;
 	private Integer gidFrom;
 	private Integer gidTo;
@@ -85,7 +87,7 @@ public class GermplasmSearchRequest {
 
 	// added columns
 	private List<String> addedColumnsPropertyIds = new LinkedList<>();
-	
+
 	// getter / setter
 
 	public SqlTextFilter getNameFilter() {
@@ -112,12 +114,12 @@ public class GermplasmSearchRequest {
 		this.germplasmUUID = germplasmUUID;
 	}
 
-	public Integer getGid() {
-		return this.gid;
+	public List<Integer> getGids() {
+		return this.gids;
 	}
 
-	public void setGid(final Integer gid) {
-		this.gid = gid;
+	public void setGids(final List<Integer> gids) {
+		this.gids = gids;
 	}
 
 	public Integer getGidFrom() {
@@ -321,7 +323,7 @@ public class GermplasmSearchRequest {
 	}
 
 	public Map<String, String> getNameTypes() {
-		return nameTypes;
+		return this.nameTypes;
 	}
 
 	public void setNameTypes(final Map<String, String> nameTypes) {
@@ -366,7 +368,7 @@ public class GermplasmSearchRequest {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
 

@@ -76,6 +76,7 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
+import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,11 +86,13 @@ import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -757,11 +760,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType) {
-		return this.getDmsProjectDao().getDatasetIdByEnvironmentIdAndDatasetType(environmentId, datasetType);
-	}
-
-	@Override
 	public DmsProject getProject(final int id) {
 		return this.getDmsProjectDao().getById(id);
 	}
@@ -930,7 +928,30 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			for (final FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
 				if (trial.getBlockId() != null) {
 					trial.updateBlockInformation(this.locationDataManager.getBlockInformation(trial.getBlockId()));
+				} else if (!Util.isEmpty(trial.getFieldMapLabels())){
+					// Row and Column should not be empty
+					final List<FieldMapLabel> rows = trial.getFieldMapLabels().stream().filter(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getColumn()) > 0).collect(
+						Collectors.toList());
+					final List<FieldMapLabel> ranges = trial.getFieldMapLabels().stream().filter(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getRange()) > 0).collect(
+						Collectors.toList());
+					if (!Util.isEmpty(rows) && !Util.isEmpty(ranges)) {
+						// If fieldMapLabels is not empty but no blockId, set rowsInBlock
+						// and rangeInBlock value based fieldMapLabels
+						final List<FieldMapLabel> rowsInBlock = rows.stream().sorted(Comparator.comparingInt(FieldMapLabel::getColumn).reversed()).collect(
+							Collectors.toList());
+						final List<FieldMapLabel> range = ranges.stream().sorted(Comparator.comparingInt(FieldMapLabel::getRange).reversed()).collect(
+							Collectors.toList());
+						trial.setRowsInBlock(rowsInBlock.get(0).getColumn());
+						trial.setRangesInBlock(range.get(0).getRange());
+
+						// To properly display plot layout, set default values
+						trial.setRowsPerPlot(1); //Default
+						trial.setMachineRowCapacity(1); //Default
+						trial.setPlantingOrder(1); // Default
+					}
 				}
+				trial.setHasOverlappingCoordinates(this.hasOverlappingCoordinates(trial.getFieldMapLabels()));
+				trial.setHasInValidValue(this.hasInvalidCoordinateValue(trial.getFieldMapLabels()));
 				if (isGetLocation) {
 					trial.setLocationName(this.getLocationName(locationMap, trial.getLocationId()));
 					trial.setSiteName(trial.getLocationName());
@@ -1317,5 +1338,26 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	void setTrialEnvironmentBuilder(final TrialEnvironmentBuilder trialEnvironmentBuilder) {
 		this.trialEnvironmentBuilder = trialEnvironmentBuilder;
+	}
+
+	private boolean hasInvalidCoordinateValue(final List<FieldMapLabel> labels) {
+		if (!CollectionUtils.isEmpty(labels)) {
+			return labels.stream().anyMatch(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getColumn()) <= 0 || Util.getIntValue(fieldMapLabel.getRange()) <= 0);
+		}
+		return false;
+	}
+
+	private boolean hasOverlappingCoordinates(final List<FieldMapLabel> labels) {
+		if (!CollectionUtils.isEmpty(labels)) {
+			final List<String> existing = new ArrayList<>();
+			for (final FieldMapLabel label : labels) {
+				if (existing.contains(label.getRange()+"-"+label.getColumn())) {
+					return true;
+				} else {
+					existing.add(label.getRange()+"-"+label.getColumn());
+				}
+			}
+		}
+		return false;
 	}
 }

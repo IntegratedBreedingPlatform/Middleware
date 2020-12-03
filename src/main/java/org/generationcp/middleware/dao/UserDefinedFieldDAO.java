@@ -11,9 +11,6 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.*;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.UDTableType;
@@ -29,9 +26,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 /**
  * DAO class for {@link UserDefinedField}.
- *
  */
 public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 
@@ -49,12 +50,13 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			}
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error with getByFieldTableNameAndType(name=" + tableName + " type= " + fieldType
-					+ " ) query from UserDefinedField: " + e.getMessage(), e);
+				+ " ) query from UserDefinedField: " + e.getMessage(), e);
 		}
 		return new ArrayList<>();
 	}
 
-	public List<UserDefinedField> getByFieldTableNameAndFTypeAndFName(final String tableName, final String fieldType, final  String fieldName) {
+	public List<UserDefinedField> getByFieldTableNameAndFTypeAndFName(final String tableName, final String fieldType,
+		final String fieldName) {
 		try {
 			if (tableName != null && fieldType != null) {
 				final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
@@ -65,7 +67,8 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 				return criteria.list();
 			}
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getByFieldTableNameAndFTypeAndFName(tableName=" + tableName + " fieldType= " + fieldType
+			throw new MiddlewareQueryException(
+				"Error with getByFieldTableNameAndFTypeAndFName(tableName=" + tableName + " fieldType= " + fieldType
 					+ " fieldName= " + fieldName + " ) query from UserDefinedField: " + e.getMessage(), e);
 		}
 		return new ArrayList<>();
@@ -105,7 +108,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			}
 		} catch (final NonUniqueResultException nonUniqueResultException) {
 			final String message =
-					"Multiple UDFLD records were found with fTable={}, fType={}, fCode={}. Was expecting one uniqe result only : {}";
+				"Multiple UDFLD records were found with fTable={}, fType={}, fCode={}. Was expecting one uniqe result only : {}";
 			UserDefinedFieldDAO.LOG.error(message, table, type, code, nonUniqueResultException.getMessage());
 			throw new MiddlewareQueryException(message, nonUniqueResultException);
 
@@ -123,7 +126,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		if (gidList != null && !gidList.isEmpty()) {
 			try {
 				final String sql = "SELECT DISTINCT {u.*}" + " FROM atributs a" + " INNER JOIN udflds u" + " WHERE a.atype=u.fldno"
-						+ " AND a.gid in (:gidList)" + " ORDER BY u.fname";
+					+ " AND a.gid in (:gidList)" + " ORDER BY u.fname";
 				final SQLQuery query = this.getSession().createSQLQuery(sql);
 				query.addEntity("u", UserDefinedField.class);
 				query.setParameterList("gidList", gidList);
@@ -142,7 +145,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		if (gidList != null && !gidList.isEmpty()) {
 			try {
 				final String sql = "SELECT DISTINCT {u.*}" + " FROM names n" + " INNER JOIN udflds u" + " WHERE n.ntype=u.fldno"
-						+ " AND n.gid in (:gidList)" + " ORDER BY u.fname";
+					+ " AND n.gid in (:gidList)" + " ORDER BY u.fname";
 				final SQLQuery query = this.getSession().createSQLQuery(sql);
 				query.addEntity("u", UserDefinedField.class);
 				query.setParameterList("gidList", gidList);
