@@ -29,6 +29,7 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -37,7 +38,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -89,6 +89,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 	}
+
+	@Value("${germplasm.list.add.entries.limit}")
+	public int maxAddEntriesLimit;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -221,6 +224,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 					)
 				);
 		}
+
+		this.checkLimitToAddEntriesToExistingList(addGermplasmEntriesModels.size(), germplasmList);
 
 		//Get the entryId max value
 		final int maxEntryNo = germplasmList.getListData()
@@ -626,12 +631,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	private Map<Integer, Object> getBreedingMethodData(final Set<String> propertyNames, final List<Integer> gids) {
-		final boolean hasBreedingMethodProperty = propertyNames.stream().anyMatch(property ->
-			GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName().equals(property) ||
-				GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION.getName().equals(property) ||
-				GermplasmListDataPropertyName.BREEDING_METHOD_NUMBER.getName().equals(property) ||
-				GermplasmListDataPropertyName.BREEDING_METHOD_GROUP.getName().equals(property)
-		);
+		final boolean hasBreedingMethodProperty = propertyNames.stream().anyMatch(property -> this.hasPedigreeProperty(property));
 		return hasBreedingMethodProperty ?
 			this.germplasmDataManager.getMethodsByGids(gids) :
 			new HashMap<>();
@@ -662,6 +662,23 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return hasBreedingMethodProperty ?
 			this.germplasmService.getGermplasmByGIDs(gids) :
 			new ArrayList<>();
+	}
+
+	private boolean hasPedigreeProperty(final String property) {
+		return GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName().equals(property) ||
+			GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION.getName().equals(property) ||
+			GermplasmListDataPropertyName.BREEDING_METHOD_NUMBER.getName().equals(property) ||
+			GermplasmListDataPropertyName.BREEDING_METHOD_GROUP.getName().equals(property);
+	}
+
+	private void checkLimitToAddEntriesToExistingList(final int entriesToAddSize, final GermplasmList actualGermplasmList) {
+		if (entriesToAddSize > this.maxAddEntriesLimit &&
+			!CollectionUtils.isEmpty(actualGermplasmList.getListData()) &&
+			!CollectionUtils.isEmpty(actualGermplasmList.getListData().get(0).getProperties()) &&
+			actualGermplasmList.getListData().get(0).getProperties().stream()
+				.anyMatch(listDataProperty -> this.hasPedigreeProperty(listDataProperty.getColumn()))) {
+			throw new MiddlewareRequestException("", "list.add.limit", new String[] {String.valueOf(this.maxAddEntriesLimit)});
+		}
 	}
 
 	private static class AddGermplasmEntryModel {
