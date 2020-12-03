@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -52,7 +53,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
 	private static final int MAX_CROSS_NAME_SIZE = 240;
 	private static final String TRUNCATED = "(truncated)";
-	private static final String GERMPLASM_PREFERRED_NAME = "";
 
 	private final DaoFactory daoFactory;
 
@@ -200,8 +200,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			if(Objects.isNull(searchRequest.getAddedColumnsPropertyIds())) {
 				searchRequest.setAddedColumnsPropertyIds(new ArrayList<>());
 			}
-			if (!searchRequest.getAddedColumnsPropertyIds().contains(GERMPLASM_PREFERRED_NAME)) {
-				searchRequest.getAddedColumnsPropertyIds().add(GERMPLASM_PREFERRED_NAME);
+			if (!searchRequest.getAddedColumnsPropertyIds().contains(ColumnLabels.PREFERRED_NAME.getName())) {
+				searchRequest.getAddedColumnsPropertyIds().add(ColumnLabels.PREFERRED_NAME.getName());
 			}
 
 			this.germplasmSearchService.searchGermplasm(searchRequest, null, programUUID)
