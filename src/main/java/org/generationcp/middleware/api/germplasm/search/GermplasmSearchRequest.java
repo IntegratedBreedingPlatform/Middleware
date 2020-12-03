@@ -16,7 +16,7 @@ public class GermplasmSearchRequest {
 
 	public static class IncludePedigree {
 
-		public static enum Type {
+		public enum Type {
 			GENERATIVE, DERIVATIVE, BOTH
 		}
 
@@ -49,6 +49,9 @@ public class GermplasmSearchRequest {
 	private SqlTextFilter nameFilter;
 	private String germplasmUUID;
 	private List<Integer> gids;
+	private Integer gid;
+	private Integer gidFrom;
+	private Integer gidTo;
 	private Integer groupId;
 	private String sampleUID;
 	private List<Integer> germplasmListIds;
@@ -62,9 +65,9 @@ public class GermplasmSearchRequest {
 	private List<Integer> harvestingStudyIds;
 	private String breedingMethodName;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date harvestDateFrom;
+	private Date germplasmDateFrom;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date harvestDateTo;
+	private Date germplasmDateTo;
 	private SqlTextFilter femaleParentName;
 	private SqlTextFilter maleParentName;
 	private SqlTextFilter groupSourceName;
@@ -75,6 +78,7 @@ public class GermplasmSearchRequest {
 	private Boolean withSampleOnly;
 	private Boolean inProgramListOnly;
 	private Map<String, String> attributes;
+	private Map<String, String> nameTypes;
 
 	// Include associated gids
 
@@ -116,6 +120,22 @@ public class GermplasmSearchRequest {
 
 	public void setGids(final List<Integer> gids) {
 		this.gids = gids;
+	}
+
+	public Integer getGidFrom() {
+		return this.gidFrom;
+	}
+
+	public void setGidFrom(final Integer gidFrom) {
+		this.gidFrom = gidFrom;
+	}
+
+	public Integer getGidTo() {
+		return this.gidTo;
+	}
+
+	public void setGidTo(final Integer gidTo) {
+		this.gidTo = gidTo;
 	}
 
 	public Integer getGroupId() {
@@ -206,20 +226,20 @@ public class GermplasmSearchRequest {
 		this.harvestingStudyIds = harvestingStudyIds;
 	}
 
-	public Date getHarvestDateFrom() {
-		return this.harvestDateFrom;
+	public Date getGermplasmDateFrom() {
+		return this.germplasmDateFrom;
 	}
 
-	public void setHarvestDateFrom(final Date harvestDateFrom) {
-		this.harvestDateFrom = harvestDateFrom;
+	public void setGermplasmDateFrom(final Date germplasmDateFrom) {
+		this.germplasmDateFrom = germplasmDateFrom;
 	}
 
-	public Date getHarvestDateTo() {
-		return this.harvestDateTo;
+	public Date getGermplasmDateTo() {
+		return this.germplasmDateTo;
 	}
 
-	public void setHarvestDateTo(final Date harvestDateTo) {
-		this.harvestDateTo = harvestDateTo;
+	public void setGermplasmDateTo(final Date germplasmDateTo) {
+		this.germplasmDateTo = germplasmDateTo;
 	}
 
 	public SqlTextFilter getFemaleParentName() {
@@ -302,6 +322,14 @@ public class GermplasmSearchRequest {
 		this.attributes = attributes;
 	}
 
+	public Map<String, String> getNameTypes() {
+		return this.nameTypes;
+	}
+
+	public void setNameTypes(final Map<String, String> nameTypes) {
+		this.nameTypes = nameTypes;
+	}
+
 	public IncludePedigree getIncludePedigree() {
 		return this.includePedigree;
 	}
@@ -340,7 +368,7 @@ public class GermplasmSearchRequest {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
 

@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -20,11 +21,13 @@ import org.hibernate.NonUniqueResultException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -153,6 +156,33 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			}
 		}
 		return returnList;
+	}
+
+	public List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(final String query) {
+		if (StringUtils.isBlank(query)) {
+			return Collections.EMPTY_LIST;
+		}
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("SELECT " //
+					+ "   u.fcode AS code," //
+					+ "   u.fldno AS id," //
+					+ "   u.fname AS name" //
+					+ " FROM  udflds u " //
+					+ " WHERE u.ftable = '" + UDTableType.NAMES_NAME.getTable() + "'" //
+					+ "   and u.ftype = '" + UDTableType.NAMES_NAME.getType() + "'"
+					+ "   and (u.fname like :fname or u.fcode like :fcode)"
+					+ " LIMIT 100 ");
+			sqlQuery.setParameter("fname", '%' + query + '%');
+			sqlQuery.setParameter("fcode", '%' + query + '%');
+			sqlQuery.addScalar("code");
+			sqlQuery.addScalar("id");
+			sqlQuery.addScalar("name");
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO.class));
+
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with searchNameTypes(query=" + query + "): " + e.getMessage(), e);
+		}
 	}
 
 }
