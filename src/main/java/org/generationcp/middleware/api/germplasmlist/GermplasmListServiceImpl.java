@@ -197,9 +197,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<AddGermplasmEntryModel> addGermplasmEntriesModels = new ArrayList<>();
 		if (CollectionUtils.isEmpty(searchComposite.getItemIds())) {
 			final GermplasmSearchRequest searchRequest = searchComposite.getSearchRequest();
-			if(Objects.isNull(searchRequest.getAddedColumnsPropertyIds())) {
-				searchRequest.setAddedColumnsPropertyIds(new ArrayList<>());
-			}
 			if (!searchRequest.getAddedColumnsPropertyIds().contains(ColumnLabels.PREFERRED_NAME.getName())) {
 				searchRequest.getAddedColumnsPropertyIds().add(ColumnLabels.PREFERRED_NAME.getName());
 			}
