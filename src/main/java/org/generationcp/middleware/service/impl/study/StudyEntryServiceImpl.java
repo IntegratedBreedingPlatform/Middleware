@@ -57,7 +57,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public List<StudyEntryDto> getStudyEntries(final int studyId) {
 		// Get entry number term. Name will be used for sorting
 		final Term entryNumberTerm = this.ontologyDataManager.getTermById(Integer.valueOf(TermId.ENTRY_NO.getId()));
-		// Return by ascending order of entry number. We need to perform cast first on uniquename since it's stored as string
 		return this.getStudyEntries(studyId, null, new PageRequest(0, Integer.MAX_VALUE,
 				new Sort(Sort.Direction.ASC, entryNumberTerm.getName())));
 	}
