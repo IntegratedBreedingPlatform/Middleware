@@ -360,9 +360,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		//This is in order to improve performance in order to get all germplasm only once
 		final List<Germplasm> germplasms = this.getGermplasms(propertyNames, gids);
 
-		final Set<String> knownPropertyes =
-			Arrays.stream(GermplasmListDataPropertyName.values()).map(GermplasmListDataPropertyName::getName).collect(Collectors.toSet());
-
 		//Check if there is an unknown property in order to get attr and names info only once
 		final Set<String> allKnownPropertyNames = Arrays.stream(GermplasmListDataPropertyName.values())
 			.map(GermplasmListDataPropertyName::getName).collect(Collectors.toSet());
