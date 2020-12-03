@@ -4,7 +4,7 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="mderamos" id="v16.4.0-1">
+	<changeSet author="mderamos" id="v16.4.0-9">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*) > 0
@@ -22,7 +22,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.0-2">
+	<changeSet author="mderamos" id="v16.4.0-10">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -45,7 +45,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.0-3">
+	<changeSet author="mderamos" id="v16.4.0-11">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -62,7 +62,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.0-4">
+	<changeSet author="mderamos" id="v16.4.0-12">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -115,7 +115,7 @@
 
 			IF duplicates > 0 THEN
 
-			CREATE TEMPORARY TABLE duplicate_guuids
+			CREATE TEMPORARY TABLE duplicate_guuids (index (gid))
 			SELECT g1.gid
 			FROM germplsm g1
 			WHERE EXISTS
@@ -155,7 +155,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.0-5">
+	<changeSet author="mderamos" id="v16.4.0-13">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -172,7 +172,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.0-6">
+	<changeSet author="mderamos" id="v16.4.0-14">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -189,7 +189,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.0-7">
+	<changeSet author="mderamos" id="v16.4.0-15">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -209,7 +209,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.0-8">
+	<changeSet author="mderamos" id="v16.4.0-16">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*) > 0 FROM germplsm WHERE deleted = 1 and germplsm_uuid is not null;
@@ -220,5 +220,7 @@
 			UPDATE germplsm SET germplsm_uuid = CONCAT(germplsm_uuid, '#', DATE_FORMAT(current_timestamp, "%Y%m%d%H%i%s%f")) WHERE deleted = 1 and germplsm_uuid is not null;
 		</sql>
 	</changeSet>
+
+
 
 </databaseChangeLog>
