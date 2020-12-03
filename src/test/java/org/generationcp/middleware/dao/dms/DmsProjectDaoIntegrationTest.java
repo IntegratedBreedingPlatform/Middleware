@@ -424,28 +424,6 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyMetadata() {
-		final DmsProject plot =
-			this.createDataset(this.study.getName() + " - Plot Dataset", this.study.getProgramUUID(), DatasetTypeEnum.PLOT_DATA.getId(),
-				this.study, this.study);
-		final Integer locationId = 3;
-		final Integer instanceId = this.createEnvironmentData(plot, "1", locationId, Optional.<String>absent(), Optional.<Integer>absent());
-		final StudySearchFilter studySearchFilter = new StudySearchFilter().withStudyDbId(instanceId.toString());
-		final Pageable pageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "trialName"));
-		final List<StudyMetadata> studyMetadataList = this.dmsProjectDao.getStudyMetadata(studySearchFilter, pageable);
-		Assert.assertNotNull(studyMetadataList);
-		final StudyMetadata studyMetadata = studyMetadataList.get(0);
-		Assert.assertNotNull(studyMetadata);
-		Assert.assertEquals(instanceId, studyMetadata.getStudyDbId());
-		Assert.assertEquals(locationId, studyMetadata.getLocationId());
-		Assert.assertEquals(this.study.getProjectId(), studyMetadata.getTrialDbId());
-		Assert.assertEquals(this.study.getProjectId(), studyMetadata.getNurseryOrTrialId());
-		Assert.assertEquals(this.study.getName(), studyMetadata.getTrialName());
-		Assert.assertEquals(this.study.getName() + 1, studyMetadata.getStudyName());
-		Assert.assertEquals(String.valueOf(STUDY_TYPE_ID), studyMetadata.getStudyType());
-	}
-
-	@Test
 	public void testGetDataSets() {
 		final String studyName = "Study1";
 		final String programUUID = UUID.randomUUID().toString();

@@ -33,6 +33,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.service.api.study.ExperimentalDesign;
 import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
@@ -67,6 +68,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -321,7 +323,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "where project_id in (:projectIds) and type_id = " + VariableType.TRAIT.getId();
 
 	private static final List<String> BRAPI_INSTANCES_SORTABLE_FIELDS = Arrays
-		.asList("programDbId", "programName", "studyDbId", "studyName", "trialDbId", "trialName", "studyTypeId", "studyTypeName",
+		.asList("programDbId", "programName", "studyDbId", "studyName", "trialDbId", "trialName", "studyTypeDbId", "studyTypeName",
 			"seasonDbId", "season", "startDate", "endDate", "locationDbId", "locationName");
 
 	private static final List<String> BRAPI_STUDIES_SORTABLE_FIELDS = Arrays
@@ -833,88 +835,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 		} catch (final HibernateException e) {
 			final String message = "Error with getStudyMetadataForInstanceId() query from study with instanceId: " + instanceId;
-			DmsProjectDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	public List<StudyMetadata> getStudyMetadata(final StudySearchFilter studySearchFilter, final Pageable pageable) {
-		Preconditions.checkNotNull(studySearchFilter);
-		try {
-			final List<StudyMetadata> studyMetadataList = new ArrayList<>();
-			final StringBuilder queryStringBuilder = new StringBuilder();
-			queryStringBuilder.append(DmsProjectDao.GET_STUDY_METADATA);
-			this.appendStudySearchFilter(queryStringBuilder, studySearchFilter);
-			queryStringBuilder.append(" GROUP BY geoloc.nd_geolocation_id ");
-			addPageRequestOrderBy(queryStringBuilder, pageable, DmsProjectDao.BRAPI_INSTANCES_SORTABLE_FIELDS);
-			final SQLQuery query = this.getSession().createSQLQuery(queryStringBuilder.toString());
-			query.addScalar("studyDbId");
-			query.addScalar("trialOrNurseryId");
-			query.addScalar("studyName");
-			query.addScalar("studyTypeId");
-			query.addScalar("studyTypeName");
-			query.addScalar("seasonId");
-			query.addScalar("trialDbId");
-			query.addScalar("trialName");
-			query.addScalar("startDate");
-			query.addScalar("endDate");
-			query.addScalar("deleted");
-			query.addScalar("locationDbId");
-			query.addScalar("studyDescription");
-			query.addScalar("studyObjective");
-			query.addScalar("experimentalDesign");
-			query.addScalar("lastUpdate");
-			query.addScalar("studyPUI");
-			query.addScalar("studyCode");
-			query.addScalar("locationName");
-			query.addScalar("contactDbid");
-			query.addScalar("contactName");
-			query.addScalar("email");
-			query.addScalar("experimentalDesignId");
-			query.addScalar("programDbId");
-			query.addScalar("programName");
-			query.addScalar("seasonDbId");
-			this.addStudySearchFilterParameters(query, studySearchFilter);
-			this.addPaginationToSQLQuery(query, pageable);
-			final List<Object[]> list = query.list();
-			if (list != null && !list.isEmpty()) {
-				for (final Object[] row : list) {
-					final StudyMetadata studyMetadata = new StudyMetadata();
-					studyMetadata.setStudyDbId((row[0] instanceof Integer) ? (Integer) row[0] : null);
-					studyMetadata.setNurseryOrTrialId((row[1] instanceof Integer) ? (Integer) row[1] : null);
-					studyMetadata.setStudyName((row[2] instanceof String) ? (String) row[2] : null);
-					studyMetadata.setStudyType((row[3] instanceof Integer) ? ((Integer) row[3]).toString() : null);
-					studyMetadata.setStudyTypeName((row[4] instanceof String) ? (String) row[4] : null);
-					if (row[5] instanceof String && !StringUtils.isBlank((String) row[5])) {
-						studyMetadata.addSeason(TermId.getById(Integer.parseInt((String) row[5])).toString());
-					}
-					studyMetadata.setTrialDbId(
-						(row[6] instanceof Integer) ? (Integer) row[6] : null);
-					studyMetadata.setTrialName((row[7] instanceof String) ? (String) row[7] : null);
-					studyMetadata.setStartDate(Util.tryParseDate((String) row[8]));
-					studyMetadata.setEndDate(Util.tryParseDate((String) row[9]));
-					studyMetadata.setActive(Boolean.FALSE.equals(row[10]));
-					studyMetadata.setLocationId((row[11] instanceof String) ? Integer.parseInt((String) row[11]) : null);
-					studyMetadata.setStudyDescription((row[12] instanceof String) ? (String) row[12] : null);
-					studyMetadata.setStudyObjective((row[13] instanceof String) ? (String) row[13] : null);
-					studyMetadata.setExperimentalDesign((row[14] instanceof String) ? (String) row[14] : null);
-					studyMetadata.setLastUpdate((row[15] instanceof String) ? (String) row[15] : null);
-					studyMetadata.setStudyPUI((row[16] instanceof String) ? (String) row[16] : null);
-					studyMetadata.setStudyCode((row[17] instanceof String) ? (String) row[17] : null);
-					studyMetadata.setLocationName((row[18] instanceof String) ? (String) row[18] : null);
-					studyMetadata.setOwnerId((row[19] instanceof Integer) ? (Integer) row[19] : null);
-					studyMetadata.setOwner((row[20] instanceof String) ? (String) row[20] : null);
-					studyMetadata.setOwnerEmail((row[21] instanceof String) ? (String) row[21] : null);
-					studyMetadata.setExperimentalDesignId((row[22] instanceof Integer) ? String.valueOf( row[22] ) : null);
-					LOG.error("EXPERIMENTAL DESIGN ID: " + studyMetadata.getExperimentalDesignId());
-					studyMetadataList.add(studyMetadata);
-				}
-				return studyMetadataList;
-			} else {
-				return null;
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with getStudyMetadata() query";
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -1593,6 +1513,15 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sqlQuery.addScalar("locationName");
 		sqlQuery.addScalar("programDbId");
 		sqlQuery.addScalar("programName");
+		sqlQuery.addScalar("contactDbid");
+		sqlQuery.addScalar("contactName");
+		sqlQuery.addScalar("email");
+		sqlQuery.addScalar("experimentalDesign");
+		sqlQuery.addScalar("experimentalDesignId");
+		sqlQuery.addScalar("lastUpdate");
+		sqlQuery.addScalar("studyDescription");
+		sqlQuery.addScalar("studyPUI");
+		sqlQuery.addScalar("studyObjective");
 
 		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
 
@@ -1605,9 +1534,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		for (final Map<String, Object> result : results) {
 			final StudyInstanceDto studyInstanceDto = new StudyInstanceDto();
 			studyInstanceDto.setCommonCropName(studySearchFilter.getCommonCropName());
-			studyInstanceDto.setStudyDbId(String.valueOf(result.get("studyDbId")));
+			studyInstanceDto.setStudyDbId((Integer) result.get("studyDbId"));
 			studyInstanceDto.setStudyName(String.valueOf(result.get("studyName")));
-			studyInstanceDto.setTrialDbId(String.valueOf(result.get("trialDbId")));
+			studyInstanceDto.setTrialDbId((Integer)result.get("trialDbId"));
 			studyInstanceDto.setTrialName(String.valueOf(result.get("trialName")));
 			studyInstanceDto.setStudyTypeDbId(String.valueOf(result.get("studyTypeDbId")));
 			studyInstanceDto.setStudyTypeName(String.valueOf(result.get("studyTypeName")));
@@ -1617,6 +1546,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyInstanceDto.setLocationName(String.valueOf(result.get("locationName")));
 			studyInstanceDto.setProgramDbId(String.valueOf(result.get("programDbId")));
 			studyInstanceDto.setProgramName(String.valueOf(result.get("programName")));
+			studyInstanceDto.setContacts(Collections.singletonList(new ContactDto((Integer) result.get("contactDbId"),
+				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
+			if(result.get("experimentalDesignId") != null) {
+				studyInstanceDto.setExperimentalDesign(new ExperimentalDesign(
+					String.valueOf(result.get("experimentalDesignId")),	String.valueOf(result.get("experimentalDesign"))));
+			}
+
+			final Map<String, String> lastUpdate = new HashMap<>();
+			lastUpdate.put("timeStamp", String.valueOf(result.get("lastUpdate")));
+			lastUpdate.put("version", "1.0");
+			studyInstanceDto.setLastUpdate(lastUpdate);
+
+			studyInstanceDto.setStudyDescription(String.valueOf(result.get("studyDescription")));
+			studyInstanceDto.setStudyPUI(String.valueOf(result.get("studyPUI")));
 
 			final List<SeasonDto> seasons = new ArrayList<>();
 			final String seasonDbId = (String) result.get("seasonDbId");
@@ -1628,6 +1571,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyInstanceDto
 				.setActive(((Integer) result.get("active")) == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
 			studyInstanceDtoList.add(studyInstanceDto);
+
+			final Map<String, String> properties = new HashMap<>();
+			properties.put("studyObjective", result.get("studyObjective") ==  null ? "" : String.valueOf(result.get("studyObjective")));
+			studyInstanceDto.setAdditionalInfo(properties);
 		}
 		return studyInstanceDtoList;
 	}
@@ -1752,7 +1699,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     location.locid AS locationDbId, ");
 		sql.append("     location.lname AS locationName, ");
 		sql.append("     wp.project_name AS programName, ");
-		sql.append("     wp.project_uuid AS programDbId ");
+		sql.append("     wp.project_uuid AS programDbId, ");
+		sql.append("     wper.personid AS contactDbid, ");
+		sql.append("     CONCAT(wper.fname, ' ', wper.lname) AS contactName, ");
+		sql.append("     wper.pemail AS email, ");
+		sql.append("     (Select definition from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = ");
+		sql.append(TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		sql.append("     , geoprop.value, NULL)))) AS experimentalDesign, ");
+		sql.append("     (Select cvterm_id from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = ");
+		sql.append(TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		sql.append("     , 		geoprop.value, NULL)))) AS experimentalDesignId, ");
+		sql.append("     pmain.study_update AS lastUpdate, ");
+		sql.append("     pmain.description AS studyDescription, ");
+		sql.append("     nde.obs_unit_id AS studyPUI, ");
+		sql.append("     pmain.objective AS studyObjective ");
 		this.appendStudyInstanceFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
 		sql.append(" GROUP BY geoloc.nd_geolocation_id ");
@@ -1825,7 +1785,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     location ON geopropLocation.value = location.locid");
 		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id ");
+		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
+		sql.append("         LEFT JOIN workbench.users wu ON wu.userid = pmain.created_by");
+		sql.append("         LEFT JOIN workbench.persons wper ON wper.personid = wu.personid");
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value");
 		sql.append(" WHERE ");

@@ -660,8 +660,6 @@ public interface StudyDataManager {
 
 	StudyMetadata getStudyMetadataForInstance(Integer instanceId);
 
-	List<StudyMetadata> getStudyMetadata(StudySearchFilter studySearchFilter, Pageable pageable);
-
 	Map<String, String> getGeolocationPropsAndValuesByGeolocation(Integer geolocationId, List<Integer> excludedVariableIds);
 
 	Map<String, String> getProjectPropsAndValuesByStudy(Integer studyId, List<Integer> excludedVariableIds);

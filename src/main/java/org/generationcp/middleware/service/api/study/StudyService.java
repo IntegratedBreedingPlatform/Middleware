@@ -40,7 +40,7 @@ public interface StudyService {
 	 */
 	StudyDetailsDto getStudyDetailsByInstance(Integer geolocationId);
 
-	List<StudyDetailsDto> getStudyDetails(StudySearchFilter studySearchFilter, Pageable pageable);
+	List<StudyInstanceDto> getStudyInstanceDtoListWithTrialData(StudySearchFilter studySearchFilter, Pageable pageable);
 
 	/**
 	 * @param ids     of the variables that i need to check data

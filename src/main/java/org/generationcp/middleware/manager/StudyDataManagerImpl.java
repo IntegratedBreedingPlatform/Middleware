@@ -1108,11 +1108,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudyMetadata> getStudyMetadata(final StudySearchFilter studySearchFilter, final Pageable pageable) {
-		return this.getDmsProjectDao().getStudyMetadata(studySearchFilter, pageable);
-	}
-
-	@Override
 	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer studyId, final List<Integer> excludedIds) {
 		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByGeolocation(studyId, excludedIds);
 	}

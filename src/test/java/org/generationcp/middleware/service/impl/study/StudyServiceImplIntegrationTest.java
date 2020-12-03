@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -152,15 +153,15 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final StudySearchFilter studySearchFilter = new StudySearchFilter().withStudyDbId(geolocation.getLocationId().toString())
 			.withProgramDbId(this.study.getProgramUUID());
 		final Pageable pageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "trialName"));
-		final List<StudyDetailsDto> studyDetailsDtoList = this.studyService.getStudyDetails(studySearchFilter, pageable);
+		final List<StudyInstanceDto> studyDetailsDtoList = this.studyService.getStudyInstanceDtoListWithTrialData(studySearchFilter, pageable);
 		Assert.assertNotNull(studyDetailsDtoList);
 		Assert.assertEquals(1, studyDetailsDtoList.size());
-		final StudyDetailsDto studyDetailsDto = studyDetailsDtoList.get(0);
-		Assert.assertFalse(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
-		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
-		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
-		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
-		Assert.assertEquals(this.study.getName() + "1", studyDetailsDto.getMetadata().getStudyName());
+		final StudyInstanceDto studyInstanceDto = studyDetailsDtoList.get(0);
+		Assert.assertFalse(CollectionUtils.isEmpty(studyInstanceDto.getContacts()));
+		Assert.assertEquals(locationId, studyInstanceDto.getLocationDbId());
+		Assert.assertEquals(geolocation.getLocationId(), studyInstanceDto.getStudyDbId());
+		Assert.assertEquals(this.study.getProjectId(), studyInstanceDto.getTrialDbId());
+		Assert.assertEquals(this.study.getName() + " 1", studyInstanceDto.getStudyName());
 	}
 
 	@Test
