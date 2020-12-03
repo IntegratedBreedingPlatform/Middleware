@@ -223,32 +223,40 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		//Get the entryId max value
-		final int maxEntryId = germplasmList.getListData()
+		final int maxEntryNo = germplasmList.getListData()
 			.stream()
 			.mapToInt(GermplasmListData::getEntryId)
 			.max()
 			.orElse(1);
-		final AtomicInteger lastEntryId = new AtomicInteger(maxEntryId);
+		final AtomicInteger lastEntryNo = new AtomicInteger(maxEntryNo);
+
+		final Set<Integer> gids = addGermplasmEntriesModels
+			.stream()
+			.map(AddGermplasmEntryModel::getGid)
+			.collect(Collectors.toSet());
+
+		final Map<Integer, String> crossExpansionsBulk =
+			this.pedigreeService.getCrossExpansionsBulk(gids, null, this.crossExpansionProperties);
 
 		//Create germplasm lists data
 		final List<GermplasmListData> germplasmListsData = addGermplasmEntriesModels.stream().map(model -> {
-			final int entryId = lastEntryId.addAndGet(1);
+			final int entryNo = lastEntryNo.addAndGet(1);
 
 			return new GermplasmListData(null,
 				germplasmList,
 				model.getGid(),
-				entryId,
-				String.valueOf(entryId),
+				entryNo,
+				String.valueOf(entryNo),
 				this.germplasmService.getPlotCodeValue(model.getGid()),
 				model.getPreferredName(),
-				this.pedigreeService.getCrossExpansion(model.getGid(), this.crossExpansionProperties),
+				crossExpansionsBulk.get(model.getGid()),
 				0,
 				0,
 				model.getGroupId());
 		}).collect(Collectors.toList());
-		final List<GermplasmListData> savedGermplasmListData = this.addGermplasmListData(germplasmListsData);
+		this.addGermplasmListData(germplasmListsData);
 
-		if (CollectionUtils.isEmpty(savedGermplasmListData) ||
+		if (CollectionUtils.isEmpty(germplasmListsData) ||
 			CollectionUtils.isEmpty(germplasmList.getListData().get(0).getProperties())) {
 			return;
 		}
@@ -257,7 +265,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.stream()
 			.map(ListDataProperty::getColumn)
 			.collect(Collectors.toSet());
-		this.addListDataProperties(savedGermplasmListData, propertyNames);
+		this.addListDataProperties(germplasmListsData, propertyNames);
 	}
 
 	@Override
