@@ -35,6 +35,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -348,7 +349,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.collect(Collectors.toMap(GermplasmListData::getGid, germplasmListData -> germplasmListData));
 		final List<Integer> gids = new ArrayList<>(listDataIndexedByGid.keySet());
 
+		//This is in order to improve performance in order to get the breeding methods only once
+		final Map<Integer, Object> methodsByGids = this.getBreedingMethodData(propertyNames, gids);
 
+		//This is in order to improve performance in order to get pedigree info only once
+		final Table<Integer, String, Optional<Germplasm>> pedigreeTable = this.getPedigreeTable(propertyNames, listDataIndexedByGid.keySet());
+
+		//This is in order to improve performance in order to get all germplasm only once
+		final List<Germplasm> germplasms = this.getGermplasms(propertyNames, gids);
 
 		propertyNames
 			.forEach(property -> {
@@ -382,42 +390,42 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				}
 
 				if (GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName().equals(property)) {
-					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_NAME, listDataIndexedByGid);
+					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_NAME, methodsByGids, listDataIndexedByGid);
 					return;
 				}
 
-				if (GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION.getName().equals(property) ) {
-					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION, listDataIndexedByGid);
+				if (GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION.getName().equals(property)) {
+					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION, methodsByGids, listDataIndexedByGid);
 					return;
 				}
 
 				if (GermplasmListDataPropertyName.BREEDING_METHOD_NUMBER.getName().equals(property)) {
-					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_NUMBER, listDataIndexedByGid);
+					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_NUMBER, methodsByGids, listDataIndexedByGid);
 					return;
 				}
 
 				if (GermplasmListDataPropertyName.BREEDING_METHOD_GROUP.getName().equals(property)) {
-					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_GROUP, listDataIndexedByGid);
+					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_GROUP, methodsByGids, listDataIndexedByGid);
 					return;
 				}
 
 				if (GermplasmListDataPropertyName.FGID.getName().equals(property)) {
-					this.addCrossFemaleDataPropertyValues(GermplasmListDataPropertyName.FGID, listDataIndexedByGid);
+					this.addCrossFemaleDataPropertyValues(GermplasmListDataPropertyName.FGID, pedigreeTable, listDataIndexedByGid);
 					return;
 				}
 
 				if (GermplasmListDataPropertyName.CROSS_FEMALE_PREFERRED_NAME.getName().equals(property)) {
-					this.addCrossFemaleDataPropertyValues(GermplasmListDataPropertyName.CROSS_FEMALE_PREFERRED_NAME, listDataIndexedByGid);
+					this.addCrossFemaleDataPropertyValues(GermplasmListDataPropertyName.CROSS_FEMALE_PREFERRED_NAME, pedigreeTable, listDataIndexedByGid);
 					return;
 				}
 
 				if (GermplasmListDataPropertyName.MGID.getName().equals(property)) {
-					this.addCrossMaleDataPropertyValues(GermplasmListDataPropertyName.MGID, listDataIndexedByGid);
+					this.addCrossMaleDataPropertyValues(GermplasmListDataPropertyName.MGID, pedigreeTable, listDataIndexedByGid);
 					return;
 				}
 
 				if (GermplasmListDataPropertyName.CROSS_MALE_PREFERRED_NAME.getName().equals(property)) {
-					this.addCrossMaleDataPropertyValues(GermplasmListDataPropertyName.CROSS_MALE_PREFERRED_NAME, listDataIndexedByGid);
+					this.addCrossMaleDataPropertyValues(GermplasmListDataPropertyName.CROSS_MALE_PREFERRED_NAME, pedigreeTable, listDataIndexedByGid);
 					return;
 				}
 
@@ -429,7 +437,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				}
 
 				if (GermplasmListDataPropertyName.GROUP_SOURCE_GID.getName().equals(property)) {
-					final Supplier<Map<Integer, String>> valueSupplier = () -> this.germplasmService.getGermplasmByGIDs(gids)
+					final Supplier<Map<Integer, String>> valueSupplier = () -> germplasms
 						.stream()
 						.collect(Collectors.toMap(Germplasm::getGid,
 							germplasm -> germplasm.getGnpgs() == -1 && !Objects.isNull(germplasm.getGpid1()) && germplasm.getGpid1() != 0
@@ -443,13 +451,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 				if (GermplasmListDataPropertyName.IMMEDIATE_SOURCE_PREFERRED_NAME.getName().equals(property)) {
 					this.addListDataProperties(GermplasmListDataPropertyName.IMMEDIATE_SOURCE_PREFERRED_NAME.getName(),
-						() -> this.germplasmDataManager.getGroupSourcePreferredNamesByGids(gids),
+						() -> this.germplasmDataManager.getImmediateSourcePreferredNamesByGids(gids),
 						listDataIndexedByGid);
 					return;
 				}
 
 				if (GermplasmListDataPropertyName.IMMEDIATE_SOURCE_GID.getName().equals(property)) {
-					final Supplier<Map<Integer, String>> valueSupplier = () -> this.germplasmService.getGermplasmByGIDs(gids)
+					final Supplier<Map<Integer, String>> valueSupplier = () -> germplasms
 						.stream()
 						.collect(Collectors.toMap(Germplasm::getGid,
 							germplasm -> germplasm.getGnpgs() == -1 && !Objects.isNull(germplasm.getGpid2()) && germplasm.getGpid2() != 0
@@ -483,8 +491,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			});
 	}
 
-	private void addBreedingMethodPropertyValue(final GermplasmListDataPropertyName propertyName, final Map<Integer, GermplasmListData> listDataIndexedByGid) {
-		final Supplier<Map<Integer, String>> valueSupplier = () -> this.germplasmDataManager.getMethodsByGids(new ArrayList<>(listDataIndexedByGid.keySet()))
+	private void addBreedingMethodPropertyValue(final GermplasmListDataPropertyName propertyName, final Map<Integer, Object> methodsByGids, final Map<Integer, GermplasmListData> listDataIndexedByGid) {
+		final Supplier<Map<Integer, String>> valueSupplier = () -> methodsByGids
 			.entrySet()
 			.stream()
 			.collect(Collectors.toMap(entrySet -> entrySet.getKey(), entrySet -> this.getBreedingMethodValue(propertyName.getName(), entrySet)));
@@ -511,41 +519,42 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.daoFactory.getListDataPropertyDAO().save(listDataProperty);
 	}
 
-	private void addCrossFemaleDataPropertyValues(final GermplasmListDataPropertyName propertyName, final Map<Integer, GermplasmListData> listDataIndexedByGid) {
-		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
-		final Table<Integer, String, Optional<Germplasm>>
-			table = this.pedigreeDataManager.generatePedigreeTable(listDataIndexedByGid.keySet(), level, false);
+	private void addCrossFemaleDataPropertyValues(final GermplasmListDataPropertyName propertyName,
+		final Table<Integer, String, Optional<Germplasm>> pedigreeTable, final Map<Integer, GermplasmListData> listDataIndexedByGid) {
 
 		listDataIndexedByGid.keySet().forEach(gid -> {
-			final Optional<Germplasm> femaleParent = table.get(gid, GermplasmListDataPropertyName.FGID.getName());
-			final String value;
-			if (propertyName == GermplasmListDataPropertyName.FGID) {
-				value = this.getGermplasmGid(femaleParent);
-			} else if (propertyName == GermplasmListDataPropertyName.CROSS_FEMALE_PREFERRED_NAME) {
-				value = this.getGermplasmPreferredName(femaleParent);
-			} else {
-				value = "-";
+			String value = "-";
+			if (!Objects.isNull(pedigreeTable)) {
+				final Optional<Germplasm> femaleParent = pedigreeTable.get(gid, GermplasmListDataPropertyName.FGID.getName());
+				if (propertyName == GermplasmListDataPropertyName.FGID) {
+					value = this.getGermplasmGid(femaleParent);
+				} else if (propertyName == GermplasmListDataPropertyName.CROSS_FEMALE_PREFERRED_NAME) {
+					value = this.getGermplasmPreferredName(femaleParent);
+				} else {
+					value = "-";
+				}
 			}
 
 			this.addListDataProperty(listDataIndexedByGid.get(gid), propertyName.getName(), value);
 		});
 	}
 
-	private void addCrossMaleDataPropertyValues(final GermplasmListDataPropertyName propertyName, final Map<Integer, GermplasmListData> listDataIndexedByGid) {
-
-		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
-		final Table<Integer, String, Optional<Germplasm>> table = this.pedigreeDataManager.generatePedigreeTable(listDataIndexedByGid.keySet(), level, false);
+	private void addCrossMaleDataPropertyValues(final GermplasmListDataPropertyName propertyName,
+		final Table<Integer, String, Optional<Germplasm>> pedigreeTable, final Map<Integer, GermplasmListData> listDataIndexedByGid) {
 
 		listDataIndexedByGid.keySet().forEach(gid -> {
-			final Optional<Germplasm> maleParent = table.get(gid, GermplasmListDataPropertyName.MGID.getName());
-			final String value;
-			if (propertyName == GermplasmListDataPropertyName.MGID) {
-				value = this.getGermplasmGid(maleParent);
-			} else if (propertyName == GermplasmListDataPropertyName.CROSS_MALE_PREFERRED_NAME) {
-				value = this.getGermplasmPreferredName(maleParent);
-			} else {
-				value = "-";
+			String value = "-";
+			if (!Objects.isNull(pedigreeTable)) {
+				final Optional<Germplasm> maleParent = pedigreeTable.get(gid, GermplasmListDataPropertyName.MGID.getName());
+				if (propertyName == GermplasmListDataPropertyName.MGID) {
+					value = this.getGermplasmGid(maleParent);
+				} else if (propertyName == GermplasmListDataPropertyName.CROSS_MALE_PREFERRED_NAME) {
+					value = this.getGermplasmPreferredName(maleParent);
+				} else {
+					value = "-";
+				}
 			}
+
 			this.addListDataProperty(listDataIndexedByGid.get(gid), propertyName.getName(), value);
 		});
 	}
@@ -600,6 +609,45 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.germplasmListManager.getGermplasmNameTypes()
 			.stream()
 			.collect(Collectors.toMap(userDefinedField -> userDefinedField.getFname().toUpperCase(), userDefinedField -> userDefinedField.getFldno()));
+	}
+
+	private Map<Integer, Object> getBreedingMethodData(final Set<String> propertyNames, final List<Integer> gids) {
+		final boolean hasBreedingMethodProperty = propertyNames.stream().anyMatch(property ->
+			GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName().equals(property) ||
+				GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION.getName().equals(property) ||
+				GermplasmListDataPropertyName.BREEDING_METHOD_NUMBER.getName().equals(property) ||
+				GermplasmListDataPropertyName.BREEDING_METHOD_GROUP.getName().equals(property)
+		);
+		return hasBreedingMethodProperty ?
+			this.germplasmDataManager.getMethodsByGids(gids) :
+			new HashMap<>();
+	}
+
+	private Table<Integer, String, Optional<Germplasm>> getPedigreeTable(final Set<String> propertyNames, final Set<Integer> gids) {
+		final boolean hasPedigreeInfoProperty = propertyNames.stream().anyMatch(property ->
+			GermplasmListDataPropertyName.FGID.getName().equals(property) ||
+				GermplasmListDataPropertyName.CROSS_FEMALE_PREFERRED_NAME.getName().equals(property) ||
+				GermplasmListDataPropertyName.MGID.getName().equals(property) ||
+				GermplasmListDataPropertyName.CROSS_MALE_PREFERRED_NAME.getName().equals(property)
+		);
+		if (hasPedigreeInfoProperty) {
+			final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
+			return this.pedigreeDataManager.generatePedigreeTable(gids, level, false);
+		}
+
+		return null;
+	}
+
+	private List<Germplasm> getGermplasms(final Set<String> propertyNames, final List<Integer> gids) {
+		final boolean hasBreedingMethodProperty = propertyNames.stream().anyMatch(property ->
+			GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName().equals(property) ||
+				GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION.getName().equals(property) ||
+				GermplasmListDataPropertyName.BREEDING_METHOD_NUMBER.getName().equals(property) ||
+				GermplasmListDataPropertyName.BREEDING_METHOD_GROUP.getName().equals(property)
+		);
+		return hasBreedingMethodProperty ?
+			this.germplasmService.getGermplasmByGIDs(gids) :
+			new ArrayList<>();
 	}
 
 	private static class AddGermplasmEntryModel {
