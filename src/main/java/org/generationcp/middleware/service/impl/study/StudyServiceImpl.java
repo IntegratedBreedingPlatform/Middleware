@@ -514,7 +514,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					environmentVariables.addAll(environmentDetails);
 					environmentParameterVariables.addAll(this.createGeolocationVariables(environmentVariables, studyInstanceDto.getStudyDbId()));
 
-					List<EnvironmentParameter> environmentParameters = environmentParameterVariables.stream()
+					final List<EnvironmentParameter> environmentParameters = environmentParameterVariables.stream()
 						.map(variable -> new EnvironmentParameter(variable)).collect(Collectors.toList());
 					studyInstanceDto.setEnvironmentParameters(environmentParameters);
 
@@ -525,8 +525,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 						.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyInstanceDto.getTrialDbId(), variableIds));
 
 					if(trialIdToObservationLevelMap.get(studyInstanceDto.getTrialDbId()) == null) {
-						List<DatasetDTO> datasetDTOs = this.daoFactory.getDmsProjectDAO().getDatasets(studyInstanceDto.getTrialDbId());
-						List<ObservationLevel> observationLevels = datasetDTOs.stream()
+						final List<DatasetDTO> datasetDTOs = this.daoFactory.getDmsProjectDAO().getDatasets(studyInstanceDto.getTrialDbId());
+						final List<ObservationLevel> observationLevels = datasetDTOs.stream()
 							.filter(datasetDTO -> (datasetDTO.getDatasetTypeId() != DatasetTypeEnum.SUMMARY_DATA.getId()))
 							.map(datasetDTO -> new ObservationLevel(datasetDTO)).collect(Collectors.toList());
 						studyInstanceDto.setObservationLevels(observationLevels);
