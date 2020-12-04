@@ -499,13 +499,13 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final StudyInstanceDto studyInstanceDto = studyInstanceDtos.get(0);
 		final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
-		Assert.assertEquals(String.valueOf(study.getProjectId()), studyInstanceDto.getTrialDbId());
+		Assert.assertEquals(study.getProjectId(), studyInstanceDto.getTrialDbId());
 		Assert.assertEquals(String.valueOf(study.getName()), studyInstanceDto.getTrialName());
 		Assert.assertEquals(study.getStartDate(), dateFormat.format(studyInstanceDto.getStartDate()));
 		Assert.assertEquals(study.getEndDate(), dateFormat.format(studyInstanceDto.getEndDate()));
 		Assert.assertEquals(String.valueOf(study.getStudyType().getStudyTypeId()), studyInstanceDto.getStudyTypeDbId());
 		Assert.assertEquals(study.getStudyType().getLabel(), studyInstanceDto.getStudyTypeName());
-		Assert.assertEquals(String.valueOf(instance1.getLocationId()), studyInstanceDto.getStudyDbId());
+		Assert.assertEquals(instance1.getLocationId(), studyInstanceDto.getStudyDbId());
 		Assert.assertEquals(study.getName() + " Environment Number 1", studyInstanceDto.getStudyName());
 		Assert.assertEquals("true", studyInstanceDto.getActive());
 		Assert.assertEquals("1", studyInstanceDto.getLocationDbId());

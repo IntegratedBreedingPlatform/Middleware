@@ -141,7 +141,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyDetails() {
+	public void testGetStudyInstanceDtoListWithTrialData() {
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Summary Dataset", "Summary Dataset-Description", this.study, this.study, DatasetTypeEnum.SUMMARY_DATA);
@@ -158,7 +158,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(1, studyDetailsDtoList.size());
 		final StudyInstanceDto studyInstanceDto = studyDetailsDtoList.get(0);
 		Assert.assertFalse(CollectionUtils.isEmpty(studyInstanceDto.getContacts()));
-		Assert.assertEquals(locationId, studyInstanceDto.getLocationDbId());
+		Assert.assertEquals(String.valueOf(locationId), studyInstanceDto.getLocationDbId());
 		Assert.assertEquals(geolocation.getLocationId(), studyInstanceDto.getStudyDbId());
 		Assert.assertEquals(this.study.getProjectId(), studyInstanceDto.getTrialDbId());
 		Assert.assertEquals(this.study.getName() + " 1", studyInstanceDto.getStudyName());
