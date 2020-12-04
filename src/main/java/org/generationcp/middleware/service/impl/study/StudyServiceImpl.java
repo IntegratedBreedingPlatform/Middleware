@@ -549,16 +549,17 @@ public class StudyServiceImpl extends Service implements StudyService {
 			final List<StudyInstanceDto> studyInstanceDtos = this.daoFactory.getDmsProjectDAO()
 				.getStudyInstances(studySearchFilter, pageable);
 			final Map<Integer, List<ObservationLevel>> observationLevelsMap = new HashMap<>();
-			final Map<Integer, DmsProject> studyEnvironmentDatasets = new HashMap<>();
+			final Map<Integer, Integer> studyEnvironmentDatasetIdMap = new HashMap<>();
+
 			final Map<Integer, List<MeasurementVariable>> studyEnvironmentVariablesMap = new HashMap<>();
 			final Map<Integer, Map<String, String>> studyAdditionalInfoMap = new HashMap<>();
 			if(studyInstanceDtos != null) {
 				for(final StudyInstanceDto studyInstanceDto: studyInstanceDtos) {
 					final Integer trialDbId = Integer.valueOf(studyInstanceDto.getTrialDbId());
 					final Integer studyDbId = Integer.valueOf(studyInstanceDto.getStudyDbId());
-					final DmsProject environmentDataset = this.getEnvironmentDataset(studyEnvironmentDatasets, trialDbId);
+					final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyEnvironmentDatasetIdMap, trialDbId);
 					final List<MeasurementVariable> environmentVariables =
-						this.getEnvironmentVariables(studyEnvironmentVariablesMap, environmentDataset);
+						this.getEnvironmentVariables(studyEnvironmentVariablesMap, environmentDatasetId);
 
 					final List<MeasurementVariable> environmentParameterVariables = new ArrayList<>();
 					final List<Integer> variableIds = environmentVariables.stream().map(measurementVariable -> measurementVariable.getTermId())
@@ -623,30 +624,28 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	List<MeasurementVariable> getEnvironmentVariables(
-		final Map<Integer, List<MeasurementVariable>> studyEnvironmentVariablesMap, final DmsProject environmentDataset) {
+		final Map<Integer, List<MeasurementVariable>> studyEnvironmentVariablesMap, final Integer environmentDatasetId) {
 		List<MeasurementVariable> environmentVariables;
-		if(studyEnvironmentVariablesMap.get(environmentDataset.getProjectId()) == null) {
+		if(studyEnvironmentVariablesMap.get(environmentDatasetId) == null) {
 			environmentVariables = this.daoFactory.getDmsProjectDAO()
 				.getObservationSetVariables(
-					environmentDataset.getProjectId(),
+					environmentDatasetId,
 					Lists.newArrayList(VariableType.ENVIRONMENT_CONDITION.getId(), VariableType.ENVIRONMENT_DETAIL.getId()));
-			studyEnvironmentVariablesMap.put(environmentDataset.getProjectId(), environmentVariables);
+			studyEnvironmentVariablesMap.put(environmentDatasetId, environmentVariables);
 		} else {
-			environmentVariables = studyEnvironmentVariablesMap.get(environmentDataset.getProjectId());
+			environmentVariables = studyEnvironmentVariablesMap.get(environmentDatasetId);
 		}
 		return environmentVariables;
 	}
 
-	DmsProject getEnvironmentDataset(final Map<Integer, DmsProject> studyEnvironmentDatasets, final Integer trialDbId) {
-		DmsProject environmentDataset;
-		if(studyEnvironmentDatasets.get(trialDbId) ==  null) {
-			environmentDataset = this.daoFactory.getDmsProjectDAO()
+	Integer getEnvironmentDatasetId(final Map<Integer, Integer> studyEnvironmentDatasetIdMap, final Integer trialDbId) {
+		if(studyEnvironmentDatasetIdMap.get(trialDbId) ==  null) {
+			final DmsProject environmentDataset = this.daoFactory.getDmsProjectDAO()
 				.getDatasetsByTypeForStudy(trialDbId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
-			studyEnvironmentDatasets.put(trialDbId, environmentDataset);
-		} else {
-			environmentDataset = studyEnvironmentDatasets.get(trialDbId);
+			studyEnvironmentDatasetIdMap.put(trialDbId, environmentDataset.getProjectId());
+
 		}
-		return environmentDataset;
+		return studyEnvironmentDatasetIdMap.get(trialDbId);
 	}
 
 	@Override
