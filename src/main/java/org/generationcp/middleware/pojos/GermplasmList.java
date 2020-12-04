@@ -41,7 +41,7 @@ public class GermplasmList implements Serializable {
 	public static final String GERMPLASM_LIST_LIST_ID_COLUMN = "listid";
 
 	// TODO db: use proper bit-value?
-	public static enum Status {
+	public enum Status {
 		LIST(1), // 0001
 		FOLDER(0), // 0000
 		// Unused
