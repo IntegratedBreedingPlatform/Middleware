@@ -17,6 +17,8 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
@@ -25,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
@@ -135,6 +138,30 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
 		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
 		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
+	}
+
+	@Test
+	public void testGetStudyInstances() {
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Summary Dataset", "Summary Dataset-Description", this.study, this.study, DatasetTypeEnum.SUMMARY_DATA);
+
+		final int locationId = 101;
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
+		this.testDataInitializer
+			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
+		final StudySearchFilter studySearchFilter = new StudySearchFilter().withStudyDbId(geolocation.getLocationId().toString())
+			.withProgramDbId(this.study.getProgramUUID());
+		final Pageable pageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "trialName"));
+		final List<StudyInstanceDto> studyDetailsDtoList = this.studyService.getStudyInstances(studySearchFilter, pageable);
+		Assert.assertNotNull(studyDetailsDtoList);
+		Assert.assertEquals(1, studyDetailsDtoList.size());
+		final StudyInstanceDto studyInstanceDto = studyDetailsDtoList.get(0);
+		Assert.assertFalse(CollectionUtils.isEmpty(studyInstanceDto.getContacts()));
+		Assert.assertEquals(String.valueOf(locationId), studyInstanceDto.getLocationDbId());
+		Assert.assertEquals(String.valueOf(geolocation.getLocationId()), studyInstanceDto.getStudyDbId());
+		Assert.assertEquals(String.valueOf(this.study.getProjectId()), studyInstanceDto.getTrialDbId());
+		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyInstanceDto.getStudyName());
 	}
 
 	@Test

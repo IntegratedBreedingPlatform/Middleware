@@ -47,8 +47,8 @@ public class StudyMetadata {
 	}
 
 	public StudyMetadata(final Integer nurseryOrTrialId, final Integer studyDbId, final Integer locationId, final Boolean active,
-			final Date endDate, final Date startDate, final Integer trialDbId, final List<String> seasons, final String trialName,
-			final String studyType, final String studyTypeName, final String studyName, final String studyDescription, final String experimentalDesign,
+		final Date endDate, final Date startDate, final Integer trialDbId, final List<String> seasons, final String trialName,
+		final String studyType, final String studyTypeName, final String studyName, final String studyDescription, final String experimentalDesign,
 		final String lastUpdate) {
 		this.nurseryOrTrialId = nurseryOrTrialId;
 		this.studyDbId = studyDbId;
@@ -220,19 +220,19 @@ public class StudyMetadata {
 			return false;
 		StudyMetadata castOther = (StudyMetadata) other;
 		return new EqualsBuilder().append(this.nurseryOrTrialId, castOther.getNurseryOrTrialId())
-				.append(this.studyDbId, castOther.getStudyDbId()).append(this.studyName, castOther.getStudyName())
-				.append(this.studyDescription, castOther.getStudyDescription())
-				.append(this.experimentalDesign, castOther.getExperimentalDesign())
-				.append(this.studyType, castOther.getStudyType()).append(this.seasons, castOther.getSeasons())
-				.append(this.trialDbId, castOther.getTrialDbId()).append(this.trialName, castOther.getTrialName())
-				.append(this.startDate, castOther.getStartDate()).append(this.endDate, castOther.getEndDate())
-				.append(this.active, castOther.getActive()).append(this.locationId, castOther.getLocationId()).isEquals();
+			.append(this.studyDbId, castOther.getStudyDbId()).append(this.studyName, castOther.getStudyName())
+			.append(this.studyDescription, castOther.getStudyDescription())
+			.append(this.experimentalDesign, castOther.getExperimentalDesign())
+			.append(this.studyType, castOther.getStudyType()).append(this.seasons, castOther.getSeasons())
+			.append(this.trialDbId, castOther.getTrialDbId()).append(this.trialName, castOther.getTrialName())
+			.append(this.startDate, castOther.getStartDate()).append(this.endDate, castOther.getEndDate())
+			.append(this.active, castOther.getActive()).append(this.locationId, castOther.getLocationId()).isEquals();
 	}
 
 	@Override public int hashCode() {
 		if (hashCode == 0) {
 			hashCode = new HashCodeBuilder().append(nurseryOrTrialId).append(studyDbId).append(studyName).append(studyType).append(seasons)
-					.append(trialDbId).append(trialName).append(startDate).append(endDate).append(active).append(locationId).toHashCode();
+				.append(trialDbId).append(trialName).append(startDate).append(endDate).append(active).append(locationId).toHashCode();
 		}
 		return hashCode;
 	}
