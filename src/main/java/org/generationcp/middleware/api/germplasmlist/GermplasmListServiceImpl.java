@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -514,7 +515,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Supplier<Map<Integer, String>> valueSupplier = () -> methodsByGids
 			.entrySet()
 			.stream()
-			.collect(Collectors.toMap(entrySet -> entrySet.getKey(), entrySet -> this.getBreedingMethodValue(propertyName.getName(), entrySet)));
+			.collect(Collectors.toMap(Map.Entry::getKey, entrySet -> this.getBreedingMethodValue(propertyName.getName(), entrySet)));
 
 		this.addListDataProperties(propertyName.getName(),
 			valueSupplier,
@@ -621,17 +622,17 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	private Map<String, Integer> getAllAttributeTypesMap() {
 		return this.germplasmDataManager.getAllAttributesTypes()
 			.stream()
-			.collect(Collectors.toMap(userDefinedField -> userDefinedField.getFcode().toUpperCase(), userDefinedField -> userDefinedField.getFldno()));
+			.collect(Collectors.toMap(userDefinedField -> userDefinedField.getFcode().toUpperCase(), UserDefinedField::getFldno));
 	}
 
 	private Map<String, Integer> getAllNameTypesMap() {
 		return this.germplasmListManager.getGermplasmNameTypes()
 			.stream()
-			.collect(Collectors.toMap(userDefinedField -> userDefinedField.getFname().toUpperCase(), userDefinedField -> userDefinedField.getFldno()));
+			.collect(Collectors.toMap(userDefinedField -> userDefinedField.getFname().toUpperCase(), UserDefinedField::getFldno));
 	}
 
 	private Map<Integer, Object> getBreedingMethodData(final Set<String> propertyNames, final List<Integer> gids) {
-		final boolean hasBreedingMethodProperty = propertyNames.stream().anyMatch(property -> this.hasPedigreeProperty(property));
+		final boolean hasBreedingMethodProperty = propertyNames.stream().anyMatch(this::hasBreedingMethodProperty);
 		return hasBreedingMethodProperty ?
 			this.germplasmDataManager.getMethodsByGids(gids) :
 			new HashMap<>();
@@ -664,7 +665,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			new ArrayList<>();
 	}
 
-	private boolean hasPedigreeProperty(final String property) {
+	private boolean hasBreedingMethodProperty(final String property) {
 		return GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName().equals(property) ||
 			GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION.getName().equals(property) ||
 			GermplasmListDataPropertyName.BREEDING_METHOD_NUMBER.getName().equals(property) ||
@@ -676,8 +677,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			!CollectionUtils.isEmpty(actualGermplasmList.getListData()) &&
 			!CollectionUtils.isEmpty(actualGermplasmList.getListData().get(0).getProperties()) &&
 			actualGermplasmList.getListData().get(0).getProperties().stream()
-				.anyMatch(listDataProperty -> this.hasPedigreeProperty(listDataProperty.getColumn()))) {
-			throw new MiddlewareRequestException("", "list.add.limit", new String[] {String.valueOf(this.maxAddEntriesLimit)});
+				.anyMatch(listDataProperty -> this.hasBreedingMethodProperty(listDataProperty.getColumn()))) {
+			throw new MiddlewareRequestException("",
+				"list.add.limit",
+				new String[] {String.valueOf(this.maxAddEntriesLimit)});
 		}
 	}
 
