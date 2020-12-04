@@ -161,7 +161,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(String.valueOf(locationId), studyInstanceDto.getLocationDbId());
 		Assert.assertEquals(geolocation.getLocationId(), studyInstanceDto.getStudyDbId());
 		Assert.assertEquals(this.study.getProjectId(), studyInstanceDto.getTrialDbId());
-		Assert.assertEquals(this.study.getName() + " 1", studyInstanceDto.getStudyName());
+		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyInstanceDto.getStudyName());
 	}
 
 	@Test
