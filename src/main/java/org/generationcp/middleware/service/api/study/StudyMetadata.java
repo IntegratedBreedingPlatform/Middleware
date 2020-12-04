@@ -45,8 +45,6 @@ public class StudyMetadata {
 
 	private String experimentalDesign;
 
-	private String experimentalDesignId;
-
 	private String lastUpdate;
 
 	private Integer ownerId;
@@ -61,8 +59,8 @@ public class StudyMetadata {
 	}
 
 	public StudyMetadata(final Integer nurseryOrTrialId, final Integer studyDbId, final Integer locationId, final Boolean active,
-			final Date endDate, final Date startDate, final Integer trialDbId, final List<String> seasons, final String trialName,
-			final String studyType, final String studyTypeName, final String studyName, final String studyDescription, final String experimentalDesign,
+		final Date endDate, final Date startDate, final Integer trialDbId, final List<String> seasons, final String trialName,
+		final String studyType, final String studyTypeName, final String studyName, final String studyDescription, final String experimentalDesign,
 		final String lastUpdate) {
 		this.nurseryOrTrialId = nurseryOrTrialId;
 		this.studyDbId = studyDbId;
@@ -82,7 +80,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getNurseryOrTrialId() {
-		return this.nurseryOrTrialId;
+		return nurseryOrTrialId;
 	}
 
 	public StudyMetadata setNurseryOrTrialId(final Integer nurseryOrTrialId) {
@@ -91,7 +89,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getStudyDbId() {
-		return this.studyDbId;
+		return studyDbId;
 	}
 
 	public StudyMetadata setStudyDbId(final Integer studyDbId) {
@@ -100,7 +98,7 @@ public class StudyMetadata {
 	}
 
 	public String getStudyName() {
-		return this.studyName;
+		return studyName;
 	}
 
 	public StudyMetadata setStudyName(final String studyName) {
@@ -109,7 +107,7 @@ public class StudyMetadata {
 	}
 
 	public String getStudyType() {
-		return this.studyType;
+		return studyType;
 	}
 
 	public StudyMetadata setStudyType(final String studyType) {
@@ -118,7 +116,7 @@ public class StudyMetadata {
 	}
 
 	public List<String> getSeasons() {
-		return this.seasons;
+		return seasons;
 	}
 
 	public StudyMetadata setSeasons(final List<String> seasons) {
@@ -127,7 +125,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getTrialDbId() {
-		return this.trialDbId;
+		return trialDbId;
 	}
 
 	public StudyMetadata setTrialDbId(final Integer trialDbId) {
@@ -136,7 +134,7 @@ public class StudyMetadata {
 	}
 
 	public String getTrialName() {
-		return this.trialName;
+		return trialName;
 	}
 
 	public StudyMetadata setTrialName(final String trialName) {
@@ -145,7 +143,7 @@ public class StudyMetadata {
 	}
 
 	public Date getStartDate() {
-		return this.startDate;
+		return startDate;
 	}
 
 	public StudyMetadata setStartDate(final Date startDate) {
@@ -154,7 +152,7 @@ public class StudyMetadata {
 	}
 
 	public Date getEndDate() {
-		return this.endDate;
+		return endDate;
 	}
 
 	public StudyMetadata setEndDate(final Date endDate) {
@@ -163,7 +161,7 @@ public class StudyMetadata {
 	}
 
 	public Boolean getActive() {
-		return this.active;
+		return active;
 	}
 
 	public StudyMetadata setActive(final Boolean active) {
@@ -172,7 +170,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getLocationId() {
-		return this.locationId;
+		return locationId;
 	}
 
 	public StudyMetadata setLocationId(final Integer locationId) {
@@ -181,7 +179,7 @@ public class StudyMetadata {
 	}
 
 	public String getLocationName() {
-		return this.locationName;
+		return locationName;
 	}
 
 	public void setLocationName(final String locationName) {
@@ -189,7 +187,7 @@ public class StudyMetadata {
 	}
 
 	public String getStudyDescription() {
-		return this.studyDescription;
+		return studyDescription;
 	}
 
 	public StudyMetadata setStudyDescription(final String studyDescription) {
@@ -215,7 +213,7 @@ public class StudyMetadata {
 		this.studyTypeName = studyTypeName;
 	}
 
-	public void addSeason(final String season) {
+	public void addSeason(String season) {
 		this.seasons.add(season);
 	}
 
@@ -232,21 +230,13 @@ public class StudyMetadata {
 		return this.lastUpdate;
 	}
 
-	public String getExperimentalDesignId() {
-		return this.experimentalDesignId;
-	}
-
-	public void setExperimentalDesignId(final String experimentalDesignId) {
-		this.experimentalDesignId = experimentalDesignId;
-	}
-
 	public StudyMetadata setLastUpdate(final String lastUpdate) {
 		this.lastUpdate = lastUpdate;
 		return this;
 	}
 
 	public String getStudyCode() {
-		return this.studyCode;
+		return studyCode;
 	}
 
 	public void setStudyCode(final String studyCode) {
@@ -254,7 +244,7 @@ public class StudyMetadata {
 	}
 
 	public String getStudyPUI() {
-		return this.studyPUI;
+		return studyPUI;
 	}
 
 	public void setStudyPUI(final String studyPUI) {
@@ -262,7 +252,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getOwnerId() {
-		return this.ownerId;
+		return ownerId;
 	}
 
 	public void setOwnerId(final Integer ownerId) {
@@ -270,7 +260,7 @@ public class StudyMetadata {
 	}
 
 	public String getOwner() {
-		return this.owner;
+		return owner;
 	}
 
 	public void setOwner(final String owner) {
@@ -278,7 +268,7 @@ public class StudyMetadata {
 	}
 
 	public String getOwnerEmail() {
-		return this.ownerEmail;
+		return ownerEmail;
 	}
 
 	public void setOwnerEmail(final String ownerEmail) {
@@ -288,26 +278,23 @@ public class StudyMetadata {
 	@Override public boolean equals(final Object other) {
 		if (!(other instanceof StudyMetadata))
 			return false;
-		final StudyMetadata castOther = (StudyMetadata) other;
+		StudyMetadata castOther = (StudyMetadata) other;
 		return new EqualsBuilder().append(this.nurseryOrTrialId, castOther.getNurseryOrTrialId())
-				.append(this.studyDbId, castOther.getStudyDbId()).append(this.studyName, castOther.getStudyName())
-				.append(this.studyDescription, castOther.getStudyDescription())
-				.append(this.experimentalDesign, castOther.getExperimentalDesign())
-				.append(this.studyType, castOther.getStudyType()).append(this.seasons, castOther.getSeasons())
-				.append(this.trialDbId, castOther.getTrialDbId()).append(this.trialName, castOther.getTrialName())
-				.append(this.startDate, castOther.getStartDate()).append(this.endDate, castOther.getEndDate())
-				.append(this.active, castOther.getActive()).append(this.locationId, castOther.getLocationId()).isEquals();
+			.append(this.studyDbId, castOther.getStudyDbId()).append(this.studyName, castOther.getStudyName())
+			.append(this.studyDescription, castOther.getStudyDescription())
+			.append(this.experimentalDesign, castOther.getExperimentalDesign())
+			.append(this.studyType, castOther.getStudyType()).append(this.seasons, castOther.getSeasons())
+			.append(this.trialDbId, castOther.getTrialDbId()).append(this.trialName, castOther.getTrialName())
+			.append(this.startDate, castOther.getStartDate()).append(this.endDate, castOther.getEndDate())
+			.append(this.active, castOther.getActive()).append(this.locationId, castOther.getLocationId()).isEquals();
 	}
 
 	@Override public int hashCode() {
-		if (this.hashCode == 0) {
-			this.hashCode = new HashCodeBuilder().append(this.nurseryOrTrialId).append(this.studyDbId).append(this.studyName).append(
-				this.studyType).append(
-				this.seasons)
-					.append(this.trialDbId).append(this.trialName).append(this.startDate).append(this.endDate).append(this.active).append(
-					this.locationId).toHashCode();
+		if (hashCode == 0) {
+			hashCode = new HashCodeBuilder().append(nurseryOrTrialId).append(studyDbId).append(studyName).append(studyType).append(seasons)
+				.append(trialDbId).append(trialName).append(startDate).append(endDate).append(active).append(locationId).toHashCode();
 		}
-		return this.hashCode;
+		return hashCode;
 	}
 
 }

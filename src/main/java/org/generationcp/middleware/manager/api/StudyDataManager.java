@@ -43,10 +43,8 @@ import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;

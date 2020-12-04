@@ -2,9 +2,7 @@ package org.generationcp.middleware.service.api.study;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.user.UserDto;
 
 import java.util.List;
@@ -20,23 +18,19 @@ public class StudyDetailsDto {
 
 	private List<MeasurementVariable> environmentParameters;
 
-	private List<DatasetDTO> datasets;
-
 	private transient int hashCode;
 
 	public StudyDetailsDto() {
 	}
 
-	public StudyDetailsDto(final StudyMetadata metadata, final List<UserDto> contacts, final Map<String, String> additionalInfo,
-		final List<DatasetDTO> datasets) {
+	public StudyDetailsDto(final StudyMetadata metadata, final List<UserDto> contacts, final Map<String, String> additionalInfo) {
 		this.metadata = metadata;
 		this.contacts = contacts;
 		this.additionalInfo = additionalInfo;
-		this.datasets = datasets;
 	}
 
 	public StudyMetadata getMetadata() {
-		return this.metadata;
+		return metadata;
 	}
 
 	public StudyDetailsDto setMetadata(final StudyMetadata metadata) {
@@ -54,7 +48,7 @@ public class StudyDetailsDto {
 	}
 
 	public List<UserDto> getContacts() {
-		return this.contacts;
+		return contacts;
 	}
 
 	public StudyDetailsDto setContacts(final List<UserDto> contacts) {
@@ -63,7 +57,7 @@ public class StudyDetailsDto {
 	}
 
 	public Map<String, String> getAdditionalInfo() {
-		return this.additionalInfo;
+		return additionalInfo;
 	}
 
 	public StudyDetailsDto setAdditionalInfo(final Map<String, String> additionalInfo) {
@@ -71,28 +65,19 @@ public class StudyDetailsDto {
 		return this;
 	}
 
-	public List<DatasetDTO> getDatasets() {
-		return this.datasets;
-	}
-
-	public void setDatasets(final List<DatasetDTO> datasets) {
-		this.datasets = datasets;
-	}
-
-
 	@Override public boolean equals(final Object other) {
 		if (!(other instanceof StudyDetailsDto))
 			return false;
-		final StudyDetailsDto castOther = (StudyDetailsDto) other;
+		StudyDetailsDto castOther = (StudyDetailsDto) other;
 		return new EqualsBuilder().append(this.additionalInfo, castOther.getAdditionalInfo()).append(this.contacts, castOther.getContacts())
-				.append(this.metadata, castOther.getMetadata()).isEquals();
+			.append(this.metadata, castOther.getMetadata()).isEquals();
 	}
 
 	@Override public int hashCode() {
-		if (this.hashCode == 0) {
-			this.hashCode = new HashCodeBuilder().append(this.additionalInfo).append(this.contacts).append(this.metadata).toHashCode();
+		if (hashCode == 0) {
+			hashCode = new HashCodeBuilder().append(additionalInfo).append(contacts).append(metadata).toHashCode();
 		}
-		return this.hashCode;
+		return hashCode;
 	}
 
 }
