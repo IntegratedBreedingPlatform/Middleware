@@ -1631,12 +1631,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     wper.personid AS contactDbid, ");
 		sql.append("     CONCAT(wper.fname, ' ', wper.lname) AS contactName, ");
 		sql.append("     wper.pemail AS email, ");
-		sql.append("     (Select definition from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = ");
-		sql.append(TermId.EXPERIMENT_DESIGN_FACTOR.getId());
-		sql.append("     , geoprop.value, NULL)))) AS experimentalDesign, ");
-		sql.append("     (Select cvterm_id from cvterm where cvterm_id = (MAX(IF(geoprop.type_id = ");
-		sql.append(TermId.EXPERIMENT_DESIGN_FACTOR.getId());
-		sql.append("     , 		geoprop.value, NULL)))) AS experimentalDesignId, ");
+		sql.append("     cvtermExptDesign.definition AS experimentalDesign, ");
+		sql.append("     geopropExperimentalDesign.value AS experimentalDesignId, ");
 		sql.append("     pmain.study_update AS lastUpdate, ");
 		sql.append("     pmain.description AS studyDescription, ");
 		sql.append("     nde.obs_unit_id AS studyPUI, ");
@@ -1713,7 +1709,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     location ON geopropLocation.value = location.locid");
 		sql.append("         LEFT OUTER JOIN ");
-		sql.append("     nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id ");
+		sql.append("     nd_geolocationprop geopropExperimentalDesign ON geopropExperimentalDesign.nd_geolocation_id = geoloc.nd_geolocation_id"
+			+ " AND geopropExperimentalDesign.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		sql.append("         LEFT OUTER JOIN ");
+		sql.append("     cvterm cvtermExptDesign ON cvtermExptDesign.cvterm_id = geopropExperimentalDesign.value");
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
 		sql.append("         LEFT JOIN workbench.users wu ON wu.userid = pmain.created_by");
