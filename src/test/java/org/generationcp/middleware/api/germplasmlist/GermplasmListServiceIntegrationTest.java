@@ -1,17 +1,28 @@
 package org.generationcp.middleware.api.germplasmlist;
 
+import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Method;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -21,6 +32,7 @@ import static org.junit.Assert.assertTrue;
 
 public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 
+	private static final String UGM = "UGM";
 	private static final String TEST_LIST_1_PARENT = "Test List #1 Parent";
 	private static final Integer USER_ID = new Random().nextInt();
 	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
@@ -33,8 +45,15 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 
 	private Integer parentFolderId;
 
+	private DaoFactory daoFactory;
+
+	private GermplasmService germplasmService;
+
+
 	@Before
 	public void setUp() throws Exception {
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+
 		//Create parent folder
 		final GermplasmListTestDataInitializer germplasmListTDI = new GermplasmListTestDataInitializer();
 		final GermplasmList germplasmListParent = germplasmListTDI
@@ -155,6 +174,73 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		assertNull(newGermplasmList.getProgramUUID());
 	}
 
+	@Test
+	public void shouldAddGermplasmListData() {
+		final Method method = this.daoFactory.getMethodDAO().getByCode(UGM, null);
+		final Germplasm germplasm = this.createGermplasm(method);
+
+		final int randomInt = new Random().nextInt(100);
+
+		// Germplasm list
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt,
+			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+
+		assertThat(germplasmList.getListData(), hasSize(0));
+
+		// Germplasm list data
+		final GermplasmListData germplasmListData = this.createGermplasmListData(germplasmList, germplasm.getGid(), 1);
+		final List<GermplasmListData> germplasmListsData = Arrays.asList(germplasmListData);
+
+		assertNull(germplasmListData.getListDataId());
+
+		this.germplasmListService.addGermplasmListData(germplasmListsData);
+
+		assertNotNull(germplasmListData.getListDataId());
+
+		this.sessionProvder.getSession().flush();
+		this.sessionProvder.getSession().clear();
+
+		final Optional<GermplasmList> germplasmListById = this.germplasmListService.getGermplasmListById(germplasmList.getId());
+		assertTrue(germplasmListById.isPresent());
+
+		final GermplasmList actualGermplasmList = germplasmListById.get();
+		assertThat(actualGermplasmList.getListData(), hasSize(1));
+
+		final GermplasmListData actualGermplasmListData = actualGermplasmList.getListData().get(0);
+		assertNotNull(actualGermplasmListData);
+		assertThat(actualGermplasmListData.getListDataId(), is(germplasmListData.getListDataId()));
+	}
+
+	@Test
+	public void shouldAddGermplasmEntriesToList_OK() {
+		final Method method = this.daoFactory.getMethodDAO().getByCode(UGM, null);
+		final Germplasm germplasm1 = this.createGermplasm(method);
+		final Germplasm germplasm2 = this.createGermplasm(method);
+
+		final int randomInt = new Random().nextInt(100);
+
+		// Germplasm list
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt,
+			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+
+
+	}
+
+	private Germplasm createGermplasm(final Method method) {
+		final Germplasm germplasm = new Germplasm(null, method.getMid(), 0, 0, 0,
+			0, 0, 0, 0, 0,
+			0, 0, null, null, method);
+		this.daoFactory.getGermplasmDao().save(germplasm);
+		return germplasm;
+	}
+
+	private GermplasmListData createGermplasmListData(final GermplasmList germplasmList, int gid, int entryNo) {
+		return new GermplasmListData(null, germplasmList, gid, entryNo, "EntryCode" + entryNo,
+			DataSetupTest.GERMPLSM_PREFIX + entryNo + " Source", DataSetupTest.GERMPLSM_PREFIX + entryNo,
+			DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0);
+	}
 
 	private void assertGermplasmList(final GermplasmList germplasmList, final Integer id, final String name) {
 		assertNotNull(germplasmList);
