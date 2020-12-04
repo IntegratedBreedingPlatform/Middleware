@@ -485,9 +485,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 			final Map<Integer, List<ObservationLevel>> trialIdToObservationLevelMap = new HashMap<>();
 			if(studyInstanceDtos != null) {
 				for(final StudyInstanceDto studyInstanceDto: studyInstanceDtos) {
+					final Integer trialDbId = Integer.valueOf(studyInstanceDto.getTrialDbId());
+					final Integer studyDbId = Integer.valueOf(studyInstanceDto.getStudyDbId());
 					final DmsProject environmentDataset =
 						this.daoFactory.getDmsProjectDAO()
-							.getDatasetsByTypeForStudy(studyInstanceDto.getTrialDbId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
+							.getDatasetsByTypeForStudy(trialDbId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 					final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
 						.getObservationSetVariables(
 							environmentDataset.getProjectId(),
@@ -497,7 +499,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					if (!variableIds.isEmpty()) {
 						environmentParameterVariables.addAll(
 							this.studyDataManager
-								.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(studyInstanceDto.getStudyDbId(), variableIds));
+								.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(studyDbId, variableIds));
 					}
 					final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
 						.getObservationSetVariables(
@@ -507,12 +509,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 					if (!variableIds.isEmpty()) {
 						environmentParameterVariables.addAll(
 							this.studyDataManager
-								.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(studyInstanceDto.getStudyDbId(), variableIds));
+								.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(studyDbId, variableIds));
 					}
 
 					final List<MeasurementVariable> environmentVariables = new ArrayList<>(environmentConditions);
 					environmentVariables.addAll(environmentDetails);
-					environmentParameterVariables.addAll(this.createGeolocationVariables(environmentVariables, studyInstanceDto.getStudyDbId()));
+					environmentParameterVariables.addAll(this.createGeolocationVariables(environmentVariables, studyDbId));
 
 					final List<EnvironmentParameter> environmentParameters = environmentParameterVariables.stream()
 						.map(variable -> new EnvironmentParameter(variable)).collect(Collectors.toList());
@@ -520,19 +522,19 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 					variableIds = this.getVariableIds(environmentVariables);
 					studyInstanceDto.getAdditionalInfo()
-						.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(studyInstanceDto.getStudyDbId(), variableIds));
+						.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(studyDbId, variableIds));
 					studyInstanceDto.getAdditionalInfo()
-						.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyInstanceDto.getTrialDbId(), variableIds));
+						.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(trialDbId, variableIds));
 
 					if(trialIdToObservationLevelMap.get(studyInstanceDto.getTrialDbId()) == null) {
-						final List<DatasetDTO> datasetDTOs = this.daoFactory.getDmsProjectDAO().getDatasets(studyInstanceDto.getTrialDbId());
+						final List<DatasetDTO> datasetDTOs = this.daoFactory.getDmsProjectDAO().getDatasets(trialDbId);
 						final List<ObservationLevel> observationLevels = datasetDTOs.stream()
 							.filter(datasetDTO -> (datasetDTO.getDatasetTypeId() != DatasetTypeEnum.SUMMARY_DATA.getId()))
 							.map(datasetDTO -> new ObservationLevel(datasetDTO)).collect(Collectors.toList());
 						studyInstanceDto.setObservationLevels(observationLevels);
-						trialIdToObservationLevelMap.put(studyInstanceDto.getTrialDbId(), observationLevels);
+						trialIdToObservationLevelMap.put(trialDbId, observationLevels);
 					} else {
-						studyInstanceDto.setObservationLevels(trialIdToObservationLevelMap.get(studyInstanceDto.getTrialDbId()));
+						studyInstanceDto.setObservationLevels(trialIdToObservationLevelMap.get(trialDbId));
 					}
 				}
 			}

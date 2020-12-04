@@ -75,7 +75,7 @@ public class StudyInstanceDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date endDate;
 
-	private Integer studyDbId;
+	private String studyDbId;
 
 	private String studyName;
 
@@ -97,7 +97,7 @@ public class StudyInstanceDto {
 
 	private String trialName;
 
-	private Integer trialDbId;
+	private String trialDbId;
 
 	private Map<String, String> optionalInfo;
 
@@ -144,14 +144,14 @@ public class StudyInstanceDto {
 	/**
 	 * @return The study db id
 	 */
-	public Integer getStudyDbId() {
+	public String getStudyDbId() {
 		return this.studyDbId;
 	}
 
 	/**
 	 * @param studyDbId
 	 */
-	public void setStudyDbId(final Integer studyDbId) {
+	public void setStudyDbId(final String studyDbId) {
 		this.studyDbId = studyDbId;
 	}
 
@@ -266,11 +266,11 @@ public class StudyInstanceDto {
 		this.trialName = trialName;
 	}
 
-	public Integer getTrialDbId() {
+	public String getTrialDbId() {
 		return this.trialDbId;
 	}
 
-	public void setTrialDbId(final Integer trialDbId) {
+	public void setTrialDbId(final String trialDbId) {
 		this.trialDbId = trialDbId;
 	}
 

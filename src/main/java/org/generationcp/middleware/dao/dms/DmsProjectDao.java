@@ -1462,9 +1462,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		for (final Map<String, Object> result : results) {
 			final StudyInstanceDto studyInstanceDto = new StudyInstanceDto();
 			studyInstanceDto.setCommonCropName(studySearchFilter.getCommonCropName());
-			studyInstanceDto.setStudyDbId((Integer) result.get("studyDbId"));
+			studyInstanceDto.setStudyDbId(String.valueOf(result.get("studyDbId")));
 			studyInstanceDto.setStudyName(String.valueOf(result.get("studyName")));
-			studyInstanceDto.setTrialDbId((Integer)result.get("trialDbId"));
+			studyInstanceDto.setTrialDbId(String.valueOf(result.get("trialDbId")));
 			studyInstanceDto.setTrialName(String.valueOf(result.get("trialName")));
 			studyInstanceDto.setStudyTypeDbId(String.valueOf(result.get("studyTypeDbId")));
 			studyInstanceDto.setStudyTypeName(String.valueOf(result.get("studyTypeName")));
