@@ -1116,7 +1116,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<StudyInstance> getDatasetInstances(final int datasetId) {
-		return this.getDatasetInstances(datasetId, Collections.<Integer>emptyList());
+		return this.getDatasetInstances(datasetId, Collections.emptyList());
 	}
 
 	public List<StudyInstance> getDatasetInstances(final int datasetId, final List<Integer> instanceIds) {
@@ -1422,7 +1422,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<StudyInstanceDto> getStudyInstances(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 
-		// TODO: Check if we can reuse this query/method in getStudyMetadataForGeolocationId()
 		final SQLQuery sqlQuery =
 			this.getSession().createSQLQuery(this.createStudyInstanceQueryString(studySearchFilter, pageable));
 
@@ -1489,20 +1488,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyInstanceDto.setStudyDescription(String.valueOf(result.get("studyDescription")));
 			studyInstanceDto.setStudyPUI(String.valueOf(result.get("studyPUI")));
 
-			final List<SeasonDto> seasons = new ArrayList<>();
 			final String seasonDbId = (String) result.get("seasonDbId");
-			if (!StringUtils.isEmpty(seasonDbId)) {
-				seasons.add(new SeasonDto(String.valueOf(result.get("season")), seasonDbId));
-			}
-			studyInstanceDto.setSeasons(seasons);
+			studyInstanceDto.setSeasons(!StringUtils.isEmpty(seasonDbId) ?
+				Collections.singletonList(new SeasonDto(String.valueOf(result.get("season")), seasonDbId)) : Collections.emptyList());
 
 			studyInstanceDto
 				.setActive(((Integer) result.get("active")) == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
-			studyInstanceDtoList.add(studyInstanceDto);
 
 			final Map<String, String> properties = new HashMap<>();
 			properties.put("studyObjective", result.get("studyObjective") ==  null ? "" : String.valueOf(result.get("studyObjective")));
 			studyInstanceDto.setAdditionalInfo(properties);
+
+			studyInstanceDtoList.add(studyInstanceDto);
 		}
 		return studyInstanceDtoList;
 	}
