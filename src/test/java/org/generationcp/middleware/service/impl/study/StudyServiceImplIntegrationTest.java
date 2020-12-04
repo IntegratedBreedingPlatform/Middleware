@@ -141,7 +141,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyInstanceDtoListWithTrialData() {
+	public void testGetStudyInstances() {
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Summary Dataset", "Summary Dataset-Description", this.study, this.study, DatasetTypeEnum.SUMMARY_DATA);
@@ -153,7 +153,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final StudySearchFilter studySearchFilter = new StudySearchFilter().withStudyDbId(geolocation.getLocationId().toString())
 			.withProgramDbId(this.study.getProgramUUID());
 		final Pageable pageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "trialName"));
-		final List<StudyInstanceDto> studyDetailsDtoList = this.studyService.getStudyInstanceDtoListWithTrialData(studySearchFilter, pageable);
+		final List<StudyInstanceDto> studyDetailsDtoList = this.studyService.getStudyInstances(studySearchFilter, pageable);
 		Assert.assertNotNull(studyDetailsDtoList);
 		Assert.assertEquals(1, studyDetailsDtoList.size());
 		final StudyInstanceDto studyInstanceDto = studyDetailsDtoList.get(0);
