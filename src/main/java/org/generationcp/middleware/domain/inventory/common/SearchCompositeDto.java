@@ -12,6 +12,16 @@ public class SearchCompositeDto<X, Y> {
 
 	private Set<Y> itemIds;
 
+	private X study;
+
+	public X getStudy() {
+		return this.study;
+	}
+
+	public void setStudy(final X study) {
+		this.study = study;
+	}
+
 	public X getSearchRequest() {
 		return searchRequest;
 	}
