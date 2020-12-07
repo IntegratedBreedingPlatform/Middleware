@@ -1718,6 +1718,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value");
 		sql.append(" WHERE ");
 		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
+		sql.append("     AND pmain.deleted = 0 ");//Exclude Deleted Studies
 	}
 
 	private void appendStudySummaryFromQuery(final StringBuilder sql) {
