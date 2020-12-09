@@ -60,7 +60,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private final DaoFactory daoFactory;
 
-	private enum GermplasmListDataPropertyName {
+	public enum GermplasmListDataPropertyName {
 
 		PREFERRED_ID("PREFERRED ID"),
 		GERMPLASM_LOCATION("LOCATIONS"),
