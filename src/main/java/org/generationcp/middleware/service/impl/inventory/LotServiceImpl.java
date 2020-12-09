@@ -169,6 +169,9 @@ public class LotServiceImpl implements LotService {
 			if (!StringUtils.isBlank(lotUpdateDto.getNotes())) {
 				lot.setComments(lotUpdateDto.getNotes());
 			}
+			if (!StringUtils.isBlank(lotUpdateDto.getNewLotUID())) {
+				lot.setLotUuId(lotUpdateDto.getNewLotUID());
+			}
 			this.daoFactory.getLotDao().save(lot);
 		}
 	}

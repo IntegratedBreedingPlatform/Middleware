@@ -20,6 +20,8 @@ public class LotMultiUpdateRequestDto {
 
 		private String notes;
 
+		private String newLotUID;
+
 		public LotUpdateDto(){
 
 		}
@@ -54,6 +56,14 @@ public class LotMultiUpdateRequestDto {
 
 		public void setNotes(final String notes) {
 			this.notes = notes;
+		}
+
+		public String getNewLotUID() {
+			return this.newLotUID;
+		}
+
+		public void setNewLotUID(final String newLotUID) {
+			this.newLotUID = newLotUID;
 		}
 
 		@Override
