@@ -368,13 +368,13 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	private void mapGeolocationMetaData(final Geolocation geolocation, final int variableId, final String value) {
 		if (TermId.LATITUDE.getId() == variableId) {
-			geolocation.setLatitude(Double.valueOf(value));
+			geolocation.setLatitude(!StringUtils.isBlank(value) ? Double.valueOf(value) : null);
 		} else if (TermId.LONGITUDE.getId() == variableId) {
-			geolocation.setLongitude(Double.valueOf(value));
+			geolocation.setLongitude(!StringUtils.isBlank(value) ? Double.valueOf(value) : null);
 		} else if (TermId.GEODETIC_DATUM.getId() == variableId) {
 			geolocation.setGeodeticDatum(value);
 		} else if (TermId.ALTITUDE.getId() == variableId) {
-			geolocation.setAltitude(Double.valueOf(value));
+			geolocation.setAltitude(!StringUtils.isBlank(value) ? Double.valueOf(value) : null);
 		}
 	}
 
