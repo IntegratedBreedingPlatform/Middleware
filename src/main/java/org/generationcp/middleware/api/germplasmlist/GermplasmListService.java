@@ -1,14 +1,30 @@
 package org.generationcp.middleware.api.germplasmlist;
 
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface GermplasmListService {
 
 	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request, int status, String programUUID,
 		WorkbenchUser loggedInUser);
+
+	/**
+	 * Inserts a list of multiple {@code GermplasmListData} objects into the database.
+	 *
+	 * @param data - A list of {@code GermplasmListData} objects to be persisted to the database. {@code GermplasmListData}
+	 *                           objects must be valid.
+	 * @return Returns the ids of the {@code GermplasmListData} records inserted in the database.
+	 */
+	List<GermplasmListData> addGermplasmListData(List<GermplasmListData> data);
+
+	void addGermplasmEntriesToList(Integer germplasmListId, SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite,
+		final String programUUID);
 
 	Optional<GermplasmList> getGermplasmListById(Integer id);
 

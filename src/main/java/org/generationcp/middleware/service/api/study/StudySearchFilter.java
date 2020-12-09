@@ -12,10 +12,13 @@ public class StudySearchFilter {
 	private String locationDbId;
 	private String seasonDbId;
 	private String trialPUI;
+	private String studyPUI;
 	private String trialDbId;
 	private String trialName;
 	private String contactDbId;
 	private String studyDbId;
+	private Integer germplasmDbId;
+	private Integer observationVariableDbId;
 	private Boolean active;
 	private Date searchDateRangeStart;
 	private Date searchDateRangeEnd;
@@ -68,6 +71,19 @@ public class StudySearchFilter {
 
 	public StudySearchFilter withSeasonDbId(final String seasonDbId) {
 		this.seasonDbId = seasonDbId;
+		return this;
+	}
+
+	public String getStudyPUI() {
+		return this.studyPUI;
+	}
+
+	public void setStudyPUI(final String studyPUI) {
+		this.studyPUI = studyPUI;
+	}
+
+	public StudySearchFilter withStudyPUI(final String studyPUI) {
+		this.studyPUI = studyPUI;
 		return this;
 	}
 
@@ -149,6 +165,32 @@ public class StudySearchFilter {
 
 	public StudySearchFilter withSearchDateRangeEnd(final Date searchDateRangeEnd) {
 		this.searchDateRangeEnd = searchDateRangeEnd;
+		return this;
+	}
+
+	public Integer getGermplasmDbId() {
+		return this.germplasmDbId;
+	}
+
+	public void setGermplasmDbId(final Integer germplasmDbId) {
+		this.germplasmDbId = germplasmDbId;
+	}
+
+	public StudySearchFilter withGermplasmDbid(final Integer germplasmDbId) {
+		this.germplasmDbId = germplasmDbId;
+		return this;
+	}
+
+	public Integer getObservationVariableDbId() {
+		return this.observationVariableDbId;
+	}
+
+	public void setObservationVariableDbId(final Integer observationVariableDbId) {
+		this.observationVariableDbId = observationVariableDbId;
+	}
+
+	public StudySearchFilter withObservationVariableDbId(final Integer observationVariableDbId) {
+		this.observationVariableDbId = observationVariableDbId;
 		return this;
 	}
 

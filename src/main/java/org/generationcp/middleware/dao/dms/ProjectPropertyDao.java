@@ -233,7 +233,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			final List<Object> results = query.list();
 			for (final Object obj : results) {
 				final Object[] row = (Object[]) obj;
-				geoProperties.put((String) row[0], (String) row[1]);
+				geoProperties.put((String) row[0], row[1] == null ? "" : (String) row[1]);
 			}
 			return geoProperties;
 		} catch (final MiddlewareQueryException e) {

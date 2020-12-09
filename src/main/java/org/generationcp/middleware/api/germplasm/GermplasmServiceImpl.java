@@ -1,8 +1,10 @@
 package org.generationcp.middleware.api.germplasm;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -50,6 +52,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private final DaoFactory daoFactory;
 
 	private static final String DEFAULT_BIBREF_FIELD = "-";
+	private static final String PLOT_CODE = "PLOTCODE";
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -60,12 +63,48 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public List<Germplasm> getGermplasmByGUIDs(final List<String> guids) {
-		return daoFactory.getGermplasmDao().getGermplasmByGUIDs(guids);
+		return this.daoFactory.getGermplasmDao().getGermplasmByGUIDs(guids);
 	}
 
 	@Override
 	public List<Germplasm> getGermplasmByGIDs(final List<Integer> gids) {
-		return daoFactory.getGermplasmDao().getByGIDList(gids);
+		return this.daoFactory.getGermplasmDao().getByGIDList(gids);
+	}
+
+	@Override
+	public String getPlotCodeValue(final Integer gid) {
+		final UserDefinedField plotCodeAttribute = this.getPlotCodeField();
+		final Optional<Attribute> plotCode = this.getAttributesByGID(gid)
+			.stream()
+			.filter(attribute -> attribute.getTypeId().equals(plotCodeAttribute.getFldno()))
+			.findFirst();
+		if (plotCode.isPresent()) {
+			return plotCode.get().getAval();
+		}
+
+		return GermplasmListDataDAO.SOURCE_UNKNOWN;
+	}
+
+	@Override
+	public List<Attribute> getAttributesByGID(final Integer gid) {
+		return this.daoFactory.getAttributeDAO().getByGID(gid);
+	}
+
+	@Override
+	public UserDefinedField getPlotCodeField() {
+		final List<UserDefinedField> udfldAttributes = this.daoFactory.getUserDefinedFieldDAO().getByFieldTableNameAndType(UDTableType.ATRIBUTS_PASSPORT.getTable(),
+			ImmutableSet.of(UDTableType.ATRIBUTS_PASSPORT.getType()));
+
+		final Optional<UserDefinedField> plotCodeField = udfldAttributes
+			.stream()
+			.filter(userDefinedField -> PLOT_CODE.equals(userDefinedField.getFcode()))
+			.findFirst();
+		if (plotCodeField.isPresent()) {
+			return plotCodeField.get();
+		}
+
+		// Defaulting to a UDFLD with fldno = 0 - this prevents NPEs and DB constraint violations.
+		return new UserDefinedField(0);
 	}
 
 	@Override

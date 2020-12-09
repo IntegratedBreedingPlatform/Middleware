@@ -1358,7 +1358,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try{
 			final SQLQuery query =
 				this.getSession().createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, "
-					+ "		cvt_scale.name AS scaleName, pheno.value AS value from phenotype pheno "
+					+ "		cvt_scale.name AS scaleName, pheno.value AS value, cvt_scale.cvterm_id AS scaleId, "
+					+ "		envcvt.cvterm_id AS variableId from phenotype pheno "
 					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.cvterm_id IN (:variableIds) "
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
@@ -1368,6 +1369,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());
 			query.addScalar("value", new StringType());
+			query.addScalar("scaleId", new IntegerType());
+			query.addScalar("variableId", new IntegerType());
 			query.setParameterList("variableIds", variableIds);
 			query.setParameter("geolocationId", geolocationId);
 
@@ -1379,6 +1382,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				measurementVariable.setDescription((row[1] instanceof String) ? (String) row[1] : null);
 				measurementVariable.setScale((row[2] instanceof String) ? (String) row[2] : null);
 				measurementVariable.setValue((row[3] instanceof String) ? (String) row[3] : null);
+				measurementVariable.setScaleId((row[4] instanceof Integer) ? (Integer) row[4] : null);
+				measurementVariable.setTermId((row[5] instanceof Integer) ? (Integer) row[5] : 0);
 				studyVariables.add(measurementVariable);
 			}
 		} catch (final MiddlewareQueryException e) {

@@ -2,9 +2,14 @@ package org.generationcp.middleware.service.api.study;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.apache.commons.lang.StringUtils;
+import org.generationcp.middleware.service.api.BrapiView;
+import org.generationcp.middleware.service.api.user.ContactDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +17,51 @@ import java.util.Map;
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StudyInstanceDto {
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private Map<String, String> additionalInfo;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<ContactDto> contacts = new ArrayList<>();
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String culturalPractices;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<String> dataLinks = new ArrayList<>();
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<EnvironmentParameter> environmentParameters;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private ExperimentalDesign experimentalDesign;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<String> externalReferences;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String growthFacility;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private Map<String, String> lastUpdate;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String license;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String observationUnitsDescription = StringUtils.EMPTY;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String studyCode  = StringUtils.EMPTY;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String studyDescription;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String studyPUI;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<ObservationLevel> observationLevels;
 
 	private String active;
 
@@ -256,6 +306,126 @@ public class StudyInstanceDto {
 	public StudyInstanceDto setOptionalInfo(final Map<String, String> optionalInfo) {
 		this.optionalInfo = optionalInfo;
 		return this;
+	}
+
+	public Map<String, String> getAdditionalInfo() {
+		return additionalInfo;
+	}
+
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
+		this.additionalInfo = additionalInfo;
+	}
+
+	public List<ContactDto> getContacts() {
+		return contacts;
+	}
+
+	public void setContacts(final List<ContactDto> contacts) {
+		this.contacts = contacts;
+	}
+
+	public String getCulturalPractices() {
+		return culturalPractices;
+	}
+
+	public void setCulturalPractices(final String culturalPractices) {
+		this.culturalPractices = culturalPractices;
+	}
+
+	public List<String> getDataLinks() {
+		return dataLinks;
+	}
+
+	public void setDataLinks(final List<String> dataLinks) {
+		this.dataLinks = dataLinks;
+	}
+
+	public List<EnvironmentParameter> getEnvironmentParameters() {
+		return environmentParameters;
+	}
+
+	public void setEnvironmentParameters(final List<EnvironmentParameter> environmentParameters) {
+		this.environmentParameters = environmentParameters;
+	}
+
+	public ExperimentalDesign getExperimentalDesign() {
+		return experimentalDesign;
+	}
+
+	public void setExperimentalDesign(final ExperimentalDesign experimentalDesign) {
+		this.experimentalDesign = experimentalDesign;
+	}
+
+	public List<String> getExternalReferences() {
+		return externalReferences;
+	}
+
+	public void setExternalReferences(final List<String> externalReferences) {
+		this.externalReferences = externalReferences;
+	}
+
+	public String getGrowthFacility() {
+		return growthFacility;
+	}
+
+	public void setGrowthFacility(final String growthFacility) {
+		this.growthFacility = growthFacility;
+	}
+
+	public Map<String, String> getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(final Map<String, String> lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
+
+	public String getLicense() {
+		return license;
+	}
+
+	public void setLicense(final String license) {
+		this.license = license;
+	}
+
+	public String getObservationUnitsDescription() {
+		return observationUnitsDescription;
+	}
+
+	public void setObservationUnitsDescription(final String observationUnitsDescription) {
+		this.observationUnitsDescription = observationUnitsDescription;
+	}
+
+	public String getStudyCode() {
+		return studyCode;
+	}
+
+	public void setStudyCode(final String studyCode) {
+		this.studyCode = studyCode;
+	}
+
+	public String getStudyDescription() {
+		return studyDescription;
+	}
+
+	public void setStudyDescription(final String studyDescription) {
+		this.studyDescription = studyDescription;
+	}
+
+	public String getStudyPUI() {
+		return studyPUI;
+	}
+
+	public void setStudyPUI(final String studyPUI) {
+		this.studyPUI = studyPUI;
+	}
+
+	public List<ObservationLevel> getObservationLevels() {
+		return observationLevels;
+	}
+
+	public void setObservationLevels(final List<ObservationLevel> observationLevels) {
+		this.observationLevels = observationLevels;
 	}
 
 	@Override

@@ -1,5 +1,11 @@
 package org.generationcp.middleware.service.api.user;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.lang.StringUtils;
+import org.pojomatic.annotations.AutoProperty;
+
+@AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ContactDto {
 
 	private Integer contactDbId;
@@ -9,6 +15,10 @@ public class ContactDto {
 	private String email;
 
 	private String type;
+
+	private String orcid = StringUtils.EMPTY;
+
+	private String instituteName = StringUtils.EMPTY;
 
 	public ContactDto(final Integer contactDbId, final String name, final String email, final String type) {
 		this.contactDbId = contactDbId;
@@ -47,5 +57,21 @@ public class ContactDto {
 
 	public void setType(final String type) {
 		this.type = type;
+	}
+
+	public String getOrcid() {
+		return orcid;
+	}
+
+	public void setOrcid(final String orcid) {
+		this.orcid = orcid;
+	}
+
+	public String getInstituteName() {
+		return instituteName;
+	}
+
+	public void setInstituteName(final String instituteName) {
+		this.instituteName = instituteName;
 	}
 }
