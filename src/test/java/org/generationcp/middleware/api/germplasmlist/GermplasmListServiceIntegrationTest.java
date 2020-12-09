@@ -178,7 +178,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void shouldAddGermplasmListData() {
+	public void shouldAddGermplasmListData_OK() {
 		final Method method = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD, null);
 		final Germplasm germplasm = this.createGermplasm(method);
 
@@ -216,7 +216,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void shouldAddGermplasmEntriesToList_OK() {
+	public void testAddGermplasmEntriesToList_WithSelectedItems_OK() {
 		final int randomInt = new Random().nextInt(100);
 
 		// Germplasm list
@@ -242,6 +242,54 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 
 		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite = new SearchCompositeDto<>();
 		searchComposite.setItemIds(Sets.newHashSet(addGermplasmEntry.getGid()));
+		this.germplasmListService.addGermplasmEntriesToList(germplasmList.getId(), searchComposite, PROGRAM_UUID);
+
+		this.sessionProvder.getSession().flush();
+		this.sessionProvder.getSession().clear();
+
+		final Optional<GermplasmList> germplasmListById = this.germplasmListService.getGermplasmListById(germplasmList.getId());
+		assertTrue(germplasmListById.isPresent());
+
+		final GermplasmList actualGermplasmList = germplasmListById.get();
+		assertThat(actualGermplasmList.getListData(), hasSize(2));
+
+		this.assertGermplasmListDataAndProperty(actualGermplasmList.getListData().get(0),
+			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
+			singleCrossMethod.getMname());
+		this.assertGermplasmListDataAndProperty(actualGermplasmList.getListData().get(1),
+			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
+			doubleCrossMethod.getMname());
+	}
+
+	@Test
+	public void testAddGermplasmEntriesToList_WithoutSelectedItems_OK() {
+		final int randomInt = new Random().nextInt(100);
+
+		// Germplasm list
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt,
+			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+
+		// Add entry to list
+		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD, null);
+		final Germplasm existingGermplasmEntry = this.createGermplasm(singleCrossMethod);
+		final GermplasmListData germplasmListData = this.createGermplasmListData(germplasmList, existingGermplasmEntry.getGid(), 1);
+		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
+
+		final ListDataProperty existingEntryProperty = new ListDataProperty(germplasmListData.getListDataId(),
+			germplasmListData,
+			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
+			existingGermplasmEntry.getMethod().getMname());
+		this.daoFactory.getListDataPropertyDAO().save(existingEntryProperty);
+
+		//Create entry to add into existing list
+		final Method doubleCrossMethod = this.daoFactory.getMethodDAO().getByCode(DOUBLE_CROSS_METHOD, null);
+		final Germplasm addGermplasmEntry = this.createGermplasm(doubleCrossMethod);
+
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		germplasmSearchRequest.setGids(Arrays.asList(addGermplasmEntry.getGid()));
+		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite = new SearchCompositeDto<>();
+		searchComposite.setSearchRequest(germplasmSearchRequest);
 		this.germplasmListService.addGermplasmEntriesToList(germplasmList.getId(), searchComposite, PROGRAM_UUID);
 
 		this.sessionProvder.getSession().flush();
