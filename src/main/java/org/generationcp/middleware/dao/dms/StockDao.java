@@ -352,6 +352,20 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
+	public List<Integer> hasPlotEntries(final List<Integer> entryIds) {
+		try {
+			final String queryString = "Select s.stock_id from stock s where s.stock_id IN (:entryIds)"
+				+ "	AND EXISTS (SELECT 1 FROM nd_experiment e where e.stock_id = s.stock_id)";
+			final SQLQuery query = this.getSession().createSQLQuery(queryString);
+			query.setParameterList("entryIds", entryIds);
+			return query.list();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in hasPlotEntries for entryIds=" + entryIds + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
 	public Integer getNextEntryNumber(final Integer studyId) {
 		try {
 			final String queryString = "SELECT IFNULL(MAX(Convert(s.uniquename, SIGNED)), 0) + 1 FROM stock s where s.project_id = :studyId";

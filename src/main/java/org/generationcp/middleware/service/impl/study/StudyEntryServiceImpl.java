@@ -182,6 +182,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
+	public List<Integer> hasPlotEntries(final List<Integer> entryIds) {
+		return this.daoFactory.getStockDao().hasPlotEntries(entryIds);
+	}
+
+	@Override
 	public Boolean hasUnassignedEntries(final int studyId) {
 		return this.daoFactory.getStockDao().hasUnassignedEntries(studyId);
 	}
