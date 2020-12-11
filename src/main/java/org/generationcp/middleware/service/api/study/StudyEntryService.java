@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.generationcp.middleware.domain.study.StudyEntryPropertyDataUpdateRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.springframework.data.domain.Pageable;
 
@@ -29,11 +30,9 @@ public interface StudyEntryService {
 
 	StudyEntryDto replaceStudyEntry(int studyId, int entryId, int gid, String crossExpansion);
 
-	void updateStudyEntryProperty(int studyId, StudyEntryPropertyData studyEntryPropertyData);
+	void updateStudyEntriesProperty(StudyEntryPropertyDataUpdateRequestDto studyEntryPropertyDataUpdateRequestDto);
 
 	List<Integer> hasPlotEntries(List<Integer> entryIds);
 
 	Boolean hasUnassignedEntries(int studyId);
-
-	Optional<StudyEntryPropertyData> getStudyEntryPropertyData(int studyEntryPropertyId);
 }

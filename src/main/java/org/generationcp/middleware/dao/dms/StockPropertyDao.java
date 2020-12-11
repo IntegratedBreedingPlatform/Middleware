@@ -69,4 +69,21 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 		}
 	}
 
+	public boolean updateByStockIdsAndTypeId(final List<Integer> stockIds, final Integer typeId, final String value) {
+		try {
+			this.getSession().flush();
+
+			final String queryString = "UPDATE stockprop SET value = :value WHERE type_id = :typeId AND stock_id IN (:stockIds)";
+			final SQLQuery query = this.getSession().createSQLQuery(queryString);
+			query.setParameter("value", value);
+			query.setParameter("typeId", typeId);
+			query.setParameterList("stockIds", stockIds);
+			return query.executeUpdate() > 0;
+
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error in updateByStockIdsAndTypeId(" + stockIds + ", " + typeId  + ", " + value
+				+ ") in StockPropertyDao: "	+ e.getMessage(), e);
+		}
+	}
+
 }
