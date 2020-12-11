@@ -354,7 +354,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	public List<Integer> hasPlotEntries(final List<Integer> entryIds) {
 		try {
-			final String queryString = "Select s.stock_id from stock s where s.stock_id IN (:entryIds)"
+			final String queryString = "Select s.uniquename from stock s where s.stock_id IN (:entryIds)"
 				+ "	AND EXISTS (SELECT 1 FROM nd_experiment e where e.stock_id = s.stock_id)";
 			final SQLQuery query = this.getSession().createSQLQuery(queryString);
 			query.setParameterList("entryIds", entryIds);
