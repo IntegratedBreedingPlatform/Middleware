@@ -203,6 +203,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ " WHERE "
 		+ "     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 		+ "         AND geoloc.nd_geolocation_id = :instanceId "
+		+ "         AND proj.deleted = 0 "
 		+ " GROUP BY geoloc.nd_geolocation_id ";
 
 	private static final String GET_PROJECTID_BY_STUDYDBID =
