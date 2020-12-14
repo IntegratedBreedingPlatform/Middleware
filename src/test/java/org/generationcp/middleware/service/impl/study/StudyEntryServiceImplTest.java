@@ -8,6 +8,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyEntryPropertyDataUpdateRequestDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -22,11 +23,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * The class <code>StudyGermplasmListServiceImplTest</code> contains tests for the class <code>{@link StudyEntryServiceImpl}</code>.
@@ -172,15 +175,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	public void testHasUnassignedEntries() {
 		Assert.assertTrue(this.service.hasUnassignedEntries(this.studyId));
 		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(this.studyId);
-		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		for (final StockModel stock: stocks) {
-			final ExperimentModel experimentModel = new ExperimentModel();
-			experimentModel.setGeoLocation(geolocation);
-			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-			experimentModel.setProject(this.study);
-			experimentModel.setStock(stock);
-			this.daoFactory.getExperimentDao().save(experimentModel);
-		}
+		addExperimentsForStocks(stocks);
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
 		Assert.assertFalse(this.service.hasUnassignedEntries(this.studyId));
@@ -228,21 +223,43 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testUpdateStudyEntryProperty() {
+	public void testUpdateStudyEntriesProperty() {
 
 		final StockModel stockModel = this.daoFactory.getStockDao().getStocksForStudy(this.studyId).get(0);
 		final Optional<StockProperty> stockPropertyOptional =
 			stockModel.getProperties().stream().filter(o -> o.getTypeId() == TermId.ENTRY_TYPE.getId()).findFirst();
-		final StudyEntryPropertyData studyEntryPropertyData = new StudyEntryPropertyData();
-		studyEntryPropertyData.setStudyEntryPropertyId(stockPropertyOptional.get().getStockPropId());
-		studyEntryPropertyData.setVariableId(stockPropertyOptional.get().getTypeId());
-		studyEntryPropertyData.setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
-
-		this.service.updateStudyEntryProperty(this.studyId, studyEntryPropertyData);
-
+		final StudyEntryPropertyDataUpdateRequestDto requestDto = new StudyEntryPropertyDataUpdateRequestDto();
+		requestDto.setEntryIds(Collections.singletonList(stockPropertyOptional.get().getStock().getStockId()));
+		requestDto.setVariableId(stockPropertyOptional.get().getTypeId());
+		requestDto.setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
+		this.service.updateStudyEntriesProperty(requestDto);
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
 		Assert.assertEquals(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()),
-			this.daoFactory.getStockPropertyDao().getById(studyEntryPropertyData.getStudyEntryPropertyId()).getValue());
+			this.daoFactory.getStockPropertyDao().getById(stockPropertyOptional.get().getStockPropId()).getValue());
 
+	}
+
+	@Test
+	public void testHasPlotEntries() {
+		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(this.studyId);
+		addExperimentsForStocks(stocks);
+		final List<Integer> entryIds = stocks.stream().map(StockModel::getStockId).collect(Collectors.toList());
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
+		Assert.assertTrue(CollectionUtils.isEmpty(this.service.hasPlotEntries(entryIds)));
+	}
+
+	void addExperimentsForStocks(final List<StockModel> stocks) {
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		for (final StockModel stock : stocks) {
+			final ExperimentModel experimentModel = new ExperimentModel();
+			experimentModel.setGeoLocation(geolocation);
+			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+			experimentModel.setProject(this.study);
+			experimentModel.setStock(stock);
+			this.daoFactory.getExperimentDao().save(experimentModel);
+		}
 	}
 
 	@Test
