@@ -175,7 +175,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	public void testHasUnassignedEntries() {
 		Assert.assertTrue(this.service.hasUnassignedEntries(this.studyId));
 		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(this.studyId);
-		addExperimentsForStocks(stocks);
+		this.addExperimentsForStocks(stocks);
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
 		Assert.assertFalse(this.service.hasUnassignedEntries(this.studyId));
@@ -247,7 +247,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 		final List<Integer> entryIds = stocks.stream().map(StockModel::getStockId).collect(Collectors.toList());
 		Assert.assertTrue(CollectionUtils.isEmpty(this.service.hasPlotEntries(entryIds)));
 
-		addExperimentsForStocks(stocks);
+		this.addExperimentsForStocks(stocks);
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
 		Assert.assertEquals(entryIds.size(), this.service.hasPlotEntries(entryIds).size());

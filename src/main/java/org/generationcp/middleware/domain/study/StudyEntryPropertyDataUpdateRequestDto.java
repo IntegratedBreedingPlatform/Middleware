@@ -25,7 +25,7 @@ public class StudyEntryPropertyDataUpdateRequestDto {
 	}
 
 	public List<Integer> getEntryIds() {
-		return entryIds;
+		return this.entryIds;
 	}
 
 	public void setEntryIds(final List<Integer> entryIds) {
@@ -33,7 +33,7 @@ public class StudyEntryPropertyDataUpdateRequestDto {
 	}
 
 	public Integer getVariableId() {
-		return variableId;
+		return this.variableId;
 	}
 
 	public void setVariableId(final Integer variableId) {
@@ -41,7 +41,7 @@ public class StudyEntryPropertyDataUpdateRequestDto {
 	}
 
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	public void setValue(final String value) {
