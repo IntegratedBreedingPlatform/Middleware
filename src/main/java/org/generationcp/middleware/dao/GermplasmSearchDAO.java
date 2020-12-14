@@ -953,7 +953,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	public long countSearchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
 
 		try {
-			// Reusing the same query without filters is expensive. We create a simpler one for count all
+			// Reusing the same query without filters is expensive. We create a simpler one for count all.
+			// Even then, count takes ~ 15s in large db, so it's not executed by default
 			if (germplasmSearchRequest == null) {
 				final SQLQuery sqlQuery =
 					this.getSession().createSQLQuery(" select count(gid) from germplsm g where 1 = 1 " + GERMPLASM_NOT_DELETED_CLAUSE);
