@@ -229,7 +229,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 		final Optional<StockProperty> stockPropertyOptional =
 			stockModel.getProperties().stream().filter(o -> o.getTypeId() == TermId.ENTRY_TYPE.getId()).findFirst();
 		final StudyEntryPropertyDataUpdateRequestDto requestDto = new StudyEntryPropertyDataUpdateRequestDto();
-		requestDto.setEntryIds(Collections.singletonList(stockPropertyOptional.get().getStock().getStockId()));
+		requestDto.setEntryIds(Collections.singletonList(stockModel.getStockId()));
 		requestDto.setVariableId(stockPropertyOptional.get().getTypeId());
 		requestDto.setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 		this.service.updateStudyEntriesProperty(requestDto);
@@ -243,11 +243,13 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testHasPlotEntries() {
 		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(this.studyId);
-		addExperimentsForStocks(stocks);
 		final List<Integer> entryIds = stocks.stream().map(StockModel::getStockId).collect(Collectors.toList());
+		Assert.assertTrue(CollectionUtils.isEmpty(this.service.hasPlotEntries(entryIds)));
+
+		addExperimentsForStocks(stocks);
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
-		Assert.assertTrue(CollectionUtils.isEmpty(this.service.hasPlotEntries(entryIds)));
+		Assert.assertEquals(entryIds.size(), this.service.hasPlotEntries(entryIds).size());
 	}
 
 	void addExperimentsForStocks(final List<StockModel> stocks) {
