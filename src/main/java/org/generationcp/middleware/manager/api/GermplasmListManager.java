@@ -246,12 +246,15 @@ public interface GermplasmListManager {
 	Integer addGermplasmListData(GermplasmListData germplasmListData);
 
 	/**
+	 * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasmlist.GermplasmListService#addGermplasmListData(List)}
+	 *
 	 * Inserts a list of multiple {@code GermplasmListData} objects into the database.
 	 *
 	 * @param germplasmListDatas - A list of {@code GermplasmListData} objects to be persisted to the database. {@code GermplasmListData}
 	 *                           objects must be valid.
 	 * @return Returns the ids of the {@code GermplasmListData} records inserted in the database.
 	 */
+	@Deprecated
 	List<Integer> addGermplasmListData(List<GermplasmListData> germplasmListDatas);
 
 	/**

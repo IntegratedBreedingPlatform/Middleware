@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -183,6 +184,8 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void lotMultiUpdateNotesUnit_Ok() {
+		final String newLotUID = UUID.randomUUID().toString();
+
 		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
 		final LotMultiUpdateRequestDto multiInput = new LotMultiUpdateRequestDto();
 		final List<LotMultiUpdateRequestDto.LotUpdateDto> lotList = new ArrayList<>();
@@ -190,6 +193,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		lot.setLotUID(this.lot.getLotUuId());
 		lot.setUnitName("SEED_AMOUNT_kg");
 		lot.setNotes("Test3");
+		lot.setNewLotUID(newLotUID);
 		lotList.add(lot);
 		multiInput.setLotList(lotList);
 		lotUpdateRequestDto.setMultiInput(multiInput);
@@ -204,6 +208,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		this.lotService.updateLots(null, extendedLotDtos, lotUpdateRequestDto);
 		assertThat(this.lot.getComments(), hasToString("Test3"));
 		assertThat(this.lot.getScaleId(), equalTo(8267));
+		assertThat(this.lot.getLotUuId(), equalTo(newLotUID));
 	}
 
 	@Test
