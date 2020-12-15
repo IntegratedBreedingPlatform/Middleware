@@ -553,7 +553,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 		try {
 			final List<StudyInstanceDto> studyInstanceDtos = this.daoFactory.getDmsProjectDAO()
 				.getStudyInstances(studySearchFilter, pageable);
-			final Map<Integer, List<ObservationLevel>> observationLevelsMap = new HashMap<>();
+			final Set<Integer> studyIds = studyInstanceDtos.stream().map(o -> Integer.valueOf(o.getTrialDbId())).collect(Collectors.toSet());
+			final Map<Integer, List<ObservationLevel>> observationLevelsMap = this.daoFactory.getDmsProjectDAO()
+				.getObservationLevelsMap(new ArrayList<>(studyIds));
 			final Map<Integer, Integer> studyEnvironmentDatasetIdMap = new HashMap<>();
 
 			final Map<Integer, List<MeasurementVariable>> studyEnvironmentVariablesMap = new HashMap<>();
@@ -589,7 +591,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					studyInstanceDto.getAdditionalInfo()
 						.putAll(this.getStudyAdditionalInfo(trialDbId, studyAdditionalInfoMap, variableIds));
 
-					studyInstanceDto.setObservationLevels(this.getObservationLevels(observationLevelsMap, studyInstanceDto, trialDbId));
+					studyInstanceDto.setObservationLevels(observationLevelsMap.get(trialDbId));
 				}
 			}
 			return studyInstanceDtos;
@@ -610,22 +612,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 			studyAdditionalInfo = studyAdditonalInfoMap.get(trialDbId);
 		}
 		return studyAdditionalInfo;
-	}
-	List<ObservationLevel> getObservationLevels(
-		final Map<Integer, List<ObservationLevel>> observationLevelsMap, final StudyInstanceDto studyInstanceDto,
-		final Integer trialDbId) {
-		List<ObservationLevel> observationLevels;
-		if(observationLevelsMap.get(studyInstanceDto.getTrialDbId()) == null) {
-			final List<DatasetDTO> datasetDTOs = this.daoFactory.getDmsProjectDAO().getDatasets(trialDbId);
-			 observationLevels = datasetDTOs.stream()
-				.filter(datasetDTO -> (datasetDTO.getDatasetTypeId() != DatasetTypeEnum.SUMMARY_DATA.getId()))
-				.map(datasetDTO -> new ObservationLevel(datasetDTO)).collect(Collectors.toList());
-			studyInstanceDto.setObservationLevels(observationLevels);
-			observationLevelsMap.put(trialDbId, observationLevels);
-		} else {
-			observationLevels = observationLevelsMap.get(trialDbId);
-		}
-		return observationLevels;
 	}
 
 	List<MeasurementVariable> getEnvironmentVariables(

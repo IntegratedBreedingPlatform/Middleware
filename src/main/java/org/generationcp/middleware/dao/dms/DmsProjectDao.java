@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.study.ExperimentalDesign;
+import org.generationcp.middleware.service.api.study.ObservationLevel;
 import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
@@ -1114,6 +1115,45 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		return datasetDTOS;
 
+	}
+
+
+	public Map<Integer, List<ObservationLevel>> getObservationLevelsMap(final List<Integer> studyIds) {
+		try {
+			final Map<Integer, List<ObservationLevel>> observationLevelsMap = new HashMap<>();
+
+			final String sqlString = "SELECT study_id AS studyId, dataset_type_id AS datasetTypeId, name AS studyName FROM project "
+				+ " where dataset_type_id != " + DatasetTypeEnum.SUMMARY_DATA.getId()
+				+ " AND study_id IN (:studyIds)";
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sqlString);
+
+			sqlQuery.addScalar("studyId", new IntegerType());
+			sqlQuery.addScalar("datasetTypeId", new IntegerType());
+			sqlQuery.addScalar("studyName", new StringType());
+			sqlQuery.setParameterList("studyIds", studyIds);
+
+			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			final List<Map<String, Object>> results = sqlQuery.list();
+
+			final List<StudyInstanceDto> studyInstanceDtoList = new ArrayList<>();
+			for (final Map<String, Object> result : results) {
+				final ObservationLevel observationLevel = new ObservationLevel((Integer)result.get("datasetTypeId"),
+					String.valueOf(result.get("studyName")));
+				final Integer studyId = (Integer) result.get("studyId");
+				if(observationLevelsMap.get(studyId) != null) {
+					observationLevelsMap.get(studyId).add(observationLevel);
+				} else {
+					final List<ObservationLevel> observationLevels = new ArrayList<>();
+					observationLevels.add(observationLevel);
+					observationLevelsMap.put(studyId, observationLevels);
+				}
+			}
+
+			return observationLevelsMap;
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error getting getObservationLevelsMap for studyIds=" + studyIds + ":" + e.getMessage(), e);
+		}
 	}
 
 	public List<StudyInstance> getDatasetInstances(final int datasetId) {
