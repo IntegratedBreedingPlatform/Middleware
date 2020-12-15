@@ -6,6 +6,16 @@ public class LotGeneratorBatchRequestDto {
 
 	private LotGeneratorInputDto lotGeneratorInput;
 
+	private String studyId;
+
+	public String getStudyId() {
+		return this.studyId;
+	}
+
+	public void setStudyId(final String studyId) {
+		this.studyId = studyId;
+	}
+
 	/**
 	 * searchRequestId for {@link org.generationcp.middleware.domain.search_request.GidSearchDto}
 	 * or list of gids
