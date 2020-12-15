@@ -1117,6 +1117,31 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
+	public Map<Integer, Integer> getStudyIdEnvironmentDatasetIdMap(final List<Integer> studyIds) {
+		try {
+			final Map<Integer, Integer> studyIdEnvironmentDatasetIdMap = new HashMap<>();
+
+			final String sqlString = "SELECT study_id AS studyId, project_id AS projectId FROM project "
+				+ " where dataset_type_id == " + DatasetTypeEnum.SUMMARY_DATA.getId()
+				+ " AND study_id IN (:studyIds)";
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sqlString);
+
+			sqlQuery.addScalar("studyId", new IntegerType());
+			sqlQuery.addScalar("projectId", new IntegerType());
+			sqlQuery.setParameterList("studyIds", studyIds);
+
+			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			final List<Map<String, Object>> results = sqlQuery.list();
+			for (final Map<String, Object> result : results) {
+				studyIdEnvironmentDatasetIdMap.put((Integer) result.get("studyId"), (Integer) result.get("projectId"));
+			}
+
+			return studyIdEnvironmentDatasetIdMap;
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error getting getObservationLevelsMap for studyIds=" + studyIds + ":" + e.getMessage(), e);
+		}
+	}
 
 	public Map<Integer, List<ObservationLevel>> getObservationLevelsMap(final List<Integer> studyIds) {
 		try {
@@ -1135,7 +1160,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = sqlQuery.list();
 
-			final List<StudyInstanceDto> studyInstanceDtoList = new ArrayList<>();
 			for (final Map<String, Object> result : results) {
 				final ObservationLevel observationLevel = new ObservationLevel((Integer)result.get("datasetTypeId"),
 					String.valueOf(result.get("studyName")));

@@ -553,20 +553,22 @@ public class StudyServiceImpl extends Service implements StudyService {
 		try {
 			final List<StudyInstanceDto> studyInstanceDtos = this.daoFactory.getDmsProjectDAO()
 				.getStudyInstances(studySearchFilter, pageable);
-			final Set<Integer> studyIds = studyInstanceDtos.stream().map(o -> Integer.valueOf(o.getTrialDbId())).collect(Collectors.toSet());
-			final Map<Integer, List<ObservationLevel>> observationLevelsMap = this.daoFactory.getDmsProjectDAO()
-				.getObservationLevelsMap(new ArrayList<>(studyIds));
-			final Map<Integer, Integer> studyEnvironmentDatasetIdMap = new HashMap<>();
-
-			final Map<Integer, List<MeasurementVariable>> studyEnvironmentVariablesMap = new HashMap<>();
-			final Map<Integer, Map<String, String>> studyAdditionalInfoMap = new HashMap<>();
 			if(studyInstanceDtos != null) {
+				final List<Integer> studyIds = new ArrayList<>(studyInstanceDtos.stream().map(o -> Integer.valueOf(o.getTrialDbId()))
+					.collect(Collectors.toSet()));
+				final Map<Integer, List<ObservationLevel>> observationLevelsMap = this.daoFactory.getDmsProjectDAO()
+					.getObservationLevelsMap(studyIds);
+				final Map<Integer, Integer> studyEnvironmentDatasetIdMap = this.daoFactory.getDmsProjectDAO()
+					.getStudyIdEnvironmentDatasetIdMap(studyIds);
+
+				final Map<Integer, List<MeasurementVariable>> studyEnvironmentVariablesMap = new HashMap<>();
+				final Map<Integer, Map<String, String>> studyAdditionalInfoMap = new HashMap<>();
+
 				for(final StudyInstanceDto studyInstanceDto: studyInstanceDtos) {
 					final Integer trialDbId = Integer.valueOf(studyInstanceDto.getTrialDbId());
 					final Integer studyDbId = Integer.valueOf(studyInstanceDto.getStudyDbId());
-					final Integer environmentDatasetId = this.getEnvironmentDatasetId(studyEnvironmentDatasetIdMap, trialDbId);
 					final List<MeasurementVariable> environmentVariables =
-						this.getEnvironmentVariables(studyEnvironmentVariablesMap, environmentDatasetId);
+						this.getEnvironmentVariables(studyEnvironmentVariablesMap, studyEnvironmentDatasetIdMap.get(trialDbId));
 
 					final List<MeasurementVariable> environmentParameterVariables = new ArrayList<>();
 					final List<Integer> variableIds = environmentVariables.stream().map(measurementVariable -> measurementVariable.getTermId())
@@ -627,16 +629,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 			environmentVariables = studyEnvironmentVariablesMap.get(environmentDatasetId);
 		}
 		return environmentVariables;
-	}
-
-	Integer getEnvironmentDatasetId(final Map<Integer, Integer> studyEnvironmentDatasetIdMap, final Integer trialDbId) {
-		if(studyEnvironmentDatasetIdMap.get(trialDbId) ==  null) {
-			final DmsProject environmentDataset = this.daoFactory.getDmsProjectDAO()
-				.getDatasetsByTypeForStudy(trialDbId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
-			studyEnvironmentDatasetIdMap.put(trialDbId, environmentDataset.getProjectId());
-
-		}
-		return studyEnvironmentDatasetIdMap.get(trialDbId);
 	}
 
 	@Override
