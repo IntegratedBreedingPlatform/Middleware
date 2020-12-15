@@ -195,5 +195,5 @@ public interface DataImportService {
 
 	void processExperimentalDesign(Workbook workbook, String programUUID, String exptDesignValueFromObsSheet) throws WorkbookParserException;
 
-	void addEntryTypeIdVariableIfNotExists(Workbook workbook, List<MeasurementVariable> measurementVariables, String programUUID);
+	void addEntryTypeVariableIfNotExists(Workbook workbook, List<MeasurementVariable> measurementVariables, String programUUID);
 }

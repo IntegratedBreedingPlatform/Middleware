@@ -431,7 +431,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public void addEntryTypeIdVariableIfNotExists(final Workbook workbook, final List<MeasurementVariable> measurementVariables,
+	public void addEntryTypeVariableIfNotExists(final Workbook workbook, final List<MeasurementVariable> measurementVariables,
 		final String programUUID) {
 		final List<MeasurementVariable> combinedVariables = new ArrayList<>();
 		combinedVariables.addAll(workbook.getConditions());
