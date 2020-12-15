@@ -1358,13 +1358,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try{
 			final SQLQuery query =
 				this.getSession().createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, "
-					+ "		cvt_scale.name AS scaleName, pheno.value AS value, cvt_scale.cvterm_id AS scaleId, "
+					+ "		cvt_scale.name AS scaleName, IFNULL(categoricalVar.name, pheno.value) AS value, cvt_scale.cvterm_id AS scaleId, "
 					+ "		envcvt.cvterm_id AS variableId from phenotype pheno "
 					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.cvterm_id IN (:variableIds) "
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
 					+ "     INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id\n"
-					+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id = :geolocationId ;");
+					+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id = :geolocationId "
+					+ "     LEFT JOIN cvterm categoricalVar on categoricalVar.cvterm_id = pheno.value;");
 			query.addScalar("name", new StringType());
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());
