@@ -59,16 +59,6 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private List<Integer> harvestingStudyIds;
 
-	private String studyId;
-
-	public String getStudyId() {
-		return this.studyId;
-	}
-
-	public void setStudyId(final String studyId) {
-		this.studyId = studyId;
-	}
-
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date createdDateFrom;
 
