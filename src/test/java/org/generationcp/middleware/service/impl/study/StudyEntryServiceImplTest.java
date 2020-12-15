@@ -223,25 +223,6 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testUpdateStudyEntriesProperty() {
-		//TODO: fix this failing test. Sql statement not working on unit test
-/*
-		final StockModel stockModel = this.daoFactory.getStockDao().getStocksForStudy(this.studyId).get(0);
-		final Optional<StockProperty> stockPropertyOptional =
-			stockModel.getProperties().stream().filter(o -> o.getTypeId() == TermId.ENTRY_TYPE.getId()).findFirst();
-		final StudyEntryPropertyDataUpdateRequestDto requestDto = new StudyEntryPropertyDataUpdateRequestDto();
-		requestDto.setEntryIds(Collections.singletonList(stockModel.getStockId()));
-		requestDto.setVariableId(stockPropertyOptional.get().getTypeId());
-		requestDto.setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
-		this.service.updateStudyEntriesProperty(requestDto);
-		// Need to flush session to sync with underlying database before querying
-		this.sessionProvder.getSession().flush();
-		Assert.assertEquals(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()),
-			this.daoFactory.getStockPropertyDao().getById(stockPropertyOptional.get().getStockPropId()).getValue());*/
-
-	}
-
-	@Test
 	public void testHasPlotEntries() {
 		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(this.studyId);
 		final List<Integer> entryIds = stocks.stream().map(StockModel::getStockId).collect(Collectors.toList());
