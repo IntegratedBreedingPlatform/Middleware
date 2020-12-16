@@ -4,8 +4,18 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
+	<changeSet author="nahuel" id="v16.4.1-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<indexExists tableName="germplsm" indexName="germplsm_idx13"></indexExists>
+				<changeSetExecuted id="v16.2.0-1" author="nahuel" changeLogFile="liquibase/crop_changelog/16_2_0.xml"></changeSetExecuted>
+			</and>
+		</preConditions>
+		<comment>Removes obsolete index germplsm_idx13 created by 16_2_0.xml</comment>
+		<dropIndex tableName="germplsm" indexName="germplsm_idx13"></dropIndex>
+	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.1-1">
+	<changeSet author="mderamos" id="v16.4.1-2">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="1">
@@ -35,7 +45,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.1-2">
+	<changeSet author="mderamos" id="v16.4.1-3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -52,7 +62,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.1-3">
+	<changeSet author="mderamos" id="v16.4.1-4">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="1">
@@ -137,7 +147,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.1-4">
+	<changeSet author="mderamos" id="v16.4.1-5">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="1">
@@ -161,7 +171,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.1-5">
+	<changeSet author="mderamos" id="v16.4.1-6">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -178,7 +188,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.1-6">
+	<changeSet author="mderamos" id="v16.4.1-7">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -198,7 +208,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v16.4.1-7">
+	<changeSet author="mderamos" id="v16.4.1-8">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*) > 0 FROM germplsm WHERE deleted = 1 and germplsm_uuid is not null;
@@ -209,5 +219,5 @@
 			UPDATE germplsm SET germplsm_uuid = CONCAT(germplsm_uuid, '#', DATE_FORMAT(current_timestamp, "%Y%m%d%H%i%s%f")) WHERE deleted = 1 and germplsm_uuid is not null;
 		</sql>
 	</changeSet>
-
+	
 </databaseChangeLog>
