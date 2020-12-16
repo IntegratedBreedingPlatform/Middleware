@@ -70,7 +70,7 @@ public class StudyDetailsDto {
 			return false;
 		StudyDetailsDto castOther = (StudyDetailsDto) other;
 		return new EqualsBuilder().append(this.additionalInfo, castOther.getAdditionalInfo()).append(this.contacts, castOther.getContacts())
-				.append(this.metadata, castOther.getMetadata()).isEquals();
+			.append(this.metadata, castOther.getMetadata()).isEquals();
 	}
 
 	@Override public int hashCode() {

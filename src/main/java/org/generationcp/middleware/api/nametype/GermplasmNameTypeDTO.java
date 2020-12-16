@@ -1,4 +1,4 @@
-package org.generationcp.middleware.api.germplasm;
+package org.generationcp.middleware.api.nametype;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -9,6 +9,16 @@ public class GermplasmNameTypeDTO {
 	private Integer id;
 	private String code;
 	private String name;
+
+	public GermplasmNameTypeDTO() {
+
+	}
+
+	public GermplasmNameTypeDTO(final Integer id, final String code, final String name) {
+		this.id = id;
+		this.code = code;
+		this.name = name;
+	}
 
 	public Integer getId() {
 		return id;

@@ -2,8 +2,8 @@ package org.generationcp.middleware.domain.sqlfilter;
 
 public class SqlTextFilter {
 
-	public static enum Type {
-		STARTSWITH, EXACTMATCH, CONTAINS
+	public enum Type {
+		STARTSWITH, EXACTMATCH, CONTAINS, ENDSWITH
 	}
 
 	private String value;

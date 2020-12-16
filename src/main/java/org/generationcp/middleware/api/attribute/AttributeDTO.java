@@ -10,6 +10,16 @@ public class AttributeDTO {
 	private Integer id;
 	private String name;
 
+	public AttributeDTO() {
+
+	}
+
+	public AttributeDTO(final Integer id, final String code, final String name) {
+		this.id = id;
+		this.code = code;
+		this.name = name;
+	}
+
 	public String getCode() {
 		return this.code;
 	}

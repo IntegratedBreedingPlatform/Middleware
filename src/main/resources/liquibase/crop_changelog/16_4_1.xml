@@ -4,6 +4,17 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
+	<changeSet author="nahuel" id="v16.4.1-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<indexExists tableName="germplsm" indexName="germplsm_idx13"></indexExists>
+				<changeSetExecuted id="v16.2.0-1" author="nahuel" changeLogFile="liquibase/crop_changelog/16_2_0.xml"></changeSetExecuted>
+			</and>
+		</preConditions>
+		<comment>Removes obsolete index germplsm_idx13 created by 16_2_0.xml</comment>
+		<dropIndex tableName="germplsm" indexName="germplsm_idx13"></dropIndex>
+
+	</changeSet>
 
 	<changeSet author="corina" id="v16.4.1-1">
 		<preConditions onFail="MARK_RAN">

@@ -7,8 +7,8 @@ import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
@@ -25,12 +26,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
@@ -51,9 +56,12 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	private CropType crop;
 	private Project commonTestProject;
 	private WorkbenchUser testUser;
+	private DaoFactory daoFactory;
 
 	@Before
 	public void setUp() {
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+
 		this.workbenchTestDataUtil.setUpWorkbench();
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
@@ -135,6 +143,39 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
 		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
 		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
+
+		environmentDataset.setDeleted(true);
+
+		this.daoFactory.getDmsProjectDAO().save(environmentDataset);
+
+		this.sessionProvder.getSession().flush();
+		this.sessionProvder.getSession().clear();
+
+		assertNull(this.studyService.getStudyDetailsByInstance(geolocation.getLocationId()));
+	}
+
+	@Test
+	public void testGetStudyInstances() {
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Summary Dataset", "Summary Dataset-Description", this.study, this.study, DatasetTypeEnum.SUMMARY_DATA);
+
+		final int locationId = 101;
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
+		this.testDataInitializer
+			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
+		final StudySearchFilter studySearchFilter = new StudySearchFilter().withStudyDbId(geolocation.getLocationId().toString())
+			.withProgramDbId(this.study.getProgramUUID());
+		final Pageable pageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "trialName"));
+		final List<StudyInstanceDto> studyDetailsDtoList = this.studyService.getStudyInstances(studySearchFilter, pageable);
+		Assert.assertNotNull(studyDetailsDtoList);
+		Assert.assertEquals(1, studyDetailsDtoList.size());
+		final StudyInstanceDto studyInstanceDto = studyDetailsDtoList.get(0);
+		Assert.assertFalse(CollectionUtils.isEmpty(studyInstanceDto.getContacts()));
+		Assert.assertEquals(String.valueOf(locationId), studyInstanceDto.getLocationDbId());
+		Assert.assertEquals(String.valueOf(geolocation.getLocationId()), studyInstanceDto.getStudyDbId());
+		Assert.assertEquals(String.valueOf(this.study.getProjectId()), studyInstanceDto.getTrialDbId());
+		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyInstanceDto.getStudyName());
 	}
 
 	@Test

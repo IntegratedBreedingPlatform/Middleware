@@ -322,6 +322,8 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		switch (type) {
 			case STARTSWITH:
 				return value + "%";
+			case ENDSWITH:
+				return "%" + value;
 			case CONTAINS:
 				return "%" + value + "%";
 			case EXACTMATCH:

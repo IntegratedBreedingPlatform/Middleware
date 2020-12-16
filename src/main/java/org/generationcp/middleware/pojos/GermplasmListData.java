@@ -169,6 +169,14 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	}
 
 	public GermplasmListData(final Integer id, final GermplasmList list, final Integer gid, final Integer entryId, final String entryCode,
+		final String seedSource, final String designation, final String groupName, final Integer status, final Integer localRecordId,
+		final Integer groupId) {
+		this(id, list, gid, entryId, entryCode, seedSource, designation, groupName, status, localRecordId);
+		this.groupId = groupId;
+	}
+
+
+	public GermplasmListData(final Integer id, final GermplasmList list, final Integer gid, final Integer entryId, final String entryCode,
 			final String seedSource, final String designation, final String groupName, final Integer status, final Integer localRecordId,
 			final String notes, final Integer crossingDate) {
 		this(id, list, gid, entryId, entryCode, seedSource, designation, groupName, status, localRecordId);

@@ -4,6 +4,7 @@ package org.generationcp.middleware.service.impl.study;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
@@ -12,6 +13,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -35,6 +37,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Resource
 	private DatasetService datasetService;
 
+	@Resource
+	private OntologyDataManager ontologyDataManager;
+
 	private final DaoFactory daoFactory;
 
 	private static final List<Integer> FIXED_GERMPLASM_DESCRIPTOR_IDS = Lists
@@ -50,9 +55,10 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public List<StudyEntryDto> getStudyEntries(final int studyId) {
-		// Return by ascending order of entry number. We need to perform cast first on uniquename since it's stored as string
+		// Get entry number term. Name will be used for sorting
+		final Term entryNumberTerm = this.ontologyDataManager.getTermById(Integer.valueOf(TermId.ENTRY_NO.getId()));
 		return this.getStudyEntries(studyId, null, new PageRequest(0, Integer.MAX_VALUE,
-				new Sort(Sort.Direction.ASC, String.valueOf(TermId.ENTRY_NO.getId()))));
+				new Sort(Sort.Direction.ASC, entryNumberTerm.getName())));
 	}
 
 	@Override
