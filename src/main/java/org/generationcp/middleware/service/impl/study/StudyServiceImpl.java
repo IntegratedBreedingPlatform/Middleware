@@ -612,7 +612,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	List<MeasurementVariable> getEnvironmentVariables(
 		final Map<Integer, List<MeasurementVariable>> studyEnvironmentVariablesMap, final Integer environmentDatasetId) {
-		List<MeasurementVariable> environmentVariables;
+		final List<MeasurementVariable> environmentVariables;
 		if(studyEnvironmentVariablesMap.get(environmentDatasetId) == null) {
 			environmentVariables = this.daoFactory.getDmsProjectDAO()
 				.getObservationSetVariables(
