@@ -1122,7 +1122,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Map<Integer, Integer> studyIdEnvironmentDatasetIdMap = new HashMap<>();
 
 			final String sqlString = "SELECT study_id AS studyId, project_id AS projectId FROM project "
-				+ " where dataset_type_id == " + DatasetTypeEnum.SUMMARY_DATA.getId()
+				+ " where dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId()
 				+ " AND study_id IN (:studyIds)";
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sqlString);
 
