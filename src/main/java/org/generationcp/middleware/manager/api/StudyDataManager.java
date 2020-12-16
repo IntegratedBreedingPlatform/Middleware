@@ -650,8 +650,6 @@ public interface StudyDataManager {
 
 	Map<String, String> getGeolocationPropsAndValuesByGeolocation(Integer geolocationId, List<Integer> excludedVariableIds);
 
-	Map<String, String> getProjectPropsAndValuesByStudy(Integer studyId, List<Integer> excludedVariableIds);
-
 	Integer getProjectIdByStudyDbId(final Integer studyDbId);
 
 	/**

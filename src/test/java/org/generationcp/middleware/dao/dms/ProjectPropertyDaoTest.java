@@ -356,7 +356,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 
 	@Test
-	public void testGetProjectPropsAndValuesByStudy() {
+	public void testGetProjectPropsAndValuesByStudyIds() {
 		final CVTerm categoricalScale = CVTermTestDataInitializer.createTerm("Categorical Scale", CvId.SCALES.getId());
 		final CVTerm textScale = CVTermTestDataInitializer.createTerm("Text Scale", CvId.VARIABLES.getId());
 		final CVTerm variable1 = CVTermTestDataInitializer.createTerm("Categorical Option", CvId.SCALES.getId());
@@ -405,16 +405,17 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		this.saveProjectVariableWithValue(this.study, personId, 3, VariableType.STUDY_DETAIL, "1");
 
 		final Integer projectId = this.study.getProjectId();
-		final Map<String, String> map = this.projectPropDao.getProjectPropsAndValuesByStudy(projectId, new ArrayList<>());
-		Assert.assertEquals(2, map.size());
-		Assert.assertNotNull("Study has properties ",map);
- 		Assert.assertEquals(map.get(variable1.getDefinition()),choice1.getDefinition());
-		Assert.assertEquals(map.get(variable2.getDefinition()),"Mock Input Field");
-		Assert.assertNull("Variable PersonId excluded from the result",map.get(personId.getDefinition()));
+		final Map<Integer, Map<String, String>> map = this.projectPropDao.getProjectPropsAndValuesByStudyIds(Collections.singletonList(projectId));
+		final Map<String, String> projectPropMap = map.get(projectId);
+		Assert.assertEquals(2, projectPropMap.size());
+		Assert.assertNotNull("Study has properties ",projectPropMap);
+ 		Assert.assertEquals(projectPropMap.get(variable1.getDefinition()),choice1.getDefinition());
+		Assert.assertEquals(projectPropMap.get(variable2.getDefinition()),"Mock Input Field");
+		Assert.assertNull("Variable PersonId excluded from the result",projectPropMap.get(personId.getDefinition()));
 	}
 
 	@Test
-	public void testGetProjectPropsAndValuesByStudyWithPiName() {
+	public void testGetProjectPropsAndValuesByStudyIdsWithPiName() {
 		final CVTerm categoricalScale = CVTermTestDataInitializer.createTerm("Categorical Scale", CvId.SCALES.getId());
 		final CVTerm textScale = CVTermTestDataInitializer.createTerm("Text Scale", CvId.VARIABLES.getId());
 		final CVTerm variable1 = CVTermTestDataInitializer.createTerm("Categorical Option", CvId.SCALES.getId());
@@ -471,13 +472,14 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		this.saveProjectVariableWithValue(this.study, personId, 3, VariableType.STUDY_DETAIL, "1");
 		this.saveProjectVariableWithValue(this.study, personName, 4, VariableType.STUDY_DETAIL, "Person Name 1");
 		final Integer projectId = this.study.getProjectId();
-		final Map<String, String> map = this.projectPropDao.getProjectPropsAndValuesByStudy(projectId, new ArrayList<>());
-		Assert.assertEquals(3, map.size());
+		final Map<Integer, Map<String, String>> map = this.projectPropDao.getProjectPropsAndValuesByStudyIds(Collections.singletonList(projectId));
+		final Map<String, String> projectPropMap = map.get(projectId);
+		Assert.assertEquals(3, projectPropMap.size());
 		Assert.assertNotNull("Study has properties ",map);
-		Assert.assertEquals(map.get(variable1.getDefinition()),choice1.getDefinition());
-		Assert.assertEquals(map.get(variable2.getDefinition()),"Mock Input Field");
-		Assert.assertEquals(map.get(personName.getDefinition()),"Person Name 1");
-		Assert.assertNull("Variable PersonId excluded from the result",map.get(personId.getDefinition()));
+		Assert.assertEquals(projectPropMap.get(variable1.getDefinition()),choice1.getDefinition());
+		Assert.assertEquals(projectPropMap.get(variable2.getDefinition()),"Mock Input Field");
+		Assert.assertEquals(projectPropMap.get(personName.getDefinition()),"Person Name 1");
+		Assert.assertNull("Variable PersonId excluded from the result",projectPropMap.get(personId.getDefinition()));
 	}
 
 	private ProjectProperty saveProjectVariableWithValue(final DmsProject project, final CVTerm variable, final int rank, final VariableType variableType, final String value) {

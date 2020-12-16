@@ -468,7 +468,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 					.collect(Collectors.toList());
 				properties.put("studyObjective", studyMetadata.getStudyObjective());
 				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(instanceId, variableIds));
-				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId(), variableIds));
+				properties.putAll(this.daoFactory.getProjectPropertyDAO().getProjectPropsAndValuesByStudyIds(
+					Collections.singletonList(studyMetadata.getNurseryOrTrialId())).get(studyMetadata.getNurseryOrTrialId()));
 				studyDetailsDto.setAdditionalInfo(properties);
 				return studyDetailsDto;
 			}
@@ -562,7 +563,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 					.getStudyIdEnvironmentDatasetIdMap(studyIds);
 
 				final Map<Integer, List<MeasurementVariable>> studyEnvironmentVariablesMap = new HashMap<>();
-				final Map<Integer, Map<String, String>> studyAdditionalInfoMap = new HashMap<>();
+				final Map<Integer, Map<String, String>> studyAdditionalInfoMap = this.daoFactory.getProjectPropertyDAO()
+					.getProjectPropsAndValuesByStudyIds(studyIds);
 
 				for(final StudyInstanceDto studyInstanceDto: studyInstanceDtos) {
 					final Integer trialDbId = Integer.valueOf(studyInstanceDto.getTrialDbId());
@@ -590,8 +592,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 					studyInstanceDto.getAdditionalInfo()
 						.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(studyDbId, variableIds));
-					studyInstanceDto.getAdditionalInfo()
-						.putAll(this.getStudyAdditionalInfo(trialDbId, studyAdditionalInfoMap, variableIds));
+					if(studyAdditionalInfoMap.containsKey(trialDbId)) {
+						studyInstanceDto.getAdditionalInfo().putAll(studyAdditionalInfoMap.get(trialDbId));
+					}
 
 					studyInstanceDto.setObservationLevels(observationLevelsMap.get(trialDbId));
 				}
@@ -602,18 +605,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 			StudyServiceImpl.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-	}
-
-	Map<String, String> getStudyAdditionalInfo(final Integer trialDbId, final Map<Integer, Map<String, String>> studyAdditonalInfoMap,
-		final List<Integer> variableIds) {
-		Map<String, String> studyAdditionalInfo;
-		if(studyAdditonalInfoMap.get(trialDbId) == null) {
-			studyAdditionalInfo = this.studyDataManager.getProjectPropsAndValuesByStudy(trialDbId, variableIds);
-			studyAdditonalInfoMap.put(trialDbId, studyAdditionalInfo);
-		} else {
-			studyAdditionalInfo = studyAdditonalInfoMap.get(trialDbId);
-		}
-		return studyAdditionalInfo;
 	}
 
 	List<MeasurementVariable> getEnvironmentVariables(
