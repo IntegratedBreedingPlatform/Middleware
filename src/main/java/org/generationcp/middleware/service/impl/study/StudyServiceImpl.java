@@ -468,8 +468,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 					.collect(Collectors.toList());
 				properties.put("studyObjective", studyMetadata.getStudyObjective());
 				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(instanceId, variableIds));
-				properties.putAll(this.daoFactory.getProjectPropertyDAO().getProjectPropsAndValuesByStudyIds(
-					Collections.singletonList(studyMetadata.getNurseryOrTrialId())).get(studyMetadata.getNurseryOrTrialId()));
+				final Map<Integer, Map<String, String>> projectPropMap = this.daoFactory.getProjectPropertyDAO().getProjectPropsAndValuesByStudyIds(
+					Collections.singletonList(studyMetadata.getNurseryOrTrialId()));
+				if(projectPropMap.containsKey(studyMetadata.getNurseryOrTrialId())) {
+					properties.putAll(projectPropMap.get(studyMetadata.getNurseryOrTrialId()));
+				}
 				studyDetailsDto.setAdditionalInfo(properties);
 				return studyDetailsDto;
 			}
