@@ -233,7 +233,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		this.testDataInitializer.addProjectProp(dmsProject, irrMethodText.getCvTermId(), irrMethodText.getName(), VariableType.ENVIRONMENT_DETAIL, null, 6);
 
-		final String irrMethodTextValue = UUID.randomUUID().toString();
+		//Use termId as value in order to check corner case. It must get the termId as value because the variable is not categorical
+		final String irrMethodTextValue = String.valueOf(TermId.SEASON_VAR.getId());
 		this.testDataInitializer.addGeolocationProp(geolocation, irrMethodText.getCvTermId(), irrMethodTextValue, 1);
 
 		//Add 'Selection_Trait' as environment condition with 'Drought tolerance' as value
@@ -252,7 +253,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		this.testDataInitializer.addProjectProp(dmsProject, siteSoilPH.getCvTermId(), siteSoilPH.getName(), VariableType.ENVIRONMENT_CONDITION, null, 6);
 
-		final String siteSoilPHValue = "5.5";
+		//Use termId as value in order to check corner case. It must get the termId as value because the variable is not categorical
+		final String siteSoilPHValue = selectionTrait.getCvTermId().toString();
 		this.testDataInitializer.addPhenotypes(Arrays.asList(testExperiment), siteSoilPH.getCvTermId(), siteSoilPHValue);
 
 		this.sessionProvder.getSession().flush();
