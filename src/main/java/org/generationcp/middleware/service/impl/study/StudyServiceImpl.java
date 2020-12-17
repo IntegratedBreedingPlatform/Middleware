@@ -557,7 +557,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		try {
 			final List<StudyInstanceDto> studyInstanceDtos = this.daoFactory.getDmsProjectDAO()
 				.getStudyInstances(studySearchFilter, pageable);
-			if(studyInstanceDtos != null) {
+			if(!CollectionUtils.isEmpty(studyInstanceDtos)) {
 				final List<Integer> studyIds = new ArrayList<>(studyInstanceDtos.stream().map(o -> Integer.valueOf(o.getTrialDbId()))
 					.collect(Collectors.toSet()));
 				final Map<Integer, List<ObservationLevel>> observationLevelsMap = this.daoFactory.getDmsProjectDAO()
