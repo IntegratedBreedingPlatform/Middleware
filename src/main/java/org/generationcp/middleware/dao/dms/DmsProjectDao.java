@@ -1139,7 +1139,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return studyIdEnvironmentDatasetIdMap;
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error getting getObservationLevelsMap for studyIds=" + studyIds + ":" + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error getting getStudyIdEnvironmentDatasetIdMap for studyIds=" + studyIds + ":" + e.getMessage(), e);
 		}
 	}
 
@@ -1164,13 +1164,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				final ObservationLevel observationLevel = new ObservationLevel((Integer)result.get("datasetTypeId"),
 					String.valueOf(result.get("studyName")));
 				final Integer studyId = (Integer) result.get("studyId");
-				if(observationLevelsMap.get(studyId) != null) {
-					observationLevelsMap.get(studyId).add(observationLevel);
-				} else {
-					final List<ObservationLevel> observationLevels = new ArrayList<>();
-					observationLevels.add(observationLevel);
-					observationLevelsMap.put(studyId, observationLevels);
-				}
+
+				observationLevelsMap.putIfAbsent(studyId, new ArrayList<>());
+				observationLevelsMap.get(studyId).add(observationLevel);
 			}
 
 			return observationLevelsMap;

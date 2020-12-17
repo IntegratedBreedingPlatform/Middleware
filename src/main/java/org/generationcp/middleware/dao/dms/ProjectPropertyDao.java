@@ -235,13 +235,8 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			for (final Object obj : results) {
 				final Object[] row = (Object[]) obj;
 				final Integer studyId = (Integer) row[2];
-				if(projectPropMap.get(studyId) != null) {
-					projectPropMap.get(studyId).put((String) row[0], row[1] == null ? "" : (String) row[1]);
-				} else {
-					final Map<String, String> projectProps = new HashMap<>();
-					projectProps.put((String) row[0], row[1] == null ? "" : (String) row[1]);
-					projectPropMap.put(studyId, projectProps);
-				}
+				projectPropMap.putIfAbsent(studyId, new HashMap<>());
+				projectPropMap.get(studyId).put((String) row[0], row[1] == null ? "" : (String) row[1]);
 			}
 			return projectPropMap;
 		} catch (final MiddlewareQueryException e) {
