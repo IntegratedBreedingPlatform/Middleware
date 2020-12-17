@@ -1147,14 +1147,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			final Map<Integer, List<ObservationLevel>> observationLevelsMap = new HashMap<>();
 
-			final String sqlString = "SELECT study_id AS studyId, dataset_type_id AS datasetTypeId, name AS studyName FROM project "
+			final String sqlString = "SELECT study_id AS studyId, dataset_type_id AS datasetTypeId, name AS datasetName FROM project "
 				+ " where dataset_type_id != " + DatasetTypeEnum.SUMMARY_DATA.getId()
 				+ " AND study_id IN (:studyIds)";
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sqlString);
 
 			sqlQuery.addScalar("studyId", new IntegerType());
 			sqlQuery.addScalar("datasetTypeId", new IntegerType());
-			sqlQuery.addScalar("studyName", new StringType());
+			sqlQuery.addScalar("datasetName", new StringType());
 			sqlQuery.setParameterList("studyIds", studyIds);
 
 			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
@@ -1162,7 +1162,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			for (final Map<String, Object> result : results) {
 				final ObservationLevel observationLevel = new ObservationLevel((Integer)result.get("datasetTypeId"),
-					String.valueOf(result.get("studyName")));
+					String.valueOf(result.get("datasetName")));
 				final Integer studyId = (Integer) result.get("studyId");
 
 				observationLevelsMap.putIfAbsent(studyId, new ArrayList<>());
