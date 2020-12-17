@@ -22,11 +22,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * The class <code>StudyGermplasmListServiceImplTest</code> contains tests for the class <code>{@link StudyEntryServiceImpl}</code>.
@@ -172,15 +173,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	public void testHasUnassignedEntries() {
 		Assert.assertTrue(this.service.hasUnassignedEntries(this.studyId));
 		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(this.studyId);
-		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		for (final StockModel stock: stocks) {
-			final ExperimentModel experimentModel = new ExperimentModel();
-			experimentModel.setGeoLocation(geolocation);
-			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-			experimentModel.setProject(this.study);
-			experimentModel.setStock(stock);
-			this.daoFactory.getExperimentDao().save(experimentModel);
-		}
+		this.addExperimentsForStocks(stocks);
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
 		Assert.assertFalse(this.service.hasUnassignedEntries(this.studyId));
@@ -227,22 +220,16 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 		this.service.replaceStudyEntry(this.studyId + 1, dto.getEntryId(), dto.getGid(), RandomStringUtils.random(5));
 	}
 
-	@Test
-	public void testUpdateStudyEntryProperty() {
-
-		final StockModel stockModel = this.daoFactory.getStockDao().getStocksForStudy(this.studyId).get(0);
-		final Optional<StockProperty> stockPropertyOptional =
-			stockModel.getProperties().stream().filter(o -> o.getTypeId() == TermId.ENTRY_TYPE.getId()).findFirst();
-		final StudyEntryPropertyData studyEntryPropertyData = new StudyEntryPropertyData();
-		studyEntryPropertyData.setStudyEntryPropertyId(stockPropertyOptional.get().getStockPropId());
-		studyEntryPropertyData.setVariableId(stockPropertyOptional.get().getTypeId());
-		studyEntryPropertyData.setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
-
-		this.service.updateStudyEntryProperty(this.studyId, studyEntryPropertyData);
-
-		Assert.assertEquals(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()),
-			this.daoFactory.getStockPropertyDao().getById(studyEntryPropertyData.getStudyEntryPropertyId()).getValue());
-
+	void addExperimentsForStocks(final List<StockModel> stocks) {
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		for (final StockModel stock : stocks) {
+			final ExperimentModel experimentModel = new ExperimentModel();
+			experimentModel.setGeoLocation(geolocation);
+			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+			experimentModel.setProject(this.study);
+			experimentModel.setStock(stock);
+			this.daoFactory.getExperimentDao().save(experimentModel);
+		}
 	}
 
 	@Test
