@@ -367,7 +367,7 @@ public class ManagerFactory implements Serializable {
 		return new SearchRequestServiceImpl(this.sessionProvider);
 	}
 
-	public StudyInstanceService getStudyInstanceService() {
+	public StudyInstanceService studyInstanceMiddlewareService() {
 		return new StudyInstanceServiceImpl(this.sessionProvider);
 	}
 
