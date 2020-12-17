@@ -121,7 +121,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {
 
 			@Override
-			public String load(final StudyKey key) throws Exception {
+			public String load(final StudyKey key) {
 				return StudyServiceImpl.this.studyDataManager.getProject(key.getStudyId()).getProgramUUID();
 			}
 		};
@@ -402,7 +402,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					if (rowValue != null) {
 						entry.add(String.valueOf(rowValue));
 					} else {
-						entry.add((String) null);
+						entry.add(null);
 					}
 
 					// get every other column skipping over PhenotypeId column
