@@ -8,7 +8,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.study.StudyEntryPropertyDataUpdateRequestDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -28,7 +27,6 @@ import org.springframework.util.CollectionUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -220,18 +218,6 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 		final StudyEntryDto dto = this.service.getStudyEntries(this.studyId).get(1);
 		Assert.assertNotNull(dto);
 		this.service.replaceStudyEntry(this.studyId + 1, dto.getEntryId(), dto.getGid(), RandomStringUtils.random(5));
-	}
-
-	@Test
-	public void testHasPlotEntries() {
-		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(this.studyId);
-		final List<Integer> entryIds = stocks.stream().map(StockModel::getStockId).collect(Collectors.toList());
-		Assert.assertTrue(CollectionUtils.isEmpty(this.service.hasPlotEntries(entryIds)));
-
-		this.addExperimentsForStocks(stocks);
-		// Need to flush session to sync with underlying database before querying
-		this.sessionProvder.getSession().flush();
-		Assert.assertEquals(entryIds.size(), this.service.hasPlotEntries(entryIds).size());
 	}
 
 	void addExperimentsForStocks(final List<StockModel> stocks) {

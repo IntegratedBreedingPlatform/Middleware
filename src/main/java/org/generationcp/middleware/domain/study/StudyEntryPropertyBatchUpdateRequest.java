@@ -1,35 +1,36 @@
 package org.generationcp.middleware.domain.study;
 
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.List;
 
 @AutoProperty
-public class StudyEntryPropertyDataUpdateRequestDto {
+public class StudyEntryPropertyBatchUpdateRequest {
 
-	private List<Integer> entryIds;
+	private SearchCompositeDto<Integer, Integer> searchComposite;
 
 	private Integer variableId;
 
 	private String value;
 
-	public StudyEntryPropertyDataUpdateRequestDto() {
+	public StudyEntryPropertyBatchUpdateRequest() {
 
 	}
 
-	public StudyEntryPropertyDataUpdateRequestDto(final List<Integer> entryIds, final Integer variableId, final String value) {
-		this.entryIds = entryIds;
+	public StudyEntryPropertyBatchUpdateRequest(final SearchCompositeDto<Integer, Integer> searchComposite, final Integer variableId, final String value) {
+		this.searchComposite = searchComposite;
 		this.variableId = variableId;
 		this.value = value;
 	}
 
-	public List<Integer> getEntryIds() {
-		return this.entryIds;
+	public SearchCompositeDto<Integer, Integer> getSearchComposite() {
+		return this.searchComposite;
 	}
 
-	public void setEntryIds(final List<Integer> entryIds) {
-		this.entryIds = entryIds;
+	public void setSearchComposite(final SearchCompositeDto<Integer, Integer> searchComposite) {
+		this.searchComposite = searchComposite;
 	}
 
 	public Integer getVariableId() {
