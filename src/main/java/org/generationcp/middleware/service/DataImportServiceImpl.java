@@ -61,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 public class DataImportServiceImpl extends Service implements DataImportService {
@@ -434,13 +435,19 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public void addEntryTypeVariableIfNotExists(final Workbook workbook,
 		final String programUUID) {
 
-		final boolean entryTypeIdExists = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getFactors()).isPresent();
+		final Optional<MeasurementVariable> optEntryType = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getFactors());
+		final boolean entryTypeidExistsInRow = this.findMeasurementRowByTermId(TermId.ENTRY_TYPE.getId(), workbook.getObservations()).isPresent();
 
-		// If ENTRY_TYPE variable is not existing in both Condition and Factors Section of workbook
-		// Automatically add ENTRY_TYPE variable as it is required in creating a new Study.
-		if (!entryTypeIdExists) {
-			final MeasurementVariable entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.GERMPLASM, programUUID);
-			workbook.getFactors().add(entryType);
+		if (!optEntryType.isPresent() || !entryTypeidExistsInRow) {
+			final MeasurementVariable entryType;
+			if (!optEntryType.isPresent()) {
+				// If ENTRY_TYPE variable is not existing in Factors Section of workbook
+				// Automatically add ENTRY_TYPE variable as it is required in creating a new Study.
+				entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.GERMPLASM, programUUID);
+				workbook.getFactors().add(entryType);
+			} else {
+				entryType = optEntryType.get();
+			}
 			// Add ENTRY_TYPE variable in Measurement Row with default value Test Entry
 			final MeasurementData data = new MeasurementData(entryType.getLabel(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false, entryType.getDataType(), entryType);
 			workbook.getObservations().forEach(row -> row.getDataList().add(data));
@@ -1225,5 +1232,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				measurementVariable.setTermId(measurementVariableId);
 			}
 		}
+	}
+
+	private Optional<MeasurementData> findMeasurementRowByTermId(final Integer termId, final List<MeasurementRow> rowList) {
+		if (!Util.isEmpty(rowList)) {
+			final List<MeasurementData> measurementDataList = new ArrayList<>();
+			rowList.forEach(measurementRow -> {measurementDataList.addAll(measurementRow.getDataList());});
+			final List<MeasurementData> entryType = measurementDataList.stream().filter(measurementData -> measurementData.getMeasurementVariable().getTermId() == termId).collect(Collectors.toList());
+			if (!Util.isEmpty(entryType)) {
+				return Optional.of(entryType.get(0));
+			}
+
+		}
+		return Optional.absent();
 	}
 }
