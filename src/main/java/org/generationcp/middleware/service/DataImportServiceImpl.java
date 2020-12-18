@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -427,6 +428,23 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			workbook.getConditions().add(exptDesignVar);
 		}
 
+	}
+
+	@Override
+	public void addEntryTypeVariableIfNotExists(final Workbook workbook,
+		final String programUUID) {
+
+		final boolean entryTypeIdExists = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getFactors()).isPresent();
+
+		// If ENTRY_TYPE variable is not existing in both Condition and Factors Section of workbook
+		// Automatically add ENTRY_TYPE variable as it is required in creating a new Study.
+		if (!entryTypeIdExists) {
+			final MeasurementVariable entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.GERMPLASM, programUUID);
+			workbook.getFactors().add(entryType);
+			// Add ENTRY_TYPE variable in Measurement Row with default value Test Entry
+			final MeasurementData data = new MeasurementData(entryType.getLabel(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false, entryType.getDataType(), entryType);
+			workbook.getObservations().forEach(row -> row.getDataList().add(data));
+		}
 	}
 
 	String getExperimentalDesignIdValue(final String experimentalDesign) throws WorkbookParserException{
