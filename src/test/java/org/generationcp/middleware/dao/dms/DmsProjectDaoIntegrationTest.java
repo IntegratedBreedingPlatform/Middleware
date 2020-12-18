@@ -33,6 +33,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.study.ObservationLevel;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -46,7 +47,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
@@ -463,6 +466,42 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			this.dmsProjectDao.getStudyInstances(studySearchFilter, new PageRequest(0, Integer.MAX_VALUE));
 		Assert.assertEquals(count.intValue(), studyInstanceDtos.size());
 
+	}
+
+	@Test
+	public void testGetObservationLevelsMap() {
+		final Project workbenchProject = this.testDataInitializer.createWorkbenchProject();
+		this.workbenchSessionProvider.getSessionFactory().getCurrentSession().flush();
+
+		final String studyName = "Study Search";
+		// Afghanistan location
+		final String locationId = "1";
+		final DmsProject study = this.createProject(studyName, workbenchProject.getUniqueID(), true);
+		final DmsProject plot =
+			this.createDataset(studyName + " - Plot Dataset", workbenchProject.getUniqueID(), DatasetTypeEnum.PLOT_DATA.getId(),
+				study, study);
+		final DmsProject summary =
+			this.createDataset(studyName + " - Summary Dataset", workbenchProject.getUniqueID(), DatasetTypeEnum.SUMMARY_DATA.getId(),
+				study, study);
+		final DmsProject subObs =
+			this.createDataset("Plant Sub", workbenchProject.getUniqueID(), DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(),
+				plot, study);
+
+		final Map<Integer, List<ObservationLevel>> observationLevelsMap = this.dmsProjectDao.getObservationLevelsMap(
+			Collections.singletonList(study.getProjectId()));
+
+		Assert.assertTrue(observationLevelsMap.containsKey(study.getProjectId()));
+		Assert.assertEquals(2, observationLevelsMap.get(study.getProjectId()).size());
+	}
+
+	@Test
+	public void testGetStudyIdEnvironmentDatasetIdMap() {
+		final DmsProject summary =
+			this.createDataset(this.study.getName() + " - Summary Dataset", this.study.getProgramUUID(), DatasetTypeEnum.SUMMARY_DATA.getId(),
+				this.study, this.study);
+		final Map<Integer, Integer> studyIdEnvIdMap = this.dmsProjectDao.getStudyIdEnvironmentDatasetIdMap(
+			Collections.singletonList(this.study.getProjectId()));
+		Assert.assertEquals(summary.getProjectId(), studyIdEnvIdMap.get(this.study.getProjectId()));
 	}
 
 	@Test

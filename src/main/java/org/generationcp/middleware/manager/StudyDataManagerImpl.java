@@ -1106,11 +1106,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId, final List<Integer> excludedVariableIds) {
-		return this.getProjectPropertyDao().getProjectPropsAndValuesByStudy(studyId, excludedVariableIds);
-	}
-
-	@Override
 	public Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
 		return this.daoFactory.getSampleDao().getExperimentSampleMap(studyDbId);
 	}

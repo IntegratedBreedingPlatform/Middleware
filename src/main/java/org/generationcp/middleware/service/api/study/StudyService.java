@@ -75,6 +75,8 @@ public interface StudyService {
 
 	Integer getEnvironmentDatasetId(int studyId);
 
+	List<StudyInstanceDto> getStudyInstancesWithMetadata(StudySearchFilter studySearchFilter, Pageable pageable);
+
 	List<StudyInstanceDto> getStudyInstances(StudySearchFilter studySearchFilter, Pageable pageable);
 
 	long countStudyInstances(StudySearchFilter studySearchFilter);

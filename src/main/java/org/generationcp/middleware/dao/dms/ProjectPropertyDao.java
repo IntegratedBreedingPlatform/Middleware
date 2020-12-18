@@ -203,10 +203,9 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return list;
 	}
 
-	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId, final List<Integer> excludedVariableIds) {
-		Preconditions.checkNotNull(studyId);
-		final Map<String, String> geoProperties = new HashMap<>();
-		final List<Integer> excludedIds = new ArrayList<>(excludedVariableIds);
+	public Map<Integer, Map<String, String>> getProjectPropsAndValuesByStudyIds(final List<Integer> studyIds) {
+		Preconditions.checkNotNull(studyIds);
+		final List<Integer> excludedIds = new ArrayList<>();
 		excludedIds.add(TermId.SEASON_VAR.getId());
 		excludedIds.add(TermId.LOCATION_ID.getId());
 		final String sql =
@@ -215,29 +214,33 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			+ "		(CASE WHEN scale_type.object_id = " + TermId.CATEGORICAL_VARIABLE.getId()
 			+ "		THEN (SELECT incvterm.definition FROM cvterm incvterm WHERE incvterm.cvterm_id = pp.value) "
 			+ "		ELSE pp.value "
-			+ "		END) value "
+			+ "		END) value, "
+			+ "		pp.project_id AS projectId "
 			+ " FROM projectprop pp "
 			+ " INNER JOIN cvterm cvterm ON cvterm.cvterm_id = pp.variable_id "
 			+ " INNER JOIN cvterm_relationship scale ON scale.subject_id = pp.variable_id AND scale.type_id = " + TermId.HAS_SCALE.getId()
 			+ " INNER JOIN cvterm_relationship scale_type ON scale_type.subject_id = scale.object_id AND scale_type.type_id = " + TermId.HAS_TYPE.getId()
 			+ " WHERE "
-			+ " pp.project_id = :studyId "
+			+ " pp.project_id IN (:studyIds) "
 			+ " AND pp.variable_id NOT IN (:excludedIds) "
 				//Exclude Variables with scale PersonId (1901)
 			+ " AND scale.object_id != " + TermId.PERSON_ID.getId();
 
 		try {
 			final Query query =
-				this.getSession().createSQLQuery(sql).addScalar("name").addScalar("value").setParameter("studyId", studyId)
-				.setParameterList("excludedIds", excludedIds);
+				this.getSession().createSQLQuery(sql).addScalar("name").addScalar("value").addScalar("projectId")
+					.setParameterList("studyIds", studyIds).setParameterList("excludedIds", excludedIds);
 			final List<Object> results = query.list();
+			final Map<Integer, Map<String, String>> projectPropMap = new HashMap<>();
 			for (final Object obj : results) {
 				final Object[] row = (Object[]) obj;
-				geoProperties.put((String) row[0], row[1] == null ? "" : (String) row[1]);
+				final Integer studyId = (Integer) row[2];
+				projectPropMap.putIfAbsent(studyId, new HashMap<>());
+				projectPropMap.get(studyId).put((String) row[0], row[1] == null ? "" : (String) row[1]);
 			}
-			return geoProperties;
+			return projectPropMap;
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getProjectPropsAndValuesByStudy() query from studyId: " + studyId;
+			final String message = "Error with getProjectPropsAndValuesByStudyIds() query from studyIds: " + studyIds;
 			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

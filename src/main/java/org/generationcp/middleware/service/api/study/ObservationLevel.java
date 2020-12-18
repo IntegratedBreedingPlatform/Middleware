@@ -17,11 +17,6 @@ public class ObservationLevel {
 		this.levelName = levelName;
 	}
 
-	public ObservationLevel(final DatasetDTO datasetDTO){
-		this.levelOrder = datasetDTO.getDatasetTypeId();
-		this.levelName = datasetDTO.getName();
-	}
-
 	public String getLevelName() {
 		return this.levelName;
 	}

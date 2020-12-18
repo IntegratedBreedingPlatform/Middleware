@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.study.ExperimentalDesign;
+import org.generationcp.middleware.service.api.study.ObservationLevel;
 import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
@@ -1114,6 +1115,65 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		return datasetDTOS;
 
+	}
+
+	public Map<Integer, Integer> getStudyIdEnvironmentDatasetIdMap(final List<Integer> studyIds) {
+		try {
+			final Map<Integer, Integer> studyIdEnvironmentDatasetIdMap = new HashMap<>();
+
+			final String sqlString = "SELECT study_id AS studyId, project_id AS projectId FROM project "
+				+ " where dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId()
+				+ " AND study_id IN (:studyIds)";
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sqlString);
+
+			sqlQuery.addScalar("studyId", new IntegerType());
+			sqlQuery.addScalar("projectId", new IntegerType());
+			sqlQuery.setParameterList("studyIds", studyIds);
+
+			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			final List<Map<String, Object>> results = sqlQuery.list();
+			for (final Map<String, Object> result : results) {
+				studyIdEnvironmentDatasetIdMap.put((Integer) result.get("studyId"), (Integer) result.get("projectId"));
+			}
+
+			return studyIdEnvironmentDatasetIdMap;
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error getting getStudyIdEnvironmentDatasetIdMap for studyIds=" + studyIds + ":" + e.getMessage(), e);
+		}
+	}
+
+	public Map<Integer, List<ObservationLevel>> getObservationLevelsMap(final List<Integer> studyIds) {
+		try {
+			final Map<Integer, List<ObservationLevel>> observationLevelsMap = new HashMap<>();
+
+			final String sqlString = "SELECT study_id AS studyId, dataset_type_id AS datasetTypeId, name AS datasetName FROM project "
+				+ " where dataset_type_id != " + DatasetTypeEnum.SUMMARY_DATA.getId()
+				+ " AND study_id IN (:studyIds)";
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sqlString);
+
+			sqlQuery.addScalar("studyId", new IntegerType());
+			sqlQuery.addScalar("datasetTypeId", new IntegerType());
+			sqlQuery.addScalar("datasetName", new StringType());
+			sqlQuery.setParameterList("studyIds", studyIds);
+
+			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			final List<Map<String, Object>> results = sqlQuery.list();
+
+			for (final Map<String, Object> result : results) {
+				final ObservationLevel observationLevel = new ObservationLevel((Integer)result.get("datasetTypeId"),
+					String.valueOf(result.get("datasetName")));
+				final Integer studyId = (Integer) result.get("studyId");
+
+				observationLevelsMap.putIfAbsent(studyId, new ArrayList<>());
+				observationLevelsMap.get(studyId).add(observationLevel);
+			}
+
+			return observationLevelsMap;
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error getting getObservationLevelsMap for studyIds=" + studyIds + ":" + e.getMessage(), e);
+		}
 	}
 
 	public List<StudyInstance> getDatasetInstances(final int datasetId) {
