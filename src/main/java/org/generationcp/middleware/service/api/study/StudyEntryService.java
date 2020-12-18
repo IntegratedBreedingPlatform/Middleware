@@ -1,12 +1,12 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 public interface StudyEntryService {
@@ -29,9 +29,7 @@ public interface StudyEntryService {
 
 	StudyEntryDto replaceStudyEntry(int studyId, int entryId, int gid, String crossExpansion);
 
-	void updateStudyEntryProperty(int studyId, StudyEntryPropertyData studyEntryPropertyData);
+	void updateStudyEntriesProperty(StudyEntryPropertyBatchUpdateRequest studyEntryPropertyBatchUpdateRequest);
 
 	Boolean hasUnassignedEntries(int studyId);
-
-	Optional<StudyEntryPropertyData> getStudyEntryPropertyData(int studyEntryPropertyId);
 }
