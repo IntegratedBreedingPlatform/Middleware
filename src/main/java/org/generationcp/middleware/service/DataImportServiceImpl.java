@@ -442,10 +442,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			final MeasurementVariable entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.GERMPLASM, programUUID);
 			workbook.getFactors().add(entryType);
 			// Add ENTRY_TYPE variable in Measurement Row with default value Test Entry
-			for (final MeasurementRow row : workbook.getObservations()) {
-				final MeasurementData data = new MeasurementData(entryType.getLabel(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false, entryType.getDataType(), entryType);
-				row.getDataList().add(data);
-			}
+			final MeasurementData data = new MeasurementData(entryType.getLabel(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false, entryType.getDataType(), entryType);
+			workbook.getObservations().forEach(row -> row.getDataList().add(data));
 		}
 	}
 
