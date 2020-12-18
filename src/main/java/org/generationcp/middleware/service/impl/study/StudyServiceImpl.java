@@ -512,7 +512,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 				geolocationVariables.add(variableMap.get(TermId.LONGITUDE.getId()));
 			}
 			if (variableIds.contains(TermId.GEODETIC_DATUM.getId())) {
-				variableMap.get(TermId.GEODETIC_DATUM.getId()).setValue(geolocation.getGeodeticDatum());
+				final String value = geolocation.getGeodeticDatum() == null ? "" : geolocation.getGeodeticDatum();
+				variableMap.get(TermId.GEODETIC_DATUM.getId()).setValue(value);
 				geolocationVariables.add(variableMap.get(TermId.GEODETIC_DATUM.getId()));
 			}
 
