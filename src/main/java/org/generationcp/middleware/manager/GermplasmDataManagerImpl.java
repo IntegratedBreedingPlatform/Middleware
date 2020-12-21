@@ -1381,6 +1381,20 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return plotCodeUdfld;
 	}
 
+	@Override
+	public String getPlotCodeValue(final Integer gid) {
+		String plotCode = "Unknown";
+		final List<Attribute> attributes = this.getAttributesByGID(gid);
+		final UserDefinedField plotCodeAttribute = this.getPlotCodeField();
+		for (final Attribute attr : attributes) {
+			if (attr.getTypeId().equals(plotCodeAttribute.getFldno())) {
+				plotCode = attr.getAval();
+				break;
+			}
+		}
+		return plotCode;
+	}
+
 	/**
 	 * (non-Javadoc)
 	 */

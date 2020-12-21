@@ -1018,6 +1018,15 @@ public interface GermplasmDataManager {
 	UserDefinedField getPlotCodeField();
 
 	/**
+	 * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasm.GermplasmService#getPlotCodeValue(Integer)}
+	 *
+	 * Returns value of the plot code (seed source) where the germplasm was created, identified by the given gid. Returns "Unknown" if plot
+	 * code attribute is not present. Never returns null.
+	 */
+	@Deprecated
+	String getPlotCodeValue(Integer gid);
+
+	/**
 	 * Enables us to query the udflds table
 	 *
 	 * @param table the ftable value
