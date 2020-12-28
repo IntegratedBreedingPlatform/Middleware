@@ -134,7 +134,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Integer createUser(final UserDto userDto) {
 
-		Integer idUserSaved = null;
+//		Integer idUserSaved = null;
 		// user.access = 0 - Default User
 		// user.instalid = 0 - Access all areas (legacy from the ICIS system) (not used)
 		// user.status = 0 - Unassigned
@@ -172,20 +172,19 @@ public class UserServiceImpl implements UserService {
 			person.setCrops(crops);
 
 			final WorkbenchUser recordSaved = this.workbenchDaoFactory.getWorkbenchUserDAO().saveOrUpdate(user);
-			idUserSaved = recordSaved.getUserid();
 
 			final UserInfo userInfo = new UserInfo();
 			userInfo.setUserId(user.getUserid());
 			userInfo.setLoginCount(0);
 			this.workbenchDaoFactory.getUserInfoDAO().insertOrUpdateUserInfo(userInfo);
 
+			return recordSaved.getUserid();
+
 		} catch (final Exception e) {
 
 			LOG.error(e.getMessage(), e);
 			throw new MiddlewareRequestException("", "user.create.error", new String[] {userDto.getUsername()});
 		}
-
-		return idUserSaved;
 	}
 
 	@Override
