@@ -126,7 +126,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 	private VariableTypeList createFactorVariableTypeList() throws MiddlewareException {
 		final VariableTypeList varTypeList = new VariableTypeList();
 		final StandardVariable trialInstance = this.getStandardVariable(TermId.TRIAL_INSTANCE_FACTOR.getId());
-		final StandardVariable entryType = this.getStandardVariable(TermId.CHECK.getId());
+		final StandardVariable entryType = this.getStandardVariable(TermId.ENTRY_TYPE.getId());
 		final StandardVariable gid = this.getStandardVariable(TermId.GID.getId());
 		final StandardVariable entryNo = this.getStandardVariable(TermId.ENTRY_NO.getId());
 		final StandardVariable repNo = this.getStandardVariable(TermId.REP_NO.getId());

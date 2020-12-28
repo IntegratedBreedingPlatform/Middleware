@@ -194,7 +194,7 @@ public class StudyTestDataInitializer {
 		variableList.add(this.createVariable(TermId.GID.getId(), gid, 2, PhenotypicType.GERMPLASM));
 		variableList.add(this.createVariable(TermId.DESIG.getId(), designation, 3, PhenotypicType.GERMPLASM));
 		variableList.add(this.createVariable(TermId.ENTRY_CODE.getId(), code, 4, PhenotypicType.GERMPLASM));
-		variableList.add(this.createVariable(TermId.CHECK.getId(), check, 5, PhenotypicType.GERMPLASM));
+		variableList.add(this.createVariable(TermId.ENTRY_TYPE.getId(), check, 5, PhenotypicType.GERMPLASM));
 		variableList.add(this.createVariable(TermId.CROSS.getId(), cross, 6, PhenotypicType.GERMPLASM));
 		return variableList;
 	}
