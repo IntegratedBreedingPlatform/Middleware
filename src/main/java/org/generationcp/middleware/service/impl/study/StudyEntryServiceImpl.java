@@ -63,6 +63,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
+	public long countFilteredStudyEntries(int studyId, StudyEntrySearchDto.Filter filter){
+		return this.daoFactory.getStockDao().countFilteredStudyEntries(studyId, filter);
+	}
+
+	@Override
 	public List<StudyEntryDto> getStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 
 		final Integer plotDatasetId =

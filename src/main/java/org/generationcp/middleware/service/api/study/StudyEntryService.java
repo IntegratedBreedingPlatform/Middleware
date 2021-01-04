@@ -17,6 +17,8 @@ public interface StudyEntryService {
 
 	Map<Integer, StudyEntryDto> getPlotEntriesMap(int studyBusinessIdentifier, Set<Integer> plotNos);
 
+	long countFilteredStudyEntries(int studyId, StudyEntrySearchDto.Filter filter);
+
 	long countStudyEntries(int studyId);
 
 	void deleteStudyEntries(int studyId);

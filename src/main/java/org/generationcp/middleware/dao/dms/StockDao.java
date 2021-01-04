@@ -206,6 +206,83 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
+	public long countFilteredStudyEntries(int studyId, StudyEntrySearchDto.Filter filter){
+		try {
+			final StringBuilder sqlQuery = new StringBuilder("select COUNT(DISTINCT S.stock_id) as totalStudyEntries ");
+			sqlQuery.append(" FROM stock s "
+				+ "       LEFT JOIN ims_lot l ON l.eid = s.dbxref_id and l.status = " + LotStatus.ACTIVE.getIntValue()
+				+ "       LEFT JOIN cvterm c ON c.cvterm_id = l.scaleid "
+				+ "       LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
+				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id "
+				+ "WHERE s.project_id = :studyId ");
+
+			if (filter != null) {
+				if (!CollectionUtils.isEmpty(filter.getEntryNumbers())) {
+					sqlQuery.append(" AND s.uniquename in (:entryNumbers)" );
+				}
+				if (!CollectionUtils.isEmpty(filter.getEntryIds())) {
+					sqlQuery.append(" AND s.stock_id in (:entryIds)" );
+				}
+
+				if (!CollectionUtils.isEmpty(filter.getFilteredValues())) {
+					// Perform IN operation on variable values
+					this.appendVariableIdAndOperationToFilterQuery(sqlQuery, filter,
+						filter.getFilteredValues().keySet(), false);
+				}
+
+				if (!CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
+					// Perform LIKE operation on variable value
+					this.appendVariableIdAndOperationToFilterQuery(sqlQuery, filter,
+						filter.getFilteredTextValues().keySet(), true);
+				}
+
+			}
+
+			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery.toString());
+			query.addScalar("totalStudyEntries", new IntegerType());
+			query.setParameter("studyId", studyId);
+
+			if (filter != null) {
+				if (!CollectionUtils.isEmpty(filter.getEntryNumbers())) {
+					query.setParameterList("entryNumbers", filter.getEntryNumbers());
+				}
+				if (!CollectionUtils.isEmpty(filter.getEntryIds())) {
+					query.setParameterList("entryIds", filter.getEntryIds());
+				}
+
+				if (!CollectionUtils.isEmpty(filter.getFilteredValues())) {
+					final Map<String, List<String>> filteredValues = filter.getFilteredValues();
+					for (final Map.Entry<String, List<String>> entry : filteredValues.entrySet()) {
+						final String variableId = entry.getKey();
+						if (factorsFilterMap.get(variableId) == null) {
+							query.setParameter(variableId + "_Id", variableId);
+						}
+						final String finalId = variableId.replace("-", "");
+						query.setParameterList(finalId + "_values", filteredValues.get(variableId));
+					}
+				}
+
+				if (!CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
+					final Map<String, String> filteredTextValues = filter.getFilteredTextValues();
+					for (final Map.Entry<String, String> entry : filteredTextValues.entrySet()) {
+						final String variableId = entry.getKey();
+						if (factorsFilterMap.get(variableId) == null) {
+							query.setParameter(variableId + "_Id", variableId);
+						}
+						final String finalId = variableId.replace("-", "");
+						query.setParameter(finalId + "_text", "%" + filteredTextValues.get(variableId) + "%");
+					}
+				}
+			}
+
+			return (Integer) query.uniqueResult();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Unexpected error in executing totalStudyEntries(studyId = %s)" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
 	public long countStocksForStudy(final int studyId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
