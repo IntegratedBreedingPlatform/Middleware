@@ -57,6 +57,8 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private List<Integer> plantingStudyIds;
 
+	private List<Integer> harvestingStudyIds;
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date createdDateFrom;
 
@@ -293,6 +295,14 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	public void setPlantingStudyIds(final List<Integer> plantingStudyIds) {
 		this.plantingStudyIds = plantingStudyIds;
+	}
+
+	public List<Integer> getHarvestingStudyIds() {
+		return this.harvestingStudyIds;
+	}
+
+	public void setHarvestingStudyIds(final List<Integer> harvestingStudyIds) {
+		this.harvestingStudyIds = harvestingStudyIds;
 	}
 
 	public String getLocationNameContainsString() {

@@ -1,7 +1,39 @@
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.dao.*;
-import org.generationcp.middleware.dao.dms.*;
+import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.BibrefDAO;
+import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.FormulaDAO;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.GermplasmSearchDAO;
+import org.generationcp.middleware.dao.GermplasmStudySourceDAO;
+import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
+import org.generationcp.middleware.dao.ListDataPropertyDAO;
+import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.MethodDAO;
+import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.ProgramPresetDAO;
+import org.generationcp.middleware.dao.SampleDao;
+import org.generationcp.middleware.dao.SampleListDao;
+import org.generationcp.middleware.dao.SearchRequestDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
+import org.generationcp.middleware.dao.dms.GeolocationDao;
+import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
+import org.generationcp.middleware.dao.dms.LocationSearchDao;
+import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
+import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.dao.dms.StockPropertyDao;
+import org.generationcp.middleware.dao.dms.StudySearchDao;
 import org.generationcp.middleware.dao.ims.ExperimentTransactionDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -76,10 +108,22 @@ public class DaoFactory {
 		return stockDao;
 	}
 
+	public StockPropertyDao getStockPropertyDao() {
+		final StockPropertyDao stockPropertyDao = new StockPropertyDao();
+		stockPropertyDao.setSession(this.sessionProvider.getSession());
+		return stockPropertyDao;
+	}
+
 	public GermplasmDAO getGermplasmDao() {
 		final GermplasmDAO germplasmDao = new GermplasmDAO();
 		germplasmDao.setSession(this.sessionProvider.getSession());
 		return germplasmDao;
+	}
+
+	public GermplasmSearchDAO getGermplasmSearchDAO() {
+		final GermplasmSearchDAO germplasmSearchDAO = new GermplasmSearchDAO();
+		germplasmSearchDAO.setSession(this.sessionProvider.getSession());
+		return germplasmSearchDAO;
 	}
 
 	public GermplasmListDAO getGermplasmListDAO() {
@@ -94,10 +138,22 @@ public class DaoFactory {
 		return germplasmListDataDao;
 	}
 
+	public AttributeDAO getAttributeDAO() {
+		final AttributeDAO attributeDAO = new AttributeDAO();
+		attributeDAO.setSession(this.sessionProvider.getSession());
+		return attributeDAO;
+	}
+
 	public LocationDAO getLocationDAO() {
 		final LocationDAO locationDao = new LocationDAO();
 		locationDao.setSession(this.sessionProvider.getSession());
 		return locationDao;
+	}
+
+	public MethodDAO getMethodDAO() {
+		final MethodDAO methodDAO = new MethodDAO();
+		methodDAO.setSession(this.sessionProvider.getSession());
+		return methodDAO;
 	}
 
 	public PhenotypeDao getPhenotypeDAO() {
@@ -200,6 +256,12 @@ public class DaoFactory {
 		return countryDAO;
 	}
 
+	public UserDefinedFieldDAO getUserDefinedFieldDAO() {
+		final UserDefinedFieldDAO userDefinedFieldDAO = new UserDefinedFieldDAO();
+		userDefinedFieldDAO.setSession(this.sessionProvider.getSession());
+		return userDefinedFieldDAO;
+	}
+
 	public ProgramFavoriteDAO getProgramFavoriteDao() {
 		final ProgramFavoriteDAO programFavoriteDao = new ProgramFavoriteDAO();
 		programFavoriteDao.setSession(this.sessionProvider.getSession());
@@ -222,6 +284,18 @@ public class DaoFactory {
 		final GermplasmStudySourceDAO germplasmStudySourceDAO = new GermplasmStudySourceDAO();
 		germplasmStudySourceDAO.setSession(this.sessionProvider.getSession());
 		return germplasmStudySourceDAO;
+	}
+
+	public BibrefDAO getBibrefDAO() {
+		final BibrefDAO bibrefDAO = new BibrefDAO();
+		bibrefDAO.setSession(this.sessionProvider.getSession());
+		return bibrefDAO;
+	}
+
+	public ListDataPropertyDAO getListDataPropertyDAO() {
+		final ListDataPropertyDAO listDataPropertyDAO = new ListDataPropertyDAO();
+		listDataPropertyDAO.setSession(this.sessionProvider.getSession());
+		return listDataPropertyDAO;
 	}
 
 }

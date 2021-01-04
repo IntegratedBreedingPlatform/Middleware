@@ -40,6 +40,26 @@ public class GermplasmList implements Serializable {
 	public static final String DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY = "deleteGermplasmListByListIdPhysically";
 	public static final String GERMPLASM_LIST_LIST_ID_COLUMN = "listid";
 
+	// TODO db: use proper bit-value?
+	public enum Status {
+		LIST(1), // 0001
+		FOLDER(0), // 0000
+		// Unused
+		// LOCKED(100), // 0100
+		LOCKED_LIST(101), // 0101
+		DELETED(9);
+
+		private final int code;
+
+		Status(final int code) {
+			this.code = code;
+		}
+
+		public int getCode() {
+			return this.code;
+		}
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)

@@ -10,10 +10,13 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.collect.ImmutableSet;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -22,7 +25,6 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
-import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -47,11 +49,13 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -114,6 +118,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	@Deprecated
 	public long countGermplasmByLocationName(final String name, final Operation op) {
 		long count = 0;
 		final GermplasmDAO dao = this.getGermplasmDao();
@@ -126,6 +131,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	@Deprecated
 	public List<Germplasm> getGermplasmByMethodName(final String name, final int start, final int numOfRows, final Operation op) {
 		List<Germplasm> germplasms = new ArrayList<>();
 		final GermplasmDAO dao = this.getGermplasmDao();
@@ -138,6 +144,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	@Deprecated
 	public long countGermplasmByMethodName(final String name, final Operation op) {
 		long count = 0;
 		final GermplasmDAO dao = this.getGermplasmDao();
@@ -175,7 +182,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Germplasm> getSortedGermplasmWithPrefName(final List<Integer> gids) {
 		final List<Germplasm> result = new ArrayList<>();
-		for (final Iterator<Integer> iterator = gids.iterator(); iterator.hasNext();) {
+		for (final Iterator<Integer> iterator = gids.iterator(); iterator.hasNext(); ) {
 			final Integer gid = iterator.next();
 			result.add(this.getGermplasmWithPrefName(gid));
 		}
@@ -210,7 +217,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 * (non-Javadoc)
 	 *
 	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getByGIDWithListTypeFilters(java.lang.Integer, java.lang.Integer, *
-	 *      java.util.List)
+	 * java.util.List)
 	 */
 	@Override
 	public List<Name> getByGIDWithListTypeFilters(final Integer gid, final Integer status, final List<Integer> type) {
@@ -309,15 +316,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			} else {
 				// throw exception if no Name record with specified value does not exist
 				throw new MiddlewareQueryException(
-						"Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue=" + newPrefValue
-								+ ", nameOrAbbrev=" + nameOrAbbrev + "): The specified Germplasm Name does not exist.",
-						new Throwable());
+					"Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue=" + newPrefValue
+						+ ", nameOrAbbrev=" + nameOrAbbrev + "): The specified Germplasm Name does not exist.",
+					new Throwable());
 			}
 
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue="
-					+ newPrefValue + ", nameOrAbbrev=" + nameOrAbbrev + "):  " + e.getMessage(), e);
+				+ newPrefValue + ", nameOrAbbrev=" + nameOrAbbrev + "):  " + e.getMessage(), e);
 		}
 	}
 
@@ -360,7 +367,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error while saving Germplasm Name: GermplasmDataManager.addOrUpdateGermplasmName(names="
-					+ names + ", operation=" + operation + "): " + e.getMessage(), e);
+				+ names + ", operation=" + operation + "): " + e.getMessage(), e);
 		}
 		return idNamesSaved;
 	}
@@ -473,7 +480,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			return false;
 		}
 		return !(breedingMethod.getSuffix() == null && breedingMethod.getSeparator() == null && breedingMethod.getSnametype() == null
-				&& breedingMethod.getPrefix() == null && breedingMethod.getCount() == null);
+			&& breedingMethod.getPrefix() == null && breedingMethod.getCount() == null);
 	}
 
 	@Override
@@ -560,7 +567,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e);
+				"Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e);
 		}
 		return methodId;
 	}
@@ -583,7 +590,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e);
+				"Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e);
 		}
 
 		return recordSaved;
@@ -605,7 +612,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error encountered while saving a list of Methods: GermplasmDataManager.addMethod(methods="
-					+ methods + "): " + e.getMessage(), e);
+				+ methods + "): " + e.getMessage(), e);
 		}
 		return idMethodsSaved;
 	}
@@ -620,8 +627,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while deleting Method: GermplasmDataMananger.deleteMethod(method=" + method + "): " + e.getMessage(),
-					e);
+				"Error encountered while deleting Method: GermplasmDataMananger.deleteMethod(method=" + method + "): " + e.getMessage(),
+				e);
 		}
 	}
 
@@ -681,9 +688,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving Bibliographic Reference: GermplasmDataManager.addBibliographicReference(bibref="
-							+ bibref + "): " + e.getMessage(),
-					e);
+				"Error encountered while saving Bibliographic Reference: GermplasmDataManager.addBibliographicReference(bibref="
+					+ bibref + "): " + e.getMessage(),
+				e);
 		}
 		return idBibrefSaved;
 	}
@@ -729,9 +736,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving Attribute: GermplasmDataManager.addOrUpdateAttributes(attributes=" + attributes + "): "
-							+ e.getMessage(),
-					e);
+				"Error encountered while saving Attribute: GermplasmDataManager.addOrUpdateAttributes(attributes=" + attributes + "): "
+					+ e.getMessage(),
+				e);
 		}
 
 		return idAttributesSaved;
@@ -756,9 +763,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving Germplasm: GermplasmDataManager.addOrUpdateGermplasms(germplasms=" + germplasms
-							+ ", operation=" + operation + "): " + e.getMessage(),
-					e);
+				"Error encountered while saving Germplasm: GermplasmDataManager.addOrUpdateGermplasms(germplasms=" + germplasms
+					+ ", operation=" + operation + "): " + e.getMessage(),
+				e);
 		}
 
 		return idGermplasmsSaved;
@@ -775,31 +782,30 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Integer addGermplasm(final Germplasm germplasm, final Name preferredName) {
+	public Integer addGermplasm(final Germplasm germplasm, final Name preferredName, final CropType cropType) {
 		final List<Triple<Germplasm, Name, List<Progenitor>>> tripleList = new ArrayList<>();
 		final List<Progenitor> progenitors = new ArrayList<>();
 		final Triple<Germplasm, Name, List<Progenitor>> triple = new ImmutableTriple<>(germplasm, preferredName, progenitors);
 		tripleList.add(triple);
-		final List<Integer> ids = this.addGermplasm(tripleList);
+		final List<Integer> ids = this.addGermplasm(tripleList, cropType);
 		return !ids.isEmpty() ? ids.get(0) : null;
 	}
 
 	@Override
-	public List<Integer> addGermplasm(final Map<Germplasm, Name> germplasmNameMap) {
+	public List<Integer> addGermplasm(final Map<Germplasm, Name> germplasmNameMap, final CropType cropType) {
 		final List<Triple<Germplasm, Name, List<Progenitor>>> tripleList = new ArrayList<>();
 		final List<Progenitor> progenitors = new ArrayList<>();
 		for (final Map.Entry<Germplasm, Name> entry : germplasmNameMap.entrySet()) {
 			final Triple<Germplasm, Name, List<Progenitor>> triple = new ImmutableTriple<>(entry.getKey(), entry.getValue(), progenitors);
 			tripleList.add(triple);
 		}
-		return this.addGermplasm(tripleList);
+		return this.addGermplasm(tripleList, cropType);
 	}
 
 	@Override
-	public List<Integer> addGermplasm(final List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples) {
+	public List<Integer> addGermplasm(final List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples, final CropType cropType) {
 		final List<Integer> listOfGermplasm = new ArrayList<>();
 		try {
-
 			final GermplasmDAO dao = this.daoFactory.getGermplasmDao();
 			final NameDAO nameDao = this.daoFactory.getNameDao();
 			final ProgenitorDAO progenitorDao = this.daoFactory.getProgenitorDao();
@@ -813,12 +819,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				// to take into account the gpid1 and gpid2 parents.
 				// Setting gnpgs to >2 will indicate that there are other parents in progenitors table other than gpid1 and gpid2.
 				if (!progenitors.isEmpty()) {
-					germplasm.setGnpgs(progenitors.size()+2);
+					germplasm.setGnpgs(progenitors.size() + 2);
 				}
 
 				if (name.getNstat() == null) {
 					name.setNstat(1);
 				}
+
+				GermplasmGuidGenerator.generateGermplasmGuids(cropType, Arrays.asList(germplasm));
 
 				final Germplasm germplasmSaved = dao.save(germplasm);
 				listOfGermplasm.add(germplasmSaved.getGid());
@@ -834,7 +842,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving Germplasm: GermplasmDataManager.addGermplasm(): " + e.getMessage(), e);
+				"Error encountered while saving Germplasm: GermplasmDataManager.addGermplasm(): " + e.getMessage(), e);
 		}
 		return listOfGermplasm;
 	}
@@ -850,7 +858,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedField(): " + e.getMessage(), e);
+				"Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedField(): " + e.getMessage(), e);
 		}
 
 		return field.getFldno();
@@ -873,9 +881,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedFields(fields=" + fields + "): "
-							+ e.getMessage(),
-					e);
+				"Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedFields(fields=" + fields + "): "
+					+ e.getMessage(),
+				e);
 		}
 
 		return isUdfldSaved;
@@ -894,7 +902,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error encountered while saving Attribute: GermplasmDataManager.addAttribute(addAttribute="
-					+ attr + "): " + e.getMessage(), e);
+				+ attr + "): " + e.getMessage(), e);
 		}
 
 		return isAttrSaved;
@@ -916,7 +924,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error encountered while saving UserDefinedField: GermplasmDataManager.addAttributes(attrs="
-					+ isAttrSaved + "): " + e.getMessage(), e);
+				+ isAttrSaved + "): " + e.getMessage(), e);
 		}
 
 		return isAttrSaved;
@@ -924,7 +932,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(final List<String> germplasmNames,
-			final GetGermplasmByNameModes mode) {
+		final GetGermplasmByNameModes mode) {
 		final List<String> namesToUse = GermplasmDataManagerUtil.getNamesToUseByMode(germplasmNames, mode);
 		return this.getNameDao().getGermplasmNameDetailsByNames(namesToUse, mode);
 	}
@@ -940,11 +948,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final String fieldType) {
-		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, fieldType);
+		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, ImmutableSet.of(fieldType));
 	}
 
 	@Override
-	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndFTypeAndFName(final String tableName, final String fieldType, final String fieldName) {
+	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndFTypeAndFName(final String tableName, final String fieldType,
+		final String fieldName) {
 		return this.getUserDefinedFieldDao().getByFieldTableNameAndFTypeAndFName(tableName, fieldType, fieldName);
 	}
 
@@ -985,11 +994,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Germplasm> getGermplasmByLocationId(final String name, final int locationID) {
 		return this.getGermplasmDao().getByLocationId(name, locationID);
-	}
-
-	@Override
-	public Germplasm getGermplasmWithMethodType(final Integer gid) {
-		return this.getGermplasmDao().getByGIDWithMethodType(gid);
 	}
 
 	@Override
@@ -1058,11 +1062,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	/**
 	 * Return the count of germplasm search results based on the following parameters:
 	 *
-	 * @param q - keyword
-	 * @param o - operation
-	 * @param includeParents - include the parents of the search germplasm
+	 * @param q                 - keyword
+	 * @param o                 - operation
+	 * @param includeParents    - include the parents of the search germplasm
 	 * @param withInventoryOnly - include germplasm with inventory details only
-	 * @param includeMGMembers - include germplasm of the same group of the search germplasm
+	 * @param includeMGMembers  - include germplasm of the same group of the search germplasm
 	 * @return
 	 */
 	@Override
@@ -1090,6 +1094,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return results;
 	}
 
+	/**
+	 * See {@link org.generationcp.middleware.pojos.MethodClass}
+	 */
+	@Deprecated
 	@Override
 	public List<Term> getMethodClasses() {
 		final List<Integer> ids = new ArrayList<>();
@@ -1114,7 +1122,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Method getMethodByCode(final String code) {
-		return this.getMethodDao().getByCode(code);
+		return this.getMethodDao().getByCode(Collections.singletonList(code)).get(0);
 	}
 
 	@Override
@@ -1172,9 +1180,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorites(list=" + list + "): "
-							+ e.getMessage(),
-					e);
+				"Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorites(list=" + list + "): "
+					+ e.getMessage(),
+				e);
 		}
 	}
 
@@ -1189,9 +1197,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorite(favorite=" + favorite + "): "
-							+ e.getMessage(),
-					e);
+				"Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorite(favorite=" + favorite + "): "
+					+ e.getMessage(),
+				e);
 		}
 
 	}
@@ -1205,9 +1213,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			}
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-					"Error encountered while saving ProgramFavorite: GermplasmDataManager.deleteProgramFavorites(list=" + list + "): "
-							+ e.getMessage(),
-					e);
+				"Error encountered while saving ProgramFavorite: GermplasmDataManager.deleteProgramFavorites(list=" + list + "): "
+					+ e.getMessage(),
+				e);
 		}
 
 	}
@@ -1223,9 +1231,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while deleting ProgramFavorite: GermplasmDataManager.deleteProgramFavorite(favorite=" + favorite
-							+ "): " + e.getMessage(),
-					e);
+				"Error encountered while deleting ProgramFavorite: GermplasmDataManager.deleteProgramFavorite(favorite=" + favorite
+					+ "): " + e.getMessage(),
+				e);
 		}
 
 	}
@@ -1254,9 +1262,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while deleting methods: GermplasmDataManager.deleteProgramMethodsByUniqueId(uniqueId=" + programUUID
-							+ "): " + e.getMessage(),
-					e);
+				"Error encountered while deleting methods: GermplasmDataManager.deleteProgramMethodsByUniqueId(uniqueId=" + programUUID
+					+ "): " + e.getMessage(),
+				e);
 		}
 	}
 
@@ -1408,7 +1416,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public Map<Integer, String> getGroupSourcePreferredNamesByGids(final List<Integer> gids) {
 		return this.getNameDao().getSourcePreferredNamesByGids(gids);
-
 	}
 
 	@Override
@@ -1440,13 +1447,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Germplasm> getGermplasmWithAllNamesAndAncestry(final Set<Integer> gids, final int numberOfLevelsToTraverse) {
 		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.manager.GermplasmDataManagerImpl"
-				+ ".getGermplasmWithAllNamesAndAncestry(Set<Integer> - SetSize(" + gids.size() + ") , int)");
+			+ ".getGermplasmWithAllNamesAndAncestry(Set<Integer> - SetSize(" + gids.size() + ") , int)");
 
 		try {
 			final StringBuilder commaSeparatedListOfGids = this.getGidsAsCommaSeparatedList(gids);
 
 			final SQLQuery storedProcedure =
-					this.getActiveSession().createSQLQuery("CALL getGermplasmWithNamesAndAncestry(:gids, :numberOfLevelsToTraverse) ");
+				this.getActiveSession().createSQLQuery("CALL getGermplasmWithNamesAndAncestry(:gids, :numberOfLevelsToTraverse) ");
 			storedProcedure.setParameter("gids", commaSeparatedListOfGids.toString());
 			storedProcedure.setParameter("numberOfLevelsToTraverse", numberOfLevelsToTraverse);
 
@@ -1587,5 +1594,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final Optional<Integer> gid) {
 		return this.getGermplasmDao().hasExistingCrosses(femaleParent, maleParentIds, gid);
 	}
+
+	@Override
+	public List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types,
+		final Set<String> codes) {
+		return this.getUserDefinedFieldDao().getByCodes(table, types, codes);
+	}
+
+	@Override
+	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final Set<String> fieldTypes) {
+		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, fieldTypes);
+	}
+
 }
 

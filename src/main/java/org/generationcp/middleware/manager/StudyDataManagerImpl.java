@@ -12,11 +12,9 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
@@ -33,7 +31,6 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -47,7 +44,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.StudyResultSetByNameStartDateSeasonCountry;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
@@ -59,16 +55,21 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.dms.*;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.PedigreeService;
-import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -78,13 +79,20 @@ import org.generationcp.middleware.util.PlotUtil;
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -93,9 +101,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;
-
-	@Resource
-	private OntologyVariableDataManager variableDataManager;
 
 	@Resource
 	private UserService userService;
@@ -755,11 +760,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType) {
-		return this.getDmsProjectDao().getDatasetIdByEnvironmentIdAndDatasetType(environmentId, datasetType);
-	}
-
-	@Override
 	public DmsProject getProject(final int id) {
 		return this.getDmsProjectDao().getById(id);
 	}
@@ -928,7 +928,30 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			for (final FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
 				if (trial.getBlockId() != null) {
 					trial.updateBlockInformation(this.locationDataManager.getBlockInformation(trial.getBlockId()));
+				} else if (!Util.isEmpty(trial.getFieldMapLabels())){
+					// Row and Column should not be empty
+					final List<FieldMapLabel> rows = trial.getFieldMapLabels().stream().filter(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getColumn()) > 0).collect(
+						Collectors.toList());
+					final List<FieldMapLabel> ranges = trial.getFieldMapLabels().stream().filter(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getRange()) > 0).collect(
+						Collectors.toList());
+					if (!Util.isEmpty(rows) && !Util.isEmpty(ranges)) {
+						// If fieldMapLabels is not empty but no blockId, set rowsInBlock
+						// and rangeInBlock value based fieldMapLabels
+						final List<FieldMapLabel> rowsInBlock = rows.stream().sorted(Comparator.comparingInt(FieldMapLabel::getColumn).reversed()).collect(
+							Collectors.toList());
+						final List<FieldMapLabel> range = ranges.stream().sorted(Comparator.comparingInt(FieldMapLabel::getRange).reversed()).collect(
+							Collectors.toList());
+						trial.setRowsInBlock(rowsInBlock.get(0).getColumn());
+						trial.setRangesInBlock(range.get(0).getRange());
+
+						// To properly display plot layout, set default values
+						trial.setRowsPerPlot(1); //Default
+						trial.setMachineRowCapacity(1); //Default
+						trial.setPlantingOrder(1); // Default
+					}
 				}
+				trial.setHasOverlappingCoordinates(this.hasOverlappingCoordinates(trial.getFieldMapLabels()));
+				trial.setHasInValidValue(this.hasInvalidCoordinateValue(trial.getFieldMapLabels()));
 				if (isGetLocation) {
 					trial.setLocationName(this.getLocationName(locationMap, trial.getLocationId()));
 					trial.setSiteName(trial.getLocationName());
@@ -1063,66 +1086,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudySummary> findPagedProjects(final Map<StudyFilters, String> filters, final Integer pageSize, final Integer pageNumber) {
-
-		final List<DmsProject> dmsProjects = this.getDmsProjectDao().findPagedProjects(filters, pageSize, pageNumber);
-
-		final List<StudySummary> studySummaries = Lists.newArrayList();
-
-		for (final DmsProject dmsProject : dmsProjects) {
-			final StudySummary studySummary = new StudySummary();
-
-			studySummary.setActive(!dmsProject.isDeleted());
-			studySummary.setStartDate(Util.tryConvertDate(dmsProject.getStartDate(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
-			studySummary.setEndDate(Util.tryConvertDate(dmsProject.getEndDate(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
-
-			final Map<String, String> additionalProps = Maps.newHashMap();
-
-			for (final ProjectProperty prop : dmsProject.getProperties()) {
-
-				final Integer variableId = prop.getVariableId();
-				final Optional<DataType> dmsVariableType = this.variableDataManager.getDataType(prop.getVariableId());
-				final String value;
-				if (dmsVariableType.isPresent() && dmsVariableType.get().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
-					final Integer categoricalId = prop.getValue().equals("") ? 0 : Integer.parseInt(prop.getValue());
-					value = this.variableDataManager.retrieveVariableCategoricalValue(dmsProject.getProgramUUID(), prop.getVariableId(), categoricalId);
- 				} else {
-					value = prop.getValue();
-				}
-
-				if (variableId.equals(TermId.SEASON_VAR_TEXT.getId())) {
-					studySummary.addSeason(value);
-				} else if (variableId.equals(TermId.LOCATION_ID.getId())) {
-					studySummary.setLocationId(!StringUtils.isEmpty(value) ? value : null);
-				} else {
-					additionalProps.put(prop.getAlias(), value);
-				}
-			}
-
-			studySummary.setOptionalInfo(additionalProps).setName(dmsProject.getName()).setProgramDbId(dmsProject.getProgramUUID())
-				.setStudyDbid(dmsProject.getProjectId());
-			final List<Integer> locationIds =
-				filters.get(StudyFilters.LOCATION_ID) != null ?
-					Collections.singletonList(Integer.parseInt(filters.get(StudyFilters.LOCATION_ID))) :
-					new ArrayList<Integer>();
-			studySummary.setInstanceMetaData(this.getInstanceMetadata(dmsProject.getProjectId(), locationIds));
-			studySummaries.add(studySummary);
-		}
-		return studySummaries;
-	}
-
-	@Override
-	public Long countAllStudies(final Map<StudyFilters, String> filters) {
-		return this.getDmsProjectDao().countStudies(filters);
-	}
-
-	@Override
 	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
-		return this.getGeolocationDao().getInstanceMetadata(studyId, new ArrayList<Integer>());
-	}
-
-	List<InstanceMetadata> getInstanceMetadata(final int studyId, final List<Integer> locationIds) {
-		return this.getGeolocationDao().getInstanceMetadata(studyId, locationIds);
+		return this.getGeolocationDao().getInstanceMetadata(studyId, new ArrayList<>());
 	}
 
 	@Override
@@ -1138,11 +1103,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer studyId, final List<Integer> excludedIds) {
 		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByGeolocation(studyId, excludedIds);
-	}
-
-	@Override
-	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId, final List<Integer> excludedVariableIds) {
-		return this.getProjectPropertyDao().getProjectPropsAndValuesByStudy(studyId, excludedVariableIds);
 	}
 
 	@Override
@@ -1339,7 +1299,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) {
 		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToStudy(studyId);
-		if (!CollectionUtils.isEmpty(personIds)){
+		if (!CollectionUtils.isEmpty(personIds)) {
 			return this.userService.getUsersByPersonIds(personIds);
 		}
 		return Collections.emptyList();
@@ -1348,20 +1308,23 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<UserDto> getUsersForEnvironment(final Integer instanceId) {
 		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToEnvironment(instanceId);
-		if (!CollectionUtils.isEmpty(personIds)){
+		if (!CollectionUtils.isEmpty(personIds)) {
 			return this.userService.getUsersByPersonIds(personIds);
 		}
 		return Collections.emptyList();
 	}
 
 	@Override
-	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
+	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId,
+		final List<Integer> variableIds) {
 		return this.daoFactory.getPhenotypeDAO().getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
 	}
 
 	@Override
-	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
-		return this.daoFactory.getGeolocationPropertyDao().getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
+	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId,
+		final List<Integer> variableIds) {
+		return this.daoFactory.getGeolocationPropertyDao()
+			.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
 	}
 
 	void setDataSetBuilder(final DataSetBuilder dataSetBuilder) {
@@ -1372,7 +1335,24 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		this.trialEnvironmentBuilder = trialEnvironmentBuilder;
 	}
 
-	void setVariableDataManager(final OntologyVariableDataManager ontologyVariableDataManager) {
-		this.variableDataManager = ontologyVariableDataManager;
+	private boolean hasInvalidCoordinateValue(final List<FieldMapLabel> labels) {
+		if (!CollectionUtils.isEmpty(labels)) {
+			return labels.stream().anyMatch(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getColumn()) <= 0 || Util.getIntValue(fieldMapLabel.getRange()) <= 0);
+		}
+		return false;
+	}
+
+	private boolean hasOverlappingCoordinates(final List<FieldMapLabel> labels) {
+		if (!CollectionUtils.isEmpty(labels)) {
+			final List<String> existing = new ArrayList<>();
+			for (final FieldMapLabel label : labels) {
+				if (existing.contains(label.getRange()+"-"+label.getColumn())) {
+					return true;
+				} else {
+					existing.add(label.getRange()+"-"+label.getColumn());
+				}
+			}
+		}
+		return false;
 	}
 }

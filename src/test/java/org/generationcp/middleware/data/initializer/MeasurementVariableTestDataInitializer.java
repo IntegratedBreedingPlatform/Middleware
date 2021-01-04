@@ -42,7 +42,24 @@ public class MeasurementVariableTestDataInitializer {
 		measurementVar.setMethod("METHOD");
 		return measurementVar;
 	}
-	
+
+	public static MeasurementVariable createMeasurementVariable(final int termId, final String name,
+		final String value, final String alias) {
+		final MeasurementVariable measurementVar = new MeasurementVariable();
+		measurementVar.setTermId(termId);
+		measurementVar.setName(name);
+		measurementVar.setValue(value);
+		measurementVar.setDataTypeId(TermId.NUMERIC_VARIABLE.getId());
+		measurementVar.setRole(PhenotypicType.TRIAL_DESIGN);
+		measurementVar.setVariableType(VariableType.STUDY_DETAIL);
+		measurementVar.setDescription(name);
+		measurementVar.setProperty("PROPERTY");
+		measurementVar.setScale("SCALE");
+		measurementVar.setMethod("METHOD");
+		measurementVar.setAlias(alias);
+		return measurementVar;
+	}
+
 	public static MeasurementVariable createMeasurementVariableWithOperation(final int termId, final String name,
 			final String value, final Operation operation) {
 		final MeasurementVariable measurementVar = MeasurementVariableTestDataInitializer.createMeasurementVariable(termId, name, value);

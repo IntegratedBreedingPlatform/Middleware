@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v16.2.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'MERGE_LOTS'
+            </sqlCheck>
+        </preConditions>
+        <comment>MERGE_LOTS permissions</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_lots_id = (select permission_id from permission where name = 'MANAGE_LOTS');
+
+			# Merge Lots Permissions
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MERGE_LOTS', 'Merge Lots', @manage_lots_id, null);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+		</sql>
+	</changeSet>
+
+		<changeSet author="lkovacic" id="v16.2.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'SPLIT_LOT'
+            </sqlCheck>
+        </preConditions>
+        <comment>SPLIT_LOT permissions</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_lots_id = (select permission_id from permission where name = 'MANAGE_LOTS');
+
+			# Split Lots Permissions
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('SPLIT_LOT', 'Split Lot', @manage_lots_id, null);
+			set @last_permission_id  = (select last_insert_id());
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @last_permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @last_permission_id , 1);
+		</sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v16.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="0">
+                SELECT count(*) FROM workbench_tool WHERE name = 'germplasm_search'
+            </sqlCheck>
+        </preConditions>
+		<comment>
+			Add Germplasm Search sidebar item.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+		INSERT INTO workbench_tool (`name`, `group_name`, `title`, `version`, `tool_type`, `path`, `parameter`, `user_tool`)
+		VALUES ('search_germplasm', 'search_germplasm', 'Search Germplasm', '1.0', 'WEB', '/ibpworkbench/controller/jhipster#germplasm-manager', '', 0);
+
+		INSERT INTO workbench_sidebar_category_link (`tool_name`, `sidebar_category_id`, `sidebar_link_name`, `sidebar_link_title`, `rank`)
+		VALUES ('search_germplasm', 1, 'search_germplasm', 'Search Germplasm', 3);
+
+		SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM');
+		SET @workbench_sidebar_category_link_id =  (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'search_germplasm');
+
+		INSERT INTO permission (`name`, `description`, `parent_id`, `workbench_sidebar_category_link_id`)
+		VALUES ('SEARCH_GERMPLASM', 'Search Germplasm', @permission_id , @workbench_sidebar_category_link_id);
+
+		SET @search_germplasm_permission_id = (SELECT permission_id FROM permission where name = 'SEARCH_GERMPLASM');
+
+		INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @search_germplasm_permission_id, '1');
+        INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @search_germplasm_permission_id, '1');
+        INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @search_germplasm_permission_id, '1');
+
+		</sql>
+	</changeSet>
+
+
+</databaseChangeLog>

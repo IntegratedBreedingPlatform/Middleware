@@ -11,13 +11,9 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -25,35 +21,42 @@ import org.hibernate.NonUniqueResultException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * DAO class for {@link UserDefinedField}.
- *
  */
 public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserDefinedFieldDAO.class);
 
 	@SuppressWarnings("unchecked")
-	public List<UserDefinedField> getByFieldTableNameAndType(final String tableName, final String fieldType) {
+	public List<UserDefinedField> getByFieldTableNameAndType(final String tableName, final Set<String> fieldType) {
 		try {
 			if (tableName != null && fieldType != null) {
 				final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 				criteria.add(Restrictions.eq("ftable", tableName));
-				criteria.add(Restrictions.eq("ftype", fieldType));
+				criteria.add(Restrictions.in("ftype", fieldType));
 				criteria.addOrder(Order.asc("fname"));
 				return criteria.list();
 			}
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error with getByFieldTableNameAndType(name=" + tableName + " type= " + fieldType
-					+ " ) query from UserDefinedField: " + e.getMessage(), e);
+				+ " ) query from UserDefinedField: " + e.getMessage(), e);
 		}
 		return new ArrayList<>();
 	}
 
-	public List<UserDefinedField> getByFieldTableNameAndFTypeAndFName(final String tableName, final String fieldType, final  String fieldName) {
+	public List<UserDefinedField> getByFieldTableNameAndFTypeAndFName(final String tableName, final String fieldType,
+		final String fieldName) {
 		try {
 			if (tableName != null && fieldType != null) {
 				final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
@@ -64,50 +67,28 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 				return criteria.list();
 			}
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getByFieldTableNameAndFTypeAndFName(tableName=" + tableName + " fieldType= " + fieldType
+			throw new MiddlewareQueryException(
+				"Error with getByFieldTableNameAndFTypeAndFName(tableName=" + tableName + " fieldType= " + fieldType
 					+ " fieldName= " + fieldName + " ) query from UserDefinedField: " + e.getMessage(), e);
 		}
 		return new ArrayList<>();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<UserDefinedField> getByTableNameAndNameLike(final String tableName, final String nameLike) {
-		try {
-			if (tableName != null && nameLike != null) {
-				final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
-				criteria.add(Restrictions.eq("ftable", tableName));
-				criteria.add(Restrictions.like("fname", nameLike));
-				criteria.addOrder(Order.asc("fname"));
-				return criteria.list();
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getByTableNameAndNameLike(name=" + tableName + " nameLike= " + nameLike
-					+ " ) query from UserDefinedField: " + e.getMessage(), e);
-		}
-		return new ArrayList<>();
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<String, Integer> getByCodesInMap(final String table, final String type, final List<String> codes) {
+	public List<UserDefinedField> getByCodes(final String table, final Set<String> types, final Set<String> codes) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 			criteria.add(Restrictions.eq("ftable", table));
-			criteria.add(Restrictions.like("ftype", type));
-			criteria.add(Restrictions.in("fcode", codes));
-			final List<UserDefinedField> list = criteria.list();
-			if (list != null && !list.isEmpty()) {
-				final Map<String, Integer> map = new HashMap<>();
-				for (final UserDefinedField field : list) {
-					map.put(field.getFcode(), field.getFldno());
-				}
-				return map;
-			}
+			criteria.add(Restrictions.in("ftype", types));
 
+			if (!CollectionUtils.isEmpty(codes)) {
+				criteria.add(Restrictions.in("fcode", codes));
+			}
+			criteria.addOrder(Order.asc("fname"));
+			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error with getByCodesInMap(name=" + table + " type= " + type + " ) query from UserDefinedField: " + e.getMessage(), e);
+				"Error with getByCodes(name=" + table + " types= " + types + " ) query from UserDefinedField: " + e.getMessage(), e);
 		}
-		return new HashMap<>();
 	}
 
 	public UserDefinedField getByLocalFieldNo(final Integer lfldno) {
@@ -127,7 +108,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			}
 		} catch (final NonUniqueResultException nonUniqueResultException) {
 			final String message =
-					"Multiple UDFLD records were found with fTable={}, fType={}, fCode={}. Was expecting one uniqe result only : {}";
+				"Multiple UDFLD records were found with fTable={}, fType={}, fCode={}. Was expecting one uniqe result only : {}";
 			UserDefinedFieldDAO.LOG.error(message, table, type, code, nonUniqueResultException.getMessage());
 			throw new MiddlewareQueryException(message, nonUniqueResultException);
 
@@ -145,7 +126,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		if (gidList != null && !gidList.isEmpty()) {
 			try {
 				final String sql = "SELECT DISTINCT {u.*}" + " FROM atributs a" + " INNER JOIN udflds u" + " WHERE a.atype=u.fldno"
-						+ " AND a.gid in (:gidList)" + " ORDER BY u.fname";
+					+ " AND a.gid in (:gidList)" + " ORDER BY u.fname";
 				final SQLQuery query = this.getSession().createSQLQuery(sql);
 				query.addEntity("u", UserDefinedField.class);
 				query.setParameterList("gidList", gidList);
@@ -164,7 +145,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		if (gidList != null && !gidList.isEmpty()) {
 			try {
 				final String sql = "SELECT DISTINCT {u.*}" + " FROM names n" + " INNER JOIN udflds u" + " WHERE n.ntype=u.fldno"
-						+ " AND n.gid in (:gidList)" + " ORDER BY u.fname";
+					+ " AND n.gid in (:gidList)" + " ORDER BY u.fname";
 				final SQLQuery query = this.getSession().createSQLQuery(sql);
 				query.addEntity("u", UserDefinedField.class);
 				query.setParameterList("gidList", gidList);
@@ -176,4 +157,32 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		}
 		return returnList;
 	}
+
+	public List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(final String query) {
+		if (StringUtils.isBlank(query)) {
+			return Collections.EMPTY_LIST;
+		}
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("SELECT " //
+					+ "   u.fcode AS code," //
+					+ "   u.fldno AS id," //
+					+ "   u.fname AS name" //
+					+ " FROM  udflds u " //
+					+ " WHERE u.ftable = '" + UDTableType.NAMES_NAME.getTable() + "'" //
+					+ "   and u.ftype = '" + UDTableType.NAMES_NAME.getType() + "'"
+					+ "   and (u.fname like :fname or u.fcode like :fcode)"
+					+ " LIMIT 100 ");
+			sqlQuery.setParameter("fname", '%' + query + '%');
+			sqlQuery.setParameter("fcode", '%' + query + '%');
+			sqlQuery.addScalar("code");
+			sqlQuery.addScalar("id");
+			sqlQuery.addScalar("name");
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO.class));
+
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with searchNameTypes(query=" + query + "): " + e.getMessage(), e);
+		}
+	}
+
 }

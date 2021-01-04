@@ -7,7 +7,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
-import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -43,6 +42,7 @@ import org.generationcp.middleware.util.Util;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 
@@ -166,7 +167,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		try {
 			this.plantingService.savePlanting(userId, studyId, observationDatasetId, plantingRequestDto, TransactionStatus.CONFIRMED);
 		} catch (final MiddlewareRequestException e) {
-			assertThat(e.getErrorCode(), equalTo("planting.confirmed.transactions.found"));
+			assertTrue(e.getErrorCodeParamsMultiMap().containsKey("planting.confirmed.transactions.found"));
 		}
 	}
 
@@ -203,7 +204,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		try {
 			this.plantingService.savePlanting(userId, studyId, observationDatasetId, plantingRequestDto, TransactionStatus.CONFIRMED);
 		} catch (final MiddlewareRequestException e) {
-			assertThat(e.getErrorCode(), equalTo("planting.not.enough.inventory"));
+			assertTrue(e.getErrorCodeParamsMultiMap().containsKey("planting.not.enough.inventory"));
 		}
 	}
 
@@ -313,7 +314,8 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 
 		// Study transaction search
 		final StudyTransactionsRequest studyTransactionsRequest = new StudyTransactionsRequest();
-		final List<StudyTransactionsDto> studyTransactionsDtos = transactionDAO.searchStudyTransactions(studyId, studyTransactionsRequest);
+		final List<StudyTransactionsDto> studyTransactionsDtos =
+			transactionDAO.searchStudyTransactions(studyId, studyTransactionsRequest, new PageRequest(0, Integer.MAX_VALUE));
 
 		assertThat(studyTransactionsDtos.size(), equalTo(transactions.size()));
 		assertThat(studyTransactionsDtos.get(0).getTransactionId(), equalTo(transactions.get(0).getId()));

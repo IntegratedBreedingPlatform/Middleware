@@ -70,6 +70,23 @@ public class InventoryServiceImplTest {
 	}
 
 	@Test
+	public void testGetCurrentNotationNumberForBreederIdentifier_WithExistingCaseInsensitivity() throws MiddlewareException {
+		final List<String> inventoryIDs = new ArrayList<>();
+		inventoryIDs.add("PRE1-12");
+		inventoryIDs.add("PRE1-13");
+		inventoryIDs.add("PRE1-14");
+		inventoryIDs.add("PRE2-1");
+		inventoryIDs.add("PRE3-1");
+		inventoryIDs.add("pre36-1");
+
+		final String breederIdentifier = "PRE";
+		Mockito.doReturn(inventoryIDs).when(this.lotDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
+		final Integer currentNotationNumber = this.inventoryServiceImpl.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
+		Assert.assertEquals(36, currentNotationNumber.intValue());
+
+	}
+
+	@Test
 	public void testGetCurrentNotationNumberForBreederIdentifier_WithNoMatch() throws MiddlewareException {
 		final List<String> inventoryIDs = new ArrayList<>();
 		inventoryIDs.add("DUMMY1-1");

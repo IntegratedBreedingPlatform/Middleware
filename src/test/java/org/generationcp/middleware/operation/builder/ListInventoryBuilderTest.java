@@ -18,6 +18,7 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +35,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	private static ListInventoryBuilder listInventoryBuilder;
 	private static GermplasmListManager germplasmListManager;
 	private static List<Integer> gids;
+	private CropType cropType;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -50,6 +52,8 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
 		listInventoryBuilder = new ListInventoryBuilder(this.sessionProvder);
 		germplasmListManager = new GermplasmListManagerImpl(this.sessionProvder);
+		this.cropType = new CropType();
+		this.cropType.setUseUUID(false);
 		gids = this.createListOfGermplasmIds(NO_OF_ENTRIES);
 		this.initializeGermplasms(gids);
 		this.germplasmList = GermplasmListTestDataInitializer.createGermplasmListWithListData(LIST_ID, NO_OF_ENTRIES, gids);
@@ -79,11 +83,11 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		this.inventoryDataManager.addLots(lots);
 
 		final Transaction initialTransaction = this.inventoryDetailsTestDataInitializer
-			.createReservationTransaction(5.0, 1, "Initial inventory", lots.get(0), 1, this.germplasmList.getId(),
+			.createTransaction(5.0, 1, "Initial inventory", lots.get(0), 1, this.germplasmList.getId(),
 				listEntries.get(0).getId(), "LIST", TransactionType.DEPOSIT.getId());
 
 		final Transaction reservationTransaction = this.inventoryDetailsTestDataInitializer
-			.createReservationTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
+			.createTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
 				"LIST", TransactionType.WITHDRAWAL.getId());
 
 		this.inventoryDataManager.addTransaction(initialTransaction);
@@ -105,14 +109,14 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	public void testSetAvailableBalanceScaleForGermplasm() throws Exception {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
 				"LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		germplasm.setInventoryInfo(new GermplasmInventory(germplasmId));
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
 
 		final Transaction transaction = InventoryDetailsTestDataInitializer
-				.createReservationTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
+				.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
 		this.inventoryDataManager.addTransactions(com.google.common.collect.Lists.<Transaction>newArrayList(transaction));
 
 		final List<Germplasm> germplasmList = Lists.newArrayList(germplasm);
@@ -127,7 +131,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		for (final Integer gid : gids) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(gid);
 			germplasm.setMgid(GROUP_ID);
-			this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+			this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		}
 	}
 

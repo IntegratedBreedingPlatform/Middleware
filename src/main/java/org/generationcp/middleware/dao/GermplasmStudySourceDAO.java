@@ -3,7 +3,7 @@ package org.generationcp.middleware.dao;
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
-import org.generationcp.middleware.pojos.SortedPageRequest;
+import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
@@ -13,14 +13,12 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, Integer> {
 
@@ -53,7 +51,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "LEFT JOIN methods m ON m.mid = g.methn\n"
 		+ "LEFT JOIN location breedingLoc ON breedingLoc.locid = g.glocn\n"
 		+ "LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1\n"
-		+ "LEFT JOIN ims_lot lot ON lot.eid = gss.gid \n"
+		+ "LEFT JOIN ims_lot lot ON lot.eid = gss.gid and lot.status = " + LotStatus.ACTIVE.getIntValue() + " "
 		+ "WHERE gss.project_id = :studyId ";
 
 	public List<GermplasmStudySource> getByGids(final Set<Integer> gids) {
@@ -64,12 +62,12 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 	}
 
 	public List<GermplasmStudySourceDto> getGermplasmStudySourceList(
-		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
+		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest, final Pageable pageable) {
 
 		final StringBuilder sql = new StringBuilder(GERMPLASM_STUDY_SOURCE_SEARCH_QUERY);
 		addSearchQueryFilters(new SqlQueryParamBuilder(sql), germplasmStudySourceSearchRequest.getFilter());
 		addGroupByAndLotsFilter(new SqlQueryParamBuilder(sql), germplasmStudySourceSearchRequest.getFilter());
-		addOrder(sql, germplasmStudySourceSearchRequest.getSortedRequest());
+		addPageRequestOrderBy(sql, pageable, GermplasmStudySourceSearchRequest.Filter.SORTABLE_FIELDS);
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 		addSearchQueryFilters(new SqlQueryParamBuilder(query), germplasmStudySourceSearchRequest.getFilter());
@@ -90,7 +88,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		query.addScalar("numberOfLots", new IntegerType());
 		query.setParameter("studyId", germplasmStudySourceSearchRequest.getStudyId());
 
-		GenericDAO.addSortedPageRequestPagination(query, germplasmStudySourceSearchRequest.getSortedRequest());
+		addPaginationToSQLQuery(query, pageable);
 
 		query.setResultTransformer(Transformers.aliasToBean(GermplasmStudySourceDto.class));
 		return query.list();
@@ -158,28 +156,28 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 			}
 			final String breedingMethodAbbreviation = filter.getBreedingMethodAbbreviation();
 			if (!StringUtils.isEmpty(breedingMethodAbbreviation)) {
-				paramBuilder.append(" and m.mcode = :breedingMethodAbbreviation");
-				paramBuilder.setParameter("breedingMethodAbbreviation", breedingMethodAbbreviation);
+				paramBuilder.append(" and m.mcode like :breedingMethodAbbreviation");
+				paramBuilder.setParameter("breedingMethodAbbreviation", '%' + breedingMethodAbbreviation + '%');
 			}
 			final String breedingMethodName = filter.getBreedingMethodName();
 			if (!StringUtils.isEmpty(breedingMethodName)) {
-				paramBuilder.append(" and m.mname = :breedingMethodName");
-				paramBuilder.setParameter("breedingMethodName", breedingMethodName);
+				paramBuilder.append(" and m.mname like :breedingMethodName");
+				paramBuilder.setParameter("breedingMethodName", '%' + breedingMethodName + '%');
 			}
 			final String breedingMethodType = filter.getBreedingMethodType();
 			if (!StringUtils.isEmpty(breedingMethodType)) {
-				paramBuilder.append(" and m.mtype = :breedingMethodType");
-				paramBuilder.setParameter("breedingMethodType", breedingMethodType);
+				paramBuilder.append(" and m.mtype like :breedingMethodType");
+				paramBuilder.setParameter("breedingMethodType", '%' + breedingMethodType + '%');
 			}
 			final String designation = filter.getDesignation();
 			if (!StringUtils.isEmpty(designation)) {
-				paramBuilder.append(" and n.nval = :designation");
-				paramBuilder.setParameter("designation", designation);
+				paramBuilder.append(" and n.nval like :designation"); //
+				paramBuilder.setParameter("designation", '%' + designation + '%');
 			}
 			final String breedingLocationName = filter.getBreedingLocationName();
 			if (!StringUtils.isEmpty(breedingLocationName)) {
-				paramBuilder.append(" and breedingLoc.lname = :breedingLocationName");
-				paramBuilder.setParameter("breedingLocationName", breedingLocationName);
+				paramBuilder.append(" and breedingLoc.lname like :breedingLocationName");
+				paramBuilder.setParameter("breedingLocationName", '%' + breedingLocationName + '%');
 			}
 			final List<String> trialInstanceList = filter.getTrialInstanceList();
 			if (!CollectionUtils.isEmpty(trialInstanceList)) {
@@ -187,13 +185,6 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				paramBuilder.setParameterList("trialInstanceList", trialInstanceList);
 			}
 
-		}
-	}
-
-	private static void addOrder(final StringBuilder sql, final SortedPageRequest sortedPageRequest) {
-		if (sortedPageRequest != null && sortedPageRequest.getSortBy() != null && sortedPageRequest.getSortOrder() != null
-			&& GermplasmStudySourceSearchRequest.Filter.SORTABLE_FIELDS.contains(sortedPageRequest.getSortBy())) {
-			sql.append(" ORDER BY " + sortedPageRequest.getSortBy() + " " + sortedPageRequest.getSortOrder() + "\n ");
 		}
 	}
 

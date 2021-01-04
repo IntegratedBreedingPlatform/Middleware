@@ -44,7 +44,6 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -97,7 +96,7 @@ public class WorkbookParser {
 		STUDY_DETAILS("STUDY DETAILS", PhenotypicType.STUDY, PhenotypicType.STUDY.getLabelList().get(0), VariableType.STUDY_DETAIL),
 		EXPERIMENTAL_DESIGN("EXPERIMENTAL DESIGN", PhenotypicType.TRIAL_DESIGN, PhenotypicType.TRIAL_DESIGN.getLabelList().get(0), VariableType.EXPERIMENTAL_DESIGN),
 		ENVIRONMENT_DETAILS("ENVIRONMENT DETAILS", PhenotypicType.TRIAL_ENVIRONMENT, PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), VariableType.ENVIRONMENT_DETAIL),
-		ENVIRONMENTAL_CONDITIONS("ENVIRONMENTAL CONDITIONS", PhenotypicType.TRIAL_ENVIRONMENT, PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), VariableType.STUDY_CONDITION),
+		ENVIRONMENTAL_CONDITIONS("ENVIRONMENTAL CONDITIONS", PhenotypicType.TRIAL_ENVIRONMENT, PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), VariableType.ENVIRONMENT_CONDITION),
 		GERMPLASM_DECRIPTORS("GERMPLASM DESCRIPTORS", PhenotypicType.GERMPLASM, PhenotypicType.GERMPLASM.getLabelList().get(0), VariableType.GERMPLASM_DESCRIPTOR),
 		OBSERVATION_UNIT("OBSERVATION UNIT", PhenotypicType.TRIAL_DESIGN, PhenotypicType.TRIAL_DESIGN.getLabelList().get(1), VariableType.EXPERIMENTAL_DESIGN),
 		TRAIT("TRAITS", PhenotypicType.VARIATE, PhenotypicType.VARIATE.getLabelList().get(1), VariableType.TRAIT),

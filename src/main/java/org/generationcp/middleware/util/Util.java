@@ -22,7 +22,11 @@
 package org.generationcp.middleware.util;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.etl.Constants;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +34,8 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +59,7 @@ public class Util {
 	public static final String FRONTEND_DATE_FORMAT_2 = "MM/dd/yyyy";
 	public static final String FRONTEND_DATE_FORMAT_3 = "dd/MM/yyyy";
 	public static final String FRONTEND_TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
+	public static final String DATE_AS_NUMBER_FORMAT_KSU = "d/M/yy";
 
 	private Util() {
 		// make a private constructor to hide the implicit public one
@@ -64,7 +67,7 @@ public class Util {
 
 	/**
 	 * Get the boolean value of <code>value</code>.
-	 * 
+	 *
 	 * @param value
 	 * @return the boolean value of <code>value</code>. If <code>value</code> is null, this method returns false.
 	 */
@@ -78,7 +81,7 @@ public class Util {
 
 	/**
 	 * Test whether <code>obj</code> is equal to one of the specified objects.
-	 * 
+	 *
 	 * @param obj
 	 * @param objs
 	 * @return true if the obj is one of the objects
@@ -98,44 +101,8 @@ public class Util {
 	}
 
 	/**
-	 * Returns true if all values are null.
-	 * 
-	 * @param args
-	 * @return true if all values are null.
-	 */
-	public static boolean isAllNull(final Object... args) {
-		for (final Object obj : args) {
-			if (obj != null) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Test whether <code>value</code> is equal to all of the specified values.
-	 * 
-	 * @param value
-	 * @param values
-	 * @return true if value is equal to all values.
-	 */
-	public static boolean isAllEqualTo(final Double value, final Double... values) {
-		if (values == null) {
-			return false;
-		}
-
-		for (final Double val : values) {
-			if (!value.equals(val)) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
 	 * Test whether the specified list is "empty". A <code>null</code> value is considered "empty".
-	 * 
+	 *
 	 * @param list
 	 * @return true if the given list is empty.
 	 */
@@ -145,7 +112,7 @@ public class Util {
 
 	/**
 	 * Returns the maximum among the input values.
-	 * 
+	 *
 	 * @param value1
 	 * @param values
 	 * @return Maximum of the given values.
@@ -160,29 +127,6 @@ public class Util {
 		}
 
 		return max;
-	}
-
-	/**
-	 * Makes the given objects in the list unmodifiable.
-	 * 
-	 * @param objects
-	 * @return the read-only list.
-	 */
-	public static <T> List<T> makeReadOnlyList(final T... objects) {
-		if (objects == null) {
-			return Collections.unmodifiableList(new ArrayList<T>());
-		}
-
-		return Arrays.asList(objects);
-	}
-
-	public static Integer getCurrentDateAsInteger() {
-		final Calendar now = Calendar.getInstance();
-		final SimpleDateFormat formatter = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
-		final String dateNowStr = formatter.format(now.getTime());
-		final Integer dateNowInt = Integer.valueOf(dateNowStr);
-		return dateNowInt;
-
 	}
 
 	/**
@@ -225,22 +169,22 @@ public class Util {
 		return results;
 	}
 
-	public static boolean isNonNullValidNumericString(final Object value) {
-		return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));
-	}
-
 	/**
 	 * Returns the current date in format "yyyyMMdd" as Integer
-	 * 
+	 *
 	 * @return current date as Integer
 	 */
 	public static Integer getCurrentDateAsIntegerValue() {
 		return Integer.valueOf(Util.getCurrentDateAsStringValue());
 	}
 
+	public static Integer convertDateToIntegerValue(final Date date) {
+		return Integer.valueOf(Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).format(date.getTime()));
+	}
+
 	/**
 	 * Returns the current date in format "yyyyMMdd" as Long
-	 * 
+	 *
 	 * @return current date as Long
 	 */
 	public static Long getCurrentDateAsLongValue() {
@@ -249,7 +193,7 @@ public class Util {
 
 	/**
 	 * Returns the current date in format "yyyyMMdd" as String
-	 * 
+	 *
 	 * @return current date as String
 	 */
 	public static String getCurrentDateAsStringValue() {
@@ -258,7 +202,7 @@ public class Util {
 
 	/**
 	 * Returns the current date
-	 * 
+	 *
 	 * @return current date as Date
 	 */
 	public static Date getCurrentDate() {
@@ -267,7 +211,7 @@ public class Util {
 
 	/**
 	 * Returns the calendar instance
-	 * 
+	 *
 	 * @return calendar instance
 	 */
 	public static Calendar getCalendarInstance() {
@@ -277,7 +221,7 @@ public class Util {
 
 	/**
 	 * Returns the current date in the specified format as String
-	 * 
+	 *
 	 * @return current date as String
 	 */
 	public static String getCurrentDateAsStringValue(final String format) {
@@ -286,7 +230,7 @@ public class Util {
 
 	/**
 	 * Returns the SimpleDateFormat of the current display locale
-	 * 
+	 *
 	 * @return SimpleDateFormat
 	 */
 	public static SimpleDateFormat getSimpleDateFormat(final String format) {
@@ -298,7 +242,7 @@ public class Util {
 
 	/**
 	 * Returns the date in the specified format as String
-	 * 
+	 *
 	 * @return date in the specified format as String
 	 */
 	public static String formatDateAsStringValue(final Date date, final String format) {
@@ -317,7 +261,7 @@ public class Util {
 
 	/**
 	 * Returns the date object from the specified format
-	 * 
+	 *
 	 * @return date object
 	 * @throws ParseException
 	 */
@@ -488,6 +432,30 @@ public class Util {
 			isLeapYear = false;
 		}
 		return isLeapYear;
+	}
+
+	/**
+	 * Use to validate measurementVariable if using correct value for it's dataType
+	 * @param measurementVariable
+	 * @param value
+	 * @return Message object
+	 */
+	public static Optional<Message> validateVariableValues(final MeasurementVariable variable, final String value) {
+
+		if ((variable.getDataTypeId() != null && variable.getDataTypeId().equals(DataType.NUMERIC_VARIABLE.getId())) || variable.getDataType().equals(DataType.NUMERIC_VARIABLE.getDataTypeCode())) {
+			if (!StringUtils.isNumeric(value)) {
+				return Optional.of(new Message(Constants.INVALID_NUMERIC_VALUE_MESSAGE, variable.getLabel(), value));
+			}
+		}
+
+		return Optional.absent();
+	}
+
+	public static int getIntValue(final Integer value) {
+		if (value == null) {
+			return 0;
+		}
+		return value;
 	}
 
 }

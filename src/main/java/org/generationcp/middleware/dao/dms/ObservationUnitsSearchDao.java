@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -11,6 +12,8 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -23,6 +26,7 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -57,6 +61,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	protected static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 	static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
 	protected static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
+	protected static final String STOCK_ID = "STOCK_ID";
 	private static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
@@ -72,6 +77,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		factorsFilterMap.put(SUM_OF_SAMPLES_ID,
 			"EXISTS ( SELECT 1 FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id HAVING count(sample_id)");
 		factorsFilterMap.put(String.valueOf(TermId.OBS_UNIT_ID.getId()), "nde.obs_unit_id");
+		factorsFilterMap.put(String.valueOf(TermId.STOCK_ID.getId()),
+			"EXISTS ( SELECT 1 FROM ims_experiment_transaction ndt \n"
+			+ "   inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = " + ExperimentTransactionType.PLANTING.getId() + "  and tr.trntype = " + TransactionType.WITHDRAWAL.getId()
+			+ "   inner join ims_lot lot on lot.lotid = tr.lotid \n"
+			+ "    WHERE ndt.nd_experiment_id = nde.nd_experiment_id \n"
+			+ "     and lot.stock_id");
 	}
 
 	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
@@ -119,6 +130,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "        FROM sample sp "
 			+ "        WHERE sp.nd_experiment_id = nde.nd_experiment_id) "
 			+ "         + coalesce(child_sample_count.count, 0), 0), '-') AS 'SUM_OF_SAMPLES'");
+		mainVariablesMap.put(STOCK_ID,"    coalesce(nullif((SELECT distinct(lot.stock_id) "
+			+ "        FROM ims_experiment_transaction  ndt "
+			+ "			inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = " + ExperimentTransactionType.PLANTING.getId() + " and tr.trntype = " + TransactionType.WITHDRAWAL.getId()
+			+ "			inner join ims_lot lot on lot.lotid = tr.lotid \n"
+			+ "        WHERE ndt.nd_experiment_id = nde.nd_experiment_id), '-') ) AS 'STOCK_ID'");
 
 	}
 
@@ -347,12 +363,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return result;
 	}
 
-	public List<ObservationUnitRow> getObservationUnitTable(final ObservationUnitsSearchDTO searchDto) {
+	public List<ObservationUnitRow> getObservationUnitTable(final ObservationUnitsSearchDTO searchDto, final Pageable pageable) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
 				searchDto,
-				observationVariableName);
+				observationVariableName, pageable);
 			return this.convertToObservationUnitRows(results, searchDto, observationVariableName);
 		} catch (final Exception e) {
 			ObservationUnitsSearchDao.LOG.error(e.getMessage(), e);
@@ -361,12 +377,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	public List<Map<String, Object>> getObservationUnitTableMapList(final ObservationUnitsSearchDTO searchDto) {
+	public List<Map<String, Object>> getObservationUnitTableMapList(final ObservationUnitsSearchDTO searchDto,
+		final Pageable pageable) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
 			return this.getObservationUnitTableAsMapListResult(
 				searchDto,
-				observationVariableName);
+				observationVariableName, pageable);
 		} catch (final Exception e) {
 			ObservationUnitsSearchDao.LOG.error(e.getMessage(), e);
 			final String error =
@@ -376,12 +393,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO searchDto,
-		final String observationVariableName) {
+		final String observationVariableName, final Pageable pageable) {
 		try {
 
-			final String observationUnitTableQuery = this.getObservationUnitTableQuery(searchDto, observationVariableName);
+			final String observationUnitTableQuery = this.getObservationUnitTableQuery(searchDto, observationVariableName, pageable);
 			final SQLQuery query = this.createQueryAndAddScalar(searchDto, observationUnitTableQuery);
-			this.setParameters(searchDto, query);
+			this.setParameters(searchDto, query, pageable);
 			return query.list();
 
 		} catch (final Exception e) {
@@ -391,7 +408,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	private void setParameters(final ObservationUnitsSearchDTO searchDto, final SQLQuery query) {
+	private void setParameters(final ObservationUnitsSearchDTO searchDto, final SQLQuery query, final Pageable pageable) {
 		query.setParameter("datasetId", searchDto.getDatasetId());
 
 		if (searchDto.getInstanceId() != null) {
@@ -404,12 +421,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		addQueryParams(query, searchDto.getFilter());
 
-		final Integer pageNumber = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageNumber() : null;
-		final Integer pageSize = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageSize() : null;
-		if (pageNumber != null && pageSize != null) {
-			query.setFirstResult(pageSize * (pageNumber - 1));
-			query.setMaxResults(pageSize);
-		}
+		addPaginationToSQLQuery(query, pageable);
 
 		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 	}
@@ -461,10 +473,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.PARENT_OBS_UNIT_ID, new StringType());
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.OBS_UNIT_ID, new StringType());
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.SUM_OF_SAMPLES);
+		createSQLQuery.addScalar(ObservationUnitsSearchDao.STOCK_ID, new StringType());
 	}
 
 	private String getObservationUnitTableQuery(
-		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
+		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName, final Pageable pageable) {
 
 		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
 		//  same for columns -> DatasetServiceImpl.getSubObservationSetColumns
@@ -528,11 +541,30 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getGenericGermplasmDescriptors())) {
+			final List<Integer> fixedGermplasmDescriptors =
+				Lists.newArrayList(TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.ENTRY_TYPE.getId(), TermId.ENTRY_CODE.getId(), TermId.OBS_UNIT_ID.getId());
+
 			final String germplasmDescriptorClauseFormat =
-				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') AS '%s'";
+				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND %s) AS '%s'";
+
 			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
+
 				if (noFilterVariables || filterColumns.contains(gpFactor)) {
-					columns.add(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
+					final int cvtermId = this.getVariableIdbyName(gpFactor, searchDto.getDatasetId());
+					final String cvtermQuery;
+					if (fixedGermplasmDescriptors.contains(cvtermId)) {
+						final String germplasmDescriptorClauseFormatFixed =
+							"    s.value AS '%s'";
+						columns.add(String.format(germplasmDescriptorClauseFormatFixed, gpFactor));
+					} else {
+						if (cvtermId == 0) {
+							cvtermQuery = String.format(germplasmDescriptorClauseFormat, "spropcvt.name = '"+gpFactor+"'", gpFactor);
+						} else {
+							cvtermQuery = String.format(germplasmDescriptorClauseFormat, "spropcvt.cvterm_id = "+cvtermId, gpFactor);
+						}
+						columns.add(cvtermQuery);
+					}
+
 				}
 			}
 		}
@@ -597,7 +629,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		sql.append(" GROUP BY nde.nd_experiment_id ");
 
 		if (noFilterVariables) {
-			this.addOrder(sql, searchDto, observationUnitNoName);
+			this.addOrder(sql, searchDto, observationUnitNoName, pageable);
 		} else {
 			sql.append(") T ");
 		}
@@ -686,21 +718,27 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	}
 
-	private void addOrder(final StringBuilder sql, final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
+	private void addOrder(final StringBuilder sql, final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName,
+		final Pageable pageable) {
 
 		String orderColumn;
-		final String sortBy = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortBy() : "";
+		String sortBy = "";
+		String direction = "asc";
+		if (pageable != null && pageable.getSort() != null) {
+			sortBy = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getProperty() : "";
+			String sortOrder = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getDirection().name() : "";
+			direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
+		}
 		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)
 			&& !ObservationUnitsSearchDao.PLOT_NO.equals(observationUnitNoName)) {
 			orderColumn = ObservationUnitsSearchDao.OBSERVATION_UNIT_NO;
 		} else if (SUM_OF_SAMPLES_ID.equals(sortBy)) {
 			orderColumn = ObservationUnitsSearchDao.SUM_OF_SAMPLES;
+		} else if (String.valueOf(TermId.STOCK_ID.getId()).equals(sortBy)) {
+			orderColumn = ObservationUnitsSearchDao.STOCK_ID;
 		} else {
 			orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : ObservationUnitsSearchDao.PLOT_NO;
 		}
-
-		final String sortOrder = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortOrder() : "";
-		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
 
 		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
 			for (final MeasurementVariableDto selectionMethodsAndTrait : searchDto.getSelectionMethodsAndTraits()) {
@@ -776,11 +814,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "          ) " //
 			+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId() //
 			// get the numericals whose value is not within bounds
-			+ "          then cast(ph2." + filterByDraftOrValue + " as unsigned) < scaleMinRange.value or cast(ph2." + filterByDraftOrValue
-			+ " as unsigned) > scaleMaxRange.value " //
-			+ "            or cast(ph2." + filterByDraftOrValue + " as unsigned) < vo.expected_min or cast(ph2." + filterByDraftOrValue
-			+ " as unsigned) > vo.expected_max "
-			//
+			// cast strings to decimal (+ 0) to compare
+			+ "          then ph2." + filterByDraftOrValue + " + 0 < scaleMinRange.value "  //
+			+ "            or ph2." + filterByDraftOrValue + " + 0 > scaleMaxRange.value " //
+			+ "            or ph2." + filterByDraftOrValue + " + 0 < vo.expected_min "  //
+			+ "            or ph2." + filterByDraftOrValue + " + 0 > vo.expected_max " //
 			+ "        else false " //
 			+ "        end " //
 			+ "    )"); //
@@ -820,6 +858,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(matchClause);
 			// If Sum of Samples, append extra closing parenthesis for the EXISTS clause it uses
 			if (SUM_OF_SAMPLES_ID.equals(variableId)) {
+				sql.append(") ");
+			}
+			if (String.valueOf(TermId.STOCK_ID.getId()).equals(variableId)) {
 				sql.append(") ");
 			}
 			return;
@@ -886,6 +927,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				final String variableType = filter.getVariableTypeMap().get(observableId);
 				if (!VariableType.OBSERVATION_UNIT.name().equals(variableType) && factorsFilterMap.get(observableId) == null) {
 					query.setParameter(observableId + "_Id", observableId);
+				}
+
+				if(String.valueOf(TermId.STOCK_ID.getId()).equals(observableId)){
+					// Stock_Id, whose Id is -1727, will cause an error as query parameter. Remove the "-" from the ID as workaround
+					final String finalId = observableId.replace("-", "");
+					query.setParameter(finalId + "_text", "%" + filteredTextValues.get(observableId) + "%");
+					continue;
 				}
 				query.setParameter(observableId + "_text", "%" + filteredTextValues.get(observableId) + "%");
 			}
@@ -1015,6 +1063,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		observationUnitRow.setDesignation(designation);
 		observationVariables.put(DESIGNATION, new ObservationUnitData(designation));
 
+		if (row.containsKey(STOCK_ID)) {
+			final String stockId = (String) row.get(STOCK_ID);
+			observationUnitRow.setStockId(stockId);
+			observationVariables.put(STOCK_ID, new ObservationUnitData(stockId));
+		}
+
 		final String trialInstance = (String) row.get(TRIAL_INSTANCE);
 		if (NumberUtils.isDigits(trialInstance)) {
 			observationUnitRow.setTrialInstance(Integer.valueOf(trialInstance));
@@ -1077,17 +1131,17 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private List<Map<String, Object>> getObservationUnitTableAsMapListResult(final ObservationUnitsSearchDTO searchDto,
-		final String observationVariableName) {
+		final String observationVariableName, final Pageable pageable) {
 		try {
 
-			final String sql = this.getObservationUnitTableQuery(searchDto, observationVariableName);
+			final String sql = this.getObservationUnitTableQuery(searchDto, observationVariableName, pageable);
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 
 			for (final String columnName : searchDto.getFilterColumns()) {
 				query.addScalar(columnName);
 			}
 
-			this.setParameters(searchDto, query);
+			this.setParameters(searchDto, query, pageable);
 			return this.convertSelectionAndTraitColumnsValueType(query.list(), searchDto.getSelectionMethodsAndTraits());
 
 		} catch (final Exception e) {
@@ -1121,6 +1175,23 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 		}
 		return result;
+	}
+
+	private Integer getVariableIdbyName(final String variableName, final int datasetId) {
+		final String query = "SELECT cvt.cvterm_id "
+			+ "FROM projectprop pp "
+			+ "INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
+			+ "WHERE pp.project_id = :datasetId AND pp.alias = :variable";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
+		sqlQuery.setParameter("datasetId", datasetId);
+		sqlQuery.setParameter("variable", variableName);
+		final List<Integer> list = sqlQuery.list();
+		if (list == null || list.isEmpty()) {
+			return 0;
+		} else {
+			return list.get(0);
+		}
+
 	}
 
 }

@@ -26,7 +26,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -58,6 +57,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
@@ -409,7 +409,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testaddStudyVariablesToUnitRows() {
+	public void testAddStudyVariablesToUnitRows() {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		final Map<String, ObservationUnitData> variables = new HashMap<>();
 		variables.put(OBS_UNIT_ID, new ObservationUnitData("obunit123"));
@@ -418,6 +418,18 @@ public class DatasetServiceImplTest {
 			.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(), "1");
 		this.datasetService.addStudyVariablesToUnitRows(Arrays.asList(observationUnitRow), Arrays.asList(trialInstanceVariable));
 		Assert.assertNotNull(observationUnitRow.getVariables().get(trialInstanceVariable.getName()));
+	}
+
+	@Test
+	public void testAddStudyVariablesAliasToUnitRows() {
+		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		final Map<String, ObservationUnitData> variables = new HashMap<>();
+		variables.put(OBS_UNIT_ID, new ObservationUnitData("obunit123"));
+		observationUnitRow.setVariables(variables);
+		final MeasurementVariable trialInstanceVariable = MeasurementVariableTestDataInitializer
+			.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(), "1", "Alias");
+		this.datasetService.addStudyVariablesToUnitRows(Arrays.asList(observationUnitRow), Arrays.asList(trialInstanceVariable));
+		Assert.assertNotNull(observationUnitRow.getVariables().get("Alias"));
 	}
 
 	private List<DatasetDTO> setUpDatasets(final Integer datasetTypeId) {
@@ -509,8 +521,8 @@ public class DatasetServiceImplTest {
 		Mockito.when(this.obsUnitsSearchDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
 		final ObservationUnitsSearchDTO
 			searchDTO = new ObservationUnitsSearchDTO(DATASET_ID, INSTANCE_ID, GERMPLASM_DESCRIPTORS, DESING_FACTORS, projectTraits);
-		searchDTO.setSortedRequest(new SortedPageRequest(1, 100, null, null));
-		Mockito.when(this.obsUnitsSearchDao.getObservationUnitTable(searchDTO)).thenReturn(testMeasurements);
+
+		Mockito.when(this.obsUnitsSearchDao.getObservationUnitTable(searchDTO, new PageRequest(0, 100))).thenReturn(testMeasurements);
 
 		Mockito.when(this.mockSession.createSQLQuery(Mockito.anyString())).thenReturn(mockQuery);
 		final List<Map<String, Object>> results = new ArrayList<>();
@@ -529,7 +541,7 @@ public class DatasetServiceImplTest {
 		// Method to test
 		final List<ObservationUnitRow> actualMeasurements = this.datasetService.getObservationUnitRows(DatasetServiceImplTest.STUDY_ID,
 			DatasetServiceImplTest.DATASET_ID,
-			new ObservationUnitsSearchDTO());
+			new ObservationUnitsSearchDTO(), new PageRequest(0, 100));
 
 		Assert.assertEquals(testMeasurements, actualMeasurements);
 	}
@@ -600,7 +612,7 @@ public class DatasetServiceImplTest {
 		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
 		Mockito.verify(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.obsUnitsSearchDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class));
+		Mockito.verify(this.obsUnitsSearchDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class), Mockito.any(PageRequest.class));
 
 	}
 
@@ -989,7 +1001,7 @@ public class DatasetServiceImplTest {
 		final DmsProject subobsDataset = new DmsProject();
 		final int subObsDatasetId = new Random().nextInt();
 		subobsDataset.setProjectId(subObsDatasetId);
-		final Integer numberOfSubObsUnits = 5;
+		final int numberOfSubObsUnits = 5;
 		this.datasetService
 			.saveSubObservationUnits(DatasetServiceImplTest.STUDY_ID, instanceIds, numberOfSubObsUnits, plotDataset, subobsDataset);
 		final ArgumentCaptor<ExperimentModel> experimentCaptor = ArgumentCaptor.forClass(ExperimentModel.class);
@@ -1060,13 +1072,13 @@ public class DatasetServiceImplTest {
 		final int termId = 100;
 		final String variableName = "VariableName";
 		measurementVariable.setTermId(termId);
-		measurementVariable.setVariableType(VariableType.STUDY_CONDITION);
+		measurementVariable.setVariableType(VariableType.ENVIRONMENT_CONDITION);
 		measurementVariable.setName(variableName);
 
 		final List<MeasurementVariable> observationSetVariables = Arrays.asList(measurementVariable);
 
 		when(this.dmsProjectDao.getObservationSetVariables(datasetId, Lists.newArrayList(
-			VariableType.STUDY_CONDITION.getId()))).thenReturn(observationSetVariables);
+			VariableType.ENVIRONMENT_CONDITION.getId()))).thenReturn(observationSetVariables);
 
 		final List<MeasurementVariableDto> result = this.datasetService.getEnvironmentConditionVariableNames(datasetId);
 

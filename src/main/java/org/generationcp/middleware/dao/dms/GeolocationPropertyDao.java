@@ -26,6 +26,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,7 +132,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			final List<Object> results = query.list();
 			for (final Object obj : results) {
 				final Object[] row = (Object[]) obj;
-				geoProperties.put((String) row[0], (String) row[1]);
+				geoProperties.put((String) row[0], row[1] == null ? "" : (String) row[1]);
 			}
 			return geoProperties;
 		} catch (final MiddlewareQueryException e) {
@@ -193,31 +194,38 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		return criteria.list();
 	}
 
-	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds) {
-		List<MeasurementVariable> studyVariables = new ArrayList<>();
+	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
+		final List<MeasurementVariable> studyVariables = new ArrayList<>();
 		final List<Integer> standardEnvironmentFactors = Lists.newArrayList(
 			TermId.LOCATION_ID.getId(),
 			TermId.TRIAL_INSTANCE_FACTOR.getId(),
 			TermId.EXPERIMENT_DESIGN_FACTOR.getId());
 		try{
 			final SQLQuery query =
-				this.getSession().createSQLQuery("SELECT ispcvt.name as name, ispcvt.definition as definition, "
-					+ "		cvt_scale.name AS scaleName, gprop.value AS value FROM nd_geolocationprop gprop "
+				this.getSession().createSQLQuery("SELECT ispcvt.name as name, ispcvt.definition as definition, cvt_scale.name AS scaleName, "
+					+ "		(CASE WHEN cvt_rel_catVar.subject_id IS NULL THEN gprop.value ELSE categoricalVar.name END) AS value, "
+					+ "		cvt_scale.cvterm_id AS scaleId, ispcvt.cvterm_id AS variableId "
+					+ "		FROM nd_geolocationprop gprop "
 					+ "		INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.cvterm_id in (:variableIds) "
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = ispcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "		INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id "
 					+ "		INNER JOIN nd_geolocation gl ON gprop.nd_geolocation_id = gl.nd_geolocation_id "
+					+ "     LEFT JOIN cvterm_relationship cvt_rel_catVar on cvt_scale.cvterm_id = cvt_rel_catVar.subject_id and cvt_rel_catVar.type_id = " + TermId.HAS_TYPE.getId()
+					+ "			AND cvt_rel_catVar.object_id= " + TermId.CATEGORICAL_VARIABLE.getId()
+					+ "		LEFT JOIN cvterm categoricalVar ON categoricalVar.cvterm_id = gprop.value "
 					+ "	    WHERE gl.nd_geolocation_id = :geolocationId AND ispcvt.cvterm_id NOT IN (:standardEnvironmentFactors) ;");
 			query.addScalar("name", new StringType());
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());
 			query.addScalar("value", new StringType());
+			query.addScalar("scaleId", new IntegerType());
+			query.addScalar("variableId", new IntegerType());
 			query.setParameterList("variableIds", variableIds);
 			query.setParameter("geolocationId", geolocationId);
 			query.setParameterList("standardEnvironmentFactors", standardEnvironmentFactors);
 
 			final List<Object> results = query.list();
-			for(Object result: results) {
+			for(final Object result: results) {
 
 				final Object[] row = (Object[]) result;
 				final MeasurementVariable measurementVariable = new MeasurementVariable();
@@ -225,6 +233,8 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 				measurementVariable.setDescription((row[1] instanceof String) ? (String) row[1] : null);
 				measurementVariable.setScale((row[2] instanceof String) ? (String) row[2] : null);
 				measurementVariable.setValue((row[3] instanceof String) ? (String) row[3] : null);
+				measurementVariable.setScaleId((row[4] instanceof Integer) ? (Integer) row[4] : null);
+				measurementVariable.setTermId((row[5] instanceof Integer) ? (Integer) row[5] : 0);
 				studyVariables.add(measurementVariable);
 			}
 		} catch (final MiddlewareQueryException e) {

@@ -39,13 +39,13 @@ public class StudyBuilder extends Builder {
 		return study;
 	}
 
-	public Study createStudy(final int studyId, final boolean hasVariabletype) {
+	public Study createStudy(final int studyId, final boolean hasVariableType) {
 		final Monitor monitor = MonitorFactory.start("Build Study");
 		try {
 			Study study = null;
 			final DmsProject project = this.getDmsProjectDao().getById(studyId);
 			if (project != null) {
-				study = this.createStudy(project, hasVariabletype);
+				study = this.createStudy(project, hasVariableType);
 			}
 			return study;
 		} finally {

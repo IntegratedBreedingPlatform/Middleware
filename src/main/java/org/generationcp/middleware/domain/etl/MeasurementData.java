@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.domain.etl;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -21,6 +19,8 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.util.Debug;
+
+import java.util.List;
 
 public class MeasurementData {
 
@@ -35,7 +35,7 @@ public class MeasurementData {
 	private String dataType;
 
 	// This can be geolocationPropertyId or phenotype ID depending on variable type
-	// (e.g. geolocationPropertyId for ENVIRONMENT_DETAIL, phenotypeID for TRAIT or STUDY_CONDITION).
+	// (e.g. geolocationPropertyId for ENVIRONMENT_DETAIL, phenotypeID for TRAIT or ENVIRONMENT_CONDITION).
 	private Integer measurementDataId;
 
 	private MeasurementVariable measurementVariable;

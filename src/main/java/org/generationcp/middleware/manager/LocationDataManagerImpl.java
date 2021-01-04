@@ -10,6 +10,9 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -25,7 +28,6 @@ import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
-import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -138,8 +141,15 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Location> getFilteredLocations(final Set<Integer> types, final List<Integer> locationIds, final List<String> locationAbbreviations) {
-		return this.daoFactory.getLocationDAO().filterLocations(types, locationIds, locationAbbreviations);
+	public List<Location> getFilteredLocations(final String programUUID, final Set<Integer> types, List<Integer> locationIds,
+		final List<String> locationAbbreviations, final boolean favourites) {
+		if (!StringUtils.isEmpty(programUUID) && favourites) {
+			if (locationIds == null) {
+				locationIds = new ArrayList<>();
+			}
+			locationIds.addAll(this.getFavoriteProjectLocationIds(programUUID));
+		}
+		return this.daoFactory.getLocationDAO().filterLocations(programUUID, types, locationIds, locationAbbreviations);
 	}
 
 	@Override
@@ -193,7 +203,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final String fieldType) {
-		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, fieldType);
+		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, ImmutableSet.of(fieldType));
 	}
 
 	@Override
@@ -383,11 +393,13 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		}
 
 		for (final Location location : locations) {
-			final Location tempParent = namesMap.get(location.getParentLocationId());
-			location.setParentLocationName(tempParent.getLname());
-			location.setParentLocationAbbr(tempParent.getLabbr());
-		}
+			final Optional<Location> tempParent = Optional.ofNullable(namesMap.get(location.getParentLocationId()));
+			if (tempParent.isPresent()) {
+				location.setParentLocationName(tempParent.get().getLname());
+				location.setParentLocationAbbr(tempParent.get().getLabbr());
+			}
 
+		}
 		return locations;
 	}
 
@@ -473,7 +485,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<LocationDetails> getFilteredLocationsDetails(final Integer countryId, final Integer locationType, final String locationName,
-			final String programUUID) {
+		final String programUUID) {
 		return this.daoFactory.getLocationDAO().getFilteredLocations(countryId, locationType, locationName, programUUID);
 	}
 
@@ -521,7 +533,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Integer> getFavoriteProjectLocationIds(final String programUUID) {
 		final List<ProgramFavorite> programFavorites =
-			this.daoFactory.getProgramFavoriteDao().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
+			this.daoFactory.getProgramFavoriteDao()
+				.getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
 		final List<Integer> favoriteLocationIds = new ArrayList<>();
 		if (programFavorites != null && !programFavorites.isEmpty()) {
 			for (final ProgramFavorite programFavorite : programFavorites) {
@@ -537,4 +550,5 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		final Integer id = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locationType.getCode());
 		return this.daoFactory.getLocationDAO().getDefaultLocationByType(id);
 	}
+
 }

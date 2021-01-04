@@ -136,9 +136,12 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final List<StudyInstance> instances = this.daoFactory.getDmsProjectDAO().getDatasetInstances(environmentDatasetId, instanceIds);
 		// If study has advance or crosses generated and instance has experiment design, mark instance as cannot be deleted
 		final boolean hasCrossesOrSelections = this.studyService.hasCrossesOrSelections(studyId);
-		if (hasCrossesOrSelections) {
+		// If study has means dataset
+		final boolean hasMeansDataset = this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
+		if (hasCrossesOrSelections || hasMeansDataset) {
 			for (final StudyInstance instance : instances) {
-				if (instance.isHasExperimentalDesign()) {
+				final Optional<Integer> instanceHasGivenDatasetType = this.getDatasetIdForInstanceIdAndDatasetType(instance.getInstanceId(), DatasetTypeEnum.MEANS_DATA);
+				if ((hasCrossesOrSelections && instance.isHasExperimentalDesign()) || (hasMeansDataset && instanceHasGivenDatasetType.isPresent())) {
 					instance.setCanBeDeleted(false);
 				}
 			}
@@ -167,6 +170,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 		// Delete geolocation and its properties
 		this.daoFactory.getGeolocationDao().deleteGeolocations(instanceIds);
+
+		this.deleteExperimentalDesignIfApplicable(studyId,plotDatasetId);
 
 		// IF experimental design is not yet generated, re-number succeeding trial instances
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
@@ -334,6 +339,12 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		return Optional.empty();
 	}
 
+	@Override
+	public Optional<Integer> getDatasetIdForInstanceIdAndDatasetType(final Integer instanceId, final DatasetTypeEnum datasetTypeEnum) {
+		return
+			Optional.ofNullable(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, datasetTypeEnum));
+	}
+
 	protected Optional<Location> getUnspecifiedLocation() {
 		final List<Location> locations = this.daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 		if (!locations.isEmpty()) {
@@ -357,14 +368,23 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	private void mapGeolocationMetaData(final Geolocation geolocation, final int variableId, final String value) {
 		if (TermId.LATITUDE.getId() == variableId) {
-			geolocation.setLatitude(Double.valueOf(value));
+			final Double dValue = !StringUtils.isBlank(value) ? Double.valueOf(value) : null;
+			geolocation.setLatitude(dValue);
 		} else if (TermId.LONGITUDE.getId() == variableId) {
-			geolocation.setLongitude(Double.valueOf(value));
+			final Double dValue = !StringUtils.isBlank(value) ? Double.valueOf(value) : null;
+			geolocation.setLongitude(dValue);
 		} else if (TermId.GEODETIC_DATUM.getId() == variableId) {
 			geolocation.setGeodeticDatum(value);
 		} else if (TermId.ALTITUDE.getId() == variableId) {
-			geolocation.setAltitude(Double.valueOf(value));
+			final Double dValue = !StringUtils.isBlank(value) ? Double.valueOf(value) : null;
+			geolocation.setAltitude(dValue);
 		}
 	}
 
+	private void deleteExperimentalDesignIfApplicable(final int studyId, final int plotDatasetId) {
+		final boolean hasExperimentalDesign = this.daoFactory.getExperimentDao().count(plotDatasetId) > 0;
+		if (!hasExperimentalDesign) {
+			this.experimentDesignService.deleteStudyExperimentDesign(studyId);
+		}
+	}
 }

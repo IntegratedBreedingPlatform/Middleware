@@ -24,7 +24,23 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
@@ -49,12 +65,15 @@ import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.dms.*;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
@@ -65,9 +84,7 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -124,7 +141,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private StudyTestDataInitializer studyTDI;
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 	private CropType crop;
-	private CVTerm option;
 
 	private StandardVariableSaver standardVariableSaver;
 	@Before
@@ -138,13 +154,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.variableDataManager = Mockito.mock(OntologyVariableDataManagerImpl.class);
 		final Optional<DataType> dataTypeOptional = Optional.of(DataType.CATEGORICAL_VARIABLE);
 		Mockito.when(this.variableDataManager.getDataType(Matchers.anyInt())).thenReturn(dataTypeOptional);
-
-		this.option = CVTermTestDataInitializer.createTerm("Option 1", 2030);
-		this.cvTermDao.save(this.option);
-		Mockito.when(this.variableDataManager.retrieveVariableCategoricalValue(Matchers.anyString(), Matchers.any(), Matchers.anyInt())).thenReturn(
-			this.option.getName());
-
-		this.manager.setVariableDataManager(this.variableDataManager);
 
 		this.standardVariableSaver = new StandardVariableSaver(this.sessionProvder);
 
@@ -529,13 +538,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
 			this.manager.updateFieldMapWithBlockInformation(infos, false);
 
-			Assert.assertNull("Expected null but got " + trialInstance.getRowsInBlock() + " instead.", trialInstance.getRowsInBlock());
-			Assert.assertNull("Expected null but got " + trialInstance.getRangesInBlock() + " instead.", trialInstance.getRangesInBlock());
-			Assert.assertNull("Expected null but got " + trialInstance.getRowsPerPlot() + " instead.", trialInstance.getRowsPerPlot());
-			Assert.assertNull("Expected null but got " + trialInstance.getPlantingOrder() + " instead.", trialInstance.getPlantingOrder());
-			Assert.assertNull(
-				"Expected null but got " + trialInstance.getMachineRowCapacity() + " instead.",
-				trialInstance.getMachineRowCapacity());
+			Assert.assertNotNull("Expected maximum number of rows " + trialInstance.getRowsInBlock() + " instead.", trialInstance.getRowsInBlock());
+			Assert.assertNotNull("Expected maximum number of range " + trialInstance.getRangesInBlock() + " instead.", trialInstance.getRangesInBlock());
+			Assert.assertEquals("Expected with default value of 1 ", 1, (int) trialInstance.getRowsPerPlot());
+			Assert.assertEquals("Expected with default value of 1", 1, (int) trialInstance.getPlantingOrder());
+			Assert.assertEquals("Expected with default value of 1", 1, (int) trialInstance.getMachineRowCapacity());
+
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
 		}
@@ -1063,72 +1071,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	}
 
-	@Test
-	public void testCountStudies() throws Exception {
-		// Empty filter will retrieve all studies in crop
-		final Map<StudyFilters, String> map = new HashMap<>();
-		final Long initialCount = this.manager.countAllStudies(map);
-
-		// Add new study with new location ID
-		final StudyReference newStudy = this.studyTDI.addTestStudy();
-		final Integer studyId = newStudy.getId();
-		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
-		final Random random = new Random();
-		final String location1 = String.valueOf(random.nextInt());
-		final String season = String.valueOf(random.nextInt());
-		this.studyTDI.createEnvironmentDataset(this.crop, studyId, location1, season);
-
-		// Flushing to force Hibernate to synchronize with the underlying database
-		this.manager.getActiveSession().flush();
-
-		// New study should be retrieved for empty filter
-		Assert.assertEquals(initialCount.intValue() + 1, this.manager.countAllStudies(map).intValue());
-		map.put(StudyFilters.PROGRAM_ID, newStudy.getProgramUUID());
-		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
-		Assert.assertEquals(2, this.manager.countAllStudies(map).intValue());
-		map.put(StudyFilters.LOCATION_ID, location1);
-		// Expecting only one to be retrieved when filtered by location
-		Assert.assertEquals(1, this.manager.countAllStudies(map).intValue());
-	}
-
-	@Test
-	public void testFindPagedProjects() throws Exception {
-		// Add new study with 2 environments assigned new location IDs
-		final StudyReference newStudy = this.studyTDI.addTestStudy();
-		final Integer studyId = newStudy.getId();
-
-		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
-		final Random random = new Random();
-		final String location1 = String.valueOf(random.nextInt());
-		final String season = String.valueOf(random.nextInt());
-		final Integer datasetId = this.studyTDI.createEnvironmentDataset(this.crop, studyId, location1, season);
-		final String location2 = String.valueOf(random.nextInt());
-		this.studyTDI.addEnvironmentToDataset(this.crop, datasetId, 2, location2, season);
-
-		// Flushing to force Hibernate to synchronize with the underlying database
-		this.manager.getActiveSession().flush();
-
-		final Map<StudyFilters, String> map = new HashMap<>();
-		map.put(StudyFilters.PROGRAM_ID, newStudy.getProgramUUID());
-		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
-		List<StudySummary> studies = this.manager.findPagedProjects(map, 10, 1);
-		Assert.assertEquals(2, studies.size());
-		StudySummary study1 = studies.get(0);
-		Assert.assertEquals(this.studyReference.getId(), study1.getStudyDbid());
-		final StudySummary study2 = studies.get(1);
-		Assert.assertEquals(newStudy.getId(), study2.getStudyDbid());
-		Assert.assertEquals(2, study2.getInstanceMetaData().size());
-
-		map.put(StudyFilters.LOCATION_ID, location1);
-		// Expecting only one study to be retrieved when filtered by location
-		studies = this.manager.findPagedProjects(map, 10, 1);
-		Assert.assertEquals(1, studies.size());
-		study1 = studies.get(0);
-		Assert.assertEquals(newStudy.getId(), study1.getStudyDbid());
-		// Expecting environments of retrieved study to also be filtered by location
-		Assert.assertEquals(1, study1.getInstanceMetaData().size());
-		Assert.assertEquals(location1, study1.getInstanceMetaData().get(0).getLocationDbId().toString());
-	}
 
 	@Test
 	public void testIsStudy() {
@@ -1138,49 +1080,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(this.manager.isStudy(mainFolder.getProjectId()));
 	}
 
-	@Test
-	public void testFindPagedProjectsWithCategoricalVariable() throws Exception {
-		// Create project record
-		final DmsProject project = new DmsProject();
-		final String programUUID = "74364-9075-asdhaskj-74825";
-		final StudyType studyType = new StudyType();
-		studyType.setStudyTypeId(6);
-		studyType.setLabel(StudyTypeDto.TRIAL_LABEL);
-		studyType.setName(StudyTypeDto.TRIAL_NAME);
-		studyType.setCvTermId(10010);
-		studyType.setVisible(true);
-
-		project.setName("projectName");
-		project.setDescription("projectDescription");
-		project.setProgramUUID(programUUID);
-		project.setStudyType(studyType);
-
-		this.manager.getDmsProjectDao().save(project);
-
-		final DMSVariableType dmsVariableType = new DMSVariableType();
-		dmsVariableType.setVariableType(VariableType.STUDY_DETAIL);
-		dmsVariableType.setLocalName("PI_NAME");
-		dmsVariableType.setRank(1);
-		dmsVariableType.setStandardVariable(this.createStandardVariable("Categorical Option"));
-
-
-		// Create projectproperty record
-		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, String.valueOf(this.option.getCvTermId()));
-
-		final Map<StudyFilters, String> map = new HashMap<>();
-		map.put(StudyFilters.PROGRAM_ID, project.getProgramUUID());
-		final List<StudySummary> studySummaryList = this.manager.findPagedProjects(map, 1, 1);
-		Assert.assertTrue(!studySummaryList.isEmpty());
-		for(final StudySummary studySummary : studySummaryList) {
-			Assert.assertEquals(studySummary.getProgramDbId(), programUUID);
-			Assert.assertTrue(!studySummary.getOptionalInfo().isEmpty());
-			for (final String mapKey : studySummary.getOptionalInfo().keySet()) {
-				final String value = studySummary.getOptionalInfo().get(mapKey);
-				Assert.assertEquals(this.option.getName(), value);
-			}
-		}
-
-	}
 
 	private StandardVariable createStandardVariable(final String name) {
 

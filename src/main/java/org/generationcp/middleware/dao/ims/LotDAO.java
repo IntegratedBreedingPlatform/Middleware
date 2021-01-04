@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -642,11 +643,26 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 					+ " from project study_filter_p \n" //
 					+ "	    inner join project study_filter_plotdata on study_filter_p.project_id = study_filter_plotdata.study_id \n" //
 					+ "     inner join nd_experiment study_filter_nde on study_filter_plotdata.project_id = study_filter_nde.project_id \n"
-					+ "     inner join ims_experiment_transaction study_filter_iet on study_filter_nde.nd_experiment_id = study_filter_iet.nd_experiment_id \n"
+					+ "     inner join ims_experiment_transaction study_filter_iet on study_filter_nde.nd_experiment_id = study_filter_iet.nd_experiment_id \n" 
+					+ "                and study_filter_iet.type = " + ExperimentTransactionType.PLANTING.getId()
 					+ "     inner join ims_transaction study_filter_transaction on study_filter_iet.trnid = study_filter_transaction.trnid \n"
 					+ "     inner join ims_lot study_filter_lot on study_filter_transaction.lotid = study_filter_lot.lotid \n" //
 					+ " where study_filter_p.project_id in (:plantingStudyIds) and study_filter_lot.lotid = lot.lotid)"); //
 				paramBuilder.setParameterList("plantingStudyIds", plantingStudyIds);
+			}
+
+			final List<Integer> harvestingStudyIds = lotsSearchDto.getHarvestingStudyIds();
+			if (harvestingStudyIds != null && !harvestingStudyIds.isEmpty()) {
+				paramBuilder.append(" and exists(select 1 \n" //
+					+ " from project study_filter_p \n" //
+					+ "	    inner join project study_filter_plotdata on study_filter_p.project_id = study_filter_plotdata.study_id \n" //
+					+ "     inner join nd_experiment study_filter_nde on study_filter_plotdata.project_id = study_filter_nde.project_id \n"
+					+ "     inner join ims_experiment_transaction study_filter_iet on study_filter_nde.nd_experiment_id = study_filter_iet.nd_experiment_id \n"
+					+ "                and study_filter_iet.type = " + ExperimentTransactionType.HARVESTING.getId()
+					+ "     inner join ims_transaction study_filter_transaction on study_filter_iet.trnid = study_filter_transaction.trnid \n"
+					+ "     inner join ims_lot study_filter_lot on study_filter_transaction.lotid = study_filter_lot.lotid \n" //
+					+ " where study_filter_p.project_id in (:harvestingStudyIds) and study_filter_lot.lotid = lot.lotid)"); //
+				paramBuilder.setParameterList("harvestingStudyIds", harvestingStudyIds);
 			}
 		}
 	}
@@ -808,8 +824,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public List<String> getInventoryIDsWithBreederIdentifier(final String identifier) {
 		try {
-			final String queryString = "select stock_id FROM ims_lot WHERE stock_id "
-				+ "RLIKE '^:identifier[0-9][0-9]*.*'".replace(":identifier", identifier);
+			final String queryString = "select stock_id FROM ims_lot WHERE UPPER(stock_id) "
+				+ "RLIKE UPPER('^:identifier[0-9][0-9]*.*')".replace(":identifier", identifier);
 			final Query query = this.getSession().createSQLQuery(queryString);
 			return query.list();
 		} catch (final HibernateException e) {

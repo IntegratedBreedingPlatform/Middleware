@@ -84,6 +84,7 @@ public class Transaction implements Serializable {
 	@Column(name = "cmtdata")
 	private Integer commitmentDate;
 
+	//TODO: use TransactionSourceType instead of String
 	@Column(name = "sourcetype")
 	private String sourceType;
 
