@@ -270,31 +270,34 @@ public class ExperimentDaoTest {
 	}
 
 	@Test
-	public void testGetExperiments_FirstInstance() {
+	public void testGetExperiments_WithFiltering() {
 		final Query query = Mockito.mock(Query.class);
 		Mockito.when(this.mockSession.createQuery(ArgumentMatchers.anyString())).thenReturn(query);
 		final int projectId = 1011;
 		final int start = 1000;
 		final int numOfRows = 5000;
 		this.experimentDao.getExperiments(projectId, Arrays.asList(TermId.PLOT_EXPERIMENT, TermId.SAMPLE_EXPERIMENT), start, numOfRows,
-				Collections.singletonList(1), null);
+				Arrays.asList(1, 2, 3), Collections.singletonList(2));
 
 		final String sql = "select distinct exp from ExperimentModel as exp "
 				+ "left outer join exp.properties as plot with plot.typeId IN (8200,8380) "
 				+ "left outer join exp.properties as rep with rep.typeId = 8210 " + "left outer join exp.stock as st "
-				+ "where exp.project.projectId =:p_id and exp.typeId in (:type_ids) " + "and exp.geoLocation.description = 1 "
+				+ "where exp.project.projectId =:p_id and exp.typeId in (:type_ids) " + "and exp.geoLocation.description IN (:instanceNumbers) "
+				+ "and rep.value IN (:repNumbers) "
 				+ "order by (exp.geoLocation.description * 1) ASC, " + "(plot.value * 1) ASC, " + "(rep.value * 1) ASC, "
 				+ "(st.uniqueName * 1) ASC, " + "exp.ndExperimentId ASC";
 		Mockito.verify(this.mockSession).createQuery(ArgumentMatchers.eq(sql));
 		Mockito.verify(query).setParameter("p_id", projectId);
 		Mockito.verify(query).setParameterList("type_ids",
 				Arrays.asList(TermId.PLOT_EXPERIMENT.getId(), TermId.SAMPLE_EXPERIMENT.getId()));
+		Mockito.verify(query).setParameterList("instanceNumbers", Arrays.asList("1", "2", "3"));
+		Mockito.verify(query).setParameterList("repNumbers", Collections.singletonList("2"));
 		Mockito.verify(query).setMaxResults(numOfRows);
 		Mockito.verify(query).setFirstResult(start);
 	}
 	
 	@Test
-	public void testGetExperiments_NotFirstInstance() {
+	public void testGetExperiments_NoFiltering() {
 		final Query query = Mockito.mock(Query.class);
 		Mockito.when(this.mockSession.createQuery(ArgumentMatchers.anyString())).thenReturn(query);
 		final int projectId = 1011;
@@ -313,6 +316,8 @@ public class ExperimentDaoTest {
 		Mockito.verify(query).setParameter("p_id", projectId);
 		Mockito.verify(query).setParameterList("type_ids",
 				Arrays.asList(TermId.PLOT_EXPERIMENT.getId(), TermId.SAMPLE_EXPERIMENT.getId()));
+		Mockito.verify(query, Mockito.never()).setParameterList(ArgumentMatchers.eq("instanceNumbers"), ArgumentMatchers.anyList());
+		Mockito.verify(query, Mockito.never()).setParameterList(ArgumentMatchers.eq("repNumbers"), ArgumentMatchers.anyList());
 		Mockito.verify(query).setMaxResults(numOfRows);
 		Mockito.verify(query).setFirstResult(start);
 	}
