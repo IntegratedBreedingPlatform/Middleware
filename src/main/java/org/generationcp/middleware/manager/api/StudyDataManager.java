@@ -139,9 +139,10 @@ public interface StudyDataManager {
 	 *
 	 * @param dataSetId the data set id
 	 * @param instanceNumbers - instances to retrieve
-		 * @return the experiments
+	 * @param repNumbers - repetition numbers to retrieve
+	 * @return the experiments
 	 */
-	List<Experiment> getExperiments(final int dataSetId, final List<Integer> instanceNumbers);
+	List<Experiment> getExperiments(final int dataSetId, final List<Integer> instanceNumbers, final List<Integer> repNumbers);
 
 	/**
 	 * Gets the treatment factor variables of the study
