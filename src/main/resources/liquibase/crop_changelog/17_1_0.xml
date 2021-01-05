@@ -4,7 +4,7 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="diego" id="v17_1_0">
+	<changeSet author="diego" id="v17.1.0-1">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<columnExists tableName="stockprop" columnName="rank"></columnExists>
@@ -19,5 +19,5 @@
 			<column name="type_id" type="int"/>
 		</createIndex>
 	</changeSet>
-
+	
 </databaseChangeLog>
