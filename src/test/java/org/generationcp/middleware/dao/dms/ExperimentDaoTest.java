@@ -277,7 +277,7 @@ public class ExperimentDaoTest {
 		final int start = 1000;
 		final int numOfRows = 5000;
 		this.experimentDao.getExperiments(projectId, Arrays.asList(TermId.PLOT_EXPERIMENT, TermId.SAMPLE_EXPERIMENT), start, numOfRows,
-				true);
+				Collections.singletonList(1), null);
 
 		final String sql = "select distinct exp from ExperimentModel as exp "
 				+ "left outer join exp.properties as plot with plot.typeId IN (8200,8380) "
@@ -301,7 +301,7 @@ public class ExperimentDaoTest {
 		final int start = 1000;
 		final int numOfRows = 5000;
 		this.experimentDao.getExperiments(projectId, Arrays.asList(TermId.PLOT_EXPERIMENT, TermId.SAMPLE_EXPERIMENT), start, numOfRows,
-				false);
+				null, null);
 
 		final String sql = "select distinct exp from ExperimentModel as exp "
 				+ "left outer join exp.properties as plot with plot.typeId IN (8200,8380) "

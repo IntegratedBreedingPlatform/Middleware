@@ -36,7 +36,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
@@ -136,14 +135,13 @@ public interface StudyDataManager {
 	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList);
 
 	/**
-	 * Gets the experiments of the first Instance.
+	 * Gets the experiments of the given instance/s.
 	 *
 	 * @param dataSetId the data set id
-	 * @param start     the start
-	 * @param numOfRows the num of rows
-	 * @return the experiments
+	 * @param instanceNumbers - instances to retrieve
+		 * @return the experiments
 	 */
-	List<Experiment> getExperimentsOfFirstInstance(final int dataSetId, final int start, final int numOfRows);
+	List<Experiment> getExperiments(final int dataSetId, final List<Integer> instanceNumbers);
 
 	/**
 	 * Gets the treatment factor variables of the study
