@@ -112,7 +112,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 
 		final Workbook wb = this.workbookBuilder.create(studyId);
 		// getWorkbookBuilder().create no longer loads observations collection by default. Load only when needed. Like here.
-		this.workbookBuilder.loadAllObservations(wb);
+		this.workbookBuilder.loadObservations(wb, null, null);
 		final List<MeasurementRow> observations = wb.getObservations();
 		final List<MeasurementVariable> studyConditions = this.appendCountryInformationFromCondition(wb.getConditions());
 		final List<MeasurementRow> trialObservations = wb.getTrialObservations();
