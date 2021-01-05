@@ -1,0 +1,23 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="diego" id="v17_1_0">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="stockprop" columnName="rank"></columnExists>
+			</and>
+		</preConditions>
+		<comment>Remove rank column from stockprop table</comment>
+		<dropIndex tableName="stockprop" indexName="stockprop_idx1"></dropIndex>
+		<dropColumn tableName="stockprop" columnName="rank"></dropColumn>
+
+		<createIndex indexName="stockprop_idx1" tableName="stockprop" unique="true">
+			<column name="stock_id" type="int"/>
+			<column name="type_id" type="int"/>
+		</createIndex>
+	</changeSet>
+
+</databaseChangeLog>
