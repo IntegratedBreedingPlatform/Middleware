@@ -141,9 +141,11 @@ public class PlantingServiceImpl implements PlantingService {
 
 		final PlantingMetadata plantingMetadata = new PlantingMetadata();
 		plantingMetadata.setConfirmedTransactionsCount(
-			daoFactory.getExperimentTransactionDao().countPlantingTransactionsByStatus(obsUnitIds, TransactionStatus.CONFIRMED));
+			daoFactory.getExperimentTransactionDao()
+				.countTransactionsByNdExperimentIds(obsUnitIds, TransactionStatus.CONFIRMED, ExperimentTransactionType.PLANTING));
 		plantingMetadata.setPendingTransactionsCount(
-			daoFactory.getExperimentTransactionDao().countPlantingTransactionsByStatus(obsUnitIds, TransactionStatus.PENDING));
+			daoFactory.getExperimentTransactionDao()
+				.countTransactionsByNdExperimentIds(obsUnitIds, TransactionStatus.PENDING, ExperimentTransactionType.PLANTING));
 		return plantingMetadata;
 	}
 
@@ -165,7 +167,8 @@ public class PlantingServiceImpl implements PlantingService {
 
 		// Verify that none of them has confirmed transactions, if there are, throw an exception
 		if (daoFactory.getExperimentTransactionDao()
-			.countPlantingTransactionsByStatus(requestedNdExperimentIds, TransactionStatus.CONFIRMED) > 0L) {
+			.countTransactionsByNdExperimentIds(requestedNdExperimentIds, TransactionStatus.CONFIRMED, ExperimentTransactionType.PLANTING)
+			> 0L) {
 			throw new MiddlewareRequestException("", "planting.confirmed.transactions.found");
 		}
 
