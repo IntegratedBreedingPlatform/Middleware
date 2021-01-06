@@ -245,13 +245,6 @@ public class PlantingServiceImpl implements PlantingService {
 		return daoFactory.getExperimentTransactionDao().getTransactionsByStudyAndEntryId(studyId, entryId, transactionStatus, ExperimentTransactionType.PLANTING);
 	}
 
-	@Override
-	public List<Transaction> getPlantingTransactionsByInstanceIds(final List<Integer> instanceIds,
-		final TransactionStatus transactionStatus) {
-		return daoFactory.getExperimentTransactionDao()
-			.getTransactionsByInstanceIds(instanceIds, transactionStatus, ExperimentTransactionType.PLANTING);
-	}
-
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
 		if (searchDTO.getItemIds() != null && !searchDTO.getItemIds().isEmpty()) {
 			final ObservationUnitsSearchDTO searchRequest = new ObservationUnitsSearchDTO();
