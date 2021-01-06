@@ -10,6 +10,5 @@
 		</preConditions>
 		<comment>Remove personlist table</comment>
 		<dropTable tableName="personlist"></dropTable>
-
 	</changeSet>
 </databaseChangeLog>
