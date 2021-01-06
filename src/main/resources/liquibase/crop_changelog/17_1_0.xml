@@ -7,9 +7,7 @@
 
 	<changeSet author="diego" id="v17.1.0-2">
 		<preConditions onFail="MARK_RAN">
-			<and>
-				<columnExists tableName="ims_transaction" columnName="prevamount"></columnExists>
-			</and>
+			<columnExists tableName="ims_transaction" columnName="prevamount"></columnExists>
 		</preConditions>
 		<comment>Remove prevamount column from ims_transaction</comment>
 		<dropColumn tableName="ims_transaction" columnName="prevamount"></dropColumn>
