@@ -26,7 +26,6 @@ import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
-import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.dms.StockPropertyDao;
@@ -370,12 +369,6 @@ public class DatabaseBroker {
 		final UserDefinedFieldDAO userDefinedFieldDao = new UserDefinedFieldDAO();
 		userDefinedFieldDao.setSession(this.getActiveSession());
 		return userDefinedFieldDao;
-	}
-
-	public ProgramFavoriteDAO getProgramFavoriteDao() {
-		final ProgramFavoriteDAO programFavoriteDao = new ProgramFavoriteDAO();
-		programFavoriteDao.setSession(this.getActiveSession());
-		return programFavoriteDao;
 	}
 
 	public TermPropertyBuilder getTermPropertyBuilder() {

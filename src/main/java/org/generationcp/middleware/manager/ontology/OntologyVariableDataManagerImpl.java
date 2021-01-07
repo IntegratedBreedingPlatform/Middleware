@@ -537,7 +537,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 			// Get favorite from ProgramFavoriteDAO
 			final ProgramFavorite programFavorite =
-					this.getProgramFavoriteDao().getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
+				this.daoFactory.getProgramFavoriteDao()
+					.getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
 			variable.setIsFavorite(programFavorite != null);
 
 			final int unknownUsage = -1;
@@ -636,7 +637,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			programFavorite.setEntityId(variableInfo.getId());
 			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
 			programFavorite.setUniqueID(variableInfo.getProgramUuid());
-			this.getProgramFavoriteDao().save(programFavorite);
+			this.daoFactory.getProgramFavoriteDao().save(programFavorite);
 		}
 
 		// Setting last update time.
@@ -753,7 +754,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 
 		// Updating favorite to true if alias is defined
-		ProgramFavorite programFavorite = this.getProgramFavoriteDao().getProgramFavorite(variableInfo.getProgramUuid(),
+		ProgramFavorite programFavorite = this.daoFactory.getProgramFavoriteDao().getProgramFavorite(variableInfo.getProgramUuid(),
 				ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
 
 		final String previousAlias = variableOverrides == null ? null : variableOverrides.getAlias();
@@ -769,9 +770,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			programFavorite.setEntityId(variableInfo.getId());
 			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
 			programFavorite.setUniqueID(variableInfo.getProgramUuid());
-			this.getProgramFavoriteDao().save(programFavorite);
+			this.daoFactory.getProgramFavoriteDao().save(programFavorite);
 		} else if (!isFavorite && programFavorite != null) {
-			this.getProgramFavoriteDao().makeTransient(programFavorite);
+			this.daoFactory.getProgramFavoriteDao().makeTransient(programFavorite);
 		}
 
 		daoFactory.getCvTermPropertyDao().save(variableInfo.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);

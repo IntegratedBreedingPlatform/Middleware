@@ -1146,24 +1146,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<ProgramFavorite> getProgramFavorites(final FavoriteType type, final String programUUID) {
-		return this.getProgramFavoriteDao().getProgramFavorites(type, programUUID);
+		return this.daoFactory.getProgramFavoriteDao().getProgramFavorites(type, programUUID);
 	}
 
 	@Override
 	public int countProgramFavorites(final FavoriteType type) {
-		return this.getProgramFavoriteDao().countProgramFavorites(type);
+		return this.daoFactory.getProgramFavoriteDao().countProgramFavorites(type);
 	}
 
 	@Override
 	public List<ProgramFavorite> getProgramFavorites(final FavoriteType type, final int max, final String programUUID) {
-		return this.getProgramFavoriteDao().getProgramFavorites(type, max, programUUID);
+		return this.daoFactory.getProgramFavoriteDao().getProgramFavorites(type, max, programUUID);
 	}
 
 	@Override
 	public void saveProgramFavorites(final List<ProgramFavorite> list) {
 
 		try {
-			final ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
+			final ProgramFavoriteDAO dao = this.daoFactory.getProgramFavoriteDao();
 
 			for (final ProgramFavorite favorite : list) {
 				dao.save(favorite);
@@ -1183,7 +1183,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		try {
 
-			final ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
+			final ProgramFavoriteDAO dao = this.daoFactory.getProgramFavoriteDao();
 			dao.save(favorite);
 
 		} catch (final Exception e) {
@@ -1199,7 +1199,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public void deleteProgramFavorites(final List<ProgramFavorite> list) {
 		try {
-			final ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
+			final ProgramFavoriteDAO dao = this.daoFactory.getProgramFavoriteDao();
 			for (final ProgramFavorite favorite : list) {
 				dao.makeTransient(favorite);
 			}
@@ -1217,7 +1217,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		try {
 
-			final ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
+			final ProgramFavoriteDAO dao = this.daoFactory.getProgramFavoriteDao();
 			dao.makeTransient(favorite);
 
 		} catch (final Exception e) {
