@@ -21,7 +21,6 @@ import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.NamingConfigurationDAO;
-import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -375,12 +374,6 @@ public class DatabaseBroker {
 		final MethodDAO methodDao = new MethodDAO();
 		methodDao.setSession(this.getActiveSession());
 		return methodDao;
-	}
-
-	public ProgenitorDAO getProgenitorDao() {
-		final ProgenitorDAO progenitorDao = new ProgenitorDAO();
-		progenitorDao.setSession(this.getActiveSession());
-		return progenitorDao;
 	}
 
 	public UserDefinedFieldDAO getUserDefinedFieldDao() {
