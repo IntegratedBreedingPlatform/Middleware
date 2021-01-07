@@ -1,10 +1,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
@@ -15,14 +11,21 @@ import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by cyrus on 12/16/14.
  */
 @Transactional
 public class UserProgramStateDataManagerImpl extends DataManager implements UserProgramStateDataManager {
 
+	private DaoFactory daoFactory;
+
 	public UserProgramStateDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public UserProgramStateDataManagerImpl() {
@@ -84,7 +87,7 @@ public class UserProgramStateDataManagerImpl extends DataManager implements User
 			}
 			String text = Util.convertCollectionToCSV(treeState);
 			userProgramTreeState.setTreeState(text);
-			this.getUserProgramTreeStateDAO().saveOrUpdate(userProgramTreeState);
+			this.daoFactory.getUserProgramTreeStateDAO().saveOrUpdate(userProgramTreeState);
 
 		} catch (HibernateException e) {
 

@@ -19,7 +19,6 @@ import org.generationcp.middleware.dao.GermplasmSearchDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
-import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
@@ -381,14 +380,6 @@ public class DatabaseBroker {
 
 	public TermPropertyBuilder getTermPropertyBuilder() {
 		return new TermPropertyBuilder(this.sessionProvider);
-	}
-
-	// ================================ InventoryDataManager DAO Methods =============================
-
-	public UserProgramTreeStateDAO getUserProgramTreeStateDAO() {
-		final UserProgramTreeStateDAO userProgramTreeStateDAO = new UserProgramTreeStateDAO();
-		userProgramTreeStateDAO.setSession(this.getActiveSession());
-		return userProgramTreeStateDAO;
 	}
 
 	/**

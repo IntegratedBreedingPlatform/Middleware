@@ -23,6 +23,7 @@ import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
 import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -323,6 +324,12 @@ public class DaoFactory {
 		final NamingConfigurationDAO namingConfigurationDAO = new NamingConfigurationDAO();
 		namingConfigurationDAO.setSession(this.sessionProvider.getSession());
 		return namingConfigurationDAO;
+	}
+
+	public UserProgramTreeStateDAO getUserProgramTreeStateDAO() {
+		final UserProgramTreeStateDAO userProgramTreeStateDAO = new UserProgramTreeStateDAO();
+		userProgramTreeStateDAO.setSession(this.sessionProvider.getSession());
+		return userProgramTreeStateDAO;
 	}
 
 }
