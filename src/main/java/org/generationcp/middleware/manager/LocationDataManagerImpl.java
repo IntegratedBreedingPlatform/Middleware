@@ -75,19 +75,19 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Location> getLocationsByUniqueID(final String programUUID) {
 		final List<Location> locations = new ArrayList<>();
-		locations.addAll(this.daoFactory.getLocationDAO().getByUniqueID(programUUID));
+		locations.addAll(this.daoFactory.getLocationDAO().getByProgramUUID(programUUID));
 		return locations;
 	}
 
 	@Override
 	public long countLocationsByUniqueID(final String programUUID) {
-		return this.daoFactory.getLocationDAO().countByUniqueID(programUUID);
+		return this.daoFactory.getLocationDAO().countByProgramUUID(programUUID);
 	}
 
 	@Override
 	public List<Location> getLocationsByName(final String name, final Operation op, final String programUUID) {
 		final List<Location> locations = new ArrayList<>();
-		locations.addAll(this.daoFactory.getLocationDAO().getByNameAndUniqueID(name, op, programUUID));
+		locations.addAll(this.daoFactory.getLocationDAO().getByNameAndProgramUUID(name, op, programUUID));
 		return locations;
 	}
 
@@ -95,12 +95,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<Location> getLocationsByName(
 		final String name, final int start, final int numOfRows, final Operation op,
 		final String programUUID) {
-		return this.daoFactory.getLocationDAO().getByNameAndUniqueID(name, op, programUUID, start, numOfRows);
+		return this.daoFactory.getLocationDAO().getByNameAndProgramUUID(name, op, programUUID, start, numOfRows);
 	}
 
 	@Override
 	public long countLocationsByName(final String name, final Operation op, final String programUUID) {
-		return this.daoFactory.getLocationDAO().countByNameAndUniqueID(name, op, programUUID);
+		return this.daoFactory.getLocationDAO().countByNameAndProgramUUID(name, op, programUUID);
 	}
 
 	@Override
@@ -225,13 +225,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public Integer addLocation(final Location location) {
 
-		Integer idLocationSaved = null;
 		try {
 
 			final LocationDAO dao = this.daoFactory.getLocationDAO();
 
 			final Location recordSaved = dao.saveOrUpdate(location);
-			idLocationSaved = recordSaved.getLocid();
+			return recordSaved.getLocid();
 
 		} catch (final Exception e) {
 
@@ -239,7 +238,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 				"Error encountered while saving Location: LocationDataManager.addLocation(location=" + location + "): " + e
 					.getMessage(), e);
 		}
-		return idLocationSaved;
 	}
 
 	@Override
@@ -480,7 +478,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Location> getAllBreedingLocationsByUniqueID(final String programUUID) {
-		return this.daoFactory.getLocationDAO().getBreedingLocationsByUniqueID(programUUID);
+		return this.daoFactory.getLocationDAO().getBreedingLocationsByProgramUUID(programUUID);
 	}
 
 	@Override
