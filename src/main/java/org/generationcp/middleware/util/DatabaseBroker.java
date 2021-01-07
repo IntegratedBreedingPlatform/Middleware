@@ -12,7 +12,6 @@
 package org.generationcp.middleware.util;
 
 import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
@@ -107,10 +106,6 @@ public class DatabaseBroker {
 
 	public StandardVariableDao getStandardVariableDao() {
 		return new StandardVariableDao(this.getActiveSession());
-	}
-
-	public BreedersQueryDao getBreedersQueryDao() {
-		return new BreedersQueryDao(this.getActiveSession());
 	}
 
 	public CountryDAO getCountryDao() {

@@ -106,7 +106,7 @@
     </bean>
 
     <bean id="crossStudyDataManager" class="org.generationcp.middleware.manager.CrossStudyDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="genotypicDataManager" class="org.generationcp.middleware.manager.GenotypicDataManagerImpl">

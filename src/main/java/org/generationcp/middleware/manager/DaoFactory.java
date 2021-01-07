@@ -2,6 +2,7 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
+import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -330,6 +331,10 @@ public class DaoFactory {
 		final UserProgramTreeStateDAO userProgramTreeStateDAO = new UserProgramTreeStateDAO();
 		userProgramTreeStateDAO.setSession(this.sessionProvider.getSession());
 		return userProgramTreeStateDAO;
+	}
+
+	public BreedersQueryDao getBreedersQueryDao() {
+		return new BreedersQueryDao(this.sessionProvider.getSession());
 	}
 
 }
