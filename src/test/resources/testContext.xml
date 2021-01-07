@@ -126,7 +126,7 @@
     </bean>
 
     <bean id="userProgramStateDataManager" class="org.generationcp.middleware.manager.UserProgramStateDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="conformityTestingService" class="org.generationcp.middleware.service.ConformityTestingServiceImpl">
