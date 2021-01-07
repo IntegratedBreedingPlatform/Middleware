@@ -23,7 +23,6 @@ import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.NamingConfigurationDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
-import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -111,12 +110,6 @@ public class DatabaseBroker {
 		final DmsProjectDao dmsProjectDao = new DmsProjectDao();
 		dmsProjectDao.setSession(this.getActiveSession());
 		return dmsProjectDao;
-	}
-
-	public StudyTypeDAO getStudyTypeDao() {
-		final StudyTypeDAO studyTypeDAO = new StudyTypeDAO();
-		studyTypeDAO.setSession(this.getActiveSession());
-		return studyTypeDAO;
 	}
 
 	public StandardVariableDao getStandardVariableDao() {

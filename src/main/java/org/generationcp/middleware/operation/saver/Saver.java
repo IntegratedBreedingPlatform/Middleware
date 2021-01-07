@@ -12,13 +12,11 @@
 package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
-import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.transformer.etl.DatasetValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
@@ -35,6 +33,8 @@ import org.generationcp.middleware.util.DatabaseBroker;
  */
 public class Saver extends DatabaseBroker {
 
+	private DaoFactory daoFactory;
+
 	public Saver() {
 
 	}
@@ -44,6 +44,7 @@ public class Saver extends DatabaseBroker {
 	 */
 	protected Saver(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	protected final StudySaver getStudySaver() {
@@ -128,5 +129,13 @@ public class Saver extends DatabaseBroker {
 
 	protected final ExperimentDestroyer getExperimentDestroyer() {
 		return new ExperimentDestroyer(this.sessionProvider);
+	}
+
+	public DaoFactory getDaoFactory() {
+		return daoFactory;
+	}
+
+	public void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 }

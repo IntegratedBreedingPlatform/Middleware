@@ -11,12 +11,11 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import org.generationcp.middleware.dao.StudyTypeDAO;
-import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.Util;
 
@@ -24,13 +23,11 @@ import java.text.ParseException;
 
 public class ProjectSaver extends Saver {
 
+	private DaoFactory daoFactory;
+
 	public ProjectSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
-	}
-
-	public DmsProject save(final DmsProject project) {
-		final DmsProjectDao projectDao = this.getDmsProjectDao();
-		return projectDao.save(project);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public DmsProject create(final StudyValues studyValues, final StudyTypeDto studyType, final String description, final String startDate,
@@ -38,12 +35,11 @@ public class ProjectSaver extends Saver {
 		DmsProject project = null;
 
 		if (studyValues != null) {
-			final StudyTypeDAO studyTypeDAO = this.getStudyTypeDao();
 			final DmsProject parentProject = this.getDmsProjectDao().getById(parentId);
 
 			project = new DmsProject();
 			project.setName(name);
-			project.setStudyType(studyTypeDAO.getById(studyType.getId()));
+			project.setStudyType(this.daoFactory.getStudyTypeDao().getById(studyType.getId()));
 			project.setCreatedBy(createdBy);
 			project.setParent(parentProject);
 
@@ -102,7 +98,7 @@ public class ProjectSaver extends Saver {
 		project.setProgramUUID(programUUID);
 		project.setParent(this.getDmsProjectDao().getById(parentId));
 		this.mapStudytoProject(name, description, project, objective);
-		return this.save(project);
+		return this.daoFactory.getDmsProjectDAO().save(project);
 
 	}
 

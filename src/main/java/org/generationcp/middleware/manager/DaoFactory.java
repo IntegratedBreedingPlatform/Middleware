@@ -19,6 +19,7 @@ import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
+import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -296,6 +297,12 @@ public class DaoFactory {
 		final ListDataPropertyDAO listDataPropertyDAO = new ListDataPropertyDAO();
 		listDataPropertyDAO.setSession(this.sessionProvider.getSession());
 		return listDataPropertyDAO;
+	}
+
+	public StudyTypeDAO getStudyTypeDao() {
+		final StudyTypeDAO studyTypeDAO = new StudyTypeDAO();
+		studyTypeDAO.setSession(this.sessionProvider.getSession());
+		return studyTypeDAO;
 	}
 
 }

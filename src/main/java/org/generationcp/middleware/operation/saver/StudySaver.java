@@ -44,7 +44,7 @@ public class StudySaver extends Saver {
 
 		project.setProgramUUID(programUUID);
 
-		project = this.getProjectSaver().save(project);
+		project = this.getDaoFactory().getDmsProjectDAO().save(project);
 		this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, studyValues.getVariableList());
 		if (saveStudyExperiment) {
 			this.saveStudyExperiment(crop, project.getProjectId(), studyValues);

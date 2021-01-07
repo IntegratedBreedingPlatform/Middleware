@@ -1023,7 +1023,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyTypeDto getStudyType(final int studyTypeId) {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getById(studyTypeId));
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getById(studyTypeId));
 	}
 
 	@Override
@@ -1131,12 +1131,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<StudyTypeDto> getAllStudyTypes() {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getAll());
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getAll());
 	}
 
 	@Override
 	public StudyTypeDto getStudyTypeByName(final String name) {
-		final StudyType studyTypeByName = this.getStudyTypeDao().getStudyTypeByName(name);
+		final StudyType studyTypeByName = this.daoFactory.getStudyTypeDao().getStudyTypeByName(name);
 		if (studyTypeByName != null) {
 			return this.getStudyTypeBuilder().createStudyTypeDto(studyTypeByName);
 		}
@@ -1145,12 +1145,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyTypeDto getStudyTypeByLabel(final String label) {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getStudyTypeByLabel(label));
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getStudyTypeByLabel(label));
 	}
 
 	@Override
 	public List<StudyTypeDto> getAllVisibleStudyTypes() {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getAllVisibleStudyTypes());
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getAllVisibleStudyTypes());
 	}
 
 	@Override
