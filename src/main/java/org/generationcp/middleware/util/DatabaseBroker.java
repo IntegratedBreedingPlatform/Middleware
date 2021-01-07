@@ -11,9 +11,56 @@
 
 package org.generationcp.middleware.util;
 
-import org.generationcp.middleware.dao.*;
-import org.generationcp.middleware.dao.dms.*;
-import org.generationcp.middleware.dao.gdms.*;
+import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.BibrefDAO;
+import org.generationcp.middleware.dao.BreedersQueryDao;
+import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.GermplasmSearchDAO;
+import org.generationcp.middleware.dao.ListDataPropertyDAO;
+import org.generationcp.middleware.dao.LocdesDAO;
+import org.generationcp.middleware.dao.MethodDAO;
+import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.NamingConfigurationDAO;
+import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.StudyTypeDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
+import org.generationcp.middleware.dao.dms.GeolocationDao;
+import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
+import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
+import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.dao.dms.StockPropertyDao;
+import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
+import org.generationcp.middleware.dao.gdms.CharValuesDAO;
+import org.generationcp.middleware.dao.gdms.DartValuesDAO;
+import org.generationcp.middleware.dao.gdms.DatasetDAO;
+import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
+import org.generationcp.middleware.dao.gdms.ExtendedMarkerInfoDAO;
+import org.generationcp.middleware.dao.gdms.MapDAO;
+import org.generationcp.middleware.dao.gdms.MappingDataDAO;
+import org.generationcp.middleware.dao.gdms.MappingPopDAO;
+import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
+import org.generationcp.middleware.dao.gdms.MarkerAliasDAO;
+import org.generationcp.middleware.dao.gdms.MarkerDAO;
+import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
+import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
+import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
+import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
+import org.generationcp.middleware.dao.gdms.MtaDAO;
+import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
+import org.generationcp.middleware.dao.gdms.QtlDAO;
+import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
+import org.generationcp.middleware.dao.gdms.TrackDataDAO;
+import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
 import org.generationcp.middleware.dao.oms.CVDao;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
@@ -32,9 +79,6 @@ import org.hibernate.Session;
 public class DatabaseBroker {
 
 	protected HibernateSessionProvider sessionProvider;
-	protected String databaseName;
-
-	protected static final int JDBC_BATCH_SIZE = 50;
 
 	protected DatabaseBroker() {
 
@@ -42,11 +86,6 @@ public class DatabaseBroker {
 
 	protected DatabaseBroker(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
-	}
-
-	protected DatabaseBroker(final HibernateSessionProvider sessionProvider, final String databaseName) {
-		this.sessionProvider = sessionProvider;
-		this.databaseName = databaseName;
 	}
 
 	public HibernateSessionProvider getSessionProvider() {
@@ -104,18 +143,6 @@ public class DatabaseBroker {
 		final StockDao stockDao = new StockDao();
 		stockDao.setSession(this.getActiveSession());
 		return stockDao;
-	}
-
-	public StudySearchDao getStudySearchDao() {
-		final StudySearchDao studySearchDao = new StudySearchDao();
-		studySearchDao.setSession(this.getActiveSession());
-		return studySearchDao;
-	}
-
-	public LocationSearchDao getLocationSearchDao() {
-		final LocationSearchDao dao = new LocationSearchDao();
-		dao.setSession(this.getActiveSession());
-		return dao;
 	}
 
 	public GeolocationPropertyDao getGeolocationPropertyDao() {
@@ -292,12 +319,6 @@ public class DatabaseBroker {
 		return markerUserInfoDao;
 	}
 
-	public MarkerUserInfoDetailsDAO getMarkerUserInfoDetailsDao() {
-		final MarkerUserInfoDetailsDAO markerUserInfoDetailsDao = new MarkerUserInfoDetailsDAO();
-		markerUserInfoDetailsDao.setSession(this.getActiveSession());
-		return markerUserInfoDetailsDao;
-	}
-
 	public QtlDAO getQtlDao() {
 		final QtlDAO qtlDao = new QtlDAO();
 		qtlDao.setSession(this.getActiveSession());
@@ -405,11 +426,6 @@ public class DatabaseBroker {
 	}
 
 	// ================================ InventoryDataManager DAO Methods =============================
-	public ProgramPresetDAO getProgramPresetDAO() {
-		final ProgramPresetDAO programPresetDAO = new ProgramPresetDAO();
-		programPresetDAO.setSession(this.getActiveSession());
-		return programPresetDAO;
-	}
 
 	public UserProgramTreeStateDAO getUserProgramTreeStateDAO() {
 		final UserProgramTreeStateDAO userProgramTreeStateDAO = new UserProgramTreeStateDAO();

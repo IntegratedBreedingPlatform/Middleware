@@ -67,10 +67,6 @@ public abstract class DataManager extends DatabaseBroker {
 		super(sessionProvider);
 	}
 
-	public DataManager(final HibernateSessionProvider sessionProvider, final String databaseName) {
-		super(sessionProvider, databaseName);
-	}
-
 	/**
 	 * Gets the parameter types of given parameters. <br/>
 	 *

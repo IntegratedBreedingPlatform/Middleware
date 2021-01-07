@@ -132,8 +132,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		super();
 	}
 
-	public FieldbookServiceImpl(final HibernateSessionProvider sessionProvider, final String localDatabaseName) {
-		super(sessionProvider, localDatabaseName);
+	public FieldbookServiceImpl(final HibernateSessionProvider sessionProvider) {
+		super(sessionProvider);
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 

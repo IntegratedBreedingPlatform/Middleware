@@ -20,7 +20,6 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.MBDTDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.PresetService;
@@ -51,7 +50,6 @@ import org.generationcp.middleware.service.ReportServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
-import org.generationcp.middleware.service.api.GermplasmNamingReferenceDataResolver;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.OntologyService;
@@ -69,7 +67,6 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
-import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
@@ -106,7 +103,6 @@ public class ManagerFactory implements Serializable {
 
 	private HibernateSessionProvider sessionProvider;
 
-	private String databaseName;
 	private String cropName;
 	private String pedigreeProfile;
 	private static ThreadLocal<ManagerFactory> currentManagerFactory = new ThreadLocal<ManagerFactory>();
@@ -128,7 +124,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public GermplasmDataManager getGermplasmDataManager() {
-		return new GermplasmDataManagerImpl(this.sessionProvider, this.databaseName);
+		return new GermplasmDataManagerImpl(this.sessionProvider);
 	}
 
 	public PedigreeDataManager getPedigreeDataManager() {
@@ -140,7 +136,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public GermplasmListManager getGermplasmListManager() {
-		return new GermplasmListManagerImpl(this.sessionProvider, this.databaseName);
+		return new GermplasmListManagerImpl(this.sessionProvider);
 	}
 
 	public LocationDataManager getLocationDataManager() {
@@ -181,7 +177,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public StudyDataManager getNewStudyDataManager() {
-		return new StudyDataManagerImpl(this.sessionProvider, this.databaseName);
+		return new StudyDataManagerImpl(this.sessionProvider);
 	}
 
 	public org.generationcp.middleware.service.api.dataset.DatasetService getDatasetMiddlewareService() {
@@ -193,7 +189,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public InventoryDataManager getInventoryDataManager() {
-		return new InventoryDataManagerImpl(this.sessionProvider, this.databaseName);
+		return new InventoryDataManagerImpl(this.sessionProvider);
 	}
 
 	public UserProgramStateDataManager getUserProgramStateDataManager() {
@@ -205,7 +201,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public FieldbookService getFieldbookMiddlewareService() {
-		return new FieldbookServiceImpl(this.sessionProvider, this.databaseName);
+		return new FieldbookServiceImpl(this.sessionProvider);
 	}
 
 	public InventoryService getInventoryMiddlewareService() {
@@ -220,23 +216,12 @@ public class ManagerFactory implements Serializable {
 		return new OntologyServiceImpl(this.sessionProvider);
 	}
 
-	public MBDTDataManager getMbdtDataManager() {
-		return new MBDTDataManagerImpl(this.sessionProvider);
-	}
-
 	public ReportService getReportService() {
-		return new ReportServiceImpl(this.sessionProvider, this.databaseName);
+		return new ReportServiceImpl(this.sessionProvider);
 	}
 
 	public PedigreeService getPedigreeService() {
 		return PedigreeFactory.getPedigreeService(this.sessionProvider, this.pedigreeProfile, this.cropName);
-	}
-
-	/*
-	 * This was exposed so that it can be access in the jUnit
-	 */
-	public PedigreeService getPedigreeService(final String profile, final String crop) {
-		return PedigreeFactory.getPedigreeService(this.sessionProvider, profile, crop);
 	}
 
 	/**
@@ -251,14 +236,6 @@ public class ManagerFactory implements Serializable {
 
 		ManagerFactory.currentManagerFactory.remove();
 		ManagerFactory.LOG.trace("Closing ManagerFactory...Done.");
-	}
-
-	public String getDatabaseName() {
-		return this.databaseName;
-	}
-
-	public void setDatabaseName(final String localDatabaseName) {
-		this.databaseName = localDatabaseName;
 	}
 
 	public String getCropName() {
@@ -287,12 +264,6 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmGroupingService getGermplasmGroupingService() {
 		return new GermplasmGroupingServiceImpl(this.sessionProvider);
-	}
-
-	public GermplasmNamingReferenceDataResolver getGermplasmNamingReferenceDataResolver() {
-		// In future we can switch implementation based on profile/crop.
-		// Currently just construct and return the only (CIMMYT maize) impl we have.
-		return new GermplasmNamingReferenceDataResolverImpl(this.sessionProvider);
 	}
 
 	public KeySequenceRegisterService getKeySequenceRegisterService() {

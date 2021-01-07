@@ -59,11 +59,6 @@ public class ReportServiceImpl extends Service implements ReportService {
 
 	}
 
-	public ReportServiceImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
-		super(sessionProvider, databaseName);
-
-	}
-
 	@Override
 	public JasperPrint getPrintReport(final String code, final Integer studyId) throws JRException, IOException,
 			BuildReportException {

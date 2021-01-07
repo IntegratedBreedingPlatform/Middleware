@@ -85,11 +85,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
-	public GermplasmDataManagerImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
-		super(sessionProvider, databaseName);
-		this.daoFactory = new DaoFactory(sessionProvider);
-	}
-
 	@Override
 	public List<Germplasm> getAllGermplasm(final int start, final int numOfRows) {
 		return this.getGermplasmDao().getAll(start, numOfRows);
