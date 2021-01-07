@@ -174,7 +174,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public UserDefinedField getUserDefinedFieldByID(final Integer id) {
-		return this.getUserDefinedFieldDao().getById(id, false);
+		return this.daoFactory.getUserDefinedFieldDAO().getById(id, false);
 	}
 
 	@Override
@@ -203,7 +203,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final String fieldType) {
-		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, ImmutableSet.of(fieldType));
+		return this.daoFactory.getUserDefinedFieldDAO().getByFieldTableNameAndType(tableName, ImmutableSet.of(fieldType));
 	}
 
 	@Override

@@ -22,7 +22,6 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
-import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -373,7 +372,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<UserDefinedField> getAttributeTypesByGIDList(final List<Integer> gidList) {
-		return this.getUserDefinedFieldDao().getAttributeTypesByGIDList(gidList);
+		return this.daoFactory.getUserDefinedFieldDAO().getAttributeTypesByGIDList(gidList);
 	}
 
 	@Override
@@ -413,7 +412,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<UserDefinedField> getNameTypesByGIDList(final List<Integer> gidList) {
-		return this.getUserDefinedFieldDao().getNameTypesByGIDList(gidList);
+		return this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gidList);
 	}
 
 	@Override
@@ -628,12 +627,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public UserDefinedField getUserDefinedFieldByID(final Integer id) {
-		return this.getUserDefinedFieldDao().getById(id, false);
+		return this.daoFactory.getUserDefinedFieldDAO().getById(id, false);
 	}
 
 	@Override
 	public UserDefinedField getUserDefinedFieldByLocalFieldNo(final Integer lfldno) {
-		return this.getUserDefinedFieldDao().getByLocalFieldNo(lfldno);
+		return this.daoFactory.getUserDefinedFieldDAO().getByLocalFieldNo(lfldno);
 	}
 
 	/**
@@ -844,8 +843,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		try {
 
-			final UserDefinedFieldDAO dao = this.getUserDefinedFieldDao();
-			dao.save(field);
+			this.daoFactory.getUserDefinedFieldDAO().save(field);
 
 		} catch (final Exception e) {
 
@@ -862,11 +860,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final List<Integer> isUdfldSaved = new ArrayList<>();
 		try {
 
-			final UserDefinedFieldDAO dao = this.getUserDefinedFieldDao();
-
 			for (final UserDefinedField field : fields) {
 
-				final UserDefinedField udflds = dao.save(field);
+				final UserDefinedField udflds = this.daoFactory.getUserDefinedFieldDAO().save(field);
 				isUdfldSaved.add(udflds.getFldno());
 			}
 
@@ -940,13 +936,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final String fieldType) {
-		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, ImmutableSet.of(fieldType));
+		return this.daoFactory.getUserDefinedFieldDAO().getByFieldTableNameAndType(tableName, ImmutableSet.of(fieldType));
 	}
 
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndFTypeAndFName(final String tableName, final String fieldType,
 		final String fieldName) {
-		return this.getUserDefinedFieldDao().getByFieldTableNameAndFTypeAndFName(tableName, fieldType, fieldName);
+		return this.daoFactory.getUserDefinedFieldDAO().getByFieldTableNameAndFTypeAndFName(tableName, fieldType, fieldName);
 	}
 
 	@Override
@@ -1392,7 +1388,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 */
 	@Override
 	public UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code) {
-		return this.getUserDefinedFieldDao().getByTableTypeAndCode(table, type, code);
+		return this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(table, type, code);
 	}
 
 	@Override
@@ -1590,12 +1586,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types,
 		final Set<String> codes) {
-		return this.getUserDefinedFieldDao().getByCodes(table, types, codes);
+		return this.daoFactory.getUserDefinedFieldDAO().getByCodes(table, types, codes);
 	}
 
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final Set<String> fieldTypes) {
-		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, fieldTypes);
+		return this.daoFactory.getUserDefinedFieldDAO().getByFieldTableNameAndType(tableName, fieldTypes);
 	}
 
 }

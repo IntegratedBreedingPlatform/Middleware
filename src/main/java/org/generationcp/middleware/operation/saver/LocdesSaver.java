@@ -59,7 +59,7 @@ public class LocdesSaver extends Saver {
 		final List<String> codes = Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode(), LocdesType.RANGES_IN_BLOCK.getCode(),
 			LocdesType.ROWS_IN_PLOT.getCode(), LocdesType.MACHINE_ROW_CAPACITY.getCode(),
 			LocdesType.PLANTING_ORDER.getCode(), LocdesType.DELETED_PLOTS.getCode());
-		return getUserDefinedFieldDao()
+		return daoFactory.getUserDefinedFieldDAO()
 			.getByCodes(
 				"LOCDES",
 				Collections.singleton("DTYPE"),
