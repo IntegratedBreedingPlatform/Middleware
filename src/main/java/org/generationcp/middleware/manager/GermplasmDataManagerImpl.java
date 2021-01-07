@@ -433,7 +433,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Method getMethodByID(final Integer id) {
-		return this.getMethodDao().getById(id, false);
+		return this.daoFactory.getMethodDAO().getById(id, false);
 	}
 
 	@Override
@@ -441,7 +441,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final List<Method> results = new ArrayList<>();
 
 		if (!ids.isEmpty()) {
-			results.addAll(this.getMethodDao().getMethodsByIds(ids));
+			results.addAll(this.daoFactory.getMethodDAO().getMethodsByIds(ids));
 		}
 
 		return results;
@@ -449,22 +449,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Method> getNonGenerativeMethodsByID(final List<Integer> ids) {
-		return this.getMethodDao().getMethodsNotGenerativeById(ids);
+		return this.daoFactory.getMethodDAO().getMethodsNotGenerativeById(ids);
 	}
 
 	@Override
 	public List<Method> getAllMethods() {
-		return this.getMethodDao().getAllMethod();
+		return this.daoFactory.getMethodDAO().getAllMethod();
 	}
 
 	@Override
 	public List<Method> getFavoriteMethodsByMethodType(final String methodType, final String programUUID) {
-		return this.getMethodDao().getFavoriteMethodsByMethodType(methodType, programUUID);
+		return this.daoFactory.getMethodDAO().getFavoriteMethodsByMethodType(methodType, programUUID);
 	}
 
 	@Override
 	public List<Method> getAllMethodsOrderByMname() {
-		return this.getMethodDao().getAllMethodOrderByMname();
+		return this.daoFactory.getMethodDAO().getAllMethodOrderByMname();
 	}
 
 	@Override
@@ -478,72 +478,72 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Method> getAllMethodsNotGenerative() {
-		return this.getMethodDao().getAllMethodsNotGenerative();
+		return this.daoFactory.getMethodDAO().getAllMethodsNotGenerative();
 	}
 
 	@Override
 	public long countAllMethods() {
-		return this.countAll(this.getMethodDao());
+		return this.countAll(this.daoFactory.getMethodDAO());
 	}
 
 	@Override
 	public List<Method> getMethodsByUniqueID(final String programUUID) {
-		return this.getMethodDao().getByUniqueID(programUUID);
+		return this.daoFactory.getMethodDAO().getByUniqueID(programUUID);
 	}
 
 	@Override
 	public long countMethodsByUniqueID(final String programUUID) {
-		return this.getMethodDao().countByUniqueID(programUUID);
+		return this.daoFactory.getMethodDAO().countByUniqueID(programUUID);
 	}
 
 	@Override
 	public List<Method> getMethodsByType(final String type) {
-		return this.getMethodDao().getByType(type);
+		return this.daoFactory.getMethodDAO().getByType(type);
 	}
 
 	@Override
 	public List<Method> getMethodsByType(final String type, final String programUUID) {
-		return this.getMethodDao().getByType(type, programUUID);
+		return this.daoFactory.getMethodDAO().getByType(type, programUUID);
 	}
 
 	@Override
 	public List<Method> getMethodsByType(final String type, final int start, final int numOfRows) {
-		return this.getMethodDao().getByType(type, start, numOfRows);
+		return this.daoFactory.getMethodDAO().getByType(type, start, numOfRows);
 	}
 
 	@Override
 	public long countMethodsByType(final String type) {
-		return this.getMethodDao().countByType(type);
+		return this.daoFactory.getMethodDAO().countByType(type);
 	}
 
 	@Override
 	public long countMethodsByType(final String type, final String programUUID) {
-		return this.getMethodDao().countByType(type, programUUID);
+		return this.daoFactory.getMethodDAO().countByType(type, programUUID);
 	}
 
 	@Override
 	public List<Method> getMethodsByGroup(final String group) {
-		return this.getMethodDao().getByGroup(group);
+		return this.daoFactory.getMethodDAO().getByGroup(group);
 	}
 
 	@Override
 	public List<Method> getMethodsByGroup(final String group, final int start, final int numOfRows) {
-		return this.getMethodDao().getByGroup(group, start, numOfRows);
+		return this.daoFactory.getMethodDAO().getByGroup(group, start, numOfRows);
 	}
 
 	@Override
 	public List<Method> getMethodsByGroupAndType(final String group, final String type) {
-		return this.getMethodDao().getByGroupAndType(group, type);
+		return this.daoFactory.getMethodDAO().getByGroupAndType(group, type);
 	}
 
 	@Override
 	public List<Method> getMethodsByGroupAndTypeAndName(final String group, final String type, final String name) {
-		return this.getMethodDao().getByGroupAndTypeAndName(group, type, name);
+		return this.daoFactory.getMethodDAO().getByGroupAndTypeAndName(group, type, name);
 	}
 
 	@Override
 	public long countMethodsByGroup(final String group) {
-		return this.getMethodDao().countByGroup(group);
+		return this.daoFactory.getMethodDAO().countByGroup(group);
 	}
 
 	@Override
@@ -552,7 +552,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final Integer methodId;
 		try {
 
-			final MethodDAO dao = this.getMethodDao();
+			final MethodDAO dao = this.daoFactory.getMethodDAO();
 
 			final Method recordSaved = dao.saveOrUpdate(method);
 			methodId = recordSaved.getMid();
@@ -576,7 +576,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				throw new MiddlewareQueryException("method has no Id or is not a local method");
 			}
 
-			final MethodDAO dao = this.getMethodDao();
+			final MethodDAO dao = this.daoFactory.getMethodDAO();
 
 			recordSaved = dao.merge(method);
 
@@ -595,7 +595,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final List<Integer> idMethodsSaved = new ArrayList<>();
 		try {
 
-			final MethodDAO dao = this.getMethodDao();
+			final MethodDAO dao = this.daoFactory.getMethodDAO();
 
 			for (final Method method : methods) {
 				final Method recordSaved = dao.saveOrUpdate(method);
@@ -615,7 +615,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		try {
 
-			this.getMethodDao().makeTransient(method);
+			this.daoFactory.getMethodDAO().makeTransient(method);
 
 		} catch (final Exception e) {
 
@@ -947,7 +947,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Method> getMethodsByGroupIncludesGgroup(final String group) {
-		return this.getMethodDao().getByGroupIncludesGgroup(group);
+		return this.daoFactory.getMethodDAO().getByGroupIncludesGgroup(group);
 	}
 
 	/**
@@ -1075,7 +1075,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		methodIds = this.getGermplasmDao().getMethodIdsByGids(gids);
 		for (final Map.Entry<Integer, Integer> entry : methodIds.entrySet()) {
-			final Method method = this.getMethodDao().getById(entry.getValue(), false);
+			final Method method = this.daoFactory.getMethodDAO().getById(entry.getValue(), false);
 			results.put(entry.getKey(), method);
 		}
 
@@ -1105,18 +1105,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Method getMethodByCode(final String code, final String programUUID) {
-		return this.getMethodDao().getByCode(code, programUUID);
+		return this.daoFactory.getMethodDAO().getByCode(code, programUUID);
 	}
 
 	@Override
 	public Method getMethodByCode(final String code) {
-		return this.getMethodDao().getByCode(Collections.singletonList(code)).get(0);
+		return this.daoFactory.getMethodDAO().getByCode(Collections.singletonList(code)).get(0);
 	}
 
 	@Override
 	public Method getMethodByName(final String name) {
 		final List<Method> methods;
-		methods = this.getMethodDao().getByName(name);
+		methods = this.daoFactory.getMethodDAO().getByName(name);
 		if (methods != null && !methods.isEmpty()) {
 			return methods.get(0);
 		} else {
@@ -1127,7 +1127,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public Method getMethodByName(final String name, final String programUUID) {
 		final List<Method> methods;
-		methods = this.getMethodDao().getByName(name, programUUID);
+		methods = this.daoFactory.getMethodDAO().getByName(name, programUUID);
 		if (methods != null && !methods.isEmpty()) {
 			return methods.get(0);
 		} else {
@@ -1233,13 +1233,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Method> getProgramMethods(final String programUUID) {
-		return this.getMethodDao().getProgramMethods(programUUID);
+		return this.daoFactory.getMethodDAO().getProgramMethods(programUUID);
 	}
 
 	@Override
 	public void deleteProgramMethodsByUniqueId(final String programUUID) {
 
-		final MethodDAO methodDao = this.getMethodDao();
+		final MethodDAO methodDao = this.daoFactory.getMethodDAO();
 		try {
 
 			final List<Method> list = this.getProgramMethods(programUUID);
@@ -1393,12 +1393,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) {
-		return this.getMethodDao().getDerivativeAndMaintenanceMethods(ids);
+		return this.daoFactory.getMethodDAO().getDerivativeAndMaintenanceMethods(ids);
 	}
 
 	@Override
 	public List<String> getMethodCodeByMethodIds(final Set<Integer> methodIds) {
-		return this.getMethodDao().getMethodCodeByMethodIds(methodIds);
+		return this.daoFactory.getMethodDAO().getMethodCodeByMethodIds(methodIds);
 	}
 
 	@Override
@@ -1491,22 +1491,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 */
 	@Override
 	public List<Method> getAllNoBulkingMethods() {
-		return this.getMethodDao().getAllNoBulkingMethods();
+		return this.daoFactory.getMethodDAO().getAllNoBulkingMethods();
 	}
 
 	@Override
 	public List<Method> getNoBulkingMethodsByIdList(final List<Integer> ids) {
-		return this.getMethodDao().getNoBulkingMethodsByIdList(ids);
+		return this.daoFactory.getMethodDAO().getNoBulkingMethodsByIdList(ids);
 	}
 
 	@Override
 	public List<Method> getAllMethodsNotBulkingNotGenerative() {
-		return this.getMethodDao().getAllMethodsNotBulkingNotGenerative();
+		return this.daoFactory.getMethodDAO().getAllMethodsNotBulkingNotGenerative();
 	}
 
 	@Override
 	public List<Method> getNoBulkingMethodsByType(final String type, final String programUUID) {
-		return this.getMethodDao().getNoBulkingMethodsByType(type, programUUID);
+		return this.daoFactory.getMethodDAO().getNoBulkingMethodsByType(type, programUUID);
 	}
 
 	@Override

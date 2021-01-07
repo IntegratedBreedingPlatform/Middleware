@@ -15,7 +15,6 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
-import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -350,12 +349,6 @@ public class DatabaseBroker {
 		final GermplasmSearchDAO germplasmSearchDao = new GermplasmSearchDAO();
 		germplasmSearchDao.setSession(this.getActiveSession());
 		return germplasmSearchDao;
-	}
-
-	public MethodDAO getMethodDao() {
-		final MethodDAO methodDao = new MethodDAO();
-		methodDao.setSession(this.getActiveSession());
-		return methodDao;
 	}
 
 	/**
