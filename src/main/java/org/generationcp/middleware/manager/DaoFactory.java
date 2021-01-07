@@ -16,6 +16,7 @@ import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
+import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
@@ -266,6 +267,12 @@ public class DaoFactory {
 		final ProgramFavoriteDAO programFavoriteDao = new ProgramFavoriteDAO();
 		programFavoriteDao.setSession(this.sessionProvider.getSession());
 		return programFavoriteDao;
+	}
+
+	public ProjectDAO getProjectDAO() {
+		final ProjectDAO projectDAO = new ProjectDAO();
+		projectDAO.setSession(this.sessionProvider.getSession());
+		return projectDAO;
 	}
 
 	public ExperimentTransactionDAO getExperimentTransactionDao() {
