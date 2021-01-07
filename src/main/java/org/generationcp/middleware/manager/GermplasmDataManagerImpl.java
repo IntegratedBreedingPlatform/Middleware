@@ -1530,7 +1530,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public NamingConfiguration getNamingConfigurationByName(final String name) {
-		return this.getNamingConfigurationDAO().getByName(name);
+		return this.daoFactory.getNamingConfigurationDAO().getByName(name);
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.NamingConfigurationDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
@@ -316,6 +317,12 @@ public class DaoFactory {
 		final LocdesDAO locdesDao = new LocdesDAO();
 		locdesDao.setSession(this.sessionProvider.getSession());
 		return locdesDao;
+	}
+
+	public NamingConfigurationDAO getNamingConfigurationDAO() {
+		final NamingConfigurationDAO namingConfigurationDAO = new NamingConfigurationDAO();
+		namingConfigurationDAO.setSession(this.sessionProvider.getSession());
+		return namingConfigurationDAO;
 	}
 
 }

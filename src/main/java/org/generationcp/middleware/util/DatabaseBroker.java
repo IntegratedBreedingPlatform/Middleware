@@ -18,7 +18,6 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.NamingConfigurationDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -390,12 +389,6 @@ public class DatabaseBroker {
 		final UserProgramTreeStateDAO userProgramTreeStateDAO = new UserProgramTreeStateDAO();
 		userProgramTreeStateDAO.setSession(this.getActiveSession());
 		return userProgramTreeStateDAO;
-	}
-
-	public NamingConfigurationDAO getNamingConfigurationDAO() {
-		final NamingConfigurationDAO namingConfigurationDAO = new NamingConfigurationDAO();
-		namingConfigurationDAO.setSession(this.getActiveSession());
-		return namingConfigurationDAO;
 	}
 
 	/**
