@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
@@ -34,6 +32,8 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
+
+import java.util.List;
 
 public class StandardVariableSaver extends Saver {
 
@@ -435,7 +435,7 @@ public class StandardVariableSaver extends Saver {
 			throw new MiddlewareQueryException("Specified trait ID for deletion of crop ontology ID is not valid");
 		}
 
-		final List<CVTermProperty> traitProperties = this.getTermPropertyBuilder().findProperties(traitId);
+		final List<CVTermProperty> traitProperties = this.daoFactory.getTermPropertyBuilder().findProperties(traitId);
 
 		for (final CVTermProperty traitProperty : traitProperties) {
 			if (traitProperty.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {

@@ -57,7 +57,6 @@ import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.hibernate.Session;
 
 /**
@@ -364,10 +363,6 @@ public class DatabaseBroker {
 		final UserDefinedFieldDAO userDefinedFieldDao = new UserDefinedFieldDAO();
 		userDefinedFieldDao.setSession(this.getActiveSession());
 		return userDefinedFieldDao;
-	}
-
-	public TermPropertyBuilder getTermPropertyBuilder() {
-		return new TermPropertyBuilder(this.sessionProvider);
 	}
 
 	/**

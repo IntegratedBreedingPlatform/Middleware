@@ -187,8 +187,8 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	public List<TermProperty> createTermProperties(final int cvTermId) {
-		final List<CVTermProperty> cvTermProperties = this.getTermPropertyBuilder().findProperties(cvTermId);
-		return this.getTermPropertyBuilder().create(cvTermProperties);
+		final List<CVTermProperty> cvTermProperties = this.daoFactory.getTermPropertyBuilder().findProperties(cvTermId);
+		return this.daoFactory.getTermPropertyBuilder().create(cvTermProperties);
 	}
 
 	private CVTerm getCvTerm(final int id) {
