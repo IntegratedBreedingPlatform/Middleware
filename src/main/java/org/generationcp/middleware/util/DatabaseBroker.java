@@ -12,7 +12,6 @@
 package org.generationcp.middleware.util;
 
 import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -352,12 +351,6 @@ public class DatabaseBroker {
 		final AttributeDAO attributeDao = new AttributeDAO();
 		attributeDao.setSession(this.getActiveSession());
 		return attributeDao;
-	}
-
-	public BibrefDAO getBibrefDao() {
-		final BibrefDAO bibrefDao = new BibrefDAO();
-		bibrefDao.setSession(this.getActiveSession());
-		return bibrefDao;
 	}
 
 	public GermplasmDAO getGermplasmDao() {

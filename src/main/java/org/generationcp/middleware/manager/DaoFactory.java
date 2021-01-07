@@ -305,4 +305,10 @@ public class DaoFactory {
 		return studyTypeDAO;
 	}
 
+	public BibrefDAO getBibrefDao() {
+		final BibrefDAO bibrefDao = new BibrefDAO();
+		bibrefDao.setSession(this.sessionProvider.getSession());
+		return bibrefDao;
+	}
+
 }

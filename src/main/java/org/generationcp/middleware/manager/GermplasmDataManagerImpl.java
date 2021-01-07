@@ -18,7 +18,6 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
@@ -666,7 +665,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Bibref getBibliographicReferenceByID(final Integer id) {
-		return this.getBibrefDao().getById(id, false);
+		return this.daoFactory.getBibrefDao().getById(id, false);
 	}
 
 	@Override
@@ -675,9 +674,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final Integer idBibrefSaved;
 		try {
 
-			final BibrefDAO dao = this.getBibrefDao();
-
-			final Bibref recordSaved = dao.saveOrUpdate(bibref);
+			final Bibref recordSaved = this.daoFactory.getBibrefDao().saveOrUpdate(bibref);
 			idBibrefSaved = recordSaved.getRefid();
 
 		} catch (final Exception e) {
