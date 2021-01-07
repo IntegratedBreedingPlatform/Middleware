@@ -510,7 +510,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public GermplasmListNewColumnsInfo getAdditionalColumnsForList(final Integer listId) {
-		return this.getListDataPropertyDAO().getPropertiesForList(listId);
+		return this.daoFactory.getListDataPropertyDAO().getPropertiesForList(listId);
 	}
 
 	@Override

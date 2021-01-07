@@ -16,7 +16,6 @@ import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
-import org.generationcp.middleware.dao.ListDataPropertyDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
@@ -392,12 +391,6 @@ public class DatabaseBroker {
 		final ProgramFavoriteDAO programFavoriteDao = new ProgramFavoriteDAO();
 		programFavoriteDao.setSession(this.getActiveSession());
 		return programFavoriteDao;
-	}
-
-	public ListDataPropertyDAO getListDataPropertyDAO() {
-		final ListDataPropertyDAO listDataPropertyDao = new ListDataPropertyDAO();
-		listDataPropertyDao.setSession(this.getActiveSession());
-		return listDataPropertyDao;
 	}
 
 	public TermPropertyBuilder getTermPropertyBuilder() {
