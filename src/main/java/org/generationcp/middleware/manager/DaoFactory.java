@@ -12,6 +12,7 @@ import org.generationcp.middleware.dao.GermplasmStudySourceDAO;
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
 import org.generationcp.middleware.dao.ListDataPropertyDAO;
 import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
@@ -309,6 +310,12 @@ public class DaoFactory {
 		final BibrefDAO bibrefDao = new BibrefDAO();
 		bibrefDao.setSession(this.sessionProvider.getSession());
 		return bibrefDao;
+	}
+
+	public LocdesDAO getLocDesDao() {
+		final LocdesDAO locdesDao = new LocdesDAO();
+		locdesDao.setSession(this.sessionProvider.getSession());
+		return locdesDao;
 	}
 
 }

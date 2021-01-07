@@ -16,7 +16,6 @@ import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
-import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.NamingConfigurationDAO;
@@ -363,12 +362,6 @@ public class DatabaseBroker {
 		return germplasmSearchDao;
 	}
 
-	public LocdesDAO getLocDesDao() {
-		final LocdesDAO locdesDao = new LocdesDAO();
-		locdesDao.setSession(this.getActiveSession());
-		return locdesDao;
-	}
-
 	public MethodDAO getMethodDao() {
 		final MethodDAO methodDao = new MethodDAO();
 		methodDao.setSession(this.getActiveSession());
@@ -379,12 +372,6 @@ public class DatabaseBroker {
 		final UserDefinedFieldDAO userDefinedFieldDao = new UserDefinedFieldDAO();
 		userDefinedFieldDao.setSession(this.getActiveSession());
 		return userDefinedFieldDao;
-	}
-
-	public LocdesDAO getLocdesDao() {
-		final LocdesDAO locdesDao = new LocdesDAO();
-		locdesDao.setSession(this.getActiveSession());
-		return locdesDao;
 	}
 
 	public ProgramFavoriteDAO getProgramFavoriteDao() {
