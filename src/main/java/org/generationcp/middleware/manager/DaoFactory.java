@@ -39,6 +39,29 @@ import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.dms.StockPropertyDao;
 import org.generationcp.middleware.dao.dms.StudySearchDao;
+import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
+import org.generationcp.middleware.dao.gdms.CharValuesDAO;
+import org.generationcp.middleware.dao.gdms.DartValuesDAO;
+import org.generationcp.middleware.dao.gdms.DatasetDAO;
+import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
+import org.generationcp.middleware.dao.gdms.ExtendedMarkerInfoDAO;
+import org.generationcp.middleware.dao.gdms.MapDAO;
+import org.generationcp.middleware.dao.gdms.MappingDataDAO;
+import org.generationcp.middleware.dao.gdms.MappingPopDAO;
+import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
+import org.generationcp.middleware.dao.gdms.MarkerAliasDAO;
+import org.generationcp.middleware.dao.gdms.MarkerDAO;
+import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
+import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
+import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
+import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
+import org.generationcp.middleware.dao.gdms.MtaDAO;
+import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
+import org.generationcp.middleware.dao.gdms.QtlDAO;
+import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
+import org.generationcp.middleware.dao.gdms.TrackDataDAO;
 import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
 import org.generationcp.middleware.dao.ims.ExperimentTransactionDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
@@ -362,5 +385,145 @@ public class DaoFactory {
 		trackMarkerDao.setSession(this.sessionProvider.getSession());
 		return trackMarkerDao;
 	}
+
+	public MapDAO getMapDao() {
+		final MapDAO mapDao = new MapDAO();
+		mapDao.setSession(this.sessionProvider.getSession());
+		return mapDao;
+	}
+
+	public MappingDataDAO getMappingDataDao() {
+		final MappingDataDAO mappingDataDao = new MappingDataDAO();
+		mappingDataDao.setSession(this.sessionProvider.getSession());
+		return mappingDataDao;
+	}
+
+	public MappingPopDAO getMappingPopDao() {
+		final MappingPopDAO mappingPopDao = new MappingPopDAO();
+		mappingPopDao.setSession(this.sessionProvider.getSession());
+		return mappingPopDao;
+	}
+
+	public MappingPopValuesDAO getMappingPopValuesDao() {
+		final MappingPopValuesDAO mappingPopValuesDao = new MappingPopValuesDAO();
+		mappingPopValuesDao.setSession(this.sessionProvider.getSession());
+		return mappingPopValuesDao;
+	}
+
+	public MarkerAliasDAO getMarkerAliasDao() {
+		final MarkerAliasDAO markerAliasDao = new MarkerAliasDAO();
+		markerAliasDao.setSession(this.sessionProvider.getSession());
+		return markerAliasDao;
+	}
+
+	public MarkerDAO getMarkerDao() {
+		final MarkerDAO markerDao = new MarkerDAO();
+		markerDao.setSession(this.sessionProvider.getSession());
+		return markerDao;
+	}
+
+	public MarkerDetailsDAO getMarkerDetailsDao() {
+		final MarkerDetailsDAO markerDetailsDao = new MarkerDetailsDAO();
+		markerDetailsDao.setSession(this.sessionProvider.getSession());
+		return markerDetailsDao;
+	}
+
+	public MarkerInfoDAO getMarkerInfoDao() {
+		final MarkerInfoDAO markerInfoDao = new MarkerInfoDAO();
+		markerInfoDao.setSession(this.sessionProvider.getSession());
+		return markerInfoDao;
+	}
+
+	public ExtendedMarkerInfoDAO getExtendedMarkerInfoDao() {
+		final ExtendedMarkerInfoDAO extendedMarkerInfoDAO = new ExtendedMarkerInfoDAO();
+		extendedMarkerInfoDAO.setSession(this.sessionProvider.getSession());
+		return extendedMarkerInfoDAO;
+	}
+
+	public MarkerMetadataSetDAO getMarkerMetadataSetDao() {
+		final MarkerMetadataSetDAO markerMetadataSetDao = new MarkerMetadataSetDAO();
+		markerMetadataSetDao.setSession(this.sessionProvider.getSession());
+		return markerMetadataSetDao;
+	}
+
+	public MarkerOnMapDAO getMarkerOnMapDao() {
+		final MarkerOnMapDAO markerOnMapDao = new MarkerOnMapDAO();
+		markerOnMapDao.setSession(this.sessionProvider.getSession());
+		return markerOnMapDao;
+	}
+
+	public MarkerUserInfoDAO getMarkerUserInfoDao() {
+		final MarkerUserInfoDAO markerUserInfoDao = new MarkerUserInfoDAO();
+		markerUserInfoDao.setSession(this.sessionProvider.getSession());
+		return markerUserInfoDao;
+	}
+
+	public QtlDAO getQtlDao() {
+		final QtlDAO qtlDao = new QtlDAO();
+		qtlDao.setSession(this.sessionProvider.getSession());
+		return qtlDao;
+	}
+
+	public QtlDetailsDAO getQtlDetailsDao() {
+		final QtlDetailsDAO qtlDetailsDao = new QtlDetailsDAO();
+		qtlDetailsDao.setSession(this.sessionProvider.getSession());
+		return qtlDetailsDao;
+	}
+
+	public MtaDAO getMtaDao() {
+		final MtaDAO mtaDao = new MtaDAO();
+		mtaDao.setSession(this.sessionProvider.getSession());
+		return mtaDao;
+	}
+
+	public MtaMetadataDAO getMtaMetadataDao() {
+		final MtaMetadataDAO mtaMetadataDao = new MtaMetadataDAO();
+		mtaMetadataDao.setSession(this.sessionProvider.getSession());
+		return mtaMetadataDao;
+	}
+
+	public TrackDataDAO getTrackDataDao() {
+		final TrackDataDAO trackDataDao = new TrackDataDAO();
+		trackDataDao.setSession(this.sessionProvider.getSession());
+		return trackDataDao;
+	}
+
+	public AccMetadataSetDAO getAccMetadataSetDao() {
+		final AccMetadataSetDAO accMetadataSetDao = new AccMetadataSetDAO();
+		accMetadataSetDao.setSession(this.sessionProvider.getSession());
+		return accMetadataSetDao;
+	}
+
+	public AlleleValuesDAO getAlleleValuesDao() {
+		final AlleleValuesDAO alleleValuesDao = new AlleleValuesDAO();
+		alleleValuesDao.setSession(this.sessionProvider.getSession());
+		return alleleValuesDao;
+	}
+
+	public CharValuesDAO getCharValuesDao() {
+		final CharValuesDAO charValuesDao = new CharValuesDAO();
+		charValuesDao.setSession(this.sessionProvider.getSession());
+		return charValuesDao;
+	}
+
+	public DartValuesDAO getDartValuesDao() {
+		final DartValuesDAO dartValuesDao = new DartValuesDAO();
+		dartValuesDao.setSession(this.sessionProvider.getSession());
+		return dartValuesDao;
+	}
+
+	public DatasetDAO getDatasetDao() {
+		final DatasetDAO datasetDao = new DatasetDAO();
+		datasetDao.setSession(this.sessionProvider.getSession());
+		return datasetDao;
+	}
+
+	public DatasetUsersDAO getDatasetUsersDao() {
+		final DatasetUsersDAO datasetUsersDao = new DatasetUsersDAO();
+		datasetUsersDao.setSession(this.sessionProvider.getSession());
+		return datasetUsersDao;
+	}
+
+
 
 }

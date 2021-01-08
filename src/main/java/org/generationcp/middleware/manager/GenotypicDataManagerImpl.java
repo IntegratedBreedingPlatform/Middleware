@@ -104,13 +104,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			return new ArrayList<>();
 		}
 
-		return new ArrayList<>(this.getQtlDao().getMapIDsByQTLName(qtlName, start, numOfRows));
+		return new ArrayList<>(this.daoFactory.getQtlDao().getMapIDsByQTLName(qtlName, start, numOfRows));
 	}
 
 	@Override
 	public long countMapIDsByQTLName(final String qtlName) {
 
-		return this.getQtlDao().countMapIDsByQTLName(qtlName);
+		return this.daoFactory.getQtlDao().countMapIDsByQTLName(qtlName);
 
 	}
 
@@ -121,7 +121,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public List<Name> getGermplasmNamesByMarkerId(final Integer markerId) {
-		return this.getDatasetDao().getGermplasmNamesByMarkerId(markerId);
+		return this.daoFactory.getDatasetDao().getGermplasmNamesByMarkerId(markerId);
 	}
 
 	@Override
@@ -131,13 +131,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public long countAllMaps() {
-		return super.countFromInstance(this.getMapDao());
+		return super.countFromInstance(this.daoFactory.getMapDao());
 	}
 
 	@Override
 	public List<Map> getAllMaps(final int start, final int numOfRows) {
 
-		return this.getMapDao().getAll();
+		return this.daoFactory.getMapDao().getAll();
 
 	}
 
@@ -146,13 +146,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		final List<MapInfo> mapInfoList = new ArrayList<>();
 
 		// Step 1: Get map id by map name
-		final Map map = this.getMapDao().getByName(mapName);
+		final Map map = this.daoFactory.getMapDao().getByName(mapName);
 		if (map == null) {
 			return new ArrayList<>();
 		}
 
 		// Step 2: Get markerId, linkageGroup, startPosition from gdms_markers_onmap
-		final List<MarkerOnMap> markersOnMap = this.getMarkerOnMapDao().getMarkersOnMapByMapId(map.getMapId());
+		final List<MarkerOnMap> markersOnMap = this.daoFactory.getMarkerOnMapDao().getMarkersOnMapByMapId(map.getMapId());
 
 		final HashMap<Integer, Marker> markersMap = getMarkerByMapId(map.getMapId());
 
@@ -173,87 +173,88 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public List<MapInfo> getMapInfoByMapAndChromosome(final int mapId, final String chromosome) {
-		return this.getMapDao().getMapInfoByMapAndChromosome(mapId, chromosome);
+		return this.daoFactory.getMapDao().getMapInfoByMapAndChromosome(mapId, chromosome);
 	}
 
 	@Override
 	public List<MapInfo> getMapInfoByMapChromosomeAndPosition(final int mapId, final String chromosome, final float startPosition) {
-		return this.getMapDao().getMapInfoByMapChromosomeAndPosition(mapId, chromosome, startPosition);
+		return this.daoFactory.getMapDao().getMapInfoByMapChromosomeAndPosition(mapId, chromosome, startPosition);
 	}
 
 	@Override
 	public List<MapInfo> getMapInfoByMarkersAndMap(final List<Integer> markers, final Integer mapId) {
-		return this.getMapDao().getMapInfoByMarkersAndMap(markers, mapId);
+		return this.daoFactory.getMapDao().getMapInfoByMarkersAndMap(markers, mapId);
 	}
 
 	// GCP-8572
 	@Override
 	public List<MarkerOnMap> getMarkerOnMaps(
 		final List<Integer> mapIds, final String linkageGroup, final double startPos, final double endPos) {
-		return this.getMarkerOnMapDao().getMarkersOnMap(mapIds, linkageGroup, startPos, endPos);
+		return this.daoFactory.getMarkerOnMapDao().getMarkersOnMap(mapIds, linkageGroup, startPos, endPos);
 	}
 
 	// GCP-8571
 	@Override
 	public List<MarkerOnMap> getMarkersOnMapByMarkerIds(final List<Integer> markerIds) {
-		return this.getMarkerOnMapDao().getMarkersOnMapByMarkerIds(markerIds);
+		return this.daoFactory.getMarkerOnMapDao().getMarkersOnMapByMarkerIds(markerIds);
 	}
 
 	// GCP-8573
 	@Override
 	public List<String> getAllMarkerNamesFromMarkersOnMap() {
-		final List<Integer> markerIds = this.getMarkerOnMapDao().getAllMarkerIds();
+		final List<Integer> markerIds = this.daoFactory.getMarkerOnMapDao().getAllMarkerIds();
 
-		return this.getMarkerDao().getMarkerNamesByIds(markerIds);
+		return this.daoFactory.getMarkerDao().getMarkerNamesByIds(markerIds);
 
 	}
 
 	@Override
 	public String getMapNameById(final Integer mapID) {
-		return this.getMapDao().getMapNameById(mapID);
+		return this.daoFactory.getMapDao().getMapNameById(mapID);
 	}
 
 	@Override
 	public List<Dataset> getAllDatasets() {
-		return this.getDatasetDao().getAll();
+		return this.daoFactory.getDatasetDao().getAll();
 	}
 
 	@Override
 	public long countDatasetNames() {
-		return this.getDatasetDao().countByName();
+		return this.daoFactory.getDatasetDao().countByName();
 	}
 
 	@Override
 	public List<String> getDatasetNames(final int start, final int numOfRows) {
-		return this.getDatasetDao().getDatasetNames(start, numOfRows);
+		return this.daoFactory.getDatasetDao().getDatasetNames(start, numOfRows);
 	}
 
 	@Override
 	public List<String> getDatasetNamesByQtlId(final Integer qtlId, final int start, final int numOfRows) {
-		return this.getDatasetDao().getDatasetNamesByQtlId(qtlId, start, numOfRows);
+		return this.daoFactory.getDatasetDao().getDatasetNamesByQtlId(qtlId, start, numOfRows);
 	}
 
 	@Override
 	public long countDatasetNamesByQtlId(final Integer qtlId) {
-		return this.getDatasetDao().countDatasetNamesByQtlId(qtlId);
+		return this.daoFactory.getDatasetDao().countDatasetNamesByQtlId(qtlId);
 
 	}
 
 	@Override
 	public List<DatasetElement> getDatasetDetailsByDatasetName(final String datasetName) {
-		return this.getDatasetDao().getDetailsByName(datasetName);
+		return this.daoFactory.getDatasetDao().getDetailsByName(datasetName);
 	}
 
 	@Override
 	public List<Marker> getMarkersByMarkerNames(final List<String> markerNames, final int start, final int numOfRows) {
-		return this.getMarkerDao().getByNames(markerNames, start, numOfRows);
+		return this.daoFactory.getMarkerDao().getByNames(markerNames, start, numOfRows);
 	}
 
 	@Override
 	public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(
 		final int mapId, final String linkageGroup, final double startPos, final double endPos,
 		final int start, final int numOfRows) {
-		return this.getMarkerDao().getMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapId, linkageGroup, startPos, endPos, start,
+		return this.daoFactory.getMarkerDao()
+			.getMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapId, linkageGroup, startPos, endPos, start,
 			numOfRows);
 	}
 
@@ -261,36 +262,37 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public List<Marker> getMarkersByPositionAndLinkageGroup(final double startPos, final double endPos, final String linkageGroup) {
 
-		final List<Integer> markerIds = this.getMarkerOnMapDao().getMarkerIdsByPositionAndLinkageGroup(startPos, endPos, linkageGroup);
-		return this.getMarkerDao().getMarkersByIds(markerIds);
+		final List<Integer> markerIds =
+			this.daoFactory.getMarkerOnMapDao().getMarkerIdsByPositionAndLinkageGroup(startPos, endPos, linkageGroup);
+		return this.daoFactory.getMarkerDao().getMarkersByIds(markerIds);
 	}
 
 	@Override
 	public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(
 		final int mapId, final String linkageGroup, final double startPos, final double endPos) {
-		return this.getMarkerDao().countMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapId, linkageGroup, startPos, endPos);
+		return this.daoFactory.getMarkerDao().countMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapId, linkageGroup, startPos, endPos);
 	}
 
 	@Override
 	public List<Integer> getMarkerIdsByDatasetId(final Integer datasetId) {
-		return this.getMarkerMetadataSetDao().getMarkerIdByDatasetId(datasetId);
+		return this.daoFactory.getMarkerMetadataSetDao().getMarkerIdByDatasetId(datasetId);
 
 	}
 
 	@Override
 	public List<ParentElement> getParentsByDatasetId(final Integer datasetId) {
-		return this.getMappingPopDao().getParentsByDatasetId(datasetId);
+		return this.daoFactory.getMappingPopDao().getParentsByDatasetId(datasetId);
 	}
 
 	@Override
 	public List<String> getMarkerTypesByMarkerIds(final List<Integer> markerIds) {
-		return this.getMarkerDao().getMarkerTypeByMarkerIds(markerIds);
+		return this.daoFactory.getMarkerDao().getMarkerTypeByMarkerIds(markerIds);
 	}
 
 	@Override
 	public List<MarkerNameElement> getMarkerNamesByGIds(final List<Integer> gIds) {
 
-		final List<MarkerNameElement> dataValues = this.getMarkerDao().getMarkerNamesByGIds(gIds);
+		final List<MarkerNameElement> dataValues = this.daoFactory.getMarkerDao().getMarkerNamesByGIds(gIds);
 
 		// Remove duplicates
 		final Set<MarkerNameElement> set = new HashSet<>();
@@ -303,7 +305,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(final List<String> markerNames) {
-		return this.getMarkerDao().getGermplasmNamesByMarkerNames(markerNames);
+		return this.daoFactory.getMarkerDao().getGermplasmNamesByMarkerNames(markerNames);
 	}
 
 	@Override
@@ -312,14 +314,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		final int numOfRows) {
 		final List<MappingValueElement> mappingValueElementList;
 
-		final List<Marker> markers = this.getMarkerDao().getByNames(markerNames, start, numOfRows);
+		final List<Marker> markers = this.daoFactory.getMarkerDao().getByNames(markerNames, start, numOfRows);
 
 		final List<Integer> markerIds = new ArrayList<>();
 		for (final Marker marker : markers) {
 			markerIds.add(marker.getMarkerId());
 		}
 
-		mappingValueElementList = this.getMappingPopDao().getMappingValuesByGidAndMarkerIds(gids, markerIds);
+		mappingValueElementList = this.daoFactory.getMappingPopDao().getMappingValuesByGidAndMarkerIds(gids, markerIds);
 
 		for (final MappingValueElement element : mappingValueElementList) {
 			if (element != null && element.getMarkerId() != null) {
@@ -342,10 +344,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		final List<AllelicValueElement> allelicValues = new ArrayList<>();
 
 		// Get marker_ids by marker_names
-		final java.util.Map<Integer, String> markerIdName = this.getMarkerDao().getFirstMarkerIdByMarkerName(markerNames);
+		final java.util.Map<Integer, String> markerIdName = this.daoFactory.getMarkerDao().getFirstMarkerIdByMarkerName(markerNames);
 		final List<Integer> markerIds = new ArrayList<>(markerIdName.keySet());
 
-		allelicValues.addAll(this.getMarkerDao().getAllelicValuesByGidsAndMarkerIds(gids, markerIds));
+		allelicValues.addAll(this.daoFactory.getMarkerDao().getAllelicValuesByGidsAndMarkerIds(gids, markerIds));
 
 		for (final AllelicValueElement allelicValue : allelicValues) {
 			allelicValue.setMarkerName(markerIdName.get(allelicValue.getMarkerId()));
@@ -357,43 +359,43 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromAlleleValuesByDatasetId(
 		final Integer datasetId, final int start, final int numOfRows) {
-		return this.getAlleleValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
+		return this.daoFactory.getAlleleValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
 	}
 
 	@Override
 	public long countAllelicValuesFromAlleleValuesByDatasetId(final Integer datasetId) {
-		return this.getAlleleValuesDao().countByDatasetId(datasetId);
+		return this.daoFactory.getAlleleValuesDao().countByDatasetId(datasetId);
 	}
 
 	@Override
 	public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromMappingPopValuesByDatasetId(
 		final Integer datasetId, final int start, final int numOfRows) {
-		return this.getMappingPopValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
+		return this.daoFactory.getMappingPopValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
 	}
 
 	@Override
 	public long countAllelicValuesFromMappingPopValuesByDatasetId(final Integer datasetId) {
-		return this.getMappingPopValuesDao().countByDatasetId(datasetId);
+		return this.daoFactory.getMappingPopValuesDao().countByDatasetId(datasetId);
 	}
 
 	@Override
 	public List<MarkerInfo> getMarkerInfoByMarkerName(final String markerName, final int start, final int numOfRows) {
-		return this.getMarkerInfoDao().getByMarkerName(markerName, start, numOfRows);
+		return this.daoFactory.getMarkerInfoDao().getByMarkerName(markerName, start, numOfRows);
 	}
 
 	@Override
 	public List<ExtendedMarkerInfo> getMarkerInfoDataByMarkerType(final String markerType) {
-		return this.getExtendedMarkerInfoDao().getByMarkerType(markerType);
+		return this.daoFactory.getExtendedMarkerInfoDao().getByMarkerType(markerType);
 	}
 
 	@Override
 	public List<ExtendedMarkerInfo> getMarkerInfoDataLikeMarkerName(final String partialMarkerName) {
-		return this.getExtendedMarkerInfoDao().getLikeMarkerName(partialMarkerName);
+		return this.daoFactory.getExtendedMarkerInfoDao().getLikeMarkerName(partialMarkerName);
 	}
 
 	@Override
 	public List<ExtendedMarkerInfo> getMarkerInfoByMarkerNames(final List<String> markerNames) {
-		return this.getExtendedMarkerInfoDao().getByMarkerNames(markerNames);
+		return this.daoFactory.getExtendedMarkerInfoDao().getByMarkerNames(markerNames);
 	}
 
 	@Override
@@ -414,33 +416,33 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public long countMarkerInfoByMarkerName(final String markerName) {
-		return this.getMarkerInfoDao().countByMarkerName(markerName);
+		return this.daoFactory.getMarkerInfoDao().countByMarkerName(markerName);
 	}
 
 	@Override
 	public List<MarkerInfo> getMarkerInfoByGenotype(final String genotype, final int start, final int numOfRows) {
 
-		return this.getMarkerInfoDao().getByGenotype(genotype, start, numOfRows);
+		return this.daoFactory.getMarkerInfoDao().getByGenotype(genotype, start, numOfRows);
 	}
 
 	@Override
 	public long countMarkerInfoByGenotype(final String genotype) {
-		return this.getMarkerInfoDao().countByGenotype(genotype);
+		return this.daoFactory.getMarkerInfoDao().countByGenotype(genotype);
 	}
 
 	@Override
 	public List<MarkerInfo> getMarkerInfoByDbAccessionId(final String dbAccessionId, final int start, final int numOfRows) {
-		return this.getMarkerInfoDao().getByDbAccessionId(dbAccessionId, start, numOfRows);
+		return this.daoFactory.getMarkerInfoDao().getByDbAccessionId(dbAccessionId, start, numOfRows);
 	}
 
 	@Override
 	public long countMarkerInfoByDbAccessionId(final String dbAccessionId) {
-		return this.getMarkerInfoDao().countByDbAccessionId(dbAccessionId);
+		return this.daoFactory.getMarkerInfoDao().countByDbAccessionId(dbAccessionId);
 	}
 
 	@Override
 	public List<MarkerIdMarkerNameElement> getMarkerNamesByMarkerIds(final List<Integer> markerIds) {
-		final List<MarkerIdMarkerNameElement> markers = this.getMarkerDao().getNamesByIds(markerIds);
+		final List<MarkerIdMarkerNameElement> markers = this.daoFactory.getMarkerDao().getNamesByIds(markerIds);
 
 		// Sort based on the given input order
 		final List<MarkerIdMarkerNameElement> markersToReturn = new ArrayList<>();
@@ -457,12 +459,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	private String getMarkerNameByMarkerId(final Integer markerId) {
-		return this.getMarkerDao().getNameById(markerId);
+		return this.daoFactory.getMarkerDao().getNameById(markerId);
 	}
 
 	private HashMap<Integer, Marker> getMarkerByMapId(final Integer mapId) {
 		final HashMap<Integer, Marker> markersMap = new HashMap<>();
-		final List<Marker> markerList = this.getMarkerDao().getMarkersByMapId(mapId);
+		final List<Marker> markerList = this.daoFactory.getMarkerDao().getMarkersByMapId(mapId);
 		for (final Marker marker : markerList) {
 			markersMap.put(marker.getMarkerId(), marker);
 		}
@@ -471,85 +473,86 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public List<String> getAllMarkerTypes(final int start, final int numOfRows) {
-		return this.getMarkerDao().getAllMarkerTypes(start, numOfRows);
+		return this.daoFactory.getMarkerDao().getAllMarkerTypes(start, numOfRows);
 	}
 
 	@Override
 	public long countAllMarkerTypes() {
-		return this.getMarkerDao().countAllMarkerTypes();
+		return this.daoFactory.getMarkerDao().countAllMarkerTypes();
 	}
 
 	@Override
 	public List<String> getMarkerNamesByMarkerType(final String markerType, final int start, final int numOfRows) {
-		return this.getMarkerDao().getMarkerNamesByMarkerType(markerType, start, numOfRows);
+		return this.daoFactory.getMarkerDao().getMarkerNamesByMarkerType(markerType, start, numOfRows);
 	}
 
 	@Override
 	public long countMarkerNamesByMarkerType(final String markerType) {
-		return this.getMarkerDao().countMarkerNamesByMarkerType(markerType);
+		return this.daoFactory.getMarkerDao().countMarkerNamesByMarkerType(markerType);
 	}
 
 	@Override
 	public List<Integer> getGIDsFromCharValuesByMarkerId(final Integer markerId, final int start, final int numOfRows) {
-		return this.getCharValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
+		return this.daoFactory.getCharValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
 	}
 
 	@Override
 	public long countGIDsFromCharValuesByMarkerId(final Integer markerId) {
-		return this.getCharValuesDao().countGIDsByMarkerId(markerId);
+		return this.daoFactory.getCharValuesDao().countGIDsByMarkerId(markerId);
 	}
 
 	@Override
 	public List<Integer> getGIDsFromAlleleValuesByMarkerId(final Integer markerId, final int start, final int numOfRows) {
-		return this.getAlleleValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
+		return this.daoFactory.getAlleleValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
 	}
 
 	@Override
 	public List<Integer> getGIDsFromMappingPopValuesByMarkerId(final Integer markerId, final int start, final int numOfRows) {
-		return this.getMappingPopValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
+		return this.daoFactory.getMappingPopValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
 	}
 
 	@Override
 	public long countGIDsFromMappingPopValuesByMarkerId(final Integer markerId) {
-		return this.getMappingPopValuesDao().countGIDsByMarkerId(markerId);
+		return this.daoFactory.getMappingPopValuesDao().countGIDsByMarkerId(markerId);
 	}
 
 	@Override
 	public List<Integer> getGidsByMarkersAndAlleleValues(final List<Integer> markerIdList, final List<String> alleleValueList) {
-		return this.getAlleleValuesDao().getGidsByMarkersAndAlleleValues(markerIdList, alleleValueList);
+		return this.daoFactory.getAlleleValuesDao().getGidsByMarkersAndAlleleValues(markerIdList, alleleValueList);
 	}
 
 	@Override
 	public List<String> getAllDbAccessionIdsFromMarker(final int start, final int numOfRows) {
 
-		return this.getMarkerDao().getAllDbAccessionIds(start, numOfRows);
+		return this.daoFactory.getMarkerDao().getAllDbAccessionIds(start, numOfRows);
 	}
 
 	@Override
 	public long countAllDbAccessionIdsFromMarker() {
-		return this.getMarkerDao().countAllDbAccessionIds();
+		return this.daoFactory.getMarkerDao().countAllDbAccessionIds();
 	}
 
 	@Override
 	public List<AccMetadataSet> getAccMetadatasetsByDatasetIds(final List<Integer> datasetIds, final int start, final int numOfRows) {
-		return this.getAccMetadataSetDao().getByDatasetIds(datasetIds, start, numOfRows);
+		return this.daoFactory.getAccMetadataSetDao().getByDatasetIds(datasetIds, start, numOfRows);
 	}
 
 	public Set<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(
 		final List<Integer> datasetIds, final List<Integer> markerIds,
 		final List<Integer> gIds, final int start, final int numOfRows) {
-		return this.getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, start, numOfRows);
+		return this.daoFactory.getAccMetadataSetDao()
+			.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, start, numOfRows);
 	}
 
 	@Override
 	public int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(
 		final List<Integer> datasetIds, final List<Integer> markerIds, final List<Integer> gIds) {
-		return (int) this.getAccMetadataSetDao().countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds);
+		return (int) this.daoFactory.getAccMetadataSetDao().countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds);
 	}
 
 	private List<Integer> getNIdsByMarkerIdsAndDatasetIds(final List<Integer> datasetIds, final List<Integer> markerIds) {
 		final Set<Integer> nidSet = new TreeSet<>();
-		nidSet.addAll(this.getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
+		nidSet.addAll(this.daoFactory.getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
 		return new ArrayList<>(((TreeSet<Integer>) nidSet).descendingSet());
 	}
 
@@ -569,65 +572,65 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public List<Integer> getDatasetIdsForFingerPrinting(final int start, final int numOfRows) {
 
-		return this.getDatasetDao().getDatasetIdsForFingerPrinting(start, numOfRows);
+		return this.daoFactory.getDatasetDao().getDatasetIdsForFingerPrinting(start, numOfRows);
 	}
 
 	@Override
 	public long countDatasetIdsForFingerPrinting() {
-		return this.getDatasetDao().countDatasetIdsForFingerPrinting();
+		return this.daoFactory.getDatasetDao().countDatasetIdsForFingerPrinting();
 	}
 
 	@Override
 	public List<Integer> getDatasetIdsForMapping(final int start, final int numOfRows) {
-		return this.getDatasetDao().getDatasetIdsForMapping(start, numOfRows);
+		return this.daoFactory.getDatasetDao().getDatasetIdsForMapping(start, numOfRows);
 	}
 
 	@Override
 	public long countDatasetIdsForMapping() {
-		return this.getDatasetDao().countDatasetIdsForMapping();
+		return this.daoFactory.getDatasetDao().countDatasetIdsForMapping();
 	}
 
 	@Override
 	public List<AccMetadataSet> getGdmsAccMetadatasetByGid(final List<Integer> gids, final int start, final int numOfRows) {
-		return this.getAccMetadataSetDao().getAccMetadataSetsByGids(gids, start, numOfRows);
+		return this.daoFactory.getAccMetadataSetDao().getAccMetadataSetsByGids(gids, start, numOfRows);
 	}
 
 	@Override
 	public long countGdmsAccMetadatasetByGid(final List<Integer> gids) {
-		return this.getAccMetadataSetDao().countAccMetadataSetsByGids(gids);
+		return this.daoFactory.getAccMetadataSetDao().countAccMetadataSetsByGids(gids);
 	}
 
 	@Override
 	public List<Integer> getMarkersBySampleIdAndDatasetIds(
 		final Integer sampleId, final List<Integer> datasetIds, final int start, final int numOfRows) {
-		return this.getMarkerMetadataSetDao().getMarkersBySampleIdAndDatasetIds(sampleId, datasetIds, start, numOfRows);
+		return this.daoFactory.getMarkerMetadataSetDao().getMarkersBySampleIdAndDatasetIds(sampleId, datasetIds, start, numOfRows);
 	}
 
 	@Override
 	public long countMarkersBySampleIdAndDatasetIds(final Integer sampleId, final List<Integer> datasetIds) {
-		return this.getMarkerMetadataSetDao().countMarkersBySampleIdAndDatasetIds(sampleId, datasetIds);
+		return this.daoFactory.getMarkerMetadataSetDao().countMarkersBySampleIdAndDatasetIds(sampleId, datasetIds);
 	}
 
 	@Override
 	public List<Marker> getMarkersByMarkerIds(final List<Integer> markerIds, final int start, final int numOfRows) {
-		return this.getMarkerDao().getMarkersByIds(markerIds, start, numOfRows);
+		return this.daoFactory.getMarkerDao().getMarkersByIds(markerIds, start, numOfRows);
 	}
 
 	@Override
 	public long countMarkersByMarkerIds(final List<Integer> markerIds) {
-		return this.getMarkerDao().countMarkersByIds(markerIds);
+		return this.daoFactory.getMarkerDao().countMarkersByIds(markerIds);
 	}
 
 	@Override
 	public long countAlleleValuesByGids(final List<Integer> gids) {
-		return this.getAlleleValuesDao().countAlleleValuesByGids(gids);
+		return this.daoFactory.getAlleleValuesDao().countAlleleValuesByGids(gids);
 	}
 
 	@Override
 	public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(
 		final List<Integer> gids, final int start, final int numOfRows) {
 		final List<AllelicValueElement> allelicValueElements =
-			this.getAlleleValuesDao().getIntAlleleValuesForPolymorphicMarkersRetrieval(gids, start, numOfRows);
+			this.daoFactory.getAlleleValuesDao().getIntAlleleValuesForPolymorphicMarkersRetrieval(gids, start, numOfRows);
 
 		// Sort by gid, markerName
 		Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
@@ -637,14 +640,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public long countIntAlleleValuesForPolymorphicMarkersRetrieval(final List<Integer> gids) {
-		return this.getAlleleValuesDao().countIntAlleleValuesForPolymorphicMarkersRetrieval(gids);
+		return this.daoFactory.getAlleleValuesDao().countIntAlleleValuesForPolymorphicMarkersRetrieval(gids);
 	}
 
 	@Override
 	public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(
 		final List<Integer> gids, final int start, final int numOfRows) {
 		final List<AllelicValueElement> allelicValueElements =
-			this.getAlleleValuesDao().getCharAlleleValuesForPolymorphicMarkersRetrieval(gids, start, numOfRows);
+			this.daoFactory.getAlleleValuesDao().getCharAlleleValuesForPolymorphicMarkersRetrieval(gids, start, numOfRows);
 
 		// Sort by gid, markerName
 		Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
@@ -653,14 +656,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public long countCharAlleleValuesForPolymorphicMarkersRetrieval(final List<Integer> gids) {
-		return this.getAlleleValuesDao().countCharAlleleValuesForPolymorphicMarkersRetrieval(gids);
+		return this.daoFactory.getAlleleValuesDao().countCharAlleleValuesForPolymorphicMarkersRetrieval(gids);
 	}
 
 	@Override
 	public List<AllelicValueElement> getMappingAlleleValuesForPolymorphicMarkersRetrieval(
 		final List<Integer> gids, final int start, final int numOfRows) {
 		final List<AllelicValueElement> allelicValueElements =
-			this.getAlleleValuesDao().getMappingAlleleValuesForPolymorphicMarkersRetrieval(gids, start, numOfRows);
+			this.daoFactory.getAlleleValuesDao().getMappingAlleleValuesForPolymorphicMarkersRetrieval(gids, start, numOfRows);
 
 		// Sort by gid, markerName
 		Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
@@ -670,17 +673,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public long countMappingAlleleValuesForPolymorphicMarkersRetrieval(final List<Integer> gids) {
-		return this.getAlleleValuesDao().countMappingAlleleValuesForPolymorphicMarkersRetrieval(gids);
+		return this.daoFactory.getAlleleValuesDao().countMappingAlleleValuesForPolymorphicMarkersRetrieval(gids);
 	}
 
 	@Override
 	public List<Qtl> getAllQtl(final int start, final int numOfRows) {
-		return this.getQtlDao().getAll(start, numOfRows);
+		return this.daoFactory.getQtlDao().getAll(start, numOfRows);
 	}
 
 	@Override
 	public long countAllQtl() {
-		return this.countAll(this.getQtlDao());
+		return this.countAll(this.daoFactory.getQtlDao());
 	}
 
 	@Override
@@ -689,7 +692,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			return new ArrayList<>();
 		}
 
-		return this.getQtlDao().getQtlIdByName(name, start, numOfRows);
+		return this.daoFactory.getQtlDao().getQtlIdByName(name, start, numOfRows);
 	}
 
 	@Override
@@ -697,7 +700,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		if (name == null || name.isEmpty()) {
 			return 0;
 		}
-		return this.getQtlDao().countQtlIdByName(name);
+		return this.daoFactory.getQtlDao().countQtlIdByName(name);
 	}
 
 	@Override
@@ -707,7 +710,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			return qtlDetailElements;
 		}
 
-		return this.getQtlDao().getQtlAndQtlDetailsByName(name, start, numOfRows);
+		return this.daoFactory.getQtlDao().getQtlAndQtlDetailsByName(name, start, numOfRows);
 
 	}
 
@@ -716,13 +719,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		if (name == null || name.isEmpty()) {
 			return 0;
 		}
-		return this.getQtlDao().countQtlAndQtlDetailsByName(name);
+		return this.daoFactory.getQtlDao().countQtlAndQtlDetailsByName(name);
 	}
 
 	@Override
 	public java.util.Map<Integer, String> getQtlNamesByQtlIds(final List<Integer> qtlIds) {
 		final java.util.Map<Integer, String> qtlNames = new HashMap<>();
-		qtlNames.putAll(this.getQtlDao().getQtlNameByQtlIds(qtlIds));
+		qtlNames.putAll(this.daoFactory.getQtlDao().getQtlNameByQtlIds(qtlIds));
 		return qtlNames;
 	}
 
@@ -735,7 +738,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			return qtlDetailElements;
 		}
 
-		return this.getQtlDao().getQtlAndQtlDetailsByQtlIds(qtlIds, start, numOfRows);
+		return this.daoFactory.getQtlDao().getQtlAndQtlDetailsByQtlIds(qtlIds, start, numOfRows);
 	}
 
 	@Override
@@ -743,48 +746,48 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		if (qtlIds == null || qtlIds.isEmpty()) {
 			return 0;
 		}
-		return this.getQtlDao().countQtlAndQtlDetailsByQtlIds(qtlIds);
+		return this.daoFactory.getQtlDao().countQtlAndQtlDetailsByQtlIds(qtlIds);
 	}
 
 	@Override
 	public List<Integer> getQtlByTrait(final Integer trait, final int start, final int numOfRows) {
 
-		return this.getQtlDao().getQtlByTrait(trait, start, numOfRows);
+		return this.daoFactory.getQtlDao().getQtlByTrait(trait, start, numOfRows);
 	}
 
 	@Override
 	public long countQtlByTrait(final Integer trait) {
-		return this.getQtlDao().countQtlByTrait(trait);
+		return this.daoFactory.getQtlDao().countQtlByTrait(trait);
 	}
 
 	@Override
 	public List<Integer> getQtlTraitsByDatasetId(final Integer datasetId, final int start, final int numOfRows) {
-		return this.getQtlDetailsDao().getQtlTraitsByDatasetId(datasetId, start, numOfRows);
+		return this.daoFactory.getQtlDetailsDao().getQtlTraitsByDatasetId(datasetId, start, numOfRows);
 	}
 
 	@Override
 	public long countQtlTraitsByDatasetId(final Integer datasetId) {
-		return this.getQtlDetailsDao().countQtlTraitsByDatasetId(datasetId);
+		return this.daoFactory.getQtlDetailsDao().countQtlTraitsByDatasetId(datasetId);
 	}
 
 	@Override
 	public List<ParentElement> getAllParentsFromMappingPopulation(final int start, final int numOfRows) {
-		return this.getMappingPopDao().getAllParentsFromMappingPopulation(start, numOfRows);
+		return this.daoFactory.getMappingPopDao().getAllParentsFromMappingPopulation(start, numOfRows);
 	}
 
 	@Override
 	public Long countAllParentsFromMappingPopulation() {
-		return this.getMappingPopDao().countAllParentsFromMappingPopulation();
+		return this.daoFactory.getMappingPopDao().countAllParentsFromMappingPopulation();
 	}
 
 	@Override
 	public List<MapDetailElement> getMapDetailsByName(final String nameLike, final int start, final int numOfRows) {
-		return this.getMapDao().getMapDetailsByName(nameLike, start, numOfRows);
+		return this.daoFactory.getMapDao().getMapDetailsByName(nameLike, start, numOfRows);
 	}
 
 	@Override
 	public Long countMapDetailsByName(final String nameLike) {
-		return this.getMapDao().countMapDetailsByName(nameLike);
+		return this.daoFactory.getMapDao().countMapDetailsByName(nameLike);
 	}
 
 	@Override
@@ -796,45 +799,45 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			return markerMaps;
 		}
 
-		markerMaps.putAll(this.getMarkerOnMapDao().getMapNameByMarkerIds(markerIds));
+		markerMaps.putAll(this.daoFactory.getMarkerOnMapDao().getMapNameByMarkerIds(markerIds));
 		return markerMaps;
 	}
 
 	@Override
 	public List<MapDetailElement> getAllMapDetails(final int start, final int numOfRows) {
-		return this.getMapDao().getAllMapDetails(start, numOfRows);
+		return this.daoFactory.getMapDao().getAllMapDetails(start, numOfRows);
 	}
 
 	@Override
 	public long countAllMapDetails() {
-		return this.getMapDao().countAllMapDetails();
+		return this.daoFactory.getMapDao().countAllMapDetails();
 	}
 
 	@Override
 	public List<Integer> getMapIdsByQtlName(final String qtlName, final int start, final int numOfRows) {
-		return this.getQtlDetailsDao().getMapIdsByQtlName(qtlName, start, numOfRows);
+		return this.daoFactory.getQtlDetailsDao().getMapIdsByQtlName(qtlName, start, numOfRows);
 	}
 
 	@Override
 	public long countMapIdsByQtlName(final String qtlName) {
-		return this.getQtlDetailsDao().countMapIdsByQtlName(qtlName);
+		return this.daoFactory.getQtlDetailsDao().countMapIdsByQtlName(qtlName);
 	}
 
 	@Override
 	public List<Integer> getMarkerIdsByQtl(
 		final String qtlName, final String chromosome, final float min, final float max, final int start, final int numOfRows) {
-		return this.getQtlDetailsDao().getMarkerIdsByQtl(qtlName, chromosome, min, max, start, numOfRows);
+		return this.daoFactory.getQtlDetailsDao().getMarkerIdsByQtl(qtlName, chromosome, min, max, start, numOfRows);
 	}
 
 	@Override
 	public long countMarkerIdsByQtl(final String qtlName, final String chromosome, final float min, final float max) {
-		return this.getQtlDetailsDao().countMarkerIdsByQtl(qtlName, chromosome, min, max);
+		return this.daoFactory.getQtlDetailsDao().countMarkerIdsByQtl(qtlName, chromosome, min, max);
 	}
 
 	@Override
 	public List<Marker> getMarkersByIds(final List<Integer> markerIds, final int start, final int numOfRows) {
 		final List<Marker> markers = new ArrayList<>();
-		markers.addAll(this.getMarkerDao().getMarkersByIds(markerIds, start, numOfRows));
+		markers.addAll(this.daoFactory.getMarkerDao().getMarkersByIds(markerIds, start, numOfRows));
 		return markers;
 	}
 
@@ -847,7 +850,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			// No need to auto-assign negative IDs for new local DB records
 			// qtlId and mapId are foreign keys
 
-			final QtlDetails recordSaved = this.getQtlDetailsDao().save(qtlDetails);
+			final QtlDetails recordSaved = this.daoFactory.getQtlDetailsDao().save(qtlDetails);
 			savedId = recordSaved.getQtlId();
 
 		} catch (final Exception e) {
@@ -860,12 +863,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addMarker(final Marker marker) {
-		return ((Marker) super.save(this.getMarkerDao(), marker)).getMarkerId();
+		return ((Marker) super.save(this.daoFactory.getMarkerDao(), marker)).getMarkerId();
 	}
 
 	@Override
 	public Integer addMarkerDetails(final MarkerDetails markerDetails) {
-		final MarkerDetailsDAO dao = this.getMarkerDetailsDao();
+		final MarkerDetailsDAO dao = this.daoFactory.getMarkerDetailsDao();
 		final MarkerDetails details = dao.getById(markerDetails.getMarkerId());
 		if (details == null) {
 			return ((MarkerDetails) super.save(dao, details)).getMarkerId();
@@ -876,7 +879,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addMarkerUserInfo(final MarkerUserInfo markerUserInfo) {
-		return ((MarkerUserInfo) super.save(this.getMarkerUserInfoDao(), markerUserInfo)).getUserInfoId();
+		return ((MarkerUserInfo) super.save(this.daoFactory.getMarkerUserInfoDao(), markerUserInfo)).getUserInfoId();
 	}
 
 	@Override
@@ -886,7 +889,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		try {
 
-			final AccMetadataSet recordSaved = this.getAccMetadataSetDao().save(accMetadataSet);
+			final AccMetadataSet recordSaved = this.daoFactory.getAccMetadataSetDao().save(accMetadataSet);
 			savedId = recordSaved.getAccMetadataSetId();
 
 		} catch (final Exception e) {
@@ -903,7 +906,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		try {
 
-			final MarkerMetadataSet recordSaved = this.getMarkerMetadataSetDao().save(markerMetadataSet);
+			final MarkerMetadataSet recordSaved = this.daoFactory.getMarkerMetadataSetDao().save(markerMetadataSet);
 			savedId = recordSaved.getMarkerMetadataSetId();
 
 		} catch (final Exception e) {
@@ -915,7 +918,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addDataset(final Dataset dataset) {
-		return ((Dataset) super.save(this.getDatasetDao(), dataset)).getDatasetId();
+		return ((Dataset) super.save(this.daoFactory.getDatasetDao(), dataset)).getDatasetId();
 	}
 
 	@Override
@@ -935,12 +938,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addGDMSMarkerAlias(final MarkerAlias markerAlias) {
-		return ((MarkerAlias) super.save(this.getMarkerAliasDao(), markerAlias)).getMarkerId();
+		return ((MarkerAlias) super.save(this.daoFactory.getMarkerAliasDao(), markerAlias)).getMarkerId();
 	}
 
 	@Override
 	public Integer addDatasetUser(final DatasetUsers datasetUser) {
-		final DatasetUsersDAO dao = this.getDatasetUsersDao();
+		final DatasetUsersDAO dao = this.daoFactory.getDatasetUsersDao();
 		final DatasetUsers user = dao.getById(datasetUser.getDataset().getDatasetId());
 		if (user == null) {
 			return ((DatasetUsers) super.save(dao, datasetUser)).getUserId();
@@ -951,18 +954,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addAlleleValues(final AlleleValues alleleValues) {
-		return ((AlleleValues) super.saveOrUpdate(this.getAlleleValuesDao(), alleleValues)).getAnId();
+		return ((AlleleValues) super.saveOrUpdate(this.daoFactory.getAlleleValuesDao(), alleleValues)).getAnId();
 	}
 
 	@Override
 	public Integer addCharValues(final CharValues charValues) {
-		return ((CharValues) super.saveOrUpdate(this.getCharValuesDao(), charValues)).getAcId();
+		return ((CharValues) super.saveOrUpdate(this.daoFactory.getCharValuesDao(), charValues)).getAcId();
 	}
 
 	@Override
 	public Integer addMappingPop(final MappingPop mappingPop) {
 
-		final MappingPopDAO dao = this.getMappingPopDao();
+		final MappingPopDAO dao = this.daoFactory.getMappingPopDao();
 		final MappingPop popFromDB = dao.getById(mappingPop.getDatasetId());
 		if (popFromDB == null) {
 			return ((MappingPop) super.save(dao, mappingPop)).getDatasetId();
@@ -973,31 +976,31 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addMappingPopValue(final MappingPopValues mappingPopValue) {
-		return ((MappingPopValues) super.saveOrUpdate(this.getMappingPopValuesDao(), mappingPopValue)).getMpId();
+		return ((MappingPopValues) super.saveOrUpdate(this.daoFactory.getMappingPopValuesDao(), mappingPopValue)).getMpId();
 	}
 
 	@Override
 	public Integer addMarkerOnMap(final MarkerOnMap markerOnMap) {
-		if (this.getMapDao().getById(markerOnMap.getMapId()) == null) {
+		if (this.daoFactory.getMapDao().getById(markerOnMap.getMapId()) == null) {
 			throw new MiddlewareQueryException("Map Id not found: " + markerOnMap.getMapId());
 		}
 
-		return ((MarkerOnMap) super.save(this.getMarkerOnMapDao(), markerOnMap)).getMapId();
+		return ((MarkerOnMap) super.save(this.daoFactory.getMarkerOnMapDao(), markerOnMap)).getMapId();
 	}
 
 	@Override
 	public Integer addDartValue(final DartValues dartValue) {
-		return ((DartValues) super.save(this.getDartValuesDao(), dartValue)).getAdId();
+		return ((DartValues) super.save(this.daoFactory.getDartValuesDao(), dartValue)).getAdId();
 	}
 
 	@Override
 	public Integer addQtl(final Qtl qtl) {
-		return ((Qtl) super.saveOrUpdate(this.getQtlDao(), qtl)).getQtlId();
+		return ((Qtl) super.saveOrUpdate(this.daoFactory.getQtlDao(), qtl)).getQtlId();
 	}
 
 	@Override
 	public Integer addMap(final Map map) {
-		return ((Map) super.saveOrUpdate(this.getMapDao(), map)).getMapId();
+		return ((Map) super.saveOrUpdate(this.daoFactory.getMapDao(), map)).getMapId();
 	}
 
 	@Override
@@ -1062,112 +1065,112 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	private Integer getMarkerIdByMarkerName(final String markerName) throws MiddlewareException {
-		return this.getMarkerDao().getIdByName(markerName);
+		return this.daoFactory.getMarkerDao().getIdByName(markerName);
 	}
 
 	private Integer getMapIdByMapName(final String mapName) {
-		return this.getMapDao().getMapIdByName(mapName);
+		return this.daoFactory.getMapDao().getMapIdByName(mapName);
 	}
 
 	@Override
 	public List<QtlDataElement> getQtlDataByQtlTraits(final List<Integer> qtlTraitIds, final int start, final int numOfRows) {
-		return this.getQtlDetailsDao().getQtlDataByQtlTraits(qtlTraitIds, start, numOfRows);
+		return this.daoFactory.getQtlDetailsDao().getQtlDataByQtlTraits(qtlTraitIds, start, numOfRows);
 	}
 
 	@Override
 	public long countQtlDataByQtlTraits(final List<Integer> qtlTraits) {
-		return this.getQtlDetailsDao().countQtlDataByQtlTraits(qtlTraits);
+		return this.daoFactory.getQtlDetailsDao().countQtlDataByQtlTraits(qtlTraits);
 	}
 
 	@Override
 	public List<QtlDetailElement> getQtlDetailsByQtlTraits(final List<Integer> qtlTraitIds, final int start, final int numOfRows) {
-		return this.getQtlDao().getQtlDetailsByQtlTraits(qtlTraitIds, start, numOfRows);
+		return this.daoFactory.getQtlDao().getQtlDetailsByQtlTraits(qtlTraitIds, start, numOfRows);
 	}
 
 	@Override
 	public long countQtlDetailsByQtlTraits(final List<Integer> qtlTraits) {
-		return this.getQtlDao().countQtlDetailsByQtlTraits(qtlTraits);
+		return this.daoFactory.getQtlDao().countQtlDetailsByQtlTraits(qtlTraits);
 	}
 
 	@Override
 	public long countAccMetadatasetByDatasetIds(final List<Integer> datasetIds) {
-		return this.getAccMetadataSetDao().countSampleIdsByDatasetIds(datasetIds);
+		return this.daoFactory.getAccMetadataSetDao().countSampleIdsByDatasetIds(datasetIds);
 	}
 
 	@Override
 	public long countMarkersFromMarkerMetadatasetByDatasetIds(final List<Integer> datasetIds) {
-		return this.getMarkerMetadataSetDao().countByDatasetIds(datasetIds);
+		return this.daoFactory.getMarkerMetadataSetDao().countByDatasetIds(datasetIds);
 	}
 
 	@Override
 	public Integer getMapIdByName(final String mapName) {
-		return this.getMapDao().getMapIdByName(mapName);
+		return this.daoFactory.getMapDao().getMapIdByName(mapName);
 	}
 
 	@Override
 	public long countMappingPopValuesByGids(final List<Integer> gIds) {
-		return this.getMappingPopValuesDao().countByGids(gIds);
+		return this.daoFactory.getMappingPopValuesDao().countByGids(gIds);
 	}
 
 	@Override
 	public long countMappingAlleleValuesByGids(final List<Integer> gIds) {
-		return this.getAlleleValuesDao().countByGids(gIds);
+		return this.daoFactory.getAlleleValuesDao().countByGids(gIds);
 	}
 
 	@Override
 	public List<MarkerMetadataSet> getAllFromMarkerMetadatasetByMarkers(final List<Integer> markerIds) {
-		return this.getMarkerMetadataSetDao().getByMarkerIds(markerIds);
+		return this.daoFactory.getMarkerMetadataSetDao().getByMarkerIds(markerIds);
 	}
 
 	@Override
 	public Dataset getDatasetById(final Integer datasetId) {
-		return this.getDatasetDao().getById(datasetId);
+		return this.daoFactory.getDatasetDao().getById(datasetId);
 	}
 
 	@Override
 	public List<Dataset> getDatasetsByType(final GdmsType type) {
-		return this.getDatasetDao().getDatasetsByType(type.getValue());
+		return this.daoFactory.getDatasetDao().getDatasetsByType(type.getValue());
 	}
 
 	@Override
 	public MappingPop getMappingPopByDatasetId(final Integer datasetId) {
-		return this.getMappingPopDao().getMappingPopByDatasetId(datasetId);
+		return this.daoFactory.getMappingPopDao().getMappingPopByDatasetId(datasetId);
 	}
 
 	@Override
 	public List<Dataset> getDatasetDetailsByDatasetIds(final List<Integer> datasetIds) {
-		return this.getDatasetDao().getDatasetsByIds(datasetIds);
+		return this.daoFactory.getDatasetDao().getDatasetsByIds(datasetIds);
 
 	}
 
 	@Override
 	public List<Integer> getQTLIdsByDatasetIds(final List<Integer> datasetIds) {
-		return this.getQtlDao().getQTLIdsByDatasetIds(datasetIds);
+		return this.daoFactory.getQtlDao().getQTLIdsByDatasetIds(datasetIds);
 	}
 
 	@Override
 	public List<AccMetadataSet> getAllFromAccMetadataset(final List<Integer> gIds, final Integer datasetId, final SetOperation operation) {
-		return this.getAccMetadataSetDao().getAccMetadataSetByGidsAndDatasetId(gIds, datasetId, operation);
+		return this.daoFactory.getAccMetadataSetDao().getAccMetadataSetByGidsAndDatasetId(gIds, datasetId, operation);
 	}
 
 	@Override
 	public List<MapDetailElement> getMapAndMarkerCountByMarkers(final List<Integer> markerIds) {
-		return this.getMapDao().getMapAndMarkerCountByMarkers(markerIds);
+		return this.daoFactory.getMapDao().getMapAndMarkerCountByMarkers(markerIds);
 	}
 
 	@Override
 	public List<Mta> getAllMTAs() {
-		return this.getMtaDao().getAll();
+		return this.daoFactory.getMtaDao().getAll();
 	}
 
 	@Override
 	public long countAllMTAs() {
-		return this.getMtaDao().countAll();
+		return this.daoFactory.getMtaDao().countAll();
 	}
 
 	@Override
 	public List<Mta> getMTAsByTrait(final Integer traitId) {
-		return this.getMtaDao().getMtasByTrait(traitId);
+		return this.daoFactory.getMtaDao().getMtasByTrait(traitId);
 	}
 
 	@Override
@@ -1176,12 +1179,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 
 			// delete qtl and qtl details
-			this.getQtlDetailsDao().deleteByQtlIds(qtlIds);
-			this.getQtlDao().deleteByQtlIds(qtlIds);
+			this.daoFactory.getQtlDetailsDao().deleteByQtlIds(qtlIds);
+			this.daoFactory.getQtlDao().deleteByQtlIds(qtlIds);
 
 			// delete dataset users and dataset
-			this.getDatasetUsersDao().deleteByDatasetId(datasetId);
-			this.getDatasetDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getDatasetUsersDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getDatasetDao().deleteByDatasetId(datasetId);
 
 		} catch (final Exception e) {
 
@@ -1195,11 +1198,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		try {
 
-			this.getCharValuesDao().deleteByDatasetId(datasetId);
-			this.getDatasetUsersDao().deleteByDatasetId(datasetId);
-			this.getAccMetadataSetDao().deleteByDatasetId(datasetId);
-			this.getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
-			this.getDatasetDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getCharValuesDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getDatasetUsersDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getAccMetadataSetDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getDatasetDao().deleteByDatasetId(datasetId);
 
 		} catch (final Exception e) {
 
@@ -1214,22 +1217,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		try {
 
-			this.getMappingPopValuesDao().deleteByDatasetId(datasetId);
-			this.getMappingPopDao().deleteByDatasetId(datasetId);
-			this.getDatasetUsersDao().deleteByDatasetId(datasetId);
-			this.getAccMetadataSetDao().deleteByDatasetId(datasetId);
-			this.getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getMappingPopValuesDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getMappingPopDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getDatasetUsersDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getAccMetadataSetDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
 
 			// DELETE from char_values - there will be entries for the given datasetId if markerType = SNP
-			this.getCharValuesDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getCharValuesDao().deleteByDatasetId(datasetId);
 
 			// DELETE from allele_values - there will be entries for the given datasetId if markerType = SSR or DART
-			this.getAlleleValuesDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getAlleleValuesDao().deleteByDatasetId(datasetId);
 
 			// DELETE from dart_values - there will be entries for the given datasetId if markerType = DART
-			this.getDartValuesDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getDartValuesDao().deleteByDatasetId(datasetId);
 
-			this.getDatasetDao().deleteByDatasetId(datasetId);
+			this.daoFactory.getDatasetDao().deleteByDatasetId(datasetId);
 
 		} catch (final Exception e) {
 
@@ -1240,12 +1243,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public List<QtlDetails> getQtlDetailsByMapId(final Integer mapId) {
-		return this.getQtlDetailsDao().getQtlDetailsByMapId(mapId);
+		return this.daoFactory.getQtlDetailsDao().getQtlDetailsByMapId(mapId);
 	}
 
 	@Override
 	public long countQtlDetailsByMapId(final Integer mapId) {
-		return this.getQtlDetailsDao().countQtlDetailsByMapId(mapId);
+		return this.daoFactory.getQtlDetailsDao().countQtlDetailsByMapId(mapId);
 	}
 
 	@Override
@@ -1253,8 +1256,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		try {
 
-			this.getMarkerOnMapDao().deleteByMapId(mapId);
-			this.getMapDao().deleteByMapId(mapId);
+			this.daoFactory.getMarkerOnMapDao().deleteByMapId(mapId);
+			this.daoFactory.getMapDao().deleteByMapId(mapId);
 
 		} catch (final Exception e) {
 
@@ -1265,17 +1268,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public List<MarkerSampleId> getMarkerFromCharValuesByGids(final List<Integer> gIds) {
-		return this.getCharValuesDao().getMarkerSampleIdsByGids(gIds);
+		return this.daoFactory.getCharValuesDao().getMarkerSampleIdsByGids(gIds);
 	}
 
 	@Override
 	public List<MarkerSampleId> getMarkerFromAlleleValuesByGids(final List<Integer> gIds) {
-		return this.getAlleleValuesDao().getMarkerSampleIdsByGids(gIds);
+		return this.daoFactory.getAlleleValuesDao().getMarkerSampleIdsByGids(gIds);
 	}
 
 	@Override
 	public List<MarkerSampleId> getMarkerFromMappingPopByGids(final List<Integer> gIds) {
-		return this.getMappingPopValuesDao().getMarkerSampleIdsByGids(gIds);
+		return this.daoFactory.getMappingPopValuesDao().getMarkerSampleIdsByGids(gIds);
 	}
 
 	@Override
@@ -1290,16 +1293,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MTA);
 			dataset.setUploadTemplateDate(new Date());
 
-			this.getDatasetDao().merge(dataset);
+			this.daoFactory.getDatasetDao().merge(dataset);
 
 			users.setDataset(dataset);
-			this.getDatasetUsersDao().merge(users);
+			this.daoFactory.getDatasetUsersDao().merge(users);
 
-			final MtaDAO mtaDao = this.getMtaDao();
+			final MtaDAO mtaDao = this.daoFactory.getMtaDao();
 			mta.setDatasetId(dataset.getDatasetId());
 			mtaDao.save(mta);
 
-			final MtaMetadataDAO mtaMetadataDao = this.getMtaMetadataDao();
+			final MtaMetadataDAO mtaMetadataDao = this.daoFactory.getMtaMetadataDao();
 			mtaMetadata.setDatasetID(dataset.getDatasetId());
 			mtaMetadataDao.merge(mtaMetadata);
 
@@ -1321,13 +1324,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MTA);
 			dataset.setUploadTemplateDate(new Date());
 
-			this.getDatasetDao().merge(dataset);
+			this.daoFactory.getDatasetDao().merge(dataset);
 
 			users.setDataset(dataset);
-			this.getDatasetUsersDao().merge(users);
+			this.daoFactory.getDatasetUsersDao().merge(users);
 
-			final MtaDAO mtaDao = this.getMtaDao();
-			final MtaMetadataDAO mtaMetadataDao = this.getMtaMetadataDao();
+			final MtaDAO mtaDao = this.daoFactory.getMtaDao();
+			final MtaMetadataDAO mtaMetadataDao = this.daoFactory.getMtaMetadataDao();
 
 			for (final Mta mta : mtaList) {
 				mta.setDatasetId(dataset.getDatasetId());
@@ -1351,9 +1354,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			for (final Integer datasetId : datasetIds) {
 
 				// delete mta, dataset users and dataset
-				this.getMtaDao().deleteByDatasetId(datasetId);
-				this.getDatasetUsersDao().deleteByDatasetId(datasetId);
-				this.getDatasetDao().deleteByDatasetId(datasetId);
+				this.daoFactory.getMtaDao().deleteByDatasetId(datasetId);
+				this.daoFactory.getDatasetUsersDao().deleteByDatasetId(datasetId);
+				this.daoFactory.getDatasetDao().deleteByDatasetId(datasetId);
 			}
 
 		} catch (final Exception e) {
@@ -1377,7 +1380,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 
 			// No need to generate id. The id (mta_id) is a foreign key
-			final MtaMetadataDAO mtaMetadataDao = this.getMtaMetadataDao();
+			final MtaMetadataDAO mtaMetadataDao = this.daoFactory.getMtaMetadataDao();
 			mtaMetadataDao.save(mtaMetadata);
 
 		} catch (final Exception e) {
@@ -1408,7 +1411,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		// If the marker is not yet existing in the database (local and central) - should create a new marker in the local database.
 		if (markerId == null) {
 			this.getActiveSession();
-			final MarkerDAO markerDao = this.getMarkerDao();
+			final MarkerDAO markerDao = this.daoFactory.getMarkerDao();
 			marker.setMarkerType(markerType);
 			final Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
 			markerId = markerRecordSaved.getMarkerId();
@@ -1433,7 +1436,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		// Save the marker
 		this.getActiveSession();
-		final MarkerDAO markerDao = this.getMarkerDao();
+		final MarkerDAO markerDao = this.daoFactory.getMarkerDao();
 		marker.setMarkerType(markerType);
 		final Marker markerRecordSaved = markerDao.merge(marker);
 		markerId = markerRecordSaved.getMarkerId();
@@ -1448,7 +1451,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private void saveMarkers(final List<Marker> markers) throws Exception {
 
 		this.getActiveSession();
-		final MarkerDAO markerDao = this.getMarkerDao();
+		final MarkerDAO markerDao = this.daoFactory.getMarkerDao();
 		if (markers != null) {
 			for (final Marker marker : markers) {
 				markerDao.merge(marker);
@@ -1463,11 +1466,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		}
 
 		this.getActiveSession();
-		final MarkerDAO markerDao = this.getMarkerDao();
+		final MarkerDAO markerDao = this.daoFactory.getMarkerDao();
 
 		final Integer markerId = marker.getMarkerId();
 		// Marker id, name and species cannot be updated.
-		final Marker markerFromDB = this.getMarkerDao().getById(markerId);
+		final Marker markerFromDB = this.daoFactory.getMarkerDao().getById(markerId);
 		if (markerFromDB == null) {
 			throw new MiddlewareException("Marker is not found in the database and cannot be updated.");
 		}
@@ -1482,7 +1485,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private Integer saveMarkerAlias(final MarkerAlias markerAlias) throws Exception {
 		this.getActiveSession();
 
-		final MarkerAlias markerAliasRecordSaved = this.getMarkerAliasDao().save(markerAlias);
+		final MarkerAlias markerAliasRecordSaved = this.daoFactory.getMarkerAliasDao().save(markerAlias);
 		final Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
 		if (markerAliasRecordSavedMarkerId == null) {
 			throw new Exception();
@@ -1492,18 +1495,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	private Integer saveOrUpdateMarkerAlias(final MarkerAlias markerAlias) throws Exception {
 		this.getActiveSession();
-		final MarkerAlias markerAliasFromDB = this.getMarkerAliasDao().getById(markerAlias.getMarkerId());
+		final MarkerAlias markerAliasFromDB = this.daoFactory.getMarkerAliasDao().getById(markerAlias.getMarkerId());
 		if (markerAliasFromDB == null) {
 			return this.saveMarkerAlias(markerAlias);
 		} else {
-			this.getMarkerAliasDao().merge(markerAlias);
+			this.daoFactory.getMarkerAliasDao().merge(markerAlias);
 		}
 		return markerAlias.getMarkerId();
 	}
 
 	private Integer saveMarkerDetails(final MarkerDetails markerDetails) throws Exception {
 		this.getActiveSession();
-		final MarkerDetails markerDetailsRecordSaved = this.getMarkerDetailsDao().save(markerDetails);
+		final MarkerDetails markerDetailsRecordSaved = this.daoFactory.getMarkerDetailsDao().save(markerDetails);
 		final Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
 		if (markerDetailsSavedMarkerId == null) {
 			throw new Exception();
@@ -1513,11 +1516,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	private Integer saveOrUpdateMarkerDetails(final MarkerDetails markerDetails) throws Exception {
 		this.getActiveSession();
-		final MarkerDetails markerDetailsFromDB = this.getMarkerDetailsDao().getById(markerDetails.getMarkerId());
+		final MarkerDetails markerDetailsFromDB = this.daoFactory.getMarkerDetailsDao().getById(markerDetails.getMarkerId());
 		if (markerDetailsFromDB == null) {
 			return this.saveMarkerDetails(markerDetails);
 		} else {
-			this.getMarkerDetailsDao().merge(markerDetails);
+			this.daoFactory.getMarkerDetailsDao().merge(markerDetails);
 		}
 		return markerDetails.getMarkerId();
 	}
@@ -1525,7 +1528,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private Integer saveMarkerUserInfo(final MarkerUserInfo markerUserInfo) throws Exception {
 		this.getActiveSession();
 
-		final MarkerUserInfoDAO dao = this.getMarkerUserInfoDao();
+		final MarkerUserInfoDAO dao = this.daoFactory.getMarkerUserInfoDao();
 		final MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
 		final Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
 		if (markerUserInfoSavedId == null) {
@@ -1536,10 +1539,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	private Integer saveOrUpdateMarkerUserInfo(final MarkerUserInfo markerUserInfo) throws Exception {
 		this.getActiveSession();
-		final MarkerUserInfoDAO dao = this.getMarkerUserInfoDao();
+		final MarkerUserInfoDAO dao = this.daoFactory.getMarkerUserInfoDao();
 
 		if (markerUserInfo.getUserInfoId() != null) {
-			final MarkerUserInfo markerDetailsFromDB = this.getMarkerUserInfoDao().getById(markerUserInfo.getUserInfoId());
+			final MarkerUserInfo markerDetailsFromDB = this.daoFactory.getMarkerUserInfoDao().getById(markerUserInfo.getUserInfoId());
 			if (markerDetailsFromDB == null) {
 				return this.saveMarkerUserInfo(markerUserInfo);
 			}
@@ -1553,7 +1556,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		Integer mapSavedId = map.getMapId() == null ? this.getMapIdByMapName(map.getMapName()) : map.getMapId();
 		if (mapSavedId == null) {
-			final MapDAO mapDao = this.getMapDao();
+			final MapDAO mapDao = this.daoFactory.getMapDao();
 
 			final Map mapRecordSaved = mapDao.saveOrUpdate(map);
 			mapSavedId = mapRecordSaved.getMapId();
@@ -1568,7 +1571,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	private Integer saveMarkerOnMap(final Integer markerId, final Integer mapId, final MarkerOnMap markerOnMap) throws Exception {
 		this.getActiveSession();
-		final MarkerOnMapDAO markerOnMapDao = this.getMarkerOnMapDao();
+		final MarkerOnMapDAO markerOnMapDao = this.daoFactory.getMarkerOnMapDao();
 
 		markerOnMap.setMarkerId(markerId);
 		markerOnMap.setMapId(mapId);
@@ -1589,20 +1592,20 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	// GCP-7873
 	@Override
 	public List<Marker> getAllSNPMarkers() {
-		return this.getMarkerDao().getByType(GenotypicDataManagerImpl.TYPE_SNP);
+		return this.daoFactory.getMarkerDao().getByType(GenotypicDataManagerImpl.TYPE_SNP);
 	}
 
 	// GCP-8568
 	@Override
 	public List<Marker> getMarkersByType(final String type) {
-		return this.getMarkerDao().getMarkersByType(type);
+		return this.daoFactory.getMarkerDao().getMarkersByType(type);
 	}
 
 	// GCP-7874
 	@Override
 	public List<Marker> getSNPsByHaplotype(final String haplotype) {
-		final List<Integer> markerIds = this.getMarkerDao().getMarkerIDsByHaplotype(haplotype);
-		return this.getMarkerDao().getMarkersByIdsAndType(markerIds, GdmsType.TYPE_SNP.getValue());
+		final List<Integer> markerIds = this.daoFactory.getMarkerDao().getMarkerIDsByHaplotype(haplotype);
+		return this.daoFactory.getMarkerDao().getMarkersByIdsAndType(markerIds, GdmsType.TYPE_SNP.getValue());
 	}
 
 	// GCP-8566
@@ -1611,7 +1614,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		try {
 
-			this.getTrackDataDao().save(trackData);
+			this.daoFactory.getTrackDataDao().save(trackData);
 
 			for (final TrackMarker trackMarker : trackMarkers) {
 				trackMarker.setTrackId(trackData.getTrackId());
@@ -1630,7 +1633,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public List<MarkerInfo> getMarkerInfoByMarkerIds(final List<Integer> markerIds) {
 		final List<MarkerInfo> returnVal = new ArrayList<MarkerInfo>();
-		returnVal.addAll(this.getMarkerInfoDao().getByMarkerIds(markerIds));
+		returnVal.addAll(this.daoFactory.getMarkerInfoDao().getByMarkerIds(markerIds));
 		return returnVal;
 	}
 
@@ -1638,8 +1641,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public List<AllelicValueElement> getAlleleValuesByMarkers(final List<Integer> markerIds) {
 		final List<AllelicValueElement> returnVal = new ArrayList<>();
-		returnVal.addAll(this.getAlleleValuesDao().getAlleleValuesByMarkerId(markerIds));
-		returnVal.addAll(this.getCharValuesDao().getAlleleValuesByMarkerId(markerIds));
+		returnVal.addAll(this.daoFactory.getAlleleValuesDao().getAlleleValuesByMarkerId(markerIds));
+		returnVal.addAll(this.daoFactory.getCharValuesDao().getAlleleValuesByMarkerId(markerIds));
 		return returnVal;
 	}
 
@@ -1648,7 +1651,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		final Marker marker, final MarkerAlias markerAlias, final MarkerDetails markerDetails, final MarkerUserInfo markerUserInfo) {
 
 		if (marker.getMarkerId() >= 0) {
-			final Marker markerFromDB = this.getMarkerDao().getById(marker.getMarkerId());
+			final Marker markerFromDB = this.daoFactory.getMarkerDao().getById(marker.getMarkerId());
 			if (markerFromDB != null) {
 				throw new MiddlewareQueryException("Marker is in central database and cannot be updated.");
 			} else {
@@ -1685,79 +1688,79 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public List<MarkerMetadataSet> getMarkerMetadataSetByDatasetId(final Integer datasetId) {
-		return this.getMarkerMetadataSetDao().getMarkerMetadataSetByDatasetId(datasetId);
+		return this.daoFactory.getMarkerMetadataSetDao().getMarkerMetadataSetByDatasetId(datasetId);
 	}
 
 	@Override
 	public List<CharValues> getCharValuesByMarkerIds(final List<Integer> markerIds) {
-		return this.getCharValuesDao().getCharValuesByMarkerIds(markerIds);
+		return this.daoFactory.getCharValuesDao().getCharValuesByMarkerIds(markerIds);
 	}
 
 	@Override
 	public List<MappingData> getAllMappingData() {
-		return this.getMappingDataDao().getAll();
+		return this.daoFactory.getMappingDataDao().getAll();
 	}
 
 	// --- Added by Matthew transferring GDMS SQL to middleware -- //
 	@Override
 	public List<QtlDetails> getAllQtlDetails() {
-		return this.getQtlDetailsDao().getAll();
+		return this.daoFactory.getQtlDetailsDao().getAll();
 	}
 
 	@Override
 	public List<Qtl> getAllQtl() {
-		return this.getQtlDao().getAll();
+		return this.daoFactory.getQtlDao().getAll();
 	}
 
 	@Override
 	public List<Object> getUniqueCharAllelesByGidsAndMids(final List<Integer> gids, final List<Integer> mids) {
-		return this.getCharValuesDao().getUniqueCharAllelesByGidsAndMids(gids, mids);
+		return this.daoFactory.getCharValuesDao().getUniqueCharAllelesByGidsAndMids(gids, mids);
 	}
 
 	@Override
 	public List<Object> getUniqueAllelesByGidsAndMids(final List<Integer> gids, final List<Integer> mids) {
-		return this.getAlleleValuesDao().getUniqueAllelesByGidsAndMids(gids, mids);
+		return this.daoFactory.getAlleleValuesDao().getUniqueAllelesByGidsAndMids(gids, mids);
 	}
 
 	@Override
 	public List<Object> getUniqueMapPopAllelesByGidsAndMids(final List<Integer> gids, final List<Integer> mids) {
-		return this.getMappingPopValuesDao().getUniqueMapPopAllelesByGidsAndMids(gids, mids);
+		return this.daoFactory.getMappingPopValuesDao().getUniqueMapPopAllelesByGidsAndMids(gids, mids);
 	}
 
 	@Override
 	public List<Object> getUniqueAccMetaDataSetByGids(final List gids) {
-		return this.getAccMetadataSetDao().getUniqueAccMetaDatsetByGids(gids);
+		return this.daoFactory.getAccMetadataSetDao().getUniqueAccMetaDatsetByGids(gids);
 	}
 
 	@Override
 	public List<Integer> getMarkerIdsByNames(final List<String> names, final int start, final int numOfRows) {
-		return this.getMarkerDao().getIdsByNames(names, start, numOfRows);
+		return this.daoFactory.getMarkerDao().getIdsByNames(names, start, numOfRows);
 	}
 
 	@Override
 	public int countAllMarkers() {
-		return this.getMarkerDao().getAll().size();
+		return this.daoFactory.getMarkerDao().getAll().size();
 	}
 
 	@Override
 	public List<Integer> getDatasetIdsByGermplasmIds(final List<Integer> gIds) {
-		return this.getAccMetadataSetDao().getDatasetIdsByGermplasmIds(gIds);
+		return this.daoFactory.getAccMetadataSetDao().getDatasetIdsByGermplasmIds(gIds);
 	}
 
 	@Override
 	public List<Integer> getAccMetadatasetByDatasetIds(final List<Integer> datasetIds) {
-		return this.getAccMetadataSetDao().getNidsByDatasetIds(datasetIds);
+		return this.daoFactory.getAccMetadataSetDao().getNidsByDatasetIds(datasetIds);
 	}
 
 	@Override
 	public List<Object> getMarkersOnMapByMarkerIdsAndMapId(final List<Integer> markerIds, final Integer mapID) {
-		return this.getMarkerOnMapDao().getMarkersOnMapByMarkerIdsAndMapId(markerIds, mapID);
+		return this.daoFactory.getMarkerOnMapDao().getMarkersOnMapByMarkerIdsAndMapId(markerIds, mapID);
 	}
 
 	@Override
 	public List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(
 		final Integer mapId, final Integer linkageGroupId, final Integer markerId) {
-		return this.getMarkerOnMapDao().getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(mapId, linkageGroupId, markerId);
+		return this.daoFactory.getMarkerOnMapDao().getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(mapId, linkageGroupId, markerId);
 	}
 
 }
