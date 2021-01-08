@@ -26,6 +26,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -41,8 +42,11 @@ public class StandardVariableSaver extends Saver {
 
 	private DaoFactory daoFactory;
 
+	private TermPropertyBuilder termPropertyBuilder;
+
 	public StandardVariableSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.termPropertyBuilder = new TermPropertyBuilder(sessionProviderForLocal);
 		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
@@ -435,7 +439,7 @@ public class StandardVariableSaver extends Saver {
 			throw new MiddlewareQueryException("Specified trait ID for deletion of crop ontology ID is not valid");
 		}
 
-		final List<CVTermProperty> traitProperties = this.daoFactory.getTermPropertyBuilder().findProperties(traitId);
+		final List<CVTermProperty> traitProperties = daoFactory.getCvTermPropertyDao().getByCvTermId(traitId);
 
 		for (final CVTermProperty traitProperty : traitProperties) {
 			if (traitProperty.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {

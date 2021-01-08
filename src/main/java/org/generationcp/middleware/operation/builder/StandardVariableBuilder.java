@@ -57,8 +57,11 @@ public class StandardVariableBuilder extends Builder {
 
 	private final DaoFactory daoFactory;
 
+	private TermPropertyBuilder termPropertyBuilder;
+
 	public StandardVariableBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		termPropertyBuilder = new TermPropertyBuilder(sessionProviderForLocal);
 		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
@@ -178,8 +181,8 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	public List<TermProperty> createTermProperties(final int cvTermId) {
-		final List<CVTermProperty> cvTermProperties = this.daoFactory.getTermPropertyBuilder().findProperties(cvTermId);
-		return this.daoFactory.getTermPropertyBuilder().create(cvTermProperties);
+		final List<CVTermProperty> cvTermProperties = daoFactory.getCvTermPropertyDao().getByCvTermId(cvTermId);
+		return this.termPropertyBuilder.create(cvTermProperties);
 	}
 
 	private CVTerm getCvTerm(final int id) {

@@ -48,7 +48,6 @@ import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 
 public class DaoFactory {
 
@@ -338,10 +337,6 @@ public class DaoFactory {
 
 	public BreedersQueryDao getBreedersQueryDao() {
 		return new BreedersQueryDao(this.sessionProvider.getSession());
-	}
-
-	public TermPropertyBuilder getTermPropertyBuilder() {
-		return new TermPropertyBuilder(this.sessionProvider);
 	}
 
 	public VariableOverridesDao getVariableProgramOverridesDao() {
