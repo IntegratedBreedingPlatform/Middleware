@@ -367,7 +367,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Attribute> getAttributesByGID(final Integer gid) {
-		return this.getAttributeDao().getByGID(gid);
+		return this.daoFactory.getAttributeDAO().getByGID(gid);
 	}
 
 	@Override
@@ -384,7 +384,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 
 		// retrieve attribute values
-		final List<Attribute> attributeList = this.getAttributeDao().getAttributeValuesByTypeAndGIDList(attributeType, gidList);
+		final List<Attribute> attributeList = this.daoFactory.getAttributeDAO().getAttributeValuesByTypeAndGIDList(attributeType, gidList);
 		for (final Attribute attribute : attributeList) {
 			returnMap.put(attribute.getGermplasmId(), attribute.getAval());
 		}
@@ -397,7 +397,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final Map<Integer, Map<Integer, String>> attributeMap = new HashMap<>();
 
 		// retrieve attribute values
-		final List<Attribute> attributeList = this.getAttributeDao().getAttributeValuesGIDList(gidList);
+		final List<Attribute> attributeList = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(gidList);
 		for (final Attribute attribute : attributeList) {
 			Map<Integer, String> attrByType = attributeMap.get(attribute.getGermplasmId());
 			if (attrByType == null) {
@@ -717,7 +717,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final List<Integer> idAttributesSaved = new ArrayList<>();
 		try {
 
-			final AttributeDAO dao = this.getAttributeDao();
+			final AttributeDAO dao = this.daoFactory.getAttributeDAO();
 
 			for (final Attribute attribute : attributes) {
 				final Attribute recordSaved = dao.saveOrUpdate(attribute);
@@ -737,7 +737,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Attribute getAttributeById(final Integer id) {
-		return this.getAttributeDao().getById(id, false);
+		return this.daoFactory.getAttributeDAO().getById(id, false);
 	}
 
 	@Override
@@ -883,7 +883,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		Integer isAttrSaved = 0;
 		try {
 
-			final AttributeDAO dao = this.getAttributeDao();
+			final AttributeDAO dao = this.daoFactory.getAttributeDAO();
 			dao.save(attr);
 			isAttrSaved++;
 
@@ -902,7 +902,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final List<Integer> isAttrSaved = new ArrayList<>();
 		try {
 
-			final AttributeDAO dao = this.getAttributeDao();
+			final AttributeDAO dao = this.daoFactory.getAttributeDAO();
 
 			for (final Attribute attr : attrs) {
 				final Attribute newAttr = dao.save(attr);
@@ -1483,7 +1483,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<UserDefinedField> getAllAttributesTypes() {
-		return this.getAttributeDao().getAttributeTypes();
+		return this.daoFactory.getAttributeDAO().getAttributeTypes();
 	}
 
 	/**
@@ -1511,7 +1511,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public String getAttributeValue(final Integer gid, final String attributeName) {
-		final Attribute attribute = this.getAttributeDao().getAttribute(gid, attributeName);
+		final Attribute attribute = this.daoFactory.getAttributeDAO().getAttribute(gid, attributeName);
 		if (attribute == null) {
 			return "";
 		} else {
@@ -1558,17 +1558,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<AttributeDTO> getAttributesByGid(
 		final String gid, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
-		return this.getAttributeDao().getAttributesByGidAndAttributeIds(gid, attributeDbIds, pageSize, pageNumber);
+		return this.daoFactory.getAttributeDAO().getAttributesByGidAndAttributeIds(gid, attributeDbIds, pageSize, pageNumber);
 	}
 
 	@Override
 	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
-		return this.getAttributeDao().countAttributesByGid(gid, attributeDbIds);
+		return this.daoFactory.getAttributeDAO().countAttributesByGid(gid, attributeDbIds);
 	}
 
 	@Override
 	public List<Attribute> getAttributeByIds(final List<Integer> ids) {
-		return this.getAttributeDao().getByIDs(ids);
+		return this.daoFactory.getAttributeDAO().getByIDs(ids);
 	}
 
 	@Override

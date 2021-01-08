@@ -403,7 +403,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 					// Save Germplasm attributes
 					final List<Attribute> attributesList = germplasmAttributes.get(counter).getRight();
-					final AttributeDAO attributeDAO = this.getAttributeDao();
+					final AttributeDAO attributeDAO = this.daoFactory.getAttributeDAO();
 					for (final Attribute attribute : attributesList) {
 						attribute.setGermplasmId(germplasm.getGid());
 						attributeDAO.save(attribute);
