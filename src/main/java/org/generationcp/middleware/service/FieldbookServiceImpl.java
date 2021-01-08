@@ -546,7 +546,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		List<StandardVariableReference> newRefs = new ArrayList<>();
 		try {
 			final List<StandardVariableSummary> variableSummaries =
-					this.getStandardVariableDao().getStandardVariableSummaryWithIsAId(isAIds);
+				this.daoFactory.getStandardVariableDao().getStandardVariableSummaryWithIsAId(isAIds);
 			for (final StandardVariableReference ref : standardReferences) {
 				boolean isFound = false;
 				for (final StandardVariableSummary summary : variableSummaries) {

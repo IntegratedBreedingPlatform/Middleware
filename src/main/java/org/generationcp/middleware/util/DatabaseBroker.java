@@ -47,7 +47,6 @@ import org.generationcp.middleware.dao.gdms.TrackDataDAO;
 import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
 import org.generationcp.middleware.dao.oms.CVDao;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
-import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.hibernate.Session;
 
@@ -93,10 +92,6 @@ public class DatabaseBroker {
 		final DmsProjectDao dmsProjectDao = new DmsProjectDao();
 		dmsProjectDao.setSession(this.getActiveSession());
 		return dmsProjectDao;
-	}
-
-	public StandardVariableDao getStandardVariableDao() {
-		return new StandardVariableDao(this.getActiveSession());
 	}
 
 	public CVDao getCvDao() {

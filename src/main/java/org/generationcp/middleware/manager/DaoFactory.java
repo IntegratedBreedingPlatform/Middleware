@@ -45,6 +45,7 @@ import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
+import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
@@ -348,5 +349,10 @@ public class DaoFactory {
 		variableOverridesDao.setSession(this.sessionProvider.getSession());
 		return variableOverridesDao;
 	}
+
+	public StandardVariableDao getStandardVariableDao() {
+		return new StandardVariableDao(this.sessionProvider.getSession());
+	}
+
 
 }

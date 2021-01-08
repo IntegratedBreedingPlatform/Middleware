@@ -82,7 +82,7 @@ public class StandardVariableBuilder extends Builder {
 	public StandardVariableSummary getStandardVariableSummary(final Integer standardVariableId) {
 		StandardVariableSummary summary = null;
 		if (standardVariableId != null) {
-			summary = this.getStandardVariableDao().getStandardVariableSummary(standardVariableId);
+			summary = this.daoFactory.getStandardVariableDao().getStandardVariableSummary(standardVariableId);
 			if (summary != null) {
 				this.specialProcessing(Arrays.asList(summary));
 			}
@@ -100,17 +100,8 @@ public class StandardVariableBuilder extends Builder {
 		final List<StandardVariableSummary> result = new ArrayList<>();
 		if (standardVariableIds != null && !standardVariableIds.isEmpty()) {
 			final List<StandardVariableSummary> localVariables =
-				this.getStandardVariableDao().getStarndardVariableSummaries(standardVariableIds);
+				this.daoFactory.getStandardVariableDao().getStarndardVariableSummaries(standardVariableIds);
 			this.specialProcessing(localVariables);
-			result.addAll(localVariables);
-		}
-		return result;
-	}
-
-	public List<StandardVariableSummary> getStandardVariableSummariesWithIsAId(final List<Integer> isAIds) {
-		final List<StandardVariableSummary> result = new ArrayList<>();
-		if (isAIds != null && !isAIds.isEmpty()) {
-			final List<StandardVariableSummary> localVariables = this.getStandardVariableDao().getStandardVariableSummaryWithIsAId(isAIds);
 			result.addAll(localVariables);
 		}
 		return result;
