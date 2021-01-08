@@ -986,7 +986,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void saveOrUpdatePhenotypeOutliers(final List<PhenotypeOutlier> phenotyleOutliers) {
 
-		final PhenotypeOutlierDao phenotypeOutlierDao = this.getPhenotypeOutlierDao();
+		final PhenotypeOutlierDao phenotypeOutlierDao = this.daoFactory.getPhenotypeOutlierDao();
 		try {
 
 			for (final PhenotypeOutlier phenotypeOutlier : phenotyleOutliers) {

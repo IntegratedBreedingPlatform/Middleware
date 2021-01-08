@@ -34,6 +34,7 @@ import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
@@ -529,6 +530,12 @@ public class DaoFactory {
 		final CvTermSynonymDao cvTermSynonymDao = new CvTermSynonymDao();
 		cvTermSynonymDao.setSession(this.sessionProvider.getSession());
 		return cvTermSynonymDao;
+	}
+
+	public PhenotypeOutlierDao getPhenotypeOutlierDao() {
+		final PhenotypeOutlierDao phenotypeOutlierDao = new PhenotypeOutlierDao();
+		phenotypeOutlierDao.setSession(this.sessionProvider.getSession());
+		return phenotypeOutlierDao;
 	}
 
 }
