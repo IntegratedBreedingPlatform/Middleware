@@ -198,12 +198,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Name getGermplasmNameByID(final Integer id) {
-		return this.getNameDao().getById(id, false);
+		return this.daoFactory.getNameDao().getById(id, false);
 	}
 
 	@Override
 	public List<Name> getNamesByGID(final Integer gid, final Integer status, final GermplasmNameType type) {
-		return this.getNameDao().getByGIDWithFilters(gid, status, type);
+		return this.daoFactory.getNameDao().getByGIDWithFilters(gid, status, type);
 	}
 
 	/**
@@ -214,12 +214,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 */
 	@Override
 	public List<Name> getByGIDWithListTypeFilters(final Integer gid, final Integer status, final List<Integer> type) {
-		return this.getNameDao().getByGIDWithListTypeFilters(gid, status, type);
+		return this.daoFactory.getNameDao().getByGIDWithListTypeFilters(gid, status, type);
 	}
 
 	@Override
 	public Name getPreferredNameByGID(final Integer gid) {
-		final List<Name> names = this.getNameDao().getByGIDWithFilters(gid, 1, null);
+		final List<Name> names = this.daoFactory.getNameDao().getByGIDWithFilters(gid, 1, null);
 		if (!names.isEmpty()) {
 			return names.get(0);
 		}
@@ -228,7 +228,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public String getPreferredNameValueByGID(final Integer gid) {
-		final List<Name> names = this.getNameDao().getByGIDWithFilters(gid, 1, null);
+		final List<Name> names = this.daoFactory.getNameDao().getByGIDWithFilters(gid, 1, null);
 		if (!names.isEmpty()) {
 			return names.get(0).getNval();
 		}
@@ -237,7 +237,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Name getPreferredAbbrevByGID(final Integer gid) {
-		final List<Name> names = this.getNameDao().getByGIDWithFilters(gid, 2, null);
+		final List<Name> names = this.daoFactory.getNameDao().getByGIDWithFilters(gid, 2, null);
 		if (!names.isEmpty()) {
 			return names.get(0);
 		}
@@ -246,7 +246,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Name getPreferredIdByGID(final Integer gid) {
-		final List<Name> names = this.getNameDao().getByGIDWithFilters(gid, 8, null);
+		final List<Name> names = this.daoFactory.getNameDao().getByGIDWithFilters(gid, 8, null);
 		if (!names.isEmpty()) {
 			return names.get(0);
 		}
@@ -255,12 +255,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Name> getPreferredIdsByListId(final Integer listId) {
-		return this.getNameDao().getPreferredIdsByListId(listId);
+		return this.daoFactory.getNameDao().getPreferredIdsByListId(listId);
 	}
 
 	@Override
 	public Name getNameByGIDAndNval(final Integer gid, final String nval, final GetGermplasmByNameModes mode) {
-		return this.getNameDao().getByGIDAndNval(gid, GermplasmDataManagerUtil.getNameToUseByMode(nval, mode));
+		return this.daoFactory.getNameDao().getByGIDAndNval(gid, GermplasmDataManagerUtil.getNameToUseByMode(nval, mode));
 	}
 
 	@Override
@@ -280,7 +280,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		try {
 			// begin update transaction
 
-			final NameDAO dao = this.getNameDao();
+			final NameDAO dao = this.daoFactory.getNameDao();
 
 			// check for a name record with germplasm = gid, and nval = newPrefName
 			final Name newPref = this.getNameByGIDAndNval(gid, newPrefValue, GetGermplasmByNameModes.NORMAL);
@@ -351,7 +351,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final List<Integer> idNamesSaved = new ArrayList<>();
 		try {
 
-			final NameDAO dao = this.getNameDao();
+			final NameDAO dao = this.daoFactory.getNameDao();
 
 			for (final Name name : names) {
 				final Name recordAdded = dao.saveOrUpdate(name);
@@ -423,7 +423,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			returnMap.put(gid, "-");
 		}
 
-		final List<Name> nameList = this.getNameDao().getNamesByTypeAndGIDList(nameType, gidList);
+		final List<Name> nameList = this.daoFactory.getNameDao().getNamesByTypeAndGIDList(nameType, gidList);
 		for (final Name name : nameList) {
 			returnMap.put(name.getGermplasmId(), name.getNval());
 		}
@@ -922,7 +922,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(final List<String> germplasmNames,
 		final GetGermplasmByNameModes mode) {
 		final List<String> namesToUse = GermplasmDataManagerUtil.getNamesToUseByMode(germplasmNames, mode);
-		return this.getNameDao().getGermplasmNameDetailsByNames(namesToUse, mode);
+		return this.daoFactory.getNameDao().getGermplasmNameDetailsByNames(namesToUse, mode);
 	}
 
 	/**
@@ -971,7 +971,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final Map<Integer, String> toreturn = new HashMap<>();
 
 		if (!gids.isEmpty()) {
-			final Map<Integer, String> results = this.getNameDao().getPreferredIdsByGIDs(gids);
+			final Map<Integer, String> results = this.daoFactory.getNameDao().getPreferredIdsByGIDs(gids);
 			for (final Integer gid : results.keySet()) {
 				toreturn.put(gid, results.get(gid));
 			}
@@ -1013,7 +1013,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final Map<Integer, String> toreturn = new HashMap<>();
 
 		if (!gids.isEmpty()) {
-			final Map<Integer, String> results = this.getNameDao().getPreferredNamesByGIDs(gids);
+			final Map<Integer, String> results = this.daoFactory.getNameDao().getPreferredNamesByGIDs(gids);
 			for (final Integer gid : results.keySet()) {
 				toreturn.put(gid, results.get(gid));
 			}
@@ -1027,7 +1027,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Map<Integer, Integer> getPreferredNameIdsByGIDs(final List<Integer> gids) {
-		return this.getNameDao().getPreferredNameIdsByGIDs(gids);
+		return this.daoFactory.getNameDao().getPreferredNameIdsByGIDs(gids);
 	}
 
 	@Override
@@ -1228,7 +1228,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public boolean checkIfMatches(final String name) {
-		return this.getNameDao().checkIfMatches(name);
+		return this.daoFactory.getNameDao().checkIfMatches(name);
 	}
 
 	@Override
@@ -1403,17 +1403,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Map<Integer, String> getGroupSourcePreferredNamesByGids(final List<Integer> gids) {
-		return this.getNameDao().getSourcePreferredNamesByGids(gids);
+		return this.daoFactory.getNameDao().getSourcePreferredNamesByGids(gids);
 	}
 
 	@Override
 	public List<String> getNamesByGidsAndPrefixes(final List<Integer> gids, final List<String> prefixes) {
-		return this.getNameDao().getNamesByGidsAndPrefixes(gids, prefixes);
+		return this.daoFactory.getNameDao().getNamesByGidsAndPrefixes(gids, prefixes);
 	}
 
 	@Override
 	public Map<Integer, String> getImmediateSourcePreferredNamesByGids(final List<Integer> gids) {
-		return this.getNameDao().getImmediatePreferredNamesByGids(gids);
+		return this.daoFactory.getNameDao().getImmediatePreferredNamesByGids(gids);
 	}
 
 	@Override
@@ -1423,7 +1423,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Map<Integer, List<Name>> getNamesByGidsAndNTypeIdsInMap(final List<Integer> gids, final List<Integer> ntypeIds) {
-		return this.getNameDao().getNamesByGidsAndNTypeIdsInMap(gids, ntypeIds);
+		return this.daoFactory.getNameDao().getNamesByGidsAndNTypeIdsInMap(gids, ntypeIds);
 	}
 
 	/**

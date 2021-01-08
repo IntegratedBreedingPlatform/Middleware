@@ -11,15 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
 import org.generationcp.middleware.dao.gdms.MapDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopDAO;
@@ -71,9 +62,16 @@ import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.TrackData;
 import org.generationcp.middleware.pojos.gdms.TrackMarker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Implementation of the GenotypicDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -90,11 +88,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private static final String TYPE_CISR = GdmsType.TYPE_CISR.getValue();
 	private static final String TYPE_UA = GdmsType.TYPE_UA.getValue(); // Unassigned
 
+	private DaoFactory daoFactory;
+
 	public GenotypicDataManagerImpl() {
 	}
 
 	public GenotypicDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -115,7 +116,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public List<Name> getNamesByNameIds(final List<Integer> nIds) {
-		return this.getNameDao().getNamesByNameIds(nIds);
+		return this.daoFactory.getNameDao().getNamesByNameIds(nIds);
 	}
 
 	@Override
@@ -125,7 +126,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Name getNameByNameId(final Integer nId) {
-		return this.getNameDao().getNameByNameId(nId);
+		return this.daoFactory.getNameDao().getNameByNameId(nId);
 	}
 
 	@Override

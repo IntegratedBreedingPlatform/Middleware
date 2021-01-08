@@ -110,7 +110,7 @@
     </bean>
 
     <bean id="genotypicDataManager" class="org.generationcp.middleware.manager.GenotypicDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="inventoryDataManager" class="org.generationcp.middleware.manager.InventoryDataManagerImpl">

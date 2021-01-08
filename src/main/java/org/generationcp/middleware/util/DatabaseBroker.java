@@ -13,7 +13,6 @@ package org.generationcp.middleware.util;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
@@ -166,12 +165,6 @@ public class DatabaseBroker {
 		final CvTermSynonymDao cvTermSynonymDao = new CvTermSynonymDao();
 		cvTermSynonymDao.setSession(this.getActiveSession());
 		return cvTermSynonymDao;
-	}
-
-	public NameDAO getNameDao() {
-		final NameDAO nameDao = new NameDAO();
-		nameDao.setSession(this.getActiveSession());
-		return nameDao;
 	}
 
 	public AccMetadataSetDAO getAccMetadataSetDao() {

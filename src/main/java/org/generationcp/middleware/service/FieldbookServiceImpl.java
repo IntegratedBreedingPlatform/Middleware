@@ -483,7 +483,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	private List<Name> getByGidAndNtype(final int gid, final GermplasmNameType nType) {
-		return this.getNameDao().getByGIDWithFilters(gid, null, nType);
+		return this.daoFactory.getNameDao().getByGIDWithFilters(gid, null, nType);
 	}
 
 	@Override
@@ -812,7 +812,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Integer> getGermplasmIdsByName(final String name) {
-		return this.getNameDao().getGidsByName(name);
+		return this.daoFactory.getNameDao().getGidsByName(name);
 	}
 
 	@Override
@@ -877,7 +877,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Map<Integer, List<Name>> getNamesByGids(final List<Integer> gids) {
-		return this.getNameDao().getNamesByGidsInMap(gids);
+		return this.daoFactory.getNameDao().getNamesByGidsInMap(gids);
 	}
 
 	@Override
