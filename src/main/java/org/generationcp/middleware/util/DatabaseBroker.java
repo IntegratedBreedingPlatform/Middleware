@@ -20,7 +20,6 @@ import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.dms.StockPropertyDao;
-import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.hibernate.Session;
 
@@ -114,12 +113,6 @@ public class DatabaseBroker {
 		final PhenotypeOutlierDao phenotypeOutlierDao = new PhenotypeOutlierDao();
 		phenotypeOutlierDao.setSession(this.getActiveSession());
 		return phenotypeOutlierDao;
-	}
-
-	public CvTermSynonymDao getCvTermSynonymDao() {
-		final CvTermSynonymDao cvTermSynonymDao = new CvTermSynonymDao();
-		cvTermSynonymDao.setSession(this.getActiveSession());
-		return cvTermSynonymDao;
 	}
 
 	/**

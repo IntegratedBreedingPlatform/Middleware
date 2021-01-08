@@ -894,7 +894,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		if (!Objects.equals(oldVariableName, newName)) {
 
-			final List<CVTermSynonym> byCvTermSynonymList = this.getCvTermSynonymDao().getByCvTermId(term.getCvTermId());
+			final List<CVTermSynonym> byCvTermSynonymList = this.daoFactory.getCvTermSynonymDao().getByCvTermId(term.getCvTermId());
 			boolean synonymFound = false;
 
 			for (final CVTermSynonym cvTermSynonym : byCvTermSynonymList) {
@@ -907,17 +907,17 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			if (!synonymFound) {
 				final CVTermSynonym cvTermSynonym =
 						CvTermSynonymDao.buildCvTermSynonym(term.getCvTermId(), oldVariableName, NameType.ALTERNATIVE_ENGLISH.getId());
-				this.getCvTermSynonymDao().save(cvTermSynonym);
+				this.daoFactory.getCvTermSynonymDao().save(cvTermSynonym);
 			}
 		}
 	}
 
 	private void deleteVariableSynonym(final int variableId) {
 		// delete Variable synonym
-		final List<CVTermSynonym> cvTermSynonymList = this.getCvTermSynonymDao().getByCvTermId(variableId);
+		final List<CVTermSynonym> cvTermSynonymList = this.daoFactory.getCvTermSynonymDao().getByCvTermId(variableId);
 
 		for (final CVTermSynonym synonym : cvTermSynonymList) {
-			this.getCvTermSynonymDao().makeTransient(synonym);
+			this.daoFactory.getCvTermSynonymDao().makeTransient(synonym);
 		}
 	}
 

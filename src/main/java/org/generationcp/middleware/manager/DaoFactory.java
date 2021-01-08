@@ -70,6 +70,7 @@ import org.generationcp.middleware.dao.oms.CVDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
+import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -524,6 +525,10 @@ public class DaoFactory {
 		return datasetUsersDao;
 	}
 
-
+	public CvTermSynonymDao getCvTermSynonymDao() {
+		final CvTermSynonymDao cvTermSynonymDao = new CvTermSynonymDao();
+		cvTermSynonymDao.setSession(this.sessionProvider.getSession());
+		return cvTermSynonymDao;
+	}
 
 }

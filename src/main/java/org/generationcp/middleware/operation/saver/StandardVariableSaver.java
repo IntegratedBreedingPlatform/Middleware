@@ -458,10 +458,10 @@ public class StandardVariableSaver extends Saver {
 
 	private void deleteSynonyms(final int cvTermId, final List<NameSynonym> nameSynonyms) throws MiddlewareQueryException {
 		if (nameSynonyms != null && !nameSynonyms.isEmpty()) {
-			final List<CVTermSynonym> cvTermSynonyms = this.getCvTermSynonymDao().getByCvTermId(cvTermId);
+			final List<CVTermSynonym> cvTermSynonyms = this.daoFactory.getCvTermSynonymDao().getByCvTermId(cvTermId);
 			if (cvTermSynonyms != null) {
 				for (final CVTermSynonym cvTermSynonym : cvTermSynonyms) {
-					this.getCvTermSynonymDao().makeTransient(cvTermSynonym);
+					this.daoFactory.getCvTermSynonymDao().makeTransient(cvTermSynonym);
 				}
 			}
 		}
