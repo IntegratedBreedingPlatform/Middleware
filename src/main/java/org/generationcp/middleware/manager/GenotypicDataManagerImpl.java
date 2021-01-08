@@ -1615,7 +1615,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			for (final TrackMarker trackMarker : trackMarkers) {
 				trackMarker.setTrackId(trackData.getTrackId());
-				this.getTrackMarkerDao().save(trackMarker);
+				this.daoFactory.getTrackMarkerDao().save(trackMarker);
 			}
 
 		} catch (final Exception e) {

@@ -39,6 +39,7 @@ import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.dms.StockPropertyDao;
 import org.generationcp.middleware.dao.dms.StudySearchDao;
+import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
 import org.generationcp.middleware.dao.ims.ExperimentTransactionDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -356,5 +357,10 @@ public class DaoFactory {
 		return cvDao;
 	}
 
+	public TrackMarkerDAO getTrackMarkerDao() {
+		final TrackMarkerDAO trackMarkerDao = new TrackMarkerDAO();
+		trackMarkerDao.setSession(this.sessionProvider.getSession());
+		return trackMarkerDao;
+	}
 
 }

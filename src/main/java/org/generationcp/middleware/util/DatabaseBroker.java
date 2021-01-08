@@ -43,7 +43,6 @@ import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.dao.gdms.TrackDataDAO;
-import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.hibernate.Session;
@@ -282,12 +281,6 @@ public class DatabaseBroker {
 		final TrackDataDAO trackDataDao = new TrackDataDAO();
 		trackDataDao.setSession(this.getActiveSession());
 		return trackDataDao;
-	}
-
-	public TrackMarkerDAO getTrackMarkerDao() {
-		final TrackMarkerDAO trackMarkerDao = new TrackMarkerDAO();
-		trackMarkerDao.setSession(this.getActiveSession());
-		return trackMarkerDao;
 	}
 
 	/**
