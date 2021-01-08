@@ -6,9 +6,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.pojos.UserProgramTreeState;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -50,24 +48,7 @@ public class UserProgramStateDataManagerImpl extends DataManager implements User
 	}
 
 	private UserProgramTreeState getUserProgramTreeState(int userId, String programUuid, String type) throws MiddlewareQueryException {
-		try {
-			Criteria criteria = this.getCurrentSession().createCriteria(UserProgramTreeState.class);
-
-			criteria.add(Restrictions.eq("userId", userId));
-			criteria.add(Restrictions.eq("programUuid", programUuid));
-			criteria.add(Restrictions.eq("treeType", type));
-
-			@SuppressWarnings("unchecked")
-			List<UserProgramTreeState> userProgramTreeStates = criteria.list();
-			if (!userProgramTreeStates.isEmpty()) {
-				return userProgramTreeStates.get(0);
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("error in: WorkbenchDataManager.getUserProgramTreeStateByUserIdProgramUuidAndType(programId="
-					+ programUuid + "): " + e.getMessage(), e);
-		}
-
-		return null;
+		return this.daoFactory.getUserProgramTreeStateDAO().getUserProgramTreeState(userId, programUuid, type);
 	}
 
 	@Override

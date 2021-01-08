@@ -41,10 +41,6 @@ public class DatabaseBroker {
 		this.sessionProvider = sessionProvider;
 	}
 
-	public Session getCurrentSession() {
-		return this.getActiveSession();
-	}
-
 	public Session getActiveSession() {
 		if (this.sessionProvider != null) {
 			return this.sessionProvider.getSession();

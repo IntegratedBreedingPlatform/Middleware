@@ -44,16 +44,17 @@ import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
-import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 
-public abstract class Service extends DatabaseBroker {
+public abstract class Service {
+
+	protected HibernateSessionProvider sessionProvider;
 
 	public Service() {
 	}
 
 	public Service(HibernateSessionProvider sessionProvider) {
-		super(sessionProvider);
+		this.sessionProvider = sessionProvider;
 	}
 
 	protected void logAndThrowException(String message, Throwable e, Logger log) {
@@ -114,7 +115,7 @@ public abstract class Service extends DatabaseBroker {
 	}
 
 	protected final MeasurementVariableTransformer getMeasurementVariableTransformer() {
-		return new MeasurementVariableTransformer(this.sessionProvider);
+		return new MeasurementVariableTransformer();
 	}
 
 	protected final TermBuilder getTermBuilder() {

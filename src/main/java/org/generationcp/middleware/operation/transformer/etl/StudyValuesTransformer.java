@@ -9,14 +9,12 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 import java.util.List;
 
 public class StudyValuesTransformer extends Transformer {
 
-	public StudyValuesTransformer(HibernateSessionProvider sessionProviderForLocal) {
-		super(sessionProviderForLocal);
+	public StudyValuesTransformer() {
 	}
 
 	public StudyValues transform(Integer germplasmId, Integer locationId, List<MeasurementVariable> measurementVariables,

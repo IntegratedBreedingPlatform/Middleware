@@ -28,26 +28,26 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
 import org.generationcp.middleware.operation.saver.CvTermSaver;
-import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
-import org.generationcp.middleware.util.DatabaseBroker;
 
 /**
  * Provides builder classes (DatasetBuilder, StudyVariableBuilder, etc) based on the given session for local / central.
  *
  * @author Donald Barre
  */
-public abstract class Builder extends DatabaseBroker {
+public abstract class Builder {
+
+	protected HibernateSessionProvider sessionProvider;
 
 	public Builder() {
 
 	}
 
 	public Builder(final HibernateSessionProvider sessionProvider) {
-		super(sessionProvider);
+		this.sessionProvider = sessionProvider;
 	}
 
 	protected final StudyBuilder getStudyBuilder() {
@@ -86,10 +86,6 @@ public abstract class Builder extends DatabaseBroker {
 		return new CvTermSaver(this.sessionProvider);
 	}
 
-	protected final StandardVariableSaver getStandardVariableSaver() {
-		return new StandardVariableSaver(this.sessionProvider);
-	}
-
 	protected final NameSynonymBuilder getNameSynonymBuilder() {
 		return new NameSynonymBuilder(this.sessionProvider);
 	}
@@ -99,7 +95,7 @@ public abstract class Builder extends DatabaseBroker {
 	}
 
 	protected final MeasurementVariableTransformer getMeasurementVariableTransformer() {
-		return new MeasurementVariableTransformer(this.sessionProvider);
+		return new MeasurementVariableTransformer();
 	}
 
 	protected final GermplasmDataManager getGermplasmDataManager() {
@@ -129,7 +125,7 @@ public abstract class Builder extends DatabaseBroker {
 	}
 	
 	protected final StandardVariableTransformer getStandardVariableTransformer() {
-		return new StandardVariableTransformer(this.sessionProvider);
+		return new StandardVariableTransformer();
 	}
 
 	protected final FormulaService getFormulaService() {

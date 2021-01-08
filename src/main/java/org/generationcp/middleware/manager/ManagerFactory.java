@@ -259,7 +259,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public StandardVariableTransformer getStandardVariableTransformer() {
-		return new StandardVariableTransformer(this.sessionProvider);
+		return new StandardVariableTransformer();
 	}
 
 	public GermplasmGroupingService getGermplasmGroupingService() {

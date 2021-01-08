@@ -21,14 +21,11 @@ import org.generationcp.middleware.operation.builder.NameSynonymBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StudyBuilder;
 import org.generationcp.middleware.operation.builder.StudyFactorBuilder;
-import org.generationcp.middleware.operation.builder.StudyReferenceBuilder;
 import org.generationcp.middleware.operation.builder.StudyTypeBuilder;
 import org.generationcp.middleware.operation.builder.StudyVariateBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.TraitBuilder;
 import org.generationcp.middleware.operation.builder.TraitGroupBuilder;
-import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
-import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
 import org.generationcp.middleware.operation.saver.CvTermSaver;
@@ -45,7 +42,7 @@ import org.generationcp.middleware.operation.saver.ProjectSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.operation.saver.StockSaver;
 import org.generationcp.middleware.operation.saver.StudySaver;
-import org.generationcp.middleware.util.DatabaseBroker;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +53,9 @@ import org.slf4j.LoggerFactory;
  * @author Joyce Avestro
  * @author Glenn Marintes
  */
-public abstract class DataManager extends DatabaseBroker {
+public abstract class DataManager {
+
+	protected HibernateSessionProvider sessionProvider;
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataManager.class);
 
@@ -64,7 +63,7 @@ public abstract class DataManager extends DatabaseBroker {
 	}
 
 	public DataManager(final HibernateSessionProvider sessionProvider) {
-		super(sessionProvider);
+		this.sessionProvider = sessionProvider;
 	}
 
 	/**
@@ -228,20 +227,8 @@ public abstract class DataManager extends DatabaseBroker {
 		return new StudyVariateBuilder(this.sessionProvider);
 	}
 
-	protected final StudyReferenceBuilder getStudyNodeBuilder() {
-		return new StudyReferenceBuilder(this.sessionProvider);
-	}
-
 	protected final TraitBuilder getTraitBuilder() {
 		return new TraitBuilder(this.sessionProvider);
-	}
-
-	protected final VariableInfoBuilder getVariableInfoBuilder() {
-		return new VariableInfoBuilder();
-	}
-
-	protected final VariableTypeBuilder getVariableTypeBuilder() {
-		return new VariableTypeBuilder(this.sessionProvider);
 	}
 
 	protected final NameSynonymBuilder getNameSynonymBuilder() {
@@ -318,5 +305,16 @@ public abstract class DataManager extends DatabaseBroker {
 
 	protected final StudyDestroyer getStudyDestroyer() {
 		return new StudyDestroyer(this.sessionProvider);
+	}
+
+	public Session getActiveSession() {
+		if (this.sessionProvider != null) {
+			return this.sessionProvider.getSession();
+		}
+		return null;
+	}
+
+	public void setSessionProvider(final HibernateSessionProvider sessionProvider) {
+		this.sessionProvider = sessionProvider;
 	}
 }

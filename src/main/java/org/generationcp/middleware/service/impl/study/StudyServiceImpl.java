@@ -41,10 +41,6 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -70,30 +66,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyServiceImpl.class);
 
-	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT = "select count(*) as totalObservationUnits from "
-		+ "nd_experiment nde \n"
-		+ "    inner join project proj on proj.project_id = nde.project_id \n"
-		+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n";
-
-	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE = " where \n"
-		+ "	proj.study_id = :studyIdentifier AND proj.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
-		+ "    and gl.nd_geolocation_id = :instanceId ";
-
-	public static final String SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED =
-		"SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value) \n" + " FROM \n" + " project p \n"
-			+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
-			+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-			+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
-			+ "        LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
-			+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
-			+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
-			+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
-
-	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES =
-		StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT
-			+ "		LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
-			+ StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE + " and ph.value is not null ";
-
 	private StudyMeasurements studyMeasurements;
 
 	@Resource
@@ -112,8 +84,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	public StudyServiceImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		final Session currentSession = this.getCurrentSession();
-		this.studyMeasurements = new StudyMeasurements(currentSession);
+		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
 
 		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {
@@ -140,20 +111,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId) {
-		try {
-
-			final SQLQuery query =
-				this.getCurrentSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES);
-			query.addScalar("totalObservationUnits", new IntegerType());
-			query.setParameter("studyIdentifier", studyIdentifier);
-			query.setParameter("instanceId", instanceId);
-			return (int) query.uniqueResult() > 0;
-		} catch (final HibernateException he) {
-			throw new MiddlewareQueryException(
-				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
-					studyIdentifier, instanceId) + he.getMessage(),
-				he);
-		}
+		return this.daoFactory.getExperimentDao().hasMeasurementDataOnEnvironment(studyIdentifier, instanceId);
 	}
 
 	@Override
@@ -165,19 +123,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
-		try {
-			final SQLQuery query = this.getCurrentSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT
-				+ StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE);
-			query.addScalar("totalObservationUnits", new IntegerType());
-			query.setParameter("studyIdentifier", studyIdentifier);
-			query.setParameter("instanceId", instanceId);
-			return (int) query.uniqueResult();
-		} catch (final HibernateException he) {
-			throw new MiddlewareQueryException(
-				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
-					studyIdentifier, instanceId) + he.getMessage(),
-				he);
-		}
+		return this.daoFactory.getExperimentDao().countTotalObservationUnits(studyIdentifier, instanceId);
 	}
 
 	@Override
@@ -250,20 +196,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 			this.daoFactory.getProjectPropertyDAO().getVariables(studyIdentifier, VariableType.TRAIT.getId());
 		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, this.getGenericGermplasmDescriptors(studyIdentifier),
 			this.getAdditionalDesignFactors(studyIdentifier), measurementIdentifier);
-	}
-
-	@Override
-	public ObservationDto updateObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement) {
-
-		final Session currentSession = this.getCurrentSession();
-		final Observations observations = new Observations(currentSession, this.ontologyVariableDataManager);
-		try {
-			return observations.updataObsevationTraits(middlewareMeasurement,
-				StudyServiceImpl.studyIdToProgramIdCache.get(new StudyKey(studyIdentifier, ContextHolder.getCurrentCrop())));
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Unexpected error updating observations. Please contact support for " + "further assistence.", e); // or
-		}
 	}
 
 	@Override
@@ -521,19 +453,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {
-		final List queryResults;
-		try {
-			final SQLQuery query = this.getCurrentSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED);
-			query.setParameter("studyId", studyId);
-			query.setParameterList("cvtermIds", ids);
-			queryResults = query.list();
-
-		} catch (final HibernateException he) {
-			throw new MiddlewareQueryException(
-				"Unexpected error in executing hasMeasurementDataEntered(studyId = " + studyId + ") query: " + he.getMessage(), he);
-		}
-
-		return !queryResults.isEmpty();
+		return this.daoFactory.getPhenotypeDAO().hasMeasurementDataEntered(ids, studyId);
 	}
 
 	@Override

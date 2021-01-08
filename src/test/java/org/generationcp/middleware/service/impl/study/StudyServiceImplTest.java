@@ -5,26 +5,38 @@ import com.beust.jcommander.internal.Lists;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.GermplasmStudySourceDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.service.api.study.*;
+import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -67,6 +79,12 @@ public class StudyServiceImplTest {
 	@Mock
 	private DmsProjectDao dmsProjectDao;
 
+	@Mock
+	private ExperimentDao experimentDao;
+
+	@Mock
+	private PhenotypeDao phenotypeDao;
+
 	private StudyServiceImpl studyServiceImpl;
 
 	final List<String> additionalGermplasmDescriptors = Lists.newArrayList(STOCK_ID);
@@ -81,6 +99,9 @@ public class StudyServiceImplTest {
 		this.studyServiceImpl.setStudyMeasurements(this.studyMeasurements);
 		this.studyServiceImpl.setDaoFactory(this.daoFactory);
 		Mockito.when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
+		Mockito.when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
+		Mockito.when(this.daoFactory.getPhenotypeDAO()).thenReturn(this.phenotypeDao);
+
 		Mockito.when(this.daoFactory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
 		Mockito.when(this.mockSessionProvider.getSession()).thenReturn(this.mockSession);
 		Mockito.when(this.mockSession.createSQLQuery(ArgumentMatchers.anyString())).thenReturn(this.mockSqlQuery);
@@ -95,32 +116,19 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void testHasMeasurementDataOnEnvironmentAssertTrue() {
-		Mockito.when(this.mockSqlQuery.uniqueResult()).thenReturn(1);
-		Mockito.when(
-			this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
-			.thenReturn(this.mockSqlQuery);
-
+		Mockito.when(experimentDao.hasMeasurementDataOnEnvironment(Mockito.anyInt(), Mockito.anyInt())).thenReturn(true);
 		Assert.assertTrue(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
 	}
 
 	@Test
 	public void testHasMeasurementDataOnEnvironmentAssertFalse() {
-		Mockito.when(this.mockSqlQuery.uniqueResult()).thenReturn(0);
-		Mockito.when(
-			this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
-			.thenReturn(this.mockSqlQuery);
-
+		Mockito.when(experimentDao.hasMeasurementDataOnEnvironment(Mockito.anyInt(), Mockito.anyInt())).thenReturn(false);
 		Assert.assertFalse(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
 	}
 
 	@Test
 	public void testHasMeasurementDataEnteredAssertTrue() {
-		final Object[] testDBRow = {2503, 51547, "AleuCol_E_1to5", 43};
-		final List<Object[]> testResult = Collections.singletonList(testDBRow);
-		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
-
-		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
-			.thenReturn(this.mockSqlQuery);
+		Mockito.when(phenotypeDao.hasMeasurementDataEntered(Mockito.anyList(), Mockito.anyInt())).thenReturn(true);
 
 		final List<Integer> ids = Arrays.asList(1000, 1002);
 		assertThat(true, is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
@@ -128,11 +136,7 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void testHasMeasurementDataEnteredAssertFalse() {
-		final List<Object[]> testResult = Collections.emptyList();
-
-		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
-		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
-			.thenReturn(this.mockSqlQuery);
+		Mockito.when(phenotypeDao.hasMeasurementDataEntered(Mockito.anyList(), Mockito.anyInt())).thenReturn(false);
 
 		final List<Integer> ids = Arrays.asList(1000, 1002);
 		assertThat(false, is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));

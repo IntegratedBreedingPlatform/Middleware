@@ -1483,8 +1483,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	private Integer saveMarkerAlias(final MarkerAlias markerAlias) throws Exception {
-		this.getActiveSession();
-
 		final MarkerAlias markerAliasRecordSaved = this.daoFactory.getMarkerAliasDao().save(markerAlias);
 		final Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
 		if (markerAliasRecordSavedMarkerId == null) {
@@ -1494,7 +1492,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	private Integer saveOrUpdateMarkerAlias(final MarkerAlias markerAlias) throws Exception {
-		this.getActiveSession();
 		final MarkerAlias markerAliasFromDB = this.daoFactory.getMarkerAliasDao().getById(markerAlias.getMarkerId());
 		if (markerAliasFromDB == null) {
 			return this.saveMarkerAlias(markerAlias);
