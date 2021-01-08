@@ -30,8 +30,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.utils.test.Debug;
-import org.hamcrest.FeatureMatcher;
-import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -476,8 +474,10 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void getCodeFixedStatusByGidList() {
-		final GermplasmListManagerImpl germplasmListManager = Mockito.mock(GermplasmListManagerImpl.class);
+		final GermplasmListManagerImpl germplasmListManager = Mockito.spy(GermplasmListManagerImpl.class);
 		final GermplasmDAO germplasmDAO = Mockito.mock(GermplasmDAO.class);
+		final DaoFactory daoFactory = Mockito.mock(DaoFactory.class);
+		germplasmListManager.setDaoFactory(daoFactory);
 
 		final List<Integer> gids = Arrays.asList(1, 2);
 		final Germplasm gid1 = new Germplasm();
@@ -487,7 +487,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		gid2.setGid(2);
 		gid2.setMgid(0);
 		final List<Germplasm> germplasms = Arrays.asList(gid1, gid2);
-		Mockito.when(germplasmListManager.getGermplasmDao()).thenReturn(germplasmDAO);
+		Mockito.when(daoFactory.getGermplasmDao()).thenReturn(germplasmDAO);
 		Mockito.when(germplasmDAO.getByGIDList(gids)).thenReturn(germplasms);
 		Mockito.doCallRealMethod().when(germplasmListManager).getCodeFixedGidsByGidList(gids);
 		final Set<Integer> result = germplasmListManager.getCodeFixedGidsByGidList(gids);

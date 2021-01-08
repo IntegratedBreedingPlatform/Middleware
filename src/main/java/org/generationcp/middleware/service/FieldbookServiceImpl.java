@@ -336,7 +336,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
 			final List<Pair<Germplasm, List<Attribute>>> germplasmAttributes, final CropType cropType) {
 
-		final GermplasmDAO germplasmDao = this.getGermplasmDao();
+		final GermplasmDAO germplasmDao = this.daoFactory.getGermplasmDao();
 		final GermplasmListDAO germplasmListDao = this.daoFactory.getGermplasmListDAO();
 
 		final long startTime = System.currentTimeMillis();
@@ -393,7 +393,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					// if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
 						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm);
-						this.germplasmGroupingService.copyCodedNames(germplasm, this.getGermplasmDao().getById(germplasm.getGpid2()));
+						this.germplasmGroupingService
+							.copyCodedNames(germplasm, this.daoFactory.getGermplasmDao().getById(germplasm.getGpid2()));
 					}
 
 					// set Lgid to GID if it's value was not set previously

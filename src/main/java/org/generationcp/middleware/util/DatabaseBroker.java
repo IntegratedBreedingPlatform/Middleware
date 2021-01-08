@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.util;
 
-import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -302,12 +301,6 @@ public class DatabaseBroker {
 		final TrackMarkerDAO trackMarkerDao = new TrackMarkerDAO();
 		trackMarkerDao.setSession(this.getActiveSession());
 		return trackMarkerDao;
-	}
-
-	public GermplasmDAO getGermplasmDao() {
-		final GermplasmDAO germplasmDao = new GermplasmDAO();
-		germplasmDao.setSession(this.getActiveSession());
-		return germplasmDao;
 	}
 
 	public GermplasmSearchDAO getGermplasmSearchDao() {

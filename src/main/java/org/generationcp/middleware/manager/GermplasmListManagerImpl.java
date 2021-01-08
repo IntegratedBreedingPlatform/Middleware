@@ -18,7 +18,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
@@ -578,8 +577,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		final List<Integer> gidsDelete = new ArrayList<>(CollectionUtils.disjunction(germplasms, notDeletableGermplasmList));
 
 		if (!gidsDelete.isEmpty()) {
-			final GermplasmDAO dao = this.getGermplasmDao();
-			dao.deleteGermplasms(gidsDelete);
+			daoFactory.getGermplasmDao().deleteGermplasms(gidsDelete);
 
 			this.performGermplasmListEntriesDeletion(gidsDelete, listId);
 		}
@@ -609,8 +607,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	protected Set<Integer> getCodeFixedGidsByGidList(final List<Integer> gids) {
 		try {
 			final Set<Integer> set = new HashSet<>();
-			final GermplasmDAO dao = this.getGermplasmDao();
-			final List<Germplasm> germplasms = dao.getByGIDList(gids);
+			final List<Germplasm> germplasms = daoFactory.getGermplasmDao().getByGIDList(gids);
 			for (final Germplasm germplasm : germplasms) {
 				if (germplasm.getMgid() > 0) {
 					set.add(germplasm.getGid());
@@ -639,7 +636,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	private Set<Integer> getGermplasmOffspringByGIDs(final List<Integer> gids) {
 		try {
-			return this.getGermplasmDao().getGermplasmOffspringByGIDs(gids).keySet();
+			return this.daoFactory.getGermplasmDao().getGermplasmOffspringByGIDs(gids).keySet();
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 				"Error encountered while getting gids thart belongs to more than one list: GermplasmDataManager.getGermplasmUsedInMoreThanOneList(gids="
@@ -674,5 +671,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		for (final GermplasmList germplasmList : germplasmLists) {
 			germplasmList.setCreatedBy(userIDFullNameMap.get(germplasmList.getUserId()));
 		}
+	}
+
+	public void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 }

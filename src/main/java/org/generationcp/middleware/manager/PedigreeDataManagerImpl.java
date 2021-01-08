@@ -89,7 +89,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 			return maxPedigreeLevel;
 		}
 
-		final Germplasm germplasm = this.getGermplasmDao().getById(gid);
+		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
 
 		if (germplasm.getGnpgs() == -1) {
 			if (!includeDerivativeLine) {
@@ -447,12 +447,12 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	private List<Germplasm> getChildren(final Integer gid, final char methodType) {
-		return this.getGermplasmDao().getChildren(gid, methodType);
+		return this.daoFactory.getGermplasmDao().getChildren(gid, methodType);
 	}
 
 	@Override
 	public Germplasm getParentByGIDAndProgenitorNumber(final Integer gid, final Integer progenitorNumber) {
-		return this.getGermplasmDao().getProgenitorByGID(gid, progenitorNumber);
+		return this.daoFactory.getGermplasmDao().getProgenitorByGID(gid, progenitorNumber);
 	}
 
 	@Override
@@ -481,32 +481,32 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
 	private List<Germplasm> getGermplasmDescendantByGID(final Integer gid, final int start,
 		final int numOfRows) {
-		return this.getGermplasmDao().getGermplasmDescendantByGID(gid, start, numOfRows);
+		return this.daoFactory.getGermplasmDao().getGermplasmDescendantByGID(gid, start, numOfRows);
 	}
 
 	@Override
 	public long countDescendants(final Integer gid) {
-		return this.getGermplasmDao().countGermplasmDescendantByGID(gid);
+		return this.daoFactory.getGermplasmDao().countGermplasmDescendantByGID(gid);
 	}
 
 	@Override
 	public List<Germplasm> getManagementNeighbors(final Integer gid, final int start, final int numOfRows) {
-		return this.getGermplasmDao().getManagementNeighbors(gid, start, numOfRows);
+		return this.daoFactory.getGermplasmDao().getManagementNeighbors(gid, start, numOfRows);
 	}
 
 	@Override
 	public long countManagementNeighbors(final Integer gid) {
-		return this.getGermplasmDao().countManagementNeighbors(gid);
+		return this.daoFactory.getGermplasmDao().countManagementNeighbors(gid);
 	}
 
 	@Override
 	public long countGroupRelatives(final Integer gid) {
-		return this.getGermplasmDao().countGroupRelatives(gid);
+		return this.daoFactory.getGermplasmDao().countGroupRelatives(gid);
 	}
 
 	@Override
 	public List<Germplasm> getGroupRelatives(final Integer gid, final int start, final int numRows) {
-		return this.getGermplasmDao().getGroupRelatives(gid, start, numRows);
+		return this.daoFactory.getGermplasmDao().getGroupRelatives(gid, start, numRows);
 	}
 
 	@Override
