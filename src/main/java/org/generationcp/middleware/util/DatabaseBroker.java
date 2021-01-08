@@ -52,7 +52,6 @@ import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
 import org.generationcp.middleware.dao.oms.CVDao;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
-import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.hibernate.Session;
 
@@ -162,12 +161,6 @@ public class DatabaseBroker {
 		final PhenotypeOutlierDao phenotypeOutlierDao = new PhenotypeOutlierDao();
 		phenotypeOutlierDao.setSession(this.getActiveSession());
 		return phenotypeOutlierDao;
-	}
-
-	public VariableOverridesDao getVariableProgramOverridesDao() {
-		final VariableOverridesDao variableOverridesDao = new VariableOverridesDao();
-		variableOverridesDao.setSession(this.getActiveSession());
-		return variableOverridesDao;
 	}
 
 	public CvTermSynonymDao getCvTermSynonymDao() {

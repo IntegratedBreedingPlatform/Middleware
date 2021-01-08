@@ -324,4 +324,8 @@ public class ReportServiceImpl extends Service implements ReportService {
 		dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
 		dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
 	}
+
+	public void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
 }

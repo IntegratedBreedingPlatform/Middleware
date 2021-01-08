@@ -527,7 +527,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			// Variable alias and expected range
-			final VariableOverrides overrides = this.getVariableProgramOverridesDao().getByVariableAndProgram(id, programUuid);
+			final VariableOverrides overrides = this.daoFactory.getVariableProgramOverridesDao().getByVariableAndProgram(id, programUuid);
 
 			if (overrides != null) {
 				variable.setAlias(overrides.getAlias());
@@ -627,7 +627,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		// Saving alias, min, max values
 		if (!StringUtils.isBlank(variableInfo.getAlias()) || variableInfo.getExpectedMin() != null || variableInfo.getExpectedMax() != null) {
-			this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
+			this.daoFactory.getVariableProgramOverridesDao()
+				.save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
 					variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
 		}
 
@@ -747,10 +748,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		// Saving alias, min, max values
 		if (!Strings.isNullOrEmpty(variableInfo.getAlias()) || variableInfo.getExpectedMin() != null
 				|| variableInfo.getExpectedMax() != null) {
-			this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
+			this.daoFactory.getVariableProgramOverridesDao()
+				.save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
 					variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
 		} else if (variableOverrides != null) {
-			this.getVariableProgramOverridesDao().makeTransient(variableOverrides);
+			this.daoFactory.getVariableProgramOverridesDao().makeTransient(variableOverrides);
 		}
 
 		// Updating favorite to true if alias is defined
@@ -822,10 +824,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			// delete Variable alias and expected range
-			final List<VariableOverrides> variableOverridesList = this.getVariableProgramOverridesDao().getByVariableId(variableId);
+			final List<VariableOverrides> variableOverridesList =
+				this.daoFactory.getVariableProgramOverridesDao().getByVariableId(variableId);
 
 			for (final VariableOverrides overrides : variableOverridesList) {
-				this.getVariableProgramOverridesDao().makeTransient(overrides);
+				this.daoFactory.getVariableProgramOverridesDao().makeTransient(overrides);
 			}
 
 			// delete variable synonym
@@ -959,7 +962,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		final List<CVTermProperty> termProperties = daoFactory.getCvTermPropertyDao().getByCvTermId(elements.getVariableId());
 
 		final VariableOverrides variableOverrides =
-				this.getVariableProgramOverridesDao().getByVariableAndProgram(elements.getVariableId(), elements.getProgramUuid());
+			this.daoFactory.getVariableProgramOverridesDao().getByVariableAndProgram(elements.getVariableId(), elements.getProgramUuid());
 
 		// Set to elements to send response back to caller.
 		elements.setVariableTerm(variableTerm);
@@ -984,7 +987,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public List<VariableOverrides> getVariableOverridesByVariableIds(final List<Integer> variableIds) {
 		try {
-			return this.getVariableProgramOverridesDao().getVariableOverridesByVariableIds(variableIds);
+			return this.daoFactory.getVariableProgramOverridesDao().getVariableOverridesByVariableIds(variableIds);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error at getVariableOverridesByVariableIds:" + e.getMessage(), e);
 		}
@@ -993,7 +996,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public VariableOverrides getVariableOverridesByVariableIdAndProgram(final Integer variableId, final String programUuid) {
 		try {
-			return this.getVariableProgramOverridesDao().getByVariableAndProgram(variableId, programUuid);
+			return this.daoFactory.getVariableProgramOverridesDao().getByVariableAndProgram(variableId, programUuid);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error at getByVariableAndProgram:" + e.getMessage(), e);
 		}

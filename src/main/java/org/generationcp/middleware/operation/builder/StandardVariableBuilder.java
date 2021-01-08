@@ -428,7 +428,7 @@ public class StandardVariableBuilder extends Builder {
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAliasInVariableOverrideTable(
 		final List<String> variableNames, final String programUUID) {
 		if (!variableNames.isEmpty()) {
-			return this.getVariableProgramOverridesDao().getVariableOverridesByVariableIdsAndProgram(variableNames, programUUID);
+			return this.daoFactory.getVariableProgramOverridesDao().getVariableOverridesByVariableIdsAndProgram(variableNames, programUUID);
 		}
 		return new HashMap<>();
 	}
