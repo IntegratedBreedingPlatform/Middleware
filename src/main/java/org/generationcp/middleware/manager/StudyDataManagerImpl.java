@@ -561,7 +561,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		for (final ExperimentValues exp : experimentValues) {
 			if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
 				final ExperimentModel experimentModel =
-					this.getExperimentDao().getExperimentByProjectIdAndLocation(projectId, exp.getLocationId());
+					this.daoFactory.getExperimentDao().getExperimentByProjectIdAndLocation(projectId, exp.getLocationId());
 				for (final Variable variable : exp.getVariableList().getVariables()) {
 					final int val =
 						this.daoFactory.getPhenotypeDAO().updatePhenotypesByExperimentIdAndObervableId(experimentModel.getNdExperimentId(),
@@ -1076,7 +1076,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		if (!datasetProjects.isEmpty()) {
 			final int dataSetId = datasetProjects.get(0).getProjectId();
-			return this.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(dataSetId, locationIds);
+			return this.daoFactory.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(dataSetId, locationIds);
 		} else {
 			return false;
 		}
@@ -1110,7 +1110,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(final Integer studyId) {
-		return this.getExperimentDao().getExperimentSamplesDTOMap(studyId);
+		return this.daoFactory.getExperimentDao().getExperimentSamplesDTOMap(studyId);
 	}
 
 	@Override
@@ -1231,7 +1231,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public boolean areAllInstancesExistInDataset(final Integer datasetId, final Set<Integer> instanceIds) {
-		return this.getExperimentDao().areAllInstancesExistInDataset(datasetId, instanceIds);
+		return this.daoFactory.getExperimentDao().areAllInstancesExistInDataset(datasetId, instanceIds);
 	}
 
 	@Override

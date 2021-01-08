@@ -24,9 +24,9 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.HashSet;
@@ -37,12 +37,15 @@ public class StockBuilder extends Builder {
 	@Resource
 	private DataSetBuilder dataSetBuilder;
 
+	private DaoFactory daoFactory;
+
 	public StockBuilder() {
 
 	}
 
 	public StockBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public Stocks getStocksInDataset(int datasetId) throws MiddlewareException {
@@ -106,6 +109,6 @@ public class StockBuilder extends Builder {
 	}
 
 	public long countStocks(int datasetId) throws MiddlewareQueryException {
-		return this.getExperimentDao().countStocksByDatasetId(datasetId);
+		return this.daoFactory.getExperimentDao().countStocksByDatasetId(datasetId);
 	}
 }

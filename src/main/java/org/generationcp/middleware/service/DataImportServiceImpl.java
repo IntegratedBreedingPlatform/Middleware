@@ -1192,7 +1192,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		if (!existingInstances.isEmpty() && workbook.getStudyDetails().getId() != null) {
 			final List<String> instancesWithExperiments = new ArrayList<>();
 			final boolean isMeansDataImport = workbook.getImportType() != null && workbook.getImportType() == DatasetTypeEnum.MEANS_DATA.getId();
-			final Map<String, Long> instanceExperimentsMap = this.getExperimentDao()
+			final Map<String, Long> instanceExperimentsMap = this.daoFactory.getExperimentDao()
 				.countObservationsPerInstance(isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId());
 			for (final String existingInstance : existingInstances) {
 				if (instanceExperimentsMap.containsKey(existingInstance) && instanceExperimentsMap.get(existingInstance) > 0) {

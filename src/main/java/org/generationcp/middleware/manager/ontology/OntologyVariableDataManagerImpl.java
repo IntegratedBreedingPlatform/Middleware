@@ -567,7 +567,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		//setting variable observations, first observations will be null so set it to 0
 		Integer observations = 0;
 		for (VariableType v : variable.getVariableTypes()) {
-			long observationsPerType = this.getExperimentDao().countByObservedVariable(variable.getId(), v.getId());
+			long observationsPerType = this.daoFactory.getExperimentDao().countByObservedVariable(variable.getId(), v.getId());
 			observations = (int) (observations + observationsPerType);
 		}
 		variable.setObservations(observations);

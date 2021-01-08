@@ -12,7 +12,6 @@
 package org.generationcp.middleware.util;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -72,12 +71,6 @@ public class DatabaseBroker {
 		final GeolocationPropertyDao geolocationPropertyDao = new GeolocationPropertyDao();
 		geolocationPropertyDao.setSession(this.getActiveSession());
 		return geolocationPropertyDao;
-	}
-
-	public ExperimentDao getExperimentDao() {
-		final ExperimentDao experimentDao = new ExperimentDao();
-		experimentDao.setSession(this.getActiveSession());
-		return experimentDao;
 	}
 
 }

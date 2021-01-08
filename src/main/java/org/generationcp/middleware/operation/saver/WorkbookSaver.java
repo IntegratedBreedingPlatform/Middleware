@@ -244,9 +244,9 @@ public class WorkbookSaver extends Saver {
 		if (isDeleteTrialObservations) {
 
 			final ExperimentModel studyExperiment =
-				this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
+				this.daoFactory.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
 			studyExperiment.setGeoLocation(this.daoFactory.getGeolocationDao().getById(studyLocationId));
-			this.getExperimentDao().saveOrUpdate(studyExperiment);
+			this.daoFactory.getExperimentDao().saveOrUpdate(studyExperiment);
 
 			// delete trial observations
 			this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
@@ -323,9 +323,9 @@ public class WorkbookSaver extends Saver {
 			trialHeaders, trialVariatesMap, true, programUUID);
 
 		final ExperimentModel studyExperiment =
-			this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(studyId)).get(0);
+			this.daoFactory.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(studyId)).get(0);
 		studyExperiment.setGeoLocation(this.daoFactory.getGeolocationDao().getById(studyLocationId));
-		this.getExperimentDao().saveOrUpdate(studyExperiment);
+		this.daoFactory.getExperimentDao().saveOrUpdate(studyExperiment);
 
 		// delete trial observations
 		this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
@@ -1174,12 +1174,12 @@ public class WorkbookSaver extends Saver {
 	}
 
 	private boolean checkIfHasExistingStudyExperiment(final int studyId) {
-		final Integer experimentId = this.getExperimentDao().getExperimentIdByProjectId(studyId);
+		final Integer experimentId = this.daoFactory.getExperimentDao().getExperimentIdByProjectId(studyId);
 		return experimentId != null;
 	}
 
 	private boolean checkIfHasExistingExperiments(final List<Integer> locationIds) {
-		final List<Integer> experimentIds = this.getExperimentDao().getExperimentIdsByGeolocationIds(locationIds);
+		final List<Integer> experimentIds = this.daoFactory.getExperimentDao().getExperimentIdsByGeolocationIds(locationIds);
 		return experimentIds != null && !experimentIds.isEmpty();
 	}
 

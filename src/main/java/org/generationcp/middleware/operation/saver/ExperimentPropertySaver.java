@@ -204,7 +204,7 @@ public class ExperimentPropertySaver extends Saver {
 	 */
 	private Map<Integer, ExperimentModel> createExperimentIdWiseMap(final List<Integer> experimentIds){
 		Map<Integer, ExperimentModel> experimentMap = new HashMap<>();
-		List<ExperimentModel> experiments = this.getExperimentDao().filterByColumnValues("ndExperimentId", experimentIds);
+		List<ExperimentModel> experiments = this.daoFactory.getExperimentDao().filterByColumnValues("ndExperimentId", experimentIds);
 		if(experiments != null){
 			for(ExperimentModel experimentModel : experiments){
 				experimentMap.put(experimentModel.getNdExperimentId(), experimentModel);

@@ -44,8 +44,6 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -69,7 +67,6 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StudyType;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -789,7 +786,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setProject(project);
-		this.manager.getExperimentDao().save(experimentModel);
+		this.daoFactory.getExperimentDao().save(experimentModel);
 
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
 			locationNameIdValue, programUUID));
@@ -828,7 +825,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setProject(project);
-		this.manager.getExperimentDao().save(experimentModel);
+		this.daoFactory.getExperimentDao().save(experimentModel);
 
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
 			locationNameIdValue, ""));
@@ -989,7 +986,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		values.setLocationId(this.manager.getExperimentModelSaver().createNewGeoLocation().getLocationId());
 		//Save the experiment
 		this.manager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.manager.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		final ExperimentModel experiment =
+			this.daoFactory.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Phenotype updatedPhenotype =
 			this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", updatedPhenotype.getValue());
@@ -1085,23 +1083,4 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(this.manager.isStudy(mainFolder.getProjectId()));
 	}
 
-
-	private StandardVariable createStandardVariable(final String name) {
-
-		final CVTerm property = this.cvTermDao.save(org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(10), "", CvId.PROPERTIES);
-		final CVTerm scale = this.cvTermDao.save(org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(10), "", CvId.SCALES);
-		final CVTerm method = this.cvTermDao.save(org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(10), "", CvId.METHODS);
-
-		final StandardVariable standardVariable = new StandardVariable();
-		standardVariable.setName(name);
-		standardVariable.setProperty(new Term(property.getCvTermId(), property.getName(), property.getDefinition()));
-		standardVariable.setScale(new Term(scale.getCvTermId(), scale.getName(), scale.getDefinition()));
-		standardVariable.setMethod(new Term(method.getCvTermId(), method.getName(), method.getDefinition()));
-		standardVariable.setDataType(new Term(DataType.CATEGORICAL_VARIABLE.getId(), "Categorical variable", "variable with Categorical values"));
-		standardVariable.setIsA(new Term(1050, "Study detail", "Study detail class"));
-
-		this.standardVariableSaver.save(standardVariable);
-
-		return standardVariable;
-	}
 }
