@@ -12,7 +12,6 @@
 package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
@@ -33,8 +32,6 @@ import org.generationcp.middleware.util.DatabaseBroker;
  */
 public class Saver extends DatabaseBroker {
 
-	private DaoFactory daoFactory;
-
 	public Saver() {
 
 	}
@@ -44,7 +41,6 @@ public class Saver extends DatabaseBroker {
 	 */
 	protected Saver(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	protected final StudySaver getStudySaver() {
@@ -131,11 +127,4 @@ public class Saver extends DatabaseBroker {
 		return new ExperimentDestroyer(this.sessionProvider);
 	}
 
-	public DaoFactory getDaoFactory() {
-		return daoFactory;
-	}
-
-	public void setDaoFactory(final DaoFactory daoFactory) {
-		this.daoFactory = daoFactory;
-	}
 }

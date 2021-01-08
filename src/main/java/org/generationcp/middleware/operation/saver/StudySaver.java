@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.CropType;
 
@@ -27,8 +28,11 @@ import org.generationcp.middleware.pojos.workbench.CropType;
  */
 public class StudySaver extends Saver {
 
+	private DaoFactory daoFactory;
+
 	public StudySaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	/**
@@ -44,7 +48,7 @@ public class StudySaver extends Saver {
 
 		project.setProgramUUID(programUUID);
 
-		project = this.getDaoFactory().getDmsProjectDAO().save(project);
+		project = this.daoFactory.getDmsProjectDAO().save(project);
 		this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, studyValues.getVariableList());
 		if (saveStudyExperiment) {
 			this.saveStudyExperiment(crop, project.getProjectId(), studyValues);

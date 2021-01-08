@@ -135,7 +135,7 @@
     </bean>
 
     <bean id="dataImportService" class="org.generationcp.middleware.service.DataImportServiceImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="fieldbookService" class="org.generationcp.middleware.service.FieldbookServiceImpl">

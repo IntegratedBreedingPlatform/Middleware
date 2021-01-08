@@ -1052,7 +1052,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public String getTrialInstanceNumberByGeolocationId(final int geolocationId) {
-		final Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
+		final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(geolocationId);
 		if (geolocation != null) {
 			return geolocation.getDescription();
 		}
@@ -1082,7 +1082,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
-		return this.getGeolocationDao().getInstanceMetadata(studyId, new ArrayList<>());
+		return this.daoFactory.getGeolocationDao().getInstanceMetadata(studyId, new ArrayList<>());
 	}
 
 	@Override
@@ -1112,7 +1112,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public Map<String, Integer> getInstanceGeolocationIdsMap(final Integer studyId) {
-		final List<Geolocation> geolocations = this.getGeolocationDao().getEnvironmentGeolocations(studyId);
+		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId);
 		final Map<String, Integer> map = new HashMap<>();
 		for (final Geolocation geolocation : geolocations) {
 			map.put(geolocation.getDescription(), geolocation.getLocationId());
@@ -1251,7 +1251,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public Map<Integer, String> getGeolocationByInstanceId(final Integer datasetId, final Integer instanceDbId) {
-		final Geolocation geoLocation = this.getGeolocationDao().getById(instanceDbId);
+		final Geolocation geoLocation = this.daoFactory.getGeolocationDao().getById(instanceDbId);
 		final Map<Integer, String> geoLocationMap =
 			this.getGeolocationPropertyDao().getGeoLocationPropertyByVariableId(datasetId, instanceDbId);
 

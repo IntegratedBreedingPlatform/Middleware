@@ -13,7 +13,18 @@ package org.generationcp.middleware.operation.saver;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -44,7 +55,12 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 // Assumptions - can be added to validations
@@ -229,7 +245,7 @@ public class WorkbookSaver extends Saver {
 
 			final ExperimentModel studyExperiment =
 				this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
-			studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
+			studyExperiment.setGeoLocation(this.daoFactory.getGeolocationDao().getById(studyLocationId));
 			this.getExperimentDao().saveOrUpdate(studyExperiment);
 
 			// delete trial observations
@@ -308,7 +324,7 @@ public class WorkbookSaver extends Saver {
 
 		final ExperimentModel studyExperiment =
 			this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(studyId)).get(0);
-		studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
+		studyExperiment.setGeoLocation(this.daoFactory.getGeolocationDao().getById(studyLocationId));
 		this.getExperimentDao().saveOrUpdate(studyExperiment);
 
 		// delete trial observations

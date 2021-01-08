@@ -16,7 +16,6 @@ import org.generationcp.middleware.dao.GermplasmSearchDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
@@ -141,12 +140,6 @@ public class DatabaseBroker {
 		final ProjectPropertyDao projectPropertyDao = new ProjectPropertyDao();
 		projectPropertyDao.setSession(this.getActiveSession());
 		return projectPropertyDao;
-	}
-
-	public GeolocationDao getGeolocationDao() {
-		final GeolocationDao geolocationDao = new GeolocationDao();
-		geolocationDao.setSession(this.getActiveSession());
-		return geolocationDao;
 	}
 
 	public PhenotypeDao getPhenotypeDao() {
