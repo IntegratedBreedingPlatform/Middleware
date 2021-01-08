@@ -1,15 +1,7 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -24,11 +16,19 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Implements {@link OntologyPropertyDataManagerImpl}
@@ -204,7 +204,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 				// Check if Property term is already added to Map. We are iterating multiple classes for property
 				Property property =
 						new Property(new Term((Integer) items[0], (String) items[1], (String) items[2], (Integer) items[3],
-								this.typeSafeObjectToBoolean(items[4])));
+							Util.typeSafeObjectToBoolean(items[4])));
 
 				if (items[5] != null) {
 					property.setCropOntologyId((String) items[5]);

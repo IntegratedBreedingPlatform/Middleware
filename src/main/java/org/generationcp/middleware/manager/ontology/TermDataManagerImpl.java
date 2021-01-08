@@ -1,9 +1,6 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
@@ -13,9 +10,13 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Transactional
 public class TermDataManagerImpl extends DataManager implements TermDataManager {
@@ -90,12 +91,12 @@ public class TermDataManagerImpl extends DataManager implements TermDataManager 
 				}
 
 				final TermRelationship relationship = new TermRelationship();
-				relationship.setId(this.typeSafeObjectToInteger(items[0]));
-				relationship.setRelationshipId(TermRelationshipId.getById(this.typeSafeObjectToInteger(items[1])));
-				relationship.setSubjectTerm(new Term(this.typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5],
-						this.typeSafeObjectToInteger(items[2]), false));
-				relationship.setObjectTerm(new Term(this.typeSafeObjectToInteger(items[7]), (String) items[8], (String) items[9],
-						this.typeSafeObjectToInteger(items[6]), false));
+				relationship.setId(Util.typeSafeObjectToInteger(items[0]));
+				relationship.setRelationshipId(TermRelationshipId.getById(Util.typeSafeObjectToInteger(items[1])));
+				relationship.setSubjectTerm(new Term(Util.typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5],
+					Util.typeSafeObjectToInteger(items[2]), false));
+				relationship.setObjectTerm(new Term(Util.typeSafeObjectToInteger(items[7]), (String) items[8], (String) items[9],
+					Util.typeSafeObjectToInteger(items[6]), false));
 				termRelationships.add(relationship);
 			}
 		} catch (final HibernateException e) {

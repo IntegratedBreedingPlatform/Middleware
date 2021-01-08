@@ -174,7 +174,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 					final List<Integer> propertyIds = listParameters.get(PROPERTY_IDS);
 					for (final Object row : queryResults) {
-						propertyIds.add(this.typeSafeObjectToInteger(row));
+						propertyIds.add(Util.typeSafeObjectToInteger(row));
 					}
 
 					// Filtering with class that is invalid. So no further iteration required.
@@ -214,7 +214,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 					final List<Integer> scaleIds = listParameters.get(SCALE_IDS);
 					for (final Object row : queryResults) {
-						scaleIds.add(this.typeSafeObjectToInteger(row));
+						scaleIds.add(Util.typeSafeObjectToInteger(row));
 					}
 
 					// Filtering with data type gives no scale. So no further iteration required.
@@ -259,7 +259,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 					final List<Integer> variableIds = listParameters.get(VARIABLE_IDS);
 					for (final Object row : queryResults) {
-						variableIds.add(this.typeSafeObjectToInteger(row));
+						variableIds.add(Util.typeSafeObjectToInteger(row));
 					}
 
 					// Filtering with variable types that is not used or invalid. So no further iteration required.
@@ -316,24 +316,24 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			for (final Object row : queryResults) {
 				final Object[] items = (Object[]) row;
 				final Variable variable =
-						new Variable(new Term(this.typeSafeObjectToInteger(items[0]), (String) items[1], (String) items[2]));
+					new Variable(new Term(Util.typeSafeObjectToInteger(items[0]), (String) items[1], (String) items[2]));
 
-				final Integer propertyId = this.typeSafeObjectToInteger(items[3]);
+				final Integer propertyId = Util.typeSafeObjectToInteger(items[3]);
 				if (!pMap.containsKey(propertyId)) {
 					pMap.put(propertyId,
-							new Property(new Term(this.typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5])));
+						new Property(new Term(Util.typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5])));
 				}
 				variable.setProperty(pMap.get(propertyId));
 
-				final Integer methodId = this.typeSafeObjectToInteger(items[6]);
+				final Integer methodId = Util.typeSafeObjectToInteger(items[6]);
 				if (!mMap.containsKey(methodId)) {
-					mMap.put(methodId, new Method(new Term(this.typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8])));
+					mMap.put(methodId, new Method(new Term(Util.typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8])));
 				}
 				variable.setMethod(mMap.get(methodId));
 
-				final Integer scaleId = this.typeSafeObjectToInteger(items[9]);
+				final Integer scaleId = Util.typeSafeObjectToInteger(items[9]);
 				if (!sMap.containsKey(scaleId)) {
-					sMap.put(scaleId, new Scale(new Term(this.typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11])));
+					sMap.put(scaleId, new Scale(new Term(Util.typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11])));
 				}
 
 				variable.setScale(sMap.get(scaleId));
@@ -380,9 +380,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			for (final Object row : rQueryResults) {
 				final Object[] items = (Object[]) row;
 
-				final Integer subjectId = this.typeSafeObjectToInteger(items[0]);
-				final Integer typeId = this.typeSafeObjectToInteger(items[1]);
-				final Integer objectId = this.typeSafeObjectToInteger(items[2]);
+				final Integer subjectId = Util.typeSafeObjectToInteger(items[0]);
+				final Integer typeId = Util.typeSafeObjectToInteger(items[1]);
+				final Integer objectId = Util.typeSafeObjectToInteger(items[2]);
 
 				final String name = (String) items[3];
 				final String description = (String) items[4];
@@ -415,9 +415,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			for (final Object row : pQueryResults) {
 				final Object[] items = (Object[]) row;
 
-				final Integer cvTermId = this.typeSafeObjectToInteger(items[0]);
-				final Integer cvId = this.typeSafeObjectToInteger(items[1]);
-				final Integer typeId = this.typeSafeObjectToInteger(items[2]);
+				final Integer cvTermId = Util.typeSafeObjectToInteger(items[0]);
+				final Integer cvId = Util.typeSafeObjectToInteger(items[1]);
+				final Integer typeId = Util.typeSafeObjectToInteger(items[2]);
 				final String value = (String) items[3];
 
 				if (Objects.equals(typeId, TermId.CROP_ONTOLOGY_ID.getId()) && Objects.equals(cvId, CvId.PROPERTIES.getId())) {
