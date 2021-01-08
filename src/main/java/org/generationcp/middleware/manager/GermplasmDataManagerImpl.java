@@ -1037,14 +1037,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Germplasm> searchForGermplasm(final GermplasmSearchParameter germplasmSearchParameter) {
-		final List<Germplasm> germplasms = this.getGermplasmSearchDao().searchForGermplasms(germplasmSearchParameter);
+		final List<Germplasm> germplasms = this.daoFactory.getGermplasmSearchDAO().searchForGermplasms(germplasmSearchParameter);
 		this.getListInventoryBuilder().setAvailableBalanceScaleForGermplasm(germplasms);
 		return germplasms;
 	}
 
 	@Override
 	public Set<Integer> retrieveGidsOfSearchGermplasmResult(final GermplasmSearchParameter germplasmSearchParameter) {
-		return this.getGermplasmSearchDao().retrieveGIDSearchResults(germplasmSearchParameter);
+		return this.daoFactory.getGermplasmSearchDAO().retrieveGIDSearchResults(germplasmSearchParameter);
 	}
 
 	/**
@@ -1059,7 +1059,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 */
 	@Override
 	public Integer countSearchForGermplasm(final GermplasmSearchParameter germplasmSearchParameter) {
-		return this.getGermplasmSearchDao().countSearchForGermplasms(germplasmSearchParameter);
+		return this.daoFactory.getGermplasmSearchDAO().countSearchForGermplasms(germplasmSearchParameter);
 	}
 
 	@Override
