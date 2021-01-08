@@ -35,7 +35,7 @@ public class ProjectSaver extends Saver {
 		DmsProject project = null;
 
 		if (studyValues != null) {
-			final DmsProject parentProject = this.getDmsProjectDao().getById(parentId);
+			final DmsProject parentProject = this.daoFactory.getDmsProjectDAO().getById(parentId);
 
 			project = new DmsProject();
 			project.setName(name);
@@ -96,7 +96,7 @@ public class ProjectSaver extends Saver {
 	public DmsProject saveFolder(final int parentId, final String name, final String description, final String programUUID, final String objective) {
 		final DmsProject project = new DmsProject();
 		project.setProgramUUID(programUUID);
-		project.setParent(this.getDmsProjectDao().getById(parentId));
+		project.setParent(this.daoFactory.getDmsProjectDAO().getById(parentId));
 		this.mapStudytoProject(name, description, project, objective);
 		return this.daoFactory.getDmsProjectDAO().save(project);
 

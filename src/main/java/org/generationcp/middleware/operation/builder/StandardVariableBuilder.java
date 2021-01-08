@@ -480,7 +480,7 @@ public class StandardVariableBuilder extends Builder {
 
 	private boolean isExistsGeolocationByTypeAndValue(final int factorId, final String value) {
 		final Set<Integer> geolocationIds =
-			new HashSet<>(this.getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
+			new HashSet<>(this.daoFactory.getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
 		return !geolocationIds.isEmpty();
 	}
 

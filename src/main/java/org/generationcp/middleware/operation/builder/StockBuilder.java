@@ -53,7 +53,7 @@ public class StockBuilder extends Builder {
 		Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
 
 		VariableTypeList stockVariableTypes = this.getStockVariableTypes(study, dataSet);
-		Set<StockModel> stockModels = new HashSet<>(this.getStockDao().getStocksForStudy(dataSet.getStudyId()));
+		Set<StockModel> stockModels = new HashSet<>(this.daoFactory.getStockDao().getStocksForStudy(dataSet.getStudyId()));
 
 		return this.buildStocks(stockModels, stockVariableTypes);
 	}

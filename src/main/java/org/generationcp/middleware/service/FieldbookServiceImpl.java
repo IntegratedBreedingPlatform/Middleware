@@ -793,7 +793,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public String getBlockId(final int datasetId, final Integer trialInstance) {
-		return this.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+		return this.daoFactory.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
 	}
 
 	@Override
@@ -842,7 +842,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Integer getProjectIdByNameAndProgramUUID(final String name, final String programUUID) {
-		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(name, programUUID);
+		return this.daoFactory.getDmsProjectDAO().getProjectIdByNameAndProgramUUID(name, programUUID);
 	}
 
 	@Override

@@ -709,7 +709,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setDescription("projectDescription");
 		project.setProgramUUID(programUUID);
 
-		this.manager.getDmsProjectDao().save(project);
+		this.daoFactory.getDmsProjectDAO().save(project);
 
 		final DMSVariableType dmsVariableType = new DMSVariableType();
 		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
@@ -737,7 +737,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setProgramUUID(programUUID);
 		project.setDeleted(true);
 
-		this.manager.getDmsProjectDao().save(project);
+		this.daoFactory.getDmsProjectDAO().save(project);
 
 		final DMSVariableType dmsVariableType = new DMSVariableType();
 		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
@@ -764,7 +764,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setName("projectName");
 		project.setDescription("projectDescription");
 		project.setProgramUUID(programUUID);
-		this.manager.getDmsProjectDao().save(project);
+		this.daoFactory.getDmsProjectDAO().save(project);
 
 		final DMSVariableType dmsVariableType = new DMSVariableType();
 		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
@@ -803,7 +803,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setDescription("projectDescription");
 		project.setProgramUUID(programUUID);
 		project.setDeleted(true);
-		this.manager.getDmsProjectDao().save(project);
+		this.daoFactory.getDmsProjectDAO().save(project);
 
 		final DMSVariableType dmsVariableType = new DMSVariableType();
 		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
@@ -843,7 +843,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setProgramUUID(programUUID);
 		project.setDeleted(false);
 		project.setStartDate("20180403");
-		this.manager.getDmsProjectDao().save(project);
+		this.daoFactory.getDmsProjectDAO().save(project);
 
 		final String startDate = this.manager.getProjectStartDateByProjectId(project.getProjectId());
 		Assert.assertEquals(project.getStartDate(), startDate);
@@ -1054,7 +1054,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setName("projectName");
 		project.setDescription("ProjectDescription");
 		project.setProgramUUID(programUUID);
-		project = this.manager.getDmsProjectDao().save(project);
+		project = this.daoFactory.getDmsProjectDAO().save(project);
 
 		final DatasetReference plotdata =
 			this.addTestDataset(project.getProjectId(), project.getName() + PLOTDATA, DatasetTypeEnum.PLOT_DATA.getId());
@@ -1065,8 +1065,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final String newStudyName = "newStudyName";
 		this.manager.renameStudy(newStudyName, project.getProjectId(), programUUID);
 
-		final DmsProject plotDataset = this.manager.getDmsProjectDao().getById(plotdata.getId());
-		final DmsProject environmentDataset = this.manager.getDmsProjectDao().getById(environment.getId());
+		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(plotdata.getId());
+		final DmsProject environmentDataset = this.daoFactory.getDmsProjectDAO().getById(environment.getId());
 
 		Assert.assertEquals(newStudyName + PLOTDATA, plotDataset.getName());
 		Assert.assertEquals(newStudyName + ENVIRONMENT, environmentDataset.getName());

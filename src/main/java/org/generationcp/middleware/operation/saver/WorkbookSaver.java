@@ -713,7 +713,8 @@ public class WorkbookSaver extends Saver {
 
 		Integer studyId = null;
 		if (workbook.getStudyDetails() != null) {
-			studyId = this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(workbook.getStudyDetails().getStudyName(), programUUID);
+			studyId =
+				this.daoFactory.getDmsProjectDAO().getProjectIdByNameAndProgramUUID(workbook.getStudyDetails().getStudyName(), programUUID);
 		}
 
 		if (studyId == null) {
@@ -977,7 +978,7 @@ public class WorkbookSaver extends Saver {
 
 	private Integer getMeansDataset(final Integer studyId) {
 		Integer id = null;
-		final List<DmsProject> datasets = this.getDmsProjectDao()
+		final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO()
 			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.MEANS_DATA.getId());
 		if (datasets != null && !datasets.isEmpty()) {
 			id = datasets.get(0).getProjectId();
@@ -1199,8 +1200,8 @@ public class WorkbookSaver extends Saver {
 
 		final int parentFolderId = (int) workbook.getStudyDetails().getParentFolderId();
 
-		final DmsProject study = this.getDmsProjectDao().getById(workbook.getStudyDetails().getId());
-		study.setParent(this.getDmsProjectDao().getById(parentFolderId));
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(workbook.getStudyDetails().getId());
+		study.setParent(this.daoFactory.getDmsProjectDAO().getById(parentFolderId));
 		Integer trialDatasetId = workbook.getTrialDatasetId();
 		Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {
@@ -1208,8 +1209,8 @@ public class WorkbookSaver extends Saver {
 			measurementDatasetId = this.workbookBuilder.getMeasurementDataSetId(studyId);
 			trialDatasetId = this.workbookBuilder.getTrialDataSetId(studyId);
 		}
-		final DmsProject trialDataset = this.getDmsProjectDao().getById(trialDatasetId);
-		final DmsProject measurementDataset = this.getDmsProjectDao().getById(measurementDatasetId);
+		final DmsProject trialDataset = this.daoFactory.getDmsProjectDAO().getById(trialDatasetId);
+		final DmsProject measurementDataset = this.daoFactory.getDmsProjectDAO().getById(measurementDatasetId);
 
 		this.saveProjectProperties(workbook);
 
@@ -1229,9 +1230,9 @@ public class WorkbookSaver extends Saver {
 		final Integer trialDatasetId = workbook.getTrialDatasetId();
 		final Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 
-		final DmsProject study = this.getDmsProjectDao().getById(studyId);
-		final DmsProject trialDataset = this.getDmsProjectDao().getById(trialDatasetId);
-		final DmsProject measurementDataset = this.getDmsProjectDao().getById(measurementDatasetId);
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
+		final DmsProject trialDataset = this.daoFactory.getDmsProjectDAO().getById(trialDatasetId);
+		final DmsProject measurementDataset = this.daoFactory.getDmsProjectDAO().getById(measurementDatasetId);
 
 		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConditions(), false);
 		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
@@ -1266,7 +1267,7 @@ public class WorkbookSaver extends Saver {
 	private void updateStudyDetails(final String description, final DmsProject study, final String objective) {
 		study.setDescription(description);
 		study.setObjective(objective);
-		this.getDmsProjectDao().merge(study);
+		this.daoFactory.getDmsProjectDAO().merge(study);
 	}
 
 	private int createMeansDatasetIfNecessary(

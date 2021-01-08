@@ -1020,7 +1020,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Override
 	public boolean checkIfProjectNameIsExistingInProgram(final String name, final String programUUID) {
-		return this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(name, programUUID);
+		return this.daoFactory.getDmsProjectDAO().checkIfProjectNameIsExistingInProgram(name, programUUID);
 	}
 
 	@Override

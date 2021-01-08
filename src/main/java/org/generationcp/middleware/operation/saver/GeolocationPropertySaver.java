@@ -57,7 +57,7 @@ public class GeolocationPropertySaver extends Saver {
 			property.setType(typeId);
 		}
 		property.setValue(value);
-		this.getGeolocationPropertyDao().saveOrUpdate(property);
+		this.daoFactory.getGeolocationPropertyDao().saveOrUpdate(property);
 	}
 
 	private int getMaxRank(final List<GeolocationProperty> properties) {
@@ -94,6 +94,6 @@ public class GeolocationPropertySaver extends Saver {
 			geolocation.getProperties().add(property);
 		}
 		property.setValue(value);
-		this.getGeolocationPropertyDao().saveOrUpdate(property);
+		this.daoFactory.getGeolocationPropertyDao().saveOrUpdate(property);
 	}
 }
