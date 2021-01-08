@@ -26,7 +26,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -42,11 +41,8 @@ public class StandardVariableSaver extends Saver {
 
 	private DaoFactory daoFactory;
 
-	private TermPropertyBuilder termPropertyBuilder;
-
 	public StandardVariableSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
-		this.termPropertyBuilder = new TermPropertyBuilder(sessionProviderForLocal);
 		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
@@ -206,7 +202,7 @@ public class StandardVariableSaver extends Saver {
 		final CV cv = new CV();
 		cv.setName(String.valueOf(variable.getId()));
 		cv.setDefinition(String.valueOf(variable.getName() + " - " + variable.getDescription()));
-		this.getCvDao().save(cv);
+		this.daoFactory.getCvDao().save(cv);
 		return cv;
 
 	}
@@ -290,7 +286,7 @@ public class StandardVariableSaver extends Saver {
 
 		// Check if cv entry of enumeration already exists
 		// Add cv entry of the standard variable if none found
-		Integer cvId = this.getCvDao().getIdByName(String.valueOf(variable.getId()));
+		Integer cvId = this.daoFactory.getCvDao().getIdByName(String.valueOf(variable.getId()));
 
 		if (cvId == null) {
 			cvId = this.createCv(variable).getCvId();

@@ -794,7 +794,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		// Check if cv entry of enumeration already exists
 		// Add cv entry of the standard variable if none found
-		Integer cvId = this.getCvDao().getIdByName(String.valueOf(variable.getId()));
+		Integer cvId = this.daoFactory.getCvDao().getIdByName(String.valueOf(variable.getId()));
 
 		if (cvId == null) {
 			cvId = this.getStandardVariableSaver().createCv(variable).getCvId();
@@ -989,7 +989,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public Integer getCVIdByName(final String name) {
-		return this.getCvDao().getIdByName(name);
+		return this.daoFactory.getCvDao().getIdByName(name);
 	}
 
 	@Override

@@ -42,6 +42,7 @@ import org.generationcp.middleware.dao.dms.StudySearchDao;
 import org.generationcp.middleware.dao.ims.ExperimentTransactionDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
+import org.generationcp.middleware.dao.oms.CVDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
@@ -347,6 +348,12 @@ public class DaoFactory {
 
 	public StandardVariableDao getStandardVariableDao() {
 		return new StandardVariableDao(this.sessionProvider.getSession());
+	}
+
+	public CVDao getCvDao() {
+		final CVDao cvDao = new CVDao();
+		cvDao.setSession(this.sessionProvider.getSession());
+		return cvDao;
 	}
 
 
