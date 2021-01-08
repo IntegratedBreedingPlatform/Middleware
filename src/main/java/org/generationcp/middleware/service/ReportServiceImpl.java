@@ -10,8 +10,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -42,13 +41,9 @@ public class ReportServiceImpl extends Service implements ReportService {
 	private final ReporterFactory factory = ReporterFactory.instance();
 
 	@Resource
-	private StudyDataManager studyDataManager;
-
-	@Resource
-	private DataSetBuilder dataSetBuilder;
-
-	@Resource
 	private WorkbookBuilder workbookBuilder;
+
+	private DaoFactory daoFactory;
 
 	public ReportServiceImpl() {
 		super();
@@ -56,7 +51,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 
 	public ReportServiceImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -153,7 +148,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 			final Location location = this.getLocationDataManager().getLocationByID(locationId);
 
 			if ((location.getCntryid() != null && location.getCntryid() != 0)) {
-				final Country country = this.getCountryDao().getById(location.getCntryid());
+				final Country country = this.daoFactory.getCountryDao().getById(location.getCntryid());
 
 				variables.add(createPlaceholderCountryMeasurementVariable(country.getIsofull()));
 			}
@@ -181,7 +176,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 			final Location location = this.getLocationDataManager().getLocationByID(locationId);
 
 			if (location.getCntryid() != null && location.getCntryid() != 0) {
-				final Country country = this.getCountryDao().getById(location.getCntryid());
+				final Country country = this.daoFactory.getCountryDao().getById(location.getCntryid());
 
 				variables.add(createPlaceholderCountryMeasurementData(country.getIsofull()));
 			}

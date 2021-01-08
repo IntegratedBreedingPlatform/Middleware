@@ -641,7 +641,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	@Deprecated
 	public Country getCountryById(final Integer id) {
-		return this.getCountryDao().getById(id, false);
+		return this.daoFactory.getCountryDao().getById(id, false);
 	}
 
 	/**
@@ -931,7 +931,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	@Deprecated
 	public List<Country> getAllCountry() {
-		return this.getCountryDao().getAllCountry();
+		return this.daoFactory.getCountryDao().getAllCountry();
 	}
 
 	@Override

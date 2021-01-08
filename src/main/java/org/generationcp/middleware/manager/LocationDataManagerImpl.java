@@ -208,7 +208,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public Country getCountryById(final Integer id) {
-		return this.getCountryDao().getById(id, false);
+		return this.daoFactory.getCountryDao().getById(id, false);
 	}
 
 	@Override
@@ -289,7 +289,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Country> getAllCountry() {
-		return this.getCountryDao().getAllCountry();
+		return this.daoFactory.getCountryDao().getAllCountry();
 	}
 
 	@Override

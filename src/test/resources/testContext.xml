@@ -147,7 +147,7 @@
     </bean>
 
     <bean id="reportService" class="org.generationcp.middleware.service.ReportServiceImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="ontologyMethodDataManager" class="org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl">
