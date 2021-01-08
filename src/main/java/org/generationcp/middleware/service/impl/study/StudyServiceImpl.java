@@ -11,7 +11,6 @@ import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -42,7 +41,6 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -541,12 +539,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber,
 		final PhenotypeSearchRequestDTO requestDTO) {
-		return this.getPhenotypeDao().searchPhenotypes(pageSize, pageNumber, requestDTO);
+		return this.daoFactory.getPhenotypeDAO().searchPhenotypes(pageSize, pageNumber, requestDTO);
 	}
 
 	@Override
 	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
-		return this.getPhenotypeDao().countPhenotypes(requestDTO);
+		return this.daoFactory.getPhenotypeDAO().countPhenotypes(requestDTO);
 	}
 
 	@Override

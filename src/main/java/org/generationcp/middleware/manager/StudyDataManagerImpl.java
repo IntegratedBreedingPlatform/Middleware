@@ -440,7 +440,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public String getLocalNameByStandardVariableId(final Integer projectId, final Integer standardVariableId) {
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setProjectId(projectId);
-		final ProjectProperty projectProperty = this.getProjectPropertyDao().getByStandardVariableId(dmsProject, standardVariableId);
+		final ProjectProperty projectProperty =
+			this.daoFactory.getProjectPropertyDAO().getByStandardVariableId(dmsProject, standardVariableId);
 		return (projectProperty == null) ? null : projectProperty.getAlias();
 	}
 
@@ -562,7 +563,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				final ExperimentModel experimentModel =
 					this.getExperimentDao().getExperimentByProjectIdAndLocation(projectId, exp.getLocationId());
 				for (final Variable variable : exp.getVariableList().getVariables()) {
-					final int val = this.getPhenotypeDao().updatePhenotypesByExperimentIdAndObervableId(experimentModel.getNdExperimentId(),
+					final int val =
+						this.daoFactory.getPhenotypeDAO().updatePhenotypesByExperimentIdAndObervableId(experimentModel.getNdExperimentId(),
 						variable.getVariableType().getId(), variable.getValue());
 					if (val == 0) {
 						this.getPhenotypeSaver().save(experimentModel.getNdExperimentId(), variable);
@@ -815,7 +817,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public int countPlotsWithRecordedVariatesInDataset(final int dataSetId, final List<Integer> variateIds) {
-		return this.getPhenotypeDao().countRecordedVariatesOfStudy(dataSetId, variateIds);
+		return this.daoFactory.getPhenotypeDAO().countRecordedVariatesOfStudy(dataSetId, variateIds);
 	}
 
 	@Override
@@ -826,14 +828,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public boolean checkIfStudyHasMeasurementData(final int datasetId, final List<Integer> variateIds) {
-		return this.getPhenotypeDao().countVariatesDataOfStudy(datasetId, variateIds) > 0;
+		return this.daoFactory.getPhenotypeDAO().countVariatesDataOfStudy(datasetId, variateIds) > 0;
 	}
 
 	@Override
 	public int countVariatesWithData(final int datasetId, final List<Integer> variateIds) {
 		int variatesWithDataCount = 0;
 		if (variateIds != null && !variateIds.isEmpty()) {
-			final Map<Integer, Integer> map = this.getPhenotypeDao().countVariatesDataOfStudy(datasetId);
+			final Map<Integer, Integer> map = this.daoFactory.getPhenotypeDAO().countVariatesDataOfStudy(datasetId);
 			for (final Integer variateId : variateIds) {
 				final Integer count = map.get(variateId);
 				if (count != null && count > 0) {
@@ -980,7 +982,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(
 		final int projectId, final int locationId, final Integer plotNo,
 		final List<Integer> cvTermIds) {
-		return this.getPhenotypeDao().getPhenotypeIdsByLocationAndPlotNo(projectId, locationId, plotNo, cvTermIds);
+		return this.daoFactory.getPhenotypeDAO().getPhenotypeIdsByLocationAndPlotNo(projectId, locationId, plotNo, cvTermIds);
 	}
 
 	@Override
@@ -1010,7 +1012,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public Boolean containsAtLeast2CommonEntriesWithValues(final int projectId, final int locationId, final int germplasmTermId) {
 
-		return this.getPhenotypeDao().containsAtLeast2CommonEntriesWithValues(projectId, locationId, germplasmTermId);
+		return this.daoFactory.getPhenotypeDAO().containsAtLeast2CommonEntriesWithValues(projectId, locationId, germplasmTermId);
 	}
 
 	public void setLocationDataManager(final LocationDataManager locationDataManager) {
@@ -1087,7 +1089,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public Phenotype getPhenotypeById(final int phenotypeId) {
-		return this.getPhenotypeDao().getById(phenotypeId);
+		return this.daoFactory.getPhenotypeDAO().getById(phenotypeId);
 	}
 
 	@Override
@@ -1284,7 +1286,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId) {
 		final Map<Integer, String> phenotypeMap = new HashMap<>();
-		final List<Phenotype> phenotypes = this.getPhenotypeDao().getPhenotypeByDatasetIdAndInstanceDbId(datasetId, instanceDbId);
+		final List<Phenotype> phenotypes =
+			this.daoFactory.getPhenotypeDAO().getPhenotypeByDatasetIdAndInstanceDbId(datasetId, instanceDbId);
 		for (final Phenotype phenotype : phenotypes) {
 			phenotypeMap.put(phenotype.getObservableId(), phenotype.getValue());
 		}

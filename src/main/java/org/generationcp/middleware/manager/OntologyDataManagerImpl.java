@@ -411,7 +411,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public List<ProjectProperty> getProjectPropertiesByProjectId(final int projectId) {
-		return this.getProjectPropertyDao().getByProjectId(projectId);
+		return this.daoFactory.getProjectPropertyDAO().getByProjectId(projectId);
 	}
 
 	@Override

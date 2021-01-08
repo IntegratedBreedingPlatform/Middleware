@@ -414,7 +414,7 @@ public class StandardVariableBuilder extends Builder {
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(
 		final List<String> variableNames, final String programUUID) {
 		if (!variableNames.isEmpty()) {
-			return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByAlias(variableNames, programUUID);
+			return this.daoFactory.getProjectPropertyDAO().getStandardVariableIdsWithTypeByAlias(variableNames, programUUID);
 		}
 		return new HashMap<>();
 	}
@@ -496,12 +496,13 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	private boolean isExistsPropertyByTypeAndValue(final Integer factorId, final String value) {
-		final List<ProjectProperty> properties = new ArrayList<>(this.getProjectPropertyDao().getByTypeAndValue(factorId, value));
+		final List<ProjectProperty> properties =
+			new ArrayList<>(this.daoFactory.getProjectPropertyDAO().getByTypeAndValue(factorId, value));
 		return !properties.isEmpty();
 	}
 
 	private boolean isExistsPhenotypeByTypeAndValue(final Integer variateId, final String value, final boolean isEnum) {
-		final List<Phenotype> phenotypes = new ArrayList<>(this.getPhenotypeDao().getByTypeAndValue(variateId, value, isEnum));
+		final List<Phenotype> phenotypes = new ArrayList<>(this.daoFactory.getPhenotypeDAO().getByTypeAndValue(variateId, value, isEnum));
 		return !phenotypes.isEmpty();
 	}
 

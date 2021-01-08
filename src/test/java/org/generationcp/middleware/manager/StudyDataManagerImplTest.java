@@ -21,7 +21,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.oms.CVTermDao;
-import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -136,6 +135,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	private Project commonTestProject;
 
+	private DaoFactory daoFactory;
+
 	private static CrossExpansionProperties crossExpansionProperties;
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
@@ -146,6 +147,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
+
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+
 		this.manager.setUserService(this.userService);
 
 		this.cvTermDao = new CVTermDao();
@@ -987,7 +991,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.manager.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Phenotype updatedPhenotype =
-			this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+			this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", updatedPhenotype.getValue());
 
 		//Change the value of the variable
@@ -999,9 +1003,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		this.manager.updateExperimentValues(Arrays.asList(values), 1);
 
-		updatedPhenotype = this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+		updatedPhenotype =
+			this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		final Phenotype savedPhenotype =
-			this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1002);
+			this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1002);
 		Assert.assertEquals("900", updatedPhenotype.getValue());
 		Assert.assertEquals("1000", savedPhenotype.getValue());
 	}

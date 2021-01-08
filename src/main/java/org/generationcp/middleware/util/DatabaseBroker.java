@@ -15,8 +15,6 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
-import org.generationcp.middleware.dao.dms.PhenotypeDao;
-import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.dms.StockPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -94,18 +92,6 @@ public class DatabaseBroker {
 		final StockPropertyDao stockPropertyDao = new StockPropertyDao();
 		stockPropertyDao.setSession(this.getActiveSession());
 		return stockPropertyDao;
-	}
-
-	public ProjectPropertyDao getProjectPropertyDao() {
-		final ProjectPropertyDao projectPropertyDao = new ProjectPropertyDao();
-		projectPropertyDao.setSession(this.getActiveSession());
-		return projectPropertyDao;
-	}
-
-	public PhenotypeDao getPhenotypeDao() {
-		final PhenotypeDao phenotypeDao = new PhenotypeDao();
-		phenotypeDao.setSession(this.getActiveSession());
-		return phenotypeDao;
 	}
 
 }

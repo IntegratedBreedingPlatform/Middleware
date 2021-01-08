@@ -139,7 +139,7 @@
     </bean>
 
     <bean id="fieldbookService" class="org.generationcp.middleware.service.FieldbookServiceImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="MBDTDataManager" class="org.generationcp.middleware.manager.MBDTDataManagerImpl">

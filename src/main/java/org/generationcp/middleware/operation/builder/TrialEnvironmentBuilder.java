@@ -155,7 +155,7 @@ public class TrialEnvironmentBuilder extends Builder {
 
 		// Step 3: Get environment traits
 		final List<TrialEnvironment> localTrialEnvironments =
-				this.getPhenotypeDao().getEnvironmentTraits(trialEnvironmentDetails, experimentTypes);
+			this.daoFactory.getPhenotypeDAO().getEnvironmentTraits(trialEnvironmentDetails, experimentTypes);
 		trialEnvironments.addAll(localTrialEnvironments);
 
 		// Step 4: Build germplasm pairs. Get what's common between GID1 AND GID2
