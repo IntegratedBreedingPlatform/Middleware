@@ -485,13 +485,14 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	private boolean isExistsStocksByTypeAndValue(final Integer factorId, final String value) {
-		final Set<Integer> stockIds = new HashSet<>(this.getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
+		final Set<Integer> stockIds =
+			new HashSet<>(this.daoFactory.getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
 		return !stockIds.isEmpty();
 	}
 
 	private boolean isExistsExperimentsByTypeAndValue(final Integer factorId, final String value) {
 		final Set<Integer> experimentIds =
-			new HashSet<>(this.getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value));
+			new HashSet<>(this.daoFactory.getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value));
 		return !experimentIds.isEmpty();
 	}
 

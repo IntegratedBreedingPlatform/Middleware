@@ -989,7 +989,7 @@ public class WorkbookBuilder extends Builder {
 		final int measurementDatasetId) {
 
 		for (final TreatmentVariable treatmentVariable : treatmentVariables) {
-			final List<String> values = this.getExperimentPropertyDao().getTreatmentFactorValues(
+			final List<String> values = this.daoFactory.getExperimentPropertyDao().getTreatmentFactorValues(
 				treatmentVariable.getLevelVariable().getTermId(), treatmentVariable.getValueVariable().getTermId(),
 				measurementDatasetId);
 			treatmentVariable.setValues(values);

@@ -11,16 +11,16 @@
 
 package org.generationcp.middleware.operation.searcher;
 
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.DaoFactory;
 
 public class ExperimentSearcher extends Searcher {
 
@@ -77,13 +77,13 @@ public class ExperimentSearcher extends Searcher {
 
 	private List<Integer> findExperimentsByStockFactorValue(Integer factorId, String value) throws MiddlewareQueryException {
 		Set<Integer> stockIds = new HashSet<Integer>();
-		stockIds.addAll(this.getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
+		stockIds.addAll(this.daoFactory.getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
 
 		return this.getExperimentIdsByStockIds(stockIds);
 	}
 
 	private List<Integer> findExperimentsByExperimentFactorValue(Integer factorId, String value) throws MiddlewareQueryException {
-		return this.getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value);
+		return this.daoFactory.getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value);
 	}
 
 	private List<Integer> getExperimentIdsByStockIds(Collection<Integer> stockIds) throws MiddlewareQueryException {

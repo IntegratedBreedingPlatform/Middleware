@@ -463,7 +463,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				gids.add(stockModel.getGermplasm().getGid());
 			}
 			final Map<Integer, String> crossExpansions = this.pedigreeService.getCrossExpansions(gids, null, crossExpansionProperties);
-			final List<FieldMapDatasetInfo> fieldMapDatasetInfos = this.getExperimentPropertyDao().getFieldMapLabels(studyId);
+			final List<FieldMapDatasetInfo> fieldMapDatasetInfos = this.daoFactory.getExperimentPropertyDao().getFieldMapLabels(studyId);
 			for (final FieldMapDatasetInfo datasetInfo : fieldMapDatasetInfos) {
 				for (final FieldMapTrialInstanceInfo instanceInfo : datasetInfo.getTrialInstances()) {
 					for (final FieldMapLabel label : instanceInfo.getFieldMapLabels()) {
@@ -579,7 +579,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final int datasetId, final int geolocationId,
 		final CrossExpansionProperties crossExpansionProperties) {
 		final List<FieldMapInfo> fieldMapInfos =
-			this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
+			this.daoFactory.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
 
 		this.updateFieldMapWithBlockInformation(fieldMapInfos, true);
 		final Map<Integer, String> pedigreeStringMap = new HashMap<>();
@@ -597,7 +597,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(final int blockId) {
 
-		final List<FieldMapInfo> fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
+		final List<FieldMapInfo> fieldMapInfos =
+			this.daoFactory.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
 
 		this.updateFieldMapWithBlockInformation(fieldMapInfos);
 
