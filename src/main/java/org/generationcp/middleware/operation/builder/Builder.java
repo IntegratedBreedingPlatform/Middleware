@@ -135,4 +135,12 @@ public abstract class Builder {
 	protected final InventoryDataManager getInventoryDataManager() {
 		return new InventoryDataManagerImpl(this.sessionProvider);
 	}
+
+	public HibernateSessionProvider getSessionProvider() {
+		return this.sessionProvider;
+	}
+
+	public void setSessionProvider(final HibernateSessionProvider sessionProvider) {
+		this.sessionProvider = sessionProvider;
+	}
 }

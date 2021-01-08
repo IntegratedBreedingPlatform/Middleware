@@ -314,6 +314,10 @@ public abstract class DataManager {
 		return null;
 	}
 
+	public HibernateSessionProvider getSessionProvider() {
+		return this.sessionProvider;
+	}
+
 	public void setSessionProvider(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 	}
