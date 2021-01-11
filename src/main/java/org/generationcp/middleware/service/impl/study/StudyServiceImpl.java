@@ -31,7 +31,6 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.EnvironmentParameter;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.ObservationLevel;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
@@ -110,32 +109,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId) {
-		return this.daoFactory.getExperimentDao().hasMeasurementDataOnEnvironment(studyIdentifier, instanceId);
-	}
-
-	@Override
 	public boolean hasCrossesOrSelections(final int studyId) {
 		final GermplasmStudySourceSearchRequest searchParameters = new GermplasmStudySourceSearchRequest();
 		searchParameters.setStudyId(studyId);
 		return this.daoFactory.getGermplasmStudySourceDAO().countGermplasmStudySourceList(searchParameters) > 0;
-	}
-
-	@Override
-	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
-		return this.daoFactory.getExperimentDao().countTotalObservationUnits(studyIdentifier, instanceId);
-	}
-
-	@Override
-	public List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize,
-		final String sortBy, final String sortOrder) {
-
-		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.daoFactory.getProjectPropertyDAO().getVariables(studyIdentifier,
-			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
-
-		return this.studyMeasurements.getAllMeasurements(studyIdentifier, selectionMethodsAndTraits,
-			this.getGenericGermplasmDescriptors(studyIdentifier), this.getAdditionalDesignFactors(studyIdentifier), instanceId,
-			pageNumber, pageSize, sortBy, sortOrder);
 	}
 
 	@Override
@@ -188,14 +165,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public Integer getEnvironmentDatasetId(final int studyId) {
 		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0)
 			.getProjectId();
-	}
-
-	@Override
-	public List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier) {
-		final List<MeasurementVariableDto> traits =
-			this.daoFactory.getProjectPropertyDAO().getVariables(studyIdentifier, VariableType.TRAIT.getId());
-		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, this.getGenericGermplasmDescriptors(studyIdentifier),
-			this.getAdditionalDesignFactors(studyIdentifier), measurementIdentifier);
 	}
 
 	@Override

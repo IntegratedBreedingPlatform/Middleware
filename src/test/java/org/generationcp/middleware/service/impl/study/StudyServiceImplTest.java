@@ -15,10 +15,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.hibernate.SQLQuery;
@@ -115,18 +112,6 @@ public class StudyServiceImplTest {
 	}
 
 	@Test
-	public void testHasMeasurementDataOnEnvironmentAssertTrue() {
-		Mockito.when(experimentDao.hasMeasurementDataOnEnvironment(Mockito.anyInt(), Mockito.anyInt())).thenReturn(true);
-		Assert.assertTrue(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
-	}
-
-	@Test
-	public void testHasMeasurementDataOnEnvironmentAssertFalse() {
-		Mockito.when(experimentDao.hasMeasurementDataOnEnvironment(Mockito.anyInt(), Mockito.anyInt())).thenReturn(false);
-		Assert.assertFalse(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
-	}
-
-	@Test
 	public void testHasMeasurementDataEnteredAssertTrue() {
 		Mockito.when(phenotypeDao.hasMeasurementDataEntered(Mockito.anyList(), Mockito.anyInt())).thenReturn(true);
 
@@ -151,41 +136,6 @@ public class StudyServiceImplTest {
 		final ArgumentCaptor<GermplasmStudySourceSearchRequest> captor = ArgumentCaptor.forClass(GermplasmStudySourceSearchRequest.class);
 		Mockito.verify(sourceDao).countGermplasmStudySourceList(captor.capture());
 		Assert.assertEquals(studyId, captor.getValue().getStudyId());
-	}
-
-	/**
-	 * Run the StudyServiceImpl(HibernateSessionProvider) constructor test.
-	 */
-	@Test
-	public void testGetObservations() {
-		final StudyMeasurements mockMeasurements = Mockito.mock(StudyMeasurements.class);
-
-		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl( mockMeasurements);
-		studyServiceImpl.setDaoFactory(this.daoFactory);
-
-		final List<MeasurementVariableDto> projectTraits =
-			Arrays.<MeasurementVariableDto>asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
-		Mockito.when(this.projectPropertyDao.getVariables(StudyServiceImplTest.STUDY_ID, VariableType.TRAIT.getId(),
-			VariableType.SELECTION_METHOD.getId())).thenReturn(projectTraits);
-		final List<MeasurementDto> traits = new ArrayList<>();
-		traits.add(new MeasurementDto(new MeasurementVariableDto(1, "traitName"), 9999, "traitValue", Phenotype.ValueStatus.OUT_OF_SYNC));
-		final ObservationDto measurement = new ObservationDto(1, "trialInstance", "entryType", StudyServiceImplTest.STUDY_ID, "designation",
-			"entryNo", "seedSource", "repitionNumber", "plotNumber", "blockNumber", traits);
-		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
-		final int instanceId = 1;
-		final int pageNumber = 1;
-		final int pageSize = 100;
-		Mockito.when(mockMeasurements.getAllMeasurements(StudyServiceImplTest.STUDY_ID, projectTraits,
-			this.additionalGermplasmDescriptors, this.additionalDesignFactors, instanceId, pageNumber, pageSize, null, null))
-			.thenReturn(testMeasurements);
-
-		// Method to test
-		final List<ObservationDto> actualMeasurements =
-			studyServiceImpl.getObservations(StudyServiceImplTest.STUDY_ID, 1, 1, 100, null, null);
-
-		Assert.assertEquals(testMeasurements, actualMeasurements);
-		Mockito.verify(mockMeasurements).getAllMeasurements(StudyServiceImplTest.STUDY_ID, projectTraits,
-			this.additionalGermplasmDescriptors, this.additionalDesignFactors, instanceId, pageNumber, pageSize, null, null);
 	}
 
 	@Test

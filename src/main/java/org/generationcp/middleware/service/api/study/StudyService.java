@@ -10,16 +10,7 @@ import java.util.List;
 
 public interface StudyService {
 
-	boolean hasMeasurementDataOnEnvironment(int studyIdentifier, int instanceId);
-
 	boolean hasCrossesOrSelections(int studyId);
-
-	int countTotalObservationUnits(int studyIdentifier, int instanceId);
-
-	List<ObservationDto> getObservations(int studyIdentifier, int instanceId, int pageNumber, int pageSize, String sortBy,
-		String sortOrder);
-
-	List<ObservationDto> getSingleObservation(int studyIdentifier, int measurementIdentifier);
 
 	String getProgramUUID(Integer studyIdentifier);
 
