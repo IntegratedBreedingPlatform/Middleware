@@ -482,10 +482,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	}
 
-	private List<Name> getByGidAndNtype(final int gid, final GermplasmNameType nType) {
-		return this.getNameDao().getByGIDWithFilters(gid, null, nType);
-	}
-
 	@Override
 	public GermplasmList getGermplasmListByName(final String name, final String programUUID) {
 		final List<GermplasmList> germplasmLists = this.germplasmListManager.getGermplasmListByName(name, programUUID, 0, 1, Operation.EQUAL);
