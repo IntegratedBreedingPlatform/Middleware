@@ -409,10 +409,6 @@ public class ExperimentBuilder extends Builder {
 		return variable;
 	}
 
-	public ExperimentModel getExperimentModel(final int experimentId) {
-		return this.daoFactory.getExperimentDao().getById(experimentId);
-	}
-
 	public boolean hasFieldmap(final int datasetId) {
 		return this.daoFactory.getExperimentDao().hasFieldmap(datasetId);
 	}

@@ -14,7 +14,6 @@ package org.generationcp.middleware.operation.saver;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
-import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.transformer.etl.DatasetValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StudyValuesTransformer;
@@ -105,10 +104,6 @@ public class Saver {
 
 	protected final GeolocationPropertySaver getGeolocationPropertySaver() {
 		return new GeolocationPropertySaver(this.sessionProvider);
-	}
-
-	protected final ExperimentDestroyer getExperimentDestroyer() {
-		return new ExperimentDestroyer(this.sessionProvider);
 	}
 
 	public Session getActiveSession() {

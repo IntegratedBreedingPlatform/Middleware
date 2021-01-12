@@ -122,8 +122,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Resource
 	private LocationDataManager locationDataManager;
 
-	private GermplasmGuidGenerator germplasmGuidGenerator = new GermplasmGuidGenerator();
-
 	private DaoFactory daoFactory;
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
@@ -911,7 +909,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		try {
-			this.getStudyDestroyer().deleteStudy(studyId);
+			this.studyDataManager.deleteStudy(studyId);
 
 		} catch (final Exception e) {
 			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
