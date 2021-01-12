@@ -435,18 +435,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public void addEntryTypeVariableIfNotExists(final Workbook workbook,
 		final String programUUID) {
 
-		final Optional<MeasurementVariable> optEntryType = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getFactors());
+		final Optional<MeasurementVariable> entryTypeFactor = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getFactors());
 		final boolean entryTypeidExistsInRow = this.findMeasurementRowByTermId(TermId.ENTRY_TYPE.getId(), workbook.getObservations()).isPresent();
 
-		if (!optEntryType.isPresent() || !entryTypeidExistsInRow) {
+		if (!entryTypeFactor.isPresent() || !entryTypeidExistsInRow) {
 			final MeasurementVariable entryType;
-			if (!optEntryType.isPresent()) {
+			if (!entryTypeFactor.isPresent()) {
 				// If ENTRY_TYPE variable is not existing in Factors Section of workbook
 				// Automatically add ENTRY_TYPE variable as it is required in creating a new Study.
 				entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.GERMPLASM, programUUID);
 				workbook.getFactors().add(entryType);
 			} else {
-				entryType = optEntryType.get();
+				entryType = entryTypeFactor.get();
 			}
 			// Add ENTRY_TYPE variable in Measurement Row with default value Test Entry
 			final MeasurementData data = new MeasurementData(entryType.getLabel(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false, entryType.getDataType(), entryType);
