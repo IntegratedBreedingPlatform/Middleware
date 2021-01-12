@@ -36,7 +36,7 @@ public class StudyValuesTransformerTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		StudyValuesTransformerTest.transformer = new StudyValuesTransformer(this.sessionProvder);
+		StudyValuesTransformerTest.transformer = new StudyValuesTransformer();
 	}
 
 	@Test

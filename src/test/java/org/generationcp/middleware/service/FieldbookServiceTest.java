@@ -6,12 +6,10 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmListDAO;
-import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
@@ -22,7 +20,6 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
-import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -72,15 +69,9 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 	private GermplasmListDAO germplasmListDAO;
 	private CropType crop;
 
-	private static final String TEST_LIST_DESCRIPTION = "Test List Description";
-	private static final long TEST_GERMPLASM_LIST_DATE = 20141103;
-	private static final Integer STATUS_ACTIVE = 0;
-	private static final String PROGRAM_UUID = "1001";
-	private static final int TEST_GERMPLASM_LIST_USER_ID = 9999;
-
 	@Before
 	public void setUp() throws Exception {
-		this.fieldbookService = new FieldbookServiceImpl(this.sessionProvder, "TESTCROP");
+		this.fieldbookService = new FieldbookServiceImpl(this.sessionProvder);
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
 
 		this.workbenchTestDataUtil.setUpWorkbench();

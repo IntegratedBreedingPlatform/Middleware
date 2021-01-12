@@ -11,8 +11,8 @@ import java.util.List;
 @Transactional
 public class MethodServiceImpl extends Service implements MethodService {
 
-	public MethodServiceImpl(final HibernateSessionProvider sessionProvider, final String localDatabaseName) {
-		super(sessionProvider, localDatabaseName);
+	public MethodServiceImpl(final HibernateSessionProvider sessionProvider) {
+		super(sessionProvider);
 	}
 
 	@Override

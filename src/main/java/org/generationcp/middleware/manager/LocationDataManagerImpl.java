@@ -174,7 +174,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public UserDefinedField getUserDefinedFieldByID(final Integer id) {
-		return this.getUserDefinedFieldDao().getById(id, false);
+		return this.daoFactory.getUserDefinedFieldDAO().getById(id, false);
 	}
 
 	@Override
@@ -203,12 +203,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final String fieldType) {
-		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, ImmutableSet.of(fieldType));
+		return this.daoFactory.getUserDefinedFieldDAO().getByFieldTableNameAndType(tableName, ImmutableSet.of(fieldType));
 	}
 
 	@Override
 	public Country getCountryById(final Integer id) {
-		return this.getCountryDao().getById(id, false);
+		return this.daoFactory.getCountryDao().getById(id, false);
 	}
 
 	@Override
@@ -273,7 +273,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			final Location recordSaved = locationDao.saveOrUpdate(location);
 			idLocationSaved = recordSaved.getLocid();
 
-			final LocdesDAO locdesDao = this.getLocdesDao();
+			final LocdesDAO locdesDao = this.daoFactory.getLocDesDao();
 			locdes.setLocationId(idLocationSaved);
 			locdesDao.saveOrUpdate(locdes);
 
@@ -287,7 +287,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Country> getAllCountry() {
-		return this.getCountryDao().getAllCountry();
+		return this.daoFactory.getCountryDao().getAllCountry();
 	}
 
 	@Override
@@ -341,7 +341,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 		final Map<String, UserDefinedField> dTypes = this.getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
 
-		final List<Locdes> locdesOfLocation = this.getLocdesDao().getByLocation(blockId);
+		final List<Locdes> locdesOfLocation = this.daoFactory.getLocDesDao().getByLocation(blockId);
 		final List<String> deletedPlots = new ArrayList<>();
 
 		for (final Locdes locdes : locdesOfLocation) {
@@ -452,7 +452,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 		if (locdesList != null && !locdesList.isEmpty()) {
 			try {
-				final List<Locdes> existingLocdesList = this.getLocDesDao().getByLocation(locId);
+				final List<Locdes> existingLocdesList = this.daoFactory.getLocDesDao().getByLocation(locId);
 				for (final Locdes locdes : locdesList) {
 					this.getLocdesSaver()
 						.saveOrUpdateLocdes(locdes.getLocationId(), existingLocdesList, locdes.getTypeId(), locdes.getDval(),

@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -28,6 +26,8 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.util.StringUtil;
 
+import java.util.ArrayList;
+
 public class GeolocationSaver {
 	
 	private DaoFactory daoFactory;
@@ -39,7 +39,7 @@ public class GeolocationSaver {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.phenotypeSaver = new PhenotypeSaver(sessionProvider);
 		this.variableTypeListTransformer = new VariableTypeListTransformer(sessionProvider);
-		this.variableListTransformer = new VariableListTransformer(sessionProvider);
+		this.variableListTransformer = new VariableListTransformer();
 	}
 
 	public Geolocation saveGeolocation(VariableList variableList, MeasurementRow row) {

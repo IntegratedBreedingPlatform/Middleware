@@ -1,8 +1,6 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -11,12 +9,12 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+
+import java.util.List;
 
 public class ExperimentValuesTransformer extends Transformer {
 
-	public ExperimentValuesTransformer(HibernateSessionProvider sessionProviderForLocal) {
-		super(sessionProviderForLocal);
+	public ExperimentValuesTransformer() {
 	}
 
 	public ExperimentValues transform(MeasurementRow mRow, VariableTypeList varTypeList, List<String> trialHeaders)

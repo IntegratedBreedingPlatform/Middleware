@@ -117,11 +117,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public StudyDataManagerImpl() {
 	}
 
-	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
-		super(sessionProvider, databaseName);
-		this.init(sessionProvider);
-	}
-
 	private void init(final HibernateSessionProvider sessionProvider) {
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
@@ -153,31 +148,31 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public Integer getStudyIdByNameAndProgramUUID(final String studyName, final String programUUID) {
-		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(studyName, programUUID);
+		return this.daoFactory.getDmsProjectDAO().getProjectIdByNameAndProgramUUID(studyName, programUUID);
 	}
 
 	@Override
 	public boolean checkIfProjectNameIsExistingInProgram(final String name, final String programUUID) {
-		return this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(name, programUUID);
+		return this.daoFactory.getDmsProjectDAO().checkIfProjectNameIsExistingInProgram(name, programUUID);
 	}
 
 	@Override
 	public List<Reference> getRootFolders(final String programUUID) {
-		final List<Reference> references = this.getDmsProjectDao().getRootFolders(programUUID, null);
+		final List<Reference> references = this.daoFactory.getDmsProjectDAO().getRootFolders(programUUID, null);
 		this.populateStudyOwnerName(references);
 		return references;
 	}
 
 	@Override
 	public List<Reference> getChildrenOfFolder(final int folderId, final String programUUID) {
-		final List<Reference> childrenOfFolder = this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, null);
+		final List<Reference> childrenOfFolder = this.daoFactory.getDmsProjectDAO().getChildrenOfFolder(folderId, programUUID, null);
 		this.populateStudyOwnerName(childrenOfFolder);
 		return childrenOfFolder;
 	}
 
 	@Override
 	public List<DatasetReference> getDatasetReferences(final int studyId) {
-		return this.getDmsProjectDao().getDirectChildDatasetsOfStudy(studyId);
+		return this.daoFactory.getDmsProjectDAO().getDirectChildDatasetsOfStudy(studyId);
 	}
 
 	@Override
@@ -383,7 +378,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<DataSet> getDataSetsByType(final int studyId, final int datasetTypeId) {
 
-		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getDatasetsByTypeForStudy(studyId, datasetTypeId);
+		final List<DmsProject> datasetProjects = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, datasetTypeId);
 		final List<DataSet> datasets = new ArrayList<>();
 
 		for (final DmsProject datasetProject : datasetProjects) {
@@ -408,7 +403,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public TrialEnvironments getTrialEnvironmentsInDataset(final int datasetId) {
-		final DmsProject study = this.getDmsProjectDao().getById(datasetId).getStudy();
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(datasetId).getStudy();
 		return this.trialEnvironmentBuilder.getTrialEnvironmentsInDataset(study.getProjectId(), datasetId);
 	}
 
@@ -419,7 +414,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId) {
-		return this.getStockDao().countStocks(datasetId, trialEnvironmentId, variateStdVarId);
+		return this.daoFactory.getStockDao().countStocks(datasetId, trialEnvironmentId, variateStdVarId);
 	}
 
 	@Override
@@ -433,7 +428,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public DatasetReference findOneDataSetReferenceByType(final int studyId, final int datasetTypeId) {
-		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getDatasetsByTypeForStudy(studyId, datasetTypeId);
+		final List<DmsProject> datasetProjects = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, datasetTypeId);
 		if (datasetProjects != null && !datasetProjects.isEmpty()) {
 			final DmsProject dataSetProject = datasetProjects.get(0);
 			return new DatasetReference(dataSetProject.getProjectId(), dataSetProject.getName(), dataSetProject.getDescription());
@@ -445,7 +440,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public String getLocalNameByStandardVariableId(final Integer projectId, final Integer standardVariableId) {
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setProjectId(projectId);
-		final ProjectProperty projectProperty = this.getProjectPropertyDao().getByStandardVariableId(dmsProject, standardVariableId);
+		final ProjectProperty projectProperty =
+			this.daoFactory.getProjectPropertyDAO().getByStandardVariableId(dmsProject, standardVariableId);
 		return (projectProperty == null) ? null : projectProperty.getAlias();
 	}
 
@@ -458,7 +454,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			final FieldMapInfo fieldMapInfo = new FieldMapInfo();
 
 			fieldMapInfo.setFieldbookId(studyId);
-			fieldMapInfo.setFieldbookName(this.getDmsProjectDao().getById(studyId).getName());
+			fieldMapInfo.setFieldbookName(this.daoFactory.getDmsProjectDAO().getById(studyId).getName());
 
 			// Retrieve one-off the cross expansions of GIDs of study
 			final List<StockModel> stockModelList = this.daoFactory.getStockDao().getStocksForStudy(studyId);
@@ -467,7 +463,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				gids.add(stockModel.getGermplasm().getGid());
 			}
 			final Map<Integer, String> crossExpansions = this.pedigreeService.getCrossExpansions(gids, null, crossExpansionProperties);
-			final List<FieldMapDatasetInfo> fieldMapDatasetInfos = this.getExperimentPropertyDao().getFieldMapLabels(studyId);
+			final List<FieldMapDatasetInfo> fieldMapDatasetInfos = this.daoFactory.getExperimentPropertyDao().getFieldMapLabels(studyId);
 			for (final FieldMapDatasetInfo datasetInfo : fieldMapDatasetInfos) {
 				for (final FieldMapTrialInstanceInfo instanceInfo : datasetInfo.getTrialInstances()) {
 					for (final FieldMapLabel label : instanceInfo.getFieldMapLabels()) {
@@ -565,9 +561,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		for (final ExperimentValues exp : experimentValues) {
 			if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
 				final ExperimentModel experimentModel =
-					this.getExperimentDao().getExperimentByProjectIdAndLocation(projectId, exp.getLocationId());
+					this.daoFactory.getExperimentDao().getExperimentByProjectIdAndLocation(projectId, exp.getLocationId());
 				for (final Variable variable : exp.getVariableList().getVariables()) {
-					final int val = this.getPhenotypeDao().updatePhenotypesByExperimentIdAndObervableId(experimentModel.getNdExperimentId(),
+					final int val =
+						this.daoFactory.getPhenotypeDAO().updatePhenotypesByExperimentIdAndObervableId(experimentModel.getNdExperimentId(),
 						variable.getVariableType().getId(), variable.getValue());
 					if (val == 0) {
 						this.getPhenotypeSaver().save(experimentModel.getNdExperimentId(), variable);
@@ -582,7 +579,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final int datasetId, final int geolocationId,
 		final CrossExpansionProperties crossExpansionProperties) {
 		final List<FieldMapInfo> fieldMapInfos =
-			this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
+			this.daoFactory.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
 
 		this.updateFieldMapWithBlockInformation(fieldMapInfos, true);
 		final Map<Integer, String> pedigreeStringMap = new HashMap<>();
@@ -600,7 +597,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(final int blockId) {
 
-		final List<FieldMapInfo> fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
+		final List<FieldMapInfo> fieldMapInfos =
+			this.daoFactory.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
 
 		this.updateFieldMapWithBlockInformation(fieldMapInfos);
 
@@ -609,23 +607,23 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public boolean isStudy(final int id) {
-		return this.getDmsProjectDao().getById(id).getStudyType() != null;
+		return this.daoFactory.getDmsProjectDAO().getById(id).getStudyType() != null;
 	}
 
 	@Override
 	public boolean renameSubFolder(final String newFolderName, final int folderId, final String programUUID) {
 
 		// check for existing folder label
-		final boolean isExisting = this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(newFolderName, programUUID);
+		final boolean isExisting = this.daoFactory.getDmsProjectDAO().checkIfProjectNameIsExistingInProgram(newFolderName, programUUID);
 		if (isExisting) {
 			throw new MiddlewareQueryException("Folder label is not unique");
 		}
 
 		try {
 
-			final DmsProject currentFolder = this.getDmsProjectDao().getById(folderId);
+			final DmsProject currentFolder = this.daoFactory.getDmsProjectDAO().getById(folderId);
 			currentFolder.setName(newFolderName);
-			this.getDmsProjectDao().saveOrUpdate(currentFolder);
+			this.daoFactory.getDmsProjectDAO().saveOrUpdate(currentFolder);
 
 			return true;
 		} catch (final Exception e) {
@@ -639,22 +637,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public boolean renameStudy(final String newStudyName, final int studyId, final String programUUID) {
 
 		// check for existing study name
-		final boolean isExisting = this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(newStudyName, programUUID);
+		final boolean isExisting = this.daoFactory.getDmsProjectDAO().checkIfProjectNameIsExistingInProgram(newStudyName, programUUID);
 		if (isExisting) {
 			throw new MiddlewareQueryException("Study name is not unique");
 		}
 
 		try {
 
-			final DmsProject currentStudy = this.getDmsProjectDao().getById(studyId);
+			final DmsProject currentStudy = this.daoFactory.getDmsProjectDAO().getById(studyId);
 			final String oldName = currentStudy.getName();
 			currentStudy.setName(newStudyName);
-			this.getDmsProjectDao().saveOrUpdate(currentStudy);
+			this.daoFactory.getDmsProjectDAO().saveOrUpdate(currentStudy);
 
-			final List<DmsProject> datasets = this.getDmsProjectDao().getDatasetsByParent(studyId);
+			final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO().getDatasetsByParent(studyId);
 			for (final DmsProject dataset : datasets) {
 				dataset.setName(dataset.getName().replace(oldName, newStudyName));
-				this.getDmsProjectDao().saveOrUpdate(dataset);
+				this.daoFactory.getDmsProjectDAO().saveOrUpdate(dataset);
 			}
 			return true;
 		} catch (final Exception e) {
@@ -668,11 +666,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public int addSubFolder(
 		final int parentFolderId, final String name, final String description, final String programUUID,
 		final String objective) {
-		final DmsProject parentProject = this.getDmsProjectDao().getById(parentFolderId);
+		final DmsProject parentProject = this.daoFactory.getDmsProjectDAO().getById(parentFolderId);
 		if (parentProject == null) {
 			throw new MiddlewareQueryException("DMS Project is not existing");
 		}
-		final boolean isExisting = this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(name, programUUID);
+		final boolean isExisting = this.daoFactory.getDmsProjectDAO().checkIfProjectNameIsExistingInProgram(name, programUUID);
 		if (isExisting) {
 			throw new MiddlewareQueryException("Folder label is not unique");
 		}
@@ -693,8 +691,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public boolean moveDmsProject(final int sourceId, final int targetId) {
 
-		final DmsProject source = this.getDmsProjectDao().getById(sourceId);
-		final DmsProject target = this.getDmsProjectDao().getById(targetId);
+		final DmsProject source = this.daoFactory.getDmsProjectDAO().getById(sourceId);
+		final DmsProject target = this.daoFactory.getDmsProjectDAO().getById(targetId);
 		if (source == null) {
 			throw new MiddlewareQueryException("Source Project is not existing");
 		}
@@ -708,14 +706,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 
 		source.setParent(target);
-		this.getDmsProjectDao().saveOrUpdate(source);
+		this.daoFactory.getDmsProjectDAO().saveOrUpdate(source);
 
 		return true;
 	}
 
 	@Override
 	public void deleteEmptyFolder(final int id, final String programUUID) {
-		final DmsProjectDao dmsProjectDao = this.getDmsProjectDao();
+		final DmsProjectDao dmsProjectDao = this.daoFactory.getDmsProjectDAO();
 		// check if folder is existing
 		final DmsProject project = dmsProjectDao.getById(id);
 		if (project == null) {
@@ -742,7 +740,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public boolean isFolderEmpty(final int id, final String programUUID) {
-		final DmsProjectDao dmsProjectDao = this.getDmsProjectDao();
+		final DmsProjectDao dmsProjectDao = this.daoFactory.getDmsProjectDAO();
 
 		// check if folder has no children
 		final List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID, null);
@@ -751,38 +749,38 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public DmsProject getParentFolder(final int id) {
-		return this.getDmsProjectDao().getById(id).getParent();
+		return this.daoFactory.getDmsProjectDAO().getById(id).getParent();
 	}
 
 	@Override
 	public Integer getProjectIdByStudyDbId(final Integer studyDbId) {
-		return this.getDmsProjectDao().getProjectIdByStudyDbId(studyDbId);
+		return this.daoFactory.getDmsProjectDAO().getProjectIdByStudyDbId(studyDbId);
 	}
 
 	@Override
 	public DmsProject getProject(final int id) {
-		return this.getDmsProjectDao().getById(id);
+		return this.daoFactory.getDmsProjectDAO().getById(id);
 	}
 
 	@Override
 	public List<StudyDetails> getStudyDetails(
 		final StudyTypeDto studyType, final String programUUID, final int start,
 		final int numOfRows) {
-		final List<StudyDetails> details = this.getDmsProjectDao().getAllStudyDetails(studyType, programUUID, start, numOfRows);
+		final List<StudyDetails> details = this.daoFactory.getDmsProjectDAO().getAllStudyDetails(studyType, programUUID, start, numOfRows);
 		this.populateSiteAndPersonIfNecessary(details);
 		return details;
 	}
 
 	@Override
 	public StudyDetails getStudyDetails(final int studyId) {
-		final StudyDetails studyDetails = this.getDmsProjectDao().getStudyDetails(studyId);
+		final StudyDetails studyDetails = this.daoFactory.getDmsProjectDAO().getStudyDetails(studyId);
 		this.populateSiteAnPersonIfNecessary(studyDetails);
 		return studyDetails;
 	}
 
 	@Override
 	public List<StudyDetails> getNurseryAndTrialStudyDetails(final String programUUID, final int start, final int numOfRows) {
-		final List<StudyDetails> list = this.getDmsProjectDao().getAllStudyDetails(programUUID, start, numOfRows);
+		final List<StudyDetails> list = this.daoFactory.getDmsProjectDAO().getAllStudyDetails(programUUID, start, numOfRows);
 		this.populateSiteAndPersonIfNecessary(list);
 		return list;
 	}
@@ -791,7 +789,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<StudyDetails> getAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {
 		final List<StudyDetails> list = new ArrayList<>();
-		final List localList = this.getDmsProjectDao().getAllStudyDetails(studyType, programUUID);
+		final List localList = this.daoFactory.getDmsProjectDAO().getAllStudyDetails(studyType, programUUID);
 		if (localList != null) {
 			list.addAll(localList);
 		}
@@ -802,43 +800,43 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public long countAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {
 		long count = 0;
-		count += this.getDmsProjectDao().countAllStudyDetails(studyType, programUUID);
+		count += this.daoFactory.getDmsProjectDAO().countAllStudyDetails(studyType, programUUID);
 		return count;
 	}
 
 	@Override
 	public long countAllNurseryAndTrialStudyDetails(final String programUUID) {
 		long count = 0;
-		count += this.getDmsProjectDao().countAllStudyDetails(programUUID);
+		count += this.daoFactory.getDmsProjectDAO().countAllStudyDetails(programUUID);
 		return count;
 	}
 
 	@Override
 	public List<FolderReference> getAllFolders() {
-		return this.getDmsProjectDao().getAllFolders();
+		return this.daoFactory.getDmsProjectDAO().getAllFolders();
 	}
 
 	@Override
 	public int countPlotsWithRecordedVariatesInDataset(final int dataSetId, final List<Integer> variateIds) {
-		return this.getPhenotypeDao().countRecordedVariatesOfStudy(dataSetId, variateIds);
+		return this.daoFactory.getPhenotypeDAO().countRecordedVariatesOfStudy(dataSetId, variateIds);
 	}
 
 	@Override
 	public String getFolderNameById(final Integer folderId) {
-		final DmsProject currentFolder = this.getDmsProjectDao().getById(folderId);
+		final DmsProject currentFolder = this.daoFactory.getDmsProjectDAO().getById(folderId);
 		return currentFolder.getName();
 	}
 
 	@Override
 	public boolean checkIfStudyHasMeasurementData(final int datasetId, final List<Integer> variateIds) {
-		return this.getPhenotypeDao().countVariatesDataOfStudy(datasetId, variateIds) > 0;
+		return this.daoFactory.getPhenotypeDAO().countVariatesDataOfStudy(datasetId, variateIds) > 0;
 	}
 
 	@Override
 	public int countVariatesWithData(final int datasetId, final List<Integer> variateIds) {
 		int variatesWithDataCount = 0;
 		if (variateIds != null && !variateIds.isEmpty()) {
-			final Map<Integer, Integer> map = this.getPhenotypeDao().countVariatesDataOfStudy(datasetId);
+			final Map<Integer, Integer> map = this.daoFactory.getPhenotypeDAO().countVariatesDataOfStudy(datasetId);
 			for (final Integer variateId : variateIds) {
 				final Integer count = map.get(variateId);
 				if (count != null && count > 0) {
@@ -985,13 +983,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(
 		final int projectId, final int locationId, final Integer plotNo,
 		final List<Integer> cvTermIds) {
-		return this.getPhenotypeDao().getPhenotypeIdsByLocationAndPlotNo(projectId, locationId, plotNo, cvTermIds);
+		return this.daoFactory.getPhenotypeDAO().getPhenotypeIdsByLocationAndPlotNo(projectId, locationId, plotNo, cvTermIds);
 	}
 
 	@Override
 	public void saveOrUpdatePhenotypeOutliers(final List<PhenotypeOutlier> phenotyleOutliers) {
 
-		final PhenotypeOutlierDao phenotypeOutlierDao = this.getPhenotypeOutlierDao();
+		final PhenotypeOutlierDao phenotypeOutlierDao = this.daoFactory.getPhenotypeOutlierDao();
 		try {
 
 			for (final PhenotypeOutlier phenotypeOutlier : phenotyleOutliers) {
@@ -1015,7 +1013,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public Boolean containsAtLeast2CommonEntriesWithValues(final int projectId, final int locationId, final int germplasmTermId) {
 
-		return this.getPhenotypeDao().containsAtLeast2CommonEntriesWithValues(projectId, locationId, germplasmTermId);
+		return this.daoFactory.getPhenotypeDAO().containsAtLeast2CommonEntriesWithValues(projectId, locationId, germplasmTermId);
 	}
 
 	public void setLocationDataManager(final LocationDataManager locationDataManager) {
@@ -1028,12 +1026,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyTypeDto getStudyType(final int studyTypeId) {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getById(studyTypeId));
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getById(studyTypeId));
 	}
 
 	@Override
 	public void deleteProgramStudies(final String programUUID) {
-		final List<Integer> projectIds = this.getDmsProjectDao().getAllProgramStudiesAndFolders(programUUID);
+		final List<Integer> projectIds = this.daoFactory.getDmsProjectDAO().getAllProgramStudiesAndFolders(programUUID);
 
 		try {
 			for (final Integer projectId : projectIds) {
@@ -1057,7 +1055,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public String getTrialInstanceNumberByGeolocationId(final int geolocationId) {
-		final Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
+		final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(geolocationId);
 		if (geolocation != null) {
 			return geolocation.getDescription();
 		}
@@ -1066,7 +1064,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<String> getAllSharedProjectNames() {
-		return this.getDmsProjectDao().getAllSharedProjectNames();
+		return this.daoFactory.getDmsProjectDAO().getAllSharedProjectNames();
 	}
 
 	@Override
@@ -1074,11 +1072,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final int studyId, final int datasetTypeId,
 		final List<Integer> locationIds) {
 
-		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getDatasetsByTypeForStudy(studyId, datasetTypeId);
+		final List<DmsProject> datasetProjects = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, datasetTypeId);
 
 		if (!datasetProjects.isEmpty()) {
 			final int dataSetId = datasetProjects.get(0).getProjectId();
-			return this.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(dataSetId, locationIds);
+			return this.daoFactory.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(dataSetId, locationIds);
 		} else {
 			return false;
 		}
@@ -1087,22 +1085,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
-		return this.getGeolocationDao().getInstanceMetadata(studyId, new ArrayList<>());
+		return this.daoFactory.getGeolocationDao().getInstanceMetadata(studyId, new ArrayList<>());
 	}
 
 	@Override
 	public Phenotype getPhenotypeById(final int phenotypeId) {
-		return this.getPhenotypeDao().getById(phenotypeId);
+		return this.daoFactory.getPhenotypeDAO().getById(phenotypeId);
 	}
 
 	@Override
 	public StudyMetadata getStudyMetadataForInstance(final Integer instanceId) {
-		return this.getDmsProjectDao().getStudyMetadataForInstanceId(instanceId);
+		return this.daoFactory.getDmsProjectDAO().getStudyMetadataForInstanceId(instanceId);
 	}
 
 	@Override
 	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer studyId, final List<Integer> excludedIds) {
-		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByGeolocation(studyId, excludedIds);
+		return this.daoFactory.getGeolocationPropertyDao().getGeolocationPropsAndValuesByGeolocation(studyId, excludedIds);
 	}
 
 	@Override
@@ -1112,12 +1110,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(final Integer studyId) {
-		return this.getExperimentDao().getExperimentSamplesDTOMap(studyId);
+		return this.daoFactory.getExperimentDao().getExperimentSamplesDTOMap(studyId);
 	}
 
 	@Override
 	public Map<String, Integer> getInstanceGeolocationIdsMap(final Integer studyId) {
-		final List<Geolocation> geolocations = this.getGeolocationDao().getEnvironmentGeolocations(studyId);
+		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId);
 		final Map<String, Integer> map = new HashMap<>();
 		for (final Geolocation geolocation : geolocations) {
 			map.put(geolocation.getDescription(), geolocation.getLocationId());
@@ -1130,18 +1128,18 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final String variableId, final String variableValue,
 		final String programUUID) {
 
-		return this.getDmsProjectDao().isVariableUsedInOtherPrograms(variableId, variableValue, programUUID);
+		return this.daoFactory.getDmsProjectDAO().isVariableUsedInOtherPrograms(variableId, variableValue, programUUID);
 
 	}
 
 	@Override
 	public List<StudyTypeDto> getAllStudyTypes() {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getAll());
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getAll());
 	}
 
 	@Override
 	public StudyTypeDto getStudyTypeByName(final String name) {
-		final StudyType studyTypeByName = this.getStudyTypeDao().getStudyTypeByName(name);
+		final StudyType studyTypeByName = this.daoFactory.getStudyTypeDao().getStudyTypeByName(name);
 		if (studyTypeByName != null) {
 			return this.getStudyTypeBuilder().createStudyTypeDto(studyTypeByName);
 		}
@@ -1150,17 +1148,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyTypeDto getStudyTypeByLabel(final String label) {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getStudyTypeByLabel(label));
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getStudyTypeByLabel(label));
 	}
 
 	@Override
 	public List<StudyTypeDto> getAllVisibleStudyTypes() {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getAllVisibleStudyTypes());
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getAllVisibleStudyTypes());
 	}
 
 	@Override
 	public String getProjectStartDateByProjectId(final int projectId) {
-		return this.getDmsProjectDao().getProjectStartDateByProjectId(projectId);
+		return this.daoFactory.getDmsProjectDAO().getProjectStartDateByProjectId(projectId);
 	}
 
 	@Override
@@ -1190,7 +1188,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	public StudyTypeDto getStudyTypeByStudyId(final Integer studyIdentifier) {
-		final DmsProject study = this.getDmsProjectDao().getById(studyIdentifier);
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyIdentifier);
 		if (study != null && study.getStudyType() != null) {
 			return this.getStudyTypeBuilder().createStudyTypeDto(study.getStudyType());
 		}
@@ -1207,7 +1205,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	 */
 	@Override
 	public List<Reference> getRootFoldersByStudyType(final String programUUID, final Integer studyTypeId) {
-		return this.getDmsProjectDao().getRootFolders(programUUID, studyTypeId);
+		return this.daoFactory.getDmsProjectDAO().getRootFolders(programUUID, studyTypeId);
 	}
 
 	/**
@@ -1220,20 +1218,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	 */
 	@Override
 	public List<Reference> getChildrenOfFolderByStudyType(final int folderId, final String programUUID, final Integer studyTypeId) {
-		final List<Reference> children = this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypeId);
+		final List<Reference> children = this.daoFactory.getDmsProjectDAO().getChildrenOfFolder(folderId, programUUID, studyTypeId);
 		this.populateStudyOwnerName(children);
 		return children;
 	}
 
 	@Override
 	public void updateStudyLockedStatus(final Integer studyId, final Boolean isLocked) {
-		this.getDmsProjectDao().lockUnlockStudy(studyId, isLocked);
+		this.daoFactory.getDmsProjectDAO().lockUnlockStudy(studyId, isLocked);
 
 	}
 
 	@Override
 	public boolean areAllInstancesExistInDataset(final Integer datasetId, final Set<Integer> instanceIds) {
-		return this.getExperimentDao().areAllInstancesExistInDataset(datasetId, instanceIds);
+		return this.daoFactory.getExperimentDao().areAllInstancesExistInDataset(datasetId, instanceIds);
 	}
 
 	@Override
@@ -1249,16 +1247,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyReference getStudyReference(final Integer studyId) {
-		final StudyReference studyReference = this.getDmsProjectDao().getStudyReference(studyId);
+		final StudyReference studyReference = this.daoFactory.getDmsProjectDAO().getStudyReference(studyId);
 		this.populateStudyOwnerName(Collections.singletonList(studyReference));
 		return studyReference;
 	}
 
 	@Override
 	public Map<Integer, String> getGeolocationByInstanceId(final Integer datasetId, final Integer instanceDbId) {
-		final Geolocation geoLocation = this.getGeolocationDao().getById(instanceDbId);
+		final Geolocation geoLocation = this.daoFactory.getGeolocationDao().getById(instanceDbId);
 		final Map<Integer, String> geoLocationMap =
-			this.getGeolocationPropertyDao().getGeoLocationPropertyByVariableId(datasetId, instanceDbId);
+			this.daoFactory.getGeolocationPropertyDao().getGeoLocationPropertyByVariableId(datasetId, instanceDbId);
 
 		geoLocationMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), geoLocation.getDescription());
 		if (geoLocation.getLatitude() != null) {
@@ -1289,7 +1287,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId) {
 		final Map<Integer, String> phenotypeMap = new HashMap<>();
-		final List<Phenotype> phenotypes = this.getPhenotypeDao().getPhenotypeByDatasetIdAndInstanceDbId(datasetId, instanceDbId);
+		final List<Phenotype> phenotypes =
+			this.daoFactory.getPhenotypeDAO().getPhenotypeByDatasetIdAndInstanceDbId(datasetId, instanceDbId);
 		for (final Phenotype phenotype : phenotypes) {
 			phenotypeMap.put(phenotype.getObservableId(), phenotype.getValue());
 		}
