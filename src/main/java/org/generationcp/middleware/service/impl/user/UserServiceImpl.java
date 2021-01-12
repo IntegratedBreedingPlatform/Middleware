@@ -134,7 +134,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Integer createUser(final UserDto userDto) {
 
-//		Integer idUserSaved = null;
 		// user.access = 0 - Default User
 		// user.instalid = 0 - Access all areas (legacy from the ICIS system) (not used)
 		// user.status = 0 - Unassigned
