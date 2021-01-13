@@ -11,4 +11,11 @@
 		<comment>Remove rank column from stockprop table</comment>
 		<dropColumn tableName="stockprop" columnName="rank"></dropColumn>
 	</changeSet>
+	<changeSet author="diego" id="v17.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="ims_transaction" columnName="prevamount"></columnExists>
+		</preConditions>
+		<comment>Remove prevamount column from ims_transaction</comment>
+		<dropColumn tableName="ims_transaction" columnName="prevamount"></dropColumn>
+	</changeSet>
 </databaseChangeLog>
