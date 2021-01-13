@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.service.api.location.LocationFilters;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -142,14 +143,27 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Location> getFilteredLocations(final String programUUID, final Set<Integer> types, List<Integer> locationIds,
-		final List<String> locationAbbreviations, final boolean favourites) {
+		final List<String> locationAbbreviations, final boolean favourites, final String locationName, final Pageable pageable) {
 		if (!StringUtils.isEmpty(programUUID) && favourites) {
 			if (locationIds == null) {
 				locationIds = new ArrayList<>();
 			}
 			locationIds.addAll(this.getFavoriteProjectLocationIds(programUUID));
 		}
-		return this.daoFactory.getLocationDAO().filterLocations(programUUID, types, locationIds, locationAbbreviations);
+		return this.daoFactory.getLocationDAO().filterLocations(programUUID, types, locationIds, locationAbbreviations, locationName, pageable);
+	}
+
+	@Override
+	public long countFilteredLocations(final String programUUID, final Set<Integer> types,
+		List<Integer> locationIds,
+		final List<String> locationAbbreviations, final boolean favourites, final String locationName) {
+		if (!StringUtils.isEmpty(programUUID) && favourites) {
+			if (locationIds == null) {
+				locationIds = new ArrayList<>();
+			}
+			locationIds.addAll(this.getFavoriteProjectLocationIds(programUUID));
+		}
+		return this.daoFactory.getLocationDAO().countFilterLocations(programUUID, types, locationIds, locationAbbreviations, locationName);
 	}
 
 	@Override

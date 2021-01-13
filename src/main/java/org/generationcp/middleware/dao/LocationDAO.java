@@ -36,6 +36,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -300,43 +301,72 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<Location> filterLocations(final String programUUID, final Set<Integer> types, final List<Integer> locationIds,
-		final List<String> locationAbbreviations) {
-		final List<Location> locations;
+	public long countFilterLocations(final String programUUID, final Set<Integer> types, final List<Integer> locationIds,
+		final List<String> locationAbbreviations, final String locationName) {
 		try {
 
-			final Criteria criteria = this.getSession().createCriteria(Location.class);
-
-			if (programUUID != null) {
-				criteria.add(Restrictions.disjunction()
-					.add(Restrictions.eq("uniqueID", programUUID))
-					.add(Restrictions.isNull("uniqueID")));
-			} else {
-				criteria.add(Restrictions.isNull("uniqueID"));
-			}
-
-			if (types != null && !types.isEmpty()) {
-				criteria.add(Restrictions.in(LocationDAO.LTYPE, types));
-			}
-
-			if (locationIds != null && !locationIds.isEmpty()) {
-				criteria.add(Restrictions.in(LocationDAO.LOCID, locationIds));
-			}
-
-			if (locationAbbreviations != null && !locationAbbreviations.isEmpty()) {
-				criteria.add(Restrictions.in(LocationDAO.LABBREVIATION, locationAbbreviations));
-			}
-
-			criteria.addOrder(Order.asc(LocationDAO.LNAME));
-			locations = criteria.list();
+			final Criteria criteria =
+				this.createFilterLocationCriteria(programUUID, types, locationIds, locationAbbreviations, locationName);
+			return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
 
 		} catch (final HibernateException e) {
 			LocationDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("filterLocations", "types,locationIds,locationAbbreviations", "", e.getMessage(),
+				this.getLogExceptionMessage("countFilterLocations", "types,locationIds,locationAbbreviations,locationName", "",
+					e.getMessage(),
 					LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return locations;
+	}
+
+	public List<Location> filterLocations(final String programUUID, final Set<Integer> types, final List<Integer> locationIds,
+		final List<String> locationAbbreviations, final String locationName, final Pageable pageable) {
+		try {
+
+			final Criteria criteria =
+				this.createFilterLocationCriteria(programUUID, types, locationIds, locationAbbreviations, locationName);
+
+			criteria.addOrder(Order.asc(LocationDAO.LNAME));
+
+			addPagination(criteria, pageable);
+
+			return criteria.list();
+
+		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("filterLocations", "types,locationIds,locationAbbreviations,locationName", "", e.getMessage(),
+					LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+	}
+
+	private Criteria createFilterLocationCriteria(final String programUUID, final Set<Integer> types, final List<Integer> locationIds,
+		final List<String> locationAbbreviations, final String locationName) {
+		final Criteria criteria = this.getSession().createCriteria(Location.class);
+
+		if (programUUID != null) {
+			criteria.add(Restrictions.disjunction()
+				.add(Restrictions.eq("uniqueID", programUUID))
+				.add(Restrictions.isNull("uniqueID")));
+		} else {
+			criteria.add(Restrictions.isNull("uniqueID"));
+		}
+
+		if (types != null && !types.isEmpty()) {
+			criteria.add(Restrictions.in(LocationDAO.LTYPE, types));
+		}
+
+		if (locationIds != null && !locationIds.isEmpty()) {
+			criteria.add(Restrictions.in(LocationDAO.LOCID, locationIds));
+		}
+
+		if (locationAbbreviations != null && !locationAbbreviations.isEmpty()) {
+			criteria.add(Restrictions.in(LocationDAO.LABBREVIATION, locationAbbreviations));
+		}
+
+		if (StringUtils.isNotEmpty(locationName)) {
+			criteria.add(Restrictions.like("lname", locationName, MatchMode.START));
+		}
+		return criteria;
 	}
 
 	public List<Location> getByType(final Integer type, final String programUUID) {

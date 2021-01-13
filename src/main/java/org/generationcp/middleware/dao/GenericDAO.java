@@ -269,6 +269,14 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 	}
 
 
+	public static void addPagination(final Criteria criteria, final Pageable pageable) {
+		if (pageable == null || criteria == null) {
+			return;
+		}
+		criteria.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
+		criteria.setMaxResults(pageable.getPageSize());
+	}
+
 	/**
 	 * addPagination to criteria
 	 * @param pageable

@@ -183,7 +183,7 @@ public class LotServiceImpl implements LotService {
 
 	private Map<String, Integer> buildLocationsByLocationAbbrMap(final String programUUID, final List<String> locationAbbreviations) {
 		final List<Location> locations =
-			this.daoFactory.getLocationDAO().filterLocations(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations);
+			this.daoFactory.getLocationDAO().filterLocations(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null, null);
 		return locations.stream().collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
 	}
 
