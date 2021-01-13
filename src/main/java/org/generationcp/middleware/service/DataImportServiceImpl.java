@@ -436,21 +436,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final String programUUID) {
 
 		final Optional<MeasurementVariable> entryTypeFactor = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getFactors());
-		final boolean entryTypeidExistsInRow = this.findMeasurementRowByTermId(TermId.ENTRY_TYPE.getId(), workbook.getObservations()).isPresent();
+		final Optional<List<MeasurementRow>> rowsWithoutTermId = this.findMeasurementRowWithoutTermId(TermId.ENTRY_TYPE.getId(), workbook.getObservations());
 
-		if (!entryTypeFactor.isPresent() || !entryTypeidExistsInRow) {
-			final MeasurementVariable entryType;
-			if (!entryTypeFactor.isPresent()) {
-				// If ENTRY_TYPE variable is not existing in Factors Section of workbook
-				// Automatically add ENTRY_TYPE variable as it is required in creating a new Study.
-				entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.GERMPLASM, programUUID);
-				workbook.getFactors().add(entryType);
-			} else {
-				entryType = entryTypeFactor.get();
-			}
-			// Add ENTRY_TYPE variable in Measurement Row with default value Test Entry
+		// ENTRY_TYPE Not existing in Factors and in Observation
+		if (!entryTypeFactor.isPresent() && rowsWithoutTermId.isPresent()) {
+			final MeasurementVariable entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.GERMPLASM, programUUID);
+			workbook.getFactors().add(entryType);
 			final MeasurementData data = new MeasurementData(entryType.getLabel(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false, entryType.getDataType(), entryType);
-			workbook.getObservations().forEach(row -> row.getDataList().add(data));
+			workbook.getObservations().forEach(row->row.getDataList().add(data));
 		}
 	}
 
@@ -1245,5 +1238,25 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		}
 		return Optional.absent();
+	}
+
+	/**
+	 * @param termId
+	 * @param rowList
+	 * @return Optional List MeasurementRow without termId
+	 */
+	private Optional<List<MeasurementRow>> findMeasurementRowWithoutTermId(final Integer termId, final List<MeasurementRow> rowList) {
+		final List<MeasurementRow> rowWithoutTermid = new ArrayList<>();
+		for (final MeasurementRow row: rowList) {
+			final boolean hasTermId = row.getDataList().stream().filter(measurementData -> measurementData.getMeasurementVariable().getTermId() == termId).collect(Collectors.toList()).size() > 0;
+			if (!hasTermId) {
+				rowWithoutTermid.add(row);
+			}
+		}
+		if (Util.isEmpty(rowList)) {
+			return Optional.absent();
+		} else {
+			return Optional.of(rowWithoutTermid);
+		}
 	}
 }
