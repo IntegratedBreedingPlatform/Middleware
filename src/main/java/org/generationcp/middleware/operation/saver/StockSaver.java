@@ -136,7 +136,6 @@ public class StockSaver extends Saver {
 		final StockProperty property = new StockProperty();
 		property.setTypeId(variable.getVariableType().getId());
 		property.setValue(variable.getValue());
-		property.setRank(variable.getVariableType().getRank());
 
 		return property;
 	}
