@@ -99,7 +99,7 @@ public class ExperimentBuilder extends Builder {
 		try {
 			final List<Experiment> experiments = new ArrayList<>();
 			final List<ExperimentModel> experimentModels =
-				this.daoFactory.getExperimentDao().getExperiments(projectId, types, start, numOfRows, false);
+				this.daoFactory.getExperimentDao().getExperiments(projectId, types, start, numOfRows, null, null);
 			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
 			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
 
@@ -112,14 +112,14 @@ public class ExperimentBuilder extends Builder {
 		}
 	}
 
-	public List<Experiment> build(final int projectId, final List<TermId> types, final int start, final int numOfRows,
-		final VariableTypeList variableTypes, final boolean firstInstance) {
+	public List<Experiment> build(final int projectId, final List<TermId> types,
+		final VariableTypeList variableTypes, final List<Integer> instanceNumbers, final List<Integer> repNumbers) {
 		final Monitor monitor = MonitorFactory.start("Build Experiments");
 		try {
 			final List<Experiment> experiments = new ArrayList<>();
 
 			final List<ExperimentModel> experimentModels =
-				this.daoFactory.getExperimentDao().getExperiments(projectId, types, start, numOfRows, firstInstance);
+				this.daoFactory.getExperimentDao().getExperiments(projectId, types, 0, Integer.MAX_VALUE, instanceNumbers, repNumbers);
 			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
 			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
 

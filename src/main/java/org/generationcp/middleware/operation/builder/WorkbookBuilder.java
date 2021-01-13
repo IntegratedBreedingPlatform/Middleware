@@ -97,24 +97,10 @@ public class WorkbookBuilder extends Builder {
 		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
-	/**
-	 * Given a workbook already loaded which does not load observations now - this is a helper method to trigger
-	 * loading the observations collection IF AND WHEN NEEDED. This method is a
-	 * stop gap mecahnism to lazy load the observations collection until we can
-	 * gradually refactor all code so that entire set of observations (plots)
-	 * data is not required to be loaded in session. This method should only be
-	 * invoked at a point in process where entire observations (plots)
-	 * collection with measurements is required due to the way rest of the
-	 * process code is written. For large Nurseries and trials this method is
-	 * not yet performance tuned. Memory footprint of the overall application
-	 * can be severly impacted if this method is used without consideration for
-	 * performance at scale. So please be very careful and think it through
-	 * before using this method.
-	 */
-	public void loadAllObservations(final Workbook workbook) {
+	public void loadObservations(final Workbook workbook, final List<Integer> instanceNumbers, final List<Integer> repNumbers) {
 		final VariableTypeList variables = this.dataSetBuilder.getVariableTypes(workbook.getMeasurementDatesetId());
 		final List<Experiment> experiments =
-			this.studyDataManager.getExperiments(workbook.getMeasurementDatesetId(), 0, Integer.MAX_VALUE, variables);
+			this.studyDataManager.getExperiments(workbook.getMeasurementDatesetId(), instanceNumbers, repNumbers);
 		final Map<Integer, String> samples = this.getExperimentSampleMap(workbook.getStudyDetails().getId());
 		workbook.setObservations(this.buildObservations(experiments, variables.getVariates(), workbook.getFactors(), workbook.getVariates(),
 			workbook.getConditions(), samples));

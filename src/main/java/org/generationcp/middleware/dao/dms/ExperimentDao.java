@@ -445,7 +445,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<ExperimentModel> getExperiments(final int projectId, final List<TermId> types, final int start, final int numOfRows,
-		final boolean firstInstance) {
+		final List<Integer> instanceNumbers, final List<Integer> repNumbers) {
 		try {
 
 			final List<Integer> lists = new ArrayList<>();
@@ -459,8 +459,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			queryString.append("left outer join exp.properties as rep with rep.typeId = 8210 ");
 			queryString.append("left outer join exp.stock as st ");
 			queryString.append("where exp.project.projectId =:p_id and exp.typeId in (:type_ids) ");
-			if (firstInstance) {
-				queryString.append("and exp.geoLocation.description = 1 ");
+			if (!CollectionUtils.isEmpty(instanceNumbers)) {
+				queryString.append("and exp.geoLocation.description IN (:instanceNumbers) ");
+			}
+			if (!CollectionUtils.isEmpty(repNumbers)) {
+				queryString.append("and rep.value IN (:repNumbers) ");
 			}
 			queryString.append("order by (exp.geoLocation.description * 1) ASC, ");
 			queryString.append("(plot.value * 1) ASC, ");
@@ -471,6 +474,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final Query q = this.getSession().createQuery(queryString.toString());
 			q.setParameter("p_id", projectId);
 			q.setParameterList("type_ids", lists);
+			if (!CollectionUtils.isEmpty(instanceNumbers)) {
+				q.setParameterList("instanceNumbers", instanceNumbers.stream().map(i -> i.toString()).collect(Collectors.toList()));
+			}
+			if (!CollectionUtils.isEmpty(repNumbers)) {
+				q.setParameterList("repNumbers", repNumbers.stream().map(r -> r.toString()).collect(Collectors.toList()));
+			}
 			q.setMaxResults(numOfRows);
 			q.setFirstResult(start);
 

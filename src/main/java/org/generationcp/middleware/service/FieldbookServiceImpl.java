@@ -234,10 +234,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public boolean loadAllObservations(final Workbook workbook) {
+	public boolean loadObservations(final Workbook workbook, final List<Integer> instanceNumbers, final List<Integer> repNumbers) {
 		if (workbook.getObservations() == null || workbook.getObservations().isEmpty() && workbook.getStudyDetails() != null
 				&& workbook.getStudyDetails().getId() != null) {
-			this.workbookBuilder.loadAllObservations(workbook);
+			this.workbookBuilder.loadObservations(workbook, instanceNumbers, repNumbers);
 			return true;
 		}
 		return false;
@@ -481,10 +481,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		return germplasmList.getId();
 
-	}
-
-	private List<Name> getByGidAndNtype(final int gid, final GermplasmNameType nType) {
-		return this.daoFactory.getNameDao().getByGIDWithFilters(gid, null, nType);
 	}
 
 	@Override
