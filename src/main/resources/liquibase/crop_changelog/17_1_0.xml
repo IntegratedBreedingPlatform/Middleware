@@ -4,6 +4,13 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
+	<changeSet author="diego" id="v17.1.0-1">
+		<preConditions onFail="MARK_RAN">
+				<columnExists tableName="stockprop" columnName="rank"></columnExists>
+		</preConditions>
+		<comment>Remove rank column from stockprop table</comment>
+		<dropColumn tableName="stockprop" columnName="rank"></dropColumn>
+	</changeSet>
 	<changeSet author="diego" id="v17.1.0-2">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="ims_transaction" columnName="prevamount"></columnExists>

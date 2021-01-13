@@ -13,8 +13,6 @@ import javax.persistence.Table;
 @Table(name = "program_favorites")
 public class ProgramFavorite {
 
-	public static final String ID_NAME = "programFavoriteId";
-
 	public enum FavoriteType {
 		LOCATION("LOCATION"), METHOD("METHODS"), VARIABLE("VARIABLES");
 

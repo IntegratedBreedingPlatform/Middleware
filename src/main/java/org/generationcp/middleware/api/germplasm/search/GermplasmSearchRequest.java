@@ -58,7 +58,7 @@ public class GermplasmSearchRequest {
 	private String stockId;
 	private String locationOfOrigin;
 	private String locationOfUse;
-	private Integer reference;
+	private String reference;
 	private List<Integer> studyOfUseIds;
 	private List<Integer> studyOfOriginIds;
 	private List<Integer> plantingStudyIds;
@@ -186,11 +186,11 @@ public class GermplasmSearchRequest {
 		this.locationOfUse = locationOfUse;
 	}
 
-	public Integer getReference() {
+	public String getReference() {
 		return this.reference;
 	}
 
-	public void setReference(final Integer reference) {
+	public void setReference(final String reference) {
 		this.reference = reference;
 	}
 
