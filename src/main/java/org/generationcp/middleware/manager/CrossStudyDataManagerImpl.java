@@ -22,7 +22,6 @@ import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,9 +36,7 @@ import java.util.Set;
 @Transactional
 public class CrossStudyDataManagerImpl extends DataManager implements CrossStudyDataManager {
 
-
-	@Resource
-	private StudyDataManager studyDataManager;
+	private DaoFactory daoFactory;
 
 	@Resource
 	private TrialEnvironmentBuilder trialEnvironmentBuilder;
@@ -49,6 +46,7 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 
 	public CrossStudyDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -114,7 +112,7 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	public List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(final Set<Integer> environmentIds) {
 		final List<GermplasmLocationInfo> result = new ArrayList<>();
 		if (environmentIds != null && !environmentIds.isEmpty()) {
-			result.addAll(this.getBreedersQueryDao().getGermplasmLocationInfoByEnvironmentIds(environmentIds));
+			result.addAll(this.daoFactory.getBreedersQueryDao().getGermplasmLocationInfoByEnvironmentIds(environmentIds));
 		}
 		return result;
 	}
@@ -123,7 +121,7 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	public List<Integer> getTrialEnvironmentIdsForGermplasm(final Set<Integer> gids) {
 		final List<Integer> result = new ArrayList<>();
 		if (gids != null && !gids.isEmpty()) {
-			result.addAll(this.getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
+			result.addAll(this.daoFactory.getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
 		}
 		return result;
 	}

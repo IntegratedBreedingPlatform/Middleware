@@ -11,10 +11,8 @@
 
 package org.generationcp.middleware.operation.destroyer;
 
-import org.generationcp.middleware.dao.dms.DataSetDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.operation.saver.ProjectPropertySaver;
-import org.generationcp.middleware.util.DatabaseBroker;
+import org.hibernate.Session;
 
 /**
  * Provides destroyer classes that can be used to delete logical/physical data in IBDBv2. Creates destroyer classes based on the given
@@ -22,20 +20,18 @@ import org.generationcp.middleware.util.DatabaseBroker;
  *
  * @author Donald Barre
  */
-public abstract class Destroyer extends DatabaseBroker {
+public abstract class Destroyer {
+
+	protected HibernateSessionProvider sessionProvider;
 
 	public Destroyer(HibernateSessionProvider sessionProvider) {
-		super(sessionProvider);
+		this.sessionProvider = sessionProvider;
 	}
 
-	protected final DataSetDao getDataSetDao() {
-		DataSetDao dataSetDao = new DataSetDao();
-		dataSetDao.setSession(this.getActiveSession());
-		return dataSetDao;
+	public Session getActiveSession() {
+		if (this.sessionProvider != null) {
+			return this.sessionProvider.getSession();
+		}
+		return null;
 	}
-
-	protected final ProjectPropertySaver getProjectPropertySaver() {
-		return new ProjectPropertySaver(this.sessionProvider);
-	}
-
 }

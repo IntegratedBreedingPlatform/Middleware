@@ -11,7 +11,6 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,8 +19,7 @@ import java.util.Set;
 
 public class MeasurementVariableTransformer extends Transformer {
 
-	public MeasurementVariableTransformer(final HibernateSessionProvider sessionProviderForLocal) {
-		super(sessionProviderForLocal);
+	public MeasurementVariableTransformer() {
 	}
 
 	public List<MeasurementVariable> transform(final VariableTypeList variableTypeList, final boolean isFactor) {

@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -27,25 +28,28 @@ import java.util.HashSet;
 
 public class StockSaver extends Saver {
 
+	private DaoFactory daoFactory;
+
 	public StockSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public Integer saveStock(final int studyId, final VariableList variableList) {
 		final StockModel stockModel = this.createStock(variableList, null);
 		if (stockModel != null) {
 			stockModel.setProject(new DmsProject(studyId));
-			this.getStockDao().save(stockModel);
+			this.daoFactory.getStockDao().save(stockModel);
 			return stockModel.getStockId();
 		}
 		return null;
 	}
 
 	public void saveOrUpdateStock(final VariableList variableList, final int stockId) {
-		final StockModel stockModel = this.getStockDao().getById(stockId);
+		final StockModel stockModel = this.daoFactory.getStockDao().getById(stockId);
 		this.createStock(variableList, stockModel);
 		if (stockModel != null) {
-			this.getStockDao().merge(stockModel);
+			this.daoFactory.getStockDao().merge(stockModel);
 		}
 	}
 

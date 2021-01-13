@@ -27,19 +27,31 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationType;
+import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocdesType;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.generationcp.middleware.util.DatabaseBroker;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.text.ParseException;
@@ -58,9 +70,6 @@ public class FieldbookServiceImplTest {
 
 	@Mock
 	HibernateSessionProvider sessionProvider;
-
-	@Mock
-	DatabaseBroker dbBroker;
 
 	@Mock
 	SQLQuery query;
@@ -98,7 +107,6 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.setWorkbookSaver(this.workbookSaver);
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
 		Mockito.doReturn(this.query).when(this.session).createSQLQuery(ArgumentMatchers.anyString());
-		this.dbBroker.setSessionProvider(this.sessionProvider);
 		this.germplasms = this.createGermplasms();
 		this.listDataItems = this.createListDataItems();
 		this.germplasmAttributes = this.createGermplasmAttributes();

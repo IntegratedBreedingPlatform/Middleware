@@ -57,8 +57,11 @@ public class StandardVariableBuilder extends Builder {
 
 	private final DaoFactory daoFactory;
 
+	private TermPropertyBuilder termPropertyBuilder;
+
 	public StandardVariableBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		termPropertyBuilder = new TermPropertyBuilder(sessionProviderForLocal);
 		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
@@ -82,7 +85,7 @@ public class StandardVariableBuilder extends Builder {
 	public StandardVariableSummary getStandardVariableSummary(final Integer standardVariableId) {
 		StandardVariableSummary summary = null;
 		if (standardVariableId != null) {
-			summary = this.getStandardVariableDao().getStandardVariableSummary(standardVariableId);
+			summary = this.daoFactory.getStandardVariableDao().getStandardVariableSummary(standardVariableId);
 			if (summary != null) {
 				this.specialProcessing(Arrays.asList(summary));
 			}
@@ -100,17 +103,8 @@ public class StandardVariableBuilder extends Builder {
 		final List<StandardVariableSummary> result = new ArrayList<>();
 		if (standardVariableIds != null && !standardVariableIds.isEmpty()) {
 			final List<StandardVariableSummary> localVariables =
-				this.getStandardVariableDao().getStarndardVariableSummaries(standardVariableIds);
+				this.daoFactory.getStandardVariableDao().getStarndardVariableSummaries(standardVariableIds);
 			this.specialProcessing(localVariables);
-			result.addAll(localVariables);
-		}
-		return result;
-	}
-
-	public List<StandardVariableSummary> getStandardVariableSummariesWithIsAId(final List<Integer> isAIds) {
-		final List<StandardVariableSummary> result = new ArrayList<>();
-		if (isAIds != null && !isAIds.isEmpty()) {
-			final List<StandardVariableSummary> localVariables = this.getStandardVariableDao().getStandardVariableSummaryWithIsAId(isAIds);
 			result.addAll(localVariables);
 		}
 		return result;
@@ -187,8 +181,8 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	public List<TermProperty> createTermProperties(final int cvTermId) {
-		final List<CVTermProperty> cvTermProperties = this.getTermPropertyBuilder().findProperties(cvTermId);
-		return this.getTermPropertyBuilder().create(cvTermProperties);
+		final List<CVTermProperty> cvTermProperties = daoFactory.getCvTermPropertyDao().getByCvTermId(cvTermId);
+		return this.termPropertyBuilder.create(cvTermProperties);
 	}
 
 	private CVTerm getCvTerm(final int id) {
@@ -420,7 +414,7 @@ public class StandardVariableBuilder extends Builder {
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(
 		final List<String> variableNames, final String programUUID) {
 		if (!variableNames.isEmpty()) {
-			return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByAlias(variableNames, programUUID);
+			return this.daoFactory.getProjectPropertyDAO().getStandardVariableIdsWithTypeByAlias(variableNames, programUUID);
 		}
 		return new HashMap<>();
 	}
@@ -428,7 +422,7 @@ public class StandardVariableBuilder extends Builder {
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAliasInVariableOverrideTable(
 		final List<String> variableNames, final String programUUID) {
 		if (!variableNames.isEmpty()) {
-			return this.getVariableProgramOverridesDao().getVariableOverridesByVariableIdsAndProgram(variableNames, programUUID);
+			return this.daoFactory.getVariableProgramOverridesDao().getVariableOverridesByVariableIdsAndProgram(variableNames, programUUID);
 		}
 		return new HashMap<>();
 	}
@@ -486,28 +480,30 @@ public class StandardVariableBuilder extends Builder {
 
 	private boolean isExistsGeolocationByTypeAndValue(final int factorId, final String value) {
 		final Set<Integer> geolocationIds =
-			new HashSet<>(this.getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
+			new HashSet<>(this.daoFactory.getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
 		return !geolocationIds.isEmpty();
 	}
 
 	private boolean isExistsStocksByTypeAndValue(final Integer factorId, final String value) {
-		final Set<Integer> stockIds = new HashSet<>(this.getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
+		final Set<Integer> stockIds =
+			new HashSet<>(this.daoFactory.getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
 		return !stockIds.isEmpty();
 	}
 
 	private boolean isExistsExperimentsByTypeAndValue(final Integer factorId, final String value) {
 		final Set<Integer> experimentIds =
-			new HashSet<>(this.getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value));
+			new HashSet<>(this.daoFactory.getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value));
 		return !experimentIds.isEmpty();
 	}
 
 	private boolean isExistsPropertyByTypeAndValue(final Integer factorId, final String value) {
-		final List<ProjectProperty> properties = new ArrayList<>(this.getProjectPropertyDao().getByTypeAndValue(factorId, value));
+		final List<ProjectProperty> properties =
+			new ArrayList<>(this.daoFactory.getProjectPropertyDAO().getByTypeAndValue(factorId, value));
 		return !properties.isEmpty();
 	}
 
 	private boolean isExistsPhenotypeByTypeAndValue(final Integer variateId, final String value, final boolean isEnum) {
-		final List<Phenotype> phenotypes = new ArrayList<>(this.getPhenotypeDao().getByTypeAndValue(variateId, value, isEnum));
+		final List<Phenotype> phenotypes = new ArrayList<>(this.daoFactory.getPhenotypeDAO().getByTypeAndValue(variateId, value, isEnum));
 		return !phenotypes.isEmpty();
 	}
 

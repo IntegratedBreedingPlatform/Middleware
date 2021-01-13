@@ -73,7 +73,7 @@ public class Location implements Serializable, Comparable<Location> {
 
 	@Basic(optional = true)
 	@Column(name = "program_uuid")
-	private String uniqueID;
+	private String programUUID;
 
 	@Basic(optional = false)
 	@Column(name = "ltype")
@@ -166,12 +166,12 @@ public class Location implements Serializable, Comparable<Location> {
 		this.locid = locid;
 	}
 
-	public String getUniqueID() {
-		return this.uniqueID;
+	public String getProgramUUID() {
+		return this.programUUID;
 	}
 
-	public void setUniqueID(String uniqueID) {
-		this.uniqueID = uniqueID;
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
 	}
 
 	public Integer getLtype() {

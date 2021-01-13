@@ -18,7 +18,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
@@ -27,7 +26,11 @@ import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListMetadata;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
@@ -37,7 +40,12 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -85,13 +93,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	public GermplasmListManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		this.daoFactory = new DaoFactory(sessionProvider);
-		this.bindCacheLoaderFunctionToCache();
-
-	}
-
-	public GermplasmListManagerImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
-		super(sessionProvider, databaseName);
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.bindCacheLoaderFunctionToCache();
 
@@ -508,7 +509,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public GermplasmListNewColumnsInfo getAdditionalColumnsForList(final Integer listId) {
-		return this.getListDataPropertyDAO().getPropertiesForList(listId);
+		return this.daoFactory.getListDataPropertyDAO().getPropertiesForList(listId);
 	}
 
 	@Override
@@ -576,8 +577,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		final List<Integer> gidsDelete = new ArrayList<>(CollectionUtils.disjunction(germplasms, notDeletableGermplasmList));
 
 		if (!gidsDelete.isEmpty()) {
-			final GermplasmDAO dao = this.getGermplasmDao();
-			dao.deleteGermplasms(gidsDelete);
+			daoFactory.getGermplasmDao().deleteGermplasms(gidsDelete);
 
 			this.performGermplasmListEntriesDeletion(gidsDelete, listId);
 		}
@@ -607,8 +607,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	protected Set<Integer> getCodeFixedGidsByGidList(final List<Integer> gids) {
 		try {
 			final Set<Integer> set = new HashSet<>();
-			final GermplasmDAO dao = this.getGermplasmDao();
-			final List<Germplasm> germplasms = dao.getByGIDList(gids);
+			final List<Germplasm> germplasms = daoFactory.getGermplasmDao().getByGIDList(gids);
 			for (final Germplasm germplasm : germplasms) {
 				if (germplasm.getMgid() > 0) {
 					set.add(germplasm.getGid());
@@ -637,7 +636,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	private Set<Integer> getGermplasmOffspringByGIDs(final List<Integer> gids) {
 		try {
-			return this.getGermplasmDao().getGermplasmOffspringByGIDs(gids).keySet();
+			return this.daoFactory.getGermplasmDao().getGermplasmOffspringByGIDs(gids).keySet();
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 				"Error encountered while getting gids thart belongs to more than one list: GermplasmDataManager.getGermplasmUsedInMoreThanOneList(gids="
@@ -672,5 +671,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		for (final GermplasmList germplasmList : germplasmLists) {
 			germplasmList.setCreatedBy(userIDFullNameMap.get(germplasmList.getUserId()));
 		}
+	}
+
+	public void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 }

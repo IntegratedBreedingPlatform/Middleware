@@ -30,6 +30,15 @@ public interface GermplasmService {
 	String getPlotCodeValue(Integer gid);
 
 	/**
+	 * Returns a map of plot codes (seed source) where the germplasm was created, indexed by the given gids. Returns "Unknown" if plot
+	 * code attribute is not present. Never returns null.
+	 *
+	 * @param gids
+	 * @return Map<gids, plotCodeValue>
+	 */
+	Map<Integer, String> getPlotCodeValues(Set<Integer> gids);
+
+	/**
 	 * Returns all the attributes of the Germplasm identified by the given id.
 	 *
 	 * @param gid - id of the Germplasm
