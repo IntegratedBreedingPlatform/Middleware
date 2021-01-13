@@ -746,4 +746,6 @@ public interface StudyDataManager {
 
 	List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
 
+	void deleteStudy(int studyId);
+
 }

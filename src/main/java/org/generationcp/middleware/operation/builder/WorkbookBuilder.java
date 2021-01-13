@@ -45,7 +45,6 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -215,28 +214,6 @@ public class WorkbookBuilder extends Builder {
 		WorkbookBuilder.LOG.debug(StringUtils.EMPTY + monitor.stop() + ". This instance was for studyId: " + id);
 
 		return workbook;
-	}
-
-	private String getVariableValueFromGeolocation(final int stdVariableId, final String value, final Geolocation geolocation) {
-
-		if (geolocation != null) {
-			if (TermId.TRIAL_INSTANCE_FACTOR.getId() == stdVariableId) {
-				return geolocation.getDescription();
-
-			} else if (TermId.LATITUDE.getId() == stdVariableId && geolocation.getLatitude() != null) {
-				return geolocation.getLatitude().toString();
-
-			} else if (TermId.LONGITUDE.getId() == stdVariableId && geolocation.getLongitude() != null) {
-				return geolocation.getLongitude().toString();
-
-			} else if (TermId.GEODETIC_DATUM.getId() == stdVariableId && geolocation.getGeodeticDatum() != null) {
-				geolocation.setGeodeticDatum(value);
-
-			} else if (TermId.ALTITUDE.getId() == stdVariableId && geolocation.getAltitude() != null) {
-				return geolocation.getAltitude().toString();
-			}
-		}
-		return value;
 	}
 
 	private void populateBreedingMethodPossibleValues(final List<MeasurementVariable> variates) {
@@ -810,16 +787,6 @@ public class WorkbookBuilder extends Builder {
 		}
 
 		return vlist;
-	}
-
-	private MeasurementVariable getMeasurementVariableByName(final String name, final List<MeasurementVariable> list) {
-		final MeasurementVariable var = null;
-		for (final MeasurementVariable variable : list) {
-			if (variable.getName().equalsIgnoreCase(name)) {
-				return variable;
-			}
-		}
-		return var;
 	}
 
 	protected VariableList getTrialEnvironmentVariableList(final DataSet trialDataset) {

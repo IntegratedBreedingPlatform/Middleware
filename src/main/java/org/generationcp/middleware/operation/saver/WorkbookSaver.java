@@ -230,7 +230,7 @@ public class WorkbookSaver extends Saver {
 			&& environmentDatasetId != null) {
 			isDeleteTrialObservations = true;
 			// delete measurement data
-			this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
+			this.daoFactory.getExperimentDao().deleteExperimentsForDataset(plotDatasetId);
 			// reset trial observation details such as experimentid, stockid and
 			// geolocationid
 			this.resetTrialObservations(workbook.getTrialObservations());
@@ -249,7 +249,7 @@ public class WorkbookSaver extends Saver {
 			this.daoFactory.getExperimentDao().saveOrUpdate(studyExperiment);
 
 			// delete trial observations
-			this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
+			this.daoFactory.getExperimentDao().deleteTrialExperimentsOfStudy(environmentDatasetId);
 		}
 
 		final int studyId;
@@ -315,7 +315,7 @@ public class WorkbookSaver extends Saver {
 		final int studyId = workbook.getStudyDetails().getId();
 
 		final int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
-		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
+		this.daoFactory.getExperimentDao().deleteExperimentsForDataset(plotDatasetId);
 
 		this.resetTrialObservations(workbook.getTrialObservations());
 
@@ -328,7 +328,7 @@ public class WorkbookSaver extends Saver {
 		this.daoFactory.getExperimentDao().saveOrUpdate(studyExperiment);
 
 		// delete trial observations
-		this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
+		this.daoFactory.getExperimentDao().deleteTrialExperimentsOfStudy(environmentDatasetId);
 
 		this.saveOrUpdateTrialObservations( crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId, savedEnvironmentsCount, true, programUUID);
 

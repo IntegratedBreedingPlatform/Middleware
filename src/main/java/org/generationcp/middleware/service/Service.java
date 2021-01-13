@@ -38,7 +38,6 @@ import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
-import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -121,11 +120,6 @@ public abstract class Service {
 	protected final TermBuilder getTermBuilder() {
 		return new TermBuilder(this.sessionProvider);
 	}
-
-	protected final StudyDestroyer getStudyDestroyer() {
-		return new StudyDestroyer(this.sessionProvider);
-	}
-
 
 	protected LocationDataManager getLocationDataManager() {
 		return new LocationDataManagerImpl(this.sessionProvider);

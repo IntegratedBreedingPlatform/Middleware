@@ -26,7 +26,6 @@ import org.generationcp.middleware.operation.builder.StudyVariateBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.TraitBuilder;
 import org.generationcp.middleware.operation.builder.TraitGroupBuilder;
-import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
 import org.generationcp.middleware.operation.saver.CvTermSaver;
 import org.generationcp.middleware.operation.saver.DatasetProjectSaver;
@@ -301,10 +300,6 @@ public abstract class DataManager {
 
 	protected final ListInventoryBuilder getListInventoryBuilder() {
 		return new ListInventoryBuilder(this.sessionProvider);
-	}
-
-	protected final StudyDestroyer getStudyDestroyer() {
-		return new StudyDestroyer(this.sessionProvider);
 	}
 
 	public Session getActiveSession() {

@@ -1035,7 +1035,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		try {
 			for (final Integer projectId : projectIds) {
-				this.getStudyDestroyer().deleteStudy(projectId);
+				this.deleteStudy(projectId);
 			}
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e);
@@ -1353,5 +1353,34 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public void deleteStudy(final int studyId) {
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
+		this.renameStudyAndDatasets(study);
+		this.updateStudyStatusToDeleted(study);
+	}
+
+	private void updateStudyStatusToDeleted(final DmsProject study) {
+		if (null != study) {
+			study.setDeleted(true);
+			this.daoFactory.getDmsProjectDAO().save(study);
+		}
+	}
+
+	private void renameStudyAndDatasets(final DmsProject study) {
+		final String tstamp = Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS");
+		study.setName(study.getName() + "#" + tstamp);
+		this.daoFactory.getDmsProjectDAO().save(study);
+
+		final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO().getDatasetsByParent(study.getProjectId());
+		if (datasets != null) {
+			for (final DmsProject dataset : datasets) {
+				dataset.setName(dataset.getName() + "#" + tstamp);
+				dataset.setDeleted(true);
+				this.daoFactory.getDmsProjectDAO().save(dataset);
+			}
+		}
 	}
 }
