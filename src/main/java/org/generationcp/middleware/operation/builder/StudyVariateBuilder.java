@@ -11,25 +11,29 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+
+import java.util.List;
 
 public class StudyVariateBuilder extends Builder {
 
+	private DaoFactory daoFactory;
+
 	public StudyVariateBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public VariableTypeList build(int studyId) throws MiddlewareException {
 		VariableTypeList variates = new VariableTypeList();
 		this.addVariates(studyId, variates);
 
-		List<DatasetReference> dataSetReferences = this.getDmsProjectDao().getDirectChildDatasetsOfStudy(studyId);
+		List<DatasetReference> dataSetReferences = this.daoFactory.getDmsProjectDAO().getDirectChildDatasetsOfStudy(studyId);
 		for (DatasetReference dataSetReference : dataSetReferences) {
 			this.addVariates(dataSetReference.getId(), variates);
 		}
@@ -37,7 +41,7 @@ public class StudyVariateBuilder extends Builder {
 	}
 
 	private void addVariates(int projectId, VariableTypeList variates) throws MiddlewareException {
-		DmsProject project = this.getDmsProjectDao().getById(projectId);
+		DmsProject project = this.daoFactory.getDmsProjectDAO().getById(projectId);
 		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(
 				project.getProperties(),project.getProgramUUID());
 		variates.addAll(variableTypes.getVariates());

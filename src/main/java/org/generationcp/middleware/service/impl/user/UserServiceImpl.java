@@ -4,6 +4,7 @@ import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
@@ -20,6 +21,8 @@ import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +37,8 @@ import java.util.Set;
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
 	private final WorkbenchDaoFactory workbenchDaoFactory;
 
@@ -129,60 +134,56 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Integer createUser(final UserDto userDto) {
 
-		Integer idUserSaved = null;
 		// user.access = 0 - Default User
 		// user.instalid = 0 - Access all areas (legacy from the ICIS system) (not used)
 		// user.status = 0 - Unassigned
 		// user.type = 0 - Default user type (not used)
 
-		final Integer currentDate = Util.getCurrentDateAsIntegerValue();
-		final Person person = this.createPersonFromDto(userDto, new Person());
-
-		final WorkbenchUser user = new WorkbenchUser();
-		user.setPerson(person);
-		user.setName(userDto.getUsername());
-		user.setPassword(userDto.getPassword());
-		user.setAccess(0);
-		user.setAssignDate(currentDate);
-		user.setCloseDate(currentDate);
-		user.setInstalid(0);
-		user.setStatus(userDto.getStatus());
-		user.setType(0);
-
-		// Add user roles to the particular user
-		final List<UserRole> userRoles = new ArrayList<>();
-		if (userDto.getUserRoles() != null) {
-			for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
-				userRoles.add(this.buildNewUserRole(user, userRoleDto));
-			}
-		}
-		user.setRoles(userRoles);
-
-		final Set<CropType> crops = new HashSet<>();
-		for (final CropDto crop : userDto.getCrops()) {
-			final CropType cropType = new CropType(crop.getCropName());
-			crops.add(cropType);
-		}
-		person.setCrops(crops);
-
 		try {
+			final Integer currentDate = Util.getCurrentDateAsIntegerValue();
+			final Person person = this.createPersonFromDto(userDto, new Person());
+
+			final WorkbenchUser user = new WorkbenchUser();
+			user.setPerson(person);
+			user.setName(userDto.getUsername());
+			user.setPassword(userDto.getPassword());
+			user.setAccess(0);
+			user.setAssignDate(currentDate);
+			user.setCloseDate(currentDate);
+			user.setInstalid(0);
+			user.setStatus(userDto.getStatus());
+			user.setType(0);
+
+			// Add user roles to the particular user
+			final List<UserRole> userRoles = new ArrayList<>();
+			if (userDto.getUserRoles() != null) {
+				for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
+					userRoles.add(this.buildNewUserRole(user, userRoleDto));
+				}
+			}
+			user.setRoles(userRoles);
+
+			final Set<CropType> crops = new HashSet<>();
+			for (final CropDto crop : userDto.getCrops()) {
+				final CropType cropType = new CropType(crop.getCropName());
+				crops.add(cropType);
+			}
+			person.setCrops(crops);
 
 			final WorkbenchUser recordSaved = this.workbenchDaoFactory.getWorkbenchUserDAO().saveOrUpdate(user);
-			idUserSaved = recordSaved.getUserid();
+
+			final UserInfo userInfo = new UserInfo();
+			userInfo.setUserId(user.getUserid());
+			userInfo.setLoginCount(0);
+			this.workbenchDaoFactory.getUserInfoDAO().insertOrUpdateUserInfo(userInfo);
+
+			return recordSaved.getUserid();
 
 		} catch (final Exception e) {
 
-			throw new MiddlewareQueryException(
-				"Error encountered while saving User: userService.addUser(user=" + user + "): " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareRequestException("", "user.create.error", new String[] {userDto.getUsername()});
 		}
-
-		final UserInfo userInfo = new UserInfo();
-		userInfo.setUserId(user.getUserid());
-		userInfo.setLoginCount(0);
-		this.workbenchDaoFactory.getUserInfoDAO().insertOrUpdateUserInfo(userInfo);
-
-		return idUserSaved;
-
 	}
 
 	@Override
@@ -230,8 +231,8 @@ public class UserServiceImpl implements UserService {
 			idUserSaved = user.getUserid();
 		} catch (final Exception e) {
 
-			throw new MiddlewareQueryException(
-				"Error encountered while saving User: UserServiceImpl.updateUser(org.generationcp.middleware.service.api.user.UserDto)(user=" + user + "): " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareRequestException("", "user.update.error", new String[] {userDto.getUsername()});
 		}
 
 		return idUserSaved;

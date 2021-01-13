@@ -1,16 +1,11 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -38,11 +33,15 @@ import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Transactional
 public class OntologyScaleDataManagerImpl extends DataManager implements OntologyScaleDataManager {
@@ -246,7 +245,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 				CV cv = new CV();
 				cv.setName(String.valueOf(scale.getId()));
 				cv.setDefinition(String.valueOf(scale.getName() + " - " + scale.getDefinition()));
-				this.getCvDao().save(cv);
+				this.daoFactory.getCvDao().save(cv);
 
 				// Saving Categorical data if present
 				for (TermSummary c : scale.getCategories()) {
@@ -398,7 +397,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 					CV cv = new CV();
 					cv.setName(String.valueOf(scale.getId()));
 					cv.setDefinition(String.valueOf(scale.getName() + " - " + scale.getDefinition()));
-					this.getCvDao().save(cv);
+					this.daoFactory.getCvDao().save(cv);
 
 					//Setting cvId from auto incremented value.
 					cvId = cv.getCvId();
@@ -443,7 +442,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			}
 
 			if (!scale.getDataType().equals(DataType.CATEGORICAL_VARIABLE) && cvId != null) {
-				this.getCvDao().makeTransient(this.getCvDao().getById(cvId));
+				this.daoFactory.getCvDao().makeTransient(this.daoFactory.getCvDao().getById(cvId));
 			}
 
 			// Save last modified Time
@@ -516,7 +515,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			}
 
 			if (!terms.isEmpty()) {
-				this.getCvDao().makeTransient(this.getCvDao().getById(terms.get(0).getCv()));
+				this.daoFactory.getCvDao().makeTransient(this.daoFactory.getCvDao().getById(terms.get(0).getCv()));
 			}
 
 			// Deleting existing values for property

@@ -56,7 +56,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		 * For program 1, verify there are breeding locations returned
 		 */
 		final List<Location> programOneLocations =
-				this.locationDAO.getBreedingLocationsByUniqueID(LocationDAOTest.PROGRAM_UUID1);
+			this.locationDAO.getBreedingLocationsByProgramUUID(LocationDAOTest.PROGRAM_UUID1);
 		Assert.assertTrue("Expecting breeding locations for program with ID " + LocationDAOTest.PROGRAM_UUID1,
 				programOneLocations.size() > 0);
 
@@ -64,7 +64,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		 * For program 2, verify there are breeding locations returned
 		 */
 		final List<Location> programTwoLocations =
-				this.locationDAO.getBreedingLocationsByUniqueID(LocationDAOTest.PROGRAM_UUID2);
+			this.locationDAO.getBreedingLocationsByProgramUUID(LocationDAOTest.PROGRAM_UUID2);
 		Assert.assertTrue("Expecting breeding locations for program with ID " + LocationDAOTest.PROGRAM_UUID2,
 				programTwoLocations.size() > 0);
 
@@ -72,7 +72,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		 * For program 3, verify there are breeding locations returned
 		 */
 		final List<Location> programThreeLocations =
-				this.locationDAO.getBreedingLocationsByUniqueID(LocationDAOTest.PROGRAM_UUID3);
+			this.locationDAO.getBreedingLocationsByProgramUUID(LocationDAOTest.PROGRAM_UUID3);
 		Assert.assertTrue("Expecting breeding locations for program with ID " + LocationDAOTest.PROGRAM_UUID3,
 				programThreeLocations.size() > 0);
 	}
@@ -363,13 +363,13 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		locationDAO.saveOrUpdate(location);
 
-		final List<Location> result = locationDAO.getByUniqueIDAndExcludeLocationTypes(programUUID, new ArrayList<Integer>());
+		final List<Location> result = locationDAO.getByProgramUUIDAndExcludeLocationTypes(programUUID, new ArrayList<Integer>());
 
 		final Collection<Location> programSpecificLocations = Collections2.filter(result, new Predicate<Location>() {
 
 			@Override
 			public boolean apply(@Nullable final Location location) {
-				return programUUID.equals(location.getUniqueID());
+				return programUUID.equals(location.getProgramUUID());
 			}
 		});
 
@@ -380,7 +380,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 			@Override
 			public boolean apply(@Nullable final Location location) {
-				return null == location.getUniqueID();
+				return null == location.getProgramUUID();
 			}
 		});
 
@@ -398,7 +398,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		excludeCountryType.add(countryLocationType);
 
 		final List<Location> resultWithoutCountryLocationType =
-				locationDAO.getByUniqueIDAndExcludeLocationTypes("any-program-uuid", excludeCountryType);
+			locationDAO.getByProgramUUIDAndExcludeLocationTypes("any-program-uuid", excludeCountryType);
 
 		for (final Location location : resultWithoutCountryLocationType) {
 			// Verify that no country type locations are returned

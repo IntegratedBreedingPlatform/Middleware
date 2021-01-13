@@ -21,7 +21,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.oms.CVTermDao;
-import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -45,8 +44,6 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -70,7 +67,6 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StudyType;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -136,6 +132,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	private Project commonTestProject;
 
+	private DaoFactory daoFactory;
+
 	private static CrossExpansionProperties crossExpansionProperties;
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
@@ -146,6 +144,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
+
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+
 		this.manager.setUserService(this.userService);
 
 		this.cvTermDao = new CVTermDao();
@@ -708,7 +709,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setDescription("projectDescription");
 		project.setProgramUUID(programUUID);
 
-		this.manager.getDmsProjectDao().save(project);
+		this.daoFactory.getDmsProjectDAO().save(project);
 
 		final DMSVariableType dmsVariableType = new DMSVariableType();
 		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
@@ -736,7 +737,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setProgramUUID(programUUID);
 		project.setDeleted(true);
 
-		this.manager.getDmsProjectDao().save(project);
+		this.daoFactory.getDmsProjectDAO().save(project);
 
 		final DMSVariableType dmsVariableType = new DMSVariableType();
 		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
@@ -763,7 +764,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setName("projectName");
 		project.setDescription("projectDescription");
 		project.setProgramUUID(programUUID);
-		this.manager.getDmsProjectDao().save(project);
+		this.daoFactory.getDmsProjectDAO().save(project);
 
 		final DMSVariableType dmsVariableType = new DMSVariableType();
 		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
@@ -785,7 +786,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setProject(project);
-		this.manager.getExperimentDao().save(experimentModel);
+		this.daoFactory.getExperimentDao().save(experimentModel);
 
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
 			locationNameIdValue, programUUID));
@@ -802,7 +803,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setDescription("projectDescription");
 		project.setProgramUUID(programUUID);
 		project.setDeleted(true);
-		this.manager.getDmsProjectDao().save(project);
+		this.daoFactory.getDmsProjectDAO().save(project);
 
 		final DMSVariableType dmsVariableType = new DMSVariableType();
 		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
@@ -824,7 +825,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setProject(project);
-		this.manager.getExperimentDao().save(experimentModel);
+		this.daoFactory.getExperimentDao().save(experimentModel);
 
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
 			locationNameIdValue, ""));
@@ -842,7 +843,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setProgramUUID(programUUID);
 		project.setDeleted(false);
 		project.setStartDate("20180403");
-		this.manager.getDmsProjectDao().save(project);
+		this.daoFactory.getDmsProjectDAO().save(project);
 
 		final String startDate = this.manager.getProjectStartDateByProjectId(project.getProjectId());
 		Assert.assertEquals(project.getStartDate(), startDate);
@@ -985,9 +986,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		values.setLocationId(this.manager.getExperimentModelSaver().createNewGeoLocation().getLocationId());
 		//Save the experiment
 		this.manager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.manager.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		final ExperimentModel experiment =
+			this.daoFactory.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Phenotype updatedPhenotype =
-			this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+			this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", updatedPhenotype.getValue());
 
 		//Change the value of the variable
@@ -999,9 +1001,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		this.manager.updateExperimentValues(Arrays.asList(values), 1);
 
-		updatedPhenotype = this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+		updatedPhenotype =
+			this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		final Phenotype savedPhenotype =
-			this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1002);
+			this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1002);
 		Assert.assertEquals("900", updatedPhenotype.getValue());
 		Assert.assertEquals("1000", savedPhenotype.getValue());
 	}
@@ -1051,7 +1054,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setName("projectName");
 		project.setDescription("ProjectDescription");
 		project.setProgramUUID(programUUID);
-		project = this.manager.getDmsProjectDao().save(project);
+		project = this.daoFactory.getDmsProjectDAO().save(project);
 
 		final DatasetReference plotdata =
 			this.addTestDataset(project.getProjectId(), project.getName() + PLOTDATA, DatasetTypeEnum.PLOT_DATA.getId());
@@ -1062,8 +1065,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final String newStudyName = "newStudyName";
 		this.manager.renameStudy(newStudyName, project.getProjectId(), programUUID);
 
-		final DmsProject plotDataset = this.manager.getDmsProjectDao().getById(plotdata.getId());
-		final DmsProject environmentDataset = this.manager.getDmsProjectDao().getById(environment.getId());
+		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(plotdata.getId());
+		final DmsProject environmentDataset = this.daoFactory.getDmsProjectDAO().getById(environment.getId());
 
 		Assert.assertEquals(newStudyName + PLOTDATA, plotDataset.getName());
 		Assert.assertEquals(newStudyName + ENVIRONMENT, environmentDataset.getName());
@@ -1080,23 +1083,4 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(this.manager.isStudy(mainFolder.getProjectId()));
 	}
 
-
-	private StandardVariable createStandardVariable(final String name) {
-
-		final CVTerm property = this.cvTermDao.save(org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(10), "", CvId.PROPERTIES);
-		final CVTerm scale = this.cvTermDao.save(org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(10), "", CvId.SCALES);
-		final CVTerm method = this.cvTermDao.save(org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(10), "", CvId.METHODS);
-
-		final StandardVariable standardVariable = new StandardVariable();
-		standardVariable.setName(name);
-		standardVariable.setProperty(new Term(property.getCvTermId(), property.getName(), property.getDefinition()));
-		standardVariable.setScale(new Term(scale.getCvTermId(), scale.getName(), scale.getDefinition()));
-		standardVariable.setMethod(new Term(method.getCvTermId(), method.getName(), method.getDefinition()));
-		standardVariable.setDataType(new Term(DataType.CATEGORICAL_VARIABLE.getId(), "Categorical variable", "variable with Categorical values"));
-		standardVariable.setIsA(new Term(1050, "Study detail", "Study detail class"));
-
-		this.standardVariableSaver.save(standardVariable);
-
-		return standardVariable;
-	}
 }

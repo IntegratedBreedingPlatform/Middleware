@@ -1,21 +1,25 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 
+import java.util.List;
+
 public class GeolocationPropertySaver extends Saver {
+
+	private DaoFactory daoFactory;
 
 	public GeolocationPropertySaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public void saveFieldmapProperties(final List<FieldMapInfo> infos) throws MiddlewareQueryException {
@@ -41,7 +45,7 @@ public class GeolocationPropertySaver extends Saver {
 	}
 
 	public void saveOrUpdate(final int geolocationId, final int typeId, final String value) throws MiddlewareQueryException {
-		final Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
+		final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(geolocationId);
 		GeolocationProperty property = null;
 		if (geolocation.getProperties() != null && !geolocation.getProperties().isEmpty()) {
 			property = this.findProperty(geolocation.getProperties(), typeId);
@@ -53,7 +57,7 @@ public class GeolocationPropertySaver extends Saver {
 			property.setType(typeId);
 		}
 		property.setValue(value);
-		this.getGeolocationPropertyDao().saveOrUpdate(property);
+		this.daoFactory.getGeolocationPropertyDao().saveOrUpdate(property);
 	}
 
 	private int getMaxRank(final List<GeolocationProperty> properties) {
@@ -90,6 +94,6 @@ public class GeolocationPropertySaver extends Saver {
 			geolocation.getProperties().add(property);
 		}
 		property.setValue(value);
-		this.getGeolocationPropertyDao().saveOrUpdate(property);
+		this.daoFactory.getGeolocationPropertyDao().saveOrUpdate(property);
 	}
 }

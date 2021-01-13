@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
@@ -34,6 +32,8 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
+
+import java.util.List;
 
 public class StandardVariableSaver extends Saver {
 
@@ -202,7 +202,7 @@ public class StandardVariableSaver extends Saver {
 		final CV cv = new CV();
 		cv.setName(String.valueOf(variable.getId()));
 		cv.setDefinition(String.valueOf(variable.getName() + " - " + variable.getDescription()));
-		this.getCvDao().save(cv);
+		this.daoFactory.getCvDao().save(cv);
 		return cv;
 
 	}
@@ -286,7 +286,7 @@ public class StandardVariableSaver extends Saver {
 
 		// Check if cv entry of enumeration already exists
 		// Add cv entry of the standard variable if none found
-		Integer cvId = this.getCvDao().getIdByName(String.valueOf(variable.getId()));
+		Integer cvId = this.daoFactory.getCvDao().getIdByName(String.valueOf(variable.getId()));
 
 		if (cvId == null) {
 			cvId = this.createCv(variable).getCvId();
@@ -435,7 +435,7 @@ public class StandardVariableSaver extends Saver {
 			throw new MiddlewareQueryException("Specified trait ID for deletion of crop ontology ID is not valid");
 		}
 
-		final List<CVTermProperty> traitProperties = this.getTermPropertyBuilder().findProperties(traitId);
+		final List<CVTermProperty> traitProperties = daoFactory.getCvTermPropertyDao().getByCvTermId(traitId);
 
 		for (final CVTermProperty traitProperty : traitProperties) {
 			if (traitProperty.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
@@ -458,10 +458,10 @@ public class StandardVariableSaver extends Saver {
 
 	private void deleteSynonyms(final int cvTermId, final List<NameSynonym> nameSynonyms) throws MiddlewareQueryException {
 		if (nameSynonyms != null && !nameSynonyms.isEmpty()) {
-			final List<CVTermSynonym> cvTermSynonyms = this.getCvTermSynonymDao().getByCvTermId(cvTermId);
+			final List<CVTermSynonym> cvTermSynonyms = this.daoFactory.getCvTermSynonymDao().getByCvTermId(cvTermId);
 			if (cvTermSynonyms != null) {
 				for (final CVTermSynonym cvTermSynonym : cvTermSynonyms) {
-					this.getCvTermSynonymDao().makeTransient(cvTermSynonym);
+					this.daoFactory.getCvTermSynonymDao().makeTransient(cvTermSynonym);
 				}
 			}
 		}

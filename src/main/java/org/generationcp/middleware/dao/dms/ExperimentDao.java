@@ -69,6 +69,20 @@ import java.util.stream.Collectors;
  */
 public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
+	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT = "select count(*) as totalObservationUnits from "
+		+ "nd_experiment nde \n"
+		+ "    inner join project proj on proj.project_id = nde.project_id \n"
+		+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n";
+
+	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE = " where \n"
+		+ "	proj.study_id = :studyIdentifier AND proj.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
+		+ "    and gl.nd_geolocation_id = :instanceId ";
+
+	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES =
+		ExperimentDao.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT
+			+ "		LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
+			+ ExperimentDao.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE + " and ph.value is not null ";
+
 	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
 	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 	static final String SQL_GET_SAMPLED_OBSERVATION_BY_STUDY = " SELECT " +
@@ -431,7 +445,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<ExperimentModel> getExperiments(final int projectId, final List<TermId> types, final int start, final int numOfRows,
-		final boolean firstInstance) {
+		final List<Integer> instanceNumbers, final List<Integer> repNumbers) {
 		try {
 
 			final List<Integer> lists = new ArrayList<>();
@@ -445,8 +459,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			queryString.append("left outer join exp.properties as rep with rep.typeId = 8210 ");
 			queryString.append("left outer join exp.stock as st ");
 			queryString.append("where exp.project.projectId =:p_id and exp.typeId in (:type_ids) ");
-			if (firstInstance) {
-				queryString.append("and exp.geoLocation.description = 1 ");
+			if (!CollectionUtils.isEmpty(instanceNumbers)) {
+				queryString.append("and exp.geoLocation.description IN (:instanceNumbers) ");
+			}
+			if (!CollectionUtils.isEmpty(repNumbers)) {
+				queryString.append("and rep.value IN (:repNumbers) ");
 			}
 			queryString.append("order by (exp.geoLocation.description * 1) ASC, ");
 			queryString.append("(plot.value * 1) ASC, ");
@@ -457,6 +474,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final Query q = this.getSession().createQuery(queryString.toString());
 			q.setParameter("p_id", projectId);
 			q.setParameterList("type_ids", lists);
+			if (!CollectionUtils.isEmpty(instanceNumbers)) {
+				q.setParameterList("instanceNumbers", instanceNumbers.stream().map(i -> i.toString()).collect(Collectors.toList()));
+			}
+			if (!CollectionUtils.isEmpty(repNumbers)) {
+				q.setParameterList("repNumbers", repNumbers.stream().map(r -> r.toString()).collect(Collectors.toList()));
+			}
 			q.setMaxResults(numOfRows);
 			q.setFirstResult(start);
 
@@ -1118,6 +1141,39 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final String message = "Error with updateEntryId query from ExperimentModel: " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(ExperimentDao.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT
+				+ ExperimentDao.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE);
+			query.addScalar("totalObservationUnits", new IntegerType());
+			query.setParameter("studyIdentifier", studyIdentifier);
+			query.setParameter("instanceId", instanceId);
+			return (int) query.uniqueResult();
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
+					studyIdentifier, instanceId) + he.getMessage(),
+				he);
+		}
+	}
+
+	public boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId) {
+		try {
+
+			final SQLQuery query =
+				this.getSession().createSQLQuery(ExperimentDao.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES);
+			query.addScalar("totalObservationUnits", new IntegerType());
+			query.setParameter("studyIdentifier", studyIdentifier);
+			query.setParameter("instanceId", instanceId);
+			return (int) query.uniqueResult() > 0;
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
+					studyIdentifier, instanceId) + he.getMessage(),
+				he);
 		}
 	}
 
