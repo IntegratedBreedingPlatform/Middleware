@@ -12,18 +12,9 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -36,7 +27,10 @@ import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Implementation of the PedigreeDataManager interface. To instantiate this
@@ -54,12 +48,15 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	private static final ThreadLocal<Integer> PEDIGREE_COUNTER = new ThreadLocal<>();
 	private static final ThreadLocal<Boolean> CALCULATE_FULL = new ThreadLocal<>();
 
+	private DaoFactory daoFactory;
+
 	public PedigreeDataManagerImpl() {
 	}
 
 	public PedigreeDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		this.germplasmDataManager = new GermplasmDataManagerImpl(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -92,7 +89,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 			return maxPedigreeLevel;
 		}
 
-		final Germplasm germplasm = this.getGermplasmDao().getById(gid);
+		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
 
 		if (germplasm.getGnpgs() == -1) {
 			if (!includeDerivativeLine) {
@@ -450,12 +447,12 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	private List<Germplasm> getChildren(final Integer gid, final char methodType) {
-		return this.getGermplasmDao().getChildren(gid, methodType);
+		return this.daoFactory.getGermplasmDao().getChildren(gid, methodType);
 	}
 
 	@Override
 	public Germplasm getParentByGIDAndProgenitorNumber(final Integer gid, final Integer progenitorNumber) {
-		return this.getGermplasmDao().getProgenitorByGID(gid, progenitorNumber);
+		return this.daoFactory.getGermplasmDao().getProgenitorByGID(gid, progenitorNumber);
 	}
 
 	@Override
@@ -472,7 +469,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 				germplasmList[0] = 2;
 			} else {
 				germplasmList[0] =
-					this.getProgenitorDao().getByGIDAndPID(g.getGid(), gid).getProgenitorNumber();
+					this.daoFactory.getProgenitorDao().getByGIDAndPID(g.getGid(), gid).getProgenitorNumber();
 			}
 			germplasmList[1] = g;
 
@@ -484,32 +481,32 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
 	private List<Germplasm> getGermplasmDescendantByGID(final Integer gid, final int start,
 		final int numOfRows) {
-		return this.getGermplasmDao().getGermplasmDescendantByGID(gid, start, numOfRows);
+		return this.daoFactory.getGermplasmDao().getGermplasmDescendantByGID(gid, start, numOfRows);
 	}
 
 	@Override
 	public long countDescendants(final Integer gid) {
-		return this.getGermplasmDao().countGermplasmDescendantByGID(gid);
+		return this.daoFactory.getGermplasmDao().countGermplasmDescendantByGID(gid);
 	}
 
 	@Override
 	public List<Germplasm> getManagementNeighbors(final Integer gid, final int start, final int numOfRows) {
-		return this.getGermplasmDao().getManagementNeighbors(gid, start, numOfRows);
+		return this.daoFactory.getGermplasmDao().getManagementNeighbors(gid, start, numOfRows);
 	}
 
 	@Override
 	public long countManagementNeighbors(final Integer gid) {
-		return this.getGermplasmDao().countManagementNeighbors(gid);
+		return this.daoFactory.getGermplasmDao().countManagementNeighbors(gid);
 	}
 
 	@Override
 	public long countGroupRelatives(final Integer gid) {
-		return this.getGermplasmDao().countGroupRelatives(gid);
+		return this.daoFactory.getGermplasmDao().countGroupRelatives(gid);
 	}
 
 	@Override
 	public List<Germplasm> getGroupRelatives(final Integer gid, final int start, final int numRows) {
-		return this.getGermplasmDao().getGroupRelatives(gid, start, numRows);
+		return this.daoFactory.getGermplasmDao().getGroupRelatives(gid, start, numRows);
 	}
 
 	@Override
@@ -564,7 +561,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
 	@Override
 	public List<Progenitor> getProgenitorsByGID(final Integer gid) {
-		return this.getProgenitorDao().getByGID(gid);
+		return this.daoFactory.getProgenitorDao().getByGID(gid);
 	}
 
 	@Override
@@ -599,10 +596,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 			germplasm.add(child);
 			this.germplasmDataManager.addOrUpdateGermplasm(germplasm, Operation.UPDATE);
 		} else if (progenitorNumber > 2) {
-			final ProgenitorDAO dao = this.getProgenitorDao();
-
 			// check if there is an existing Progenitor record
-			final Progenitor p = dao.getByGIDAndProgenitorNumber(gid, progenitorNumber);
+			final Progenitor p = this.daoFactory.getProgenitorDao().getByGIDAndProgenitorNumber(gid, progenitorNumber);
 
 			if (p != null) {
 				// update the existing record
@@ -661,10 +656,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		int progenitorsSaved = 0;
 		try {
 
-			final ProgenitorDAO dao = this.getProgenitorDao();
-
 			for (final Progenitor progenitor : progenitors) {
-				dao.saveOrUpdate(progenitor);
+				this.daoFactory.getProgenitorDao().saveOrUpdate(progenitor);
 				progenitorsSaved++;
 			}
 

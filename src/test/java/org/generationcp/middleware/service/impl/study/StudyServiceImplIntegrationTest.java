@@ -36,7 +36,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -97,15 +96,6 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountTotalObservationUnits() {
-
-		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 5);
-
-		Assert.assertEquals(5, this.studyService.countTotalObservationUnits(this.study.getProjectId(), geolocation.getLocationId()));
-	}
-
-	@Test
 	public void testHasMeasurementDataEntered() {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 		final List<ExperimentModel> experimentModels =
@@ -121,19 +111,6 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(
 			this.studyService
 				.hasMeasurementDataEntered(Collections.singletonList(this.testTrait.getCvTermId()), this.study.getProjectId()));
-	}
-
-	@Test
-	public void testHasMeasurementDataOnEnvironment() {
-		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> experimentModels =
-			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 5);
-		assertFalse(this.studyService.hasMeasurementDataOnEnvironment(this.study.getProjectId(), geolocation.getLocationId()));
-
-		this.testDataInitializer.addPhenotypes(experimentModels, this.testTrait.getCvTermId(), RandomStringUtils.randomNumeric(5));
-		// Need to flush session to sync with underlying database before querying
-		this.sessionProvder.getSession().flush();
-		Assert.assertTrue(this.studyService.hasMeasurementDataOnEnvironment(this.study.getProjectId(), geolocation.getLocationId()));
 	}
 
 	@Test

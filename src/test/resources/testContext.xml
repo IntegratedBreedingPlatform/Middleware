@@ -98,8 +98,7 @@
     </bean>
 
     <bean id="pedigreeDataManager" class="org.generationcp.middleware.manager.PedigreeDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
-        <property name="germplasmDataManager" ref="germplasmDataManager"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="locationDataManager" class="org.generationcp.middleware.manager.LocationDataManagerImpl">
@@ -107,11 +106,11 @@
     </bean>
 
     <bean id="crossStudyDataManager" class="org.generationcp.middleware.manager.CrossStudyDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="genotypicDataManager" class="org.generationcp.middleware.manager.GenotypicDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="inventoryDataManager" class="org.generationcp.middleware.manager.InventoryDataManagerImpl">
@@ -127,7 +126,7 @@
     </bean>
 
     <bean id="userProgramStateDataManager" class="org.generationcp.middleware.manager.UserProgramStateDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="conformityTestingService" class="org.generationcp.middleware.service.ConformityTestingServiceImpl">
@@ -136,11 +135,11 @@
     </bean>
 
     <bean id="dataImportService" class="org.generationcp.middleware.service.DataImportServiceImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="fieldbookService" class="org.generationcp.middleware.service.FieldbookServiceImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="MBDTDataManager" class="org.generationcp.middleware.manager.MBDTDataManagerImpl">
@@ -148,7 +147,7 @@
     </bean>
 
     <bean id="reportService" class="org.generationcp.middleware.service.ReportServiceImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="ontologyMethodDataManager" class="org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl">

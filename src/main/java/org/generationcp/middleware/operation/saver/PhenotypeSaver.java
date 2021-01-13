@@ -12,7 +12,11 @@
 package org.generationcp.middleware.operation.saver;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -74,13 +78,6 @@ public class PhenotypeSaver {
 			final Integer dataTypeId, final Phenotype.ValueStatus valueStatus) throws MiddlewareQueryException {
 		final Phenotype phenotype = this.createPhenotype(variableId, value, oldPhenotype, dataTypeId, valueStatus);
 		this.saveOrUpdate(experimentId, phenotype);
-	}
-
-	public void savePhenotype(final int experimentId, final Variable variable) throws MiddlewareQueryException {
-		final Phenotype phenotype = this.createPhenotype(variable, experimentId);
-		if (phenotype != null) {
-			this.daoFactory.getPhenotypeDAO().save(phenotype);
-		}
 	}
 
 	private Phenotype createPhenotype(final Variable variable, final int experimentId) throws MiddlewareQueryException {

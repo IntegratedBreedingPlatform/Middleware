@@ -16,8 +16,23 @@ import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
-import org.generationcp.middleware.domain.dms.*;
-import org.generationcp.middleware.domain.etl.*;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.TreatmentVariable;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -30,7 +45,6 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -38,7 +52,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class WorkbookBuilder extends Builder {
 
@@ -75,24 +96,10 @@ public class WorkbookBuilder extends Builder {
 		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
-	/**
-	 * Given a workbook already loaded which does not load observations now - this is a helper method to trigger
-	 * loading the observations collection IF AND WHEN NEEDED. This method is a
-	 * stop gap mecahnism to lazy load the observations collection until we can
-	 * gradually refactor all code so that entire set of observations (plots)
-	 * data is not required to be loaded in session. This method should only be
-	 * invoked at a point in process where entire observations (plots)
-	 * collection with measurements is required due to the way rest of the
-	 * process code is written. For large Nurseries and trials this method is
-	 * not yet performance tuned. Memory footprint of the overall application
-	 * can be severly impacted if this method is used without consideration for
-	 * performance at scale. So please be very careful and think it through
-	 * before using this method.
-	 */
-	public void loadAllObservations(final Workbook workbook) {
+	public void loadObservations(final Workbook workbook, final List<Integer> instanceNumbers, final List<Integer> repNumbers) {
 		final VariableTypeList variables = this.dataSetBuilder.getVariableTypes(workbook.getMeasurementDatesetId());
 		final List<Experiment> experiments =
-			this.studyDataManager.getExperiments(workbook.getMeasurementDatesetId(), 0, Integer.MAX_VALUE, variables);
+			this.studyDataManager.getExperiments(workbook.getMeasurementDatesetId(), instanceNumbers, repNumbers);
 		final Map<Integer, String> samples = this.getExperimentSampleMap(workbook.getStudyDetails().getId());
 		workbook.setObservations(this.buildObservations(experiments, variables.getVariates(), workbook.getFactors(), workbook.getVariates(),
 			workbook.getConditions(), samples));
@@ -207,28 +214,6 @@ public class WorkbookBuilder extends Builder {
 		WorkbookBuilder.LOG.debug(StringUtils.EMPTY + monitor.stop() + ". This instance was for studyId: " + id);
 
 		return workbook;
-	}
-
-	private String getVariableValueFromGeolocation(final int stdVariableId, final String value, final Geolocation geolocation) {
-
-		if (geolocation != null) {
-			if (TermId.TRIAL_INSTANCE_FACTOR.getId() == stdVariableId) {
-				return geolocation.getDescription();
-
-			} else if (TermId.LATITUDE.getId() == stdVariableId && geolocation.getLatitude() != null) {
-				return geolocation.getLatitude().toString();
-
-			} else if (TermId.LONGITUDE.getId() == stdVariableId && geolocation.getLongitude() != null) {
-				return geolocation.getLongitude().toString();
-
-			} else if (TermId.GEODETIC_DATUM.getId() == stdVariableId && geolocation.getGeodeticDatum() != null) {
-				geolocation.setGeodeticDatum(value);
-
-			} else if (TermId.ALTITUDE.getId() == stdVariableId && geolocation.getAltitude() != null) {
-				return geolocation.getAltitude().toString();
-			}
-		}
-		return value;
 	}
 
 	private void populateBreedingMethodPossibleValues(final List<MeasurementVariable> variates) {
@@ -593,7 +578,7 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private void setValueStatusToMeasurementData(final Variable variable, final MeasurementData measurementData) {
-		final Phenotype phenotype = this.getPhenotypeDao().getById(variable.getVariableDataId());
+		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(variable.getVariableDataId());
 		if (phenotype != null) {
 			measurementData.setValueStatus(phenotype.getValueStatus());
 		}
@@ -804,16 +789,6 @@ public class WorkbookBuilder extends Builder {
 		return vlist;
 	}
 
-	private MeasurementVariable getMeasurementVariableByName(final String name, final List<MeasurementVariable> list) {
-		final MeasurementVariable var = null;
-		for (final MeasurementVariable variable : list) {
-			if (variable.getName().equalsIgnoreCase(name)) {
-				return variable;
-			}
-		}
-		return var;
-	}
-
 	protected VariableList getTrialEnvironmentVariableList(final DataSet trialDataset) {
 		final VariableTypeList typeList = trialDataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
 		final VariableList list = new VariableList();
@@ -967,7 +942,7 @@ public class WorkbookBuilder extends Builder {
 		final int measurementDatasetId) {
 
 		for (final TreatmentVariable treatmentVariable : treatmentVariables) {
-			final List<String> values = this.getExperimentPropertyDao().getTreatmentFactorValues(
+			final List<String> values = this.daoFactory.getExperimentPropertyDao().getTreatmentFactorValues(
 				treatmentVariable.getLevelVariable().getTermId(), treatmentVariable.getValueVariable().getTermId(),
 				measurementDatasetId);
 			treatmentVariable.setValues(values);

@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -22,8 +23,11 @@ import java.util.stream.Collectors;
 
 public class LocdesSaver extends Saver {
 
+	private DaoFactory daoFactory;
+
 	public LocdesSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public void saveLocationDescriptions(final List<FieldMapInfo> infoList, final int userId) throws MiddlewareQueryException {
@@ -32,7 +36,7 @@ public class LocdesSaver extends Saver {
 			for (final Integer blockId : blockMap.keySet()) {
 				final BlockInfo blockInfo = blockMap.get(blockId);
 
-				final List<Locdes> descriptions = this.getLocdesDao().getByLocation(blockInfo.getBlockId());
+				final List<Locdes> descriptions = this.daoFactory.getLocDesDao().getByLocation(blockInfo.getBlockId());
 				final Map<String, Integer> udfldMap = this.getUdfldMap();
 
 				this.saveOrUpdateLocdes(blockId, descriptions, this.getId(udfldMap, LocdesType.ROWS_IN_BLOCK),
@@ -55,7 +59,7 @@ public class LocdesSaver extends Saver {
 		final List<String> codes = Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode(), LocdesType.RANGES_IN_BLOCK.getCode(),
 			LocdesType.ROWS_IN_PLOT.getCode(), LocdesType.MACHINE_ROW_CAPACITY.getCode(),
 			LocdesType.PLANTING_ORDER.getCode(), LocdesType.DELETED_PLOTS.getCode());
-		return getUserDefinedFieldDao()
+		return daoFactory.getUserDefinedFieldDAO()
 			.getByCodes(
 				"LOCDES",
 				Collections.singleton("DTYPE"),
@@ -77,7 +81,7 @@ public class LocdesSaver extends Saver {
 		if (!blockMap.isEmpty()) {
 			for (final Integer blockId : blockMap.keySet()) {
 				final BlockInfo blockInfo = blockMap.get(blockId);
-				final List<Locdes> descriptions = this.getLocdesDao().getByLocation(blockInfo.getBlockId());
+				final List<Locdes> descriptions = this.daoFactory.getLocDesDao().getByLocation(blockInfo.getBlockId());
 				this.updateDeletedPlots(blockId, descriptions, blockInfo.getDeletedPlots(), userId);
 			}
 		}
@@ -89,13 +93,13 @@ public class LocdesSaver extends Saver {
 		final List<Locdes> savedDeletedPlots = this.findAllLocdes(descriptions, this.getId(udfldMap, LocdesType.DELETED_PLOTS));
 		if (savedDeletedPlots != null && !savedDeletedPlots.isEmpty()) {
 			for (final Locdes savedDeletedPlot : savedDeletedPlots) {
-				this.getLocdesDao().makeTransient(savedDeletedPlot);
+				this.daoFactory.getLocDesDao().makeTransient(savedDeletedPlot);
 			}
 		}
 		if (deletedPlots != null && !deletedPlots.isEmpty()) {
 			for (final String deletedPlot : deletedPlots) {
 				final Locdes locdes = this.createLocdes(locId, this.getId(udfldMap, LocdesType.DELETED_PLOTS), deletedPlot, userId);
-				this.getLocdesDao().save(locdes);
+				this.daoFactory.getLocDesDao().save(locdes);
 			}
 		}
 	}
@@ -107,7 +111,7 @@ public class LocdesSaver extends Saver {
 			if (locdes == null) {
 				locdes = this.createLocdes(locId, typeId, value, userId);
 			}
-			this.getLocdesDao().saveOrUpdate(locdes);
+			this.daoFactory.getLocDesDao().saveOrUpdate(locdes);
 		}
 	}
 

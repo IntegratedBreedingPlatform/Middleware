@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
@@ -41,12 +42,15 @@ public class TrialEnvironmentBuilder extends Builder {
 	@Resource
 	private DataSetBuilder dataSetBuilder;
 
+	private DaoFactory daoFactory;
+
 	public TrialEnvironmentBuilder() {
 
 	}
 
 	public TrialEnvironmentBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public TrialEnvironments getTrialEnvironmentsInDataset(final int studyId, final int datasetId) {
@@ -68,7 +72,7 @@ public class TrialEnvironmentBuilder extends Builder {
 	}
 
 	private Set<Geolocation> getGeoLocations(final int datasetId) {
-		return this.getGeolocationDao().findInDataSet(datasetId);
+		return this.daoFactory.getGeolocationDao().findInDataSet(datasetId);
 	}
 
 	private TrialEnvironments buildTrialEnvironments(final Set<Geolocation> locations,
@@ -120,16 +124,16 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	public TrialEnvironments getAllTrialEnvironments() {
 		final TrialEnvironments environments = new TrialEnvironments();
-		environments.addAll(this.getGeolocationDao().getAllTrialEnvironments());
+		environments.addAll(this.daoFactory.getGeolocationDao().getAllTrialEnvironments());
 		return environments;
 	}
 
 	public long countAllTrialEnvironments() {
-		return this.getGeolocationDao().countAllTrialEnvironments();
+		return this.daoFactory.getGeolocationDao().countAllTrialEnvironments();
 	}
 
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(final List<Integer> environmentIds) {
-		return this.getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds);
+		return this.daoFactory.getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds);
 	}
 
 	public List<GermplasmPair> getEnvironmentForGermplasmPairs(final List<GermplasmPair> germplasmPairs,
@@ -143,7 +147,8 @@ public class TrialEnvironmentBuilder extends Builder {
 		}
 
 		// Step 1: Get Trial Environments for each GID
-		final Map<Integer, Set<Integer>> germplasmEnvironments = this.getExperimentDao().getEnvironmentsOfGermplasms(allGids, programUUID);
+		final Map<Integer, Set<Integer>> germplasmEnvironments =
+			this.daoFactory.getExperimentDao().getEnvironmentsOfGermplasms(allGids, programUUID);
 
 		// Step 2: Get the trial environment details
 		final Set<TrialEnvironment> trialEnvironmentDetails = new HashSet<>();
@@ -151,7 +156,7 @@ public class TrialEnvironmentBuilder extends Builder {
 
 		// Step 3: Get environment traits
 		final List<TrialEnvironment> localTrialEnvironments =
-				this.getPhenotypeDao().getEnvironmentTraits(trialEnvironmentDetails, experimentTypes);
+			this.daoFactory.getPhenotypeDAO().getEnvironmentTraits(trialEnvironmentDetails, experimentTypes);
 		trialEnvironments.addAll(localTrialEnvironments);
 
 		// Step 4: Build germplasm pairs. Get what's common between GID1 AND GID2
@@ -162,7 +167,7 @@ public class TrialEnvironmentBuilder extends Builder {
 	private void getTrialEnvironmentDetails(final Map<Integer, Set<Integer>> germplasmEnvironments,
 			final Set<TrialEnvironment> trialEnvironmentDetails) {
 		final Set<Integer> localEnvironmentIds = this.getEnvironmentIdsFromMap(germplasmEnvironments);
-		trialEnvironmentDetails.addAll(this.getGeolocationDao().getTrialEnvironmentDetails(localEnvironmentIds));
+		trialEnvironmentDetails.addAll(this.daoFactory.getGeolocationDao().getTrialEnvironmentDetails(localEnvironmentIds));
 	}
 
 	private void buildGermplasmPairsBetweenGids(final List<GermplasmPair> germplasmPairs,
@@ -211,7 +216,7 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds, final String programUUID) {
 		final TrialEnvironments environments = new TrialEnvironments();
-		environments.addAll(this.getGeolocationDao().getEnvironmentsForTraits(traitIds, programUUID));
+		environments.addAll(this.daoFactory.getGeolocationDao().getEnvironmentsForTraits(traitIds, programUUID));
 		return environments;
 	}
 

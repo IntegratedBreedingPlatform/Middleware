@@ -28,9 +28,11 @@ public class GermplasmDataManagerTest {
 	public void testGetDirectParentsForStudyOneParentOnly() {
 
 		// we make use of partial mocking techniques so as to be able to inject the GermplasmDAO mock
-		final GermplasmDataManagerImpl germplasmDataManager = Mockito.mock(GermplasmDataManagerImpl.class);
+		final GermplasmDataManagerImpl germplasmDataManager = Mockito.spy(GermplasmDataManagerImpl.class);
+		final DaoFactory daoFactory = Mockito.mock(DaoFactory.class);
+		germplasmDataManager.setDaoFactory(daoFactory);
 
-		Mockito.doReturn(germplasmDAO).when(germplasmDataManager).getGermplasmDao();
+		Mockito.doReturn(germplasmDAO).when(daoFactory).getGermplasmDao();
 		Mockito.doReturn(GermplasmDataManagerDataInitializer.createGermplasmParentNameMap()).when(this.germplasmDAO)
 			.getGermplasmParentNamesForStudy(TEST_STUDY_ID);
 

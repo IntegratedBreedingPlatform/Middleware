@@ -17,9 +17,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
-import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -32,14 +30,17 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.user.UserService;
-import org.generationcp.middleware.util.Util;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Implementation of the InventoryDataManager interface. Most of the functions in this class only use the connection to the local instance,
@@ -64,11 +65,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	public InventoryDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		this.daoFactory = new DaoFactory(sessionProvider);
-	}
-
-	public InventoryDataManagerImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
-		super(sessionProvider, databaseName);
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
