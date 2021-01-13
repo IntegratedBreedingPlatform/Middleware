@@ -48,6 +48,7 @@ import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.ReportServiceImpl;
+import org.generationcp.middleware.service.api.CropConfigurationService;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
@@ -68,6 +69,7 @@ import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
+import org.generationcp.middleware.service.impl.CropConfigurationServiceImpl;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
@@ -357,6 +359,10 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmStudySourceService getGermplasmStudySourceService() {
 		return new GermplasmStudySourceServiceImpl(this.sessionProvider);
+	}
+
+	public CropConfigurationService getCropConfigurationService() {
+		return new CropConfigurationServiceImpl(this.sessionProvider);
 	}
 
 	public InventoryService getInventoryService() {

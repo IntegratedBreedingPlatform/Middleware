@@ -3,6 +3,7 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.CropConfigurationDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -296,6 +297,12 @@ public class DaoFactory {
 		final ListDataPropertyDAO listDataPropertyDAO = new ListDataPropertyDAO();
 		listDataPropertyDAO.setSession(this.sessionProvider.getSession());
 		return listDataPropertyDAO;
+	}
+
+	public CropConfigurationDAO getCropConfigurationDAO() {
+		final CropConfigurationDAO cropConfigurationDAO = new CropConfigurationDAO();
+		cropConfigurationDAO.setSession(this.sessionProvider.getSession());
+		return cropConfigurationDAO;
 	}
 
 }

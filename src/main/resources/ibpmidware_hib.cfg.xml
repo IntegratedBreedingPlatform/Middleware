@@ -118,5 +118,6 @@
         <mapping class="org.generationcp.middleware.pojos.search.SearchRequest"/>
 
         <mapping class="org.generationcp.middleware.pojos.GermplasmStudySource"/>
+        <mapping class="org.generationcp.middleware.pojos.CropConfiguration"/>
     </session-factory>
 </hibernate-configuration>
