@@ -254,18 +254,15 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Transaction confirmedDeposit =
 			new Transaction(null, userId, lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
-				20D, "Transaction 1", Util.getCurrentDateAsIntegerValue(), null, null, null,
-				Double.valueOf(0), userId, TransactionType.DEPOSIT.getId());
+				20D, "Transaction 1", Util.getCurrentDateAsIntegerValue(), null, null, null, userId, TransactionType.DEPOSIT.getId());
 
 		final Transaction pendingDeposit =
 			new Transaction(null, userId, lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
-				20D, "Transaction 2", 0, null, null, null,
-				Double.valueOf(0), userId, TransactionType.DEPOSIT.getId());
+				20D, "Transaction 2", 0, null, null, null, userId, TransactionType.DEPOSIT.getId());
 
 		final Transaction pendingWithdrawal =
 			new Transaction(null, userId, lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
-				-2D, "Transaction 3", 0, null, null, null,
-				Double.valueOf(0), userId, TransactionType.WITHDRAWAL.getId());
+				-2D, "Transaction 3", 0, null, null, null, userId, TransactionType.WITHDRAWAL.getId());
 
 		this.daoFactory.getTransactionDAO().save(confirmedDeposit);
 		this.daoFactory.getTransactionDAO().save(pendingDeposit);
