@@ -16,15 +16,21 @@ import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.data.domain.PageRequest;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.not;
 
 public class LocationDAOTest extends IntegrationTestBase {
 
@@ -56,25 +62,25 @@ public class LocationDAOTest extends IntegrationTestBase {
 		 * For program 1, verify there are breeding locations returned
 		 */
 		final List<Location> programOneLocations =
-				this.locationDAO.getBreedingLocationsByUniqueID(LocationDAOTest.PROGRAM_UUID1);
+			this.locationDAO.getBreedingLocationsByUniqueID(LocationDAOTest.PROGRAM_UUID1);
 		Assert.assertTrue("Expecting breeding locations for program with ID " + LocationDAOTest.PROGRAM_UUID1,
-				programOneLocations.size() > 0);
+			programOneLocations.size() > 0);
 
 		/*
 		 * For program 2, verify there are breeding locations returned
 		 */
 		final List<Location> programTwoLocations =
-				this.locationDAO.getBreedingLocationsByUniqueID(LocationDAOTest.PROGRAM_UUID2);
+			this.locationDAO.getBreedingLocationsByUniqueID(LocationDAOTest.PROGRAM_UUID2);
 		Assert.assertTrue("Expecting breeding locations for program with ID " + LocationDAOTest.PROGRAM_UUID2,
-				programTwoLocations.size() > 0);
+			programTwoLocations.size() > 0);
 
 		/*
 		 * For program 3, verify there are breeding locations returned
 		 */
 		final List<Location> programThreeLocations =
-				this.locationDAO.getBreedingLocationsByUniqueID(LocationDAOTest.PROGRAM_UUID3);
+			this.locationDAO.getBreedingLocationsByUniqueID(LocationDAOTest.PROGRAM_UUID3);
 		Assert.assertTrue("Expecting breeding locations for program with ID " + LocationDAOTest.PROGRAM_UUID3,
-				programThreeLocations.size() > 0);
+			programThreeLocations.size() > 0);
 	}
 
 	private void createTestLocationsForPrograms() {
@@ -82,43 +88,43 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		// add historical breeding location (null program uuid)
 		locations.add(LocationTestDataInitializer
-				.createLocation(LocationDAOTest.HISTORICAL_LOC_ID, LocationDAOTest.LOCATION + LocationDAOTest.HISTORICAL_LOC_ID,
-						Location.BREEDING_LOCATION_TYPE_IDS[0], LocationDAOTest.ABBR + LocationDAOTest.HISTORICAL_LOC_ID, null));
+			.createLocation(LocationDAOTest.HISTORICAL_LOC_ID, LocationDAOTest.LOCATION + LocationDAOTest.HISTORICAL_LOC_ID,
+				Location.BREEDING_LOCATION_TYPE_IDS[0], LocationDAOTest.ABBR + LocationDAOTest.HISTORICAL_LOC_ID, null));
 
 		// Add locations for Program 1 - 2 breeding locations, 1 non-breeding
 		// location
 		Integer id = LocationDAOTest.PROGRAM1_BREEDING_LOC_IDS[0];
 		locations.add(LocationTestDataInitializer
-				.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[0], LocationDAOTest.ABBR + id,
-						LocationDAOTest.PROGRAM_UUID1));
+			.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[0], LocationDAOTest.ABBR + id,
+				LocationDAOTest.PROGRAM_UUID1));
 		id = LocationDAOTest.PROGRAM1_BREEDING_LOC_IDS[1];
 		locations.add(LocationTestDataInitializer
-				.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[1], LocationDAOTest.ABBR + id,
-						LocationDAOTest.PROGRAM_UUID1));
+			.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[1], LocationDAOTest.ABBR + id,
+				LocationDAOTest.PROGRAM_UUID1));
 		locations.add(LocationTestDataInitializer
-				.createLocation(22, LocationDAOTest.LOCATION + 22, LocationDAOTest.NON_BREEDING_LOC_TYPE, LocationDAOTest.ABBR + 22,
-						LocationDAOTest.PROGRAM_UUID1));
+			.createLocation(22, LocationDAOTest.LOCATION + 22, LocationDAOTest.NON_BREEDING_LOC_TYPE, LocationDAOTest.ABBR + 22,
+				LocationDAOTest.PROGRAM_UUID1));
 
 		// Add locations for Program 2 - 3 breeding locations, 2 non-breeding
 		// location
 		id = LocationDAOTest.PROGRAM2_BREEDING_LOC_IDS[0];
 		locations.add(LocationTestDataInitializer
-				.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[0], LocationDAOTest.ABBR + id,
-						LocationDAOTest.PROGRAM_UUID2));
+			.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[0], LocationDAOTest.ABBR + id,
+				LocationDAOTest.PROGRAM_UUID2));
 		id = LocationDAOTest.PROGRAM2_BREEDING_LOC_IDS[1];
 		locations.add(LocationTestDataInitializer
-				.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[1], LocationDAOTest.ABBR + id,
-						LocationDAOTest.PROGRAM_UUID2));
+			.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[1], LocationDAOTest.ABBR + id,
+				LocationDAOTest.PROGRAM_UUID2));
 		id = LocationDAOTest.PROGRAM2_BREEDING_LOC_IDS[2];
 		locations.add(LocationTestDataInitializer
-				.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[2], LocationDAOTest.ABBR + id,
-						LocationDAOTest.PROGRAM_UUID2));
+			.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[2], LocationDAOTest.ABBR + id,
+				LocationDAOTest.PROGRAM_UUID2));
 		locations.add(LocationTestDataInitializer
-				.createLocation(33, LocationDAOTest.LOCATION + 33, LocationDAOTest.NON_BREEDING_LOC_TYPE, LocationDAOTest.ABBR + 33,
-						LocationDAOTest.PROGRAM_UUID2));
+			.createLocation(33, LocationDAOTest.LOCATION + 33, LocationDAOTest.NON_BREEDING_LOC_TYPE, LocationDAOTest.ABBR + 33,
+				LocationDAOTest.PROGRAM_UUID2));
 		locations.add(LocationTestDataInitializer
-				.createLocation(34, LocationDAOTest.LOCATION + 34, LocationDAOTest.NON_BREEDING_LOC_TYPE, LocationDAOTest.ABBR + 34,
-						LocationDAOTest.PROGRAM_UUID2));
+			.createLocation(34, LocationDAOTest.LOCATION + 34, LocationDAOTest.NON_BREEDING_LOC_TYPE, LocationDAOTest.ABBR + 34,
+				LocationDAOTest.PROGRAM_UUID2));
 
 		for (final Location location : locations) {
 			this.locationDAO.save(location);
@@ -177,11 +183,11 @@ public class LocationDAOTest extends IntegrationTestBase {
 		location.setSnl1id(provinceId);
 		location.setLdefault(Boolean.FALSE);
 
-		locationDAO.saveOrUpdate(location);
+		this.locationDAO.saveOrUpdate(location);
 
-		final List<LocationDetails> result = locationDAO.getLocationDetails(location.getLocid(), 0, Integer.MAX_VALUE);
+		final List<LocationDetails> result = this.locationDAO.getLocationDetails(location.getLocid(), 0, Integer.MAX_VALUE);
 		final LocationDetails locationDetails = result.get(0);
-		final Location province = locationDAO.getById(provinceId);
+		final Location province = this.locationDAO.getById(provinceId);
 
 		Assert.assertEquals(lname, locationDetails.getLocationName());
 		Assert.assertEquals(location.getLocid(), locationDetails.getLocid());
@@ -239,11 +245,11 @@ public class LocationDAOTest extends IntegrationTestBase {
 		location.setSnl1id(provinceId);
 		location.setLdefault(Boolean.FALSE);
 
-		locationDAO.saveOrUpdate(location);
-		final Location province = locationDAO.getById(1001);
-		final Location country = locationDAO.getById(1);
+		this.locationDAO.saveOrUpdate(location);
+		final Location province = this.locationDAO.getById(1001);
+		final Location country = this.locationDAO.getById(1);
 
-		final List<LocationDetails> result = locationDAO.getFilteredLocations(cntryid, ltype, lname, programUUID);
+		final List<LocationDetails> result = this.locationDAO.getFilteredLocations(cntryid, ltype, lname, programUUID);
 		final LocationDetails locationDetails = result.get(0);
 
 		Assert.assertEquals(lname, locationDetails.getLocationName());
@@ -267,7 +273,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		final Integer cntryid = 1;
 
-		final List<LocationDetails> locationDetailsList = locationDAO.getFilteredLocations(cntryid, null, null, null);
+		final List<LocationDetails> locationDetailsList = this.locationDAO.getFilteredLocations(cntryid, null, null, null);
 
 		// Verify that all locationDetails returned have cntryId = 1
 		for (final LocationDetails locationDetails : locationDetailsList) {
@@ -281,7 +287,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		final Integer ltype = 405;
 
-		final List<LocationDetails> locationDetailsList = locationDAO.getFilteredLocations(null, ltype, null, null);
+		final List<LocationDetails> locationDetailsList = this.locationDAO.getFilteredLocations(null, ltype, null, null);
 
 		// Verify that all locationDetails returned have cntryId = 1
 		for (final LocationDetails locationDetails : locationDetailsList) {
@@ -295,7 +301,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		final String lname = "Unknown";
 
-		final List<LocationDetails> locationDetailsList = locationDAO.getFilteredLocations(null, null, lname, null);
+		final List<LocationDetails> locationDetailsList = this.locationDAO.getFilteredLocations(null, null, lname, null);
 
 		// Verify that all locationDetails returned have cntryId = 1
 		for (final LocationDetails locationDetails : locationDetailsList) {
@@ -318,30 +324,30 @@ public class LocationDAOTest extends IntegrationTestBase {
 		location.setCntryid(cntryid);
 		location.setLdefault(Boolean.FALSE);
 
-		locationDAO.saveOrUpdate(location);
+		this.locationDAO.saveOrUpdate(location);
 
-		final List<LocationDetails> locationDetailsList = locationDAO.getFilteredLocations(null, null, null, programUUID);
+		final List<LocationDetails> locationDetailsList = this.locationDAO.getFilteredLocations(null, null, null, programUUID);
 
 		final Collection<LocationDetails> locationsWithProgramUUID =
-				Collections2.filter(locationDetailsList, new Predicate<LocationDetails>() {
+			Collections2.filter(locationDetailsList, new Predicate<LocationDetails>() {
 
-					@Override
-					public boolean apply(@Nullable final LocationDetails locationDetails) {
-						return programUUID.equals(locationDetails.getProgramUUID());
-					}
-				});
+				@Override
+				public boolean apply(@Nullable final LocationDetails locationDetails) {
+					return programUUID.equals(locationDetails.getProgramUUID());
+				}
+			});
 
 		// Verify that only one LocationDetails with programUUID (hvggfdhf-f34t6-24677) is returned
 		Assert.assertTrue(locationsWithProgramUUID.size() == 1);
 
 		final Collection<LocationDetails> locationWithNullProgramUUID =
-				Collections2.filter(locationDetailsList, new Predicate<LocationDetails>() {
+			Collections2.filter(locationDetailsList, new Predicate<LocationDetails>() {
 
-					@Override
-					public boolean apply(@Nullable final LocationDetails locationDetails) {
-						return StringUtil.isEmpty(locationDetails.getProgramUUID());
-					}
-				});
+				@Override
+				public boolean apply(@Nullable final LocationDetails locationDetails) {
+					return StringUtil.isEmpty(locationDetails.getProgramUUID());
+				}
+			});
 
 		Assert.assertEquals(locationDetailsList.size(), locationWithNullProgramUUID.size() + locationsWithProgramUUID.size());
 
@@ -361,9 +367,9 @@ public class LocationDAOTest extends IntegrationTestBase {
 		location.setCntryid(cntryid);
 		location.setLdefault(Boolean.FALSE);
 
-		locationDAO.saveOrUpdate(location);
+		this.locationDAO.saveOrUpdate(location);
 
-		final List<Location> result = locationDAO.getByUniqueIDAndExcludeLocationTypes(programUUID, new ArrayList<Integer>());
+		final List<Location> result = this.locationDAO.getByUniqueIDAndExcludeLocationTypes(programUUID, new ArrayList<Integer>());
 
 		final Collection<Location> programSpecificLocations = Collections2.filter(result, new Predicate<Location>() {
 
@@ -398,7 +404,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		excludeCountryType.add(countryLocationType);
 
 		final List<Location> resultWithoutCountryLocationType =
-				locationDAO.getByUniqueIDAndExcludeLocationTypes("any-program-uuid", excludeCountryType);
+			this.locationDAO.getByUniqueIDAndExcludeLocationTypes("any-program-uuid", excludeCountryType);
 
 		for (final Location location : resultWithoutCountryLocationType) {
 			// Verify that no country type locations are returned
@@ -415,13 +421,108 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, 0, labbr, null);
 		location.setCntryid(0);
 		location.setLdefault(Boolean.FALSE);
-		locationDAO.saveOrUpdate(location);
+		this.locationDAO.saveOrUpdate(location);
 
 		final List<Location> locations =
-			locationDAO.getByAbbreviations(Collections.singletonList(labbr));
+			this.locationDAO.getByAbbreviations(Collections.singletonList(labbr));
 
 		Assert.assertEquals(locations.size(), 1);
 		Assert.assertEquals(locations.get(0).getLabbr(), labbr);
+	}
+
+	@Test
+	public void testFilterLocations_RetrieveAll() {
+		final long count = this.locationDAO.countFilterLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "");
+		final List<Location> locations =
+			this.locationDAO.filterLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "", null);
+		Assert.assertThat((int) count, equalTo(locations.size()));
+	}
+
+	@Test
+	public void testFilterLocations_Pagination() {
+		final long count = this.locationDAO.countFilterLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "");
+
+		// Page 1
+		final PageRequest pageRequest = new PageRequest(0, 10);
+		final List<Location> locations =
+			this.locationDAO.filterLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "", pageRequest);
+		Assert.assertThat(pageRequest.getPageSize(), equalTo(locations.size()));
+
+		// Page 2
+		final PageRequest pageRequest2 = new PageRequest(1, 10);
+		final List<Location> locations2 =
+			this.locationDAO.filterLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "", pageRequest2);
+		Assert.assertThat(pageRequest2.getPageSize(), equalTo(locations2.size()));
+		Assert.assertThat(locations, not(equalTo(locations2)));
+
+	}
+
+	@Test
+	public void testFilterLocations_SearchByLocationName() {
+		final String locationName = "Philippines";
+		final List<Location> locations =
+			this.locationDAO
+				.filterLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), locationName, new PageRequest(0, 10));
+		Assert.assertThat(locationName, equalTo(locations.get(0).getLname()));
+
+	}
+
+	@Test
+	public void testFilterLocations_FilterByLocationType() {
+		final Integer locationType = 405;
+		final List<Location> locations =
+			this.locationDAO
+				.filterLocations(null, Collections.singleton(locationType), new ArrayList<>(), new ArrayList<>(), "",
+					new PageRequest(0, 10));
+
+		locations.stream().forEach((location) -> {
+			Assert.assertThat(locationType, equalTo(location.getLtype()));
+		});
+	}
+
+	@Test
+	public void testFilterLocations_FilterByLocationId() {
+		// Philippines
+		final Integer locationId = 171;
+		final List<Location> locations =
+			this.locationDAO
+				.filterLocations(null, new HashSet<>(), Collections.singletonList(locationId), new ArrayList<>(), "",
+					new PageRequest(0, 10));
+
+		Assert.assertThat(locationId, equalTo(locations.get(0).getLocid()));
+	}
+
+	@Test
+	public void testFilterLocations_FilterByAbbreviation() {
+		// Philippines
+		final String locationAbbreviation = "PHL";
+		final List<Location> locations =
+			this.locationDAO
+				.filterLocations(null, new HashSet<>(), new ArrayList<>(), Collections.singletonList(locationAbbreviation), "",
+					new PageRequest(0, 10));
+
+		Assert.assertThat(locationAbbreviation, equalTo(locations.get(0).getLabbr()));
+	}
+
+	@Test
+	public void testFilterLocations_FilterByProgramUUID() {
+
+		final String programUUID = UUID.randomUUID().toString();
+		final int cntryid = 1;
+		final Location location = LocationTestDataInitializer
+			.createLocation(null, RandomStringUtils.randomAlphabetic(10), 405, RandomStringUtils.randomAlphabetic(3), programUUID);
+		location.setCntryid(cntryid);
+		location.setLdefault(Boolean.FALSE);
+
+		this.locationDAO.saveOrUpdate(location);
+
+		final List<Location> locations =
+			this.locationDAO
+				.filterLocations(programUUID, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "", null);
+
+		final Optional<Location> optional = locations.stream().filter(loc -> programUUID.equals(loc.getUniqueID())).findFirst();
+		Assert.assertTrue(optional.isPresent());
+
 	}
 
 }
