@@ -54,7 +54,6 @@
 	<include file="crop_changelog/13_3_0.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/13_4_1.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/14_1_0.xml" relativeToChangelogFile="true"/>
-	<include file="crop_changelog/14_2_0.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/14_3_0.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/14_4_0.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/14_4_1.xml" relativeToChangelogFile="true"/>
