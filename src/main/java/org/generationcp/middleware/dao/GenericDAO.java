@@ -13,7 +13,6 @@ package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockOptions;
@@ -205,7 +204,8 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		throw new MiddlewareQueryException(message, e);
 	}
 
-	protected String getLogExceptionMessage(String methodName, String paramVar, String paramValue, String exceptionMessage, String className) {
+	protected String getLogExceptionMessage(String methodName, String paramVar, String paramValue, String exceptionMessage,
+		String className) {
 		String message = "Error with " + methodName + "(";
 
 		if (paramVar.length() != 0) {
@@ -222,9 +222,9 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 	/**
 	 * An utility method to build the Criterion Query IN clause if the number of parameter values passed has a size more than 1000. Oracle
 	 * does not allow more than 1000 parameter values in a IN clause. maximum number of expressions in a list is 1000'.
-	 * 
+	 *
 	 * @param propertyName The name of property
-	 * @param values List to be passed in clause
+	 * @param values       List to be passed in clause
 	 * @return Criterion
 	 */
 	public static Criterion buildInCriterion(String propertyName, List values) {
@@ -250,6 +250,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 
 	/**
 	 * addOrder to criteria for each pageable.getSort
+	 *
 	 * @param criteria
 	 * @param pageable
 	 */
@@ -268,7 +269,6 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
-
 	public static void addPagination(final Criteria criteria, final Pageable pageable) {
 		if (pageable == null || criteria == null) {
 			return;
@@ -279,6 +279,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 
 	/**
 	 * addPagination to criteria
+	 *
 	 * @param pageable
 	 */
 	public static void addPaginationToSQLQuery(final SQLQuery query, final Pageable pageable) {
@@ -290,7 +291,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 	}
 
 	public static void addPageRequestOrderBy(final StringBuilder query, final Pageable pageable) {
-		if (pageable == null || pageable.getSort() == null  || query == null) {
+		if (pageable == null || pageable.getSort() == null || query == null) {
 			return;
 		}
 		final Iterator<Sort.Order> iterator = pageable.getSort().iterator();

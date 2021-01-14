@@ -150,7 +150,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			}
 			locationIds.addAll(this.getFavoriteProjectLocationIds(programUUID));
 		}
-		return this.daoFactory.getLocationDAO().filterLocations(programUUID, types, locationIds, locationAbbreviations, locationName, pageable);
+		return this.daoFactory.getLocationDAO()
+			.filterLocations(programUUID, types, locationIds, locationAbbreviations, locationName, pageable);
 	}
 
 	@Override
