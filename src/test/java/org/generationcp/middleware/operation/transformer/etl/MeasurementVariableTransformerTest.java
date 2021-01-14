@@ -1,10 +1,6 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -23,6 +19,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 
 	private MeasurementVariableTransformer transformer;
@@ -40,7 +40,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		this.transformer = new MeasurementVariableTransformer(this.sessionProvder);
+		this.transformer = new MeasurementVariableTransformer();
 		this.standardVariableBuilder = new StandardVariableBuilder(this.sessionProvder);
 	}
 
@@ -126,7 +126,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 	private VariableTypeList createFactorVariableTypeList() throws MiddlewareException {
 		final VariableTypeList varTypeList = new VariableTypeList();
 		final StandardVariable trialInstance = this.getStandardVariable(TermId.TRIAL_INSTANCE_FACTOR.getId());
-		final StandardVariable entryType = this.getStandardVariable(TermId.CHECK.getId());
+		final StandardVariable entryType = this.getStandardVariable(TermId.ENTRY_TYPE.getId());
 		final StandardVariable gid = this.getStandardVariable(TermId.GID.getId());
 		final StandardVariable entryNo = this.getStandardVariable(TermId.ENTRY_NO.getId());
 		final StandardVariable repNo = this.getStandardVariable(TermId.REP_NO.getId());

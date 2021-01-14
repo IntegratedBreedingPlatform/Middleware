@@ -1,10 +1,10 @@
 
 package org.generationcp.middleware.data.initializer;
 
+import org.generationcp.middleware.pojos.Location;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.generationcp.middleware.pojos.Location;
 
 public class LocationTestDataInitializer {
 
@@ -31,11 +31,11 @@ public class LocationTestDataInitializer {
 		return location;
 	}
 
-	public static Location createLocation(final Integer locId, final String lname, final String uuid) {
+	public static Location createLocation(final Integer locId, final String lname, final String programUUID) {
 		final Location location = new Location();
 		location.setLocid(locId);
 		location.setLname(lname);
-		location.setUniqueID(uuid);
+		location.setProgramUUID(programUUID);
 		return location;
 	}
 
@@ -47,7 +47,7 @@ public class LocationTestDataInitializer {
 		location.setLtype(locationType);
 		location.setLabbr(locationAbbreviation);
 		if (programUUID != null) {
-			location.setUniqueID(programUUID);
+			location.setProgramUUID(programUUID);
 		}
 		location.setNllp(0);
 		location.setSnl1id(0);

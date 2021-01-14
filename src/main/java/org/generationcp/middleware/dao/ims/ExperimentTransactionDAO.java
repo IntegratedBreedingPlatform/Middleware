@@ -20,14 +20,15 @@ public class ExperimentTransactionDAO extends GenericDAO<ExperimentTransaction, 
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentTransactionDAO.class);
 
-	public Long countPlantingTransactionsByStatus(final List<Integer> ndExperimentIds, final TransactionStatus transactionStatus) {
+	public Long countTransactionsByNdExperimentIds(final List<Integer> ndExperimentIds, final TransactionStatus transactionStatus,
+		final ExperimentTransactionType experimentTransactionType) {
 		if (ndExperimentIds == null || ndExperimentIds.isEmpty()) {
 			return 0L;
 		}
 		try {
 			final Query query = this.getSession().createQuery("select count(distinct t.id) from Transaction t "
 				+ "inner join t.experimentTransactions et where et.type = :expTransactionType and et.experiment.id in (:ndExperimentIdsList) and t.status = :trnStatus")
-				.setParameter("expTransactionType", ExperimentTransactionType.PLANTING.getId())
+				.setParameter("expTransactionType", experimentTransactionType.getId())
 				.setParameterList("ndExperimentIdsList", ndExperimentIds)
 				.setParameter("trnStatus", transactionStatus.getIntValue());
 			return (Long) query.uniqueResult();

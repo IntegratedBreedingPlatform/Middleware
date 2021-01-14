@@ -118,7 +118,7 @@ public class DataSetBuilder extends Builder {
 	}
 
 	private Set<Integer> getLocationIds(final Integer projectId) {
-		return this.getGeolocationDao().getLocationIds(projectId);
+		return this.daoFactory.getGeolocationDao().getLocationIds(projectId);
 	}
 
 	private VariableTypeList getVariableTypes(final DmsProject project) {
