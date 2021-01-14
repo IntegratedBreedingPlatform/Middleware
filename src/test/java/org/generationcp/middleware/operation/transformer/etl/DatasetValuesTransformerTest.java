@@ -19,12 +19,10 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +33,7 @@ public class DatasetValuesTransformerTest extends TestOutputFormatter {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		DatasetValuesTransformerTest.transformer = new DatasetValuesTransformer(Mockito.mock(HibernateSessionProvider.class));
+		DatasetValuesTransformerTest.transformer = new DatasetValuesTransformer();
 	}
 
 	@Test

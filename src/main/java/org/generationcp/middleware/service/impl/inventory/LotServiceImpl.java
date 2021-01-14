@@ -242,7 +242,6 @@ public class LotServiceImpl implements LotService {
 					transaction.setUserId(userId);
 					transaction.setTransactionDate(new Date());
 					transaction.setQuantity(initialBalance);
-					transaction.setPreviousAmount(0D);
 					transaction.setCommitmentDate(0);
 
 					daoFactory.getTransactionDAO().save(transaction);
@@ -291,7 +290,6 @@ public class LotServiceImpl implements LotService {
 			discardTransaction.setUserId(userId);
 			discardTransaction.setTransactionDate(new Date());
 			discardTransaction.setQuantity(-1 * extendedLotDto.getAvailableBalance());
-			discardTransaction.setPreviousAmount(0D);
 			discardTransaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
 			daoFactory.getTransactionDAO().save(discardTransaction);
 		}

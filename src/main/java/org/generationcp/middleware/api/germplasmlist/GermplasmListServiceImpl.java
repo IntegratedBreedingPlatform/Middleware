@@ -244,6 +244,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Map<Integer, String> crossExpansionsBulk =
 			this.pedigreeService.getCrossExpansionsBulk(gids, null, this.crossExpansionProperties);
 
+		final Map<Integer, String> plotCodeValuesIndexedByGids = this.germplasmService.getPlotCodeValues(gids);
+
 		//Create germplasm lists data
 		final List<GermplasmListData> germplasmListsData = addGermplasmEntriesModels.stream().map(model -> {
 			final int entryNo = lastEntryNo.addAndGet(1);
@@ -253,7 +255,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				model.getGid(),
 				entryNo,
 				String.valueOf(entryNo),
-				this.germplasmService.getPlotCodeValue(model.getGid()),
+				plotCodeValuesIndexedByGids.get(model.getGid()),
 				model.getPreferredName(),
 				crossExpansionsBulk.get(model.getGid()),
 				0,

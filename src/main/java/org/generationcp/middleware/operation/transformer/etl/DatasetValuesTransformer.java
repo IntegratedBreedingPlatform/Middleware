@@ -7,14 +7,12 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 import java.util.List;
 
 public class DatasetValuesTransformer extends Transformer {
 
-	public DatasetValuesTransformer(final HibernateSessionProvider sessionProviderForLocal) {
-		super(sessionProviderForLocal);
+	public DatasetValuesTransformer() {
 	}
 
 	public DatasetValues transform(

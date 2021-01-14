@@ -12,20 +12,14 @@
 package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
-import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
-import org.generationcp.middleware.operation.builder.WorkbookBuilder;
-import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.transformer.etl.DatasetValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StudyValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.VariableListTransformer;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
-import org.generationcp.middleware.util.DatabaseBroker;
+import org.hibernate.Session;
 
 /**
  * Provides saver classes that can be used to save logical/physical data in IBDBv2. Creates saver classes based on the given local/central
@@ -33,7 +27,9 @@ import org.generationcp.middleware.util.DatabaseBroker;
  *
  * @author Joyce Avestro
  */
-public class Saver extends DatabaseBroker {
+public class Saver {
+
+	protected HibernateSessionProvider sessionProvider;
 
 	public Saver() {
 
@@ -43,7 +39,7 @@ public class Saver extends DatabaseBroker {
 	 * Instantiates a new data manager given session providers for local and central.
 	 */
 	protected Saver(HibernateSessionProvider sessionProvider) {
-		super(sessionProvider);
+		this.sessionProvider = sessionProvider;
 	}
 
 	protected final StudySaver getStudySaver() {
@@ -83,50 +79,46 @@ public class Saver extends DatabaseBroker {
 	}
 
 	protected final VariableListTransformer getVariableListTransformer() {
-		return new VariableListTransformer(this.sessionProvider);
+		return new VariableListTransformer();
 	}
 
 	protected final StudyValuesTransformer getStudyValuesTransformer() {
-		return new StudyValuesTransformer(this.sessionProvider);
+		return new StudyValuesTransformer();
 	}
 
 	protected final DatasetValuesTransformer getDatasetValuesTransformer() {
-		return new DatasetValuesTransformer(this.sessionProvider);
+		return new DatasetValuesTransformer();
 	}
 
 	protected final ExperimentValuesTransformer getExperimentValuesTransformer() {
-		return new ExperimentValuesTransformer(this.sessionProvider);
+		return new ExperimentValuesTransformer();
 	}
 
 	protected final DatasetProjectSaver getDatasetProjectSaver() {
 		return new DatasetProjectSaver(this.sessionProvider);
 	}
 
-	protected final VariableTypeBuilder getVariableTypeBuilder() {
-		return new VariableTypeBuilder(this.sessionProvider);
-	}
-
 	protected final TermBuilder getTermBuilder() {
 		return new TermBuilder(this.sessionProvider);
-	}
-
-	protected final ExperimentBuilder getExperimentBuilder() {
-		return new ExperimentBuilder(this.sessionProvider);
-	}
-
-	protected final ExperimentPropertySaver getExperimentPropertySaver() {
-		return new ExperimentPropertySaver(this.sessionProvider);
-	}
-
-	protected final ListDataPropertySaver getListDataPropertySaver() {
-		return new ListDataPropertySaver(this.sessionProvider);
 	}
 
 	protected final GeolocationPropertySaver getGeolocationPropertySaver() {
 		return new GeolocationPropertySaver(this.sessionProvider);
 	}
 
-	protected final ExperimentDestroyer getExperimentDestroyer() {
-		return new ExperimentDestroyer(this.sessionProvider);
+	public Session getActiveSession() {
+		if (this.sessionProvider != null) {
+			return this.sessionProvider.getSession();
+		}
+		return null;
 	}
+
+	public HibernateSessionProvider getSessionProvider() {
+		return this.sessionProvider;
+	}
+
+	public void setSessionProvider(final HibernateSessionProvider sessionProvider) {
+		this.sessionProvider = sessionProvider;
+	}
+
 }

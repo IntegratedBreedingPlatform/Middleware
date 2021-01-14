@@ -519,7 +519,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 	private Location createLocationTestData(final int id, final String programUUID) {
 		final Location location = new Location();
-		location.setUniqueID(programUUID);
+		location.setProgramUUID(programUUID);
 		location.setLrplce(0);
 		location.setLname("TEST-LOCATION" + id);
 		location.setLabbr("");

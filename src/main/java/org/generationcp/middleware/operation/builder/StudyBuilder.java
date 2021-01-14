@@ -18,21 +18,25 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class StudyBuilder extends Builder {
 
+	private DaoFactory daoFactory;
+
 	private static final Logger LOG = LoggerFactory.getLogger(StudyBuilder.class);
 	
 	public StudyBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public Study createStudy(final int studyId) {
 		Study study = null;
-		final DmsProject project = this.getDmsProjectDao().getById(studyId);
+		final DmsProject project = this.daoFactory.getDmsProjectDAO().getById(studyId);
 		if (project != null) {
 			study = this.createStudy(project);
 		}
@@ -43,7 +47,7 @@ public class StudyBuilder extends Builder {
 		final Monitor monitor = MonitorFactory.start("Build Study");
 		try {
 			Study study = null;
-			final DmsProject project = this.getDmsProjectDao().getById(studyId);
+			final DmsProject project = this.daoFactory.getDmsProjectDAO().getById(studyId);
 			if (project != null) {
 				study = this.createStudy(project, hasVariableType);
 			}

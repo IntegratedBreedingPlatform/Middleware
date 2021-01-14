@@ -11,13 +11,6 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
@@ -28,6 +21,13 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TraitBuilder extends Builder {
 
@@ -51,7 +51,7 @@ public class TraitBuilder extends Builder {
 		// Retrieve traits environments
 		variableTerms.addAll(daoFactory.getCvTermDao().getVariablesByType(TraitBuilder.NUMERIC_VARIABLE_TYPE));
 		variableIds.addAll(this.getVariableIds(variableTerms));
-		numericTraitInfoList.addAll(this.getPhenotypeDao().getNumericTraitInfoList(environmentIds, variableIds));
+		numericTraitInfoList.addAll(this.daoFactory.getPhenotypeDAO().getNumericTraitInfoList(environmentIds, variableIds));
 
 		Collections.sort(numericTraitInfoList);
 
@@ -107,7 +107,7 @@ public class TraitBuilder extends Builder {
 		}
 
 		// Get the distinct phenotype values from the databases
-		final Map<Integer, List<String>> localTraitValues = this.getPhenotypeDao()
+		final Map<Integer, List<String>> localTraitValues = this.daoFactory.getPhenotypeDAO()
 				.getCharacterTraitInfoValues(environmentIds, characterTraitInfoList);
 
 		for (final CharacterTraitInfo traitInfo : characterTraitInfoList) {
@@ -130,7 +130,7 @@ public class TraitBuilder extends Builder {
 		// Get locationCount, germplasmCount, observationCount
 		final List<TraitInfo> localTraitInfoList = new ArrayList<>();
 
-		localTraitInfoList.addAll(this.getPhenotypeDao().getTraitInfoCounts(environmentIds));
+		localTraitInfoList.addAll(this.daoFactory.getPhenotypeDAO().getTraitInfoCounts(environmentIds));
 
 		Collections.sort(localTraitInfoList);
 
@@ -143,7 +143,7 @@ public class TraitBuilder extends Builder {
 		// value
 		if (!localCategTraitList.isEmpty()) {
 			finalTraitInfoList.addAll(daoFactory.getCvTermDao().setCategoricalVariables(localCategTraitList));
-			this.getPhenotypeDao().setCategoricalTraitInfoValues(finalTraitInfoList, environmentIds);
+			this.daoFactory.getPhenotypeDAO().setCategoricalTraitInfoValues(finalTraitInfoList, environmentIds);
 		}
 
 		return finalTraitInfoList;
@@ -153,7 +153,7 @@ public class TraitBuilder extends Builder {
 	private List<TraitInfo> getTraitCounts(final List<Integer> variableIds, final List<Integer> environmentIds) {
 		final List<TraitInfo> traitInfoList = new ArrayList<>();
 		// Get locationCount, germplasmCount, observationCount
-		traitInfoList.addAll(this.getPhenotypeDao().getTraitInfoCounts(environmentIds, variableIds));
+		traitInfoList.addAll(this.daoFactory.getPhenotypeDAO().getTraitInfoCounts(environmentIds, variableIds));
 		return traitInfoList;
 	}
 
@@ -175,11 +175,11 @@ public class TraitBuilder extends Builder {
 		// error for large DBs
 		if (environmentIds.size() > 1000) {
 			for (final NumericTraitInfo traitInfo : numericTraitInfoList) {
-				traitValues.putAll(this.getPhenotypeDao().getNumericTraitInfoValues(environmentIds, traitInfo.getId()));
+				traitValues.putAll(this.daoFactory.getPhenotypeDAO().getNumericTraitInfoValues(environmentIds, traitInfo.getId()));
 				this.getMedianValue(traitValues, traitInfo);
 			}
 		} else {
-			traitValues.putAll(this.getPhenotypeDao().getNumericTraitInfoValues(environmentIds, numericTraitInfoList));
+			traitValues.putAll(this.daoFactory.getPhenotypeDAO().getNumericTraitInfoValues(environmentIds, numericTraitInfoList));
 			for (final NumericTraitInfo traitInfo : numericTraitInfoList) {
 				this.getMedianValue(traitValues, traitInfo);
 			}
@@ -207,7 +207,7 @@ public class TraitBuilder extends Builder {
 
 		List<Observation> observations = new ArrayList<>();
 		if (environmentIds != null && !environmentIds.isEmpty()) {
-			observations = this.getPhenotypeDao().getObservationForTraitOnGermplasms(traitIds, germplasmIds,
+			observations = this.daoFactory.getPhenotypeDAO().getObservationForTraitOnGermplasms(traitIds, germplasmIds,
 					environmentIds);
 		}
 		return observations;
@@ -218,7 +218,7 @@ public class TraitBuilder extends Builder {
 
 		List<Observation> observations = new ArrayList<>();
 		if (!environmentIds.isEmpty()) {
-			observations = this.getPhenotypeDao().getObservationForTraits(traitIds, environmentIds, 0, 0);
+			observations = this.daoFactory.getPhenotypeDAO().getObservationForTraits(traitIds, environmentIds, 0, 0);
 		}
 		return observations;
 	}
@@ -226,7 +226,7 @@ public class TraitBuilder extends Builder {
 	public List<TraitObservation> getObservationsForTrait(final int traitId, final List<Integer> environmentIds) {
 		List<TraitObservation> traitObservations = new ArrayList<>();
 		if (!environmentIds.isEmpty()) {
-			traitObservations = this.getPhenotypeDao().getObservationsForTrait(traitId, environmentIds);
+			traitObservations = this.daoFactory.getPhenotypeDAO().getObservationsForTrait(traitId, environmentIds);
 		}
 		return traitObservations;
 	}

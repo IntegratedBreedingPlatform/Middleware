@@ -1,13 +1,5 @@
 package org.generationcp.middleware.operation.transformer.etl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
@@ -19,10 +11,16 @@ import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class StandardVariableTransformerTest {
 
@@ -30,7 +28,7 @@ public class StandardVariableTransformerTest {
 
 	@BeforeClass
 	public static void setUp() {
-		standardVariableTransformer = new StandardVariableTransformer(Mockito.mock(HibernateSessionProvider.class));
+		standardVariableTransformer = new StandardVariableTransformer();
 	}
 
 	@Test

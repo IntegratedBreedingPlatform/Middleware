@@ -791,6 +791,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			+ " LEFT JOIN cvterm scale ON scale.cvterm_id = gl.scaleid \n" //
 			+ " LEFT JOIN methods m ON m.mid = g.methn \n" //
 			+ " LEFT JOIN location l ON l.locid = g.glocn \n" //
+			+ " LEFT JOIN bibrefs ref ON ref.refid = g.gref \n" //
 			+ " LEFT JOIN `names` allNames ON g.gid = allNames.gid and allNames.nstat != " + STATUS_DELETED + " \n");
 
 		for (final String propertyId : addedColumnsPropertyIds) {
@@ -1110,10 +1111,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			paramBuilder.setParameter("locationOfUse", '%' + locationOfUse + '%');
 		}
 
-		final Integer reference = germplasmSearchRequest.getReference();
-		if (reference != null) {
-			paramBuilder.append(" and g.gref = :reference ");
-			paramBuilder.setParameter("reference", reference);
+		final String reference = germplasmSearchRequest.getReference();
+		if (!StringUtils.isEmpty(reference)) {
+			paramBuilder.append(" and ref.analyt like :reference ");
+			paramBuilder.setParameter("reference", '%' + reference + '%');
 		}
 
 		final List<Integer> studyOfOriginIds = germplasmSearchRequest.getStudyOfOriginIds();
