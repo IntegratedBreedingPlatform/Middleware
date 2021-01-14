@@ -520,7 +520,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 			this.locationDAO
 				.filterLocations(programUUID, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "", null);
 
-		final Optional<Location> optional = locations.stream().filter(loc -> programUUID.equals(loc.getUniqueID())).findFirst();
+		final Optional<Location> optional = locations.stream().filter(loc -> programUUID.equals(loc.getProgramUUID())).findFirst();
 		Assert.assertTrue(optional.isPresent());
 
 	}
