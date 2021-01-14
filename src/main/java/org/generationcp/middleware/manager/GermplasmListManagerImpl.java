@@ -39,14 +39,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -409,7 +407,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 			return this.functionBasedGermplasmListTypeGuavaCacheLoader.get(url).get();
 
-		} catch (final HibernateException | SQLException e) {
+		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Problems connecting to the database. P"
 				+ "lease contact administrator for assistance.", e);
 		}
