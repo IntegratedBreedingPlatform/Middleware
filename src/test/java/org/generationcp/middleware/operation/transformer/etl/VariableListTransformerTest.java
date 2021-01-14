@@ -24,12 +24,10 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +40,7 @@ public class VariableListTransformerTest {
 
 	@BeforeClass
 	public static void setUp() {
-		VariableListTransformerTest.transformer = new VariableListTransformer(Mockito.mock(HibernateSessionProvider.class));
+		VariableListTransformerTest.transformer = new VariableListTransformer();
 	}
 
 	@Test

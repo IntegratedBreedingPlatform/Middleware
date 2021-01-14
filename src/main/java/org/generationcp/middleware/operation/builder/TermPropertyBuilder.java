@@ -11,29 +11,17 @@
 
 package org.generationcp.middleware.operation.builder;
 
+import org.generationcp.middleware.domain.oms.TermProperty;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.domain.oms.TermProperty;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.oms.CVTermProperty;
-
 public class TermPropertyBuilder extends Builder {
-
-	private DaoFactory daoFactory;
-
 
 	public TermPropertyBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
-		daoFactory = new DaoFactory(sessionProviderForLocal);
-	}
-
-	public TermProperty get(int termPropertyId) throws MiddlewareQueryException {
-		TermProperty term = null;
-		term = this.create(daoFactory.getCvTermPropertyDao().getById(termPropertyId));
-		return term;
 	}
 
 	public TermProperty create(CVTermProperty cVTermProperty) {
@@ -58,15 +46,4 @@ public class TermPropertyBuilder extends Builder {
 		return properties;
 	}
 
-	public List<CVTermProperty> findProperties(int cvTermId) throws MiddlewareQueryException {
-		return daoFactory.getCvTermPropertyDao().getByCvTermId(cvTermId);
-	}
-
-	public List<CVTermProperty> findPropertiesByType(int cvTermId, int typeId) throws MiddlewareQueryException {
-		return daoFactory.getCvTermPropertyDao().getByCvTermAndType(cvTermId, typeId);
-	}
-
-	public CVTermProperty findPropertyByType(int cvTermId, int typeId) throws MiddlewareQueryException {
-		return daoFactory.getCvTermPropertyDao().getOneByCvTermAndType(cvTermId, typeId);
-	}
 }

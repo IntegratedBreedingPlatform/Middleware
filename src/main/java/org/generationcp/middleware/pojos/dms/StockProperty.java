@@ -35,7 +35,7 @@ import java.io.Serializable;
  *
  */
 @Entity
-@Table(name = "stockprop", uniqueConstraints = {@UniqueConstraint(columnNames = {"stock_id", "type_id", "rank"})})
+@Table(name = "stockprop", uniqueConstraints = {@UniqueConstraint(columnNames = {"stock_id", "type_id"})})
 public class StockProperty implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -59,18 +59,13 @@ public class StockProperty implements Serializable {
 	@Column(name = "value")
 	private String value;
 
-	@Basic(optional = false)
-	@Column(name = "rank")
-	private Integer rank;
-
 	public StockProperty() {
 
 	}
 
-	public StockProperty (final Integer variableId, final String value, final Integer rank) {
+	public StockProperty (final Integer variableId, final String value) {
 		this.setTypeId(variableId);
 		this.setValue(value);
-		this.setRank(rank);
 	}
 
 	public Integer getStockPropId() {
@@ -105,19 +100,10 @@ public class StockProperty implements Serializable {
 		this.value = value;
 	}
 
-	public Integer getRank() {
-		return this.rank;
-	}
-
-	public void setRank(Integer rank) {
-		this.rank = rank;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (this.rank == null ? 0 : this.rank.hashCode());
 		result = prime * result + (this.stockModel == null ? 0 : this.stockModel.hashCode());
 		result = prime * result + (this.stockPropId == null ? 0 : this.stockPropId.hashCode());
 		result = prime * result + (this.typeId == null ? 0 : this.typeId.hashCode());
@@ -137,13 +123,6 @@ public class StockProperty implements Serializable {
 			return false;
 		}
 		StockProperty other = (StockProperty) obj;
-		if (this.rank == null) {
-			if (other.rank != null) {
-				return false;
-			}
-		} else if (!this.rank.equals(other.rank)) {
-			return false;
-		}
 		if (this.stockModel == null) {
 			if (other.stockModel != null) {
 				return false;
@@ -186,8 +165,6 @@ public class StockProperty implements Serializable {
 		builder.append(this.typeId);
 		builder.append(", value=");
 		builder.append(this.value);
-		builder.append(", rank=");
-		builder.append(this.rank);
 		builder.append("]");
 		return builder.toString();
 	}

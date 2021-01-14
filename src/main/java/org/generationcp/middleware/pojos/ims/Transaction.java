@@ -94,9 +94,6 @@ public class Transaction implements Serializable {
 	@Column(name = "recordid")
 	private Integer sourceRecordId;
 
-	@Column(name = "prevamount")
-	private Double previousAmount;
-
 	@Column(name = "personid")
 	private Integer personId;
 
@@ -126,7 +123,7 @@ public class Transaction implements Serializable {
 	}
 
 	public Transaction(final Integer id, final Integer userId, final Lot lot, final Date transactionDate, final Integer status, final Double quantity, final String comments,
-			final Integer commitmentDate, final String sourceType, final Integer sourceId, final Integer sourceRecordId, final Double previousAmount, final Integer personId, final Integer type) {
+			final Integer commitmentDate, final String sourceType, final Integer sourceId, final Integer sourceRecordId, final Integer personId, final Integer type) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -139,7 +136,6 @@ public class Transaction implements Serializable {
 		this.sourceType = sourceType;
 		this.sourceId = sourceId;
 		this.sourceRecordId = sourceRecordId;
-		this.previousAmount = previousAmount;
 		this.personId = personId;
 		this.type = type;
 
@@ -156,7 +152,6 @@ public class Transaction implements Serializable {
 		this.setTransactionDate(new Date());
 		this.setQuantity(amount);
 		this.setComments(notes);
-		this.setPreviousAmount(0D);
 		if (transactionStatus.equals(TransactionStatus.CONFIRMED)) {
 			this.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
 		} else {
@@ -252,14 +247,6 @@ public class Transaction implements Serializable {
 		this.sourceRecordId = sourceRecordId;
 	}
 
-	public Double getPreviousAmount() {
-		return this.previousAmount;
-	}
-
-	public void setPreviousAmount(final Double previousAmount) {
-		this.previousAmount = previousAmount;
-	}
-
 	public Integer getPersonId() {
 		return this.personId;
 	}
@@ -307,8 +294,6 @@ public class Transaction implements Serializable {
 		builder.append(this.sourceId);
 		builder.append(", sourceRecordId=");
 		builder.append(this.sourceRecordId);
-		builder.append(", previousAmount=");
-		builder.append(this.previousAmount);
 		builder.append(", personId=");
 		builder.append(this.personId);
 		builder.append("]");

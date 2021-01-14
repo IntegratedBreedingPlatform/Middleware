@@ -116,8 +116,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	public void lotWithNoOpenBalanceClosed_Ok() {
 		final Transaction confirmedWithdrawal =
 			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
-				-20D, "Transaction 3", 0, null, null, null,
-				Double.valueOf(0), this.userId, TransactionType.WITHDRAWAL.getId());
+				-20D, "Transaction 3", 0, null, null, null, this.userId, TransactionType.WITHDRAWAL.getId());
 		this.daoFactory.getTransactionDAO().save(confirmedWithdrawal);
 
 		final TransactionsSearchDto discardedTransactionSearch = new TransactionsSearchDto();
@@ -298,13 +297,11 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Transaction confirmedDeposit =
 			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
-				20D, "Transaction 1", Util.getCurrentDateAsIntegerValue(), null, null, null,
-				Double.valueOf(0), this.userId, TransactionType.DEPOSIT.getId());
+				20D, "Transaction 1", Util.getCurrentDateAsIntegerValue(), null, null, null, this.userId, TransactionType.DEPOSIT.getId());
 
 		final Transaction pendingDeposit =
 			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
-				20D, "Transaction 2", 0, null, null, null,
-				Double.valueOf(0), this.userId, TransactionType.DEPOSIT.getId());
+				20D, "Transaction 2", 0, null, null, null, this.userId, TransactionType.DEPOSIT.getId());
 
 		this.daoFactory.getTransactionDAO().save(confirmedDeposit);
 		this.daoFactory.getTransactionDAO().save(pendingDeposit);

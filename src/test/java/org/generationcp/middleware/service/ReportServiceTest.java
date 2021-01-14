@@ -1,12 +1,10 @@
 
 package org.generationcp.middleware.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
@@ -15,8 +13,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReportServiceTest {
@@ -32,12 +34,16 @@ public class ReportServiceTest {
 	private LocationDataManager locationDataManager;
 	private CountryDAO countryDAO;
 
+	@Mock
+	private DaoFactory daoFactory;
+
 	@Before
 	public void setUp() throws Exception {
+		unitUnderTest.setDaoFactory(daoFactory);
 		locationDataManager = Mockito.mock(LocationDataManager.class);
 		countryDAO = Mockito.mock(CountryDAO.class);
 		Mockito.doReturn(locationDataManager).when(unitUnderTest).getLocationDataManager();
-		Mockito.doReturn(countryDAO).when(unitUnderTest).getCountryDao();
+		Mockito.doReturn(countryDAO).when(daoFactory).getCountryDao();
 	}
 
 	@Test

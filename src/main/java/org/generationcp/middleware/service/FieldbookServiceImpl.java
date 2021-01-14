@@ -122,8 +122,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Resource
 	private LocationDataManager locationDataManager;
 
-	private GermplasmGuidGenerator germplasmGuidGenerator = new GermplasmGuidGenerator();
-
 	private DaoFactory daoFactory;
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
@@ -132,8 +130,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		super();
 	}
 
-	public FieldbookServiceImpl(final HibernateSessionProvider sessionProvider, final String localDatabaseName) {
-		super(sessionProvider, localDatabaseName);
+	public FieldbookServiceImpl(final HibernateSessionProvider sessionProvider) {
+		super(sessionProvider);
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
@@ -234,10 +232,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public boolean loadAllObservations(final Workbook workbook) {
+	public boolean loadObservations(final Workbook workbook, final List<Integer> instanceNumbers, final List<Integer> repNumbers) {
 		if (workbook.getObservations() == null || workbook.getObservations().isEmpty() && workbook.getStudyDetails() != null
 				&& workbook.getStudyDetails().getId() != null) {
-			this.workbookBuilder.loadAllObservations(workbook);
+			this.workbookBuilder.loadObservations(workbook, instanceNumbers, repNumbers);
 			return true;
 		}
 		return false;
@@ -336,7 +334,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
 			final List<Pair<Germplasm, List<Attribute>>> germplasmAttributes, final CropType cropType) {
 
-		final GermplasmDAO germplasmDao = this.getGermplasmDao();
+		final GermplasmDAO germplasmDao = this.daoFactory.getGermplasmDao();
 		final GermplasmListDAO germplasmListDao = this.daoFactory.getGermplasmListDAO();
 
 		final long startTime = System.currentTimeMillis();
@@ -393,7 +391,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					// if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
 						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm);
-						this.germplasmGroupingService.copyCodedNames(germplasm, this.getGermplasmDao().getById(germplasm.getGpid2()));
+						this.germplasmGroupingService
+							.copyCodedNames(germplasm, this.daoFactory.getGermplasmDao().getById(germplasm.getGpid2()));
 					}
 
 					// set Lgid to GID if it's value was not set previously
@@ -403,7 +402,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 					// Save Germplasm attributes
 					final List<Attribute> attributesList = germplasmAttributes.get(counter).getRight();
-					final AttributeDAO attributeDAO = this.getAttributeDao();
+					final AttributeDAO attributeDAO = this.daoFactory.getAttributeDAO();
 					for (final Attribute attribute : attributesList) {
 						attribute.setGermplasmId(germplasm.getGid());
 						attributeDAO.save(attribute);
@@ -482,10 +481,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	}
 
-	private List<Name> getByGidAndNtype(final int gid, final GermplasmNameType nType) {
-		return this.getNameDao().getByGIDWithFilters(gid, null, nType);
-	}
-
 	@Override
 	public GermplasmList getGermplasmListByName(final String name, final String programUUID) {
 		final List<GermplasmList> germplasmLists = this.germplasmListManager.getGermplasmListByName(name, programUUID, 0, 1, Operation.EQUAL);
@@ -545,7 +540,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		List<StandardVariableReference> newRefs = new ArrayList<>();
 		try {
 			final List<StandardVariableSummary> variableSummaries =
-					this.getStandardVariableDao().getStandardVariableSummaryWithIsAId(isAIds);
+				this.daoFactory.getStandardVariableDao().getStandardVariableSummaryWithIsAId(isAIds);
 			for (final StandardVariableReference ref : standardReferences) {
 				boolean isFound = false;
 				for (final StandardVariableSummary summary : variableSummaries) {
@@ -792,7 +787,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public String getBlockId(final int datasetId, final Integer trialInstance) {
-		return this.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+		return this.daoFactory.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
 	}
 
 	@Override
@@ -812,7 +807,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Integer> getGermplasmIdsByName(final String name) {
-		return this.getNameDao().getGidsByName(name);
+		return this.daoFactory.getNameDao().getGidsByName(name);
 	}
 
 	@Override
@@ -841,7 +836,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Integer getProjectIdByNameAndProgramUUID(final String name, final String programUUID) {
-		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(name, programUUID);
+		return this.daoFactory.getDmsProjectDAO().getProjectIdByNameAndProgramUUID(name, programUUID);
 	}
 
 	@Override
@@ -877,7 +872,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Map<Integer, List<Name>> getNamesByGids(final List<Integer> gids) {
-		return this.getNameDao().getNamesByGidsInMap(gids);
+		return this.daoFactory.getNameDao().getNamesByGidsInMap(gids);
 	}
 
 	@Override
@@ -910,7 +905,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		try {
-			this.getStudyDestroyer().deleteStudy(studyId);
+			this.studyDataManager.deleteStudy(studyId);
 
 		} catch (final Exception e) {
 			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
@@ -976,7 +971,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
 			storedInIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());
 			workbook.setColumnOrderedLists(
-					this.getProjectPropertyDao().getDatasetVariableIdsForVariableTypeIds(plotDatasetId, storedInIds, null));
+				this.daoFactory.getProjectPropertyDAO().getDatasetVariableIdsForVariableTypeIds(plotDatasetId, storedInIds, null));
 			return true;
 		}
 		return false;

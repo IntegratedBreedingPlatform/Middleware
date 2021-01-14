@@ -7,7 +7,6 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +14,6 @@ import java.util.List;
 public class StandardVariableTransformer extends Transformer {
 
 	public StandardVariableTransformer() {
-		super(null);
-	}
-
-	public StandardVariableTransformer(final HibernateSessionProvider sessionProvider) {
-		super(sessionProvider);
 	}
 
 	public StandardVariable transformVariable(final Variable variable) {

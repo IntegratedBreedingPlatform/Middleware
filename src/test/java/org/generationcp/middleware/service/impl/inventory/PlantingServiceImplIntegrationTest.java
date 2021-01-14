@@ -351,8 +351,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		final Double amount) {
 		final Transaction transaction =
 			new Transaction(null, userId, lot, Util.getCurrentDate(), transactionStatus.getIntValue(),
-				amount, "Transaction for gid: " + lot.getEntityId(), Util.getCurrentDateAsIntegerValue(), null, null, null,
-				Double.valueOf(0), userId, transactionType.getId());
+				amount, "Transaction for gid: " + lot.getEntityId(), Util.getCurrentDateAsIntegerValue(), null, null, null, userId, transactionType.getId());
 
 		this.daoFactory.getTransactionDAO().save(transaction);
 

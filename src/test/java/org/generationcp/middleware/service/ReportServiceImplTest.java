@@ -2,24 +2,28 @@
 package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.dao.CountryDAO;
-import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmDataManagerDataInitializer;
+import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.reports.AbstractReporter;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,14 +35,23 @@ public class ReportServiceImplTest {
 	@Mock
 	private GermplasmDataManager germplasmDataManager;
 
-	private final ReportServiceImpl reportService = new ReportServiceImpl();
+	@Mock
+	private DaoFactory daoFactory;
 
-	public static final int TEST_GERMPLASM_LIST_ID = 2;
+	@InjectMocks
+	private ReportServiceImpl reportService;
+
+
     public static final Integer TEST_LOCATION_ID = 3;
     public static final int TEST_COUNTRY_ID = 4;
     public static final String TEST_COUNTRY_ISO_NAME = "Afghanistan";
     public static final String TEST_LOCATION_ABBREVIATION = "ICWS";
 	public static final int TEST_STUDY_ID = 1;
+
+	@Before
+	public void init() {
+
+	}
 
 	@Test
 	public void testRetrieveLocationIdFromConditionReturnsNullForEmptyString() {
@@ -131,9 +144,10 @@ public class ReportServiceImplTest {
     @Test
     public void testAppendCountryInformationLocationProvided() {
         // we use partial mocking on the ReportServiceImplementation so as to be able to mock the GermplasmDataManager object
-        final ReportServiceImpl mocked = Mockito.mock(ReportServiceImpl.class);
+		final ReportServiceImpl mocked = Mockito.spy(ReportServiceImpl.class);
         final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
         final CountryDAO countryDAO = Mockito.mock(CountryDAO.class);
+		mocked.setDaoFactory(daoFactory);
 
         final Location location = new Location(TEST_LOCATION_ID);
         location.setCntryid(TEST_COUNTRY_ID);
@@ -150,7 +164,7 @@ public class ReportServiceImplTest {
         Mockito.doCallRealMethod().when(mocked).retrieveLocationIdFromCondition(variableList);
         Mockito.doCallRealMethod().when(mocked).createPlaceholderCountryMeasurementVariable(Mockito.anyString());
         Mockito.doReturn(locationDataManager).when(mocked).getLocationDataManager();
-        Mockito.doReturn(countryDAO).when(mocked).getCountryDao();
+		Mockito.doReturn(countryDAO).when(daoFactory).getCountryDao();
 
         Mockito.doReturn(location).when(locationDataManager).getLocationByID(TEST_LOCATION_ID);
         Mockito.doReturn(country).when(countryDAO).getById(TEST_COUNTRY_ID);

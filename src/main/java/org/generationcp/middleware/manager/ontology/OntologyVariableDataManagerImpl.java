@@ -174,7 +174,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 					final List<Integer> propertyIds = listParameters.get(PROPERTY_IDS);
 					for (final Object row : queryResults) {
-						propertyIds.add(this.typeSafeObjectToInteger(row));
+						propertyIds.add(Util.typeSafeObjectToInteger(row));
 					}
 
 					// Filtering with class that is invalid. So no further iteration required.
@@ -214,7 +214,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 					final List<Integer> scaleIds = listParameters.get(SCALE_IDS);
 					for (final Object row : queryResults) {
-						scaleIds.add(this.typeSafeObjectToInteger(row));
+						scaleIds.add(Util.typeSafeObjectToInteger(row));
 					}
 
 					// Filtering with data type gives no scale. So no further iteration required.
@@ -259,7 +259,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 					final List<Integer> variableIds = listParameters.get(VARIABLE_IDS);
 					for (final Object row : queryResults) {
-						variableIds.add(this.typeSafeObjectToInteger(row));
+						variableIds.add(Util.typeSafeObjectToInteger(row));
 					}
 
 					// Filtering with variable types that is not used or invalid. So no further iteration required.
@@ -316,24 +316,24 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			for (final Object row : queryResults) {
 				final Object[] items = (Object[]) row;
 				final Variable variable =
-						new Variable(new Term(this.typeSafeObjectToInteger(items[0]), (String) items[1], (String) items[2]));
+					new Variable(new Term(Util.typeSafeObjectToInteger(items[0]), (String) items[1], (String) items[2]));
 
-				final Integer propertyId = this.typeSafeObjectToInteger(items[3]);
+				final Integer propertyId = Util.typeSafeObjectToInteger(items[3]);
 				if (!pMap.containsKey(propertyId)) {
 					pMap.put(propertyId,
-							new Property(new Term(this.typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5])));
+						new Property(new Term(Util.typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5])));
 				}
 				variable.setProperty(pMap.get(propertyId));
 
-				final Integer methodId = this.typeSafeObjectToInteger(items[6]);
+				final Integer methodId = Util.typeSafeObjectToInteger(items[6]);
 				if (!mMap.containsKey(methodId)) {
-					mMap.put(methodId, new Method(new Term(this.typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8])));
+					mMap.put(methodId, new Method(new Term(Util.typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8])));
 				}
 				variable.setMethod(mMap.get(methodId));
 
-				final Integer scaleId = this.typeSafeObjectToInteger(items[9]);
+				final Integer scaleId = Util.typeSafeObjectToInteger(items[9]);
 				if (!sMap.containsKey(scaleId)) {
-					sMap.put(scaleId, new Scale(new Term(this.typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11])));
+					sMap.put(scaleId, new Scale(new Term(Util.typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11])));
 				}
 
 				variable.setScale(sMap.get(scaleId));
@@ -380,9 +380,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			for (final Object row : rQueryResults) {
 				final Object[] items = (Object[]) row;
 
-				final Integer subjectId = this.typeSafeObjectToInteger(items[0]);
-				final Integer typeId = this.typeSafeObjectToInteger(items[1]);
-				final Integer objectId = this.typeSafeObjectToInteger(items[2]);
+				final Integer subjectId = Util.typeSafeObjectToInteger(items[0]);
+				final Integer typeId = Util.typeSafeObjectToInteger(items[1]);
+				final Integer objectId = Util.typeSafeObjectToInteger(items[2]);
 
 				final String name = (String) items[3];
 				final String description = (String) items[4];
@@ -415,9 +415,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			for (final Object row : pQueryResults) {
 				final Object[] items = (Object[]) row;
 
-				final Integer cvTermId = this.typeSafeObjectToInteger(items[0]);
-				final Integer cvId = this.typeSafeObjectToInteger(items[1]);
-				final Integer typeId = this.typeSafeObjectToInteger(items[2]);
+				final Integer cvTermId = Util.typeSafeObjectToInteger(items[0]);
+				final Integer cvId = Util.typeSafeObjectToInteger(items[1]);
+				final Integer typeId = Util.typeSafeObjectToInteger(items[2]);
 				final String value = (String) items[3];
 
 				if (Objects.equals(typeId, TermId.CROP_ONTOLOGY_ID.getId()) && Objects.equals(cvId, CvId.PROPERTIES.getId())) {
@@ -527,7 +527,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			// Variable alias and expected range
-			final VariableOverrides overrides = this.getVariableProgramOverridesDao().getByVariableAndProgram(id, programUuid);
+			final VariableOverrides overrides = this.daoFactory.getVariableProgramOverridesDao().getByVariableAndProgram(id, programUuid);
 
 			if (overrides != null) {
 				variable.setAlias(overrides.getAlias());
@@ -537,7 +537,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 			// Get favorite from ProgramFavoriteDAO
 			final ProgramFavorite programFavorite =
-					this.getProgramFavoriteDao().getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
+				this.daoFactory.getProgramFavoriteDao()
+					.getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
 			variable.setIsFavorite(programFavorite != null);
 
 			final int unknownUsage = -1;
@@ -561,12 +562,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		// setting variable studies
 		variable.setStudies(0);
 
-		variable.setDatasets((int) this.getDmsProjectDao().countByVariable(variable.getId()));
+		variable.setDatasets((int) this.daoFactory.getDmsProjectDAO().countByVariable(variable.getId()));
 
 		//setting variable observations, first observations will be null so set it to 0
 		Integer observations = 0;
 		for (VariableType v : variable.getVariableTypes()) {
-			long observationsPerType = this.getExperimentDao().countByObservedVariable(variable.getId(), v.getId());
+			long observationsPerType = this.daoFactory.getExperimentDao().countByObservedVariable(variable.getId(), v.getId());
 			observations = (int) (observations + observationsPerType);
 		}
 		variable.setObservations(observations);
@@ -626,7 +627,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		// Saving alias, min, max values
 		if (!StringUtils.isBlank(variableInfo.getAlias()) || variableInfo.getExpectedMin() != null || variableInfo.getExpectedMax() != null) {
-			this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
+			this.daoFactory.getVariableProgramOverridesDao()
+				.save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
 					variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
 		}
 
@@ -636,7 +638,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			programFavorite.setEntityId(variableInfo.getId());
 			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
 			programFavorite.setUniqueID(variableInfo.getProgramUuid());
-			this.getProgramFavoriteDao().save(programFavorite);
+			this.daoFactory.getProgramFavoriteDao().save(programFavorite);
 		}
 
 		// Setting last update time.
@@ -746,14 +748,15 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		// Saving alias, min, max values
 		if (!Strings.isNullOrEmpty(variableInfo.getAlias()) || variableInfo.getExpectedMin() != null
 				|| variableInfo.getExpectedMax() != null) {
-			this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
+			this.daoFactory.getVariableProgramOverridesDao()
+				.save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
 					variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
 		} else if (variableOverrides != null) {
-			this.getVariableProgramOverridesDao().makeTransient(variableOverrides);
+			this.daoFactory.getVariableProgramOverridesDao().makeTransient(variableOverrides);
 		}
 
 		// Updating favorite to true if alias is defined
-		ProgramFavorite programFavorite = this.getProgramFavoriteDao().getProgramFavorite(variableInfo.getProgramUuid(),
+		ProgramFavorite programFavorite = this.daoFactory.getProgramFavoriteDao().getProgramFavorite(variableInfo.getProgramUuid(),
 				ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
 
 		final String previousAlias = variableOverrides == null ? null : variableOverrides.getAlias();
@@ -769,9 +772,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			programFavorite.setEntityId(variableInfo.getId());
 			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
 			programFavorite.setUniqueID(variableInfo.getProgramUuid());
-			this.getProgramFavoriteDao().save(programFavorite);
+			this.daoFactory.getProgramFavoriteDao().save(programFavorite);
 		} else if (!isFavorite && programFavorite != null) {
-			this.getProgramFavoriteDao().makeTransient(programFavorite);
+			this.daoFactory.getProgramFavoriteDao().makeTransient(programFavorite);
 		}
 
 		daoFactory.getCvTermPropertyDao().save(variableInfo.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
@@ -821,10 +824,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			// delete Variable alias and expected range
-			final List<VariableOverrides> variableOverridesList = this.getVariableProgramOverridesDao().getByVariableId(variableId);
+			final List<VariableOverrides> variableOverridesList =
+				this.daoFactory.getVariableProgramOverridesDao().getByVariableId(variableId);
 
 			for (final VariableOverrides overrides : variableOverridesList) {
-				this.getVariableProgramOverridesDao().makeTransient(overrides);
+				this.daoFactory.getVariableProgramOverridesDao().makeTransient(overrides);
 			}
 
 			// delete variable synonym
@@ -890,7 +894,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		if (!Objects.equals(oldVariableName, newName)) {
 
-			final List<CVTermSynonym> byCvTermSynonymList = this.getCvTermSynonymDao().getByCvTermId(term.getCvTermId());
+			final List<CVTermSynonym> byCvTermSynonymList = this.daoFactory.getCvTermSynonymDao().getByCvTermId(term.getCvTermId());
 			boolean synonymFound = false;
 
 			for (final CVTermSynonym cvTermSynonym : byCvTermSynonymList) {
@@ -903,17 +907,17 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			if (!synonymFound) {
 				final CVTermSynonym cvTermSynonym =
 						CvTermSynonymDao.buildCvTermSynonym(term.getCvTermId(), oldVariableName, NameType.ALTERNATIVE_ENGLISH.getId());
-				this.getCvTermSynonymDao().save(cvTermSynonym);
+				this.daoFactory.getCvTermSynonymDao().save(cvTermSynonym);
 			}
 		}
 	}
 
 	private void deleteVariableSynonym(final int variableId) {
 		// delete Variable synonym
-		final List<CVTermSynonym> cvTermSynonymList = this.getCvTermSynonymDao().getByCvTermId(variableId);
+		final List<CVTermSynonym> cvTermSynonymList = this.daoFactory.getCvTermSynonymDao().getByCvTermId(variableId);
 
 		for (final CVTermSynonym synonym : cvTermSynonymList) {
-			this.getCvTermSynonymDao().makeTransient(synonym);
+			this.daoFactory.getCvTermSynonymDao().makeTransient(synonym);
 		}
 	}
 
@@ -958,7 +962,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		final List<CVTermProperty> termProperties = daoFactory.getCvTermPropertyDao().getByCvTermId(elements.getVariableId());
 
 		final VariableOverrides variableOverrides =
-				this.getVariableProgramOverridesDao().getByVariableAndProgram(elements.getVariableId(), elements.getProgramUuid());
+			this.daoFactory.getVariableProgramOverridesDao().getByVariableAndProgram(elements.getVariableId(), elements.getProgramUuid());
 
 		// Set to elements to send response back to caller.
 		elements.setVariableTerm(variableTerm);
@@ -983,7 +987,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public List<VariableOverrides> getVariableOverridesByVariableIds(final List<Integer> variableIds) {
 		try {
-			return this.getVariableProgramOverridesDao().getVariableOverridesByVariableIds(variableIds);
+			return this.daoFactory.getVariableProgramOverridesDao().getVariableOverridesByVariableIds(variableIds);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error at getVariableOverridesByVariableIds:" + e.getMessage(), e);
 		}
@@ -992,7 +996,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public VariableOverrides getVariableOverridesByVariableIdAndProgram(final Integer variableId, final String programUuid) {
 		try {
-			return this.getVariableProgramOverridesDao().getByVariableAndProgram(variableId, programUuid);
+			return this.daoFactory.getVariableProgramOverridesDao().getByVariableAndProgram(variableId, programUuid);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error at getByVariableAndProgram:" + e.getMessage(), e);
 		}
