@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -142,29 +143,20 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Location> getFilteredLocations(final String programUUID, final Set<Integer> types, List<Integer> locationIds,
-		final List<String> locationAbbreviations, final boolean favourites, final String locationName, final Pageable pageable) {
-		if (!StringUtils.isEmpty(programUUID) && favourites) {
-			if (locationIds == null) {
-				locationIds = new ArrayList<>();
-			}
-			locationIds.addAll(this.getFavoriteProjectLocationIds(programUUID));
+	public List<Location> getFilteredLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
+		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID()) && locationSearchRequest.getFavourites()) {
+			locationSearchRequest.getLocationIds().addAll(this.getFavoriteProjectLocationIds(locationSearchRequest.getProgramUUID()));
 		}
 		return this.daoFactory.getLocationDAO()
-			.filterLocations(programUUID, types, locationIds, locationAbbreviations, locationName, pageable);
+			.filterLocations(locationSearchRequest, pageable);
 	}
 
 	@Override
-	public long countFilteredLocations(final String programUUID, final Set<Integer> types,
-		List<Integer> locationIds,
-		final List<String> locationAbbreviations, final boolean favourites, final String locationName) {
-		if (!StringUtils.isEmpty(programUUID) && favourites) {
-			if (locationIds == null) {
-				locationIds = new ArrayList<>();
-			}
-			locationIds.addAll(this.getFavoriteProjectLocationIds(programUUID));
+	public long countFilteredLocations(final LocationSearchRequest locationSearchRequest) {
+		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID()) && locationSearchRequest.getFavourites()) {
+			locationSearchRequest.getLocationIds().addAll(this.getFavoriteProjectLocationIds(locationSearchRequest.getProgramUUID()));
 		}
-		return this.daoFactory.getLocationDAO().countFilterLocations(programUUID, types, locationIds, locationAbbreviations, locationName);
+		return this.daoFactory.getLocationDAO().countFilterLocations(locationSearchRequest);
 	}
 
 	@Override

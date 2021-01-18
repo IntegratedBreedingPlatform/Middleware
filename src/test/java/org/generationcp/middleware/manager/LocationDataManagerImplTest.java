@@ -15,6 +15,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -38,7 +39,6 @@ import org.springframework.data.domain.PageRequest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -725,10 +725,13 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountFilteredLocations() {
+
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+
 		final long count = this.manager
-			.countFilteredLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), false, "");
+			.countFilteredLocations(locationSearchRequest);
 		final List<Location> locations = this.manager
-			.getFilteredLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), false, "", null);
+			.getFilteredLocations(locationSearchRequest, null);
 		Assert.assertThat((int) count, equalTo(locations.size()));
 
 	}
@@ -737,7 +740,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	public void testGetFilteredLocations() {
 
 		final List<Location> locations = this.manager
-			.getFilteredLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), false, "", new PageRequest(0, 10));
+			.getFilteredLocations(new LocationSearchRequest(), new PageRequest(0, 10));
 		Assert.assertThat(10, equalTo(locations.size()));
 
 	}
@@ -760,8 +763,12 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		programFavorite.setEntityType("LOCATION");
 		this.daoFactory.getProgramFavoriteDao().save(programFavorite);
 
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setProgramUUID(programUUID);
+		locationSearchRequest.setFavourites(true);
+
 		final List<Location> locations = this.manager
-			.getFilteredLocations(programUUID, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), true, "", new PageRequest(0, 10));
+			.getFilteredLocations(locationSearchRequest, new PageRequest(0, 10));
 
 		Assert.assertThat(1, equalTo(locations.size()));
 		Assert.assertThat(location.getLocid(), equalTo(locations.get(0).getLocid()));

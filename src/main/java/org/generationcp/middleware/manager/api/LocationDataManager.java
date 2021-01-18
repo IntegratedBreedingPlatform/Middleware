@@ -10,6 +10,8 @@
 
 package org.generationcp.middleware.manager.api;
 
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
@@ -19,13 +21,11 @@ import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This is the API for managing Location information.
@@ -213,36 +213,21 @@ public interface LocationDataManager {
 	List<Location> getLocationsByType(Integer type);
 
 	/**
-	 * Returns the Location records with type matching the given parameter. The
-	 * data is retrieved from both local and central databases.
+	 * Returns the Location records filtered by LocationSearchRequest parameter.
 	 *
-	 * @param programUUID           - programUUID
-	 * @param types                 - search set for the types of locations
-	 * @param locationIds           - List of favorite LocIds of the current program
-	 * @param locationAbbreviations - List of location abbreviations
-	 * @param favourites            - Get favourites locations if true
-	 * @param locationName			- Search by name of locations
-	 * @param pageable				- pagination parameters
-	 * @return List of Location POJOs
+	 * @param locationSearchRequest - filter parameters
+	 * @param pageable              - pagination parameters
+	 * @return
 	 */
-	List<Location> getFilteredLocations(String programUUID, Set<Integer> types, List<Integer> locationIds,
-		List<String> locationAbbreviations, boolean favourites, String locationName, Pageable pageable);
+	List<Location> getFilteredLocations(LocationSearchRequest locationSearchRequest, Pageable pageable);
 
 	/**
-	 * Returns the count of records with type matching the given parameter. The
-	 * data is retrieved from both local and central databases.
+	 * Returns the count of Location records filtered by LocationSearchRequest parameter.
 	 *
-	 * @param programUUID           - programUUID
-	 * @param types                 - search by name of locations
-	 * @param types                 - search set for the types of locations
-	 * @param locationIds           - List of favorite LocIds of the current program
-	 * @param locationAbbreviations - List of location abbreviations
-	 * @param favourites            - Get favourites locations if true
-	 * @param locationName			- Search by name of locations
-	 * @return List of Location POJOs
+	 * @param locationSearchRequest - filter parameters
+	 * @return
 	 */
-	long countFilteredLocations(String programUUID, Set<Integer> locationTypes, List<Integer> locationIds,
-		List<String> locationAbbreviations, boolean favoriteLocations, String locationName);
+	long countFilteredLocations(LocationSearchRequest locationSearchRequest);
 
 	/**
 	 * Returns the Location records with type matching the given parameter. The

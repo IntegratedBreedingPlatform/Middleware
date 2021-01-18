@@ -6,6 +6,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -432,26 +432,28 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testFilterLocations_RetrieveAll() {
-		final long count = this.locationDAO.countFilterLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "");
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		final long count = this.locationDAO.countFilterLocations(locationSearchRequest);
 		final List<Location> locations =
-			this.locationDAO.filterLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "", null);
+			this.locationDAO.filterLocations(locationSearchRequest, null);
 		Assert.assertThat((int) count, equalTo(locations.size()));
 	}
 
 	@Test
 	public void testFilterLocations_Pagination() {
-		final long count = this.locationDAO.countFilterLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "");
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		final long count = this.locationDAO.countFilterLocations(locationSearchRequest);
 
 		// Page 1
 		final PageRequest pageRequest = new PageRequest(0, 10);
 		final List<Location> locations =
-			this.locationDAO.filterLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "", pageRequest);
+			this.locationDAO.filterLocations(locationSearchRequest, pageRequest);
 		Assert.assertThat(pageRequest.getPageSize(), equalTo(locations.size()));
 
 		// Page 2
 		final PageRequest pageRequest2 = new PageRequest(1, 10);
 		final List<Location> locations2 =
-			this.locationDAO.filterLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "", pageRequest2);
+			this.locationDAO.filterLocations(locationSearchRequest, pageRequest2);
 		Assert.assertThat(pageRequest2.getPageSize(), equalTo(locations2.size()));
 		Assert.assertThat(locations, not(equalTo(locations2)));
 
@@ -460,9 +462,11 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testFilterLocations_SearchByLocationName() {
 		final String locationName = "Philippines";
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationName(locationName);
 		final List<Location> locations =
 			this.locationDAO
-				.filterLocations(null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), locationName, new PageRequest(0, 10));
+				.filterLocations(locationSearchRequest, new PageRequest(0, 10));
 		Assert.assertThat(locationName, equalTo(locations.get(0).getLname()));
 
 	}
@@ -470,9 +474,11 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testFilterLocations_FilterByLocationType() {
 		final Integer locationType = 405;
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationTypes(Collections.singleton(locationType));
 		final List<Location> locations =
 			this.locationDAO
-				.filterLocations(null, Collections.singleton(locationType), new ArrayList<>(), new ArrayList<>(), "",
+				.filterLocations(locationSearchRequest,
 					new PageRequest(0, 10));
 
 		locations.stream().forEach((location) -> {
@@ -484,9 +490,11 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void testFilterLocations_FilterByLocationId() {
 		// Philippines
 		final Integer locationId = 171;
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationIds(Collections.singletonList(locationId));
 		final List<Location> locations =
 			this.locationDAO
-				.filterLocations(null, new HashSet<>(), Collections.singletonList(locationId), new ArrayList<>(), "",
+				.filterLocations(locationSearchRequest,
 					new PageRequest(0, 10));
 
 		Assert.assertThat(locationId, equalTo(locations.get(0).getLocid()));
@@ -496,9 +504,11 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void testFilterLocations_FilterByAbbreviation() {
 		// Philippines
 		final String locationAbbreviation = "PHL";
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationAbbreviations(Collections.singletonList(locationAbbreviation));
 		final List<Location> locations =
 			this.locationDAO
-				.filterLocations(null, new HashSet<>(), new ArrayList<>(), Collections.singletonList(locationAbbreviation), "",
+				.filterLocations(locationSearchRequest,
 					new PageRequest(0, 10));
 
 		Assert.assertThat(locationAbbreviation, equalTo(locations.get(0).getLabbr()));
@@ -508,6 +518,8 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void testFilterLocations_FilterByProgramUUID() {
 
 		final String programUUID = UUID.randomUUID().toString();
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setProgramUUID(programUUID);
 		final int cntryid = 1;
 		final Location location = LocationTestDataInitializer
 			.createLocation(null, RandomStringUtils.randomAlphabetic(10), 405, RandomStringUtils.randomAlphabetic(3), programUUID);
@@ -518,7 +530,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		final List<Location> locations =
 			this.locationDAO
-				.filterLocations(programUUID, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), "", null);
+				.filterLocations(locationSearchRequest, null);
 
 		final Optional<Location> optional = locations.stream().filter(loc -> programUUID.equals(loc.getProgramUUID())).findFirst();
 		Assert.assertTrue(optional.isPresent());

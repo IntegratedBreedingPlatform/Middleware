@@ -15,6 +15,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.api.brapi.v1.location.AdditionalInfoDto;
 import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -37,6 +38,7 @@ import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -303,12 +305,11 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return new ArrayList<>();
 	}
 
-	public long countFilterLocations(final String programUUID, final Set<Integer> types, final List<Integer> locationIds,
-		final List<String> locationAbbreviations, final String locationName) {
+	public long countFilterLocations(final LocationSearchRequest locationSearchRequest) {
 		try {
 
 			final Criteria criteria =
-				this.createFilterLocationCriteria(programUUID, types, locationIds, locationAbbreviations, locationName);
+				this.createFilterLocationCriteria(locationSearchRequest);
 			return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
 
 		} catch (final HibernateException e) {
@@ -320,12 +321,11 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	public List<Location> filterLocations(final String programUUID, final Set<Integer> types, final List<Integer> locationIds,
-		final List<String> locationAbbreviations, final String locationName, final Pageable pageable) {
+	public List<Location> filterLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
 		try {
 
 			final Criteria criteria =
-				this.createFilterLocationCriteria(programUUID, types, locationIds, locationAbbreviations, locationName);
+				this.createFilterLocationCriteria(locationSearchRequest);
 
 			criteria.addOrder(Order.asc(LocationDAO.LNAME));
 
@@ -341,32 +341,32 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	private Criteria createFilterLocationCriteria(final String programUUID, final Set<Integer> types, final List<Integer> locationIds,
-		final List<String> locationAbbreviations, final String locationName) {
+	private Criteria createFilterLocationCriteria(final LocationSearchRequest locationSearchRequest) {
 		final Criteria criteria = this.getSession().createCriteria(Location.class);
 
-		if (programUUID != null) {
+		if (locationSearchRequest.getProgramUUID() != null) {
 			criteria.add(Restrictions.disjunction()
-				.add(Restrictions.eq(PROGRAM_UUID, programUUID))
+				.add(Restrictions.eq(PROGRAM_UUID, locationSearchRequest.getProgramUUID()))
 				.add(Restrictions.isNull(PROGRAM_UUID)));
 		} else {
 			criteria.add(Restrictions.isNull(PROGRAM_UUID));
 		}
 
-		if (types != null && !types.isEmpty()) {
-			criteria.add(Restrictions.in(LocationDAO.LTYPE, types));
+		if (locationSearchRequest.getLocationTypes() != null && !CollectionUtils.isEmpty(locationSearchRequest.getLocationTypes())) {
+			criteria.add(Restrictions.in(LocationDAO.LTYPE, locationSearchRequest.getLocationTypes()));
 		}
 
-		if (locationIds != null && !locationIds.isEmpty()) {
-			criteria.add(Restrictions.in(LocationDAO.LOCID, locationIds));
+		if (locationSearchRequest.getLocationIds() != null && !CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
+			criteria.add(Restrictions.in(LocationDAO.LOCID, locationSearchRequest.getLocationIds()));
 		}
 
-		if (locationAbbreviations != null && !locationAbbreviations.isEmpty()) {
-			criteria.add(Restrictions.in(LocationDAO.LABBREVIATION, locationAbbreviations));
+		if (locationSearchRequest.getLocationAbbreviations() != null && !CollectionUtils
+			.isEmpty(locationSearchRequest.getLocationAbbreviations())) {
+			criteria.add(Restrictions.in(LocationDAO.LABBREVIATION, locationSearchRequest.getLocationAbbreviations()));
 		}
 
-		if (StringUtils.isNotEmpty(locationName)) {
-			criteria.add(Restrictions.like("lname", locationName, MatchMode.START));
+		if (StringUtils.isNotEmpty(locationSearchRequest.getLocationName())) {
+			criteria.add(Restrictions.like("lname", locationSearchRequest.getLocationName(), MatchMode.START));
 		}
 		return criteria;
 	}
@@ -823,7 +823,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("getByProgramUUIDAndExcludeLocationTypes", "", null, e.getMessage(),
-				LocationDAO.CLASS_NAME_LOCATION), e);
+					LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 
 		return locations;
