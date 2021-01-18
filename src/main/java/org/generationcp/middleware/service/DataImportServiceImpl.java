@@ -1227,19 +1227,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 	}
 
-	private Optional<MeasurementData> findMeasurementRowByTermId(final Integer termId, final List<MeasurementRow> rowList) {
-		if (!Util.isEmpty(rowList)) {
-			final List<MeasurementData> measurementDataList = new ArrayList<>();
-			rowList.forEach(measurementRow -> {measurementDataList.addAll(measurementRow.getDataList());});
-			final List<MeasurementData> entryType = measurementDataList.stream().filter(measurementData -> measurementData.getMeasurementVariable().getTermId() == termId).collect(Collectors.toList());
-			if (!Util.isEmpty(entryType)) {
-				return Optional.of(entryType.get(0));
-			}
-
-		}
-		return Optional.absent();
-	}
-
 	/**
 	 * @param termId
 	 * @param rowList
