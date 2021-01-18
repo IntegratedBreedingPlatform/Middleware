@@ -14,27 +14,59 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.api.*;
-import org.generationcp.middleware.manager.ontology.*;
-import org.generationcp.middleware.manager.ontology.api.*;
+import org.generationcp.middleware.manager.api.CrossStudyDataManager;
+import org.generationcp.middleware.manager.api.GenotypicDataManager;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.PedigreeDataManager;
+import org.generationcp.middleware.manager.api.PresetService;
+import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.TermDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
-import org.generationcp.middleware.service.*;
-import org.generationcp.middleware.service.api.*;
+import org.generationcp.middleware.service.DataImportServiceImpl;
+import org.generationcp.middleware.service.FieldbookServiceImpl;
+import org.generationcp.middleware.service.InventoryServiceImpl;
+import org.generationcp.middleware.service.OntologyServiceImpl;
+import org.generationcp.middleware.service.ReportServiceImpl;
+import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.InventoryService;
+import org.generationcp.middleware.service.api.KeySequenceRegisterService;
+import org.generationcp.middleware.service.api.OntologyService;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.ReportService;
+import org.generationcp.middleware.service.api.SampleListService;
+import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.gdms.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
+import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
-import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
@@ -43,8 +75,10 @@ import org.generationcp.middleware.service.impl.gdms.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyEntryServiceImpl;
+import org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
+import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.service.impl.study.germplasm.source.GermplasmStudySourceServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.slf4j.Logger;
@@ -69,7 +103,6 @@ public class ManagerFactory implements Serializable {
 
 	private HibernateSessionProvider sessionProvider;
 
-	private String databaseName;
 	private String cropName;
 	private String pedigreeProfile;
 	private static ThreadLocal<ManagerFactory> currentManagerFactory = new ThreadLocal<ManagerFactory>();
@@ -91,7 +124,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public GermplasmDataManager getGermplasmDataManager() {
-		return new GermplasmDataManagerImpl(this.sessionProvider, this.databaseName);
+		return new GermplasmDataManagerImpl(this.sessionProvider);
 	}
 
 	public PedigreeDataManager getPedigreeDataManager() {
@@ -103,7 +136,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public GermplasmListManager getGermplasmListManager() {
-		return new GermplasmListManagerImpl(this.sessionProvider, this.databaseName);
+		return new GermplasmListManagerImpl(this.sessionProvider);
 	}
 
 	public LocationDataManager getLocationDataManager() {
@@ -144,7 +177,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public StudyDataManager getNewStudyDataManager() {
-		return new StudyDataManagerImpl(this.sessionProvider, this.databaseName);
+		return new StudyDataManagerImpl(this.sessionProvider);
 	}
 
 	public org.generationcp.middleware.service.api.dataset.DatasetService getDatasetMiddlewareService() {
@@ -156,7 +189,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public InventoryDataManager getInventoryDataManager() {
-		return new InventoryDataManagerImpl(this.sessionProvider, this.databaseName);
+		return new InventoryDataManagerImpl(this.sessionProvider);
 	}
 
 	public UserProgramStateDataManager getUserProgramStateDataManager() {
@@ -168,7 +201,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public FieldbookService getFieldbookMiddlewareService() {
-		return new FieldbookServiceImpl(this.sessionProvider, this.databaseName);
+		return new FieldbookServiceImpl(this.sessionProvider);
 	}
 
 	public InventoryService getInventoryMiddlewareService() {
@@ -183,23 +216,12 @@ public class ManagerFactory implements Serializable {
 		return new OntologyServiceImpl(this.sessionProvider);
 	}
 
-	public MBDTDataManager getMbdtDataManager() {
-		return new MBDTDataManagerImpl(this.sessionProvider);
-	}
-
 	public ReportService getReportService() {
-		return new ReportServiceImpl(this.sessionProvider, this.databaseName);
+		return new ReportServiceImpl(this.sessionProvider);
 	}
 
 	public PedigreeService getPedigreeService() {
 		return PedigreeFactory.getPedigreeService(this.sessionProvider, this.pedigreeProfile, this.cropName);
-	}
-
-	/*
-	 * This was exposed so that it can be access in the jUnit
-	 */
-	public PedigreeService getPedigreeService(final String profile, final String crop) {
-		return PedigreeFactory.getPedigreeService(this.sessionProvider, profile, crop);
 	}
 
 	/**
@@ -214,14 +236,6 @@ public class ManagerFactory implements Serializable {
 
 		ManagerFactory.currentManagerFactory.remove();
 		ManagerFactory.LOG.trace("Closing ManagerFactory...Done.");
-	}
-
-	public String getDatabaseName() {
-		return this.databaseName;
-	}
-
-	public void setDatabaseName(final String localDatabaseName) {
-		this.databaseName = localDatabaseName;
 	}
 
 	public String getCropName() {
@@ -245,17 +259,11 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public StandardVariableTransformer getStandardVariableTransformer() {
-		return new StandardVariableTransformer(this.sessionProvider);
+		return new StandardVariableTransformer();
 	}
 
 	public GermplasmGroupingService getGermplasmGroupingService() {
 		return new GermplasmGroupingServiceImpl(this.sessionProvider);
-	}
-
-	public GermplasmNamingReferenceDataResolver getGermplasmNamingReferenceDataResolver() {
-		// In future we can switch implementation based on profile/crop.
-		// Currently just construct and return the only (CIMMYT maize) impl we have.
-		return new GermplasmNamingReferenceDataResolverImpl(this.sessionProvider);
 	}
 
 	public KeySequenceRegisterService getKeySequenceRegisterService() {
@@ -328,6 +336,14 @@ public class ManagerFactory implements Serializable {
 
 	public SearchRequestService getSearchRequestService() {
 		return new SearchRequestServiceImpl(this.sessionProvider);
+	}
+
+	public StudyInstanceService studyInstanceMiddlewareService() {
+		return new StudyInstanceServiceImpl(this.sessionProvider);
+	}
+
+	public ExperimentModelGenerator getExperimentModelGenerator() {
+		return new ExperimentModelGenerator(this.sessionProvider);
 	}
 
 	public BreedingMethodService getBreedingMethodService() {

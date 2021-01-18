@@ -16,7 +16,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SimplifiedWorkbookTestDataInitializer;
 import org.generationcp.middleware.data.initializer.VariableListTestDataInitializer;
-import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DMSVariableTypeTestDataInitializer;
 import org.generationcp.middleware.domain.dms.Experiment;
@@ -26,7 +25,6 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.Term;
@@ -98,7 +96,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	public void setUp() {
 
 		if (this.measurementVariableTransformer == null) {
-			this.measurementVariableTransformer = new MeasurementVariableTransformer(this.sessionProvder);
+			this.measurementVariableTransformer = new MeasurementVariableTransformer();
 		}
 
 		if (this.standardVariableBuilder == null) {

@@ -92,8 +92,6 @@ public class TransactionServiceImpl implements TransactionService {
 			transaction.setTransactionDate(new Date());
 			transaction.setQuantity(-1 * amountToWithdraw);
 			transaction.setComments(lotWithdrawalInputDto.getNotes());
-			//Always zero for new transactions
-			transaction.setPreviousAmount(0D);
 			if (transactionStatus.equals(TransactionStatus.CONFIRMED)) {
 				transaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
 			} else {

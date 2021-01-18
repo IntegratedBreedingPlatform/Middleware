@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -59,6 +60,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final Term entryNumberTerm = this.ontologyDataManager.getTermById(Integer.valueOf(TermId.ENTRY_NO.getId()));
 		return this.getStudyEntries(studyId, null, new PageRequest(0, Integer.MAX_VALUE,
 				new Sort(Sort.Direction.ASC, entryNumberTerm.getName())));
+	}
+
+	@Override
+	public long countFilteredStudyEntries(int studyId, StudyEntrySearchDto.Filter filter){
+		return this.daoFactory.getStockDao().countFilteredStudyEntries(studyId, filter);
 	}
 
 	@Override
@@ -173,27 +179,14 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public void updateStudyEntryProperty(final int studyId, final StudyEntryPropertyData studyEntryPropertyData) {
-		final StockProperty stockProperty = this.daoFactory.getStockPropertyDao().getById(studyEntryPropertyData.getStudyEntryPropertyId());
-		if (stockProperty != null) {
-			stockProperty.setValue(studyEntryPropertyData.getValue());
-			this.daoFactory.getStockPropertyDao().saveOrUpdate(stockProperty);
-		}
+	public void updateStudyEntriesProperty(final StudyEntryPropertyBatchUpdateRequest studyEntryPropertyBatchUpdateRequest) {
+		this.daoFactory.getStockPropertyDao().updateByStockIdsAndTypeId(
+			new ArrayList<>(studyEntryPropertyBatchUpdateRequest.getSearchComposite().getItemIds()),
+			studyEntryPropertyBatchUpdateRequest.getVariableId(), studyEntryPropertyBatchUpdateRequest.getValue());
 	}
 
 	@Override
 	public Boolean hasUnassignedEntries(final int studyId) {
 		return this.daoFactory.getStockDao().hasUnassignedEntries(studyId);
 	}
-
-	@Override
-	public Optional<StudyEntryPropertyData> getStudyEntryPropertyData(final int studyEntryPropertyId) {
-		final StockProperty stockProperty = this.daoFactory.getStockPropertyDao().getById(studyEntryPropertyId);
-		if (stockProperty != null) {
-			return Optional
-				.of(new StudyEntryPropertyData(stockProperty.getStockPropId(), stockProperty.getTypeId(), stockProperty.getValue()));
-		}
-		return Optional.empty();
-	}
-
 }

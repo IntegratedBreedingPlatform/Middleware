@@ -2,7 +2,6 @@
 package org.generationcp.middleware.service.api.study;
 
 import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.springframework.data.domain.Pageable;
@@ -11,18 +10,7 @@ import java.util.List;
 
 public interface StudyService {
 
-	boolean hasMeasurementDataOnEnvironment(int studyIdentifier, int instanceId);
-
 	boolean hasCrossesOrSelections(int studyId);
-
-	int countTotalObservationUnits(int studyIdentifier, int instanceId);
-
-	List<ObservationDto> getObservations(int studyIdentifier, int instanceId, int pageNumber, int pageSize, String sortBy,
-		String sortOrder);
-
-	List<ObservationDto> getSingleObservation(int studyIdentifier, int measurementIdentifier);
-
-	ObservationDto updateObservation(Integer studyIdentifier, ObservationDto middlewareMeasurement);
 
 	String getProgramUUID(Integer studyIdentifier);
 
@@ -74,6 +62,8 @@ public interface StudyService {
 	Integer getPlotDatasetId(int studyId);
 
 	Integer getEnvironmentDatasetId(int studyId);
+
+	List<StudyInstanceDto> getStudyInstancesWithMetadata(StudySearchFilter studySearchFilter, Pageable pageable);
 
 	List<StudyInstanceDto> getStudyInstances(StudySearchFilter studySearchFilter, Pageable pageable);
 

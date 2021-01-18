@@ -149,27 +149,35 @@ public class LotServiceImpl implements LotService {
 	}
 
 	private void updateLots(final String programUUID, final List<Lot> lots, final LotMultiUpdateRequestDto lotMultiUpdateRequestDto) {
+		try {
+			final Map<String, Integer> locationsByLocationAbbrMap =
+				buildLocationsByLocationAbbrMap(programUUID, lotMultiUpdateRequestDto.getLotList().stream()
+					.map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr)
+					.collect(Collectors.toList()));
+			final Map<String, Integer> unitMapByName = buildUnitsByNameMap();
+			final Map<String, LotMultiUpdateRequestDto.LotUpdateDto> lotUpdateMapByLotUID =
+				Maps.uniqueIndex(lotMultiUpdateRequestDto.getLotList(), LotMultiUpdateRequestDto.LotUpdateDto::getLotUID);
 
-		final Map<String, Integer> locationsByLocationAbbrMap =
-			buildLocationsByLocationAbbrMap(programUUID, lotMultiUpdateRequestDto.getLotList().stream()
-				.map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr)
-				.collect(Collectors.toList()));
-		final Map<String, Integer> unitMapByName = buildUnitsByNameMap();
-		final Map<String, LotMultiUpdateRequestDto.LotUpdateDto> lotUpdateMapByLotUID =
-			Maps.uniqueIndex(lotMultiUpdateRequestDto.getLotList(), LotMultiUpdateRequestDto.LotUpdateDto::getLotUID);
+			for (final Lot lot : lots) {
+				final LotMultiUpdateRequestDto.LotUpdateDto lotUpdateDto = lotUpdateMapByLotUID.get(lot.getLotUuId());
+				if (!StringUtils.isBlank(lotUpdateDto.getStorageLocationAbbr())) {
+					lot.setLocationId(locationsByLocationAbbrMap.get(lotUpdateDto.getStorageLocationAbbr()));
+				}
+				if (!StringUtils.isBlank(lotUpdateDto.getUnitName())) {
+					lot.setScaleId(unitMapByName.get(lotUpdateDto.getUnitName()));
+				}
+				if (!StringUtils.isBlank(lotUpdateDto.getNotes())) {
+					lot.setComments(lotUpdateDto.getNotes());
+				}
+				if (!StringUtils.isBlank(lotUpdateDto.getNewLotUID())) {
+					lot.setLotUuId(lotUpdateDto.getNewLotUID());
+				}
 
-		for (final Lot lot : lots) {
-			final LotMultiUpdateRequestDto.LotUpdateDto lotUpdateDto = lotUpdateMapByLotUID.get(lot.getLotUuId());
-			if (!StringUtils.isBlank(lotUpdateDto.getStorageLocationAbbr())) {
-				lot.setLocationId(locationsByLocationAbbrMap.get(lotUpdateDto.getStorageLocationAbbr()));
+				this.daoFactory.getLotDao().saveOrUpdate(lot);
 			}
-			if (!StringUtils.isBlank(lotUpdateDto.getUnitName())) {
-				lot.setScaleId(unitMapByName.get(lotUpdateDto.getUnitName()));
-			}
-			if (!StringUtils.isBlank(lotUpdateDto.getNotes())) {
-				lot.setComments(lotUpdateDto.getNotes());
-			}
-			this.daoFactory.getLotDao().save(lot);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareRequestException("", "common.middleware.error.update.lots");
 		}
 	}
 
@@ -234,7 +242,6 @@ public class LotServiceImpl implements LotService {
 					transaction.setUserId(userId);
 					transaction.setTransactionDate(new Date());
 					transaction.setQuantity(initialBalance);
-					transaction.setPreviousAmount(0D);
 					transaction.setCommitmentDate(0);
 
 					daoFactory.getTransactionDAO().save(transaction);
@@ -283,7 +290,6 @@ public class LotServiceImpl implements LotService {
 			discardTransaction.setUserId(userId);
 			discardTransaction.setTransactionDate(new Date());
 			discardTransaction.setQuantity(-1 * extendedLotDto.getAvailableBalance());
-			discardTransaction.setPreviousAmount(0D);
 			discardTransaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
 			daoFactory.getTransactionDAO().save(discardTransaction);
 		}

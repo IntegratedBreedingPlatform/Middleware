@@ -469,7 +469,6 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		for (final MeasurementVariable measurementVariable: this.germplasmDescriptors) {
 			final StockProperty stockProperty = new StockProperty();
 			stockProperty.setValue(String.valueOf(i));
-			stockProperty.setRank(i);
 			stockProperty.setTypeId(measurementVariable.getTermId());
 			stockProperty.setStock(stockModel);
 		}

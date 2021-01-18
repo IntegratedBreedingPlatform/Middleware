@@ -377,7 +377,7 @@ public class OntologyServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testValidateDeleteStandardVariableEnumeration() throws Exception {
 
-		int standardVariableId = TermId.CHECK.getId();
+		int standardVariableId = TermId.ENTRY_TYPE.getId();
 		int enumerationId = -2;
 
 		boolean found = this.ontologyService.validateDeleteStandardVariableEnumeration(standardVariableId, enumerationId);

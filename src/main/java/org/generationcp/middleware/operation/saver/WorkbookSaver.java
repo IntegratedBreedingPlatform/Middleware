@@ -13,7 +13,18 @@ package org.generationcp.middleware.operation.saver;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -44,7 +55,12 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 // Assumptions - can be added to validations
@@ -214,7 +230,7 @@ public class WorkbookSaver extends Saver {
 			&& environmentDatasetId != null) {
 			isDeleteTrialObservations = true;
 			// delete measurement data
-			this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
+			this.daoFactory.getExperimentDao().deleteExperimentsForDataset(plotDatasetId);
 			// reset trial observation details such as experimentid, stockid and
 			// geolocationid
 			this.resetTrialObservations(workbook.getTrialObservations());
@@ -228,12 +244,12 @@ public class WorkbookSaver extends Saver {
 		if (isDeleteTrialObservations) {
 
 			final ExperimentModel studyExperiment =
-				this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
-			studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
-			this.getExperimentDao().saveOrUpdate(studyExperiment);
+				this.daoFactory.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
+			studyExperiment.setGeoLocation(this.daoFactory.getGeolocationDao().getById(studyLocationId));
+			this.daoFactory.getExperimentDao().saveOrUpdate(studyExperiment);
 
 			// delete trial observations
-			this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
+			this.daoFactory.getExperimentDao().deleteTrialExperimentsOfStudy(environmentDatasetId);
 		}
 
 		final int studyId;
@@ -299,7 +315,7 @@ public class WorkbookSaver extends Saver {
 		final int studyId = workbook.getStudyDetails().getId();
 
 		final int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
-		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
+		this.daoFactory.getExperimentDao().deleteExperimentsForDataset(plotDatasetId);
 
 		this.resetTrialObservations(workbook.getTrialObservations());
 
@@ -307,12 +323,12 @@ public class WorkbookSaver extends Saver {
 			trialHeaders, trialVariatesMap, true, programUUID);
 
 		final ExperimentModel studyExperiment =
-			this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(studyId)).get(0);
-		studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
-		this.getExperimentDao().saveOrUpdate(studyExperiment);
+			this.daoFactory.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(studyId)).get(0);
+		studyExperiment.setGeoLocation(this.daoFactory.getGeolocationDao().getById(studyLocationId));
+		this.daoFactory.getExperimentDao().saveOrUpdate(studyExperiment);
 
 		// delete trial observations
-		this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
+		this.daoFactory.getExperimentDao().deleteTrialExperimentsOfStudy(environmentDatasetId);
 
 		this.saveOrUpdateTrialObservations( crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId, savedEnvironmentsCount, true, programUUID);
 
@@ -697,7 +713,8 @@ public class WorkbookSaver extends Saver {
 
 		Integer studyId = null;
 		if (workbook.getStudyDetails() != null) {
-			studyId = this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(workbook.getStudyDetails().getStudyName(), programUUID);
+			studyId =
+				this.daoFactory.getDmsProjectDAO().getProjectIdByNameAndProgramUUID(workbook.getStudyDetails().getStudyName(), programUUID);
 		}
 
 		if (studyId == null) {
@@ -961,7 +978,7 @@ public class WorkbookSaver extends Saver {
 
 	private Integer getMeansDataset(final Integer studyId) {
 		Integer id = null;
-		final List<DmsProject> datasets = this.getDmsProjectDao()
+		final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO()
 			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.MEANS_DATA.getId());
 		if (datasets != null && !datasets.isEmpty()) {
 			id = datasets.get(0).getProjectId();
@@ -1158,12 +1175,12 @@ public class WorkbookSaver extends Saver {
 	}
 
 	private boolean checkIfHasExistingStudyExperiment(final int studyId) {
-		final Integer experimentId = this.getExperimentDao().getExperimentIdByProjectId(studyId);
+		final Integer experimentId = this.daoFactory.getExperimentDao().getExperimentIdByProjectId(studyId);
 		return experimentId != null;
 	}
 
 	private boolean checkIfHasExistingExperiments(final List<Integer> locationIds) {
-		final List<Integer> experimentIds = this.getExperimentDao().getExperimentIdsByGeolocationIds(locationIds);
+		final List<Integer> experimentIds = this.daoFactory.getExperimentDao().getExperimentIdsByGeolocationIds(locationIds);
 		return experimentIds != null && !experimentIds.isEmpty();
 	}
 
@@ -1183,8 +1200,8 @@ public class WorkbookSaver extends Saver {
 
 		final int parentFolderId = (int) workbook.getStudyDetails().getParentFolderId();
 
-		final DmsProject study = this.getDmsProjectDao().getById(workbook.getStudyDetails().getId());
-		study.setParent(this.getDmsProjectDao().getById(parentFolderId));
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(workbook.getStudyDetails().getId());
+		study.setParent(this.daoFactory.getDmsProjectDAO().getById(parentFolderId));
 		Integer trialDatasetId = workbook.getTrialDatasetId();
 		Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {
@@ -1192,8 +1209,8 @@ public class WorkbookSaver extends Saver {
 			measurementDatasetId = this.workbookBuilder.getMeasurementDataSetId(studyId);
 			trialDatasetId = this.workbookBuilder.getTrialDataSetId(studyId);
 		}
-		final DmsProject trialDataset = this.getDmsProjectDao().getById(trialDatasetId);
-		final DmsProject measurementDataset = this.getDmsProjectDao().getById(measurementDatasetId);
+		final DmsProject trialDataset = this.daoFactory.getDmsProjectDAO().getById(trialDatasetId);
+		final DmsProject measurementDataset = this.daoFactory.getDmsProjectDAO().getById(measurementDatasetId);
 
 		this.saveProjectProperties(workbook);
 
@@ -1213,9 +1230,9 @@ public class WorkbookSaver extends Saver {
 		final Integer trialDatasetId = workbook.getTrialDatasetId();
 		final Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 
-		final DmsProject study = this.getDmsProjectDao().getById(studyId);
-		final DmsProject trialDataset = this.getDmsProjectDao().getById(trialDatasetId);
-		final DmsProject measurementDataset = this.getDmsProjectDao().getById(measurementDatasetId);
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
+		final DmsProject trialDataset = this.daoFactory.getDmsProjectDAO().getById(trialDatasetId);
+		final DmsProject measurementDataset = this.daoFactory.getDmsProjectDAO().getById(measurementDatasetId);
 
 		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConditions(), false);
 		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
@@ -1250,7 +1267,7 @@ public class WorkbookSaver extends Saver {
 	private void updateStudyDetails(final String description, final DmsProject study, final String objective) {
 		study.setDescription(description);
 		study.setObjective(objective);
-		this.getDmsProjectDao().merge(study);
+		this.daoFactory.getDmsProjectDAO().merge(study);
 	}
 
 	private int createMeansDatasetIfNecessary(

@@ -1,291 +1,181 @@
 package org.generationcp.middleware.api.germplasm;
 
-import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
-import org.generationcp.middleware.exceptions.MiddlewareRequestException;
+import com.google.common.collect.ImmutableSet;
+import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class GermplasmServiceImplTest extends IntegrationTestBase {
+public class GermplasmServiceImplTest {
 
-	public static final String DRVNM = "DRVNM";
-	public static final String NOTE = "NOTE";
-	public static final String UGM = "UGM";
-	public static final String BDU = "BDU";
-	public static final String UKN = "UKN";
-	public static final String NOLOC = "NOLOC";
+	private static final Integer GID = new Random().nextInt(Integer.MAX_VALUE);
+	private static final Integer FIELD_NUMBER = ThreadLocalRandom.current().nextInt();
 
+	@InjectMocks
+	private GermplasmServiceImpl germplasmService;
+
+	@Mock
 	private DaoFactory daoFactory;
 
-	private GermplasmService germplasmService;
+	@Mock
+	private AttributeDAO attributeDAO;
+
+	@Mock
+	private UserDefinedFieldDAO userDefinedFieldDAO;
+
+	@Captor
+	private ArgumentCaptor<List<Integer>> integerListArgumentCaptor;
+
+	@Captor
+	private ArgumentCaptor<Set<String>> stringSetArgumentCaptor;
 
 	@Before
 	public void setUp() {
+		MockitoAnnotations.initMocks(this);
 
-		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.germplasmService = new GermplasmServiceImpl(this.sessionProvder);
-
+		//Mock DaoFactory
+		ReflectionTestUtils.setField(this.germplasmService, "daoFactory", daoFactory);
+		Mockito.when(this.daoFactory.getAttributeDAO()).thenReturn(this.attributeDAO);
+		Mockito.when(this.daoFactory.getUserDefinedFieldDAO()).thenReturn(this.userDefinedFieldDAO);
 	}
 
 	@Test
-	public void testImportGermplasmUpdates_NewNamesAndAttributes() {
-		final Method method = this.daoFactory.getMethodDAO().getByCode(UGM, null);
-		final Location location = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(UKN)).get(0);
-		final int creationDate = 20200101;
+	public void testGetPlotCodeValue() {
+		final GermplasmServiceImpl unitToTest = new GermplasmServiceImpl(Mockito.mock(HibernateSessionProvider.class));
 
-		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(BDU, null);
-		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
+		// We want to mock away calls to other methods in same unit.
+		final GermplasmServiceImpl partiallyMockedUnit = Mockito.spy(unitToTest);
 
-		final UserDefinedField newNameCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
-				UDTableType.NAMES_NAME.getType(), DRVNM);
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
+		// First set up data such that no plot code attribute is associated.
+		Mockito.doReturn(null).when(partiallyMockedUnit).getPlotCodeField();
+		final List<Attribute> attributes = new ArrayList<>();
+		Mockito.doReturn(attributes).when(partiallyMockedUnit).getAttributesByGID(ArgumentMatchers.anyInt());
 
-		final Germplasm germplasm = this.createGermplasm(method, location.getLocid());
+		final String plotCode1 = partiallyMockedUnit.getPlotCodeValue(GID);
+		assertThat("getPlotCodeValue() should never return null.", plotCode1, is(notNullValue()));
+		assertThat("Expected `Unknown` returned when there is no plot code attribute present.", "Unknown", is(plotCode1));
+		// Now setup data so that gid has plot code attribute associated with it.
+		final UserDefinedField udfld = Mockito.mock(UserDefinedField.class);
+		Mockito.when(udfld.getFcode()).thenReturn(GermplasmServiceImpl.PLOT_CODE);
 
-		final GermplasmUpdateDTO germplasmUpdateDTO =
-			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), newMethod, newLocation, creationDate);
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		Mockito.when(partiallyMockedUnit.getPlotCodeField()).thenReturn(udfld);
+		final Attribute plotCodeAttr = new Attribute();
+		plotCodeAttr.setTypeId(udfld.getFldno());
+		plotCodeAttr.setAval("The PlotCode Value");
+		attributes.add(plotCodeAttr);
+		Mockito.when(partiallyMockedUnit.getAttributesByGID(GID)).thenReturn(attributes);
 
-		final Germplasm savedGermplasm =
-			this.daoFactory.getGermplasmDao()
-				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
-		final List<Name> names = this.daoFactory.getNameDao().getNamesByGids(Arrays.asList(germplasm.getGid()));
-		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Arrays.asList(germplasm.getGid()));
-
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
-		assertEquals(newLocation.getLocid(), savedGermplasm.getLocationId());
-		assertEquals(creationDate, savedGermplasm.getGdate().intValue());
-		assertNotNull(savedGermplasm.getReferenceId());
-		assertFalse(names.isEmpty());
-		assertFalse(attributes.isEmpty());
-
-		final Name savedName = names.get(0);
-		assertEquals(newNameCode.getFldno(), savedName.getTypeId());
-		assertEquals(1, savedName.getNstat().intValue());
-		assertEquals(newLocation.getLocid(), savedName.getLocationId());
-		assertEquals(creationDate, savedName.getNdate().intValue());
-		assertEquals("Name for " + germplasm.getGid(), savedName.getNval());
-
-		final Attribute savedAttribute = attributes.get(0);
-		assertEquals(newAttributeCode.getFldno(), savedAttribute.getTypeId());
-		assertEquals(newLocation.getLocid(), savedAttribute.getLocationId());
-		assertEquals(creationDate, savedAttribute.getAdate().intValue());
-		assertEquals("Note for " + germplasm.getGid(), savedAttribute.getAval());
-
+		final String plotCode2 = partiallyMockedUnit.getPlotCodeValue(GID);
+		assertThat("getPlotCodeValue() should never return null.", plotCode2, is(notNullValue()));
+		assertThat("Expected value of plot code attribute returned when plot code attribute is present.", plotCodeAttr.getAval(),
+			is(equalTo(plotCode2)));
 	}
 
 	@Test
-	public void testImportGermplasmUpdates_UpdateNamesAndAttributes() {
-		final Method method = this.daoFactory.getMethodDAO().getByCode(UGM, null);
-		final Location location = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(UKN)).get(0);
+	public void test_getPlotCodeValues_OK() {
+		final int unknownPlotCodeGid = new Random().nextInt();
+		final String plotCodeValue = UUID.randomUUID().toString();
 
-		final int creationDate = 20200101;
-		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(BDU, null);
-		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
-		final UserDefinedField newNameCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
-				UDTableType.NAMES_NAME.getType(), DRVNM);
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
+		//Mock attribute
+		final Attribute attribute = Mockito.mock(Attribute.class);
+		Mockito.when(attribute.getGermplasmId()).thenReturn(GID);
+		Mockito.when(attribute.getAval()).thenReturn(plotCodeValue);
+		final List<Attribute> attributes = Arrays.asList(attribute);
+		Mockito.when(this.attributeDAO.getAttributeValuesByTypeAndGIDList(ArgumentMatchers.eq(FIELD_NUMBER), ArgumentMatchers.anyList()))
+			.thenReturn(attributes);
 
-		final Germplasm germplasm = this.createGermplasm(method, location.getLocid());
+		//Create partial mock for the unit to be tested
+		final GermplasmServiceImpl partiallyMockedUnit = Mockito.spy(new GermplasmServiceImpl(Mockito.mock(HibernateSessionProvider.class)));
+		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", daoFactory);
 
-		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0, germplasm.getUserId(),
-			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
+		//Mock GermplasmServiceImpl#getPlotCodeField);
+		final UserDefinedField userDefinedField = Mockito.mock(UserDefinedField.class);
+		Mockito.when(userDefinedField.getFldno()).thenReturn(FIELD_NUMBER);
+		Mockito.doReturn(userDefinedField).when(partiallyMockedUnit).getPlotCodeField();
 
-		final Attribute attribute = new Attribute();
-		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), germplasm.getUserId(), "",
-				germplasm.getLocationId(),
-				0, germplasm.getGdate()));
+		final Map<Integer, String> plotCodeValues = partiallyMockedUnit.getPlotCodeValues(ImmutableSet.of(GID, unknownPlotCodeGid));
+		assertNotNull(plotCodeValues);
+		assertThat(plotCodeValues.size(), is(2));
+		assertTrue(plotCodeValues.containsKey(GID));
+		assertThat(plotCodeValues.get(GID), is(plotCodeValue));
 
-		final GermplasmUpdateDTO germplasmUpdateDTO =
-			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), newMethod, newLocation, creationDate);
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		assertTrue(plotCodeValues.containsKey(unknownPlotCodeGid));
+		assertThat(plotCodeValues.get(unknownPlotCodeGid), is(GermplasmListDataDAO.SOURCE_UNKNOWN));
 
-		final Germplasm savedGermplasm =
-			this.daoFactory.getGermplasmDao()
-				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
-		final List<Name> names = this.daoFactory.getNameDao().getNamesByGids(Arrays.asList(germplasm.getGid()));
-		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Arrays.asList(germplasm.getGid()));
-
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
-		assertEquals(newLocation.getLocid(), savedGermplasm.getLocationId());
-		assertEquals(creationDate, savedGermplasm.getGdate().intValue());
-		assertNotNull(savedGermplasm.getReferenceId());
-		assertFalse(names.isEmpty());
-		assertFalse(attributes.isEmpty());
-
-		final Name savedName = names.get(0);
-		assertEquals(newNameCode.getFldno(), savedName.getTypeId());
-		assertEquals(1, savedName.getNstat().intValue());
-		assertEquals(newLocation.getLocid(), savedName.getLocationId());
-		assertEquals(creationDate, savedName.getNdate().intValue());
-		assertEquals("Name for " + germplasm.getGid(), savedName.getNval());
-
-		final Attribute savedAttribute = attributes.get(0);
-		assertEquals(newAttributeCode.getFldno(), savedAttribute.getTypeId());
-		assertEquals(newLocation.getLocid(), savedAttribute.getLocationId());
-		assertEquals(creationDate, savedAttribute.getAdate().intValue());
-		assertEquals("Note for " + germplasm.getGid(), savedAttribute.getAval());
-
+		Mockito.verify(this.attributeDAO).getAttributeValuesByTypeAndGIDList(ArgumentMatchers.eq(FIELD_NUMBER), this.integerListArgumentCaptor
+			.capture());
+		final List<Integer> actualGIDs = this.integerListArgumentCaptor.getValue();
+		assertNotNull(actualGIDs);
+		assertThat(actualGIDs.size(), is(2));
+		assertThat(actualGIDs, hasItems(GID, unknownPlotCodeGid));
 	}
 
 	@Test
-	public void testImportGermplasmUpdates_PreferredNameHasDuplicates() {
-		final Method method = this.daoFactory.getMethodDAO().getByCode(UGM, null);
-		final Location location = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(UKN)).get(0);
+	public void test_getPlotCodeField_OK() {
+		final UserDefinedField userDefinedField = Mockito.mock(UserDefinedField.class);
+		Mockito.when(userDefinedField.getFcode()).thenReturn(GermplasmServiceImpl.PLOT_CODE);
+		this.mockUserDefinedFieldDAOGetByFieldTableNameAndType(userDefinedField);
 
-		final int creationDate = 20200101;
-		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(BDU, null);
-		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
-		final UserDefinedField newNameCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
-				UDTableType.NAMES_NAME.getType(), DRVNM);
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
+		final UserDefinedField actualPlotCodeField = this.germplasmService.getPlotCodeField();
+		assertThat(actualPlotCodeField, is(userDefinedField));
 
-		final Germplasm germplasm = this.createGermplasm(method, location.getLocid());
-
-		// Create Duplicate PreferredName assigned
-		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 1, germplasm.getUserId(),
-			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
-
-		final GermplasmUpdateDTO germplasmUpdateDTO =
-			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), newMethod, newLocation, creationDate);
-
-		try {
-			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
-		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.preferred.name.duplicate.names"));
-		}
-
+		this.verifyUserDefinedFieldDAOGetByFieldTableNameAndType();
 	}
 
 	@Test
-	public void testImportGermplasmUpdates_PreferredNameDoesntExist() {
-		final Method method = this.daoFactory.getMethodDAO().getByCode(UGM, null);
-		final Location location = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(UKN)).get(0);
+	public void test_getPlotCodeField_NoPlotCodeNotAttrAssociated_OK() {
+		this.mockUserDefinedFieldDAOGetByFieldTableNameAndType(Mockito.mock(UserDefinedField.class));
 
-		final int creationDate = 20200101;
-		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(BDU, null);
-		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
-		final UserDefinedField newNameCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
-				UDTableType.NAMES_NAME.getType(), DRVNM);
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
+		final UserDefinedField actualPlotCodeField = this.germplasmService.getPlotCodeField();
+		assertNotNull(actualPlotCodeField);
+		assertThat(actualPlotCodeField.getFldno(), is(0));
 
-		final Germplasm germplasm = this.createGermplasm(method, location.getLocid());
-		final GermplasmUpdateDTO germplasmUpdateDTO =
-			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), newMethod, newLocation, creationDate);
-		// Set invalid preferred name code.
-		germplasmUpdateDTO.setPreferredNameType("Some Non Existing Code");
-
-		try {
-			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
-		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.preferred.name.doesnt.exist"));
-		}
-
+		this.verifyUserDefinedFieldDAOGetByFieldTableNameAndType();
 	}
 
-	@Test
-	public void testImportGermplasmUpdates_DuplicateNamesAndAttributes() {
-		final Method method = this.daoFactory.getMethodDAO().getByCode(UGM, null);
-		final Location location = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(UKN)).get(0);
-
-		final int creationDate = 20200101;
-		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(BDU, null);
-		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
-		final UserDefinedField newNameCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
-				UDTableType.NAMES_NAME.getType(), DRVNM);
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
-
-		final Germplasm germplasm = this.createGermplasm(method, location.getLocid());
-
-		final GermplasmUpdateDTO germplasmUpdateDTO =
-			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), newMethod, newLocation, creationDate);
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
-
-		// Create duplicate names and attributes
-		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0, germplasm.getUserId(),
-			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
-		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0, germplasm.getUserId(),
-			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
-
-		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), germplasm.getUserId(), "",
-				germplasm.getLocationId(),
-				0, germplasm.getGdate()));
-		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), germplasm.getUserId(), "",
-				germplasm.getLocationId(),
-				0, germplasm.getGdate()));
-
-		try {
-			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
-		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.duplicate.names"));
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.duplicate.attributes"));
-		}
-
+	private void mockUserDefinedFieldDAOGetByFieldTableNameAndType(UserDefinedField userDefinedField) {
+		Mockito.when(this.userDefinedFieldDAO.getByFieldTableNameAndType(ArgumentMatchers.eq(UDTableType.ATRIBUTS_PASSPORT.getTable()),
+			ArgumentMatchers.anySet())).thenReturn(Arrays.asList(userDefinedField));
 	}
 
-	private Germplasm createGermplasm(final Method method, final int locationId) {
-		final Germplasm germplasm = new Germplasm(null, method.getMid(), 0, 0, 0,
-			0, 0, 0, 0, 0,
-			0, 0, null, null, method);
-		this.daoFactory.getGermplasmDao().save(germplasm);
-		return germplasm;
-	}
-
-	private Germplasm createGermplasmWithNamesAndAttributes(final Method method, final int locationId,
-		final UserDefinedField nameUserDefinedField, final UserDefinedField attributeUserDefinedField) {
-		final Germplasm germplasm = this.createGermplasm(method, locationId);
-		return germplasm;
-	}
-
-	private GermplasmUpdateDTO createGermplasmUpdateDto(final Integer gid, final String uuid, final Method method,
-		final Location location, final Integer creationDate) {
-		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
-		germplasmUpdateDTO.setGid(gid);
-		germplasmUpdateDTO.setGermplasmUUID(uuid);
-		germplasmUpdateDTO.setLocationAbbreviation(location.getLabbr());
-		germplasmUpdateDTO.setBreedingMethodAbbr(method.getMcode());
-		germplasmUpdateDTO.setPreferredNameType(DRVNM);
-		germplasmUpdateDTO.setCreationDate(String.valueOf(creationDate));
-		germplasmUpdateDTO.setReference("Reference gid " + gid);
-		germplasmUpdateDTO.getAttributes().put(NOTE, "Note for " + gid);
-		germplasmUpdateDTO.getNames().put(DRVNM, "Name for " + gid);
-		return germplasmUpdateDTO;
+	private void verifyUserDefinedFieldDAOGetByFieldTableNameAndType() {
+		Mockito.verify(this.userDefinedFieldDAO).getByFieldTableNameAndType(ArgumentMatchers.eq(UDTableType.ATRIBUTS_PASSPORT.getTable()),
+			this.stringSetArgumentCaptor.capture());
+		final Set<String> actualFieldTypes = this.stringSetArgumentCaptor.getValue();
+		assertThat(actualFieldTypes.size(), is(1));
+		assertThat(actualFieldTypes, hasItem(UDTableType.ATRIBUTS_PASSPORT.getType()));
 	}
 
 }

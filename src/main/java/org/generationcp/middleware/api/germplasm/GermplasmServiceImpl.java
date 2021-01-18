@@ -49,10 +49,11 @@ import java.util.stream.Collectors;
 @Transactional
 public class GermplasmServiceImpl implements GermplasmService {
 
-	private final DaoFactory daoFactory;
+	public static final String PLOT_CODE = "PLOTCODE";
 
 	private static final String DEFAULT_BIBREF_FIELD = "-";
-	private static final String PLOT_CODE = "PLOTCODE";
+
+	private final DaoFactory daoFactory;
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -83,6 +84,22 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 
 		return GermplasmListDataDAO.SOURCE_UNKNOWN;
+	}
+
+	@Override
+	public Map<Integer, String> getPlotCodeValues(final Set<Integer> gids) {
+		final UserDefinedField plotCodeAttribute = this.getPlotCodeField();
+		final Map<Integer, String> plotCodeValuesByGids =
+			this.daoFactory.getAttributeDAO().getAttributeValuesByTypeAndGIDList(plotCodeAttribute.getFldno(), new ArrayList<>(gids))
+				.stream()
+				.collect(Collectors.toMap(Attribute::getGermplasmId, Attribute::getAval));
+
+		final Map<Integer, String> plotCodesIndexedByGIDs = new HashMap<>();
+		gids.forEach(gid -> {
+			final String plotCodeValue = plotCodeValuesByGids.get(gid);
+			plotCodesIndexedByGIDs.put(gid, Objects.isNull(plotCodeValue) ? GermplasmListDataDAO.SOURCE_UNKNOWN : plotCodeValue);
+		});
+		return plotCodesIndexedByGIDs;
 	}
 
 	@Override

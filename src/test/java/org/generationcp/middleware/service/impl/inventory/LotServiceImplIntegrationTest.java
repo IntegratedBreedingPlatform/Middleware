@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -115,8 +116,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	public void lotWithNoOpenBalanceClosed_Ok() {
 		final Transaction confirmedWithdrawal =
 			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
-				-20D, "Transaction 3", 0, null, null, null,
-				Double.valueOf(0), this.userId, TransactionType.WITHDRAWAL.getId());
+				-20D, "Transaction 3", 0, null, null, null, this.userId, TransactionType.WITHDRAWAL.getId());
 		this.daoFactory.getTransactionDAO().save(confirmedWithdrawal);
 
 		final TransactionsSearchDto discardedTransactionSearch = new TransactionsSearchDto();
@@ -183,6 +183,8 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void lotMultiUpdateNotesUnit_Ok() {
+		final String newLotUID = UUID.randomUUID().toString();
+
 		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
 		final LotMultiUpdateRequestDto multiInput = new LotMultiUpdateRequestDto();
 		final List<LotMultiUpdateRequestDto.LotUpdateDto> lotList = new ArrayList<>();
@@ -190,6 +192,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		lot.setLotUID(this.lot.getLotUuId());
 		lot.setUnitName("SEED_AMOUNT_kg");
 		lot.setNotes("Test3");
+		lot.setNewLotUID(newLotUID);
 		lotList.add(lot);
 		multiInput.setLotList(lotList);
 		lotUpdateRequestDto.setMultiInput(multiInput);
@@ -204,6 +207,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		this.lotService.updateLots(null, extendedLotDtos, lotUpdateRequestDto);
 		assertThat(this.lot.getComments(), hasToString("Test3"));
 		assertThat(this.lot.getScaleId(), equalTo(8267));
+		assertThat(this.lot.getLotUuId(), equalTo(newLotUID));
 	}
 
 	@Test
@@ -293,13 +297,11 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Transaction confirmedDeposit =
 			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
-				20D, "Transaction 1", Util.getCurrentDateAsIntegerValue(), null, null, null,
-				Double.valueOf(0), this.userId, TransactionType.DEPOSIT.getId());
+				20D, "Transaction 1", Util.getCurrentDateAsIntegerValue(), null, null, null, this.userId, TransactionType.DEPOSIT.getId());
 
 		final Transaction pendingDeposit =
 			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
-				20D, "Transaction 2", 0, null, null, null,
-				Double.valueOf(0), this.userId, TransactionType.DEPOSIT.getId());
+				20D, "Transaction 2", 0, null, null, null, this.userId, TransactionType.DEPOSIT.getId());
 
 		this.daoFactory.getTransactionDAO().save(confirmedDeposit);
 		this.daoFactory.getTransactionDAO().save(pendingDeposit);

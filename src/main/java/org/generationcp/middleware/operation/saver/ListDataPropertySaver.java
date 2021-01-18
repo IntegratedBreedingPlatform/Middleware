@@ -1,8 +1,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.gms.ListDataColumn;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -10,8 +8,9 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProperty;
-import org.generationcp.middleware.util.DatabaseBroker;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Transactional
 public class ListDataPropertySaver extends Saver {
@@ -39,7 +38,7 @@ public class ListDataPropertySaver extends Saver {
 					if (listData != null) {
 						for (ListDataColumn column : listDataObj.getColumns()) {
 							ListDataProperty property =
-									this.getListDataPropertyDAO().getByListDataIDAndColumnName(listDataId, column.getColumnName());
+								this.daoFactory.getListDataPropertyDAO().getByListDataIDAndColumnName(listDataId, column.getColumnName());
 							// create if combination of listdata ID and column name doesn't exist yet
 							if (property == null) {
 								property = new ListDataProperty(listData, column.getColumnName());
@@ -50,7 +49,7 @@ public class ListDataPropertySaver extends Saver {
 							}
 							property.setValue(value);
 
-							property = this.getListDataPropertyDAO().saveOrUpdate(property);
+							property = this.daoFactory.getListDataPropertyDAO().saveOrUpdate(property);
 							// save ID of the inserted or updated listdataprop record
 							column.setListDataColumnId(property.getListDataPropertyId());
 							column.setValue(property.getValue());
@@ -71,28 +70,6 @@ public class ListDataPropertySaver extends Saver {
 
 		}
 		return listDataCollection;
-	}
-
-	public List<ListDataProperty> saveListDataProperties(List<ListDataProperty> listDataProps) throws MiddlewareQueryException {
-
-		try {
-			for (ListDataProperty listDataProperty : listDataProps) {
-
-				if (listDataProperty.getListData() != null) {
-					this.getListDataPropertyDAO().saveOrUpdate(listDataProperty);
-
-				} else {
-					throw new MiddlewareQueryException("List Data ID cannot be null.");
-				}
-			}
-
-		} catch (MiddlewareQueryException e) {
-
-			throw new MiddlewareQueryException("Error in saving List Data properties - " + e.getMessage(), e);
-
-		}
-
-		return listDataProps;
 	}
 
 }

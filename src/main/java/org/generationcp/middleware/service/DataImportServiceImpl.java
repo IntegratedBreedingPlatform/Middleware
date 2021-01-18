@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -29,11 +30,11 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
@@ -92,10 +93,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	private TermDataManager termDataManager;
 
 	@Resource
-	private StudyDataManager studyDataManager;
-
-	@Resource
 	private WorkbookSaver workbookSaver;
+
+	private DaoFactory daoFactory;
 
 	public DataImportServiceImpl() {
 
@@ -103,6 +103,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	public DataImportServiceImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	/**
@@ -427,6 +428,23 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			workbook.getConditions().add(exptDesignVar);
 		}
 
+	}
+
+	@Override
+	public void addEntryTypeVariableIfNotExists(final Workbook workbook,
+		final String programUUID) {
+
+		final boolean entryTypeIdExists = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getFactors()).isPresent();
+
+		// If ENTRY_TYPE variable is not existing in both Condition and Factors Section of workbook
+		// Automatically add ENTRY_TYPE variable as it is required in creating a new Study.
+		if (!entryTypeIdExists) {
+			final MeasurementVariable entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.GERMPLASM, programUUID);
+			workbook.getFactors().add(entryType);
+			// Add ENTRY_TYPE variable in Measurement Row with default value Test Entry
+			final MeasurementData data = new MeasurementData(entryType.getLabel(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false, entryType.getDataType(), entryType);
+			workbook.getObservations().forEach(row -> row.getDataList().add(data));
+		}
 	}
 
 	String getExperimentalDesignIdValue(final String experimentalDesign) throws WorkbookParserException{
@@ -1002,14 +1020,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Override
 	public boolean checkIfProjectNameIsExistingInProgram(final String name, final String programUUID) {
-		return this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(name, programUUID);
+		return this.daoFactory.getDmsProjectDAO().checkIfProjectNameIsExistingInProgram(name, programUUID);
 	}
 
 	@Override
 	public Integer getLocationIdByProjectNameAndDescriptionAndProgramUUID(
 		final String projectName, final String locationDescription,
 		final String programUUID) {
-		return this.getGeolocationDao()
+		return this.daoFactory.getGeolocationDao()
 			.getLocationIdByProjectNameAndDescriptionAndProgramUUID(projectName, locationDescription, programUUID);
 	}
 
@@ -1174,7 +1192,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		if (!existingInstances.isEmpty() && workbook.getStudyDetails().getId() != null) {
 			final List<String> instancesWithExperiments = new ArrayList<>();
 			final boolean isMeansDataImport = workbook.getImportType() != null && workbook.getImportType() == DatasetTypeEnum.MEANS_DATA.getId();
-			final Map<String, Long> instanceExperimentsMap = this.getExperimentDao()
+			final Map<String, Long> instanceExperimentsMap = this.daoFactory.getExperimentDao()
 				.countObservationsPerInstance(isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId());
 			for (final String existingInstance : existingInstances) {
 				if (instanceExperimentsMap.containsKey(existingInstance) && instanceExperimentsMap.get(existingInstance) > 0) {

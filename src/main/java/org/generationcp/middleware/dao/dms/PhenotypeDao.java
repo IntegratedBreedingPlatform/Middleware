@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.h2h.ObservationKey;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -117,6 +118,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		+ " WHERE"
 		+ "    pheno.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC
 		+ "'        AND n.project_id = :projectId";
+
+	public static final String SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED =
+		"SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value) \n" + " FROM \n" + " project p \n"
+			+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
+			+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+			+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
+			+ "        LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
+			+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
+			+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
+			+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
+
 
 	public List<NumericTraitInfo> getNumericTraitInfoList(final List<Integer> environmentIds, final List<Integer> numericVariableIds) {
 		final List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>();
@@ -1357,14 +1369,18 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		try{
 			final SQLQuery query =
-				this.getSession().createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, "
-					+ "		cvt_scale.name AS scaleName, pheno.value AS value, cvt_scale.cvterm_id AS scaleId, "
-					+ "		envcvt.cvterm_id AS variableId from phenotype pheno "
+				this.getSession().createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, cvt_scale.name AS scaleName, "
+					+ "		(CASE WHEN cvt_rel_catVar.subject_id IS NULL THEN pheno.value ELSE categoricalVar.name END) AS value, "
+					+ "		cvt_scale.cvterm_id AS scaleId, envcvt.cvterm_id AS variableId "
+					+ "		from phenotype pheno "
 					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.cvterm_id IN (:variableIds) "
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
 					+ "     INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id\n"
-					+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id = :geolocationId ;");
+					+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id = :geolocationId "
+					+ "     LEFT JOIN cvterm_relationship cvt_rel_catVar on cvt_scale.cvterm_id = cvt_rel_catVar.subject_id and cvt_rel_catVar.type_id = " + TermId.HAS_TYPE.getId()
+					+ "			AND cvt_rel_catVar.object_id= " + TermId.CATEGORICAL_VARIABLE.getId()
+					+ "		LEFT JOIN cvterm categoricalVar ON categoricalVar.cvterm_id = pheno.value");
 			query.addScalar("name", new StringType());
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());
@@ -1393,6 +1409,22 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return studyVariables;
+	}
+
+	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {
+		final List queryResults;
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(PhenotypeDao.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED);
+			query.setParameter("studyId", studyId);
+			query.setParameterList("cvtermIds", ids);
+			queryResults = query.list();
+
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				"Unexpected error in executing hasMeasurementDataEntered(studyId = " + studyId + ") query: " + he.getMessage(), he);
+		}
+
+		return !queryResults.isEmpty();
 	}
 
 }

@@ -11,11 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -24,29 +19,25 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.hibernate.SQLQuery;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ExperimentPropertySaver extends Saver {
 
 	private StringBuilder batchExperimentPropInsertSql = new StringBuilder();
 
+	private DaoFactory daoFactory;
+
 	public ExperimentPropertySaver(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
-	}
-
-	public void saveOrUpdateProperty(ExperimentModel experiment, TermId propertyType, String value) throws MiddlewareQueryException {
-		ExperimentProperty experimentProperty = this.getExperimentProperty(experiment, propertyType.getId());
-		if (experimentProperty == null) {
-			this.getProjectPropertySaver().createProjectPropertyIfNecessary(experiment.getProject(), propertyType, PhenotypicType.TRIAL_DESIGN);
-			experimentProperty = new ExperimentProperty();
-			experimentProperty.setTypeId(propertyType.getId());
-			experimentProperty.setRank(0);
-			experimentProperty.setExperiment(experiment);
-		}
-		experimentProperty.setValue(value);
-		this.getExperimentPropertyDao().saveOrUpdate(experimentProperty);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	/**
@@ -78,7 +69,7 @@ public class ExperimentPropertySaver extends Saver {
 		}
 		else{
 			experimentProperty.setValue(value);
-			this.getExperimentPropertyDao().saveOrUpdate(experimentProperty);
+			this.daoFactory.getExperimentPropertyDao().saveOrUpdate(experimentProperty);
 		}
 
 	}
@@ -121,7 +112,7 @@ public class ExperimentPropertySaver extends Saver {
 			experimentProperty.setExperiment(experiment);
 		}
 		experimentProperty.setValue(value);
-		this.getExperimentPropertyDao().saveOrUpdate(experimentProperty);
+		this.daoFactory.getExperimentPropertyDao().saveOrUpdate(experimentProperty);
 	}
 
 	private ExperimentProperty getExperimentProperty(ExperimentModel experiment, int typeId) {
@@ -213,7 +204,7 @@ public class ExperimentPropertySaver extends Saver {
 	 */
 	private Map<Integer, ExperimentModel> createExperimentIdWiseMap(final List<Integer> experimentIds){
 		Map<Integer, ExperimentModel> experimentMap = new HashMap<>();
-		List<ExperimentModel> experiments = this.getExperimentDao().filterByColumnValues("ndExperimentId", experimentIds);
+		List<ExperimentModel> experiments = this.daoFactory.getExperimentDao().filterByColumnValues("ndExperimentId", experimentIds);
 		if(experiments != null){
 			for(ExperimentModel experimentModel : experiments){
 				experimentMap.put(experimentModel.getNdExperimentId(), experimentModel);
@@ -229,7 +220,8 @@ public class ExperimentPropertySaver extends Saver {
 	 * @return Map<Integer, List<ExperimentProperty>> experimentId wise experiment properties
 	 */
 	private Map<Integer, List<ExperimentProperty>> createExperimentIdWisePropertiesMap(final List<Integer> experimentIds){
-		List<ExperimentProperty> experimentProperties = this.getExperimentPropertyDao().filterByColumnValues("experiment.ndExperimentId", experimentIds);
+		List<ExperimentProperty> experimentProperties =
+			this.daoFactory.getExperimentPropertyDao().filterByColumnValues("experiment.ndExperimentId", experimentIds);
 		Map<Integer, List<ExperimentProperty>> experimentPropertyMap = new HashMap<>();
 
 		if(experimentProperties != null){
