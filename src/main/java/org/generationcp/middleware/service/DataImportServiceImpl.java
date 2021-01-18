@@ -1253,7 +1253,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				rowWithoutTermid.add(row);
 			}
 		}
-		if (Util.isEmpty(rowList)) {
+		if (Util.isEmpty(rowWithoutTermid)) {
 			return Optional.absent();
 		} else {
 			return Optional.of(rowWithoutTermid);
