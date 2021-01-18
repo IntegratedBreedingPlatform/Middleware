@@ -11,9 +11,7 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.collect.ImmutableSet;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
-import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -28,9 +26,7 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.service.api.location.LocationFilters;
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -140,23 +136,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Location> getLocationsByType(final Integer type) {
 		return this.daoFactory.getLocationDAO().getByType(type);
-	}
-
-	@Override
-	public List<Location> getFilteredLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
-		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID()) && locationSearchRequest.getFavourites()) {
-			locationSearchRequest.getLocationIds().addAll(this.getFavoriteProjectLocationIds(locationSearchRequest.getProgramUUID()));
-		}
-		return this.daoFactory.getLocationDAO()
-			.filterLocations(locationSearchRequest, pageable);
-	}
-
-	@Override
-	public long countFilteredLocations(final LocationSearchRequest locationSearchRequest) {
-		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID()) && locationSearchRequest.getFavourites()) {
-			locationSearchRequest.getLocationIds().addAll(this.getFavoriteProjectLocationIds(locationSearchRequest.getProgramUUID()));
-		}
-		return this.daoFactory.getLocationDAO().countFilterLocations(locationSearchRequest);
 	}
 
 	@Override
@@ -533,21 +512,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
 		}
 		return unspecifiedLocationId;
-	}
-
-	@Override
-	public List<Integer> getFavoriteProjectLocationIds(final String programUUID) {
-		final List<ProgramFavorite> programFavorites =
-			this.daoFactory.getProgramFavoriteDao()
-				.getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
-		final List<Integer> favoriteLocationIds = new ArrayList<>();
-		if (programFavorites != null && !programFavorites.isEmpty()) {
-			for (final ProgramFavorite programFavorite : programFavorites) {
-				favoriteLocationIds.add(programFavorite.getEntityId());
-
-			}
-		}
-		return favoriteLocationIds;
 	}
 
 	@Override

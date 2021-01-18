@@ -213,23 +213,6 @@ public interface LocationDataManager {
 	List<Location> getLocationsByType(Integer type);
 
 	/**
-	 * Returns the Location records filtered by LocationSearchRequest parameter.
-	 *
-	 * @param locationSearchRequest - filter parameters
-	 * @param pageable              - pagination parameters
-	 * @return
-	 */
-	List<Location> getFilteredLocations(LocationSearchRequest locationSearchRequest, Pageable pageable);
-
-	/**
-	 * Returns the count of Location records filtered by LocationSearchRequest parameter.
-	 *
-	 * @param locationSearchRequest - filter parameters
-	 * @return
-	 */
-	long countFilteredLocations(LocationSearchRequest locationSearchRequest);
-
-	/**
 	 * Returns the Location records with type matching the given parameter. The
 	 * data is retrieved from both local and central databases.
 	 *
@@ -505,14 +488,6 @@ public interface LocationDataManager {
 	 * @return
 	 */
 	long countByLocationAbbreviation(final String locationAbbreviation);
-
-	/**
-	 * Gets the favorite project location ids.
-	 *
-	 * @param programUUID - unique id of program
-	 * @return the favorite project location ids
-	 */
-	List<Integer> getFavoriteProjectLocationIds(String programUUID);
 
 	Location getDefaultLocationByType(LocationType locationType);
 
