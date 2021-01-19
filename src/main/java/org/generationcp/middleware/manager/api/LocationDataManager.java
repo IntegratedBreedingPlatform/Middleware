@@ -10,6 +10,8 @@
 
 package org.generationcp.middleware.manager.api;
 
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
@@ -19,12 +21,11 @@ import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This is the API for managing Location information.
@@ -210,21 +211,6 @@ public interface LocationDataManager {
 	 * @return List of Location POJOs
 	 */
 	List<Location> getLocationsByType(Integer type);
-
-	/**
-	 * Returns the Location records with type matching the given parameter. The
-	 * data is retrieved from both local and central databases.
-	 *
-	 * @param programUUID - programUUID
-	 * @param types - search set for the types of locations
-	 * @param locationIds - List of favorite LocIds of the current program
-	 * @param locationAbbreviations - List of location abbreviations
-	 * @param favourites - Get favourites locations if true
-	 *
-	 * @return List of Location POJOs
-	 */
-	List<Location> getFilteredLocations(String programUUID, Set<Integer> types, List<Integer> locationIds,
-		List<String> locationAbbreviations, boolean favourites);
 
 	/**
 	 * Returns the Location records with type matching the given parameter. The
@@ -497,20 +483,12 @@ public interface LocationDataManager {
 
 	/**
 	 * Returns the number of locations where the location abbreviation value equals to the locationAbbreviation parameter
+	 *
 	 * @param locationAbbreviation
 	 * @return
 	 */
 	long countByLocationAbbreviation(final String locationAbbreviation);
 
-
-	/**
-	 * Gets the favorite project location ids.
-	 *
-	 * @param programUUID
-	 *            - unique id of program
-	 * @return the favorite project location ids
-	 */
-	List<Integer> getFavoriteProjectLocationIds(String programUUID);
-
 	Location getDefaultLocationByType(LocationType locationType);
+
 }
