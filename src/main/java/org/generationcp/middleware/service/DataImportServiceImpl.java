@@ -61,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 public class DataImportServiceImpl extends Service implements DataImportService {
@@ -434,16 +435,15 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public void addEntryTypeVariableIfNotExists(final Workbook workbook,
 		final String programUUID) {
 
-		final boolean entryTypeIdExists = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getFactors()).isPresent();
+		final Optional<MeasurementVariable> entryTypeFactor = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getFactors());
+		final Optional<List<MeasurementRow>> rowsWithoutTermId = this.findMeasurementRowWithoutTermId(TermId.ENTRY_TYPE.getId(), workbook.getObservations());
 
-		// If ENTRY_TYPE variable is not existing in both Condition and Factors Section of workbook
-		// Automatically add ENTRY_TYPE variable as it is required in creating a new Study.
-		if (!entryTypeIdExists) {
+		// ENTRY_TYPE Not existing in Factors and in Observation
+		if (!entryTypeFactor.isPresent() && rowsWithoutTermId.isPresent()) {
 			final MeasurementVariable entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.GERMPLASM, programUUID);
 			workbook.getFactors().add(entryType);
-			// Add ENTRY_TYPE variable in Measurement Row with default value Test Entry
 			final MeasurementData data = new MeasurementData(entryType.getLabel(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false, entryType.getDataType(), entryType);
-			workbook.getObservations().forEach(row -> row.getDataList().add(data));
+			workbook.getObservations().forEach(row->row.getDataList().add(data));
 		}
 	}
 
@@ -1224,6 +1224,26 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				final Integer measurementVariableId = this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod());
 				measurementVariable.setTermId(measurementVariableId);
 			}
+		}
+	}
+
+	/**
+	 * @param termId
+	 * @param rowList
+	 * @return Optional List MeasurementRow without termId
+	 */
+	private Optional<List<MeasurementRow>> findMeasurementRowWithoutTermId(final Integer termId, final List<MeasurementRow> rowList) {
+		final List<MeasurementRow> rowWithoutTermid = new ArrayList<>();
+		for (final MeasurementRow row: rowList) {
+			final boolean hasTermId = row.getDataList().stream().filter(measurementData -> measurementData.getMeasurementVariable().getTermId() == termId).collect(Collectors.toList()).size() > 0;
+			if (!hasTermId) {
+				rowWithoutTermid.add(row);
+			}
+		}
+		if (Util.isEmpty(rowWithoutTermid)) {
+			return Optional.absent();
+		} else {
+			return Optional.of(rowWithoutTermid);
 		}
 	}
 }
