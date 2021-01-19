@@ -551,6 +551,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		// Instance 3 has no plot experiments
 		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance3, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		this.sessionProvder.getSession().flush();
 		return study;
 	}
 

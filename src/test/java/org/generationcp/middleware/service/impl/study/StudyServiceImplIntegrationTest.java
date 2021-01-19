@@ -151,6 +151,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
+		this.sessionProvder.getSession().flush();
 		final StudySearchFilter studySearchFilter = new StudySearchFilter().withStudyDbId(geolocation.getLocationId().toString())
 			.withProgramDbId(this.study.getProgramUUID());
 		final Pageable pageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "trialName"));

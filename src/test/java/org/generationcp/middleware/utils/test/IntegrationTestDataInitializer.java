@@ -2,7 +2,6 @@ package org.generationcp.middleware.utils.test;
 
 import liquibase.util.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.bouncycastle.asn1.esf.CrlValidatedID;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.SampleDao;
@@ -212,7 +211,6 @@ public class IntegrationTestDataInitializer {
 			experimentProperty.setValue(value);
 			experimentProperty.setRank(1);
 			this.experimentPropertyDao.saveOrUpdate(experimentProperty);
-			this.experimentDao.refresh(experimentModel);
 		}
 
 		return experimentModel;
@@ -335,7 +333,6 @@ public class IntegrationTestDataInitializer {
 		experimentProperty.setValue(value);
 		experimentProperty.setRank(rank);
 		this.experimentPropertyDao.save(experimentProperty);
-		this.experimentPropertyDao.refresh(experimentProperty);
 
 	}
 

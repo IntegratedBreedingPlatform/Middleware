@@ -193,8 +193,8 @@
 
 
     <bean id="cropSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
-        <property name="sessionFactory" ref="IBDBV2_MAIZE_MERGED_SessionFactory"/>
-        <aop:scoped-proxy proxy-target-class="false"/>
+		<constructor-arg name="sessionFactory" ref="IBDBV2_MAIZE_MERGED_SessionFactory"/>
+		<aop:scoped-proxy proxy-target-class="false"/>
     </bean>
 
 	<bean id="workbenchTestDataUtil" class="org.generationcp.middleware.WorkbenchTestDataUtil">

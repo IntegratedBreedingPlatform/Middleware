@@ -114,6 +114,15 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME,
 			GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME));
 
+	private static final List<String> GERMPLASM_SEARCH_FIXED_SCALARS = Collections.unmodifiableList(Arrays.asList(NAMES,
+		GROUP_ID, AVAIL_LOTS,
+		AVAIL_BALANCE,
+		LOT_UNITS,
+		METHOD_NAME,
+		LOCATION_NAME,
+		LOCATION_ID,
+		METHOD_ID));
+
 	static {
 
 		GermplasmSearchDAO.selectClauseColumnsMap.put(GermplasmSearchDAO.METHOD_ABBREVIATION,
@@ -210,7 +219,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			final List<String> filteredProperty = germplasmSearchParameter.getAddedColumnsPropertyIds().stream()
 				.filter(s -> !this.GERMPLASM_TREE_NODE_PROPERTY_IDS.contains(s)).collect(Collectors.toList());
 			for (final String propertyId : filteredProperty) {
-				query.addScalar(propertyId);
+				if (!GERMPLASM_SEARCH_FIXED_SCALARS.contains(propertyId)) {
+					query.addScalar(propertyId);
+				}
 			}
 
 			query.setFirstResult(startingRow);
@@ -750,7 +761,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			final List<String> filteredProperties = addedColumnsPropertyIds.stream()
 				.filter(s -> !this.GERMPLASM_TREE_NODE_PROPERTY_IDS.contains(s)).collect(Collectors.toList());
 			for (final String propertyId : filteredProperties) {
-				query.addScalar(propertyId);
+				if (!GERMPLASM_SEARCH_FIXED_SCALARS.contains(propertyId)) {
+					query.addScalar(propertyId);
+				}
 			}
 
 			/*
