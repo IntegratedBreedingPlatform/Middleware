@@ -72,7 +72,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setProgramUUID(programUUID);
-		locationSearchRequest.setFavourites(true);
+		locationSearchRequest.setFavoritesOnly(true);
 
 		final List<Location> locations = this.locationService
 			.getFilteredLocations(locationSearchRequest, new PageRequest(0, 10));

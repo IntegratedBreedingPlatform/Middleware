@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -44,14 +45,14 @@ public class LocationServiceImpl implements LocationService {
 
 	@Override
 	public List<Location> getFilteredLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
-		this.retrieveFavouritesLocationsIfApplicable(locationSearchRequest);
+		this.retrieveFavoriteLocationsIfApplicable(locationSearchRequest);
 		return this.daoFactory.getLocationDAO()
 			.filterLocations(locationSearchRequest, pageable);
 	}
 
 	@Override
 	public long countFilteredLocations(final LocationSearchRequest locationSearchRequest) {
-		this.retrieveFavouritesLocationsIfApplicable(locationSearchRequest);
+		this.retrieveFavoriteLocationsIfApplicable(locationSearchRequest);
 		return this.daoFactory.getLocationDAO().countFilterLocations(locationSearchRequest);
 	}
 
@@ -60,18 +61,11 @@ public class LocationServiceImpl implements LocationService {
 		final List<ProgramFavorite> programFavorites =
 			this.daoFactory.getProgramFavoriteDao()
 				.getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
-		final List<Integer> favoriteLocationIds = new ArrayList<>();
-		if (programFavorites != null && !programFavorites.isEmpty()) {
-			for (final ProgramFavorite programFavorite : programFavorites) {
-				favoriteLocationIds.add(programFavorite.getEntityId());
-
-			}
-		}
-		return favoriteLocationIds;
+		return programFavorites.stream().map(ProgramFavorite::getEntityId).collect(Collectors.toList());
 	}
 
-	private void retrieveFavouritesLocationsIfApplicable(final LocationSearchRequest locationSearchRequest) {
-		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID()) && locationSearchRequest.getFavourites()) {
+	private void retrieveFavoriteLocationsIfApplicable(final LocationSearchRequest locationSearchRequest) {
+		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID()) && locationSearchRequest.getFavoritesOnly()) {
 			locationSearchRequest.getLocationIds().addAll(this.getFavoriteProjectLocationIds(locationSearchRequest.getProgramUUID()));
 		}
 	}

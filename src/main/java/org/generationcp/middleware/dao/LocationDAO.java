@@ -351,15 +351,15 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			criteria.add(Restrictions.isNull(PROGRAM_UUID));
 		}
 
-		if (locationSearchRequest.getLocationTypes() != null && !CollectionUtils.isEmpty(locationSearchRequest.getLocationTypes())) {
+		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationTypes())) {
 			criteria.add(Restrictions.in(LocationDAO.LTYPE, locationSearchRequest.getLocationTypes()));
 		}
 
-		if (locationSearchRequest.getLocationIds() != null && !CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
+		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
 			criteria.add(Restrictions.in(LocationDAO.LOCID, locationSearchRequest.getLocationIds()));
 		}
 
-		if (locationSearchRequest.getLocationAbbreviations() != null && !CollectionUtils
+		if (!CollectionUtils
 			.isEmpty(locationSearchRequest.getLocationAbbreviations())) {
 			criteria.add(Restrictions.in(LocationDAO.LABBREVIATION, locationSearchRequest.getLocationAbbreviations()));
 		}

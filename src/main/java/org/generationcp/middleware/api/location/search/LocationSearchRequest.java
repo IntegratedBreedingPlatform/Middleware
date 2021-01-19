@@ -16,28 +16,28 @@ public class LocationSearchRequest {
 	private List<Integer> locationIds = new ArrayList<>();
 	private List<String> locationAbbreviations = new ArrayList<>();
 	private String locationName;
-	private boolean favourites;
+	private boolean favoritesOnly;
 
 	public LocationSearchRequest() {
 
 	}
 
 	public LocationSearchRequest(final String programUUID, final Set<Integer> locationTypes, final List<Integer> locationIds,
-		final List<String> locationAbbreviations, final String locationName, final Boolean favourites) {
+		final List<String> locationAbbreviations, final String locationName, final Boolean favoritesOnly) {
 		this.programUUID = programUUID;
 		this.locationTypes = locationTypes;
 		this.locationIds = locationIds;
 		this.locationAbbreviations = locationAbbreviations;
 		this.locationName = locationName;
-		this.favourites = favourites;
+		this.favoritesOnly = favoritesOnly;
 	}
 
-	public boolean getFavourites() {
-		return this.favourites;
+	public boolean getFavoritesOnly() {
+		return this.favoritesOnly;
 	}
 
-	public void setFavourites(final boolean favourites) {
-		this.favourites = favourites;
+	public void setFavoritesOnly(final boolean favoritesOnly) {
+		this.favoritesOnly = favoritesOnly;
 	}
 
 	public String getProgramUUID() {
