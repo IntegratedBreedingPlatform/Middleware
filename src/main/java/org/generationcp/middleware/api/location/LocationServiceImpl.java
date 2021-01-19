@@ -3,7 +3,6 @@ package org.generationcp.middleware.api.location;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Location;
@@ -45,18 +44,14 @@ public class LocationServiceImpl implements LocationService {
 
 	@Override
 	public List<Location> getFilteredLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
-		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID()) && locationSearchRequest.getFavourites()) {
-			locationSearchRequest.getLocationIds().addAll(this.getFavoriteProjectLocationIds(locationSearchRequest.getProgramUUID()));
-		}
+		this.retrieveFavouritesLocationsIfApplicable(locationSearchRequest);
 		return this.daoFactory.getLocationDAO()
 			.filterLocations(locationSearchRequest, pageable);
 	}
 
 	@Override
 	public long countFilteredLocations(final LocationSearchRequest locationSearchRequest) {
-		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID()) && locationSearchRequest.getFavourites()) {
-			locationSearchRequest.getLocationIds().addAll(this.getFavoriteProjectLocationIds(locationSearchRequest.getProgramUUID()));
-		}
+		this.retrieveFavouritesLocationsIfApplicable(locationSearchRequest);
 		return this.daoFactory.getLocationDAO().countFilterLocations(locationSearchRequest);
 	}
 
@@ -73,5 +68,11 @@ public class LocationServiceImpl implements LocationService {
 			}
 		}
 		return favoriteLocationIds;
+	}
+
+	private void retrieveFavouritesLocationsIfApplicable(final LocationSearchRequest locationSearchRequest) {
+		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID()) && locationSearchRequest.getFavourites()) {
+			locationSearchRequest.getLocationIds().addAll(this.getFavoriteProjectLocationIds(locationSearchRequest.getProgramUUID()));
+		}
 	}
 }
