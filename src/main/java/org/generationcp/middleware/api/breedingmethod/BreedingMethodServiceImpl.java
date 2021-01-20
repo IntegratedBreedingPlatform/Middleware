@@ -49,13 +49,15 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	}
 
 	@Override
-	public List<BreedingMethodDTO> getBreedingMethods(final String programUUID, final Set<String> abbreviations, final boolean favorites) {
+	public List<BreedingMethodDTO> getBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest) {
 		final List<Integer> breedingMethodIds = new ArrayList<>();
-		if (!StringUtils.isEmpty(programUUID) && favorites) {
+		final String programUUID = methodSearchRequest.getProgramUUID();
+		final boolean favoritesOnly = methodSearchRequest.isFavoritesOnly();
+		if (!StringUtils.isEmpty(programUUID) && favoritesOnly) {
 			breedingMethodIds.addAll(this.getFavoriteProjectMethodsIds(programUUID));
 		}
 
-		return this.daoFactory.getMethodDAO().filterMethods(programUUID, abbreviations, breedingMethodIds).stream()
+		return this.daoFactory.getMethodDAO().filterMethods(methodSearchRequest).stream()
 			.map(BreedingMethodDTO::new)
 			.collect(Collectors.toList());
 	}

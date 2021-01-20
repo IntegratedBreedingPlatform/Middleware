@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
 import org.hibernate.Criteria;
@@ -20,6 +21,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -546,25 +548,33 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		}
 	}
 
-	public List<Method> filterMethods(final String programUUID, final Set<String> abbreviations, final List<Integer> methodIds) {
+	public List<Method> filterMethods(final BreedingMethodSearchRequest methodSearchRequest) {
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Method.class);
+			final String programUUID = methodSearchRequest.getProgramUUID();
 			if (StringUtils.isEmpty(programUUID)) {
 				criteria.add(Restrictions.isNull(MethodDAO.UNIQUE_ID));
 			} else {
 				criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
 			}
 
+			final List<Integer> methodIds = methodSearchRequest.getMethodIds();
 			if (!CollectionUtils.isEmpty(methodIds)) {
 				criteria.add(Restrictions.in("mid", methodIds));
 			}
 
-			if (!CollectionUtils.isEmpty(abbreviations)) {
-				criteria.add(Restrictions.in("mcode", abbreviations));
+			final List<String> methodAbbreviations = methodSearchRequest.getMethodAbbreviations();
+			if (!CollectionUtils.isEmpty(methodAbbreviations)) {
+				criteria.add(Restrictions.in("mcode", methodAbbreviations));
 			}
 
-			criteria.addOrder(Order.asc(METHOD_NAME));
+			final String name = methodSearchRequest.getMethodName();
+			if (!StringUtils.isEmpty(name)) {
+				criteria.add(Restrictions.like(MethodDAO.METHOD_NAME, name, MatchMode.START));
+			}
+
+			criteria.addOrder(Order.asc(MethodDAO.METHOD_NAME));
 			return criteria.list();
 		} catch (final Exception e) {
 			MethodDAO.LOG.error(this.getLogExceptionMessage("filterMethods", "", null, e.getMessage(), "Method"), e);
