@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.MethodType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -123,6 +124,18 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsByType", "type", type, e.getMessage(), "Method"), e);
 		}
+	}
+
+	public List<String> getNonGenerativeMethodCodes(final Set<String> methodCodes) {
+		final List<String> methodsCodes = new ArrayList<String>();
+		final StringBuilder queryString = new StringBuilder();
+		queryString.append("SELECT mcode FROM methods WHERE mcode IN (:methodCodes) AND mtype <> :generativeType");
+		final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+		query.setParameterList("methodCodes", methodCodes);
+		query.setParameter("generativeType", MethodType.GENERATIVE.getCode());
+
+		methodsCodes.addAll(query.list());
+		return methodsCodes;
 	}
 
 	public long countByType(final String type) throws MiddlewareQueryException {
