@@ -141,9 +141,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final Method method = methodsMapByAbbr.get(germplasmDto.getBreedingMethodAbbr().toUpperCase());
 			germplasm.setMethodId(method.getMid());
 
-			//Given that parents are not provided, gnpgs = method.mprgn
-			//If parents are provided and method type = GEN and mprgn = 0, then, gnpgs = number or parents provided
-			germplasm.setGnpgs(method.getMprgn());
+			germplasm.setGnpgs(this.calculateGnpgs(method));
 
 			//First iteration, parents not provided, default = 0
 			germplasm.setGpid1(0);
@@ -564,6 +562,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 			return attributesUdfldList.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
 		} else {
 			return new HashMap<>();
+		}
+	}
+
+	private Integer calculateGnpgs(final Method method) {
+		if (method.getMtype().equals(MethodType.GENERATIVE.getCode())) {
+			return 0;
+		} else {
+			return -1;
 		}
 	}
 
