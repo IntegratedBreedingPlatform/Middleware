@@ -822,6 +822,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public List<String> getNonMaintenanceAndDerivativeMethods(final int dataSetId, final String variableId, final List<String> trialInstances) {
+		return this.daoFactory.getPhenotypeDAO().getNonMaintenanceAndDerivativeMethods(dataSetId, variableId, trialInstances);
+	}
+
+	@Override
 	public String getFolderNameById(final Integer folderId) {
 		final DmsProject currentFolder = this.daoFactory.getDmsProjectDAO().getById(folderId);
 		return currentFolder.getName();

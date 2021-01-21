@@ -528,6 +528,16 @@ public interface StudyDataManager {
 	int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds);
 
 	/**
+	 * returns method code of the non maintenance and derivative method values
+	 *
+	 * @param dataSetId
+	 * @param variableId
+	 * @param trialInstances
+	 * @return
+	 */
+	List<String> getNonMaintenanceAndDerivativeMethods(int dataSetId, String variableId, List<String> trialInstances);
+
+	/**
 	 * Gets the all field maps in block by block id.
 	 *
 	 * @param blockId the block id
