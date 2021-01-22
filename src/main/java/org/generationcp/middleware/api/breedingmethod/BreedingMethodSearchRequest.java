@@ -10,7 +10,7 @@ import java.util.List;
 public class BreedingMethodSearchRequest {
 
 	private String programUUID;
-	private List<Integer> methodTypes = new ArrayList<>();
+	private List<String> methodTypes = new ArrayList<>();
 	private List<Integer> methodIds = new ArrayList<>();
 	private List<String> methodAbbreviations = new ArrayList<>();
 	private String methodName;
@@ -34,11 +34,11 @@ public class BreedingMethodSearchRequest {
 		this.programUUID = programUUID;
 	}
 
-	public List<Integer> getMethodTypes() {
+	public List<String> getMethodTypes() {
 		return methodTypes;
 	}
 
-	public void setMethodTypes(final List<Integer> methodTypes) {
+	public void setMethodTypes(final List<String> methodTypes) {
 		this.methodTypes = methodTypes;
 	}
 
