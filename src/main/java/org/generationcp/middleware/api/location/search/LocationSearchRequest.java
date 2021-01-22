@@ -22,6 +22,8 @@ public class LocationSearchRequest {
 
 	}
 
+	
+
 	public LocationSearchRequest(final String programUUID, final Set<Integer> locationTypes, final List<Integer> locationIds,
 		final List<String> locationAbbreviations, final String locationName, final Boolean favoritesOnly) {
 		this.programUUID = programUUID;

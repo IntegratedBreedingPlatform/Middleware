@@ -13,7 +13,6 @@ public class BreedingMethodSearchRequest {
 	private List<String> methodTypes = new ArrayList<>();
 	private List<Integer> methodIds = new ArrayList<>();
 	private List<String> methodAbbreviations = new ArrayList<>();
-	private String methodName;
 	private boolean favoritesOnly;
 
 	public BreedingMethodSearchRequest() {
@@ -56,14 +55,6 @@ public class BreedingMethodSearchRequest {
 
 	public void setMethodAbbreviations(final List<String> methodAbbreviations) {
 		this.methodAbbreviations = methodAbbreviations;
-	}
-
-	public String getMethodName() {
-		return methodName;
-	}
-
-	public void setMethodName(final String methodName) {
-		this.methodName = methodName;
 	}
 
 	public boolean isFavoritesOnly() {
