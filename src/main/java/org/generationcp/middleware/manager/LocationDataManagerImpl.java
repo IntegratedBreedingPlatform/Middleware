@@ -11,7 +11,6 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.collect.ImmutableSet;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
@@ -27,7 +26,6 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -138,18 +136,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Location> getLocationsByType(final Integer type) {
 		return this.daoFactory.getLocationDAO().getByType(type);
-	}
-
-	@Override
-	public List<Location> getFilteredLocations(final String programUUID, final Set<Integer> types, List<Integer> locationIds,
-		final List<String> locationAbbreviations, final boolean favourites) {
-		if (!StringUtils.isEmpty(programUUID) && favourites) {
-			if (locationIds == null) {
-				locationIds = new ArrayList<>();
-			}
-			locationIds.addAll(this.getFavoriteProjectLocationIds(programUUID));
-		}
-		return this.daoFactory.getLocationDAO().filterLocations(programUUID, types, locationIds, locationAbbreviations);
 	}
 
 	@Override
@@ -526,21 +512,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
 		}
 		return unspecifiedLocationId;
-	}
-
-	@Override
-	public List<Integer> getFavoriteProjectLocationIds(final String programUUID) {
-		final List<ProgramFavorite> programFavorites =
-			this.daoFactory.getProgramFavoriteDao()
-				.getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
-		final List<Integer> favoriteLocationIds = new ArrayList<>();
-		if (programFavorites != null && !programFavorites.isEmpty()) {
-			for (final ProgramFavorite programFavorite : programFavorites) {
-				favoriteLocationIds.add(programFavorite.getEntityId());
-
-			}
-		}
-		return favoriteLocationIds;
 	}
 
 	@Override
