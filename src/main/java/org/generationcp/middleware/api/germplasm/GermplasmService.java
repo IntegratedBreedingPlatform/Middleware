@@ -53,7 +53,7 @@ public interface GermplasmService {
 	UserDefinedField getPlotCodeField();
 
 	Map<Integer, GermplasmImportResponseDto> importGermplasm(Integer userId, String cropName,
-		List<GermplasmImportRequestDto> germplasmImportRequestDto);
+		GermplasmImportRequestDto germplasmImportRequestDto);
 
 	Set<Integer> importGermplasmUpdates(Integer userId, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
