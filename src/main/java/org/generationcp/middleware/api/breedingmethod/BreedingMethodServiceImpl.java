@@ -10,11 +10,12 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -50,17 +51,22 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 
 	@Override
 	public List<BreedingMethodDTO> getBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest) {
-		final List<Integer> breedingMethodIds = new ArrayList<>();
 		final String programUUID = methodSearchRequest.getProgramUUID();
 		final boolean favoritesOnly = methodSearchRequest.isFavoritesOnly();
 		if (!StringUtils.isEmpty(programUUID) && favoritesOnly) {
-			breedingMethodIds.addAll(this.getFavoriteProjectMethodsIds(programUUID));
+			final List<Integer> favoriteProjectMethodsIds = this.getFavoriteProjectMethodsIds(programUUID);
+			// if filtering by program favorite methods but none exist, do not proceed with search and immediately return empty list
+			if (CollectionUtils.isEmpty(favoriteProjectMethodsIds)) {
+				return Collections.emptyList();
+			}
+			methodSearchRequest.setMethodIds(favoriteProjectMethodsIds);
 		}
 
 		return this.daoFactory.getMethodDAO().filterMethods(methodSearchRequest).stream()
 			.map(BreedingMethodDTO::new)
 			.collect(Collectors.toList());
 	}
+
 
 	private List<Integer> getFavoriteProjectMethodsIds(final String programUUID) {
 		return this.daoFactory.getProgramFavoriteDao()

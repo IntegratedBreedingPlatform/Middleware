@@ -569,6 +569,11 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 				criteria.add(Restrictions.in("mcode", methodAbbreviations));
 			}
 
+			final List<String> methodTypes = methodSearchRequest.getMethodTypes();
+			if (!CollectionUtils.isEmpty(methodTypes)) {
+				criteria.add(Restrictions.in("mtype", methodTypes));
+			}
+
 			criteria.addOrder(Order.asc(MethodDAO.METHOD_NAME));
 			return criteria.list();
 		} catch (final Exception e) {
