@@ -138,6 +138,17 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		return methodsCodes;
 	}
 
+	public List<String> getMethodCodesWithOneMPRGN(final Set<String> methodCodes) {
+		final List<String> methodsCodes = new ArrayList<String>();
+		final StringBuilder queryString = new StringBuilder();
+		queryString.append("SELECT mcode FROM methods WHERE mcode IN (:methodCodes) AND mprgn = 1");
+		final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+		query.setParameterList("methodCodes", methodCodes);
+
+		methodsCodes.addAll(query.list());
+		return methodsCodes;
+	}
+
 	public long countByType(final String type) throws MiddlewareQueryException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Method.class);
