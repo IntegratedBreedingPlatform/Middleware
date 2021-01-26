@@ -57,7 +57,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 			final List<Integer> favoriteProjectMethodsIds = this.getFavoriteProjectMethodsIds(programUUID);
 			// if filtering by program favorite methods but none exist, do not proceed with search and immediately return empty list
 			if (CollectionUtils.isEmpty(favoriteProjectMethodsIds)) {
-				return Collections.emptyList();
+				return Collections.EMPTY_LIST;
 			}
 			methodSearchRequest.setMethodIds(favoriteProjectMethodsIds);
 		}
