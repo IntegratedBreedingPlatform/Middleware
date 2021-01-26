@@ -11,9 +11,12 @@
 
 package org.generationcp.middleware.manager;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
+import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -23,6 +26,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.utils.test.Debug;
@@ -30,12 +34,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,6 +58,8 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
+	private DaoFactory daoFactory;
+
 	private Project commonTestProject;
 
 	private final static Integer COUNTRY_LTYPEID = 405;
@@ -65,6 +73,8 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 		}
+
+		this.daoFactory = new DaoFactory(this.sessionProvder);
 	}
 
 	@Test
@@ -123,7 +133,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testCountByLocationAbbreviation() {
 		final String labbr = "LABBRR";
-		final long count =  this.manager.countByLocationAbbreviation(labbr);
+		final long count = this.manager.countByLocationAbbreviation(labbr);
 
 		final Location location = new Location();
 		location.setCntryid(1);
@@ -140,7 +150,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		// add the location
 		this.manager.addLocation(location);
 		final long newCount = this.manager.countByLocationAbbreviation(labbr);
-		Assert.assertEquals(count+1, newCount);
+		Assert.assertEquals(count + 1, newCount);
 	}
 
 	@Test
@@ -148,11 +158,11 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 		final List<Location> locationsByIdEmptyTest = this.manager.getLocationsByIDs(Collections.<Integer>emptyList());
 		Assert.assertTrue("Returned result must not be null and must be an empty list",
-				locationsByIdEmptyTest != null && locationsByIdEmptyTest.isEmpty());
+			locationsByIdEmptyTest != null && locationsByIdEmptyTest.isEmpty());
 
 		final List<Location> locationsByIdNullTest = this.manager.getLocationsByIDs(null);
 		Assert.assertTrue("Returned result must not be null and must be an empty list",
-				locationsByIdNullTest != null && locationsByIdNullTest.isEmpty());
+			locationsByIdNullTest != null && locationsByIdNullTest.isEmpty());
 
 	}
 
@@ -189,7 +199,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 		final List<Location> locationList2 = this.manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL);
 		Debug.println(IntegrationTestBase.INDENT,
-				"testGetLocationsByName(" + name + ", start=" + start + ", numOfRows=" + numOfRows + "): ");
+			"testGetLocationsByName(" + name + ", start=" + start + ", numOfRows=" + numOfRows + "): ");
 		Debug.printObjects(IntegrationTestBase.INDENT, locationList2);
 	}
 
@@ -235,8 +245,8 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 		final List<Location> locationList = this.manager.getLocationsByCountry(country, start, numOfRows);
 		Debug.println(IntegrationTestBase.INDENT,
-				"testGetLocationByCountry(country=" + country + ", start=" + start + ", numOfRows=" + numOfRows + "): " + locationList
-						.size());
+			"testGetLocationByCountry(country=" + country + ", start=" + start + ", numOfRows=" + numOfRows + "): " + locationList
+				.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, locationList);
 	}
 
@@ -248,7 +258,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 		final List<Location> locations = this.manager.getLocationsByCountryAndType(country, type);
 		Debug.println(IntegrationTestBase.INDENT,
-				"testGetLocationByCountryAndType(country=" + country + "): type= " + type + ":" + locations.size());
+			"testGetLocationByCountryAndType(country=" + country + "): type= " + type + ":" + locations.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, locations);
 	}
 
@@ -280,7 +290,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		final List<Location> locationList = this.manager.getLocationsByType(type, start, numOfRows);
 		Assert.assertNotNull("Expecting to have returned results.", locationList);
 		Debug.println(IntegrationTestBase.INDENT,
-				"testGetLocationByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows + "): " + locationList.size());
+			"testGetLocationByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows + "): " + locationList.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, locations);
 	}
 
@@ -313,7 +323,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		// add the location
 		final Integer id = this.manager.addLocation(location);
 		Debug.println(IntegrationTestBase.INDENT, "testAddLocation(" + location + "): " + id + "  \n  " + this.manager
-				.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
+			.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
 	}
 
 	@Test
@@ -362,7 +372,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		final String fieldType = "LTYPE";
 		final List<UserDefinedField> userDefinedField = this.manager.getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
 		Debug.println(IntegrationTestBase.INDENT,
-				"testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): " + userDefinedField.size());
+			"testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): " + userDefinedField.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, userDefinedField);
 	}
 
@@ -474,7 +484,8 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 			Assert.assertEquals("90.5", aculcoLoc.getGeoref().getLon().toString());
 			Assert.assertEquals("2080", aculcoLoc.getGeoref().getAlt().toString());
 
-			final List<LocationDetails> locationDetails = this.manager.getLocationDetailsByLocId(aculcoLoc.getLocid(), 0, Integer.MAX_VALUE);
+			final List<LocationDetails> locationDetails =
+				this.manager.getLocationDetailsByLocId(aculcoLoc.getLocid(), 0, Integer.MAX_VALUE);
 
 			Assert.assertEquals(aculcoLoc.getGeoref().getLat(), locationDetails.get(0).getLatitude());
 			Assert.assertEquals(aculcoLoc.getGeoref().getLon(), locationDetails.get(0).getLongitude());
@@ -554,11 +565,12 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	public void testGetLocationsByNameCountryAndType_WithNonZeroLocationTypeId() throws MiddlewareQueryException {
 		final String locationName = "";
 		final Country country = null;
-		final List<Location> locationList = this.manager.getLocationsByNameCountryAndType(locationName, country, LocationDataManagerImplTest.COUNTRY_LTYPEID);
+		final List<Location> locationList =
+			this.manager.getLocationsByNameCountryAndType(locationName, country, LocationDataManagerImplTest.COUNTRY_LTYPEID);
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 		for (final Location location : locationList) {
 			Assert.assertEquals("Location should have a lytpeId = " + LocationDataManagerImplTest.COUNTRY_LTYPEID,
-					LocationDataManagerImplTest.COUNTRY_LTYPEID, location.getLtype());
+				LocationDataManagerImplTest.COUNTRY_LTYPEID, location.getLtype());
 		}
 	}
 
@@ -572,7 +584,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 		for (final Location location : locationList) {
 			Assert.assertEquals("Location should have a countryId = " + LocationDataManagerImplTest.PHILIPPINES_CNTRYID,
-					LocationDataManagerImplTest.PHILIPPINES_CNTRYID, location.getCntryid());
+				LocationDataManagerImplTest.PHILIPPINES_CNTRYID, location.getCntryid());
 		}
 	}
 
@@ -585,7 +597,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 		for (final Location location : locationList) {
 			Assert.assertTrue("Location should have a location name having the keyword " + locationName,
-					location.getLname().toLowerCase().contains(locationName.toLowerCase()));
+				location.getLname().toLowerCase().contains(locationName.toLowerCase()));
 		}
 	}
 
@@ -635,7 +647,8 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testgetUserDefinedFieldIdOfName() throws MiddlewareQueryException {
-		final Integer value = this.manager.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, "Country");
+		final Integer value =
+			this.manager.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, "Country");
 		final Integer countryId = 405;
 		Assert.assertEquals("Expected recovered id of the Contry", countryId, value);
 	}
@@ -695,7 +708,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		assertThat(locationOrg.getName(), is(equalTo(locationFinal.getName())));
 		assertThat(locationOrg.getAbbreviation(), is(equalTo(locationFinal.getAbbreviation())));
 		assertThat(locationOrg.getAdditionalInfo().getInfoValue("province"),
-				is(equalTo(locationFinal.getAdditionalInfo().getInfoValue("province"))));
+			is(equalTo(locationFinal.getAdditionalInfo().getInfoValue("province"))));
 	}
 
 	@Test
@@ -709,6 +722,5 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(unspecifiedLocationName, unspecifiedLocation.getLname());
 		Assert.assertEquals(unspecifiedLocationAbbr, unspecifiedLocation.getLabbr());
 	}
-
 
 }
