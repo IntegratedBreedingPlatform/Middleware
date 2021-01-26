@@ -9,5 +9,5 @@ public interface BreedingMethodService {
 
 	BreedingMethodDTO getBreedingMethod(Integer breedingMethodDbId);
 
-	List<BreedingMethodDTO> getBreedingMethods(String programUUID, Set<String> abbreviations, boolean favorites);
+	List<BreedingMethodDTO> getBreedingMethods(BreedingMethodSearchRequest methodSearchRequest);
 }
