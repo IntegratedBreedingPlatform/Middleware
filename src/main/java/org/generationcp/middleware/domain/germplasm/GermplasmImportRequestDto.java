@@ -16,7 +16,6 @@ public class GermplasmImportRequestDto {
 		NONE, GID, GUID
 	}
 
-
 	@AutoProperty
 	@JsonPropertyOrder({
 		"clientId", "germplasmUUID", "locationAbbr", "breedingMethodAbbr", "reference", "preferredName", "names", "attributes",

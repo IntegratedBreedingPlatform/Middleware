@@ -608,7 +608,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 				if (!"0".equals(progenitor2) && !progenitorsMap.get(progenitor2).getGpid1()
 					.equals(progenitorsMap.get(progenitor1).getGid())) {
 					throw new MiddlewareRequestException("", "import.germplasm.invalid.immediate.source.group",
-						new String[] {progenitor2, String.valueOf(germplasmDTO.getClientId())});
+						new String[] {
+							String.valueOf(progenitorsMap.get(progenitor2).getGid()),
+							String.valueOf(progenitorsMap.get(progenitor1).getGid())});
 				}
 				germplasm.setGpid1(resolveGpid(progenitor1, progenitorsMap));
 			}
