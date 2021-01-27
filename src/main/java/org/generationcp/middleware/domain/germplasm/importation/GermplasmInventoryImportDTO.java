@@ -1,8 +1,10 @@
 package org.generationcp.middleware.domain.germplasm.importation;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
-public class ExtendedGermplasmImportRequestDto extends GermplasmImportRequestDto {
+@AutoProperty
+public class GermplasmInventoryImportDTO extends GermplasmImportDTO {
 
 	private Double amount;
 
