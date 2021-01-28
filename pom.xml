@@ -12,7 +12,7 @@
 		<itext.version>2.1.7</itext.version>
 		<reflections.version>0.9.9</reflections.version>
 		<atomikos.version>3.9.3</atomikos.version>
-		<spring.version>4.1.6.RELEASE</spring.version>
+		<spring.version>4.3.7.RELEASE</spring.version>
 		<liquibase.version>3.6.1</liquibase.version>
 		<envConfig>${user.name}</envConfig>
 	</properties>
@@ -257,7 +257,7 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
-			<version>1.8.2.RELEASE</version>
+			<version>1.13.1.RELEASE</version>
 		</dependency>
 
 		<dependency>
