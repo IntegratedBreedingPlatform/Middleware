@@ -49,6 +49,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public static final String PLOT_CODE = "PLOTCODE";
 
 	private static final String DEFAULT_BIBREF_FIELD = "-";
+	public static final String PROGENITOR_1 = "PROGENITOR 1";
+	public static final String PROGENITOR_2 = "PROGENITOR 2";
 
 	private final DaoFactory daoFactory;
 
@@ -348,8 +350,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Multimap<String, Object[]> conflictErrors) {
 		if (breedingMethodOptional.isPresent()) {
 
-			final int femaleParentGid = Integer.parseInt(germplasmUpdateDTO.getProgenitors().get("PROGENITOR 1"));
-			final int maleParentGid = Integer.parseInt(germplasmUpdateDTO.getProgenitors().get("PROGENITOR 2"));
+			final int femaleParentGid = Integer.parseInt(germplasmUpdateDTO.getProgenitors().get(PROGENITOR_1));
+			final int maleParentGid = Integer.parseInt(germplasmUpdateDTO.getProgenitors().get(PROGENITOR_2));
 			final Method newBreedingMethod = breedingMethodOptional.get();
 			final Method oldBreedingMethod = germplasm.getMethod();
 
@@ -362,7 +364,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 					conflictErrors.put("import.germplasm.update.mutation.method.is.not.supported", new Object[] {
 						germplasm.getGid()});
 				} else if (this.isGenerative(newBreedingMethod.getMtype())) {
-					this.assignProgenitorForGenerativeMethod(germplasm, femaleParentGid, maleParentGid, newBreedingMethod);
+					this.assignProgenitorForGenerativeMethod(germplasm, femaleParentGid, maleParentGid, newBreedingMethod, conflictErrors);
 				} else if (this.isMaintenanceOrDerivative(newBreedingMethod.getMtype())) {
 					this.assignProgenitorForDerivativeOrMaintenanceMethod(germplasm, progenitorsMapByGid, germplasmWithDescendantsMap,
 						conflictErrors, femaleParentGid, maleParentGid);
@@ -377,14 +379,20 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void assignProgenitorForGenerativeMethod(final Germplasm germplasm, final int femaleParentGid, final int maleParentGid,
-		final Method newBreedingMethod) {
-		if (femaleParentGid == 0 && maleParentGid == 0) {
-			germplasm.setGnpgs(0);
-		} else if (newBreedingMethod.getMprgn().intValue() > 1) {
-			germplasm.setGnpgs(2);
+		final Method newBreedingMethod, final Multimap<String, Object[]> conflictErrors) {
+
+		if (!germplasm.getMethod().getMprgn().equals(newBreedingMethod.getMprgn())) {
+			conflictErrors.put("import.germplasm.update.number.of.progenitors.mismatch", new Object[] {
+				germplasm.getGid()});
+		} else {
+			if (femaleParentGid == 0 && maleParentGid == 0) {
+				germplasm.setGnpgs(0);
+			} else if (newBreedingMethod.getMprgn().intValue() != 1) {
+				germplasm.setGnpgs(2);
+			}
+			germplasm.setGpid1(femaleParentGid);
+			germplasm.setGpid2(maleParentGid);
 		}
-		germplasm.setGpid1(femaleParentGid);
-		germplasm.setGpid2(maleParentGid);
 	}
 
 	private void assignProgenitorForDerivativeOrMaintenanceMethod(final Germplasm germplasm,

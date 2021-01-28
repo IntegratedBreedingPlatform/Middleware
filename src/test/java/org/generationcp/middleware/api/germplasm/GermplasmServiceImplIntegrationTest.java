@@ -39,7 +39,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	public static final String DRVNM = "DRVNM";
 	public static final String NOTE = "NOTE";
 	public static final String UGM = "UGM";
-	public static final String BDU = "BDU";
+	public static final String CSP = "CSP";
 	public static final String UKN = "UKN";
 	public static final String NOLOC = "NOLOC";
 
@@ -60,7 +60,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Method method = this.daoFactory.getMethodDAO().getByCode(UGM, null);
 		final int creationDate = 20200101;
 
-		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(BDU, null);
+		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(CSP, null);
 		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
 
 		final UserDefinedField newNameCode =
@@ -109,7 +109,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Method method = this.daoFactory.getMethodDAO().getByCode(UGM, null);
 
 		final int creationDate = 20200101;
-		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(BDU, null);
+		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(CSP, null);
 		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
 		final UserDefinedField newNameCode =
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
@@ -165,7 +165,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Method method = this.daoFactory.getMethodDAO().getByCode(UGM, null);
 
 		final int creationDate = 20200101;
-		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(BDU, null);
+		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(CSP, null);
 		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
 		final UserDefinedField newNameCode =
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
@@ -192,7 +192,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Method method = this.daoFactory.getMethodDAO().getByCode(UGM, null);
 
 		final int creationDate = 20200101;
-		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(BDU, null);
+		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(CSP, null);
 		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
 		final Germplasm germplasm = this.createGermplasm(method);
 		final GermplasmUpdateDTO germplasmUpdateDTO =
@@ -213,7 +213,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Method method = this.daoFactory.getMethodDAO().getByCode(UGM, null);
 
 		final int creationDate = 20200101;
-		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(BDU, null);
+		final Method newMethod = this.daoFactory.getMethodDAO().getByCode(CSP, null);
 		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
 		final UserDefinedField newNameCode =
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
@@ -339,7 +339,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_PASSPORT.getTable(),
 				UDTableType.ATRIBUTS_PASSPORT.getType(), GermplasmServiceImpl.PLOT_CODE);
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasmWithPlotCode.getGid(), plotCodeAttr.getFldno(), germplasmWithPlotCode.getUserId(), plotCodeValue,
+			.save(new Attribute(null, germplasmWithPlotCode.getGid(), plotCodeAttr.getFldno(), germplasmWithPlotCode.getUserId(),
+				plotCodeValue,
 				germplasmWithPlotCode.getLocationId(),
 				0, germplasmWithPlotCode.getGdate()));
 
@@ -373,6 +374,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.setReference("Reference gid " + gid);
 		germplasmUpdateDTO.getAttributes().put(NOTE, "Note for " + gid);
 		germplasmUpdateDTO.getNames().put(DRVNM, "Name for " + gid);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, "0");
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, "0");
 		return germplasmUpdateDTO;
 	}
 
