@@ -56,7 +56,7 @@ public interface GermplasmService {
 	UserDefinedField getPlotCodeField();
 
 	Map<Integer, GermplasmImportResponseDto> importGermplasm(Integer userId, String cropName,
-		List<GermplasmImportRequestDto> germplasmImportRequestDto);
+		GermplasmImportRequestDto germplasmImportRequestDto);
 
 	long countGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto);
 
