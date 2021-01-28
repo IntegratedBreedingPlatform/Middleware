@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v17.1.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM workbench_tool WHERE
+					(name = 'breeding_view_wb' AND path = '/ibpworkbench/workbenchtools/breeding_view' AND tool_type = 'WEB' AND version = '17.1') OR
+					(name = 'breeding_gxe' AND path = '/ibpworkbench/workbenchtools/breeding_gxe' AND tool_type = 'WEB' AND version = '17.1') OR
+					(name = 'manage_program' AND path = '/ibpworkbench/workbenchtools/manage_program' AND tool_type = 'WEB' AND version = '17.1');
+            </sqlCheck>
+        </preConditions>
+        <comment>Change several tool paths</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE workbench_tool SET path = '/ibpworkbench/workbenchtools/breeding_view', tool_type = 'WEB', version = '17.1' WHERE name = 'breeding_view_wb';
+			UPDATE workbench_tool SET path = '/ibpworkbench/workbenchtools/breeding_gxe', tool_type = 'WEB', version = '17.1' WHERE name = 'breeding_gxe';
+			UPDATE workbench_tool SET path = '/ibpworkbench/workbenchtools/manage_program', tool_type = 'WEB', version = '17.1' WHERE name = 'manage_program';
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
