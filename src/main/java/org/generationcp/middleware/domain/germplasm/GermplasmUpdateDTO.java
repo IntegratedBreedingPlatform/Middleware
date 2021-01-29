@@ -18,7 +18,7 @@ public class GermplasmUpdateDTO {
 	private String reference;
 	private Map<String, String> names = new HashMap<>();
 	private Map<String, String> attributes = new HashMap<>();
-	private Map<String, String> progenitors = new HashMap<>();
+	private Map<String, Integer> progenitors = new HashMap<>();
 
 	public Integer getGid() {
 		return this.gid;
@@ -92,11 +92,11 @@ public class GermplasmUpdateDTO {
 		this.attributes = attributes;
 	}
 
-	public Map<String, String> getProgenitors() {
+	public Map<String, Integer> getProgenitors() {
 		return this.progenitors;
 	}
 
-	public void setProgenitors(final Map<String, String> progenitors) {
+	public void setProgenitors(final Map<String, Integer> progenitors) {
 		this.progenitors = progenitors;
 	}
 

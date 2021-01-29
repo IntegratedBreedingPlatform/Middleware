@@ -429,8 +429,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
 
 		// Assign known parents
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, "1");
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, "2");
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 2);
 
 		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
@@ -457,8 +457,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
 
 		// Assign unknown male parent
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, "1");
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, "0");
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 0);
 
 		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
@@ -472,8 +472,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals(0, savedGermplasm.getGpid2().intValue());
 
 		// Assign unknown female parent
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, "0");
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, "1");
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 1);
 
 		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
@@ -533,9 +533,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmDescendant2.getGid().toString());
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmDescendant2.getGid());
 		// Assign immediate source germplasm with a group source (female parent) different from current group source.
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmDescendant.getGid().toString());
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmDescendant.getGid());
 
 		try {
 			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
@@ -568,8 +568,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmWithDescendants.getGid().toString());
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmDescendant2.getGid().toString());
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmWithDescendants.getGid());
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmDescendant2.getGid());
 
 		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
@@ -594,8 +594,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, "1");
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, "0");
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 0);
 
 		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
@@ -627,8 +627,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, "0");
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmDescendant.getGid().toString());
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmDescendant.getGid());
 
 		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
@@ -691,8 +691,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.setReference("Reference gid " + gid);
 		germplasmUpdateDTO.getAttributes().put(NOTE, "Note for " + gid);
 		germplasmUpdateDTO.getNames().put(DRVNM, "Name for " + gid);
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, "0");
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, "0");
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 0);
 		return germplasmUpdateDTO;
 	}
 

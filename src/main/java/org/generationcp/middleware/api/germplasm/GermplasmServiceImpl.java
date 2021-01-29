@@ -350,8 +350,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Multimap<String, Object[]> conflictErrors) {
 		if (breedingMethodOptional.isPresent()) {
 
-			final int femaleParentGid = Integer.parseInt(germplasmUpdateDTO.getProgenitors().get(PROGENITOR_1));
-			final int maleParentGid = Integer.parseInt(germplasmUpdateDTO.getProgenitors().get(PROGENITOR_2));
+			final int femaleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_1);
+			final int maleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_2);
 			final Method newBreedingMethod = breedingMethodOptional.get();
 			final Method oldBreedingMethod = germplasm.getMethod();
 
@@ -579,8 +579,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private Map<Integer, Germplasm> getGermplasmProgenitorsMapByGids(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		final Set<Integer> progenitorGids =
 			germplasmUpdateDTOList.stream().map(dto -> dto.getProgenitors().values()).flatMap(Collection::stream)
-				.filter(value -> StringUtils.isNotEmpty(value)).map(value -> Integer.parseInt(value))
-				.collect(Collectors.toSet());
+				.filter(value -> value != null).collect(Collectors.toSet());
 		return this.daoFactory.getGermplasmDao().getByGIDsOrUUIDListWithMethodAndBibref(progenitorGids, Collections.emptySet()).stream()
 			.collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
 	}
