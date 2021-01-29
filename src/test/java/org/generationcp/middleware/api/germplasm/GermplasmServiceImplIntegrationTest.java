@@ -184,7 +184,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		try {
 			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.preferred.name.duplicate.names"));
+			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.preferred.name.duplicate.names"));
 		}
 
 	}
@@ -206,7 +206,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		try {
 			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.preferred.name.doesnt.exist"));
+			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.preferred.name.doesnt.exist"));
 		}
 
 	}
@@ -250,8 +250,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		try {
 			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.duplicate.names"));
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.duplicate.attributes"));
+			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.duplicate.names"));
+			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.duplicate.attributes"));
 		}
 
 	}
@@ -371,7 +371,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.breeding.method.mismatch"));
+			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.breeding.method.mismatch"));
 		}
 
 	}
@@ -392,7 +392,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.number.of.progenitors.mismatch"));
+			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.number.of.progenitors.mismatch"));
 		}
 
 	}
@@ -412,7 +412,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.mutation.method.is.not.supported"));
+			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.mutation.method.is.not.supported"));
 		}
 
 	}
@@ -508,7 +508,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.germplasm.has.existing.progeny"));
+			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.germplasm.has.existing.progeny"));
 		}
 	}
 
@@ -542,7 +542,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(
-				e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.update.immediate.source.must.belong.to.the.same.group"));
+				e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.immediate.source.must.belong.to.the.same.group"));
 		}
 
 	}
