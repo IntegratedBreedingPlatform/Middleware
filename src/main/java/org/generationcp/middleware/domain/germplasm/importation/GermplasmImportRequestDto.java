@@ -19,6 +19,7 @@ public class GermplasmImportRequestDto {
 	}
 
 	private PedigreeConnectionType connectUsing;
+	private boolean skipCreationWhenMatches = false;
 	private List<GermplasmImportDTO> germplasmList;
 
 	public PedigreeConnectionType getConnectUsing() {
@@ -35,6 +36,14 @@ public class GermplasmImportRequestDto {
 
 	public void setGermplasmList(final List<GermplasmImportDTO> germplasmList) {
 		this.germplasmList = germplasmList;
+	}
+
+	public boolean isSkipCreationWhenMatches() {
+		return skipCreationWhenMatches;
+	}
+
+	public void setSkipCreationWhenMatches(final boolean skipCreationWhenMatches) {
+		this.skipCreationWhenMatches = skipCreationWhenMatches;
 	}
 
 	@Override
