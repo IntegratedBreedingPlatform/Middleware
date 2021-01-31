@@ -67,6 +67,10 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 			.collect(Collectors.toList());
 	}
 
+	@Override
+	public List<BreedingMethodDTO> getAllBreedingMethods() {
+		return this.daoFactory.getMethodDAO().getAll().stream().map(BreedingMethodDTO::new).collect(Collectors.toList());
+	}
 
 	private List<Integer> getFavoriteProjectMethodsIds(final String programUUID) {
 		return this.daoFactory.getProgramFavoriteDao()

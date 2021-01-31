@@ -10,4 +10,6 @@ public interface BreedingMethodService {
 	BreedingMethodDTO getBreedingMethod(Integer breedingMethodDbId);
 
 	List<BreedingMethodDTO> getBreedingMethods(BreedingMethodSearchRequest methodSearchRequest);
+
+	List<BreedingMethodDTO> getAllBreedingMethods();
 }
