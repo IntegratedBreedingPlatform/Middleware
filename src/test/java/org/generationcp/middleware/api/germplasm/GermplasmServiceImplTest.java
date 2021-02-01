@@ -261,7 +261,7 @@ public class GermplasmServiceImplTest {
 	}
 
 	@Test
-	public void test_importGermplasm_saveGermplasmIsNeverCalled_WhenAMatchIsFound() {
+	public void test_importGermplasm_SaveGermplasmIsNeverCalled_WhenAMatchIsFound() {
 		final GermplasmServiceImpl unitToTest = new GermplasmServiceImpl(Mockito.mock(HibernateSessionProvider.class));
 		unitToTest.setWorkbenchDataManager(workbenchDataManager);
 
