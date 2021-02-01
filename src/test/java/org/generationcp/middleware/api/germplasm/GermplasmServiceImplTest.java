@@ -40,7 +40,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -100,19 +99,19 @@ public class GermplasmServiceImplTest {
 	@Captor
 	private ArgumentCaptor<Set<String>> stringSetArgumentCaptor;
 
-	private String locationAbbreviation = RandomStringUtils.randomAlphabetic(3);
+	private final String locationAbbreviation = RandomStringUtils.randomAlphabetic(3);
 
-	private String methodAbbreviation = RandomStringUtils.randomAlphabetic(3);
+	private final String methodAbbreviation = RandomStringUtils.randomAlphabetic(3);
 
-	private String germplasmUUID = RandomStringUtils.randomAlphabetic(36);
+	private final String germplasmUUID = RandomStringUtils.randomAlphabetic(36);
 
-	private String cropName = "maize";
+	private final String cropName = "maize";
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		//Mock DaoFactory
-		ReflectionTestUtils.setField(this.germplasmService, "daoFactory", daoFactory);
+		ReflectionTestUtils.setField(this.germplasmService, "daoFactory", this.daoFactory);
 		Mockito.when(this.daoFactory.getAttributeDAO()).thenReturn(this.attributeDAO);
 		Mockito.when(this.daoFactory.getUserDefinedFieldDAO()).thenReturn(this.userDefinedFieldDAO);
 		Mockito.when(this.daoFactory.getGermplasmDao()).thenReturn(this.germplasmDAO);
@@ -121,7 +120,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.daoFactory.getNameDao()).thenReturn(this.nameDAO);
 		Mockito.when(this.daoFactory.getBibrefDAO()).thenReturn(this.bibrefDAO);
 
-		germplasmService.setWorkbenchDataManager(workbenchDataManager);
+		this.germplasmService.setWorkbenchDataManager(this.workbenchDataManager);
 
 	}
 
@@ -166,14 +165,14 @@ public class GermplasmServiceImplTest {
 		final Attribute attribute = Mockito.mock(Attribute.class);
 		Mockito.when(attribute.getGermplasmId()).thenReturn(GID);
 		Mockito.when(attribute.getAval()).thenReturn(plotCodeValue);
-		final List<Attribute> attributes = Arrays.asList(attribute);
+		final List<Attribute> attributes = Collections.singletonList(attribute);
 		Mockito.when(this.attributeDAO.getAttributeValuesByTypeAndGIDList(ArgumentMatchers.eq(FIELD_NUMBER), ArgumentMatchers.anyList()))
 			.thenReturn(attributes);
 
 		//Create partial mock for the unit to be tested
 		final GermplasmServiceImpl partiallyMockedUnit =
 			Mockito.spy(new GermplasmServiceImpl(Mockito.mock(HibernateSessionProvider.class)));
-		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", daoFactory);
+		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", this.daoFactory);
 
 		//Mock GermplasmServiceImpl#getPlotCodeField);
 		final UserDefinedField userDefinedField = Mockito.mock(UserDefinedField.class);
@@ -230,85 +229,85 @@ public class GermplasmServiceImplTest {
 		germplasmImportDTO.setProgenitor2("2");
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDTO));
 
-		Mockito.when(germplasmDAO.getByGIDList(Mockito.anyList())).thenReturn(Collections.singletonList(new Germplasm()));
-		Mockito.when(methodDAO.getByCode(Mockito.anyList())).thenReturn(Collections.emptyList());
-		Mockito.when(locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.emptyList());
-		Mockito.when(this.workbenchDataManager.getCropTypeByName(cropName)).thenReturn(new CropType());
+		Mockito.when(this.germplasmDAO.getByGIDList(Mockito.anyList())).thenReturn(Collections.singletonList(new Germplasm()));
+		Mockito.when(this.methodDAO.getByCode(Mockito.anyList())).thenReturn(Collections.emptyList());
+		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.emptyList());
+		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
 
-		germplasmService.importGermplasm(1, cropName, germplasmImportRequestDto);
+		this.germplasmService.importGermplasm(1, this.cropName, germplasmImportRequestDto);
 	}
 
 	@Test
 	public void test_importGermplasm_MatchesAreNotLoaded_WhenSkipWhenMatchesIsFalse() {
 		final GermplasmServiceImpl unitToTest = new GermplasmServiceImpl(Mockito.mock(HibernateSessionProvider.class));
-		unitToTest.setWorkbenchDataManager(workbenchDataManager);
+		unitToTest.setWorkbenchDataManager(this.workbenchDataManager);
 
 		final GermplasmServiceImpl partiallyMockedUnit = Mockito.spy(unitToTest);
-		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", daoFactory);
+		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", this.daoFactory);
 
 		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
 		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.NONE);
 
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(this.createGermplasmImportDto()));
 
-		Mockito.when(germplasmDAO.getByGIDList(Mockito.anyList())).thenReturn(Collections.singletonList(new Germplasm()));
-		Mockito.when(methodDAO.getByCode(Mockito.anyList())).thenReturn(Collections.singletonList(this.createMethod()));
-		Mockito.when(locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.emptyList());
-		Mockito.when(this.workbenchDataManager.getCropTypeByName(cropName)).thenReturn(new CropType());
+		Mockito.when(this.germplasmDAO.getByGIDList(Mockito.anyList())).thenReturn(Collections.singletonList(new Germplasm()));
+		Mockito.when(this.methodDAO.getByCode(Mockito.anyList())).thenReturn(Collections.singletonList(this.createMethod()));
+		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.emptyList());
+		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
 
-		partiallyMockedUnit.importGermplasm(1, cropName, germplasmImportRequestDto);
+		partiallyMockedUnit.importGermplasm(1, this.cropName, germplasmImportRequestDto);
 		Mockito.verify(partiallyMockedUnit, Mockito.times(0)).findGermplasmMatches(Mockito.any(), Mockito.isNull());
 	}
 
 	@Test
 	public void test_importGermplasm_SaveGermplasmIsNeverCalled_WhenAMatchIsFound() {
 		final GermplasmServiceImpl unitToTest = new GermplasmServiceImpl(Mockito.mock(HibernateSessionProvider.class));
-		unitToTest.setWorkbenchDataManager(workbenchDataManager);
+		unitToTest.setWorkbenchDataManager(this.workbenchDataManager);
 
 		final GermplasmServiceImpl partiallyMockedUnit = Mockito.spy(unitToTest);
-		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", daoFactory);
+		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", this.daoFactory);
 
 		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
 		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.NONE);
 		germplasmImportRequestDto.setSkipCreationWhenMatches(true);
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(this.createGermplasmImportDto()));
 
-		Mockito.when(germplasmDAO.getByGIDList(Mockito.anyList())).thenReturn(Collections.singletonList(new Germplasm()));
-		Mockito.when(methodDAO.getByCode(Mockito.anyList())).thenReturn(Collections.singletonList(this.createMethod()));
-		Mockito.when(locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.emptyList());
-		Mockito.when(this.workbenchDataManager.getCropTypeByName(cropName)).thenReturn(new CropType());
+		Mockito.when(this.germplasmDAO.getByGIDList(Mockito.anyList())).thenReturn(Collections.singletonList(new Germplasm()));
+		Mockito.when(this.methodDAO.getByCode(Mockito.anyList())).thenReturn(Collections.singletonList(this.createMethod()));
+		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.emptyList());
+		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
 
 		Mockito.doReturn(Collections.singletonList(this.createGermplasmDto())).when(partiallyMockedUnit)
 			.findGermplasmMatches(Mockito.any(GermplasmMatchRequestDto.class), ArgumentMatchers.isNull());
 
-		partiallyMockedUnit.importGermplasm(1, cropName, germplasmImportRequestDto);
-		Mockito.verify(germplasmDAO, Mockito.times(0)).save(Mockito.any());
+		partiallyMockedUnit.importGermplasm(1, this.cropName, germplasmImportRequestDto);
+		Mockito.verify(this.germplasmDAO, Mockito.times(0)).save(Mockito.any());
 	}
 
 	@Test
 	public void test_importGermplasm_ReferenceIsSet_WhenAReferenceIsSpecified() {
 		final GermplasmServiceImpl unitToTest = new GermplasmServiceImpl(Mockito.mock(HibernateSessionProvider.class));
-		unitToTest.setWorkbenchDataManager(workbenchDataManager);
+		unitToTest.setWorkbenchDataManager(this.workbenchDataManager);
 
 		final GermplasmServiceImpl partiallyMockedUnit = Mockito.spy(unitToTest);
-		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", daoFactory);
+		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", this.daoFactory);
 
 		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
 		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.NONE);
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(this.createGermplasmImportDto()));
 
-		Mockito.when(germplasmDAO.getByGIDList(Mockito.anyList())).thenReturn(Collections.singletonList(new Germplasm()));
-		Mockito.when(methodDAO.getByCode(Mockito.anyList())).thenReturn(Collections.singletonList(this.createMethod()));
-		Mockito.when(locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.singletonList(this.createLocation()));
-		Mockito.when(this.workbenchDataManager.getCropTypeByName(cropName)).thenReturn(new CropType());
+		Mockito.when(this.germplasmDAO.getByGIDList(Mockito.anyList())).thenReturn(Collections.singletonList(new Germplasm()));
+		Mockito.when(this.methodDAO.getByCode(Mockito.anyList())).thenReturn(Collections.singletonList(this.createMethod()));
+		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.singletonList(this.createLocation()));
+		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
 
-		partiallyMockedUnit.importGermplasm(1, cropName, germplasmImportRequestDto);
-		Mockito.verify(bibrefDAO, Mockito.times(1)).save(Mockito.any());
+		partiallyMockedUnit.importGermplasm(1, this.cropName, germplasmImportRequestDto);
+		Mockito.verify(this.bibrefDAO, Mockito.times(1)).save(Mockito.any());
 	}
 
-	private void mockUserDefinedFieldDAOGetByFieldTableNameAndType(UserDefinedField userDefinedField) {
+	private void mockUserDefinedFieldDAOGetByFieldTableNameAndType(final UserDefinedField userDefinedField) {
 		Mockito.when(this.userDefinedFieldDAO.getByFieldTableNameAndType(ArgumentMatchers.eq(UDTableType.ATRIBUTS_PASSPORT.getTable()),
-			ArgumentMatchers.anySet())).thenReturn(Arrays.asList(userDefinedField));
+			ArgumentMatchers.anySet())).thenReturn(Collections.singletonList(userDefinedField));
 	}
 
 	private void verifyUserDefinedFieldDAOGetByFieldTableNameAndType() {
@@ -328,7 +327,7 @@ public class GermplasmServiceImplTest {
 		germplasmImportDTO.setLocationAbbr(this.locationAbbreviation);
 		germplasmImportDTO.setCreationDate("20201212");
 		germplasmImportDTO.setReference("Reference");
-		germplasmImportDTO.setGermplasmUUID(germplasmUUID);
+		germplasmImportDTO.setGermplasmUUID(this.germplasmUUID);
 		return germplasmImportDTO;
 	}
 
@@ -349,7 +348,7 @@ public class GermplasmServiceImplTest {
 
 	private GermplasmDto createGermplasmDto() {
 		final GermplasmDto germplasmDto = new GermplasmDto();
-		germplasmDto.setGermplasmUUID(germplasmUUID);
+		germplasmDto.setGermplasmUUID(this.germplasmUUID);
 		germplasmDto.setGid(1);
 		final GermplasmNameDto germplasmNameDto = new GermplasmNameDto();
 		germplasmNameDto.setName("name");
