@@ -70,7 +70,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 
 	@Override
 	public Integer countBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest) {
-		List<BreedingMethodDTO> breedingMethodDTO = this.getBreedingMethods(methodSearchRequest);
+		final List<BreedingMethodDTO> breedingMethodDTO = this.getBreedingMethods(methodSearchRequest);
 		final Integer count = Util.isEmpty(breedingMethodDTO) ? 0 : breedingMethodDTO.size();
 		return count;
 	}
