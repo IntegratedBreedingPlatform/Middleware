@@ -305,13 +305,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 				}
 			}
 		} else if (preferredNames.size() > 1) {
-			conflictErrors.put("germplasm.update.preferred.name.duplicate.names", new Object[] {
+			conflictErrors.put("germplasm.update.preferred.name.duplicate.names", new String[] {
 				germplasmUpdateDTO.getPreferredNameType(),
-				germplasm.getGid()});
+				String.valueOf(germplasm.getGid())});
 		} else if (!liquibase.util.StringUtils.isEmpty(germplasmUpdateDTO.getPreferredNameType())) {
-			conflictErrors.put("germplasm.update.preferred.name.doesnt.exist", new Object[] {
+			conflictErrors.put("germplasm.update.preferred.name.doesnt.exist", new String[] {
 				germplasmUpdateDTO.getPreferredNameType(),
-				germplasm.getGid()});
+				String.valueOf(germplasm.getGid())});
 		}
 	}
 
@@ -361,8 +361,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 				germplasm.setMethodId(breedingMethodOptional.get().getMid());
 
 				if (newBreedingMethod.getMprgn() == 1) {
-					conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new Object[] {
-						germplasm.getGid()});
+					conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new String[] {
+						String.valueOf(germplasm.getGid())});
 				} else if (this.isGenerative(newBreedingMethod.getMtype())) {
 					this.assignProgenitorForGenerativeMethod(germplasm, femaleParentGid, maleParentGid, newBreedingMethod, conflictErrors);
 				} else if (this.isMaintenanceOrDerivative(newBreedingMethod.getMtype())) {
@@ -370,8 +370,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 						conflictErrors, femaleParentGid, maleParentGid);
 				}
 			} else {
-				conflictErrors.put("germplasm.update.breeding.method.mismatch", new Object[] {
-					germplasm.getGid(),
+				conflictErrors.put("germplasm.update.breeding.method.mismatch", new String[] {
+					String.valueOf(germplasm.getGid()),
 					String.format("%s (%s)", germplasm.getMethod().getMname(), germplasm.getMethod().getMtype())});
 			}
 
@@ -382,8 +382,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Method newBreedingMethod, final Multimap<String, Object[]> conflictErrors) {
 
 		if (!germplasm.getMethod().getMprgn().equals(newBreedingMethod.getMprgn())) {
-			conflictErrors.put("germplasm.update.number.of.progenitors.mismatch", new Object[] {
-				germplasm.getGid()});
+			conflictErrors.put("germplasm.update.number.of.progenitors.mismatch", new String[] {
+				String.valueOf(germplasm.getGid())});
 		} else {
 			if (femaleParentGid == 0 && maleParentGid == 0) {
 				germplasm.setGnpgs(0);
@@ -404,13 +404,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		if (germplasmWithDescendantsMap.containsKey(germplasm.getGid())) {
 			// Prevent update if the germplasm has existing pedigree tree.
-			conflictErrors.put("germplasm.update.germplasm.has.existing.progeny", new Object[] {
-				germplasm.getGid()});
+			conflictErrors.put("germplasm.update.germplasm.has.existing.progeny", new String[] {
+				String.valueOf(germplasm.getGid())});
 		} else if (femaleParentGid != 0 && maleParentGid != 0
 			&& progenitorsMapByGid.get(maleParentGid).getGpid1().intValue() != femaleParentGid) {
 			// Prevent update if the specified immediate source (male parent) does not belong to the same group
-			conflictErrors.put("germplasm.update.immediate.source.must.belong.to.the.same.group", new Object[] {
-				germplasm.getGid()});
+			conflictErrors.put("germplasm.update.immediate.source.must.belong.to.the.same.group", new String[] {
+				String.valueOf(germplasm.getGid())});
 		} else if (femaleParentGid == 0 && maleParentGid != 0) {
 			// For Unknown Group Source
 			germplasm.setGpid1(progenitorsMapByGid.get(maleParentGid).getGpid1());
@@ -467,8 +467,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			// Check if there are multiple names with same type
 			if (namesByType.size() > 1) {
-				conflictErrors.put("germplasm.update.duplicate.names", new Object[] {
-					code, germplasm.getGid()});
+				conflictErrors.put("germplasm.update.duplicate.names", new String[] {
+					code, String.valueOf(germplasm.getGid())});
 			} else if (namesByType.size() == 1) {
 				// Update if name is existing
 				final Name name = namesByType.get(0);
@@ -499,8 +499,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			// Check if there are multiple attributes with same type
 			if (attributesByType.size() > 1) {
-				conflictErrors.put("germplasm.update.duplicate.attributes", new Object[] {
-					code, germplasm.getGid()});
+				conflictErrors.put("germplasm.update.duplicate.attributes", new String[] {
+					code, String.valueOf(germplasm.getGid())});
 			} else if (attributesByType.size() == 1) {
 				final Attribute attribute = attributesByType.get(0);
 				attribute.setLocationId(germplasm.getLocationId());
