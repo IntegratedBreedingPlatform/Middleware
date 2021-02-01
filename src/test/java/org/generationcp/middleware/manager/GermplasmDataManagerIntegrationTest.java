@@ -1303,7 +1303,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			UDTableType.NAMES_NAME.getType(), fname1));
 
 		final HashSet codes = new HashSet() {{
-			add(UserDefinedFieldTestDataInitializer.CODE);
+			this.add(UserDefinedFieldTestDataInitializer.CODE);
 		}};
 		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
 			Collections.singleton(UDTableType.NAMES_NAME.getType()),

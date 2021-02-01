@@ -741,7 +741,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final StringBuilder sql = new StringBuilder();
 		sql.append("SELECT DISTINCT m.mcode FROM phenotype p ")
 			.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
-			.append(" INNER JOIN methods m ON m.mcode = p.value OR m.mid = p.value ")
+			.append(" INNER JOIN methods m ON m.mcode = p.value ")
 			.append(" INNER JOIN nd_geolocation location ON e.nd_geolocation_id = location.nd_geolocation_id ")
 			.append(" WHERE e.project_id = :studyDbid AND p.observable_id = :variableId AND location.description IN (:trialInstances) ")
 			.append(" AND m.mtype NOT IN (:advancingMethodTypes) ");
