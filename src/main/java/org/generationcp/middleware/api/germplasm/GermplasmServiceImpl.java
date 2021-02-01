@@ -337,27 +337,28 @@ public class GermplasmServiceImpl implements GermplasmService {
 		germplasmDateOptional.ifPresent(germplasm::setGdate);
 
 		this.saveOrUpdateReference(germplasm, referenceOptional);
-		this.updateProgenitors(germplasmUpdateDTO, germplasm, breedingMethodOptional, progenitorsMapByGid, germplasmWithDescendantsMap,
+		this.updateBreedingMethodAndProgenitors(germplasmUpdateDTO, germplasm, breedingMethodOptional, progenitorsMapByGid,
+			germplasmWithDescendantsMap,
 			conflictErrors);
 
 		this.daoFactory.getGermplasmDao().update(germplasm);
 	}
 
-	private void updateProgenitors(final GermplasmUpdateDTO germplasmUpdateDTO, final Germplasm germplasm,
+	private void updateBreedingMethodAndProgenitors(final GermplasmUpdateDTO germplasmUpdateDTO, final Germplasm germplasm,
 		final Optional<Method> breedingMethodOptional,
 		final Map<Integer, Germplasm> progenitorsMapByGid,
 		final Map<Integer, Germplasm> germplasmWithDescendantsMap,
 		final Multimap<String, Object[]> conflictErrors) {
 		if (breedingMethodOptional.isPresent()) {
 
-			final int femaleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_1);
-			final int maleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_2);
+			final Integer femaleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_1);
+			final Integer maleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_2);
 			final Method newBreedingMethod = breedingMethodOptional.get();
 			final Method oldBreedingMethod = germplasm.getMethod();
 
-			// Only update the method and assign progenitors if the new method has the same type as the old method.
 			if (this.isMethodTypeMatch(newBreedingMethod.getMtype(), oldBreedingMethod.getMtype())) {
 
+				// Only update the method if the new method has the same type as the old method.
 				germplasm.setMethodId(breedingMethodOptional.get().getMid());
 
 				if (newBreedingMethod.getMprgn() == 1) {
@@ -378,50 +379,56 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private void assignProgenitorForGenerativeMethod(final Germplasm germplasm, final int femaleParentGid, final int maleParentGid,
+	private void assignProgenitorForGenerativeMethod(final Germplasm germplasm, final Integer femaleParentGid, final Integer maleParentGid,
 		final Method newBreedingMethod, final Multimap<String, Object[]> conflictErrors) {
 
-		if (!germplasm.getMethod().getMprgn().equals(newBreedingMethod.getMprgn())) {
-			conflictErrors.put("germplasm.update.number.of.progenitors.mismatch", new String[] {
-				String.valueOf(germplasm.getGid())});
-		} else {
-			if (femaleParentGid == 0 && maleParentGid == 0) {
-				germplasm.setGnpgs(0);
-			} else if (newBreedingMethod.getMprgn().intValue() != 1) {
-				germplasm.setGnpgs(2);
+		if (femaleParentGid != null && maleParentGid != null) {
+			if (!germplasm.getMethod().getMprgn().equals(newBreedingMethod.getMprgn())) {
+				conflictErrors.put("germplasm.update.number.of.progenitors.mismatch", new String[] {
+					String.valueOf(germplasm.getGid())});
+			} else {
+				if (femaleParentGid == 0 && maleParentGid == 0) {
+					germplasm.setGnpgs(0);
+				} else if (newBreedingMethod.getMprgn().intValue() != 1) {
+					germplasm.setGnpgs(2);
+				}
+				germplasm.setGpid1(femaleParentGid);
+				germplasm.setGpid2(maleParentGid);
 			}
-			germplasm.setGpid1(femaleParentGid);
-			germplasm.setGpid2(maleParentGid);
 		}
 	}
 
 	private void assignProgenitorForDerivativeOrMaintenanceMethod(final Germplasm germplasm,
 		final Map<Integer, Germplasm> progenitorsMapByGid,
 		final Map<Integer, Germplasm> germplasmWithDescendantsMap, final Multimap<String, Object[]> conflictErrors,
-		final int femaleParentGid, final int maleParentGid) {
-		// Gnpgs of derivative/maintenance germplasm is always -1
-		germplasm.setGnpgs(-1);
+		final Integer femaleParentGid, final Integer maleParentGid) {
 
-		if (germplasmWithDescendantsMap.containsKey(germplasm.getGid())) {
-			// Prevent update if the germplasm has existing pedigree tree.
-			conflictErrors.put("germplasm.update.germplasm.has.existing.progeny", new String[] {
-				String.valueOf(germplasm.getGid())});
-		} else if (femaleParentGid != 0 && maleParentGid != 0
-			&& progenitorsMapByGid.get(maleParentGid).getGpid1().intValue() != femaleParentGid) {
-			// Prevent update if the specified immediate source (male parent) does not belong to the same group
-			conflictErrors.put("germplasm.update.immediate.source.must.belong.to.the.same.group", new String[] {
-				String.valueOf(germplasm.getGid())});
-		} else if (femaleParentGid == 0 && maleParentGid != 0) {
-			// For Unknown Group Source
-			germplasm.setGpid1(progenitorsMapByGid.get(maleParentGid).getGpid1());
-			germplasm.setGpid2(maleParentGid);
-		} else {
-			// For Terminal node (group source = 0 and immediate source = 0)
-			// For Unknown Immediate Source (group source <> 0 and immediate source = 0)
-			// Known Group/Immediate Source (group source <> 0 and immediate source <> 0 and immediate source belongs to the same group)
-			germplasm.setGpid1(femaleParentGid);
-			germplasm.setGpid2(maleParentGid);
+		if (femaleParentGid != null && maleParentGid != null) {
+			// Gnpgs of derivative/maintenance germplasm is always -1
+			germplasm.setGnpgs(-1);
+
+			if (germplasmWithDescendantsMap.containsKey(germplasm.getGid())) {
+				// Prevent update if the germplasm has existing pedigree tree.
+				conflictErrors.put("germplasm.update.germplasm.has.existing.progeny", new String[] {
+					String.valueOf(germplasm.getGid())});
+			} else if (femaleParentGid != 0 && maleParentGid != 0
+				&& progenitorsMapByGid.get(maleParentGid).getGpid1().intValue() != femaleParentGid) {
+				// Prevent update if the specified immediate source (male parent) does not belong to the same group
+				conflictErrors.put("germplasm.update.immediate.source.must.belong.to.the.same.group", new String[] {
+					String.valueOf(germplasm.getGid())});
+			} else if (femaleParentGid == 0 && maleParentGid != 0) {
+				// For Unknown Group Source
+				germplasm.setGpid1(progenitorsMapByGid.get(maleParentGid).getGpid1());
+				germplasm.setGpid2(maleParentGid);
+			} else {
+				// For Terminal node (group source = 0 and immediate source = 0)
+				// For Unknown Immediate Source (group source <> 0 and immediate source = 0)
+				// Known Group/Immediate Source (group source <> 0 and immediate source <> 0 and immediate source belongs to the same group)
+				germplasm.setGpid1(femaleParentGid);
+				germplasm.setGpid2(maleParentGid);
+			}
 		}
+
 	}
 
 	private Map<Integer, Germplasm> getGermplasmWithDescendantsMap(final List<Germplasm> germplasmList) {
