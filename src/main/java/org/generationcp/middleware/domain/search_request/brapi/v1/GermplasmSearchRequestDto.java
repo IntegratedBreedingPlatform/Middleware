@@ -20,6 +20,9 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	private List<String> germplasmPUIs;
 	private List<String> germplasmSpecies;
 	private String preferredName;
+	private String studyDbId;
+	private String parentDbId;
+	private String progenyDbId;
 
 	public GermplasmSearchRequestDto() {
 		this.accessionNumbers = Lists.newArrayList();
@@ -93,6 +96,30 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 
 	public void setGermplasmSpecies(final List<String> germplasmSpecies) {
 		this.germplasmSpecies = germplasmSpecies;
+	}
+
+	public String getStudyDbId() {
+		return this.studyDbId;
+	}
+
+	public void setStudyDbId(final String studyDbId) {
+		this.studyDbId = studyDbId;
+	}
+
+	public String getParentDbId() {
+		return this.parentDbId;
+	}
+
+	public void setParentDbId(final String parentDbId) {
+		this.parentDbId = parentDbId;
+	}
+
+	public String getProgenyDbId() {
+		return progenyDbId;
+	}
+
+	public void setProgenyDbId(final String progenyDbId) {
+		this.progenyDbId = progenyDbId;
 	}
 
 	@Override

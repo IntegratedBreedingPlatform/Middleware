@@ -1314,6 +1314,18 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
 			paramBuilder.setParameterList("germplasmSpecies", germplasmSearchRequestDTO.getGermplasmSpecies());
 		}
+
+		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getStudyDbId())) {
+			paramBuilder.setParameter("studyDbId", germplasmSearchRequestDTO.getStudyDbId());
+		}
+
+		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getParentDbId())) {
+			paramBuilder.setParameter("parentDbId", germplasmSearchRequestDTO.getParentDbId());
+		}
+
+		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getProgenyDbId())) {
+			paramBuilder.setParameter("progenyDbId", germplasmSearchRequestDTO.getProgenyDbId());
+		}
 	}
 	private void addGermplasmSearchFilters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {
@@ -1353,6 +1365,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
 			paramBuilder.append(" AND species IN (:germplasmSpecies) "); //
 		}
+
+		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getStudyDbId())) {
+			paramBuilder.append(" AND EXISTS (SELECT 1 from stock s "
+				+ " INNER JOIN nd_experiment e ON e.stock_id = s.stock_id "
+				+ " WHERE s.dbxref_id = g.gid AND e.nd_geolocation_id = :studyDbId )");
+		}
+
+		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getParentDbId())) {
+			paramBuilder.append(" AND (g.gpid1 = :parentDbId OR g.gpid2 = :parentDbId) AND g.gnpgs >= 2");
+		}
+
+		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getProgenyDbId())) {
+			paramBuilder.append(" AND EXISTS ("
+				+ "SELECT 1 from germplsm child "
+				+ "WHERE child.gid = :progenyDbId AND (child.gpid1 = g.gid or child.gpid2 = g.gid) AND child.gnpgs >= 2 )");
+		}
 	}
 
 	public List<GermplasmDTO> getGermplasmDTOList(
@@ -1383,6 +1411,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private String getSelectClauseForFilterGermplasm() {
 		return "SELECT convert(g.gid, char) AS germplasmDbId, g.germplsm_uuid as germplasmPUI, " //
+			+ "  g.gpid1, g.gpid2, g.gnpgs, " //
 			+ "  max(if(ntype.fcode = 'ACCNO', n.nval, null)) as accessionNumber, " //
 			+ "   STR_TO_DATE (convert(g.gdate,char), '%Y%m%d') AS acquisitionDate," //
 			+ "   loc.labbr AS countryOfOriginCode, " //
@@ -1443,7 +1472,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		queryBuilder.append(this.getMainFromGermplasmClause());
 		queryBuilder.append(" INNER JOIN stock s ON s.dbxref_id = g.gid "//
 			+ " INNER JOIN nd_experiment e ON e.stock_id = s.stock_id "//
-			+ " INNER JOIN project p ON e.project_id = p.project_id "
 			+ " WHERE g.deleted = 0 AND g.grplce = 0 "//
 			+ " AND e.nd_geolocation_id = :studyDbId ");
 		queryBuilder.append(" GROUP by g.gid ");
