@@ -27,6 +27,8 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -547,11 +549,14 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		}
 	}
 
-	public List<Method> filterMethods(final BreedingMethodSearchRequest methodSearchRequest) {
+	public List<Method> filterMethods(final BreedingMethodSearchRequest methodSearchRequest, final Pageable pageable) {
 
 		try {
 			final Criteria criteria = this.setCriteriaFilteredMethods(methodSearchRequest);
 			criteria.addOrder(Order.asc(MethodDAO.METHOD_NAME));
+			if (pageable != null) {
+				GenericDAO.addPagination(criteria, pageable);
+			}
 			return criteria.list();
 		} catch (final Exception e) {
 			MethodDAO.LOG.error(this.getLogExceptionMessage("filterMethods", "", null, e.getMessage(), "Method"), e);
@@ -559,6 +564,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 				e);
 		}
 	}
+
 	public Long countFilteredMethods(final BreedingMethodSearchRequest methodSearchRequest) {
 		try {
 			final Criteria criteria = this.setCriteriaFilteredMethods(methodSearchRequest);

@@ -1,7 +1,8 @@
 package org.generationcp.middleware.api.breedingmethod;
 
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
-import java.util.Set;
 
 public interface BreedingMethodService {
 
@@ -9,7 +10,7 @@ public interface BreedingMethodService {
 
 	BreedingMethodDTO getBreedingMethod(Integer breedingMethodDbId);
 
-	List<BreedingMethodDTO> getBreedingMethods(BreedingMethodSearchRequest methodSearchRequest);
+	List<BreedingMethodDTO> getBreedingMethods(BreedingMethodSearchRequest methodSearchRequest, Pageable pageable);
 
 	Long countBreedingMethods(BreedingMethodSearchRequest methodSearchRequest);
 }

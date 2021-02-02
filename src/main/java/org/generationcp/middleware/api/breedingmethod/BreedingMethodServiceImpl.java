@@ -8,6 +8,7 @@ import org.generationcp.middleware.pojos.MethodClass;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -50,7 +51,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	}
 
 	@Override
-	public List<BreedingMethodDTO> getBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest) {
+	public List<BreedingMethodDTO> getBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest, final Pageable pageable) {
 		final String programUUID = methodSearchRequest.getProgramUUID();
 		final boolean favoritesOnly = methodSearchRequest.isFavoritesOnly();
 		if (!StringUtils.isEmpty(programUUID) && favoritesOnly) {
@@ -62,7 +63,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 			methodSearchRequest.setMethodIds(favoriteProjectMethodsIds);
 		}
 
-		return this.daoFactory.getMethodDAO().filterMethods(methodSearchRequest).stream()
+		return this.daoFactory.getMethodDAO().filterMethods(methodSearchRequest, pageable).stream()
 			.map(BreedingMethodDTO::new)
 			.collect(Collectors.toList());
 	}
