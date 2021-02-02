@@ -664,7 +664,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Bibref getBibliographicReferenceByID(final Integer id) {
-		return this.daoFactory.getBibrefDao().getById(id, false);
+		return this.daoFactory.getBibrefDAO().getById(id, false);
 	}
 
 	@Override
@@ -673,7 +673,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final Integer idBibrefSaved;
 		try {
 
-			final Bibref recordSaved = this.daoFactory.getBibrefDao().saveOrUpdate(bibref);
+			final Bibref recordSaved = this.daoFactory.getBibrefDAO().saveOrUpdate(bibref);
 			idBibrefSaved = recordSaved.getRefid();
 
 		} catch (final Exception e) {

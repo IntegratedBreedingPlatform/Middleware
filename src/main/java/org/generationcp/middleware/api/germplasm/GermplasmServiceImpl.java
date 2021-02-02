@@ -154,7 +154,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		for (final GermplasmImportDTO germplasmDto : germplasmDtoList) {
 
-			if (germplasmImportRequestDto.isSkipCreationWhenMatches()) {
+			if (germplasmImportRequestDto.isSkipIfExists()) {
 				if (gidMatchByUUID.containsKey(germplasmDto.getGermplasmUUID())) {
 					results.put(germplasmDto.getClientId(),
 						new GermplasmImportResponseDto(GermplasmImportResponseDto.Status.FOUND,
@@ -624,7 +624,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 					GermplasmImportDTO::getProgenitor2).collect(Collectors.toSet());
 			final Set<String> allProgenitors = new HashSet<>(progenitor1Set);
 			allProgenitors.addAll(progenitor2Set);
-			List<Germplasm> germplasmList;
+			final List<Germplasm> germplasmList;
 			if (connectionType == GermplasmImportRequestDto.PedigreeConnectionType.GID) {
 				final List<Integer> gids = allProgenitors.stream().map(g -> Integer.valueOf(g)).collect(Collectors.toList());
 				germplasmList = this.daoFactory.getGermplasmDao().getByGIDList(gids);
@@ -643,7 +643,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private List<GermplasmDto> loadGermplasmMatches(final GermplasmImportRequestDto germplasmImportRequestDto) {
-		if (germplasmImportRequestDto.isSkipCreationWhenMatches()) {
+		if (germplasmImportRequestDto.isSkipIfExists()) {
 			final List<String> guids =
 				germplasmImportRequestDto.getGermplasmList().stream().filter(g -> StringUtils.isNotEmpty(g.getGermplasmUUID()))
 					.map(GermplasmImportDTO::getGermplasmUUID).collect(Collectors.toList());
@@ -669,8 +669,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		if ((StringUtils.isEmpty(progenitor1) && StringUtils.isEmpty(progenitor2)) || ("0".equals(progenitor1) && "0"
 			.equals(progenitor2)) || method.isGenerative()) {
-			germplasm.setGpid1(resolveGpid(progenitor1, progenitorsMap));
-			germplasm.setGpid2(resolveGpid(progenitor2, progenitorsMap));
+			germplasm.setGpid1(this.resolveGpid(progenitor1, progenitorsMap));
+			germplasm.setGpid2(this.resolveGpid(progenitor2, progenitorsMap));
 			return;
 		}
 
@@ -689,9 +689,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 							String.valueOf(progenitorsMap.get(progenitor2).getGid()),
 							String.valueOf(progenitorsMap.get(progenitor1).getGid())});
 				}
-				germplasm.setGpid1(resolveGpid(progenitor1, progenitorsMap));
+				germplasm.setGpid1(this.resolveGpid(progenitor1, progenitorsMap));
 			}
-			germplasm.setGpid2(resolveGpid(progenitor2, progenitorsMap));
+			germplasm.setGpid2(this.resolveGpid(progenitor2, progenitorsMap));
 		}
 	}
 

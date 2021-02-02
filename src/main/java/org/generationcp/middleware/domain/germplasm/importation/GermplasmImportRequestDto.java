@@ -8,7 +8,7 @@ import java.util.List;
 
 @AutoProperty
 @JsonPropertyOrder({
-	"connectUsing", "germplasmList"})
+	"connectUsing", "skipIfExists", "germplasmList"})
 public class GermplasmImportRequestDto {
 
 	public enum PedigreeConnectionType {
@@ -19,7 +19,7 @@ public class GermplasmImportRequestDto {
 	}
 
 	private PedigreeConnectionType connectUsing;
-	private boolean skipCreationWhenMatches = false;
+	private boolean skipIfExists = false;
 	private List<GermplasmImportDTO> germplasmList;
 
 	public PedigreeConnectionType getConnectUsing() {
@@ -38,12 +38,12 @@ public class GermplasmImportRequestDto {
 		this.germplasmList = germplasmList;
 	}
 
-	public boolean isSkipCreationWhenMatches() {
-		return skipCreationWhenMatches;
+	public boolean isSkipIfExists() {
+		return skipIfExists;
 	}
 
-	public void setSkipCreationWhenMatches(final boolean skipCreationWhenMatches) {
-		this.skipCreationWhenMatches = skipCreationWhenMatches;
+	public void setSkipIfExists(final boolean skipIfExists) {
+		this.skipIfExists = skipIfExists;
 	}
 
 	@Override

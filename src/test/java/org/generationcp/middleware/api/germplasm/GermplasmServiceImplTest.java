@@ -269,7 +269,7 @@ public class GermplasmServiceImplTest {
 
 		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
 		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.NONE);
-		germplasmImportRequestDto.setSkipCreationWhenMatches(true);
+		germplasmImportRequestDto.setSkipIfExists(true);
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(this.createGermplasmImportDto()));
 
 		Mockito.when(this.germplasmDAO.getByGIDList(Mockito.anyList())).thenReturn(Collections.singletonList(new Germplasm()));
