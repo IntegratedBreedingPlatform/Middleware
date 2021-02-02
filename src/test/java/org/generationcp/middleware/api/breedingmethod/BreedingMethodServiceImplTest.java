@@ -67,7 +67,7 @@ public class BreedingMethodServiceImplTest {
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
 		searchRequest.setProgramUUID(PROGRAM_UUID);
 		Mockito.when(
-			this.methodDAO.filterMethods(ArgumentMatchers.eq(searchRequest), null))
+			this.methodDAO.filterMethods(ArgumentMatchers.eq(searchRequest), ArgumentMatchers.eq(null)))
 			.thenReturn(methods);
 
 		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest, null);
@@ -77,7 +77,7 @@ public class BreedingMethodServiceImplTest {
 		this.assertBreedingMethodDTO(actualBreedingMethodDTO, method);
 
 		Mockito.verify(this.methodDAO)
-			.filterMethods(ArgumentMatchers.eq(searchRequest), null);
+			.filterMethods(ArgumentMatchers.eq(searchRequest), ArgumentMatchers.eq(null));
 
 		Mockito.verify(this.programFavoriteDAO, new Times(0)).getProgramFavorites(
 			ArgumentMatchers.any(ProgramFavorite.FavoriteType.class),
