@@ -8,7 +8,6 @@ import org.generationcp.middleware.pojos.MethodClass;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.util.Util;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -69,10 +68,8 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	}
 
 	@Override
-	public Integer countBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest) {
-		final List<BreedingMethodDTO> breedingMethodDTO = this.getBreedingMethods(methodSearchRequest);
-		final Integer count = Util.isEmpty(breedingMethodDTO) ? 0 : breedingMethodDTO.size();
-		return count;
+	public Long countBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest) {
+		return this.daoFactory.getMethodDAO().countFilteredMethods(methodSearchRequest);
 	}
 
 	private List<Integer> getFavoriteProjectMethodsIds(final String programUUID) {

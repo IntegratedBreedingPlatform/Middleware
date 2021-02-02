@@ -11,5 +11,5 @@ public interface BreedingMethodService {
 
 	List<BreedingMethodDTO> getBreedingMethods(BreedingMethodSearchRequest methodSearchRequest);
 
-	Integer countBreedingMethods(BreedingMethodSearchRequest methodSearchRequest);
+	Long countBreedingMethods(BreedingMethodSearchRequest methodSearchRequest);
 }

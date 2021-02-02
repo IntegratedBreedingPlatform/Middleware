@@ -21,7 +21,6 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -551,29 +550,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	public List<Method> filterMethods(final BreedingMethodSearchRequest methodSearchRequest) {
 
 		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			final String programUUID = methodSearchRequest.getProgramUUID();
-			if (StringUtils.isEmpty(programUUID)) {
-				criteria.add(Restrictions.isNull(MethodDAO.UNIQUE_ID));
-			} else {
-				criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
-			}
-
-			final List<Integer> methodIds = methodSearchRequest.getMethodIds();
-			if (!CollectionUtils.isEmpty(methodIds)) {
-				criteria.add(Restrictions.in("mid", methodIds));
-			}
-
-			final List<String> methodAbbreviations = methodSearchRequest.getMethodAbbreviations();
-			if (!CollectionUtils.isEmpty(methodAbbreviations)) {
-				criteria.add(Restrictions.in("mcode", methodAbbreviations));
-			}
-
-			final List<String> methodTypes = methodSearchRequest.getMethodTypes();
-			if (!CollectionUtils.isEmpty(methodTypes)) {
-				criteria.add(Restrictions.in("mtype", methodTypes));
-			}
-
+			final Criteria criteria = this.setCriteriaFilteredMethods(methodSearchRequest);
 			criteria.addOrder(Order.asc(MethodDAO.METHOD_NAME));
 			return criteria.list();
 		} catch (final Exception e) {
@@ -582,5 +559,40 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 				e);
 		}
 	}
+	public Long countFilteredMethods(final BreedingMethodSearchRequest methodSearchRequest) {
+		try {
+			final Criteria criteria = this.setCriteriaFilteredMethods(methodSearchRequest);
+			return ((Long) criteria.uniqueResult()).longValue();
+		} catch (final Exception e) {
+			MethodDAO.LOG.error(this.getLogExceptionMessage("filterMethods", "", null, e.getMessage(), "Method"), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("filterMethods", "", null, e.getMessage(), "Method"),
+				e);
+		}
+	}
 
+	private Criteria setCriteriaFilteredMethods(final BreedingMethodSearchRequest methodSearchRequest) {
+		final Criteria criteria = this.getSession().createCriteria(Method.class);
+		final String programUUID = methodSearchRequest.getProgramUUID();
+		if (StringUtils.isEmpty(programUUID)) {
+			criteria.add(Restrictions.isNull(MethodDAO.UNIQUE_ID));
+		} else {
+			criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
+		}
+
+		final List<Integer> methodIds = methodSearchRequest.getMethodIds();
+		if (!CollectionUtils.isEmpty(methodIds)) {
+			criteria.add(Restrictions.in("mid", methodIds));
+		}
+
+		final List<String> methodAbbreviations = methodSearchRequest.getMethodAbbreviations();
+		if (!CollectionUtils.isEmpty(methodAbbreviations)) {
+			criteria.add(Restrictions.in("mcode", methodAbbreviations));
+		}
+
+		final List<String> methodTypes = methodSearchRequest.getMethodTypes();
+		if (!CollectionUtils.isEmpty(methodTypes)) {
+			criteria.add(Restrictions.in("mtype", methodTypes));
+		}
+		return criteria;
+	}
 }
