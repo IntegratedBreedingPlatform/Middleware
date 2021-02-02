@@ -51,6 +51,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -206,12 +207,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.daoFactory.getNameDao().getByGIDWithFilters(gid, status, type);
 	}
 
-	/**
-	 * (non-Javadoc)
-	 *
-	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getByGIDWithListTypeFilters(java.lang.Integer, java.lang.Integer, *
-	 * java.util.List)
-	 */
 	@Override
 	public List<Name> getByGIDWithListTypeFilters(final Integer gid, final Integer status, final List<Integer> type) {
 		return this.daoFactory.getNameDao().getByGIDWithListTypeFilters(gid, status, type);
@@ -1050,11 +1045,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	/**
 	 * Return the count of germplasm search results based on the following parameters:
 	 *
-	 * @param q                 - keyword
-	 * @param o                 - operation
-	 * @param includeParents    - include the parents of the search germplasm
-	 * @param withInventoryOnly - include germplasm with inventory details only
-	 * @param includeMGMembers  - include germplasm of the same group of the search germplasm
+	 * @param germplasmSearchParameter	- search filter
 	 * @return
 	 */
 	@Override
@@ -1530,14 +1521,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public GermplasmDTO getGermplasmDTOByGID(final Integer gid) {
-		return this.daoFactory.getGermplasmDao().getGermplasmDTO(gid);
+	public Optional<GermplasmDTO> getGermplasmDTOByGID(final Integer gid) {
+		final GermplasmSearchRequestDto searchDto = new GermplasmSearchRequestDto();
+		searchDto.setGermplasmDbIds(Collections.singletonList(String.valueOf(gid)));
+		final List<GermplasmDTO> germplasmDTOS = this.searchGermplasmDTO(searchDto, 0, 1);
+		if (!CollectionUtils.isEmpty(germplasmDTOS)) {
+			return Optional.of(germplasmDTOS.get(0));
+		}
+		return Optional.empty();
 	}
 
 	@Override
 	public List<GermplasmDTO> searchGermplasmDTO(
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Integer page, final Integer pageSize) {
-		return this.daoFactory.getGermplasmDao().getGermplasmDTOList(germplasmSearchRequestDTO, page, pageSize);
+		final List<GermplasmDTO> germplasmDTOList =
+			this.daoFactory.getGermplasmDao().getGermplasmDTOList(germplasmSearchRequestDTO, page, pageSize);
+		return germplasmDTOList;
 	}
 
 	@Override

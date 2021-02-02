@@ -1156,7 +1156,7 @@ public interface GermplasmDataManager {
 	 */
 	NamingConfiguration getNamingConfigurationByName(String name);
 
-	GermplasmDTO getGermplasmDTOByGID(Integer gid);
+	Optional<GermplasmDTO> getGermplasmDTOByGID(Integer gid);
 
 	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Integer page, Integer pageSize);
 
