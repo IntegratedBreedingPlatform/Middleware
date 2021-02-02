@@ -562,6 +562,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	public Long countFilteredMethods(final BreedingMethodSearchRequest methodSearchRequest) {
 		try {
 			final Criteria criteria = this.setCriteriaFilteredMethods(methodSearchRequest);
+			criteria.setProjection(Projections.rowCount());
 			return ((Long) criteria.uniqueResult()).longValue();
 		} catch (final Exception e) {
 			MethodDAO.LOG.error(this.getLogExceptionMessage("filterMethods", "", null, e.getMessage(), "Method"), e);
