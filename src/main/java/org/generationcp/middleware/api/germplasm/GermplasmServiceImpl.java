@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasm;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
@@ -134,12 +135,45 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, Integer> locationsMapByAbbr = this.getLocationsMapByAbbr(germplasmDtoList);
 		final Map<String, Integer> attributesMapByName = this.getAttributesMapByName(germplasmDtoList);
 		final Map<String, Integer> nameTypesMapByName = this.getNameTypesMapByName(germplasmDtoList);
-
-		final Map<String, Germplasm> progenitors = this.loadProgenitors(germplasmImportRequestDto);
-
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
+		final Map<String, Germplasm> progenitors = this.loadProgenitors(germplasmImportRequestDto);
+		final List<GermplasmDto> germplasmMatches = this.loadGermplasmMatches(germplasmImportRequestDto);
+		final Map<String, List<Integer>> gidMatchByUUID =
+			germplasmMatches.stream().collect(Collectors.toMap(GermplasmDto::getGermplasmUUID, g -> Arrays.asList(g.getGid())));
+		final Map<String, List<Integer>> gidsMatchesByName = new HashMap<>();
+		germplasmMatches.forEach(g ->
+			g.getNames().forEach(n -> {
+				if (gidsMatchesByName.containsKey(n.getName())) {
+					gidsMatchesByName.get(n.getName()).add(g.getGid());
+				} else {
+					gidsMatchesByName.put(n.getName(), Lists.newArrayList(g.getGid()));
+				}
+			})
+		);
+
 		for (final GermplasmImportDTO germplasmDto : germplasmDtoList) {
+
+			if (germplasmImportRequestDto.isSkipIfExists()) {
+				if (gidMatchByUUID.containsKey(germplasmDto.getGermplasmUUID())) {
+					results.put(germplasmDto.getClientId(),
+						new GermplasmImportResponseDto(GermplasmImportResponseDto.Status.FOUND,
+							gidMatchByUUID.get(germplasmDto.getGermplasmUUID())));
+					continue;
+				}
+				final Set<Integer> gidSet = new HashSet<>();
+				germplasmDto.getNames().values().forEach(n -> {
+					if (gidsMatchesByName.containsKey(n)) {
+						gidSet.addAll(gidsMatchesByName.get(n));
+					}
+				});
+				if (!gidSet.isEmpty()) {
+					results.put(germplasmDto.getClientId(),
+						new GermplasmImportResponseDto(GermplasmImportResponseDto.Status.FOUND, new ArrayList<>(gidSet)));
+					continue;
+				}
+			}
+
 			final Germplasm germplasm = new Germplasm();
 
 			final Method method = methodsMapByAbbr.get(germplasmDto.getBreedingMethodAbbr().toUpperCase());
@@ -590,7 +624,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 					GermplasmImportDTO::getProgenitor2).collect(Collectors.toSet());
 			final Set<String> allProgenitors = new HashSet<>(progenitor1Set);
 			allProgenitors.addAll(progenitor2Set);
-			List<Germplasm> germplasmList;
+			final List<Germplasm> germplasmList;
 			if (connectionType == GermplasmImportRequestDto.PedigreeConnectionType.GID) {
 				final List<Integer> gids = allProgenitors.stream().map(g -> Integer.valueOf(g)).collect(Collectors.toList());
 				germplasmList = this.daoFactory.getGermplasmDao().getByGIDList(gids);
@@ -608,6 +642,22 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
+	private List<GermplasmDto> loadGermplasmMatches(final GermplasmImportRequestDto germplasmImportRequestDto) {
+		if (germplasmImportRequestDto.isSkipIfExists()) {
+			final List<String> guids =
+				germplasmImportRequestDto.getGermplasmList().stream().filter(g -> StringUtils.isNotEmpty(g.getGermplasmUUID()))
+					.map(GermplasmImportDTO::getGermplasmUUID).collect(Collectors.toList());
+			final Set<String> names = new HashSet<>();
+			germplasmImportRequestDto.getGermplasmList().forEach(g -> names.addAll(g.getNames().values()));
+			final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
+			germplasmMatchRequestDto.setNames(new ArrayList<>(names));
+			germplasmMatchRequestDto.setGermplasmUUIDs(guids);
+			return this.findGermplasmMatches(germplasmMatchRequestDto, null);
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
 	private void setProgenitors(final Germplasm germplasm, final Method method, final GermplasmImportDTO germplasmImportDTO,
 		final Map<String, Germplasm> progenitorsMap) {
 
@@ -619,8 +669,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		if ((StringUtils.isEmpty(progenitor1) && StringUtils.isEmpty(progenitor2)) || ("0".equals(progenitor1) && "0"
 			.equals(progenitor2)) || method.isGenerative()) {
-			germplasm.setGpid1(resolveGpid(progenitor1, progenitorsMap));
-			germplasm.setGpid2(resolveGpid(progenitor2, progenitorsMap));
+			germplasm.setGpid1(this.resolveGpid(progenitor1, progenitorsMap));
+			germplasm.setGpid2(this.resolveGpid(progenitor2, progenitorsMap));
 			return;
 		}
 
@@ -639,9 +689,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 							String.valueOf(progenitorsMap.get(progenitor2).getGid()),
 							String.valueOf(progenitorsMap.get(progenitor1).getGid())});
 				}
-				germplasm.setGpid1(resolveGpid(progenitor1, progenitorsMap));
+				germplasm.setGpid1(this.resolveGpid(progenitor1, progenitorsMap));
 			}
-			germplasm.setGpid2(resolveGpid(progenitor2, progenitorsMap));
+			germplasm.setGpid2(this.resolveGpid(progenitor2, progenitorsMap));
 		}
 	}
 
@@ -649,4 +699,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return ("0".equals(progenitor) || StringUtils.isEmpty(progenitor)) ? 0 : progenitorsMap.get(progenitor).getGid();
 	}
 
+	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
+	}
 }
