@@ -332,9 +332,9 @@ public interface GermplasmDataManager {
 	 * Returns a Map of GIDs to the attribute values by type given a list of GIDs.
 	 *
 	 * @param gidList - list of GIDs
-	 * @return Map<Integer, Map < Integer, String> - map of gids to their corresponding attribute values
+	 * @return Map<Integer, Map < String, String> - map of gids to their corresponding attribute type and values
 	 */
-	Map<Integer, Map<Integer, String>> getAttributeValuesGIDList(List<Integer> gidList);
+	Map<Integer, Map<String, String>> getAttributesNameAndValuesMapForGids(List<Integer> gidList);
 
 	/**
 	 * Returns all the list of name types available for the given list of gids.

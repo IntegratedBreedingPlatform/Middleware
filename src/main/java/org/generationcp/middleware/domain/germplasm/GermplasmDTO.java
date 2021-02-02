@@ -6,6 +6,7 @@ import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -35,6 +36,8 @@ public class GermplasmDTO {
 	private String seedSource;
 	private String entryNumber;
 	private List<String> synonyms;
+	private Map<String, String> additionalInfo;
+
 	private final static String documentationURL = null;
 
 	public String getBreedingMethodDbId() {
@@ -238,6 +241,14 @@ public class GermplasmDTO {
 
 	public void setSynonyms(List<String> synonyms) {
 		this.synonyms = synonyms;
+	}
+
+	public Map<String, String> getAdditionalInfo() {
+		return this.additionalInfo;
+	}
+
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
+		this.additionalInfo = additionalInfo;
 	}
 
 	@Override

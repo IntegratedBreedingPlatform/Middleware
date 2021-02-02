@@ -63,6 +63,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -388,17 +389,20 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Map<Integer, Map<Integer, String>> getAttributeValuesGIDList(final List<Integer> gidList) {
-		final Map<Integer, Map<Integer, String>> attributeMap = new HashMap<>();
+	public Map<Integer, Map<String, String>> getAttributesNameAndValuesMapForGids(final List<Integer> gidList) {
+		final Map<Integer, Map<String, String>> attributeMap = new HashMap<>();
 
 		// retrieve attribute values
 		final List<Attribute> attributeList = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(gidList);
+		final Map<Integer, String> attributeTypeMap = this.daoFactory.getUserDefinedFieldDAO().getAttributeTypesByGIDList(gidList).stream()
+			.collect(Collectors.toMap(UserDefinedField::getFldno, UserDefinedField::getFcode));
 		for (final Attribute attribute : attributeList) {
-			Map<Integer, String> attrByType = attributeMap.get(attribute.getGermplasmId());
+			Map<String, String> attrByType = attributeMap.get(attribute.getGermplasmId());
 			if (attrByType == null) {
 				attrByType = new HashMap<>();
 			}
-			attrByType.put(attribute.getTypeId(), attribute.getAval());
+			final String attributeType = attributeTypeMap.get(attribute.getTypeId());
+			attrByType.put(attributeType, attribute.getAval());
 			attributeMap.put(attribute.getGermplasmId(), attrByType);
 		}
 
@@ -764,7 +768,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<GermplasmDTO> getGermplasmByStudy(final Integer studyDbId, final Integer pageNumber, final Integer pageSize) {
-		return this.daoFactory.getGermplasmDao().getGermplasmByStudy(studyDbId, pageNumber, pageSize);
+		final List<GermplasmDTO> germplasmByStudy = this.daoFactory.getGermplasmDao().getGermplasmByStudy(studyDbId, pageNumber, pageSize);
+		this.populateSynonymsAndAttributes(germplasmByStudy);
+		return germplasmByStudy;
 	}
 
 	@Override
@@ -1536,7 +1542,27 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Integer page, final Integer pageSize) {
 		final List<GermplasmDTO> germplasmDTOList =
 			this.daoFactory.getGermplasmDao().getGermplasmDTOList(germplasmSearchRequestDTO, page, pageSize);
+		this.populateSynonymsAndAttributes(germplasmDTOList);
 		return germplasmDTOList;
+	}
+
+	private void populateSynonymsAndAttributes(final List<GermplasmDTO> germplasmDTOList) {
+		final Set<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGermplasmDbId()))
+			.collect(Collectors.toSet());
+		final Map<Integer, List<Name>> gidNamesMap = this.getNamesByGidsAndNTypeIdsInMap(new ArrayList<>(gids), Collections.emptyList());
+		final Map<Integer, Map<String, String>> gidAttributesMap = this.getAttributesNameAndValuesMapForGids(new ArrayList<>(gids));
+		// Populate synonyms and attributes per germplasm DTO
+		for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
+			final Integer gid = Integer.valueOf(germplasmDTO.getGermplasmDbId());
+			// Set as synonyms other names, other than the preferred name, found for germplasm
+			final String defaultName = germplasmDTO.getGermplasmName();
+			final List<Name> names = gidNamesMap.get(gid);
+			if (!CollectionUtils.isEmpty(names)) {
+				germplasmDTO.setSynonyms(
+					names.stream().filter(n -> !defaultName.equalsIgnoreCase(n.getNval())).map(Name::getNval).collect(Collectors.toList()));
+			}
+			germplasmDTO.setAdditionalInfo(gidAttributesMap.get(gid));
+		}
 	}
 
 	@Override
