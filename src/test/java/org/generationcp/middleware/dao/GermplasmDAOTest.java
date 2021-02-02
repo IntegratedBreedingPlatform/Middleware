@@ -19,6 +19,7 @@ import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -30,6 +31,7 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
@@ -78,6 +80,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	private LotDAO lotDAO;
 	private TransactionDAO transactionDAO;
 	private MethodDAO methodDAO;
+	private LocationDAO locationDAO;
 	private NameDAO nameDAO;
 	private UserDefinedFieldDAO userDefinedFieldDao;
 	private ProgenitorDAO progenitorDao;
@@ -116,6 +119,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 			this.methodDAO = new MethodDAO();
 			this.methodDAO.setSession(this.sessionProvder.getSession());
+
+			this.locationDAO = new LocationDAO();
+			this.locationDAO.setSession(this.sessionProvder.getSession());
 
 			this.nameDAO = new NameDAO();
 			this.nameDAO.setSession(this.sessionProvder.getSession());
@@ -683,18 +689,21 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	}
 
-	// TODO Add more assertions
 	@Test
 	public void testGetGermplasmDTOList() {
 
+		final Location location = LocationTestDataInitializer
+			.createLocation(null, "Sample Location ", 410, "Sample ABBR",
+				null);
+		this.locationDAO.save(location);
 		final Germplasm germplasm =
-			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, location.getLocid(), 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Map<String, String> fields = new HashMap<>();
 
 		// atributs
-		fields.put("ORI_COUN", "");
+		fields.put("PLOTCODE", "");
 		fields.put("SPNAM", "");
 		fields.put("SPAUTH", "");
 		fields.put("SUBTAX", "");
@@ -753,23 +762,22 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final GermplasmDTO germplasmDTO = result.get(0);
 
 		Assert.assertThat(germplasmDTO.getGermplasmDbId(), is(String.valueOf(germplasmGID)));
+		Assert.assertThat(germplasmDTO.getGermplasmPUI(), is(germplasm.getGermplasmUUID()));
 		Assert.assertThat(germplasmDTO.getDefaultDisplayName(), is(displayName));
-		// Assert.assertThat(germplasmDTO.getAccessionNumber(), is(names.get("ACCNO"))); // FIXME
+		Assert.assertThat(germplasmDTO.getAccessionNumber(), is(names.get("ACCNO")));
 		Assert.assertThat(germplasmDTO.getGermplasmName(), is(displayName));
-		// Assert.assertThat(germplasmDTO.getGermplasmPUI(), is());
-		// Assert.assertThat(germplasmDTO.getPedigree(), is());
-		// Assert.assertThat(germplasmDTO.getGermplasmSeedSource(), is());
+		Assert.assertThat(germplasmDTO.getPedigree(), nullValue());
+		Assert.assertThat(germplasmDTO.getGermplasmSeedSource(), is(fields.get("PLOTCODE")));
 		Assert.assertTrue(StringUtils.isEmpty(germplasmDTO.getCommonCropName()));
 		Assert.assertThat(germplasmDTO.getInstituteCode(), is(fields.get("PROGM")));
-		Assert.assertThat(germplasmDTO.getInstituteName(), is(fields.get("PROGM")));
 		Assert.assertThat(germplasmDTO.getBiologicalStatusOfAccessionCode(), nullValue());
-		Assert.assertThat(germplasmDTO.getCountryOfOriginCode(), is(fields.get("ORI_COUN")));
+		Assert.assertThat(germplasmDTO.getCountryOfOriginCode(), is(location.getLabbr()));
 		Assert.assertThat(germplasmDTO.getGenus(), is(names.get("GENUS")));
 		Assert.assertThat(germplasmDTO.getSpecies(), is(fields.get("SPNAM")));
 		Assert.assertThat(germplasmDTO.getSpeciesAuthority(), is(fields.get("SPAUTH")));
 		Assert.assertThat(germplasmDTO.getSubtaxa(), is(fields.get("SUBTAX")));
 		Assert.assertThat(germplasmDTO.getSubtaxaAuthority(), is(fields.get("STAUTH")));
-		// Assert.assertThat(germplasmDTO.getAcquisitionDate(), is(germplasm.getGdate()));
+		Assert.assertThat(germplasmDTO.getAcquisitionDate(), is("2015-01-01"));
 	}
 
 	@Test
