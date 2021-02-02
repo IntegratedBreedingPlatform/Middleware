@@ -33,6 +33,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -554,7 +555,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		try {
 			final Criteria criteria = this.setCriteriaFilteredMethods(methodSearchRequest);
 			criteria.addOrder(Order.asc(MethodDAO.METHOD_NAME));
-			if (pageable != null) {
+			if (!Objects.isNull(pageable)) {
 				GenericDAO.addPagination(criteria, pageable);
 			}
 			return criteria.list();
