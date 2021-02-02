@@ -337,22 +337,6 @@ public interface GermplasmDataManager {
 	Map<Integer, Map<Integer, String>> getAttributeValuesGIDList(List<Integer> gidList);
 
 	/**
-	 * Returns list of non generative method codes given a set of method codes
-	 *
-	 * @param methodCodes
-	 * @return
-	 */
-	List<String> getNonGenerativeMethodCodes(Set<String> methodCodes);
-
-	/**
-	 * Returns list of method codes with mpgrn = 1
-	 *
-	 * @param methodCodes
-	 * @return
-	 */
-	List<String> getMethodCodesWithOneMPRGN(Set<String> methodCodes);
-
-	/**
 	 * Returns all the list of name types available for the given list of gids.
 	 *
 	 * @param gidList - list of GIDs

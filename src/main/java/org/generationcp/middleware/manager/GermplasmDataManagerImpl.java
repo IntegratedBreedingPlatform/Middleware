@@ -411,16 +411,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<String> getNonGenerativeMethodCodes(final Set<String> methodCodes) {
-		return this.daoFactory.getMethodDAO().getNonGenerativeMethodCodes(methodCodes);
-	}
-
-	@Override
-	public List<String> getMethodCodesWithOneMPRGN(final Set<String> methodCodes) {
-		return this.daoFactory.getMethodDAO().getMethodCodesWithOneMPRGN(methodCodes);
-	}
-
-	@Override
 	public List<UserDefinedField> getNameTypesByGIDList(final List<Integer> gidList) {
 		return this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gidList);
 	}

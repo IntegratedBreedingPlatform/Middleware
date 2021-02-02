@@ -1340,54 +1340,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		assertThat(fields.size(), is(namesUserDefined.size()));
 	}
 
-	@Test
-	public void testGetNonGenerativeMethodCodes() {
-		Method method = new Method();
-		method.setUniqueID(this.commonTestProject.getUniqueID());
-		method.setMname("NEW METHOD NAME");
-		method.setMdesc("NEW METHOD DESC");
-		method.setMcode("NMC_TEST");
-		method.setMgrp("0");
-		method.setMtype(MethodType.DERIVATIVE.getCode());
-		method.setReference(0);
-		method.setGeneq(0);
-		method.setMprgn(0);
-		method.setMfprg(0);
-		method.setMattr(0);
-		method.setUser(0);
-		method.setLmid(0);
-		method.setMdate(0);
-		method = this.methodDAO.save(method);
-
-		final List<String> nonGenerativeMethodCodes = this.germplasmDataManager.getNonGenerativeMethodCodes(Collections.singleton(method.getMcode()));
-		Assert.assertEquals(1, nonGenerativeMethodCodes.size());
-		Assert.assertEquals(method.getMcode(), nonGenerativeMethodCodes.get(0));
-	}
-
-	@Test
-	public void testGetMethodCodesWithOneMPRGN() {
-		Method method = new Method();
-		method.setUniqueID(this.commonTestProject.getUniqueID());
-		method.setMname("NEW METHOD NAME");
-		method.setMdesc("NEW METHOD DESC");
-		method.setMcode("NMC_TEST");
-		method.setMgrp("0");
-		method.setMtype(MethodType.DERIVATIVE.getCode());
-		method.setReference(0);
-		method.setGeneq(0);
-		method.setMprgn(1);
-		method.setMfprg(0);
-		method.setMattr(0);
-		method.setUser(0);
-		method.setLmid(0);
-		method.setMdate(0);
-		method = this.methodDAO.save(method);
-
-		final List<String> methodCodesWithOneMPRGN = this.germplasmDataManager.getMethodCodesWithOneMPRGN(Collections.singleton(method.getMcode()));
-		Assert.assertEquals(1, methodCodesWithOneMPRGN.size());
-		Assert.assertEquals(method.getMcode(), methodCodesWithOneMPRGN.get(0));
-	}
-
 	private Attribute createAttribute(final Germplasm germplasm, final UserDefinedField userDefinedField, final String aval) {
 		final Attribute attr = new Attribute();
 		attr.setAid(1);
