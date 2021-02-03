@@ -66,5 +66,11 @@ public enum PermissionsEnum {
 		+ ", 'MS_CREATE_LOTS'"
 		+ ", 'CREATE_LOTS')";
 
+	public static final String HAS_IMPORT_GERMPLASM = " or hasAnyAuthority('ADMIN'"
+		+ ", 'CROP_MANAGEMENT'"
+		+ ", 'GERMPLASM'"
+		+ ", 'MANAGE_GERMPLASM'"
+		+ ", 'IMPORT_GERMPLASM')";
+
 	public static final List<String> SITE_ADMIN_PERMISSIONS = Arrays.asList(SITE_ADMIN.name(), ADMINISTRATION.name(), ADMIN.name());
 }
