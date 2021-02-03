@@ -369,7 +369,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	public List<Method> getMethodsFromExperiments(final int studyDbid, final String variableID, final List<String> trialInstances) {
 
 		try {
-			final StringBuilder sql = createSelectMethodString();
+			final StringBuilder sql = this.createSelectMethodString();
 			sql.append(" FROM phenotype p ")
 				.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
 				.append(" INNER JOIN methods m ON m.mcode = p.value ")
