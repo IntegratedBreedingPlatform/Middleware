@@ -35,6 +35,7 @@ public class GermplasmDTO {
 	private String germplasmSpecies;
 	private String seedSource;
 	private String entryNumber;
+	private String germplasmOrigin;
 	private List<String> synonyms;
 	private Map<String, String> additionalInfo;
 
@@ -233,6 +234,14 @@ public class GermplasmDTO {
 
 	public void setEntryNumber(final String entryNumber) {
 		this.entryNumber = entryNumber;
+	}
+
+	public String getGermplasmOrigin() {
+		return this.germplasmOrigin;
+	}
+
+	public void setGermplasmOrigin(final String germplasmOrigin) {
+		this.germplasmOrigin = germplasmOrigin;
 	}
 
 	public List<String> getSynonyms() {

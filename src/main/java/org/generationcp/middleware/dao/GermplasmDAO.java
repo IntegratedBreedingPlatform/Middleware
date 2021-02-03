@@ -1392,7 +1392,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			sqlQuery.addScalar("germplasmDbId").addScalar("germplasmPUI").addScalar("accessionNumber").addScalar("acquisitionDate")
 				.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmSeedSource")
 				.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority")
-				.addScalar("instituteCode").addScalar("breedingMethodDbId") //
+				.addScalar("instituteCode").addScalar("breedingMethodDbId").addScalar("germplasmOrigin") //
 				.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
 			this.addGermplasmSearchParameters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequestDTO);
 
@@ -1439,6 +1439,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private String buildFilterGermplasmQuery(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		final StringBuilder queryBuilder = new StringBuilder();
 		queryBuilder.append(this.getSelectClauseForFilterGermplasm());
+		// custom for BrAPI v2
+		queryBuilder.append(", (SELECT e.obs_unit_id FROM nd_experiment e "
+							+ "  INNER JOIN germplasm_study_source gss ON gss.nd_experiment_id = e.nd_experiment_id \n"
+							+ "  WHERE gss.gid = g.gid) as germplasmOrigin ");
 		queryBuilder.append(this.getMainFromGermplasmClause()); //
 		queryBuilder.append(" WHERE g.deleted = 0 AND g.grplce = 0 ");
 		queryBuilder.append(" GROUP by g.gid ");
