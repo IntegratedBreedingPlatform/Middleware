@@ -623,7 +623,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Set<String> locationAbbreviations =
 			germplasmImportDTOList.stream().map(GermplasmImportDTO::getLocationAbbr).collect(Collectors.toSet());
 		return this.daoFactory.getLocationDAO().getByAbbreviations(new ArrayList<>(locationAbbreviations)).stream()
-			.collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
+			.collect(Collectors.toMap(l -> l.getLabbr().toUpperCase(), Location::getLocid));
 	}
 
 	private List<Germplasm> getGermplasmListByGIDorGermplasmUUID(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
@@ -653,7 +653,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Set<String> breedingMethods =
 			germplasmDtos.stream().map(GermplasmImportDTO::getBreedingMethodAbbr).collect(Collectors.toSet());
 		return this.daoFactory.getMethodDAO().getByCode(new ArrayList<>(breedingMethods)).stream()
-			.collect(Collectors.toMap(Method::getMcode, method -> method));
+			.collect(Collectors.toMap(m -> m.getMcode().toUpperCase(), method -> method));
 	}
 
 	private Map<String, Integer> getNameTypesMapByCodes(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
@@ -689,7 +689,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		germplasmDtos.forEach(g -> nameTypes.addAll(g.getNames().keySet()));
 		final List<UserDefinedField> nameTypesUdfldList = this.daoFactory.getUserDefinedFieldDAO()
 			.getByCodes(UDTableType.NAMES_NAME.getTable(), Collections.singleton(UDTableType.NAMES_NAME.getType()), nameTypes);
-		return nameTypesUdfldList.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+		return nameTypesUdfldList.stream().collect(Collectors.toMap(u -> u.getFcode().toUpperCase(), UserDefinedField::getFldno));
 	}
 
 	private Map<String, Integer> getAttributesMapByName(final List<GermplasmImportDTO> germplasmDtos) {
@@ -704,7 +704,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
 					new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType())),
 					attributes);
-			return attributesUdfldList.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+			return attributesUdfldList.stream().collect(Collectors.toMap(u -> u.getFcode().toUpperCase(), UserDefinedField::getFldno));
 		} else {
 			return new HashMap<>();
 		}
