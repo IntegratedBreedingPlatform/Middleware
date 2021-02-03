@@ -29,6 +29,7 @@ import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -735,24 +736,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			throw new MiddlewareQueryException("Error at countPlantsSelectedOfNursery() query on PhenotypeDao: " + e.getMessage(), e);
 		}
 		return 0;
-	}
-
-	public List<String> getNonMaintenanceAndDerivativeMethods(final int studyDbid, final String variableID, final List<String> trialInstances) {
-		final StringBuilder sql = new StringBuilder();
-		sql.append("SELECT DISTINCT m.mcode FROM phenotype p ")
-			.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
-			.append(" INNER JOIN methods m ON m.mcode = p.value ")
-			.append(" INNER JOIN nd_geolocation location ON e.nd_geolocation_id = location.nd_geolocation_id ")
-			.append(" WHERE e.project_id = :studyDbid AND p.observable_id = :variableId AND location.description IN (:trialInstances) ")
-			.append(" AND m.mtype NOT IN (:advancingMethodTypes) ");
-		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-		query.setParameter("studyDbid", studyDbid);
-		query.setParameter("variableId", variableID);
-		query.setParameterList("trialInstances", trialInstances);
-		query.setParameterList("advancingMethodTypes", MethodType.getAdvancingMethodTypes());
-
-		return query.list();
-
 	}
 
 	public int countVariatesDataOfStudy(final Integer projectId, final List<Integer> variateIds) {

@@ -59,6 +59,7 @@ import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -822,8 +823,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<String> getNonMaintenanceAndDerivativeMethods(final int dataSetId, final String variableId, final List<String> trialInstances) {
-		return this.daoFactory.getPhenotypeDAO().getNonMaintenanceAndDerivativeMethods(dataSetId, variableId, trialInstances);
+	public List<Method> getMethodsFromExperiments(final int dataSetId, final String variableId, final List<String> trialInstances) {
+		return this.daoFactory.getMethodDAO().getMethodsFromExperiments(dataSetId, variableId, trialInstances);
 	}
 
 	@Override

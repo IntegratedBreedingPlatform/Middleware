@@ -36,6 +36,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
@@ -528,14 +529,14 @@ public interface StudyDataManager {
 	int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds);
 
 	/**
-	 * returns method code of the non maintenance and derivative method values
+	 * returns methods of experiments
 	 *
 	 * @param dataSetId
 	 * @param variableId
 	 * @param trialInstances
 	 * @return
 	 */
-	List<String> getNonMaintenanceAndDerivativeMethods(int dataSetId, String variableId, List<String> trialInstances);
+	List<Method> getMethodsFromExperiments(int dataSetId, String variableId, List<String> trialInstances);
 
 	/**
 	 * Gets the all field maps in block by block id.
