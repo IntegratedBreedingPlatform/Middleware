@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
@@ -119,6 +120,28 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	@Override
 	public List<Germplasm> getGroupMembers(final Integer gid) {
 		return this.germplasmDAO.getManagementGroupMembers(gid);
+	}
+
+	@Override
+	public List<Germplasm> getDescendantGroupMembers(final Integer gid, final Integer mgid) {
+		final List<Germplasm> descendantGroupMembers = new ArrayList<>();
+		this.populateDescendantGroupMembers(descendantGroupMembers, gid, mgid);
+		return descendantGroupMembers;
+	}
+
+	private void populateDescendantGroupMembers(final List<Germplasm> descendantGroupMembers, final Integer gid, final Integer mgid) {
+		// Get advanced children
+		final List<Germplasm> maintenanceAndDerivativeChildren = this.germplasmDAO.getChildren(gid, 'M');
+		maintenanceAndDerivativeChildren.addAll(this.germplasmDAO.getChildren(gid, 'D'));
+
+		//Filter children in the same maintenance group
+		final List<Germplasm> descendantGroupChildren = maintenanceAndDerivativeChildren.stream()
+			.filter(germplasm -> germplasm.getMgid().equals(mgid)).collect(Collectors.toList());
+		descendantGroupMembers.addAll(descendantGroupChildren);
+
+		for (final Germplasm germplasm: descendantGroupChildren) {
+			this.populateDescendantGroupMembers(descendantGroupMembers, germplasm.getGid(), mgid);
+		}
 	}
 
 	private void traverseAssignGroup(final GermplasmPedigreeTreeNode node, final Integer groupId, final boolean preserveExistingGroup) {
