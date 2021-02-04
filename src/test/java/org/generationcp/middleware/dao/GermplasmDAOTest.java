@@ -13,14 +13,12 @@ package org.generationcp.middleware.dao;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -32,7 +30,6 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
@@ -756,8 +753,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final String displayName = germplasm.getPreferredName().getNval();
 		final GermplasmDTO germplasmDTO = result.get(0);
-
-		List<Name> names1 = this.nameDAO.getNamesByGids(Arrays.asList(germplasmGID));
 
 		Assert.assertThat(germplasmDTO.getGermplasmDbId(), is(String.valueOf(germplasmGID)));
 		Assert.assertThat(germplasmDTO.getGermplasmPUI(), is(germplasm.getGermplasmUUID()));
