@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.MethodType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -26,6 +27,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -337,40 +339,13 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Method> getByName(final String name) {
-		final List<Method> methods = new ArrayList<Method>();
 		try {
-			final StringBuilder queryString = new StringBuilder();
-			queryString.append(
-				"SELECT mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, program_uuid ")
-				.append("FROM methods m WHERE m.mname = :mname");
+			final StringBuilder queryString = this.createSelectMethodString();
+			queryString.append("FROM methods m WHERE m.mname = :mname");
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter(METHOD_NAME, name);
-
-			final List<Object[]> list = query.list();
-
-			for (final Object[] row : list) {
-				final Integer mid = (Integer) row[0];
-				final String mtype = (String) row[1];
-				final String mgrp = (String) row[2];
-				final String mcode = (String) row[3];
-				final String mname = (String) row[4];
-				final String mdesc = (String) row[5];
-				final Integer mref = (Integer) row[6];
-				final Integer mprgn = (Integer) row[7];
-				final Integer mfprg = (Integer) row[8];
-				final Integer mattr = (Integer) row[9];
-				final Integer geneq = (Integer) row[10];
-				final Integer muid = (Integer) row[11];
-				final Integer lmid = (Integer) row[12];
-				final Integer mdate = (Integer) row[13];
-				final String programUUID = (String) row[14];
-
-				final Method method =
-					new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, programUUID);
-				methods.add(method);
-			}
-
-			return methods;
+			this.addMethodScalar(query);
+			return query.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("getByName", "name", name, e.getMessage(), "Method"), e);
 		}
@@ -378,44 +353,66 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Method> getByName(final String name, final String uniqueId) {
-		final List<Method> methods = new ArrayList<Method>();
 		try {
-			final StringBuilder queryString = new StringBuilder();
-			queryString
-				.append("SELECT mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, program_uuid ")
-				.append("FROM methods m WHERE m.mname = :mname ").append("AND m.program_uuid = :uniqueId");
+			final StringBuilder queryString = this.createSelectMethodString();
+			queryString.append("FROM methods m WHERE m.mname = :mname ").append("AND m.program_uuid = :uniqueId");
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter(METHOD_NAME, name);
 			query.setParameter("uniqueId", uniqueId);
-
-			final List<Object[]> list = query.list();
-
-			for (final Object[] row : list) {
-				final Integer mid = (Integer) row[0];
-				final String mtype = (String) row[1];
-				final String mgrp = (String) row[2];
-				final String mcode = (String) row[3];
-				final String mname = (String) row[4];
-				final String mdesc = (String) row[5];
-				final Integer mref = (Integer) row[6];
-				final Integer mprgn = (Integer) row[7];
-				final Integer mfprg = (Integer) row[8];
-				final Integer mattr = (Integer) row[9];
-				final Integer geneq = (Integer) row[10];
-				final Integer muid = (Integer) row[11];
-				final Integer lmid = (Integer) row[12];
-				final Integer mdate = (Integer) row[13];
-				final String programUUID = (String) row[14];
-
-				final Method method =
-					new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, programUUID);
-				methods.add(method);
-			}
-
-			return methods;
+			this.addMethodScalar(query);
+			return query.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("getByName", "name", name, e.getMessage(), "Method"), e);
 		}
+	}
+
+	public List<Method> getMethodsFromExperiments(final int studyDbid, final String variableID, final List<String> trialInstances) {
+
+		try {
+			final StringBuilder sql = this.createSelectMethodString();
+			sql.append(" FROM phenotype p ")
+				.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
+				.append(" INNER JOIN methods m ON m.mcode = p.value ")
+				.append(" INNER JOIN nd_geolocation location ON e.nd_geolocation_id = location.nd_geolocation_id ")
+				.append(" WHERE e.project_id = :studyDbid AND p.observable_id = :variableId AND location.description IN (:trialInstances) ");
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			query.setParameter("studyDbid", studyDbid);
+			query.setParameter("variableId", variableID);
+			query.setParameterList("trialInstances", trialInstances);
+			this.addMethodScalar(query);
+
+			return query.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Errow with getMethodsFromExperiments: " + e.getMessage(), e);
+		}
+
+	}
+
+	void addMethodScalar(final SQLQuery query) {
+		query.addScalar("mid")
+			.addScalar("mtype")
+			.addScalar("mgrp")
+			.addScalar("mcode")
+			.addScalar("mname")
+			.addScalar("mdesc")
+			.addScalar("mref")
+			.addScalar("mprgn")
+			.addScalar("mfprg")
+			.addScalar("mattr")
+			.addScalar("geneq")
+			.addScalar("muid")
+			.addScalar("lmid")
+			.addScalar("mdate")
+			.addScalar("uniqueID");
+		query.setResultTransformer(Transformers.aliasToBean(Method.class));
+	}
+
+	StringBuilder createSelectMethodString() {
+		final StringBuilder sql = new StringBuilder();
+		sql.append("SELECT m.mid AS mid, m.mtype AS mtype, m.mgrp AS mgrp, m.mcode AS mcode, m.mname AS mname, m.mdesc AS mdesc, ")
+			.append(" m.mref AS mref, m.mprgn AS mprgn, m.mfprg AS mfprg, m.mattr AS mattr, m.geneq AS geneq, m.muid AS muid, m.lmid AS lmid, ")
+			.append(" m.mdate AS mdate, m.program_uuid AS uniqueID ");
+		return sql;
 	}
 
 	@SuppressWarnings("unchecked")
