@@ -13,6 +13,7 @@ public class BreedingMethodDTO {
 	private String type;
 	private String group;
 	private Integer methodClass;
+	private Integer mid;
 	private Integer numberOfProgenitors;
 
 	public BreedingMethodDTO() {
@@ -27,6 +28,7 @@ public class BreedingMethodDTO {
 		this.group = method.getMgrp();
 		this.methodClass = method.getGeneq();
 		this.numberOfProgenitors = method.getMprgn();
+		this.mid = method.getMid();
 	}
 
 	public String getCode() {
@@ -98,5 +100,13 @@ public class BreedingMethodDTO {
 	@Override
 	public String toString() {
 		return Pojomatic.toString(this);
+	}
+
+	public Integer getMid() {
+		return this.mid;
+	}
+
+	public void setMid(final Integer mid) {
+		this.mid = mid;
 	}
 }
