@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.StockDao;
@@ -53,6 +54,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -730,7 +732,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		// names
 		final Map<String, String> names = new HashMap<>();
 		names.put("GENUS", "");
-		names.put("ACCNO", "");
 
 		for (final Map.Entry<String, String> nameEntry : names.entrySet()) {
 			UserDefinedField attributeField =
@@ -756,10 +757,13 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String displayName = germplasm.getPreferredName().getNval();
 		final GermplasmDTO germplasmDTO = result.get(0);
 
+		List<Name> names1 = this.nameDAO.getNamesByGids(Arrays.asList(germplasmGID));
+
 		Assert.assertThat(germplasmDTO.getGermplasmDbId(), is(String.valueOf(germplasmGID)));
 		Assert.assertThat(germplasmDTO.getGermplasmPUI(), is(germplasm.getGermplasmUUID()));
 		Assert.assertThat(germplasmDTO.getDefaultDisplayName(), is(displayName));
-		Assert.assertThat(germplasmDTO.getAccessionNumber(), is(names.get("ACCNO")));
+		// Preferred Name is ACCNO
+		Assert.assertThat(germplasmDTO.getAccessionNumber(), is(displayName));
 		Assert.assertThat(germplasmDTO.getGermplasmName(), is(displayName));
 		Assert.assertThat(germplasmDTO.getPedigree(), nullValue());
 		Assert.assertThat(germplasmDTO.getGermplasmSeedSource(), is(fields.get("PLOTCODE")));
@@ -771,7 +775,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertThat(germplasmDTO.getSpeciesAuthority(), is(fields.get("SPAUTH")));
 		Assert.assertThat(germplasmDTO.getSubtaxa(), is(fields.get("SUBTAX")));
 		Assert.assertThat(germplasmDTO.getSubtaxaAuthority(), is(fields.get("STAUTH")));
-		Assert.assertThat(germplasmDTO.getAcquisitionDate(), is("2015-01-01"));
+		Assert.assertThat(new SimpleDateFormat("yyyy-MM-dd").format(germplasmDTO.getAcquisitionDate()), is("2015-01-01"));
 	}
 
 	@Test
