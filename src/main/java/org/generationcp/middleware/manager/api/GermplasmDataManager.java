@@ -36,6 +36,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -1158,7 +1159,7 @@ public interface GermplasmDataManager {
 
 	Optional<GermplasmDTO> getGermplasmDTOByGID(Integer gid);
 
-	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Integer page, Integer pageSize);
+	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
 
 	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);
 
@@ -1168,7 +1169,7 @@ public interface GermplasmDataManager {
 
 	long countGermplasmByStudy(Integer studyDbId);
 
-	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Integer pageNumber, Integer pageSize);
+	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Pageable pageable);
 
 	List<AttributeDTO> getAttributesByGid(
 		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNumber);

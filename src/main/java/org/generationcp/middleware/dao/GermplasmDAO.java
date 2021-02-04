@@ -42,6 +42,7 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
@@ -1384,7 +1385,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public List<GermplasmDTO> getGermplasmDTOList(
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Integer page, final Integer pageSize) {
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Pageable pageable) {
 
 		try {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.buildFilterGermplasmQuery(germplasmSearchRequestDTO));
@@ -1396,10 +1397,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
 			this.addGermplasmSearchParameters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequestDTO);
 
-			if (page != null && pageSize != null) {
-				sqlQuery.setFirstResult(pageSize * page);
-				sqlQuery.setMaxResults(pageSize);
-			}
+			addPaginationToSQLQuery(sqlQuery, pageable);
 
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
@@ -1483,7 +1481,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return queryBuilder.toString();
 	}
 
-	public List<GermplasmDTO> getGermplasmByStudy(final Integer studyDbId, final Integer pageNumber, final Integer pageSize) {
+	public List<GermplasmDTO> getGermplasmByStudy(final Integer studyDbId, final Pageable pageable) {
 		try {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.getGermplasmForStudyQuery());
 			sqlQuery.setParameter("studyDbId", studyDbId);
@@ -1494,10 +1492,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				.addScalar("instituteCode").addScalar("breedingMethodDbId").addScalar("entryNumber") //
 				.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
 
-			if (pageNumber != null && pageSize != null) {
-				sqlQuery.setFirstResult(pageSize * pageNumber);
-				sqlQuery.setMaxResults(pageSize);
-			}
+			addPaginationToSQLQuery(sqlQuery, pageable);
 
 			return sqlQuery.list();
 		} catch (final HibernateException e) {

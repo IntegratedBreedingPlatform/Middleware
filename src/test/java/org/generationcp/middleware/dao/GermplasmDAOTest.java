@@ -756,7 +756,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
 		request.setGermplasmDbIds(Lists.newArrayList(germplasmGID.toString()));
-		final List<GermplasmDTO> result = this.dao.getGermplasmDTOList(request, null, null);
+		final List<GermplasmDTO> result = this.dao.getGermplasmDTOList(request, null);
 
 		final String displayName = germplasm.getPreferredName().getNval();
 		final GermplasmDTO germplasmDTO = result.get(0);

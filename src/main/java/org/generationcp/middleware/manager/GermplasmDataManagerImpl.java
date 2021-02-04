@@ -50,6 +50,8 @@ import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -767,8 +769,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<GermplasmDTO> getGermplasmByStudy(final Integer studyDbId, final Integer pageNumber, final Integer pageSize) {
-		final List<GermplasmDTO> germplasmByStudy = this.daoFactory.getGermplasmDao().getGermplasmByStudy(studyDbId, pageNumber, pageSize);
+	public List<GermplasmDTO> getGermplasmByStudy(final Integer studyDbId, final Pageable pageable) {
+		final List<GermplasmDTO> germplasmByStudy = this.daoFactory.getGermplasmDao().getGermplasmByStudy(studyDbId, pageable);
 		this.populateSynonymsAndAttributes(germplasmByStudy);
 		return germplasmByStudy;
 	}
@@ -1530,7 +1532,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Optional<GermplasmDTO> getGermplasmDTOByGID(final Integer gid) {
 		final GermplasmSearchRequestDto searchDto = new GermplasmSearchRequestDto();
 		searchDto.setGermplasmDbIds(Collections.singletonList(String.valueOf(gid)));
-		final List<GermplasmDTO> germplasmDTOS = this.searchGermplasmDTO(searchDto, 0, 1);
+		final List<GermplasmDTO> germplasmDTOS = this.searchGermplasmDTO(searchDto,  new PageRequest(0, 1));
 		if (!CollectionUtils.isEmpty(germplasmDTOS)) {
 			return Optional.of(germplasmDTOS.get(0));
 		}
@@ -1539,9 +1541,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<GermplasmDTO> searchGermplasmDTO(
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Integer page, final Integer pageSize) {
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Pageable pageable) {
 		final List<GermplasmDTO> germplasmDTOList =
-			this.daoFactory.getGermplasmDao().getGermplasmDTOList(germplasmSearchRequestDTO, page, pageSize);
+			this.daoFactory.getGermplasmDao().getGermplasmDTOList(germplasmSearchRequestDTO, pageable);
 		this.populateSynonymsAndAttributes(germplasmDTOList);
 		return germplasmDTOList;
 	}
