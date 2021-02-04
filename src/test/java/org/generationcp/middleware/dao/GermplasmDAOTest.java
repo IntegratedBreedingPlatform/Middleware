@@ -691,17 +691,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmDTOList() {
-
-		final Location location = LocationTestDataInitializer
-			.createLocation(null, "Sample Location ", 410, "Sample ABBR",
-				null);
-		location.setCntryid(1);
-		final int provinceId = 1001;
-		location.setSnl1id(provinceId);
-		location.setLdefault(Boolean.FALSE);
-		this.locationDAO.save(location);
 		final Germplasm germplasm =
-			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, location.getLocid(), 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Map<String, String> fields = new HashMap<>();
@@ -775,7 +766,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertTrue(StringUtils.isEmpty(germplasmDTO.getCommonCropName()));
 		Assert.assertThat(germplasmDTO.getInstituteCode(), is(fields.get("PROGM")));
 		Assert.assertThat(germplasmDTO.getBiologicalStatusOfAccessionCode(), nullValue());
-		Assert.assertThat(germplasmDTO.getCountryOfOriginCode(), is(location.getLabbr()));
 		Assert.assertThat(germplasmDTO.getGenus(), is(names.get("GENUS")));
 		Assert.assertThat(germplasmDTO.getSpecies(), is(fields.get("SPNAM")));
 		Assert.assertThat(germplasmDTO.getSpeciesAuthority(), is(fields.get("SPAUTH")));
