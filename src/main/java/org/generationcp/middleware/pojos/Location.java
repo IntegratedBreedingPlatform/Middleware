@@ -399,7 +399,7 @@ public class Location implements Serializable, Comparable<Location> {
 		builder.append(", parentLocationName=");
 		builder.append(this.parentLocationName);
 		builder.append(", ldefault=");
-		builder.append(this.parentLocationName);
+		builder.append(this.ldefault);
 		builder.append("]");
 		return builder.toString();
 	}
