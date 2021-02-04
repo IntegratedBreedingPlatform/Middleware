@@ -51,6 +51,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -78,6 +79,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	private LotDAO lotDAO;
 	private TransactionDAO transactionDAO;
 	private MethodDAO methodDAO;
+	private LocationDAO locationDAO;
 	private NameDAO nameDAO;
 	private UserDefinedFieldDAO userDefinedFieldDao;
 	private ProgenitorDAO progenitorDao;
@@ -116,6 +118,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 			this.methodDAO = new MethodDAO();
 			this.methodDAO.setSession(this.sessionProvder.getSession());
+
+			this.locationDAO = new LocationDAO();
+			this.locationDAO.setSession(this.sessionProvder.getSession());
 
 			this.nameDAO = new NameDAO();
 			this.nameDAO.setSession(this.sessionProvder.getSession());
@@ -683,10 +688,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	}
 
-	// TODO Add more assertions
 	@Test
 	public void testGetGermplasmDTOList() {
-
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
@@ -694,7 +697,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Map<String, String> fields = new HashMap<>();
 
 		// atributs
-		fields.put("ORI_COUN", "");
+		fields.put("PLOTCODE", "");
 		fields.put("SPNAM", "");
 		fields.put("SPAUTH", "");
 		fields.put("SUBTAX", "");
@@ -726,7 +729,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		// names
 		final Map<String, String> names = new HashMap<>();
 		names.put("GENUS", "");
-		names.put("ACCNO", "");
 
 		for (final Map.Entry<String, String> nameEntry : names.entrySet()) {
 			UserDefinedField attributeField =
@@ -747,29 +749,28 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
 		request.setGermplasmDbIds(Lists.newArrayList(germplasmGID.toString()));
-		final List<GermplasmDTO> result = this.dao.getGermplasmDTOList(request, null, null);
+		final List<GermplasmDTO> result = this.dao.getGermplasmDTOList(request, null);
 
 		final String displayName = germplasm.getPreferredName().getNval();
 		final GermplasmDTO germplasmDTO = result.get(0);
 
 		Assert.assertThat(germplasmDTO.getGermplasmDbId(), is(String.valueOf(germplasmGID)));
+		Assert.assertThat(germplasmDTO.getGermplasmPUI(), is(germplasm.getGermplasmUUID()));
 		Assert.assertThat(germplasmDTO.getDefaultDisplayName(), is(displayName));
-		// Assert.assertThat(germplasmDTO.getAccessionNumber(), is(names.get("ACCNO"))); // FIXME
+		// Preferred Name is ACCNO
+		Assert.assertThat(germplasmDTO.getAccessionNumber(), is(displayName));
 		Assert.assertThat(germplasmDTO.getGermplasmName(), is(displayName));
-		// Assert.assertThat(germplasmDTO.getGermplasmPUI(), is());
-		// Assert.assertThat(germplasmDTO.getPedigree(), is());
-		// Assert.assertThat(germplasmDTO.getGermplasmSeedSource(), is());
+		Assert.assertThat(germplasmDTO.getPedigree(), nullValue());
+		Assert.assertThat(germplasmDTO.getGermplasmSeedSource(), is(fields.get("PLOTCODE")));
 		Assert.assertTrue(StringUtils.isEmpty(germplasmDTO.getCommonCropName()));
 		Assert.assertThat(germplasmDTO.getInstituteCode(), is(fields.get("PROGM")));
-		Assert.assertThat(germplasmDTO.getInstituteName(), is(fields.get("PROGM")));
 		Assert.assertThat(germplasmDTO.getBiologicalStatusOfAccessionCode(), nullValue());
-		Assert.assertThat(germplasmDTO.getCountryOfOriginCode(), is(fields.get("ORI_COUN")));
 		Assert.assertThat(germplasmDTO.getGenus(), is(names.get("GENUS")));
 		Assert.assertThat(germplasmDTO.getSpecies(), is(fields.get("SPNAM")));
 		Assert.assertThat(germplasmDTO.getSpeciesAuthority(), is(fields.get("SPAUTH")));
 		Assert.assertThat(germplasmDTO.getSubtaxa(), is(fields.get("SUBTAX")));
 		Assert.assertThat(germplasmDTO.getSubtaxaAuthority(), is(fields.get("STAUTH")));
-		// Assert.assertThat(germplasmDTO.getAcquisitionDate(), is(germplasm.getGdate()));
+		Assert.assertThat(new SimpleDateFormat("yyyy-MM-dd").format(germplasmDTO.getAcquisitionDate()), is("2015-01-01"));
 	}
 
 	@Test
