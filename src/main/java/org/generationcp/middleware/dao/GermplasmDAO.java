@@ -497,6 +497,31 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return new ArrayList<>();
 	}
 
+	/**
+	 * Only returns IDs of germplasm with progeny (Germplasm Id is assigned to other germplasm's gpid1, gpid2 OR progntrs.pid)
+	 *
+	 * @param gids - gids to be checked for descendants
+	 * @return
+	 */
+	public List<Integer> getGidsOfGermplasmWithDescendants(final Set<Integer> gids) {
+		try {
+			if (!CollectionUtils.isEmpty(gids)) {
+				final SQLQuery query = this.getSession().createSQLQuery("SELECT g.gid as gid FROM germplsm g "
+					+ "WHERE (EXISTS (SELECT 1 FROM germplsm descendant WHERE g.gid = descendant.gpid1 OR g.gid = descendant.gpid2 ) "
+					+ "OR EXISTS (SELECT 1 FROM progntrs p WHERE  g.gid = p.gid)) "
+					+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ");
+				query.addScalar("gid", new IntegerType());
+				query.setParameterList("gids", gids);
+				return query.list();
+			}
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with getGidsOfGermplasmWithDescendants(gids=" + gids + e.getMessage();
+			GermplasmDAO.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+		return Collections.emptyList();
+	}
+
 	public Germplasm getProgenitorByGID(final Integer gid, final Integer proNo) {
 		try {
 			if (gid != null && proNo != null) {
