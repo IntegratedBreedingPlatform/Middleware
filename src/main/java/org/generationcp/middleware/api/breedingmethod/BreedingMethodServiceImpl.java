@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -46,12 +47,12 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	}
 
 	@Override
-	public BreedingMethodDTO getBreedingMethod(final Integer breedingMethodDbId) {
+	public Optional<BreedingMethodDTO> getBreedingMethod(final Integer breedingMethodDbId) {
 		final Method methodEntity = this.daoFactory.getMethodDAO().getById(breedingMethodDbId);
 		if (!Objects.isNull(methodEntity)) {
-			return new BreedingMethodDTO(methodEntity);
+			return Optional.of(new BreedingMethodDTO(methodEntity));
 		}
-		return null;
+		return Optional.empty();
 	}
 
 	@Override

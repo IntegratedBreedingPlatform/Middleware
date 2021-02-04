@@ -572,7 +572,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			criteria.setProjection(Projections.rowCount());
 			return ((Long) criteria.uniqueResult()).longValue();
 		} catch (final Exception e) {
-			MethodDAO.LOG.error(this.getLogExceptionMessage("filterMethods", "", null, e.getMessage(), "Method"), e);
+			MethodDAO.LOG.error(this.getLogExceptionMessage("countFilterMethods", "", null, e.getMessage(), "Method"), e);
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("filterMethods", "", null, e.getMessage(), "Method"),
 				e);
 		}
