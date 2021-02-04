@@ -14,6 +14,7 @@ public class BreedingMethodDTO {
 	private String group;
 	private Integer methodClass;
 	private Integer mid;
+	private Integer numberOfProgenitors;
 
 	public BreedingMethodDTO() {
 	}
@@ -26,6 +27,7 @@ public class BreedingMethodDTO {
 		this.type = method.getMtype();
 		this.group = method.getMgrp();
 		this.methodClass = method.getGeneq();
+		this.numberOfProgenitors = method.getMprgn();
 		this.mid = method.getMid();
 	}
 
@@ -75,6 +77,14 @@ public class BreedingMethodDTO {
 
 	public void setMethodClass(final Integer methodClass) {
 		this.methodClass = methodClass;
+	}
+
+	public Integer getNumberOfProgenitors() {
+		return numberOfProgenitors;
+	}
+
+	public void setNumberOfProgenitors(final Integer numberOfProgenitors) {
+		this.numberOfProgenitors = numberOfProgenitors;
 	}
 
 	@Override
