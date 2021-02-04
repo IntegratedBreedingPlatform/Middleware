@@ -695,6 +695,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Location location = LocationTestDataInitializer
 			.createLocation(null, "Sample Location ", 410, "Sample ABBR",
 				null);
+		location.setCntryid(1);
+		final int provinceId = 1001;
+		location.setSnl1id(provinceId);
+		location.setLdefault(Boolean.FALSE);
 		this.locationDAO.save(location);
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, location.getLocid(), 1, 0, 1, 1, "MethodName", "LocationName");
