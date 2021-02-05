@@ -349,33 +349,42 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<Integer, Germplasm> progenitorsMapByGid,
 		final List<Integer> gidsOfGermplasmWithDescendants,
 		final Multimap<String, Object[]> conflictErrors) {
-		if (breedingMethodOptional.isPresent()) {
 
-			final Integer femaleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_1);
-			final Integer maleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_2);
-			final Method newBreedingMethod = breedingMethodOptional.get();
-			final Method oldBreedingMethod = germplasm.getMethod();
+		final Integer femaleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_1);
+		final Integer maleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_2);
 
-			if (this.isMethodTypeMatch(newBreedingMethod.getMtype(), oldBreedingMethod.getMtype())) {
+		if (!breedingMethodOptional.isPresent()) {
+			// If breeding method is not specified, update the progenitors based on existing method
+			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
+				maleParentGid,
+				germplasm.getMethod());
+		} else if (this.isMethodTypeMatch(breedingMethodOptional.get().getMtype(), germplasm.getMethod().getMtype())) {
+			// Only update the method if the new method has the same type as the old method.
+			germplasm.setMethodId(breedingMethodOptional.get().getMid());
 
-				// Only update the method if the new method has the same type as the old method.
-				germplasm.setMethodId(breedingMethodOptional.get().getMid());
+			// Update the progenitors based on the new method
+			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
+				maleParentGid,
+				breedingMethodOptional.get());
+		} else {
+			conflictErrors.put("germplasm.update.breeding.method.mismatch", new String[] {
+				String.valueOf(germplasm.getGid()),
+				String.format("%s (%s)", germplasm.getMethod().getMname(), germplasm.getMethod().getMtype())});
+		}
 
-				if (newBreedingMethod.getMprgn() == 1) {
-					conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new String[] {
-						String.valueOf(germplasm.getGid())});
-				} else if (this.isGenerative(newBreedingMethod.getMtype())) {
-					this.assignProgenitorForGenerativeMethod(germplasm, femaleParentGid, maleParentGid, newBreedingMethod, conflictErrors);
-				} else if (this.isMaintenanceOrDerivative(newBreedingMethod.getMtype())) {
-					this.assignProgenitorForDerivativeOrMaintenanceMethod(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants,
-						conflictErrors, femaleParentGid, maleParentGid);
-				}
-			} else {
-				conflictErrors.put("germplasm.update.breeding.method.mismatch", new String[] {
-					String.valueOf(germplasm.getGid()),
-					String.format("%s (%s)", germplasm.getMethod().getMname(), germplasm.getMethod().getMtype())});
-			}
+	}
 
+	private void updateProgenitors(final Germplasm germplasm, final Map<Integer, Germplasm> progenitorsMapByGid,
+		final List<Integer> gidsOfGermplasmWithDescendants, final Multimap<String, Object[]> conflictErrors, final Integer femaleParentGid,
+		final Integer maleParentGid, final Method breedingMethod) {
+		if (breedingMethod.getMprgn() == 1) {
+			conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new String[] {
+				String.valueOf(germplasm.getGid())});
+		} else if (this.isGenerative(breedingMethod.getMtype())) {
+			this.assignProgenitorForGenerativeMethod(germplasm, femaleParentGid, maleParentGid, breedingMethod, conflictErrors);
+		} else if (this.isMaintenanceOrDerivative(breedingMethod.getMtype())) {
+			this.assignProgenitorForDerivativeOrMaintenanceMethod(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants,
+				conflictErrors, femaleParentGid, maleParentGid);
 		}
 	}
 
