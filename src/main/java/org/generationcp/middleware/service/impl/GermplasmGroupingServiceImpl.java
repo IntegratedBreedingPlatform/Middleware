@@ -118,11 +118,6 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	@Override
-	public List<Germplasm> getGroupMembers(final Integer gid) {
-		return this.germplasmDAO.getManagementGroupMembers(gid);
-	}
-
-	@Override
 	public List<Germplasm> getDescendantGroupMembers(final Integer gid, final Integer mgid) {
 		final List<Germplasm> descendantGroupMembers = new ArrayList<>();
 		this.populateDescendantGroupMembers(descendantGroupMembers, gid, mgid);
@@ -131,12 +126,13 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private void populateDescendantGroupMembers(final List<Germplasm> descendantGroupMembers, final Integer gid, final Integer mgid) {
 		// Get advanced children
-		final List<Germplasm> maintenanceAndDerivativeChildren = this.germplasmDAO.getChildren(gid, 'M');
+		final List<Germplasm> maintenanceAndDerivativeChildren = new ArrayList<>();
+		maintenanceAndDerivativeChildren.addAll(this.germplasmDAO.getChildren(gid, 'M'));
 		maintenanceAndDerivativeChildren.addAll(this.germplasmDAO.getChildren(gid, 'D'));
 
 		//Filter children in the same maintenance group
 		final List<Germplasm> descendantGroupChildren = maintenanceAndDerivativeChildren.stream()
-			.filter(germplasm -> germplasm.getMgid().equals(mgid)).collect(Collectors.toList());
+			.filter(germplasm ->mgid.equals(germplasm.getMgid())).collect(Collectors.toList());
 		descendantGroupMembers.addAll(descendantGroupChildren);
 
 		for (final Germplasm germplasm: descendantGroupChildren) {
