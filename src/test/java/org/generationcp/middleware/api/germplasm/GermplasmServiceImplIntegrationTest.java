@@ -386,6 +386,31 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testImportGermplasmUpdates_UpdateProgenitors_BreedingMethodNotSpecified() {
+
+		final Method method = this.createBreedingMethod("GEN", 2);
+		final Germplasm germplasm = this.createGermplasm(method);
+
+		// Cretae GermplasmUpdateDTO with empty method.
+		final GermplasmUpdateDTO germplasmUpdateDTO =
+			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.empty(), Optional.empty(), null);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 2);
+
+		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+
+		final Germplasm savedGermplasm =
+			this.daoFactory.getGermplasmDao()
+				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
+
+		assertEquals(method.getMid(), savedGermplasm.getMethodId());
+		assertEquals(2, savedGermplasm.getGnpgs().intValue());
+		assertEquals(1, savedGermplasm.getGpid1().intValue());
+		assertEquals(2, savedGermplasm.getGpid2().intValue());
+
+	}
+
+	@Test
 	public void testImportGermplasmUpdates_BreedingMethodTypeMismatch() {
 
 		// If the germplasm has a GENERATIVE type then the new breeding method has to be also GENERATIVE, if not, it should throw an error.
