@@ -389,7 +389,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testImportGermplasmUpdates_UpdateProgenitors_BreedingMethodNotSpecified() {
 
 		final Method method = this.createBreedingMethod("GEN", 2);
-		final Germplasm germplasm = this.createGermplasm(method);
+		final Germplasm germplasm = this.createGermplasm(method, null, 0, 0, 0);
 
 		// Cretae GermplasmUpdateDTO with empty method.
 		final GermplasmUpdateDTO germplasmUpdateDTO =
