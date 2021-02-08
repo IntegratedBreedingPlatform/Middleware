@@ -368,7 +368,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		}
 	}
 
-	public List<Method> getMethodsFromExperiments(final int studyDbid, final String variableID, final List<String> trialInstances) {
+	public List<Method> getMethodsFromExperiments(final int studyDbid, final Integer variableID, final List<String> trialInstances) {
 
 		try {
 			final StringBuilder sql = this.createSelectMethodString();
