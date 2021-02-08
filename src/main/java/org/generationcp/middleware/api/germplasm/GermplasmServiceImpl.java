@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +49,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public static final String PLOT_CODE = "PLOTCODE";
 
 	private static final String DEFAULT_BIBREF_FIELD = "-";
+	public static final String PROGENITOR_1 = "PROGENITOR 1";
+	public static final String PROGENITOR_2 = "PROGENITOR 2";
 
 	private final DaoFactory daoFactory;
 
@@ -105,8 +108,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public UserDefinedField getPlotCodeField() {
-		final List<UserDefinedField> udfldAttributes = this.daoFactory.getUserDefinedFieldDAO().getByFieldTableNameAndType(UDTableType.ATRIBUTS_PASSPORT.getTable(),
-			ImmutableSet.of(UDTableType.ATRIBUTS_PASSPORT.getType()));
+		final List<UserDefinedField> udfldAttributes =
+			this.daoFactory.getUserDefinedFieldDAO().getByFieldTableNameAndType(UDTableType.ATRIBUTS_PASSPORT.getTable(),
+				ImmutableSet.of(UDTableType.ATRIBUTS_PASSPORT.getType()));
 
 		final Optional<UserDefinedField> plotCodeField = udfldAttributes
 			.stream()
@@ -200,9 +204,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 
+		final List<Germplasm> germplasmList = this.getGermplasmListByGIDorGermplasmUUID(germplasmUpdateDTOList);
+		final List<Integer> gidsOfGermplasmWithDescendants = this.getGidsOfGermplasmWithDescendants(germplasmList);
 		final Map<String, Integer> nameCodesFieldNoMap = this.getNameTypesMapByCodes(germplasmUpdateDTOList);
 		final Map<String, Integer> attributeCodesFieldNoMap = this.getAttributesMapByCodes(germplasmUpdateDTOList);
-		final List<Germplasm> germplasmList = this.getGermplasmListByGIDorGermplasmUUID(germplasmUpdateDTOList);
+		final Map<Integer, Germplasm> progenitorsMapByGid = this.getGermplasmProgenitorsMapByGids(germplasmUpdateDTOList);
 
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap = new HashMap<>();
 		for (final GermplasmUpdateDTO germplasmUpdateDTO : germplasmUpdateDTOList) {
@@ -218,7 +224,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.getCodeBreedingMethodDTOMap(germplasmUpdateDTOList);
 
 		// Retrieve the names and attributes associated to GIDs in one go.
-		final List<Integer> gids = germplasmList.stream().map(g -> g.getGid()).collect(Collectors.toList());
+		final List<Integer> gids = germplasmList.stream().map(Germplasm::getGid).collect(Collectors.toList());
 		final Map<Integer, List<Name>> namesMap =
 			this.daoFactory.getNameDao().getNamesByGidsInMap(gids);
 		final List<Attribute> attributes =
@@ -230,13 +236,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 		for (final Germplasm germplasm : germplasmList) {
 			this.saveGermplasmUpdateDTO(userId, attributeCodesFieldNoMap, nameCodesFieldNoMap,
 				germplasmUpdateDTOMap,
-				locationAbbreviationIdMap, codeBreedingMethodDTOMap, namesMap, attributesMap, germplasm, conflictErrors);
+				locationAbbreviationIdMap, codeBreedingMethodDTOMap, namesMap, attributesMap, germplasm,
+				progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors);
 		}
 
 		if (!conflictErrors.isEmpty()) {
 			throw new MiddlewareRequestException(null, conflictErrors);
 		}
-		return germplasmList.stream().map(g -> g.getGid()).collect(Collectors.toSet());
+		return germplasmList.stream().map(Germplasm::getGid).collect(Collectors.toSet());
 
 	}
 
@@ -244,12 +251,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, Integer> nameCodes,
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
-		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm, final Multimap<String, Object[]> conflictErrors) {
+		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
+		final Map<Integer, Germplasm> progenitorsMapByGid,
+		final List<Integer> gidsOfGermplasmWithDescendants,
+		final Multimap<String, Object[]> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
 		if (optionalGermplasmUpdateDTO.isPresent()) {
 			final GermplasmUpdateDTO germplasmUpdateDTO = optionalGermplasmUpdateDTO.get();
-			this.updateGermplasm(germplasm, germplasmUpdateDTO, locationAbbreviationIdMap, codeBreedingMethodDTOMap,
+			this.updateGermplasm(germplasm, germplasmUpdateDTO, locationAbbreviationIdMap, codeBreedingMethodDTOMap, progenitorsMapByGid,
+				gidsOfGermplasmWithDescendants,
 				conflictErrors);
 			this.saveAttributesAndNames(userId, attributeCodes, nameCodes, namesMap, attributesMap, germplasm,
 				conflictErrors,
@@ -294,22 +305,24 @@ public class GermplasmServiceImpl implements GermplasmService {
 				}
 			}
 		} else if (preferredNames.size() > 1) {
-			conflictErrors.put("import.germplasm.update.preferred.name.duplicate.names", new Object[] {
+			conflictErrors.put("germplasm.update.preferred.name.duplicate.names", new String[] {
 				germplasmUpdateDTO.getPreferredNameType(),
-				germplasm.getGid()});
+				String.valueOf(germplasm.getGid())});
 		} else if (!liquibase.util.StringUtils.isEmpty(germplasmUpdateDTO.getPreferredNameType())) {
-			conflictErrors.put("import.germplasm.update.preferred.name.doesnt.exist", new Object[] {
+			conflictErrors.put("germplasm.update.preferred.name.doesnt.exist", new String[] {
 				germplasmUpdateDTO.getPreferredNameType(),
-				germplasm.getGid()});
+				String.valueOf(germplasm.getGid())});
 		}
 	}
 
 	private void updateGermplasm(final Germplasm germplasm, final GermplasmUpdateDTO germplasmUpdateDTO,
 		final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap,
+		final Map<Integer, Germplasm> progenitorsMapByGid,
+		final List<Integer> gidsOfGermplasmWithDescendants,
 		final Multimap<String, Object[]> conflictErrors) {
 
-		final Optional<Method> breedingMethodDtoOptional =
+		final Optional<Method> breedingMethodOptional =
 			Optional.ofNullable(codeBreedingMethodDTOMap.getOrDefault(germplasmUpdateDTO.getBreedingMethodAbbr(), null));
 		final Optional<Integer> locationIdOptional =
 			Optional.ofNullable(locationAbbreviationIdMap.getOrDefault(
@@ -317,29 +330,124 @@ public class GermplasmServiceImpl implements GermplasmService {
 					germplasmUpdateDTO.getLocationAbbreviation().toUpperCase() : StringUtils.EMPTY, null));
 		final Optional<Integer> germplasmDateOptional =
 			StringUtils.isEmpty(germplasmUpdateDTO.getCreationDate()) ? Optional.empty() :
-				Optional.ofNullable(Integer.parseInt(germplasmUpdateDTO.getCreationDate()));
+				Optional.of(Integer.parseInt(germplasmUpdateDTO.getCreationDate()));
 		final Optional<String> referenceOptional = Optional.ofNullable(germplasmUpdateDTO.getReference());
-
-		if (breedingMethodDtoOptional.isPresent()) {
-			final String oldMethodType = germplasm.getMethod().getMtype();
-			final String newMethodType = breedingMethodDtoOptional.get().getMtype();
-
-			// Only update the method if the new method has the same type as the old method.
-			if (this.isMethodTypeMatch(newMethodType, oldMethodType)) {
-				germplasm.setMethodId(breedingMethodDtoOptional.get().getMid());
-			} else {
-				conflictErrors.put("import.germplasm.update.breeding.method.mismatch", new Object[] {
-					germplasm.getGid(),
-					String.format("%s (%s)", germplasm.getMethod().getMname(), germplasm.getMethod().getMtype())});
-			}
-		}
 
 		locationIdOptional.ifPresent(germplasm::setLocationId);
 		germplasmDateOptional.ifPresent(germplasm::setGdate);
 
 		this.saveOrUpdateReference(germplasm, referenceOptional);
+		this.updateBreedingMethodAndProgenitors(germplasmUpdateDTO, germplasm, breedingMethodOptional, progenitorsMapByGid,
+			gidsOfGermplasmWithDescendants,
+			conflictErrors);
 
 		this.daoFactory.getGermplasmDao().update(germplasm);
+	}
+
+	private void updateBreedingMethodAndProgenitors(final GermplasmUpdateDTO germplasmUpdateDTO, final Germplasm germplasm,
+		final Optional<Method> breedingMethodOptional,
+		final Map<Integer, Germplasm> progenitorsMapByGid,
+		final List<Integer> gidsOfGermplasmWithDescendants,
+		final Multimap<String, Object[]> conflictErrors) {
+
+		final Integer femaleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_1);
+		final Integer maleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_2);
+
+		if (!breedingMethodOptional.isPresent()) {
+			// If breeding method is not specified, update the progenitors based on existing method
+			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
+				maleParentGid,
+				germplasm.getMethod());
+		} else if (this.isMethodTypeMatch(breedingMethodOptional.get().getMtype(), germplasm.getMethod().getMtype())) {
+			// Only update the method if the new method has the same type as the old method.
+			germplasm.setMethodId(breedingMethodOptional.get().getMid());
+
+			// Update the progenitors based on the new method
+			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
+				maleParentGid,
+				breedingMethodOptional.get());
+		} else {
+			conflictErrors.put("germplasm.update.breeding.method.mismatch", new String[] {
+				String.valueOf(germplasm.getGid()),
+				String.format("%s (%s)", germplasm.getMethod().getMname(), germplasm.getMethod().getMtype())});
+		}
+
+	}
+
+	private void updateProgenitors(final Germplasm germplasm, final Map<Integer, Germplasm> progenitorsMapByGid,
+		final List<Integer> gidsOfGermplasmWithDescendants, final Multimap<String, Object[]> conflictErrors, final Integer femaleParentGid,
+		final Integer maleParentGid, final Method breedingMethod) {
+		if (breedingMethod.getMprgn() == 1) {
+			conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new String[] {
+				String.valueOf(germplasm.getGid())});
+		} else if (this.isGenerative(breedingMethod.getMtype())) {
+			this.assignProgenitorForGenerativeMethod(germplasm, femaleParentGid, maleParentGid, breedingMethod, conflictErrors);
+		} else if (this.isMaintenanceOrDerivative(breedingMethod.getMtype())) {
+			this.assignProgenitorForDerivativeOrMaintenanceMethod(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants,
+				conflictErrors, femaleParentGid, maleParentGid);
+		}
+	}
+
+	private void assignProgenitorForGenerativeMethod(final Germplasm germplasm, final Integer femaleParentGid, final Integer maleParentGid,
+		final Method newBreedingMethod, final Multimap<String, Object[]> conflictErrors) {
+
+		if (femaleParentGid != null && maleParentGid != null) {
+			if (!germplasm.getMethod().getMprgn().equals(newBreedingMethod.getMprgn())) {
+				conflictErrors.put("germplasm.update.number.of.progenitors.mismatch", new String[] {
+					String.valueOf(germplasm.getGid())});
+			} else {
+				if (femaleParentGid == 0 && maleParentGid == 0) {
+					germplasm.setGnpgs(0);
+				} else if (newBreedingMethod.getMprgn().intValue() != 1) {
+					germplasm.setGnpgs(2);
+				}
+				germplasm.setGpid1(femaleParentGid);
+				germplasm.setGpid2(maleParentGid);
+			}
+		}
+	}
+
+	private void assignProgenitorForDerivativeOrMaintenanceMethod(final Germplasm germplasm,
+		final Map<Integer, Germplasm> progenitorsMapByGid,
+		final List<Integer> gidsOfGermplasmWithDescendants, final Multimap<String, Object[]> conflictErrors,
+		final Integer femaleParentGid, final Integer maleParentGid) {
+
+		if (femaleParentGid != null && maleParentGid != null) {
+			// Gnpgs of derivative/maintenance germplasm is always -1
+			germplasm.setGnpgs(-1);
+
+			if (gidsOfGermplasmWithDescendants.contains(germplasm.getGid())) {
+				// Prevent update if the germplasm has existing pedigree tree.
+				conflictErrors.put("germplasm.update.germplasm.has.existing.progeny", new String[] {
+					String.valueOf(germplasm.getGid())});
+			} else if (femaleParentGid != 0 && maleParentGid != 0
+				&& progenitorsMapByGid.get(maleParentGid).getGpid1().intValue() != femaleParentGid) {
+				// Prevent update if the specified immediate source (male parent) does not belong to the same group
+				conflictErrors.put("germplasm.update.immediate.source.must.belong.to.the.same.group", new String[] {
+					String.valueOf(germplasm.getGid())});
+			} else if (femaleParentGid == 0 && maleParentGid != 0) {
+				// For Unknown Group Source
+				germplasm.setGpid1(progenitorsMapByGid.get(maleParentGid).getGpid1());
+				germplasm.setGpid2(maleParentGid);
+			} else {
+				// For Terminal node (group source = 0 and immediate source = 0)
+				// For Unknown Immediate Source (group source <> 0 and immediate source = 0)
+				// Known Group/Immediate Source (group source <> 0 and immediate source <> 0 and immediate source belongs to the same group)
+				germplasm.setGpid1(femaleParentGid);
+				germplasm.setGpid2(maleParentGid);
+			}
+		}
+
+	}
+
+	private List<Integer> getGidsOfGermplasmWithDescendants(final List<Germplasm> germplasmList) {
+		// Get the GIDs of germplasm with DER/MAN methods.
+		final Set<Integer> gids =
+			germplasmList.stream().filter(germplasm -> this.isMaintenanceOrDerivative(germplasm.getMethod().getMtype()))
+				.map(Germplasm::getGid).collect(Collectors.toSet());
+
+		// Get all DER/MAN germplasm that has existing derivative progeny.
+		return this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDescendants(gids);
 	}
 
 	private void saveOrUpdateReference(final Germplasm germplasm, final Optional<String> referenceOptional) {
@@ -374,8 +482,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			// Check if there are multiple names with same type
 			if (namesByType.size() > 1) {
-				conflictErrors.put("import.germplasm.update.duplicate.names", new Object[] {
-					code, germplasm.getGid()});
+				conflictErrors.put("germplasm.update.duplicate.names", new String[] {
+					code, String.valueOf(germplasm.getGid())});
 			} else if (namesByType.size() == 1) {
 				// Update if name is existing
 				final Name name = namesByType.get(0);
@@ -406,8 +514,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			// Check if there are multiple attributes with same type
 			if (attributesByType.size() > 1) {
-				conflictErrors.put("import.germplasm.update.duplicate.attributes", new Object[] {
-					code, germplasm.getGid()});
+				conflictErrors.put("germplasm.update.duplicate.attributes", new String[] {
+					code, String.valueOf(germplasm.getGid())});
 			} else if (attributesByType.size() == 1) {
 				final Attribute attribute = attributesByType.get(0);
 				attribute.setLocationId(germplasm.getLocationId());
@@ -435,7 +543,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private Map<String, Integer> getLocationAbbreviationIdMap(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		final Set<String> locationAbbrs =
-			germplasmUpdateDTOList.stream().map(dto -> dto.getLocationAbbreviation()).collect(Collectors.toSet());
+			germplasmUpdateDTOList.stream().map(GermplasmUpdateDTO::getLocationAbbreviation).collect(Collectors.toSet());
 		return
 			this.daoFactory.getLocationDAO().getByAbbreviations(new ArrayList<>(locationAbbrs)).stream()
 				.collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
@@ -443,7 +551,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private Map<String, Method> getCodeBreedingMethodDTOMap(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		final Set<String> breedingMethodsAbbrs =
-			germplasmUpdateDTOList.stream().map(dto -> dto.getBreedingMethodAbbr()).collect(Collectors.toSet());
+			germplasmUpdateDTOList.stream().map(GermplasmUpdateDTO::getBreedingMethodAbbr).collect(Collectors.toSet());
 		return this.daoFactory.getMethodDAO().getByCode(new ArrayList<>(breedingMethodsAbbrs)).stream()
 			.collect(Collectors.toMap(Method::getMcode, Function.identity()));
 	}
@@ -462,7 +570,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private Map<String, Integer> getLocationsMapByAbbr(final List<GermplasmImportRequestDto> germplasmDtos) {
-		final Set<String> locationAbbreviations = germplasmDtos.stream().map(g -> g.getLocationAbbr()).collect(Collectors.toSet());
+		final Set<String> locationAbbreviations =
+			germplasmDtos.stream().map(GermplasmImportRequestDto::getLocationAbbr).collect(Collectors.toSet());
 		return this.daoFactory.getLocationDAO().getByAbbreviations(new ArrayList<>(locationAbbreviations)).stream()
 			.collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
 	}
@@ -471,7 +580,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		// germplasm UUID should be the priority in getting germplasm
 		final Set<String> germplasmUUIDs =
-			germplasmUpdateDTOList.stream().map(o -> o.getGermplasmUUID()).collect(Collectors.toSet());
+			germplasmUpdateDTOList.stream().map(GermplasmUpdateDTO::getGermplasmUUID).collect(Collectors.toSet());
 		// If there's no UUID, use GID
 		final Set<Integer> gids =
 			germplasmUpdateDTOList.stream().map(o -> liquibase.util.StringUtils.isEmpty(o.getGermplasmUUID()) ? o.getGid() : null).filter(
@@ -482,8 +591,17 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	}
 
+	private Map<Integer, Germplasm> getGermplasmProgenitorsMapByGids(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+		final Set<Integer> progenitorGids =
+			germplasmUpdateDTOList.stream().map(dto -> dto.getProgenitors().values()).flatMap(Collection::stream)
+				.filter(value -> value != null).collect(Collectors.toSet());
+		return this.daoFactory.getGermplasmDao().getByGIDsOrUUIDListWithMethodAndBibref(progenitorGids, Collections.emptySet()).stream()
+			.collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
+	}
+
 	private Map<String, Method> getBreedingMethodsMapByAbbr(final List<GermplasmImportRequestDto> germplasmDtos) {
-		final Set<String> breedingMethods = germplasmDtos.stream().map(g -> g.getBreedingMethodAbbr()).collect(Collectors.toSet());
+		final Set<String> breedingMethods =
+			germplasmDtos.stream().map(GermplasmImportRequestDto::getBreedingMethodAbbr).collect(Collectors.toSet());
 		return this.daoFactory.getMethodDAO().getByCode(new ArrayList<>(breedingMethods)).stream()
 			.collect(Collectors.toMap(Method::getMcode, method -> method));
 	}
@@ -492,10 +610,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 		// Get the names as well as the codes specified in the preferred name property.
 		final Set<String> namesCode = new HashSet<>();
 		germplasmUpdateDTOList.forEach(
-			g -> namesCode.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
+			g -> namesCode.addAll(g.getNames().keySet().stream().map(String::toUpperCase).collect(Collectors.toList())));
 		namesCode
 			.addAll(
-				germplasmUpdateDTOList.stream().map(o -> o.getPreferredNameType()).filter(Objects::nonNull).collect(Collectors.toSet()));
+				germplasmUpdateDTOList.stream().map(GermplasmUpdateDTO::getPreferredNameType).filter(Objects::nonNull)
+					.collect(Collectors.toSet()));
 		return this.daoFactory.getUserDefinedFieldDAO()
 			.getByCodes(UDTableType.NAMES_NAME.getTable(),
 				Collections.singleton(UDTableType.NAMES_NAME.getType()), namesCode).stream().collect(Collectors.toMap(
@@ -505,7 +624,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private Map<String, Integer> getAttributesMapByCodes(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		final Set<String> attributesCode = new HashSet<>();
 		germplasmUpdateDTOList.forEach(
-			g -> attributesCode.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
+			g -> attributesCode.addAll(g.getAttributes().keySet().stream().map(String::toUpperCase).collect(Collectors.toList())));
 
 		// Retrieve the field id of attributes and names
 		return

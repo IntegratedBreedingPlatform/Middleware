@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -19,6 +20,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
+import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
@@ -40,6 +42,7 @@ import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UDTableType;
@@ -104,6 +107,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	private GermplasmDAO germplasmDAO;
 
+	private MethodDAO methodDAO;
+
 	private LotDAO lotDAO;
 
 	private TransactionDAO transactionDAO;
@@ -135,6 +140,12 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			this.germplasmDAO = new GermplasmDAO();
 			this.germplasmDAO.setSession(this.sessionProvder.getSession());
 		}
+
+		if (this.methodDAO == null) {
+			this.methodDAO = new MethodDAO();
+			this.methodDAO.setSession(this.sessionProvder.getSession());
+		}
+
 
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager);
@@ -1292,7 +1303,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			UDTableType.NAMES_NAME.getType(), fname1));
 
 		final HashSet codes = new HashSet() {{
-			add(UserDefinedFieldTestDataInitializer.CODE);
+			this.add(UserDefinedFieldTestDataInitializer.CODE);
 		}};
 		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
 			Collections.singleton(UDTableType.NAMES_NAME.getType()),

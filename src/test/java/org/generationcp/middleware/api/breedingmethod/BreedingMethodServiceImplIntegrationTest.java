@@ -42,7 +42,7 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		final List<Method> methodsWithoutProgram = this.germplasmDataManager.getMethodsByUniqueID(null);
 
 		//Should get all breeding methods without program
-		final List<BreedingMethodDTO> actualMethodsWithoutProgram = this.breedingMethodService.getBreedingMethods(new BreedingMethodSearchRequest());
+		final List<BreedingMethodDTO> actualMethodsWithoutProgram = this.breedingMethodService.getBreedingMethods(new BreedingMethodSearchRequest(), null);
 		assertNotNull(actualMethodsWithoutProgram);
 		assertThat(actualMethodsWithoutProgram, hasSize(methodsWithoutProgram.size()));
 	}
@@ -65,7 +65,7 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
 		searchRequest.setProgramUUID(programUUID);
 		searchRequest.setFavoritesOnly(true);
-		final List<BreedingMethodDTO> favoriteBreedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest);
+		final List<BreedingMethodDTO> favoriteBreedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 		assertNotNull(favoriteBreedingMethods);
 		assertThat(favoriteBreedingMethods, hasSize(1));
 		assertThat(favoriteBreedingMethods.get(0).getCode(), is(favoriteBreedingMethod.getMcode()));
@@ -86,7 +86,7 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		//Should get all methods without program and also the method previously created
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
 		searchRequest.setProgramUUID(programUUID);
-		final List<BreedingMethodDTO> favoriteBreedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest);
+		final List<BreedingMethodDTO> favoriteBreedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 		assertNotNull(favoriteBreedingMethods);
 		assertThat(favoriteBreedingMethods.size(), is(methodsByUniqueID.size() + 1));
 		assertThat(favoriteBreedingMethods, hasItem(hasProperty("code", is(newMethodCode))));
@@ -102,7 +102,7 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		//Should get all methods without program and also the method previously created
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
 		searchRequest.setMethodAbbreviations(Collections.singletonList(newMethodCode));
-		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest);
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 		assertNotNull(breedingMethods);
 		assertThat(breedingMethods.size(), is(1));
 		assertThat(breedingMethods, hasItem(hasProperty("code", is(newMethodCode))));
