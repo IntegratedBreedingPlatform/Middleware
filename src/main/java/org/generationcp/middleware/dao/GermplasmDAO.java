@@ -14,10 +14,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -39,6 +41,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.BooleanType;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +71,36 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String QUERY_FROM_GERMPLASM = ") query from Germplasm: ";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
+
+	private static final String FIND_GERMPLASM_MATCHES_SELECT_CLAUSE = "select " //
+		+ "    g.gid as gid, " //
+		+ "    g.germplsm_uuid as germplasmUUID, " //
+		+ "    n.nval as preferredName, " //
+		+ "    cast(g.gdate as char) as creationDate, " //
+		+ "    r.analyt as reference, " //
+		+ "    l.locid as breedingLocationId, " //
+		+ "    l.lname as breedingLocation, " //
+		+ "    m.mid as breedingMethodId, " //
+		+ "    m.mname as breedingMethod, " //
+		+ "    if(g.mgid > 0, true, false) as isGroupedLine, " //
+		+ "    g.mgid as groupId ";
+
+	private static final String FIND_GERMPLASM_MATCHES_FROM_CLAUSE = " from " //
+		+ "    germplsm g " //
+		+ "        left join " //
+		+ "    methods m on m.mid = g.methn " //
+		+ "        left join " //
+		+ "    location l on l.locid = g.glocn " //
+		+ "        left join " //
+		+ "    names n on n.gid = g.gid and n.nstat = 1 " //
+		+ "        left join " //
+		+ "    bibrefs r on g.gref = r.refid ";
+
+	private static final String FIND_GERMPLASM_MATCHES_BY_GUID = " g.germplsm_uuid in (:guidList)  ";
+
+	private static final String FIND_GERMPLASM_MATCHES_BY_NAMES =
+		" g.gid in (select gid from names n where n.nval in (:nameList) and n.nstat <> 9)";
+
 
 	@Override
 	public Germplasm getById(final Integer gid, final boolean lock) {
@@ -1570,6 +1603,70 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("getGermplasmByGUIDs", "guids", "", e.getMessage(),
 					"Germplasm"), e);
+		}
+	}
+
+	public long countGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto) {
+		final StringBuilder queryBuilder =
+			new StringBuilder(" select count(1) from germplsm g ");
+		this.addGermplasmMatchesFilter(new SqlQueryParamBuilder(queryBuilder), germplasmMatchRequestDto);
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+		this.addGermplasmMatchesFilter(new SqlQueryParamBuilder(sqlQuery), germplasmMatchRequestDto);
+		try {
+			return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+		} catch (final HibernateException e) {
+			final String message = "Error with countGermplasmMatches " + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<GermplasmDto> findGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto, final Pageable pageable) {
+		final StringBuilder queryBuilder =
+			new StringBuilder(FIND_GERMPLASM_MATCHES_SELECT_CLAUSE).append(FIND_GERMPLASM_MATCHES_FROM_CLAUSE);
+		this.addGermplasmMatchesFilter(new SqlQueryParamBuilder(queryBuilder), germplasmMatchRequestDto);
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+		sqlQuery.addScalar("gid").addScalar("germplasmUUID").addScalar("preferredName").addScalar("creationDate").addScalar("reference")
+			.addScalar("breedingLocationId")
+			.addScalar("breedingLocation").addScalar("breedingMethodId").addScalar("breedingMethod")
+			.addScalar("isGroupedLine", new BooleanType())
+			.addScalar("groupId");
+
+		this.addGermplasmMatchesFilter(new SqlQueryParamBuilder(sqlQuery), germplasmMatchRequestDto);
+
+		if (pageable != null) {
+			addPaginationToSQLQuery(sqlQuery, pageable);
+		}
+
+		sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmDto.class));
+
+		try {
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with findGermplasmMatches" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	private void addGermplasmMatchesFilter(final SqlQueryParamBuilder sqlQueryParamBuilder,
+		final GermplasmMatchRequestDto germplasmMatchRequestDto) {
+		sqlQueryParamBuilder.append(" where g.deleted = 0 ");
+		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmUUIDs()) && !CollectionUtils
+			.isEmpty(germplasmMatchRequestDto.getNames())) {
+			sqlQueryParamBuilder.append(" and (").append(FIND_GERMPLASM_MATCHES_BY_NAMES).append(" or ")
+				.append(FIND_GERMPLASM_MATCHES_BY_GUID).append(") ");
+			sqlQueryParamBuilder.setParameterList("guidList", germplasmMatchRequestDto.getGermplasmUUIDs());
+			sqlQueryParamBuilder.setParameterList("nameList", germplasmMatchRequestDto.getNames());
+		} else {
+			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmUUIDs())) {
+				sqlQueryParamBuilder.append(" and ").append(FIND_GERMPLASM_MATCHES_BY_GUID);
+				sqlQueryParamBuilder.setParameterList("guidList", germplasmMatchRequestDto.getGermplasmUUIDs());
+			}
+			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getNames())) {
+				sqlQueryParamBuilder.append(" and ").append(FIND_GERMPLASM_MATCHES_BY_NAMES);
+				sqlQueryParamBuilder.setParameterList("nameList", germplasmMatchRequestDto.getNames());
+			}
 		}
 	}
 

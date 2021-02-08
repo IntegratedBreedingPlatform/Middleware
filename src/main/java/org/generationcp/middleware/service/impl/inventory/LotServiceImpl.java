@@ -240,7 +240,11 @@ public class LotServiceImpl implements LotService {
 				final Double initialBalance = lotItemDto.getInitialBalance();
 				if (initialBalance != null) {
 					final Transaction transaction = new Transaction();
-					transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
+					if (lotItemDto.isPendingStatus()) {
+						transaction.setStatus(TransactionStatus.PENDING.getIntValue());
+					} else {
+						transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
+					}
 					transaction.setType(TransactionType.DEPOSIT.getId());
 					transaction.setLot(lot);
 					transaction.setPersonId(userId);

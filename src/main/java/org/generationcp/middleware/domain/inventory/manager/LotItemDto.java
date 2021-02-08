@@ -21,6 +21,8 @@ public class LotItemDto {
 
 	private Double initialBalance;
 
+	private boolean pendingStatus;
+
 	private String stockId;
 
 	private String notes;
@@ -67,6 +69,14 @@ public class LotItemDto {
 
 	public Double getInitialBalance() {
 		return initialBalance;
+	}
+
+	public boolean isPendingStatus() {
+		return this.pendingStatus;
+	}
+
+	public void setPendingStatus(final boolean pendingStatus) {
+		this.pendingStatus = pendingStatus;
 	}
 
 	public void setInitialBalance(final Double initialBalance) {

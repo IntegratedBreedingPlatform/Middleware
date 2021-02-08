@@ -1,4 +1,4 @@
-package org.generationcp.middleware.domain.germplasm;
+package org.generationcp.middleware.domain.germplasm.importation;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;

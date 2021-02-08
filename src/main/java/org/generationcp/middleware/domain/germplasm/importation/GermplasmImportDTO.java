@@ -1,4 +1,4 @@
-package org.generationcp.middleware.domain.germplasm;
+package org.generationcp.middleware.domain.germplasm.importation;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.pojomatic.Pojomatic;
@@ -8,8 +8,9 @@ import java.util.Map;
 
 @AutoProperty
 @JsonPropertyOrder({
-	"clientId", "germplasmUUID", "locationAbbr", "breedingMethodAbbr", "reference", "preferredName", "names", "attributes", "creationDate"})
-public class GermplasmImportRequestDto {
+	"clientId", "germplasmUUID", "locationAbbr", "breedingMethodAbbr", "reference", "preferredName", "names", "attributes",
+	"creationDate", "progenitor1", "progenitor2"})
+public class GermplasmImportDTO {
 
 	private Integer clientId;
 
@@ -29,13 +30,18 @@ public class GermplasmImportRequestDto {
 
 	private String creationDate;
 
-	public GermplasmImportRequestDto() {
+	private String progenitor1;
+
+	private String progenitor2;
+
+	public GermplasmImportDTO() {
 	}
 
-	public GermplasmImportRequestDto(final Integer clientId, final String germplasmUUID, final String locationAbbr,
+	public GermplasmImportDTO(final Integer clientId, final String germplasmUUID, final String locationAbbr,
 		final String breedingMethodAbbr,
 		final String reference,
-		final String preferredName, final Map<String, String> names, final Map<String, String> attributes, final String creationDate) {
+		final String preferredName, final Map<String, String> names, final Map<String, String> attributes, final String creationDate,
+		final String progenitor1, final String progenitor2) {
 		this.clientId = clientId;
 		this.germplasmUUID = germplasmUUID;
 		this.locationAbbr = locationAbbr;
@@ -45,6 +51,8 @@ public class GermplasmImportRequestDto {
 		this.names = names;
 		this.attributes = attributes;
 		this.creationDate = creationDate;
+		this.progenitor1 = progenitor1;
+		this.progenitor2 = progenitor2;
 	}
 
 	public Integer getClientId() {
@@ -117,6 +125,22 @@ public class GermplasmImportRequestDto {
 
 	public void setCreationDate(final String creationDate) {
 		this.creationDate = creationDate;
+	}
+
+	public String getProgenitor1() {
+		return progenitor1;
+	}
+
+	public void setProgenitor1(final String progenitor1) {
+		this.progenitor1 = progenitor1;
+	}
+
+	public String getProgenitor2() {
+		return progenitor2;
+	}
+
+	public void setProgenitor2(final String progenitor2) {
+		this.progenitor2 = progenitor2;
 	}
 
 	@Override

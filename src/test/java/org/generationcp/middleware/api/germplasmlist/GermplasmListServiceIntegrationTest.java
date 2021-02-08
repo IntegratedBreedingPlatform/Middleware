@@ -3,7 +3,6 @@ package org.generationcp.middleware.api.germplasmlist;
 import com.google.common.collect.Sets;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -50,8 +49,6 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 	private Integer parentFolderId;
 
 	private DaoFactory daoFactory;
-
-	private GermplasmService germplasmService;
 
 	@Before
 	public void setUp() throws Exception {

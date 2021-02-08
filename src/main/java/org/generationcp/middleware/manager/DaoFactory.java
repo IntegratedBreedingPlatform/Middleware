@@ -338,12 +338,6 @@ public class DaoFactory {
 		return studyTypeDAO;
 	}
 
-	public BibrefDAO getBibrefDao() {
-		final BibrefDAO bibrefDao = new BibrefDAO();
-		bibrefDao.setSession(this.sessionProvider.getSession());
-		return bibrefDao;
-	}
-
 	public LocdesDAO getLocDesDao() {
 		final LocdesDAO locdesDao = new LocdesDAO();
 		locdesDao.setSession(this.sessionProvider.getSession());
