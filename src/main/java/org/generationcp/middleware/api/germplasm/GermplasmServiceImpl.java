@@ -418,13 +418,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 				maleParentGid,
 				germplasm.getMethod());
 		} else if (this.isMethodTypeMatch(breedingMethodOptional.get().getMtype(), germplasm.getMethod().getMtype())) {
-			// Only update the method if the new method has the same type as the old method.
-			germplasm.setMethodId(breedingMethodOptional.get().getMid());
 
-			// Update the progenitors based on the new method
-			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
-				maleParentGid,
-				breedingMethodOptional.get());
+			if (this.isGenerative(germplasm.getMethod().getMtype()) && !germplasm.getMethod().getMprgn()
+				.equals(breedingMethodOptional.get().getMprgn())) {
+				conflictErrors.put("germplasm.update.number.of.progenitors.mismatch", new String[] {
+					String.valueOf(germplasm.getGid())});
+			} else {
+				// Only update the method if the new method has the same type as the old method.
+				germplasm.setMethodId(breedingMethodOptional.get().getMid());
+
+				// Update the progenitors based on the new method
+				this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
+					maleParentGid,
+					breedingMethodOptional.get());
+			}
+
 		} else {
 			conflictErrors.put("germplasm.update.breeding.method.mismatch", new String[] {
 				String.valueOf(germplasm.getGid()),
@@ -440,7 +448,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new String[] {
 				String.valueOf(germplasm.getGid())});
 		} else if (this.isGenerative(breedingMethod.getMtype())) {
-			this.assignProgenitorForGenerativeMethod(germplasm, femaleParentGid, maleParentGid, breedingMethod, conflictErrors);
+			this.assignProgenitorForGenerativeMethod(germplasm, femaleParentGid, maleParentGid, breedingMethod);
 		} else if (this.isMaintenanceOrDerivative(breedingMethod.getMtype())) {
 			this.assignProgenitorForDerivativeOrMaintenanceMethod(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants,
 				conflictErrors, femaleParentGid, maleParentGid);
@@ -448,21 +456,17 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void assignProgenitorForGenerativeMethod(final Germplasm germplasm, final Integer femaleParentGid, final Integer maleParentGid,
-		final Method newBreedingMethod, final Multimap<String, Object[]> conflictErrors) {
+		final Method newBreedingMethod) {
 
 		if (femaleParentGid != null && maleParentGid != null) {
-			if (!germplasm.getMethod().getMprgn().equals(newBreedingMethod.getMprgn())) {
-				conflictErrors.put("germplasm.update.number.of.progenitors.mismatch", new String[] {
-					String.valueOf(germplasm.getGid())});
-			} else {
-				if (femaleParentGid == 0 && maleParentGid == 0) {
-					germplasm.setGnpgs(0);
-				} else if (newBreedingMethod.getMprgn().intValue() != 1) {
-					germplasm.setGnpgs(2);
-				}
-				germplasm.setGpid1(femaleParentGid);
-				germplasm.setGpid2(maleParentGid);
+			if (femaleParentGid == 0 && maleParentGid == 0) {
+				germplasm.setGnpgs(0);
+			} else if (newBreedingMethod.getMprgn().intValue() != 1) {
+				germplasm.setGnpgs(2);
 			}
+			germplasm.setGpid1(femaleParentGid);
+			germplasm.setGpid2(maleParentGid);
+
 		}
 	}
 
