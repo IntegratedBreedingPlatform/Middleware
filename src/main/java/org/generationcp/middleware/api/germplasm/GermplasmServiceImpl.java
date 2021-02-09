@@ -419,18 +419,20 @@ public class GermplasmServiceImpl implements GermplasmService {
 				germplasm.getMethod());
 		} else if (this.isMethodTypeMatch(breedingMethodOptional.get().getMtype(), germplasm.getMethod().getMtype())) {
 
+			final Method breedingMethod = breedingMethodOptional.get();
+
 			if (this.isGenerative(germplasm.getMethod().getMtype()) && !germplasm.getMethod().getMprgn()
-				.equals(breedingMethodOptional.get().getMprgn())) {
+				.equals(breedingMethod.getMprgn())) {
 				conflictErrors.put("germplasm.update.number.of.progenitors.mismatch", new String[] {
 					String.valueOf(germplasm.getGid())});
 			} else {
 				// Only update the method if the new method has the same type as the old method.
-				germplasm.setMethodId(breedingMethodOptional.get().getMid());
+				germplasm.setMethodId(breedingMethod.getMid());
 
 				// Update the progenitors based on the new method
 				this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
 					maleParentGid,
-					breedingMethodOptional.get());
+					breedingMethod);
 			}
 
 		} else {
