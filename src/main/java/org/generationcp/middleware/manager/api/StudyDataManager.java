@@ -536,7 +536,7 @@ public interface StudyDataManager {
 	 * @param trialInstances
 	 * @return
 	 */
-	List<Method> getMethodsFromExperiments(int dataSetId, String variableId, List<String> trialInstances);
+	List<Method> getMethodsFromExperiments(int dataSetId, Integer variableId, List<String> trialInstances);
 
 	/**
 	 * Gets the all field maps in block by block id.
