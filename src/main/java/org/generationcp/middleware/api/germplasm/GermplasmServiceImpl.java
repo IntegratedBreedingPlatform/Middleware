@@ -4,8 +4,10 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -264,7 +266,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 
 		final List<Germplasm> germplasmList = this.getGermplasmListByGIDorGermplasmUUID(germplasmUpdateDTOList);
-		final List<Integer> gidsOfGermplasmWithDescendants = this.getGidsOfGermplasmWithDescendants(germplasmList);
+		final List<Integer> gidsOfGermplasmWithDescendants = this.getGidsOfDerivativeGermplasmWithDescendants(germplasmList);
 		final Map<String, Integer> nameCodesFieldNoMap = this.getNameTypesMapByCodes(germplasmUpdateDTOList);
 		final Map<String, Integer> attributeCodesFieldNoMap = this.getAttributesMapByCodes(germplasmUpdateDTOList);
 		final Map<Integer, Germplasm> progenitorsMapByGid = this.getGermplasmProgenitorsMapByGids(germplasmUpdateDTOList);
@@ -304,6 +306,38 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 		return germplasmList.stream().map(Germplasm::getGid).collect(Collectors.toSet());
 
+	}
+
+	@Override
+	public void deleteGermplasm(final List<Integer> gids) {
+		this.daoFactory.getGermplasmDao().deleteGermplasm(gids);
+	}
+
+	@Override
+	public Set<Integer> getCodeFixedGidsByGidList(final List<Integer> gids) {
+		final List<Germplasm> germplasmList = this.daoFactory.getGermplasmDao().getByGIDList(gids);
+		return germplasmList.stream().filter(germplasm -> germplasm.getMgid() > 0).map(Germplasm::getGid).collect(Collectors.toSet());
+	}
+
+	@Override
+	public Set<Integer> getGidsWithOpenLots(final List<Integer> gids) {
+		final LotDAO dao = this.daoFactory.getLotDao();
+		return dao.getGermplasmsWithOpenLots(gids);
+	}
+
+	@Override
+	public Set<Integer> getGidsOfGermplasmWithDescendants(final List<Integer> gids) {
+		return this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDescendants(Sets.newHashSet(gids));
+	}
+
+	@Override
+	public Set<Integer> getGermplasmUsedInOneOrMoreList(final List<Integer> gids) {
+		return new HashSet<>(this.daoFactory.getGermplasmListDAO().getGermplasmUsedInOneOrMoreList(gids));
+	}
+
+	@Override
+	public Set<Integer> getGermplasmUsedInStudies(final List<Integer> gids) {
+		return new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(gids));
 	}
 
 	private void saveGermplasmUpdateDTO(final Integer userId, final Map<String, Integer> attributeCodes,
@@ -505,14 +539,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	}
 
-	private List<Integer> getGidsOfGermplasmWithDescendants(final List<Germplasm> germplasmList) {
+	private List<Integer> getGidsOfDerivativeGermplasmWithDescendants(final List<Germplasm> germplasmList) {
 		// Get the GIDs of germplasm with DER/MAN methods.
-		final Set<Integer> gids =
+		final List<Integer> gids =
 			germplasmList.stream().filter(germplasm -> this.isMaintenanceOrDerivative(germplasm.getMethod().getMtype()))
-				.map(Germplasm::getGid).collect(Collectors.toSet());
+				.map(Germplasm::getGid).collect(Collectors.toList());
 
 		// Get all DER/MAN germplasm that has existing derivative progeny.
-		return this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDescendants(gids);
+		return Lists.newArrayList(this.getGidsOfGermplasmWithDescendants(gids));
 	}
 
 	private void saveOrUpdateReference(final Germplasm germplasm, final Optional<String> referenceOptional) {
