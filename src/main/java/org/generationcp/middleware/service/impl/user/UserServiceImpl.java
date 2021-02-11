@@ -97,8 +97,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<Integer> getActiveUserIDsWithProgramRoleByProjectId(final Long projectId) {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO().getActiveUserIDsWithProgramRoleByProjectId(projectId);
+	public List<Integer> getActiveUserIDsWithAccessToTheProgram(final Long projectId) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getActiveUserIDsWithAccessToTheProject(projectId);
 	}
 
 	@Override
