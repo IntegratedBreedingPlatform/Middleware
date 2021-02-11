@@ -11,9 +11,7 @@
 
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
+import org.generationcp.middleware.domain.oms.TermId;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -30,8 +28,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
-import org.generationcp.middleware.domain.oms.TermId;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Represents breeding methods. The ICIS model recognizes three classes of breeding methods by which genetic material is advanced:
@@ -482,6 +481,12 @@ public class Method implements Serializable {
 
 	@Transient
 	public boolean isGenerative() {
-		return this.mtype != null && "GEN".equals(this.mtype.trim());
+		return this.mtype != null && MethodType.GENERATIVE.getCode().equals(this.mtype.trim());
+	}
+
+	@Transient
+	public boolean isDerivativeOrMaintenance() {
+		return this.mtype != null && (MethodType.DERIVATIVE.getCode().equals(this.mtype.trim()) || MethodType.MAINTENANCE.getCode()
+			.equals(this.mtype.trim()));
 	}
 }

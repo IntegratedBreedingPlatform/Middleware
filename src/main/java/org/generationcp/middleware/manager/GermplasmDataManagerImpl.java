@@ -16,6 +16,7 @@ import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -23,7 +24,6 @@ import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
-import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
@@ -665,7 +665,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Bibref getBibliographicReferenceByID(final Integer id) {
-		return this.daoFactory.getBibrefDao().getById(id, false);
+		return this.daoFactory.getBibrefDAO().getById(id, false);
 	}
 
 	@Override
@@ -674,7 +674,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final Integer idBibrefSaved;
 		try {
 
-			final Bibref recordSaved = this.daoFactory.getBibrefDao().saveOrUpdate(bibref);
+			final Bibref recordSaved = this.daoFactory.getBibrefDAO().saveOrUpdate(bibref);
 			idBibrefSaved = recordSaved.getRefid();
 
 		} catch (final Exception e) {
