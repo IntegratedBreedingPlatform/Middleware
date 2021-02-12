@@ -110,14 +110,10 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 			+ "  || (role_type_id = " + RoleType.CROP.getId() + " and not exists(SELECT distinct p1.project_id " //
 			+ "                                      FROM workbench_project p1 " //
 			+ "                                             INNER JOIN " //
-			+ "                                      crop_persons cp1 ON cp1.crop_name = p1.crop_type " //
-			+ "                                             INNER JOIN " //
-			+ "                                      users users1 ON cp1.personid = users1.personid " //
-			+ "                                             INNER JOIN " //
-			+ "                                      users_roles ur1 ON ur1.userid = users1.userid " //
+			+ "                                      users_roles ur1 ON ur1.workbench_project_id = p1.project_id " //
 			+ "                                             INNER JOIN role r1 ON ur1.role_id = r1.id " //
-			+ "                                      where (r1.role_type_id = " + RoleType.PROGRAM.getId() //
-			+ "                                        AND ur1.crop_name = cp.crop_name AND ur1.workbench_project_id = p1.project_id) AND users1.userid = u.userid) "
+			+ "                                      where r1.role_type_id = " + RoleType.PROGRAM.getId() //
+			+ "                                        AND ur1.crop_name = cp.crop_name AND ur1.userid = u.userid) "
 			//
 			+ "    || (role_type_id= " + RoleType.PROGRAM.getId() + " and wp.project_id = :projectId))) and " //
 			+ "  u.ustatus = 0 and cp.crop_name = (select wpi.crop_type from workbench_project wpi where wpi.project_id = :projectId) ";
