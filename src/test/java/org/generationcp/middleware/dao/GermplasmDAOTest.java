@@ -754,8 +754,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String displayName = germplasm.getPreferredName().getNval();
 		final GermplasmDTO germplasmDTO = result.get(0);
 
-		Assert.assertThat(germplasmDTO.getGermplasmDbId(), is(String.valueOf(germplasmGID)));
-		Assert.assertThat(germplasmDTO.getGermplasmPUI(), is(germplasm.getGermplasmUUID()));
+		Assert.assertThat(germplasmDTO.getGermplasmDbId(), is(germplasm.getGermplasmUUID()));
+		Assert.assertThat(germplasmDTO.getGermplasmPUI(), nullValue());
+		Assert.assertThat(germplasmDTO.getBreedingMethodDbId(), is(germplasm.getMethodId()));
 		Assert.assertThat(germplasmDTO.getDefaultDisplayName(), is(displayName));
 		// Preferred Name is ACCNO
 		Assert.assertThat(germplasmDTO.getAccessionNumber(), is(displayName));
