@@ -36,8 +36,9 @@ public class GermplasmDTO {
 	private String seedSource;
 	private String entryNumber;
 	private String germplasmOrigin;
-	private List<String> synonyms;
+	private Map<String, String> synonyms;
 	private Map<String, String> additionalInfo;
+	private String gid;
 
 	private final static String documentationURL = null;
 
@@ -244,11 +245,11 @@ public class GermplasmDTO {
 		this.germplasmOrigin = germplasmOrigin;
 	}
 
-	public List<String> getSynonyms() {
+	public Map<String, String> getSynonyms() {
 		return synonyms;
 	}
 
-	public void setSynonyms(List<String> synonyms) {
+	public void setSynonyms(final Map<String, String> synonyms) {
 		this.synonyms = synonyms;
 	}
 
@@ -258,6 +259,14 @@ public class GermplasmDTO {
 
 	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 		this.additionalInfo = additionalInfo;
+	}
+
+	public String getGid() {
+		return this.gid;
+	}
+
+	public void setGid(final String gid) {
+		this.gid = gid;
 	}
 
 	@Override
