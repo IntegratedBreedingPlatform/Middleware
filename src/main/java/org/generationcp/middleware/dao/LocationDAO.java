@@ -1028,7 +1028,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final org.generationcp.middleware.api.location.Location location = new org.generationcp.middleware.api.location.Location();
 			location.setLocationDbId(String.valueOf(result.get("locationDbId")));
 			location.setLocationType(String.valueOf(result.get("locationType")));
-			location.setName(String.valueOf(result.get("locationName")));
 			location.setLocationName(String.valueOf(result.get("locationName")));
 			location.setAbbreviation(String.valueOf(result.get("abbreviation")));
 			location.setCountryCode(String.valueOf(result.get("countryCode")));
