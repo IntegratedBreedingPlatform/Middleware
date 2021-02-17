@@ -16,7 +16,7 @@ public class Coordinate {
 	}
 
 	public Geometry getGeometry() {
-		return geometry;
+		return this.geometry;
 	}
 
 	public Coordinate setGeometry(final Geometry geometry) {
@@ -25,7 +25,7 @@ public class Coordinate {
 	}
 
 	public String getType() {
-		return type;
+		return this.type;
 	}
 
 	public Coordinate setType(final String type) {

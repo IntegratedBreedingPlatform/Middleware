@@ -91,7 +91,7 @@ public class LocationSearchRequest {
 	}
 
 	public String getLocationId() {
-		return locationId;
+		return this.locationId;
 	}
 
 	public void setLocationId(final String locationId) {
@@ -99,7 +99,7 @@ public class LocationSearchRequest {
 	}
 
 	public String getLocationType() {
-		return locationType;
+		return this.locationType;
 	}
 
 	public void setLocationType(final String locationType) {

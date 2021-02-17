@@ -25,7 +25,7 @@ public class Geometry {
 	}
 
 	public List<Double> getCoordinates() {
-		return coordinates;
+		return this.coordinates;
 	}
 
 	public Geometry setCoordinates(final List<Double> coordinates) {
@@ -34,7 +34,7 @@ public class Geometry {
 	}
 
 	public String getType() {
-		return type;
+		return this.type;
 	}
 
 	public Geometry setType(final String type) {

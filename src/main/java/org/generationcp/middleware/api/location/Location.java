@@ -298,7 +298,7 @@ public class Location {
 	}
 
 	public String getCoordinateDescription() {
-		return coordinateDescription;
+		return this.coordinateDescription;
 	}
 
 	public Location setCoordinateDescription(final String coordinateDescription) {
@@ -307,7 +307,7 @@ public class Location {
 	}
 
 	public Double getCoordinateUncertainty() {
-		return coordinateUncertainty;
+		return this.coordinateUncertainty;
 	}
 
 	public Location setCoordinateUncertainty(final Double coordinateUncertainty) {
@@ -316,7 +316,7 @@ public class Location {
 	}
 
 	public Coordinate getCoordinates() {
-		return coordinates;
+		return this.coordinates;
 	}
 
 	public Location setCoordinates(final Coordinate coordinates) {
@@ -325,7 +325,7 @@ public class Location {
 	}
 
 	public List<String> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public Location setExternalReferences(final List<String> externalReferences) {
@@ -334,7 +334,7 @@ public class Location {
 	}
 
 	public String getDocumentationURL() {
-		return documentationURL;
+		return this.documentationURL;
 	}
 
 	public Location setDocumentationURL(final String documentationURL) {
@@ -343,7 +343,7 @@ public class Location {
 	}
 
 	public String getEnvironmentType() {
-		return environmentType;
+		return this.environmentType;
 	}
 
 	public Location setEnvironmentType(final String environmentType) {
@@ -352,7 +352,7 @@ public class Location {
 	}
 
 	public String getExposure() {
-		return exposure;
+		return this.exposure;
 	}
 
 	public Location setExposure(final String exposure) {
@@ -361,7 +361,7 @@ public class Location {
 	}
 
 	public String getInstituteAddress() {
-		return instituteAddress;
+		return this.instituteAddress;
 	}
 
 	public Location setInstituteAddress(final String instituteAddress) {
@@ -370,7 +370,7 @@ public class Location {
 	}
 
 	public String getInstituteName() {
-		return instituteName;
+		return this.instituteName;
 	}
 
 	public Location setInstituteName(final String instituteName) {
@@ -379,7 +379,7 @@ public class Location {
 	}
 
 	public String getSiteStatus() {
-		return siteStatus;
+		return this.siteStatus;
 	}
 
 	public Location setSiteStatus(final String siteStatus) {
@@ -388,7 +388,7 @@ public class Location {
 	}
 
 	public Double getSlope() {
-		return slope;
+		return this.slope;
 	}
 
 	public Location setSlope(final Double slope) {
@@ -397,7 +397,7 @@ public class Location {
 	}
 
 	public String getTopography() {
-		return topography;
+		return this.topography;
 	}
 
 	public Location setTopography(final String topography) {
@@ -414,7 +414,7 @@ public class Location {
 	}
 
 	public Map<String, String> getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 
 	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
