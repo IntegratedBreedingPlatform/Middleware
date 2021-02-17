@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 
@@ -50,6 +52,38 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 			.getFilteredLocations(new LocationSearchRequest(), new PageRequest(0, 10));
 		Assert.assertThat(10, equalTo(locations.size()));
 
+	}
+
+	@Test
+	public void testcountLocations() throws MiddlewareQueryException {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationType("COUNTRY");
+		final long countLocation = this.locationService.countLocations(locationSearchRequest);
+		assertThat("Expected country location size > zero", 0 < countLocation);
+	}
+
+	@Test
+	public void testcountLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationType("DUMMYLOCTYOE");
+		final long countLocation = this.locationService.countLocations(locationSearchRequest);
+		assertThat("Expected country location size equals to zero", 0 == countLocation);
+	}
+
+	@Test
+	public void testgetLocationsByFilter() throws MiddlewareQueryException {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationType("COUNTRY");
+		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		assertThat("Expected list of location size > zero", !locationList.isEmpty());
+	}
+
+	@Test
+	public void testgetLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationType("DUMMYLOCTYPE");
+		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		assertThat("Expected list of location size equals to zero", locationList.isEmpty());
 	}
 
 	@Test

@@ -11,7 +11,6 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.collect.ImmutableSet;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -26,7 +25,6 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -471,20 +469,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<LocationDetails> getFilteredLocationsDetails(final Integer countryId, final Integer locationType, final String locationName,
 		final String programUUID) {
 		return this.daoFactory.getLocationDAO().getFilteredLocations(countryId, locationType, locationName, programUUID);
-	}
-
-	@Override
-	public long countLocationsByFilter(final Map<LocationFilters, Object> filters) {
-		return this.daoFactory.getLocationDAO().countLocationsByFilter(filters);
-
-	}
-
-	@Override
-	public List<LocationDetailsDto> getLocationsByFilter(
-		final int pageNumber, final int pageSize,
-		final Map<LocationFilters, Object> filters) {
-		return
-			this.daoFactory.getLocationDAO().getLocationsByFilter(pageNumber, pageSize, filters);
 	}
 
 	@Override

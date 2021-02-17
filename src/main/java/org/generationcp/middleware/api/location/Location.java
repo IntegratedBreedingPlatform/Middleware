@@ -28,6 +28,7 @@ public class Location {
 
 	private String locationType;
 
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private String name;
 
 	private String locationName;
@@ -38,10 +39,13 @@ public class Location {
 
 	private String countryName;
 
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private Double latitude;
 
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private Double longitude;
 
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private Double altitude;
 
 	@JsonView(BrapiView.BrapiV2.class)
