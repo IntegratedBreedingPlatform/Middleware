@@ -14,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.api.brapi.v1.location.AdditionalInfoDto;
 import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
+import org.generationcp.middleware.api.location.Coordinate;
+import org.generationcp.middleware.api.location.Geometry;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.dms.LocationDto;
@@ -34,12 +36,14 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -351,8 +355,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			criteria.add(Restrictions.isNull(PROGRAM_UUID));
 		}
 
-		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationTypes())) {
-			criteria.add(Restrictions.in(LocationDAO.LTYPE, locationSearchRequest.getLocationTypes()));
+		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationTypeIds())) {
+			criteria.add(Restrictions.in(LocationDAO.LTYPE, locationSearchRequest.getLocationTypeIds()));
 		}
 
 		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
@@ -992,6 +996,97 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
+	public long countLocations(final LocationSearchRequest locationSearchRequest) {
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT l.locid) ");
+		this.appendGetLocationFromQuery(sql);
+		this.appendLocationSearchFilter(sql, locationSearchRequest);
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql.toString());
+		this.addLocationSearchFilterParameters(sqlQuery, locationSearchRequest);
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
+
+		final SQLQuery sqlQuery =
+			this.getSession().createSQLQuery(this.createGetLocationsQuery(locationSearchRequest));
+		sqlQuery.addScalar("locationDbId");
+		sqlQuery.addScalar("locationType");
+		sqlQuery.addScalar("locationName");
+		sqlQuery.addScalar("abbreviation");
+		sqlQuery.addScalar("countryCode");
+		sqlQuery.addScalar("countryName");
+		sqlQuery.addScalar("latitude");
+		sqlQuery.addScalar("longitude");
+		sqlQuery.addScalar("altitude");
+
+		this.addLocationSearchFilterParameters(sqlQuery, locationSearchRequest);
+		addPaginationToSQLQuery(sqlQuery, pageable);
+		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+		final List<Map<String, Object>> results = sqlQuery.list();
+		final List<org.generationcp.middleware.api.location.Location> locations = new ArrayList<>();
+		for (final Map<String, Object> result : results) {
+			final org.generationcp.middleware.api.location.Location location = new org.generationcp.middleware.api.location.Location();
+			location.setLocationDbId(String.valueOf(result.get("locationDbId")));
+			location.setLocationType(String.valueOf(result.get("locationType")));
+			location.setName(String.valueOf(result.get("locationName")));
+			location.setLocationName(String.valueOf(result.get("locationName")));
+			location.setAbbreviation(String.valueOf(result.get("abbreviation")));
+			location.setCountryCode(String.valueOf(result.get("countryCode")));
+			location.setCountryName(String.valueOf(result.get("countryName")));
+			final Coordinate coordinate = new Coordinate();
+			final Geometry geometry = new Geometry();
+			geometry.setType("Point");
+			geometry.setCoordinates(Arrays.asList((Double) result.get("latitude"), (Double)result.get("longitude"), (Double)result.get("altitude")));
+			coordinate.setGeometry(geometry);
+			coordinate.setType("Feature");
+			location.setCoordinates(coordinate);
+			locations.add(location);
+		}
+		return locations;
+	}
+
+	private void addLocationSearchFilterParameters(final SQLQuery sqlQuery, final LocationSearchRequest locationSearchRequest) {
+		if(!StringUtils.isEmpty(locationSearchRequest.getLocationType())) {
+			sqlQuery.setParameter("locationType", locationSearchRequest.getLocationType());
+		}
+		if(!StringUtils.isEmpty(locationSearchRequest.getLocationId())) {
+			sqlQuery.setParameter("locationId", locationSearchRequest.getLocationId());
+		}
+	}
+
+	private String createGetLocationsQuery(final LocationSearchRequest locationSearchRequest) {
+		final StringBuilder queryString = new StringBuilder();
+		queryString.append("SELECT l.locid AS locationDbId, ");
+		queryString.append("ud.fname AS locationType, ");
+		queryString.append("l.lname AS locationName, ");
+		queryString.append("l.labbr AS abbreviation, ");
+		queryString.append("c.isothree AS countryCode, ");
+		queryString.append("c.isoabbr AS countryName, ");
+		queryString.append("g.lat AS latitude, ");
+		queryString.append("g.lon AS longitude, ");
+		queryString.append("g.alt AS altitude ");
+		this.appendGetLocationFromQuery(queryString);
+		this.appendLocationSearchFilter(queryString, locationSearchRequest);
+		return queryString.toString();
+	}
+
+	private void appendGetLocationFromQuery(final StringBuilder queryString) {
+		queryString.append("FROM location l ");
+		queryString.append(" LEFT JOIN georef g on l.locid = g.locid ");
+		queryString.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid ");
+		queryString.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype ");
+	}
+
+	private void appendLocationSearchFilter(final StringBuilder queryString, final LocationSearchRequest locationSearchRequest) {
+		queryString.append("WHERE 1=1 ");
+		if(!StringUtils.isEmpty(locationSearchRequest.getLocationType())) {
+			queryString.append("AND ud.fname = :locationType ");
+		}
+		if(!StringUtils.isEmpty(locationSearchRequest.getLocationId())) {
+			queryString.append("AND l.locid = :locationId ");
+		}
+	}
+
 	public long countLocationsByFilter(final Map<LocationFilters, Object> filters) {
 
 		try {
@@ -1121,5 +1216,4 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return sqlString.toString();
 
 	}
-
 }

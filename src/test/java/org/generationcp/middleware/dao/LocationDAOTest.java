@@ -475,7 +475,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void testFilterLocations_FilterByLocationType() {
 		final Integer locationType = 405;
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationTypes(Collections.singleton(locationType));
+		locationSearchRequest.setLocationTypeIds(Collections.singleton(locationType));
 		final List<Location> locations =
 			this.locationDAO
 				.filterLocations(locationSearchRequest,

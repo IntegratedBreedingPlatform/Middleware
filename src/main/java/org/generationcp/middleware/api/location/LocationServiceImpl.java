@@ -70,6 +70,16 @@ public class LocationServiceImpl implements LocationService {
 		return programFavorites.stream().map(ProgramFavorite::getEntityId).collect(Collectors.toList());
 	}
 
+	@Override
+	public long countLocations(final LocationSearchRequest locationSearchRequest) {
+		return this.daoFactory.getLocationDAO().countLocations(locationSearchRequest);
+	}
+
+	@Override
+	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
+		return this.daoFactory.getLocationDAO().getLocations(locationSearchRequest, pageable);
+	}
+
 	/**
 	 * Return true if proceed with searching by filter when
 	 * 1) filtering by favorites and at least one favorite exists OR
