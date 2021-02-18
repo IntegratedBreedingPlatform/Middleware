@@ -994,7 +994,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	public long countLocations(final LocationSearchRequest locationSearchRequest) {
-		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT l.locid) ");
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(l.locid) ");
 		this.appendGetLocationFromQuery(sql);
 		this.appendLocationSearchFilter(sql, locationSearchRequest);
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql.toString());
@@ -1075,6 +1075,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		queryString.append("province.lname AS province ");
 		this.appendGetLocationFromQuery(queryString);
 		this.appendLocationSearchFilter(queryString, locationSearchRequest);
+		queryString.append(" ORDER BY l.locid ");
 		return queryString.toString();
 	}
 
@@ -1087,7 +1088,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	private void appendLocationSearchFilter(final StringBuilder queryString, final LocationSearchRequest locationSearchRequest) {
-		queryString.append("WHERE 1=1 ");
+		queryString.append("WHERE province.locid = l.snl1id ");
 		if(!StringUtils.isEmpty(locationSearchRequest.getLocationType())) {
 			queryString.append("AND ud.fname = :locationType ");
 		}
