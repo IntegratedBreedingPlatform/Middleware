@@ -1084,11 +1084,11 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		queryString.append(" LEFT JOIN georef g on l.locid = g.locid ");
 		queryString.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid ");
 		queryString.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype ");
-		queryString.append(" ,location province ");
+		queryString.append(" LEFT JOIN location province ON  province.locid = l.snl1id ");
 	}
 
 	private void appendLocationSearchFilter(final StringBuilder queryString, final LocationSearchRequest locationSearchRequest) {
-		queryString.append("WHERE province.locid = l.snl1id ");
+		queryString.append("WHERE 1=1 ");
 		if(!StringUtils.isEmpty(locationSearchRequest.getLocationType())) {
 			queryString.append("AND ud.fname = :locationType ");
 		}
