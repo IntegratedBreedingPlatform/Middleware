@@ -151,7 +151,6 @@ public class GermplasmDTO {
 
 	public void setInstituteCode(final String instituteCode) {
 		this.instituteCode = instituteCode;
-		this.instituteName = instituteCode;
 	}
 
 	public String getInstituteName() {
@@ -159,7 +158,6 @@ public class GermplasmDTO {
 	}
 
 	public void setInstituteName(final String instituteName) {
-		this.instituteCode = instituteName;
 		this.instituteName = instituteName;
 	}
 

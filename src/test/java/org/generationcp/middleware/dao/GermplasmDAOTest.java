@@ -702,7 +702,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		fields.put("SPAUTH", "");
 		fields.put("SUBTAX", "");
 		fields.put("STAUTH", "");
-		fields.put("PROGM", "");
+		fields.put("INSTCODE", "");
+		fields.put("ORIGININST", "");
+		fields.put("CROPNM", "");
+		fields.put("SORIG", "");
 
 		for (final Map.Entry<String, String> attributEntry : fields.entrySet()) {
 
@@ -748,7 +751,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		}
 
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
-		request.setGermplasmDbIds(Lists.newArrayList(germplasmGID.toString()));
+		request.setGermplasmDbIds(Lists.newArrayList(germplasm.getGermplasmUUID()));
 		final List<GermplasmDTO> result = this.dao.getGermplasmDTOList(request, null);
 
 		final String displayName = germplasm.getPreferredName().getNval();
@@ -756,15 +759,17 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		Assert.assertThat(germplasmDTO.getGermplasmDbId(), is(germplasm.getGermplasmUUID()));
 		Assert.assertThat(germplasmDTO.getGermplasmPUI(), nullValue());
-		Assert.assertThat(germplasmDTO.getBreedingMethodDbId(), is(germplasm.getMethodId()));
+		Assert.assertThat(germplasmDTO.getBreedingMethodDbId(), is(germplasm.getMethodId().toString()));
 		Assert.assertThat(germplasmDTO.getDefaultDisplayName(), is(displayName));
 		// Preferred Name is ACCNO
 		Assert.assertThat(germplasmDTO.getAccessionNumber(), is(displayName));
 		Assert.assertThat(germplasmDTO.getGermplasmName(), is(displayName));
 		Assert.assertThat(germplasmDTO.getPedigree(), nullValue());
 		Assert.assertThat(germplasmDTO.getGermplasmSeedSource(), is(fields.get("PLOTCODE")));
-		Assert.assertTrue(StringUtils.isEmpty(germplasmDTO.getCommonCropName()));
-		Assert.assertThat(germplasmDTO.getInstituteCode(), is(fields.get("PROGM")));
+		Assert.assertThat(germplasmDTO.getInstituteCode(), is(fields.get("INSTCODE")));
+		Assert.assertThat(germplasmDTO.getInstituteName(), is(fields.get("ORIGININST")));
+		Assert.assertThat(germplasmDTO.getCommonCropName(), is(fields.get("CROPNM")));
+		Assert.assertThat(germplasmDTO.getGermplasmOrigin(), is(fields.get("SORIG")));
 		Assert.assertThat(germplasmDTO.getBiologicalStatusOfAccessionCode(), nullValue());
 		Assert.assertThat(germplasmDTO.getGenus(), is(names.get("GENUS")));
 		Assert.assertThat(germplasmDTO.getSpecies(), is(fields.get("SPNAM")));
