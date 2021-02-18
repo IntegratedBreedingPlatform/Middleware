@@ -1047,8 +1047,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	private void addLocationSearchFilterParameters(final SQLQuery sqlQuery, final LocationSearchRequest locationSearchRequest) {
-		if(!StringUtils.isEmpty(locationSearchRequest.getLocationType())) {
-			sqlQuery.setParameter("locationType", locationSearchRequest.getLocationType());
+		if(!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
+			sqlQuery.setParameter("locationType", locationSearchRequest.getLocationTypeName());
 		}
 		if(!StringUtils.isEmpty(locationSearchRequest.getLocationId())) {
 			sqlQuery.setParameter("locationId", locationSearchRequest.getLocationId());
@@ -1083,7 +1083,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	private void appendLocationSearchFilter(final StringBuilder queryString, final LocationSearchRequest locationSearchRequest) {
 		queryString.append("WHERE 1=1 ");
-		if(!StringUtils.isEmpty(locationSearchRequest.getLocationType())) {
+		if(!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
 			queryString.append("AND ud.fname = :locationType ");
 		}
 		if(!StringUtils.isEmpty(locationSearchRequest.getLocationId())) {

@@ -131,7 +131,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetLocations() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationType("Country");
+		locationSearchRequest.setLocationTypeName("Country");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected list of country location size > zero", locationList != null && locationList.size() > 0);
 
@@ -140,7 +140,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void getLocationsWithWrongLocType() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationType("DUMMYLOCTYPE");
+		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected list of location size equals to zero", locationList != null && locationList.size() == 0);
 
@@ -149,7 +149,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void countLocations() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationType("COUNTRY");
+		locationSearchRequest.setLocationTypeName("COUNTRY");
 		final long countLocation = this.locationDAO.countLocations(locationSearchRequest);
 		MatcherAssert.assertThat("Expected country location size > zero", countLocation > 0);
 	}
@@ -157,7 +157,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void countLocationsNotFoundLocation() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationType("DUMMYLOCTYPE");
+		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
 		final long countLocation = this.locationDAO.countLocations(locationSearchRequest);
 		MatcherAssert.assertThat("Expected country location size equals to zero by this locationType = 000100000405", countLocation == 0);
 

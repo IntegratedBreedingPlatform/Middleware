@@ -57,7 +57,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testcountLocations() throws MiddlewareQueryException {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationType("COUNTRY");
+		locationSearchRequest.setLocationTypeName("COUNTRY");
 		final long countLocation = this.locationService.countLocations(locationSearchRequest);
 		assertThat("Expected country location size > zero", 0 < countLocation);
 	}
@@ -65,7 +65,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testcountLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationType("DUMMYLOCTYOE");
+		locationSearchRequest.setLocationTypeName("DUMMYLOCTYOE");
 		final long countLocation = this.locationService.countLocations(locationSearchRequest);
 		assertThat("Expected country location size equals to zero", 0 == countLocation);
 	}
@@ -73,7 +73,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testgetLocationsByFilter() throws MiddlewareQueryException {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationType("COUNTRY");
+		locationSearchRequest.setLocationTypeName("COUNTRY");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		assertThat("Expected list of location size > zero", !locationList.isEmpty());
 	}
@@ -81,7 +81,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testgetLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationType("DUMMYLOCTYPE");
+		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		assertThat("Expected list of location size equals to zero", locationList.isEmpty());
 	}
