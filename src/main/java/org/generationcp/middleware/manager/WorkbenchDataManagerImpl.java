@@ -531,7 +531,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		final boolean hasInstanceRoleWithAddProgramPermission = this.workbenchDaoFactory.getUserRoleDao().hasInstanceRoleWithAddProgramPermission(workbenchUserId);
 		if (hasInstanceRoleWithAddProgramPermission) {
-			return getAvailableCropsForUser(workbenchUserId);
+			return this.getAvailableCropsForUser(workbenchUserId);
 		} else {
 			return new ArrayList<>(this.workbenchDaoFactory.getUserRoleDao().getCropsWithAddProgramPermissionForCropRoles(workbenchUserId));
 		}

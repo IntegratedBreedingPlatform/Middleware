@@ -100,7 +100,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	public void testGetProjects() {
 		final List<Project> projects = this.workbenchDataManager.getProjects();
 		Assert.assertNotNull(projects);
-		Assert.assertTrue(!projects.isEmpty());
+		Assert.assertFalse(projects.isEmpty());
 	}
 
 	@Test
@@ -153,7 +153,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	public void testGetAllTools() {
 		final List<Tool> results = this.workbenchDataManager.getAllTools();
 		Assert.assertNotNull(results);
-		Assert.assertTrue(!results.isEmpty());
+		Assert.assertFalse(results.isEmpty());
 	}
 
 	@Test
@@ -166,7 +166,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	public void testGetProjectsList() {
 		final List<Project> results = this.workbenchDataManager.getProjects(0, 100);
 		Assert.assertNotNull(results);
-		Assert.assertTrue(!results.isEmpty());
+		Assert.assertFalse(results.isEmpty());
 	}
 
 	@Test
@@ -214,7 +214,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	public void testGetToolsWithType() {
 		final List<Tool> results = this.workbenchDataManager.getToolsWithType(ToolType.NATIVE);
 		Assert.assertNotNull(results);
-		Assert.assertTrue(!results.isEmpty());
+		Assert.assertFalse(results.isEmpty());
 		Debug.printObjects(IntegrationTestBase.INDENT, results);
 	}
 
@@ -234,7 +234,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("we retrieved the correct object from database", results, retrievedResult);
 
 		final List<StandardPreset> out = this.workbenchDaoFactory.getStandardPresetDAO().getAll();
-		Assert.assertTrue(!out.isEmpty());
+		Assert.assertFalse(out.isEmpty());
 	}
 
 	@Test
@@ -305,7 +305,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testCountProjectsByFilter() {
 		final List<Project> projects = this.workbenchDataManager.getProjects();
-		ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		if (!projects.isEmpty()) {
 			final Project project = projects.get(0);
 			programSearchRequest.setProgramName(project.getProjectName());

@@ -35,7 +35,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	public String getProgramDbId() {
-		return programDbId;
+		return this.programDbId;
 	}
 
 	public void setProgramDbId(final String programDbId) {
@@ -43,7 +43,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -51,7 +51,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	public String getAbbreviation() {
-		return abbreviation;
+		return this.abbreviation;
 	}
 
 	public void setAbbreviation(final String abbreviation) {
@@ -59,7 +59,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	public String getObjective() {
-		return objective;
+		return this.objective;
 	}
 
 	public void setObjective(final String objective) {
@@ -67,7 +67,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	public String getLeadPerson() {
-		return leadPerson;
+		return this.leadPerson;
 	}
 
 	public void setLeadPerson(final String leadPerson) {
