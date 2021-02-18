@@ -15,7 +15,6 @@ public class LocationSearchRequest {
 	private Set<Integer> locationTypeIds = new HashSet<>();
 	private List<Integer> locationIds = new ArrayList<>();
 	private List<String> locationAbbreviations = new ArrayList<>();
-	private String locationId;
 	private String locationTypeName;
 	private String locationName;
 	private boolean favoritesOnly;
@@ -88,14 +87,6 @@ public class LocationSearchRequest {
 
 	public void setLocationName(final String locationName) {
 		this.locationName = locationName;
-	}
-
-	public String getLocationId() {
-		return this.locationId;
-	}
-
-	public void setLocationId(final String locationId) {
-		this.locationId = locationId;
 	}
 
 	public String getLocationTypeName() {
