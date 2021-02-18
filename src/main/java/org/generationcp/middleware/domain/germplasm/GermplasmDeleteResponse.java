@@ -14,7 +14,8 @@ public class GermplasmDeleteResponse {
 	private Set<Integer> germplasmWithErrors;
 
 	public GermplasmDeleteResponse(final Set<Integer> germplasmWithErrors, final Set<Integer> deletedGermplasm) {
-
+		this.germplasmWithErrors = germplasmWithErrors;
+		this.deletedGermplasm = deletedGermplasm;
 	}
 
 	public Set<Integer> getDeletedGermplasm() {
