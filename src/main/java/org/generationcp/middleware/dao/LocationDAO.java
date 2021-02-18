@@ -1031,12 +1031,10 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			location.setCountryCode(String.valueOf(result.get("countryCode")));
 			location.setCountryName(String.valueOf(result.get("countryName")));
 			location.setName(String.valueOf(result.get("locationName")));
-			final Coordinate coordinate = new Coordinate();
-			final Geometry geometry = new Geometry();
-			geometry.setType("Point");
-			geometry.setCoordinates(Arrays.asList((Double) result.get("latitude"), (Double)result.get("longitude"), (Double)result.get("altitude")));
-			coordinate.setGeometry(geometry);
-			coordinate.setType("Feature");
+			final Geometry geometry = new Geometry(
+				Arrays.asList((Double) result.get("latitude"), (Double)result.get("longitude"), (Double)result.get("altitude")),
+				"Point");
+			final Coordinate coordinate = new Coordinate(geometry, "Feature");
 			location.setCoordinates(coordinate);
 			location.setAltitude((Double) result.get("latitude"));
 			location.setLongitude((Double) result.get("longitude"));

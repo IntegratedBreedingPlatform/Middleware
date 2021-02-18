@@ -23,7 +23,7 @@ public class Geometry {
 
 	}
 
-	private Geometry(final List<Double> coordinates, final String type) {
+	public Geometry(final List<Double> coordinates, final String type) {
 		this.coordinates = coordinates;
 		this.type = type;
 	}
