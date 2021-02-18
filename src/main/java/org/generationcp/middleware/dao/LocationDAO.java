@@ -1023,26 +1023,22 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		final List<Map<String, Object>> results = sqlQuery.list();
 		final List<org.generationcp.middleware.api.location.Location> locations = new ArrayList<>();
 		for (final Map<String, Object> result : results) {
-			final org.generationcp.middleware.api.location.Location location = new org.generationcp.middleware.api.location.Location();
-			location.setLocationDbId(String.valueOf(result.get("locationDbId")));
-			location.setLocationType(String.valueOf(result.get("locationType")));
-			location.setLocationName(String.valueOf(result.get("locationName")));
-			location.setAbbreviation(String.valueOf(result.get("abbreviation")));
-			location.setCountryCode(String.valueOf(result.get("countryCode")));
-			location.setCountryName(String.valueOf(result.get("countryName")));
-			location.setName(String.valueOf(result.get("locationName")));
 			final Geometry geometry = new Geometry(
 				Arrays.asList((Double) result.get("latitude"), (Double)result.get("longitude"), (Double)result.get("altitude")),
 				"Point");
 			final Coordinate coordinate = new Coordinate(geometry, "Feature");
-			location.setCoordinates(coordinate);
-			location.setAltitude((Double) result.get("latitude"));
-			location.setLongitude((Double) result.get("longitude"));
-			location.setLongitude((Double) result.get("altitude"));
+
+			final org.generationcp.middleware.api.location.Location location = new org.generationcp.middleware.api.location.Location()
+				.withLocationDbId(String.valueOf(result.get("locationDbId"))).withLocationType(String.valueOf(result.get("locationType")))
+				.withLocationName(String.valueOf(result.get("locationName"))).withAbbreviation(String.valueOf(result.get("abbreviation")))
+				.withCountryCode(String.valueOf(result.get("countryCode"))).withCountryName(String.valueOf(result.get("countryName")))
+				.withName(String.valueOf(result.get("locationName"))).withCoordinates(coordinate)
+				.withLatitude((Double) result.get("latitude")).withLongitude((Double) result.get("longitude"))
+				.withAltitude((Double) result.get("altitude"));
 			if (!location.getLocationType().equalsIgnoreCase(LocationDAO.COUNTRY)) {
 				final Map<String, String> additionalInfo = new HashMap<>();
 				additionalInfo.put("province", String.valueOf(result.get("province")));
-				location.setAdditionalInfo(additionalInfo);
+				location.withAdditionalInfo(additionalInfo);
 			}
 
 			locations.add(location);

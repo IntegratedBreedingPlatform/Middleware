@@ -283,7 +283,11 @@ public class Location {
 		return this.locationType;
 	}
 
-	public Location setLocationType(final String locationType) {
+	public void setLocationType(final String locationType) {
+		this.locationType = locationType;
+	}
+
+	public Location withLocationType(final String locationType) {
 		this.locationType = locationType;
 		return this;
 	}
@@ -292,7 +296,11 @@ public class Location {
 		return this.abbreviation;
 	}
 
-	public Location setAbbreviation(final String abbreviation) {
+	public void setAbbreviation(final String abbreviation) {
+		this.abbreviation = abbreviation;
+	}
+
+	public Location withAbbreviation(final String abbreviation) {
 		this.abbreviation = abbreviation;
 		return this;
 	}
@@ -319,7 +327,11 @@ public class Location {
 		return this.coordinates;
 	}
 
-	public Location setCoordinates(final Coordinate coordinates) {
+	public void setCoordinates(final Coordinate coordinates) {
+		this.coordinates = coordinates;
+	}
+
+	public Location withCoordinates(final Coordinate coordinates) {
 		this.coordinates = coordinates;
 		return this;
 	}
@@ -413,12 +425,22 @@ public class Location {
 		this.locationName = locationName;
 	}
 
+	public Location withLocationName(final String locationName) {
+		this.locationName = locationName;
+		return this;
+	}
+
 	public Map<String, String> getAdditionalInfo() {
 		return this.additionalInfo;
 	}
 
 	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 		this.additionalInfo = additionalInfo;
+	}
+
+	public Location withAdditionalInfo(final Map<String, String> additionalInfo) {
+		this.additionalInfo = additionalInfo;
+		return this;
 	}
 
 	@Override
