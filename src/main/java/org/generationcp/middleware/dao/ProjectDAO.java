@@ -11,13 +11,14 @@
 
 package org.generationcp.middleware.dao;
 
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -168,14 +169,20 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		return criteria.list();
 	}
 
-	public List<Project> getProjectsByFilter(final int pageNumber,final int pageSize, final Map<ProgramFilters, Object> filters)
+	public List<Project> getProjectsByFilter(final int pageNumber,final int pageSize, final ProgramSearchRequest programSearchRequest)
 		throws MiddlewareException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Project.class);
-			for (final Map.Entry<ProgramFilters, Object> entry : filters.entrySet()) {
-				final ProgramFilters filter = entry.getKey();
-				final Object value = entry.getValue();
-				criteria.add(Restrictions.eq(filter.getStatement(), value));
+			if (!StringUtils.isBlank(programSearchRequest.getCommonCropName())) {
+				criteria.add(Restrictions.eq("cropType.cropName", programSearchRequest.getCommonCropName()));
+			}
+
+			if (!StringUtils.isBlank(programSearchRequest.getProgramDbId())) {
+				criteria.add(Restrictions.eq("projectId", Long.valueOf(programSearchRequest.getProgramDbId())));
+			}
+
+			if (!StringUtils.isBlank(programSearchRequest.getProgramName())) {
+				criteria.add(Restrictions.eq("projectName", programSearchRequest.getProgramName()));
 			}
 
 			final int start = pageSize * (pageNumber - 1);
@@ -190,13 +197,19 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		}
 	}
 
-	public long countProjectsByFilter(final Map<ProgramFilters, Object> filters) throws MiddlewareException {
+	public long countProjectsByFilter(final ProgramSearchRequest programSearchRequest) throws MiddlewareException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Project.class);
-			for (final Map.Entry<ProgramFilters, Object> entry : filters.entrySet()) {
-				final ProgramFilters filter = entry.getKey();
-				final Object value = entry.getValue();
-				criteria.add(Restrictions.eq(filter.getStatement(), value));
+			if (!StringUtils.isBlank(programSearchRequest.getCommonCropName())) {
+				criteria.add(Restrictions.eq("cropType.cropName", programSearchRequest.getCommonCropName()));
+			}
+
+			if (!StringUtils.isBlank(programSearchRequest.getProgramDbId())) {
+				criteria.add(Restrictions.eq("projectId", Long.valueOf(programSearchRequest.getProgramDbId())));
+			}
+
+			if (!StringUtils.isBlank(programSearchRequest.getProgramName())) {
+				criteria.add(Restrictions.eq("projectName", programSearchRequest.getProgramName()));
 			}
 
 			return criteria.list().size();

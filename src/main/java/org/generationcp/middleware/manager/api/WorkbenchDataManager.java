@@ -10,6 +10,7 @@
 
 package org.generationcp.middleware.manager.api;
 
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -22,11 +23,9 @@ import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * This is the API used by the Workbench to retrieve Workbench project information.
@@ -55,7 +54,7 @@ public interface WorkbenchDataManager {
 	 * @param filters - the number of rows to retrieve
 	 * @return the number of all the projects
 	 */
-	long countProjectsByFilter(final Map<ProgramFilters, Object> filters);
+	long countProjectsByFilter(final ProgramSearchRequest programSearchRequest);
 
 	/**
 	 * Gets the projects.
@@ -65,7 +64,7 @@ public interface WorkbenchDataManager {
 	 * @param filters   - the filters that to be included in the query
 	 * @return All projects based on the given start, numOfRows and filters Map
 	 */
-	List<Project> getProjects(final int start, final int numOfRows, final Map<ProgramFilters, Object> filters);
+	List<Project> getProjects(final int start, final int numOfRows, final ProgramSearchRequest programSearchRequest);
 
 	/**
 	 * Gets a project by Uuid. Should return only one value.

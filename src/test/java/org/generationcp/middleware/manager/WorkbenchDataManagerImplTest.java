@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -22,7 +23,6 @@ import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
@@ -31,9 +31,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -307,12 +305,12 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testCountProjectsByFilter() {
 		final List<Project> projects = this.workbenchDataManager.getProjects();
-		final Map<ProgramFilters, Object> filters = new HashMap<>();
+		ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		if (!projects.isEmpty()) {
 			final Project project = projects.get(0);
-			filters.put(ProgramFilters.CROP_TYPE, project.getCropType());
-			filters.put(ProgramFilters.PROGRAM_NAME, project.getProjectName());
-			final long count = this.workbenchDataManager.countProjectsByFilter(filters);
+			programSearchRequest.setProgramName(project.getProjectName());
+			programSearchRequest.setCommonCropName(project.getCropType().getCropName());
+			final long count = this.workbenchDataManager.countProjectsByFilter(programSearchRequest);
 			assertThat(new Long(1), is(equalTo(count)));
 
 		}
@@ -321,12 +319,12 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetProjectsbyFilters() {
 		final List<Project> projects = this.workbenchDataManager.getProjects();
-		final Map<ProgramFilters, Object> filters = new HashMap<>();
+		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		if (!projects.isEmpty()) {
 			final Project project = projects.get(0);
-			filters.put(ProgramFilters.CROP_TYPE, project.getCropType());
-			filters.put(ProgramFilters.PROGRAM_NAME, project.getProjectName());
-			final List<Project> Projects = this.workbenchDataManager.getProjects(1, 100, filters);
+			programSearchRequest.setCommonCropName(project.getCropType().getCropName());
+			programSearchRequest.setProgramName(project.getProjectName());
+			final List<Project> Projects = this.workbenchDataManager.getProjects(1, 100, programSearchRequest);
 			assertThat(project.getProjectId(), is(equalTo(Projects.get(0).getProjectId())));
 			assertThat(project.getCropType().getCropName(), is(equalTo(Projects.get(0).getCropType().getCropName())));
 			assertThat(project.getProjectName(), is(equalTo(Projects.get(0).getProjectName())));

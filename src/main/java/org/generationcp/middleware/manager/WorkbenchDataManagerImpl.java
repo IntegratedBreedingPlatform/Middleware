@@ -10,6 +10,7 @@
 
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -28,7 +29,6 @@ import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -40,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -81,13 +80,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Project> getProjects(final int start, final int numOfRows, final Map<ProgramFilters, Object> filters) {
-		return this.workbenchDaoFactory.getProjectDAO().getProjectsByFilter(start, numOfRows, filters);
+	public List<Project> getProjects(final int start, final int numOfRows, final ProgramSearchRequest programSearchRequest) {
+		return this.workbenchDaoFactory.getProjectDAO().getProjectsByFilter(start, numOfRows, programSearchRequest);
 	}
 
 	@Override
-	public long countProjectsByFilter(final Map<ProgramFilters, Object> filters) {
-		return this.workbenchDaoFactory.getProjectDAO().countProjectsByFilter(filters);
+	public long countProjectsByFilter(final ProgramSearchRequest programSearchRequest) {
+		return this.workbenchDaoFactory.getProjectDAO().countProjectsByFilter(programSearchRequest);
 	}
 
 	@Override
