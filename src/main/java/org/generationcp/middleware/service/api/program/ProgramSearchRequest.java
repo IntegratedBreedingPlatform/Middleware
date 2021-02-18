@@ -5,6 +5,15 @@ public class ProgramSearchRequest {
     private String commonCropName;
     private String programDbId;
     private String programName;
+    private String abbreviation;
+
+    public String getAbbreviation() {
+        return this.abbreviation;
+    }
+
+    public void setAbbreviation(final String abbreviation) {
+        this.abbreviation = abbreviation;
+    }
 
     public String getCommonCropName() {
         return this.commonCropName;
