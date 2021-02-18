@@ -2,6 +2,10 @@ package org.generationcp.middleware.api.location;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.List;
@@ -42,5 +46,23 @@ public class Geometry {
 		return this;
 	}
 
+	@Override
+	public boolean equals(final Object other) {
+		if (!(other instanceof Geometry)) {
+			return false;
+		}
+		final Geometry castOther = (Geometry) other;
+		return new EqualsBuilder().append(this.coordinates, castOther.coordinates).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(this.coordinates).hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+	}
 
 }

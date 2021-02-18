@@ -1,5 +1,10 @@
 package org.generationcp.middleware.api.location;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 public class Coordinate {
 
 	private Geometry geometry;
@@ -33,4 +38,22 @@ public class Coordinate {
 		return this;
 	}
 
+	@Override
+	public boolean equals(final Object other) {
+		if (!(other instanceof Geometry)) {
+			return false;
+		}
+		final Coordinate castOther = (Coordinate) other;
+		return new EqualsBuilder().append(this.geometry, castOther.geometry).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(this.geometry).hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+	}
 }
