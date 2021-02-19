@@ -1,8 +1,9 @@
 package org.generationcp.middleware.api.germplasm;
 
+import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
-import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.pojos.Attribute;
@@ -56,12 +57,14 @@ public interface GermplasmService {
 	UserDefinedField getPlotCodeField();
 
 	Map<Integer, GermplasmImportResponseDto> importGermplasm(Integer userId, String cropName,
-		GermplasmImportRequestDto germplasmImportRequestDto);
+		org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto germplasmImportRequestDto);
 
 	long countGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto);
 
 	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
 
 	Set<Integer> importGermplasmUpdates(Integer userId, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
+
+	List<GermplasmDTO> createGermplasm(Integer userId, String cropname, List<GermplasmImportRequestDto> germplasmImportRequestDtoList);
 
 }
