@@ -178,7 +178,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			}
 
 			if (!StringUtils.isBlank(programSearchRequest.getProgramDbId())) {
-				criteria.add(Restrictions.eq("projectId", Long.valueOf(programSearchRequest.getProgramDbId())));
+				criteria.add(Restrictions.eq("uniqueID", programSearchRequest.getProgramDbId()));
 			}
 
 			if (!StringUtils.isBlank(programSearchRequest.getProgramName())) {
@@ -205,7 +205,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			}
 
 			if (!StringUtils.isBlank(programSearchRequest.getProgramDbId())) {
-				criteria.add(Restrictions.eq("projectId", Long.valueOf(programSearchRequest.getProgramDbId())));
+				criteria.add(Restrictions.eq("uniqueID", programSearchRequest.getProgramDbId()));
 			}
 
 			if (!StringUtils.isBlank(programSearchRequest.getProgramName())) {
