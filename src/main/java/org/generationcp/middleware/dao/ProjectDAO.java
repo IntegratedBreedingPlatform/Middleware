@@ -24,6 +24,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -169,7 +170,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		return criteria.list();
 	}
 
-	public List<Project> getProjectsByFilter(final int pageNumber,final int pageSize, final ProgramSearchRequest programSearchRequest)
+	public List<Project> getProjectsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest)
 		throws MiddlewareException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Project.class);
@@ -185,15 +186,15 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 				criteria.add(Restrictions.eq("projectName", programSearchRequest.getProgramName()));
 			}
 
-			final int start = pageSize * (pageNumber - 1);
-			final int numOfRows = pageSize;
+			final int start = pageable.getPageSize() * (pageable.getPageNumber() - 1);
+			final int numOfRows = pageable.getPageSize();
 
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
 			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareException(
-				"Error in getProjectsByFilter(start=" + pageNumber + ", numOfRows=" + pageSize + "): " + e.getMessage(), e);
+				"Error in getProjectsByFilter(start=" + pageable.getPageNumber() + ", numOfRows=" + pageable.getPageSize() + "): " + e.getMessage(), e);
 		}
 	}
 

@@ -1,11 +1,16 @@
 package org.generationcp.middleware.service.api.program;
 
+import org.pojomatic.Pojomatic;
+
+import java.util.Objects;
+
 public class ProgramSearchRequest {
     // Program search request
     private String commonCropName;
     private String programDbId;
     private String programName;
     private String abbreviation;
+    private Integer loggedInUserId;
 
     public String getAbbreviation() {
         return this.abbreviation;
@@ -31,6 +36,14 @@ public class ProgramSearchRequest {
         this.programDbId = programDbId;
     }
 
+    public Integer getLoggedInUserId() {
+        return this.loggedInUserId;
+    }
+
+    public void setLoggedInUserId(final Integer loggedInUserId) {
+        this.loggedInUserId = loggedInUserId;
+    }
+
     public String getProgramName() {
         return this.programName;
     }
@@ -39,4 +52,21 @@ public class ProgramSearchRequest {
         this.programName = programName;
     }
 
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || this.getClass() != o.getClass()) return false;
+        final ProgramSearchRequest that = (ProgramSearchRequest) o;
+        return Objects.equals(this.commonCropName, that.commonCropName) && Objects.equals(this.programDbId, that.programDbId) && Objects.equals(this.programName, that.programName) && Objects.equals(this.abbreviation, that.abbreviation);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.commonCropName, this.programDbId, this.programName, this.abbreviation);
+    }
+
+    @Override
+    public String toString() {
+        return Pojomatic.toString(this);
+    }
 }

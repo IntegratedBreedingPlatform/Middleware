@@ -36,6 +36,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -80,8 +81,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Project> getProjects(final int start, final int numOfRows, final ProgramSearchRequest programSearchRequest) {
-		return this.workbenchDaoFactory.getProjectDAO().getProjectsByFilter(start, numOfRows, programSearchRequest);
+	public List<Project> getProjects(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
+		return this.workbenchDaoFactory.getProjectDAO().getProjectsByFilter(pageable, programSearchRequest);
 	}
 
 	@Override

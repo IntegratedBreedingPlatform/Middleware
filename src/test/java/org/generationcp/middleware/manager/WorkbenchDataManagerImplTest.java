@@ -29,6 +29,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -324,7 +326,9 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 			final Project project = projects.get(0);
 			programSearchRequest.setCommonCropName(project.getCropType().getCropName());
 			programSearchRequest.setProgramName(project.getProjectName());
-			final List<Project> Projects = this.workbenchDataManager.getProjects(1, 100, programSearchRequest);
+
+			final Pageable pageable = new PageRequest(1, 100);
+			final List<Project> Projects = this.workbenchDataManager.getProjects(pageable, programSearchRequest);
 			assertThat(project.getProjectId(), is(equalTo(Projects.get(0).getProjectId())));
 			assertThat(project.getCropType().getCropName(), is(equalTo(Projects.get(0).getCropType().getCropName())));
 			assertThat(project.getProjectName(), is(equalTo(Projects.get(0).getProjectName())));

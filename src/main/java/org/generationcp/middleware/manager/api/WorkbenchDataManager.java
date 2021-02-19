@@ -24,6 +24,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -59,12 +60,11 @@ public interface WorkbenchDataManager {
 	/**
 	 * Gets the projects.
 	 *
-	 * @param start     - the starting record
-	 * @param numOfRows - the number of rows to retrieve
-	 * @param filters   - the filters that to be included in the query
+	 * @param pageable     - the starting record and number of page
+	 * @param programSearchRequest   - the filters that to be included in the query
 	 * @return All projects based on the given start, numOfRows and filters Map
 	 */
-	List<Project> getProjects(final int start, final int numOfRows, final ProgramSearchRequest programSearchRequest);
+	List<Project> getProjects(final Pageable pageable, final ProgramSearchRequest programSearchRequest);
 
 	/**
 	 * Gets a project by Uuid. Should return only one value.
