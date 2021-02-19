@@ -67,4 +67,14 @@ public interface GermplasmService {
 
 	List<GermplasmDTO> createGermplasm(Integer userId, String cropname, List<GermplasmImportRequestDto> germplasmImportRequestDtoList);
 
+	long countFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO);
+
+	List<GermplasmDTO> searchFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
+
+	Optional<GermplasmDTO> getGermplasmDTOByGID(Integer gid);
+
+	long countGermplasmByStudy(Integer studyDbId);
+
+	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Pageable pageable);
+
 }

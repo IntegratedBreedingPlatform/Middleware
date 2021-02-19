@@ -31,6 +31,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -917,9 +918,94 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 		final GermplasmSearchRequestDto searchRequestDto = new GermplasmSearchRequestDto();
 		searchRequestDto.setGermplasmDbIds(createdGermplasmUUIDs);
-		// TODO move GermplasmDataManagerImpl#searchGermplasmDTO to this class as it contains code to populate synonyms and attributes
-		return this.daoFactory.getGermplasmDao().getGermplasmDTOList(searchRequestDto, null);
+		return this.searchFilteredGermplasm(searchRequestDto, null);
 	}
+
+	@Override
+	public long countFilteredGermplasm(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
+		return this.daoFactory.getGermplasmDao().countGermplasmDTOs(germplasmSearchRequestDTO);
+	}
+
+	@Override
+	public List<GermplasmDTO> searchFilteredGermplasm(
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Pageable pageable) {
+		final List<GermplasmDTO> germplasmDTOList =
+			this.daoFactory.getGermplasmDao().getGermplasmDTOList(germplasmSearchRequestDTO, pageable);
+		this.populateSynonymsAndAttributes(germplasmDTOList);
+		return germplasmDTOList;
+	}
+
+	@Override
+	public Optional<GermplasmDTO> getGermplasmDTOByGID(final Integer gid) {
+		final GermplasmSearchRequestDto searchDto = new GermplasmSearchRequestDto();
+		searchDto.setGermplasmDbIds(Collections.singletonList(String.valueOf(gid)));
+		final List<GermplasmDTO> germplasmDTOS = this.searchFilteredGermplasm(searchDto,  new PageRequest(0, 1));
+		if (!CollectionUtils.isEmpty(germplasmDTOS)) {
+			return Optional.of(germplasmDTOS.get(0));
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public List<GermplasmDTO> getGermplasmByStudy(final Integer studyDbId, final Pageable pageable) {
+		final List<GermplasmDTO> germplasmByStudy = this.daoFactory.getGermplasmDao().getGermplasmByStudy(studyDbId, pageable);
+		this.populateSynonymsAndAttributes(germplasmByStudy);
+		return germplasmByStudy;
+	}
+
+	@Override
+	public long countGermplasmByStudy(final Integer studyDbId) {
+		return this.daoFactory.getGermplasmDao().countGermplasmByStudy(studyDbId);
+	}
+
+	private void populateSynonymsAndAttributes(final List<GermplasmDTO> germplasmDTOList) {
+		final List<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGid()))
+			.collect(Collectors.toList());
+		final Map<Integer, String> nameTypesMap = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids).stream()
+			.collect(Collectors.toMap(UserDefinedField::getFldno, UserDefinedField::getFcode));
+		final Map<Integer, List<Name>> gidNamesMap = this.daoFactory.getNameDao().getNamesByGidsAndNTypeIdsInMap(new ArrayList<>(gids), Collections.emptyList());
+		final Map<Integer, Map<String, String>> gidAttributesMap = this.getAttributesNameAndValuesMapForGids(new ArrayList<>(gids));
+		// Populate synonyms and attributes per germplasm DTO
+		for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
+			final Integer gid = Integer.valueOf(germplasmDTO.getGid());
+			// Set as synonyms other names, other than the preferred name, found for germplasm
+			final String defaultName = germplasmDTO.getGermplasmName();
+			final List<Name> names = gidNamesMap.get(gid);
+			if (!CollectionUtils.isEmpty(names)) {
+				final Map<String, String> synonymsMap = new HashMap<>();
+				final List<Name> synonyms =
+					names.stream().filter(n -> !defaultName.equalsIgnoreCase(n.getNval())).collect(Collectors.toList());
+				for (final Name name : synonyms) {
+					synonymsMap.put(nameTypesMap.get(name.getTypeId()), name.getNval());
+				}
+				germplasmDTO.setSynonyms(synonymsMap);
+			}
+			germplasmDTO.setAdditionalInfo(gidAttributesMap.get(gid));
+		}
+	}
+
+	private Map<Integer, Map<String, String>> getAttributesNameAndValuesMapForGids(final List<Integer> gidList) {
+		final Map<Integer, Map<String, String>> attributeMap = new HashMap<>();
+
+		// retrieve attribute values
+		final List<Attribute> attributeList = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(gidList);
+		final Map<Integer, String> attributeTypeMap = this.daoFactory.getUserDefinedFieldDAO().getAttributeTypesByGIDList(gidList).stream()
+			.collect(Collectors.toMap(UserDefinedField::getFldno, UserDefinedField::getFcode));
+		for (final Attribute attribute : attributeList) {
+			Map<String, String> attrByType = attributeMap.get(attribute.getGermplasmId());
+			if (attrByType == null) {
+				attrByType = new HashMap<>();
+			}
+			final String attributeType = attributeTypeMap.get(attribute.getTypeId());
+			attrByType.put(attributeType, attribute.getAval());
+			attributeMap.put(attribute.getGermplasmId(), attrByType);
+		}
+
+		return attributeMap;
+	}
+
+
+
 
 	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
