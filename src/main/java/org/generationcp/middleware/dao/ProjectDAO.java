@@ -19,6 +19,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -174,8 +175,8 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		throws MiddlewareException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Project.class);
-			if (!StringUtils.isBlank(programSearchRequest.getCommonCropName())) {
-				criteria.add(Restrictions.eq("cropType.cropName", programSearchRequest.getCommonCropName()));
+			if (!Util.isEmpty(programSearchRequest.getCommonCropName())) {
+				criteria.add(Restrictions.in("cropType.cropName", programSearchRequest.getCommonCropName()));
 			}
 
 			if (!StringUtils.isBlank(programSearchRequest.getProgramDbId())) {
@@ -201,8 +202,8 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 	public long countProjectsByFilter(final ProgramSearchRequest programSearchRequest) throws MiddlewareException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Project.class);
-			if (!StringUtils.isBlank(programSearchRequest.getCommonCropName())) {
-				criteria.add(Restrictions.eq("cropType.cropName", programSearchRequest.getCommonCropName()));
+			if (!Util.isEmpty(programSearchRequest.getCommonCropName())) {
+				criteria.add(Restrictions.in("cropType.cropName", programSearchRequest.getCommonCropName()));
 			}
 
 			if (!StringUtils.isBlank(programSearchRequest.getProgramDbId())) {
