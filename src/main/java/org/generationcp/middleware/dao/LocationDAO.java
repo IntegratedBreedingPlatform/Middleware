@@ -305,22 +305,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return new ArrayList<>();
 	}
 
-	public long countFilterLocations(final LocationSearchRequest locationSearchRequest) {
-		try {
-
-			final Criteria criteria =
-				this.createFilterLocationCriteria(locationSearchRequest);
-			return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
-
-		} catch (final HibernateException e) {
-			LocationDAO.LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("countFilterLocations", "types,locationIds,locationAbbreviations,locationName", "",
-					e.getMessage(),
-					LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-	}
-
 	public List<Location> filterLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
 		try {
 
@@ -1046,15 +1030,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return locations;
 	}
 
-	private void addLocationSearchFilterParameters(final SQLQuery sqlQuery, final LocationSearchRequest locationSearchRequest) {
-		if(!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
-			sqlQuery.setParameter("locationType", locationSearchRequest.getLocationTypeName());
-		}
-		if(!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
-			sqlQuery.setParameterList("locationId", locationSearchRequest.getLocationIds());
-		}
-	}
-
 	private String createGetLocationsQuery(final LocationSearchRequest locationSearchRequest) {
 		final StringBuilder queryString = new StringBuilder();
 		queryString.append("SELECT l.locid AS locationDbId, ");
@@ -1081,6 +1056,31 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		queryString.append(" LEFT JOIN location province ON  province.locid = l.snl1id ");
 	}
 
+	private void addLocationSearchFilterParameters(final SQLQuery sqlQuery, final LocationSearchRequest locationSearchRequest) {
+		if(!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
+			sqlQuery.setParameter("locationType", locationSearchRequest.getLocationTypeName());
+		}
+		if(!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
+			sqlQuery.setParameterList("locationId", locationSearchRequest.getLocationIds());
+		}
+
+		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID())) {
+			sqlQuery.setParameter("programUUID", locationSearchRequest.getProgramUUID());
+		}
+
+		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationTypeIds())) {
+			sqlQuery.setParameterList("locationTypeIds", locationSearchRequest.getLocationTypeIds());
+		}
+
+		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationAbbreviations())) {
+			sqlQuery.setParameterList("labbr", locationSearchRequest.getLocationAbbreviations());
+		}
+
+		if (StringUtils.isNotEmpty(locationSearchRequest.getLocationName())) {
+			sqlQuery.setParameter("name", locationSearchRequest.getLocationName() + "%");
+		}
+	}
+
 	private void appendLocationSearchFilter(final StringBuilder queryString, final LocationSearchRequest locationSearchRequest) {
 		queryString.append("WHERE 1=1 ");
 		if(!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
@@ -1088,6 +1088,22 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 		if(!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
 			queryString.append("AND l.locid IN (:locationId) ");
+		}
+
+		if (locationSearchRequest.getProgramUUID() != null) {
+			queryString.append("AND (l.program_uuid = :programUUID OR l.program_uuid IS NULL) ");
+		}
+
+		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationTypeIds())) {
+			queryString.append("AND l.ltype IN (:locationTypeIds) ");
+		}
+
+		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationAbbreviations())) {
+			queryString.append("AND l.labbr IN (:locationAbbrs) ");
+		}
+
+		if (StringUtils.isNotEmpty(locationSearchRequest.getLocationName())) {
+			queryString.append("AND l.lname like :name ");
 		}
 	}
 

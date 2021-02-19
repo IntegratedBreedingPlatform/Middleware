@@ -430,7 +430,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testFilterLocations_RetrieveAll() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		final long count = this.locationDAO.countFilterLocations(locationSearchRequest);
+		final long count = this.locationDAO.countLocations(locationSearchRequest);
 		final List<Location> locations =
 			this.locationDAO.filterLocations(locationSearchRequest, null);
 		Assert.assertThat((int) count, equalTo(locations.size()));
@@ -439,7 +439,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testFilterLocations_Pagination() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		final long count = this.locationDAO.countFilterLocations(locationSearchRequest);
 
 		// Page 1
 		final PageRequest pageRequest = new PageRequest(0, 10);

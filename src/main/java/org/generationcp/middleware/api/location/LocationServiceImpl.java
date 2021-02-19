@@ -57,7 +57,7 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public long countFilteredLocations(final LocationSearchRequest locationSearchRequest) {
 		if (this.doProceedWithFilteredSearch(locationSearchRequest)) {
-			return this.daoFactory.getLocationDAO().countFilterLocations(locationSearchRequest);
+			return this.daoFactory.getLocationDAO().countLocations(locationSearchRequest);
 		}
 		return 0L;
 	}
