@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 
@@ -50,6 +51,30 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 			.getFilteredLocations(new LocationSearchRequest(), new PageRequest(0, 10));
 		Assert.assertThat(10, equalTo(locations.size()));
 
+	}
+
+	@Test
+	public void testCountLocationsByFilterNotRecoveredLocation() {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationTypeName("DUMMYLOCTYOE");
+		final long countLocation = this.locationService.countFilteredLocations(locationSearchRequest);
+		assertThat("Expected country location size equals to zero", 0 == countLocation);
+	}
+
+	@Test
+	public void testGetLocationsByFilter(){
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationTypeName("COUNTRY");
+		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		assertThat("Expected list of location size > zero", !locationList.isEmpty());
+	}
+
+	@Test
+	public void testGetLocationsByFilterNotRecoveredLocation() {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
+		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		assertThat("Expected list of location size equals to zero", locationList.isEmpty());
 	}
 
 	@Test
