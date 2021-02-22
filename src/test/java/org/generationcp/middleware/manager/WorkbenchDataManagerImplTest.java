@@ -311,7 +311,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		if (!projects.isEmpty()) {
 			final Project project = projects.get(0);
 			programSearchRequest.setProgramName(project.getProjectName());
-			programSearchRequest.addCommonCropName(project.getCropType().getCropName());
+			programSearchRequest.setCommonCropName(project.getCropType().getCropName());
 			final long count = this.workbenchDataManager.countProjectsByFilter(programSearchRequest);
 			assertThat(new Long(1), is(equalTo(count)));
 
@@ -324,7 +324,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		if (!projects.isEmpty()) {
 			final Project project = projects.get(0);
-			programSearchRequest.addCommonCropName(project.getCropType().getCropName());
+			programSearchRequest.setCommonCropName(project.getCropType().getCropName());
 			programSearchRequest.setProgramName(project.getProjectName());
 
 			final Pageable pageable = new PageRequest(1, 100);
