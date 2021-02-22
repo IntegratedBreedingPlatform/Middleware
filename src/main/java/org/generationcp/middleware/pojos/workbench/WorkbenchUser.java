@@ -99,6 +99,10 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		+ "       p.project_id = :projectId "
 		+ "    GROUP BY users.userid";
 
+	//User with access to a program is the union of:
+	//1. Users with Instance role
+	//2. Users with crop role and no program role assigned
+	//3. Users with explicit access to the program via program role
 	public static final String GET_ACTIVE_USER_IDS_WITH_ACCESS_TO_A_PROGRAM =
 		"select distinct u.userid " //
 			+ "from users u " //
