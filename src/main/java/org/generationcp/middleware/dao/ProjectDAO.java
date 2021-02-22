@@ -51,7 +51,14 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			+ "	WHERE "
 			+ "		u.userid = :userId and r.active = 1 "
 			+ "		AND ( r.role_type_id = " + RoleType.INSTANCE.getId()
-			+ "				OR ( r.role_type_id = "+ RoleType.CROP.getId() +" and ur.crop_name = p.crop_type ) "
+			+ "				OR ( r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = p.crop_type and NOT EXISTS ("
+			+ "										 SELECT distinct p1.project_id "
+			+ "                                      FROM workbench_project p1 "
+			+ "                                             INNER JOIN "
+			+ "                                      users_roles ur1 ON ur1.workbench_project_id = p1.project_id "
+			+ "                                             INNER JOIN role r1 ON ur1.role_id = r1.id "
+			+ "                                      where r1.role_type_id = " + RoleType.PROGRAM.getId()
+			+ "                                        AND ur1.crop_name = p.crop_type AND ur1.userid = u.userid )) "
 			+ "				OR ( r.role_type_id = "+ RoleType.PROGRAM.getId() +" and ur.crop_name = p.crop_type "
 			+ "						and ur.workbench_project_id = p.project_id ) "
 			+ "			) "

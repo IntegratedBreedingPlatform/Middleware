@@ -32,7 +32,14 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
  		+ "inner join role r on rp.role_id = r.id " //
 		+ "inner join users_roles ur on r.id = ur.role_id " //
 		+ "where  (r.role_type_id = " + RoleType.INSTANCE.getId() //
-		+ "  or (r.role_type_id = "+ RoleType.CROP.getId() +" and ur.crop_name = :cropName) " //
+		+ "  or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = :cropName and not exists (" //
+		+ " 							SELECT distinct p1.project_id " //
+		+ "							    FROM workbench_project p1 " //
+		+ "                             INNER JOIN " //
+		+ "                             users_roles ur1 ON ur1.workbench_project_id = p1.project_id " //
+		+ "                             INNER JOIN role r1 ON ur1.role_id = r1.id " //
+		+ "                             where r1.role_type_id = " + RoleType.PROGRAM.getId() //
+		+ "                             AND ur1.crop_name = ur.crop_name AND ur1.userid = ur.userid ) ) " //
 		+ "  or (r.role_type_id = "+ RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName and ur.workbench_project_id = :projectId)) " //
 		+ "and ur.userid = :userId and r.active = 1";
 
