@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class ProgramSearchRequest {
     // Program search request
-    private List<String> commonCropName;
+    private String commonCropName;
     private String programDbId;
     private String programName;
     private String abbreviation;
@@ -24,18 +24,11 @@ public class ProgramSearchRequest {
         this.abbreviation = abbreviation;
     }
 
-    public List<String> getCommonCropName() {
+    public String getCommonCropName() {
         return this.commonCropName;
     }
 
-    public void addCommonCropName(final String commonCropName) {
-        if (Util.isEmpty(this.commonCropName)) {
-            this.commonCropName = new ArrayList<>();
-        }
-        this.commonCropName.add(commonCropName);
-    }
-
-    public void setCommonCropName(final List<String> commonCropName) {
+    public void setCommonCropName(final String commonCropName) {
         this.commonCropName = commonCropName;
     }
 
