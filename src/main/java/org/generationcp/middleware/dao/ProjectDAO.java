@@ -243,23 +243,6 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Project> getProjectsByUser(final WorkbenchUser user, final String cropName) {
-		final List<Project> projects = new ArrayList<>();
-		try {
-			if (user != null) {
-				final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-				programSearchRequest.setLoggedInUserId(user.getUserid());
-
-				return this.getProjectsByFilter(null, programSearchRequest);
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error in getProjectsByUser(user=" + user + ") query from ProjectUserInfoDao: " + e.getMessage(), e);
-		}
-		return new ArrayList<>();
-	}
-
 	public List<Project> getProjectsByCropName(final String cropName) {
 		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("cropType.cropName", cropName));
 		return criteria.list();
