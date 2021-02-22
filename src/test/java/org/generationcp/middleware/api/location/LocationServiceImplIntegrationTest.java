@@ -4,7 +4,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -55,7 +54,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
+	public void testCountLocationsByFilterNotRecoveredLocation() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYOE");
 		final long countLocation = this.locationService.countFilteredLocations(locationSearchRequest);
@@ -63,7 +62,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetLocationsByFilter() throws MiddlewareQueryException {
+	public void testGetLocationsByFilter(){
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("COUNTRY");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
@@ -71,7 +70,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
+	public void testGetLocationsByFilterNotRecoveredLocation() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
