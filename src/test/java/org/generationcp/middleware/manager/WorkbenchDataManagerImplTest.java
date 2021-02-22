@@ -312,6 +312,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 			final Project project = projects.get(0);
 			programSearchRequest.setProgramName(project.getProjectName());
 			programSearchRequest.setCommonCropName(project.getCropType().getCropName());
+			programSearchRequest.setLoggedInUserId(project.getUserId());
 			final long count = this.workbenchDataManager.countProjectsByFilter(programSearchRequest);
 			assertThat(new Long(1), is(equalTo(count)));
 
@@ -326,6 +327,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 			final Project project = projects.get(0);
 			programSearchRequest.setCommonCropName(project.getCropType().getCropName());
 			programSearchRequest.setProgramName(project.getProjectName());
+			programSearchRequest.setLoggedInUserId(project.getUserId());
 
 			final Pageable pageable = new PageRequest(1, 100);
 			final List<Project> Projects = this.workbenchDataManager.getProjects(pageable, programSearchRequest);
