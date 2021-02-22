@@ -1549,19 +1549,26 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	private void populateSynonymsAndAttributes(final List<GermplasmDTO> germplasmDTOList) {
-		final Set<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGermplasmDbId()))
-			.collect(Collectors.toSet());
+		final List<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGid()))
+			.collect(Collectors.toList());
+		final Map<Integer, String> nameTypesMap = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids).stream()
+			.collect(Collectors.toMap(UserDefinedField::getFldno, UserDefinedField::getFcode));
 		final Map<Integer, List<Name>> gidNamesMap = this.getNamesByGidsAndNTypeIdsInMap(new ArrayList<>(gids), Collections.emptyList());
 		final Map<Integer, Map<String, String>> gidAttributesMap = this.getAttributesNameAndValuesMapForGids(new ArrayList<>(gids));
 		// Populate synonyms and attributes per germplasm DTO
 		for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
-			final Integer gid = Integer.valueOf(germplasmDTO.getGermplasmDbId());
+			final Integer gid = Integer.valueOf(germplasmDTO.getGid());
 			// Set as synonyms other names, other than the preferred name, found for germplasm
 			final String defaultName = germplasmDTO.getGermplasmName();
 			final List<Name> names = gidNamesMap.get(gid);
 			if (!CollectionUtils.isEmpty(names)) {
-				germplasmDTO.setSynonyms(
-					names.stream().filter(n -> !defaultName.equalsIgnoreCase(n.getNval())).map(Name::getNval).collect(Collectors.toList()));
+				final Map<String, String> synonymsMap = new HashMap<>();
+				final List<Name> synonyms =
+					names.stream().filter(n -> !defaultName.equalsIgnoreCase(n.getNval())).collect(Collectors.toList());
+				for (final Name name : synonyms) {
+					synonymsMap.put(nameTypesMap.get(name.getTypeId()), name.getNval());
+				}
+				germplasmDTO.setSynonyms(synonymsMap);
 			}
 			germplasmDTO.setAdditionalInfo(gidAttributesMap.get(gid));
 		}
