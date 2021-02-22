@@ -63,22 +63,21 @@ public class BreedingMethodServiceImplTest {
 
 		final Method method = MethodTestDataInitializer.createMethod();
 		methods.add(method);
+
+		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
+		searchRequest.setProgramUUID(PROGRAM_UUID);
 		Mockito.when(
-			this.methodDAO.filterMethods(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.eq(abbreviations), ArgumentMatchers.anyList()))
+			this.methodDAO.filterMethods(ArgumentMatchers.eq(searchRequest), ArgumentMatchers.eq(null)))
 			.thenReturn(methods);
 
-		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(PROGRAM_UUID, abbreviations
-			, false);
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 		assertNotNull(breedingMethods);
 		assertThat(breedingMethods, hasSize(1));
 		final BreedingMethodDTO actualBreedingMethodDTO = breedingMethods.get(0);
 		this.assertBreedingMethodDTO(actualBreedingMethodDTO, method);
 
 		Mockito.verify(this.methodDAO)
-			.filterMethods(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.eq(abbreviations), this.listArgumentCaptor.capture());
-		final List<Integer> actualBreedingMethodIds = this.listArgumentCaptor.getValue();
-		assertNotNull(actualBreedingMethodIds);
-		assertThat(actualBreedingMethodIds, hasSize(0));
+			.filterMethods(ArgumentMatchers.eq(searchRequest), ArgumentMatchers.eq(null));
 
 		Mockito.verify(this.programFavoriteDAO, new Times(0)).getProgramFavorites(
 			ArgumentMatchers.any(ProgramFavorite.FavoriteType.class),
@@ -92,7 +91,11 @@ public class BreedingMethodServiceImplTest {
 		final Set<String> abbreviations = new HashSet<>();
 		final Method method = MethodTestDataInitializer.createMethod();
 		methods.add(method);
-		Mockito.when(this.methodDAO.filterMethods(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.any(), ArgumentMatchers.anyList()))
+
+		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
+		searchRequest.setProgramUUID(PROGRAM_UUID);
+		searchRequest.setFavoritesOnly(true);
+		Mockito.when(this.methodDAO.filterMethods(searchRequest, null))
 			.thenReturn(methods);
 
 		final ProgramFavorite programFavorite =
@@ -100,23 +103,22 @@ public class BreedingMethodServiceImplTest {
 		Mockito.when(this.programFavoriteDAO.getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, PROGRAM_UUID))
 			.thenReturn(Arrays.asList(programFavorite));
 
-		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(PROGRAM_UUID, abbreviations, true);
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 		assertNotNull(breedingMethods);
 		assertThat(breedingMethods, hasSize(1));
 		final BreedingMethodDTO actualBreedingMethodDTO = breedingMethods.get(0);
 		this.assertBreedingMethodDTO(actualBreedingMethodDTO, method);
 
 		Mockito.verify(this.methodDAO)
-			.filterMethods(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.eq(abbreviations), this.listArgumentCaptor.capture());
-		final List<Integer> actualBreedingMethodIds = this.listArgumentCaptor.getValue();
-		assertNotNull(actualBreedingMethodIds);
-		assertThat(actualBreedingMethodIds, hasSize(1));
-		assertThat(actualBreedingMethodIds.get(0), is(programFavorite.getEntityId()));
+			.filterMethods(searchRequest, null);
+		assertNotNull(searchRequest.getMethodIds());
+		assertThat(searchRequest.getMethodIds(), hasSize(1));
+		assertThat(searchRequest.getMethodIds().get(0), is(programFavorite.getEntityId()));
 
 		Mockito.verify(this.programFavoriteDAO).getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, PROGRAM_UUID);
 	}
 
-	private void assertBreedingMethodDTO(BreedingMethodDTO actualBreedingMethodDTO, Method method) {
+	private void assertBreedingMethodDTO(final BreedingMethodDTO actualBreedingMethodDTO, final Method method) {
 		assertThat(actualBreedingMethodDTO.getCode(), is(method.getMcode()));
 		assertThat(actualBreedingMethodDTO.getDescription(), is(method.getMdesc()));
 		assertThat(actualBreedingMethodDTO.getGroup(), is(method.getMgrp()));

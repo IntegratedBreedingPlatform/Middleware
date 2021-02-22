@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="nahuel" id="v17.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				select count(1)
+				from permission
+				where name = 'IMPORT_GERMPLASM' and
+						parent_id = (
+						select permission_id
+						from permission
+						where name = 'GERMPLASM') and
+					not exists(
+						select 1
+						from permission
+						where name = 'IMPORT_GERMPLASM' and
+								parent_id = (
+								select permission_id
+								from permission
+								where name = 'MANAGE_GERMPLASM'
+							))
+			</sqlCheck>
+		</preConditions>
+		<comment>Move IMPORT_GERMPLASM under MANAGE_GERMPLASM in Permission tree</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @new_parent_id = (
+				select permission_id
+				from permission
+				where name = 'MANAGE_GERMPLASM'
+			);
+			set @current_permission_id = (
+				select permission_id
+				from permission
+				where name = 'IMPORT_GERMPLASM' and
+						parent_id = (
+						select permission_id
+						from permission
+						where name = 'GERMPLASM') and
+					not exists(
+						select 1
+						from permission
+						where name = 'IMPORT_GERMPLASM' and
+								parent_id = (
+								select permission_id
+								from permission
+								where name = 'MANAGE_GERMPLASM'
+							))
+			);
+
+			update permission
+			set parent_id = @new_parent_id
+			where permission_id = @current_permission_id;
+		</sql>
+	</changeSet>
+
+
+
+</databaseChangeLog>
+

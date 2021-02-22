@@ -36,4 +36,6 @@ public interface LocationService {
 	 * @return the favorite project location ids
 	 */
 	List<Integer> getFavoriteProjectLocationIds(String programUUID);
+
+	List<org.generationcp.middleware.api.location.Location> getLocations(LocationSearchRequest locationSearchRequest, Pageable pageable);
 }

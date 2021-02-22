@@ -13,7 +13,7 @@ package org.generationcp.middleware.manager.api;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
-import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
@@ -36,6 +36,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -332,9 +333,9 @@ public interface GermplasmDataManager {
 	 * Returns a Map of GIDs to the attribute values by type given a list of GIDs.
 	 *
 	 * @param gidList - list of GIDs
-	 * @return Map<Integer, Map < Integer, String> - map of gids to their corresponding attribute values
+	 * @return Map<Integer, Map < String, String> - map of gids to their corresponding attribute type and values
 	 */
-	Map<Integer, Map<Integer, String>> getAttributeValuesGIDList(List<Integer> gidList);
+	Map<Integer, Map<String, String>> getAttributesNameAndValuesMapForGids(List<Integer> gidList);
 
 	/**
 	 * Returns all the list of name types available for the given list of gids.
@@ -1156,9 +1157,9 @@ public interface GermplasmDataManager {
 	 */
 	NamingConfiguration getNamingConfigurationByName(String name);
 
-	GermplasmDTO getGermplasmDTOByGID(Integer gid);
+	Optional<GermplasmDTO> getGermplasmDTOByGID(Integer gid);
 
-	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Integer page, Integer pageSize);
+	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
 
 	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);
 
@@ -1168,7 +1169,7 @@ public interface GermplasmDataManager {
 
 	long countGermplasmByStudy(Integer studyDbId);
 
-	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Integer pageNumber, Integer pageSize);
+	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Pageable pageable);
 
 	List<AttributeDTO> getAttributesByGid(
 		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNumber);

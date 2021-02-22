@@ -12,9 +12,10 @@ import java.util.Set;
 public class LocationSearchRequest {
 
 	private String programUUID;
-	private Set<Integer> locationTypes = new HashSet<>();
+	private Set<Integer> locationTypeIds = new HashSet<>();
 	private List<Integer> locationIds = new ArrayList<>();
 	private List<String> locationAbbreviations = new ArrayList<>();
+	private String locationTypeName;
 	private String locationName;
 	private boolean favoritesOnly;
 
@@ -22,10 +23,18 @@ public class LocationSearchRequest {
 
 	}
 
-	public LocationSearchRequest(final String programUUID, final Set<Integer> locationTypes, final List<Integer> locationIds,
+	public LocationSearchRequest(final String programUUID, final Set<Integer> locationTypeIds, final String locationName,
+		final boolean favoritesOnly) {
+		this.programUUID = programUUID;
+		this.locationTypeIds = locationTypeIds;
+		this.locationName = locationName;
+		this.favoritesOnly = favoritesOnly;
+	}
+
+	public LocationSearchRequest(final String programUUID, final Set<Integer> locationTypeIds, final List<Integer> locationIds,
 		final List<String> locationAbbreviations, final String locationName, final Boolean favoritesOnly) {
 		this.programUUID = programUUID;
-		this.locationTypes = locationTypes;
+		this.locationTypeIds = locationTypeIds;
 		this.locationIds = locationIds;
 		this.locationAbbreviations = locationAbbreviations;
 		this.locationName = locationName;
@@ -48,12 +57,12 @@ public class LocationSearchRequest {
 		this.programUUID = programUUID;
 	}
 
-	public Set<Integer> getLocationTypes() {
-		return this.locationTypes;
+	public Set<Integer> getLocationTypeIds() {
+		return this.locationTypeIds;
 	}
 
-	public void setLocationTypes(final Set<Integer> locationTypes) {
-		this.locationTypes = locationTypes;
+	public void setLocationTypeIds(final Set<Integer> locationTypeIds) {
+		this.locationTypeIds = locationTypeIds;
 	}
 
 	public List<Integer> getLocationIds() {
@@ -78,6 +87,14 @@ public class LocationSearchRequest {
 
 	public void setLocationName(final String locationName) {
 		this.locationName = locationName;
+	}
+
+	public String getLocationTypeName() {
+		return this.locationTypeName;
+	}
+
+	public void setLocationTypeName(final String locationType) {
+		this.locationTypeName = locationType;
 	}
 
 	@Override

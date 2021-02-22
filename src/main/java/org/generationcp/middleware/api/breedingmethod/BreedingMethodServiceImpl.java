@@ -8,13 +8,17 @@ import org.generationcp.middleware.pojos.MethodClass;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -43,21 +47,35 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	}
 
 	@Override
-	public BreedingMethodDTO getBreedingMethod(final Integer breedingMethodDbId) {
+	public Optional<BreedingMethodDTO> getBreedingMethod(final Integer breedingMethodDbId) {
 		final Method methodEntity = this.daoFactory.getMethodDAO().getById(breedingMethodDbId);
-		return new BreedingMethodDTO(methodEntity);
+		if (!Objects.isNull(methodEntity)) {
+			return Optional.of(new BreedingMethodDTO(methodEntity));
+		}
+		return Optional.empty();
 	}
 
 	@Override
-	public List<BreedingMethodDTO> getBreedingMethods(final String programUUID, final Set<String> abbreviations, final boolean favorites) {
-		final List<Integer> breedingMethodIds = new ArrayList<>();
-		if (!StringUtils.isEmpty(programUUID) && favorites) {
-			breedingMethodIds.addAll(this.getFavoriteProjectMethodsIds(programUUID));
+	public List<BreedingMethodDTO> getBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest, final Pageable pageable) {
+		final String programUUID = methodSearchRequest.getProgramUUID();
+		final boolean favoritesOnly = methodSearchRequest.isFavoritesOnly();
+		if (!StringUtils.isEmpty(programUUID) && favoritesOnly) {
+			final List<Integer> favoriteProjectMethodsIds = this.getFavoriteProjectMethodsIds(programUUID);
+			// if filtering by program favorite methods but none exist, do not proceed with search and immediately return empty list
+			if (CollectionUtils.isEmpty(favoriteProjectMethodsIds)) {
+				return Collections.EMPTY_LIST;
+			}
+			methodSearchRequest.setMethodIds(favoriteProjectMethodsIds);
 		}
 
-		return this.daoFactory.getMethodDAO().filterMethods(programUUID, abbreviations, breedingMethodIds).stream()
+		return this.daoFactory.getMethodDAO().filterMethods(methodSearchRequest, pageable).stream()
 			.map(BreedingMethodDTO::new)
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	public Long countBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest) {
+		return this.daoFactory.getMethodDAO().countFilteredMethods(methodSearchRequest);
 	}
 
 	private List<Integer> getFavoriteProjectMethodsIds(final String programUUID) {

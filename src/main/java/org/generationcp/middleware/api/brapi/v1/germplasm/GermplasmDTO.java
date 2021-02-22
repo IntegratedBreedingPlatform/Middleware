@@ -1,4 +1,4 @@
-package org.generationcp.middleware.domain.germplasm;
+package org.generationcp.middleware.api.brapi.v1.germplasm;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
@@ -6,6 +6,7 @@ import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -34,7 +35,11 @@ public class GermplasmDTO {
 	private String germplasmSpecies;
 	private String seedSource;
 	private String entryNumber;
-	private List<String> synonyms;
+	private String germplasmOrigin;
+	private Map<String, String> synonyms;
+	private Map<String, String> additionalInfo;
+	private String gid;
+
 	private final static String documentationURL = null;
 
 	public String getBreedingMethodDbId() {
@@ -146,7 +151,6 @@ public class GermplasmDTO {
 
 	public void setInstituteCode(final String instituteCode) {
 		this.instituteCode = instituteCode;
-		this.instituteName = instituteCode;
 	}
 
 	public String getInstituteName() {
@@ -154,7 +158,6 @@ public class GermplasmDTO {
 	}
 
 	public void setInstituteName(final String instituteName) {
-		this.instituteCode = instituteName;
 		this.instituteName = instituteName;
 	}
 
@@ -232,12 +235,36 @@ public class GermplasmDTO {
 		this.entryNumber = entryNumber;
 	}
 
-	public List<String> getSynonyms() {
+	public String getGermplasmOrigin() {
+		return this.germplasmOrigin;
+	}
+
+	public void setGermplasmOrigin(final String germplasmOrigin) {
+		this.germplasmOrigin = germplasmOrigin;
+	}
+
+	public Map<String, String> getSynonyms() {
 		return synonyms;
 	}
 
-	public void setSynonyms(List<String> synonyms) {
+	public void setSynonyms(final Map<String, String> synonyms) {
 		this.synonyms = synonyms;
+	}
+
+	public Map<String, String> getAdditionalInfo() {
+		return this.additionalInfo;
+	}
+
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
+		this.additionalInfo = additionalInfo;
+	}
+
+	public String getGid() {
+		return this.gid;
+	}
+
+	public void setGid(final String gid) {
+		this.gid = gid;
 	}
 
 	@Override
