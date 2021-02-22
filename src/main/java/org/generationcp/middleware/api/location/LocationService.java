@@ -37,7 +37,5 @@ public interface LocationService {
 	 */
 	List<Integer> getFavoriteProjectLocationIds(String programUUID);
 
-	long countLocations(LocationSearchRequest locationSearchRequest);
-
 	List<org.generationcp.middleware.api.location.Location> getLocations(LocationSearchRequest locationSearchRequest, Pageable pageable);
 }

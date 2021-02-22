@@ -71,11 +71,6 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public long countLocations(final LocationSearchRequest locationSearchRequest) {
-		return this.daoFactory.getLocationDAO().countLocations(locationSearchRequest);
-	}
-
-	@Override
 	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
 		return this.daoFactory.getLocationDAO().getLocations(locationSearchRequest, pageable);
 	}

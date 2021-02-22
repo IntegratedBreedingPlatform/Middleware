@@ -58,7 +58,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testcountLocations() throws MiddlewareQueryException {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("COUNTRY");
-		final long countLocation = this.locationService.countLocations(locationSearchRequest);
+		final long countLocation = this.locationService.countFilteredLocations(locationSearchRequest);
 		assertThat("Expected country location size > zero", 0 < countLocation);
 	}
 
@@ -66,7 +66,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testcountLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYOE");
-		final long countLocation = this.locationService.countLocations(locationSearchRequest);
+		final long countLocation = this.locationService.countFilteredLocations(locationSearchRequest);
 		assertThat("Expected country location size equals to zero", 0 == countLocation);
 	}
 
