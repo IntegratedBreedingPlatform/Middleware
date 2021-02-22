@@ -55,15 +55,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testcountLocations() throws MiddlewareQueryException {
-		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationTypeName("COUNTRY");
-		final long countLocation = this.locationService.countFilteredLocations(locationSearchRequest);
-		assertThat("Expected country location size > zero", 0 < countLocation);
-	}
-
-	@Test
-	public void testcountLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
+	public void testCountLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYOE");
 		final long countLocation = this.locationService.countFilteredLocations(locationSearchRequest);
@@ -71,7 +63,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testgetLocationsByFilter() throws MiddlewareQueryException {
+	public void testGetLocationsByFilter() throws MiddlewareQueryException {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("COUNTRY");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
@@ -79,7 +71,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testgetLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
+	public void testGetLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
