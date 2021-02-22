@@ -10,8 +10,6 @@
 
 package org.generationcp.middleware.manager.api;
 
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
-import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
@@ -21,8 +19,6 @@ import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.service.api.location.LocationFilters;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -445,25 +441,6 @@ public interface LocationDataManager {
 	List<Location> getAllBreedingLocationsByUniqueID(String programUUID);
 
 	List<LocationDetails> getFilteredLocationsDetails(Integer countryId, Integer locationType, String locationName, String programUUID);
-
-	/**
-	 * Returns number of all Locations depending on the filters.
-	 *
-	 * @return the number of all Locations
-	 * @ the middleware query exception
-	 */
-	long countLocationsByFilter(final Map<LocationFilters, Object> filters);
-
-	/**
-	 * Returns all Local Locations depending on the filters.
-	 *
-	 * @param pageNumber - the starting index of the sublist of results to be returned
-	 * @param pageSize   - the number of rows to be included in the sublist of results
-	 *                   to be returned
-	 * @param filters    - the filters that to be included in the query
-	 * @return All Locations based on the given start and numOfRows
-	 */
-	List<LocationDetailsDto> getLocationsByFilter(final int pageNumber, final int pageSize, final Map<LocationFilters, Object> filters);
 
 	/**
 	 * Gets the user defined field id of name.

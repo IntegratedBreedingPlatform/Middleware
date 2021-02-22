@@ -155,7 +155,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		lotUpdateRequestDto.getSingleInput().getSearchComposite().setItemIds(itemIds);
 		final LotsSearchDto searchDto = new LotsSearchDto();
 		searchDto.setLotIds(Collections.singletonList(this.lot.getId()));
-		List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 
 		this.lotService.updateLots(null, extendedLotDtos, lotUpdateRequestDto);
 		assertThat(this.lot.getComments(), hasToString("Test1"));
@@ -174,7 +174,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		lotUpdateRequestDto.getSingleInput().getSearchComposite().setItemIds(itemIds);
 		final LotsSearchDto searchDto = new LotsSearchDto();
 		searchDto.setLotIds(Collections.singletonList(this.lot.getId()));
-		List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 
 		this.lotService.updateLots(null, extendedLotDtos, lotUpdateRequestDto);
 		assertThat(this.lot.getComments(), hasToString("Test2"));
@@ -188,7 +188,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
 		final LotMultiUpdateRequestDto multiInput = new LotMultiUpdateRequestDto();
 		final List<LotMultiUpdateRequestDto.LotUpdateDto> lotList = new ArrayList<>();
-		LotMultiUpdateRequestDto.LotUpdateDto lot = new LotMultiUpdateRequestDto.LotUpdateDto();
+		final LotMultiUpdateRequestDto.LotUpdateDto lot = new LotMultiUpdateRequestDto.LotUpdateDto();
 		lot.setLotUID(this.lot.getLotUuId());
 		lot.setUnitName("SEED_AMOUNT_kg");
 		lot.setNotes("Test3");
@@ -202,7 +202,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(this.lot.getScaleId(), equalTo(8264));
 		assertThat(this.lot.getComments(), hasToString("Lot"));
 
-		List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 
 		this.lotService.updateLots(null, extendedLotDtos, lotUpdateRequestDto);
 		assertThat(this.lot.getComments(), hasToString("Test3"));
@@ -222,13 +222,13 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 						TransactionSourceType.MERGED_LOT))
 				.list();
 		assertThat(keepLotIdMergedTransactions, hasSize(0));
-		
+
 		//Check that the lot to keep has 20 as actual amount
-		List<TransactionDto> availableBalanceTransactions = this.transactionService.getAvailableBalanceTransactions(this.lot.getId());
+		final List<TransactionDto> availableBalanceTransactions = this.transactionService.getAvailableBalanceTransactions(this.lot.getId());
 		assertNotNull(availableBalanceTransactions);
 		assertThat(availableBalanceTransactions, hasSize(1));
 
-		TransactionDto transactionDto = availableBalanceTransactions.get(0);
+		final TransactionDto transactionDto = availableBalanceTransactions.get(0);
 		assertThat(transactionDto.getLot().getLotId(), is(keepLotId));
 		assertThat(transactionDto.getAmount(), is(20d));
 
