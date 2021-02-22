@@ -306,36 +306,28 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountProjectsByFilter() {
-		final List<Project> projects = this.workbenchDataManager.getProjects();
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-		if (!projects.isEmpty()) {
-			final Project project = projects.get(0);
-			programSearchRequest.setProgramName(project.getProjectName());
-			programSearchRequest.setCommonCropName(project.getCropType().getCropName());
-			programSearchRequest.setLoggedInUserId(project.getUserId());
-			final long count = this.workbenchDataManager.countProjectsByFilter(programSearchRequest);
-			assertThat(new Long(1), is(equalTo(count)));
-
-		}
+		final Project project = this.commonTestProject;
+		programSearchRequest.setProgramName(project.getProjectName());
+		programSearchRequest.setCommonCropName(project.getCropType().getCropName());
+		programSearchRequest.setLoggedInUserId(this.testUser1.getUserid());
+		final long count = this.workbenchDataManager.countProjectsByFilter(programSearchRequest);
+		assertThat(new Long(1), is(equalTo(count)));
 	}
 
 	@Test
 	public void testGetProjectsbyFilters() {
-		final List<Project> projects = this.workbenchDataManager.getProjects();
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-		if (!projects.isEmpty()) {
-			final Project project = projects.get(0);
-			programSearchRequest.setCommonCropName(project.getCropType().getCropName());
-			programSearchRequest.setProgramName(project.getProjectName());
-			programSearchRequest.setLoggedInUserId(project.getUserId());
+		final Project project = this.commonTestProject;
+		programSearchRequest.setCommonCropName(project.getCropType().getCropName());
+		programSearchRequest.setProgramName(project.getProjectName());
+		programSearchRequest.setLoggedInUserId(project.getUserId());
 
-			final Pageable pageable = new PageRequest(1, 100);
-			final List<Project> Projects = this.workbenchDataManager.getProjects(pageable, programSearchRequest);
-			assertThat(project.getProjectId(), is(equalTo(Projects.get(0).getProjectId())));
-			assertThat(project.getCropType().getCropName(), is(equalTo(Projects.get(0).getCropType().getCropName())));
-			assertThat(project.getProjectName(), is(equalTo(Projects.get(0).getProjectName())));
-
-		}
+		final Pageable pageable = new PageRequest(1, 100);
+		final List<Project> Projects = this.workbenchDataManager.getProjects(pageable, programSearchRequest);
+		assertThat(project.getProjectId(), is(equalTo(Projects.get(0).getProjectId())));
+		assertThat(project.getCropType().getCropName(), is(equalTo(Projects.get(0).getCropType().getCropName())));
+		assertThat(project.getProjectName(), is(equalTo(Projects.get(0).getProjectName())));
 	}
 
 	@Test
