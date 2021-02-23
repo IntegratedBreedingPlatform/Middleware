@@ -888,7 +888,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasm.setMgid(0);
 			germplasm.setUserId(userId);
 			germplasm.setLgid(0);
+			germplasm.setGnpgs(0);
+			germplasm.setGpid1(0);
+			germplasm.setGpid2(0);
 			germplasm.setLocationId(locationsMap.get(germplasmDto.getCountryOfOriginCode()));
+
 			germplasm.setDeleted(Boolean.FALSE);
 			germplasm.setGdate(Util.convertDateToIntegerValue(germplasmDto.getAcquisitionDate()));
 			germplasm.setReferenceId(0);
@@ -898,21 +902,27 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			this.addCustomNameFieldsToSynonyms(germplasmDto);
 			germplasmDto.getSynonyms().forEach(synonym -> {
-				final Name name = new Name(null, germplasm.getGid(), nameTypesMap.get(synonym.getType().toUpperCase()),
-					0, userId, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
-				if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
-					name.setNstat(1);
+				final Integer typeId = nameTypesMap.get(synonym.getType().toUpperCase());
+				if (typeId != null) {
+					final Name name = new Name(null, germplasm.getGid(), typeId,
+						0, userId, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
+					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
+						name.setNstat(1);
+					}
+					this.daoFactory.getNameDao().save(name);
 				}
-				this.daoFactory.getNameDao().save(name);
 			});
 
 			this.addCustomAttributeFieldsToAdditionalInfo(germplasmDto);
 			germplasmDto.getAdditionalInfo().forEach((k, v) -> {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), attributesMap.get(k.toUpperCase()), userId, v,
+				final Integer typeId = attributesMap.get(k.toUpperCase());
+				if (typeId != null) {
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, userId, v,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					this.daoFactory.getAttributeDAO().save(attribute);
-				});
+				}
+			});
 
 			createdGermplasmUUIDs.add(germplasm.getGermplasmUUID());
 		}
