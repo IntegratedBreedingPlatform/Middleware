@@ -11,6 +11,11 @@ public class Synonym {
 	private String synonym;
 	private String type;
 
+	public Synonym(final String synonym, final String type) {
+		this.synonym = synonym;
+		this.type = type;
+	}
+
 	public String getSynonym() {
 		return synonym;
 	}

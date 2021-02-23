@@ -6,7 +6,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
-import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequestDto;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
@@ -828,41 +829,37 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return ("0".equals(progenitor) || StringUtils.isEmpty(progenitor)) ? 0 : progenitorsMap.get(progenitor).getGid();
 	}
 
-	private Map<Integer, Method> getBreedingMethodsMapByMethodIds(final List<GermplasmImportRequestDto> germplasmImportRequestDtoList) {
+	private Map<Integer, Method> getBreedingMethodsMapByMethodIds(final List<GermplasmImportRequest> germplasmImportRequestList) {
 		final Set<Integer> breedingMethodIds =
-			germplasmImportRequestDtoList.stream().map(method -> Integer.parseInt(method.getBreedingMethodDbId())).collect(Collectors.toSet());
+			germplasmImportRequestList.stream().map(method -> Integer.parseInt(method.getBreedingMethodDbId())).collect(Collectors.toSet());
 		return this.daoFactory.getMethodDAO().getMethodsByIds(new ArrayList<>(breedingMethodIds)).stream()
 			.collect(Collectors.toMap(Method::getMid, Function.identity()));
 	}
 
-	private Map<String, Integer> getLocationsMapByLocAbbr(final List<GermplasmImportRequestDto> germplasmImportRequestDtoList) {
+	private Map<String, Integer> getLocationsMapByLocAbbr(final List<GermplasmImportRequest> germplasmImportRequestList) {
 		final Set<String> locationAbbreviations =
-			germplasmImportRequestDtoList.stream().map(GermplasmImportRequestDto::getCountryOfOriginCode).collect(Collectors.toSet());
+			germplasmImportRequestList.stream().map(GermplasmImportRequest::getCountryOfOriginCode).collect(Collectors.toSet());
 		return this.daoFactory.getLocationDAO().getByAbbreviations(new ArrayList<>(locationAbbreviations)).stream()
 			.collect(Collectors.toMap(l -> l.getLabbr().toUpperCase(), Location::getLocid));
 	}
 
-	private Map<String, Integer> getAttributesMapByAttrCode(final List<GermplasmImportRequestDto> germplasmImportRequestDtoList) {
-		final Set<String> attributes = new HashSet<>();
-		germplasmImportRequestDtoList.forEach(g -> {
+	private Map<String, Integer> getAttributesMapByAttrCode(final List<GermplasmImportRequest> germplasmImportRequestList) {
+		final Set<String> attributes = new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES);
+		germplasmImportRequestList.forEach(g -> {
 			if (!CollectionUtils.isEmpty(g.getAdditionalInfo())) {
 				attributes.addAll(g.getAdditionalInfo().keySet());
 			}
 		});
-		if (!attributes.isEmpty()) {
-			final List<UserDefinedField> attributesUdfldList = this.daoFactory.getUserDefinedFieldDAO()
-				.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-					new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType())),
-					attributes);
-			return attributesUdfldList.stream().collect(Collectors.toMap(u -> u.getFcode().toUpperCase(), UserDefinedField::getFldno));
-		} else {
-			return new HashMap<>();
-		}
+		final List<UserDefinedField> attributesUdfldList = this.daoFactory.getUserDefinedFieldDAO()
+			.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
+				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType())),
+				attributes);
+		return attributesUdfldList.stream().collect(Collectors.toMap(u -> u.getFcode().toUpperCase(), UserDefinedField::getFldno));
 	}
 
-	private Map<String, Integer> getNameTypesMapByNameTypeCode(final List<GermplasmImportRequestDto> germplasmImportRequestDtoList) {
-		final Set<String> namesCode = new HashSet<>();
-		germplasmImportRequestDtoList.forEach(
+	private Map<String, Integer> getNameTypesMapByNameTypeCode(final List<GermplasmImportRequest> germplasmImportRequestList) {
+		final Set<String> namesCode = new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_NAMETYPES);
+		germplasmImportRequestList.forEach(
 			g -> namesCode.addAll(g.getSynonyms().stream().map(s -> s.getType().toUpperCase()).collect(Collectors.toList())));
 		return this.daoFactory.getUserDefinedFieldDAO()
 			.getByCodes(UDTableType.NAMES_NAME.getTable(),
@@ -871,18 +868,17 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 
-
 	@Override
 	public List<GermplasmDTO> createGermplasm(final Integer userId, final String cropname,
-		final List<GermplasmImportRequestDto> germplasmImportRequestDtoList) {
-		final Map<Integer, Method> methodsMap = this.getBreedingMethodsMapByMethodIds(germplasmImportRequestDtoList);
-		final Map<String, Integer> locationsMap = this.getLocationsMapByLocAbbr(germplasmImportRequestDtoList);
-		final Map<String, Integer> attributesMap = this.getAttributesMapByAttrCode(germplasmImportRequestDtoList);
-		final Map<String, Integer> nameTypesMap = this.getNameTypesMapByNameTypeCode(germplasmImportRequestDtoList);
+		final List<GermplasmImportRequest> germplasmImportRequestList) {
+		final Map<Integer, Method> methodsMap = this.getBreedingMethodsMapByMethodIds(germplasmImportRequestList);
+		final Map<String, Integer> locationsMap = this.getLocationsMapByLocAbbr(germplasmImportRequestList);
+		final Map<String, Integer> attributesMap = this.getAttributesMapByAttrCode(germplasmImportRequestList);
+		final Map<String, Integer> nameTypesMap = this.getNameTypesMapByNameTypeCode(germplasmImportRequestList);
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropname);
 
 		final List<String> createdGermplasmUUIDs = new ArrayList<>();
-		for (final GermplasmImportRequestDto germplasmDto : germplasmImportRequestDtoList) {
+		for (final GermplasmImportRequest germplasmDto : germplasmImportRequestList) {
 
 			final Germplasm germplasm = new Germplasm();
 			final Method method = methodsMap.get(Integer.parseInt(germplasmDto.getBreedingMethodDbId()));
@@ -900,13 +896,17 @@ public class GermplasmServiceImpl implements GermplasmService {
 			GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(germplasm));
 			this.daoFactory.getGermplasmDao().save(germplasm);
 
+			this.addCustomNameFieldsToSynonyms(germplasmDto);
 			germplasmDto.getSynonyms().forEach(synonym -> {
 				final Name name = new Name(null, germplasm.getGid(), nameTypesMap.get(synonym.getType().toUpperCase()),
 					0, userId, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
+				if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
+					name.setNstat(1);
+				}
 				this.daoFactory.getNameDao().save(name);
 			});
 
-
+			this.addCustomAttributeFieldsToAdditionalInfo(germplasmDto);
 			germplasmDto.getAdditionalInfo().forEach((k, v) -> {
 					final Attribute attribute = new Attribute(null, germplasm.getGid(), attributesMap.get(k.toUpperCase()), userId, v,
 						germplasm.getLocationId(),
@@ -919,6 +919,30 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final GermplasmSearchRequestDto searchRequestDto = new GermplasmSearchRequestDto();
 		searchRequestDto.setGermplasmDbIds(createdGermplasmUUIDs);
 		return this.searchFilteredGermplasm(searchRequestDto, null);
+	}
+
+	// Add to attributes map to be saved the custom atttribute fields in import request dto
+	private void addCustomAttributeFieldsToAdditionalInfo(final GermplasmImportRequest germplasmDto) {
+		final Map<String, String> customAttributeFieldsMap = germplasmDto.getCustomAttributeFieldsMap();
+		for (final String attributeKey : GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES) {
+			final boolean isAttributeSpecified = germplasmDto.getAdditionalInfo().containsKey(attributeKey);
+			if (!StringUtils.isEmpty(customAttributeFieldsMap.get(attributeKey)) && !isAttributeSpecified) {
+				germplasmDto.getAdditionalInfo().put(attributeKey, customAttributeFieldsMap.get(attributeKey));
+			}
+		}
+	}
+
+	// Add to names list to be saved the custom name fields in import request dto
+	private void addCustomNameFieldsToSynonyms(final GermplasmImportRequest germplasmDto) {
+		final Map<String, String> customNamesFieldsMap = germplasmDto.getCustomNamesFieldsMap();
+		for (final String nameType : GermplasmImportRequest.BRAPI_SPECIFIABLE_NAMETYPES) {
+			final Optional<Synonym> synonymOptional =
+				germplasmDto.getSynonyms().stream().filter(s -> nameType.equals(s.getType().toUpperCase())).findAny();
+			if (!StringUtils.isEmpty(customNamesFieldsMap.get(nameType)) && !synonymOptional.isPresent()) {
+				germplasmDto.getSynonyms().add(new Synonym(customNamesFieldsMap.get(nameType), nameType));
+			}
+		}
+
 	}
 
 	@Override
@@ -1003,9 +1027,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		return attributeMap;
 	}
-
-
-
 
 	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
