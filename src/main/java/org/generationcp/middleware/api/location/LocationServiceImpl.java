@@ -57,7 +57,7 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public long countFilteredLocations(final LocationSearchRequest locationSearchRequest) {
 		if (this.doProceedWithFilteredSearch(locationSearchRequest)) {
-			return this.daoFactory.getLocationDAO().countFilterLocations(locationSearchRequest);
+			return this.daoFactory.getLocationDAO().countLocations(locationSearchRequest);
 		}
 		return 0L;
 	}
@@ -68,6 +68,11 @@ public class LocationServiceImpl implements LocationService {
 			this.daoFactory.getProgramFavoriteDao()
 				.getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
 		return programFavorites.stream().map(ProgramFavorite::getEntityId).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
+		return this.daoFactory.getLocationDAO().getLocations(locationSearchRequest, pageable);
 	}
 
 	/**

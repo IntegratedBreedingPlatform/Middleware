@@ -11,12 +11,8 @@
 
 package org.generationcp.middleware.manager;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
-import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -26,24 +22,19 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
@@ -651,64 +642,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 			this.manager.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, "Country");
 		final Integer countryId = 405;
 		Assert.assertEquals("Expected recovered id of the Contry", countryId, value);
-	}
-
-	@Test
-	public void testcountLocationsByFilter() throws MiddlewareQueryException {
-		final Map<LocationFilters, Object> filters = new HashMap<>();
-		filters.put(LocationFilters.LOCATION_TYPE, 405L);
-		final long countLocation = this.manager.countLocationsByFilter(filters);
-		assertThat("Expected country location size > zero", 0 < countLocation);
-	}
-
-	@Test
-	public void testcountLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
-		final Map<LocationFilters, Object> filters = new HashMap<>();
-		filters.put(LocationFilters.LOCATION_TYPE, 101010101010010405L);
-		final long countLocation = this.manager.countLocationsByFilter(filters);
-		assertThat("Expected country location size equals to zero", 0 == countLocation);
-	}
-
-	@Test
-	public void testgetLocationsByFilter() throws MiddlewareQueryException {
-		final Map<LocationFilters, Object> filters = new HashMap<>();
-		filters.put(LocationFilters.LOCATION_TYPE, 405L);
-		final List<LocationDetailsDto> locationList = this.manager.getLocationsByFilter(1, 100, filters);
-		assertThat("Expected list of location size > zero", !locationList.isEmpty());
-	}
-
-	@Test
-	public void testgetLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
-		final Map<LocationFilters, Object> filters = new HashMap<>();
-		filters.put(LocationFilters.LOCATION_TYPE, 0000010000405L);
-		final List<LocationDetailsDto> locationList = this.manager.getLocationsByFilter(1, 100, filters);
-		assertThat("Expected list of location size equals to zero", locationList.isEmpty());
-	}
-
-	@Test
-	public void testgetLocationsByFilterWithAdditionalInfo() throws MiddlewareQueryException {
-		Map<LocationFilters, Object> filters = new HashMap<>();
-		filters.put(LocationFilters.LOCATION_TYPE, 410L); // Filter by Breeding Location
-		List<LocationDetailsDto> locationList = this.manager.getLocationsByFilter(1, 100, filters);
-		final LocationDetailsDto locationOrg = locationList.get(0);
-
-		filters = new HashMap<>();
-		filters.put(LocationFilters.LOCATION_NAME, locationOrg.getName()); //Filter by Location Name
-		locationList = this.manager.getLocationsByFilter(0, 100, filters);
-		final LocationDetailsDto locationFinal = locationList.get(0);
-		assertThat(locationOrg, equalTo(locationList.get(0)));
-		assertThat(locationOrg.getLocationDbId(), is(equalTo(locationFinal.getLocationDbId())));
-		assertThat(locationOrg.getCountryCode(), is(equalTo(locationFinal.getCountryCode())));
-		assertThat(locationOrg.getCountryName(), is(equalTo(locationFinal.getCountryName())));
-		assertThat(locationOrg.getLocationType(), is(equalTo(locationFinal.getLocationType())));
-		assertThat(locationOrg.getLocationDbId(), is(equalTo(locationFinal.getLocationDbId())));
-		assertThat(locationOrg.getAltitude(), is(equalTo(locationFinal.getAltitude())));
-		assertThat(locationOrg.getLatitude(), is(equalTo(locationFinal.getLatitude())));
-		assertThat(locationOrg.getAltitude(), is(equalTo(locationFinal.getAltitude())));
-		assertThat(locationOrg.getName(), is(equalTo(locationFinal.getName())));
-		assertThat(locationOrg.getAbbreviation(), is(equalTo(locationFinal.getAbbreviation())));
-		assertThat(locationOrg.getAdditionalInfo().getInfoValue("province"),
-			is(equalTo(locationFinal.getAdditionalInfo().getInfoValue("province"))));
 	}
 
 	@Test
