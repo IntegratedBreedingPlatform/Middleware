@@ -1044,7 +1044,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void test_createGermplasm_Ok() {
-		final GermplasmImportRequest request = new GermplasmImportRequest(RandomStringUtils.randomAlphabetic(20), Util.tryParseDate(this.creationDate),
+		final String creationDate = "2020-10-24";
+		final GermplasmImportRequest request = new GermplasmImportRequest(RandomStringUtils.randomAlphabetic(20), creationDate,
 		this.derivativeMethod.getMid().toString(), RandomStringUtils.randomAlphabetic(20), "UKN", RandomStringUtils.randomAlphabetic(20),
 		RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 		RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
@@ -1061,7 +1062,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Integer gid = Integer.parseInt(germplasmDTO.getGid());
 		assertThat(germplasmDTO.getBreedingMethodDbId(), equalTo(this.derivativeMethod.getMid().toString()));
 		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo("UKN"));
-		assertThat(germplasmDTO.getAcquisitionDate(), equalTo(Util.tryParseDate(this.creationDate)));
+		assertThat(germplasmDTO.getAcquisitionDate(), equalTo(Util.tryParseDate(this.creationDate, Util.FRONTEND_DATE_FORMAT)));
 		assertThat(germplasmDTO.getGermplasmDbId(), notNullValue());
 		assertThat(germplasmDTO.getGermplasmPUI(), nullValue());
 		assertThat(germplasmDTO.getEntryNumber(), nullValue());

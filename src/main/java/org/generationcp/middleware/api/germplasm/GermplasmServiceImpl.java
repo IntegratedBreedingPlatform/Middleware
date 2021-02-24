@@ -831,14 +831,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private Map<Integer, Method> getBreedingMethodsMapByMethodIds(final List<GermplasmImportRequest> germplasmImportRequestList) {
 		final Set<Integer> breedingMethodIds =
-			germplasmImportRequestList.stream().map(method -> Integer.parseInt(method.getBreedingMethodDbId())).collect(Collectors.toSet());
+			germplasmImportRequestList.stream().filter(g -> StringUtils.isNotEmpty(g.getBreedingMethodDbId()))
+				.map(method -> Integer.parseInt(method.getBreedingMethodDbId())).collect(Collectors.toSet());
 		return this.daoFactory.getMethodDAO().getMethodsByIds(new ArrayList<>(breedingMethodIds)).stream()
 			.collect(Collectors.toMap(Method::getMid, Function.identity()));
 	}
 
 	private Map<String, Integer> getLocationsMapByLocAbbr(final List<GermplasmImportRequest> germplasmImportRequestList) {
 		final Set<String> locationAbbreviations =
-			germplasmImportRequestList.stream().map(GermplasmImportRequest::getCountryOfOriginCode).collect(Collectors.toSet());
+			germplasmImportRequestList.stream().filter(g -> StringUtils.isNotEmpty(g.getCountryOfOriginCode()))
+				.map(GermplasmImportRequest::getCountryOfOriginCode).collect(Collectors.toSet());
 		return this.daoFactory.getLocationDAO().getByAbbreviations(new ArrayList<>(locationAbbreviations)).stream()
 			.collect(Collectors.toMap(l -> l.getLabbr().toUpperCase(), Location::getLocid));
 	}
@@ -894,7 +896,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasm.setLocationId(locationsMap.get(germplasmDto.getCountryOfOriginCode()));
 
 			germplasm.setDeleted(Boolean.FALSE);
-			germplasm.setGdate(Util.convertDateToIntegerValue(germplasmDto.getAcquisitionDate()));
+			germplasm.setGdate(Util.convertDateToIntegerValue(Util.tryParseDate(germplasmDto.getAcquisitionDate(), Util.FRONTEND_DATE_FORMAT)));
 			germplasm.setReferenceId(0);
 
 			GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(germplasm));
@@ -926,9 +928,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			createdGermplasmUUIDs.add(germplasm.getGermplasmUUID());
 		}
-		final GermplasmSearchRequestDto searchRequestDto = new GermplasmSearchRequestDto();
-		searchRequestDto.setGermplasmDbIds(createdGermplasmUUIDs);
-		return this.searchFilteredGermplasm(searchRequestDto, null);
+		if (!createdGermplasmUUIDs.isEmpty()) {
+			final GermplasmSearchRequestDto searchRequestDto = new GermplasmSearchRequestDto();
+			searchRequestDto.setGermplasmDbIds(createdGermplasmUUIDs);
+			return this.searchFilteredGermplasm(searchRequestDto, null);
+		}
+		return Collections.emptyList();
 	}
 
 	// Add to attributes map to be saved the custom atttribute fields in import request dto

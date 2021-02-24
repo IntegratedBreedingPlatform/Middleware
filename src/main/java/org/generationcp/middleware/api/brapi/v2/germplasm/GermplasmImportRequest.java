@@ -33,12 +33,11 @@ public class GermplasmImportRequest {
 		Arrays.asList(CROPNM, ORIGIN, INSTCODE, INSTNAME, PLOTCODE, SPECIES, SPECIES_AUTH, SUBTAX, SUBTAX_AUTH);
 
 	private String accessionNumber;
-	private Date acquisitionDate;
+	private String acquisitionDate;
 	private Map<String, String> additionalInfo = new HashMap<>();
 	private Integer biologicalStatusOfAccessionCode;
 	private Integer biologicalStatusOfAccessionDescription;
 	private String breedingMethodDbId;
-	private String germplasmDbId;
 	private String collection;
 	private String commonCropName;
 	private String countryOfOriginCode;
@@ -66,7 +65,7 @@ public class GermplasmImportRequest {
 
 	}
 
-	public GermplasmImportRequest(final String accessionNumber, final Date acquisitionDate, final String breedingMethodDbId,
+	public GermplasmImportRequest(final String accessionNumber, final String acquisitionDate, final String breedingMethodDbId,
 		final String commonCropName,
 		final String countryOfOriginCode, final String defaultDisplayName, final String genus, final String germplasmOrigin,
 		final String instituteCode,
@@ -98,11 +97,11 @@ public class GermplasmImportRequest {
 		this.accessionNumber = accessionNumber;
 	}
 
-	public Date getAcquisitionDate() {
+	public String getAcquisitionDate() {
 		return acquisitionDate;
 	}
 
-	public void setAcquisitionDate(final Date acquisitionDate) {
+	public void setAcquisitionDate(final String acquisitionDate) {
 		this.acquisitionDate = acquisitionDate;
 	}
 
@@ -136,14 +135,6 @@ public class GermplasmImportRequest {
 
 	public void setBreedingMethodDbId(final String breedingMethodDbId) {
 		this.breedingMethodDbId = breedingMethodDbId;
-	}
-
-	public String getGermplasmDbId() {
-		return germplasmDbId;
-	}
-
-	public void setGermplasmDbId(final String germplasmDbId) {
-		this.germplasmDbId = germplasmDbId;
 	}
 
 	public String getCollection() {
