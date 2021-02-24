@@ -13,6 +13,7 @@ public class UserRoleMapper {
 		userRoleDto.setRole(RoleMapper.map(userRole.getRole()));
 		userRoleDto.setProgram(ProgramMapper.map(userRole.getWorkbenchProject()));
 		userRoleDto.setCrop((userRole.getCropType() != null) ? new CropDto(userRole.getCropType()) : null);
+		userRoleDto.setCreatedBy((userRole.getCreatedBy() == null ? null : userRole.getCreatedBy().getUserid()));
 		userRoleDto.setId(userRole.getId());
 		return userRoleDto;
 	}

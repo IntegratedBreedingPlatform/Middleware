@@ -1,14 +1,15 @@
 package org.generationcp.middleware.data.initializer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class UserTestDataInitializer {
 
@@ -66,10 +67,15 @@ public class UserTestDataInitializer {
 		final WorkbenchUser user = new WorkbenchUser();
 		user.setUserid(userid);
 		// Role ID 1 = ADMIN
+		final Role role = new Role(1, "Admin");
+		final RoleType roleType = new RoleType(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.name());
+		roleType.setId(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.getId());
+		role.setRoleType(roleType);
 		final UserRole userRole = new UserRole();
 		userRole.setUser(user);
+		userRole.setCropType(project.getCropType());
 		userRole.setWorkbenchProject(project);
-		userRole.setRole( new Role(1, "Admin"));
+		userRole.setRole(role);
 		user.setRoles(Arrays.asList(userRole));
 		return user;
 	}
@@ -79,10 +85,16 @@ public class UserTestDataInitializer {
 		if(workbenchUser.getRoles()!=null && !workbenchUser.getRoles().isEmpty()){
 			userRoles = (ArrayList<UserRole>) workbenchUser.getRoles();
 		}
+		final RoleType roleType = new RoleType(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.name());
+		roleType.setId(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.getId());
+		final Role role = new Role(roleId, roleName);
+		role.setRoleType(roleType);
+
 		final UserRole userRole = new UserRole();
 		userRole.setUser(workbenchUser);
 		userRole.setWorkbenchProject(project);
-		userRole.setRole(new Role(roleId, roleName));
+		userRole.setRole(role);
+		userRole.setCropType(project.getCropType());
 		userRoles.add(userRole);
 		workbenchUser.setRoles(userRoles);
 	}
