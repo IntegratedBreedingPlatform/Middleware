@@ -4,13 +4,11 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.util.StringUtil;
 import org.hamcrest.MatcherAssert;
 import org.hibernate.Session;
@@ -23,7 +21,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -132,36 +129,36 @@ public class LocationDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void getLocalLocationsByFilter() {
-		final HashMap<LocationFilters, Object> filters = new HashMap<>();
-		filters.put(LocationFilters.LOCATION_TYPE, 405L);
-		final List<LocationDetailsDto> locationList = this.locationDAO.getLocationsByFilter(1, 100, filters);
+	public void testGetLocations() {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationTypeName("Country");
+		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected list of country location size > zero", locationList != null && locationList.size() > 0);
 
 	}
 
 	@Test
-	public void getLocalLocationsByFilterNotRecoverData() {
-		final HashMap<LocationFilters, Object> filters = new HashMap<>();
-		filters.put(LocationFilters.LOCATION_TYPE, 000100000405L);
-		final List<LocationDetailsDto> locationList = this.locationDAO.getLocationsByFilter(1, 100, filters);
+	public void getLocationsWithWrongLocType() {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
+		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected list of location size equals to zero", locationList != null && locationList.size() == 0);
 
 	}
 
 	@Test
-	public void countLocationsByFilter() {
-		final HashMap<LocationFilters, Object> filters = new HashMap<LocationFilters, Object>();
-		filters.put(LocationFilters.LOCATION_TYPE, 405L);
-		final long countLocation = this.locationDAO.countLocationsByFilter(filters);
+	public void countLocations() {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationTypeName("COUNTRY");
+		final long countLocation = this.locationDAO.countLocations(locationSearchRequest);
 		MatcherAssert.assertThat("Expected country location size > zero", countLocation > 0);
 	}
 
 	@Test
-	public void countLocationsByFilterNotFoundLocation() {
-		final HashMap<LocationFilters, Object> filters = new HashMap<LocationFilters, Object>();
-		filters.put(LocationFilters.LOCATION_TYPE, 000100000405L);
-		final long countLocation = this.locationDAO.countLocationsByFilter(filters);
+	public void countLocationsNotFoundLocation() {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
+		final long countLocation = this.locationDAO.countLocations(locationSearchRequest);
 		MatcherAssert.assertThat("Expected country location size equals to zero by this locationType = 000100000405", countLocation == 0);
 
 	}
@@ -433,7 +430,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testFilterLocations_RetrieveAll() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		final long count = this.locationDAO.countFilterLocations(locationSearchRequest);
+		final long count = this.locationDAO.countLocations(locationSearchRequest);
 		final List<Location> locations =
 			this.locationDAO.filterLocations(locationSearchRequest, null);
 		Assert.assertThat((int) count, equalTo(locations.size()));
@@ -442,7 +439,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testFilterLocations_Pagination() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		final long count = this.locationDAO.countFilterLocations(locationSearchRequest);
 
 		// Page 1
 		final PageRequest pageRequest = new PageRequest(0, 10);
@@ -475,7 +471,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void testFilterLocations_FilterByLocationType() {
 		final Integer locationType = 405;
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationTypes(Collections.singleton(locationType));
+		locationSearchRequest.setLocationTypeIds(Collections.singleton(locationType));
 		final List<Location> locations =
 			this.locationDAO
 				.filterLocations(locationSearchRequest,
