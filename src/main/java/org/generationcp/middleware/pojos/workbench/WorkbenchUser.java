@@ -482,6 +482,20 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return false;
 	}
 
+	public boolean hasAccessToAGivenProgram(final String cropName, final Long programId) {
+		if (this.roles == null) {
+			return false;
+		}
+		if (this.hasInstanceRole() || (this.hasCropRole(cropName) && !this.hasProgramRoles(cropName)) || this.getRoles().stream()
+			.anyMatch(
+				ur -> ur.getRole().getRoleType().getId().equals(RoleType.PROGRAM.getId()) && ur.getCropType().getCropName().equals(cropName)
+					&& ur.getWorkbenchProject().getProjectId().equals((programId)))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	/**
 	 * @param cropName
 	 * @return True if the user has only program role types for the specified cropName
