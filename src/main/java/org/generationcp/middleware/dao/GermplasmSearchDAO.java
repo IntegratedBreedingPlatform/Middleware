@@ -837,7 +837,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			+ "  IFNULL((SELECT SUM(CASE WHEN gt.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() //
 			+ "    OR (gt.trnstat = " + TransactionStatus.PENDING.getIntValue() //
 			+ "    AND gt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN gt.trnqty ELSE 0 END)) " //
-			+ "  , 0)/(Count(gt.trnid)/Count(DISTINCT gt.trnid))" //
+			+ "  /(Count(gt.trnid)/Count(DISTINCT gt.trnid)), 0)" //
 			+ " , '" + MIXED_UNITS_LABEL + "') AS  `" + GermplasmSearchDAO.AVAIL_BALANCE + "`, \n"  //
 			+ " IF(COUNT(DISTINCT IFNULL(gl.scaleid, 'null')) = 1, scale.name, '" + MIXED_UNITS_LABEL + "') AS `" + LOT_UNITS + "`, \n"  //
 			+ " m.mname AS `" + GermplasmSearchDAO.METHOD_NAME + "`, \n"  //
