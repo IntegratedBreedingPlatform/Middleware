@@ -99,21 +99,29 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		+ "       p.project_id = :projectId "
 		+ "    GROUP BY users.userid";
 
-	public static final String GET_ACTIVE_USER_IDS_WITH_PROGRAM_ROLE_BY_PROJECT_ID =
-		"SELECT DISTINCT users.userid "
-			+ "    FROM "
-			+ "       workbench_project p "
-			+ "           INNER JOIN "
-			+ "       crop_persons cp ON cp.crop_name = p.crop_type "
-			+ "           INNER JOIN "
-			+ "       users ON cp.personid = users.personid "
-			+ "           INNER JOIN "
-			+ "       users_roles ur ON ur.userid = users.userid "
-			+ "           INNER JOIN role r ON ur.role_id = r.id  "
-			+ "   where  (r.role_type_id =  " + RoleType.PROGRAM.getId()
-			+ " 			AND ur.crop_name = p.crop_type AND ur.workbench_project_id = p.project_id) "
-			+ "    	AND p.project_id = :projectId "
-			+ "  	AND users.ustatus = 0 ";
+	//User with access to a program is the union of:
+	//1. Users with Instance role
+	//2. Users with crop role and no program role assigned
+	//3. Users with explicit access to the program via program role
+	public static final String GET_ACTIVE_USER_IDS_WITH_ACCESS_TO_A_PROGRAM =
+		"select distinct u.userid " //
+			+ "from users u " //
+			+ "       inner join crop_persons cp on cp.personid = u.personid " //
+			+ "       inner join users_roles ur on ur.userid = u.userid " //
+			+ "       inner join role r on ur.role_id = r.id " //
+			+ "       left join workbench_project wp on ur.workbench_project_id = wp.project_id " //
+			+ "where ((role_type_id = " + RoleType.INSTANCE.getId() + ") " //
+			+ "  || (role_type_id = " + RoleType.CROP.getId()
+			+ " and ur.crop_name = cp.crop_name and not exists(SELECT distinct p1.project_id " //
+			+ "                                      FROM workbench_project p1 " //
+			+ "                                             INNER JOIN " //
+			+ "                                      users_roles ur1 ON ur1.workbench_project_id = p1.project_id " //
+			+ "                                             INNER JOIN role r1 ON ur1.role_id = r1.id " //
+			+ "                                      where r1.role_type_id = " + RoleType.PROGRAM.getId() //
+			+ "                                        AND ur1.crop_name = cp.crop_name AND ur1.userid = u.userid) "
+			//
+			+ "    || (role_type_id= " + RoleType.PROGRAM.getId() + " and wp.project_id = :projectId))) and " //
+			+ "  u.ustatus = 0 and cp.crop_name = (select wpi.crop_type from workbench_project wpi where wpi.project_id = :projectId) ";
 
 	public static final String GET_BY_NAME_USING_EQUAL = "getUserByNameUsingEqual";
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
@@ -409,6 +417,83 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 			}
 		}
 		return false;
+	}
+
+	public boolean hasInstanceRole() {
+		if (this.roles == null) {
+			return false;
+		}
+		for (final UserRole userRole : this.roles) {
+			if (userRole.getRole().getRoleType().getId().equals(RoleType.INSTANCE.getId())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public UserRole getInstanceRole() {
+		if (this.roles == null) {
+			return null;
+		}
+		for (final UserRole userRole : this.roles) {
+			if (userRole.getRole().getRoleType().getId().equals(RoleType.INSTANCE.getId())) {
+				return userRole;
+			}
+		}
+		return null;
+	}
+
+	public boolean hasCropRole(final String crop) {
+		if (this.roles == null) {
+			return false;
+		}
+		for (final UserRole userRole : this.roles) {
+			if (userRole.getRole().getRoleType().getId().equals(RoleType.CROP.getId()) && userRole.getCropType().getCropName()
+				.equals(crop)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public UserRole getCropRole(final String crop) {
+		if (this.roles == null) {
+			return null;
+		}
+		for (final UserRole userRole : this.roles) {
+			if (userRole.getRole().getRoleType().getId().equals(RoleType.CROP.getId()) && userRole.getCropType().getCropName()
+				.equals(crop)) {
+				return userRole;
+			}
+		}
+		return null;
+	}
+
+	public boolean hasProgramRoles(final String crop) {
+		if (this.roles == null) {
+			return false;
+		}
+		for (final UserRole userRole : this.roles) {
+			if (userRole.getRole().getRoleType().getId().equals(RoleType.PROGRAM.getId()) && userRole.getCropType().getCropName()
+				.equals(crop)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean hasAccessToAGivenProgram(final String cropName, final Long programId) {
+		if (this.roles == null) {
+			return false;
+		}
+		if (this.hasInstanceRole() || (this.hasCropRole(cropName) && !this.hasProgramRoles(cropName)) || this.getRoles().stream()
+			.anyMatch(
+				ur -> ur.getRole().getRoleType().getId().equals(RoleType.PROGRAM.getId()) && ur.getCropType().getCropName().equals(cropName)
+					&& ur.getWorkbenchProject().getProjectId().equals((programId)))) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
