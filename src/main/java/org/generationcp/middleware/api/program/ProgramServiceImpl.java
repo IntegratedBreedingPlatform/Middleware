@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.program;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,11 +41,9 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public List<ProgramDTO> getProgramsByUser(final WorkbenchUser user, final Pageable pageable) {
-		final int pageSize = pageable.getPageSize();
-		final int start = pageSize * pageable.getPageNumber();
-
-		//FIXME pagination not implemented yet
-		return this.daoFactory.getProjectDAO().getProjectsByUser(user, null).stream().map(project -> {
+		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+		programSearchRequest.setLoggedInUserId(user.getUserid());
+		return this.daoFactory.getProjectDAO().getProjectsByFilter(pageable, programSearchRequest).stream().map(project -> {
 			final ProgramDTO program = new ProgramDTO(project);
 			//FIXME set createdBy (not set in constructor)
 			return program;
@@ -52,9 +51,10 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	//FIXME to be implemented
 	public long countProgramsByUser(final WorkbenchUser user) {
-		return 0;
+		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+		programSearchRequest.setLoggedInUserId(user.getUserid());
+		return this.daoFactory.getProjectDAO().countProjectsByFilter(programSearchRequest);
 	}
 
 }
