@@ -15,23 +15,27 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	private String abbreviation;
 	private String objective;
 	private String leadPerson;
+	private String leadPersonDbId;
+	private String cropName;
 
 	public ProgramDetailsDto() {
 
 	}
 
 	public ProgramDetailsDto(final String programDbId, final String name, final String abbreviation, final String objective,
-			final String leadPerson) {
+			final String leadPerson, final String leadPersonDbId, final String leadPersonName, final String cropName) {
 
 		this.programDbId = programDbId;
 		this.name = name;
 		this.abbreviation = abbreviation;
 		this.objective = objective;
 		this.leadPerson = leadPerson;
+		this.cropName = cropName;
+		this.leadPersonDbId = leadPersonDbId;
 	}
 
 	public String getProgramDbId() {
-		return programDbId;
+		return this.programDbId;
 	}
 
 	public void setProgramDbId(final String programDbId) {
@@ -39,7 +43,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -47,7 +51,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	public String getAbbreviation() {
-		return abbreviation;
+		return this.abbreviation;
 	}
 
 	public void setAbbreviation(final String abbreviation) {
@@ -55,7 +59,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	public String getObjective() {
-		return objective;
+		return this.objective;
 	}
 
 	public void setObjective(final String objective) {
@@ -63,11 +67,27 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	public String getLeadPerson() {
-		return leadPerson;
+		return this.leadPerson;
 	}
 
 	public void setLeadPerson(final String leadPerson) {
 		this.leadPerson = leadPerson;
+	}
+
+	public String getLeadPersonDbId() {
+		return this.leadPersonDbId;
+	}
+
+	public void setLeadPersonDbId(final String leadPersonDbId) {
+		this.leadPersonDbId = leadPersonDbId;
+	}
+
+	public String getCropName() {
+		return this.cropName;
+	}
+
+	public void setCropName(final String cropName) {
+		this.cropName = cropName;
 	}
 
 	@Override
