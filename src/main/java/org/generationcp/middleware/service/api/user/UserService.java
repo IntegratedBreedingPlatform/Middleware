@@ -51,14 +51,6 @@ public interface UserService {
 	List<WorkbenchUser> getAllUsers();
 
 	/**
-	 * Retrieves the user ids of the program members using the project id
-	 *
-	 * @param projectId
-	 * @return
-	 */
-	List<Integer> getActiveUserIDsWithProgramRoleByProjectId(final Long projectId);
-
-	/**
 	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
 	 *
 	 * @param projectId - the project id
@@ -101,7 +93,7 @@ public interface UserService {
 	 * @param userDto the user
 	 * @return Returns the id of the {@code UserDto} record added
 	 */
-	public Integer createUser(UserDto userDto);
+	Integer createUser(UserDto userDto);
 
 	/**
 	 * Updates the user.
@@ -109,7 +101,7 @@ public interface UserService {
 	 * @param userDto the user to update
 	 * @return Returns the id of the {@code UserDto} record added
 	 */
-	public Integer updateUser(UserDto userDto);
+	Integer updateUser(UserDto userDto);
 
 	/**
 	 * Updates the user.
@@ -117,7 +109,7 @@ public interface UserService {
 	 * @param user the user to update
 	 * @return Returns the id of the {@code User} record updated
 	 */
-	public void updateUser(WorkbenchUser user);
+	void updateUser(WorkbenchUser user);
 
 	/**
 	 * Deletes a user.
@@ -319,4 +311,7 @@ public interface UserService {
 	WorkbenchUser getUserWithAuthorities(final String userName, final String cropName, final String programUuid);
 
 	List<WorkbenchUser> getUsersWithRole(int id);
+
+	List<Integer> getActiveUserIDsWithAccessToTheProgram(Long projectId);
+
 }
