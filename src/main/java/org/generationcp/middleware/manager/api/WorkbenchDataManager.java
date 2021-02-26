@@ -10,7 +10,6 @@
 
 package org.generationcp.middleware.manager.api;
 
-import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -22,7 +21,7 @@ import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.springframework.data.domain.Pageable;
 
@@ -55,6 +54,7 @@ public interface WorkbenchDataManager {
 	 * @param filters - the number of rows to retrieve
 	 * @return the number of all the projects
 	 */
+	//FIXME Remove this method, move tests. It is now in ProgramService
 	long countProjectsByFilter(final ProgramSearchRequest programSearchRequest);
 
 	/**

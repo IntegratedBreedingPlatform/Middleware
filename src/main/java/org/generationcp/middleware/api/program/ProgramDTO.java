@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.api.program;
 
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -9,24 +10,43 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 
+/**
+ * Summary information about breeding program.
+ */
 public class ProgramDTO {
 
-	private Integer id;
-	private String programUUID;
+	//TODO Modify id data type, it may impact site admin
+	private String id;
+	//TODO rename to programUUID
+	private String uniqueID;
 	private String name;
 	private String createdBy;
 	private Set<String> members = new HashSet<>();
-	private String cropName;
+	//TODO Rename to cropName
+	private String crop;
 	private String startDate;
 
 	public ProgramDTO() {
 	}
 
+	public ProgramDTO(
+		final String id, final String uniqueID, final String name, final String crop) {
+		this.id = id;
+		this.uniqueID = uniqueID;
+		this.name = name;
+		this.crop = crop;
+	}
+
+	public ProgramDTO(final String crop, final String programUUID) {
+		this.crop = crop;
+		this.uniqueID = programUUID;
+	}
+
 	public ProgramDTO(final Project project) {
-		this.setId(Long.valueOf(project.getProjectId()).intValue());
-		this.setCropName(project.getCropType().getCropName());
+		this.setId(String.valueOf(project.getProjectId()));
+		this.setCrop(project.getCropType().getCropName());
 		this.setName(project.getProjectName());
-		this.setProgramUUID(project.getUniqueID());
+		this.setUniqueID(project.getUniqueID());
 		// TODO get username
 		// program.setCreatedBy();
 		this.setStartDate(Util.formatDateAsStringValue(project.getStartDate(), Util.FRONTEND_DATE_FORMAT));
@@ -36,20 +56,20 @@ public class ProgramDTO {
 		}
 	}
 
-	public Integer getId() {
+	public String getId() {
 		return this.id;
 	}
 
-	public void setId(final Integer id) {
+	public void setId(final String id) {
 		this.id = id;
 	}
 
-	public String getProgramUUID() {
-		return this.programUUID;
+	public String getUniqueID() {
+		return this.uniqueID;
 	}
 
-	public void setProgramUUID(final String programUUID) {
-		this.programUUID = programUUID;
+	public void setUniqueID(final String uniqueID) {
+		this.uniqueID = uniqueID;
 	}
 
 	public String getName() {
@@ -76,12 +96,12 @@ public class ProgramDTO {
 		this.members = members;
 	}
 
-	public String getCropName() {
-		return this.cropName;
+	public String getCrop() {
+		return this.crop;
 	}
 
-	public void setCropName(final String cropName) {
-		this.cropName = cropName;
+	public void setCrop(final String crop) {
+		this.crop = crop;
 	}
 
 	public String getStartDate() {
@@ -91,4 +111,5 @@ public class ProgramDTO {
 	public void setStartDate(final String startDate) {
 		this.startDate = startDate;
 	}
+
 }
