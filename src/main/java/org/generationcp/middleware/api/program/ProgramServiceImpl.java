@@ -2,7 +2,6 @@ package org.generationcp.middleware.api.program;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,26 +22,7 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public List<ProgramDTO> listPrograms(final Pageable pageable) {
-		final int pageSize = pageable.getPageSize();
-		final int start = pageSize * pageable.getPageNumber();
-
-		return this.daoFactory.getProjectDAO().getAll(start, pageSize).stream().map(project -> {
-			final ProgramDTO program = new ProgramDTO(project);
-			//FIXME set createdBy (not set in constructor)
-			return program;
-		}).collect(toList());
-	}
-
-	@Override
-	public long countPrograms() {
-		return this.daoFactory.getProjectDAO().countAll();
-	}
-
-	@Override
-	public List<ProgramDTO> getProgramsByUser(final WorkbenchUser user, final Pageable pageable) {
-		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-		programSearchRequest.setLoggedInUserId(user.getUserid());
+	public List<ProgramDTO> filterPrograms(final ProgramSearchRequest programSearchRequest, final Pageable pageable) {
 		return this.daoFactory.getProjectDAO().getProjectsByFilter(pageable, programSearchRequest).stream().map(project -> {
 			final ProgramDTO program = new ProgramDTO(project);
 			//FIXME set createdBy (not set in constructor)
@@ -51,9 +31,7 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public long countProgramsByUser(final WorkbenchUser user) {
-		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-		programSearchRequest.setLoggedInUserId(user.getUserid());
+	public long countFilteredPrograms(final ProgramSearchRequest programSearchRequest) {
 		return this.daoFactory.getProjectDAO().countProjectsByFilter(programSearchRequest);
 	}
 

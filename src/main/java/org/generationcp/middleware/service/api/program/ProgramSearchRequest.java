@@ -1,15 +1,11 @@
 package org.generationcp.middleware.service.api.program;
 
-import org.generationcp.middleware.util.Util;
 import org.pojomatic.Pojomatic;
-import org.reflections.util.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class ProgramSearchRequest {
-    // Program search request
+
     private String commonCropName;
     private String programDbId;
     private String programName;
