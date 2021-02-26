@@ -11,18 +11,22 @@
 
 package org.generationcp.middleware.dao;
 
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.program.ProgramFilters;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.reflections.util.Utils;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +39,10 @@ import java.util.Map;
  */
 public class ProjectDAO extends GenericDAO<Project, Long> {
 
+	//User will be able to see the following programs:
+	// 1. If user has instance role, then all programs for the assigned crop will be listed
+	// 2. If user has crop role and no program roles associated to that crop, then all crop programs will be listed
+	// 3. If user has a program role, then user will see ONLY programs with explicit access no matter if he has crop role assigned
 	public static final String GET_PROJECTS_BY_USER_ID =
 		"SELECT  "
 			+ "    p.* "
@@ -51,11 +59,20 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			+ "	WHERE "
 			+ "		u.userid = :userId and r.active = 1 "
 			+ "		AND ( r.role_type_id = " + RoleType.INSTANCE.getId()
-			+ "				OR ( r.role_type_id = "+ RoleType.CROP.getId() +" and ur.crop_name = p.crop_type ) "
+			+ "				OR ( r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = p.crop_type and NOT EXISTS ("
+			+ "										 SELECT distinct p1.project_id "
+			+ "                                      FROM workbench_project p1 "
+			+ "                                             INNER JOIN "
+			+ "                                      users_roles ur1 ON ur1.workbench_project_id = p1.project_id "
+			+ "                                             INNER JOIN role r1 ON ur1.role_id = r1.id "
+			+ "                                      where r1.role_type_id = " + RoleType.PROGRAM.getId()
+			+ "                                        AND ur1.crop_name = p.crop_type AND ur1.userid = u.userid )) "
 			+ "				OR ( r.role_type_id = "+ RoleType.PROGRAM.getId() +" and ur.crop_name = p.crop_type "
 			+ "						and ur.workbench_project_id = p.project_id ) "
 			+ "			) "
-			+ "		AND ( :cropName IS NULL OR p.crop_type = :cropName ) ";
+			+ "		AND ( :cropName IS NULL OR p.crop_type = :cropName ) "
+			+ " 	AND ( :programName IS NULL OR p.project_name = :programName ) "
+			+ " 	AND ( :programDbId IS NULL OR p.project_uuid = :programDbId ) ";
 
 	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
 
@@ -168,52 +185,19 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		return criteria.list();
 	}
 
-	public List<Project> getProjectsByFilter(final int pageNumber,final int pageSize, final Map<ProgramFilters, Object> filters)
+	public List<Project> getProjectsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest)
 		throws MiddlewareException {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Project.class);
-			for (final Map.Entry<ProgramFilters, Object> entry : filters.entrySet()) {
-				final ProgramFilters filter = entry.getKey();
-				final Object value = entry.getValue();
-				criteria.add(Restrictions.eq(filter.getStatement(), value));
-			}
-
-			final int start = pageSize * (pageNumber - 1);
-			final int numOfRows = pageSize;
-
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareException(
-				"Error in getProjectsByFilter(start=" + pageNumber + ", numOfRows=" + pageSize + "): " + e.getMessage(), e);
-		}
-	}
-
-	public long countProjectsByFilter(final Map<ProgramFilters, Object> filters) throws MiddlewareException {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Project.class);
-			for (final Map.Entry<ProgramFilters, Object> entry : filters.entrySet()) {
-				final ProgramFilters filter = entry.getKey();
-				final Object value = entry.getValue();
-				criteria.add(Restrictions.eq(filter.getStatement(), value));
-			}
-
-			return criteria.list().size();
-		} catch (final HibernateException e) {
-			throw new MiddlewareException("Error in countProjectsByFilter(): " + e.getMessage(), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Project> getProjectsByUser(final WorkbenchUser user, final String cropName) {
 		final List<Project> projects = new ArrayList<>();
 		try {
-			if (user != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(GET_PROJECTS_BY_USER_ID);
-				query.setParameter("userId", user.getUserid());
-				query.setParameter("cropName", cropName);
-				query
+			final StringBuilder sb = new StringBuilder(GET_PROJECTS_BY_USER_ID);
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sb.toString());
+			sqlQuery.setParameter("userId", programSearchRequest.getLoggedInUserId());
+			sqlQuery.setParameter("cropName", programSearchRequest.getCommonCropName());
+			sqlQuery.setParameter("programName", programSearchRequest.getProgramName());
+			sqlQuery.setParameter("programDbId", programSearchRequest.getProgramDbId());
+
+			sqlQuery
 					.addScalar("project_id")
 					.addScalar("project_uuid")
 					.addScalar("project_name")
@@ -221,29 +205,53 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 					.addScalar("user_id")
 					.addScalar("crop_type")
 					.addScalar("last_open_date");
-				query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-				final List<Map<String, Object>> results = query.list();
 
-				for (final Map<String, Object> result : results) {
-					final Long project_id = Long.valueOf((Integer) result.get("project_id"));
-					final String project_uuid = (String) result.get("project_uuid");
-					final String project_name = (String) result.get("project_name");
-					final Date start_date = (Date) result.get("start_date");
-					final Integer user_id = (Integer) result.get("user_id");
-					final CropType crop_type = new CropType((String) result.get("crop_type"));
-					final Date last_open_date = (Date) result.get("last_open_date");
-					final Project u = new Project(project_id, project_uuid,
+			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+			if (pageable != null) {
+				final int start = pageable.getPageSize() * (pageable.getPageNumber() - 1);
+				final int numOfRows = pageable.getPageSize();
+
+				sqlQuery.setFirstResult(start);
+				sqlQuery.setMaxResults(numOfRows);
+			}
+
+
+			final List<Map<String, Object>> results = sqlQuery.list();
+
+			for (final Map<String, Object> result : results) {
+				final Long project_id = Long.valueOf((Integer) result.get("project_id"));
+				final String project_uuid = (String) result.get("project_uuid");
+				final String project_name = (String) result.get("project_name");
+				final Date start_date = (Date) result.get("start_date");
+				final Integer user_id = (Integer) result.get("user_id");
+				final CropType crop_type = new CropType((String) result.get("crop_type"));
+				final Date last_open_date = (Date) result.get("last_open_date");
+				final Project u = new Project(project_id, project_uuid,
 						project_name, start_date,
 						user_id, crop_type, last_open_date);
-					projects.add(u);
-				}
-				return projects;
+				projects.add(u);
 			}
+			return projects;
+
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error in getProjectsByUser(user=" + user + ") query from ProjectUserInfoDao: " + e.getMessage(), e);
+			throw new MiddlewareException(
+				"Error in getProjectsByFilter(start=" + pageable.getPageNumber() + ", numOfRows=" + pageable.getPageSize() + "): " + e.getMessage(), e);
 		}
-		return new ArrayList<>();
+	}
+
+	public long countProjectsByFilter(final ProgramSearchRequest programSearchRequest) throws MiddlewareException {
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(GET_PROJECTS_BY_USER_ID);
+			sqlQuery.setParameter("userId", programSearchRequest.getLoggedInUserId());
+			sqlQuery.setParameter("cropName", programSearchRequest.getCommonCropName());
+			sqlQuery.setParameter("programName", programSearchRequest.getProgramName());
+			sqlQuery.setParameter("programDbId", programSearchRequest.getProgramDbId());
+
+			return sqlQuery.list().size();
+		} catch (final HibernateException e) {
+			throw new MiddlewareException("Error in countProjectsByFilter(): " + e.getMessage(), e);
+		}
 	}
 
 	public List<Project> getProjectsByCropName(final String cropName) {
