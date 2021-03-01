@@ -21,18 +21,29 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PermissionDAO.class);
 
+	// Permissions will change based on if user has crop role plus any program role assigned for the same crop
+	// In this case, user will be able to access only programs associated via program role.
+	// So an user with NO instance role, CROP role and PROGRAM role (i.e. program1) for that crop
+	// wants to access program2, no permissions will be loaded.
 	private static final String SQL_FILTERED_PERMISSIONS = "select " //
 		+ "p.permission_id as id, " //
- 		+ "p.name as name, " //
+		+ "p.name as name, " //
 		+ "p.description as description, " //
 		+ "p.parent_id as parentId," //
 		+ "p.workbench_sidebar_category_link_id as workbenchCategoryLinkId " //
 		+ "from permission p " //
 		+ "inner join role_permission rp on p.permission_id = rp.permission_id " //
- 		+ "inner join role r on rp.role_id = r.id " //
+		+ "inner join role r on rp.role_id = r.id " //
 		+ "inner join users_roles ur on r.id = ur.role_id " //
 		+ "where  (r.role_type_id = " + RoleType.INSTANCE.getId() //
-		+ "  or (r.role_type_id = "+ RoleType.CROP.getId() +" and ur.crop_name = :cropName) " //
+		+ "  or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = :cropName and not exists (" //
+		+ " 							SELECT distinct p1.project_id " //
+		+ "							    FROM workbench_project p1 " //
+		+ "                             INNER JOIN " //
+		+ "                             users_roles ur1 ON ur1.workbench_project_id = p1.project_id " //
+		+ "                             INNER JOIN role r1 ON ur1.role_id = r1.id " //
+		+ "                             where r1.role_type_id = " + RoleType.PROGRAM.getId() //
+		+ "                             AND ur1.crop_name = ur.crop_name AND ur1.userid = ur.userid ) ) " //
 		+ "  or (r.role_type_id = "+ RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName and ur.workbench_project_id = :projectId)) " //
 		+ "and ur.userid = :userId and r.active = 1";
 

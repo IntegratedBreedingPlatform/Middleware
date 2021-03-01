@@ -78,8 +78,11 @@ public class WorkbenchTestDataUtil {
 		user.setCloseDate(20150101);
 		final UserRole userRole = new UserRole();
 		userRole.setUser(user);
+		userRole.setCropType(this.cropType);
+		userRole.setWorkbenchProject(this.commonTestProject);
 		final Role role = new Role();
 		role.setId(1);
+		role.setActive(true);
 		final RoleType roleType = new RoleType();
 		roleType.setId(1);
 		role.setRoleType(roleType);
@@ -223,4 +226,5 @@ public class WorkbenchTestDataUtil {
 	public void setCropType(final CropType cropType) {
 		this.cropType = cropType;
 	}
+
 }

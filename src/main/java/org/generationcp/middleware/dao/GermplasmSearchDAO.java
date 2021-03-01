@@ -804,6 +804,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			// FIXME IBP-4320
 			+ "  FORCE INDEX (ims_lot_idx01)"  //
 			+ "  ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 \n" //
+			+ " LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9 \n" //
 			+ " LEFT JOIN cvterm scale ON scale.cvterm_id = gl.scaleid \n" //
 			+ " LEFT JOIN methods m ON m.mid = g.methn \n" //
 			+ " LEFT JOIN location l ON l.locid = g.glocn \n" //
@@ -838,12 +839,19 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			+ GermplasmSearchDAO.NAMES + "`, \n"  //
 			+ " g.mgid AS `" + GermplasmSearchDAO.GROUP_ID + "`, \n" //
 			+ " Count(DISTINCT gl.lotid) AS `" + GermplasmSearchDAO.AVAIL_LOTS + "`, \n" //
+			/*
+			 * Sum of transaction (duplicated because of joins)
+			 * -----divided by----
+			 * ( count of tr / count of distinct tr) = how many times the real sum is repeated
+			 * ===================
+			 * Real sum = Available balance
+			 */
 			+ " IF(COUNT(DISTINCT IFNULL(gl.scaleid, 'null')) = 1, " //
-			+ "  IFNULL((SELECT SUM(CASE WHEN imt.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() //
-			+ "    OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue() //
-			+ "    AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) " //
-			+ "   FROM ims_transaction imt WHERE imt.lotid = gl.lotid), 0)," //
-			+ " '" + MIXED_UNITS_LABEL + "') AS  `" + GermplasmSearchDAO.AVAIL_BALANCE + "`, \n"  //
+			+ "  IFNULL((SELECT SUM(CASE WHEN gt.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() //
+			+ "    OR (gt.trnstat = " + TransactionStatus.PENDING.getIntValue() //
+			+ "    AND gt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN gt.trnqty ELSE 0 END)) " //
+			+ "  /(Count(gt.trnid)/Count(DISTINCT gt.trnid)), 0)" //
+			+ " , '" + MIXED_UNITS_LABEL + "') AS  `" + GermplasmSearchDAO.AVAIL_BALANCE + "`, \n"  //
 			+ " IF(COUNT(DISTINCT IFNULL(gl.scaleid, 'null')) = 1, scale.name, '" + MIXED_UNITS_LABEL + "') AS `" + LOT_UNITS + "`, \n"  //
 			+ " m.mname AS `" + GermplasmSearchDAO.METHOD_NAME + "`, \n"  //
 			+ " l.lname AS `" + GermplasmSearchDAO.LOCATION_NAME + "`, \n"
