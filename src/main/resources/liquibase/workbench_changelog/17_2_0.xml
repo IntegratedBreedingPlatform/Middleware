@@ -9,8 +9,7 @@
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM permission WHERE
 					(name = 'MG_MANAGE_INVENTORY' AND parent_id =
-					(SELECT permission_id FROM permission WHERE name = 'MANAGE_GERMPLASM'))
-					OR (name IN ('MG_MANAGE_INVENTORY', 'MG_CREATE_LOTS') AND workbench_sidebar_category_link_id IS NULL);
+					(SELECT permission_id FROM permission WHERE name = 'MANAGE_GERMPLASM'));
             </sqlCheck>
         </preConditions>
         <comment>Update MG_MANAGE_INVENTORY permission</comment>
@@ -21,7 +20,17 @@
 									   FROM permission
 									   WHERE name = 'MANAGE_GERMPLASM') AS p1)
 				WHERE name = 'MG_MANAGE_INVENTORY';
+		</sql>
+	</changeSet>
 
+	<changeSet author="lkovacic" id="v17.2.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM permission WHERE name IN ('MG_MANAGE_INVENTORY', 'MG_CREATE_LOTS') AND workbench_sidebar_category_link_id IS NULL;
+            </sqlCheck>
+        </preConditions>
+        <comment>Update sidebar link for MG_MANAGE_INVENTORY and MG_CREATE_LOTS permission</comment>
+		<sql dbms="mysql" splitStatements="true">
 				UPDATE permission
 				SET workbench_sidebar_category_link_id = NULL
 				WHERE name IN ('MG_MANAGE_INVENTORY', 'MG_CREATE_LOTS');
