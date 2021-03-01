@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
@@ -27,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -35,6 +37,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 @Repository
 @Transactional(propagation = Propagation.REQUIRED)
@@ -89,62 +95,18 @@ public class SampleListServiceImpl implements SampleListService {
 
 			sampleList.setHierarchy(parent);
 
-			final List<ObservationDto> observationDtos = this.studyMeasurements
-				.getSampleObservations(sampleListDTO.getDatasetId(), sampleListDTO.getInstanceIds(),
-					sampleListDTO.getSelectionVariableId());
-
-			Preconditions.checkArgument(!observationDtos.isEmpty(), "The observation list must not be empty");
-
-			Integer takenBy = null;
-			if (!sampleListDTO.getTakenBy().isEmpty()) {
-				takenBy = this.userService.getUserByUsername(sampleListDTO.getTakenBy()).getUserid();
-			}
-
-			final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
-			final Collection<Integer> gids = this.getGids(observationDtos);
-			final Collection<Integer> experimentIds = this.getExperimentIds(observationDtos);
-			final Map<Integer, Integer> maxSampleNumbers = this.getMaxSampleNumber(experimentIds);
-			final Map<Integer, Integer> maxSequenceNumberByGID = this.getMaxSequenceNumberByGID(gids);
-			final List<Sample> samples = new ArrayList<>();
-			int entryNumber = 0;
-
-			for (final ObservationDto observationDto : observationDtos) {
+			final List<Sample> samples;
+			if (!sampleListDTO.getEntries().isEmpty()) {
 				/*
-				 * maxSequence is the maximum number among samples in the same GID. If there is no sample for Gid, the sequence starts in 1.
+				 * TODO IBP-4375
+				 *  - create sample_list_data
+				 *  - change hibernate mapping / adapt createSamplesFromStudy
+				 *  - set new entry_no
+				 *  - set list id
 				 */
-
-				final Integer gid = observationDto.getGid();
-				Integer maxSequence = maxSequenceNumberByGID.get(gid);
-
-				if (maxSequence == null) {
-					maxSequence = 0;
-					maxSequenceNumberByGID.put(gid, maxSequence);
-				}
-
-				final int selectionVariateValue =
-					(Double.valueOf(observationDto.getVariableMeasurements().get(0).getVariableValue())).intValue();
-
-				Integer sampleNumber = maxSampleNumbers.get(observationDto.getMeasurementId());
-				if (sampleNumber == null) {
-					sampleNumber = 0;
-				}
-
-				for (int i = 0; i < selectionVariateValue; i++) {
-
-					sampleNumber++;
-					maxSequence++;
-					entryNumber++;
-
-					final String sampleName = observationDto.getDesignation() + ':' + maxSequence;
-
-					final Sample sample = this.sampleService
-						.buildSample(sampleListDTO.getCropName(), cropPrefix, entryNumber, sampleName,
-							sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, workbenchUser.getUserid(),
-							sampleListDTO.getCreatedDate(), takenBy, sampleNumber);
-					samples.add(sample);
-				}
-
-				maxSequenceNumberByGID.put(gid, maxSequence);
+				throw new NotImplementedException();
+			} else {
+				 samples = this.createSamplesFromStudy(sampleListDTO, sampleList, workbenchUser);
 			}
 
 			sampleList.setSamples(samples);
@@ -152,6 +114,69 @@ public class SampleListServiceImpl implements SampleListService {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in createSampleList in SampleListServiceImpl: " + e.getMessage(), e);
 		}
+	}
+
+	private List<Sample> createSamplesFromStudy(final SampleListDTO sampleListDTO, final SampleList sampleList,
+		final WorkbenchUser workbenchUser) {
+
+		final List<ObservationDto> observationDtos = this.studyMeasurements
+			.getSampleObservations(sampleListDTO.getDatasetId(), sampleListDTO.getInstanceIds(),
+				sampleListDTO.getSelectionVariableId());
+
+		Preconditions.checkArgument(!observationDtos.isEmpty(), "The observation list must not be empty");
+
+		Integer takenBy = null;
+		if (!sampleListDTO.getTakenBy().isEmpty()) {
+			takenBy = this.userService.getUserByUsername(sampleListDTO.getTakenBy()).getUserid();
+		}
+
+		final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
+		final Collection<Integer> gids = this.getGids(observationDtos);
+		final Collection<Integer> experimentIds = this.getExperimentIds(observationDtos);
+		final Map<Integer, Integer> maxSampleNumbers = this.getMaxSampleNumber(experimentIds);
+		final Map<Integer, Integer> maxSequenceNumberByGID = this.getMaxSequenceNumberByGID(gids);
+		final List<Sample> samples = new ArrayList<>();
+		int entryNumber = 0;
+
+		for (final ObservationDto observationDto : observationDtos) {
+			/*
+			 * maxSequence is the maximum number among samples in the same GID. If there is no sample for Gid, the sequence starts in 1.
+			 */
+
+			final Integer gid = observationDto.getGid();
+			Integer maxSequence = maxSequenceNumberByGID.get(gid);
+
+			if (maxSequence == null) {
+				maxSequence = 0;
+				maxSequenceNumberByGID.put(gid, maxSequence);
+			}
+
+			final int selectionVariateValue =
+				(Double.valueOf(observationDto.getVariableMeasurements().get(0).getVariableValue())).intValue();
+
+			Integer sampleNumber = maxSampleNumbers.get(observationDto.getMeasurementId());
+			if (sampleNumber == null) {
+				sampleNumber = 0;
+			}
+
+			for (int i = 0; i < selectionVariateValue; i++) {
+
+				sampleNumber++;
+				maxSequence++;
+				entryNumber++;
+
+				final String sampleName = observationDto.getDesignation() + ':' + maxSequence;
+
+				final Sample sample = this.sampleService
+					.buildSample(sampleListDTO.getCropName(), cropPrefix, entryNumber, sampleName,
+						sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, workbenchUser.getUserid(),
+						sampleListDTO.getCreatedDate(), takenBy, sampleNumber);
+				samples.add(sample);
+			}
+
+			maxSequenceNumberByGID.put(gid, maxSequence);
+		}
+		return samples;
 	}
 
 	@SuppressWarnings("unchecked")
