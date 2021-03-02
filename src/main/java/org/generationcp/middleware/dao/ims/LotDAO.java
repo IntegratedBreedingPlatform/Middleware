@@ -90,9 +90,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			+ " LEFT JOIN cvterm cv ON cv.cvterm_id = cvr.object_id "
 			+ " where lot.eid in (:gids) AND lot.etype = 'GERMPLSM' AND lot.status <> 9 ORDER BY lot.eid";
 
-	private static final String GET_GIDS_WITH_OPEN_LOTS = "select distinct (i.eid) FROM ims_lot i "
-			+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) GROUP BY i.lotid ";
-
 	@SuppressWarnings("unchecked")
 	public List<Lot> getByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException {
 		try {
@@ -263,15 +260,15 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	}
 
 	public Set<Integer> getGermplasmsWithOpenLots(final List<Integer> gids) {
-		Set<Integer> gidsWithOpenLots = new HashSet<>();
 		try {
-			Query query = this.getSession().createSQLQuery(GET_GIDS_WITH_OPEN_LOTS).setParameterList("gids", gids);
-			gidsWithOpenLots = Sets.newHashSet(query.list());
-		} catch (Exception e) {
+			Query query = this.getSession().createSQLQuery("select distinct (i.eid) FROM ims_lot i "
+				+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) GROUP BY i.lotid ")
+				.setParameterList("gids", gids);
+			return Sets.newHashSet(query.list());
+		} catch (final Exception e) {
 			LotDAO.LOG.error("Error at checkGermplasmsWithOpenLots for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
 			throw new MiddlewareQueryException("Error at checkGermplasmsWithOpenLots for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
 		}
-		return gidsWithOpenLots;
 	}
 
 	@SuppressWarnings("unchecked")
