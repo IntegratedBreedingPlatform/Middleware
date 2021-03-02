@@ -1062,7 +1062,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Integer gid = Integer.parseInt(germplasmDTO.getGid());
 		assertThat(germplasmDTO.getBreedingMethodDbId(), equalTo(this.derivativeMethod.getMid().toString()));
 		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo("UKN"));
-		assertThat(germplasmDTO.getAcquisitionDate(), equalTo(Util.tryParseDate(this.creationDate, Util.FRONTEND_DATE_FORMAT)));
+		assertThat(germplasmDTO.getAcquisitionDate(), equalTo(Util.tryParseDate(creationDate, Util.FRONTEND_DATE_FORMAT)));
 		assertThat(germplasmDTO.getGermplasmDbId(), notNullValue());
 		assertThat(germplasmDTO.getGermplasmPUI(), nullValue());
 		assertThat(germplasmDTO.getEntryNumber(), nullValue());
