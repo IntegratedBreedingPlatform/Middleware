@@ -8,12 +8,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.hibernate.jdbc.util.BasicFormatterImpl;
+import org.hibernate.engine.jdbc.internal.BasicFormatterImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.LinkedList;
+import java.util.List;
+import static org.junit.Assert.assertEquals;
 
 import com.beust.jcommander.internal.Lists;
 

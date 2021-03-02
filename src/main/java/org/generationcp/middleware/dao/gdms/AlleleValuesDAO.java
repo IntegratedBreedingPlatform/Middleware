@@ -11,28 +11,24 @@
 
 package org.generationcp.middleware.dao.gdms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
-import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.util.StringUtil;
-import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DAO class for {@link AlleleValues}.
@@ -551,11 +547,11 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 						this.getSession().createSQLQuery(AlleleValuesDAO.GET_UNIQUE_ALLELIC_VALUES_BY_GIDS_AND_MIDS);
 				query.setParameterList("gids", gids);				
 				query.setParameterList("mids", mids);				
-				query.addScalar("gid", Hibernate.INTEGER);
-				query.addScalar("marker_id", Hibernate.INTEGER);
-				query.addScalar("allele_bin_value", Hibernate.STRING);
-				query.addScalar("acc_sample_id", Hibernate.INTEGER);
-				query.addScalar("marker_sample_id", Hibernate.INTEGER);
+				query.addScalar("gid", IntegerType.INSTANCE);
+				query.addScalar("marker_id", IntegerType.INSTANCE);
+				query.addScalar("allele_bin_value", StringType.INSTANCE);
+				query.addScalar("acc_sample_id", IntegerType.INSTANCE);
+				query.addScalar("marker_sample_id", IntegerType.INSTANCE);
 				results = query.list();
 
 					}

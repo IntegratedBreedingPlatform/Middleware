@@ -37,6 +37,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanConstructorResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.DateType;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -615,7 +616,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("amount");
 		query.addScalar("availableBalance");
 		query.addScalar("notes");
-		query.addScalar("createdDate", Hibernate.DATE);
+		query.addScalar("createdDate", DateType.INSTANCE);
 		query.addScalar("lotLotId");
 		query.addScalar("lotUUID");
 		query.addScalar("lotGid");

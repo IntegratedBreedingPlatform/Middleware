@@ -1,20 +1,19 @@
 
 package org.generationcp.middleware.hibernate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
+import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 
-import com.atomikos.jdbc.AtomikosDataSourceBean;
-import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class XABeanDefinition {
 
@@ -119,11 +118,10 @@ public class XABeanDefinition {
 		LOG.debug(String.format("Created data source bean defintion for database '%s' with bean name '%s'.", cropDatabaseName, beanName));
 
 		final ImmutableMap<String, Object> sessionFactoryBeanDefinitionProperties =
-				ImmutableMap.<String, Object>of(XABeanDefinition.DATA_SOURCE_ATTRIBUTE, dataSourceBeanDefinition, "configLocation",
-						xaDataSourceProperties.getHibernateConfigurationLocation(), "configurationClass",
-						org.hibernate.cfg.AnnotationConfiguration.class);
+				ImmutableMap.of(XABeanDefinition.DATA_SOURCE_ATTRIBUTE, dataSourceBeanDefinition, "configLocation",
+						xaDataSourceProperties.getHibernateConfigurationLocation());
 		final RootBeanDefinition createRootBeanDefinition =
-				this.xaDatasourceUtilities.createRootBeanDefinition(AnnotationSessionFactoryBean.class, ImmutableMap.<String, Object>of(),
+				this.xaDatasourceUtilities.createRootBeanDefinition(LocalSessionFactoryBean.class, ImmutableMap.<String, Object>of(),
 						sessionFactoryBeanDefinitionProperties);
 		final String sessionFactoryBeanName = this.xaDatasourceUtilities.computeSessionFactoryName(cropDatabaseName);
 		registry.registerBeanDefinition(sessionFactoryBeanName, createRootBeanDefinition);

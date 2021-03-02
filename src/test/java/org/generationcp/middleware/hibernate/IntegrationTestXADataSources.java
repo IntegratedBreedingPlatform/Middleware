@@ -8,7 +8,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -20,14 +19,12 @@ import java.util.Properties;
 
 public class IntegrationTestXADataSources implements BeanDefinitionRegistryPostProcessor {
 
-	private DatasourceUtilities xaDatasourceUtilities;
 	private IntegrationTestXABeanDefinition xaBeanDefinition;
 	private DataSourceProperties xaDataSourceProperties;
 	private String cropDbname;
 
 	public IntegrationTestXADataSources(final String cropDbname) {
 		try {
-			this.xaDatasourceUtilities = new DatasourceUtilities();
 			this.xaBeanDefinition = new IntegrationTestXABeanDefinition();
 			final Resource resource = new ClassPathResource("/database.properties");
 			final Properties props = PropertiesLoaderUtils.loadProperties(resource);
