@@ -20,19 +20,33 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListMetadata;
-import org.hibernate.*;
-import org.hibernate.criterion.*;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * DAO class for {@link GermplasmList}.
- *
  */
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
@@ -607,6 +621,23 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			resultMap.put((Integer) result[0], (String) result[1]);
 		}
 		return resultMap;
+	}
+
+	/**
+	 * Get germplasm that exist on one or more list.
+	 *
+	 * @param gids
+	 */
+	public List<Integer> getGermplasmUsedInOneOrMoreList(final List<Integer> gids) {
+		final SQLQuery query = this.getSession()
+			.createSQLQuery(" SELECT ld.gid as gid "
+				+ " FROM listnms l"
+				+ " INNER JOIN listdata ld ON l.listid = ld.listid INNER JOIN germplsm g ON ld.gid = g.gid"
+				+ " WHERE ld.gid IN (:gids) AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED
+				+ " GROUP BY ld.gid \n" + " HAVING count(1) >= 1");
+		query.addScalar("gid", new IntegerType());
+		query.setParameterList("gids", gids);
+		return query.list();
 	}
 
 	/**

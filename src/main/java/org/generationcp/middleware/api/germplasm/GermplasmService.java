@@ -64,4 +64,20 @@ public interface GermplasmService {
 
 	Set<Integer> importGermplasmUpdates(Integer userId, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
+	/**
+	 * Delete the specified germplasm
+	 *
+	 * @param gids
+	 */
+	void deleteGermplasm(List<Integer> gids);
+
+	Set<Integer> getCodeFixedGidsByGidList(List<Integer> gids);
+
+	Set<Integer> getGidsWithOpenLots(List<Integer> gids);
+
+	Set<Integer> getGidsOfGermplasmWithDescendants(List<Integer> gids);
+
+	Set<Integer> getGermplasmUsedInOneOrMoreList(List<Integer> gids);
+
+	Set<Integer> getGermplasmUsedInStudies(List<Integer> gids);
 }
