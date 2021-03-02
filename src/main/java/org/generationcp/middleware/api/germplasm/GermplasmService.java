@@ -67,7 +67,7 @@ public interface GermplasmService {
 	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
 
 	Set<Integer> importGermplasmUpdates(Integer userId, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
-
+	
 	List<GermplasmDTO> createGermplasm(Integer userId, String cropname, List<GermplasmImportRequest> germplasmImportRequestList);
 
 	long countFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO);
@@ -79,5 +79,22 @@ public interface GermplasmService {
 	long countGermplasmByStudy(Integer studyDbId);
 
 	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Pageable pageable);
+
+	/**
+	 * Delete the specified germplasm
+	 *
+	 * @param gids
+	 */
+	void deleteGermplasm(List<Integer> gids);
+
+	Set<Integer> getCodeFixedGidsByGidList(List<Integer> gids);
+
+	Set<Integer> getGidsWithOpenLots(List<Integer> gids);
+
+	Set<Integer> getGidsOfGermplasmWithDescendants(List<Integer> gids);
+
+	Set<Integer> getGermplasmUsedInOneOrMoreList(List<Integer> gids);
+
+	Set<Integer> getGermplasmUsedInStudies(List<Integer> gids);
 
 }
