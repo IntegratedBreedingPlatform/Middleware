@@ -2,6 +2,7 @@
 package org.generationcp.middleware.domain.samplelist;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 
 public class SampleListDTO implements Serializable {
 
@@ -18,41 +20,24 @@ public class SampleListDTO implements Serializable {
 	private static final long serialVersionUID = -3724999931592177161L;
 
 	private Integer listId;
-
-	private Integer datasetId;
-
-	private String description;
-
-	private String notes;
-
-	private String createdBy;
-
-	private Integer selectionVariableId;
-
-	private List<Integer> instanceIds;
-
-	private String takenBy;
-
-	private Date samplingDate;
-
-	private String cropName;
-
-	private Integer parentId;
-
 	private String listName;
-
+	private String description;
+	private String notes;
+	private String createdBy;
+	private String takenBy;
+	private Date samplingDate;
+	private String cropName;
+	private Integer parentId;
 	private Date createdDate;
-
 	private String programUUID;
 
-	public SampleListDTO(final Integer id, final String listName) {
-		this.listId = id;
-		this.listName = listName;
-	}
+	// Creation from study
+	private Integer datasetId;
+	private Integer selectionVariableId;
+	private List<Integer> instanceIds;
 
-	public SampleListDTO() {
-		super();
-	}
+	// List builder
+	private List<SampleDTO> entries;
 
 	public String getCropName() {
 		return this.cropName;
@@ -135,27 +120,6 @@ public class SampleListDTO implements Serializable {
 		this.datasetId = datasetId;
 	}
 
-	@Override
-	public boolean equals(final Object other) {
-		if (!(other instanceof SampleListDTO)) {
-			return false;
-		}
-		final SampleListDTO castOther = (SampleListDTO) other;
-		return new EqualsBuilder().append(this.listId, castOther.listId).isEquals();
-	}
-
-	@Override
-	public int hashCode() {
-
-		return new HashCodeBuilder().append(this.listId).hashCode();
-	}
-
-	@Override
-	public String toString() {
-
-		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
-	}
-
 	public Integer getParentId() {
 		return parentId;
 	}
@@ -186,5 +150,37 @@ public class SampleListDTO implements Serializable {
 
 	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
+	}
+
+	public List<SampleDTO> getEntries() {
+		if (this.entries == null) {
+			this.entries = new ArrayList<>();
+		}
+		return this.entries;
+	}
+
+	public void setEntries(final List<SampleDTO> entries) {
+		this.entries = entries;
+	}
+
+	@Override
+	public boolean equals(final Object other) {
+		if (!(other instanceof SampleListDTO)) {
+			return false;
+		}
+		final SampleListDTO castOther = (SampleListDTO) other;
+		return new EqualsBuilder().append(this.listId, castOther.listId).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+
+		return new HashCodeBuilder().append(this.listId).hashCode();
+	}
+
+	@Override
+	public String toString() {
+
+		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
 	}
 }
