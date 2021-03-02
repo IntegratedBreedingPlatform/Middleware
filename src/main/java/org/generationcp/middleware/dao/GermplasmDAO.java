@@ -12,6 +12,7 @@ package org.generationcp.middleware.dao;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
@@ -100,7 +101,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private static final String FIND_GERMPLASM_MATCHES_BY_NAMES =
 		" g.gid in (select gid from names n where n.nval in (:nameList) and n.nstat <> 9)";
-
 
 	@Override
 	public Germplasm getById(final Integer gid, final boolean lock) {
@@ -494,7 +494,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	 * @param gids - gids to be checked for descendants
 	 * @return
 	 */
-	public List<Integer> getGidsOfGermplasmWithDescendants(final Set<Integer> gids) {
+	public Set<Integer> getGidsOfGermplasmWithDescendants(final Set<Integer> gids) {
 		try {
 			if (!CollectionUtils.isEmpty(gids)) {
 				final SQLQuery query = this.getSession().createSQLQuery("SELECT g.gid as gid FROM germplsm g "
@@ -503,14 +503,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ");
 				query.addScalar("gid", new IntegerType());
 				query.setParameterList("gids", gids);
-				return query.list();
+				return Sets.newHashSet(query.list());
 			}
+			return Sets.newHashSet();
 		} catch (final HibernateException e) {
 			final String errorMessage = "Error with getGidsOfGermplasmWithDescendants(gids=" + gids + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
-		return Collections.emptyList();
 	}
 
 	public Germplasm getProgenitorByGID(final Integer gid, final Integer proNo) {
@@ -1205,11 +1205,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public void deleteGermplasms(final List<Integer> gids) {
+	public void deleteGermplasm(final List<Integer> gids) {
 		final StringBuilder queryString = new StringBuilder();
 
 		try {
-			this.getSession().flush();
 			queryString.append("UPDATE germplsm SET deleted = 1, germplsm_uuid = CONCAT (germplsm_uuid, '#', '" + Util
 				.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS") + "')  where gid in (:gids)");
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
