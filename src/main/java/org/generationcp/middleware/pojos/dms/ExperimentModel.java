@@ -56,7 +56,7 @@ public class ExperimentModel implements Serializable {
 
 	@Id
 	@TableGenerator(name = "ndExperimentIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
-	pkColumnValue = "nd_experiment", allocationSize = 500)
+		pkColumnValue = "nd_experiment", allocationSize = 500)
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = "ndExperimentIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_id")

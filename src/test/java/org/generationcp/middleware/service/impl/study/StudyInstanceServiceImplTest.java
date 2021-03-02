@@ -184,6 +184,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		final DmsProject study = this.createTestStudy(false);
 
+		this.sessionProvder.getSession().flush();
+
 		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(study.getProjectId());
 
 		Assert.assertEquals(3, studyInstances.size());
@@ -227,6 +229,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	public void testGetStudyInstance() {
 
 		final DmsProject study = this.createTestStudy(false);
+
+		this.sessionProvder.getSession().flush();
 
 		final StudyInstance studyInstance1 =
 			this.studyInstanceService.getStudyInstance(study.getProjectId(), this.instance1.getLocationId()).get();
@@ -547,6 +551,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		// Instance 3 has no plot experiments
 		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance3, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		this.sessionProvder.getSession().flush();
 		return study;
 	}
 

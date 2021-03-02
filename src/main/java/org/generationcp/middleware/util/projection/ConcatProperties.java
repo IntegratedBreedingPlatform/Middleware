@@ -1,9 +1,9 @@
 package org.generationcp.middleware.util.projection;
 
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.SimpleProjection;
+import org.hibernate.type.StringType;
 import org.hibernate.type.Type;
 
 import java.util.ArrayList;
@@ -42,6 +42,6 @@ public class ConcatProperties extends SimpleProjection {
 
 	@Override
 	public Type[] getTypes(final Criteria criteria, final CriteriaQuery criteriaQuery) {
-		return new Type[] {Hibernate.STRING};
+		return new Type[] {StringType.INSTANCE};
 	}
 }

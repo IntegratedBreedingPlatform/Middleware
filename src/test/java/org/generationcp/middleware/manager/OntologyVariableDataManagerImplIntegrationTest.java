@@ -11,9 +11,9 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -49,9 +49,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationTestBase {
 
@@ -392,7 +391,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		variableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
 		variableInfo.setIsFavorite(true);
 		this.variableManager.addVariable(variableInfo);
-		
+
 		return variableInfo;
 	}
 

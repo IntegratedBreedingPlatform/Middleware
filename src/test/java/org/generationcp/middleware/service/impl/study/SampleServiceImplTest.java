@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl.study;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
@@ -26,6 +27,7 @@ import java.util.List;
 public class SampleServiceImplTest extends IntegrationTestBase {
 
 	private DmsProjectDao dmsProjectDao;
+	private ExperimentDao experimentDao;
 	private IntegrationTestDataInitializer testDataInitializer;
 	private WorkbenchDataManager workbenchDataManager;
 
@@ -37,6 +39,8 @@ public class SampleServiceImplTest extends IntegrationTestBase {
 
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		this.experimentDao = new ExperimentDao();
+		this.experimentDao.setSession(this.sessionProvder.getSession());
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 	}
 
