@@ -209,7 +209,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 
 			if (pageable != null) {
-				final int start = pageable.getPageSize() * (pageable.getPageNumber() - 1);
+				final int start = pageable.getPageSize() * pageable.getPageNumber();
 				final int numOfRows = pageable.getPageSize();
 
 				sqlQuery.setFirstResult(start);
