@@ -13,7 +13,6 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -23,6 +22,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
@@ -40,8 +40,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
-
-	private final static String CROP_NAME = "maize";
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -316,18 +314,22 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetProjectsbyFilters() {
+	public void testGetProjectsByFilters() {
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		final Project project = this.commonTestProject;
+
+		this.workbenchDataManager.addProject(project);
+
 		programSearchRequest.setCommonCropName(project.getCropType().getCropName());
 		programSearchRequest.setProgramName(project.getProjectName());
 		programSearchRequest.setLoggedInUserId(project.getUserId());
 
-		final Pageable pageable = new PageRequest(1, 100);
-		final List<Project> Projects = this.workbenchDataManager.getProjects(pageable, programSearchRequest);
-		assertThat(project.getProjectId(), is(equalTo(Projects.get(0).getProjectId())));
-		assertThat(project.getCropType().getCropName(), is(equalTo(Projects.get(0).getCropType().getCropName())));
-		assertThat(project.getProjectName(), is(equalTo(Projects.get(0).getProjectName())));
+		final Pageable pageable = new PageRequest(0, 100);
+		final List<Project> projects = this.workbenchDataManager.getProjects(pageable, programSearchRequest);
+
+		assertThat(project.getProjectId(), is(equalTo(projects.get(0).getProjectId())));
+		assertThat(project.getCropType().getCropName(), is(equalTo(projects.get(0).getCropType().getCropName())));
+		assertThat(project.getProjectName(), is(equalTo(projects.get(0).getProjectName())));
 	}
 
 	@Test
