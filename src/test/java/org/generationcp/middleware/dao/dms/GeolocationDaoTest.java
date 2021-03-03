@@ -119,6 +119,8 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 			this.createGermplasm();
 			this.geolocation = this.createEnvironmentData(this.dataset, "1", Collections.<Integer>emptyList(), true, null);
 		}
+		this.sessionProvder.getSession().flush();
+
 	}
 
 	private DmsProject createStudy() {
@@ -195,6 +197,7 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 	public void testGetAllTrialEnvironments() {
 		final long previousCount = this.geolocationDao.getAllTrialEnvironments().size();
 		final Geolocation geolocation2 = this.createEnvironmentData(this.dataset, "2", Collections.<Integer>emptyList(), true, null);
+		this.sessionProvder.getSession().flush();
 
 		final List<TrialEnvironment> allTrialEnvironments = this.geolocationDao.getAllTrialEnvironments();
 		Assert.assertEquals(previousCount + 1, allTrialEnvironments.size());
@@ -217,6 +220,7 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 		final List<Integer> traitIds = Collections.singletonList(trait.getCvTermId());
 		final Geolocation geolocation2 = this.createEnvironmentData(this.dataset, "2", traitIds, true, null);
 		final Geolocation geolocation3 = this.createEnvironmentData(this.dataset, "3", traitIds, true, null);
+		this.sessionProvder.getSession().flush();
 
 		final TrialEnvironments environmentsForTraits = this.geolocationDao.getEnvironmentsForTraits(traitIds, this.study.getProgramUUID());
 		Assert.assertNotNull(environmentsForTraits);
@@ -266,6 +270,7 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 		final Geolocation geolocation2 = this.createEnvironmentData(this.dataset, "2", traitIds, true, null);
 		final Geolocation geolocation3 = this.createEnvironmentData(this.dataset, "3", traitIds, false, null);
 		this.createEnvironmentData(this.dataset, "3", traitIds, true, geolocation3);
+		this.sessionProvder.getSession().flush();
 
 		final TrialEnvironments environmentsForTraits = this.geolocationDao.getEnvironmentsForTraits(traitIds, this.study.getProgramUUID());
 		Assert.assertNotNull(environmentsForTraits);

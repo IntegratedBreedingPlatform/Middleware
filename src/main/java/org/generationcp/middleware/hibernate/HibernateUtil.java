@@ -11,21 +11,23 @@
 
 package org.generationcp.middleware.hibernate;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URISyntaxException;
-import java.net.URL;
-
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
  * This utility class instantiates a SessionFactory from which Sessions for a thread can be opened.
@@ -57,9 +59,14 @@ public class HibernateUtil implements Serializable {
 			HibernateUtil.LOG.info("Reading Hibernate config file: " + hibernateCfgFileName);
 			URL urlOfCfgFile = ResourceFinder.locateFile(hibernateCfgFileName);
 
-			AnnotationConfiguration cfg = new AnnotationConfiguration().configure(urlOfCfgFile);
+			Configuration cfg = new Configuration().configure(urlOfCfgFile);
+
+			ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(
+					cfg.getProperties()). buildServiceRegistry();
+
 			HibernateUtil.LOG.info("Opening SessionFactory...");
-			this.sessionFactory = cfg.buildSessionFactory();
+
+			this.sessionFactory = cfg.buildSessionFactory(serviceRegistry);
 
 			this.threadSession = new ThreadLocal<Session>();
 		} catch (FileNotFoundException e) {
@@ -109,14 +116,19 @@ public class HibernateUtil implements Serializable {
 			HibernateUtil.LOG.info("Reading Hibernate config file: " + hibernateCfgFilename);
 			URL urlOfCfgFile = ResourceFinder.locateFile(hibernateCfgFilename);
 
-			AnnotationConfiguration cfg = new AnnotationConfiguration().configure(urlOfCfgFile);
+			Configuration cfg = new Configuration().configure(urlOfCfgFile);
 			cfg.setProperty("hibernate.connection.url", connectionUrl);
 			cfg.setProperty("hibernate.connection.username", username);
 			cfg.setProperty("hibernate.connection.password", password);
-			HibernateUtil.LOG.info("Opening SessionFactory...");
-			this.sessionFactory = cfg.buildSessionFactory();
 
-			this.threadSession = new ThreadLocal<Session>();
+			ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(
+					cfg.getProperties()). buildServiceRegistry();
+
+			HibernateUtil.LOG.info("Opening SessionFactory...");
+
+			this.sessionFactory = cfg.buildSessionFactory(serviceRegistry);
+
+			this.threadSession = new ThreadLocal<>();
 		} catch (FileNotFoundException e) {
 			throw new ConfigException(e.getMessage(), e);
 		}

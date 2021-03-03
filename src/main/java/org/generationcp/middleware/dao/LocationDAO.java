@@ -25,7 +25,6 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -34,6 +33,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.hibernate.type.LongType;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -474,7 +474,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		try {
 			final Session session = this.getSession();
 			final SQLQuery query = session.createSQLQuery(Location.COUNT_ALL_BREEDING_LOCATIONS);
-			return (Long) query.addScalar("count", Hibernate.LONG).uniqueResult();
+			return (Long) query.addScalar("count", LongType.INSTANCE).uniqueResult();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("countAllBreedingLocations", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);

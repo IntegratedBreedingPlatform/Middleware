@@ -1,10 +1,6 @@
 
 package org.generationcp.middleware.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.generationcp.middleware.data.initializer.MeasurementTestDataInitializer;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -16,13 +12,17 @@ import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.hibernate.FlushMode;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MeasurementsTest {
 

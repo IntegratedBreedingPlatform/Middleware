@@ -24,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import javax.persistence.UniqueConstraint;
 import java.io.Serializable;
 
@@ -43,7 +44,9 @@ public class ExperimentProperty implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@TableGenerator(name = "ndExperimentPropIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
+		pkColumnValue = "nd_experimentprop", allocationSize = 500)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "ndExperimentPropIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "nd_experimentprop_id")
 	private Integer ndExperimentpropId;

@@ -31,6 +31,9 @@ import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.DateType;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -704,9 +707,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("pendingDepositsTotal");
 			query.addScalar("notes");
 			query.addScalar("createdByUsername");
-			query.addScalar("createdDate", Hibernate.DATE);
-			query.addScalar("lastDepositDate", Hibernate.DATE);
-			query.addScalar("lastWithdrawalDate",Hibernate.DATE);
+			query.addScalar("createdDate", DateType.INSTANCE);
+			query.addScalar("lastDepositDate", DateType.INSTANCE);
+			query.addScalar("lastWithdrawalDate",DateType.INSTANCE);
 
 			query.setResultTransformer(Transformers.aliasToBean(ExtendedLotDto.class));
 
@@ -846,13 +849,13 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				+ "where l.stock_id in (:stockIds)";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			query.addScalar("lotId", Hibernate.INTEGER);
-			query.addScalar("stockId", Hibernate.STRING);
-			query.addScalar("gid", Hibernate.INTEGER);
-			query.addScalar("locationId", Hibernate.INTEGER);
-			query.addScalar("unitId", Hibernate.INTEGER);
-			query.addScalar("notes", Hibernate.STRING);
-			query.addScalar("status", Hibernate.STRING);
+			query.addScalar("lotId", IntegerType.INSTANCE);
+			query.addScalar("stockId", StringType.INSTANCE);
+			query.addScalar("gid", IntegerType.INSTANCE);
+			query.addScalar("locationId", IntegerType.INSTANCE);
+			query.addScalar("unitId", IntegerType.INSTANCE);
+			query.addScalar("notes", StringType.INSTANCE);
+			query.addScalar("status", StringType.INSTANCE);
 
 			query.setParameterList("stockIds", stockIds);
 

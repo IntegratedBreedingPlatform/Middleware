@@ -2,10 +2,10 @@ package org.generationcp.middleware.util.projection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.SimpleProjection;
+import org.hibernate.type.StringType;
 import org.hibernate.type.Type;
 
 import java.util.ArrayList;
@@ -31,6 +31,6 @@ public class CoalesceProjection extends SimpleProjection {
 
 	@Override
 	public Type[] getTypes(final Criteria criteria, final CriteriaQuery criteriaQuery) throws HibernateException {
-		return new Type[] {Hibernate.STRING};
+		return new Type[] {StringType.INSTANCE};
 	}
 }

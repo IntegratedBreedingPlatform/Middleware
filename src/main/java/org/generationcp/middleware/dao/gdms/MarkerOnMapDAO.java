@@ -11,18 +11,19 @@
 
 package org.generationcp.middleware.dao.gdms;
 
+import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.type.DoubleType;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
-import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 
 /**
  * DAO class for {@link MarkerOnMap}.
@@ -295,11 +296,11 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 		query.setParameterList("markerIds", markerIds);
 		query.setParameter("mapID", mapID);
 
-		query.addScalar("marker_id", Hibernate.INTEGER);
-		query.addScalar("map_name", Hibernate.STRING);
-		query.addScalar("start_position", Hibernate.DOUBLE);
-		query.addScalar("linkage_group", Hibernate.STRING);
-		query.addScalar("map_unit", Hibernate.STRING);
+		query.addScalar("marker_id", IntegerType.INSTANCE);
+		query.addScalar("map_name", StringType.INSTANCE);
+		query.addScalar("start_position", DoubleType.INSTANCE);
+		query.addScalar("linkage_group", StringType.INSTANCE);
+		query.addScalar("map_unit", StringType.INSTANCE);
 		result = query.list();
 		
 		return result;
