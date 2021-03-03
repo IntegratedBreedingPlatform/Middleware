@@ -5,6 +5,9 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
@@ -15,7 +18,6 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -32,6 +34,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,12 +49,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1047,6 +1052,113 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasm.getUserId(), equalTo(this.userId));
 		assertThat(germplasm.getLocationId(), equalTo(this.noLocationId));
 		assertThat(germplasm.getGdate(), equalTo(Integer.valueOf(this.creationDate)));
+	}
+
+	@Test
+	public void test_createGermplasm_Ok() {
+		final String creationDate = "2020-10-24";
+		final GermplasmImportRequest request = new GermplasmImportRequest(RandomStringUtils.randomAlphabetic(20), creationDate,
+			this.derivativeMethod.getMid().toString(), RandomStringUtils.randomAlphabetic(20), "UKN",
+			RandomStringUtils.randomAlphabetic(20),
+			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
+			RandomStringUtils.randomAlphabetic(20),
+			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
+			RandomStringUtils.randomAlphabetic(20),
+			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
+		request.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), DRVNM));
+		request.getAdditionalInfo().put(NOTE, RandomStringUtils.randomAlphabetic(20));
+		final List<GermplasmDTO> germplasmDTOList =
+			this.germplasmService.createGermplasm(this.userId, CROP_NAME, Collections.singletonList(request));
+		assertThat(germplasmDTOList.size(), is(1));
+
+		final GermplasmDTO germplasmDTO = germplasmDTOList.get(0);
+		assertThat(germplasmDTO.getGid(), notNullValue());
+		final Integer gid = Integer.parseInt(germplasmDTO.getGid());
+		assertThat(germplasmDTO.getBreedingMethodDbId(), equalTo(this.derivativeMethod.getMid().toString()));
+		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo("UKN"));
+		assertThat(germplasmDTO.getAcquisitionDate(), equalTo(Util.tryParseDate(creationDate, Util.FRONTEND_DATE_FORMAT)));
+		assertThat(germplasmDTO.getGermplasmDbId(), notNullValue());
+		assertThat(germplasmDTO.getGermplasmPUI(), nullValue());
+		assertThat(germplasmDTO.getEntryNumber(), nullValue());
+		assertThat(germplasmDTO.getDefaultDisplayName(), equalTo(request.getDefaultDisplayName()));
+		assertThat(germplasmDTO.getGermplasmName(), equalTo(request.getDefaultDisplayName()));
+
+		final Map<String, Integer> existingNameTypes = this.daoFactory.getUserDefinedFieldDAO()
+			.getByCodes(UDTableType.NAMES_NAME.getTable(),
+				Collections.singleton(UDTableType.NAMES_NAME.getType()), new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_NAMETYPES))
+			.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+		final Map<Integer, String> germplasmNames = this.daoFactory.getNameDao().getNamesByGids(Collections.singletonList(gid)).stream()
+			.collect(Collectors.toMap(Name::getTypeId, Name::getNval));
+		if (existingNameTypes.containsKey(GermplasmImportRequest.ACCNO)) {
+			assertThat(germplasmDTO.getAccessionNumber(), equalTo(request.getAccessionNumber()));
+			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.ACCNO)), equalTo(request.getAccessionNumber()));
+			assertThat(germplasmDTO.getSynonyms().get(GermplasmImportRequest.ACCNO), equalTo(request.getAccessionNumber()));
+		}
+		if (existingNameTypes.containsKey(GermplasmImportRequest.GENUS)) {
+			assertThat(germplasmDTO.getGenus(), equalTo(request.getGenus()));
+			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.GENUS)), equalTo(request.getGenus()));
+			assertThat(germplasmDTO.getSynonyms().get(GermplasmImportRequest.GENUS), equalTo(request.getGenus()));
+		}
+		assertThat(germplasmDTO.getPedigree(), nullValue());
+		if (existingNameTypes.containsValue(GermplasmImportRequest.PED)) {
+			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.PED)), equalTo(request.getPedigree()));
+			assertThat(germplasmDTO.getSynonyms().get(GermplasmImportRequest.PED), equalTo(request.getPedigree()));
+		}
+
+		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()
+			.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
+				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()))
+				, new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES))
+			.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+		final Map<Integer, String> germplasmAttributes =
+			this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Collections.singletonList(gid)).stream()
+				.collect(Collectors.toMap(Attribute::getTypeId, Attribute::getAval));
+		if (existingAttrTypes.containsKey(GermplasmImportRequest.PLOTCODE)) {
+			assertThat(germplasmDTO.getSeedSource(), equalTo(request.getSeedSource()));
+			assertThat(germplasmAttributes.get(existingAttrTypes.get(GermplasmImportRequest.PLOTCODE)), equalTo(request.getSeedSource()));
+			assertThat(germplasmDTO.getAdditionalInfo().get(GermplasmImportRequest.PLOTCODE), equalTo(request.getSeedSource()));
+		}
+		if (existingAttrTypes.containsKey(GermplasmImportRequest.ORIGIN)) {
+			assertThat(germplasmDTO.getGermplasmOrigin(), equalTo(request.getGermplasmOrigin()));
+			assertThat(germplasmAttributes.get(existingAttrTypes.get(GermplasmImportRequest.ORIGIN)),
+				equalTo(request.getGermplasmOrigin()));
+			assertThat(germplasmDTO.getAdditionalInfo().get(GermplasmImportRequest.ORIGIN), equalTo(request.getGermplasmOrigin()));
+		}
+		if (existingAttrTypes.containsKey(GermplasmImportRequest.CROPNM)) {
+			assertThat(germplasmDTO.getCommonCropName(), equalTo(request.getCommonCropName()));
+			assertThat(germplasmAttributes.get(existingAttrTypes.get(GermplasmImportRequest.CROPNM)), equalTo(request.getCommonCropName()));
+			assertThat(germplasmDTO.getAdditionalInfo().get(GermplasmImportRequest.CROPNM), equalTo(request.getCommonCropName()));
+		}
+		if (existingAttrTypes.containsKey(GermplasmImportRequest.SPECIES)) {
+			assertThat(germplasmDTO.getSpecies(), equalTo(request.getSpecies()));
+			assertThat(germplasmAttributes.get(existingAttrTypes.get(GermplasmImportRequest.SPECIES)), equalTo(request.getSpecies()));
+			assertThat(germplasmDTO.getAdditionalInfo().get(GermplasmImportRequest.SPECIES), equalTo(request.getSpecies()));
+		}
+		if (existingAttrTypes.containsKey(GermplasmImportRequest.SPECIES_AUTH)) {
+			assertThat(germplasmDTO.getSpeciesAuthority(), equalTo(request.getSpeciesAuthority()));
+			assertThat(germplasmAttributes.get(existingAttrTypes.get(GermplasmImportRequest.SPECIES_AUTH)),
+				equalTo(request.getSpeciesAuthority()));
+			assertThat(germplasmDTO.getAdditionalInfo().get(GermplasmImportRequest.SPECIES_AUTH), equalTo(request.getSpeciesAuthority()));
+		}
+		if (existingAttrTypes.containsKey(GermplasmImportRequest.SUBTAX)) {
+			assertThat(germplasmDTO.getSubtaxa(), equalTo(request.getSubtaxa()));
+			assertThat(germplasmAttributes.get(existingAttrTypes.get(GermplasmImportRequest.SUBTAX)), equalTo(request.getSubtaxa()));
+			assertThat(germplasmDTO.getAdditionalInfo().get(GermplasmImportRequest.SUBTAX), equalTo(request.getSubtaxa()));
+		}
+		if (existingAttrTypes.containsKey(GermplasmImportRequest.SUBTAX_AUTH)) {
+			assertThat(germplasmDTO.getSubtaxaAuthority(), equalTo(request.getSubtaxaAuthority()));
+			assertThat(germplasmAttributes.get(existingAttrTypes.get(GermplasmImportRequest.SUBTAX_AUTH)),
+				equalTo(request.getSubtaxaAuthority()));
+			assertThat(germplasmDTO.getAdditionalInfo().get(GermplasmImportRequest.SUBTAX_AUTH), equalTo(request.getSubtaxaAuthority()));
+		}
+		assertTrue(germplasmDTO.getSynonyms().size() > 0);
+		assertTrue(germplasmDTO.getAdditionalInfo().size() > 0);
+
+		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
+		assertThat(germplasm.getGnpgs(), equalTo(0));
+		assertThat(germplasm.getGpid1(), equalTo(0));
+		assertThat(germplasm.getGpid2(), equalTo(0));
+		assertThat(germplasm.getUserId(), equalTo(this.userId));
 	}
 
 	@Test

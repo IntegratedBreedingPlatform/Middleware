@@ -330,14 +330,6 @@ public interface GermplasmDataManager {
 	Map<Integer, String> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList);
 
 	/**
-	 * Returns a Map of GIDs to the attribute values by type given a list of GIDs.
-	 *
-	 * @param gidList - list of GIDs
-	 * @return Map<Integer, Map < String, String> - map of gids to their corresponding attribute type and values
-	 */
-	Map<Integer, Map<String, String>> getAttributesNameAndValuesMapForGids(List<Integer> gidList);
-
-	/**
 	 * Returns all the list of name types available for the given list of gids.
 	 *
 	 * @param gidList - list of GIDs
@@ -1157,19 +1149,9 @@ public interface GermplasmDataManager {
 	 */
 	NamingConfiguration getNamingConfigurationByName(String name);
 
-	Optional<GermplasmDTO> getGermplasmDTOByGID(Integer gid);
-
-	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
-
-	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);
-
 	Germplasm getUnknownGermplasmWithPreferredName();
 
 	List<Integer> addOrUpdateGermplasm(final List<Germplasm> germplasms, final Operation operation);
-
-	long countGermplasmByStudy(Integer studyDbId);
-
-	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Pageable pageable);
 
 	List<AttributeDTO> getAttributesByGid(
 		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNumber);
