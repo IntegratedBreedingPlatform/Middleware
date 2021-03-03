@@ -50,7 +50,8 @@ public enum ToolName {
 	INVENTORY_MANAGEMENT("inventory_manager"),
 	HIGH_DENSITY("high_density"),
 	GERMPLASM_SEARCH("search_germplasm"),
-	METHOD_MANAGER("ProgramMethods");
+	METHOD_MANAGER("ProgramMethods"),
+	LOCATION_MANAGER("ProgramLocations");
 
 	private final String name;
 
