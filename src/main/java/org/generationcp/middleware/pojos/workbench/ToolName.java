@@ -49,7 +49,8 @@ public enum ToolName {
 	GERMPLASM_LISTS("germplasm_lists"),
 	INVENTORY_MANAGEMENT("inventory_manager"),
 	HIGH_DENSITY("high_density"),
-	GERMPLASM_SEARCH("search_germplasm");
+	GERMPLASM_SEARCH("search_germplasm"),
+	METHOD_MANAGER("ProgramMethods");
 
 	private final String name;
 
