@@ -34,6 +34,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -50,10 +52,14 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Method> getMethodsByIds(final List<Integer> ids) {
+		if (CollectionUtils.isEmpty(ids)) {
+			return Collections.emptyList();
+		}
+
 		try {
 			return this.getSession().createCriteria(Method.class).add(Restrictions.in("mid", ids)).addOrder(Order.asc(METHOD_NAME)).list();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsByIds", "", null, e.getMessage(), "Method"), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsByIds", "ids", ids.toString(), e.getMessage(), "Method"), e);
 		}
 	}
 
