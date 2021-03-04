@@ -45,10 +45,13 @@ public enum ToolName {
 	TRIAL_MANAGER_FIELDBOOK_WEB("trial_manager_fieldbook_web"),
 	STUDY_MANAGER_FIELDBOOK_WEB("study_manager_fieldbook_web"),
 	MANAGE_PROGRAMS("manage_program"),
+	CREATE_PROGRAMS("create_program"),
 	GERMPLASM_LISTS("germplasm_lists"),
 	INVENTORY_MANAGEMENT("inventory_manager"),
 	HIGH_DENSITY("high_density"),
-	GERMPLASM_SEARCH("search_germplasm");
+	GERMPLASM_SEARCH("search_germplasm"),
+	METHOD_MANAGER("ProgramMethods"),
+	LOCATION_MANAGER("ProgramLocations");
 
 	private final String name;
 

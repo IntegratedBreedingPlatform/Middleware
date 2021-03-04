@@ -31,6 +31,8 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	private String password;
 	private Set<CropDto> crops;
 	private Set<String> authorities;
+	private String selectedCropName;
+	private String selectedProgramUUID;
 
 	public UserDto() {
 		this.userId = 0;
@@ -199,4 +201,21 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	public void setUserRoles(final List<UserRoleDto> userRoles) {
 		this.userRoles = userRoles;
 	}
+
+	public String getSelectedCropName() {
+		return selectedCropName;
+	}
+
+	public void setSelectedCropName(final String selectedCropName) {
+		this.selectedCropName = selectedCropName;
+	}
+
+	public String getSelectedProgramUUID() {
+		return selectedProgramUUID;
+	}
+
+	public void setSelectedProgramUUID(final String selectedProgramUUID) {
+		this.selectedProgramUUID = selectedProgramUUID;
+	}
+
 }

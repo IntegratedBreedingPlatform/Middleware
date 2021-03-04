@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v17.2.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM workbench_tool WHERE
+					(name = 'breeding_view_wb' AND path = '/ibpworkbench/workbenchtools/breeding_view' AND tool_type = 'WEB' AND version = '17.2') OR
+					(name = 'breeding_gxe' AND path = '/ibpworkbench/workbenchtools/breeding_gxe' AND tool_type = 'WEB' AND version = '17.2') OR
+					(name = 'manage_program' AND path = '/ibpworkbench/workbenchtools/manage_program' AND tool_type = 'WEB' AND version = '17.2') OR
+
+					(name = 'germplasm_import' AND path = '/ibpworkbench/bm/germplasm-import/' AND version = '17.2') OR
+					(name = 'bm_list_manager_main' AND path = '/ibpworkbench/bm/list-manager' AND version = '17.2') OR
+					(name = 'study_manager_fieldbook_web' AND path = '/Fieldbook/TrialManager' AND version = '17.2') OR
+					(name = 'study_browser' AND path = '/ibpworkbench/maingpsb/study/' AND version = '17.2') OR
+					(name = 'dataset_importer' AND path = '/Fieldbook/etl/' AND version = '17.2') OR
+					(name = 'inventory_manager' AND path = '/inventory-manager/#/' AND version = '17.2') OR
+					(name = 'germplasm_mainheadtohead' AND path = '/ibpworkbench/maingpsb/Head_to_head_comparison' AND version = '17.2') OR
+					(name = 'trait_donor_query' AND path = '/ibpworkbench/maingpsb/Trait_Donors_Query' AND version = '17.2') OR
+					(name = 'gdms' AND path = '/GDMS/main/' AND version = '17.2') OR
+					(name = 'ontology_manager' AND path = '/ibpworkbench/controller/ontology' AND version = '17.2');
+            </sqlCheck>
+        </preConditions>
+        <comment>Change several tool paths</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE workbench_tool SET path = '/ibpworkbench/workbenchtools/breeding_view', tool_type = 'WEB', version = '17.2' WHERE name = 'breeding_view_wb';
+			UPDATE workbench_tool SET path = '/ibpworkbench/workbenchtools/breeding_gxe', tool_type = 'WEB', version = '17.2' WHERE name = 'breeding_gxe';
+			UPDATE workbench_tool SET path = '/ibpworkbench/workbenchtools/manage_program', tool_type = 'WEB', version = '17.2' WHERE name = 'manage_program';
+
+			UPDATE workbench_tool SET path = '/ibpworkbench/bm/germplasm-import/', version = '17.2' WHERE name = 'germplasm_import';
+			UPDATE workbench_tool SET path = '/ibpworkbench/bm/list-manager', version = '17.2' WHERE name = 'bm_list_manager_main';
+			UPDATE workbench_tool SET path = '/Fieldbook/TrialManager', version = '17.2' WHERE name = 'study_manager_fieldbook_web';
+			UPDATE workbench_tool SET path = '/ibpworkbench/maingpsb/study/', version = '17.2' WHERE name = 'study_browser';
+			UPDATE workbench_tool SET path = '/Fieldbook/etl/', version = '17.2' WHERE name = 'dataset_importer';
+			UPDATE workbench_tool SET path = '/inventory-manager/#/', version = '17.2' WHERE name = 'inventory_manager';
+			UPDATE workbench_tool SET path = '/ibpworkbench/maingpsb/Head_to_head_comparison', version = '17.2' WHERE name = 'germplasm_mainheadtohead';
+			UPDATE workbench_tool SET path = '/ibpworkbench/maingpsb/Trait_Donors_Query', version = '17.2' WHERE name = 'trait_donor_query';
+			UPDATE workbench_tool SET path = '/GDMS/main/', version = '17.2' WHERE name = 'gdms';
+			UPDATE workbench_tool SET path = '/ibpworkbench/controller/ontology', version = '17.2' WHERE name = 'ontology_manager';
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
+
