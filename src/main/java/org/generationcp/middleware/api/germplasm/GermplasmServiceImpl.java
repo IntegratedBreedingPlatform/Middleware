@@ -863,14 +863,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return ("0".equals(progenitor) || StringUtils.isEmpty(progenitor)) ? 0 : progenitorsMap.get(progenitor).getGid();
 	}
 
-	private Map<Integer, Method> getBreedingMethodsMapByMethodIds(final List<GermplasmImportRequest> germplasmImportRequestList) {
-		final Set<Integer> breedingMethodIds =
-			germplasmImportRequestList.stream().filter(g -> StringUtils.isNotEmpty(g.getBreedingMethodDbId()))
-				.map(method -> Integer.parseInt(method.getBreedingMethodDbId())).collect(Collectors.toSet());
-		return this.daoFactory.getMethodDAO().getMethodsByIds(new ArrayList<>(breedingMethodIds)).stream()
-			.collect(Collectors.toMap(Method::getMid, Function.identity()));
-	}
-
 	private Map<String, Integer> getLocationsMapByLocAbbr(final List<GermplasmImportRequest> germplasmImportRequestList) {
 		final Set<String> locationAbbreviations =
 			germplasmImportRequestList.stream().filter(g -> StringUtils.isNotEmpty(g.getCountryOfOriginCode()))
@@ -907,7 +899,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public List<GermplasmDTO> createGermplasm(final Integer userId, final String cropname,
 		final List<GermplasmImportRequest> germplasmImportRequestList) {
-		final Map<Integer, Method> methodsMap = this.getBreedingMethodsMapByMethodIds(germplasmImportRequestList);
 		final Map<String, Integer> locationsMap = this.getLocationsMapByLocAbbr(germplasmImportRequestList);
 		final Map<String, Integer> attributesMap = this.getAttributesMapByAttrCode(germplasmImportRequestList);
 		final Map<String, Integer> nameTypesMap = this.getNameTypesMapByNameTypeCode(germplasmImportRequestList);
@@ -917,8 +908,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		for (final GermplasmImportRequest germplasmDto : germplasmImportRequestList) {
 
 			final Germplasm germplasm = new Germplasm();
-			final Method method = methodsMap.get(Integer.parseInt(germplasmDto.getBreedingMethodDbId()));
-			germplasm.setMethodId(method.getMid());
+			germplasm.setMethodId(Integer.parseInt(germplasmDto.getBreedingMethodDbId()));
 
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
