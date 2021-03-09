@@ -77,7 +77,7 @@ public interface GermplasmService {
 
 	List<GermplasmDTO> searchFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
 
-	Optional<GermplasmDTO> getGermplasmDTOByGID(Integer gid);
+	Optional<GermplasmDTO> getGermplasmDTOByGUID(String germplasmGUID);
 
 	long countGermplasmByStudy(Integer studyDbId);
 
