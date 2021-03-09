@@ -1009,9 +1009,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Optional<GermplasmDTO> getGermplasmDTOByGID(final Integer gid) {
+	public Optional<GermplasmDTO> getGermplasmDTOByGUID(final String germplasmGUID) {
 		final GermplasmSearchRequestDto searchDto = new GermplasmSearchRequestDto();
-		searchDto.setGermplasmDbIds(Collections.singletonList(String.valueOf(gid)));
+		searchDto.setGermplasmDbIds(Collections.singletonList(germplasmGUID));
 		final List<GermplasmDTO> germplasmDTOS = this.searchFilteredGermplasm(searchDto,  new PageRequest(0, 1));
 		if (!CollectionUtils.isEmpty(germplasmDTOS)) {
 			return Optional.of(germplasmDTOS.get(0));
