@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasm;
 
+import com.google.common.base.Functions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -8,8 +9,11 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
+import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
@@ -958,6 +962,76 @@ public class GermplasmServiceImpl implements GermplasmService {
 			return this.searchFilteredGermplasm(searchRequestDto, null);
 		}
 		return Collections.emptyList();
+	}
+
+	@Override
+	public GermplasmDTO updateGermplasm(final Integer userId, final String germplasmDbId, final GermplasmUpdateRequest germplasmUpdateRequest) {
+		final List<Germplasm> germplasmByGUIDs =
+			this.daoFactory.getGermplasmDao().getGermplasmByGUIDs(Collections.singletonList(germplasmDbId));
+		if (CollectionUtils.isEmpty(germplasmByGUIDs)) {
+			throw new MiddlewareRequestException("", "germplasm.invalid.guid");
+		}
+		final Germplasm germplasm = germplasmByGUIDs.get(0);
+		// TODO validate old and new breeding method by type and mpgrn
+		germplasm.setMethodId(Integer.parseInt(germplasmUpdateRequest.getBreedingMethodDbId()));
+		final List<Location> locationList =
+			this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(germplasmUpdateRequest.getCountryOfOriginCode()));
+		germplasm.setLocationId(locationList.get(0).getLocid());
+		germplasm.setGdate(Util.convertDateToIntegerValue(Util.tryParseDate(germplasmUpdateRequest.getAcquisitionDate(), Util.FRONTEND_DATE_FORMAT)));
+		this.daoFactory.getGermplasmDao().save(germplasm);
+
+
+		final NameDAO nameDao = this.daoFactory.getNameDao();
+		final Map<Integer, Name> existingNamesByType =
+			nameDao.getNamesByGids(Collections.singletonList(germplasm.getGid())).stream()
+				.collect(Collectors.toMap(Name::getTypeId,
+					Function.identity()));
+		final Map<String, Integer> nameTypesMap = this.getNameTypesMapByNameTypeCode(Collections.singletonList(germplasmUpdateRequest));
+		this.addCustomNameFieldsToSynonyms(germplasmUpdateRequest);
+		germplasmUpdateRequest.getSynonyms().forEach(synonym -> {
+			final Integer typeId = nameTypesMap.get(synonym.getType().toUpperCase());
+			if (typeId != null) {
+				// Create new name if none of that type exists, otherwise update name value of existing one
+				if (existingNamesByType.containsKey(typeId)) {
+					final Name name = new Name(null, germplasm.getGid(), typeId,
+						0, userId, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
+					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
+						name.setNstat(1);
+					}
+					nameDao.save(name);
+				} else {
+					final Name existingName = existingNamesByType.get(typeId);
+					existingName.setNval(synonym.getSynonym());
+					nameDao.update(existingName);
+				}
+			}
+		});
+
+		final AttributeDAO attributeDAO = this.daoFactory.getAttributeDAO();
+		final Map<Integer, Attribute> existingAttributesByType = attributeDAO.getByGID(germplasm.getGid()).stream()
+			.collect(Collectors.toMap(Attribute::getTypeId,
+				Function.identity()));
+		final Map<String, Integer> attributesMap = this.getAttributesMapByAttrCode(Collections.singletonList(germplasmUpdateRequest));
+		this.addCustomAttributeFieldsToAdditionalInfo(germplasmUpdateRequest);
+		germplasmUpdateRequest.getAdditionalInfo().forEach((k, v) -> {
+			final Integer typeId = attributesMap.get(k.toUpperCase());
+			if (typeId != null) {
+				// Create new attribute if none of that type exists, otherwise update value of existing one
+				if (existingAttributesByType.containsKey(typeId)) {
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, userId, v,
+						germplasm.getLocationId(),
+						0, Util.getCurrentDateAsIntegerValue());
+					attributeDAO.save(attribute);
+				} else {
+					final Attribute existingAttribute = existingAttributesByType.get(typeId);
+					existingAttribute.setAval(v);
+					attributeDAO.update(existingAttribute);
+				}
+			}
+		});
+
+		// TODO wait for update to getGermplasmDTObyGID to be updated to get by GUID
+		return null;
 	}
 
 	// Add to attributes map to be saved the custom atttribute fields in import request dto

@@ -43,8 +43,6 @@ public class GermplasmImportRequest {
 	private String countryOfOriginCode;
 	private String defaultDisplayName;
 	private String documentationURL;
-	// TODO Donors
-	// TODO external references
 	private String genus;
 	private String germplasmName;
 	private String germplasmOrigin;
