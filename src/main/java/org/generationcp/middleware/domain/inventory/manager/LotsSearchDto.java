@@ -59,6 +59,8 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private List<Integer> harvestingStudyIds;
 
+	private List<String> germplasmGUIDs;
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date createdDateFrom;
 
@@ -327,6 +329,14 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	public void setMaxPendingDepositsTotal(final Double maxPendingDepositTotal) {
 		this.maxPendingDepositsTotal = maxPendingDepositTotal;
+	}
+
+	public List<String> getGermplasmGUIDs() {
+		return this.germplasmGUIDs;
+	}
+
+	public void setGermplasmGUIDs(final List<String> germplasmGUIDs) {
+		this.germplasmGUIDs = germplasmGUIDs;
 	}
 
 	@Override

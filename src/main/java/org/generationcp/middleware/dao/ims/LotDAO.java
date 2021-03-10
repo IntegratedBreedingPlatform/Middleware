@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
@@ -519,6 +520,10 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				paramBuilder.setParameter("stockId", stockId + '%');
 			}
 
+			if (!CollectionUtils.isEmpty(lotsSearchDto.getGermplasmGUIDs())) {
+				paramBuilder.append(" and g.germplsm_uuid IN (:germplasmGuids)");
+				paramBuilder.setParameterList("germplasmGuids", lotsSearchDto.getGermplasmGUIDs());
+			}
 		}
 		paramBuilder.append(" GROUP BY lot.lotid ");
 
