@@ -4,6 +4,8 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
@@ -74,7 +76,7 @@ public interface GermplasmService {
 
 	List<GermplasmDTO> searchFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
 
-	Optional<GermplasmDTO> getGermplasmDTOByGUID(String germplasmGUID);
+	Optional<GermplasmDTO> getGermplasmDTOByGUID(String germplasmUUID);
 
 	long countGermplasmByStudy(Integer studyDbId);
 
@@ -96,5 +98,9 @@ public interface GermplasmService {
 	Set<Integer> getGermplasmUsedInOneOrMoreList(List<Integer> gids);
 
 	Set<Integer> getGermplasmUsedInStudies(List<Integer> gids);
+
+	PedigreeDTO getPedigree(final Integer gid, final String notation, final Boolean includeSiblings);
+
+	ProgenyDTO getProgeny(final Integer gid);
 
 }

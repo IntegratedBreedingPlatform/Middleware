@@ -1274,16 +1274,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return treeNode;
 	}
 
-	@Override
-	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
-		return this.daoFactory.getGermplasmDao().getPedigree(germplasmDbId, notation, includeSiblings);
-	}
-
-	@Override
-	public ProgenyDTO getProgeny(final Integer germplasmDbId) {
-		return this.daoFactory.getGermplasmDao().getProgeny(germplasmDbId);
-	}
-
 	/**
 	 * Local method for getting a particular germplasm's Name.
 	 *

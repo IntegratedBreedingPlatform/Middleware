@@ -990,10 +990,6 @@ public interface GermplasmDataManager {
 	 */
 	Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
 
-	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, final Boolean includeSiblings);
-
-	ProgenyDTO getProgeny(Integer germplasmDbId);
-
 	/*
 	 * get the Germplasm from the crop database based on local gid reference
 	 *
