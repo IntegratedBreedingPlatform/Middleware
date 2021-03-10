@@ -949,21 +949,37 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public GermplasmDTO updateGermplasm(final Integer userId, final String germplasmDbId, final GermplasmUpdateRequest germplasmUpdateRequest) {
+		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 		final List<Germplasm> germplasmByGUIDs =
 			this.daoFactory.getGermplasmDao().getGermplasmByGUIDs(Collections.singletonList(germplasmDbId));
 		if (CollectionUtils.isEmpty(germplasmByGUIDs)) {
 			throw new MiddlewareRequestException("", "germplasm.invalid.guid");
 		}
 		final Germplasm germplasm = germplasmByGUIDs.get(0);
-		// TODO validate old and new breeding method by type and mpgrn
-		germplasm.setMethodId(Integer.parseInt(germplasmUpdateRequest.getBreedingMethodDbId()));
+		final Integer newBreedingMethodId = Integer.parseInt(germplasmUpdateRequest.getBreedingMethodDbId());
+		final Integer oldBreedingMethodId = germplasm.getMethodId();
+		if (newBreedingMethodId != oldBreedingMethodId) {
+			final Map<Integer, Method> methodMap =
+				this.daoFactory.getMethodDAO().getMethodsByIds(Arrays.asList(oldBreedingMethodId, newBreedingMethodId)).stream()
+					.collect(Collectors.toMap(Method::getMid, Function.identity()));
+			final Method newBreedingMethod = methodMap.get(newBreedingMethodId);
+			final Method oldBreedingMethod = methodMap.get(oldBreedingMethodId);
+			if (this.germplasmMethodValidator.isNewBreedingMethodValid(oldBreedingMethod, newBreedingMethod, germplasmDbId, conflictErrors)) {
+				germplasm.setMethodId(newBreedingMethodId);
+			}
+		}
 		final List<Location> locationList =
 			this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(germplasmUpdateRequest.getCountryOfOriginCode()));
-		germplasm.setLocationId(locationList.get(0).getLocid());
+		if (!CollectionUtils.isEmpty(locationList)) {
+			germplasm.setLocationId(locationList.get(0).getLocid());
+		}
 		germplasm.setGdate(Util.convertDateToIntegerValue(Util.tryParseDate(germplasmUpdateRequest.getAcquisitionDate(), Util.FRONTEND_DATE_FORMAT)));
-		this.daoFactory.getGermplasmDao().save(germplasm);
+		if (!conflictErrors.isEmpty()) {
+			throw new MiddlewareRequestException(null, conflictErrors);
+		}
+		this.daoFactory.getGermplasmDao().update(germplasm);
 
-
+		// Update germplasm names
 		final NameDAO nameDao = this.daoFactory.getNameDao();
 		final Map<Integer, Name> existingNamesByType =
 			nameDao.getNamesByGids(Collections.singletonList(germplasm.getGid())).stream()
@@ -976,20 +992,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 			if (typeId != null) {
 				// Create new name if none of that type exists, otherwise update name value of existing one
 				if (existingNamesByType.containsKey(typeId)) {
+					final Name existingName = existingNamesByType.get(typeId);
+					existingName.setNval(synonym.getSynonym());
+					nameDao.update(existingName);
+				} else {
 					final Name name = new Name(null, germplasm.getGid(), typeId,
 						0, userId, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
 					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
 						name.setNstat(1);
 					}
 					nameDao.save(name);
-				} else {
-					final Name existingName = existingNamesByType.get(typeId);
-					existingName.setNval(synonym.getSynonym());
-					nameDao.update(existingName);
 				}
 			}
 		});
 
+		// Update germplasm attributes
 		final AttributeDAO attributeDAO = this.daoFactory.getAttributeDAO();
 		final Map<Integer, Attribute> existingAttributesByType = attributeDAO.getByGID(germplasm.getGid()).stream()
 			.collect(Collectors.toMap(Attribute::getTypeId,
@@ -1001,20 +1018,19 @@ public class GermplasmServiceImpl implements GermplasmService {
 			if (typeId != null) {
 				// Create new attribute if none of that type exists, otherwise update value of existing one
 				if (existingAttributesByType.containsKey(typeId)) {
+					final Attribute existingAttribute = existingAttributesByType.get(typeId);
+					existingAttribute.setAval(v);
+					attributeDAO.update(existingAttribute);
+				} else {
 					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, userId, v,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					attributeDAO.save(attribute);
-				} else {
-					final Attribute existingAttribute = existingAttributesByType.get(typeId);
-					existingAttribute.setAval(v);
-					attributeDAO.update(existingAttribute);
 				}
 			}
 		});
 
-		// TODO wait for update to getGermplasmDTObyGID to be updated to get by GUID
-		return null;
+		return this.getGermplasmDTOByGUID(germplasmDbId).get();
 	}
 
 	// Add to attributes map to be saved the custom atttribute fields in import request dto
