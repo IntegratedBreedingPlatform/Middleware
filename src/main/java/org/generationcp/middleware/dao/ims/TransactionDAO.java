@@ -29,7 +29,6 @@ import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -451,9 +450,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				paramBuilder.setParameterList("harvestingStudyIds", harvestingStudyIds);
 			}
 
-			if (!CollectionUtils.isEmpty(transactionsSearchDto.getGermplasmGuids())) {
+			if (!CollectionUtils.isEmpty(transactionsSearchDto.getGermplasmUUIDs())) {
 				paramBuilder.append(" and g.germplsm_uuid IN (:guids)");
-				paramBuilder.setParameterList("guids", transactionsSearchDto.getGermplasmGuids());
+				paramBuilder.setParameterList("guids", transactionsSearchDto.getGermplasmUUIDs());
 			}
 		}
 	}

@@ -521,9 +521,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				paramBuilder.setParameter("stockId", stockId + '%');
 			}
 
-			if (!CollectionUtils.isEmpty(lotsSearchDto.getGermplasmGUIDs())) {
+			if (!CollectionUtils.isEmpty(lotsSearchDto.getGermplasmUUIDs())) {
 				paramBuilder.append(" and g.germplsm_uuid IN (:germplasmGuids)");
-				paramBuilder.setParameterList("germplasmGuids", lotsSearchDto.getGermplasmGUIDs());
+				paramBuilder.setParameterList("germplasmGuids", lotsSearchDto.getGermplasmUUIDs());
 			}
 		}
 		paramBuilder.append(" GROUP BY lot.lotid ");
