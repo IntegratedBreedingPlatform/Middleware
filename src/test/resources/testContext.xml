@@ -290,4 +290,7 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+	<bean id="germplasmMethodValidator" class="org.generationcp.middleware.api.germplasm.GermplasmMethodValidator" />
+        
+
 </beans>

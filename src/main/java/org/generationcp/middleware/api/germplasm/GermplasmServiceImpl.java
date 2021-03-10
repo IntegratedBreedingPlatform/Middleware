@@ -74,6 +74,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Autowired
+	private GermplasmMethodValidator germplasmMethodValidator;
+
 	public GermplasmServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
@@ -460,28 +463,20 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
 				maleParentGid,
 				germplasm.getMethod());
-		} else if (this.isMethodTypeMatch(breedingMethodOptional.get().getMtype(), germplasm.getMethod().getMtype())) {
+
+		} else if (this.germplasmMethodValidator
+			.isNewBreedingMethodValid(germplasm.getMethod(), breedingMethodOptional.get(), String.valueOf(germplasm.getGid()),
+				conflictErrors)) {
 
 			final Method breedingMethod = breedingMethodOptional.get();
 
-			if (this.isGenerative(germplasm.getMethod().getMtype()) && !germplasm.getMethod().getMprgn()
-				.equals(breedingMethod.getMprgn())) {
-				conflictErrors.put("germplasm.update.number.of.progenitors.mismatch", new String[] {
-					String.valueOf(germplasm.getGid())});
-			} else {
-				// Only update the method if the new method has the same type as the old method.
-				germplasm.setMethodId(breedingMethod.getMid());
+			// Only update the method if the new method has the same type as the old method.
+			germplasm.setMethodId(breedingMethod.getMid());
 
-				// Update the progenitors based on the new method
-				this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
-					maleParentGid,
-					breedingMethod);
-			}
-
-		} else {
-			conflictErrors.put("germplasm.update.breeding.method.mismatch", new String[] {
-				String.valueOf(germplasm.getGid()),
-				String.format("%s (%s)", germplasm.getMethod().getMname(), germplasm.getMethod().getMtype())});
+			// Update the progenitors based on the new method
+			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
+				maleParentGid,
+				breedingMethod);
 		}
 
 	}
@@ -492,9 +487,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (breedingMethod.getMprgn() == 1) {
 			conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new String[] {
 				String.valueOf(germplasm.getGid())});
-		} else if (this.isGenerative(breedingMethod.getMtype())) {
+		} else if (this.germplasmMethodValidator.isGenerative(breedingMethod.getMtype())) {
 			this.assignProgenitorForGenerativeMethod(germplasm, femaleParentGid, maleParentGid, breedingMethod);
-		} else if (this.isMaintenanceOrDerivative(breedingMethod.getMtype())) {
+		} else if (this.germplasmMethodValidator.isMaintenanceOrDerivative(breedingMethod.getMtype())) {
 			this.assignProgenitorForDerivativeOrMaintenanceMethod(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants,
 				conflictErrors, femaleParentGid, maleParentGid);
 		}
@@ -551,7 +546,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private List<Integer> getGidsOfDerivativeGermplasmWithDescendants(final List<Germplasm> germplasmList) {
 		// Get the GIDs of germplasm with DER/MAN methods.
 		final List<Integer> gids =
-			germplasmList.stream().filter(germplasm -> this.isMaintenanceOrDerivative(germplasm.getMethod().getMtype()))
+			germplasmList.stream().filter(germplasm -> this.germplasmMethodValidator.isMaintenanceOrDerivative(germplasm.getMethod().getMtype()))
 				.map(Germplasm::getGid).collect(Collectors.toList());
 
 		// Get all DER/MAN germplasm that has existing derivative progeny.
@@ -664,18 +659,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 			.collect(Collectors.toMap(Method::getMcode, Function.identity()));
 	}
 
-	private boolean isMethodTypeMatch(final String newMethodType, final String oldMethodType) {
-		return this.isGenerative(newMethodType) && this.isGenerative(oldMethodType)
-			|| this.isMaintenanceOrDerivative(newMethodType) && this.isMaintenanceOrDerivative(oldMethodType);
-	}
-
-	private boolean isGenerative(final String methodType) {
-		return methodType.equals(MethodType.GENERATIVE.getCode());
-	}
-
-	private boolean isMaintenanceOrDerivative(final String methodType) {
-		return methodType.equals(MethodType.DERIVATIVE.getCode()) || methodType.equals(MethodType.MAINTENANCE.getCode());
-	}
 
 	private Map<String, Integer> getLocationsMapByAbbr(final List<GermplasmImportDTO> germplasmImportDTOList) {
 		final Set<String> locationAbbreviations =
