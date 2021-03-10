@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasm;
 
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
@@ -102,5 +103,10 @@ public interface GermplasmService {
 	PedigreeDTO getPedigree(final Integer gid, final String notation, final Boolean includeSiblings);
 
 	ProgenyDTO getProgeny(final Integer gid);
+
+	List<AttributeDTO> getAttributesByGid(
+			String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNumber);
+
+	long countAttributesByGid(String gid, List<String> attributeDbIds);
 
 }

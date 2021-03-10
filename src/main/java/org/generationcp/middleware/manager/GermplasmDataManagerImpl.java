@@ -1490,17 +1490,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<AttributeDTO> getAttributesByGid(
-		final String gid, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
-		return this.daoFactory.getAttributeDAO().getAttributesByGidAndAttributeIds(gid, attributeDbIds, pageSize, pageNumber);
-	}
-
-	@Override
-	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
-		return this.daoFactory.getAttributeDAO().countAttributesByGid(gid, attributeDbIds);
-	}
-
-	@Override
 	public List<Attribute> getAttributeByIds(final List<Integer> ids) {
 		return this.daoFactory.getAttributeDAO().getByIDs(ids);
 	}

@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
@@ -355,6 +356,17 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public ProgenyDTO getProgeny(final Integer gid) {
 		return this.daoFactory.getGermplasmDao().getProgeny(gid);
+	}
+
+	@Override
+	public List<AttributeDTO> getAttributesByGid(
+			final String gid, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
+		return this.daoFactory.getAttributeDAO().getAttributesByGidAndAttributeIds(gid, attributeDbIds, pageSize, pageNumber);
+	}
+
+	@Override
+	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
+		return this.daoFactory.getAttributeDAO().countAttributesByGid(gid, attributeDbIds);
 	}
 
 	private void saveGermplasmUpdateDTO(final Integer userId, final Map<String, Integer> attributeCodes,

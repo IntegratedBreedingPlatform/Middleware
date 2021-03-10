@@ -1149,11 +1149,6 @@ public interface GermplasmDataManager {
 
 	List<Integer> addOrUpdateGermplasm(final List<Germplasm> germplasms, final Operation operation);
 
-	List<AttributeDTO> getAttributesByGid(
-		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNumber);
-
-	long countAttributesByGid(String gid, List<String> attributeDbIds);
-
 	List<Attribute> getAttributeByIds(List<Integer> ids);
 
 	List<String> getNamesByGidsAndPrefixes(List<Integer> gids, List<String> prefixes);
