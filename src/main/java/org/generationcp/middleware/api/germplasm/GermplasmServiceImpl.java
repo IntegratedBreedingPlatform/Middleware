@@ -64,6 +64,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private static final String DEFAULT_BIBREF_FIELD = "-";
 	public static final String PROGENITOR_1 = "PROGENITOR 1";
 	public static final String PROGENITOR_2 = "PROGENITOR 2";
+	private static String DEFAULT_METHOD = "UDM";
 
 	private final DaoFactory daoFactory;
 
@@ -913,11 +914,23 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, Integer> nameTypesMap = this.getNameTypesMapByNameTypeCode(germplasmImportRequestList);
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropname);
 
+		//Set Unknown derivative method as default when no breeding method is specified
+		Method unknownDerivativeMethod = null;
+		if (germplasmImportRequestList.stream().anyMatch(g -> StringUtils.isEmpty(g.getBreedingMethodDbId()))) {
+			final List<Method> unknownDerivativeMethods = this.daoFactory.getMethodDAO().getByCode(Arrays.asList(DEFAULT_METHOD));
+			if (unknownDerivativeMethods.isEmpty()) {
+				throw new MiddlewareRequestException("", "brapi.import.germplasm.no.default.method.found");
+			}
+			unknownDerivativeMethod = unknownDerivativeMethods.get(0);
+		}
+
 		final List<String> createdGermplasmUUIDs = new ArrayList<>();
 		for (final GermplasmImportRequest germplasmDto : germplasmImportRequestList) {
 
 			final Germplasm germplasm = new Germplasm();
-			final Method method = methodsMap.get(Integer.parseInt(germplasmDto.getBreedingMethodDbId()));
+			final Method method = (StringUtils.isNotEmpty(germplasmDto.getBreedingMethodDbId())) ?
+				methodsMap.get(Integer.parseInt(germplasmDto.getBreedingMethodDbId()))
+				: unknownDerivativeMethod;
 			germplasm.setMethodId(method.getMid());
 
 			germplasm.setGrplce(0);
