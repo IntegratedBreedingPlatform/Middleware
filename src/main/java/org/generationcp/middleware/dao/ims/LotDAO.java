@@ -412,7 +412,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "  users.uname as createdByUsername, " //
 		+ "  lot.created_date as createdDate, " //
 		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END) AS lastDepositDate, " //
-		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END) AS lastWithdrawalDate " //
+		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END) AS lastWithdrawalDate, " //
+		+ "  g.germplsm_uuid as germplasmUUID " //
 		+ "FROM ims_lot lot " //
 		+ "       LEFT JOIN ims_transaction transaction ON transaction.lotid = lot.lotid AND transaction.trnstat <> " + TransactionStatus.CANCELLED.getIntValue()  //
 		+ "       INNER JOIN germplsm g on g.gid = lot.eid " //
@@ -715,6 +716,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("createdDate", DateType.INSTANCE);
 			query.addScalar("lastDepositDate", DateType.INSTANCE);
 			query.addScalar("lastWithdrawalDate",DateType.INSTANCE);
+			query.addScalar("germplasmUUID");
 
 			query.setResultTransformer(Transformers.aliasToBean(ExtendedLotDto.class));
 
