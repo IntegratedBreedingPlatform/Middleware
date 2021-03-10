@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
@@ -447,6 +448,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					+ "                and study_filter_iet.type = " + ExperimentTransactionType.HARVESTING.getId()
 					+ " where study_filter_p.project_id in (:harvestingStudyIds) and study_filter_iet.trnid = tr.trnid)"); //
 				paramBuilder.setParameterList("harvestingStudyIds", harvestingStudyIds);
+			}
+
+			if (!CollectionUtils.isEmpty(transactionsSearchDto.getGermplasmGuids())) {
+				paramBuilder.append(" and g.germplsm_uuid IN (:guids)");
+				paramBuilder.setParameterList("guids", transactionsSearchDto.getGermplasmGuids());
 			}
 		}
 	}

@@ -27,6 +27,7 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	private List<Integer> unitIds;
 	private Double minAmount;
 	private Double maxAmount;
+	private List<String> germplasmGuids;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date createdDateFrom;
@@ -206,6 +207,14 @@ public class TransactionsSearchDto extends SearchRequestDto {
 
 	public void setLotUUIDs(final List<String> lotUUIDs) {
 		this.lotUUIDs = lotUUIDs;
+	}
+
+	public List<String> getGermplasmGuids() {
+		return this.germplasmGuids;
+	}
+
+	public void setGermplasmGuids(final List<String> germplasmGuids) {
+		this.germplasmGuids = germplasmGuids;
 	}
 
 	@Override
