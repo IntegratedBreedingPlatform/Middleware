@@ -286,7 +286,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	public void testLoadEntityWithNameCollection() {
 		final Germplasm germplasm = this.dao.getById(1);
 		if (germplasm != null) {
-			Assert.assertTrue("If germplasm exists, the name collection can not be empty.", !germplasm.getNames().isEmpty());
+			Assert.assertFalse("If germplasm exists, the name collection can not be empty.", germplasm.getNames().isEmpty());
 		}
 	}
 
@@ -390,6 +390,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		cross.setGpid1(femaleParent.getGid());
 		cross.setGpid2(maleParent.getGid());
 		cross.setGnpgs(2);
+		cross.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		this.dao.save(cross);
 
 		final Name crossPreferredName = cross.getPreferredName();
@@ -400,11 +401,13 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		advance.setGpid1(cross.getGid());
 		advance.setGpid2(cross.getGid());
 		advance.setGnpgs(-1);
+		advance.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
+
 		this.dao.save(advance);
 
 		final ProgenyDTO progeny = this.dao.getProgeny(maleParent.getGid());
 
-		Assert.assertThat(progeny.getGermplasmDbId(), is(maleParent.getGid()));
+		Assert.assertThat(progeny.getGermplasmDbId(), is(maleParent.getGermplasmUUID()));
 		Assert.assertThat(progeny.getDefaultDisplayName(), is(maleParentPreferredName.getNval()));
 		Assert.assertThat(progeny.getProgeny(), hasSize(1));
 		Assert.assertThat(progeny.getProgeny().get(0).getParentType(), is(ParentType.MALE.name()));
@@ -412,10 +415,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final ProgenyDTO crossProgeny = this.dao.getProgeny(cross.getGid());
 
-		Assert.assertThat(crossProgeny.getGermplasmDbId(), is(cross.getGid()));
+		Assert.assertThat(crossProgeny.getGermplasmDbId(), is(cross.getGermplasmUUID()));
 		Assert.assertThat(crossProgeny.getProgeny(), hasSize(1));
 		Assert.assertThat(crossProgeny.getProgeny().get(0).getParentType(), is(ParentType.SELF.name()));
-		Assert.assertThat(crossProgeny.getProgeny().get(0).getGermplasmDbId(), is(advance.getGid()));
+		Assert.assertThat(crossProgeny.getProgeny().get(0).getGermplasmDbId(), is(advance.getGermplasmUUID()));
 	}
 
 	@Test

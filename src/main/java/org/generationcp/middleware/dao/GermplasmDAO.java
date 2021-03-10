@@ -706,7 +706,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			// = Record is not deleted or replaced.
 			generativeChildrenCriteria.add(Restrictions.eq(GermplasmDAO.DELETED, Boolean.FALSE));
 
-			final List<Germplasm> children = new ArrayList<>(generativeChildrenCriteria.getExecutableCriteria(this.getSession()).list());
+			final List<Germplasm> children = new ArrayList<Germplasm>(generativeChildrenCriteria.getExecutableCriteria(this.getSession()).list());
 
 			// Find additional children via progenitor linkage
 			final DetachedCriteria otherChildrenCriteria = DetachedCriteria.forClass(Progenitor.class);
@@ -827,7 +827,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 
 			final String query = "SELECT" //
-				+ "   progeny.gid as germplasmDbId," //
+				+ "   progeny.germplsm_uuid as germplasmDbId," //
 				+ "   name.nval as defaultDisplayName," //
 				+ "   CASE" //
 				+ "   WHEN progeny.gnpgs = -1" //
