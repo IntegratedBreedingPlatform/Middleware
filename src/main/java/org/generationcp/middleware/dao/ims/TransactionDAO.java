@@ -288,7 +288,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ " lot.locid as lotLocationId, "
 		+ " loc.lname as lotLocationName, "//
 		+ " loc.labbr as lotLocationAbbr, "//
-		+ " lot.comments as lotComments "
+		+ " lot.comments as lotComments, "//
+		+ " g.germplsm_uuid as gerplsmUUID "
 		+ " FROM"//
 		+ "   ims_transaction tr "//
 		+ "        INNER JOIN"//
@@ -579,7 +580,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				Integer.class,   // locationId
 				String.class,    // locationName
 				String.class,    // locationAbbr
-				String.class     // comments
+				String.class,    // comments
+				String.class     // gerplsmUUID
 			);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
@@ -608,7 +610,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				Integer.class,   // locationId
 				String.class,    // locationName
 				String.class,    // locationAbbr
-				String.class     // comments
+				String.class,    // comments
+				String.class	 // gerplsmUUID
 			);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
@@ -636,6 +639,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("lotLocationName");
 		query.addScalar("lotLocationAbbr");
 		query.addScalar("lotComments");
+		query.addScalar("gerplsmUUID");
 	}
 
 

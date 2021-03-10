@@ -1,7 +1,7 @@
 package org.generationcp.middleware.domain.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -55,6 +55,9 @@ public class ExtendedLotDto extends LotDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	@JsonView({InventoryView.LotView.class})
 	private Date lastWithdrawalDate;
+
+	@JsonIgnore
+	private String germplasmUUID;
 
 	public Date getCreatedDate() {
 		return createdDate;
@@ -182,6 +185,14 @@ public class ExtendedLotDto extends LotDto {
 
 	public void setPendingDepositsTotal(final Double pendingDepositsTotal) {
 		this.pendingDepositsTotal = pendingDepositsTotal;
+	}
+
+	public String getGermplasmUUID() {
+		return this.germplasmUUID;
+	}
+
+	public void setGermplasmUUID(final String germplasmUUID) {
+		this.germplasmUUID = germplasmUUID;
 	}
 
 	@Override
