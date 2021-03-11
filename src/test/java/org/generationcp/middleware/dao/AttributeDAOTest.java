@@ -135,8 +135,8 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetAttributesByGidAndAttributeIds() {
 		final List<AttributeDTO> attributes = this.attributeDao
-			.getAttributesByGidAndAttributeIds(
-				String.valueOf(this.gids.get(0)), Lists.newArrayList(String.valueOf(this.attribute1.getTypeId())), null, null);
+			.getAttributesByGUIDAndAttributeIds(
+				String.valueOf(this.gids.get(0)), Lists.newArrayList(String.valueOf(this.attribute1.getTypeId())), null);
 		Assert.assertNotNull(attributes);
 		Assert.assertEquals(1, attributes.size());
 	}

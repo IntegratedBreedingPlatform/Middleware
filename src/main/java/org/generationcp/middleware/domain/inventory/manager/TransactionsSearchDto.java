@@ -27,6 +27,7 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	private List<Integer> unitIds;
 	private Double minAmount;
 	private Double maxAmount;
+	private List<String> germplasmUUIDs;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date createdDateFrom;
@@ -41,7 +42,7 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	private List<Integer> harvestingStudyIds;
 
 	public List<Integer> getGermplasmListIds() {
-		return germplasmListIds;
+		return this.germplasmListIds;
 	}
 
 	public void setGermplasmListIds(final List<Integer> germplasmListIds) {
@@ -169,7 +170,7 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	}
 
 	public List<Integer> getStatusIds() {
-		return statusIds;
+		return this.statusIds;
 	}
 
 	public void setStatusIds(final List<Integer> statusIds) {
@@ -177,7 +178,7 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	}
 
 	public Integer getLotStatus() {
-		return lotStatus;
+		return this.lotStatus;
 	}
 
 	public void setLotStatus(final Integer lotStatus) {
@@ -201,11 +202,19 @@ public class TransactionsSearchDto extends SearchRequestDto {
 	}
 
 	public List<String> getLotUUIDs() {
-		return lotUUIDs;
+		return this.lotUUIDs;
 	}
 
 	public void setLotUUIDs(final List<String> lotUUIDs) {
 		this.lotUUIDs = lotUUIDs;
+	}
+
+	public List<String> getGermplasmUUIDs() {
+		return this.germplasmUUIDs;
+	}
+
+	public void setGermplasmUUIDs(final List<String> germplasmUUIDs) {
+		this.germplasmUUIDs = germplasmUUIDs;
 	}
 
 	@Override
