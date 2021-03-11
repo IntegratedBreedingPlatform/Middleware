@@ -144,9 +144,9 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	public List<AttributeDTO> getAttributesByGUIDAndAttributeIds(
 			final String germplasmUUID, final List<String> attributeIds, final Pageable pageable) {
 
-		List<AttributeDTO> attributes;
+		final List<AttributeDTO> attributes;
 		try {
-			String sql = this.buildQueryForAttributes(attributeIds);
+			final String sql = this.buildQueryForAttributes(attributeIds);
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.addScalar("attributeCode").addScalar("attributeDbId").addScalar("attributeName").addScalar("determinedDate")
