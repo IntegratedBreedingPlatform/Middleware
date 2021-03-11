@@ -359,14 +359,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<AttributeDTO> getAttributesByGid(
-			final String gid, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
-		return this.daoFactory.getAttributeDAO().getAttributesByGidAndAttributeIds(gid, attributeDbIds, pageSize, pageNumber);
+	public List<AttributeDTO> getAttributesByGUID(
+			final String germplasmUUID, final List<String> attributeDbIds, final Pageable pageable) {
+		return this.daoFactory.getAttributeDAO().getAttributesByGUIDAndAttributeIds(germplasmUUID, attributeDbIds, pageable);
 	}
 
 	@Override
-	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
-		return this.daoFactory.getAttributeDAO().countAttributesByGid(gid, attributeDbIds);
+	public long countAttributesByGUID(final String gemrplasmUUID, final List<String> attributeDbIds) {
+		return this.daoFactory.getAttributeDAO().countAttributesByGUID(gemrplasmUUID, attributeDbIds);
 	}
 
 	private void saveGermplasmUpdateDTO(final Integer userId, final Map<String, Integer> attributeCodes,

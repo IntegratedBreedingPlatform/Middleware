@@ -100,13 +100,13 @@ public interface GermplasmService {
 
 	Set<Integer> getGermplasmUsedInStudies(List<Integer> gids);
 
-	PedigreeDTO getPedigree(final Integer gid, final String notation, final Boolean includeSiblings);
+	PedigreeDTO getPedigree(Integer gid, String notation, Boolean includeSiblings);
 
 	ProgenyDTO getProgeny(final Integer gid);
 
-	List<AttributeDTO> getAttributesByGid(
-			String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNumber);
+	List<AttributeDTO> getAttributesByGUID(
+			String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
 
-	long countAttributesByGid(String gid, List<String> attributeDbIds);
+	long countAttributesByGUID(String gemrplasmUUID, List<String> attributeDbIds);
 
 }

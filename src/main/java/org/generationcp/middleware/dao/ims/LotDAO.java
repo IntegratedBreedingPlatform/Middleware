@@ -386,7 +386,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	}
 
 	//New inventory functions, please locate them below this line to help cleaning in the near future.
-	private final String SEARCH_LOT_QUERY = "SELECT lot.lotid as lotId, " //
+	private static final String SEARCH_LOT_QUERY = "SELECT lot.lotid as lotId, " //
 		+ "  lot.lot_uuid AS lotUUID, " //
 		+ "  lot.stock_id AS stockId, " //
 		+ "  lot.eid as gid, " //
@@ -686,7 +686,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
 		try {
-			final StringBuilder searchLotQuerySql = new StringBuilder(this.SEARCH_LOT_QUERY);
+			final StringBuilder searchLotQuerySql = new StringBuilder(SEARCH_LOT_QUERY);
 			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(searchLotQuerySql), lotsSearchDto);
 			addSortToSearchLotsQuery(searchLotQuerySql, pageable);
 
@@ -733,7 +733,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
 		try {
-			final StringBuilder filteredLotsQuery = new StringBuilder(this.SEARCH_LOT_QUERY);
+			final StringBuilder filteredLotsQuery = new StringBuilder(SEARCH_LOT_QUERY);
 			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filteredLotsQuery), lotsSearchDto);
 			final String countLotsQuery = "Select count(1) from (" + filteredLotsQuery + ") as filteredLots";
 			final SQLQuery query = this.getSession().createSQLQuery(countLotsQuery.toString());
@@ -747,7 +747,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public List<UserDefinedField> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
 		try {
-			final StringBuilder lotsQuery = new StringBuilder(this.SEARCH_LOT_QUERY);
+			final StringBuilder lotsQuery = new StringBuilder(SEARCH_LOT_QUERY);
 			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
 
 			final String sql = "select distinct {u.*} from atributs a inner join udflds u "
@@ -766,7 +766,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final LotsSearchDto searchDto) {
 		try {
-			final StringBuilder lotsQuery = new StringBuilder(this.SEARCH_LOT_QUERY);
+			final StringBuilder lotsQuery = new StringBuilder(SEARCH_LOT_QUERY);
 			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
 
 			final String sql = "select distinct {a.*} from atributs a inner join (" + lotsQuery + ") lots on lots.gid = a.gid";
@@ -800,7 +800,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		try {
 			final Map<String, BigInteger> lotsCountPerScaleName = new HashMap<>();
 
-			final StringBuilder filterLotsQuery = new StringBuilder(this.SEARCH_LOT_QUERY);
+			final StringBuilder filterLotsQuery = new StringBuilder(SEARCH_LOT_QUERY);
 			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filterLotsQuery), lotsSearchDto);
 
 			final String countQuery = "SELECT scale.name, count(*) from ("  //

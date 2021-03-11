@@ -258,7 +258,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	}
 
 	//New inventory functions, please locate them below this line to help cleaning in the near future.
-	private final String SEARCH_TRANSACTIONS_QUERY = "SELECT " //
+	private static final String SEARCH_TRANSACTIONS_QUERY = "SELECT " //
 		+ "    tr.trnid AS transactionId,"//
 		+ "    users.uname AS createdByUsername,"//
 		+ "(CASE WHEN trntype = " + TransactionType.DEPOSIT.getId() + " THEN '" + TransactionType.DEPOSIT.getValue()
@@ -475,7 +475,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	public List<TransactionDto> searchTransactions(final TransactionsSearchDto transactionsSearchDto, final Pageable pageable) {
 		try {
-			final StringBuilder filterTransactionsQuery = new StringBuilder(this.SEARCH_TRANSACTIONS_QUERY);
+			final StringBuilder filterTransactionsQuery = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
 			addSearchTransactionsFilters(new SqlQueryParamBuilder(filterTransactionsQuery), transactionsSearchDto);
 			addSortToSearchTransactionsQuery(filterTransactionsQuery, pageable);
 
@@ -498,7 +498,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	public long countSearchTransactions(final TransactionsSearchDto transactionsSearchDto) {
 		try {
-			final StringBuilder filterTransactionsQuery = new StringBuilder(this.SEARCH_TRANSACTIONS_QUERY);
+			final StringBuilder filterTransactionsQuery = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
 			addSearchTransactionsFilters(new SqlQueryParamBuilder(filterTransactionsQuery), transactionsSearchDto);
 			final String countTransactionsQuery =
 				"Select count(1) from (" + filterTransactionsQuery.toString() + ") as filteredTransactions";
@@ -515,7 +515,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		try {
 
 			if (lotId != null) {
-				final StringBuilder sql = new StringBuilder(this.SEARCH_TRANSACTIONS_QUERY);
+				final StringBuilder sql = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
 				sql.append(" and (tr.trnstat =").append(TransactionStatus.CONFIRMED.getIntValue()).append(" or (tr.trnstat = ")
 					.append(TransactionStatus.PENDING.getIntValue()).
 					append(" and tr.trntype = ").append(TransactionType.WITHDRAWAL.getId()).append(")) ");
@@ -580,7 +580,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				String.class,    // locationName
 				String.class,    // locationAbbr
 				String.class,    // comments
-				String.class     // gerplsmUUID
+				String.class     // germplsmUUID
 			);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
@@ -610,7 +610,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				String.class,    // locationName
 				String.class,    // locationAbbr
 				String.class,    // comments
-				String.class	 // gerplsmUUID
+				String.class	 // germplsmUUID
 			);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
@@ -727,7 +727,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		final TransactionsSearchDto transactionsSearchDto,
 		final StringBuilder obsUnitsQuerySql) {
 
-		final StringBuilder searchTransactionsQuery = new StringBuilder(this.SEARCH_TRANSACTIONS_QUERY);
+		final StringBuilder searchTransactionsQuery = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
 		final SqlQueryParamBuilder paramBuilder = new SqlQueryParamBuilder(searchTransactionsQuery);
 		addSearchTransactionsFilters(paramBuilder, transactionsSearchDto);
 		this.excludeCancelledTransactions(paramBuilder);
