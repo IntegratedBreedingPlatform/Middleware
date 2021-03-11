@@ -956,24 +956,32 @@ public class GermplasmServiceImpl implements GermplasmService {
 			throw new MiddlewareRequestException("", "germplasm.invalid.guid");
 		}
 		final Germplasm germplasm = germplasmByGUIDs.get(0);
-		final Integer newBreedingMethodId = Integer.parseInt(germplasmUpdateRequest.getBreedingMethodDbId());
-		final Integer oldBreedingMethodId = germplasm.getMethodId();
-		if (newBreedingMethodId != oldBreedingMethodId) {
-			final Map<Integer, Method> methodMap =
-				this.daoFactory.getMethodDAO().getMethodsByIds(Arrays.asList(oldBreedingMethodId, newBreedingMethodId)).stream()
-					.collect(Collectors.toMap(Method::getMid, Function.identity()));
-			final Method newBreedingMethod = methodMap.get(newBreedingMethodId);
-			final Method oldBreedingMethod = methodMap.get(oldBreedingMethodId);
-			if (this.germplasmMethodValidator.isNewBreedingMethodValid(oldBreedingMethod, newBreedingMethod, germplasmDbId, conflictErrors)) {
-				germplasm.setMethodId(newBreedingMethodId);
+		// Update breeding method if it is present
+		if (!StringUtils.isEmpty(germplasmUpdateRequest.getBreedingMethodDbId())) {
+			final Integer newBreedingMethodId = Integer.parseInt(germplasmUpdateRequest.getBreedingMethodDbId());
+			final Integer oldBreedingMethodId = germplasm.getMethodId();
+			if (newBreedingMethodId != oldBreedingMethodId) {
+				final Map<Integer, Method> methodMap =
+					this.daoFactory.getMethodDAO().getMethodsByIds(Arrays.asList(oldBreedingMethodId, newBreedingMethodId)).stream()
+						.collect(Collectors.toMap(Method::getMid, Function.identity()));
+				final Method newBreedingMethod = methodMap.get(newBreedingMethodId);
+				final Method oldBreedingMethod = methodMap.get(oldBreedingMethodId);
+				if (this.germplasmMethodValidator.isNewBreedingMethodValid(oldBreedingMethod, newBreedingMethod, germplasmDbId, conflictErrors)) {
+					germplasm.setMethodId(newBreedingMethodId);
+				}
 			}
 		}
-		final List<Location> locationList =
-			this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(germplasmUpdateRequest.getCountryOfOriginCode()));
-		if (!CollectionUtils.isEmpty(locationList)) {
-			germplasm.setLocationId(locationList.get(0).getLocid());
+		// Update germplasm location if it is present
+		if (!StringUtils.isEmpty(germplasmUpdateRequest.getCountryOfOriginCode())) {
+			final List<Location> locationList =
+				this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(germplasmUpdateRequest.getCountryOfOriginCode()));
+			if (!CollectionUtils.isEmpty(locationList)) {
+				germplasm.setLocationId(locationList.get(0).getLocid());
+			}
 		}
-		germplasm.setGdate(Util.convertDateToIntegerValue(Util.tryParseDate(germplasmUpdateRequest.getAcquisitionDate(), Util.FRONTEND_DATE_FORMAT)));
+		if (!StringUtils.isEmpty(germplasmUpdateRequest.getAcquisitionDate())) {
+			germplasm.setGdate(Util.convertDateToIntegerValue(Util.tryParseDate(germplasmUpdateRequest.getAcquisitionDate(), Util.FRONTEND_DATE_FORMAT)));
+		}
 		if (!conflictErrors.isEmpty()) {
 			throw new MiddlewareRequestException(null, conflictErrors);
 		}
@@ -1110,7 +1118,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			if (!CollectionUtils.isEmpty(names)) {
 				final Map<String, String> synonymsMap = new HashMap<>();
 				final List<Name> synonyms =
-					names.stream().filter(n -> !defaultName.equalsIgnoreCase(n.getNval())).collect(Collectors.toList());
+					names.stream().filter(n -> !n.getNval().equalsIgnoreCase(defaultName)).collect(Collectors.toList());
 				for (final Name name : synonyms) {
 					synonymsMap.put(nameTypesMap.get(name.getTypeId()), name.getNval());
 				}
