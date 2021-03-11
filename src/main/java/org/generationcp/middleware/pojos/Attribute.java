@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.hibernate.envers.Audited;
+
 import java.io.Serializable;
 
 import javax.persistence.Basic;
@@ -31,6 +33,7 @@ import javax.persistence.Table;
  */
 @NamedQueries({@NamedQuery(name = "getAttributesByGID",
 		query = "FROM Attribute a WHERE a.germplasmId = :gid AND a.typeId <> 9999 AND a.typeId <> 999")})
+@Audited
 @Entity
 @Table(name = "atributs")
 public class Attribute implements Serializable {

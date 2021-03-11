@@ -1,0 +1,114 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v17.3.0-1">
+        <preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<tableExists tableName="revinfo"></tableExists>
+					<tableExists tableName="germplasm_aud"></tableExists>
+					<tableExists tableName="names_aud"></tableExists>
+					<tableExists tableName="bibrefs_aud"></tableExists>
+					<tableExists tableName="atributs_aud"></tableExists>
+				</not>
+			</and>
+		</preConditions>
+        <comment>
+            Create envers germplasm audit schema
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			CREATE TABLE revinfo (
+				rev int auto_increment
+					primary key,
+				revtstmp bigint null
+			);
+
+			CREATE TABLE germplsm_aud (
+				REV           int                                    not null,
+				REVTYPE       tinyint                                not null,
+				gid           int 									 not null,
+				methn         int                          default 0 not null,
+				gnpgs         int                          default 0 not null,
+				gpid1         int                          default 0 not null,
+				gpid2         int                          default 0 not null,
+				germuid       int                          default 0 not null,
+				lgid          int                          default 0 not null,
+				glocn         int                          default 0 not null,
+				gdate         int                          default 0 not null,
+				gref          int                          default 0 not null,
+				grplce        int                          default 0 not null,
+				mgid          int                          default 0 null,
+				cid           int                                    null,
+				sid           int                                    null,
+				gchange       int                                    null,
+				deleted       tinyint(1) unsigned zerofill default 0 null,
+				germplsm_uuid varchar(60)                            null,
+				primary key (gid, REV),
+				constraint FK_germplsm_aud_revinfo
+					foreign key (REV) references revinfo(rev)
+			);
+
+			CREATE TABLE names_aud (
+				REV          int               		  not null,
+				REVTYPE      tinyint          		  not null,
+				nid   		 int 					  not null,
+				gid   		 int          default 0   not null,
+				ntype 		 int          default 0   not null,
+				nstat 		 int          default 0   not null,
+				nuid  		 int          default 0   not null,
+				nval  		 varchar(255) default '-' not null,
+				nlocn 		 int          default 0   not null,
+				ndate 		 int          default 0   not null,
+				nref  		 int          default 0   not null,
+				primary key (nid, REV),
+				constraint FK_names_aud_revinfo
+					foreign key (REV) references revinfo(rev)
+			);
+
+			CREATE TABLE bibrefs_aud (
+			    REV        int               		not null,
+				REVTYPE    tinyint          		not null,
+				refid      int 						not null,
+				pubtype    int          default 0   null,
+				pubdate    int          default 0   null,
+				authors    varchar(100) default '-' not null,
+				editors    varchar(100) default '-' not null,
+				analyt     varchar(255) default '-' not null,
+				monogr     varchar(255) default '-' not null,
+				series     varchar(255) default '-' not null,
+				volume     varchar(10)  default '-' not null,
+				issue      varchar(10)  default '-' not null,
+				pagecol    varchar(25)  default '-' not null,
+				publish    varchar(50)  default '-' not null,
+				pucity     varchar(30)  default '-' not null,
+				pucntry    varchar(75)  default '-' not null,
+				authorlist int                      null,
+				editorlist int                      null,
+				primary key (refid, REV),
+				constraint FK_bibrefs_aud_revinfo
+					foreign key (REV) references revinfo(rev)
+			);
+
+
+			create table atributs_aud (
+				REV        int               		not null,
+				REVTYPE    tinyint          		not null,
+				aid   int 					   not null,
+				gid   int          default 0   not null,
+				atype int          default 0   not null,
+				auid  int          default 0   not null,
+				aval  varchar(255) default '-' not null,
+				alocn int          default 0   null,
+				aref  int          default 0   null,
+				adate int          default 0   null,
+				primary key (aid, REV),
+				constraint FK_atributs_aud_revinfo
+					foreign key (REV) references revinfo(rev)
+			);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

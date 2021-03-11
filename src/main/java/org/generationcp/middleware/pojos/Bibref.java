@@ -13,6 +13,8 @@ package org.generationcp.middleware.pojos;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -36,6 +38,7 @@ import java.io.Serializable;
  *
  * @author Kevin Manansala, Mark Agarrado
  */
+@Audited
 @Entity
 @Table(name = "bibrefs")
 // JAXB Element Tags for JSON output
@@ -54,6 +57,7 @@ public class Bibref implements Serializable {
 	@XmlElement(name = "bibrefId")
 	private Integer refid;
 
+	@NotAudited
 	@ManyToOne(targetEntity = UserDefinedField.class, optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "pubtype", nullable = true)
 	@NotFound(action = NotFoundAction.IGNORE)

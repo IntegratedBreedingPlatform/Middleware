@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.hibernate.envers.Audited;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,6 +27,7 @@ import java.io.Serializable;
  *
  * @author klmanansala
  */
+@Audited
 @Entity
 @Table(name = "names")
 public class Name implements Serializable {
