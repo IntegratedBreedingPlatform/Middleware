@@ -118,7 +118,7 @@ import java.util.Map;
 @XmlType(propOrder = {"gid", "gnpgs", "gpid1", "gpid2", "gdate"})
 @XmlAccessorType(XmlAccessType.NONE)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "germplsm")
-public class Germplasm implements Serializable {
+public class Germplasm extends AbstractEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -272,11 +272,6 @@ public class Germplasm implements Serializable {
 	@Column(name = "gpid2")
 	@XmlElement(name = "secondParent")
 	private Integer gpid2;
-
-	@Basic(optional = false)
-	//TODO: check to rename this field
-	@Column(name = "germuid")
-	private Integer userId;
 
 	@Basic(optional = false)
 	@Column(name = "lgid")
@@ -496,21 +491,22 @@ public class Germplasm implements Serializable {
 	@Transient
 	private String immediateSourceGID = null;
 
+	//TODO:  remove it, there are tons of fields that aren't nullables.
+	@Deprecated
 	public Germplasm() {
-		super();
+		super(null);
 		this.deleted = false;
 	}
 
 	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
-		final Integer userId, final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
+		final Integer createdBy, final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
 		final Integer grplce, final Integer mgid, final Name preferredName, final String preferredAbbreviation, final Method method) {
-		this();
+		this(gid, createdBy);
 		this.gid = gid;
 		this.methodId = methodId;
 		this.gnpgs = gnpgs;
 		this.gpid1 = gpid1;
 		this.gpid2 = gpid2;
-		this.userId = userId;
 		this.lgid = lgid;
 		this.locationId = locationId;
 		this.gdate = gdate;
@@ -524,13 +520,23 @@ public class Germplasm implements Serializable {
 	}
 
 	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
-		final Integer userId, final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
+		final Integer createdBy, final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
 
 		// gref =0, grplce = 0, mgid = 0
-		this(gid, methodId, gnpgs, gpid1, gpid2, userId, lgid, locationId, gdate, 0, 0, 0, preferredName, null, null);
+		this(gid, methodId, gnpgs, gpid1, gpid2, createdBy, lgid, locationId, gdate, 0, 0, 0, preferredName, null, null);
 	}
 
+	//TODO: cleanup - remove it, gid must not be used in constructor
+	@Deprecated
+	public Germplasm(final Integer gid, final Integer createdBy) {
+		super(createdBy);
+		this.gid = gid;
+	}
+
+	//TODO: cleanup - remove it. It's only used in test scope
+	@Deprecated
 	public Germplasm(final Integer gid) {
+		super(null);
 		this.gid = gid;
 	}
 
@@ -622,12 +628,8 @@ public class Germplasm implements Serializable {
 		this.methodId = methodId;
 	}
 
-	public Integer getUserId() {
-		return this.userId;
-	}
-
-	public void setUserId(final Integer userId) {
-		this.userId = userId;
+	public void setCreatedBy(final Integer createdBy) {
+		super.setCreatedBy(createdBy);
 	}
 
 	public Integer getLocationId() {
@@ -727,8 +729,8 @@ public class Germplasm implements Serializable {
 		builder.append(this.gpid1);
 		builder.append(", gpid2=");
 		builder.append(this.gpid2);
-		builder.append(", userId=");
-		builder.append(this.userId);
+		builder.append(", createdBy=");
+		builder.append(super.getCreatedBy());
 		builder.append(", lgid=");
 		builder.append(this.lgid);
 		builder.append(", locationId=");

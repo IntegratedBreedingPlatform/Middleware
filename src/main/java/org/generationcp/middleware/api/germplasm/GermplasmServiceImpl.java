@@ -195,7 +195,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
-			germplasm.setUserId(userId);
+			germplasm.setCreatedBy(userId);
 			germplasm.setLgid(0);
 			germplasm.setLocationId(locationsMapByAbbr.get(germplasmDto.getLocationAbbr().toUpperCase()));
 			germplasm.setDeleted(Boolean.FALSE);
@@ -922,7 +922,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
-			germplasm.setUserId(userId);
+			germplasm.setCreatedBy(userId);
 			germplasm.setLgid(0);
 			germplasm.setGnpgs(0);
 			germplasm.setGpid1(0);

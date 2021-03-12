@@ -1263,7 +1263,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 
 		final GermplasmPedigreeTreeNode treeNode = new GermplasmPedigreeTreeNode();
-		final Germplasm female = new Germplasm(gid);
+		final Germplasm female = new Germplasm(gid, null);
 		female.setPreferredName(this.getPreferredName(names));
 		female.setPreferredAbbreviation(this.getNameByType(names, GermplasmNameType.LINE_NAME).getNval());
 		female.setSelectionHistory(this.getNameByType(names, GermplasmNameType.OLD_MUTANT_NAME_1).getNval());

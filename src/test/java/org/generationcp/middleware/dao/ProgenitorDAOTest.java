@@ -8,10 +8,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-
+import java.util.Random;
 
 public class ProgenitorDAOTest extends IntegrationTestBase {
-	
+
+	private static final Integer CREATED_BY = new Random().nextInt();
+
 	private GermplasmDAO germplasmDao;
 	private ProgenitorDAO progenitorDao;
 	private Germplasm testGermplasm;
@@ -36,10 +38,10 @@ public class ProgenitorDAOTest extends IntegrationTestBase {
 			this.testGermplasm.setGnpgs(4);
 			this.germplasmDao.save(this.testGermplasm);
 			
-			this.progenitor3 = new Progenitor(this.testGermplasm, 3, 13);
+			this.progenitor3 = new Progenitor(this.testGermplasm, 3, 13, CREATED_BY);
 			this.progenitorDao.save(progenitor3);
 			
-			this.progenitor4 = new Progenitor(this.testGermplasm, 4, 14);
+			this.progenitor4 = new Progenitor(this.testGermplasm, 4, 14, CREATED_BY);
 			this.progenitorDao.save(progenitor4);
 		}
 	}

@@ -12,7 +12,6 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -210,9 +209,10 @@ public interface PedigreeDataManager {
 	 * @param gid the gid
 	 * @param progenitorId the progenitor id
 	 * @param progenitorNumber the progenitor number
+	 * @param createdBy
 	 * @return Returns the id of the updated Progenitor
 	 */
-	Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber);
+	Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber, final Integer createdBy);
 
 	/***
 	 * Returns female parent and male parent of given gid
