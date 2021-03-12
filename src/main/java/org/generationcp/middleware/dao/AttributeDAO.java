@@ -151,16 +151,13 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.addScalar("attributeCode").addScalar("attributeDbId").addScalar("attributeName").addScalar("determinedDate")
 				.addScalar("value");
-			query.setParameter("gid", germplasmUUID);
+			query.setParameter("germplasmUUID", germplasmUUID);
 
 			if (attributeIds != null && !attributeIds.isEmpty()) {
 				query.setParameterList("attributs", attributeIds);
 			}
 
-			if (pageable != null) {
-				query.setFirstResult(pageable.getPageSize() * (pageable.getPageNumber() - 1));
-				query.setMaxResults(pageable.getPageSize());
-			}
+			addPaginationToSQLQuery(query, pageable);
 
 			query.setResultTransformer(Transformers.aliasToBean(AttributeDTO.class));
 
@@ -218,8 +215,8 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			+ "    atributs a"
 			+ "        INNER JOIN"
 			+ "    udflds u ON a.atype = u.fldno "
-			+ "        IINER JOIN"
-			+ "    gemrplsm g ON a.gid = g.gid "
+			+ "        INNER JOIN"
+			+ "    germplsm g ON a.gid = g.gid "
 			+ " WHERE"
 			+ "    g.germplsm_uuid = :germplasmUUID AND u.ftable = 'ATRIBUTS'";
 
