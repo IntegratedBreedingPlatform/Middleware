@@ -7,7 +7,20 @@
 	<changeSet author="lkovacic" id="v17.3.0-1">
         <preConditions onFail="MARK_RAN">
 			<not>
-				<columnExists tableName="createdBy" columnName="sample_id"/>
+				<columnExists tableName="germplsm" columnName="created_by"/>
+				<columnExists tableName="germplsm" columnName="modified_by"/>
+				<columnExists tableName="germplsm" columnName="created_date"/>
+				<columnExists tableName="germplsm" columnName="modified_date"/>
+
+				<columnExists tableName="names" columnName="created_by"/>
+				<columnExists tableName="names" columnName="modified_by"/>
+				<columnExists tableName="names" columnName="created_date"/>
+				<columnExists tableName="names" columnName="modified_date"/>
+
+				<columnExists tableName="progntrs" columnName="created_by"/>
+				<columnExists tableName="progntrs" columnName="modified_by"/>
+				<columnExists tableName="progntrs" columnName="created_date"/>
+				<columnExists tableName="progntrs" columnName="modified_date"/>
 			</not>
 		</preConditions>
         <comment>
@@ -31,11 +44,11 @@
 			ALTER TABLE germplsm ADD created_date datetime null;
 			ALTER TABLE germplsm ADD modified_date datetime null;
 
-<!--			ALTER TABLE names ADD created_by int default 0 null;-->
-<!--			ALTER TABLE names ADD modified_by int null;-->
-<!--			ALTER TABLE names ADD created_date datetime null;-->
-<!--			ALTER TABLE names ADD modified_date datetime null;-->
-<!--			-->
+			ALTER TABLE names CHANGE nuid created_by int default 0 null;
+			ALTER TABLE names ADD modified_by int null;
+			ALTER TABLE names ADD created_date datetime null;
+			ALTER TABLE names ADD modified_date datetime null;
+
 			ALTER TABLE progntrs ADD created_by int default 0 null;
 			ALTER TABLE progntrs ADD modified_by int null;
 			ALTER TABLE progntrs ADD created_date datetime null;
@@ -53,6 +66,7 @@
 					<tableExists tableName="names_aud"></tableExists>
 					<tableExists tableName="bibrefs_aud"></tableExists>
 					<tableExists tableName="atributs_aud"></tableExists>
+					<tableExists tableName="progntrs_aud"></tableExists>
 				</not>
 			</and>
 		</preConditions>
@@ -95,17 +109,20 @@
 			);
 
 			CREATE TABLE names_aud (
-				REV     int                      not null,
-				REVTYPE tinyint                  not null,
-				nid     int                      not null,
-				gid     int          default 0   not null,
-				ntype   int          default 0   not null,
-				nstat   int          default 0   not null,
-				nuid    int          default 0   not null,
-				nval    varchar(255) default '-' not null,
-				nlocn   int          default 0   not null,
-				ndate   int          default 0   not null,
-				nref    int          default 0   not null,
+				REV           int                      not null,
+				REVTYPE       tinyint                  not null,
+				nid           int                      not null,
+				gid           int          default 0   not null,
+				ntype         int          default 0   not null,
+				nstat         int          default 0   not null,
+				created_by    int          default 0   not null,
+				nval          varchar(255) default '-' not null,
+				nlocn         int          default 0   not null,
+				ndate         int          default 0   not null,
+				nref          int          default 0   not null,
+				modified_by   int                      null,
+				created_date  datetime                 null,
+				modified_date datetime                 null,
 				primary key (nid, REV),
 				constraint FK_names_aud_revinfo
 					foreign key (REV) references revinfo(rev)

@@ -203,7 +203,7 @@ public class NameDAOTest extends IntegrationTestBase {
 		final Name name = new Name();
 		name.setGermplasmId(gid);
 		name.setTypeId(nType.getUserDefinedFieldID());
-		name.setUserId(1);
+		name.setCreatedBy(1);
 		name.setNval(nameValue);
 		name.setLocationId(0);
 		name.setNdate(dateIntValue);

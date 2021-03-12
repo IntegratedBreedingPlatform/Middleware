@@ -80,7 +80,7 @@ public class GermplasmTestDataInitializer {
 		name.setNdate(Integer.valueOf(20160101));
 		name.setReferenceId(Integer.valueOf(1));
 		name.setTypeId(Integer.valueOf(1));
-		name.setUserId(Integer.valueOf(1));
+		name.setCreatedBy(Integer.valueOf(1));
 		name.setNstat(Integer.valueOf(1));
 
 		return name;

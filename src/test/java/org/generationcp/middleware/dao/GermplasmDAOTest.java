@@ -438,7 +438,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Name name1 = new Name();
 		name1.setTypeId(5);
 		name1.setNstat(1);
-		name1.setUserId(1);
+		name1.setCreatedBy(1);
 		name1.setNval("Name1");
 		name1.setLocationId(1);
 		name1.setNdate(20160101);
@@ -447,7 +447,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Name name2 = new Name();
 		name2.setTypeId(5);
 		name2.setNstat(1);
-		name2.setUserId(1);
+		name2.setCreatedBy(1);
 		name2.setNval("Name2");
 		name2.setLocationId(1);
 		name2.setNdate(20160101);

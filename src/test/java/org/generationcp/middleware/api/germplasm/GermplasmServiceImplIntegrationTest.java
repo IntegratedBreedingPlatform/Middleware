@@ -770,7 +770,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(savedNames.size(), equalTo(1));
 		assertThat(savedNames.get(0).getNval(), equalTo(this.name));
 		assertThat(savedNames.get(0).getNstat(), equalTo(1));
-		assertThat(savedNames.get(0).getUserId(), equalTo(this.userId));
+		assertThat(savedNames.get(0).getCreatedBy(), equalTo(this.userId));
 		assertThat(savedNames.get(0).getLocationId(), equalTo(this.noLocationId));
 		assertThat(savedNames.get(0).getTypeId(), equalTo(this.variableTypeId));
 
@@ -814,7 +814,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(savedNames.size(), equalTo(1));
 		assertThat(savedNames.get(0).getNval(), equalTo(this.name));
 		assertThat(savedNames.get(0).getNstat(), equalTo(1));
-		assertThat(savedNames.get(0).getUserId(), equalTo(this.userId));
+		assertThat(savedNames.get(0).getCreatedBy(), equalTo(this.userId));
 		assertThat(savedNames.get(0).getLocationId(), equalTo(this.noLocationId));
 		assertThat(savedNames.get(0).getTypeId(), equalTo(this.variableTypeId));
 
