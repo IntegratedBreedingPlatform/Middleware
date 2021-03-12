@@ -1031,6 +1031,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.daoFactory.getGermplasmDao().countGermplasmByStudy(studyDbId);
 	}
 
+	@Override
+	public List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types,
+		final Set<String> codes) {
+		return this.daoFactory.getUserDefinedFieldDAO().getByCodes(table, types, codes);
+	}
+
 	private void populateSynonymsAndAttributes(final List<GermplasmDTO> germplasmDTOList) {
 		final List<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGid()))
 			.collect(Collectors.toList());

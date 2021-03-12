@@ -11,6 +11,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
+import org.generationcp.middleware.data.initializer.UserDefinedFieldTestDataInitializer;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
@@ -18,6 +19,7 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -75,6 +77,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
 	private GermplasmService germplasmService;
+
+	@Autowired
+	private GermplasmDataManager germplasmDataManager;
 
 	private Integer noLocationId, variableTypeId, attributeId, clientId, userId;
 	private String creationDate, name, germplasmUUID, reference, note;
@@ -1280,6 +1285,51 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		Assert.assertEquals(1, gids.size());
 
+	}
+
+	@Test
+	public void shouldGetAllUserDefinedFieldByTableAndTypeWithNullCodes() {
+
+		final List<UserDefinedField> namesUserDefined = this.germplasmDataManager
+			.getUserDefinedFieldByFieldTableNameAndType(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType());
+
+		final List<UserDefinedField> fields = this.germplasmService.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
+			Collections.singleton(UDTableType.NAMES_NAME.getType()),
+			null);
+		assertNotNull(fields);
+		assertThat(fields.size(), is(namesUserDefined.size()));
+	}
+
+	@Test
+	public void shouldGetUserDefinedFieldByTableTypeAndCodes() {
+
+		final String fname1 = UUID.randomUUID().toString();
+		this.daoFactory.getUserDefinedFieldDAO().save(UserDefinedFieldTestDataInitializer.createUserDefinedField(UDTableType.NAMES_NAME.getTable(),
+			UDTableType.NAMES_NAME.getType(), fname1));
+
+		final HashSet codes = new HashSet() {{
+			this.add(UserDefinedFieldTestDataInitializer.CODE);
+		}};
+		final List<UserDefinedField> fields = this.germplasmService.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
+			Collections.singleton(UDTableType.NAMES_NAME.getType()),
+			codes);
+		assertNotNull(fields);
+		assertThat(fields, hasSize(1));
+		assertThat(fields.get(0).getFcode(), is(UserDefinedFieldTestDataInitializer.CODE));
+		assertThat(fields.get(0).getFname(), is(fname1));
+	}
+
+	@Test
+	public void shouldGetAllUserDefinedFieldByTableAndTypeWithEmptyCodes() {
+
+		final List<UserDefinedField> namesUserDefined = this.germplasmDataManager
+			.getUserDefinedFieldByFieldTableNameAndType(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType());
+
+		final List<UserDefinedField> fields = this.germplasmService.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
+			Collections.singleton(UDTableType.NAMES_NAME.getType()),
+			new HashSet<>());
+		assertNotNull(fields);
+		assertThat(fields.size(), is(namesUserDefined.size()));
 	}
 
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Integer gnpgs, final Integer gpid1,

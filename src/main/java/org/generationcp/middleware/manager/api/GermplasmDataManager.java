@@ -1166,8 +1166,6 @@ public interface GermplasmDataManager {
 
 	boolean hasExistingCrosses(Integer femaleParent, List<Integer> maleParentIds, Optional<Integer> gid);
 
-	List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types, final Set<String> codes);
-
 	/**
 	 * Returns the udfld records identified by the given tablename and field type.
 	 *

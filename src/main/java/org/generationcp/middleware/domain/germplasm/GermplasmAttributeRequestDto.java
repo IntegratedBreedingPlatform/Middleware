@@ -16,6 +16,10 @@ public class GermplasmAttributeRequestDto {
 
 	private Integer locationId;
 
+	public GermplasmAttributeRequestDto() {
+
+	}
+
 	public GermplasmAttributeRequestDto(final String value, final String attributeCode, final String attributeType, final String date,
 		final Integer locationId) {
 		this.value = value;
@@ -46,7 +50,7 @@ public class GermplasmAttributeRequestDto {
 	}
 
 	public void setAttributeType(final String attributeType) {
-		this.attributeCode = attributeType;
+		this.attributeType = attributeType;
 	}
 
 	public String getDate() {

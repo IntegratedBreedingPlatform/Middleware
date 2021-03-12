@@ -1295,51 +1295,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(name1.getNval(), names.get(0));
 	}
 
-	@Test
-	public void shouldGetUserDefinedFieldByTableTypeAndCodes() {
-
-		final String fname1 = UUID.randomUUID().toString();
-		this.userDefinedFieldDAO.save(UserDefinedFieldTestDataInitializer.createUserDefinedField(UDTableType.NAMES_NAME.getTable(),
-			UDTableType.NAMES_NAME.getType(), fname1));
-
-		final HashSet codes = new HashSet() {{
-			this.add(UserDefinedFieldTestDataInitializer.CODE);
-		}};
-		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
-			Collections.singleton(UDTableType.NAMES_NAME.getType()),
-			codes);
-		assertNotNull(fields);
-		assertThat(fields, hasSize(1));
-		assertThat(fields.get(0).getFcode(), is(UserDefinedFieldTestDataInitializer.CODE));
-		assertThat(fields.get(0).getFname(), is(fname1));
-	}
-
-	@Test
-	public void shouldGetAllUserDefinedFieldByTableAndTypeWithEmptyCodes() {
-
-		final List<UserDefinedField> namesUserDefined = this.germplasmDataManager
-			.getUserDefinedFieldByFieldTableNameAndType(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType());
-
-		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
-			Collections.singleton(UDTableType.NAMES_NAME.getType()),
-			new HashSet<>());
-		assertNotNull(fields);
-		assertThat(fields.size(), is(namesUserDefined.size()));
-	}
-
-	@Test
-	public void shouldGetAllUserDefinedFieldByTableAndTypeWithNullCodes() {
-
-		final List<UserDefinedField> namesUserDefined = this.germplasmDataManager
-			.getUserDefinedFieldByFieldTableNameAndType(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType());
-
-		final List<UserDefinedField> fields = this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
-			Collections.singleton(UDTableType.NAMES_NAME.getType()),
-			null);
-		assertNotNull(fields);
-		assertThat(fields.size(), is(namesUserDefined.size()));
-	}
-
 	private Attribute createAttribute(final Germplasm germplasm, final UserDefinedField userDefinedField, final String aval) {
 		final Attribute attr = new Attribute();
 		attr.setAid(1);
