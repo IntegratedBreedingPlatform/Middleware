@@ -7,6 +7,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
@@ -24,6 +25,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
+import org.generationcp.middleware.pojos.ExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
@@ -54,6 +56,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @Transactional
@@ -258,7 +262,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final List<GermplasmNameDto> names = this.daoFactory.getNameDao().getGermplasmNamesByGids(gids);
 
 			final Map<Integer, List<GermplasmNameDto>> namesByGid = names.stream().collect(
-				Collectors.groupingBy(GermplasmNameDto::getGid, HashMap::new, Collectors.toCollection(ArrayList::new))
+				groupingBy(GermplasmNameDto::getGid, HashMap::new, Collectors.toCollection(ArrayList::new))
 			);
 			germplasmDtos.forEach(g -> g.setNames(namesByGid.get(g.getGid())));
 		}
@@ -298,7 +302,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.daoFactory.getAttributeDAO()
 				.getAttributeValuesGIDList(gids);
 		final Map<Integer, List<Attribute>> attributesMap =
-			attributes.stream().collect(Collectors.groupingBy(Attribute::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
+			attributes.stream().collect(groupingBy(Attribute::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
 
 		for (final Germplasm germplasm : germplasmList) {
 			this.saveGermplasmUpdateDTO(userId, attributeCodesFieldNoMap, nameCodesFieldNoMap,
@@ -962,6 +966,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 				}
 			});
 
+			if (germplasmDto.getExternalReferences() != null) {
+				final List<ExternalReference> references = new ArrayList<>();
+				germplasmDto.getExternalReferences().forEach(reference -> {
+					final ExternalReference externalReference =
+						new ExternalReference(germplasm, reference.getReferenceID(), reference.getReferenceSource());
+					references.add(externalReference);
+				});
+				germplasm.setExternalReferences(references);
+			}
+
 			this.addCustomAttributeFieldsToAdditionalInfo(germplasmDto);
 			germplasmDto.getAdditionalInfo().forEach((k, v) -> {
 				final Integer typeId = attributesMap.get(k.toUpperCase());
@@ -1017,6 +1031,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Pageable pageable) {
 		final List<GermplasmDTO> germplasmDTOList =
 			this.daoFactory.getGermplasmDao().getGermplasmDTOList(germplasmSearchRequestDTO, pageable);
+		this.populateExternalReferences(germplasmDTOList);
 		this.populateSynonymsAndAttributes(germplasmDTOList);
 		return germplasmDTOList;
 	}
@@ -1042,6 +1057,20 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public long countGermplasmByStudy(final Integer studyDbId) {
 		return this.daoFactory.getGermplasmDao().countGermplasmByStudy(studyDbId);
+	}
+
+	private void populateExternalReferences(final List<GermplasmDTO> germplasmDTOList) {
+		final List<Integer> gids = germplasmDTOList.stream().map(g -> Integer.valueOf(g.getGid())).collect(Collectors.toList());
+		if (!gids.isEmpty()) {
+			final List<ExternalReferenceDTO> referenceDTOS = this.daoFactory.getExternalReferenceDAO().getExternalReferencesByGids(gids);
+			final Map<String, List<ExternalReferenceDTO>> referencesByGidMap = referenceDTOS.stream()
+				.collect(groupingBy(ExternalReferenceDTO::getGid));
+			for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
+				if (referencesByGidMap.containsKey(germplasmDTO.getGid())) {
+					germplasmDTO.setExternalReferences(referencesByGidMap.get(germplasmDTO.getGid()));
+				}
+			}
+		}
 	}
 
 	private void populateSynonymsAndAttributes(final List<GermplasmDTO> germplasmDTOList) {
