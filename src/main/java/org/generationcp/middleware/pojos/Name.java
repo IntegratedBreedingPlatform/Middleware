@@ -164,6 +164,7 @@ public class Name extends AbstractEntity implements Serializable {
 		this.typeId = typeId;
 	}
 
+	@Override
 	public void setCreatedBy(final Integer createdBy) {
 		super.setCreatedBy(createdBy);
 	}

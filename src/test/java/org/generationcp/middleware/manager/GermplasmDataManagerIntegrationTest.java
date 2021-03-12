@@ -656,7 +656,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		attribute.setAval("aval");
 		attribute.setGermplasmId(gid);
 		attribute.setLocationId(0);
-		attribute.setUserId(0);
+		attribute.setCreatedBy(0);
 		attribute.setReferenceId(0);
 		attribute.setTypeId(0);
 		final Integer id = this.germplasmDataManager.addGermplasmAttribute(attribute);
@@ -673,7 +673,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			final String attributeString = attribute.toString();
 			attribute.setAdate(0);
 			attribute.setLocationId(0);
-			attribute.setUserId(0);
+			attribute.setCreatedBy(0);
 			attribute.setReferenceId(0);
 			attribute.setTypeId(0);
 			this.germplasmDataManager.updateGermplasmAttribute(attribute);
@@ -1055,7 +1055,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Attribute attr = new Attribute();
 		attr.setGermplasmId(237431);
 		attr.setTypeId(1);
-		attr.setUserId(1);
+		attr.setCreatedBy(1);
 		attr.setAval("EARLY");
 		attr.setLocationId(31);
 		attr.setReferenceId(0);
@@ -1346,7 +1346,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		attr.setAid(1);
 		attr.setGermplasmId(germplasm.getGid());
 		attr.setTypeId(userDefinedField.getFldno());
-		attr.setUserId(1);
+		attr.setCreatedBy(1);
 		attr.setAval(aval);
 		attr.setLocationId(0);
 		attr.setReferenceId(null);

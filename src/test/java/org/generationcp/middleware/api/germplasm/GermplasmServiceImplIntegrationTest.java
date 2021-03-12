@@ -332,7 +332,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		attribute.setGermplasmId(germplasm.getGid());
 		attribute.setTypeId(newAttributeCode.getFldno());
 		attribute.setAval(RandomStringUtils.randomAlphanumeric(50));
-		attribute.setUserId(0);
+		attribute.setCreatedBy(0);
 		attribute.setAdate(germplasm.getGdate());
 
 		this.daoFactory.getAttributeDAO().save(attribute);
@@ -778,7 +778,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(savedAttributes.size(), equalTo(1));
 		assertThat(savedAttributes.get(0).getAval(), equalTo(this.note));
 		assertThat(savedAttributes.get(0).getTypeId(), equalTo(this.attributeId));
-		assertThat(savedAttributes.get(0).getUserId(), equalTo(this.userId));
+		assertThat(savedAttributes.get(0).getCreatedBy(), equalTo(this.userId));
 		assertThat(savedAttributes.get(0).getLocationId(), equalTo(this.noLocationId));
 	}
 
@@ -822,7 +822,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(savedAttributes.size(), equalTo(1));
 		assertThat(savedAttributes.get(0).getAval(), equalTo(this.note));
 		assertThat(savedAttributes.get(0).getTypeId(), equalTo(this.attributeId));
-		assertThat(savedAttributes.get(0).getUserId(), equalTo(this.userId));
+		assertThat(savedAttributes.get(0).getCreatedBy(), equalTo(this.userId));
 		assertThat(savedAttributes.get(0).getLocationId(), equalTo(this.noLocationId));
 	}
 

@@ -1223,7 +1223,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		attribute.setGermplasmId(this.germplasmGID);
 		attribute.setTypeId(attributeField.getFldno());
 		attribute.setAval(this.attributeValue);
-		attribute.setUserId(0);
+		attribute.setCreatedBy(0);
 		attribute.setAdate(this.germplasmDate);
 
 		this.germplasmDataDM.addGermplasmAttribute(attribute);
@@ -1301,7 +1301,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			attribute.setGermplasmId(tempGermplasmGid);
 			attribute.setTypeId(attributeField.getFldno());
 			attribute.setAval("Attribute of " + tempGermplasmGid);
-			attribute.setUserId(0);
+			attribute.setCreatedBy(0);
 			attribute.setAdate(tempGermplasmDate);
 
 			this.germplasmDataDM.addGermplasmAttribute(attribute);

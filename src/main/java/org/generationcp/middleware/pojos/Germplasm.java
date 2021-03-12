@@ -628,6 +628,7 @@ public class Germplasm extends AbstractEntity implements Serializable {
 		this.methodId = methodId;
 	}
 
+	@Override
 	public void setCreatedBy(final Integer createdBy) {
 		super.setCreatedBy(createdBy);
 	}

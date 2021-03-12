@@ -722,7 +722,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			attribute.setGermplasmId(germplasmGID);
 			attribute.setTypeId(attributeField.getFldno());
 			attribute.setAval(RandomStringUtils.randomAlphanumeric(50));
-			attribute.setUserId(0);
+			attribute.setCreatedBy(0);
 			attribute.setAdate(germplasm.getGdate());
 
 			this.germplasmDataDM.addGermplasmAttribute(attribute);

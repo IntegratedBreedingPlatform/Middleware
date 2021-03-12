@@ -7,6 +7,11 @@
 	<changeSet author="lkovacic" id="v17.3.0-1">
         <preConditions onFail="MARK_RAN">
 			<not>
+				<columnExists tableName="atributs" columnName="created_by"/>
+				<columnExists tableName="atributs" columnName="modified_by"/>
+				<columnExists tableName="atributs" columnName="created_date"/>
+				<columnExists tableName="atributs" columnName="modified_date"/>
+
 				<columnExists tableName="germplsm" columnName="created_by"/>
 				<columnExists tableName="germplsm" columnName="modified_by"/>
 				<columnExists tableName="germplsm" columnName="created_date"/>
@@ -28,11 +33,11 @@
         </comment>
         <sql dbms="mysql" splitStatements="true">
 
-<!--			ALTER TABLE atributs ADD created_by int default 0 null;-->
-<!--			ALTER TABLE atributs ADD modified_by int null;-->
-<!--			ALTER TABLE atributs ADD created_date datetime null;-->
-<!--			ALTER TABLE atributs ADD modified_date datetime null;-->
-<!--			-->
+			ALTER TABLE atributs CHANGE auid int default 0 null;
+			ALTER TABLE atributs ADD modified_by int null;
+			ALTER TABLE atributs ADD created_date datetime null;
+			ALTER TABLE atributs ADD modified_date datetime null;
+
 <!--			// Reference-->
 <!--			ALTER TABLE bibrefs ADD created_by int default 0 null;-->
 <!--			ALTER TABLE bibrefs ADD modified_by int null;-->
@@ -62,10 +67,10 @@
 			<and>
 				<not>
 					<tableExists tableName="revinfo"></tableExists>
+					<tableExists tableName="atributs_aud"></tableExists>
+					<tableExists tableName="bibrefs_aud"></tableExists>
 					<tableExists tableName="germplasm_aud"></tableExists>
 					<tableExists tableName="names_aud"></tableExists>
-					<tableExists tableName="bibrefs_aud"></tableExists>
-					<tableExists tableName="atributs_aud"></tableExists>
 					<tableExists tableName="progntrs_aud"></tableExists>
 				</not>
 			</and>
@@ -78,6 +83,49 @@
 				rev      int auto_increment
 					primary key,
 				revtstmp bigint null
+			);
+
+			CREATE TABLE atributs_aud (
+				REV           int                      not null,
+				REVTYPE       tinyint                  not null,
+				aid           int                      not null,
+				gid           int          default 0   not null,
+				atype         int          default 0   not null,
+				created_by    int          default 0   not null,
+				aval          varchar(255) default '-' not null,
+				alocn         int          default 0   null,
+				aref          int          default 0   null,
+				adate         int          default 0   null,
+				modified_by   int                      null,
+				created_date  datetime                 null,
+				modified_date datetime                 null,
+				primary key (aid, REV),
+				constraint FK_atributs_aud_revinfo
+					foreign key (REV) references revinfo(rev)
+			);
+
+			CREATE TABLE bibrefs_aud (
+				REV        int                      not null,
+				REVTYPE    tinyint                  not null,
+				refid      int                      not null,
+				pubtype    int          default 0   null,
+				pubdate    int          default 0   null,
+				authors    varchar(100) default '-' not null,
+				editors    varchar(100) default '-' not null,
+				analyt     varchar(255) default '-' not null,
+				monogr     varchar(255) default '-' not null,
+				series     varchar(255) default '-' not null,
+				volume     varchar(10)  default '-' not null,
+				issue      varchar(10)  default '-' not null,
+				pagecol    varchar(25)  default '-' not null,
+				publish    varchar(50)  default '-' not null,
+				pucity     varchar(30)  default '-' not null,
+				pucntry    varchar(75)  default '-' not null,
+				authorlist int                      null,
+				editorlist int                      null,
+				primary key (refid, REV),
+				constraint FK_bibrefs_aud_revinfo
+					foreign key (REV) references revinfo(rev)
 			);
 
 			CREATE TABLE germplsm_aud (
@@ -128,46 +176,6 @@
 					foreign key (REV) references revinfo(rev)
 			);
 
-			CREATE TABLE bibrefs_aud (
-				REV        int                      not null,
-				REVTYPE    tinyint                  not null,
-				refid      int                      not null,
-				pubtype    int          default 0   null,
-				pubdate    int          default 0   null,
-				authors    varchar(100) default '-' not null,
-				editors    varchar(100) default '-' not null,
-				analyt     varchar(255) default '-' not null,
-				monogr     varchar(255) default '-' not null,
-				series     varchar(255) default '-' not null,
-				volume     varchar(10)  default '-' not null,
-				issue      varchar(10)  default '-' not null,
-				pagecol    varchar(25)  default '-' not null,
-				publish    varchar(50)  default '-' not null,
-				pucity     varchar(30)  default '-' not null,
-				pucntry    varchar(75)  default '-' not null,
-				authorlist int                      null,
-				editorlist int                      null,
-				primary key (refid, REV),
-				constraint FK_bibrefs_aud_revinfo
-					foreign key (REV) references revinfo(rev)
-			);
-
-			CREATE TABLE atributs_aud (
-				REV     int                      not null,
-				REVTYPE tinyint                  not null,
-				aid     int                      not null,
-				gid     int          default 0   not null,
-				atype   int          default 0   not null,
-				auid    int          default 0   not null,
-				aval    varchar(255) default '-' not null,
-				alocn   int          default 0   null,
-				aref    int          default 0   null,
-				adate   int          default 0   null,
-				primary key (aid, REV),
-				constraint FK_atributs_aud_revinfo
-					foreign key (REV) references revinfo(rev)
-			);
-
 			CREATE TABLE progntrs_aud (
 				REV           int           not null,
 				REVTYPE       tinyint       not null,
@@ -175,6 +183,7 @@
 				pno           int default 0 not null,
 				pid           int default 0 not null,
 				id            int           not null,
+				created_by    int default 0 not null,
 				modified_by   int           null,
 				created_date  datetime      null,
 				modified_date datetime      null,
