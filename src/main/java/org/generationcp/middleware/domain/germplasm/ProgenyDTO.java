@@ -10,15 +10,15 @@ public class ProgenyDTO {
 
 	public static class Progeny {
 
-		private int germplasmDbId;
+		private String germplasmDbId;
 		private String defaultDisplayName;
 		private String parentType;
 
-		public int getGermplasmDbId() {
+		public String getGermplasmDbId() {
 			return germplasmDbId;
 		}
 
-		public void setGermplasmDbId(final int germplasmDbId) {
+		public void setGermplasmDbId(final String germplasmDbId) {
 			this.germplasmDbId = germplasmDbId;
 		}
 
@@ -40,16 +40,16 @@ public class ProgenyDTO {
 	}
 
 
-	private int germplasmDbId;
+	private String germplasmDbId;
 	private String defaultDisplayName;
 	// defined as singular in BrAPI. See also https://github.com/plantbreeding/API/issues/275
 	private List<Progeny> progeny;
 
-	public int getGermplasmDbId() {
+	public String getGermplasmDbId() {
 		return germplasmDbId;
 	}
 
-	public void setGermplasmDbId(final int germplasmDbId) {
+	public void setGermplasmDbId(final String germplasmDbId) {
 		this.germplasmDbId = germplasmDbId;
 	}
 

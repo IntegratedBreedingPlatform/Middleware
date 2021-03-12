@@ -705,7 +705,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			// = Record is not deleted or replaced.
 			generativeChildrenCriteria.add(Restrictions.eq(GermplasmDAO.DELETED, Boolean.FALSE));
 
-			final List<Germplasm> children = new ArrayList<>(generativeChildrenCriteria.getExecutableCriteria(this.getSession()).list());
+			final List<Germplasm> children = new ArrayList<Germplasm>(generativeChildrenCriteria.getExecutableCriteria(this.getSession()).list());
 
 			// Find additional children via progenitor linkage
 			final DetachedCriteria otherChildrenCriteria = DetachedCriteria.forClass(Progenitor.class);
@@ -756,7 +756,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		try {
 			final String query = "SELECT "
-				+ "   g.gid as germplasmDbId," //
+				+ "   g.germplsm_uuid as germplasmDbId," // use gid as germplasmDbId
 				+ "   (select n.nval from names n where n.gid = g.gid AND n.nstat = 1) as defaultDisplayName," //
 				+ "   CONCAT(m.mcode, '|', m.mname, '|', m.mtype) AS crossingPlan," //
 				+ "   year(str_to_date(g.gdate, '%Y%m%d')) as crossingYear," //
@@ -793,7 +793,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 
 			final String siblingsQuery = "SELECT" //
-				+ "   sibling.gid AS germplasmDbId," //
+				+ "   sibling.germplsm_uuid AS germplasmDbId," //
 				+ "   n.nval AS defaultDisplayName" //
 				+ " FROM germplsm g" //
 				+ "   INNER JOIN germplsm sibling ON sibling.gpid1 = g.gpid1"//
@@ -826,7 +826,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 
 			final String query = "SELECT" //
-				+ "   progeny.gid as germplasmDbId," //
+				+ "   progeny.germplsm_uuid as germplasmDbId," //
 				+ "   name.nval as defaultDisplayName," //
 				+ "   CASE" //
 				+ "   WHEN progeny.gnpgs = -1" //
@@ -858,7 +858,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				.list();
 
 			final ProgenyDTO progenyDTO = new ProgenyDTO();
-			progenyDTO.setGermplasmDbId(germplasm.getGid());
+			progenyDTO.setGermplasmDbId(germplasm.getGermplasmUUID());
 			progenyDTO.setDefaultDisplayName(germplasm.getPreferredName().getNval());
 
 			progenyDTO.setProgeny(progeny);
