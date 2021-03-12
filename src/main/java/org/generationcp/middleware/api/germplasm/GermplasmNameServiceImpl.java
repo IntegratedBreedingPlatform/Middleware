@@ -1,8 +1,6 @@
 package org.generationcp.middleware.api.germplasm;
 
 import org.apache.commons.lang.StringUtils;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
-import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -10,8 +8,6 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -66,7 +62,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public Integer createName(final GermplasmNameRequestDto germplasmNameRequestDto) {
+	public Integer createName(final GermplasmNameRequestDto germplasmNameRequestDto, final Integer userid) {
 		final Name name = new Name();
 		name.setGermplasmId(germplasmNameRequestDto.getGid());
 		name.setTypeId(germplasmNameRequestDto.getTypeId());
@@ -74,6 +70,8 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		name.setNdate(germplasmNameRequestDto.getDate());
 		name.setLocationId(germplasmNameRequestDto.getLocationId());
 		name.setNstat(germplasmNameRequestDto.getStatus());
+		name.setUserId(userid);
+		name.setReferenceId(0);
 		daoFactory.getNameDao().save(name);
 		return name.getNid();
 	}
