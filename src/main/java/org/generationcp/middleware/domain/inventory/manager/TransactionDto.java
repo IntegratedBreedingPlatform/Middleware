@@ -33,7 +33,7 @@ public class TransactionDto {
 		final Date createdDate, final Integer lotId, final String lotUUID, final Integer gid, final String designation,
 		final String stockId,
 		final Integer scaleId, final String scaleName, final String lotStatus, final String transactionStatus, final Integer locationId,
-		final String locationName, final String locationAbbr, final String comments) {
+		final String locationName, final String locationAbbr, final String comments, final String germplasmUUID) {
 
 		this.transactionId = transactionId;
 		this.createdByUsername = createdByUsername;
@@ -56,6 +56,7 @@ public class TransactionDto {
 		this.lot.setUnitName(scaleName);
 		this.lot.setDesignation(designation);
 		this.lot.setAvailableBalance(lotAvailableBalance);
+		this.lot.setGermplasmUUID(germplasmUUID);
 	}
 
 	public Integer getTransactionId() {

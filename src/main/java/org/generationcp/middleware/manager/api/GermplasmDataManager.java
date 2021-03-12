@@ -990,10 +990,6 @@ public interface GermplasmDataManager {
 	 */
 	Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
 
-	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, final Boolean includeSiblings);
-
-	ProgenyDTO getProgeny(Integer germplasmDbId);
-
 	/*
 	 * get the Germplasm from the crop database based on local gid reference
 	 *
@@ -1152,11 +1148,6 @@ public interface GermplasmDataManager {
 	Germplasm getUnknownGermplasmWithPreferredName();
 
 	List<Integer> addOrUpdateGermplasm(final List<Germplasm> germplasms, final Operation operation);
-
-	List<AttributeDTO> getAttributesByGid(
-		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNumber);
-
-	long countAttributesByGid(String gid, List<String> attributeDbIds);
 
 	List<Attribute> getAttributeByIds(List<Integer> ids);
 

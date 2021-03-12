@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
@@ -94,40 +95,40 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			+ " where lot.eid in (:gids) AND lot.etype = 'GERMPLSM' AND lot.status <> 9 ORDER BY lot.eid";
 
 	@SuppressWarnings("unchecked")
-	public List<Lot> getByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<Lot> getByEntityType(final String type, final int start, final int numOfRows) throws MiddlewareQueryException {
 		try {
-			Criteria criteria = this.getSession().createCriteria(Lot.class);
+			final Criteria criteria = this.getSession().createCriteria(Lot.class);
 			criteria.add(Restrictions.eq(ENTITY_TYPE, type));
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
 			return criteria.list();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByEntityType(type=" + type + QUERY_FROM_LOT + e.getMessage(), e);
 		}
 		return new ArrayList<Lot>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, BigInteger> countLotsWithAvailableBalance(List<Integer> gids) throws MiddlewareQueryException {
-		Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
+	public Map<Integer, BigInteger> countLotsWithAvailableBalance(final List<Integer> gids) throws MiddlewareQueryException {
+		final Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
 
 		try {
-			String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED) FROM ( "
+			final String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED) FROM ( "
 					+ "SELECT i.lotid, i.eid AS entity_id, " + "   SUM(trnqty) AS avail_bal " + "  FROM ims_lot i "
 					+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
 					+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
 					+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
 
-			Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
-			List<Object[]> result = query.list();
-			for (Object[] row : result) {
-				Integer gid = (Integer) row[0];
-				BigInteger count = (BigInteger) row[1];
+			final Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
+			final List<Object[]> result = query.list();
+			for (final Object[] row : result) {
+				final Integer gid = (Integer) row[0];
+				final BigInteger count = (BigInteger) row[1];
 
 				lotCounts.put(gid, count);
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			this.logAndThrowException("Error at countLotsWithAvailableBalance=" + gids + AT_LOT_DAO + e.getMessage(), e);
 		}
 
@@ -135,11 +136,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, Object[]> getAvailableBalanceCountAndTotalLotsCount(List<Integer> gids) throws MiddlewareQueryException {
-		Map<Integer, Object[]> lotCounts = new HashMap<Integer, Object[]>();
+	public Map<Integer, Object[]> getAvailableBalanceCountAndTotalLotsCount(final List<Integer> gids) throws MiddlewareQueryException {
+		final Map<Integer, Object[]> lotCounts = new HashMap<Integer, Object[]>();
 
 		try {
-			String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED), Count(DISTINCT lotid) "
+			final String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED), Count(DISTINCT lotid) "
 					+ ",sum(avail_bal), count(distinct scaleid), scaleid " + " FROM ( " + "SELECT i.lotid, i.eid AS entity_id, "
 					+ "  SUM(CASE WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND trntype = " + TransactionType.WITHDRAWAL.getId()
 					+ ") THEN trnqty ELSE 0 END) AS avail_bal, "
@@ -148,14 +149,14 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 					+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
 					+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
 
-			Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
-			List<Object[]> result = query.list();
-			for (Object[] row : result) {
-				Integer gid = (Integer) row[0];
-				BigInteger lotsWithAvailableBalance = (BigInteger) row[1];
-				BigInteger lotCount = (BigInteger) row[2];
-				Double availableBalance = (Double) row[3];
-				BigInteger distinctScaleIdCount = (BigInteger) row[4];
+			final Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
+			final List<Object[]> result = query.list();
+			for (final Object[] row : result) {
+				final Integer gid = (Integer) row[0];
+				final BigInteger lotsWithAvailableBalance = (BigInteger) row[1];
+				final BigInteger lotCount = (BigInteger) row[2];
+				final Double availableBalance = (Double) row[3];
+				final BigInteger distinctScaleIdCount = (BigInteger) row[4];
 				Integer allLotsScaleId = null;
 				if (row[5] != null) {
 					allLotsScaleId = (Integer) row[5];
@@ -165,32 +166,32 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 						new Object[] {lotsWithAvailableBalance, lotCount, availableBalance, distinctScaleIdCount, allLotsScaleId});
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			this.logAndThrowException("Error at countLotsWithAvailableBalanceAndTotalLots=" + gids + AT_LOT_DAO + e.getMessage(), e);
 		}
 
 		return lotCounts;
 	}
 
-	public List<Lot> getLotAggregateDataForListEntry(Integer listId, Integer gid) throws MiddlewareQueryException {
-		List<Lot> lots = new ArrayList<Lot>();
+	public List<Lot> getLotAggregateDataForListEntry(final Integer listId, final Integer gid) throws MiddlewareQueryException {
+		final List<Lot> lots = new ArrayList<Lot>();
 
 		try {
-			String sql = LotDAO.GET_LOTS_FOR_LIST_ENTRIES + " ORDER by lot.lotid ";
+			final String sql = LotDAO.GET_LOTS_FOR_LIST_ENTRIES + " ORDER by lot.lotid ";
 
-			Query query = this.getSession().createSQLQuery(sql);
+			final Query query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("gids", Collections.singletonList(gid));
 			query.setParameter("listId", listId);
 			query.setParameter("includeCloseLots", 1);
 
-			List<Integer> statusList = Lists.newArrayList();
+			final List<Integer> statusList = Lists.newArrayList();
 			statusList.add(0);
 			statusList.add(1);
 			query.setParameterList("statusList", statusList);
 
 			this.createLotRows(lots, query, true);
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			this.logAndThrowException(
 					"Error at getLotAggregateDataForListEntry for list ID = " + listId + " and GID = " + gid + AT_LOT_DAO + e.getMessage(),
 					e);
@@ -198,42 +199,42 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		return lots;
 	}
 
-	public List<Lot> getLotAggregateDataForGermplasm(Integer gid) throws MiddlewareQueryException {
-		List<Lot> lots = new ArrayList<Lot>();
+	public List<Lot> getLotAggregateDataForGermplasm(final Integer gid) throws MiddlewareQueryException {
+		final List<Lot> lots = new ArrayList<Lot>();
 
 		try {
-			String sql = LotDAO.GET_LOTS_FOR_GERMPLASM + "ORDER by lotid ";
+			final String sql = LotDAO.GET_LOTS_FOR_GERMPLASM + "ORDER by lotid ";
 
-			Query query = this.getSession().createSQLQuery(sql);
+			final Query query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("gids", Collections.singleton(gid));
 			query.setParameter("includeCloseLots", 1);
 
 			this.createLotRows(lots, query, false);
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			this.logAndThrowException("Error at getLotAggregateDataForGermplasm for GID = " + gid + AT_LOT_DAO + e.getMessage(), e);
 		}
 
 		return lots;
 	}
 
-	public Map<Integer, Object[]> getLotStatusDataForGermplasm(Integer gid) throws MiddlewareQueryException {
-		Map<Integer, Object[]> lotStatusCounts = new HashMap<Integer, Object[]>();
+	public Map<Integer, Object[]> getLotStatusDataForGermplasm(final Integer gid) throws MiddlewareQueryException {
+		final Map<Integer, Object[]> lotStatusCounts = new HashMap<Integer, Object[]>();
 
 		try {
-			String sql = LotDAO.GET_LOTS_STATUS_FOR_GERMPLASM;
+			final String sql = LotDAO.GET_LOTS_STATUS_FOR_GERMPLASM;
 
-			Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", Collections.singletonList(gid));
-			List<Object[]> result = query.list();
-			for (Object[] row : result) {
-				Integer lotId = (Integer) row[0];
-				BigInteger lotDistinctStatusCount = (BigInteger) row[1];
-				Integer distinctStatus = (Integer) row[2];
+			final Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", Collections.singletonList(gid));
+			final List<Object[]> result = query.list();
+			for (final Object[] row : result) {
+				final Integer lotId = (Integer) row[0];
+				final BigInteger lotDistinctStatusCount = (BigInteger) row[1];
+				final Integer distinctStatus = (Integer) row[2];
 
 				lotStatusCounts.put(lotId, new Object[] {lotDistinctStatusCount, distinctStatus});
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			this.logAndThrowException("Error at getLotStatusDataForGermplasm for GID = " + gid + AT_LOT_DAO + e.getMessage(), e);
 		}
 
@@ -241,21 +242,21 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	}
 
 	public List<Object[]> retrieveLotScalesForGermplasms(final List<Integer> gids) throws MiddlewareQueryException {
-		List<Object[]> lotScalesForGermplasm = new ArrayList<>();
+		final List<Object[]> lotScalesForGermplasm = new ArrayList<>();
 
 		try {
-			String sql = LotDAO.GET_LOT_SCALE_FOR_GERMPLSMS;
+			final String sql = LotDAO.GET_LOT_SCALE_FOR_GERMPLSMS;
 
-			Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
-			List<Object[]> result = query.list();
-			for (Object[] row : result) {
-				Integer gid = (Integer) row[0];
-				Integer scaleId = (Integer) row[1];
-				String scaleName = (String) row[2];
+			final Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
+			final List<Object[]> result = query.list();
+			for (final Object[] row : result) {
+				final Integer gid = (Integer) row[0];
+				final Integer scaleId = (Integer) row[1];
+				final String scaleName = (String) row[2];
 				lotScalesForGermplasm.add(new Object[] {gid, scaleId, scaleName});
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			this.logAndThrowException("Error at retrieveLotScalesForGermplasms for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
 		}
 
@@ -264,7 +265,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public Set<Integer> getGermplasmsWithOpenLots(final List<Integer> gids) {
 		try {
-			Query query = this.getSession().createSQLQuery("select distinct (i.eid) FROM ims_lot i "
+			final Query query = this.getSession().createSQLQuery("select distinct (i.eid) FROM ims_lot i "
 				+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) GROUP BY i.lotid ")
 				.setParameterList("gids", gids);
 			return Sets.newHashSet(query.list());
@@ -275,33 +276,33 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void createLotRows(List<Lot> lots, Query query, boolean withReservationMap) {
-		List<Object[]> result = query.list();
+	private void createLotRows(final List<Lot> lots, final Query query, final boolean withReservationMap) {
+		final List<Object[]> result = query.list();
 
 		Map<Integer, Double> reservationMap = null;
 		Map<Integer, Double> committedMap = null;
 		Map<Integer, Set<String>> reservationStatusMap = null;
 		Lot lot = null;
 
-		for (Object[] row : result) {
-			Integer lotId = (Integer) row[0];
+		for (final Object[] row : result) {
+			final Integer lotId = (Integer) row[0];
 			if (lot == null || !lot.getId().equals(lotId)) {
 				if (lot != null && reservationMap != null && committedMap != null) {
 					lot.getAggregateData().setReservationMap(reservationMap);
 					lot.getAggregateData().setReservationStatusMap(reservationStatusMap);
 					lot.getAggregateData().setCommittedMap(committedMap);
 				}
-				Integer entityId = (Integer) row[1];
-				Integer locationId = (Integer) row[2];
-				Integer scaleId = (Integer) row[3];
-				String comments = (String) row[4];
-				Integer lotStatus = (Integer) row[5];
-				Double actualBalance = (Double) row[6];
-				Double availableBalance = (Double) row[7];
-				Double reservedTotal = (Double) row[8];
-				Double committedTotal = (Double) row[9];
-				String stockIds = (String) row[10];
-				Date createdDate = (Date) row[11];
+				final Integer entityId = (Integer) row[1];
+				final Integer locationId = (Integer) row[2];
+				final Integer scaleId = (Integer) row[3];
+				final String comments = (String) row[4];
+				final Integer lotStatus = (Integer) row[5];
+				final Double actualBalance = (Double) row[6];
+				final Double availableBalance = (Double) row[7];
+				final Double reservedTotal = (Double) row[8];
+				final Double committedTotal = (Double) row[9];
+				final String stockIds = (String) row[10];
+				final Date createdDate = (Date) row[11];
 
 				lot = new Lot(lotId);
 				lot.setEntityId(entityId);
@@ -311,7 +312,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				lot.setStatus(lotStatus);
 				lot.setCreatedDate(createdDate);
 
-				LotAggregateData aggregateData = new LotAggregateData(lotId);
+				final LotAggregateData aggregateData = new LotAggregateData(lotId);
 				aggregateData.setActualBalance(actualBalance);
 				aggregateData.setAvailableBalance(availableBalance);
 				aggregateData.setReservedTotal(reservedTotal);
@@ -333,9 +334,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 
 			if (withReservationMap) {
-				Integer recordId = (Integer) row[12];
-				Double qty = (Double) row[13];
-				Integer transactionState = (Integer) row[14];
+				final Integer recordId = (Integer) row[12];
+				final Double qty = (Double) row[13];
+				final Integer transactionState = (Integer) row[14];
 
 				// compute total reserved and committed for entry
 				if (recordId != null && qty != null && transactionState != null) {
@@ -365,7 +366,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				}
 
 				if (row[15] != null) {
-					Integer transactionId = (Integer) row[15];
+					final Integer transactionId = (Integer) row[15];
 					lot.getAggregateData().setTransactionId(transactionId);
 				}
 
@@ -385,7 +386,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	}
 
 	//New inventory functions, please locate them below this line to help cleaning in the near future.
-	private final String SEARCH_LOT_QUERY = "SELECT lot.lotid as lotId, " //
+	private static final String SEARCH_LOT_QUERY = "SELECT lot.lotid as lotId, " //
 		+ "  lot.lot_uuid AS lotUUID, " //
 		+ "  lot.stock_id AS stockId, " //
 		+ "  lot.eid as gid, " //
@@ -411,7 +412,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "  users.uname as createdByUsername, " //
 		+ "  lot.created_date as createdDate, " //
 		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END) AS lastDepositDate, " //
-		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END) AS lastWithdrawalDate " //
+		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END) AS lastWithdrawalDate, " //
+		+ "  g.germplsm_uuid as germplasmUUID " //
 		+ "FROM ims_lot lot " //
 		+ "       LEFT JOIN ims_transaction transaction ON transaction.lotid = lot.lotid AND transaction.trnstat <> " + TransactionStatus.CANCELLED.getIntValue()  //
 		+ "       INNER JOIN germplsm g on g.gid = lot.eid " //
@@ -519,6 +521,10 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				paramBuilder.setParameter("stockId", stockId + '%');
 			}
 
+			if (!CollectionUtils.isEmpty(lotsSearchDto.getGermplasmUUIDs())) {
+				paramBuilder.append(" and g.germplsm_uuid IN (:germplasmGuids)");
+				paramBuilder.setParameterList("germplasmGuids", lotsSearchDto.getGermplasmUUIDs());
+			}
 		}
 		paramBuilder.append(" GROUP BY lot.lotid ");
 
@@ -710,6 +716,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("createdDate", DateType.INSTANCE);
 			query.addScalar("lastDepositDate", DateType.INSTANCE);
 			query.addScalar("lastWithdrawalDate",DateType.INSTANCE);
+			query.addScalar("germplasmUUID");
 
 			query.setResultTransformer(Transformers.aliasToBean(ExtendedLotDto.class));
 
@@ -803,8 +810,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(countQuery);
 			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
 
-			List<Object[]> result = query.list();
-			for (Object[] row : result) {
+			final List<Object[]> result = query.list();
+			for (final Object[] row : result) {
 				final String scaleName = (String) row[0];
 
 				final BigInteger count = (BigInteger) row[1];
@@ -873,7 +880,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public void closeLots(final List<Integer> lotIds) {
 		try {
-			String hqlUpdate = "update Lot l set l.status= :status where l.id in (:idList)";
+			final String hqlUpdate = "update Lot l set l.status= :status where l.id in (:idList)";
 			this.getSession().createQuery(hqlUpdate)
 				.setParameter("status", LotStatus.CLOSED.getIntValue())
 				.setParameterList("idList", lotIds)
