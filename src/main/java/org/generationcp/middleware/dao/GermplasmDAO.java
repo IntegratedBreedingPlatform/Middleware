@@ -52,7 +52,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1362,6 +1361,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getProgenyDbId())) {
 			paramBuilder.setParameter("progenyDbId", germplasmSearchRequestDTO.getProgenyDbId());
 		}
+
+		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceSource())) {
+			paramBuilder.setParameter("referenceSource", germplasmSearchRequestDTO.getExternalReferenceSource());
+		}
+
+		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceId())) {
+			paramBuilder.setParameter("referenceId", germplasmSearchRequestDTO.getExternalReferenceId());
+		}
 	}
 	private void addGermplasmSearchFilters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {
@@ -1409,6 +1416,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "SELECT 1 from germplsm child "
 				+ "WHERE child.gid = :progenyDbId AND (child.gpid1 = g.gid or child.gpid2 = g.gid) AND child.gnpgs >= 2 )");
 		}
+
+		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceId())) {
+			paramBuilder.append(" AND EXISTS (SELECT 1 ");
+			paramBuilder.append(" FROM external_reference ref WHERE ref.gid = g.gid AND ref.reference_id = :referenceId) "); //
+		}
+
+		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceSource())) {
+			paramBuilder.append(" AND EXISTS (SELECT 1 ");
+			paramBuilder.append(" FROM external_reference ref1 WHERE ref1.gid = g.gid AND ref1.reference_source = :referenceSource) "); //
+		}
+
 	}
 
 	public List<GermplasmDTO> getGermplasmDTOList(

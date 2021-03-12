@@ -23,6 +23,8 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	private String studyDbId;
 	private String parentDbId;
 	private String progenyDbId;
+	private String externalReferenceId;
+	private String externalReferenceSource;
 
 	public GermplasmSearchRequestDto() {
 		this.accessionNumbers = Lists.newArrayList();
@@ -120,6 +122,22 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 
 	public void setProgenyDbId(final String progenyDbId) {
 		this.progenyDbId = progenyDbId;
+	}
+
+	public String getExternalReferenceId() {
+		return externalReferenceId;
+	}
+
+	public void setExternalReferenceId(final String externalReferenceId) {
+		this.externalReferenceId = externalReferenceId;
+	}
+
+	public String getExternalReferenceSource() {
+		return externalReferenceSource;
+	}
+
+	public void setExternalReferenceSource(final String externalReferenceSource) {
+		this.externalReferenceSource = externalReferenceSource;
 	}
 
 	@Override
