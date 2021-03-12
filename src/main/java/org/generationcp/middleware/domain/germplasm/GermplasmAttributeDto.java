@@ -4,34 +4,28 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class GermplasmAttributeDto {
+public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 
-	public String value;
+	private Integer id;
 
-	public String attributeCode;
+	private String attributeDescription;
 
-	public String attributeDescription;
+	private String locationName;
 
-	public String date;
-
-	public String locationId;
-
-	public String locationName;
-
-	public String getValue() {
-		return value;
+	public GermplasmAttributeDto(final Integer id, final String value, final String attributeCode, final String attributeType,
+		final String date, final Integer locationId, final String attributeDescription, final String locationName) {
+		super(value, attributeCode, attributeType, date, locationId);
+		this.id = id;
+		this.attributeDescription = attributeDescription;
+		this.locationName = locationName;
 	}
 
-	public void setValue(final String value) {
-		this.value = value;
+	public Integer getId() {
+		return id;
 	}
 
-	public String getAttributeCode() {
-		return attributeCode;
-	}
-
-	public void setAttributeCode(final String attributeCode) {
-		this.attributeCode = attributeCode;
+	public void setId(final Integer id) {
+		this.id = id;
 	}
 
 	public String getAttributeDescription() {
@@ -40,22 +34,6 @@ public class GermplasmAttributeDto {
 
 	public void setAttributeDescription(final String attributeDescription) {
 		this.attributeDescription = attributeDescription;
-	}
-
-	public String getDate() {
-		return date;
-	}
-
-	public void setDate(final String date) {
-		this.date = date;
-	}
-
-	public String getLocationId() {
-		return locationId;
-	}
-
-	public void setLocationId(final String locationId) {
-		this.locationId = locationId;
 	}
 
 	public String getLocationName() {
