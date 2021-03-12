@@ -12,6 +12,11 @@
 				<columnExists tableName="atributs" columnName="created_date"/>
 				<columnExists tableName="atributs" columnName="modified_date"/>
 
+				<columnExists tableName="bibrefs" columnName="created_by"/>
+				<columnExists tableName="bibrefs" columnName="modified_by"/>
+				<columnExists tableName="bibrefs" columnName="created_date"/>
+				<columnExists tableName="bibrefs" columnName="modified_date"/>
+
 				<columnExists tableName="germplsm" columnName="created_by"/>
 				<columnExists tableName="germplsm" columnName="modified_by"/>
 				<columnExists tableName="germplsm" columnName="created_date"/>
@@ -33,16 +38,15 @@
         </comment>
         <sql dbms="mysql" splitStatements="true">
 
-			ALTER TABLE atributs CHANGE auid int default 0 null;
+			ALTER TABLE atributs CHANGE auid created_by int default 0 null;
 			ALTER TABLE atributs ADD modified_by int null;
 			ALTER TABLE atributs ADD created_date datetime null;
 			ALTER TABLE atributs ADD modified_date datetime null;
 
-<!--			// Reference-->
-<!--			ALTER TABLE bibrefs ADD created_by int default 0 null;-->
-<!--			ALTER TABLE bibrefs ADD modified_by int null;-->
-<!--			ALTER TABLE bibrefs ADD created_date datetime null;-->
-<!--			ALTER TABLE bibrefs ADD modified_date datetime null;-->
+			ALTER TABLE bibrefs ADD created_by int default 0 null;
+			ALTER TABLE bibrefs ADD modified_by int null;
+			ALTER TABLE bibrefs ADD created_date datetime null;
+			ALTER TABLE bibrefs ADD modified_date datetime null;
 
 			ALTER TABLE germplsm CHANGE germuid created_by int default 0 null;
 			ALTER TABLE germplsm ADD modified_by int null;
@@ -105,24 +109,28 @@
 			);
 
 			CREATE TABLE bibrefs_aud (
-				REV        int                      not null,
-				REVTYPE    tinyint                  not null,
-				refid      int                      not null,
-				pubtype    int          default 0   null,
-				pubdate    int          default 0   null,
-				authors    varchar(100) default '-' not null,
-				editors    varchar(100) default '-' not null,
-				analyt     varchar(255) default '-' not null,
-				monogr     varchar(255) default '-' not null,
-				series     varchar(255) default '-' not null,
-				volume     varchar(10)  default '-' not null,
-				issue      varchar(10)  default '-' not null,
-				pagecol    varchar(25)  default '-' not null,
-				publish    varchar(50)  default '-' not null,
-				pucity     varchar(30)  default '-' not null,
-				pucntry    varchar(75)  default '-' not null,
-				authorlist int                      null,
-				editorlist int                      null,
+				REV           int                      not null,
+				REVTYPE       tinyint                  not null,
+				refid         int                      not null,
+				pubtype       int          default 0   null,
+				pubdate       int          default 0   null,
+				authors       varchar(100) default '-' not null,
+				editors       varchar(100) default '-' not null,
+				analyt        varchar(255) default '-' not null,
+				monogr        varchar(255) default '-' not null,
+				series        varchar(255) default '-' not null,
+				volume        varchar(10)  default '-' not null,
+				issue         varchar(10)  default '-' not null,
+				pagecol       varchar(25)  default '-' not null,
+				publish       varchar(50)  default '-' not null,
+				pucity        varchar(30)  default '-' not null,
+				pucntry       varchar(75)  default '-' not null,
+				authorlist    int                      null,
+				editorlist    int                      null,
+				created_by    int          default 0   not null,
+				modified_by   int                      null,
+				created_date  datetime                 null,
+				modified_date datetime                 null,
 				primary key (refid, REV),
 				constraint FK_bibrefs_aud_revinfo
 					foreign key (REV) references revinfo(rev)
@@ -183,7 +191,7 @@
 				pno           int default 0 not null,
 				pid           int default 0 not null,
 				id            int           not null,
-				created_by    int default 0 not null,
+				created_by    int default 0 null,
 				modified_by   int           null,
 				created_date  datetime      null,
 				modified_date datetime      null,
