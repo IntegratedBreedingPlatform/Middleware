@@ -23,6 +23,9 @@ public class GermplasmNameRequestDto {
 
 	private Integer status;
 
+	public GermplasmNameRequestDto() {
+	}
+
 	public GermplasmNameRequestDto(final Integer id, final Integer gid){
 		this.setId(id);
 		this.setGid(gid);
