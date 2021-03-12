@@ -157,10 +157,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 				query.setParameterList("attributs", attributeIds);
 			}
 
-			if (pageable != null) {
-				query.setFirstResult(pageable.getPageSize() * (pageable.getPageNumber() - 1));
-				query.setMaxResults(pageable.getPageSize());
-			}
+			addPaginationToSQLQuery(query, pageable);
 
 			query.setResultTransformer(Transformers.aliasToBean(AttributeDTO.class));
 
