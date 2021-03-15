@@ -77,11 +77,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
-	@Autowired
 	private GermplasmMethodValidator germplasmMethodValidator;
 
 	public GermplasmServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
+		this.germplasmMethodValidator = new GermplasmMethodValidator();
 	}
 
 	@Override

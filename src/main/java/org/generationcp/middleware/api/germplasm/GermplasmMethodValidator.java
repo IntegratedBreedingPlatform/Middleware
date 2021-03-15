@@ -7,7 +7,6 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.springframework.stereotype.Component;
 
-@Component
 public class GermplasmMethodValidator {
 
 	public boolean isNewBreedingMethodValid(final Method oldMethod, final Method newMethod, final String germplasmIdentifier, final Multimap<String, Object[]> conflictErrors) {
