@@ -1,7 +1,7 @@
 package org.generationcp.middleware.domain.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -56,8 +56,11 @@ public class ExtendedLotDto extends LotDto {
 	@JsonView({InventoryView.LotView.class})
 	private Date lastWithdrawalDate;
 
+	@JsonIgnore
+	private String germplasmUUID;
+
 	public Date getCreatedDate() {
-		return createdDate;
+		return this.createdDate;
 	}
 
 	public void setCreatedDate(final Date createdDate) {
@@ -65,7 +68,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public String getDesignation() {
-		return designation;
+		return this.designation;
 	}
 
 	public void setDesignation(final String designation) {
@@ -73,7 +76,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public Double getActualBalance() {
-		return actualBalance;
+		return this.actualBalance;
 	}
 
 	public void setActualBalance(final Double actualBalance) {
@@ -81,7 +84,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public Double getAvailableBalance() {
-		return availableBalance;
+		return this.availableBalance;
 	}
 
 	public void setAvailableBalance(final Double availableBalance) {
@@ -89,7 +92,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public Double getReservedTotal() {
-		return reservedTotal;
+		return this.reservedTotal;
 	}
 
 	public void setReservedTotal(final Double reservedTotal) {
@@ -97,7 +100,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public Double getWithdrawalTotal() {
-		return withdrawalTotal;
+		return this.withdrawalTotal;
 	}
 
 	public void setWithdrawalTotal(final Double withdrawalTotal) {
@@ -105,7 +108,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public Date getLastDepositDate() {
-		return lastDepositDate;
+		return this.lastDepositDate;
 	}
 
 	public void setLastDepositDate(final Date lastDepositDate) {
@@ -113,7 +116,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public Date getLastWithdrawalDate() {
-		return lastWithdrawalDate;
+		return this.lastWithdrawalDate;
 	}
 
 	public void setLastWithdrawalDate(final Date lastWithdrawalDate) {
@@ -121,7 +124,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public Integer getMgid() {
-		return mgid;
+		return this.mgid;
 	}
 
 	public void setMgid(final Integer mgid) {
@@ -145,7 +148,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public String getLocationName() {
-		return locationName;
+		return this.locationName;
 	}
 
 	public void setLocationName(final String locationName) {
@@ -153,7 +156,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public String getLocationAbbr() {
-		return locationAbbr;
+		return this.locationAbbr;
 	}
 
 	public void setLocationAbbr(final String locationAbbr) {
@@ -161,7 +164,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public String getUnitName() {
-		return unitName;
+		return this.unitName;
 	}
 
 	public void setUnitName(final String unitName) {
@@ -169,7 +172,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public String getCreatedByUsername() {
-		return createdByUsername;
+		return this.createdByUsername;
 	}
 
 	public void setCreatedByUsername(final String createdByUsername) {
@@ -177,11 +180,19 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public Double getPendingDepositsTotal() {
-		return pendingDepositsTotal;
+		return this.pendingDepositsTotal;
 	}
 
 	public void setPendingDepositsTotal(final Double pendingDepositsTotal) {
 		this.pendingDepositsTotal = pendingDepositsTotal;
+	}
+
+	public String getGermplasmUUID() {
+		return this.germplasmUUID;
+	}
+
+	public void setGermplasmUUID(final String germplasmUUID) {
+		this.germplasmUUID = germplasmUUID;
 	}
 
 	@Override

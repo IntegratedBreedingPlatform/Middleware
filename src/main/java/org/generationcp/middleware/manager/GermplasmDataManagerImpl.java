@@ -1274,16 +1274,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return treeNode;
 	}
 
-	@Override
-	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
-		return this.daoFactory.getGermplasmDao().getPedigree(germplasmDbId, notation, includeSiblings);
-	}
-
-	@Override
-	public ProgenyDTO getProgeny(final Integer germplasmDbId) {
-		return this.daoFactory.getGermplasmDao().getProgeny(germplasmDbId);
-	}
-
 	/**
 	 * Local method for getting a particular germplasm's Name.
 	 *
@@ -1497,17 +1487,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		preferredName.setNval(Name.UNKNOWN);
 		germplasm.setPreferredName(preferredName);
 		return germplasm;
-	}
-
-	@Override
-	public List<AttributeDTO> getAttributesByGid(
-		final String gid, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
-		return this.daoFactory.getAttributeDAO().getAttributesByGidAndAttributeIds(gid, attributeDbIds, pageSize, pageNumber);
-	}
-
-	@Override
-	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
-		return this.daoFactory.getAttributeDAO().countAttributesByGid(gid, attributeDbIds);
 	}
 
 	@Override
