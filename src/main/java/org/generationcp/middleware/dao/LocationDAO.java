@@ -977,6 +977,13 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
+	public long countLocationsWithNullProgramUUID() {
+		final Criteria criteria = this.getSession().createCriteria(Location.class);
+		criteria.add(Restrictions.isNull(LocationDAO.PROGRAM_UUID));
+		criteria.setProjection(Projections.rowCount());
+		return ((Long) criteria.uniqueResult()).longValue();
+	}
+
 	public long countLocations(final LocationSearchRequest locationSearchRequest) {
 		final StringBuilder sql = new StringBuilder(" SELECT COUNT(l.locid) ");
 		this.appendGetLocationFromQuery(sql);
@@ -1092,6 +1099,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 		if (locationSearchRequest.getProgramUUID() != null) {
 			queryString.append("AND (l.program_uuid = :programUUID OR l.program_uuid IS NULL) ");
+		} else {
+			queryString.append("AND l.program_uuid IS NULL ");
+
 		}
 
 		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationTypeIds())) {
