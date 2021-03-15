@@ -9,8 +9,10 @@ public interface GermplasmAttributeService {
 
 	List<GermplasmAttributeDto> getGermplasmAttributeDtos(Integer gid, String attributeType);
 
-	Integer createGermplasmAttributeDto(Integer gid, GermplasmAttributeRequestDto dto, Integer userId);
+	Integer createGermplasmAttribute(Integer gid, GermplasmAttributeRequestDto dto, Integer userId);
 
-	Integer updateGermplasmAttributeDto(Integer attributeId, GermplasmAttributeRequestDto dto);
+	Integer updateGermplasmAttribute(Integer attributeId, GermplasmAttributeRequestDto dto);
+
+	void deleteGermplasmAttribute(Integer attributeId);
 
 }

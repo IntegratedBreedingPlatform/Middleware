@@ -24,7 +24,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public Integer createGermplasmAttributeDto(Integer gid, GermplasmAttributeRequestDto dto, final Integer userId) {
+	public Integer createGermplasmAttribute(Integer gid, GermplasmAttributeRequestDto dto, final Integer userId) {
 		final Attribute newAttribute = new Attribute();
 		newAttribute.setGermplasmId(gid);
 		newAttribute.setTypeId(this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
@@ -38,12 +38,18 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public Integer updateGermplasmAttributeDto(Integer attributeId, GermplasmAttributeRequestDto dto) {
+	public Integer updateGermplasmAttribute(Integer attributeId, GermplasmAttributeRequestDto dto) {
 		final Attribute attribute = this.daoFactory.getAttributeDAO().getById(attributeId);
 		attribute.setAval(dto.getValue());
 		attribute.setLocationId(dto.getLocationId());
 		attribute.setAdate(Util.convertDateToIntegerValue(dto.getDate()));
 		return this.daoFactory.getAttributeDAO().save(attribute).getAid();
+	}
+
+	@Override
+	public void deleteGermplasmAttribute(Integer attributeId) {
+		final Attribute attribute = this.daoFactory.getAttributeDAO().getById(attributeId);
+		this.daoFactory.getAttributeDAO().makeTransient(attribute);
 	}
 
 }
