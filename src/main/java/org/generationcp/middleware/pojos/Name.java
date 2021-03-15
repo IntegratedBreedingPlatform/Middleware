@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.hibernate.envers.AuditOverride;
+import org.hibernate.envers.AuditOverrides;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.Basic;
@@ -27,6 +29,9 @@ import java.io.Serializable;
  *
  * @author klmanansala
  */
+@AuditOverrides({
+	@AuditOverride(forClass = AbstractEntity.class)
+})
 @Audited
 @Entity
 @Table(name = "names")
@@ -93,19 +98,23 @@ public class Name extends AbstractEntity implements Serializable {
 	@Column(name = "nref")
 	private Integer referenceId;
 
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "gid")
+//	private Germplasm germplasm;
+
 	@Deprecated
 	public Name() {
-		super(null);
+//		super(null);
 	}
 
 	public Name(final Integer nid) {
-		super(null);
+//		super(null);
 		this.nid = nid;
 	}
 
 	public Name(final Integer nid, final Integer germplasmId, final Integer typeId, final Integer nstat, final Integer createdBy,
 			final String nval, final Integer locationId, final Integer ndate, final Integer referenceId) {
-		super(createdBy);
+//		super(createdBy);
 		this.nid = nid;
 		this.germplasmId = germplasmId;
 		this.typeId = typeId;
@@ -164,9 +173,9 @@ public class Name extends AbstractEntity implements Serializable {
 		this.typeId = typeId;
 	}
 
-	@Override
+//	@Override
 	public void setCreatedBy(final Integer createdBy) {
-		super.setCreatedBy(createdBy);
+//		super.setCreatedBy(createdBy);
 	}
 
 	public Integer getLocationId() {

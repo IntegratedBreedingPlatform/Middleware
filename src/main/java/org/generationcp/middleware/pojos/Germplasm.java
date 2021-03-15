@@ -21,6 +21,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.AuditOverride;
+import org.hibernate.envers.AuditOverrides;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
@@ -110,6 +112,9 @@ import java.util.Map;
 
 	@NamedNativeQuery(name = "getProgenitor", query = "SELECT g.* FROM germplsm g, progntrs p WHERE g.gid = p.pid "
 		+ "and p.gid = :gid and p.pno = :pno and  g.deleted = 0  and g.grplce = 0", resultClass = Germplasm.class)})
+@AuditOverrides({
+	@AuditOverride(forClass = AbstractEntity.class)
+})
 @Audited
 @Entity
 @Table(name = "germplsm")
@@ -491,10 +496,10 @@ public class Germplasm extends AbstractEntity implements Serializable {
 	@Transient
 	private String immediateSourceGID = null;
 
-	//TODO:  remove it, there are tons of fields that aren't nullables.
-	@Deprecated
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
 	public Germplasm() {
-		super(null);
 		this.deleted = false;
 	}
 
@@ -529,14 +534,14 @@ public class Germplasm extends AbstractEntity implements Serializable {
 	//TODO: cleanup - remove it, gid must not be used in constructor
 	@Deprecated
 	public Germplasm(final Integer gid, final Integer createdBy) {
-		super(createdBy);
+		super();
 		this.gid = gid;
 	}
 
 	//TODO: cleanup - remove it. It's only used in test scope
 	@Deprecated
 	public Germplasm(final Integer gid) {
-		super(null);
+//		super(null);
 		this.gid = gid;
 	}
 
@@ -628,9 +633,8 @@ public class Germplasm extends AbstractEntity implements Serializable {
 		this.methodId = methodId;
 	}
 
-	@Override
 	public void setCreatedBy(final Integer createdBy) {
-		super.setCreatedBy(createdBy);
+//		super.setCreatedBy(createdBy);
 	}
 
 	public Integer getLocationId() {

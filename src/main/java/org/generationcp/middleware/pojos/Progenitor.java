@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.hibernate.envers.AuditOverride;
+import org.hibernate.envers.AuditOverrides;
 import org.hibernate.envers.Audited;
 
 import java.io.Serializable;
@@ -30,6 +32,9 @@ import javax.persistence.Table;
  *
  * @author klmanansala
  */
+@AuditOverrides({
+	@AuditOverride(forClass = AbstractEntity.class)
+})
 @Audited
 @Entity
 @Table(name = "progntrs")
@@ -61,7 +66,7 @@ public class Progenitor extends AbstractEntity implements Serializable {
 //	}
 
 	public Progenitor(final Germplasm germplasm, final Integer progenitorNumber, final Integer progenitorGid, final Integer createdBy) {
-		super(createdBy);
+//		super(createdBy);
 		this.germplasm = germplasm;
 		this.progenitorNumber = progenitorNumber;
 		this.progenitorGid = progenitorGid;

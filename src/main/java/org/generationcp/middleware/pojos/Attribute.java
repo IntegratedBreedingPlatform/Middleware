@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.hibernate.envers.AuditOverride;
+import org.hibernate.envers.AuditOverrides;
 import org.hibernate.envers.Audited;
 
 import java.io.Serializable;
@@ -33,6 +35,9 @@ import javax.persistence.Table;
  */
 @NamedQueries({@NamedQuery(name = "getAttributesByGID",
 		query = "FROM Attribute a WHERE a.germplasmId = :gid AND a.typeId <> 9999 AND a.typeId <> 999")})
+@AuditOverrides({
+	@AuditOverride(forClass = AbstractEntity.class)
+})
 @Audited
 @Entity
 @Table(name = "atributs")
@@ -70,17 +75,17 @@ public class Attribute extends AbstractEntity implements Serializable {
 	private Integer adate;
 
 	public Attribute() {
-		super(null);
+//		super(null);
 	}
 
 	public Attribute(Integer aid) {
-		super(null);
+//		super(null);
 		this.aid = aid;
 	}
 
 	public Attribute(Integer aid, Integer germplasmId, Integer typeId, Integer createdBy, String aval, Integer locationId,
 			Integer referenceId, Integer adate) {
-		super(createdBy);
+//		super(createdBy);
 		this.aid = aid;
 		this.germplasmId = germplasmId;
 		this.typeId = typeId;
@@ -114,9 +119,9 @@ public class Attribute extends AbstractEntity implements Serializable {
 		this.typeId = typeId;
 	}
 
-	@Override
+//	@Override
 	public void setCreatedBy(Integer createdBy) {
-		super.setCreatedBy(createdBy);
+//		super.setCreatedBy(createdBy);
 	}
 
 	public Integer getLocationId() {

@@ -13,6 +13,8 @@ package org.generationcp.middleware.pojos;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.envers.AuditOverride;
+import org.hibernate.envers.AuditOverrides;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
@@ -38,6 +40,9 @@ import java.io.Serializable;
  *
  * @author Kevin Manansala, Mark Agarrado
  */
+@AuditOverrides({
+	@AuditOverride(forClass = AbstractEntity.class)
+})
 @Audited
 @Entity
 @Table(name = "bibrefs")
@@ -122,12 +127,12 @@ public class Bibref extends AbstractEntity implements Serializable {
 
 	@Deprecated
 	public Bibref() {
-		super(null);
+//		super(null);
 	}
 
 	@Deprecated
 	public Bibref(final Integer refid) {
-		super(null);
+//		super(null);
 		this.refid = refid;
 	}
 
@@ -135,7 +140,7 @@ public class Bibref extends AbstractEntity implements Serializable {
 	//TOOD: remove fedid
 	public Bibref(final Integer createdBy, final Integer refid, final String authors, final String editors, final String analyt, final String monogr, final String series,
 		final String volume, final String issue, final String pagecol, final String publish, final String pucity, final String pucntry) {
-		super(createdBy);
+//		super(createdBy);
 		this.refid = refid;
 		this.authors = authors;
 		this.editors = editors;
