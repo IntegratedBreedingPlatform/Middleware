@@ -11,4 +11,6 @@ public interface GermplasmAttributeService {
 
 	Integer createGermplasmAttributeDto(Integer gid, GermplasmAttributeRequestDto dto, Integer userId);
 
+	Integer updateGermplasmAttributeDto(Integer attributeId, GermplasmAttributeRequestDto dto);
+
 }

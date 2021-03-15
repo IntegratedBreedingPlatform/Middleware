@@ -3,6 +3,8 @@ package org.generationcp.middleware.domain.germplasm;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Date;
+
 @AutoProperty
 public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 
@@ -13,7 +15,7 @@ public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 	private String locationName;
 
 	public GermplasmAttributeDto(final Integer id, final String value, final String attributeCode, final String attributeType,
-		final String date, final Integer locationId, final String attributeDescription, final String locationName) {
+		final Date date, final Integer locationId, final String attributeDescription, final String locationName) {
 		super(value, attributeCode, attributeType, date, locationId);
 		this.id = id;
 		this.attributeDescription = attributeDescription;

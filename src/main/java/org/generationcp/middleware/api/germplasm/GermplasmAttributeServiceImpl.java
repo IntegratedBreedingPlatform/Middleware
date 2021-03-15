@@ -6,6 +6,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UDTableType;
+import org.generationcp.middleware.util.Util;
 
 import java.util.List;
 
@@ -32,8 +33,17 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		newAttribute.setAval(dto.getValue());
 		newAttribute.setLocationId(dto.getLocationId());
 		newAttribute.setReferenceId(0);
-		newAttribute.setAdate(Integer.valueOf(dto.getDate()));
+		newAttribute.setAdate(Util.convertDateToIntegerValue(dto.getDate()));
 		return this.daoFactory.getAttributeDAO().save(newAttribute).getAid();
+	}
+
+	@Override
+	public Integer updateGermplasmAttributeDto(Integer attributeId, GermplasmAttributeRequestDto dto) {
+		final Attribute attribute = this.daoFactory.getAttributeDAO().getById(attributeId);
+		attribute.setAval(dto.getValue());
+		attribute.setLocationId(dto.getLocationId());
+		attribute.setAdate(Util.convertDateToIntegerValue(dto.getDate()));
+		return this.daoFactory.getAttributeDAO().save(attribute).getAid();
 	}
 
 }
