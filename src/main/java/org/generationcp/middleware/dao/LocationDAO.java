@@ -1080,7 +1080,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 
 		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationAbbreviations())) {
-			sqlQuery.setParameterList("labbr", locationSearchRequest.getLocationAbbreviations());
+			sqlQuery.setParameterList("locationAbbrs", locationSearchRequest.getLocationAbbreviations());
 		}
 
 		if (StringUtils.isNotEmpty(locationSearchRequest.getLocationName())) {

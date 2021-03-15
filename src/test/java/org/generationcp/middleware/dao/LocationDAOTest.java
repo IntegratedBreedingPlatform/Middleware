@@ -134,11 +134,20 @@ public class LocationDAOTest extends IntegrationTestBase {
 		locationSearchRequest.setLocationTypeName("Country");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected list of country location size > zero", locationList != null && locationList.size() > 0);
-
 	}
 
 	@Test
-	public void getLocationsWithWrongLocType() {
+	public void testGetLocations_ByAbbreviation() {
+		final Location location = this.saveTestLocation();
+
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationAbbreviations(Collections.singletonList(location.getLabbr()));
+		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		MatcherAssert.assertThat("Expected to return filtered list by abbreviation", locationList != null && locationList.size() > 0);
+	}
+
+	@Test
+	public void testGetLocationsWithWrongLocType() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
