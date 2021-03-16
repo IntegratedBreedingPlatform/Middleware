@@ -6,7 +6,6 @@ import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +43,8 @@ public class GermplasmImportRequest {
 	private String defaultDisplayName;
 	private String documentationURL;
 	// TODO Donors
-	// TODO external references
+
+	private List<ExternalReferenceDTO> externalReferences;
 	private String genus;
 	private String germplasmName;
 	private String germplasmOrigin;
@@ -295,6 +295,14 @@ public class GermplasmImportRequest {
 
 	public void setSynonyms(final List<Synonym> synonyms) {
 		this.synonyms = synonyms;
+	}
+
+	public List<ExternalReferenceDTO> getExternalReferences() {
+		return externalReferences;
+	}
+
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override
