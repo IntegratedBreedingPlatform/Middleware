@@ -34,7 +34,7 @@ public class GermplasmAttributeRequestDto {
 	}
 
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	public void setValue(final String value) {
@@ -42,7 +42,7 @@ public class GermplasmAttributeRequestDto {
 	}
 
 	public String getAttributeCode() {
-		return attributeCode;
+		return this.attributeCode;
 	}
 
 	public void setAttributeCode(final String attributeCode) {
@@ -50,7 +50,7 @@ public class GermplasmAttributeRequestDto {
 	}
 
 	public String getAttributeType() {
-		return attributeType;
+		return this.attributeType;
 	}
 
 	public void setAttributeType(final String attributeType) {
@@ -58,7 +58,7 @@ public class GermplasmAttributeRequestDto {
 	}
 
 	public Date getDate() {
-		return date;
+		return this.date;
 	}
 
 	public void setDate(final Date date) {
@@ -66,7 +66,7 @@ public class GermplasmAttributeRequestDto {
 	}
 
 	public Integer getLocationId() {
-		return locationId;
+		return this.locationId;
 	}
 
 	public void setLocationId(final Integer locationId) {

@@ -71,7 +71,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private static final String DEFAULT_BIBREF_FIELD = "-";
 	public static final String PROGENITOR_1 = "PROGENITOR 1";
 	public static final String PROGENITOR_2 = "PROGENITOR 2";
-	private static String DEFAULT_METHOD = "UDM";
+	private static final String DEFAULT_METHOD = "UDM";
 
 	private final DaoFactory daoFactory;
 

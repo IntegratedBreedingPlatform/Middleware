@@ -42,10 +42,10 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 
 	@Test
 	public void testCreateGermplasmAttribute() throws ParseException {
-		final Integer createAttributeId = createAttribute();
+		final Integer createAttributeId = this.createAttribute();
 		final Attribute attribute = this.daoFactory.getAttributeDAO().getById(createAttributeId);
 		Assert.assertEquals(createAttributeId, attribute.getAid());
-		Assert.assertEquals(germplasm.getGid(), attribute.getGermplasmId());
+		Assert.assertEquals(this.germplasm.getGid(), attribute.getGermplasmId());
 		Assert.assertEquals(ATTRIBUTE_VALUE, attribute.getAval());
 		Assert.assertEquals(LOCATION_ID, attribute.getLocationId());
 	}
@@ -54,7 +54,7 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 	public void testUpdateGermplasmAttribute() throws ParseException{
 		final Integer createAttributeId = this.createAttribute();
 		Attribute attribute = this.daoFactory.getAttributeDAO().getById(createAttributeId);
-		Assert.assertEquals(germplasm.getGid(), attribute.getGermplasmId());
+		Assert.assertEquals(this.germplasm.getGid(), attribute.getGermplasmId());
 		Assert.assertEquals(ATTRIBUTE_VALUE, attribute.getAval());
 		Assert.assertEquals(LOCATION_ID, attribute.getLocationId());
 		final Date newDate = Util.parseDate("20210317", Util.DATE_AS_NUMBER_FORMAT);
@@ -63,7 +63,7 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		this.germplasmAttributeService.updateGermplasmAttribute(createAttributeId, dto);
 
 		attribute = this.daoFactory.getAttributeDAO().getById(createAttributeId);
-		Assert.assertEquals(germplasm.getGid(), attribute.getGermplasmId());
+		Assert.assertEquals(this.germplasm.getGid(), attribute.getGermplasmId());
 		Assert.assertEquals(dto.getValue(), attribute.getAval());
 		Assert.assertEquals(dto.getLocationId(), attribute.getLocationId());
 		Assert.assertEquals(Util.convertDateToIntegerValue(dto.getDate()), attribute.getAdate());
@@ -73,7 +73,7 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 	public void testDeleteGermplasmAttribute() throws  ParseException{
 		final Integer createAttributeId = this.createAttribute();
 		this.germplasmAttributeService.deleteGermplasmAttribute(createAttributeId);
-		Attribute attribute = this.daoFactory.getAttributeDAO().getById(createAttributeId);
+		final Attribute attribute = this.daoFactory.getAttributeDAO().getById(createAttributeId);
 		Assert.assertNull(attribute);
 	}
 

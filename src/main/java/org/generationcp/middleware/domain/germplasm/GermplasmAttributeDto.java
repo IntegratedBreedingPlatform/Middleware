@@ -23,7 +23,7 @@ public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 	}
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(final Integer id) {
@@ -31,7 +31,7 @@ public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 	}
 
 	public String getAttributeDescription() {
-		return attributeDescription;
+		return this.attributeDescription;
 	}
 
 	public void setAttributeDescription(final String attributeDescription) {
@@ -39,7 +39,7 @@ public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 	}
 
 	public String getLocationName() {
-		return locationName;
+		return this.locationName;
 	}
 
 	public void setLocationName(final String locationName) {
