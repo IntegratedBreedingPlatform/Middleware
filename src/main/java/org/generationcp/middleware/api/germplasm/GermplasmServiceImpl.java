@@ -6,7 +6,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
@@ -14,6 +16,8 @@ import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
@@ -24,6 +28,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
+import org.generationcp.middleware.pojos.ExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
@@ -55,6 +60,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
+
 @Service
 @Transactional
 public class GermplasmServiceImpl implements GermplasmService {
@@ -64,6 +71,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private static final String DEFAULT_BIBREF_FIELD = "-";
 	public static final String PROGENITOR_1 = "PROGENITOR 1";
 	public static final String PROGENITOR_2 = "PROGENITOR 2";
+	private static String DEFAULT_METHOD = "UDM";
 
 	private final DaoFactory daoFactory;
 
@@ -257,7 +265,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final List<GermplasmNameDto> names = this.daoFactory.getNameDao().getGermplasmNamesByGids(gids);
 
 			final Map<Integer, List<GermplasmNameDto>> namesByGid = names.stream().collect(
-				Collectors.groupingBy(GermplasmNameDto::getGid, HashMap::new, Collectors.toCollection(ArrayList::new))
+				groupingBy(GermplasmNameDto::getGid, HashMap::new, Collectors.toCollection(ArrayList::new))
 			);
 			germplasmDtos.forEach(g -> g.setNames(namesByGid.get(g.getGid())));
 		}
@@ -297,7 +305,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.daoFactory.getAttributeDAO()
 				.getAttributeValuesGIDList(gids);
 		final Map<Integer, List<Attribute>> attributesMap =
-			attributes.stream().collect(Collectors.groupingBy(Attribute::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
+			attributes.stream().collect(groupingBy(Attribute::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
 
 		for (final Germplasm germplasm : germplasmList) {
 			this.saveGermplasmUpdateDTO(userId, attributeCodesFieldNoMap, nameCodesFieldNoMap,
@@ -343,6 +351,27 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public Set<Integer> getGermplasmUsedInStudies(final List<Integer> gids) {
 		return new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(gids));
+	}
+
+	@Override
+	public PedigreeDTO getPedigree(final Integer gid, final String notation, final Boolean includeSiblings) {
+		return this.daoFactory.getGermplasmDao().getPedigree(gid, notation, includeSiblings);
+	}
+
+	@Override
+	public ProgenyDTO getProgeny(final Integer gid) {
+		return this.daoFactory.getGermplasmDao().getProgeny(gid);
+	}
+
+	@Override
+	public List<AttributeDTO> getAttributesByGUID(
+			final String germplasmUUID, final List<String> attributeDbIds, final Pageable pageable) {
+		return this.daoFactory.getAttributeDAO().getAttributesByGUIDAndAttributeIds(germplasmUUID, attributeDbIds, pageable);
+	}
+
+	@Override
+	public long countAttributesByGUID(final String gemrplasmUUID, final List<String> attributeDbIds) {
+		return this.daoFactory.getAttributeDAO().countAttributesByGUID(gemrplasmUUID, attributeDbIds);
 	}
 
 	private void saveGermplasmUpdateDTO(final Integer userId, final Map<String, Integer> attributeCodes,
@@ -913,11 +942,23 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, Integer> nameTypesMap = this.getNameTypesMapByNameTypeCode(germplasmImportRequestList);
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropname);
 
+		//Set Unknown derivative method as default when no breeding method is specified
+		Method unknownDerivativeMethod = null;
+		if (germplasmImportRequestList.stream().anyMatch(g -> StringUtils.isEmpty(g.getBreedingMethodDbId()))) {
+			final List<Method> unknownDerivativeMethods = this.daoFactory.getMethodDAO().getByCode(Arrays.asList(DEFAULT_METHOD));
+			if (unknownDerivativeMethods.isEmpty()) {
+				throw new MiddlewareRequestException("", "brapi.import.germplasm.no.default.method.found");
+			}
+			unknownDerivativeMethod = unknownDerivativeMethods.get(0);
+		}
+
 		final List<String> createdGermplasmUUIDs = new ArrayList<>();
 		for (final GermplasmImportRequest germplasmDto : germplasmImportRequestList) {
 
 			final Germplasm germplasm = new Germplasm();
-			final Method method = methodsMap.get(Integer.parseInt(germplasmDto.getBreedingMethodDbId()));
+			final Method method = (StringUtils.isNotEmpty(germplasmDto.getBreedingMethodDbId())) ?
+				methodsMap.get(Integer.parseInt(germplasmDto.getBreedingMethodDbId()))
+				: unknownDerivativeMethod;
 			germplasm.setMethodId(method.getMid());
 
 			germplasm.setGrplce(0);
@@ -948,6 +989,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 					this.daoFactory.getNameDao().save(name);
 				}
 			});
+
+			if (germplasmDto.getExternalReferences() != null) {
+				final List<ExternalReference> references = new ArrayList<>();
+				germplasmDto.getExternalReferences().forEach(reference -> {
+					final ExternalReference externalReference =
+						new ExternalReference(germplasm, reference.getReferenceID(), reference.getReferenceSource());
+					references.add(externalReference);
+				});
+				germplasm.setExternalReferences(references);
+			}
 
 			this.addCustomAttributeFieldsToAdditionalInfo(germplasmDto);
 			germplasmDto.getAdditionalInfo().forEach((k, v) -> {
@@ -1004,14 +1055,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Pageable pageable) {
 		final List<GermplasmDTO> germplasmDTOList =
 			this.daoFactory.getGermplasmDao().getGermplasmDTOList(germplasmSearchRequestDTO, pageable);
+		this.populateExternalReferences(germplasmDTOList);
 		this.populateSynonymsAndAttributes(germplasmDTOList);
 		return germplasmDTOList;
 	}
 
 	@Override
-	public Optional<GermplasmDTO> getGermplasmDTOByGID(final Integer gid) {
+	public Optional<GermplasmDTO> getGermplasmDTOByGUID(final String germplasmUUID) {
 		final GermplasmSearchRequestDto searchDto = new GermplasmSearchRequestDto();
-		searchDto.setGermplasmDbIds(Collections.singletonList(String.valueOf(gid)));
+		searchDto.setGermplasmDbIds(Collections.singletonList(germplasmUUID));
 		final List<GermplasmDTO> germplasmDTOS = this.searchFilteredGermplasm(searchDto,  new PageRequest(0, 1));
 		if (!CollectionUtils.isEmpty(germplasmDTOS)) {
 			return Optional.of(germplasmDTOS.get(0));
@@ -1029,6 +1081,20 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public long countGermplasmByStudy(final Integer studyDbId) {
 		return this.daoFactory.getGermplasmDao().countGermplasmByStudy(studyDbId);
+	}
+
+	private void populateExternalReferences(final List<GermplasmDTO> germplasmDTOList) {
+		final List<Integer> gids = germplasmDTOList.stream().map(g -> Integer.valueOf(g.getGid())).collect(Collectors.toList());
+		if (!gids.isEmpty()) {
+			final List<ExternalReferenceDTO> referenceDTOS = this.daoFactory.getExternalReferenceDAO().getExternalReferencesByGids(gids);
+			final Map<String, List<ExternalReferenceDTO>> referencesByGidMap = referenceDTOS.stream()
+				.collect(groupingBy(ExternalReferenceDTO::getGid));
+			for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
+				if (referencesByGidMap.containsKey(germplasmDTO.getGid())) {
+					germplasmDTO.setExternalReferences(referencesByGidMap.get(germplasmDTO.getGid()));
+				}
+			}
+		}
 	}
 
 	private void populateSynonymsAndAttributes(final List<GermplasmDTO> germplasmDTOList) {
