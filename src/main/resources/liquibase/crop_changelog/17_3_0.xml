@@ -56,37 +56,47 @@
 				<columnExists tableName="progntrs" columnName="modified_by"/>
 				<columnExists tableName="progntrs" columnName="created_date"/>
 				<columnExists tableName="progntrs" columnName="modified_date"/>
+
+				<columnExists tableName="external_reference" columnName="created_by"/>
+				<columnExists tableName="external_reference" columnName="modified_by"/>
+				<columnExists tableName="external_reference" columnName="created_date"/>
+				<columnExists tableName="external_reference" columnName="modified_date"/>
 			</not>
 		</preConditions>
         <comment>
-            Add fields for audit to tables: atributs, bibrefs, germplsm, names and progntrs
+            Add fields for audit to tables: atributs, bibrefs, germplsm, names, progntrs and external_reference
         </comment>
         <sql dbms="mysql" splitStatements="true">
 
-			ALTER TABLE atributs CHANGE auid created_by int default 0 null;
+			ALTER TABLE atributs CHANGE auid created_by int default 0 not null;
 			ALTER TABLE atributs ADD modified_by int null;
-			ALTER TABLE atributs ADD created_date datetime null;
-			ALTER TABLE atributs ADD modified_date datetime null;
+			ALTER TABLE atributs ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE atributs ADD modified_date timestamp null;
 
-			ALTER TABLE bibrefs ADD created_by int default 0 null;
+			ALTER TABLE bibrefs ADD created_by int default 0 not null;
 			ALTER TABLE bibrefs ADD modified_by int null;
-			ALTER TABLE bibrefs ADD created_date datetime null;
-			ALTER TABLE bibrefs ADD modified_date datetime null;
+			ALTER TABLE bibrefs ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE bibrefs ADD modified_date timestamp null;
 
-			ALTER TABLE germplsm CHANGE germuid created_by int default 0 null;
+			ALTER TABLE germplsm CHANGE germuid created_by int default 0 not null;
 			ALTER TABLE germplsm ADD modified_by int null;
-			ALTER TABLE germplsm ADD created_date datetime null;
-			ALTER TABLE germplsm ADD modified_date datetime null;
+			ALTER TABLE germplsm ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE germplsm ADD modified_date timestamp null;
 
-			ALTER TABLE names CHANGE nuid created_by int default 0 null;
+			ALTER TABLE names CHANGE nuid created_by int default 0 not null;
 			ALTER TABLE names ADD modified_by int null;
-			ALTER TABLE names ADD created_date datetime null;
-			ALTER TABLE names ADD modified_date datetime null;
+			ALTER TABLE names ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE names ADD modified_date timestamp null;
 
-			ALTER TABLE progntrs ADD created_by int default 0 null;
+			ALTER TABLE progntrs ADD created_by int default 0 not null;
 			ALTER TABLE progntrs ADD modified_by int null;
-			ALTER TABLE progntrs ADD created_date datetime null;
-			ALTER TABLE progntrs ADD modified_date datetime null;
+			ALTER TABLE progntrs ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE progntrs ADD modified_date timestamp null;
+
+			ALTER TABLE external_reference ADD created_by int default 0 not null;
+			ALTER TABLE external_reference ADD modified_by int null;
+			ALTER TABLE external_reference ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE external_reference ADD modified_date timestamp null;
 
         </sql>
     </changeSet>
@@ -101,6 +111,7 @@
 					<tableExists tableName="germplasm_aud"></tableExists>
 					<tableExists tableName="names_aud"></tableExists>
 					<tableExists tableName="progntrs_aud"></tableExists>
+					<tableExists tableName="external_reference_aud"></tableExists>
 				</not>
 			</and>
 		</preConditions>
@@ -126,8 +137,8 @@
 				aref          int          default 0   null,
 				adate         int          default 0   null,
 				modified_by   int                      null,
-				created_date  datetime                 null,
-				modified_date datetime                 null,
+				created_date  timestamp                 null,
+				modified_date timestamp                 null,
 				primary key (aid, REV),
 				constraint FK_atributs_aud_revinfo
 					foreign key (REV) references revinfo(rev)
@@ -154,8 +165,8 @@
 				editorlist    int                      null,
 				created_by    int          default 0   not null,
 				modified_by   int                      null,
-				created_date  datetime                 null,
-				modified_date datetime                 null,
+				created_date  timestamp                 null,
+				modified_date timestamp                 null,
 				primary key (refid, REV),
 				constraint FK_bibrefs_aud_revinfo
 					foreign key (REV) references revinfo(rev)
@@ -182,8 +193,8 @@
 				deleted       tinyint(1) unsigned zerofill default 0 null,
 				germplsm_uuid varchar(60)                            null,
 				modified_by   int                                    null,
-				created_date  datetime                               null,
-				modified_date datetime                               null,
+				created_date  timestamp                               null,
+				modified_date timestamp                               null,
 				primary key (gid, REV),
 				constraint FK_germplsm_aud_revinfo
 					foreign key (REV) references revinfo(rev)
@@ -202,8 +213,8 @@
 				ndate         int          default 0   not null,
 				nref          int          default 0   not null,
 				modified_by   int                      null,
-				created_date  datetime                 null,
-				modified_date datetime                 null,
+				created_date  timestamp                 null,
+				modified_date timestamp                 null,
 				primary key (nid, REV),
 				constraint FK_names_aud_revinfo
 					foreign key (REV) references revinfo(rev)
@@ -218,12 +229,28 @@
 				id            int           not null,
 				created_by    int default 0 null,
 				modified_by   int           null,
-				created_date  datetime      null,
-				modified_date datetime      null,
+				created_date  timestamp     null,
+				modified_date timestamp     null,
 				primary key (id, REV),
 				constraint FK_progntrs_aud_revinfo
 					foreign key (REV) references revinfo(rev)
 			);
+
+			CREATE TABLE external_reference_aud (
+				REV              int           not null,
+				REVTYPE          tinyint       not null,
+				id               int           not null,
+				gid              int           not null,
+				reference_id     varchar(2000) not null,
+				reference_source varchar(255)  not null,
+				created_by       int default 0 not null,
+				created_date     timestamp     null,
+				modified_date    timestamp     null,
+				primary key (id, REV),
+				constraint FK_external_reference_aud_revinfo
+					foreign key (REV) references revinfo(rev)
+			);
+
         </sql>
     </changeSet>
 
