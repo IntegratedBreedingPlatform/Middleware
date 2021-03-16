@@ -1,10 +1,7 @@
 package org.generationcp.middleware.domain.germplasm;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
-
-import java.util.Date;
 
 @AutoProperty
 public class GermplasmAttributeRequestDto {
@@ -15,8 +12,7 @@ public class GermplasmAttributeRequestDto {
 
 	private String attributeType;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
-	private Date date;
+	private String date;
 
 	private Integer locationId;
 
@@ -24,7 +20,7 @@ public class GermplasmAttributeRequestDto {
 
 	}
 
-	public GermplasmAttributeRequestDto(final String value, final String attributeCode, final String attributeType, final Date date,
+	public GermplasmAttributeRequestDto(final String value, final String attributeCode, final String attributeType, final String date,
 		final Integer locationId) {
 		this.value = value;
 		this.attributeCode = attributeCode;
@@ -57,11 +53,11 @@ public class GermplasmAttributeRequestDto {
 		this.attributeType = attributeType;
 	}
 
-	public Date getDate() {
+	public String getDate() {
 		return this.date;
 	}
 
-	public void setDate(final Date date) {
+	public void setDate(final String date) {
 		this.date = date;
 	}
 
