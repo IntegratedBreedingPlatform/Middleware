@@ -103,6 +103,8 @@ public class XABeanDefinition {
 	void createXAConnectionBeans(final BeanDefinitionRegistry registry, final String cropDatabaseName,
 			final DataSourceProperties xaDataSourceProperties) {
 
+		LOG.debug(String.format("Creating '%s' datasource and session factory related beans.", cropDatabaseName));
+
 		final RootBeanDefinition dataSourceBeanDefinition =
 				this.xaDatasourceUtilities.createRootBeanDefinition(AtomikosDataSourceBean.class, ImmutableMap.<String, Object>of(
 						"init-method", "init", "destroy-method", "close", "depends-on", "transactionManager"), this

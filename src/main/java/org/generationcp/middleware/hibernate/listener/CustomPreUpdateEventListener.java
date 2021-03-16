@@ -8,15 +8,12 @@ public class CustomPreUpdateEventListener implements PreUpdateEventListener {
 
 	@Override
 	public boolean onPreUpdate(final PreUpdateEvent event) {
-		System.out.println("onPreUpdate");
 		//Check if the entity extends from AbstractEntity
-		//TODO: check isInstance of method
 		if (AbstractEntity.class.isAssignableFrom(event.getEntity().getClass())) {
 			final AbstractEntity abstractEntity = (AbstractEntity) event.getEntity();
 			abstractEntity.update();
-			return false;
 		}
 
-		return true;
+		return false;
 	}
 }
