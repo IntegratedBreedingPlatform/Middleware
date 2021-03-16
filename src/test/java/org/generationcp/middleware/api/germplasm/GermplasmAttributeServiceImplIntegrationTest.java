@@ -66,7 +66,7 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		Assert.assertEquals(germplasm.getGid(), attribute.getGermplasmId());
 		Assert.assertEquals(dto.getValue(), attribute.getAval());
 		Assert.assertEquals(dto.getLocationId(), attribute.getLocationId());
-		Assert.assertEquals(dto.getDate(), attribute.getAdate());
+		Assert.assertEquals(Util.convertDateToIntegerValue(dto.getDate()), attribute.getAdate());
 	}
 
 	@Test
