@@ -34,8 +34,8 @@ public class GermplasmImportRequest {
 	private String accessionNumber;
 	private String acquisitionDate;
 	private Map<String, String> additionalInfo = new HashMap<>();
-	private Integer biologicalStatusOfAccessionCode;
-	private Integer biologicalStatusOfAccessionDescription;
+	private BiologicalStatusOfAccessionCodeEnum biologicalStatusOfAccessionCode;
+	private String biologicalStatusOfAccessionDescription;
 	private String breedingMethodDbId;
 	private String collection;
 	private String commonCropName;
@@ -111,19 +111,19 @@ public class GermplasmImportRequest {
 		this.additionalInfo = additionalInfo;
 	}
 
-	public Integer getBiologicalStatusOfAccessionCode() {
+	public BiologicalStatusOfAccessionCodeEnum getBiologicalStatusOfAccessionCode() {
 		return this.biologicalStatusOfAccessionCode;
 	}
 
-	public void setBiologicalStatusOfAccessionCode(final Integer biologicalStatusOfAccessionCode) {
+	public void setBiologicalStatusOfAccessionCode(final BiologicalStatusOfAccessionCodeEnum biologicalStatusOfAccessionCode) {
 		this.biologicalStatusOfAccessionCode = biologicalStatusOfAccessionCode;
 	}
 
-	public Integer getBiologicalStatusOfAccessionDescription() {
+	public String getBiologicalStatusOfAccessionDescription() {
 		return this.biologicalStatusOfAccessionDescription;
 	}
 
-	public void setBiologicalStatusOfAccessionDescription(final Integer biologicalStatusOfAccessionDescription) {
+	public void setBiologicalStatusOfAccessionDescription(final String biologicalStatusOfAccessionDescription) {
 		this.biologicalStatusOfAccessionDescription = biologicalStatusOfAccessionDescription;
 	}
 
