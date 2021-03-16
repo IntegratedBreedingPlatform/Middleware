@@ -1,10 +1,11 @@
 
 package org.generationcp.middleware.data.initializer;
 
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.generationcp.middleware.pojos.Name;
 
 public class NameTestDataInitializer {
 
@@ -12,7 +13,7 @@ public class NameTestDataInitializer {
 		final Name name = new Name();
 		name.setTypeId(typeId);
 		name.setNval(nVal);
-		name.setGermplasmId(gid);
+		name.setGermplasm(new Germplasm(gid));
 		name.setLocationId(0);
 		name.setNstat(1);
 		name.setNdate(20150707);

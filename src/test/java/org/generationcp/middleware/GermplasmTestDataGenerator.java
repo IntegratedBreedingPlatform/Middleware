@@ -27,7 +27,7 @@ public class GermplasmTestDataGenerator {
 
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Name preferredName = germplasm.getPreferredName();
-		preferredName.setGermplasmId(germplasm.getGid());
+		preferredName.setGermplasm(germplasm);
 		this.germplasmDataManager.addGermplasm(germplasm, preferredName, cropType);
 
 		final Name otherName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid(), "Other Name ");
@@ -42,7 +42,7 @@ public class GermplasmTestDataGenerator {
 		cropType.setUseUUID(false);
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName(name);
 		final Name preferredName = germplasm.getPreferredName();
-		preferredName.setGermplasmId(germplasm.getGid());
+		preferredName.setGermplasm(germplasm);
 
 		germplasm.setGpid1(parentGermplasm.getGid());
 		germplasm.setGpid2(parentGermplasm.getGid());
@@ -72,7 +72,7 @@ public class GermplasmTestDataGenerator {
 		for (int i = 0; i < numberOfGermplasm; i++) {
 			final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName(prefix + i);
 			final Name preferredName = germplasm.getPreferredName();
-			preferredName.setGermplasmId(germplasm.getGid());
+			preferredName.setGermplasm(germplasm);
 			this.germplasmDataManager.addGermplasm(germplasm, preferredName, cropType);
 
 			gids[i] = germplasm.getGid();
@@ -89,7 +89,7 @@ public class GermplasmTestDataGenerator {
 		for (int i = 0; i < numberOfGermplasm; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName(prefix + i);
 			final Name preferredName = germplasm.getPreferredName();
-			preferredName.setGermplasmId(germplasm.getGid());
+			preferredName.setGermplasm(germplasm);
 			this.germplasmDataManager.addGermplasm(germplasm, preferredName, cropType);
 
 			germplasms.add(germplasm);

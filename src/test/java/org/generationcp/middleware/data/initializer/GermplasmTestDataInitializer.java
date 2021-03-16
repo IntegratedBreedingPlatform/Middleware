@@ -1,13 +1,13 @@
 
 package org.generationcp.middleware.data.initializer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.util.Util;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class GermplasmTestDataInitializer {
 
@@ -74,7 +74,7 @@ public class GermplasmTestDataInitializer {
 
 	public static Name createGermplasmName(final int gid, final String germplasmName) {
 		final Name name = new Name();
-		name.setGermplasmId(gid);
+		name.setGermplasm(new Germplasm(gid));
 		name.setNval(germplasmName);
 		name.setLocationId(Integer.valueOf(1));
 		name.setNdate(Integer.valueOf(20160101));

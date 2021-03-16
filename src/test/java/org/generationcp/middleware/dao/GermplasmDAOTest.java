@@ -12,7 +12,6 @@ package org.generationcp.middleware.dao;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
@@ -383,7 +382,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(maleParent);
 
 		final Name maleParentPreferredName = maleParent.getPreferredName();
-		maleParentPreferredName.setGermplasmId(maleParent.getGid());
+		maleParentPreferredName.setGermplasm(maleParent);
 		this.nameDAO.save(maleParentPreferredName);
 
 		final Germplasm cross = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
@@ -394,7 +393,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(cross);
 
 		final Name crossPreferredName = cross.getPreferredName();
-		crossPreferredName.setGermplasmId(cross.getGid());
+		crossPreferredName.setGermplasm(cross);
 		this.nameDAO.save(crossPreferredName);
 
 		final Germplasm advance = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
@@ -463,7 +462,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		// Name collection mapping is uni-directional OneToMany right now, so the other side of the relationship has to be managed manually.
 		for (final Name name : germplasm.getNames()) {
-			name.setGermplasmId(germplasm.getGid());
+			name.setGermplasm(germplasm);
 		}
 
 		// In real app flush will happen automatically on tx commit. We don't commit tx in tests, so flush manually.
@@ -472,7 +471,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		for (final Name name : germplasm.getNames()) {
 			// No explicit save of name entity anywhere but should still be saved through cascade on flush.
 			Assert.assertNotNull(name.getNid());
-			Assert.assertEquals(germplasm.getGid(), name.getGermplasmId());
+			Assert.assertEquals(germplasm.getGid(), name.getGermplasm());
 		}
 	}
 

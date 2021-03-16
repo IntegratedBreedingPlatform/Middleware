@@ -1,14 +1,14 @@
 package org.generationcp.middleware.data.initializer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Name;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GermplasmDataManagerDataInitializer {
 
@@ -51,7 +51,7 @@ public class GermplasmDataManagerDataInitializer {
     }
 
     public static Name createGermplasmName(final Integer gid, final String name) {
-        return new Name(null, gid, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(),
+        return new Name(null, new Germplasm(gid), GermplasmNameType.LINE_NAME.getUserDefinedFieldID(),
                 NSTAT_PREFERRED_VALUE, TEST_USER_ID, name, TEST_LOCATION_ID, 20160216, 0);
     }
 

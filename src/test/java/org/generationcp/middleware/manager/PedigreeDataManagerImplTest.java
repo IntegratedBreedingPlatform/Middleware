@@ -1,7 +1,5 @@
 package org.generationcp.middleware.manager;
 
-import java.util.List;
-
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -14,6 +12,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 
 public class PedigreeDataManagerImplTest extends IntegrationTestBase {
@@ -42,7 +42,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		if (this.maternalGrandParent1 == null){
 			this.maternalGrandParent1 = GermplasmTestDataInitializer.createGermplasm(1);
 			this.germplasmManager.save(this.maternalGrandParent1);
-			this.maternalGrandParent1.getPreferredName().setGermplasmId(this.maternalGrandParent1.getGid());
+			this.maternalGrandParent1.getPreferredName().setGermplasm(this.maternalGrandParent1);
 			this.germplasmManager.addGermplasmName(this.maternalGrandParent1.getPreferredName());
 
 		}
@@ -50,7 +50,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		if (this.maternalGrandParent2 == null){
 			this.maternalGrandParent2 = GermplasmTestDataInitializer.createGermplasm(1);
 			this.germplasmManager.save(this.maternalGrandParent2);
-			this.maternalGrandParent2.getPreferredName().setGermplasmId(this.maternalGrandParent2.getGid());
+			this.maternalGrandParent2.getPreferredName().setGermplasm(this.maternalGrandParent2);
 			this.germplasmManager.addGermplasmName(this.maternalGrandParent2.getPreferredName());
 		}
 
@@ -59,7 +59,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 			this.femaleParent.setGpid1(this.maternalGrandParent1.getGid());
 			this.femaleParent.setGpid2(this.maternalGrandParent2.getGid());
 			this.germplasmManager.save(this.femaleParent);
-			this.femaleParent.getPreferredName().setGermplasmId(this.femaleParent.getGid());
+			this.femaleParent.getPreferredName().setGermplasm(this.femaleParent);
 			this.germplasmManager.addGermplasmName(this.femaleParent.getPreferredName());
 
 		}
@@ -67,7 +67,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		if (this.maleParent == null){
 			this.maleParent = GermplasmTestDataInitializer.createGermplasm(1);
 			this.germplasmManager.save(this.maleParent);
-			this.maleParent.getPreferredName().setGermplasmId(this.maleParent.getGid());
+			this.maleParent.getPreferredName().setGermplasm(this.maleParent);
 			this.germplasmManager.addGermplasmName(this.maleParent.getPreferredName());
 
 		}

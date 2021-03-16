@@ -15,16 +15,12 @@ import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
-import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
-import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
-import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -399,7 +395,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		final List<Name> nameList = this.daoFactory.getNameDao().getNamesByTypeAndGIDList(nameType, gidList);
 		for (final Name name : nameList) {
-			returnMap.put(name.getGermplasmId(), name.getNval());
+			returnMap.put(name.getGermplasm().getGid(), name.getNval());
 		}
 
 		return returnMap;
@@ -761,9 +757,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<Integer> addGermplasm(final List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples, final CropType cropType) {
 		final List<Integer> listOfGermplasm = new ArrayList<>();
 		try {
-			final GermplasmDAO dao = this.daoFactory.getGermplasmDao();
-			final NameDAO nameDao = this.daoFactory.getNameDao();
-			final ProgenitorDAO progenitorDao = this.daoFactory.getProgenitorDao();
 
 			for (final Triple<Germplasm, Name, List<Progenitor>> triple : germplasmTriples) {
 				final Germplasm germplasm = triple.getLeft();
@@ -783,14 +776,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 				GermplasmGuidGenerator.generateGermplasmGuids(cropType, Arrays.asList(germplasm));
 
-				final Germplasm germplasmSaved = dao.save(germplasm);
-				listOfGermplasm.add(germplasmSaved.getGid());
-				name.setGermplasmId(germplasmSaved.getGid());
-				nameDao.save(name);
+				name.setGermplasm(germplasm);
+				germplasm.getNames().clear();
+				germplasm.getNames().add(name);
+				this.daoFactory.getGermplasmDao().save(germplasm);
+
+				listOfGermplasm.add(germplasm.getGid());
 
 				for (final Progenitor progenitor : progenitors) {
-					progenitor.setGermplasm(germplasmSaved);
-					progenitorDao.save(progenitor);
+					progenitor.setGermplasm(germplasm);
+					this.daoFactory.getProgenitorDao().save(progenitor);
 				}
 			}
 

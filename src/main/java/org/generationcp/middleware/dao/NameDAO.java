@@ -130,7 +130,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		try {
 			if (gid != null) {
 				final Criteria crit = this.getSession().createCriteria(Name.class);
-				crit.add(Restrictions.eq("germplasmId", gid));
+				crit.createAlias("germplasm", "germplasm");
+				crit.add(Restrictions.eq("germplasm.gid", gid));
 				crit.add(Restrictions.eq("nval", nval));
 				final List<Name> names = crit.list();
 				if (names.isEmpty()) {
@@ -332,7 +333,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Name.class);
-			criteria.add(Restrictions.in("germplasmId", gids));
+			criteria.createAlias("germplasm", "germplasm");
+			criteria.add(Restrictions.in("germplasm.gid", gids));
 
 			toReturn = criteria.list();
 		} catch (final HibernateException e) {
@@ -373,7 +375,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Name.class);
-			criteria.add(Restrictions.in("germplasmId", gids));
+			criteria.createAlias("germplasm", "germplasm");
+			criteria.add(Restrictions.in("germplasm.gid", gids));
 			if (!CollectionUtils.isEmpty(ntypeIds)) {
 				criteria.add(Restrictions.in("typeId", ntypeIds));
 			}
@@ -381,7 +384,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 			final List<Name> list = criteria.list();
 
-			return list.stream().collect(Collectors.groupingBy(Name::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
+			return list.stream().collect(Collectors.groupingBy(n -> n.getGermplasm().getGid(), LinkedHashMap::new, Collectors.toList()));
 
 		} catch (final HibernateException e) {
 			final String message = "Error with getNamesByGidsAndNTypeIdsInMap(gids=" + gids + ", typeIds=" + ntypeIds+ ") query from Name " + e.getMessage();

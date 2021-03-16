@@ -1121,7 +1121,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final Integer nstat = Integer.valueOf(resultArray[4].toString());
 
 			name = new Name(nid);
-			name.setGermplasmId(gid);
+			name.setGermplasm(new Germplasm(gid));
 			name.setNval(nval);
 			name.setTypeId(ntype);
 			name.setNstat(nstat);

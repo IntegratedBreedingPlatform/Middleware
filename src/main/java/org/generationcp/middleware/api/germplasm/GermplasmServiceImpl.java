@@ -226,15 +226,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 			} else {
 				germplasm.setReferenceId(0);
 			}
-
-			this.daoFactory.getGermplasmDao().save(germplasm);
-
+			final List<Name> names = new ArrayList<>();
 			germplasmDto.getNames().forEach((k, v) -> {
-				final Name name = new Name(null, germplasm.getGid(), nameTypesMapByName.get(k.toUpperCase()),
+				final Name name = new Name(null, germplasm, nameTypesMapByName.get(k.toUpperCase()),
 					(k.equalsIgnoreCase(germplasmDto.getPreferredName())) ? 1 : 0, userId, v, germplasm.getLocationId(),
 					Util.getCurrentDateAsIntegerValue(), 0);
-				this.daoFactory.getNameDao().save(name);
+				names.add(name);
 			});
+			germplasm.setNames(names);
+
+			this.daoFactory.getGermplasmDao().save(germplasm);
 
 			if (germplasmDto.getAttributes() != null) {
 				germplasmDto.getAttributes().forEach((k, v) -> {
@@ -626,7 +627,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				this.daoFactory.getNameDao().update(name);
 			} else {
 				// Create new record if name not yet exists
-				final Name name = new Name(null, germplasm.getGid(), nameTypeId, 0, userId,
+				final Name name = new Name(null, germplasm, nameTypeId, 0, userId,
 					value, germplasm.getLocationId(), germplasm.getGdate(), 0);
 				this.daoFactory.getNameDao().save(name);
 				germplasmNames.add(name);
@@ -975,20 +976,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasm.setReferenceId(0);
 
 			GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(germplasm));
-			this.daoFactory.getGermplasmDao().save(germplasm);
-
-			this.addCustomNameFieldsToSynonyms(germplasmDto);
-			germplasmDto.getSynonyms().forEach(synonym -> {
-				final Integer typeId = nameTypesMap.get(synonym.getType().toUpperCase());
-				if (typeId != null) {
-					final Name name = new Name(null, germplasm.getGid(), typeId,
-						0, userId, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
-					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
-						name.setNstat(1);
-					}
-					this.daoFactory.getNameDao().save(name);
-				}
-			});
 
 			if (germplasmDto.getExternalReferences() != null) {
 				final List<ExternalReference> references = new ArrayList<>();
@@ -999,6 +986,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 				});
 				germplasm.setExternalReferences(references);
 			}
+
+			this.addCustomNameFieldsToSynonyms(germplasmDto);
+			germplasmDto.getSynonyms().forEach(synonym -> {
+				final Integer typeId = nameTypesMap.get(synonym.getType().toUpperCase());
+				if (typeId != null) {
+					final Name name = new Name(null, germplasm, typeId,
+						0, userId, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
+					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
+						name.setNstat(1);
+					}
+					this.daoFactory.getNameDao().save(name);
+				}
+			});
+
+			this.daoFactory.getGermplasmDao().save(germplasm);
 
 			this.addCustomAttributeFieldsToAdditionalInfo(germplasmDto);
 			germplasmDto.getAdditionalInfo().forEach((k, v) -> {

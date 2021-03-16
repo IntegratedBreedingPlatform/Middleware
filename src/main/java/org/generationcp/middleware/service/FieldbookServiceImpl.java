@@ -39,7 +39,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -382,7 +381,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 						// Name
 						// side of the relationship link (Name.germplasmId)
 						// manually.
-						name.setGermplasmId(germplasm.getGid());
+						name.setGermplasm(germplasm);
 						germplasm.getNames().add(name);
 					}
 
@@ -813,7 +812,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer addGermplasmName(final String nameValue, final int gid, final int userId, final int nameTypeId, final int locationId,
 			final Integer date) {
-		final Name name = new Name(null, gid, nameTypeId, 0, userId, nameValue, locationId, date, 0);
+		final Name name = new Name(null, new Germplasm(gid), nameTypeId, 0, userId, nameValue, locationId, date, 0);
 		return this.getGermplasmDataManager().addGermplasmName(name);
 	}
 
