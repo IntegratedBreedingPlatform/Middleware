@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasmlist;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.germplasm.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
@@ -351,6 +352,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.orElseThrow(() -> new MiddlewareRequestException("", "list.folder.not.found"));
 
 		this.daoFactory.getGermplasmListDAO().makeTransient(folder);
+	}
+
+	@Override
+	public List<GermplasmListDto> getGermplasmLists(final Integer gid) {
+		return this.daoFactory.getGermplasmListDAO().getGermplasmListDtos(gid);
 	}
 
 	private void addListDataProperties(final List<GermplasmListData> savedGermplasmListData, final Set<String> propertyNames) {

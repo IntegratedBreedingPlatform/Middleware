@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
+import org.generationcp.middleware.api.germplasm.GermplasmListDto;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -25,6 +26,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
@@ -130,7 +132,39 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 	}
 
+	public List<GermplasmListDto> getGermplasmListDtos(final Integer gid) {
+		final List<GermplasmListDto> germplasmListDtos = new ArrayList<>();
+		final StringBuilder queryString = new StringBuilder();
+		queryString.append("SELECT l.listid AS listId, ");
+		queryString.append("l.listname AS listName, ");
+		queryString.append("l.listdate AS creationDate, ");
+		queryString.append("l.listdesc AS description ");
+		queryString.append("FROM listnms l ");
+		queryString.append("INNER JOIN listdata ld ON ld.listid = l.listid ");
+		queryString.append("WHERE ld.gid = :gid ");
+
+
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
+		sqlQuery.addScalar("listId");
+		sqlQuery.addScalar("listName");
+		sqlQuery.addScalar("creationDate");
+		sqlQuery.addScalar("description");
+		sqlQuery.setParameter("gid", gid);
+
+		sqlQuery.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP);
+
+		final List<Map<String, Object>> results = sqlQuery.list();
+		for (final Map<String, Object> result : results) {
+			final GermplasmListDto dto = new GermplasmListDto((Integer) result.get("listId"), String.valueOf(result.get("listName")),
+				String.valueOf(result.get("creationDate")), String.valueOf(result.get("description")));
+			germplasmListDtos.add(dto);
+		}
+
+		return germplasmListDtos;
+	}
+
 	@SuppressWarnings("unchecked")
+	// TODO IBP-4457:  delete when phasing out old Germplasm Details popup
 	public List<GermplasmList> getByGID(final Integer gid, final int start, final int numOfRows) {
 		try {
 			if (gid != null) {

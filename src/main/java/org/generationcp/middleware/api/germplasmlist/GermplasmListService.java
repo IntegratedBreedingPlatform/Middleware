@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasmlist;
 
+import org.generationcp.middleware.api.germplasm.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -39,5 +40,7 @@ public interface GermplasmListService {
 	Integer moveGermplasmListFolder(Integer germplasmListId, Integer newParentFolderId, String programUUID);
 
 	void deleteGermplasmListFolder(Integer folderId);
+
+	List<GermplasmListDto> getGermplasmLists(Integer gid);
 
 }
