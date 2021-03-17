@@ -60,10 +60,11 @@ public class Progenitor extends AbstractEntity implements Serializable {
 	@Column(name = "pid")
 	private Integer progenitorGid;
 
-	//TODO: review if it's needed by hibernate
-//	public Progenitor() {
-//		super(null);
-//	}
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
+	public Progenitor() {
+	}
 
 	public Progenitor(final Germplasm germplasm, final Integer progenitorNumber, final Integer progenitorGid, final Integer createdBy) {
 //		super(createdBy);
