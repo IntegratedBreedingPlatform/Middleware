@@ -238,7 +238,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			if (germplasmDto.getAttributes() != null) {
 				germplasmDto.getAttributes().forEach((k, v) -> {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), attributesMapByName.get(k.toUpperCase()), userId, v,
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), attributesMapByName.get(k.toUpperCase()), v,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					this.daoFactory.getAttributeDAO().save(attribute);
@@ -657,7 +657,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				this.daoFactory.getAttributeDAO().update(attribute);
 			} else {
 				this.daoFactory.getAttributeDAO()
-					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, userId, value,
+					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, value,
 						germplasm.getLocationId(),
 						0, germplasm.getGdate()));
 			}
@@ -1003,7 +1003,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasmDto.getAdditionalInfo().forEach((k, v) -> {
 				final Integer typeId = attributesMap.get(k.toUpperCase());
 				if (typeId != null) {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, userId, v,
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, v,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					this.daoFactory.getAttributeDAO().save(attribute);

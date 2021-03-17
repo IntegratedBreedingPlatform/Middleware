@@ -172,7 +172,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), germplasm.getCreatedBy(), "",
+			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "",
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 
@@ -287,11 +287,11 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), germplasm.getCreatedBy(), "",
+			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "",
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), germplasm.getCreatedBy(), "",
+			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "",
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 
@@ -332,7 +332,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		attribute.setGermplasmId(germplasm.getGid());
 		attribute.setTypeId(newAttributeCode.getFldno());
 		attribute.setAval(RandomStringUtils.randomAlphanumeric(50));
-		attribute.setCreatedBy(0);
 		attribute.setAdate(germplasm.getGdate());
 
 		this.daoFactory.getAttributeDAO().save(attribute);
@@ -370,7 +369,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_PASSPORT.getTable(),
 				UDTableType.ATRIBUTS_PASSPORT.getType(), GermplasmServiceImpl.PLOT_CODE);
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), plotCodeAttr.getFldno(), germplasm.getCreatedBy(), plotCodeValue,
+			.save(new Attribute(null, germplasm.getGid(), plotCodeAttr.getFldno(), plotCodeValue,
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 
@@ -389,7 +388,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_PASSPORT.getTable(),
 				UDTableType.ATRIBUTS_PASSPORT.getType(), GermplasmServiceImpl.PLOT_CODE);
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasmWithPlotCode.getGid(), plotCodeAttr.getFldno(), germplasmWithPlotCode.getCreatedBy(),
+			.save(new Attribute(null, germplasmWithPlotCode.getGid(), plotCodeAttr.getFldno(),
 				plotCodeValue,
 				germplasmWithPlotCode.getLocationId(),
 				0, germplasmWithPlotCode.getGdate()));

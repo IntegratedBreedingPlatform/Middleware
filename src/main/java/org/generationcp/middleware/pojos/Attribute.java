@@ -74,18 +74,18 @@ public class Attribute extends AbstractEntity implements Serializable {
 	@Column(name = "adate")
 	private Integer adate;
 
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
 	public Attribute() {
-//		super(null);
 	}
 
 	public Attribute(Integer aid) {
-//		super(null);
 		this.aid = aid;
 	}
 
-	public Attribute(Integer aid, Integer germplasmId, Integer typeId, Integer createdBy, String aval, Integer locationId,
-			Integer referenceId, Integer adate) {
-//		super(createdBy);
+	public Attribute(Integer aid, Integer germplasmId, Integer typeId, String aval, Integer locationId,
+		Integer referenceId, Integer adate) {
 		this.aid = aid;
 		this.germplasmId = germplasmId;
 		this.typeId = typeId;
@@ -117,11 +117,6 @@ public class Attribute extends AbstractEntity implements Serializable {
 
 	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
-	}
-
-//	@Override
-	public void setCreatedBy(Integer createdBy) {
-//		super.setCreatedBy(createdBy);
 	}
 
 	public Integer getLocationId() {
