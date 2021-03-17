@@ -565,7 +565,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	@Override
-	public Integer updateProgenitor(final Integer gid, final Integer progenitorId, final Integer progenitorNumber) {
+	public Integer updateProgenitor(final Integer gid, final Integer progenitorId, final Integer progenitorNumber,
+		final Integer createdBy) {
 
 		// check if the germplasm record identified by gid exists
 		final Germplasm child = this.germplasmDataManager.getGermplasmByGID(gid);
@@ -611,7 +612,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 				}
 			} else {
 				// create new Progenitor record
-				final Progenitor newRecord = new Progenitor(new Germplasm(gid), progenitorNumber, progenitorId);
+				final Progenitor newRecord = new Progenitor(new Germplasm(gid, createdBy), progenitorNumber, progenitorId, createdBy);
 				final List<Progenitor> progenitors = new ArrayList<>();
 				progenitors.add(newRecord);
 				final int added = this.addOrUpdateProgenitors(progenitors);

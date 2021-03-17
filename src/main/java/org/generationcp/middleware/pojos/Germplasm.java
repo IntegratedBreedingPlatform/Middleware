@@ -21,6 +21,10 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.AuditOverride;
+import org.hibernate.envers.AuditOverrides;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -108,6 +112,10 @@ import java.util.Map;
 
 	@NamedNativeQuery(name = "getProgenitor", query = "SELECT g.* FROM germplsm g, progntrs p WHERE g.gid = p.pid "
 		+ "and p.gid = :gid and p.pno = :pno and  g.deleted = 0  and g.grplce = 0", resultClass = Germplasm.class)})
+@AuditOverrides({
+	@AuditOverride(forClass = AbstractEntity.class)
+})
+@Audited
 @Entity
 @Table(name = "germplsm")
 // JAXB Element Tags for JSON output
@@ -115,7 +123,7 @@ import java.util.Map;
 @XmlType(propOrder = {"gid", "gnpgs", "gpid1", "gpid2", "gdate"})
 @XmlAccessorType(XmlAccessType.NONE)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "germplsm")
-public class Germplasm implements Serializable {
+public class Germplasm extends AbstractEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -257,10 +265,6 @@ public class Germplasm implements Serializable {
 	private Integer gpid2;
 
 	@Basic(optional = false)
-	@Column(name = "germuid")
-	private Integer userId;
-
-	@Basic(optional = false)
 	@Column(name = "lgid")
 	private Integer lgid;
 
@@ -309,6 +313,7 @@ public class Germplasm implements Serializable {
 	@JoinColumn(name = "gref", insertable = false, updatable = false)
 	private Bibref bibref;
 
+	@NotAudited
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "methn", insertable = false, updatable = false)
 	private Method method;
@@ -481,21 +486,22 @@ public class Germplasm implements Serializable {
 	@Transient
 	private String immediateSourceGID = null;
 
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
 	public Germplasm() {
-		super();
 		this.deleted = false;
 	}
 
 	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
-		final Integer userId, final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
+		final Integer createdBy, final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
 		final Integer grplce, final Integer mgid, final Name preferredName, final String preferredAbbreviation, final Method method) {
-		this();
+		this(gid, createdBy);
 		this.gid = gid;
 		this.methodId = methodId;
 		this.gnpgs = gnpgs;
 		this.gpid1 = gpid1;
 		this.gpid2 = gpid2;
-		this.userId = userId;
 		this.lgid = lgid;
 		this.locationId = locationId;
 		this.gdate = gdate;
@@ -509,13 +515,23 @@ public class Germplasm implements Serializable {
 	}
 
 	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
-		final Integer userId, final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
+		final Integer createdBy, final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
 
 		// gref =0, grplce = 0, mgid = 0
-		this(gid, methodId, gnpgs, gpid1, gpid2, userId, lgid, locationId, gdate, 0, 0, 0, preferredName, null, null);
+		this(gid, methodId, gnpgs, gpid1, gpid2, createdBy, lgid, locationId, gdate, 0, 0, 0, preferredName, null, null);
 	}
 
+	//TODO: cleanup - remove it, gid must not be used in constructor
+	@Deprecated
+	public Germplasm(final Integer gid, final Integer createdBy) {
+		super();
+		this.gid = gid;
+	}
+
+	//TODO: cleanup - remove it. It's only used in test scope
+	@Deprecated
 	public Germplasm(final Integer gid) {
+//		super(null);
 		this.gid = gid;
 	}
 
@@ -607,12 +623,8 @@ public class Germplasm implements Serializable {
 		this.methodId = methodId;
 	}
 
-	public Integer getUserId() {
-		return this.userId;
-	}
-
-	public void setUserId(final Integer userId) {
-		this.userId = userId;
+	public void setCreatedBy(final Integer createdBy) {
+//		super.setCreatedBy(createdBy);
 	}
 
 	public Integer getLocationId() {
@@ -720,8 +732,8 @@ public class Germplasm implements Serializable {
 		builder.append(this.gpid1);
 		builder.append(", gpid2=");
 		builder.append(this.gpid2);
-		builder.append(", userId=");
-		builder.append(this.userId);
+		builder.append(", createdBy=");
+		builder.append(super.getCreatedBy());
 		builder.append(", lgid=");
 		builder.append(this.lgid);
 		builder.append(", locationId=");

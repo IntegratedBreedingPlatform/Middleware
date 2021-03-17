@@ -13,6 +13,10 @@ package org.generationcp.middleware.pojos;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.envers.AuditOverride;
+import org.hibernate.envers.AuditOverrides;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -36,6 +40,10 @@ import java.io.Serializable;
  *
  * @author Kevin Manansala, Mark Agarrado
  */
+@AuditOverrides({
+	@AuditOverride(forClass = AbstractEntity.class)
+})
+@Audited
 @Entity
 @Table(name = "bibrefs")
 // JAXB Element Tags for JSON output
@@ -43,7 +51,7 @@ import java.io.Serializable;
 @XmlType(propOrder = {"refid", "typeFname", "pubdate", "authors", "editors", "analyt", "series", "volume", "issue", "publish", "pucity",
 		"pucntry"})
 @XmlAccessorType(XmlAccessType.NONE)
-public class Bibref implements Serializable {
+public class Bibref extends AbstractEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -54,6 +62,7 @@ public class Bibref implements Serializable {
 	@XmlElement(name = "bibrefId")
 	private Integer refid;
 
+	@NotAudited
 	@ManyToOne(targetEntity = UserDefinedField.class, optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "pubtype", nullable = true)
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -116,15 +125,22 @@ public class Bibref implements Serializable {
 	@XmlElement(name = "publishingCountry")
 	private String pucntry;
 
+	@Deprecated
 	public Bibref() {
+//		super(null);
 	}
 
-	public Bibref(Integer refid) {
+	@Deprecated
+	public Bibref(final Integer refid) {
+//		super(null);
 		this.refid = refid;
 	}
 
-	public Bibref(Integer refid, String authors, String editors, String analyt, String monogr, String series, String volume, String issue,
-			String pagecol, String publish, String pucity, String pucntry) {
+	@Deprecated
+	//TOOD: remove fedid
+	public Bibref(final Integer createdBy, final Integer refid, final String authors, final String editors, final String analyt, final String monogr, final String series,
+		final String volume, final String issue, final String pagecol, final String publish, final String pucity, final String pucntry) {
+//		super(createdBy);
 		this.refid = refid;
 		this.authors = authors;
 		this.editors = editors;

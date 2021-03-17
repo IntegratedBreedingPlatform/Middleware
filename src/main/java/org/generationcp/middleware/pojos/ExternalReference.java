@@ -4,6 +4,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.hibernate.envers.AuditOverride;
+import org.hibernate.envers.AuditOverrides;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -17,9 +20,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 
+@AuditOverrides({
+	@AuditOverride(forClass = AbstractEntity.class)
+})
+@Audited
 @Entity
 @Table(name = "external_reference")
-public class ExternalReference implements Serializable {
+public class ExternalReference extends AbstractEntity implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

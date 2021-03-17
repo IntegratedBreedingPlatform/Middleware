@@ -37,7 +37,7 @@ public class GermplasmGuidGeneratorImplTest {
 		germplasm.setGrplce(0);
 		germplasm.setGpid1(0);
 		germplasm.setGpid2(0);
-		germplasm.setUserId(1);
+		germplasm.setCreatedBy(1);
 		germplasm.setLgid(0);
 		germplasm.setLocationId(0);
 		germplasm.setGdate(20180206);

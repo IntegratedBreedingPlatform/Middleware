@@ -22,18 +22,18 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Random;
 
 /**
  * The class <code>StudyGermplasmListServiceImplTest</code> contains tests for the class <code>{@link StudyEntryServiceImpl}</code>.
  */
 public class StudyEntryServiceImplTest extends IntegrationTestBase {
 
+	private static final Integer CREATED_BY = new Random().nextInt();
 	private static final Integer NUMBER_OF_GERMPLASM = 5;
 
 	private static final String GERMPLASM_PREFERRED_NAME_PREFIX = DataSetupTest.GERMPLSM_PREFIX + "PR-";

@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Random;
 
 
 public class PedigreeDataManagerImplTest extends IntegrationTestBase {
@@ -178,6 +179,8 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	
 	@Test
 	public void tesUpdateProgenitor() {
+		Integer createdBy = new Random().nextInt();
+
 		this.germplasmWithPolyCrosses = GermplasmTestDataInitializer.createGermplasm(1);
 		this.germplasmManager.save(this.germplasmWithPolyCrosses);
 		final Integer gid = this.germplasmWithPolyCrosses.getGid();
@@ -187,12 +190,12 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		this.germplasmManager.save(newGermplasm);
 		Integer newProgenitorId = newGermplasm.getGid();
 		Assert.assertNotEquals(0, this.germplasmWithPolyCrosses.getGpid2().intValue());
-		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 2);
+		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 2, createdBy);
 		Assert.assertEquals(newProgenitorId, this.germplasmManager.getGermplasmByGID(gid).getGpid2());
-		
+
 		// New progenitor record should be created
 		final Integer progenitorGid = this.crossWithUnknownParent.getGid();
-		this.pedigreeManager.updateProgenitor(gid, progenitorGid, 3);
+		this.pedigreeManager.updateProgenitor(gid, progenitorGid, 3, createdBy);
 		List<Germplasm> progenitors = this.germplasmManager.getProgenitorsByGIDWithPrefName(gid);
 		Assert.assertEquals(1, progenitors.size());
 		Assert.assertEquals(progenitorGid, progenitors.get(0).getGid());
@@ -202,7 +205,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		newGermplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		this.germplasmManager.save(newGermplasm);
 		newProgenitorId = newGermplasm.getGid();
-		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 3);
+		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 3, createdBy);
 		progenitors = this.germplasmManager.getProgenitorsByGIDWithPrefName(gid);
 		Assert.assertEquals(1, progenitors.size());
 		Assert.assertEquals(newProgenitorId, progenitors.get(0).getGid());

@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -42,7 +41,6 @@ import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UDTableType;
@@ -70,6 +68,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -85,6 +84,8 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertNotNull;
 
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
+
+	private static final Integer CREATED_BY = new Random().nextInt();
 
 	public static final String separator = "-";
 	private static final String parent1Name = "CML502";
@@ -655,7 +656,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		attribute.setAval("aval");
 		attribute.setGermplasmId(gid);
 		attribute.setLocationId(0);
-		attribute.setUserId(0);
+		attribute.setCreatedBy(0);
 		attribute.setReferenceId(0);
 		attribute.setTypeId(0);
 		final Integer id = this.germplasmDataManager.addGermplasmAttribute(attribute);
@@ -672,7 +673,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			final String attributeString = attribute.toString();
 			attribute.setAdate(0);
 			attribute.setLocationId(0);
-			attribute.setUserId(0);
+			attribute.setCreatedBy(0);
 			attribute.setReferenceId(0);
 			attribute.setTypeId(0);
 			this.germplasmDataManager.updateGermplasmAttribute(attribute);
@@ -694,8 +695,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		this.germplasmDAO.save(maleParent1);
 		this.germplasmDAO.save(maleParent2);
 
-		final Progenitor progenitor1 = new Progenitor(null, 3, maleParent1.getGid());
-		final Progenitor progenitor2 = new Progenitor(null, 4, maleParent2.getGid());
+		final Progenitor progenitor1 = new Progenitor(null, 3, maleParent1.getGid(), CREATED_BY);
+		final Progenitor progenitor2 = new Progenitor(null, 4, maleParent2.getGid(), CREATED_BY);
 
 		final Triple<Germplasm, Name, List<Progenitor>>
 			germplasmTriple = ImmutableTriple.of(germplasm, germplasm.getPreferredName(), Arrays.asList(progenitor1, progenitor2));
@@ -1054,7 +1055,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Attribute attr = new Attribute();
 		attr.setGermplasmId(237431);
 		attr.setTypeId(1);
-		attr.setUserId(1);
+		attr.setCreatedBy(1);
 		attr.setAval("EARLY");
 		attr.setLocationId(31);
 		attr.setReferenceId(0);
@@ -1345,7 +1346,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		attr.setAid(1);
 		attr.setGermplasmId(germplasm.getGid());
 		attr.setTypeId(userDefinedField.getFldno());
-		attr.setUserId(1);
+		attr.setCreatedBy(1);
 		attr.setAval(aval);
 		attr.setLocationId(0);
 		attr.setReferenceId(null);
@@ -1381,7 +1382,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		germplasm.setGrplce(0);
 		germplasm.setGpid1(0);
 		germplasm.setGpid2(0);
-		germplasm.setUserId(1);
+		germplasm.setCreatedBy(1);
 		germplasm.setLgid(0);
 		germplasm.setLocationId(0);
 		germplasm.setGdate(20180206);

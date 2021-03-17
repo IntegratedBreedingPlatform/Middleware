@@ -203,7 +203,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
-			germplasm.setUserId(userId);
+			germplasm.setCreatedBy(userId);
 			germplasm.setLgid(0);
 			germplasm.setLocationId(locationsMapByAbbr.get(germplasmDto.getLocationAbbr().toUpperCase()));
 			germplasm.setDeleted(Boolean.FALSE);
@@ -217,7 +217,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			if (!StringUtils.isEmpty(germplasmDto.getReference())) {
 				final Bibref bibref =
-					new Bibref(null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, germplasmDto.getReference(), DEFAULT_BIBREF_FIELD,
+					new Bibref(userId, null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, germplasmDto.getReference(), DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD);
@@ -387,7 +387,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
 		if (optionalGermplasmUpdateDTO.isPresent()) {
 			final GermplasmUpdateDTO germplasmUpdateDTO = optionalGermplasmUpdateDTO.get();
-			this.updateGermplasm(germplasm, germplasmUpdateDTO, locationAbbreviationIdMap, codeBreedingMethodDTOMap, progenitorsMapByGid,
+			this.updateGermplasm(userId, germplasm, germplasmUpdateDTO, locationAbbreviationIdMap, codeBreedingMethodDTOMap, progenitorsMapByGid,
 				gidsOfGermplasmWithDescendants,
 				conflictErrors);
 			this.saveAttributesAndNames(userId, attributeCodes, nameCodes, namesMap, attributesMap, germplasm,
@@ -443,7 +443,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private void updateGermplasm(final Germplasm germplasm, final GermplasmUpdateDTO germplasmUpdateDTO,
+	private void updateGermplasm(final Integer createdBy, final Germplasm germplasm, final GermplasmUpdateDTO germplasmUpdateDTO,
 		final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap,
 		final Map<Integer, Germplasm> progenitorsMapByGid,
@@ -464,7 +464,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		locationIdOptional.ifPresent(germplasm::setLocationId);
 		germplasmDateOptional.ifPresent(germplasm::setGdate);
 
-		this.saveOrUpdateReference(germplasm, referenceOptional);
+		this.saveOrUpdateReference(createdBy, germplasm, referenceOptional);
 		this.updateBreedingMethodAndProgenitors(germplasmUpdateDTO, germplasm, breedingMethodOptional, progenitorsMapByGid,
 			gidsOfGermplasmWithDescendants,
 			conflictErrors);
@@ -584,7 +584,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return Lists.newArrayList(this.getGidsOfGermplasmWithDescendants(gids));
 	}
 
-	private void saveOrUpdateReference(final Germplasm germplasm, final Optional<String> referenceOptional) {
+	private void saveOrUpdateReference(final Integer createdBy, final Germplasm germplasm, final Optional<String> referenceOptional) {
 		if (referenceOptional.isPresent()) {
 			if (germplasm.getBibref() != null) {
 				final Bibref bibref = germplasm.getBibref();
@@ -592,7 +592,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				this.daoFactory.getBibrefDAO().save(bibref);
 			} else {
 				final Bibref bibref =
-					new Bibref(null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, referenceOptional.get(), DEFAULT_BIBREF_FIELD,
+					new Bibref(createdBy, null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, referenceOptional.get(), DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD);
@@ -964,7 +964,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
-			germplasm.setUserId(userId);
+			germplasm.setCreatedBy(userId);
 			germplasm.setLgid(0);
 			germplasm.setGnpgs(0);
 			germplasm.setGpid1(0);
@@ -987,6 +987,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 				germplasm.setExternalReferences(references);
 			}
 
+			this.daoFactory.getGermplasmDao().save(germplasm);
+
 			this.addCustomNameFieldsToSynonyms(germplasmDto);
 			germplasmDto.getSynonyms().forEach(synonym -> {
 				final Integer typeId = nameTypesMap.get(synonym.getType().toUpperCase());
@@ -999,8 +1001,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 					this.daoFactory.getNameDao().save(name);
 				}
 			});
-
-			this.daoFactory.getGermplasmDao().save(germplasm);
 
 			this.addCustomAttributeFieldsToAdditionalInfo(germplasmDto);
 			germplasmDto.getAdditionalInfo().forEach((k, v) -> {

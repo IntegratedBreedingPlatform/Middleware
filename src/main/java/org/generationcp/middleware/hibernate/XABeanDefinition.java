@@ -61,11 +61,9 @@ public class XABeanDefinition {
 
 	static final String UNIQUE_RESOURCE_NAME = "uniqueResourceName";
 
-	private DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
+	private final DatasourceUtilities xaDatasourceUtilities;
 
 	private static final Logger LOG = LoggerFactory.getLogger(DatasourceUtilities.class);
-
-	
 
 	public XABeanDefinition() {
 		this.xaDatasourceUtilities = new DatasourceUtilities();
@@ -88,15 +86,12 @@ public class XABeanDefinition {
 		LOG.debug("Creating datasource and session factory related beans.");
 		this.createXAConnectionBeans(registry, xaDataSourceProperties.getWorkbenchDbName(), xaDataSourceProperties);
 
-		LOG.debug("Retrieve all appliable crop database.");
+		LOG.debug("Retrieve all applicable crop database.");
 
 		final List<String> cropDatabases = this.xaDatasourceUtilities.retrieveCropDatabases(workbenchDataSource);
-
-		for (final String cropDatabase : cropDatabases) {
-			LOG.debug(String.format("Creating '%s' datasource and session factory related beans.", cropDatabase));
-			this.createXAConnectionBeans(registry, cropDatabase, xaDataSourceProperties);
-		}
-
+		cropDatabases
+			.stream()
+			.forEach(cropDatabase -> this.createXAConnectionBeans(registry, cropDatabase, xaDataSourceProperties));
 	}
 
 	/**
@@ -107,6 +102,8 @@ public class XABeanDefinition {
 	 */
 	void createXAConnectionBeans(final BeanDefinitionRegistry registry, final String cropDatabaseName,
 			final DataSourceProperties xaDataSourceProperties) {
+
+		LOG.debug(String.format("Creating '%s' datasource and session factory related beans.", cropDatabaseName));
 
 		final RootBeanDefinition dataSourceBeanDefinition =
 				this.xaDatasourceUtilities.createRootBeanDefinition(AtomikosDataSourceBean.class, ImmutableMap.<String, Object>of(

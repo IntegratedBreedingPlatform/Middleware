@@ -11,6 +11,10 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.hibernate.envers.AuditOverride;
+import org.hibernate.envers.AuditOverrides;
+import org.hibernate.envers.Audited;
+
 import java.io.Serializable;
 
 import javax.persistence.Basic;
@@ -31,9 +35,13 @@ import javax.persistence.Table;
  */
 @NamedQueries({@NamedQuery(name = "getAttributesByGID",
 		query = "FROM Attribute a WHERE a.germplasmId = :gid AND a.typeId <> 9999 AND a.typeId <> 999")})
+@AuditOverrides({
+	@AuditOverride(forClass = AbstractEntity.class)
+})
+@Audited
 @Entity
 @Table(name = "atributs")
-public class Attribute implements Serializable {
+public class Attribute extends AbstractEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -54,10 +62,6 @@ public class Attribute implements Serializable {
 	private Integer typeId;
 
 	@Basic(optional = false)
-	@Column(name = "auid")
-	private Integer userId;
-
-	@Basic(optional = false)
 	@Column(name = "aval")
 	private String aval;
 
@@ -71,20 +75,20 @@ public class Attribute implements Serializable {
 	private Integer adate;
 
 	public Attribute() {
+//		super(null);
 	}
 
 	public Attribute(Integer aid) {
-		super();
+//		super(null);
 		this.aid = aid;
 	}
 
-	public Attribute(Integer aid, Integer germplasmId, Integer typeId, Integer userId, String aval, Integer locationId,
+	public Attribute(Integer aid, Integer germplasmId, Integer typeId, Integer createdBy, String aval, Integer locationId,
 			Integer referenceId, Integer adate) {
-		super();
+//		super(createdBy);
 		this.aid = aid;
 		this.germplasmId = germplasmId;
 		this.typeId = typeId;
-		this.userId = userId;
 		this.aval = aval;
 		this.locationId = locationId;
 		this.referenceId = referenceId;
@@ -115,12 +119,9 @@ public class Attribute implements Serializable {
 		this.typeId = typeId;
 	}
 
-	public Integer getUserId() {
-		return this.userId;
-	}
-
-	public void setUserId(Integer userId) {
-		this.userId = userId;
+//	@Override
+	public void setCreatedBy(Integer createdBy) {
+//		super.setCreatedBy(createdBy);
 	}
 
 	public Integer getLocationId() {
@@ -164,8 +165,8 @@ public class Attribute implements Serializable {
 		builder.append(this.germplasmId);
 		builder.append(", typeId=");
 		builder.append(this.typeId);
-		builder.append(", userId=");
-		builder.append(this.userId);
+		builder.append(", createdBy=");
+		builder.append(super.getCreatedBy());
 		builder.append(", aval=");
 		builder.append(this.aval);
 		builder.append(", locationId=");

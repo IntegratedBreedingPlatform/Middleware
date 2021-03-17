@@ -59,6 +59,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -67,6 +68,7 @@ import static org.hamcrest.core.Is.is;
 
 public class GermplasmDAOTest extends IntegrationTestBase {
 
+	private static final Integer CREATED_BY = new Random().nextInt();
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
 	private static final Integer TEST_PROJECT_ID = 1;
 
@@ -428,7 +430,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		germplasm.setGnpgs(-1);
 		germplasm.setGpid1(0);
 		germplasm.setGpid2(0);
-		germplasm.setUserId(1);
+		germplasm.setCreatedBy(1);
 		germplasm.setLgid(0);
 		germplasm.setLocationId(1);
 		germplasm.setGdate(20160101);
@@ -442,7 +444,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Name name1 = new Name();
 		name1.setTypeId(5);
 		name1.setNstat(1);
-		name1.setUserId(1);
+		name1.setCreatedBy(1);
 		name1.setNval("Name1");
 		name1.setLocationId(1);
 		name1.setNdate(20160101);
@@ -451,7 +453,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Name name2 = new Name();
 		name2.setTypeId(5);
 		name2.setNstat(1);
-		name2.setUserId(1);
+		name2.setCreatedBy(1);
 		name2.setNval("Name2");
 		name2.setLocationId(1);
 		name2.setNdate(20160101);
@@ -726,7 +728,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			attribute.setGermplasmId(germplasmGID);
 			attribute.setTypeId(attributeField.getFldno());
 			attribute.setAval(RandomStringUtils.randomAlphanumeric(50));
-			attribute.setUserId(0);
+			attribute.setCreatedBy(0);
 			attribute.setAdate(germplasm.getGdate());
 
 			this.germplasmDataDM.addGermplasmAttribute(attribute);
@@ -795,8 +797,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Integer progenitor1ID = this.insertGermplasmWithName(progenitor1Name);
 		final String progenitor2Name = RandomStringUtils.randomAlphabetic(20);
 		final Integer progenitor2ID = this.insertGermplasmWithName(progenitor2Name);
-		this.progenitorDao.save(new Progenitor(crossGermplasm, 3, progenitor1ID));
-		this.progenitorDao.save(new Progenitor(crossGermplasm, 4, progenitor2ID));
+		this.progenitorDao.save(new Progenitor(crossGermplasm, 3, progenitor1ID, CREATED_BY));
+		this.progenitorDao.save(new Progenitor(crossGermplasm, 4, progenitor2ID, CREATED_BY));
 
 		final List<Germplasm> progenitors = this.dao.getProgenitorsByGIDWithPrefName(crossId);
 		Assert.assertEquals(2, progenitors.size());
@@ -827,8 +829,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Integer cross1progenitor1ID = this.insertGermplasmWithName(cross1progenitor1Name);
 		final String cross1progenitor2Name = RandomStringUtils.randomAlphabetic(20);
 		final Integer cross1progenitor2ID = this.insertGermplasmWithName(cross1progenitor2Name);
-		this.progenitorDao.save(new Progenitor(cross1Germplasm, 3, cross1progenitor1ID));
-		this.progenitorDao.save(new Progenitor(cross1Germplasm, 4, cross1progenitor2ID));
+		this.progenitorDao.save(new Progenitor(cross1Germplasm, 3, cross1progenitor1ID, CREATED_BY));
+		this.progenitorDao.save(new Progenitor(cross1Germplasm, 4, cross1progenitor2ID, CREATED_BY));
 
 		// Create 3 progenitor records for Gid2 = Cross2
 		final String cross2progenitor1Name = RandomStringUtils.randomAlphabetic(20);
@@ -837,9 +839,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Integer cross2progenitor2ID = this.insertGermplasmWithName(cross2progenitor2Name);
 		final String cross2progenitor3Name = RandomStringUtils.randomAlphabetic(20);
 		final Integer cross2progenitor3ID = this.insertGermplasmWithName(cross2progenitor3Name);
-		this.progenitorDao.save(new Progenitor(cross2Germplasm, 3, cross2progenitor1ID));
-		this.progenitorDao.save(new Progenitor(cross2Germplasm, 4, cross2progenitor2ID));
-		this.progenitorDao.save(new Progenitor(cross2Germplasm, 5, cross2progenitor3ID));
+		this.progenitorDao.save(new Progenitor(cross2Germplasm, 3, cross2progenitor1ID, CREATED_BY));
+		this.progenitorDao.save(new Progenitor(cross2Germplasm, 4, cross2progenitor2ID, CREATED_BY));
+		this.progenitorDao.save(new Progenitor(cross2Germplasm, 5, cross2progenitor3ID, CREATED_BY));
 
 		final Map<Integer, List<GermplasmParent>> progenitorsMap =
 			this.dao.getParentsFromProgenitorsForGIDsMap(Lists.newArrayList(cross1ID, cross2ID, gidNoProgenitor));
@@ -943,7 +945,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm maleParent2 =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.dao.save(maleParent2);
-		this.progenitorDao.save(new Progenitor(existingCross, 3, maleParent2.getGid()));
+		this.progenitorDao.save(new Progenitor(existingCross, 3, maleParent2.getGid(), CREATED_BY));
 		Assert.assertTrue(this.dao
 			.hasExistingCrosses(femaleParent.getGid(), Arrays.asList(maleParent1.getGid(), maleParent2.getGid()), Optional.empty()));
 		//Check if self is excluded
@@ -985,7 +987,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm maleParent2 =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.dao.save(maleParent2);
-		this.progenitorDao.save(new Progenitor(existingCross, 3, maleParent2.getGid()));
+		this.progenitorDao.save(new Progenitor(existingCross, 3, maleParent2.getGid(), CREATED_BY));
 		List<Germplasm> existingCrosses =
 			this.dao.getExistingCrosses(femaleParent.getGid(), Arrays.asList(maleParent1.getGid(), maleParent2.getGid()), Optional.empty());
 		Assert.assertEquals(existingCross.getGid(), existingCrosses.get(0).getGid());
