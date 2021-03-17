@@ -112,6 +112,8 @@
 					<tableExists tableName="names_aud"></tableExists>
 					<tableExists tableName="progntrs_aud"></tableExists>
 					<tableExists tableName="external_reference_aud"></tableExists>
+					<tableExists tableName="germplasm_externalreference_aud"></tableExists>
+					<tableExists tableName="germplasm_name_aud"></tableExists>
 				</not>
 			</and>
 		</preConditions>
@@ -249,6 +251,26 @@
 				modified_date    timestamp     null,
 				primary key (id, REV),
 				constraint FK_external_reference_aud_revinfo
+					foreign key (REV) references revinfo(rev)
+			);
+
+			CREATE TABLE germplasm_externalreference_aud (
+				REV     int     not null,
+				REVTYPE tinyint not null,
+				id      int     not null,
+				gid     int     not null,
+				primary key (id, gid, REV),
+				constraint FK_germplasm_externalreference_aud_revinfo
+					foreign key (REV) references revinfo(rev)
+			);
+
+			CREATE TABLE germplasm_name_aud (
+				REV     int     not null,
+				REVTYPE tinyint not null,
+				nid     int     not null,
+				gid     int     not null,
+				primary key (nid, gid, REV),
+				constraint FK_germplasm_name_aud_revinfo
 					foreign key (REV) references revinfo(rev)
 			);
 

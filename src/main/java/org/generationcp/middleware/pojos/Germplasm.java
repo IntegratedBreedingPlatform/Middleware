@@ -21,6 +21,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.AuditJoinTable;
 import org.hibernate.envers.AuditOverride;
 import org.hibernate.envers.AuditOverrides;
 import org.hibernate.envers.Audited;
@@ -310,6 +311,7 @@ public class Germplasm extends AbstractEntity implements Serializable {
 	@Column(name = "mgid")
 	private Integer mgid;
 
+	@AuditJoinTable(name = "germplasm_name_aud")
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "gid")
 	private List<Name> names = new ArrayList<Name>();
@@ -332,6 +334,7 @@ public class Germplasm extends AbstractEntity implements Serializable {
 	@JoinColumn(name = "methn", insertable = false, updatable = false)
 	private Method method;
 
+	@AuditJoinTable(name = "germplasm_externalreference_aud")
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "gid")
 	private List<ExternalReference> externalReferences = new ArrayList<>();
