@@ -36,7 +36,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		newAttribute.setLocationId(dto.getLocationId());
 		newAttribute.setReferenceId(0);
 		newAttribute.setAdate(Integer.valueOf(dto.getDate()));
-		return this.daoFactory.getAttributeDAO().update(newAttribute).getAid();
+		return this.daoFactory.getAttributeDAO().save(newAttribute).getAid();
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		attribute.setAval(dto.getValue());
 		attribute.setLocationId(dto.getLocationId());
 		attribute.setAdate(Integer.valueOf(dto.getDate()));
-		return this.daoFactory.getAttributeDAO().save(attribute).getAid();
+		return this.daoFactory.getAttributeDAO().update(attribute).getAid();
 	}
 
 	@Override
