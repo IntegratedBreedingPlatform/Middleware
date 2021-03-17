@@ -15,7 +15,7 @@ public class GermplasmMethodValidator {
 				germplasmIdentifier,
 				String.format("%s (%s)", oldMethod.getMname(), oldMethod.getMtype())});
 			return false;
-		} else if (!isValidMethodProgenitor(oldMethod, newMethod)) {
+		} else if (!this.isValidMethodProgenitor(oldMethod, newMethod)) {
 			conflictErrors.put("germplasm.update.number.of.progenitors.mismatch", new String[] {
 				germplasmIdentifier});
 			return false;

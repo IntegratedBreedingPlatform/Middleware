@@ -13,6 +13,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
@@ -82,7 +83,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private final GermplasmMethodValidator germplasmMethodValidator;
 
+	private final HibernateSessionProvider sessionProvider;
+
 	public GermplasmServiceImpl(final HibernateSessionProvider sessionProvider) {
+		this.sessionProvider = sessionProvider;
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.germplasmMethodValidator = new GermplasmMethodValidator();
 	}
@@ -1000,8 +1004,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public GermplasmDTO updateGermplasm(final Integer userId, final String germplasmDbId, final GermplasmUpdateRequest germplasmUpdateRequest) {
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
+		final GermplasmDAO germplasmDao = this.daoFactory.getGermplasmDao();
 		final List<Germplasm> germplasmByGUIDs =
-			this.daoFactory.getGermplasmDao().getGermplasmByGUIDs(Collections.singletonList(germplasmDbId));
+			germplasmDao.getGermplasmByGUIDs(Collections.singletonList(germplasmDbId));
 		if (CollectionUtils.isEmpty(germplasmByGUIDs)) {
 			throw new MiddlewareRequestException("", "germplasm.invalid.guid");
 		}
@@ -1035,7 +1040,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (!conflictErrors.isEmpty()) {
 			throw new MiddlewareRequestException(null, conflictErrors);
 		}
-		this.daoFactory.getGermplasmDao().update(germplasm);
+		germplasmDao.update(germplasm);
 
 		// Update germplasm names
 		final NameDAO nameDao = this.daoFactory.getNameDao();
@@ -1087,6 +1092,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 				}
 			}
 		});
+
+		// Unless the session is flushed, the latest changes to germplasm,names and attributes are not reflected in object returned by method
+		this.sessionProvider.getSession().flush();
 
 		return this.getGermplasmDTOByGUID(germplasmDbId).get();
 	}
