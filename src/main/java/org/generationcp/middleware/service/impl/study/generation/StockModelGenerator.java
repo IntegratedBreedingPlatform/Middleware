@@ -15,8 +15,7 @@ import java.util.Map;
 
 public class StockModelGenerator {
 
-	protected StockModel generate(final Map<Integer, MeasurementVariable> variablesMap, final List<ObservationUnitData> dataList,
-		final Integer createdBy) {
+	protected StockModel generate(final Map<Integer, MeasurementVariable> variablesMap, final List<ObservationUnitData> dataList) {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setIsObsolete(false);
@@ -39,7 +38,7 @@ public class StockModelGenerator {
 						dbxref = Integer.valueOf(value);
 					}
 				}
-				stockModel.setGermplasm(new Germplasm(dbxref, createdBy));
+				stockModel.setGermplasm(new Germplasm(dbxref));
 
 			} else if (TermId.DESIG.getId() == variableId) {
 				stockModel.setName(value);

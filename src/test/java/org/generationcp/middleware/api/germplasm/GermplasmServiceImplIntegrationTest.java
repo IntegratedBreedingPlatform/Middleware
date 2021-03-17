@@ -1285,7 +1285,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Integer gnpgs, final Integer gpid1,
 		final Integer gpid2) {
 		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
-			0, 0, 0, 0, 0,
+			0, 0, 0, 0,
 			0, 0, null, null, method);
 		if (StringUtils.isNotEmpty(germplasmUUID)) {
 			germplasm.setGermplasmUUID(germplasmUUID);

@@ -74,7 +74,7 @@ public class StockSaver extends Saver {
 							dbxref = Integer.valueOf(value);
 						}
 					}
-					stockModel.setGermplasm(new Germplasm(dbxref, null));
+					stockModel.setGermplasm(new Germplasm(dbxref));
 
 				} else if (TermId.DESIG.getId() == variableId) {
 					stockModel = this.getStockObject(stockModel);

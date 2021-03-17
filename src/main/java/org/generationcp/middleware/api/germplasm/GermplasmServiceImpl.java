@@ -193,6 +193,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				}
 			}
 
+			//TODO: use a constructor with the properly arguments
 			final Germplasm germplasm = new Germplasm();
 
 			final Method method = methodsMapByAbbr.get(germplasmDto.getBreedingMethodAbbr().toUpperCase());
@@ -203,7 +204,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
-			germplasm.setCreatedBy(userId);
 			germplasm.setLgid(0);
 			germplasm.setLocationId(locationsMapByAbbr.get(germplasmDto.getLocationAbbr().toUpperCase()));
 			germplasm.setDeleted(Boolean.FALSE);
@@ -963,7 +963,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
-			germplasm.setCreatedBy(userId);
 			germplasm.setLgid(0);
 			germplasm.setGnpgs(0);
 			germplasm.setGpid1(0);

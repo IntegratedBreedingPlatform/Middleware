@@ -430,7 +430,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		germplasm.setGnpgs(-1);
 		germplasm.setGpid1(0);
 		germplasm.setGpid2(0);
-		germplasm.setCreatedBy(1);
 		germplasm.setLgid(0);
 		germplasm.setLocationId(1);
 		germplasm.setGdate(20160101);

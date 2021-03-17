@@ -1154,7 +1154,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		@SuppressWarnings("rawtypes") final List resultGermplasms = queryGermplasms.list();
 		for (final Object result : resultGermplasms) {
 			final Object[] resultArray = (Object[]) result;
-			g = new Germplasm(Integer.valueOf(resultArray[0].toString()), null);
+			g = new Germplasm(Integer.valueOf(resultArray[0].toString()));
 			g.setGpid1(Integer.valueOf(resultArray[1].toString()));
 			g.setGpid2(Integer.valueOf(resultArray[2].toString()));
 			g.setGrplce(Integer.valueOf(resultArray[3].toString()));

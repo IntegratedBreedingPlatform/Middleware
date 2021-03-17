@@ -612,7 +612,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 				}
 			} else {
 				// create new Progenitor record
-				final Progenitor newRecord = new Progenitor(new Germplasm(gid, createdBy), progenitorNumber, progenitorId, createdBy);
+				final Progenitor newRecord = new Progenitor(new Germplasm(gid), progenitorNumber, progenitorId, createdBy);
 				final List<Progenitor> progenitors = new ArrayList<>();
 				progenitors.add(newRecord);
 				final int added = this.addOrUpdateProgenitors(progenitors);

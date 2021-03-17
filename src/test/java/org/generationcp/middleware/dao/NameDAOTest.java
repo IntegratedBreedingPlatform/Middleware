@@ -184,7 +184,6 @@ public class NameDAOTest extends IntegrationTestBase {
 
 	private Germplasm createGermplasmTestData(final int dateIntValue) {
 		final Germplasm germplasm = new Germplasm();
-		germplasm.setCreatedBy(1);
 		germplasm.setLocationId(0);
 		germplasm.setGdate(dateIntValue);
 		germplasm.setMethodId(1);

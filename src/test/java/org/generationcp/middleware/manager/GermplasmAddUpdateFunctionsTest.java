@@ -41,7 +41,6 @@ public class GermplasmAddUpdateFunctionsTest extends IntegrationTestBase {
 		g.setMgid(1);
 		g.setLgid(1);
 		// g.setUserId(Integer.valueOf(527));
-		g.setCreatedBy(1);
 		g.setReferenceId(1);
 		g.setDeleted(Boolean.FALSE);
 

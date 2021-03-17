@@ -511,9 +511,9 @@ public class Germplasm extends AbstractEntity implements Serializable {
 	}
 
 	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
-		final Integer createdBy, final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
+		final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
 		final Integer grplce, final Integer mgid, final Name preferredName, final String preferredAbbreviation, final Method method) {
-		this(gid, createdBy);
+		this(gid);
 		this.gid = gid;
 		this.methodId = methodId;
 		this.gnpgs = gnpgs;
@@ -535,20 +535,12 @@ public class Germplasm extends AbstractEntity implements Serializable {
 		final Integer createdBy, final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
 
 		// gref =0, grplce = 0, mgid = 0
-		this(gid, methodId, gnpgs, gpid1, gpid2, createdBy, lgid, locationId, gdate, 0, 0, 0, preferredName, null, null);
+		this(gid, methodId, gnpgs, gpid1, gpid2, lgid, locationId, gdate, 0, 0, 0, preferredName, null, null);
 	}
 
-	//TODO: cleanup - remove it, gid must not be used in constructor
-	@Deprecated
-	public Germplasm(final Integer gid, final Integer createdBy) {
-		super();
-		this.gid = gid;
-	}
-
-	//TODO: cleanup - remove it. It's only used in test scope
+	//TODO: cleanup - remove it.
 	@Deprecated
 	public Germplasm(final Integer gid) {
-//		super(null);
 		this.gid = gid;
 	}
 
@@ -638,10 +630,6 @@ public class Germplasm extends AbstractEntity implements Serializable {
 
 	public void setMethodId(final Integer methodId) {
 		this.methodId = methodId;
-	}
-
-	public void setCreatedBy(final Integer createdBy) {
-//		super.setCreatedBy(createdBy);
 	}
 
 	public Integer getLocationId() {
