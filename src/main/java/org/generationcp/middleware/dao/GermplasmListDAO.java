@@ -141,7 +141,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		queryString.append("l.listdesc AS description ");
 		queryString.append("FROM listnms l ");
 		queryString.append("INNER JOIN listdata ld ON ld.listid = l.listid ");
-		queryString.append("WHERE ld.gid = :gid ");
+		queryString.append("WHERE ld.gid = :gid AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED);
 
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
