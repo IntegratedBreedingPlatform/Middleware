@@ -89,7 +89,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasmListByParentAndName.get().getId(), is(germplasmListNewFolderId));
 
 		//Update germplasm folder
-		String updatedFolderName = "updatedFolderName";
+		final String updatedFolderName = "updatedFolderName";
 		final Integer germplasmListUpdatedFolderId =
 			this.germplasmListService.updateGermplasmListFolder(USER_ID, updatedFolderName, germplasmListNewFolderId, PROGRAM_UUID);
 		assertNotNull(germplasmListUpdatedFolderId);
@@ -347,7 +347,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		return savedGermplasm;
 	}
 
-	private GermplasmListData createGermplasmListData(final GermplasmList germplasmList, int gid, int entryNo) {
+	private GermplasmListData createGermplasmListData(final GermplasmList germplasmList, final int gid, final int entryNo) {
 		return new GermplasmListData(null, germplasmList, gid, entryNo, "EntryCode" + entryNo,
 			DataSetupTest.GERMPLSM_PREFIX + entryNo + " Source", DataSetupTest.GERMPLSM_PREFIX + entryNo,
 			DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0);

@@ -26,7 +26,7 @@ public class GermplasmListDto {
 	}
 
 	public Integer getListId() {
-		return listId;
+		return this.listId;
 	}
 
 	public void setListId(final Integer listId) {
@@ -34,7 +34,7 @@ public class GermplasmListDto {
 	}
 
 	public String getListName() {
-		return listName;
+		return this.listName;
 	}
 
 	public void setListName(final String listName) {
@@ -42,7 +42,7 @@ public class GermplasmListDto {
 	}
 
 	public String getCreationDate() {
-		return creationDate;
+		return this.creationDate;
 	}
 
 	public void setCreationDate(final String creationDate) {
@@ -50,7 +50,7 @@ public class GermplasmListDto {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(final String description) {

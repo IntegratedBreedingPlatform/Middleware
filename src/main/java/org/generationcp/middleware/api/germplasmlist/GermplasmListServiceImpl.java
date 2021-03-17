@@ -705,15 +705,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		public Integer getGid() {
-			return gid;
+			return this.gid;
 		}
 
 		public String getPreferredName() {
-			return preferredName;
+			return this.preferredName;
 		}
 
 		public Integer getGroupId() {
-			return groupId;
+			return this.groupId;
 		}
 	}
 
