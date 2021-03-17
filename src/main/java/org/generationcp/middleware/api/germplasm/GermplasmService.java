@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasm;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -100,8 +101,6 @@ public interface GermplasmService {
 
 	Set<Integer> getGermplasmUsedInStudies(List<Integer> gids);
 
-	List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types, final Set<String> codes);
-
 	PedigreeDTO getPedigree(Integer gid, String notation, Boolean includeSiblings);
 
 	ProgenyDTO getProgeny(final Integer gid);
@@ -110,4 +109,6 @@ public interface GermplasmService {
 			String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
 
 	long countAttributesByGUID(String gemrplasmUUID, List<String> attributeDbIds);
+
+	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
 }

@@ -34,7 +34,7 @@ public class GermplasmDto {
 
 	private List<GermplasmNameDto> names;
 
-	private List<GermplasmAttributeRequestDto> attributes;
+	private List<GermplasmAttributeDto> attributes;
 
 	public Integer getGid() {
 		return this.gid;
@@ -84,11 +84,11 @@ public class GermplasmDto {
 		this.reference = reference;
 	}
 
-	public List<GermplasmAttributeRequestDto> getAttributes() {
+	public List<GermplasmAttributeDto> getAttributes() {
 		return this.attributes;
 	}
 
-	public void setAttributes(final List<GermplasmAttributeRequestDto> attributes) {
+	public void setAttributes(final List<GermplasmAttributeDto> attributes) {
 		this.attributes = attributes;
 	}
 

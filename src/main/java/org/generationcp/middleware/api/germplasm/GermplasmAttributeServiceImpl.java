@@ -1,14 +1,16 @@
 package org.generationcp.middleware.api.germplasm;
 
+import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.util.Util;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GermplasmAttributeServiceImpl implements GermplasmAttributeService {
 
@@ -34,7 +36,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		newAttribute.setLocationId(dto.getLocationId());
 		newAttribute.setReferenceId(0);
 		newAttribute.setAdate(Integer.valueOf(dto.getDate()));
-		return this.daoFactory.getAttributeDAO().save(newAttribute).getAid();
+		return this.daoFactory.getAttributeDAO().update(newAttribute).getAid();
 	}
 
 	@Override
@@ -50,6 +52,22 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	public void deleteGermplasmAttribute(final Integer attributeId) {
 		final Attribute attribute = this.daoFactory.getAttributeDAO().getById(attributeId);
 		this.daoFactory.getAttributeDAO().makeTransient(attribute);
+	}
+
+	@Override
+	public List<AttributeDTO> filterGermplasmAttributes(final Set<String> codes,
+		final Set<String> types){
+		return   this.daoFactory.getUserDefinedFieldDAO().getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), types, codes)
+			.stream()
+			.map(userDefinedField -> {
+				final org.generationcp.middleware.api.attribute.AttributeDTO attributeDTO =
+					new org.generationcp.middleware.api.attribute.AttributeDTO();
+				attributeDTO.setId(userDefinedField.getFldno());
+				attributeDTO.setName(userDefinedField.getFname());
+				attributeDTO.setCode(userDefinedField.getFcode());
+				return attributeDTO;
+			})
+			.collect(Collectors.toList());
 	}
 
 }

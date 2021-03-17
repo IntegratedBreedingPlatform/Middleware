@@ -1287,51 +1287,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 	}
 
-	@Test
-	public void shouldGetAllUserDefinedFieldByTableAndTypeWithNullCodes() {
-
-		final List<UserDefinedField> namesUserDefined = this.germplasmDataManager
-			.getUserDefinedFieldByFieldTableNameAndType(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType());
-
-		final List<UserDefinedField> fields = this.germplasmService.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
-			Collections.singleton(UDTableType.NAMES_NAME.getType()),
-			null);
-		assertNotNull(fields);
-		assertThat(fields.size(), is(namesUserDefined.size()));
-	}
-
-	@Test
-	public void shouldGetUserDefinedFieldByTableTypeAndCodes() {
-
-		final String fname1 = UUID.randomUUID().toString();
-		this.daoFactory.getUserDefinedFieldDAO().save(UserDefinedFieldTestDataInitializer.createUserDefinedField(UDTableType.NAMES_NAME.getTable(),
-			UDTableType.NAMES_NAME.getType(), fname1));
-
-		final HashSet codes = new HashSet() {{
-			this.add(UserDefinedFieldTestDataInitializer.CODE);
-		}};
-		final List<UserDefinedField> fields = this.germplasmService.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
-			Collections.singleton(UDTableType.NAMES_NAME.getType()),
-			codes);
-		assertNotNull(fields);
-		assertThat(fields, hasSize(1));
-		assertThat(fields.get(0).getFcode(), is(UserDefinedFieldTestDataInitializer.CODE));
-		assertThat(fields.get(0).getFname(), is(fname1));
-	}
-
-	@Test
-	public void shouldGetAllUserDefinedFieldByTableAndTypeWithEmptyCodes() {
-
-		final List<UserDefinedField> namesUserDefined = this.germplasmDataManager
-			.getUserDefinedFieldByFieldTableNameAndType(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType());
-
-		final List<UserDefinedField> fields = this.germplasmService.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
-			Collections.singleton(UDTableType.NAMES_NAME.getType()),
-			new HashSet<>());
-		assertNotNull(fields);
-		assertThat(fields.size(), is(namesUserDefined.size()));
-	}
-
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Integer gnpgs, final Integer gpid1,
 		final Integer gpid2) {
 		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
