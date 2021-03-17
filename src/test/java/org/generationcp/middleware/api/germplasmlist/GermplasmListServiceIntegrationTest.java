@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasmlist;
 import com.google.common.collect.Sets;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.germplasm.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -14,6 +15,7 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -304,6 +306,29 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		this.assertGermplasmListDataAndProperty(actualGermplasmList.getListData().get(1),
 			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
 			doubleCrossMethod.getMname());
+	}
+
+	@Test
+	public void testGetGermplasmLists() {
+		//create germplasm
+		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD, null);
+		final Germplasm germplasm = this.createGermplasm(singleCrossMethod);
+
+		final List<GermplasmListDto>  germplasmListDtos = this.germplasmListService.getGermplasmLists(germplasm.getGid());
+
+		//create germplasm list
+		final int randomInt = new Random().nextInt(100);
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt,
+			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+
+		// Add entry to list
+		final GermplasmListData germplasmListData = this.createGermplasmListData(germplasmList, germplasm.getGid(), 1);
+		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
+
+		final List<GermplasmListDto>  updatedGermplasmListDtos = this.germplasmListService.getGermplasmLists(germplasm.getGid());
+
+		Assert.assertEquals(germplasmListDtos.size() + 1, updatedGermplasmListDtos.size());
 	}
 
 	private Germplasm createGermplasm(final Method method) {
