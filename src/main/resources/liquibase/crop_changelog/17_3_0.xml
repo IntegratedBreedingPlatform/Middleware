@@ -29,4 +29,16 @@
        </createTable>
     </changeSet>
 
+	<changeSet author="lkovacic" id="v17.3.0-2">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="external_reference" columnName="created_date"/>
+			</not>
+        </preConditions>
+        <comment>Add 'created_date' field to external_reference table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE external_reference ADD created_date timestamp default CURRENT_TIMESTAMP not null;
+		</sql>
+    </changeSet>
+
 </databaseChangeLog>
