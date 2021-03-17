@@ -244,6 +244,7 @@
 				reference_id     varchar(2000) not null,
 				reference_source varchar(255)  not null,
 				created_by       int default 0 not null,
+				modified_by      int           null,
 				created_date     timestamp     null,
 				modified_date    timestamp     null,
 				primary key (id, REV),
