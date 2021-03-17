@@ -3,7 +3,6 @@ package org.generationcp.middleware.api.germplasmlist;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.germplasm.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;

@@ -3,7 +3,6 @@ package org.generationcp.middleware.api.germplasmlist;
 import com.google.common.collect.Sets;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.api.germplasm.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
