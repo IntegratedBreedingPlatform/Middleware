@@ -18,7 +18,6 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -76,9 +75,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
 	private GermplasmService germplasmService;
-
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
 
 	private Integer noLocationId, variableTypeId, attributeId, clientId, userId;
 	private String creationDate, name, germplasmUUID, reference, note;
