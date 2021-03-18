@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportDTO;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
@@ -146,8 +147,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final Integer userId, final String cropName,
-		final org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto germplasmImportRequestDto) {
+	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName,
+		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final Map<Integer, GermplasmImportResponseDto> results = new HashMap<>();
 		final List<GermplasmImportDTO> germplasmDtoList = germplasmImportRequestDto.getGermplasmList();
 		final Map<String, Method> methodsMapByAbbr = this.getBreedingMethodsMapByAbbr(germplasmDtoList);
@@ -217,7 +218,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			if (!StringUtils.isEmpty(germplasmDto.getReference())) {
 				final Bibref bibref =
-					new Bibref(userId, null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, germplasmDto.getReference(), DEFAULT_BIBREF_FIELD,
+					new Bibref(null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, germplasmDto.getReference(), DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD);
@@ -231,7 +232,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			germplasmDto.getNames().forEach((k, v) -> {
 				final Name name = new Name(null, germplasm.getGid(), nameTypesMapByName.get(k.toUpperCase()),
-					(k.equalsIgnoreCase(germplasmDto.getPreferredName())) ? 1 : 0, userId, v, germplasm.getLocationId(),
+					(k.equalsIgnoreCase(germplasmDto.getPreferredName())) ? 1 : 0, v, germplasm.getLocationId(),
 					Util.getCurrentDateAsIntegerValue(), 0);
 				this.daoFactory.getNameDao().save(name);
 			});
@@ -591,7 +592,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				this.daoFactory.getBibrefDAO().save(bibref);
 			} else {
 				final Bibref bibref =
-					new Bibref(createdBy, null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, referenceOptional.get(), DEFAULT_BIBREF_FIELD,
+					new Bibref(null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, referenceOptional.get(), DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD,
 						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD);
@@ -626,7 +627,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				this.daoFactory.getNameDao().update(name);
 			} else {
 				// Create new record if name not yet exists
-				final Name name = new Name(null, germplasm.getGid(), nameTypeId, 0, userId,
+				final Name name = new Name(null, germplasm.getGid(), nameTypeId, 0,
 					value, germplasm.getLocationId(), germplasm.getGdate(), 0);
 				this.daoFactory.getNameDao().save(name);
 				germplasmNames.add(name);
@@ -981,7 +982,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				final Integer typeId = nameTypesMap.get(synonym.getType().toUpperCase());
 				if (typeId != null) {
 					final Name name = new Name(null, germplasm.getGid(), typeId,
-						0, userId, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
+						0, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
 					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
 						name.setNstat(1);
 					}

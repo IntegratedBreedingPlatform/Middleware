@@ -66,8 +66,7 @@ public class Progenitor extends AbstractEntity implements Serializable {
 	public Progenitor() {
 	}
 
-	public Progenitor(final Germplasm germplasm, final Integer progenitorNumber, final Integer progenitorGid, final Integer createdBy) {
-//		super(createdBy);
+	public Progenitor(final Germplasm germplasm, final Integer progenitorNumber, final Integer progenitorGid) {
 		this.germplasm = germplasm;
 		this.progenitorNumber = progenitorNumber;
 		this.progenitorGid = progenitorGid;

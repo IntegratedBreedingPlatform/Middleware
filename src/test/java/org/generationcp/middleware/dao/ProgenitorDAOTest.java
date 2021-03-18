@@ -38,10 +38,10 @@ public class ProgenitorDAOTest extends IntegrationTestBase {
 			this.testGermplasm.setGnpgs(4);
 			this.germplasmDao.save(this.testGermplasm);
 			
-			this.progenitor3 = new Progenitor(this.testGermplasm, 3, 13, CREATED_BY);
+			this.progenitor3 = new Progenitor(this.testGermplasm, 3, 13);
 			this.progenitorDao.save(progenitor3);
 			
-			this.progenitor4 = new Progenitor(this.testGermplasm, 4, 14, CREATED_BY);
+			this.progenitor4 = new Progenitor(this.testGermplasm, 4, 14);
 			this.progenitorDao.save(progenitor4);
 		}
 	}

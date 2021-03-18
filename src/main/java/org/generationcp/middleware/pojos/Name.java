@@ -98,23 +98,19 @@ public class Name extends AbstractEntity implements Serializable {
 	@Column(name = "nref")
 	private Integer referenceId;
 
-//	@ManyToOne(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "gid")
-//	private Germplasm germplasm;
-
-	@Deprecated
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
 	public Name() {
-//		super(null);
 	}
 
+	@Deprecated
 	public Name(final Integer nid) {
-//		super(null);
 		this.nid = nid;
 	}
 
-	public Name(final Integer nid, final Integer germplasmId, final Integer typeId, final Integer nstat, final Integer createdBy,
-			final String nval, final Integer locationId, final Integer ndate, final Integer referenceId) {
-//		super(createdBy);
+	public Name(final Integer nid, final Integer germplasmId, final Integer typeId, final Integer nstat,
+		final String nval, final Integer locationId, final Integer ndate, final Integer referenceId) {
 		this.nid = nid;
 		this.germplasmId = germplasmId;
 		this.typeId = typeId;
@@ -171,11 +167,6 @@ public class Name extends AbstractEntity implements Serializable {
 
 	public void setTypeId(final Integer typeId) {
 		this.typeId = typeId;
-	}
-
-//	@Override
-	public void setCreatedBy(final Integer createdBy) {
-//		super.setCreatedBy(createdBy);
 	}
 
 	public Integer getLocationId() {

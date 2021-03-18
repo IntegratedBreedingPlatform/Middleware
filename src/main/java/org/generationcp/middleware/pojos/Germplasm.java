@@ -532,7 +532,7 @@ public class Germplasm extends AbstractEntity implements Serializable {
 	}
 
 	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
-		final Integer createdBy, final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
+		final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
 
 		// gref =0, grplce = 0, mgid = 0
 		this(gid, methodId, gnpgs, gpid1, gpid2, lgid, locationId, gdate, 0, 0, 0, preferredName, null, null);

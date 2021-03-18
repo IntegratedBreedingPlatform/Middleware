@@ -693,8 +693,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		this.germplasmDAO.save(maleParent1);
 		this.germplasmDAO.save(maleParent2);
 
-		final Progenitor progenitor1 = new Progenitor(null, 3, maleParent1.getGid(), CREATED_BY);
-		final Progenitor progenitor2 = new Progenitor(null, 4, maleParent2.getGid(), CREATED_BY);
+		final Progenitor progenitor1 = new Progenitor(null, 3, maleParent1.getGid());
+		final Progenitor progenitor2 = new Progenitor(null, 4, maleParent2.getGid());
 
 		final Triple<Germplasm, Name, List<Progenitor>>
 			germplasmTriple = ImmutableTriple.of(germplasm, germplasm.getPreferredName(), Arrays.asList(progenitor1, progenitor2));

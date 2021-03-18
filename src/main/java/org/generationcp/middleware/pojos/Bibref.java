@@ -125,22 +125,20 @@ public class Bibref extends AbstractEntity implements Serializable {
 	@XmlElement(name = "publishingCountry")
 	private String pucntry;
 
-	@Deprecated
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
 	public Bibref() {
-//		super(null);
 	}
 
 	@Deprecated
 	public Bibref(final Integer refid) {
-//		super(null);
 		this.refid = refid;
 	}
 
-	@Deprecated
-	//TOOD: remove fedid
-	public Bibref(final Integer createdBy, final Integer refid, final String authors, final String editors, final String analyt, final String monogr, final String series,
+	public Bibref(final Integer refid, final String authors, final String editors, final String analyt,
+		final String monogr, final String series,
 		final String volume, final String issue, final String pagecol, final String publish, final String pucity, final String pucntry) {
-//		super(createdBy);
 		this.refid = refid;
 		this.authors = authors;
 		this.editors = editors;

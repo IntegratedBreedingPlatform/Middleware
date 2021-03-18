@@ -168,7 +168,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Germplasm germplasm = this.createGermplasm(method, null, 0, 0, 0);
 
-		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0, germplasm.getCreatedBy(),
+		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0,
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		this.daoFactory.getAttributeDAO()
@@ -222,7 +222,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Germplasm germplasm = this.createGermplasm(method, null, 0, 0, 0);
 
 		// Create Duplicate PreferredName assigned
-		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 1, germplasm.getCreatedBy(),
+		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 1,
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
@@ -281,9 +281,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
 		// Create duplicate names and attributes
-		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0, germplasm.getCreatedBy(),
+		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0,
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
-		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0, germplasm.getCreatedBy(),
+		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0,
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		this.daoFactory.getAttributeDAO()
@@ -748,7 +748,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(this.userId, CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
 		assertThat(response.get(this.clientId).getGids().size(), is(1));
@@ -792,7 +792,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(this.userId, CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
 		assertThat(response.get(this.clientId).getGids().size(), is(1));
@@ -843,7 +843,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setSkipIfExists(true);
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(this.userId, CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
 
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.FOUND));
@@ -865,7 +865,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setSkipIfExists(true);
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(this.userId, CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
 
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
@@ -890,7 +890,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setSkipIfExists(false);
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(this.userId, CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
 
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
@@ -931,7 +931,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setSkipIfExists(false);
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(this.userId, CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
 
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
@@ -971,7 +971,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 		germplasmImportRequestDto.setSkipIfExists(false);
 
-		this.germplasmService.importGermplasm(this.userId, CROP_NAME, germplasmImportRequestDto);
+		this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
 	}
 
 	@Test
@@ -996,7 +996,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setSkipIfExists(true);
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(this.userId, CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
 
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
@@ -1036,7 +1036,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setSkipIfExists(true);
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(this.userId, CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
 
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
@@ -1305,7 +1305,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private Name addPreferredName(final Integer gid, final Integer nameId, final String nameVal, final Integer locId, final String date) {
-		final Name name = new Name(null, gid, nameId, 1, this.userId, nameVal, locId, Integer.valueOf(date), 0);
+		final Name name = new Name(null, gid, nameId, 1, nameVal, locId, Integer.valueOf(date), 0);
 		this.daoFactory.getNameDao().save(name);
 		return name;
 	}

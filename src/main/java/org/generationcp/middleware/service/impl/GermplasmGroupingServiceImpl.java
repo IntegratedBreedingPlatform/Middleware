@@ -246,7 +246,6 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
 			newSelectionHistoryAtFixation.setNval(nameToCopyFrom.getNval());
 			newSelectionHistoryAtFixation.setNstat(0);
-			newSelectionHistoryAtFixation.setCreatedBy(nameToCopyFrom.getCreatedBy());
 			newSelectionHistoryAtFixation.setLocationId(nameToCopyFrom.getLocationId());
 			newSelectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
 			newSelectionHistoryAtFixation.setReferenceId(0);
@@ -303,7 +302,6 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		codedName.setNval(nameToCopyFrom.getNval());
 		// nstat = 1 means it is preferred name.
 		codedName.setNstat(1);
-		codedName.setCreatedBy(nameToCopyFrom.getCreatedBy());
 		codedName.setLocationId(nameToCopyFrom.getLocationId());
 		codedName.setNdate(Util.getCurrentDateAsIntegerValue());
 		codedName.setReferenceId(0);

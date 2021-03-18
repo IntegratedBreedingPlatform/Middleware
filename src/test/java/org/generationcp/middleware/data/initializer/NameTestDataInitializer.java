@@ -17,7 +17,6 @@ public class NameTestDataInitializer {
 		name.setNstat(1);
 		name.setNdate(20150707);
 		name.setReferenceId(0);
-		name.setCreatedBy(1);
 		return name;
 	}
 
