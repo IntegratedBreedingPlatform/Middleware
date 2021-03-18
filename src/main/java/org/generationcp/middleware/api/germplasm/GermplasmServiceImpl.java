@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
@@ -1173,6 +1174,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 				}
 			}
 		}
+	}
+
+	@Override
+	public List<GermplasmNameTypeDTO> filterGermplasmNameTypes(final Set<String> codes){
+		return this.daoFactory.getUserDefinedFieldDAO().getByCodes(UDTableType.NAMES_NAME.getTable(),
+			Collections.singleton(UDTableType.NAMES_NAME.getType()), codes)
+			.stream()
+			.map(userDefinedField -> {
+				final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
+				germplasmNameTypeDTO.setId(userDefinedField.getFldno());
+				germplasmNameTypeDTO.setName(userDefinedField.getFname());
+				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
+				return germplasmNameTypeDTO;
+			})
+			.collect(Collectors.toList());
 	}
 
 	private void populateSynonymsAndAttributes(final List<GermplasmDTO> germplasmDTOList) {
