@@ -16,7 +16,7 @@ public class GermplasmStudyDto {
 	}
 
 	public Integer getStudyId() {
-		return studyId;
+		return this.studyId;
 	}
 
 	public void setStudyId(final Integer studyId) {
@@ -24,7 +24,7 @@ public class GermplasmStudyDto {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -32,7 +32,7 @@ public class GermplasmStudyDto {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(final String description) {
