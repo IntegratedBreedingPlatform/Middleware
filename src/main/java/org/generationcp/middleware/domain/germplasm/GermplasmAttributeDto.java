@@ -14,15 +14,6 @@ public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 	private String locationName;
 
 	public GermplasmAttributeDto() {
-
-	}
-
-	public GermplasmAttributeDto(final Integer id, final String value, final String attributeCode, final String attributeType,
-		final String date, final Integer locationId, final String attributeDescription, final String locationName) {
-		super(value, attributeCode, attributeType, date, locationId);
-		this.id = id;
-		this.attributeDescription = attributeDescription;
-		this.locationName = locationName;
 	}
 
 	public Integer getId() {

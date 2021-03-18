@@ -24,6 +24,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.springframework.data.domain.Pageable;
 
@@ -145,50 +146,44 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	}
 
 	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final String attributeType) {
-		final List<GermplasmAttributeDto> germplasmAttributeDtos = new ArrayList<>();
-		final StringBuilder queryString = new StringBuilder();
-		queryString.append("Select a.aid AS id, ");
-		queryString.append("a.aval AS value, ");
-		queryString.append("u.fcode AS attributeCode, ");
-		queryString.append("u.ftype AS attributeType, ");
-		queryString.append("u.fname AS attributeDescription, ");
-		queryString.append("a.adate AS date, ");
-		queryString.append("a.alocn AS locationId, ");
-		queryString.append("l.lname AS locationName ");
-		queryString.append("FROM atributs a ");
-		queryString.append("INNER JOIN udflds u ON a.atype = u.fldno ");
-		queryString.append("INNER JOIN location l on a.alocn = l.locid ");
-		queryString.append("WHERE a.gid = :gid ");
-		if (StringUtils.isNotEmpty(attributeType)) {
-			queryString.append("AND u.ftype = :attributeType ");
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("Select a.aid AS id, ");
+			queryString.append("a.aval AS value, ");
+			queryString.append("u.fcode AS attributeCode, ");
+			queryString.append("u.ftype AS attributeType, ");
+			queryString.append("u.fname AS attributeDescription, ");
+			queryString.append("CAST(a.adate AS CHAR(255)) AS date, ");
+			queryString.append("a.alocn AS locationId, ");
+			queryString.append("l.lname AS locationName ");
+			queryString.append("FROM atributs a ");
+			queryString.append("INNER JOIN udflds u ON a.atype = u.fldno ");
+			queryString.append("INNER JOIN location l on a.alocn = l.locid ");
+			queryString.append("WHERE a.gid = :gid ");
+			if (StringUtils.isNotEmpty(attributeType)) {
+				queryString.append("AND u.ftype = :attributeType ");
+			}
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
+			sqlQuery.addScalar("id");
+			sqlQuery.addScalar("value");
+			sqlQuery.addScalar("attributeCode");
+			sqlQuery.addScalar("attributeType");
+			sqlQuery.addScalar("attributeDescription");
+			sqlQuery.addScalar("date");
+			sqlQuery.addScalar("locationId");
+			sqlQuery.addScalar("locationName");
+			sqlQuery.setParameter("gid", gid);
+			if (StringUtils.isNotEmpty(attributeType)) {
+				sqlQuery.setParameter("attributeType", attributeType);
+			}
+
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with getGermplasmAttributeDtos(gid=" + gid + ", attributeType=" + attributeType + "): " + e.getMessage(), e);
 		}
-
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
-		sqlQuery.addScalar("id");
-		sqlQuery.addScalar("value");
-		sqlQuery.addScalar("attributeCode");
-		sqlQuery.addScalar("attributeType");
-		sqlQuery.addScalar("attributeDescription");
-		sqlQuery.addScalar("date");
-		sqlQuery.addScalar("locationId");
-		sqlQuery.addScalar("locationName");
-		sqlQuery.setParameter("gid", gid);
-		if (StringUtils.isNotEmpty(attributeType)) {
-			sqlQuery.setParameter("attributeType", attributeType);
-		}
-
-		sqlQuery.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP);
-
-		final List<Map<String, Object>> results = sqlQuery.list();
-		for (final Map<String, Object> result : results) {
-			final GermplasmAttributeDto dto = new GermplasmAttributeDto((Integer) result.get("id"), String.valueOf(result.get("value")),
-				String.valueOf(result.get("attributeCode")), String.valueOf(result.get("attributeType")),
-				String.valueOf(result.get("date")), (Integer) result.get("locationId"),
-				String.valueOf(result.get("attributeDescription")),	String.valueOf(result.get("locationName")));
-			germplasmAttributeDtos.add(dto);
-		}
-
-		return germplasmAttributeDtos;
 	}
 
 	public List<AttributeDTO> getAttributesByGUIDAndAttributeIds(

@@ -40,12 +40,12 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public Integer updateGermplasmAttribute(final Integer attributeId, final GermplasmAttributeRequestDto dto) {
+	public void updateGermplasmAttribute(final Integer attributeId, final GermplasmAttributeRequestDto dto) {
 		final Attribute attribute = this.daoFactory.getAttributeDAO().getById(attributeId);
 		attribute.setAval(dto.getValue());
 		attribute.setLocationId(dto.getLocationId());
 		attribute.setAdate(Integer.valueOf(dto.getDate()));
-		return this.daoFactory.getAttributeDAO().update(attribute).getAid();
+		this.daoFactory.getAttributeDAO().update(attribute).getAid();
 	}
 
 	@Override

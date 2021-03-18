@@ -13,7 +13,7 @@ public interface GermplasmAttributeService {
 
 	Integer createGermplasmAttribute(Integer gid, GermplasmAttributeRequestDto dto, Integer userId);
 
-	Integer updateGermplasmAttribute(Integer attributeId, GermplasmAttributeRequestDto dto);
+	void updateGermplasmAttribute(Integer attributeId, GermplasmAttributeRequestDto dto);
 
 	void deleteGermplasmAttribute(Integer attributeId);
 
