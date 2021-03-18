@@ -308,7 +308,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmLists() {
+	public void shouldGetGermplasmLists_OK() {
 		//create germplasm
 		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD, null);
 		final Germplasm germplasm = this.createGermplasm(singleCrossMethod);
@@ -332,12 +332,13 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 
 	private Germplasm createGermplasm(final Method method) {
 		final Germplasm germplasm = new Germplasm(null, method.getMid(), 0, 0, 0,
-			0, 0, 0, 0, 0,
+			this.findAdminUser(), 0, 0, 0, 0,
 			0, 0, null, null, method);
 
 		final Germplasm savedGermplasm = this.daoFactory.getGermplasmDao().save(germplasm);
 
-		final Name name = new Name(null, savedGermplasm.getGid(), 1, 1, 1, "Name", 0, 0, 0);
+		final Name name = new Name(null, savedGermplasm.getGid(), 1, 1, this.findAdminUser(), "Name", 0,
+			0, 0);
 		this.daoFactory.getNameDao().save(name);
 
 		this.sessionProvder.getSession().flush();

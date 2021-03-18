@@ -18,13 +18,6 @@ public class GermplasmListDto {
 
 	}
 
-	public GermplasmListDto(final Integer listId, final String listName, final String creationDate, final String description) {
-		this.listId = listId;
-		this.listName = listName;
-		this.creationDate = creationDate;
-		this.description = description;
-	}
-
 	public Integer getListId() {
 		return this.listId;
 	}
