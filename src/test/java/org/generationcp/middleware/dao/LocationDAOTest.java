@@ -134,11 +134,20 @@ public class LocationDAOTest extends IntegrationTestBase {
 		locationSearchRequest.setLocationTypeName("Country");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected list of country location size > zero", locationList != null && locationList.size() > 0);
-
 	}
 
 	@Test
-	public void getLocationsWithWrongLocType() {
+	public void testGetLocations_ByAbbreviation() {
+		final Location location = this.saveTestLocation();
+
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationAbbreviations(Collections.singletonList(location.getLabbr()));
+		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		MatcherAssert.assertThat("Expected to return filtered list by abbreviation", locationList != null && locationList.size() > 0);
+	}
+
+	@Test
+	public void testGetLocationsWithWrongLocType() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
@@ -147,7 +156,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void countLocations() {
+	public void testCountLocations() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("COUNTRY");
 		final long countLocation = this.locationDAO.countLocations(locationSearchRequest);
@@ -155,7 +164,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void countLocationsNotFoundLocation() {
+	public void testCountLocationsNotFoundLocation() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
 		final long countLocation = this.locationDAO.countLocations(locationSearchRequest);
@@ -412,28 +421,24 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetByAbbreviations() {
-		final String labbr = RandomStringUtils.randomAlphabetic(6);
-		final String lname = RandomStringUtils.randomAlphabetic(10);
-
-		final Location location = LocationTestDataInitializer.createLocation(null, lname, 0, labbr, null);
-		location.setCntryid(0);
-		location.setLdefault(Boolean.FALSE);
-		this.locationDAO.saveOrUpdate(location);
+		final Location location = this.saveTestLocation();
 
 		final List<Location> locations =
-			this.locationDAO.getByAbbreviations(Collections.singletonList(labbr));
+			this.locationDAO.getByAbbreviations(Collections.singletonList(location.getLabbr()));
 
 		Assert.assertEquals(locations.size(), 1);
-		Assert.assertEquals(locations.get(0).getLabbr(), labbr);
+		Assert.assertEquals(locations.get(0).getLabbr(), location.getLabbr());
 	}
 
 	@Test
-	public void testFilterLocations_RetrieveAll() {
+	public void testFilterLocations_NoProgramFilter() {
+		// If program UUID is not specified as filter, only locations with null program should be displayed
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		final long count = this.locationDAO.countLocations(locationSearchRequest);
 		final List<Location> locations =
 			this.locationDAO.filterLocations(locationSearchRequest, null);
-		Assert.assertThat((int) count, equalTo(locations.size()));
+		locations.forEach(location -> {
+			Assert.assertNull(location.getProgramUUID());
+		});
 	}
 
 	@Test
@@ -531,6 +536,18 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final Optional<Location> optional = locations.stream().filter(loc -> programUUID.equals(loc.getProgramUUID())).findFirst();
 		Assert.assertTrue(optional.isPresent());
 
+	}
+
+	private Location saveTestLocation() {
+		final String labbr = RandomStringUtils.randomAlphabetic(6);
+		final String lname = RandomStringUtils.randomAlphabetic(10);
+
+		final Location location = LocationTestDataInitializer.createLocation(null, lname, 0, labbr, null);
+		location.setCntryid(0);
+		location.setLdefault(Boolean.FALSE);
+		this.locationDAO.saveOrUpdate(location);
+
+		return location;
 	}
 
 }
