@@ -37,6 +37,7 @@ import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -633,32 +634,28 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	public List<GermplasmStudyDto> getGermplasmStudyDtos(final Integer gid) {
-		final List<GermplasmStudyDto> germplasmStudyDtos = new ArrayList<>();
-		final StringBuilder queryString = new StringBuilder();
-		queryString.append("SELECT DISTINCT p.project_id AS studyId, ");
-		queryString.append("p.name AS studyName, ");
-		queryString.append("p.description AS description ");
-		queryString.append("FROM stock s ");
-		queryString.append("INNER JOIN project p ON s.project_id = p.project_id ");
-		queryString.append("WHERE s.dbxref_id = :gid AND p.deleted = 0");
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT DISTINCT p.project_id AS studyId, ");
+			queryString.append("p.name AS studyName, ");
+			queryString.append("p.description AS description ");
+			queryString.append("FROM stock s ");
+			queryString.append("INNER JOIN project p ON s.project_id = p.project_id ");
+			queryString.append("WHERE s.dbxref_id = :gid AND p.deleted = 0");
 
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
+			sqlQuery.addScalar("studyId");
+			sqlQuery.addScalar("studyName");
+			sqlQuery.addScalar("description");
+			sqlQuery.setParameter("gid", gid);
 
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
-		sqlQuery.addScalar("studyId");
-		sqlQuery.addScalar("studyName");
-		sqlQuery.addScalar("description");
-		sqlQuery.setParameter("gid", gid);
-
-		sqlQuery.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP);
-
-		final List<Map<String, Object>> results = sqlQuery.list();
-		for (final Map<String, Object> result : results) {
-			final GermplasmStudyDto dto = new GermplasmStudyDto((Integer) result.get("studyId"), String.valueOf(result.get("studyName")),
-				String.valueOf(result.get("description")));
-			germplasmStudyDtos.add(dto);
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmStudyDto.class));
+			return sqlQuery.list();
+		}catch (final HibernateException e) {
+			final String errorMessage = "Error at getGermplasmStudyDtos(gid=" + gid + ")" + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
-
-		return germplasmStudyDtos;
 	}
 
 }

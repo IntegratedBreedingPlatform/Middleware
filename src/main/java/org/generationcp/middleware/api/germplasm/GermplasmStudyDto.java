@@ -13,13 +13,6 @@ public class GermplasmStudyDto {
 	private String description;
 
 	public GermplasmStudyDto() {
-
-	}
-
-	public GermplasmStudyDto(final Integer studyId, final String name, final String description) {
-		this.studyId = studyId;
-		this.name = name;
-		this.description = description;
 	}
 
 	public Integer getStudyId() {
