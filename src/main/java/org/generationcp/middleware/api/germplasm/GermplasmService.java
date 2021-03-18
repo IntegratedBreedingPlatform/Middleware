@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasm;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -72,6 +73,8 @@ public interface GermplasmService {
 	Set<Integer> importGermplasmUpdates(Integer userId, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 	
 	List<GermplasmDTO> createGermplasm(Integer userId, String cropname, List<GermplasmImportRequest> germplasmImportRequestList);
+
+	GermplasmDTO updateGermplasm(Integer userId, String germplasmDbId, GermplasmUpdateRequest germplasmUpdateRequest);
 
 	long countFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO);
 
