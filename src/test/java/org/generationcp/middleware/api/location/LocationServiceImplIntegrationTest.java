@@ -33,24 +33,24 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountFilteredLocations() {
-
+		// If program UUID is not specified as filter, only locations with null program should be displayed
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-
+		final long nullProgramLocationsCount = this.daoFactory.getLocationDAO().countLocationsWithNullProgramUUID();
 		final long count = this.locationService
 			.countFilteredLocations(locationSearchRequest);
-		final List<Location> locations = this.locationService
-			.getFilteredLocations(locationSearchRequest, null);
-		Assert.assertThat((int) count, equalTo(locations.size()));
+		Assert.assertThat(count, equalTo(nullProgramLocationsCount));
 
 	}
 
 	@Test
 	public void testGetFilteredLocations() {
-
 		final List<Location> locations = this.locationService
 			.getFilteredLocations(new LocationSearchRequest(), new PageRequest(0, 10));
 		Assert.assertThat(10, equalTo(locations.size()));
-
+		// If program UUID is not specified as filter, only locations with null program should be displayed
+		locations.forEach(location -> {
+			Assert.assertNull(location.getProgramUUID());
+		});
 	}
 
 	@Test

@@ -3,6 +3,8 @@ package org.generationcp.middleware.api.germplasm;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -70,8 +72,10 @@ public interface GermplasmService {
 	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
 
 	Set<Integer> importGermplasmUpdates(Integer userId, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
-	
+
 	List<GermplasmDTO> createGermplasm(Integer userId, String cropname, List<GermplasmImportRequest> germplasmImportRequestList);
+
+	GermplasmDTO updateGermplasm(Integer userId, String germplasmDbId, GermplasmUpdateRequest germplasmUpdateRequest);
 
 	long countFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO);
 
@@ -108,6 +112,8 @@ public interface GermplasmService {
 			String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
 
 	long countAttributesByGUID(String gemrplasmUUID, List<String> attributeDbIds);
+
+	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
 
 	GermplasmDto getGermplasmDtoById(Integer gid);
 }

@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -32,6 +33,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
@@ -130,7 +132,32 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 	}
 
+	public List<GermplasmListDto> getGermplasmListDtos(final Integer gid) {
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT l.listid AS listId, ");
+			queryString.append("l.listname AS listName, ");
+			queryString.append("CAST(l.listdate AS CHAR(255)) AS creationDate, ");
+			queryString.append("l.listdesc AS description ");
+			queryString.append("FROM listnms l ");
+			queryString.append("INNER JOIN listdata ld ON ld.listid = l.listid ");
+			queryString.append("WHERE ld.gid = :gid AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED);
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
+			sqlQuery.addScalar("listId");
+			sqlQuery.addScalar("listName");
+			sqlQuery.addScalar("creationDate");
+			sqlQuery.addScalar("description");
+			sqlQuery.setParameter("gid", gid);
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmListDto.class));
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getGermplasmListDtos(gid=" + gid + ") from GermplasmList: " + e.getMessage(), e);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
+	// TODO IBP-4457:  delete when phasing out old Germplasm Details popup
 	public List<GermplasmList> getByGID(final Integer gid, final int start, final int numOfRows) {
 		try {
 			if (gid != null) {

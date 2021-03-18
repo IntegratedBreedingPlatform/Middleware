@@ -40,4 +40,6 @@ public interface GermplasmListService {
 
 	void deleteGermplasmListFolder(Integer folderId);
 
+	List<GermplasmListDto> getGermplasmLists(Integer gid);
+
 }

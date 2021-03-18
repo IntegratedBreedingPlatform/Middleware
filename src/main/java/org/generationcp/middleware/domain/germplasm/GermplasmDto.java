@@ -45,7 +45,7 @@ public class GermplasmDto {
 	private List<GermplasmAttributeDto> attributes;
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
 
 	public void setGid(final Integer gid) {
@@ -53,7 +53,7 @@ public class GermplasmDto {
 	}
 
 	public String getGermplasmUUID() {
-		return germplasmUUID;
+		return this.germplasmUUID;
 	}
 
 	public void setGermplasmUUID(final String germplasmUUID) {
@@ -61,7 +61,7 @@ public class GermplasmDto {
 	}
 
 	public String getPreferredName() {
-		return preferredName;
+		return this.preferredName;
 	}
 
 	public void setPreferredName(final String preferredName) {
@@ -69,7 +69,7 @@ public class GermplasmDto {
 	}
 
 	public List<GermplasmNameDto> getNames() {
-		return names;
+		return this.names;
 	}
 
 	public void setNames(final List<GermplasmNameDto> names) {
@@ -77,7 +77,7 @@ public class GermplasmDto {
 	}
 
 	public String getCreationDate() {
-		return creationDate;
+		return this.creationDate;
 	}
 
 	public void setCreationDate(final String creationDate) {
@@ -85,7 +85,7 @@ public class GermplasmDto {
 	}
 
 	public String getReference() {
-		return reference;
+		return this.reference;
 	}
 
 	public void setReference(final String reference) {
@@ -93,7 +93,7 @@ public class GermplasmDto {
 	}
 
 	public List<GermplasmAttributeDto> getAttributes() {
-		return attributes;
+		return this.attributes;
 	}
 
 	public void setAttributes(final List<GermplasmAttributeDto> attributes) {
@@ -101,7 +101,7 @@ public class GermplasmDto {
 	}
 
 	public String getBreedingLocation() {
-		return breedingLocation;
+		return this.breedingLocation;
 	}
 
 	public void setBreedingLocation(final String breedingLocation) {
@@ -109,7 +109,7 @@ public class GermplasmDto {
 	}
 
 	public String getBreedingMethod() {
-		return breedingMethod;
+		return this.breedingMethod;
 	}
 
 	public void setBreedingMethod(final String breedingMethod) {
@@ -117,15 +117,15 @@ public class GermplasmDto {
 	}
 
 	public boolean isGroupedLine() {
-		return isGroupedLine;
+		return this.isGroupedLine;
 	}
 
 	public void setGroupedLine(final boolean groupedLine) {
-		isGroupedLine = groupedLine;
+		this.isGroupedLine = groupedLine;
 	}
 
 	public Integer getGroupId() {
-		return groupId;
+		return this.groupId;
 	}
 
 	public void setGroupId(final Integer groupId) {
@@ -133,7 +133,7 @@ public class GermplasmDto {
 	}
 
 	public Integer getBreedingLocationId() {
-		return breedingLocationId;
+		return this.breedingLocationId;
 	}
 
 	public void setBreedingLocationId(final Integer breedingLocationId) {
@@ -141,7 +141,7 @@ public class GermplasmDto {
 	}
 
 	public Integer getBreedingMethodId() {
-		return breedingMethodId;
+		return this.breedingMethodId;
 	}
 
 	public void setBreedingMethodId(final Integer breedingMethodId) {
