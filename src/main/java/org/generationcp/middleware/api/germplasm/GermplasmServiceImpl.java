@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportDTO;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
@@ -34,6 +35,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -835,7 +837,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private List<GermplasmDto> loadGermplasmMatches(final org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto germplasmImportRequestDto) {
+	private List<GermplasmDto> loadGermplasmMatches(final GermplasmImportRequestDto germplasmImportRequestDto) {
 		if (germplasmImportRequestDto.isSkipIfExists()) {
 			final List<String> guids =
 				germplasmImportRequestDto.getGermplasmList().stream().filter(g -> StringUtils.isNotEmpty(g.getGermplasmUUID()))
@@ -1081,6 +1083,18 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public long countGermplasmByStudy(final Integer studyDbId) {
 		return this.daoFactory.getGermplasmDao().countGermplasmByStudy(studyDbId);
+	}
+
+	@Override
+	public GermplasmDto getGermplasmDtoById(final Integer gid) {
+		final GermplasmDto germplasmDto = this.daoFactory.getGermplasmDao().getGermplasmDtoByGid(gid);
+		if (germplasmDto != null) {
+			germplasmDto.setNames(this.daoFactory.getNameDao().getGermplasmNamesByGids(Collections.singletonList(gid)));
+			// SET germplasmOrigin
+			final List<Progenitor> progenitors = this.daoFactory.getProgenitorDao().getByGID(gid);
+			germplasmDto.setOtherProgenitors(progenitors.stream().map(p -> p.getGermplasm().getGid()).collect(Collectors.toList()));
+		}
+		return germplasmDto;
 	}
 
 	private void populateExternalReferences(final List<GermplasmDTO> germplasmDTOList) {

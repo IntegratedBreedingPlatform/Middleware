@@ -10,6 +10,8 @@ public class GermplasmNameDto {
 	@JsonIgnore
 	private Integer gid;
 
+	private Integer id;
+
 	private String name;
 
 	private String date;
@@ -76,6 +78,14 @@ public class GermplasmNameDto {
 
 	public void setGid(final Integer gid) {
 		this.gid = gid;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(final Integer id) {
+		this.id = id;
 	}
 
 	@Override

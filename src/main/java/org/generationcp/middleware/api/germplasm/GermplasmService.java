@@ -109,4 +109,5 @@ public interface GermplasmService {
 
 	long countAttributesByGUID(String gemrplasmUUID, List<String> attributeDbIds);
 
+	GermplasmDto getGermplasmDtoById(Integer gid);
 }

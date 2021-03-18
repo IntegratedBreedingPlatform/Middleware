@@ -44,7 +44,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
-	private static final String SELECT_GERMPLASM_NAMES = "select " //
+	private static final String SELECT_GERMPLASM_NAMES = "select n.nid as id, " //
 		+ "    n.gid as gid, " //
 		+ "    n.nval as name, " //
 		+ "    cast(ndate as char) as date, " //
@@ -500,7 +500,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		final StringBuilder queryBuilder =
 			new StringBuilder(SELECT_GERMPLASM_NAMES);
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
-		sqlQuery.addScalar("gid").addScalar("name").addScalar("date").addScalar("locationId").addScalar("locationName")
+		sqlQuery.addScalar("id").addScalar("gid").addScalar("name").addScalar("date").addScalar("locationId").addScalar("locationName")
 			.addScalar("nameTypeCode")
 			.addScalar("nameTypeDescription");
 		sqlQuery.setParameterList("gids", gids);
