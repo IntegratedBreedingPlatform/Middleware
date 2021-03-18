@@ -637,7 +637,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT DISTINCT p.project_id AS studyId, ");
-			queryString.append("p.name AS studyName, ");
+			queryString.append("p.name AS name, ");
 			queryString.append("p.description AS description ");
 			queryString.append("FROM stock s ");
 			queryString.append("INNER JOIN project p ON s.project_id = p.project_id ");
@@ -645,7 +645,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
 			sqlQuery.addScalar("studyId");
-			sqlQuery.addScalar("studyName");
+			sqlQuery.addScalar("name");
 			sqlQuery.addScalar("description");
 			sqlQuery.setParameter("gid", gid);
 
