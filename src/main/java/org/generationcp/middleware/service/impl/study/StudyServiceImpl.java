@@ -11,6 +11,7 @@ import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -580,6 +581,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO()
 			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.MEANS_DATA.getId());
 		return (!org.springframework.util.CollectionUtils.isEmpty(datasets));
+	}
+
+	@Override
+	public List<GermplasmStudyDto> getGermplasmStudies(final Integer gid) {
+		return this.daoFactory.getStockDao().getGermplasmStudyDtos(gid);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
