@@ -38,7 +38,7 @@ public class GermplasmDto {
 
 	private List<Integer> otherProgenitors;
 
-	private GermplasmOrigin germplasmOrigin;
+	private GermplasmOriginDto germplasmOriginDto;
 
 	private List<GermplasmNameDto> names;
 
@@ -172,12 +172,12 @@ public class GermplasmDto {
 		this.otherProgenitors = otherProgenitors;
 	}
 
-	public GermplasmOrigin getGermplasmOrigin() {
-		return germplasmOrigin;
+	public GermplasmOriginDto getGermplasmOriginDto() {
+		return germplasmOriginDto;
 	}
 
-	public void setGermplasmOrigin(final GermplasmOrigin germplasmOrigin) {
-		this.germplasmOrigin = germplasmOrigin;
+	public void setGermplasmOriginDto(final GermplasmOriginDto germplasmOriginDto) {
+		this.germplasmOriginDto = germplasmOriginDto;
 	}
 
 	@Override

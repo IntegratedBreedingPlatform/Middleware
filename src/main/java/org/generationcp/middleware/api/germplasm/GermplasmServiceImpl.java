@@ -1169,7 +1169,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final GermplasmDto germplasmDto = this.daoFactory.getGermplasmDao().getGermplasmDtoByGid(gid);
 		if (germplasmDto != null) {
 			germplasmDto.setNames(this.daoFactory.getNameDao().getGermplasmNamesByGids(Collections.singletonList(gid)));
-			// SET germplasmOrigin
+			germplasmDto.setGermplasmOriginDto(this.daoFactory.getGermplasmStudySourceDAO().getGermplasmOrigin(gid));
 			final List<Progenitor> progenitors = this.daoFactory.getProgenitorDao().getByGID(gid);
 			germplasmDto.setOtherProgenitors(progenitors.stream().map(p -> p.getGermplasm().getGid()).collect(Collectors.toList()));
 		}
