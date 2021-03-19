@@ -16,7 +16,6 @@ import org.generationcp.middleware.pojos.Progenitor;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
@@ -48,8 +47,8 @@ public class ProgenitorDAO extends GenericDAO<Progenitor, Integer> {
 		try {
 
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.createAlias("germplasm", "germplasm");
 			criteria.add(Restrictions.eq("germplasm.gid", gid));
-			criteria.setProjection(Projections.property("germplasm"));
 			return criteria.list();
 
 		} catch (HibernateException e) {
