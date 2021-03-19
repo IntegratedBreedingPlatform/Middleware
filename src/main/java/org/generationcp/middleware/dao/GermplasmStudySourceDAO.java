@@ -1,7 +1,7 @@
 package org.generationcp.middleware.dao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import liquibase.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.germplasm.GermplasmOriginDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -191,7 +191,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				germplasmOriginDto.setRepNumber((Integer) result.get("repNumber"));
 				String x = result.get("row") != null ? (String) result.get("row") : null;
 				String y = result.get("col") != null ? (String) result.get("col") : null;
-				if (org.apache.commons.lang3.StringUtils.isBlank(x) || org.apache.commons.lang3.StringUtils.isBlank(y)) {
+				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
 					x = result.get("fieldMapRow") != null ? (String) result.get("fieldMapRow") : "1";
 					y = result.get("fieldMapCol") != null ? (String) result.get("fieldMapCol") : "1";
 				}
