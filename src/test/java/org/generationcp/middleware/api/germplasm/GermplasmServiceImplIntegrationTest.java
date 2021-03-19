@@ -1098,7 +1098,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasmDto.getPreferredName(), equalTo(preferredName.getNval()));
 		assertThat(germplasmDto.getNames(), hasSize(2));
 		assertThat(germplasmDto.getOtherProgenitors(), hasSize(1));
-		assertThat(germplasmDto.getOtherProgenitors().get(0), equalTo(progenitor.getGermplasm().getGid()));
+		assertThat(germplasmDto.getOtherProgenitors().get(0), equalTo(progenitor.getProgenitorGid()));
 	}
 
 	@Test
