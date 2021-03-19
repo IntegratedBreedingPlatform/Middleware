@@ -67,7 +67,6 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 
 	private static final String GET_GERMPLASM_STUDY_ORIGIN = "select study.project_id as studyId, " //
 		+ "  study.name as studyName, " //
-		+ "  study.deleted as studyStatus, " //
 		+ "  ne.obs_unit_id as observationUnitId, " //
 		+ "  ne.json_props AS jsonProps, " //
 		+ "  fieldMapRow.value AS fieldMapRow, " //
@@ -97,7 +96,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ TermId.FIELDMAP_RANGE.getId() //
 		+ "       LEFT JOIN nd_experimentprop fieldMapCol ON fieldMapCol.nd_experiment_id = ne.nd_experiment_id AND fieldMapCol.type_id = "
 		+ TermId.FIELDMAP_COLUMN.getId() //
-		+ " where source.gid = :gid AND g.deleted = 0 AND g.grplce = 0";
+		+ " where source.gid = :gid AND g.deleted = 0 AND g.grplce = 0 and study.deleted = 0";
 
 	public List<GermplasmStudySource> getByGids(final Set<Integer> gids) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -170,7 +169,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
 			sqlQuery.setParameter("gid", gid);
 
-			sqlQuery.addScalar("studyId").addScalar("studyName").addScalar("studyStatus")
+			sqlQuery.addScalar("studyId").addScalar("studyName")
 				.addScalar("observationUnitId").addScalar("jsonProps").addScalar("fieldMapRow")
 				.addScalar("fieldMapCol").addScalar("blockNumber", new IntegerType()).addScalar("repNumber", new IntegerType())
 				.addScalar("col")
@@ -185,7 +184,6 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				final GermplasmOriginDto germplasmOriginDto = new GermplasmOriginDto();
 				germplasmOriginDto.setStudyId((Integer) result.get("studyId"));
 				germplasmOriginDto.setStudyName((String) result.get("studyName"));
-				germplasmOriginDto.setStudyIsDeleted((Boolean) result.get("studyStatus"));
 				germplasmOriginDto.setObservationUnitId((String) result.get("observationUnitId"));
 				germplasmOriginDto.setBlockNumber((Integer) result.get("blockNumber"));
 				germplasmOriginDto.setRepNumber((Integer) result.get("repNumber"));

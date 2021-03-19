@@ -1102,7 +1102,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.getGermplasmDTOByGUID(germplasmDbId).get();
 	}
 
-	// Add to attributes map to be saved the custom atttribute fields in import request dto
+	// Add to attributes map to be saved the custom attribute fields in import request dto
 	private void addCustomAttributeFieldsToAdditionalInfo(final GermplasmImportRequest germplasmDto) {
 		final Map<String, String> customAttributeFieldsMap = germplasmDto.getCustomAttributeFieldsMap();
 		for (final String attributeKey : GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES) {
@@ -1169,7 +1169,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final GermplasmDto germplasmDto = this.daoFactory.getGermplasmDao().getGermplasmDtoByGid(gid);
 		if (germplasmDto != null) {
 			germplasmDto.setNames(this.daoFactory.getNameDao().getGermplasmNamesByGids(Collections.singletonList(gid)));
-			germplasmDto.setGermplasmOriginDto(this.daoFactory.getGermplasmStudySourceDAO().getGermplasmOrigin(gid));
+			germplasmDto.setGermplasmOrigin(this.daoFactory.getGermplasmStudySourceDAO().getGermplasmOrigin(gid));
 			final List<Progenitor> progenitors = this.daoFactory.getProgenitorDao().getByGID(gid);
 			germplasmDto.setOtherProgenitors(progenitors.stream().map(p -> p.getGermplasm().getGid()).collect(Collectors.toList()));
 		}

@@ -10,7 +10,6 @@ public class GermplasmOriginDto {
 
 	private Integer studyId;
 	private String studyName;
-	private boolean studyIsDeleted;
 	private String observationUnitId;
 	private Integer repNumber;
 	private Integer blockNumber;
@@ -80,14 +79,6 @@ public class GermplasmOriginDto {
 
 	public void setGeoCoordinates(final Map<String, Object> geoCoordinates) {
 		this.geoCoordinates = geoCoordinates;
-	}
-
-	public boolean isStudyIsDeleted() {
-		return studyIsDeleted;
-	}
-
-	public void setStudyIsDeleted(final boolean studyIsDeleted) {
-		this.studyIsDeleted = studyIsDeleted;
 	}
 
 	@Override
