@@ -32,6 +32,14 @@ public class GermplasmDto {
 
 	private Integer groupId;
 
+	private Integer gpid1;
+
+	private Integer gpid2;
+
+	private List<Integer> otherProgenitors;
+
+	private GermplasmOriginDto germplasmOrigin;
+
 	private List<GermplasmNameDto> names;
 
 	private List<GermplasmAttributeDto> attributes;
@@ -138,6 +146,38 @@ public class GermplasmDto {
 
 	public void setBreedingMethodId(final Integer breedingMethodId) {
 		this.breedingMethodId = breedingMethodId;
+	}
+
+	public Integer getGpid1() {
+		return gpid1;
+	}
+
+	public void setGpid1(final Integer gpid1) {
+		this.gpid1 = gpid1;
+	}
+
+	public Integer getGpid2() {
+		return gpid2;
+	}
+
+	public void setGpid2(final Integer gpid2) {
+		this.gpid2 = gpid2;
+	}
+
+	public List<Integer> getOtherProgenitors() {
+		return otherProgenitors;
+	}
+
+	public void setOtherProgenitors(final List<Integer> otherProgenitors) {
+		this.otherProgenitors = otherProgenitors;
+	}
+
+	public GermplasmOriginDto getGermplasmOrigin() {
+		return germplasmOrigin;
+	}
+
+	public void setGermplasmOrigin(final GermplasmOriginDto germplasmOrigin) {
+		this.germplasmOrigin = germplasmOrigin;
 	}
 
 	@Override

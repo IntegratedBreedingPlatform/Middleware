@@ -114,4 +114,6 @@ public interface GermplasmService {
 	long countAttributesByGUID(String gemrplasmUUID, List<String> attributeDbIds);
 
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
+
+	GermplasmDto getGermplasmDtoById(Integer gid);
 }
