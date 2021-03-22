@@ -16,6 +16,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -1372,7 +1373,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	// These are appended to the MAIN where clause because they are filters on (or EXISTS clause related to) the main germplasm object
-	private void addMainGermplasmFilters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
+	private void addGermplasmSearchRequestFilters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmDbIds())) {
 			paramBuilder.append(" AND g.germplsm_uuid IN (:germplasmDbIds) ");
 		}
@@ -1409,29 +1410,33 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			paramBuilder.append(" FROM external_reference ref1 WHERE ref1.gid = g.gid AND ref1.reference_source = :referenceSource) "); //
 		}
 
-	}
-
-	// These filters are on the computed attribute/column names so they need to be on the HAVING clause, not main WHERE
-	private void addGermplasmNamesAndAttributesFilters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {
-			paramBuilder.append(" AND germplasmName like :preferredName ");
+			paramBuilder.append(" AND EXISTS (SELECT 1 ");
+			paramBuilder.append(" FROM names n2 WHERE n2.gid = g.gid AND n2.nstat = 1 AND n2.nval like :preferredName ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getAccessionNumbers())) {
-			paramBuilder.append(" AND accessionNumber IN (:accessionNumbers) "); //
+			paramBuilder.append(" AND EXISTS (SELECT 1 ");
+			paramBuilder.append(" FROM names n2 INNER JOIN udflds u2 on n2.ntype = u2.fldno AND u2.fcode = '" + GermplasmImportRequest.ACCNO + "'");
+			paramBuilder.append(" WHERE n2.gid = g.gid AND n2.nval = :accessionNumbers  ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getCommonCropNames())) {
-			paramBuilder.append(" AND commonCropName IN (:commonCropNames) "); //
+			paramBuilder.append(" AND EXISTS (SELECT 1 ");
+			paramBuilder.append(" FROM atributs a2 INNER JOIN udflds u2 on a2.atype = u2.fldno AND u2.fcode = '" + GermplasmImportRequest.CROPNM + "'");
+			paramBuilder.append(" WHERE a2.gid = g.gid AND a2.aval = :commonCropNames  ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmGenus())) {
-			paramBuilder.append(" AND genus IN (:germplasmGenus) ");
+			paramBuilder.append(" AND EXISTS (SELECT 1 ");
+			paramBuilder.append(" FROM names n2 INNER JOIN udflds u2 on n2.ntype = u2.fldno AND u2.fcode = '" + GermplasmImportRequest.GENUS + "'");
+			paramBuilder.append(" WHERE n2.gid = g.gid AND n2.nval = :germplasmGenus  ) ");
 		}
 
-
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
-			paramBuilder.append(" AND species IN (:germplasmSpecies) "); //
+			paramBuilder.append(" AND EXISTS (SELECT 1 ");
+			paramBuilder.append(" FROM names n2 INNER JOIN udflds u2 on n2.ntype = u2.fldno AND u2.fcode = '" + GermplasmImportRequest.SPECIES + "'");
+			paramBuilder.append(" WHERE n2.gid = g.gid AND n2.nval = :germplasmSpecies  ) ");
 		}
 
 	}
@@ -1494,10 +1499,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		queryBuilder.append(this.getSelectClauseForFilterGermplasm());
 		queryBuilder.append(this.getMainFromGermplasmClause()); //
 		queryBuilder.append(" WHERE g.deleted = 0 AND g.grplce = 0 ");
-		this.addMainGermplasmFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequestDTO);
+		this.addGermplasmSearchRequestFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequestDTO);
 		queryBuilder.append(" GROUP by g.gid ");
-		queryBuilder.append("  HAVING 1 = 1 ");
-		this.addGermplasmNamesAndAttributesFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequestDTO);
 		return queryBuilder.toString();
 	}
 
