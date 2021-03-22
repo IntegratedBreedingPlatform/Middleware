@@ -70,7 +70,7 @@ public class SampleServiceImpl implements SampleService {
 		sample.setSampleList(sampleList);
 		sample.setCreatedDate(createdDate);
 		sample.setCreatedBy(createdBy);
-		sample.setExperiment(daoFactory.getExperimentDao().getById(experimentId));
+		sample.setExperiment(this.daoFactory.getExperimentDao().getById(experimentId));
 		sample.setSampleNumber(sampleNumber);
 
 		return sample;
@@ -215,7 +215,7 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public Boolean studyEntryHasSamples(Integer studyId, Integer entryId) {
+	public Boolean studyEntryHasSamples(final Integer studyId, final Integer entryId) {
 		return this.daoFactory.getSampleDao().studyEntryHasSamples(studyId, entryId);
 	}
 
