@@ -10,6 +10,8 @@ public class GermplasmNameDto {
 	@JsonIgnore
 	private Integer gid;
 
+	private Integer id;
+
 	private String name;
 
 	private String date;
@@ -21,6 +23,8 @@ public class GermplasmNameDto {
 	private String nameTypeCode;
 
 	private String nameTypeDescription;
+
+	private boolean preferred;
 
 	public String getName() {
 		return name;
@@ -76,6 +80,22 @@ public class GermplasmNameDto {
 
 	public void setGid(final Integer gid) {
 		this.gid = gid;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(final Integer id) {
+		this.id = id;
+	}
+
+	public boolean isPreferred() {
+		return preferred;
+	}
+
+	public void setPreferred(final boolean preferred) {
+		this.preferred = preferred;
 	}
 
 	@Override

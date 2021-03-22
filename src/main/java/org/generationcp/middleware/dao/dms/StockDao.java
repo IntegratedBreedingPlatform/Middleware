@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.dms;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -33,8 +34,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaQuery;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -627,6 +630,31 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 		if (orderColumn.isPresent()) {
 			sql.append(" ORDER BY `" + orderColumn.get() + "` " + direction);
+		}
+	}
+
+	public List<GermplasmStudyDto> getGermplasmStudyDtos(final Integer gid) {
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT DISTINCT p.project_id AS studyId, ");
+			queryString.append("p.name AS name, ");
+			queryString.append("p.description AS description ");
+			queryString.append("FROM stock s ");
+			queryString.append("INNER JOIN project p ON s.project_id = p.project_id ");
+			queryString.append("WHERE s.dbxref_id = :gid AND p.deleted = 0");
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
+			sqlQuery.addScalar("studyId");
+			sqlQuery.addScalar("name");
+			sqlQuery.addScalar("description");
+			sqlQuery.setParameter("gid", gid);
+
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmStudyDto.class));
+			return sqlQuery.list();
+		}catch (final HibernateException e) {
+			final String errorMessage = "Error at getGermplasmStudyDtos(gid=" + gid + ")" + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
 

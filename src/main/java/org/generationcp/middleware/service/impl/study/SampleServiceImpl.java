@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 @Transactional
@@ -69,7 +70,7 @@ public class SampleServiceImpl implements SampleService {
 		sample.setSampleList(sampleList);
 		sample.setCreatedDate(createdDate);
 		sample.setCreatedBy(createdBy);
-		sample.setExperiment(daoFactory.getExperimentDao().getById(experimentId));
+		sample.setExperiment(this.daoFactory.getExperimentDao().getById(experimentId));
 		sample.setSampleNumber(sampleNumber);
 
 		return sample;
@@ -91,20 +92,7 @@ public class SampleServiceImpl implements SampleService {
 			ndExperimentId = experiment.getNdExperimentId();
 		}
 		final List<SampleDTO> sampleDTOS = this.daoFactory.getSampleDao().filter(ndExperimentId, listId, pageable);
-		// Populate takenBy with full name of user from workbench database.
-		final List<Integer> userIds = Lists.transform(sampleDTOS, new Function<SampleDTO, Integer>() {
-
-			@Nullable
-			@Override
-			public Integer apply(@Nullable final SampleDTO input) {
-				return input.getTakenByUserId();
-			}
-		});
-		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
-		for (final SampleDTO sampleDTO : sampleDTOS) {
-			sampleDTO.setTakenBy(userIDFullNameMap.get(sampleDTO.getTakenByUserId()));
-		}
-
+		this.populateTakenBy(sampleDTOS);
 		return sampleDTOS;
 	}
 
@@ -216,7 +204,9 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public List<SampleDTO> getByGid(final Integer gid) {
-		return this.daoFactory.getSampleDao().getByGid(gid);
+		final List<SampleDTO> sampleDTOS = this.daoFactory.getSampleDao().getByGid(gid);
+		this.populateTakenBy(sampleDTOS);
+		return sampleDTOS;
 	}
 
 	@Override
@@ -225,10 +215,17 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public Boolean studyEntryHasSamples(Integer studyId, Integer entryId) {
+	public Boolean studyEntryHasSamples(final Integer studyId, final Integer entryId) {
 		return this.daoFactory.getSampleDao().studyEntryHasSamples(studyId, entryId);
 	}
 
+	void populateTakenBy(final List<SampleDTO> sampleDTOS) {
+		// Populate takenBy with full name of user from workbench database.
+		final List<Integer> userIds = sampleDTOS.stream().map(sampleDTO -> sampleDTO.getTakenByUserId()).collect(Collectors.toList());
+		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
+		sampleDTOS.forEach(sampleDTO -> sampleDTO.setTakenBy(userIDFullNameMap.get(sampleDTO.getTakenByUserId())));
+	}
+	
 	protected void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
