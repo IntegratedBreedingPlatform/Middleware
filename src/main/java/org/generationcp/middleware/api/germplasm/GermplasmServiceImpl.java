@@ -1060,7 +1060,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 					nameDao.update(existingName);
 				} else {
 					final Name name = new Name(null, germplasm.getGid(), typeId,
-						0, userId, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
+						0, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
 					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
 						name.setNstat(1);
 					}
@@ -1085,7 +1085,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 					existingAttribute.setAval(v);
 					attributeDAO.update(existingAttribute);
 				} else {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, userId, v,
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, v,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					attributeDAO.save(attribute);
