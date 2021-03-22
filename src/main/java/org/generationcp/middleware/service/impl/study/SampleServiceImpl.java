@@ -219,13 +219,13 @@ public class SampleServiceImpl implements SampleService {
 		return this.daoFactory.getSampleDao().studyEntryHasSamples(studyId, entryId);
 	}
 
-
 	void populateTakenBy(final List<SampleDTO> sampleDTOS) {
 		// Populate takenBy with full name of user from workbench database.
 		final List<Integer> userIds = sampleDTOS.stream().map(sampleDTO -> sampleDTO.getTakenByUserId()).collect(Collectors.toList());
 		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
 		sampleDTOS.forEach(sampleDTO -> sampleDTO.setTakenBy(userIDFullNameMap.get(sampleDTO.getTakenByUserId())));
 	}
+	
 	protected void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
