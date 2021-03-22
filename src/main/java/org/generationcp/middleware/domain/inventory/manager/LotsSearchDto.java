@@ -59,6 +59,8 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private List<Integer> harvestingStudyIds;
 
+	private List<String> germplasmUUIDs;
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date createdDateFrom;
 
@@ -82,7 +84,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	private String locationNameContainsString;
 
 	public Integer getStatus() {
-		return status;
+		return this.status;
 	}
 
 	public void setStatus(final Integer status) {
@@ -90,7 +92,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public List<Integer> getLotIds() {
-		return lotIds;
+		return this.lotIds;
 	}
 
 	public void setLotIds(final List<Integer> lotIds) {
@@ -98,7 +100,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public List<String> getLotUUIDs() {
-		return lotUUIDs;
+		return this.lotUUIDs;
 	}
 
 	public void setLotUUIDs(final List<String> lotUUIDs) {
@@ -106,7 +108,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public String getStockId() {
-		return stockId;
+		return this.stockId;
 	}
 
 	public void setStockId(final String stockId) {
@@ -114,7 +116,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public List<Integer> getGids() {
-		return gids;
+		return this.gids;
 	}
 
 	public void setGids(final List<Integer> gids) {
@@ -122,7 +124,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public List<Integer> getMgids() {
-		return mgids;
+		return this.mgids;
 	}
 
 	public void setMgids(final List<Integer> mgids) {
@@ -130,7 +132,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public String getDesignation() {
-		return designation;
+		return this.designation;
 	}
 
 	public void setDesignation(final String designation) {
@@ -138,7 +140,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public List<Integer> getLocationIds() {
-		return locationIds;
+		return this.locationIds;
 	}
 
 	public void setLocationIds(final List<Integer> locationIds) {
@@ -146,7 +148,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public List<Integer> getUnitIds() {
-		return unitIds;
+		return this.unitIds;
 	}
 
 	public void setUnitIds(final List<Integer> unitIds) {
@@ -154,7 +156,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Double getMinActualBalance() {
-		return minActualBalance;
+		return this.minActualBalance;
 	}
 
 	public void setMinActualBalance(final Double minActualBalance) {
@@ -162,7 +164,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Double getMaxActualBalance() {
-		return maxActualBalance;
+		return this.maxActualBalance;
 	}
 
 	public void setMaxActualBalance(final Double maxActualBalance) {
@@ -170,7 +172,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Double getMinAvailableBalance() {
-		return minAvailableBalance;
+		return this.minAvailableBalance;
 	}
 
 	public void setMinAvailableBalance(final Double minAvailableBalance) {
@@ -178,7 +180,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Double getMaxAvailableBalance() {
-		return maxAvailableBalance;
+		return this.maxAvailableBalance;
 	}
 
 	public void setMaxAvailableBalance(final Double maxAvailableBalance) {
@@ -186,7 +188,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Double getMinReservedTotal() {
-		return minReservedTotal;
+		return this.minReservedTotal;
 	}
 
 	public void setMinReservedTotal(final Double minReservedTotal) {
@@ -194,7 +196,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Double getMaxReservedTotal() {
-		return maxReservedTotal;
+		return this.maxReservedTotal;
 	}
 
 	public void setMaxReservedTotal(final Double maxReservedTotal) {
@@ -202,7 +204,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Double getMinWithdrawalTotal() {
-		return minWithdrawalTotal;
+		return this.minWithdrawalTotal;
 	}
 
 	public void setMinWithdrawalTotal(final Double minWithdrawalTotal) {
@@ -210,7 +212,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Double getMaxWithdrawalTotal() {
-		return maxWithdrawalTotal;
+		return this.maxWithdrawalTotal;
 	}
 
 	public void setMaxWithdrawalTotal(final Double maxWithdrawalTotal) {
@@ -218,7 +220,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public String getCreatedByUsername() {
-		return createdByUsername;
+		return this.createdByUsername;
 	}
 
 	public void setCreatedByUsername(final String createdByUsername) {
@@ -226,7 +228,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Date getCreatedDateFrom() {
-		return createdDateFrom;
+		return this.createdDateFrom;
 	}
 
 	public void setCreatedDateFrom(final Date createdDateFrom) {
@@ -234,7 +236,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Date getCreatedDateTo() {
-		return createdDateTo;
+		return this.createdDateTo;
 	}
 
 	public void setCreatedDateTo(final Date createdDateTo) {
@@ -242,7 +244,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Date getLastDepositDateFrom() {
-		return lastDepositDateFrom;
+		return this.lastDepositDateFrom;
 	}
 
 	public void setLastDepositDateFrom(final Date lastDepositDateFrom) {
@@ -250,7 +252,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Date getLastDepositDateTo() {
-		return lastDepositDateTo;
+		return this.lastDepositDateTo;
 	}
 
 	public void setLastDepositDateTo(final Date lastDepositDateTo) {
@@ -258,7 +260,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Date getLastWithdrawalDateFrom() {
-		return lastWithdrawalDateFrom;
+		return this.lastWithdrawalDateFrom;
 	}
 
 	public void setLastWithdrawalDateFrom(final Date lastWithdrawalDateFrom) {
@@ -266,7 +268,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Date getLastWithdrawalDateTo() {
-		return lastWithdrawalDateTo;
+		return this.lastWithdrawalDateTo;
 	}
 
 	public void setLastWithdrawalDateTo(final Date lastWithdrawalDateTo) {
@@ -274,7 +276,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public String getNotesContainsString() {
-		return notesContainsString;
+		return this.notesContainsString;
 	}
 
 	public void setNotesContainsString(final String notesContainsString) {
@@ -282,7 +284,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public List<Integer> getGermplasmListIds() {
-		return germplasmListIds;
+		return this.germplasmListIds;
 	}
 
 	public void setGermplasmListIds(final List<Integer> germplasmListIds) {
@@ -306,7 +308,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public String getLocationNameContainsString() {
-		return locationNameContainsString;
+		return this.locationNameContainsString;
 	}
 
 	public void setLocationNameContainsString(final String locationNameContainsString) {
@@ -314,7 +316,7 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Double getMinPendingDepositsTotal() {
-		return minPendingDepositsTotal;
+		return this.minPendingDepositsTotal;
 	}
 
 	public void setMinPendingDepositsTotal(final Double minPendingDepositTotal) {
@@ -322,11 +324,19 @@ public class LotsSearchDto extends SearchRequestDto {
 	}
 
 	public Double getMaxPendingDepositsTotal() {
-		return maxPendingDepositsTotal;
+		return this.maxPendingDepositsTotal;
 	}
 
 	public void setMaxPendingDepositsTotal(final Double maxPendingDepositTotal) {
 		this.maxPendingDepositsTotal = maxPendingDepositTotal;
+	}
+
+	public List<String> getGermplasmUUIDs() {
+		return this.germplasmUUIDs;
+	}
+
+	public void setGermplasmUUIDs(final List<String> germplasmUUIDs) {
+		this.germplasmUUIDs = germplasmUUIDs;
 	}
 
 	@Override

@@ -1,9 +1,13 @@
 package org.generationcp.middleware.api.germplasm;
 
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
@@ -70,11 +74,13 @@ public interface GermplasmService {
 	
 	List<GermplasmDTO> createGermplasm(Integer userId, String cropname, List<GermplasmImportRequest> germplasmImportRequestList);
 
+	GermplasmDTO updateGermplasm(Integer userId, String germplasmDbId, GermplasmUpdateRequest germplasmUpdateRequest);
+
 	long countFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO);
 
 	List<GermplasmDTO> searchFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
 
-	Optional<GermplasmDTO> getGermplasmDTOByGID(Integer gid);
+	Optional<GermplasmDTO> getGermplasmDTOByGUID(String germplasmUUID);
 
 	long countGermplasmByStudy(Integer studyDbId);
 
@@ -96,5 +102,14 @@ public interface GermplasmService {
 	Set<Integer> getGermplasmUsedInOneOrMoreList(List<Integer> gids);
 
 	Set<Integer> getGermplasmUsedInStudies(List<Integer> gids);
+
+	PedigreeDTO getPedigree(Integer gid, String notation, Boolean includeSiblings);
+
+	ProgenyDTO getProgeny(final Integer gid);
+
+	List<AttributeDTO> getAttributesByGUID(
+			String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
+
+	long countAttributesByGUID(String gemrplasmUUID, List<String> attributeDbIds);
 
 }

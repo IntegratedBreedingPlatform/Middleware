@@ -9,14 +9,14 @@ import java.util.List;
 public class PedigreeDTO {
 
 	public static class Sibling {
-		private Integer germplasmDbId;
+		private String germplasmDbId;
 		private String defaultDisplayName;
 
-		public Integer getGermplasmDbId() {
+		public String getGermplasmDbId() {
 			return germplasmDbId;
 		}
 
-		public void setGermplasmDbId(final Integer germplasmDbId) {
+		public void setGermplasmDbId(final String germplasmDbId) {
 			this.germplasmDbId = germplasmDbId;
 		}
 
@@ -30,7 +30,7 @@ public class PedigreeDTO {
 
 	}
 
-	private Integer germplasmDbId;
+	private String germplasmDbId;
 	private String defaultDisplayName;
 	private String pedigree;
 	private String crossingPlan;
@@ -44,11 +44,11 @@ public class PedigreeDTO {
 	private String parent2Type;
 	private List<Sibling> siblings;
 
-	public int getGermplasmDbId() {
+	public String getGermplasmDbId() {
 		return germplasmDbId;
 	}
 
-	public void setGermplasmDbId(final Integer germplasmDbId) {
+	public void setGermplasmDbId(final String germplasmDbId) {
 		this.germplasmDbId = germplasmDbId;
 	}
 

@@ -12,6 +12,7 @@ import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +24,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	private AttributeDAO attributeDao;
 	private GermplasmDAO germplasmDao;
 	private List<Integer> gids;
+	private List<String> guids;
 	private List<UserDefinedField> testAttributeTypes;
 	private Integer previousAttributeTypesCount = 0;
 	private Attribute attribute1;
@@ -48,7 +50,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 			this.germplasmDao.setSession(session);
 		}
 		
-		if (this.gids == null) {
+		if (CollectionUtils.isEmpty(this.gids) || CollectionUtils.isEmpty(this.guids)) {
 			final List<UserDefinedField> existingAttributeTypes = this.attributeDao.getAttributeTypes();
 			if (existingAttributeTypes != null && !existingAttributeTypes.isEmpty()) {
 				this.previousAttributeTypesCount = existingAttributeTypes.size();
@@ -60,15 +62,19 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	private void setupTestData() {
 		final Germplasm germplasm1 =
 				GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		germplasm1.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		final Germplasm germplasm2 =
 				GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		germplasm2.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		final Germplasm germplasm3 =
 				GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		germplasm3.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		this.germplasmDao.save(germplasm1);
 		this.germplasmDao.save(germplasm2);
 		this.germplasmDao.save(germplasm3);
 		this.gids = Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid());
-		
+		this.guids = Arrays.asList(germplasm1.getGermplasmUUID(), germplasm2.getGermplasmUUID(), germplasm3.getGermplasmUUID());
+
 		final UserDefinedField attributeType1 = new UserDefinedField(null, "ATRIBUTS", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
 		final UserDefinedField attributeType2 = new UserDefinedField(null, "ATRIBUTS", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
 		final UserDefinedField attributeType3 = new UserDefinedField(null, "ATRIBUTS", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
@@ -133,10 +139,10 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAttributesByGidAndAttributeIds() {
+	public void testGetAttributesByGUIDAndAttributeIds() {
 		final List<AttributeDTO> attributes = this.attributeDao
-			.getAttributesByGidAndAttributeIds(
-				String.valueOf(this.gids.get(0)), Lists.newArrayList(String.valueOf(this.attribute1.getTypeId())), null, null);
+			.getAttributesByGUIDAndAttributeIds(
+				String.valueOf(this.guids.get(0)), Lists.newArrayList(String.valueOf(this.attribute1.getTypeId())), null);
 		Assert.assertNotNull(attributes);
 		Assert.assertEquals(1, attributes.size());
 	}
