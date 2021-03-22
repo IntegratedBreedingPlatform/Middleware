@@ -13,6 +13,7 @@ public class GermplasmOriginDto {
 	private Integer studyId;
 	private String studyName;
 	private String observationUnitId;
+	private Integer plotNumber;
 	private Integer repNumber;
 	private Integer blockNumber;
 	private String positionCoordinateX;
@@ -81,6 +82,14 @@ public class GermplasmOriginDto {
 
 	public void setGeoCoordinates(final Map<String, Object> geoCoordinates) {
 		this.geoCoordinates = geoCoordinates;
+	}
+
+	public Integer getPlotNumber() {
+		return plotNumber;
+	}
+
+	public void setPlotNumber(final Integer plotNumber) {
+		this.plotNumber = plotNumber;
 	}
 
 	@Override
