@@ -47,9 +47,6 @@ public class ExternalReference extends AbstractEntity implements Serializable {
 	@Column(name = "reference_source")
 	private String source;
 
-	@Column(name = "created_date", nullable = false, updatable = false)
-	private Date createdDate = new Date();
-
 	public ExternalReference() {
 	}
 
@@ -89,10 +86,6 @@ public class ExternalReference extends AbstractEntity implements Serializable {
 
 	public void setSource(final String source) {
 		this.source = source;
-	}
-
-	public Date getCreatedDate() {
-		return this.createdDate;
 	}
 
 	@Override
