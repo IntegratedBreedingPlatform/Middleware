@@ -1418,25 +1418,25 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getAccessionNumbers())) {
 			paramBuilder.append(" AND EXISTS (SELECT 1 ");
 			paramBuilder.append(" FROM names n2 INNER JOIN udflds u2 on n2.ntype = u2.fldno AND u2.fcode = '" + GermplasmImportRequest.ACCNO + "'");
-			paramBuilder.append(" WHERE n2.gid = g.gid AND n2.nval = :accessionNumbers  ) ");
+			paramBuilder.append(" WHERE n2.gid = g.gid AND n2.nval IN (:accessionNumbers)  ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getCommonCropNames())) {
 			paramBuilder.append(" AND EXISTS (SELECT 1 ");
 			paramBuilder.append(" FROM atributs a2 INNER JOIN udflds u2 on a2.atype = u2.fldno AND u2.fcode = '" + GermplasmImportRequest.CROPNM + "'");
-			paramBuilder.append(" WHERE a2.gid = g.gid AND a2.aval = :commonCropNames  ) ");
+			paramBuilder.append(" WHERE a2.gid = g.gid AND a2.aval IN (:commonCropNames)  ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmGenus())) {
 			paramBuilder.append(" AND EXISTS (SELECT 1 ");
 			paramBuilder.append(" FROM names n2 INNER JOIN udflds u2 on n2.ntype = u2.fldno AND u2.fcode = '" + GermplasmImportRequest.GENUS + "'");
-			paramBuilder.append(" WHERE n2.gid = g.gid AND n2.nval = :germplasmGenus  ) ");
+			paramBuilder.append(" WHERE n2.gid = g.gid AND n2.nval IN (:germplasmGenus)  ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
 			paramBuilder.append(" AND EXISTS (SELECT 1 ");
 			paramBuilder.append(" FROM names n2 INNER JOIN udflds u2 on n2.ntype = u2.fldno AND u2.fcode = '" + GermplasmImportRequest.SPECIES + "'");
-			paramBuilder.append(" WHERE n2.gid = g.gid AND n2.nval = :germplasmSpecies  ) ");
+			paramBuilder.append(" WHERE n2.gid = g.gid AND n2.nval IN (:germplasmSpecies)  ) ");
 		}
 
 	}
