@@ -3,11 +3,12 @@ package org.generationcp.middleware.api.germplasm;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
@@ -116,4 +117,6 @@ public interface GermplasmService {
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
 
 	GermplasmDto getGermplasmDtoById(Integer gid);
+
+	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
 }
