@@ -802,8 +802,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testCountGermplasmDTOs_FilterBySynonyms() {
 		final List<String> allNames = new ArrayList<>();
-		allNames.addAll(this.saveGermplasmWithNames(GermplasmImportRequest.SPECIES_AUTH));
-		allNames.addAll(this.saveGermplasmWithNames(GermplasmImportRequest.SUBTAX_AUTH));
+		allNames.addAll(this.saveGermplasmWithNames(GermplasmImportRequest.GENUS));
+		allNames.addAll(this.saveGermplasmWithNames(GermplasmImportRequest.ACCNO));
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
 		request.setGermplasmNames(allNames);
 		final Long count = this.dao.countGermplasmDTOs(request);
