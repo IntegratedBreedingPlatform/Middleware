@@ -8,6 +8,8 @@ public interface GermplasmNameService {
 
 	Name getNameByNameId(Integer nameId);
 
+	Name getPreferredName(Integer gid);
+
 	UserDefinedField getNameType(final Integer nameTypeId);
 
 	void deleteName(Integer nameId);

@@ -9,6 +9,8 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class GermplasmNameServiceImpl implements GermplasmNameService {
@@ -22,6 +24,15 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	@Override
 	public Name getNameByNameId(final Integer nameId) {
 		return daoFactory.getNameDao().getById(nameId);
+	}
+
+	@Override
+	public Name getPreferredName(final Integer gid) {
+		final List<Name> names = daoFactory.getNameDao().getByGIDWithListTypeFilters(gid, 1, null);
+		if (!names.isEmpty()) {
+			return names.get(0);
+		}
+		return null;
 	}
 
 	@Override
