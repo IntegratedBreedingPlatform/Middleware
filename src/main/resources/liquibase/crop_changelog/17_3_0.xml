@@ -71,7 +71,6 @@
 
 				<columnExists tableName="external_reference" columnName="created_by"/>
 				<columnExists tableName="external_reference" columnName="modified_by"/>
-				<columnExists tableName="external_reference" columnName="created_date"/>
 				<columnExists tableName="external_reference" columnName="modified_date"/>
 			</not>
 		</preConditions>
@@ -107,7 +106,6 @@
 
 			ALTER TABLE external_reference ADD created_by int default 0 not null;
 			ALTER TABLE external_reference ADD modified_by int null;
-			ALTER TABLE external_reference ADD created_date timestamp default CURRENT_TIMESTAMP null;
 			ALTER TABLE external_reference ADD modified_date timestamp null;
 
         </sql>
