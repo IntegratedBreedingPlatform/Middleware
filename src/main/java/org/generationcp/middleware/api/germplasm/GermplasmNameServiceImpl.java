@@ -5,10 +5,12 @@ import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -36,8 +38,9 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public UserDefinedField getNameType(final Integer nameTypeId) {
-		return this.daoFactory.getUserDefinedFieldDAO().getById(nameTypeId);
+	public UserDefinedField getNameType(final String nameTypeCode) {
+		return this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
+				UDTableType.NAMES_NAME.getType(), nameTypeCode);
 	}
 
 	@Override
@@ -57,8 +60,9 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		}
 
 		final Name name = daoFactory.getNameDao().getById(germplasmNameRequestDto.getId());
-		if (germplasmNameRequestDto.getTypeId() != null) {
-			name.setTypeId(germplasmNameRequestDto.getTypeId());
+		if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
+			final UserDefinedField userDefinedField = this.getNameType(germplasmNameRequestDto.getNameTypeCode());
+			name.setTypeId(userDefinedField.getFldno());
 		}
 
 		if (!StringUtils.isBlank(germplasmNameRequestDto.getName())) {
@@ -89,7 +93,8 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 		final Name name = new Name();
 		name.setGermplasmId(germplasmNameRequestDto.getGid());
-		name.setTypeId(germplasmNameRequestDto.getTypeId());
+		final UserDefinedField userDefinedField = this.getNameType(germplasmNameRequestDto.getNameTypeCode());
+		name.setTypeId(userDefinedField.getFldno());
 		name.setNval(germplasmNameRequestDto.getName());
 		name.setNdate(Integer.valueOf(germplasmNameRequestDto.getDate()));
 		name.setLocationId(germplasmNameRequestDto.getLocationId());

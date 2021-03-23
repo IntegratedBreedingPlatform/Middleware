@@ -19,7 +19,7 @@ public class GermplasmNameRequestDto {
 
 	private Integer locationId;
 
-	private Integer typeId;
+	private String nameTypeCode;
 
 	private Boolean preferredName;
 
@@ -71,20 +71,20 @@ public class GermplasmNameRequestDto {
 		this.locationId = locationId;
 	}
 
-	public Integer getTypeId() {
-		return this.typeId;
-	}
-
-	public void setTypeId(final Integer typeId) {
-		this.typeId = typeId;
-	}
-
 	public Boolean isPreferredName() {
 		return this.preferredName;
 	}
 
 	public void setPreferredName(final Boolean preferredName) {
 		this.preferredName = preferredName;
+	}
+
+	public String getNameTypeCode() {
+		return nameTypeCode;
+	}
+
+	public void setNameTypeCode(String nameTypeCode) {
+		this.nameTypeCode = nameTypeCode;
 	}
 
 	@Override

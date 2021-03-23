@@ -10,7 +10,7 @@ public interface GermplasmNameService {
 
 	Name getPreferredName(Integer gid);
 
-	UserDefinedField getNameType(final Integer nameTypeId);
+	UserDefinedField getNameType(final String nameTypeCode);
 
 	void deleteName(Integer nameId);
 
