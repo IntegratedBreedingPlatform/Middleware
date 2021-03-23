@@ -61,12 +61,12 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 			name.setTypeId(germplasmNameRequestDto.getTypeId());
 		}
 
-		if(!StringUtils.isBlank(germplasmNameRequestDto.getName())){
+		if (!StringUtils.isBlank(germplasmNameRequestDto.getName())) {
 			name.setNval(germplasmNameRequestDto.getName());
 		}
 
 		if (germplasmNameRequestDto.getDate() != null) {
-			name.setNdate(germplasmNameRequestDto.getDate());
+			name.setNdate(Integer.valueOf(germplasmNameRequestDto.getDate()));
 		}
 
 		if (germplasmNameRequestDto.getLocationId() != null) {
@@ -91,7 +91,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		name.setGermplasmId(germplasmNameRequestDto.getGid());
 		name.setTypeId(germplasmNameRequestDto.getTypeId());
 		name.setNval(germplasmNameRequestDto.getName());
-		name.setNdate(germplasmNameRequestDto.getDate());
+		name.setNdate(Integer.valueOf(germplasmNameRequestDto.getDate()));
 		name.setLocationId(germplasmNameRequestDto.getLocationId());
 		name.setNstat(germplasmNameRequestDto.isPreferredName() ? 1 : 0);
 		name.setUserId(userid);
