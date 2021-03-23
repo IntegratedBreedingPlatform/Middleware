@@ -672,7 +672,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void resetGermplasmGroup() {
+	public void testResetGermplasmGroup() {
 
 		// Create 2 germplasm with group
 		final Germplasm germplasm1 =
@@ -792,11 +792,11 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountGermplasmDTOs_FilterBySpecies() {
-		final List<String> names = this.saveGermplasmWithNames(GermplasmImportRequest.SPECIES);
+		final List<String> attributes = this.saveGermplasmWithAttributes(GermplasmImportRequest.SPECIES);
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
-		request.setGermplasmSpecies(names);
+		request.setGermplasmSpecies(attributes);
 		final Long count = this.dao.countGermplasmDTOs(request);
-		Assert.assertThat(count.intValue(), is(names.size()));
+		Assert.assertThat(count.intValue(), is(attributes.size()));
 	}
 
 	@Test

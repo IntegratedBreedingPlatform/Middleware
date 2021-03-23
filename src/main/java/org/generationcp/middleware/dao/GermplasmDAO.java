@@ -1435,8 +1435,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
 			paramBuilder.append(" AND EXISTS (SELECT 1 ");
-			paramBuilder.append(" FROM names n2 INNER JOIN udflds u2 on n2.ntype = u2.fldno AND u2.fcode = '" + GermplasmImportRequest.SPECIES + "'");
-			paramBuilder.append(" WHERE n2.gid = g.gid AND n2.nval IN (:germplasmSpecies)  ) ");
+			paramBuilder.append(" FROM atributs a2 INNER JOIN udflds u2 on a2.atype = u2.fldno AND u2.fcode = '" + GermplasmImportRequest.SPECIES + "'");
+			paramBuilder.append(" WHERE a2.gid = g.gid AND a2.aval IN (:germplasmSpecies)  ) ");
 		}
 
 	}
