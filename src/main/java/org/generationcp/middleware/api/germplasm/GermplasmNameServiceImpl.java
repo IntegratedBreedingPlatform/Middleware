@@ -47,9 +47,16 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public void updateName(final GermplasmNameRequestDto germplasmNameRequestDto){
-		final Name name = daoFactory.getNameDao().getById(germplasmNameRequestDto.getId());
+	public void updateName(final GermplasmNameRequestDto germplasmNameRequestDto) {
+		if (germplasmNameRequestDto.isPreferredName() != null && germplasmNameRequestDto.isPreferredName()) {
+			final Name preferredName = this.getPreferredName(germplasmNameRequestDto.getGid());
+			if (preferredName != null) {
+				preferredName.setNstat(0);
+				daoFactory.getNameDao().save(preferredName);
+			}
+		}
 
+		final Name name = daoFactory.getNameDao().getById(germplasmNameRequestDto.getId());
 		if (germplasmNameRequestDto.getTypeId() != null) {
 			name.setTypeId(germplasmNameRequestDto.getTypeId());
 		}
@@ -66,21 +73,27 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 			name.setLocationId(germplasmNameRequestDto.getLocationId());
 		}
 
-		if (germplasmNameRequestDto.getStatus() != null) {
-			name.setNstat(germplasmNameRequestDto.getStatus());
+		if (germplasmNameRequestDto.isPreferredName() != null) {
+			name.setNstat(germplasmNameRequestDto.isPreferredName() ? 1 : 0);
 		}
 		daoFactory.getNameDao().save(name);
 	}
 
 	@Override
 	public Integer createName(final GermplasmNameRequestDto germplasmNameRequestDto, final Integer userid) {
+		if (germplasmNameRequestDto.isPreferredName()) {
+			final Name preferredName = this.getPreferredName(germplasmNameRequestDto.getGid());
+			preferredName.setNstat(0);
+			daoFactory.getNameDao().save(preferredName);
+		}
+
 		final Name name = new Name();
 		name.setGermplasmId(germplasmNameRequestDto.getGid());
 		name.setTypeId(germplasmNameRequestDto.getTypeId());
 		name.setNval(germplasmNameRequestDto.getName());
 		name.setNdate(germplasmNameRequestDto.getDate());
 		name.setLocationId(germplasmNameRequestDto.getLocationId());
-		name.setNstat(germplasmNameRequestDto.getStatus());
+		name.setNstat(germplasmNameRequestDto.isPreferredName() ? 1 : 0);
 		name.setUserId(userid);
 		name.setReferenceId(0);
 		daoFactory.getNameDao().save(name);
