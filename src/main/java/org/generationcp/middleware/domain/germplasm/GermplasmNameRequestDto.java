@@ -15,13 +15,13 @@ public class GermplasmNameRequestDto {
 
 	private String name;
 
-	private Integer date;
+	private String date;
 
 	private Integer locationId;
 
 	private Integer typeId;
 
-	private Integer status;
+	private Boolean preferredName;
 
 	public GermplasmNameRequestDto() {
 	}
@@ -55,11 +55,11 @@ public class GermplasmNameRequestDto {
 		this.name = name;
 	}
 
-	public Integer getDate() {
+	public String getDate() {
 		return this.date;
 	}
 
-	public void setDate(final Integer date) {
+	public void setDate(final String date) {
 		this.date = date;
 	}
 
@@ -79,12 +79,12 @@ public class GermplasmNameRequestDto {
 		this.typeId = typeId;
 	}
 
-	public Integer getStatus() {
-		return this.status;
+	public Boolean isPreferredName() {
+		return this.preferredName;
 	}
 
-	public void setStatus(final Integer status) {
-		this.status = status;
+	public void setPreferredName(final Boolean preferredName) {
+		this.preferredName = preferredName;
 	}
 
 	@Override
