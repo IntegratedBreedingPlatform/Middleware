@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
@@ -1174,6 +1175,51 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasmDto.setOtherProgenitors(progenitors.stream().map(p -> p.getProgenitorGid()).collect(Collectors.toList()));
 		}
 		return germplasmDto;
+	}
+
+	@Override
+	public ProgenitorsDetailsDto getGermplasmProgenitorDetails(final Integer gid) {
+		final GermplasmDto germplasmDto = this.daoFactory.getGermplasmDao().getGermplasmDtoByGid(gid);
+		if (germplasmDto != null) {
+			final List<Progenitor> progenitors = this.daoFactory.getProgenitorDao().getByGID(gid);
+			germplasmDto.setOtherProgenitors(progenitors.stream().map(p -> p.getProgenitorGid()).collect(Collectors.toList()));
+			final Method method = this.daoFactory.getMethodDAO().getById(germplasmDto.getBreedingMethodId());
+
+			final ProgenitorsDetailsDto progenitorsDetailsDto = new ProgenitorsDetailsDto();
+			progenitorsDetailsDto.setBreedingMethodId(germplasmDto.getBreedingMethodId());
+			progenitorsDetailsDto.setBreedingMethodName(germplasmDto.getBreedingMethod());
+			progenitorsDetailsDto.setBreedingMethodCode(method.getMcode());
+			progenitorsDetailsDto.setBreedingMethodType(method.getMtype());
+
+			final List<Integer> maleParentsGids = new ArrayList<>();
+			maleParentsGids.add(germplasmDto.getGpid2());
+			maleParentsGids.addAll(germplasmDto.getOtherProgenitors());
+
+			final List<Integer> allParentsGids = new ArrayList<>();
+			allParentsGids.add(germplasmDto.getGpid1());
+			allParentsGids.addAll(maleParentsGids);
+
+			final Map<Integer, GermplasmDto> germplasmDtoMap =
+				this.daoFactory.getGermplasmDao().getGermplasmDtoByGids(allParentsGids).stream()
+					.collect(Collectors.toMap(GermplasmDto::getGid, g -> g));
+			final GermplasmDto femaleParent = germplasmDtoMap.get(germplasmDto.getGpid1());
+			final List<GermplasmDto> maleParents = new ArrayList<>();
+			maleParentsGids.forEach(m -> {
+				if (germplasmDtoMap.containsKey(m)) {
+					maleParents.add(germplasmDtoMap.get(m));
+				}
+			});
+
+			if ("GEN".equals(method.getMtype())) {
+				progenitorsDetailsDto.setFemaleParent(femaleParent);
+				progenitorsDetailsDto.setMaleParents(maleParents);
+			} else {
+				progenitorsDetailsDto.setGroupSource(femaleParent);
+				progenitorsDetailsDto.setImmediateSource(maleParents.isEmpty() ? null : maleParents.get(0));
+			}
+			return progenitorsDetailsDto;
+		}
+		return null;
 	}
 
 	private void populateExternalReferences(final List<GermplasmDTO> germplasmDTOList) {

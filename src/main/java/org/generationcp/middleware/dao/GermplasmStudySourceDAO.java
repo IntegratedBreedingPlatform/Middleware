@@ -71,6 +71,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "  ne.json_props AS jsonProps, " //
 		+ "  fieldMapRow.value AS fieldMapRow, " //
 		+ "  fieldMapCol.value AS fieldMapCol, " //
+		+ "  plot.value AS plotNumber, " //
 		+ "  (SELECT ndep.value " //
 		+ "   FROM nd_experimentprop ndep " //
 		+ "          INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
@@ -90,8 +91,10 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "from germplasm_study_source source " //
 		+ "       inner join germplsm g on source.gid = g.gid " //
 		+ "       inner join nd_experiment ne on source.nd_experiment_id = ne.nd_experiment_id " //
-		+ "       inner join project plot on ne.project_id = plot.project_id " //
-		+ "       inner join project study on plot.study_id = study.project_id " //
+		+ "       inner join project plot_dataset on ne.project_id = plot_dataset.project_id " //
+		+ "       inner join project study on plot_dataset.study_id = study.project_id " //
+		+ "       LEFT JOIN nd_experimentprop plot ON plot.nd_experiment_id = ne.nd_experiment_id AND plot.type_id = "
+		+ TermId.PLOT_NO.getId() //
 		+ "       LEFT JOIN nd_experimentprop fieldMapRow ON fieldMapRow.nd_experiment_id = ne.nd_experiment_id AND fieldMapRow.type_id = "
 		+ TermId.FIELDMAP_RANGE.getId() //
 		+ "       LEFT JOIN nd_experimentprop fieldMapCol ON fieldMapCol.nd_experiment_id = ne.nd_experiment_id AND fieldMapCol.type_id = "
@@ -171,7 +174,8 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 
 			sqlQuery.addScalar("studyId").addScalar("studyName")
 				.addScalar("observationUnitId").addScalar("jsonProps").addScalar("fieldMapRow")
-				.addScalar("fieldMapCol").addScalar("blockNumber", new IntegerType()).addScalar("repNumber", new IntegerType())
+				.addScalar("fieldMapCol").addScalar("plotNumber", new IntegerType()).addScalar("blockNumber", new IntegerType())
+				.addScalar("repNumber", new IntegerType())
 				.addScalar("col")
 				.addScalar("row");
 
@@ -185,13 +189,14 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				germplasmOriginDto.setStudyId((Integer) result.get("studyId"));
 				germplasmOriginDto.setStudyName((String) result.get("studyName"));
 				germplasmOriginDto.setObservationUnitId((String) result.get("observationUnitId"));
-				germplasmOriginDto.setBlockNumber((Integer) result.get("blockNumber"));
+				germplasmOriginDto.setPlotNumber((Integer) result.get("plotNumber"));
+				germplasmOriginDto.setBlockNumber(((result.get("blockNumber") != null)) ? (Integer) result.get("plotNumber") : null);
 				germplasmOriginDto.setRepNumber((Integer) result.get("repNumber"));
 				String x = result.get("row") != null ? (String) result.get("row") : null;
 				String y = result.get("col") != null ? (String) result.get("col") : null;
 				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-					x = result.get("fieldMapRow") != null ? (String) result.get("fieldMapRow") : "1";
-					y = result.get("fieldMapCol") != null ? (String) result.get("fieldMapCol") : "1";
+					x = result.get("fieldMapRow") != null ? (String) result.get("fieldMapRow") : null;
+					y = result.get("fieldMapCol") != null ? (String) result.get("fieldMapCol") : null;
 				}
 				final String jsonProps = (String) result.get("jsonProps");
 				if (jsonProps != null) {

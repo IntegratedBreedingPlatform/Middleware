@@ -102,7 +102,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String FIND_GERMPLASM_MATCHES_BY_NAMES =
 		" g.gid in (select gid from names n where n.nval in (:nameList) and n.nstat <> 9)";
 
-	private static final String FIND_GERMPLASM_BY_GID = " g.gid = :gid ";
+	private static final String FIND_GERMPLASM_BY_GIDS = " g.gid in (:gids) ";
 
 	@Override
 	public Germplasm getById(final Integer gid, final boolean lock) {
@@ -1719,10 +1719,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public GermplasmDto getGermplasmDtoByGid(final Integer gid) {
 		final StringBuilder queryBuilder =
 			new StringBuilder(FIND_GERMPLASM_MATCHES_MAIN_QUERY);
-		queryBuilder.append(" WHERE ").append(FIND_GERMPLASM_BY_GID);
+		queryBuilder.append(" WHERE ").append(FIND_GERMPLASM_BY_GIDS);
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
 		this.addScalarsToFindGermplasmMatchesQuery(sqlQuery);
-		sqlQuery.setParameter("gid", gid);
+		sqlQuery.setParameterList("gids", Collections.singletonList(gid));
 		sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmDto.class));
 		try {
 			final Object result = sqlQuery.uniqueResult();
@@ -1734,4 +1734,20 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+	public List<GermplasmDto> getGermplasmDtoByGids(final List<Integer> gids) {
+		final StringBuilder queryBuilder =
+			new StringBuilder(FIND_GERMPLASM_MATCHES_MAIN_QUERY);
+		queryBuilder.append(" WHERE ").append(FIND_GERMPLASM_BY_GIDS);
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+		this.addScalarsToFindGermplasmMatchesQuery(sqlQuery);
+		sqlQuery.setParameterList("gids", gids);
+		sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmDto.class));
+		try {
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getGermplasmDtoByGid" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }
