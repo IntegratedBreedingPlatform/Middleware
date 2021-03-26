@@ -8,13 +8,11 @@ public interface GermplasmNameService {
 
 	Name getNameByNameId(Integer nameId);
 
-	Name getPreferredName(Integer gid);
-
-	UserDefinedField getNameType(final String nameTypeCode);
+	UserDefinedField getNameType(String nameTypeCode);
 
 	void deleteName(Integer nameId);
 
-	void updateName(final GermplasmNameRequestDto germplasmNameRequestDto);
+	void updateName(GermplasmNameRequestDto germplasmNameRequestDto, Integer gid, Integer nameId);
 
-	Integer createName(final GermplasmNameRequestDto germplasmNameRequestDto, final Integer userid);
+	Integer createName(Integer userid, GermplasmNameRequestDto germplasmNameRequestDto, Integer gid);
 }
