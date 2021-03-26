@@ -36,6 +36,7 @@ import org.generationcp.middleware.pojos.ExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -348,8 +349,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Set<Integer> getGidsOfGermplasmWithDescendants(final List<Integer> gids) {
-		return this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDescendants(Sets.newHashSet(gids));
+	public Set<Integer> getGidsOfGermplasmWithDescendants(final List<Integer> gids, List<String> mtypes) {
+		return this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDescendants(Sets.newHashSet(gids), Sets.newHashSet(mtypes));
 	}
 
 	@Override
@@ -581,7 +582,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 				.map(Germplasm::getGid).collect(Collectors.toList());
 
 		// Get all DER/MAN germplasm that has existing derivative progeny.
-		return Lists.newArrayList(this.getGidsOfGermplasmWithDescendants(gids));
+		final List<String> derManTypes = Arrays.asList(MethodType.MAINTENANCE.getCode(), MethodType.DERIVATIVE.getCode());
+		return Lists.newArrayList(this.getGidsOfGermplasmWithDescendants(gids, derManTypes));
 	}
 
 	private void saveOrUpdateReference(final Germplasm germplasm, final Optional<String> referenceOptional) {

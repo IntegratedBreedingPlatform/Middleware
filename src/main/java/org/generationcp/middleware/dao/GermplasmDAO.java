@@ -102,6 +102,25 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String FIND_GERMPLASM_MATCHES_BY_NAMES =
 		" g.gid in (select gid from names n where n.nval in (:nameList) and n.nstat <> 9)";
 
+	private static final String FIND_GERMPLASM_WITHDESCENDANTS = "SELECT g.gid as gid FROM germplsm g "
+			+ "WHERE (EXISTS (SELECT 1 FROM germplsm descendant WHERE g.gid = descendant.gpid1 OR g.gid = descendant.gpid2 ) "
+			+ "OR EXISTS (SELECT 1 FROM progntrs p WHERE  g.gid = p.gid)) "
+			+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
+
+	private static final String FIND_GERMPLASM_WITHDESCENDANTS_AND_MID = "SELECT g.gid as gid FROM germplsm g "
+			+ "WHERE (EXISTS "
+						+ " (SELECT 1 FROM germplsm descendant "
+						+ " INNER JOIN methods mtype ON mtype.mid = descendant.methn"
+						+ " WHERE (g.gid = descendant.gpid1 OR g.gid = descendant.gpid2) "
+						+ " AND mtype.mtype IN (:mtypes) ) "
+						+ " OR EXISTS "
+						+ " (SELECT 1 FROM progntrs p "
+						+ " INNER JOIN germplsm mid "
+						+ " INNER JOIN methods mtype "
+						+ " WHERE  g.gid = p.gid AND mtype.mtype IN (:mtypes) )"
+					+ ") "
+			+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
+
 	@Override
 	public Germplasm getById(final Integer gid, final boolean lock) {
 		return this.getById(gid);
@@ -489,25 +508,29 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	/**
-	 * Only returns IDs of germplasm with progeny (Germplasm Id is assigned to other germplasm's gpid1, gpid2 OR progntrs.pid)
+	 * Only returns IDs of germplasm with progeny (Germplasm Id is assigned to other germplasm's gpid1, gpid2 OR progntrs.pid) and it's specified method type
 	 *
 	 * @param gids - gids to be checked for descendants
-	 * @return
+	 * @param mtypes - Optional set of method type codes
+	 * @return Set of Integer
 	 */
-	public Set<Integer> getGidsOfGermplasmWithDescendants(final Set<Integer> gids) {
+	public Set<Integer> getGidsOfGermplasmWithDescendants(final Set<Integer> gids, final Set<String> mtypes) {
 		try {
-			if (!CollectionUtils.isEmpty(gids)) {
-				final SQLQuery query = this.getSession().createSQLQuery("SELECT g.gid as gid FROM germplsm g "
-					+ "WHERE (EXISTS (SELECT 1 FROM germplsm descendant WHERE g.gid = descendant.gpid1 OR g.gid = descendant.gpid2 ) "
-					+ "OR EXISTS (SELECT 1 FROM progntrs p WHERE  g.gid = p.gid)) "
-					+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ");
+			if (!CollectionUtils.isEmpty(gids) && CollectionUtils.isEmpty(mtypes)) {
+				final SQLQuery query = this.getSession().createSQLQuery(FIND_GERMPLASM_WITHDESCENDANTS);
 				query.addScalar("gid", new IntegerType());
 				query.setParameterList("gids", gids);
+				return Sets.newHashSet(query.list());
+			} else if (!CollectionUtils.isEmpty(gids) && !CollectionUtils.isEmpty(mtypes)) {
+				final SQLQuery query = this.getSession().createSQLQuery(FIND_GERMPLASM_WITHDESCENDANTS_AND_MID);
+				query.addScalar("gid", new IntegerType());
+				query.setParameterList("gids", gids);
+				query.setParameterList("mtypes", mtypes);
 				return Sets.newHashSet(query.list());
 			}
 			return Sets.newHashSet();
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error with getGidsOfGermplasmWithDescendants(gids=" + gids + e.getMessage();
+			final String errorMessage = "Error with getGidsOfGermplasmWithDescendants(gids=" + gids + " mids=" + mtypes + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}

@@ -1634,9 +1634,35 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final Set<Integer> gids =
-			this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendants.getGid()));
+			this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendants.getGid()), Collections.emptyList());
 
 		Assert.assertEquals(1, gids.size());
+
+	}
+
+	@Test
+	public void testGetGidsOfGermplasmWithDescendantsFilteredByMethod() {
+		final Method method = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), -1);
+
+		// Create germplasm with descendants
+		final Germplasm germplasmWithDescendants = this.createGermplasm(method, null, 0, 0, 0);
+		final Germplasm germplasmDescendant = this.createGermplasm(method, null, 0, 0, 0);
+		germplasmDescendant.setGpid1(germplasmWithDescendants.getGid());
+		germplasmDescendant.setGpid2(germplasmWithDescendants.getGid());
+		this.daoFactory.getGermplasmDao().saveOrUpdate(germplasmDescendant);
+		final Germplasm germplasmDescendant2 = this.createGermplasm(method, null, 0, 0, 0);
+		germplasmDescendant2.setGpid1(germplasmDescendant.getGpid1());
+		germplasmDescendant2.setGpid2(germplasmDescendant.getGid());
+		this.daoFactory.getGermplasmDao().saveOrUpdate(germplasmDescendant2);
+
+		this.sessionProvder.getSession().flush();
+
+		final List<String> mTypesSet = Arrays.asList(MethodType.DERIVATIVE.getCode(), MethodType.MAINTENANCE.getCode());
+
+		final Set<Integer> gids =
+				this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendants.getGid()), mTypesSet);
+
+		Assert.assertEquals(0, gids.size());
 
 	}
 
