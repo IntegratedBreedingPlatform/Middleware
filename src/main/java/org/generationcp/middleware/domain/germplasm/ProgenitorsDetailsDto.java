@@ -20,7 +20,7 @@ public class ProgenitorsDetailsDto {
 	private GermplasmDto immediateSource;
 
 	public Integer getBreedingMethodId() {
-		return breedingMethodId;
+		return this.breedingMethodId;
 	}
 
 	public void setBreedingMethodId(final Integer breedingMethodId) {
@@ -28,7 +28,7 @@ public class ProgenitorsDetailsDto {
 	}
 
 	public String getBreedingMethodName() {
-		return breedingMethodName;
+		return this.breedingMethodName;
 	}
 
 	public void setBreedingMethodName(final String breedingMethodName) {
@@ -36,7 +36,7 @@ public class ProgenitorsDetailsDto {
 	}
 
 	public GermplasmDto getFemaleParent() {
-		return femaleParent;
+		return this.femaleParent;
 	}
 
 	public void setFemaleParent(final GermplasmDto femaleParent) {
@@ -44,7 +44,7 @@ public class ProgenitorsDetailsDto {
 	}
 
 	public List<GermplasmDto> getMaleParents() {
-		return maleParents;
+		return this.maleParents;
 	}
 
 	public void setMaleParents(final List<GermplasmDto> maleParents) {
@@ -52,7 +52,7 @@ public class ProgenitorsDetailsDto {
 	}
 
 	public GermplasmDto getGroupSource() {
-		return groupSource;
+		return this.groupSource;
 	}
 
 	public void setGroupSource(final GermplasmDto groupSource) {
@@ -60,7 +60,7 @@ public class ProgenitorsDetailsDto {
 	}
 
 	public GermplasmDto getImmediateSource() {
-		return immediateSource;
+		return this.immediateSource;
 	}
 
 	public void setImmediateSource(final GermplasmDto immediateSource) {
@@ -68,7 +68,7 @@ public class ProgenitorsDetailsDto {
 	}
 
 	public String getBreedingMethodCode() {
-		return breedingMethodCode;
+		return this.breedingMethodCode;
 	}
 
 	public void setBreedingMethodCode(final String breedingMethodCode) {
@@ -76,7 +76,7 @@ public class ProgenitorsDetailsDto {
 	}
 
 	public String getBreedingMethodType() {
-		return breedingMethodType;
+		return this.breedingMethodType;
 	}
 
 	public void setBreedingMethodType(final String breedingMethodType) {
