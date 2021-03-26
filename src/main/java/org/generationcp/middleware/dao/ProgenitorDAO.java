@@ -53,7 +53,7 @@ public class ProgenitorDAO extends GenericDAO<Progenitor, Integer> {
 
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error with getByGIDAndPID(gid=" + gid + ") query from Progenitor: " + e.getMessage(), e);
+				"Error with getByGID(gid=" + gid + ") query from Progenitor: " + e.getMessage(), e);
 		}
 	}
 
