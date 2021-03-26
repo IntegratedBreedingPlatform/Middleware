@@ -24,7 +24,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public Name getNameByNameId(final Integer nameId) {
+	public Name getNameById(final Integer nameId) {
 		return daoFactory.getNameDao().getById(nameId);
 	}
 

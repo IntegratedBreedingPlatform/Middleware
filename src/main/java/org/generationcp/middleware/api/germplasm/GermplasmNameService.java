@@ -6,7 +6,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 
 public interface GermplasmNameService {
 
-	Name getNameByNameId(Integer nameId);
+	Name getNameById(Integer nameId);
 
 	UserDefinedField getNameType(String nameTypeCode);
 
