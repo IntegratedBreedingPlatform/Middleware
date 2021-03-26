@@ -8,8 +8,6 @@ public interface GermplasmNameService {
 
 	Name getNameById(Integer nameId);
 
-	UserDefinedField getNameType(String nameTypeCode);
-
 	void deleteName(Integer nameId);
 
 	void updateName(GermplasmNameRequestDto germplasmNameRequestDto, Integer gid, Integer nameId);

@@ -1,23 +1,31 @@
 package org.generationcp.middleware.api.germplasm;
 
 import org.apache.commons.lang.StringUtils;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
 public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 	private final DaoFactory daoFactory;
+
+	@Autowired
+	GermplasmService germplasmService;
 
 	public GermplasmNameServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -34,12 +42,6 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 			return names.get(0);
 		}
 		return null;
-	}
-
-	@Override
-	public UserDefinedField getNameType(final String nameTypeCode) {
-		return this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
-				UDTableType.NAMES_NAME.getType(), nameTypeCode);
 	}
 
 	@Override
@@ -60,8 +62,10 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 		final Name name = daoFactory.getNameDao().getById(nameId);
 		if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
-			final UserDefinedField userDefinedField = this.getNameType(germplasmNameRequestDto.getNameTypeCode());
-			name.setTypeId(userDefinedField.getFldno());
+			final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
+			final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmService.filterGermplasmNameTypes(codes);
+			name.setTypeId(germplasmNameTypeDTOs.get(0).getId());
+
 		}
 
 		if (!StringUtils.isBlank(germplasmNameRequestDto.getName())) {
@@ -90,10 +94,12 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 			daoFactory.getNameDao().save(preferredName);
 		}
 
+		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmService.filterGermplasmNameTypes(codes);
+
 		final Name name = new Name();
 		name.setGermplasmId(gid);
-		final UserDefinedField userDefinedField = this.getNameType(germplasmNameRequestDto.getNameTypeCode());
-		name.setTypeId(userDefinedField.getFldno());
+		name.setTypeId(germplasmNameTypeDTOs.get(0).getId());
 		name.setNval(germplasmNameRequestDto.getName());
 		name.setNdate(Integer.valueOf(germplasmNameRequestDto.getDate()));
 		name.setLocationId(germplasmNameRequestDto.getLocationId());
