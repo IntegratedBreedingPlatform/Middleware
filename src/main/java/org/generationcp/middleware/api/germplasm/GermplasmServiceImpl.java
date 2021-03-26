@@ -39,6 +39,7 @@ import org.generationcp.middleware.pojos.ExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UDTableType;
@@ -1210,7 +1211,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				}
 			});
 
-			if ("GEN".equals(method.getMtype())) {
+			if (MethodType.GENERATIVE.getCode().equals(method.getMtype())) {
 				progenitorsDetailsDto.setFemaleParent(femaleParent);
 				progenitorsDetailsDto.setMaleParents(maleParents);
 			} else {
