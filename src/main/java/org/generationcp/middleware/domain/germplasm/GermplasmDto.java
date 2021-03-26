@@ -149,7 +149,7 @@ public class GermplasmDto {
 	}
 
 	public Integer getGpid1() {
-		return gpid1;
+		return this.gpid1;
 	}
 
 	public void setGpid1(final Integer gpid1) {
@@ -157,7 +157,7 @@ public class GermplasmDto {
 	}
 
 	public Integer getGpid2() {
-		return gpid2;
+		return this.gpid2;
 	}
 
 	public void setGpid2(final Integer gpid2) {
@@ -165,7 +165,7 @@ public class GermplasmDto {
 	}
 
 	public List<Integer> getOtherProgenitors() {
-		return otherProgenitors;
+		return this.otherProgenitors;
 	}
 
 	public void setOtherProgenitors(final List<Integer> otherProgenitors) {
@@ -173,7 +173,7 @@ public class GermplasmDto {
 	}
 
 	public GermplasmOriginDto getGermplasmOrigin() {
-		return germplasmOrigin;
+		return this.germplasmOrigin;
 	}
 
 	public void setGermplasmOrigin(final GermplasmOriginDto germplasmOrigin) {

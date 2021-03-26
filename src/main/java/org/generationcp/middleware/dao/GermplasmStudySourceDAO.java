@@ -190,7 +190,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				germplasmOriginDto.setStudyName((String) result.get("studyName"));
 				germplasmOriginDto.setObservationUnitId((String) result.get("observationUnitId"));
 				germplasmOriginDto.setPlotNumber((Integer) result.get("plotNumber"));
-				germplasmOriginDto.setBlockNumber(((result.get("blockNumber") != null)) ? (Integer) result.get("plotNumber") : null);
+				germplasmOriginDto.setBlockNumber(((result.get("blockNumber") != null)) ? (Integer) result.get("blockNumber") : null);
 				germplasmOriginDto.setRepNumber((Integer) result.get("repNumber"));
 				String x = result.get("row") != null ? (String) result.get("row") : null;
 				String y = result.get("col") != null ? (String) result.get("col") : null;
