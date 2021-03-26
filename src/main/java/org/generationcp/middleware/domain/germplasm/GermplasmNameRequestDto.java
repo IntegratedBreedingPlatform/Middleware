@@ -7,12 +7,6 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class GermplasmNameRequestDto {
 
-	@JsonIgnore
-	private Integer id;
-
-	@JsonIgnore
-	private Integer gid;
-
 	private String name;
 
 	private String date;
@@ -24,27 +18,6 @@ public class GermplasmNameRequestDto {
 	private Boolean preferredName;
 
 	public GermplasmNameRequestDto() {
-	}
-
-	public GermplasmNameRequestDto(final Integer id, final Integer gid){
-		this.setId(id);
-		this.setGid(gid);
-	}
-
-	public Integer getId() {
-		return this.id;
-	}
-
-	public void setId(final Integer id) {
-		this.id = id;
-	}
-
-	public Integer getGid() {
-		return this.gid;
-	}
-
-	public void setGid(final Integer gid) {
-		this.gid = gid;
 	}
 
 	public String getName() {
