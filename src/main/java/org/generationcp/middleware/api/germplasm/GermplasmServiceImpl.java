@@ -349,7 +349,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Set<Integer> getGidsOfGermplasmWithDescendants(final List<Integer> gids, List<String> mtypes) {
+	public Set<Integer> getGidsOfGermplasmWithDescendants(final List<Integer> gids, final List<String> mtypes) {
 		return this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDescendants(Sets.newHashSet(gids), Sets.newHashSet(mtypes));
 	}
 

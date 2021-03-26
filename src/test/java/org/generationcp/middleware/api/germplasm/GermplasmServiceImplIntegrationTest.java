@@ -1661,9 +1661,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Set<Integer> gids =
 				this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendants.getGid()), mTypesSet);
-
 		Assert.assertEquals(0, gids.size());
-
 	}
 
 	@Test
