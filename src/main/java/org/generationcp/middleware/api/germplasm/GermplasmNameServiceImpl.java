@@ -6,14 +6,11 @@ import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +33,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		return daoFactory.getNameDao().getById(nameId);
 	}
 
-	private Name getPreferredName(final Integer gid) {
+	private Name getPreferredNameOfGermplasm(final Integer gid) {
 		final List<Name> names = daoFactory.getNameDao().getByGIDWithListTypeFilters(gid, 1, null);
 		if (!names.isEmpty()) {
 			return names.get(0);
@@ -53,7 +50,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	@Override
 	public void updateName(final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid, final Integer nameId) {
 		if (germplasmNameRequestDto.isPreferredName() != null && germplasmNameRequestDto.isPreferredName()) {
-			final Name preferredName = this.getPreferredName(gid);
+			final Name preferredName = this.getPreferredNameOfGermplasm(gid);
 			if (preferredName != null) {
 				preferredName.setNstat(0);
 				daoFactory.getNameDao().save(preferredName);
@@ -89,7 +86,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	@Override
 	public Integer createName(final Integer userid, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid) {
 		if (germplasmNameRequestDto.isPreferredName()) {
-			final Name preferredName = this.getPreferredName(gid);
+			final Name preferredName = this.getPreferredNameOfGermplasm(gid);
 			preferredName.setNstat(0);
 			daoFactory.getNameDao().save(preferredName);
 		}
