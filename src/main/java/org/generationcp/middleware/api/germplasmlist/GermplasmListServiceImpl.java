@@ -353,6 +353,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.daoFactory.getGermplasmListDAO().makeTransient(folder);
 	}
 
+	@Override
+	public List<GermplasmListDto> getGermplasmLists(final Integer gid) {
+		return this.daoFactory.getGermplasmListDAO().getGermplasmListDtos(gid);
+	}
+
 	private void addListDataProperties(final List<GermplasmListData> savedGermplasmListData, final Set<String> propertyNames) {
 		final Map<Integer, GermplasmListData> listDataIndexedByGid = savedGermplasmListData
 			.stream()
@@ -699,15 +704,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		public Integer getGid() {
-			return gid;
+			return this.gid;
 		}
 
 		public String getPreferredName() {
-			return preferredName;
+			return this.preferredName;
 		}
 
 		public Integer getGroupId() {
-			return groupId;
+			return this.groupId;
 		}
 	}
 

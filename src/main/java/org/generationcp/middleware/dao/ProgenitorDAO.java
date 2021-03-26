@@ -11,14 +11,15 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Progenitor;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DAO class for {@link Progenitor}.
@@ -44,17 +45,16 @@ public class ProgenitorDAO extends GenericDAO<Progenitor, Integer> {
 
 	public List<Progenitor> getByGID(final Integer gid) {
 		try {
-			List<Criterion> criterions = new ArrayList<>();
-			criterions.add(Restrictions.eq("germplasm.gid", gid));
-			List<Progenitor> progenitors = this.getByCriteria(criterions);
-			if (!progenitors.isEmpty()) {
-				return progenitors;
-			}
+
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.createAlias("germplasm", "germplasm");
+			criteria.add(Restrictions.eq("germplasm.gid", gid));
+			return criteria.list();
+
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error with getByGIDAndPID(gid=" + gid + ") query from Progenitor: " + e.getMessage(), e);
+				"Error with getByGID(gid=" + gid + ") query from Progenitor: " + e.getMessage(), e);
 		}
-		return null;
 	}
 
 	public Progenitor getByGIDAndProgenitorNumber(final Integer gid, final Integer progenitorNumber) {

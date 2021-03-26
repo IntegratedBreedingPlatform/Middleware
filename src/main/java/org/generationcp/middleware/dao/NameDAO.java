@@ -23,6 +23,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.BooleanType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -44,14 +45,15 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
-	private static final String SELECT_GERMPLASM_NAMES = "select " //
+	private static final String SELECT_GERMPLASM_NAMES = "select n.nid as id, " //
 		+ "    n.gid as gid, " //
 		+ "    n.nval as name, " //
 		+ "    cast(ndate as char) as date, " //
 		+ "    l.locid as locationId, " //
 		+ "    l.lname as locationName, " //
 		+ "    u.fcode as nameTypeCode, " //
-		+ "    u.fname as nameTypeDescription " //
+		+ "    u.fname as nameTypeDescription, " //
+		+ "    CASE WHEN n.nstat = 1 THEN true ELSE false END as preferred " //
 		+ "from " //
 		+ "    names n " //
 		+ "        left join " //
@@ -500,9 +502,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		final StringBuilder queryBuilder =
 			new StringBuilder(SELECT_GERMPLASM_NAMES);
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
-		sqlQuery.addScalar("gid").addScalar("name").addScalar("date").addScalar("locationId").addScalar("locationName")
+		sqlQuery.addScalar("id").addScalar("gid").addScalar("name").addScalar("date").addScalar("locationId").addScalar("locationName")
 			.addScalar("nameTypeCode")
-			.addScalar("nameTypeDescription");
+			.addScalar("nameTypeDescription").addScalar("preferred", new BooleanType());
 		sqlQuery.setParameterList("gids", gids);
 		sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmNameDto.class));
 		try {
