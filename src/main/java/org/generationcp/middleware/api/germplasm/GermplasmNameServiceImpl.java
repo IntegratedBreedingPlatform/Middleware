@@ -87,8 +87,10 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	public Integer createName(final Integer userid, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid) {
 		if (germplasmNameRequestDto.isPreferredName()) {
 			final Name preferredName = this.getPreferredNameOfGermplasm(gid);
-			preferredName.setNstat(0);
-			daoFactory.getNameDao().save(preferredName);
+			if (preferredName != null) {
+				preferredName.setNstat(0);
+				daoFactory.getNameDao().save(preferredName);
+			}
 		}
 
 		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
