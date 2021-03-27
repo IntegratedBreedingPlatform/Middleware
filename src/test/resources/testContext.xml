@@ -294,4 +294,7 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+		<bean id="germplasmNameService" class="org.generationcp.middleware.api.germplasm.GermplasmNameServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
 </beans>
