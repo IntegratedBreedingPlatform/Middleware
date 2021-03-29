@@ -28,6 +28,7 @@ import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
@@ -52,6 +53,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -115,8 +117,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 						+ " AND mtype.mtype IN (:mtypes) ) "
 						+ " OR EXISTS "
 						+ " (SELECT 1 FROM progntrs p "
-						+ " INNER JOIN germplsm mid "
-						+ " INNER JOIN methods mtype "
+						+ " INNER JOIN germplsm mid ON p.gid = mid.gid"
+						+ " INNER JOIN methods mtype ON mtype.mid = p.gid"
 						+ " WHERE  g.gid = p.gid AND mtype.mtype IN (:mtypes) )"
 					+ ") "
 			+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
@@ -508,29 +510,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	/**
-	 * Only returns IDs of germplasm with progeny (Germplasm Id is assigned to other germplasm's gpid1, gpid2 OR progntrs.pid) and it's specified method type
+	 * Only returns IDs of germplasm with progeny (Germplasm Id is assigned to other germplasm's gpid1, gpid2 OR progntrs.pid)
 	 *
 	 * @param gids - gids to be checked for descendants
-	 * @param mtypes - Optional set of method type codes
-	 * @return Set of Integer
+	 * @return gids with progeny
 	 */
-	public Set<Integer> getGidsOfGermplasmWithDescendants(final Set<Integer> gids, final Set<String> mtypes) {
+	public Set<Integer> getGidsOfGermplasmWithDescendants(final Set<Integer> gids) {
 		try {
-			if (!CollectionUtils.isEmpty(gids) && CollectionUtils.isEmpty(mtypes)) {
+			if (!CollectionUtils.isEmpty(gids)) {
 				final SQLQuery query = this.getSession().createSQLQuery(FIND_GERMPLASM_WITHDESCENDANTS);
 				query.addScalar("gid", new IntegerType());
 				query.setParameterList("gids", gids);
 				return Sets.newHashSet(query.list());
-			} else if (!CollectionUtils.isEmpty(gids) && !CollectionUtils.isEmpty(mtypes)) {
-				final SQLQuery query = this.getSession().createSQLQuery(FIND_GERMPLASM_WITHDESCENDANTS_AND_MID);
-				query.addScalar("gid", new IntegerType());
-				query.setParameterList("gids", gids);
-				query.setParameterList("mtypes", mtypes);
-				return Sets.newHashSet(query.list());
 			}
 			return Sets.newHashSet();
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error with getGidsOfGermplasmWithDescendants(gids=" + gids + " mids=" + mtypes + e.getMessage();
+			final String errorMessage = "Error with getGidsOfGermplasmWithDescendants(gids=" + gids + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -1743,5 +1738,31 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
+  /**
+   * Only returns IDs of germplasm with progeny (Germplasm Id is assigned to other germplasm's gpid1, gpid2 OR progntrs.pid) with Method Type
+   * DERIVATIVE AND MAINTENANCE
+   *
+   * @param gids - gids to be checked for descendants
+   * @return - gids with derivative or maintenance descendants
+   */
+  public Set<Integer> getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(final Set<Integer> gids) {
+
+	final List<String> mtypes = Arrays.asList(MethodType.DERIVATIVE.getCode(), MethodType.MAINTENANCE.getCode());
+	try {
+	  if (!CollectionUtils.isEmpty(gids)) {
+		final SQLQuery query = this.getSession().createSQLQuery(FIND_GERMPLASM_WITHDESCENDANTS_AND_MID);
+		query.addScalar("gid", new IntegerType());
+		query.setParameterList("gids", gids);
+		query.setParameterList("mtypes", mtypes);
+		return Sets.newHashSet(query.list());
+	  }
+	  return Sets.newHashSet();
+	} catch (final HibernateException e) {
+	  final String errorMessage = "Error with getGidsOfGermplasmWithDescendants(gids=" + gids + " mids=" + mtypes + e.getMessage();
+	  GermplasmDAO.LOG.error(errorMessage, e);
+	  throw new MiddlewareQueryException(errorMessage, e);
+	}
+  }
 
 }

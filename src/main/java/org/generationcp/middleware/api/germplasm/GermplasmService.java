@@ -97,7 +97,7 @@ public interface GermplasmService {
 
 	Set<Integer> getGidsWithOpenLots(List<Integer> gids);
 
-	Set<Integer> getGidsOfGermplasmWithDescendants(List<Integer> gids, List<String> mtypes);
+	Set<Integer> getGidsOfGermplasmWithDescendants(List<Integer> gids);
 
 	Set<Integer> getGermplasmUsedInOneOrMoreList(List<Integer> gids);
 
@@ -111,5 +111,7 @@ public interface GermplasmService {
 			String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
 
 	long countAttributesByGUID(String gemrplasmUUID, List<String> attributeDbIds);
+
+  	Set<Integer> getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(List<Integer> gids);
 
 }

@@ -349,8 +349,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Set<Integer> getGidsOfGermplasmWithDescendants(final List<Integer> gids, final List<String> mtypes) {
-		return this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDescendants(Sets.newHashSet(gids), Sets.newHashSet(mtypes));
+	public Set<Integer> getGidsOfGermplasmWithDescendants(final List<Integer> gids) {
+		return this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDescendants(Sets.newHashSet(gids));
 	}
 
 	@Override
@@ -384,7 +384,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.daoFactory.getAttributeDAO().countAttributesByGUID(gemrplasmUUID, attributeDbIds);
 	}
 
-	private void saveGermplasmUpdateDTO(final Integer userId, final Map<String, Integer> attributeCodes,
+  @Override public Set<Integer> getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(final List<Integer> gids) {
+	return this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(Sets.newHashSet(gids));
+  }
+
+  private void saveGermplasmUpdateDTO(final Integer userId, final Map<String, Integer> attributeCodes,
 		final Map<String, Integer> nameCodes,
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
@@ -582,8 +586,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				.map(Germplasm::getGid).collect(Collectors.toList());
 
 		// Get all DER/MAN germplasm that has existing derivative progeny.
-		final List<String> derManTypes = Arrays.asList(MethodType.MAINTENANCE.getCode(), MethodType.DERIVATIVE.getCode());
-		return Lists.newArrayList(this.getGidsOfGermplasmWithDescendants(gids, derManTypes));
+		return Lists.newArrayList(this.getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(gids));
 	}
 
 	private void saveOrUpdateReference(final Germplasm germplasm, final Optional<String> referenceOptional) {

@@ -1634,7 +1634,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final Set<Integer> gids =
-			this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendants.getGid()), Collections.emptyList());
+			this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendants.getGid()));
 
 		Assert.assertEquals(1, gids.size());
 
@@ -1657,10 +1657,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		this.sessionProvder.getSession().flush();
 
-		final List<String> mTypesSet = Arrays.asList(MethodType.DERIVATIVE.getCode(), MethodType.MAINTENANCE.getCode());
-
 		final Set<Integer> gids =
-				this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendants.getGid()), mTypesSet);
+				this.germplasmService.getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(Lists.newArrayList(germplasmWithDescendants.getGid()));
 		Assert.assertEquals(0, gids.size());
 	}
 
