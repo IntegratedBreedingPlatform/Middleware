@@ -112,7 +112,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			+ "OR EXISTS (SELECT 1 FROM progntrs p WHERE  g.gid = p.gid)) "
 			+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
 
-	private static final String FIND_GERMPLASM_WITHDESCENDANTS_AND_MID = "SELECT g.gid as gid FROM germplsm g "
+	private static final String FIND_GERMPLASM_WITH_DERIVATIVE_OR_MAINTENANCE_DESCENDANTS = "SELECT g.gid as gid FROM germplsm g "
 			+ "WHERE (EXISTS "
 						+ " (SELECT 1 FROM germplsm descendant "
 						+ " INNER JOIN methods mtype ON mtype.mid = descendant.methn"
@@ -120,8 +120,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 						+ " AND mtype.mtype IN (:mtypes) ) "
 						+ " OR EXISTS "
 						+ " (SELECT 1 FROM progntrs p "
-						+ " INNER JOIN germplsm mid ON p.gid = mid.gid"
-						+ " INNER JOIN methods mtype ON mtype.mid = mid.methn"
+						+ " INNER JOIN germplsm germplasmPrognitor ON p.gid = germplasmPrognitor.gid"
+						+ " INNER JOIN methods mtype ON mtype.mid = germplasmPrognitor.methn"
 						+ " WHERE  g.gid = p.gid AND mtype.mtype IN (:mtypes) )"
 					+ ") "
 			+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
@@ -1791,7 +1791,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	final List<String> mtypes = Arrays.asList(MethodType.DERIVATIVE.getCode(), MethodType.MAINTENANCE.getCode());
 	try {
 	  if (!CollectionUtils.isEmpty(gids)) {
-		final SQLQuery query = this.getSession().createSQLQuery(FIND_GERMPLASM_WITHDESCENDANTS_AND_MID);
+		final SQLQuery query = this.getSession().createSQLQuery(FIND_GERMPLASM_WITH_DERIVATIVE_OR_MAINTENANCE_DESCENDANTS);
 		query.addScalar("gid", new IntegerType());
 		query.setParameterList("gids", gids);
 		query.setParameterList("mtypes", mtypes);
@@ -1799,7 +1799,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	  }
 	  return Sets.newHashSet();
 	} catch (final HibernateException e) {
-	  final String errorMessage = "Error with getGidsOfGermplasmWithDescendants(gids=" + gids + " mids=" + mtypes + e.getMessage();
+	  final String errorMessage = "Error with getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(gids=" + gids + " mids=" + mtypes + e.getMessage();
 	  GermplasmDAO.LOG.error(errorMessage, e);
 	  throw new MiddlewareQueryException(errorMessage, e);
 	}
