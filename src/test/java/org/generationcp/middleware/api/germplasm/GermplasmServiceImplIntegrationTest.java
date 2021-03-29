@@ -1754,12 +1754,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Method method = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), -1);
 
 		// Create germplasm with descendants
-		final Germplasm germplasmWithDescendants = this.createGermplasm(method, null, 0, 0, 0);
-		final Germplasm germplasmDescendant = this.createGermplasm(method, null, 0, 0, 0);
+		final Germplasm germplasmWithDescendants = this.createGermplasm(method, null, null,0, 0, 0);
+		final Germplasm germplasmDescendant = this.createGermplasm(method, null, null, 0, 0, 0);
 		germplasmDescendant.setGpid1(germplasmWithDescendants.getGid());
 		germplasmDescendant.setGpid2(germplasmWithDescendants.getGid());
 		this.daoFactory.getGermplasmDao().saveOrUpdate(germplasmDescendant);
-		final Germplasm germplasmDescendant2 = this.createGermplasm(method, null, 0, 0, 0);
+		final Germplasm germplasmDescendant2 = this.createGermplasm(method, null, null, 0, 0, 0);
 		germplasmDescendant2.setGpid1(germplasmDescendant.getGpid1());
 		germplasmDescendant2.setGpid2(germplasmDescendant.getGid());
 		this.daoFactory.getGermplasmDao().saveOrUpdate(germplasmDescendant2);
