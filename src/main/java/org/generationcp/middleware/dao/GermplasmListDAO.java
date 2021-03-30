@@ -61,13 +61,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
 
-	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDAO.class);
+	private static final Integer LOCKED_LIST_STATUS = 101;
 
-	public static final String GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST = " SELECT \n" + "   ld.gid, \n"
-			+ "   group_concat(l.listname) \n" + " FROM listnms l \n"
-			+ "   INNER JOIN listdata ld ON l.listid = ld.listid \n" + "   INNER JOIN germplsm g ON ld.gid = g.gid"
-			+ " WHERE ld.gid IN (:gids) \n" + "       AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " \n"
-			+ " GROUP BY ld.gid \n" + " HAVING count(1) > 1";
+	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDAO.class);
 
 	private static final String GET_GERMPLASM_LIST_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid "
 			+ "FROM udflds " + "WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' ";
@@ -652,12 +648,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 *
 	 * @param gids
 	 */
-	public List<Integer> getGermplasmUsedInOneOrMoreList(final List<Integer> gids) {
+	public List<Integer> getGermplasmUsedInLockedList(final List<Integer> gids) {
 		final SQLQuery query = this.getSession()
 			.createSQLQuery(" SELECT ld.gid as gid "
 				+ " FROM listnms l"
 				+ " INNER JOIN listdata ld ON l.listid = ld.listid INNER JOIN germplsm g ON ld.gid = g.gid"
-				+ " WHERE ld.gid IN (:gids) AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED
+				+ " WHERE ld.gid IN (:gids) AND l.liststatus = " + GermplasmListDAO.LOCKED_LIST_STATUS
 				+ " GROUP BY ld.gid \n" + " HAVING count(1) >= 1");
 		query.addScalar("gid", new IntegerType());
 		query.setParameterList("gids", gids);

@@ -604,7 +604,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		final Set<Integer> germplasmOffspringByGIDs = this.getGermplasmOffspringByGIDs(germplasm);
 		final Set<Integer> germplasmUsedInStudies = new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(germplasm));
 		final Set<Integer> germplasmWithOpenLots = this.getGidsWithOpenLots(germplasm);
-		final Set<Integer> germplasmInOneOrMoreLists = this.getGermplasmUsedInMoreThanOneList(germplasm);
+		final Set<Integer> germplasmInLockedLists = new HashSet<>(this.daoFactory.getGermplasmListDAO()
+			.getGermplasmUsedInLockedList(germplasm));
 
 		final Set<Integer> all = new HashSet<>();
 
@@ -612,7 +613,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		all.addAll(germplasmOffspringByGIDs);
 		all.addAll(germplasmUsedInStudies);
 		all.addAll(germplasmWithOpenLots);
-		all.addAll(germplasmInOneOrMoreLists);
+		all.addAll(germplasmInLockedLists);
 
 		return Lists.newArrayList(all);
 	}
