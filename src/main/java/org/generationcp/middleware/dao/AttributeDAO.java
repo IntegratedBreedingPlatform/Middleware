@@ -158,7 +158,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			queryString.append("l.lname AS locationName ");
 			queryString.append("FROM atributs a ");
 			queryString.append("INNER JOIN udflds u ON a.atype = u.fldno ");
-			queryString.append("INNER JOIN location l on a.alocn = l.locid ");
+			queryString.append("LEFT JOIN location l on a.alocn = l.locid ");
 			queryString.append("WHERE a.gid = :gid ");
 			if (StringUtils.isNotEmpty(attributeType)) {
 				queryString.append("AND u.ftype = :attributeType ");
