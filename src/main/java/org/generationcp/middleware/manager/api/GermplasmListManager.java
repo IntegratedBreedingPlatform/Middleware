@@ -284,15 +284,6 @@ public interface GermplasmListManager {
 	int deleteGermplasmListDataByListId(Integer listId);
 
 	/**
-	 * Removes the specified {@code GermplasmListData} object from the database.
-	 *
-	 * @param germplasmListData - The {@code GermplasmListData} object to be removed from the database. Must be a valid
-	 *                          {@code GermplasmListData} object.
-	 * @return Returns the number of {@code GermplasmListData} objects deleted from the database.
-	 */
-	int deleteGermplasmListData(GermplasmListData germplasmListData);
-
-	/**
 	 * Removes the specified {@code GermplasmListData} objects from the database.
 	 *
 	 * @param germplasmListDatas - A list of {@code GermplasmListData} objects to be removed from the database. {@code GermplasmListData}
@@ -420,5 +411,7 @@ public interface GermplasmListManager {
 	void populateGermplasmListCreatedByName(List<GermplasmList> germplasmLists);
 
 	Map<Integer, ListMetadata> getGermplasmListMetadata(List<GermplasmList> listIds);
+
+	void performGermplasmListEntriesDeletion(List<Integer> gids);
 
 }

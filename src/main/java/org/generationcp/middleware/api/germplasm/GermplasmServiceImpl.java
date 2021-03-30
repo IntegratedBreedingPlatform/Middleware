@@ -32,6 +32,7 @@ import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearc
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
@@ -85,6 +86,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private GermplasmListManager germplasmListManager;
 
 	private final GermplasmMethodValidator germplasmMethodValidator;
 
@@ -337,6 +341,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public void deleteGermplasm(final List<Integer> gids) {
+		this.germplasmListManager.performGermplasmListEntriesDeletion(gids);
 		this.daoFactory.getGermplasmDao().deleteGermplasm(gids);
 	}
 

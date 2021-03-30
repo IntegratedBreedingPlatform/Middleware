@@ -13,7 +13,9 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -29,12 +31,15 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link GermplasmListData}.
  *
  */
 public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer> {
+	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDataDAO.class);
 
 	static final String GERMPLASM_LIST_DATA_LIST_ID_COLUMN = "listId";
 
@@ -103,6 +108,43 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
+	public Map<Integer, List<GermplasmListData>> getGermplasmDataListMapByListIds(final List<Integer> listIds) {
+		try {
+
+			final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
+			criteria.createAlias(
+				GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE,
+				GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS);
+			criteria.createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
+
+			criteria.add(Restrictions.in(GermplasmListDataDAO.GERMPLASM_LIST_NAME_ID_COLUMN, listIds));
+			criteria.add(Restrictions.ne(
+				GermplasmListDataDAO.GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN,
+				GermplasmListDataDAO.STATUS_DELETED));
+			criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_DELETED_COLUMN, Boolean.FALSE));
+			criteria.addOrder(Order.asc(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN));
+			LOG.error("MAP: " + criteria.toString());
+			final List<GermplasmListData> germplasmListDataList = criteria.list();
+			Map<Integer, List<GermplasmListData>> germplasmListDataMap = new HashMap<>();
+			for (final GermplasmListData germplasmListData : germplasmListDataList) {
+				final Germplasm germplasm = germplasmListData.getGermplasm();
+				if (germplasm != null) {
+					germplasmListData.setGroupId(germplasm.getMgid());
+				}
+				if (germplasmListDataMap.get(germplasmListData.getList().getId()) == null) {
+					germplasmListDataMap.put(germplasmListData.getList().getId(), new ArrayList<>());
+					germplasmListDataMap.get(germplasmListData.getList().getId()).add(germplasmListData);
+				} else {
+					germplasmListDataMap.get(germplasmListData.getList().getId()).add(germplasmListData);
+				}
+			}
+			return germplasmListDataMap;
+		} catch(HibernateException e) {
+			throw new MiddlewareQueryException("Error in getGermplasmDataListMapByListIds=" + listIds + " in GermplasmListDataDAO: "
+				+ e.getMessage(), e);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<GermplasmListData> getByIds(final List<Integer> entryIds) {
 
@@ -167,7 +209,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	}
 
 	/**
-	 * This will return all items of a cross list along with data of parents. 
+	 * This will return all items of a cross list along with data of parents.
 	 * Note that we're getting the name of the parents from its preferred name which is indicated by name record with nstat = 1
 	 */
 	public List<GermplasmListData> retrieveGermplasmListDataWithImmediateParents(final Integer listID) {
@@ -230,7 +272,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			final String methodName = (String) row[10];
 		  	final String malePedigree = (String) row[11];
 		  	final String femalePedigree = (String) row[12];
-		  	
+
 		  	final GermplasmListData data = new GermplasmListData();
 		  	data.setId(id);
 		  	data.setEntryId(entryId);
@@ -240,7 +282,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		  	data.setSeedSource(seedSource);
 		  	data.setBreedingMethodName(methodName);
 		  	data.addMaleParent(new GermplasmParent(mgid, maleParent, malePedigree));
-		  	
+
 			dataList.add(data);
 		}
 	}

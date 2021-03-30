@@ -18,6 +18,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
@@ -35,13 +36,18 @@ import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,9 +59,8 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unchecked")
 @Transactional
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager {
-
-	public static final int MAX_CROSS_NAME_SIZE = 240;
-	public static final String TRUNCATED = "(truncated)";
+	private static final int MAX_CROSS_NAME_SIZE = 240;
+	private static final String TRUNCATED = "(truncated)";
 
 	private DaoFactory daoFactory;
 
@@ -347,15 +352,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public int deleteGermplasmListDataByListIdLrecId(final Integer listId, final Integer lrecId) {
-		final GermplasmListData germplasmListData = this.getGermplasmListDataByListIdAndLrecId(listId, lrecId);
-		return this.deleteGermplasmListData(germplasmListData);
-	}
-
-	@Override
-	public int deleteGermplasmListData(final GermplasmListData germplasmListData) {
-		final List<GermplasmListData> list = new ArrayList<>();
-		list.add(germplasmListData);
-		return this.deleteGermplasmListData(list);
+		return this.deleteGermplasmListData(Collections.singletonList(this.getGermplasmListDataByListIdAndLrecId(listId, lrecId)));
 	}
 
 	@Override
@@ -553,20 +550,37 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return this.daoFactory.getGermplasmListDAO().getAllGermplasmListsById(listIds);
 	}
 
-	private void performGermplasmListEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
-		for (final Integer gid : germplasms) {
-			final GermplasmListData germplasmListData = this.daoFactory.getGermplasmListDataDAO().getByListIdAndGid(listId, gid);
-			this.deleteGermplasmListData(germplasmListData);
-		}
+	@Override
+	public void performGermplasmListEntriesDeletion(final List<Integer> gids) {
+		final List<Integer> germplasmListIds = this.daoFactory.getGermplasmListDAO().getListIdsByGIDs(gids);
+		if(CollectionUtils.isNotEmpty(germplasmListIds)) {
+			final Map<Integer, List<GermplasmListData>> germplasmListDataMap = this.daoFactory.getGermplasmListDataDAO()
+				.getGermplasmDataListMapByListIds(germplasmListIds);
+			final List<GermplasmListData> germplasmListDataToBeDeleted = new ArrayList<>();
+			final List<GermplasmListData> germplasmListDataToBeUpdated = new ArrayList<>();
+			for (final Integer listId : germplasmListIds) {
+				final Iterator<GermplasmListData> iterator = germplasmListDataMap.get(listId).iterator();
+				while (iterator.hasNext()) {
+					final GermplasmListData germplasmListData = iterator.next();
+					if (gids.contains(germplasmListData.getGermplasm().getGid())) {
+						iterator.remove();
+						germplasmListDataToBeDeleted.add(germplasmListData);
+					}
+				}
 
-		// Change entry IDs on listData
-		final List<GermplasmListData> listDatas = this.getGermplasmListDataByListId(listId);
-		Integer entryId = 1;
-		for (final GermplasmListData listData : listDatas) {
-			listData.setEntryId(entryId);
-			entryId++;
+				// Change entry IDs on listData
+				final List<GermplasmListData> listData = germplasmListDataMap.get(listId);
+				Integer entryId = 1;
+				for (final GermplasmListData germplasmListData : listData) {
+					germplasmListData.setEntryId(entryId);
+					entryId++;
+				}
+				germplasmListDataToBeUpdated.addAll(listData);
+			}
+
+			this.deleteGermplasmListData(germplasmListDataToBeDeleted);
+			this.updateGermplasmListData(germplasmListDataToBeUpdated);
 		}
-		this.updateGermplasmListData(listDatas);
 	}
 
 	@Override
@@ -577,9 +591,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		final List<Integer> gidsDelete = new ArrayList<>(CollectionUtils.disjunction(germplasms, notDeletableGermplasmList));
 
 		if (!gidsDelete.isEmpty()) {
+			this.performGermplasmListEntriesDeletion(gidsDelete);
 			daoFactory.getGermplasmDao().deleteGermplasm(gidsDelete);
-
-			this.performGermplasmListEntriesDeletion(gidsDelete, listId);
 		}
 
 		return gidsDelete;
@@ -637,18 +650,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	private Set<Integer> getGermplasmOffspringByGIDs(final List<Integer> gids) {
 		try {
 			return this.daoFactory.getGermplasmDao().getGermplasmOffspringByGIDs(gids).keySet();
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Error encountered while getting gids thart belongs to more than one list: GermplasmDataManager.getGermplasmUsedInMoreThanOneList(gids="
-					+ gids + "): " + e.getMessage(),
-				e);
-		}
-	}
-
-	private Set<Integer> getGermplasmUsedInMoreThanOneList(final List<Integer> gids) {
-		try {
-			final GermplasmListDAO dao = this.daoFactory.getGermplasmListDAO();
-			return dao.getGermplasmUsedInMoreThanOneList(gids).keySet();
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 				"Error encountered while getting gids thart belongs to more than one list: GermplasmDataManager.getGermplasmUsedInMoreThanOneList(gids="

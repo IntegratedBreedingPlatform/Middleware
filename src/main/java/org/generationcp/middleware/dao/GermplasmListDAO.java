@@ -623,6 +623,22 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		});
 	}
 
+	public List<Integer> getListIdsByGIDs(final List<Integer> gids) {
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT l.listid FROM listnms l ");
+			queryString.append("INNER JOIN listdata ld ON ld.listid = l.listid ");
+			queryString.append("WHERE ld.gid IN(:gids) AND l.liststatus != :status");
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("gids", gids);
+			query.setParameter("status", STATUS_DELETED);
+			return query.list();
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with getListIdsByGIDs(gids=" + gids.toString() + ") query from GermplasmListDAO: " + e.getMessage(), e);
+		}
+	}
+
 	public int deleteGermplasmListByListIdPhysically(final Integer listId) {
 		final Query query = this.getSession().getNamedQuery(GermplasmList.DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY);
 		query.setInteger(GermplasmList.GERMPLASM_LIST_LIST_ID_COLUMN, listId);
@@ -630,25 +646,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	/**
-	 * Verify if the gids are used in more than one list
-	 *
-	 * @param gids
-	 *            gids to check
-	 * @return Map with GID as key and CSV of list where it is used
-	 */
-	public Map<Integer, String> getGermplasmUsedInMoreThanOneList(final List<Integer> gids) {
-		final Map<Integer, String> resultMap = new HashMap<>();
-
-		final SQLQuery query = this.getSession()
-				.createSQLQuery(GermplasmListDAO.GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST);
-		query.setParameterList("gids", gids);
-
-		final List<Object[]> results = query.list();
-		for (final Object[] result : results) {
-			resultMap.put((Integer) result[0], (String) result[1]);
-		}
-		return resultMap;
-	}
 
 	/**
 	 * Get germplasm that exist on one or more list.

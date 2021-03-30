@@ -221,46 +221,16 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllGermplasmListsById() {
-		final GermplasmList testList = GermplasmListTestDataInitializer.createGermplasmListTestData("TestList", GermplasmListDAOTest.TEST_LIST_DESCRIPTION,
+		final GermplasmList testList =
+			GermplasmListTestDataInitializer.createGermplasmListTestData("TestList", GermplasmListDAOTest.TEST_LIST_DESCRIPTION,
 				GermplasmListDAOTest.TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_LST,
-				GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE, GermplasmListDAOTest.PROGRAM_UUID, null);
+				GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE, GermplasmListDAOTest.PROGRAM_UUID,
+				null);
 		this.saveGermplasm(testList);
 		final List<GermplasmList> allGermplasmListsById = this.dao.getAllGermplasmListsById(Collections.singletonList(testList.getId()));
 		Assert.assertTrue("Returned results should not be empty", !allGermplasmListsById.isEmpty());
 		Assert.assertEquals("Returned results should contain one item",
-				1, allGermplasmListsById.size());
+			1, allGermplasmListsById.size());
 
 	}
-
-	@Test
-	public void testGetGermplasmUsedInMoreThanOneListFalse() {
-		Assert.assertFalse(this.dao.getGermplasmUsedInMoreThanOneList(Arrays.asList(this.germplasm.getGid())).size() > 0);
-	}
-
-	@Test
-	public void testGetGermplasmUsedInMoreThanOneListSuccess() {
-		final Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
-		final Germplasm germplasm = new Germplasm(null, GermplasmListDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
-
-		final GermplasmList list1 = this.saveGermplasm(GermplasmListTestDataInitializer.createGermplasmListTestData(
-			TEST_GERMPLASM_LIST_NAME, GermplasmListDAOTest.TEST_GERMPLASM_LIST_DESC,
-			TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_LST,
-			GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE, GermplasmListDAOTest.PROGRAM_UUID, null));
-		this.dataManager.addGermplasm(germplasm, name, this.cropType);
-		final GermplasmListData listData1 = new GermplasmListData(null, list1, germplasm.getGid(), 1, "EntryCode",
-			"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
-		this.manager.addGermplasmListData(listData1);
-
-		final GermplasmList list2 = this.saveGermplasm(GermplasmListTestDataInitializer.createGermplasmListTestData(
-			TEST_GERMPLASM_LIST_NAME, GermplasmListDAOTest.TEST_GERMPLASM_LIST_DESC,
-			TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_LST,
-			GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE, GermplasmListDAOTest.PROGRAM_UUID, null));
-		this.dataManager.addGermplasm(germplasm, name, this.cropType);
-		final GermplasmListData listData2 = new GermplasmListData(null, list2, germplasm.getGid(), 1, "EntryCode",
-			"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
-		this.manager.addGermplasmListData(listData2);
-
-		Assert.assertTrue(this.dao.getGermplasmUsedInMoreThanOneList(Arrays.asList(germplasm.getGid())).size() > 0);
-	}
-
 }
