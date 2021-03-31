@@ -117,7 +117,7 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	}
 
 	public String getProgenyDbId() {
-		return progenyDbId;
+		return this.progenyDbId;
 	}
 
 	public void setProgenyDbId(final String progenyDbId) {
@@ -125,7 +125,7 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	}
 
 	public String getExternalReferenceId() {
-		return externalReferenceId;
+		return this.externalReferenceId;
 	}
 
 	public void setExternalReferenceId(final String externalReferenceId) {
@@ -133,7 +133,7 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	}
 
 	public String getExternalReferenceSource() {
-		return externalReferenceSource;
+		return this.externalReferenceSource;
 	}
 
 	public void setExternalReferenceSource(final String externalReferenceSource) {
