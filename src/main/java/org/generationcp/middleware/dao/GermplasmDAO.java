@@ -1461,7 +1461,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			addPaginationToSQLQuery(filterQuery, pageable);
 			final List<String> gids = filterQuery.list();
 
-			// If there is any match, build the list of  GermplasmDTO based on the matched germplasm (by germplasm UUID)
+			// If there is any match, build the list of  GermplasmDTO based on the matched GIDs
 			if (!CollectionUtils.isEmpty(gids)) {
 				final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.buildGetGermplasmQuery());
 				sqlQuery.addScalar("germplasmDbId").addScalar("gid").addScalar("accessionNumber").addScalar("acquisitionDate")
@@ -1505,7 +1505,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private String getMainFromGermplasmClause() {
 		return "  FROM germplsm g "
-			+ "  	INNER join location loc ON g.glocn = loc.locid "
+			+ "  	LEFT join location loc ON g.glocn = loc.locid "
 			+ "  	LEFT JOIN atributs a ON a.gid = g.gid "
 			+ "  	LEFT JOIN udflds atype ON atype.fldno = a.atype "
 			+ "  	LEFT join names n ON n.gid = g.gid and n.nstat != 9 "
@@ -1514,7 +1514,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private String buildFilterGermplasmQuery(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		final StringBuilder queryBuilder = new StringBuilder();
-		queryBuilder.append("  SELECT g.germplsm_uuid " );
 		queryBuilder.append("  SELECT g.gid " );
 		queryBuilder.append("  FROM germplsm g " );
 		queryBuilder.append(" WHERE g.deleted = 0 AND g.grplce = 0 ");
