@@ -3,6 +3,8 @@ package org.generationcp.middleware.service.impl.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -10,9 +12,11 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -123,6 +127,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
+		this.sessionProvder.getSession().flush();
 		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsByInstance(geolocation.getLocationId());
 		Assert.assertTrue(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
@@ -150,6 +155,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
+		this.sessionProvder.getSession().flush();
 		final StudySearchFilter studySearchFilter = new StudySearchFilter().withStudyDbId(geolocation.getLocationId().toString())
 			.withProgramDbId(this.study.getProgramUUID());
 		final Pageable pageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "trialName"));
@@ -416,6 +422,37 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 			.assertEquals(2, this.studyService.countStudies(new StudySearchFilter().withProgramDbId(this.commonTestProject.getUniqueID())));
 		// Expecting only one to be retrieved when filtered by location
 		Assert.assertEquals(1, this.studyService.countStudies(new StudySearchFilter().withLocationDbId(String.valueOf(location1))));
+	}
+
+	@Test
+	public void shouldGetGermplasmStudies_OK() {
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy("Study " + RandomStringUtils.randomNumeric(5), "Study2-Description", 6,
+				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString());
+
+		final StockModel stockModel = new StockModel();
+		stockModel.setUniqueName(org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(10));
+		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
+		stockModel.setName(org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(10));
+		stockModel.setIsObsolete(false);
+
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+		germplasm.setGid(null);
+		germplasm.setUserId(this.testUser.getUserid());
+		this.daoFactory.getGermplasmDao().save(germplasm);
+
+		stockModel.setGermplasm(germplasm);
+		stockModel.setValue(org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(5));
+		stockModel.setProject(newStudy);
+		this.daoFactory.getStockDao().saveOrUpdate(stockModel);
+		this.sessionProvder.getSession().flush();
+
+		final List<GermplasmStudyDto> germplasmStudyDtos = this.studyService.getGermplasmStudies(germplasm.getGid());
+		Assert.assertFalse(germplasmStudyDtos.isEmpty());
+		final GermplasmStudyDto germplasmStudyDto = germplasmStudyDtos.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), germplasmStudyDto.getStudyId());
+		Assert.assertEquals(newStudy.getName(), germplasmStudyDto.getName());
+		Assert.assertEquals(newStudy.getDescription(), germplasmStudyDto.getDescription());
 	}
 
 	private void createDeletedStudy() {

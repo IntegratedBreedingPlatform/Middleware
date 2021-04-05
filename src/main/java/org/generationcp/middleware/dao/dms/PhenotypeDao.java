@@ -29,8 +29,6 @@ import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
@@ -40,7 +38,6 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestD
 import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -532,12 +529,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter("traitId", traitId).setParameterList("environmentIds", environmentIds);
-			query.addScalar("observable_id", Hibernate.INTEGER);
-			query.addScalar("value", Hibernate.STRING);
-			query.addScalar("dbxref_id", Hibernate.INTEGER);
-			query.addScalar("nd_experiment_id", Hibernate.INTEGER);
-			query.addScalar("lname", Hibernate.STRING);
-			query.addScalar("locationId", Hibernate.INTEGER);
+			query.addScalar("observable_id", IntegerType.INSTANCE);
+			query.addScalar("value", StringType.INSTANCE);
+			query.addScalar("dbxref_id", IntegerType.INSTANCE);
+			query.addScalar("nd_experiment_id", IntegerType.INSTANCE);
+			query.addScalar("lname", StringType.INSTANCE);
+			query.addScalar("locationId", IntegerType.INSTANCE);
 
 			final List<Object[]> list = query.list();
 

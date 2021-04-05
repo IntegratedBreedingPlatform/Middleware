@@ -327,6 +327,10 @@ public class Germplasm implements Serializable {
 	@JoinColumn(name = "methn", insertable = false, updatable = false)
 	private Method method;
 
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "gid")
+	private List<ExternalReference> externalReferences = new ArrayList<>();
+
 	/**
 	 * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
 	 **/
@@ -686,6 +690,14 @@ public class Germplasm implements Serializable {
 
 	public void setLocationName(final String locationName) {
 		this.locationName = locationName;
+	}
+
+	public List<ExternalReference> getExternalReferences() {
+		return externalReferences;
+	}
+
+	public void setExternalReferences(final List<ExternalReference> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override

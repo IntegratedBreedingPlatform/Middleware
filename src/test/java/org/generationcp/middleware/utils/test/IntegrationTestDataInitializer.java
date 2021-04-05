@@ -2,7 +2,6 @@ package org.generationcp.middleware.utils.test;
 
 import liquibase.util.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.bouncycastle.asn1.esf.CrlValidatedID;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.SampleDao;
@@ -61,6 +60,7 @@ import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -205,12 +205,12 @@ public class IntegrationTestDataInitializer {
 
 		if (!StringUtils.isEmpty(value)) {
 			final ExperimentProperty experimentProperty = new ExperimentProperty();
+			experimentModel.setProperties(new ArrayList<>(Collections.singleton(experimentProperty)));
 			experimentProperty.setExperiment(experimentModel);
 			experimentProperty.setTypeId(TermId.PLOT_NO.getId());
 			experimentProperty.setValue(value);
 			experimentProperty.setRank(1);
 			this.experimentPropertyDao.saveOrUpdate(experimentProperty);
-			this.experimentDao.refresh(experimentModel);
 		}
 
 		return experimentModel;
@@ -333,7 +333,6 @@ public class IntegrationTestDataInitializer {
 		experimentProperty.setValue(value);
 		experimentProperty.setRank(rank);
 		this.experimentPropertyDao.save(experimentProperty);
-		this.experimentPropertyDao.refresh(experimentProperty);
 
 	}
 

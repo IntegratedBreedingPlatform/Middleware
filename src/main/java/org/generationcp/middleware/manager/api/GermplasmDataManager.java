@@ -12,13 +12,8 @@
 package org.generationcp.middleware.manager.api;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
-import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
-import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
-import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
@@ -36,7 +31,6 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -328,14 +322,6 @@ public interface GermplasmDataManager {
 	 * @return Map<Integer, String> - map of gids to their corresponding attribute values for the specified attribute type
 	 */
 	Map<Integer, String> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList);
-
-	/**
-	 * Returns a Map of GIDs to the attribute values by type given a list of GIDs.
-	 *
-	 * @param gidList - list of GIDs
-	 * @return Map<Integer, Map < String, String> - map of gids to their corresponding attribute type and values
-	 */
-	Map<Integer, Map<String, String>> getAttributesNameAndValuesMapForGids(List<Integer> gidList);
 
 	/**
 	 * Returns all the list of name types available for the given list of gids.
@@ -998,10 +984,6 @@ public interface GermplasmDataManager {
 	 */
 	Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
 
-	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, final Boolean includeSiblings);
-
-	ProgenyDTO getProgeny(Integer germplasmDbId);
-
 	/*
 	 * get the Germplasm from the crop database based on local gid reference
 	 *
@@ -1157,24 +1139,9 @@ public interface GermplasmDataManager {
 	 */
 	NamingConfiguration getNamingConfigurationByName(String name);
 
-	Optional<GermplasmDTO> getGermplasmDTOByGID(Integer gid);
-
-	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
-
-	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);
-
 	Germplasm getUnknownGermplasmWithPreferredName();
 
 	List<Integer> addOrUpdateGermplasm(final List<Germplasm> germplasms, final Operation operation);
-
-	long countGermplasmByStudy(Integer studyDbId);
-
-	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Pageable pageable);
-
-	List<AttributeDTO> getAttributesByGid(
-		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNumber);
-
-	long countAttributesByGid(String gid, List<String> attributeDbIds);
 
 	List<Attribute> getAttributeByIds(List<Integer> ids);
 
@@ -1183,8 +1150,6 @@ public interface GermplasmDataManager {
 	List<Germplasm> getExistingCrosses(Integer femaleParent, List<Integer> maleParentIds, Optional<Integer> gid);
 
 	boolean hasExistingCrosses(Integer femaleParent, List<Integer> maleParentIds, Optional<Integer> gid);
-
-	List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types, final Set<String> codes);
 
 	/**
 	 * Returns the udfld records identified by the given tablename and field type.

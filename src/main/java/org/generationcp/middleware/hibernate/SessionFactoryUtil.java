@@ -11,15 +11,17 @@
 
 package org.generationcp.middleware.hibernate;
 
-import java.io.FileNotFoundException;
-import java.net.URL;
-
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileNotFoundException;
+import java.net.URL;
 
 /**
  * <p>
@@ -67,10 +69,14 @@ public abstract class SessionFactoryUtil {
 
 		URL urlOfCfgFile = ResourceFinder.locateFile(hibernateConfigurationFile);
 
-		AnnotationConfiguration cfg = new AnnotationConfiguration().configure(urlOfCfgFile);
+		Configuration cfg = new Configuration().configure(urlOfCfgFile);
+
 		cfg.setProperty("hibernate.connection.url", connectionUrl);
 		cfg.setProperty("hibernate.connection.username", params.getUsername());
 		cfg.setProperty("hibernate.connection.password", params.getPassword());
+
+		ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(
+			cfg.getProperties()). buildServiceRegistry();
 
 		if (additionalResourceFiles != null) {
 			for (String resourceFile : additionalResourceFiles) {
@@ -78,6 +84,6 @@ public abstract class SessionFactoryUtil {
 			}
 		}
 
-		return cfg.buildSessionFactory();
+		return cfg.buildSessionFactory(serviceRegistry);
 	}
 }

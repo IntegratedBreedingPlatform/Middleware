@@ -295,9 +295,9 @@ public class LotDAOTest extends IntegrationTestBase {
 		transaction3 = InventoryDetailsTestDataInitializer
 			.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot3, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
 
-		this.inventoryDataManager.addTransactions(Lists.newArrayList(this.transaction1, this.transaction2, this.transaction3));
-
 		this.inventoryDataManager.addLots(Lists.newArrayList(this.lot1, this.lot2, this.lot3));
+
+		this.inventoryDataManager.addTransactions(Lists.newArrayList(this.transaction1, this.transaction2, this.transaction3));
 
 		this.germplasmList = this.germplasmListDAO.save(GermplasmListTestDataInitializer
 				.createGermplasmListTestData(RandomStringUtils.randomAlphabetic(6), RandomStringUtils.randomAlphabetic(6), 20141103, LST, 9999, 0,

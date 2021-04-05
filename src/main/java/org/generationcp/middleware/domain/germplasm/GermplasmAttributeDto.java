@@ -3,63 +3,37 @@ package org.generationcp.middleware.domain.germplasm;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+
 @AutoProperty
-public class GermplasmAttributeDto {
+public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 
-	public String value;
+	private Integer id;
 
-	public String attributeCode;
+	private String attributeDescription;
 
-	public String attributeDescription;
+	private String locationName;
 
-	public String date;
-
-	public String locationId;
-
-	public String locationName;
-
-	public String getValue() {
-		return value;
+	public GermplasmAttributeDto() {
 	}
 
-	public void setValue(final String value) {
-		this.value = value;
+	public Integer getId() {
+		return this.id;
 	}
 
-	public String getAttributeCode() {
-		return attributeCode;
-	}
-
-	public void setAttributeCode(final String attributeCode) {
-		this.attributeCode = attributeCode;
+	public void setId(final Integer id) {
+		this.id = id;
 	}
 
 	public String getAttributeDescription() {
-		return attributeDescription;
+		return this.attributeDescription;
 	}
 
 	public void setAttributeDescription(final String attributeDescription) {
 		this.attributeDescription = attributeDescription;
 	}
 
-	public String getDate() {
-		return date;
-	}
-
-	public void setDate(final String date) {
-		this.date = date;
-	}
-
-	public String getLocationId() {
-		return locationId;
-	}
-
-	public void setLocationId(final String locationId) {
-		this.locationId = locationId;
-	}
-
 	public String getLocationName() {
-		return locationName;
+		return this.locationName;
 	}
 
 	public void setLocationName(final String locationName) {
