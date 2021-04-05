@@ -21,4 +21,5 @@ public class AttributeServiceImpl implements AttributeService {
 	public List<AttributeDTO> searchAttributes(final String query) {
 		return this.daoFactory.getAttributeDAO().searchAttributes(query);
 	}
+
 }

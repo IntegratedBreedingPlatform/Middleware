@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UDTableType;
@@ -21,7 +22,9 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.springframework.data.domain.Pageable;
 
@@ -29,6 +32,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link Attribute}.
@@ -109,7 +113,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 				returnList = query.list();
 			} catch (final HibernateException e) {
 				throw new MiddlewareQueryException("Error with getAttributeValuesByTypeAndGIDList(attributeType=" + attributeType
-						+ ", gidList=" + gidList + "): " + e.getMessage(), e);
+					+ ", gidList=" + gidList + "): " + e.getMessage(), e);
 			}
 		}
 		return returnList;
@@ -125,7 +129,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		Attribute attribute = null;
 		try {
 			final String sql = "SELECT {a.*} FROM atributs a INNER JOIN udflds u ON (a.atype=u.fldno)"
-					+ " WHERE a.gid = :gid AND u.ftable='ATRIBUTS' and u.fcode=:name";
+				+ " WHERE a.gid = :gid AND u.ftable='ATRIBUTS' and u.fcode=:name";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.addEntity("a", Attribute.class);
 			query.setParameter("gid", gid);
@@ -139,6 +143,47 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			throw new MiddlewareQueryException("Error with getAttribute(gidList=" + gid + ", " + attributeName + "): " + e.getMessage(), e);
 		}
 		return attribute;
+	}
+
+	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final String attributeType) {
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("Select a.aid AS id, ");
+			queryString.append("a.aval AS value, ");
+			queryString.append("u.fcode AS attributeCode, ");
+			queryString.append("u.ftype AS attributeType, ");
+			queryString.append("u.fname AS attributeDescription, ");
+			queryString.append("CAST(a.adate AS CHAR(255)) AS date, ");
+			queryString.append("a.alocn AS locationId, ");
+			queryString.append("l.lname AS locationName ");
+			queryString.append("FROM atributs a ");
+			queryString.append("INNER JOIN udflds u ON a.atype = u.fldno ");
+			queryString.append("LEFT JOIN location l on a.alocn = l.locid ");
+			queryString.append("WHERE a.gid = :gid ");
+			if (StringUtils.isNotEmpty(attributeType)) {
+				queryString.append("AND u.ftype = :attributeType ");
+			}
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
+			sqlQuery.addScalar("id");
+			sqlQuery.addScalar("value");
+			sqlQuery.addScalar("attributeCode");
+			sqlQuery.addScalar("attributeType");
+			sqlQuery.addScalar("attributeDescription");
+			sqlQuery.addScalar("date");
+			sqlQuery.addScalar("locationId");
+			sqlQuery.addScalar("locationName");
+			sqlQuery.setParameter("gid", gid);
+			if (StringUtils.isNotEmpty(attributeType)) {
+				sqlQuery.setParameter("attributeType", attributeType);
+			}
+
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with getGermplasmAttributeDtos(gid=" + gid + ", attributeType=" + attributeType + "): " + e.getMessage(), e);
+		}
 	}
 
 	public List<AttributeDTO> getAttributesByGUIDAndAttributeIds(

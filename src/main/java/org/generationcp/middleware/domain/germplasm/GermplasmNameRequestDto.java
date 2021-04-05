@@ -5,12 +5,7 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class GermplasmNameDto {
-
-	@JsonIgnore
-	private Integer gid;
-
-	private Integer id;
+public class GermplasmNameRequestDto {
 
 	private String name;
 
@@ -18,13 +13,12 @@ public class GermplasmNameDto {
 
 	private Integer locationId;
 
-	private String locationName;
-
 	private String nameTypeCode;
 
-	private String nameTypeDescription;
+	private Boolean preferredName;
 
-	private Boolean preferred;
+	public GermplasmNameRequestDto() {
+	}
 
 	public String getName() {
 		return this.name;
@@ -50,52 +44,20 @@ public class GermplasmNameDto {
 		this.locationId = locationId;
 	}
 
-	public String getLocationName() {
-		return this.locationName;
+	public Boolean isPreferredName() {
+		return this.preferredName;
 	}
 
-	public void setLocationName(final String locationName) {
-		this.locationName = locationName;
+	public void setPreferredName(final Boolean preferredName) {
+		this.preferredName = preferredName;
 	}
 
 	public String getNameTypeCode() {
-		return this.nameTypeCode;
+		return nameTypeCode;
 	}
 
-	public void setNameTypeCode(final String nameTypeCode) {
+	public void setNameTypeCode(String nameTypeCode) {
 		this.nameTypeCode = nameTypeCode;
-	}
-
-	public String getNameTypeDescription() {
-		return this.nameTypeDescription;
-	}
-
-	public void setNameTypeDescription(final String nameTypeDescription) {
-		this.nameTypeDescription = nameTypeDescription;
-	}
-
-	public Integer getGid() {
-		return this.gid;
-	}
-
-	public void setGid(final Integer gid) {
-		this.gid = gid;
-	}
-
-	public Integer getId() {
-		return this.id;
-	}
-
-	public void setId(final Integer id) {
-		this.id = id;
-	}
-
-	public Boolean isPreferred() {
-		return this.preferred;
-	}
-
-	public void setPreferred(final Boolean preferred) {
-		this.preferred = preferred;
 	}
 
 	@Override
@@ -112,5 +74,4 @@ public class GermplasmNameDto {
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
-
 }
