@@ -1327,7 +1327,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private void addGermplasmSearchParameters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {
-			paramBuilder.setParameter("preferredName", "%" + germplasmSearchRequestDTO.getPreferredName() + "%"); //
+			paramBuilder.setParameter("preferredName", germplasmSearchRequestDTO.getPreferredName() + "%"); //
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getAccessionNumbers())) {
