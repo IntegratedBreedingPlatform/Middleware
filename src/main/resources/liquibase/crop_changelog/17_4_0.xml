@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="gelli" id="v17.4.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(1) FROM cvterm WHERE cvterm_id =  10185 AND name = 'X'
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Create cvterm for X-Non Replicated check entry
+        </comment>
+        <sql>
+            INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (10185,2050,'X','Non Replicated Entry',NULL,0,0);
+        </sql>
+    </changeSet>
+    <changeSet author="gelli" id="v17.4.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(1) FROM cvterm_relationship WHERE object_id =  10185 AND subject_id = 17269 AND type_id = 1190
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Create cvterm_relationship for Non Replicate check entry. Value of Categorical ENTRY_TYPE
+        </comment>
+        <sql>
+            INSERT INTO cvterm_relationship (type_id, subject_id, object_id)
+            VALUES (1190, 17269, 10185);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
