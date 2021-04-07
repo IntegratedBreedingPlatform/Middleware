@@ -17,7 +17,10 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
@@ -74,6 +77,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	public static final String NAMES = "NAMES";
 	private static final String MIXED_UNITS_LABEL = "Mixed";
 	public static final String LOCATION_ID = "LOCATION_ID";
+	public static final String LOCATION_ABBR = "LOCATION_ABBR";
 	public static final String METHOD_ID = "METHOD_ID";
 
 	public static final String GID = ColumnLabels.GID.getName();
@@ -757,6 +761,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			query.addScalar(LOCATION_NAME);
 			query.addScalar(LOCATION_ID);
 			query.addScalar(METHOD_ID);
+			query.addScalar(LOCATION_ABBR);
 
 			final List<String> filteredProperties = addedColumnsPropertyIds.stream()
 				.filter(s -> !this.GERMPLASM_TREE_NODE_PROPERTY_IDS.contains(s)).collect(Collectors.toList());
@@ -856,7 +861,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			+ " m.mname AS `" + GermplasmSearchDAO.METHOD_NAME + "`, \n"  //
 			+ " l.lname AS `" + GermplasmSearchDAO.LOCATION_NAME + "`, \n"
 			+ " m.mid AS `" + GermplasmSearchDAO.METHOD_ID + "`, \n"  //
-			+ " l.locid AS `" + GermplasmSearchDAO.LOCATION_ID + "` \n")
+			+ " l.locid AS `" + GermplasmSearchDAO.LOCATION_ID + "`, \n"
+			+ " l.labbr AS `" + GermplasmSearchDAO.LOCATION_ABBR + "` \n")
 		;
 
 		for (final String propertyId : addedColumnsPropertyIds) {
@@ -883,6 +889,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 		final Germplasm germplasm = (Germplasm) row[0];
 
+		response.setGermplasmUUID(germplasm.getGermplasmUUID());
 		response.setGid(germplasm.getGid());
 		response.setNames((String) row[1]);
 		response.setGroupId(germplasm.getMgid());
@@ -893,8 +900,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		response.setLocationName((String) row[7]);
 		response.setLocationId((Integer) row[8]);
 		response.setBreedingMethodId((Integer) row[9]);
+		response.setLocationAbbr((String) row[10]);
+		response.setReferenceId(germplasm.getReferenceId());
 
-		final int indexOffset = 10;
+		final int indexOffset = 11;
 		response.setGermplasmDate(this.getValueOfAddedColumns(GERMPLASM_DATE, row, addedColumnsPropertyIds, indexOffset));
 		response.setMethodCode(this.getValueOfAddedColumns(METHOD_ABBREVIATION, row, addedColumnsPropertyIds, indexOffset));
 		response.setMethodNumber(this.getValueOfAddedColumns(METHOD_NUMBER, row, addedColumnsPropertyIds, indexOffset));
