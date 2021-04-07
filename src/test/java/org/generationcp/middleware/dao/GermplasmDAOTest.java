@@ -1106,6 +1106,26 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			is("SELECT COUNT(1) FROM (  SELECT g.gid  FROM germplsm g  WHERE g.deleted = 0 AND g.grplce = 0  AND g.germplsm_uuid IN (:germplasmDbIds) ) as T "));
 	}
 
+	@Test
+	public void testCountGermplasmDTOs_UnfilteredSearch() {
+		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
+		final long allCount = this.dao.countAll();
+		if (allCount < 5000) {
+			// Save a deleted germplasm
+			final Germplasm deletedGermplasm =
+				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			deletedGermplasm.setDeleted(true);
+			this.dao.save(deletedGermplasm);
+
+			final long nonDeletedGermplasmCount = this.dao.countNonDeletedGermplasm();
+			Assert.assertThat(this.dao.countGermplasmDTOs(dto), is(nonDeletedGermplasmCount));
+			// 5000 is the count limit if the germplasm db size is equal to or more than that
+		} else {
+			Assert.assertThat(this.dao.buildCountGermplasmDTOsQuery(dto), is(5000));
+		}
+
+	}
+
 	private Name saveGermplasmName(final Integer germplasmGID, final String nameType) {
 		UserDefinedField attributeField =
 			this.userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", nameType);

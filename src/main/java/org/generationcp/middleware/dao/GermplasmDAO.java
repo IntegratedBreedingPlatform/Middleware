@@ -40,6 +40,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -1535,12 +1536,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.buildCountGermplasmDTOsQuery((germplasmSearchRequestDTO)));
 		this.addGermplasmSearchParameters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequestDTO);
 
-		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+		final long count = ((BigInteger) sqlQuery.uniqueResult()).longValue();
+		/* For unfiltered search and result of initial non-deleted germplasm count is < 5000, query the actual
+		   non-deleted germplasm count. We are sure at this point that the germplasm DB is small enough for "g.deleted = 0 and grplce = 0"
+		   clause to run in performant manner
+		 */
+		if (count < 5000 && germplasmSearchRequestDTO.noFiltersSpecified()) {
+			final SQLQuery sqlQuery2 = this.getSession().createSQLQuery(this.getCountFilteredGermplasmQuery((germplasmSearchRequestDTO)));
+			return ((BigInteger) sqlQuery2.uniqueResult()).longValue();
+		}
+		return count;
+
 	}
 
 	/*
-	 In DBs with millions of germplasms, the clause to exclude deleted germplasm g.deleted = 0 and grplce = 0) runs very slowly
-	 on unfiltered search count.
+	 In DBs with millions of germplasm, the clause to count non-deleted germplasm (g.deleted = 0 and grplce = 0) runs very slowly
+	 on unfiltered search .
 	 Workaround is for unfiltered search we "limit" count results to 5000 by getting the smaller of 5000 and
 	 count of ALL germplasm (We basically avoid running the "g.deleted = 0 and grplce = 0" clause for unfiltered search)
 	 */
@@ -1548,8 +1559,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (germplasmSearchRequestDTO.noFiltersSpecified()) {
 			return "SELECT LEAST(count(1), 5000) FROM germplsm ";
 		} else {
-			return "SELECT COUNT(1) FROM ( " + this.buildFilterGermplasmQuery(germplasmSearchRequestDTO) + ") as T ";
+			return this.getCountFilteredGermplasmQuery(germplasmSearchRequestDTO);
 		}
+	}
+
+	private String getCountFilteredGermplasmQuery(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
+		return "SELECT COUNT(1) FROM ( " + this.buildFilterGermplasmQuery(germplasmSearchRequestDTO) + ") as T ";
 	}
 
 	public long countGermplasmByStudy(final Integer studyDbId) {
@@ -1795,6 +1810,18 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final String message = "Error with getGermplasmDtoByGid" + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public long countNonDeletedGermplasm() {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("deleted", false));
+			criteria.add(Restrictions.eq("grplce", 0));
+			criteria.setProjection(Projections.rowCount());
+			return (Long) criteria.uniqueResult();
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error in countAll(): " + e.getMessage(), e);
 		}
 	}
 }
