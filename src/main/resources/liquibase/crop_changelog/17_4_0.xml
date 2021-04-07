@@ -11,13 +11,14 @@
             </sqlCheck>
         </preConditions>
         <comment>
-            Create cvterm for X-Non Replicated entry
+            Create cvterm for X-Non Replicated
         </comment>
         <sql>
             INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
-            VALUES (10185,2050,'X','Non Replicated Entry',NULL,0,0);
+            VALUES (10185,2050,'X','Non Replicated',NULL,0,0);
         </sql>
     </changeSet>
+
     <changeSet author="gelli" id="v17.4.0-2">
         <preConditions onFail="MARK_RAN">
             <and>
@@ -35,9 +36,8 @@
                 </sqlCheck>
             </and>
         </preConditions>
-
         <comment>
-            Create cvterm_relationship for Non Replicate entry. Value of Categorical ENTRY_TYPE
+            Create cvterm_relationship for Non Replicated. Value of Type of ENTRY_TYPE
         </comment>
         <sql>
             INSERT INTO cvterm_relationship (type_id, subject_id, object_id)

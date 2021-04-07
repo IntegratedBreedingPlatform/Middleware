@@ -3,7 +3,7 @@ package org.generationcp.middleware.domain.gms;
 
 public enum SystemDefinedEntryType {
 	TEST_ENTRY(10170, "T", "Test Entry"), CHECK_ENTRY(10180, "C", "Check Entry"), DISEASE_CHECK(10190, "D", "Disease Check"), STRESS_CHECK(
-			10200, "S", "Stress Check"), NON_REPLICATED_ENTRY(10185, "X", "Non Replicated Entry");
+			10200, "S", "Stress Check"), NON_REPLICATED_ENTRY(10185, "X", "Non Replicated");
 
 	private final int entryTypeCategoricalId;
 	private final String entryTypeValue;
