@@ -1530,4 +1530,108 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			.setParameterList("gids", gids) //
 			.list();
 	}
+
+	public List<UserDefinedField> getGermplasmAttributeTypes(final GermplasmSearchRequest germplasmSearchRequest) {
+		try {
+
+			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
+			final String sql = "select distinct {u.*} from atributs a inner join udflds u "
+				+ " where a.atype = u.fldno"
+				+ " and a.gid in (:gids)"
+				+ " order by u.fname";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("u", UserDefinedField.class);
+			query.setParameterList("gids", gids);
+
+			return query.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getGermplasmAttributeTypes() in GermplasmSearchDAO: " + e.getMessage(), e);
+		}
+	}
+
+	public List<UserDefinedField> getGermplasmNameTypes(final GermplasmSearchRequest germplasmSearchRequest) {
+		try {
+
+			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
+			final String sql = "select distinct {u.*} from names n inner join udflds u "
+				+ " where n.ntype = u.fldno"
+				+ " and n.gid in (:gids)"
+				+ " order by u.fname";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("u", UserDefinedField.class);
+			query.setParameterList("gids", gids);
+
+			return query.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getGermplasmNameTypes() in GermplasmSearchDAO: " + e.getMessage(), e);
+		}
+	}
+
+	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final GermplasmSearchRequest germplasmSearchRequest) {
+		try {
+
+			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
+			final String sql = "select distinct {a.*} from atributs a "
+				+ "where a.gid in (:gids)";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("a", Attribute.class);
+			query.setParameterList("gids", gids);
+
+			final List<Attribute> attributes = query.list();
+
+			if (attributes.isEmpty()) {
+				return null;
+			}
+
+			final HashMap<Integer, Map<Integer, String>> attributeMapByGid = new HashMap<>();
+			for (final Attribute attribute : attributes) {
+				Map<Integer, String> attrByType = attributeMapByGid.get(attribute.getGermplasmId());
+				if (attrByType == null) {
+					attrByType = new HashMap<>();
+				}
+				attrByType.put(attribute.getTypeId(), attribute.getAval());
+				attributeMapByGid.put(attribute.getGermplasmId(), attrByType);
+			}
+
+			return attributeMapByGid;
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getGermplasmAttributeValues() in GermplasmSearchDAO: " + e.getMessage(), e);
+		}
+	}
+
+	public Map<Integer, Map<Integer, String>> getGermplasmNameValues(final GermplasmSearchRequest germplasmSearchRequest) {
+		try {
+
+			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
+			final String sql = "select distinct {n.*} from names n "
+				+ "where n.gid in (:gids)";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("n", Name.class);
+			query.setParameterList("gids", gids);
+
+			final List<Name> names = query.list();
+
+			if (names.isEmpty()) {
+				return null;
+			}
+
+			final HashMap<Integer, Map<Integer, String>> nameMapByGid = new HashMap<>();
+			for (final Name name : names) {
+				Map<Integer, String> nameByType = nameMapByGid.get(name.getGermplasmId());
+				if (nameByType == null) {
+					nameByType = new HashMap<>();
+				}
+				nameByType.put(name.getTypeId(), name.getNval());
+				nameMapByGid.put(name.getGermplasmId(), nameByType);
+			}
+
+			return nameMapByGid;
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getGermplasmNameValues() in GermplasmSearchDAO: " + e.getMessage(), e);
+		}
+	}
 }
