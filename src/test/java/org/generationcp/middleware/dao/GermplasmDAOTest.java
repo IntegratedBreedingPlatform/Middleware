@@ -11,6 +11,7 @@
 package org.generationcp.middleware.dao;
 
 import com.google.common.collect.Lists;
+import liquibase.util.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -1089,6 +1090,20 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		existingCrosses = this.dao.getExistingCrosses(femaleParent.getGid(), Arrays.asList(maleParent1.getGid(), maleParent2.getGid()),
 			Optional.of(existingCross.getGid()));
 		Assert.assertTrue(existingCrosses.isEmpty());
+	}
+
+	@Test
+	public void testBuildCountGermplasmDTOsQuery_NoFilterSpecified() {
+		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
+		Assert.assertThat(this.dao.buildCountGermplasmDTOsQuery(dto), is("SELECT LEAST(count(1), 5000) FROM germplsm "));
+	}
+
+	@Test
+	public void testBuildCountGermplasmDTOsQuery_WithFilterSpecified() {
+		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
+		dto.setGermplasmDbIds(Collections.singletonList(RandomStringUtils.randomAlphanumeric(10)));
+		Assert.assertThat(this.dao.buildCountGermplasmDTOsQuery(dto),
+			is("SELECT COUNT(1) FROM (  SELECT g.gid  FROM germplsm g  WHERE g.deleted = 0 AND g.grplce = 0  AND g.germplsm_uuid IN (:germplasmDbIds) ) as T "));
 	}
 
 	private Name saveGermplasmName(final Integer germplasmGID, final String nameType) {

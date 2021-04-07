@@ -1514,8 +1514,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private String buildFilterGermplasmQuery(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		final StringBuilder queryBuilder = new StringBuilder();
-		queryBuilder.append("  SELECT g.gid " );
-		queryBuilder.append("  FROM germplsm g " );
+		queryBuilder.append(" SELECT g.gid " );
+		queryBuilder.append(" FROM germplsm g " );
 		queryBuilder.append(" WHERE g.deleted = 0 AND g.grplce = 0 ");
 		this.addGermplasmSearchRequestFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequestDTO);
 		return queryBuilder.toString();
@@ -1532,12 +1532,24 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public long countGermplasmDTOs(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
-
-		final String queryString = "SELECT COUNT(1) FROM ( " + this.buildFilterGermplasmQuery(germplasmSearchRequestDTO) + ") as T ";
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString);
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.buildCountGermplasmDTOsQuery((germplasmSearchRequestDTO)));
 		this.addGermplasmSearchParameters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequestDTO);
 
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	/*
+	 In DBs with millions of germplasms, the clause to exclude deleted germplasm g.deleted = 0 and grplce = 0) runs very slowly
+	 on unfiltered search count.
+	 Workaround is for unfiltered search we "limit" count results to 5000 by getting the smaller of 5000 and
+	 count of ALL germplasm (We basically avoid running the "g.deleted = 0 and grplce = 0" clause for unfiltered search)
+	 */
+	String buildCountGermplasmDTOsQuery(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
+		if (germplasmSearchRequestDTO.noFiltersSpecified()) {
+			return "SELECT LEAST(count(1), 5000) FROM germplsm ";
+		} else {
+			return "SELECT COUNT(1) FROM ( " + this.buildFilterGermplasmQuery(germplasmSearchRequestDTO) + ") as T ";
+		}
 	}
 
 	public long countGermplasmByStudy(final Integer studyDbId) {
