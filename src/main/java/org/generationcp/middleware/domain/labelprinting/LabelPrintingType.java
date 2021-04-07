@@ -3,7 +3,7 @@ package org.generationcp.middleware.domain.labelprinting;
 public enum LabelPrintingType {
 
 	OBSERVATION_DATASET("ObservationDataset"), SUBOBSERVATION_DATASET("SubObservationDataset"),
-	LOT("Lot"), GERMPLASM_SEARCH("GermplasmSearch");
+	LOT("Lot"), GERMPLASM("Germplasm");
 
 	private String code;
 
@@ -12,15 +12,15 @@ public enum LabelPrintingType {
 	}
 
 	public String getCode() {
-		return code;
+		return this.code;
 	}
 
-	public void setCode(final String value) {
+	public void setCode(final String code) {
 		this.code = code;
 	}
 
 	public static LabelPrintingType getEnumByCode(final String code) {
-		for (LabelPrintingType e : LabelPrintingType.values()) {
+		for (final LabelPrintingType e : LabelPrintingType.values()) {
 			if (code.equals(e.getCode()))
 				return e;
 		}
