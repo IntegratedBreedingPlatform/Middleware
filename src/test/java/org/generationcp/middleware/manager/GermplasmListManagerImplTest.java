@@ -443,7 +443,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		assertThat(germplasms, is(equalTo(this.dataManager.getGermplasms(gidsNews))));
 
-		this.manager.deleteGermplasms(gidsNews, list1.getId());
+		this.manager.deleteGermplasms(gidsNews);
 		this.sessionProvder.getSession().clear();
 
 		final List<Germplasm> germplasmDeleted = this.dataManager.getGermplasms(gidsNews);

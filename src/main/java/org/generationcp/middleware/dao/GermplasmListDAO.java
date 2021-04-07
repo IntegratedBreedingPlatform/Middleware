@@ -644,7 +644,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	/**
 
 	/**
-	 * Get germplasm that exist on one or more list.
+	 * Get germplasm that exist locked lists
 	 *
 	 * @param gids
 	 */
@@ -657,6 +657,30 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				+ " GROUP BY ld.gid \n" + " HAVING count(1) >= 1");
 		query.addScalar("gid", new IntegerType());
 		query.setParameterList("gids", gids);
+		return query.list();
+	}
+
+	/**
+	 * Get germplasm that exist on one or more list.
+	 *
+	 * @param gids
+	 */
+	public List<Integer> getGermplasmUsedInOneOrMoreList(final List<Integer> gids, final Integer listId) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append(" SELECT ld.gid as gid ");
+		sb.append(" FROM listnms l");
+		sb.append(" INNER JOIN listdata ld ON l.listid = ld.listid INNER JOIN germplsm g ON ld.gid = g.gid");
+		sb.append(" WHERE ld.gid IN (:gids) AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED);
+		if(listId != null){
+			sb.append(" AND l.listId != :listId ");
+		}
+		sb.append(" GROUP BY ld.gid \n" + " HAVING count(1) >= 1");
+		final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+		query.addScalar("gid", new IntegerType());
+		query.setParameterList("gids", gids);
+		if(listId != null){
+			query.setParameter("listId", listId);
+		}
 		return query.list();
 	}
 

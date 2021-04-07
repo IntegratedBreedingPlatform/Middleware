@@ -403,10 +403,9 @@ public interface GermplasmListManager {
 	 * Given a List of valid Germplasm objects, deleteGermplasms the corresponding records in the database.
 	 *
 	 * @param germplasms a list germplasm ID that need to delete
-	 * @param listId     for which we want the corresponding germplasms list
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Integer> deleteGermplasms(final List<Integer> germplasms, final Integer listId);
+	List<Integer> deleteGermplasms(final List<Integer> germplasms);
 
 	void populateGermplasmListCreatedByName(List<GermplasmList> germplasmLists);
 

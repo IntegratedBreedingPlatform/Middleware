@@ -584,7 +584,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public List<Integer> deleteGermplasms(final List<Integer> germplasms, final Integer listId) {
+	public List<Integer> deleteGermplasms(final List<Integer> germplasms) {
 
 		final List<Integer> notDeletableGermplasmList = this.validateGermplasmForDeletion(germplasms);
 
