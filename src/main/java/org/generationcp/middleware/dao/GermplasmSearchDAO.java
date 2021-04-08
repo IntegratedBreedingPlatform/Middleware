@@ -1607,7 +1607,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
 			final String sql = "select distinct {n.*} from names n "
-				+ "where n.gid in (:gids)";
+				+ "where n.gid in (:gids)  order by n.ntype, n.ndate asc";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.addEntity("n", Name.class);
