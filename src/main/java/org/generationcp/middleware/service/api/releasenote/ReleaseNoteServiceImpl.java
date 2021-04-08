@@ -1,12 +1,10 @@
-package org.generationcp.middleware.service.releasenote;
+package org.generationcp.middleware.service.api.releasenote;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNote;
 import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNotePerson;
-import org.generationcp.middleware.service.api.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +13,6 @@ import java.util.Optional;
 @Service
 @Transactional
 public class ReleaseNoteServiceImpl implements ReleaseNoteService {
-
-	@Autowired
-	private UserService userService;
 
 	private final WorkbenchDaoFactory workbenchDaoFactory;
 
@@ -47,7 +42,8 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 		return releaseNotePerson.getShowAgain() ? optionalReleaseNote : Optional.empty();
 	}
 
-	private Optional<ReleaseNote> getLatestReleaseNote() {
+	@Override
+	public Optional<ReleaseNote> getLatestReleaseNote() {
 		return this.workbenchDaoFactory.getReleaseNoteDAO().getLatestReleaseNote();
 	}
 
