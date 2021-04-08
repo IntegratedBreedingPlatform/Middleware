@@ -454,6 +454,14 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				paramBuilder.append(" and g.germplsm_uuid IN (:guids)");
 				paramBuilder.setParameterList("guids", transactionsSearchDto.getGermplasmUUIDs());
 			}
+
+			if (!CollectionUtils.isEmpty(transactionsSearchDto.getObservationUnitIds())) {
+				paramBuilder.append(" and exists (select 1 "
+					+ " from nd_experiment nde "
+					+ "		inner join ims_experiment_transaction ims_et on nde.nd_experiment_id = ims_et.nd_experiment_id "
+					+ " where nde.obs_unit_id in (:observationUnitIds) and ims_et.trnid = tr.trnid)");
+				paramBuilder.setParameterList("observationUnitIds", transactionsSearchDto.getObservationUnitIds());
+			}
 		}
 	}
 
