@@ -21,7 +21,7 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 	}
 
 	@Override
-	public Optional<ReleaseNote> showReleaseNote(final Integer personId) {
+	public Optional<ReleaseNote> shouldShowReleaseNote(final Integer personId) {
 		// Check if there is a release note available
 		final Optional<ReleaseNote> optionalReleaseNote = this.getLatestReleaseNote();
 		if (!optionalReleaseNote.isPresent()) {
@@ -30,8 +30,7 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 
 		// Check if the user has already seen it
 		final ReleaseNote releaseNote = optionalReleaseNote.get();
-		final Optional<ReleaseNotePerson> optionalReleaseNotePerson =
-			this.workbenchDaoFactory.getReleaseNotePersonDAO().getByReleaseNoteIdAndPersonId(releaseNote.getId(), personId);
+		final Optional<ReleaseNotePerson> optionalReleaseNotePerson = this.getReleaseNotePerson(releaseNote.getId(), personId);
 		if (!optionalReleaseNotePerson.isPresent()) {
 			this.createReleaseNotePerson(releaseNote, personId);
 			return optionalReleaseNote;
@@ -47,10 +46,23 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 		return this.workbenchDaoFactory.getReleaseNoteDAO().getLatestReleaseNote();
 	}
 
+	@Override
+	public void dontShowAgain(final Integer userId) {
+		this.getLatestReleaseNote().ifPresent(releaseNote ->
+			this.getReleaseNotePerson(releaseNote.getId(), userId).ifPresent(releaseNotePerson -> {
+				releaseNotePerson.dontShowAgain();
+				this.workbenchDaoFactory.getReleaseNotePersonDAO().save(releaseNotePerson);
+		}));
+	}
+
 	private void createReleaseNotePerson(final ReleaseNote releaseNote, final Integer personId) {
 		final Person person = this.workbenchDaoFactory.getPersonDAO().getById(personId);
 		final ReleaseNotePerson releaseNotePerson = new ReleaseNotePerson(releaseNote, person);
 		this.workbenchDaoFactory.getReleaseNotePersonDAO().save(releaseNotePerson);
+	}
+
+	private Optional<ReleaseNotePerson> getReleaseNotePerson(final Integer releaseNoteId, final Integer personId) {
+		return this.workbenchDaoFactory.getReleaseNotePersonDAO().getByReleaseNoteIdAndPersonId(releaseNoteId, personId);
 	}
 
 }
