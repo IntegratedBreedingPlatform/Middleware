@@ -363,8 +363,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Set<Integer> getGermplasmUsedInOneOrMoreList(final List<Integer> gids, final Integer listId) {
-		return new HashSet<>(this.daoFactory.getGermplasmListDAO().getGermplasmUsedInOneOrMoreList(gids, listId));
+	public Set<Integer> getGermplasmPresentInOtherLists(final List<Integer> gids, final Integer listId) {
+		return new HashSet<>(this.daoFactory.getGermplasmListDAO().getGermplasmPresentInOtherLists(gids, listId));
 	}
 
 	@Override

@@ -661,11 +661,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	/**
-	 * Get germplasm that exist on one or more list.
+	 * Get Germplasm used in lists other than specified.
 	 *
 	 * @param gids
+	 * @param listId
 	 */
-	public List<Integer> getGermplasmUsedInOneOrMoreList(final List<Integer> gids, final Integer listId) {
+	public List<Integer> getGermplasmPresentInOtherLists(final List<Integer> gids, final Integer listId) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(" SELECT ld.gid as gid ");
 		sb.append(" FROM listnms l");
