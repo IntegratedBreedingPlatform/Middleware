@@ -29,21 +29,23 @@
                     SELECT COUNT(1) FROM cvterm WHERE cvterm_id = 10185;
                 </sqlCheck>
                 <sqlCheck expectedResult="1">
-                    SELECT COUNT(1) FROM cvterm WHERE cvterm_id = 1190 OR name = 'has value';
+                    SELECT COUNT(1) FROM cvterm WHERE name = 'has value';
                 </sqlCheck>
                 <sqlCheck expectedResult="1">
-                    SELECT COUNT(1) FROM cvterm WHERE cvterm_id = 17269 OR name = 'Type of ENTRY_TYPE';
+                    SELECT COUNT(1) FROM cvterm WHERE name = 'Type of ENTRY_TYPE';
                 </sqlCheck>
             </and>
         </preConditions>
         <comment>
-            Create cvterm_relationship for Non Replicated. Value of Type of ENTRY_TYPE
+            Create cvterm_relationship for Non Replicated. Value of Type of ENTRY_TYPE.
+            Cvterms 'has value' and 'Type of ENTRY_TYPE' are fetched by names (which is unique) to make sure
+            cvterm_relationship is using the correct cvterm_id.
         </comment>
         <sql>
             INSERT INTO cvterm_relationship (type_id, subject_id, object_id)
             VALUES (
-            (SELECT cvterm_id FROM cvterm WHERE cvterm_id = 1190 OR name = 'has value' LIMIT 1),
-            (SELECT cvterm_id FROM cvterm WHERE cvterm_id = 17269 OR name = 'Type of ENTRY_TYPE' LIMIT 1),
+            (SELECT cvterm_id FROM cvterm WHERE name = 'has value'),
+            (SELECT cvterm_id FROM cvterm WHERE name = 'Type of ENTRY_TYPE'),
             10185);
         </sql>
     </changeSet>
