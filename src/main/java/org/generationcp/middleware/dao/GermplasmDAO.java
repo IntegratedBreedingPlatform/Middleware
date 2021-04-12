@@ -1761,4 +1761,35 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
+	/**
+	 * Cases covered by this function:
+	 * 1. If node is a terminal ancestor (gpid1=gpid2=0) with DER/MAN method and gpid1 and/or gpid2 are modified
+	 * and method remains DER/MAN
+	 * 2. If the node is GEN and it is not a terminal ancestor (gpid1!=0 gpid2=!0), and it is converted to DER/MAN
+	 * Then all the derivative progeny with group source = node will have a new group source.
+	 * With no need to traverse the tree
+	 *
+	 * @param node
+	 * @param newGroupSource
+	 */
+	public void updateGroupSource(final Integer node, final Integer newGroupSource) {
+		final String sql =
+			"UPDATE germplsm SET gpid1 = :newGroupSource WHERE gpid1 = :node and "
+				+ " deleted = 0 and methn in (select mid from methods where mtype in ('DER','MAN'))";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+		sqlQuery.setParameter("newGroupSource", newGroupSource);
+		sqlQuery.setParameter("node", node);
+		try {
+			sqlQuery.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error with updateGroupSourceForDerivativeAncestor" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public void updateGroupSOurceForNonDerivativeAncestor(final Integer node, final Integer newGroupSource) {
+
+	}
 }
