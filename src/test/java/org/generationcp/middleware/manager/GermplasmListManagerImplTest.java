@@ -37,6 +37,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -428,7 +429,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testDeleteSelectedGermplasm() {
 		final List<Germplasm> germplasm = this.germplasmTestDataGenerator.createGermplasmsList(10, "Germ");
-		final List<Integer> gidsNews = (List<Integer>) CollectionUtils.collect(germplasm, TransformerUtils.invokerTransformer("getGid"));
+		final List<Integer> gids = (List<Integer>) CollectionUtils.collect(germplasm, TransformerUtils.invokerTransformer("getGid"));
 
 		final GermplasmList list1 =
 			(this.createGermplasmListTestData());
@@ -441,15 +442,20 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 			this.manager.addGermplasmListData(listData1);
 		}
 
-		assertThat(germplasm, is(equalTo(this.dataManager.getGermplasms(gidsNews))));
+		assertThat(germplasm, is(equalTo(this.dataManager.getGermplasms(gids))));
 
-		this.manager.deleteGermplasms(gidsNews);
+		this.manager.deleteGermplasms(Collections.singletonList(gids.get(0)));
 		this.sessionProvder.getSession().clear();
 
-		final List<Germplasm> germplasmDeleted = this.dataManager.getGermplasms(gidsNews);
-		Assert.assertTrue(CollectionUtils.isEmpty(germplasmDeleted));
+		final List<Germplasm> germplasmDeleted = this.dataManager.getGermplasms(gids);
+		final List<Integer> nonDeletedGermplasmIDs = (List<Integer>) CollectionUtils.collect(germplasm, TransformerUtils.invokerTransformer("getGid"));
+		Assert.assertEquals(9, germplasmDeleted.size());
+		Assert.assertTrue(nonDeletedGermplasmIDs.contains(gids.get(0)));
 		final List<GermplasmListData> germplasmListData = this.manager.getGermplasmListDataByListId(list1.getId());
-		Assert.assertTrue(CollectionUtils.isEmpty(germplasmListData));
+		Assert.assertEquals(9, germplasmListData.size());
+		for(int i = 1; i<=germplasmListData.size(); i++) {
+			Assert.assertEquals(i, germplasmListData.get(i-1).getEntryId().intValue());
+		}
 	}
 
 	private Integer saveGermplasmList(final GermplasmList list) {
