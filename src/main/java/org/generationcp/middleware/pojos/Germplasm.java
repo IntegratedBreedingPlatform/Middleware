@@ -331,10 +331,9 @@ public class Germplasm implements Serializable {
 	@JoinColumn(name = "gid")
 	private List<ExternalReference> externalReferences = new ArrayList<>();
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "gid")
-	private List<Progenitor> otherProgenitors = new ArrayList<>();
-
+	/**
+	 * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
+	 **/
 
 	/**
 	 * This variable is populated only when the Germplasm POJO is retrieved by using GermplasmDataManager.getGermplasmWithPrefName() and
@@ -983,13 +982,5 @@ public class Germplasm implements Serializable {
 
 	public void setBibref(final Bibref bibref) {
 		this.bibref = bibref;
-	}
-
-	public List<Progenitor> getOtherProgenitors() {
-		return otherProgenitors;
-	}
-
-	public void setOtherProgenitors(final List<Progenitor> otherProgenitors) {
-		this.otherProgenitors = otherProgenitors;
 	}
 }
