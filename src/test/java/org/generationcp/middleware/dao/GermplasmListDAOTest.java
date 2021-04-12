@@ -136,7 +136,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final List<Integer> germplasmPresentInOtherLists = this.dao.getGermplasmPresentInOtherLists(
 			Collections.singletonList(this.germplasm.getGid()), null);
 		Assert.assertEquals(1, germplasmPresentInOtherLists.size());
-		Assert.assertEquals(germplasmPresentInOtherLists.get(0), this.germplasm.getGid());
+		Assert.assertEquals(this.germplasm.getGid(), germplasmPresentInOtherLists.get(0));
 	}
 
 	@Test
@@ -144,6 +144,13 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final List<Integer> germplasmUsedInLockedList = this.dao.getGermplasmUsedInLockedList(
 			Collections.singletonList(this.germplasm.getGid()));
 		Assert.assertTrue(CollectionUtils.isEmpty(germplasmUsedInLockedList));
+	}
+
+	@Test
+	public void testGetListIdsByGids() {
+		final List<Integer> listIds = this.dao.getListIdsByGIDs(Collections.singletonList(this.germplasm.getGid()));
+		Assert.assertEquals(1, listIds.size());
+		Assert.assertEquals(this.germplasm.getGid(), listIds.get(0));
 	}
 
 	@Test

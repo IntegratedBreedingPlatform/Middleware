@@ -447,13 +447,9 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().clear();
 
 		final List<Germplasm> germplasmDeleted = this.dataManager.getGermplasms(gidsNews);
-		assertThat(germplasmDeleted, is(empty()));
-
-		final List<GermplasmListData> germplasmListDataByGID = this.manager.getGermplasmListDataByListId(list1.getId());
-		for (final GermplasmListData result : germplasmListDataByGID) {
-
-			assertThat(null, is(equalTo(result)));
-		}
+		Assert.assertTrue(CollectionUtils.isEmpty(germplasmDeleted));
+		final List<GermplasmListData> germplasmListData = this.manager.getGermplasmListDataByListId(list1.getId());
+		Assert.assertTrue(CollectionUtils.isEmpty(germplasmListData));
 	}
 
 	private Integer saveGermplasmList(final GermplasmList list) {
