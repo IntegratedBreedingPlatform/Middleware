@@ -37,7 +37,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -444,18 +443,13 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		assertThat(germplasm, is(equalTo(this.dataManager.getGermplasms(gids))));
 
-		this.manager.deleteGermplasms(Collections.singletonList(gids.get(0)));
+		this.manager.deleteGermplasms(gids);
 		this.sessionProvder.getSession().clear();
 
 		final List<Germplasm> germplasmDeleted = this.dataManager.getGermplasms(gids);
-		final List<Integer> nonDeletedGermplasmIDs = (List<Integer>) CollectionUtils.collect(germplasm, TransformerUtils.invokerTransformer("getGid"));
-		Assert.assertEquals(9, germplasmDeleted.size());
-		Assert.assertTrue(nonDeletedGermplasmIDs.contains(gids.get(0)));
+		Assert.assertTrue(CollectionUtils.isEmpty(germplasmDeleted));
 		final List<GermplasmListData> germplasmListData = this.manager.getGermplasmListDataByListId(list1.getId());
-		Assert.assertEquals(9, germplasmListData.size());
-		for(int i = 1; i<=germplasmListData.size(); i++) {
-			Assert.assertEquals(i, germplasmListData.get(i-1).getEntryId().intValue());
-		}
+		Assert.assertTrue(CollectionUtils.isEmpty(germplasmListData));
 	}
 
 	private Integer saveGermplasmList(final GermplasmList list) {
