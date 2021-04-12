@@ -1,10 +1,11 @@
-package org.generationcp.middleware.service.api.releasenote;
+package org.generationcp.middleware.service.impl.releasenote;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNote;
 import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNotePerson;
+import org.generationcp.middleware.service.api.releasenote.ReleaseNoteService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
