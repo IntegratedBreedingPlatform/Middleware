@@ -61,7 +61,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
 
-	private static final Integer LOCKED_LIST_STATUS = 101;
+	static final Integer LOCKED_LIST_STATUS = 101;
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDAO.class);
 

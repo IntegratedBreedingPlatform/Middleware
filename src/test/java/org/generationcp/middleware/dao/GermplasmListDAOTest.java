@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -128,6 +129,39 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		for (final String listType : GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES) {
 			Assert.assertFalse(listType + " should not be in the Results Array", germplasmListTypes.contains(listType));
 		}
+	}
+
+	@Test
+	public void testGetGermplasmPresentInOtherListsWhereListIdIsNull() {
+		final List<Integer> germplasmPresentInOtherLists = this.dao.getGermplasmPresentInOtherLists(
+			Collections.singletonList(this.germplasm.getGid()), null);
+		Assert.assertEquals(1, germplasmPresentInOtherLists.size());
+		Assert.assertEquals(germplasmPresentInOtherLists.get(0), this.germplasm.getGid());
+	}
+
+	@Test
+	public void testGetGermplasmUsedInLockedListWhereGermplasmIsNotInLockedList() {
+		final List<Integer> germplasmUsedInLockedList = this.dao.getGermplasmUsedInLockedList(
+			Collections.singletonList(this.germplasm.getGid()));
+		Assert.assertTrue(CollectionUtils.isEmpty(germplasmUsedInLockedList));
+	}
+
+	@Test
+	public void testGetGermplasmUsedInLockedListWhereGermplasmIsInLockedList() {
+		this.list.setStatus(GermplasmListDAO.LOCKED_LIST_STATUS);
+		this.dao.saveOrUpdate(this.list);
+		this.sessionProvder.getSession().flush();
+		final List<Integer> germplasmUsedInLockedList = this.dao.getGermplasmUsedInLockedList(
+			Collections.singletonList(this.germplasm.getGid()));
+		Assert.assertEquals(1, germplasmUsedInLockedList.size());
+		Assert.assertEquals(this.germplasm.getGid(), germplasmUsedInLockedList.get(0));
+	}
+
+	@Test
+	public void testGetGermplasmPresentInOtherListsWhereListIdIsNotNull() {
+		final List<Integer> germplasmPresentInOtherLists = this.dao.getGermplasmPresentInOtherLists(
+			Collections.singletonList(this.germplasm.getGid()), this.list.getId());
+		Assert.assertTrue(CollectionUtils.isEmpty(germplasmPresentInOtherLists));
 	}
 
 	private GermplasmList saveGermplasm(final GermplasmList list) throws MiddlewareQueryException {
