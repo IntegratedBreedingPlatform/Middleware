@@ -123,7 +123,6 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 				GermplasmListDataDAO.STATUS_DELETED));
 			criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_DELETED_COLUMN, Boolean.FALSE));
 			criteria.addOrder(Order.asc(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN));
-			LOG.error("MAP: " + criteria.toString());
 			final List<GermplasmListData> germplasmListDataList = criteria.list();
 			Map<Integer, List<GermplasmListData>> germplasmListDataMap = new HashMap<>();
 			for (final GermplasmListData germplasmListData : germplasmListDataList) {

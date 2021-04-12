@@ -150,7 +150,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	public void testGetListIdsByGids() {
 		final List<Integer> listIds = this.dao.getListIdsByGIDs(Collections.singletonList(this.germplasm.getGid()));
 		Assert.assertEquals(1, listIds.size());
-		Assert.assertEquals(this.germplasm.getGid(), listIds.get(0));
+		Assert.assertEquals(this.list.getId(), listIds.get(0));
 	}
 
 	@Test
