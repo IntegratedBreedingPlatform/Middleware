@@ -562,7 +562,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				final Iterator<GermplasmListData> iterator = germplasmListDataMap.get(listId).iterator();
 				while (iterator.hasNext()) {
 					final GermplasmListData germplasmListData = iterator.next();
-					if (gids.contains(germplasmListData.getGermplasm().getGid())) {
+					if (germgids.contains(germplasmListData.getGermplasm().getGid())) {
 						iterator.remove();
 						germplasmListDataToBeDeleted.add(germplasmListData);
 					}
