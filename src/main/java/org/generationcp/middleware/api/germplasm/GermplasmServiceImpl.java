@@ -1227,19 +1227,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public void updateGermplasmBasicDetails(final Integer gid, final GermplasmBasicDetailsDto germplasmBasicDetailsDto) {
 		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
-
-		final Optional<Integer> locationIdOptional =
-			(germplasmBasicDetailsDto.getBreedingLocationId() == null) ? Optional.empty() :
-				Optional.of(germplasmBasicDetailsDto.getBreedingLocationId());
-
-		final Optional<Integer> germplasmDateOptional =
-			StringUtils.isEmpty(germplasmBasicDetailsDto.getCreationDate()) ? Optional.empty() :
-				Optional.of(Integer.parseInt(germplasmBasicDetailsDto.getCreationDate()));
-
+		Optional.ofNullable(germplasmBasicDetailsDto.getBreedingLocationId()).ifPresent(germplasm::setLocationId);
+		Optional.ofNullable(germplasmBasicDetailsDto.getCreationDate()).ifPresent(g -> germplasm.setGdate(Integer.valueOf(g)));
 		final Optional<String> referenceOptional = Optional.ofNullable(germplasmBasicDetailsDto.getReference());
-
-		locationIdOptional.ifPresent(germplasm::setLocationId);
-		germplasmDateOptional.ifPresent(germplasm::setGdate);
 		this.saveOrUpdateReference(germplasm, referenceOptional);
 		this.daoFactory.getGermplasmDao().save(germplasm);
 	}
