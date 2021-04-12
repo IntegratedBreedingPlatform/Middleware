@@ -36,6 +36,11 @@ public class GermplasmBasicDetailsDto {
 		this.breedingLocationId = breedingLocationId;
 	}
 
+	public boolean allAttributesNull() {
+		return this.breedingLocationId == null && this.creationDate == null
+			&& this.reference == null;
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
