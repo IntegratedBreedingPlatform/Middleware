@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
@@ -48,12 +49,13 @@ public interface GermplasmService {
 	 * code attribute is not present. Never returns null.
 	 *
 	 * @param gids
-	 * @return Map<gids, plotCodeValue>
+	 * @return Map<gids   ,       p   lotCodeValue>
 	 */
 	Map<Integer, String> getPlotCodeValues(Set<Integer> gids);
 
 	/**
-	 * Returns all the attributes of the Germplasm identified by the given id.
+	 *
+	 Returns all the attributes of the Germplasm identified by the given id.
 	 *
 	 * @param gid - id of the Germplasm
 	 * @return a {@link List} of {@link Attribute}
@@ -62,7 +64,7 @@ public interface GermplasmService {
 
 	/**
 	 * @return the UDFLD table record that represents "plot code": ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE. If no record matching
-	 *         these critria is found, an empty record with fldno=0 is returned. Never returns null.
+	 * these critria is found, an empty record with fldno=0 is returned. Never returns null.
 	 */
 	UserDefinedField getPlotCodeField();
 
@@ -110,7 +112,8 @@ public interface GermplasmService {
 
 	ProgenyDTO getProgeny(final Integer gid);
 
-	List<AttributeDTO> getAttributesByGUID(
+	List<AttributeDTO> getAttributesByGUID
+		(
 			String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
 
 	long countAttributesByGUID(String gemrplasmUUID, List<String> attributeDbIds);
@@ -122,4 +125,7 @@ public interface GermplasmService {
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
 
 	void updateGermplasmBasicDetails(Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
+
+	void updateGermplasmPedigree(Integer gid, ProgenitorsUpdateRequestDto progenitorsUpdateRequstDto);
+
 }
