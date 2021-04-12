@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v17.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="release_note"></tableExists>
+				<tableExists tableName="release_note_person"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create release_note and release_note_person tables
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table release_note (
+				release_note_id int auto_increment
+					primary key,
+				version         varchar(255)                        not null,
+				release_date    timestamp default CURRENT_TIMESTAMP not null,
+				constraint release_note_version_uindex
+					unique (version)
+			);
+
+			create table release_note_person (
+				release_note_id int                                  not null,
+				person_id       int                                  not null,
+				view_date       timestamp  default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+				show_again      tinyint(1) default 1                 not null,
+				primary key (release_note_id, person_id),
+				constraint release_note_person_persons_personid_fk
+					foreign key (person_id) references persons(personid),
+				constraint release_note_person_release_note_id_fk
+					foreign key (release_note_id) references release_note(release_note_id)
+			);
+		</sql>
+    </changeSet>
+
+</databaseChangeLog>
+
