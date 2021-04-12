@@ -584,10 +584,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private List<Integer> getGidsOfDerivativeGermplasmWithDescendants(final List<Germplasm> germplasmList) {
-		// Get the GIDs of germplasm with DER/MAN methods.
-		final List<Integer> gids =
-			germplasmList.stream().filter(germplasm -> this.germplasmMethodValidator.isMaintenanceOrDerivative(germplasm.getMethod().getMtype()))
-				.map(Germplasm::getGid).collect(Collectors.toList());
+		final List<Integer> gids = germplasmList.stream().map(Germplasm::getGid).collect(Collectors.toList());
 
 		// Get all DER/MAN germplasm that has existing derivative progeny.
 		return Lists.newArrayList(this.getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(gids));
