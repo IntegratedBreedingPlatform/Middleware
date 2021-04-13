@@ -32,6 +32,9 @@ public class ReleaseNote implements Serializable {
 	@Column(name = "release_date", nullable = false)
 	private Date releaseDate;
 
+	@Column(name = "has_coming_soon", nullable = false)
+	private Boolean hasComingSoon = false;
+
 	private ReleaseNote() {
 	}
 
@@ -50,6 +53,10 @@ public class ReleaseNote implements Serializable {
 
 	public Date getReleaseDate() {
 		return releaseDate;
+	}
+
+	public Boolean getHasComingSoon() {
+		return hasComingSoon;
 	}
 
 	@Override

@@ -18,8 +18,9 @@
 			create table release_note (
 				release_note_id int auto_increment
 					primary key,
-				version         varchar(255)                        not null,
-				release_date    timestamp default CURRENT_TIMESTAMP not null,
+				version         	varchar(255)        	              not null,
+				release_date    	timestamp default 	CURRENT_TIMESTAMP not null,
+				has_coming_soon     tinyint(1) default  0                 not null,
 				constraint release_note_version_uindex
 					unique (version)
 			);

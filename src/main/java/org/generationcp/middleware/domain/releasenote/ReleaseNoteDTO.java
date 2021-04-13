@@ -11,14 +11,16 @@ public class ReleaseNoteDTO {
 	private Integer id;
 	private String version;
 	private Date releaseDate;
+	private boolean hasComingSoon;
 
 	public ReleaseNoteDTO() {
 	}
 
-	public ReleaseNoteDTO(final Integer id, final String version, final Date releaseDate) {
+	public ReleaseNoteDTO(final Integer id, final String version, final Date releaseDate, final boolean hasComingSoon) {
 		this.id = id;
 		this.version = version;
 		this.releaseDate = releaseDate;
+		this.hasComingSoon = hasComingSoon;
 	}
 
 	public Integer getId() {
@@ -43,6 +45,14 @@ public class ReleaseNoteDTO {
 
 	public void setReleaseDate(final Date releaseDate) {
 		this.releaseDate = releaseDate;
+	}
+
+	public boolean getHasComingSoon() {
+		return this.hasComingSoon;
+	}
+
+	public void setHasComingSoon(final boolean hasComingSoon) {
+		this.hasComingSoon = hasComingSoon;
 	}
 
 	@Override
