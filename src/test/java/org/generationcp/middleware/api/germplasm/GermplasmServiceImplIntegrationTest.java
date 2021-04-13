@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
+import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
@@ -1774,6 +1775,26 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		Assert.assertEquals(1, gids.size());
 
+	}
+
+	@Test
+	public void testUpdateGermplasmBasicDetails_Ok() {
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+		final String reference = RandomStringUtils.randomAlphabetic(25);
+		final Location location = this.createLocation();
+		final String date = "20201010";
+		final GermplasmBasicDetailsDto germplasmBasicDetailsDto = new GermplasmBasicDetailsDto();
+		germplasmBasicDetailsDto.setBreedingLocationId(location.getLocid());
+		germplasmBasicDetailsDto.setCreationDate(date);
+		germplasmBasicDetailsDto.setReference(reference);
+
+		this.germplasmService.updateGermplasmBasicDetails(germplasm.getGid(), germplasmBasicDetailsDto);
+		final Germplasm afterSave = this.daoFactory.getGermplasmDao().getById(germplasm.getGid());
+		Assert.assertEquals(location.getLocid(), afterSave.getLocationId());
+		Assert.assertEquals(date, String.valueOf(afterSave.getGdate()));
+		final Bibref bibref = this.daoFactory.getBibrefDAO().getById(afterSave.getReferenceId());
+		Assert.assertEquals(reference, bibref.getAnalyt());
 	}
 
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
