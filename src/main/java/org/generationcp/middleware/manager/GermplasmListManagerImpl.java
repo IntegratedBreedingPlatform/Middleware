@@ -18,6 +18,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
@@ -66,6 +67,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Resource
 	private UserService userService;
+
+	@Resource
+	private GermplasmService germplasmService;
 
 	/**
 	 * Caches the udflds table. udflds should be small so this cache should be fine in terms of size. The string is the database url. So the
@@ -551,39 +555,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public void performGermplasmListEntriesDeletion(final List<Integer> gids) {
-		final List<Integer> germplasmListIds = this.daoFactory.getGermplasmListDAO().getListIdsByGIDs(gids);
-		if(CollectionUtils.isNotEmpty(germplasmListIds)) {
-			final Map<Integer, List<GermplasmListData>> germplasmListDataMap = this.daoFactory.getGermplasmListDataDAO()
-				.getGermplasmDataListMapByListIds(germplasmListIds);
-			final List<GermplasmListData> germplasmListDataToBeDeleted = new ArrayList<>();
-			final List<GermplasmListData> germplasmListDataToBeUpdated = new ArrayList<>();
-			for (final Integer listId : germplasmListIds) {
-				final Iterator<GermplasmListData> iterator = germplasmListDataMap.get(listId).iterator();
-				while (iterator.hasNext()) {
-					final GermplasmListData germplasmListData = iterator.next();
-					if (germplasmListData.getGermplasm() != null && gids.contains(germplasmListData.getGermplasm().getGid())) {
-						iterator.remove();
-						germplasmListDataToBeDeleted.add(germplasmListData);
-					}
-				}
-
-				// Change entry IDs on listData
-				final List<GermplasmListData> listData = germplasmListDataMap.get(listId);
-				Integer entryId = 1;
-				for (final GermplasmListData germplasmListData : listData) {
-					germplasmListData.setEntryId(entryId);
-					entryId++;
-				}
-				germplasmListDataToBeUpdated.addAll(listData);
-			}
-
-			this.deleteGermplasmListData(germplasmListDataToBeDeleted);
-			this.updateGermplasmListData(germplasmListDataToBeUpdated);
-		}
-	}
-
-	@Override
 	public List<Integer> deleteGermplasms(final List<Integer> germplasms) {
 
 		final List<Integer> notDeletableGermplasmList = this.validateGermplasmForDeletion(germplasms);
@@ -591,7 +562,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		final List<Integer> gidsDelete = new ArrayList<>(CollectionUtils.disjunction(germplasms, notDeletableGermplasmList));
 
 		if (!gidsDelete.isEmpty()) {
-			this.performGermplasmListEntriesDeletion(gidsDelete);
+			this.germplasmService.performGermplasmListEntriesDeletion(gidsDelete);
 			this.daoFactory.getGermplasmDao().deleteGermplasm(gidsDelete);
 		}
 

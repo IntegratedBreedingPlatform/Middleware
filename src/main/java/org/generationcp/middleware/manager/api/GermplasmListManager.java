@@ -411,6 +411,4 @@ public interface GermplasmListManager {
 
 	Map<Integer, ListMetadata> getGermplasmListMetadata(List<GermplasmList> listIds);
 
-	void performGermplasmListEntriesDeletion(List<Integer> gids);
-
 }

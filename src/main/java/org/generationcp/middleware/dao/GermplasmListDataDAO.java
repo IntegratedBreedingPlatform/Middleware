@@ -31,39 +31,36 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import com.google.common.base.Preconditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link GermplasmListData}.
  *
  */
 public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer> {
-	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDataDAO.class);
 
-	static final String GERMPLASM_LIST_DATA_LIST_ID_COLUMN = "listId";
+	private static final String GERMPLASM_LIST_DATA_LIST_ID_COLUMN = "listId";
 
-	static final String GERMPLASM_TABLE = "germplasm";
+	private static final String GERMPLASM_TABLE = "germplasm";
 
-	static final String GERMPLASM_TABLE_ALIAS = "g";
+	private static final String GERMPLASM_TABLE_ALIAS = "g";
 
-	static final String GERMPLASM_LIST_NAME_TABLE = "list";
+	private static final String GERMPLASM_LIST_NAME_TABLE = "list";
 
-	static final String GERMPLASM_LIST_NAME_TABLE_ALIAS = "l";
+	private static final String GERMPLASM_LIST_NAME_TABLE_ALIAS = "l";
 
-	static final String GERMPLASM_LIST_DATA_ID_COLUMN = "id";
+	private static final String GERMPLASM_LIST_DATA_ID_COLUMN = "id";
 
-	static final String GERMPLASM_LIST_DATA_GID_COLUMN = "gid";
+	private static final String GERMPLASM_LIST_DATA_GID_COLUMN = "gid";
 
-	static final String GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN = "entryId";
+	private static final String GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN = "entryId";
 
-	static final String GERMPLASM_LIST_NAME_ID_COLUMN = GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS + ".id";
+	private static final String GERMPLASM_LIST_NAME_ID_COLUMN = GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS + ".id";
 
-	static final String GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN = "status";
+	private static final String GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN = "status";
 
-	static final String GERMPLASM_DELETED_COLUMN = GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS + ".deleted";
+	private static final String GERMPLASM_DELETED_COLUMN = GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS + ".deleted";
 
-	public static final Integer STATUS_DELETED = 9;
+	private static final Integer STATUS_DELETED = 9;
 	public static final Integer STATUS_ACTIVE = 0;
 	public static final String SOURCE_UNKNOWN = "Unknown";
 
@@ -112,30 +109,18 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		try {
 
 			final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
-			criteria.createAlias(
-				GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE,
-				GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS);
-			criteria.createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
+			criteria.createAlias("list","l");
+			criteria.createAlias("germplasm", "g");
 
-			criteria.add(Restrictions.in(GermplasmListDataDAO.GERMPLASM_LIST_NAME_ID_COLUMN, listIds));
-			criteria.add(Restrictions.ne(
-				GermplasmListDataDAO.GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN,
-				GermplasmListDataDAO.STATUS_DELETED));
-			criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_DELETED_COLUMN, Boolean.FALSE));
-			criteria.addOrder(Order.asc(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN));
+			criteria.add(Restrictions.in("l.id", listIds));
+			criteria.add(Restrictions.ne("status", 	GermplasmListDataDAO.STATUS_DELETED));
+			criteria.add(Restrictions.eq("g.deleted", Boolean.FALSE));
+			criteria.addOrder(Order.asc("entryId"));
 			final List<GermplasmListData> germplasmListDataList = criteria.list();
 			final Map<Integer, List<GermplasmListData>> germplasmListDataMap = new HashMap<>();
 			for (final GermplasmListData germplasmListData : germplasmListDataList) {
-				final Germplasm germplasm = germplasmListData.getGermplasm();
-				if (germplasm != null) {
-					germplasmListData.setGroupId(germplasm.getMgid());
-				}
-				if (germplasmListDataMap.get(germplasmListData.getList().getId()) == null) {
-					germplasmListDataMap.put(germplasmListData.getList().getId(), new ArrayList<>());
-					germplasmListDataMap.get(germplasmListData.getList().getId()).add(germplasmListData);
-				} else {
-					germplasmListDataMap.get(germplasmListData.getList().getId()).add(germplasmListData);
-				}
+				germplasmListDataMap.putIfAbsent(germplasmListData.getList().getId(), new ArrayList<>());
+				germplasmListDataMap.get(germplasmListData.getList().getId()).add(germplasmListData);
 			}
 			return germplasmListDataMap;
 		} catch(final HibernateException e) {

@@ -101,7 +101,7 @@ public interface GermplasmService {
 	Set<Integer> getGidsWithOpenLots(List<Integer> gids);
 
 	Set<Integer> getGidsOfGermplasmWithDescendants(List<Integer> gids);
-	
+
 	Set<Integer> getGermplasmUsedInLockedList(List<Integer> gids);
 
 	Set<Integer> getGermplasmUsedInStudies(List<Integer> gids);
@@ -122,4 +122,6 @@ public interface GermplasmService {
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
 
 	void updateGermplasmBasicDetails(Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
+
+	void performGermplasmListEntriesDeletion(List<Integer> gids);
 }
