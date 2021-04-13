@@ -661,31 +661,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	/**
-	 * Get Germplasm used in lists other than specified.
-	 *
-	 * @param gids
-	 * @param listId
-	 */
-	public List<Integer> getGermplasmPresentInOtherLists(final List<Integer> gids, final Integer listId) {
-		final StringBuilder sb = new StringBuilder();
-		sb.append(" SELECT ld.gid as gid ");
-		sb.append(" FROM listnms l");
-		sb.append(" INNER JOIN listdata ld ON l.listid = ld.listid INNER JOIN germplsm g ON ld.gid = g.gid");
-		sb.append(" WHERE ld.gid IN (:gids) AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED);
-		if(listId != null){
-			sb.append(" AND l.listId != :listId ");
-		}
-		sb.append(" GROUP BY ld.gid \n" + " HAVING count(1) >= 1");
-		final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
-		query.addScalar("gid", new IntegerType());
-		query.setParameterList("gids", gids);
-		if(listId != null){
-			query.setParameter("listId", listId);
-		}
-		return query.list();
-	}
-
-	/**
 	 * @param folderIds a group of folder ids/germplasm lists for which we want to return metadata
 	 * @return the resultant map which contains the object meta data
 	 */

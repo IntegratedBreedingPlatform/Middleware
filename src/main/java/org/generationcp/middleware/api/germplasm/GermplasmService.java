@@ -101,9 +101,7 @@ public interface GermplasmService {
 	Set<Integer> getGidsWithOpenLots(List<Integer> gids);
 
 	Set<Integer> getGidsOfGermplasmWithDescendants(List<Integer> gids);
-
-	Set<Integer> getGermplasmPresentInOtherLists(List<Integer> gids, Integer listId);
-
+	
 	Set<Integer> getGermplasmUsedInLockedList(List<Integer> gids);
 
 	Set<Integer> getGermplasmUsedInStudies(List<Integer> gids);

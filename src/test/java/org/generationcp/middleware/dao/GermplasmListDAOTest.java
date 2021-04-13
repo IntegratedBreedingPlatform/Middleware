@@ -132,14 +132,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmPresentInOtherListsWhereListIdIsNull() {
-		final List<Integer> germplasmPresentInOtherLists = this.dao.getGermplasmPresentInOtherLists(
-			Collections.singletonList(this.germplasm.getGid()), null);
-		Assert.assertEquals(1, germplasmPresentInOtherLists.size());
-		Assert.assertEquals(this.germplasm.getGid(), germplasmPresentInOtherLists.get(0));
-	}
-
-	@Test
 	public void testGetGermplasmUsedInLockedListWhereGermplasmIsNotInLockedList() {
 		final List<Integer> germplasmUsedInLockedList = this.dao.getGermplasmUsedInLockedList(
 			Collections.singletonList(this.germplasm.getGid()));
@@ -162,13 +154,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 			Collections.singletonList(this.germplasm.getGid()));
 		Assert.assertEquals(1, germplasmUsedInLockedList.size());
 		Assert.assertEquals(this.germplasm.getGid(), germplasmUsedInLockedList.get(0));
-	}
-
-	@Test
-	public void testGetGermplasmPresentInOtherListsWhereListIdIsNotNull() {
-		final List<Integer> germplasmPresentInOtherLists = this.dao.getGermplasmPresentInOtherLists(
-			Collections.singletonList(this.germplasm.getGid()), this.list.getId());
-		Assert.assertTrue(CollectionUtils.isEmpty(germplasmPresentInOtherLists));
 	}
 
 	private GermplasmList saveGermplasm(final GermplasmList list) throws MiddlewareQueryException {
