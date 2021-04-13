@@ -132,7 +132,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmUsedInLockedListWhereGermplasmIsNotInLockedList() {
+	public void testGetGermplasmUsedInLockedList_GermplasmIsNotInLockedList() {
 		final List<Integer> germplasmUsedInLockedList = this.dao.getGermplasmUsedInLockedList(
 			Collections.singletonList(this.germplasm.getGid()));
 		Assert.assertTrue(CollectionUtils.isEmpty(germplasmUsedInLockedList));
@@ -146,7 +146,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmUsedInLockedListWhereGermplasmIsInLockedList() {
+	public void testGetGermplasmUsedInLockedList_GermplasmIsInLockedList() {
 		this.list.setStatus(GermplasmListDAO.LOCKED_LIST_STATUS);
 		this.dao.saveOrUpdate(this.list);
 		this.sessionProvder.getSession().flush();
