@@ -124,7 +124,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_DELETED_COLUMN, Boolean.FALSE));
 			criteria.addOrder(Order.asc(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN));
 			final List<GermplasmListData> germplasmListDataList = criteria.list();
-			Map<Integer, List<GermplasmListData>> germplasmListDataMap = new HashMap<>();
+			final Map<Integer, List<GermplasmListData>> germplasmListDataMap = new HashMap<>();
 			for (final GermplasmListData germplasmListData : germplasmListDataList) {
 				final Germplasm germplasm = germplasmListData.getGermplasm();
 				if (germplasm != null) {
@@ -138,7 +138,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 				}
 			}
 			return germplasmListDataMap;
-		} catch(HibernateException e) {
+		} catch(final HibernateException e) {
 			throw new MiddlewareQueryException("Error in getGermplasmDataListMapByListIds=" + listIds + " in GermplasmListDataDAO: "
 				+ e.getMessage(), e);
 		}
@@ -300,7 +300,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_LIST_DATA_GID_COLUMN, gid));
 		criteria.add(Restrictions.ne(GermplasmListDataDAO.GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN,
 			GermplasmListDataDAO.STATUS_DELETED));
-		List result = criteria.list();
+		final List result = criteria.list();
 		return (result != null && result.size() > 0 ? (GermplasmListData) result.get(0) : null);
 
 	}

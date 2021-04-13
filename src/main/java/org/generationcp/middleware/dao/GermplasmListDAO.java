@@ -629,7 +629,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			query.setParameterList("gids", gids);
 			query.setParameter("status", STATUS_DELETED);
 			return query.list();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
 				"Error with getListIdsByGIDs(gids=" + gids.toString() + ") query from GermplasmListDAO: " + e.getMessage(), e);
 		}

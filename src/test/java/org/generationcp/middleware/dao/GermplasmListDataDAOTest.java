@@ -2,13 +2,15 @@
 package org.generationcp.middleware.dao;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -127,7 +129,28 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByListIdAndEntryId() throws Exception {
+	public void testGetGermplasmDataListMapByListIds() {
+		// insert a new list data record from a newly-created list and germplasm
+		// records
+		final GermplasmListData testGermplasmListData = this.createTestListWithListData();
+
+		final Map<Integer, List<GermplasmListData>> listDataMap = this.germplasmListDataDAO.getGermplasmDataListMapByListIds(
+			Collections.singletonList(testGermplasmListData.getList().getId()));
+		Assert.assertNull(listDataMap);
+		final List<GermplasmListData> listDataRecords = listDataMap.get(testGermplasmListData.getList().getId());
+		Assert.assertTrue(CollectionUtils.isNotEmpty(listDataRecords));
+		final GermplasmListData germplasmListData = listDataRecords.get(0);
+		Assert.assertEquals("The id should be " + testGermplasmListData.getId(), testGermplasmListData.getId(),
+			germplasmListData.getId());
+		Assert.assertEquals("The list id should be " + testGermplasmListData.getList().getId(),
+			testGermplasmListData.getList().getId(), germplasmListData.getList().getId());
+		Assert.assertEquals("The gid should be " + testGermplasmListData.getGid(), testGermplasmListData.getGid(),
+			germplasmListData.getGid());
+
+	}
+
+	@Test
+	public void testGetByListIdAndEntryId() {
 		// insert a new list data record from a newly-created list and germplasm
 		// records
 		final GermplasmListData testGermplasmListData = this.createTestListWithListData();
@@ -148,7 +171,7 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByListIdAndLrecId() throws Exception {
+	public void testGetByListIdAndLrecId() {
 		// insert new list data record from a newly-created list and germplasm
 		// records
 		final GermplasmListData testGermplasmListData = this.createTestListWithListData();

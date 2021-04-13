@@ -592,7 +592,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 		if (!gidsDelete.isEmpty()) {
 			this.performGermplasmListEntriesDeletion(gidsDelete);
-			daoFactory.getGermplasmDao().deleteGermplasm(gidsDelete);
+			this.daoFactory.getGermplasmDao().deleteGermplasm(gidsDelete);
 		}
 
 		return gidsDelete;
@@ -621,7 +621,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	protected Set<Integer> getCodeFixedGidsByGidList(final List<Integer> gids) {
 		try {
 			final Set<Integer> set = new HashSet<>();
-			final List<Germplasm> germplasms = daoFactory.getGermplasmDao().getByGIDList(gids);
+			final List<Germplasm> germplasms = this.daoFactory.getGermplasmDao().getByGIDList(gids);
 			for (final Germplasm germplasm : germplasms) {
 				if (germplasm.getMgid() > 0) {
 					set.add(germplasm.getGid());
