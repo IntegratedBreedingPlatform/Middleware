@@ -2,7 +2,6 @@ package org.generationcp.middleware.api.germplasm;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -1728,38 +1727,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testPerformGermplasmListEntriesDeletion() {
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Germplasm germplasm1 = this.createGermplasm(method, null, null, 0, 0, 0);
-		final Germplasm germplasm2 = this.createGermplasm(method, null, null, 0, 0, 0);
-		final List<Germplasm> germplasmList = Arrays.asList(germplasm1, germplasm2);
-		final GermplasmList list = this.createGermplasmList();
-
-		final GermplasmListData data1 =
-			new GermplasmListData(null, list, germplasm1.getGid(), 1, "EntryCode",
-				"SeedSource", "Germplasm Name 5", "GroupName", 0,99995);
-		this.daoFactory.getGermplasmListDataDAO().save(data1);
-		final GermplasmListData data2 =
-			new GermplasmListData(null, list, germplasm2.getGid(), 2, "EntryCode",
-				"SeedSource", "Germplasm Name 5", "GroupName", 0,99995);
-		this.daoFactory.getGermplasmListDataDAO().save(data2);
-		this.sessionProvder.getSession().flush();
-		this.sessionProvder.getSession().refresh(data2);
-
-		List<GermplasmListData> germplasmListDataList = this.daoFactory.getGermplasmListDataDAO().getByListId(list.getId());
-		Assert.assertEquals(2, germplasmListDataList.size());
-
-		this.germplasmService.performGermplasmListEntriesDeletion(Collections.singletonList(germplasm1.getGid()));
-
-		this.sessionProvder.getSession().flush();
-
-		germplasmListDataList = this.daoFactory.getGermplasmListDataDAO().getByListId(list.getId());
-		Assert.assertEquals(1, germplasmListDataList.size());
-		Assert.assertEquals(1, germplasmListDataList.get(0).getEntryId().intValue());
-		Assert.assertEquals(data2.getEntryId(), germplasmListDataList.get(0).getEntryId());
-	}
-
-	@Test
 	public void testGetGidsOfGermplasmWithDescendants() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
@@ -1841,21 +1808,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		}
 		this.daoFactory.getGermplasmDao().save(germplasm);
 		return germplasm;
-	}
-
-	private GermplasmList createGermplasmList() {
-		final GermplasmList list = new GermplasmList();
-		list.setName("List Name " + RandomStringUtils.randomAlphanumeric(5));
-		list.setDescription("Description " + RandomStringUtils.randomAlphanumeric(5));
-		list.setDate((long)20141103);
-		list.setType("LST");
-		list.setUserId(1);
-		list.setStatus(0);
-		list.setProgramUUID("a7433c01-4f46-4bc8-ae3a-678f0b62ac23");
-		this.daoFactory.getGermplasmListDAO().save(list);
-		this.sessionProvder.getSession().flush();
-		this.daoFactory.getGermplasmListDAO().refresh(list);
-		return list;
 	}
 
 	private Method createBreedingMethod(final String breedingMethodType, final int numberOfProgenitors) {
