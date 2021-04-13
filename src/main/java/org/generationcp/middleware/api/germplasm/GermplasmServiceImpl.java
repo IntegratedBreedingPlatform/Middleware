@@ -18,6 +18,7 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
+import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -796,7 +797,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private Map<String, Germplasm> loadProgenitors(final org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto germplasmImportRequestDto) {
+	private Map<String, Germplasm> loadProgenitors(final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto.PedigreeConnectionType connectionType = germplasmImportRequestDto.getConnectUsing();
 		if (connectionType != org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto.PedigreeConnectionType.NONE) {
 			final Set<String> progenitor1Set = germplasmImportRequestDto.getGermplasmList().stream()
@@ -1217,6 +1218,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 			return progenitorsDetailsDto;
 		}
 		return null;
+	}
+
+	@Override
+	public void updateGermplasmBasicDetails(final Integer gid, final GermplasmBasicDetailsDto germplasmBasicDetailsDto) {
+		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
+		Optional.ofNullable(germplasmBasicDetailsDto.getBreedingLocationId()).ifPresent(germplasm::setLocationId);
+		Optional.ofNullable(germplasmBasicDetailsDto.getCreationDate()).ifPresent(g -> germplasm.setGdate(Integer.valueOf(g)));
+		final Optional<String> referenceOptional = Optional.ofNullable(germplasmBasicDetailsDto.getReference());
+		this.saveOrUpdateReference(germplasm, referenceOptional);
+		this.daoFactory.getGermplasmDao().save(germplasm);
 	}
 
 	private void populateExternalReferences(final List<GermplasmDTO> germplasmDTOList) {
