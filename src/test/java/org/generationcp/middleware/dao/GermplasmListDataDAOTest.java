@@ -136,7 +136,7 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 		final Map<Integer, List<GermplasmListData>> listDataMap = this.germplasmListDataDAO.getGermplasmDataListMapByListIds(
 			Collections.singletonList(testGermplasmListData.getList().getId()));
-		Assert.assertNull(listDataMap);
+		Assert.assertNotNull(listDataMap);
 		final List<GermplasmListData> listDataRecords = listDataMap.get(testGermplasmListData.getList().getId());
 		Assert.assertTrue(CollectionUtils.isNotEmpty(listDataRecords));
 		final GermplasmListData germplasmListData = listDataRecords.get(0);
