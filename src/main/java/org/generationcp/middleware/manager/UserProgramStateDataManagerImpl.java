@@ -1,12 +1,10 @@
 
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.pojos.UserProgramTreeState;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -17,12 +15,11 @@ import java.util.List;
  * Created by cyrus on 12/16/14.
  */
 @Transactional
-public class UserProgramStateDataManagerImpl extends DataManager implements UserProgramStateDataManager {
+public class UserProgramStateDataManagerImpl implements UserProgramStateDataManager {
 
 	private DaoFactory daoFactory;
 
-	public UserProgramStateDataManagerImpl(HibernateSessionProvider sessionProvider) {
-		super(sessionProvider);
+	public UserProgramStateDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
@@ -31,50 +28,28 @@ public class UserProgramStateDataManagerImpl extends DataManager implements User
 	}
 
 	@Override
-	public List<String> getUserProgramTreeStateByUserIdProgramUuidAndType(int userId, String programUuid, String type)
-			throws MiddlewareQueryException {
+	public List<String> getUserProgramTreeState(final int userId, final String programUuid, final String type) {
 		List<String> treeState = new ArrayList<>();
-		try {
-			UserProgramTreeState userProgramTreeState = this.getUserProgramTreeState(userId, programUuid, type);
-			if (userProgramTreeState != null) {
-				treeState = new ArrayList<String>(Arrays.asList(userProgramTreeState.getTreeState().split(",")));
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("error in: WorkbenchDataManager.getUserProgramTreeStateByUserIdProgramUuidAndType(programId="
-					+ programUuid + "): " + e.getMessage(), e);
+		final UserProgramTreeState userProgramTreeState = this.daoFactory.getUserProgramTreeStateDAO().getUserProgramTreeState(userId, programUuid, type);
+		if (userProgramTreeState != null) {
+			treeState = new ArrayList<>(Arrays.asList(userProgramTreeState.getTreeState().split(",")));
 		}
 
 		return treeState;
 	}
 
-	private UserProgramTreeState getUserProgramTreeState(int userId, String programUuid, String type) throws MiddlewareQueryException {
-		return this.daoFactory.getUserProgramTreeStateDAO().getUserProgramTreeState(userId, programUuid, type);
-	}
-
 	@Override
-	public UserProgramTreeState saveOrUpdateUserProgramTreeState(int userId, String programUuid, String type, List<String> treeState)
-			throws MiddlewareQueryException {
-		UserProgramTreeState userProgramTreeState = null;
-		
-		
-		try {
-
-			userProgramTreeState = this.getUserProgramTreeState(userId, programUuid, type);
-			if (userProgramTreeState == null) {
-				userProgramTreeState = new UserProgramTreeState();
-				userProgramTreeState.setUserId(userId);
-				userProgramTreeState.setProgramUuid(programUuid);
-				userProgramTreeState.setTreeType(type);
-			}
-			String text = Util.convertCollectionToCSV(treeState);
-			userProgramTreeState.setTreeState(text);
-			this.daoFactory.getUserProgramTreeStateDAO().saveOrUpdate(userProgramTreeState);
-
-		} catch (HibernateException e) {
-
-			this.logAndThrowException("error in: WorkbenchDataManager.saveOrUpdateUserProgramTreeState(programId=" + programUuid + "): "
-					+ e.getMessage(), e);
+	public UserProgramTreeState saveOrUpdateUserProgramTreeState(final int userId, final String programUuid, final String type, final List<String> treeState) {
+		UserProgramTreeState userProgramTreeState = this.daoFactory.getUserProgramTreeStateDAO().getUserProgramTreeState(userId, programUuid, type);
+		if (userProgramTreeState == null) {
+			userProgramTreeState = new UserProgramTreeState();
+			userProgramTreeState.setUserId(userId);
+			userProgramTreeState.setProgramUuid(programUuid);
+			userProgramTreeState.setTreeType(type);
 		}
+		final String text = Util.convertCollectionToCSV(treeState);
+		userProgramTreeState.setTreeState(text);
+		this.daoFactory.getUserProgramTreeStateDAO().saveOrUpdate(userProgramTreeState);
 
 		return userProgramTreeState;
 	}

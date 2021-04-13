@@ -7,10 +7,8 @@ import org.generationcp.middleware.pojos.UserProgramTreeState;
 
 public interface UserProgramStateDataManager {
 
-	List<String> getUserProgramTreeStateByUserIdProgramUuidAndType(int userId, String programUuid, String type)
-			throws MiddlewareQueryException;
+	List<String> getUserProgramTreeState(int userId, String programUuid, String type);
 
-	UserProgramTreeState saveOrUpdateUserProgramTreeState(int userId, String programUuid, String type, List<String> treeState)
-			throws MiddlewareQueryException;
+	UserProgramTreeState saveOrUpdateUserProgramTreeState(int userId, String programUuid, String type, List<String> treeState);
 
 }
