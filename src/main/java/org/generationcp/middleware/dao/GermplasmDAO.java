@@ -116,11 +116,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 						+ " INNER JOIN methods mtype ON mtype.mid = descendant.methn"
 						+ " WHERE (g.gid = descendant.gpid1 OR g.gid = descendant.gpid2) "
 						+ " AND mtype.mtype IN (:mtypes) ) "
-						+ " OR EXISTS "
-						+ " (SELECT 1 FROM progntrs p "
-						+ " INNER JOIN germplsm germplasmPrognitor ON p.gid = germplasmPrognitor.gid"
-						+ " INNER JOIN methods mtype ON mtype.mid = germplasmPrognitor.methn"
-						+ " WHERE  g.gid = p.gid AND mtype.mtype IN (:mtypes) )"
 					+ ") "
 			+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
 

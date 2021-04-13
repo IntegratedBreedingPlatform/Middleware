@@ -119,7 +119,4 @@ public interface GermplasmService {
 	GermplasmDto getGermplasmDtoById(Integer gid);
 
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
-
-	Set<Integer> getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(List<Integer> gids);
-
 }

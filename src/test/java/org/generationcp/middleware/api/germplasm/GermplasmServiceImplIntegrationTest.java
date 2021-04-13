@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasm;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -1766,8 +1767,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		this.sessionProvder.getSession().flush();
 
-		final Set<Integer> gids =
-				this.germplasmService.getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(Lists.newArrayList(germplasmWithDescendants.getGid()));
+		final List<Integer> lists = Arrays.asList(germplasmWithDescendants.getGid());
+		final Set<Integer> gids = this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(Sets.newHashSet(lists));
+
 		Assert.assertEquals(0, gids.size());
 	}
 
