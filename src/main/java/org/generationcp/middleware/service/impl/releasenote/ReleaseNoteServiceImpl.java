@@ -2,9 +2,9 @@ package org.generationcp.middleware.service.impl.releasenote;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
-import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNote;
-import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNotePerson;
+import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNoteUser;
 import org.generationcp.middleware.service.api.releasenote.ReleaseNoteService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,7 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 	}
 
 	@Override
-	public Optional<ReleaseNote> shouldShowReleaseNote(final Integer personId) {
+	public Optional<ReleaseNote> shouldShowReleaseNote(final Integer userId) {
 		// Check if there is a release note available
 		final Optional<ReleaseNote> optionalReleaseNote = this.getLatestReleaseNote();
 		if (!optionalReleaseNote.isPresent()) {
@@ -31,15 +31,15 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 
 		// Check if the user has already seen it
 		final ReleaseNote releaseNote = optionalReleaseNote.get();
-		final Optional<ReleaseNotePerson> optionalReleaseNotePerson = this.getReleaseNotePerson(releaseNote.getId(), personId);
-		if (!optionalReleaseNotePerson.isPresent()) {
-			this.createReleaseNotePerson(releaseNote, personId);
+		final Optional<ReleaseNoteUser> optionalReleaseNoteUser = this.getReleaseNoteUser(releaseNote.getId(), userId);
+		if (!optionalReleaseNoteUser.isPresent()) {
+			this.createReleaseNoteUser(releaseNote, userId);
 			return optionalReleaseNote;
 		}
 
 		// Check if the user wants to see it again
-		final ReleaseNotePerson releaseNotePerson = optionalReleaseNotePerson.get();
-		return releaseNotePerson.getShowAgain() ? optionalReleaseNote : Optional.empty();
+		final ReleaseNoteUser releaseNoteUser = optionalReleaseNoteUser.get();
+		return releaseNoteUser.getShowAgain() ? optionalReleaseNote : Optional.empty();
 	}
 
 	@Override
@@ -50,20 +50,20 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 	@Override
 	public void dontShowAgain(final Integer userId) {
 		this.getLatestReleaseNote().ifPresent(releaseNote ->
-			this.getReleaseNotePerson(releaseNote.getId(), userId).ifPresent(releaseNotePerson -> {
-				releaseNotePerson.dontShowAgain();
-				this.workbenchDaoFactory.getReleaseNotePersonDAO().save(releaseNotePerson);
+			this.getReleaseNoteUser(releaseNote.getId(), userId).ifPresent(releaseNoteUser -> {
+				releaseNoteUser.dontShowAgain();
+				this.workbenchDaoFactory.getReleaseNoteUserDAO().save(releaseNoteUser);
 		}));
 	}
 
-	private void createReleaseNotePerson(final ReleaseNote releaseNote, final Integer personId) {
-		final Person person = this.workbenchDaoFactory.getPersonDAO().getById(personId);
-		final ReleaseNotePerson releaseNotePerson = new ReleaseNotePerson(releaseNote, person);
-		this.workbenchDaoFactory.getReleaseNotePersonDAO().save(releaseNotePerson);
+	private void createReleaseNoteUser(final ReleaseNote releaseNote, final Integer userId) {
+		final WorkbenchUser user = this.workbenchDaoFactory.getWorkbenchUserDAO().getById(userId);
+		final ReleaseNoteUser releaseNoteUser = new ReleaseNoteUser(releaseNote, user);
+		this.workbenchDaoFactory.getReleaseNoteUserDAO().save(releaseNoteUser);
 	}
 
-	private Optional<ReleaseNotePerson> getReleaseNotePerson(final Integer releaseNoteId, final Integer personId) {
-		return this.workbenchDaoFactory.getReleaseNotePersonDAO().getByReleaseNoteIdAndPersonId(releaseNoteId, personId);
+	private Optional<ReleaseNoteUser> getReleaseNoteUser(final Integer releaseNoteId, final Integer userId) {
+		return this.workbenchDaoFactory.getReleaseNoteUserDAO().getByReleaseNoteIdAndUserId(releaseNoteId, userId);
 	}
 
 }

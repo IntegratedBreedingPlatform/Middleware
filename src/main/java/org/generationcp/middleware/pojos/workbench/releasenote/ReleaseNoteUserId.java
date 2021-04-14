@@ -2,16 +2,15 @@ package org.generationcp.middleware.pojos.workbench.releasenote;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropPerson;
-import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 
 import java.io.Serializable;
 
-public class ReleaseNotePersonId implements Serializable {
+public class ReleaseNoteUserId implements Serializable {
 
 	private ReleaseNote releaseNote;
-	private Person person;
+	private WorkbenchUser user;
 
 	public ReleaseNote getReleaseNote() {
 		return this.releaseNote;
@@ -21,17 +20,17 @@ public class ReleaseNotePersonId implements Serializable {
 		this.releaseNote = releaseNote;
 	}
 
-	public Person getPerson() {
-		return this.person;
+	public WorkbenchUser getUser() {
+		return this.user;
 	}
 
-	public void setPerson(final Person person) {
-		this.person = person;
+	public void setUser(final WorkbenchUser user) {
+		this.user = user;
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.releaseNote.getId()).append(this.person.getId()).hashCode();
+		return new HashCodeBuilder().append(this.releaseNote.getId()).append(this.user.getUserid()).hashCode();
 	}
 
 	@Override
@@ -46,10 +45,10 @@ public class ReleaseNotePersonId implements Serializable {
 			return false;
 		}
 
-		final ReleaseNotePerson otherObj = (ReleaseNotePerson) obj;
+		final ReleaseNoteUser otherObj = (ReleaseNoteUser) obj;
 
 		return new EqualsBuilder().append(this.releaseNote.getId(), otherObj.getReleaseNote().getId())
-			.append(this.person.getId(), otherObj.getPerson().getId()).isEquals();
+			.append(this.user.getUserid(), otherObj.getUser().getUserid()).isEquals();
 	}
 
 }

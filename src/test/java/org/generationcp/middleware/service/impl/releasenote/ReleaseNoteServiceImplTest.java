@@ -1,27 +1,24 @@
 package org.generationcp.middleware.service.impl.releasenote;
 
-import org.generationcp.middleware.dao.PersonDAO;
+import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.dao.releasenote.ReleaseNoteDAO;
-import org.generationcp.middleware.dao.releasenote.ReleaseNotePersonDAO;
+import org.generationcp.middleware.dao.releasenote.ReleaseNoteUserDAO;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
-import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNote;
-import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNotePerson;
+import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNoteUser;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatcher;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.verification.Times;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.swing.text.html.Option;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
@@ -47,25 +44,25 @@ public class ReleaseNoteServiceImplTest {
 	private ReleaseNoteDAO releaseNoteDAO;
 
 	@Mock
-	private ReleaseNotePersonDAO releaseNotePersonDAO;
+	private ReleaseNoteUserDAO releaseNoteUserDAO;
 
 	@Mock
-	private PersonDAO personDAO;
+	private WorkbenchUserDAO userDAO;
 
 	@Captor
-	private ArgumentCaptor<ReleaseNotePerson> releaseNotePersonArgumentCaptor;
+	private ArgumentCaptor<ReleaseNoteUser> releaseNoteUserArgumentCaptor;
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 
 		Mockito.when(this.workbenchDaoFactory.getReleaseNoteDAO()).thenReturn(this.releaseNoteDAO);
-		Mockito.when(this.workbenchDaoFactory.getReleaseNotePersonDAO()).thenReturn(this.releaseNotePersonDAO);
+		Mockito.when(this.workbenchDaoFactory.getReleaseNoteUserDAO()).thenReturn(this.releaseNoteUserDAO);
 
-		final Person person = Mockito.mock(Person.class);
-		Mockito.when(person.getId()).thenReturn(USER_ID);
-		Mockito.when(this.personDAO.getById(USER_ID)).thenReturn(person);
-		Mockito.when(this.workbenchDaoFactory.getPersonDAO()).thenReturn(this.personDAO);
+		final WorkbenchUser person = Mockito.mock(WorkbenchUser.class);
+		Mockito.when(person.getUserid()).thenReturn(USER_ID);
+		Mockito.when(this.userDAO.getById(USER_ID)).thenReturn(person);
+		Mockito.when(this.workbenchDaoFactory.getWorkbenchUserDAO()).thenReturn(this.userDAO);
 
 		ReflectionTestUtils.setField(this.releaseNoteService, "workbenchDaoFactory", this.workbenchDaoFactory);
 	}
@@ -80,7 +77,7 @@ public class ReleaseNoteServiceImplTest {
 		Mockito.verify(this.releaseNoteDAO).getLatestReleaseNote();
 		Mockito.verifyNoMoreInteractions(this.releaseNoteDAO);
 
-		Mockito.verifyZeroInteractions(this.releaseNotePersonDAO);
+		Mockito.verifyZeroInteractions(this.releaseNoteUserDAO);
 	}
 
 	@Test
@@ -88,7 +85,7 @@ public class ReleaseNoteServiceImplTest {
 		final ReleaseNote releaseNote = this.mockReleaseNote();
 		Mockito.when(this.releaseNoteDAO.getLatestReleaseNote()).thenReturn(Optional.of(releaseNote));
 
-		Mockito.when(this.releaseNotePersonDAO.getByReleaseNoteIdAndPersonId(releaseNote.getId(), USER_ID)).thenReturn(Optional.empty());
+		Mockito.when(this.releaseNoteUserDAO.getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID)).thenReturn(Optional.empty());
 
 		final Optional<ReleaseNote> actualReleaseNote = this.releaseNoteService.shouldShowReleaseNote(USER_ID);
 		assertTrue(actualReleaseNote.isPresent());
@@ -97,14 +94,14 @@ public class ReleaseNoteServiceImplTest {
 		Mockito.verify(this.releaseNoteDAO).getLatestReleaseNote();
 		Mockito.verifyNoMoreInteractions(this.releaseNoteDAO);
 
-		Mockito.verify(this.releaseNotePersonDAO).getByReleaseNoteIdAndPersonId(releaseNote.getId(), USER_ID);
-		Mockito.verify(this.releaseNotePersonDAO).save(this.releaseNotePersonArgumentCaptor.capture());
-		final ReleaseNotePerson actualReleaseNotePerson = this.releaseNotePersonArgumentCaptor.getValue();
-		assertThat(actualReleaseNotePerson.getPerson().getId(), is(USER_ID));
-		assertThat(actualReleaseNotePerson.getReleaseNote(), is(releaseNote));
-		assertTrue(actualReleaseNotePerson.getShowAgain());
+		Mockito.verify(this.releaseNoteUserDAO).getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID);
+		Mockito.verify(this.releaseNoteUserDAO).save(this.releaseNoteUserArgumentCaptor.capture());
+		final ReleaseNoteUser actualReleaseNoteUser = this.releaseNoteUserArgumentCaptor.getValue();
+		assertThat(actualReleaseNoteUser.getUser().getUserid(), is(USER_ID));
+		assertThat(actualReleaseNoteUser.getReleaseNote(), is(releaseNote));
+		assertTrue(actualReleaseNoteUser.getShowAgain());
 
-		Mockito.verifyNoMoreInteractions(this.releaseNotePersonDAO);
+		Mockito.verifyNoMoreInteractions(this.releaseNoteUserDAO);
 	}
 
 	@Test
@@ -112,8 +109,8 @@ public class ReleaseNoteServiceImplTest {
 		final ReleaseNote releaseNote = this.mockReleaseNote();
 		Mockito.when(this.releaseNoteDAO.getLatestReleaseNote()).thenReturn(Optional.of(releaseNote));
 
-		final ReleaseNotePerson releaseNotePerson = this.mockReleaseNotePerson(false);
-		Mockito.when(this.releaseNotePersonDAO.getByReleaseNoteIdAndPersonId(releaseNote.getId(), USER_ID)).thenReturn(Optional.of(releaseNotePerson));
+		final ReleaseNoteUser releaseNoteUser = this.mockReleaseNoteUser(false);
+		Mockito.when(this.releaseNoteUserDAO.getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID)).thenReturn(Optional.of(releaseNoteUser));
 
 		final Optional<ReleaseNote> actualReleaseNote = this.releaseNoteService.shouldShowReleaseNote(USER_ID);
 		assertFalse(actualReleaseNote.isPresent());
@@ -121,10 +118,10 @@ public class ReleaseNoteServiceImplTest {
 		Mockito.verify(this.releaseNoteDAO).getLatestReleaseNote();
 		Mockito.verifyNoMoreInteractions(this.releaseNoteDAO);
 
-		Mockito.verify(this.releaseNotePersonDAO).getByReleaseNoteIdAndPersonId(releaseNote.getId(), USER_ID);
-		Mockito.verify(this.releaseNotePersonDAO, new Times(0)).save(ArgumentMatchers.any(ReleaseNotePerson.class));
+		Mockito.verify(this.releaseNoteUserDAO).getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID);
+		Mockito.verify(this.releaseNoteUserDAO, new Times(0)).save(ArgumentMatchers.any(ReleaseNoteUser.class));
 
-		Mockito.verifyNoMoreInteractions(this.releaseNotePersonDAO);
+		Mockito.verifyNoMoreInteractions(this.releaseNoteUserDAO);
 	}
 
 	@Test
@@ -132,8 +129,8 @@ public class ReleaseNoteServiceImplTest {
 		final ReleaseNote releaseNote = this.mockReleaseNote();
 		Mockito.when(this.releaseNoteDAO.getLatestReleaseNote()).thenReturn(Optional.of(releaseNote));
 
-		final ReleaseNotePerson releaseNotePerson = this.mockReleaseNotePerson(true);
-		Mockito.when(this.releaseNotePersonDAO.getByReleaseNoteIdAndPersonId(releaseNote.getId(), USER_ID)).thenReturn(Optional.of(releaseNotePerson));
+		final ReleaseNoteUser releaseNoteUser = this.mockReleaseNoteUser(true);
+		Mockito.when(this.releaseNoteUserDAO.getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID)).thenReturn(Optional.of(releaseNoteUser));
 
 		final Optional<ReleaseNote> actualReleaseNote = this.releaseNoteService.shouldShowReleaseNote(USER_ID);
 		assertTrue(actualReleaseNote.isPresent());
@@ -142,10 +139,10 @@ public class ReleaseNoteServiceImplTest {
 		Mockito.verify(this.releaseNoteDAO).getLatestReleaseNote();
 		Mockito.verifyNoMoreInteractions(this.releaseNoteDAO);
 
-		Mockito.verify(this.releaseNotePersonDAO).getByReleaseNoteIdAndPersonId(releaseNote.getId(), USER_ID);
-		Mockito.verify(this.releaseNotePersonDAO, new Times(0)).save(ArgumentMatchers.any(ReleaseNotePerson.class));
+		Mockito.verify(this.releaseNoteUserDAO).getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID);
+		Mockito.verify(this.releaseNoteUserDAO, new Times(0)).save(ArgumentMatchers.any(ReleaseNoteUser.class));
 
-		Mockito.verifyNoMoreInteractions(this.releaseNotePersonDAO);
+		Mockito.verifyNoMoreInteractions(this.releaseNoteUserDAO);
 	}
 
 	@Test
@@ -163,14 +160,14 @@ public class ReleaseNoteServiceImplTest {
 		final ReleaseNote releaseNote = this.mockReleaseNote();
 		Mockito.when(this.releaseNoteDAO.getLatestReleaseNote()).thenReturn(Optional.of(releaseNote));
 
-		final ReleaseNotePerson releaseNotePerson = Mockito.mock(ReleaseNotePerson.class, Mockito.CALLS_REAL_METHODS);
-		Mockito.when(this.releaseNotePersonDAO.getByReleaseNoteIdAndPersonId(releaseNote.getId(), USER_ID)).thenReturn(Optional.of(releaseNotePerson));
+		final ReleaseNoteUser releaseNoteUser = Mockito.mock(ReleaseNoteUser.class, Mockito.CALLS_REAL_METHODS);
+		Mockito.when(this.releaseNoteUserDAO.getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID)).thenReturn(Optional.of(releaseNoteUser));
 
 		this.releaseNoteService.dontShowAgain(USER_ID);
 
-		Mockito.verify(this.releaseNotePersonDAO).save(this.releaseNotePersonArgumentCaptor.capture());
-		final ReleaseNotePerson actualReleaseNotePerson = this.releaseNotePersonArgumentCaptor.getValue();
-		assertFalse(actualReleaseNotePerson.getShowAgain());
+		Mockito.verify(this.releaseNoteUserDAO).save(this.releaseNoteUserArgumentCaptor.capture());
+		final ReleaseNoteUser actualReleaseNoteUser = this.releaseNoteUserArgumentCaptor.getValue();
+		assertFalse(actualReleaseNoteUser.getShowAgain());
 	}
 
 	private ReleaseNote mockReleaseNote() {
@@ -181,8 +178,8 @@ public class ReleaseNoteServiceImplTest {
 		return mock;
 	}
 
-	private ReleaseNotePerson mockReleaseNotePerson(final boolean showAgain) {
-		final ReleaseNotePerson mock = Mockito.mock(ReleaseNotePerson.class, Mockito.CALLS_REAL_METHODS);
+	private ReleaseNoteUser mockReleaseNoteUser(final boolean showAgain) {
+		final ReleaseNoteUser mock = Mockito.mock(ReleaseNoteUser.class, Mockito.CALLS_REAL_METHODS);
 		Mockito.when(mock.getShowAgain()).thenReturn(showAgain);
 		return mock;
 	}

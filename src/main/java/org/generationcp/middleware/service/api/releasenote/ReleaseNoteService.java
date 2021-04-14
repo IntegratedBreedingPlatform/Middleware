@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface ReleaseNoteService {
 
-	Optional<ReleaseNote> shouldShowReleaseNote(Integer personId);
+	Optional<ReleaseNote> shouldShowReleaseNote(Integer userId);
 
 	Optional<ReleaseNote> getLatestReleaseNote();
 

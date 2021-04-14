@@ -2,9 +2,8 @@ package org.generationcp.middleware.service.impl.releasenote;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNote;
-import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNotePerson;
+import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNoteUser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,7 +55,7 @@ public class ReleaseNoteServiceImplIntegrationTest extends IntegrationTestBase {
 		assertNotNull(releaseNote.getReleaseDate());
 
 		//Check that the user has not already seen the release note
-		assertFalse(this.workbenchDaoFactory.getReleaseNotePersonDAO().getByReleaseNoteIdAndPersonId(releaseNote.getId(), this.userId)
+		assertFalse(this.workbenchDaoFactory.getReleaseNoteUserDAO().getByReleaseNoteIdAndUserId(releaseNote.getId(), this.userId)
 			.isPresent());
 
 		final Optional<ReleaseNote> actualReleaseNote = this.releaseNoteService.shouldShowReleaseNote(this.userId);
@@ -64,10 +63,10 @@ public class ReleaseNoteServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(actualReleaseNote.get().getId(), is(releaseNote.getId()));
 
 		//Check that the user has release note person row
-		final Optional<ReleaseNotePerson> releaseNoteIdAndPersonId =
-			this.workbenchDaoFactory.getReleaseNotePersonDAO().getByReleaseNoteIdAndPersonId(releaseNote.getId(), this.userId);
-		assertTrue(releaseNoteIdAndPersonId.isPresent());
-		assertTrue(releaseNoteIdAndPersonId.get().getShowAgain());
+		final Optional<ReleaseNoteUser> releaseNoteIdAndUserId =
+			this.workbenchDaoFactory.getReleaseNoteUserDAO().getByReleaseNoteIdAndUserId(releaseNote.getId(), this.userId);
+		assertTrue(releaseNoteIdAndUserId.isPresent());
+		assertTrue(releaseNoteIdAndUserId.get().getShowAgain());
 
 		//Mark the release note so it won't be shown again
 		this.releaseNoteService.dontShowAgain(this.userId);

@@ -2,9 +2,7 @@ package org.generationcp.middleware.pojos.workbench.releasenote;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.workbench.CropPerson;
-import org.generationcp.middleware.pojos.workbench.CropPersonId;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,9 +15,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@IdClass(ReleaseNotePersonId.class)
-@Table(name = "release_note_person")
-public class ReleaseNotePerson implements Serializable {
+@IdClass(ReleaseNoteUserId.class)
+@Table(name = "release_note_user")
+public class ReleaseNoteUser implements Serializable {
 
 	private static final long serialVersionUID = 9081485395114816328L;
 
@@ -30,8 +28,8 @@ public class ReleaseNotePerson implements Serializable {
 
 	@Id
 	@ManyToOne
-	@JoinColumn(name = "person_id", updatable = false, nullable = false)
-	private Person person;
+	@JoinColumn(name = "user_id", updatable = false, nullable = false)
+	private WorkbenchUser user;
 
 	@Column(name = "view_date", nullable = false, updatable = false)
 	private Date viewDate = new Date();
@@ -39,28 +37,28 @@ public class ReleaseNotePerson implements Serializable {
 	@Column(name = "show_again", nullable = false)
 	private Boolean showAgain = true;
 
-	private ReleaseNotePerson() {
+	private ReleaseNoteUser() {
 	}
 
-	public ReleaseNotePerson(final ReleaseNote releaseNote, final Person person) {
+	public ReleaseNoteUser(final ReleaseNote releaseNote, final WorkbenchUser user) {
 		this.releaseNote = releaseNote;
-		this.person = person;
+		this.user = user;
 	}
 
 	public ReleaseNote getReleaseNote() {
-		return releaseNote;
+		return this.releaseNote;
 	}
 
-	public Person getPerson() {
-		return person;
+	public WorkbenchUser getUser() {
+		return this.user;
 	}
 
 	public Date getViewDate() {
-		return viewDate;
+		return this.viewDate;
 	}
 
 	public Boolean getShowAgain() {
-		return showAgain;
+		return this.showAgain;
 	}
 
 	public void dontShowAgain() {
@@ -69,7 +67,7 @@ public class ReleaseNotePerson implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.releaseNote.getId()).append(this.person.getId()).hashCode();
+		return new HashCodeBuilder().append(this.releaseNote.getId()).append(this.user.getUserid()).hashCode();
 	}
 
 	@Override
@@ -80,14 +78,14 @@ public class ReleaseNotePerson implements Serializable {
 		if (obj == this) {
 			return true;
 		}
-		if (!(obj instanceof CropPerson)) {
+		if (!(obj instanceof ReleaseNoteUser)) {
 			return false;
 		}
 
-		final ReleaseNotePerson otherObj = (ReleaseNotePerson) obj;
+		final ReleaseNoteUser otherObj = (ReleaseNoteUser) obj;
 
 		return new EqualsBuilder().append(this.releaseNote.getId(), otherObj.getReleaseNote().getId())
-			.append(this.person.getId(), otherObj.getPerson().getId()).isEquals();
+			.append(this.user.getUserid(), otherObj.getUser().getUserid()).isEquals();
 	}
 
 }
