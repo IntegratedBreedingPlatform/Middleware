@@ -254,7 +254,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 	 * @param criteria
 	 * @param pageable
 	 */
-	static void addOrder(final Criteria criteria, final Pageable pageable) {
+	public static void addOrder(final Criteria criteria, final Pageable pageable) {
 		if (pageable == null || pageable.getSort() == null) {
 			return;
 		}
