@@ -22,11 +22,11 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 	}
 
 	@Override
-	public Optional<ReleaseNote> shouldShowReleaseNote(final Integer userId) {
+	public boolean shouldShowReleaseNote(final Integer userId) {
 		// Check if there is a release note available
 		final Optional<ReleaseNote> optionalReleaseNote = this.getLatestReleaseNote();
 		if (!optionalReleaseNote.isPresent()) {
-			return Optional.empty();
+			return false;
 		}
 
 		// Check if the user has already seen it
@@ -34,12 +34,10 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 		final Optional<ReleaseNoteUser> optionalReleaseNoteUser = this.getReleaseNoteUser(releaseNote.getId(), userId);
 		if (!optionalReleaseNoteUser.isPresent()) {
 			this.createReleaseNoteUser(releaseNote, userId);
-			return optionalReleaseNote;
+			return true;
 		}
 
-		// Check if the user wants to see it again
-		final ReleaseNoteUser releaseNoteUser = optionalReleaseNoteUser.get();
-		return releaseNoteUser.getShowAgain() ? optionalReleaseNote : Optional.empty();
+		return optionalReleaseNoteUser.get().getShowAgain();
 	}
 
 	@Override

@@ -58,9 +58,7 @@ public class ReleaseNoteServiceImplIntegrationTest extends IntegrationTestBase {
 		assertFalse(this.workbenchDaoFactory.getReleaseNoteUserDAO().getByReleaseNoteIdAndUserId(releaseNote.getId(), this.userId)
 			.isPresent());
 
-		final Optional<ReleaseNote> actualReleaseNote = this.releaseNoteService.shouldShowReleaseNote(this.userId);
-		assertTrue(actualReleaseNote.isPresent());
-		assertThat(actualReleaseNote.get().getId(), is(releaseNote.getId()));
+		assertTrue(this.releaseNoteService.shouldShowReleaseNote(this.userId));
 
 		//Check that the user has release note person row
 		final Optional<ReleaseNoteUser> releaseNoteIdAndUserId =
@@ -72,8 +70,7 @@ public class ReleaseNoteServiceImplIntegrationTest extends IntegrationTestBase {
 		this.releaseNoteService.dontShowAgain(this.userId);
 
 		//Should not return the release note 'cause the user don't want to see it again
-		final Optional<ReleaseNote> latestReleaseNote = this.releaseNoteService.shouldShowReleaseNote(this.userId);
-		assertFalse(latestReleaseNote.isPresent());
+		assertFalse(this.releaseNoteService.shouldShowReleaseNote(this.userId));
 	}
 
 }
