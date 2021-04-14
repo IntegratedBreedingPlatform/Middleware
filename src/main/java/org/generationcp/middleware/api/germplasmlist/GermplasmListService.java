@@ -42,4 +42,6 @@ public interface GermplasmListService {
 
 	List<GermplasmListDto> getGermplasmLists(Integer gid);
 
+	void performGermplasmListEntriesDeletion(List<Integer> gids);
+
 }
