@@ -13,7 +13,9 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -36,29 +38,29 @@ import com.google.common.base.Preconditions;
  */
 public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer> {
 
-	static final String GERMPLASM_LIST_DATA_LIST_ID_COLUMN = "listId";
+	private static final String GERMPLASM_LIST_DATA_LIST_ID_COLUMN = "listId";
 
-	static final String GERMPLASM_TABLE = "germplasm";
+	private static final String GERMPLASM_TABLE = "germplasm";
 
-	static final String GERMPLASM_TABLE_ALIAS = "g";
+	private static final String GERMPLASM_TABLE_ALIAS = "g";
 
-	static final String GERMPLASM_LIST_NAME_TABLE = "list";
+	private static final String GERMPLASM_LIST_NAME_TABLE = "list";
 
-	static final String GERMPLASM_LIST_NAME_TABLE_ALIAS = "l";
+	private static final String GERMPLASM_LIST_NAME_TABLE_ALIAS = "l";
 
-	static final String GERMPLASM_LIST_DATA_ID_COLUMN = "id";
+	private static final String GERMPLASM_LIST_DATA_ID_COLUMN = "id";
 
-	static final String GERMPLASM_LIST_DATA_GID_COLUMN = "gid";
+	private static final String GERMPLASM_LIST_DATA_GID_COLUMN = "gid";
 
-	static final String GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN = "entryId";
+	private static final String GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN = "entryId";
 
-	static final String GERMPLASM_LIST_NAME_ID_COLUMN = GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS + ".id";
+	private static final String GERMPLASM_LIST_NAME_ID_COLUMN = GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS + ".id";
 
-	static final String GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN = "status";
+	private static final String GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN = "status";
 
-	static final String GERMPLASM_DELETED_COLUMN = GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS + ".deleted";
+	private static final String GERMPLASM_DELETED_COLUMN = GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS + ".deleted";
 
-	public static final Integer STATUS_DELETED = 9;
+	private static final Integer STATUS_DELETED = 9;
 	public static final Integer STATUS_ACTIVE = 0;
 	public static final String SOURCE_UNKNOWN = "Unknown";
 
@@ -101,6 +103,30 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		final SQLQuery query = session.createSQLQuery(sql.toString());
 		query.setParameter(GermplasmListDataDAO.GERMPLASM_LIST_DATA_LIST_ID_COLUMN, id);
 		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
+	public Map<Integer, List<GermplasmListData>> getGermplasmDataListMapByListIds(final List<Integer> listIds) {
+		try {
+
+			final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
+			criteria.createAlias("list","l");
+			criteria.createAlias("germplasm", "g");
+
+			criteria.add(Restrictions.in("l.id", listIds));
+			criteria.add(Restrictions.ne("status", 	GermplasmListDataDAO.STATUS_DELETED));
+			criteria.add(Restrictions.eq("g.deleted", Boolean.FALSE));
+			criteria.addOrder(Order.asc("entryId"));
+			final List<GermplasmListData> germplasmListDataList = criteria.list();
+			final Map<Integer, List<GermplasmListData>> germplasmListDataMap = new HashMap<>();
+			for (final GermplasmListData germplasmListData : germplasmListDataList) {
+				germplasmListDataMap.putIfAbsent(germplasmListData.getList().getId(), new ArrayList<>());
+				germplasmListDataMap.get(germplasmListData.getList().getId()).add(germplasmListData);
+			}
+			return germplasmListDataMap;
+		} catch(final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getGermplasmDataListMapByListIds=" + listIds + " in GermplasmListDataDAO: "
+				+ e.getMessage(), e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -167,7 +193,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	}
 
 	/**
-	 * This will return all items of a cross list along with data of parents. 
+	 * This will return all items of a cross list along with data of parents.
 	 * Note that we're getting the name of the parents from its preferred name which is indicated by name record with nstat = 1
 	 */
 	public List<GermplasmListData> retrieveGermplasmListDataWithImmediateParents(final Integer listID) {
@@ -230,7 +256,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			final String methodName = (String) row[10];
 		  	final String malePedigree = (String) row[11];
 		  	final String femalePedigree = (String) row[12];
-		  	
+
 		  	final GermplasmListData data = new GermplasmListData();
 		  	data.setId(id);
 		  	data.setEntryId(entryId);
@@ -240,7 +266,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		  	data.setSeedSource(seedSource);
 		  	data.setBreedingMethodName(methodName);
 		  	data.addMaleParent(new GermplasmParent(mgid, maleParent, malePedigree));
-		  	
+
 			dataList.add(data);
 		}
 	}
@@ -259,7 +285,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_LIST_DATA_GID_COLUMN, gid));
 		criteria.add(Restrictions.ne(GermplasmListDataDAO.GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN,
 			GermplasmListDataDAO.STATUS_DELETED));
-		List result = criteria.list();
+		final List result = criteria.list();
 		return (result != null && result.size() > 0 ? (GermplasmListData) result.get(0) : null);
 
 	}

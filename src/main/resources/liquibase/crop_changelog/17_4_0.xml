@@ -1,10 +1,55 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="cuenyad" id="v17.4.0-1">
+    <changeSet author="gelli" id="v17.4.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(1) FROM cvterm WHERE cvterm_id = 10185 AND name = 'X'
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Create cvterm for X-Non Replicated
+        </comment>
+        <sql>
+            INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (10185,2050,'X','Non Replicated',NULL,0,0);
+        </sql>
+    </changeSet>
+
+    <changeSet author="gelli" id="v17.4.0-2">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(1) FROM cvterm_relationship WHERE object_id = 10185 AND subject_id = 17269 AND type_id = 1190;
+                </sqlCheck>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(1) FROM cvterm WHERE cvterm_id = 10185;
+                </sqlCheck>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(1) FROM cvterm WHERE name = 'has value';
+                </sqlCheck>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(1) FROM cvterm WHERE name = 'Type of ENTRY_TYPE';
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <comment>
+            Create cvterm_relationship for Non Replicated. Value of Type of ENTRY_TYPE.
+            Cvterms 'has value' and 'Type of ENTRY_TYPE' are fetched by names (which is unique) to make sure
+            cvterm_relationship is using the correct cvterm_id.
+        </comment>
+        <sql>
+            INSERT INTO cvterm_relationship (type_id, subject_id, object_id)
+            VALUES (
+            (SELECT cvterm_id FROM cvterm WHERE name = 'has value'),
+            (SELECT cvterm_id FROM cvterm WHERE name = 'Type of ENTRY_TYPE'),
+            10185);
+        </sql>
+    </changeSet>
+    <changeSet author="cuenyad" id="v17.4.0-3">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM program_preset where tool_section = 'GERMPLASM_LABEL_PRINTING_PRESET' AND name = 'Excel template selected fields'
