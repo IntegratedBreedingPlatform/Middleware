@@ -1,0 +1,21 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="cuenyad" id="v17.4.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM program_preset where tool_section = 'GERMPLASM_LABEL_PRINTING_PRESET' AND name = 'Excel template selected fields'
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Insert Excel template Preset to GERMPLASM_LABEL_PRINTING_PRESET
+        </comment>
+   		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO program_preset (tool_id, tool_section, name, configuration)
+			VALUES ('23', 'GERMPLASM_LABEL_PRINTING_PRESET', 'Excel template selected fields', '{\"type\":\"LabelPrintingPreset\",\"selectedFields\":[[8240,41,8189,1712,48,1709]],\"barcodeSetting\":{\"barcodeNeeded\":false,\"automaticBarcode\":false,\"barcodeFields\":[]},\"includeHeadings\":true,\"fileConfiguration\":{\"outputType\":\"xls\"}}');
+       </sql>
+    </changeSet>
+</databaseChangeLog>
