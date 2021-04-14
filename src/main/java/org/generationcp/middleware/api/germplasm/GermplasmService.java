@@ -122,6 +122,4 @@ public interface GermplasmService {
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
 
 	void updateGermplasmBasicDetails(Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
-
-	void performGermplasmListEntriesDeletion(List<Integer> gids);
 }

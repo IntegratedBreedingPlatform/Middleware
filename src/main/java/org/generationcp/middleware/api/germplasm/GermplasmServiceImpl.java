@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -30,7 +31,6 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -39,7 +39,6 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.ExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
@@ -62,7 +61,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +87,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private GermplasmListService germplasmListService;
 
 	private final GermplasmMethodValidator germplasmMethodValidator;
 
@@ -341,68 +342,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public void deleteGermplasm(final List<Integer> gids) {
-		this.performGermplasmListEntriesDeletion(gids);
+		this.germplasmListService.performGermplasmListEntriesDeletion(gids);
 		this.daoFactory.getGermplasmDao().deleteGermplasm(gids);
-	}
-
-	@Override
-	public void performGermplasmListEntriesDeletion(final List<Integer> gids) {
-		final List<Integer> germplasmListIds = this.daoFactory.getGermplasmListDAO().getListIdsByGIDs(gids);
-		if(org.apache.commons.collections.CollectionUtils.isNotEmpty(germplasmListIds)) {
-			final Map<Integer, List<GermplasmListData>> germplasmListDataMap = this.daoFactory.getGermplasmListDataDAO()
-				.getGermplasmDataListMapByListIds(germplasmListIds);
-			final List<GermplasmListData> germplasmListDataToBeDeleted = new ArrayList<>();
-			final List<GermplasmListData> germplasmListDataToBeUpdated = new ArrayList<>();
-			for (final Integer listId : germplasmListIds) {
-				final Iterator<GermplasmListData> iterator = germplasmListDataMap.get(listId).iterator();
-				while (iterator.hasNext()) {
-					final GermplasmListData germplasmListData = iterator.next();
-					if (germplasmListData.getGermplasm() != null && gids.contains(germplasmListData.getGermplasm().getGid())) {
-						iterator.remove();
-						germplasmListDataToBeDeleted.add(germplasmListData);
-					}
-				}
-
-				// Change entry IDs on listData
-				final List<GermplasmListData> listData = germplasmListDataMap.get(listId);
-				Integer entryId = 1;
-				for (final GermplasmListData germplasmListData : listData) {
-					germplasmListData.setEntryId(entryId);
-					entryId++;
-				}
-				germplasmListDataToBeUpdated.addAll(listData);
-			}
-
-			this.deleteGermplasmListData(germplasmListDataToBeDeleted);
-			this.updateGermplasmListData(germplasmListDataToBeUpdated);
-		}
-	}
-
-	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {
-		try {
-			for (final GermplasmListData data : germplasmListData) {
-				this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(data);
-			}
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving Germplasm List Data: GermplasmServiceImpl.updateGermplasmListData(germplasmListData="
-					+ germplasmListData + "): " + e.getMessage(),
-				e);
-		}
-	}
-
-	private void deleteGermplasmListData(final List<GermplasmListData> germplasmListData) {
-		try {
-			for (final GermplasmListData data : germplasmListData) {
-				this.daoFactory.getGermplasmListDataDAO().makeTransient(data);
-			}
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Error encountered while deleting Germplasm List Data: GermplasmServiceImpl.deleteGermplasmListData(germplasmListData="
-					+ germplasmListData + "): " + e.getMessage(),
-				e);
-		}
 	}
 
 	@Override

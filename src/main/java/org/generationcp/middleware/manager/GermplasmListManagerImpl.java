@@ -69,7 +69,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	private UserService userService;
 
 	@Resource
-	private GermplasmService germplasmService;
+	private GermplasmListService germplasmListService;
 
 	/**
 	 * Caches the udflds table. udflds should be small so this cache should be fine in terms of size. The string is the database url. So the
@@ -562,7 +562,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		final List<Integer> gidsDelete = new ArrayList<>(CollectionUtils.disjunction(germplasms, notDeletableGermplasmList));
 
 		if (!gidsDelete.isEmpty()) {
-			this.germplasmService.performGermplasmListEntriesDeletion(gidsDelete);
+			this.germplasmListService.performGermplasmListEntriesDeletion(gidsDelete);
 			this.daoFactory.getGermplasmDao().deleteGermplasm(gidsDelete);
 		}
 

@@ -15,6 +15,8 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListServiceImpl;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -354,5 +356,9 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmService getGermplasmService() {
 		return new GermplasmServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmListService getGermplasmListService() {
+		return new GermplasmListServiceImpl(this.sessionProvider);
 	}
 }
