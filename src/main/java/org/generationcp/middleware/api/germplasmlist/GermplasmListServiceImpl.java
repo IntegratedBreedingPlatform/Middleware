@@ -186,7 +186,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-				"Error encountered while saving Germplasm List Data: GermplasmListManager.addOrUpdateGermplasmListData(data="
+				"Error encountered while saving Germplasm List Data: GermplasmListServiceImpl.addGermplasmListData(data="
 					+ data + "): " + e.getMessage(),
 				e);
 		}
@@ -395,12 +395,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {
 		try {
 			for (final GermplasmListData data : germplasmListData) {
-				this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(data);
+				this.daoFactory.getGermplasmListDataDAO().update(data);
 			}
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-				"Error encountered while saving Germplasm List Data: GermplasmServiceImpl.updateGermplasmListData(germplasmListData="
+				"Error encountered while saving Germplasm List Data: GermplasmListServiceImpl.updateGermplasmListData(germplasmListData="
 					+ germplasmListData + "): " + e.getMessage(),
 				e);
 		}
@@ -413,7 +413,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			}
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-				"Error encountered while deleting Germplasm List Data: GermplasmServiceImpl.deleteGermplasmListData(germplasmListData="
+				"Error encountered while deleting Germplasm List Data: GermplasmListServiceImpl.deleteGermplasmListData(germplasmListData="
 					+ germplasmListData + "): " + e.getMessage(),
 				e);
 		}
