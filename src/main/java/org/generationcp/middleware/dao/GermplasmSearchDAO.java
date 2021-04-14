@@ -1546,7 +1546,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 			return query.list();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at getGermplasmAttributeTypes() in GermplasmSearchDAO: " + e.getMessage(), e);
+			final String message =
+				"Error with getGermplasmAttributeTypes(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
+			GermplasmSearchDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
@@ -1565,11 +1568,14 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 			return query.list();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at getGermplasmNameTypes() in GermplasmSearchDAO: " + e.getMessage(), e);
+			final String message =
+				"Error with getGermplasmNameTypes(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
+			GermplasmSearchDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final GermplasmSearchRequest germplasmSearchRequest) {
+	public List<Attribute> getGermplasmAttributeValues(final GermplasmSearchRequest germplasmSearchRequest) {
 		try {
 
 			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
@@ -1581,28 +1587,17 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			query.setParameterList("gids", gids);
 
 			final List<Attribute> attributes = query.list();
+			return attributes;
 
-			if (attributes.isEmpty()) {
-				return null;
-			}
-
-			final HashMap<Integer, Map<Integer, String>> attributeMapByGid = new HashMap<>();
-			for (final Attribute attribute : attributes) {
-				Map<Integer, String> attrByType = attributeMapByGid.get(attribute.getGermplasmId());
-				if (attrByType == null) {
-					attrByType = new HashMap<>();
-				}
-				attrByType.put(attribute.getTypeId(), attribute.getAval());
-				attributeMapByGid.put(attribute.getGermplasmId(), attrByType);
-			}
-
-			return attributeMapByGid;
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at getGermplasmAttributeValues() in GermplasmSearchDAO: " + e.getMessage(), e);
+			final String message =
+				"Error with getGermplasmAttributeValues(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
+			GermplasmSearchDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public Map<Integer, Map<Integer, String>> getGermplasmNameValues(final GermplasmSearchRequest germplasmSearchRequest) {
+	public List<Name> getGermplasmNameValues(final GermplasmSearchRequest germplasmSearchRequest) {
 		try {
 
 			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
@@ -1614,24 +1609,12 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			query.setParameterList("gids", gids);
 
 			final List<Name> names = query.list();
-
-			if (names.isEmpty()) {
-				return null;
-			}
-
-			final HashMap<Integer, Map<Integer, String>> nameMapByGid = new HashMap<>();
-			for (final Name name : names) {
-				Map<Integer, String> nameByType = nameMapByGid.get(name.getGermplasmId());
-				if (nameByType == null) {
-					nameByType = new HashMap<>();
-				}
-				nameByType.put(name.getTypeId(), name.getNval());
-				nameMapByGid.put(name.getGermplasmId(), nameByType);
-			}
-
-			return nameMapByGid;
+			return names;
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at getGermplasmNameValues() in GermplasmSearchDAO: " + e.getMessage(), e);
+			final String message =
+				"Error with getGermplasmNameValues(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
+			GermplasmSearchDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 }
