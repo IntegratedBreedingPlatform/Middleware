@@ -49,5 +49,21 @@
             10185);
         </sql>
     </changeSet>
+	
+	<changeSet author="corina" id="v17.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 0
+					FROM methods
+					WHERE mid IN (202,502) and mname LIKE 'Double  haploid%';
+			</sqlCheck>
+		</preConditions>
+		<comment>
+            Remove excess space between "Double" and "haploid" in method names. IBP-4238
+        </comment>
+		<sql dbms="mysql" splitStatements="false">
+			UPDATE methods set mname=REPLACE(mname,'Double  haploid','Double haploid') WHERE `mid` IN (202,502);
+		</sql>
+	</changeSet>
 
 </databaseChangeLog>
