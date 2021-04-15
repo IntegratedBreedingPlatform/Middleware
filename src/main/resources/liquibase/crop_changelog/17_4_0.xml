@@ -4,6 +4,20 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
+    <changeSet author="gelli" id="v17.4.0-0">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(1) FROM cvterm WHERE name = 'X' AND cvterm_id != 10185
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Rename cvterm with name 'X' if cvterm_id is not 10185.
+            To ensure, 'X' has cvterm_id 10185
+        </comment>
+        <sql>
+            UPDATE cvterm SET name = 'X (old)' WHERE name = 'X' AND cvterm_id != 10185
+        </sql>
+    </changeSet>
     <changeSet author="gelli" id="v17.4.0-1">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
@@ -49,5 +63,4 @@
             10185);
         </sql>
     </changeSet>
-
 </databaseChangeLog>
