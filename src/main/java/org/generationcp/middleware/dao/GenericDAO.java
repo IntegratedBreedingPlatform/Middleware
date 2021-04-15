@@ -42,9 +42,18 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 	private final Class<T> persistentClass;
 	private Session session;
 
+	/**
+	 * @deprecated please, instead use {@link #GenericDAO(Session)}}
+	 */
+	@Deprecated
 	@SuppressWarnings("unchecked")
 	public GenericDAO() {
 		this.persistentClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+	}
+
+	public GenericDAO(final Session session) {
+		this.persistentClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		this.session = session;
 	}
 
 	public void setSession(Session session) {
