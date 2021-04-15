@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="gelli" id="v17.4.0-0">
+    <changeSet author="gelli" id="v17.4.0-01">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(1) FROM cvterm WHERE name = 'X' AND cvterm_id != 10185
