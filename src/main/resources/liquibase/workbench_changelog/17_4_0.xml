@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v17.4.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(1) FROM permission p INNER JOIN workbench_sidebar_category_link wscl
+					ON p.workbench_sidebar_category_link_id = wscl.sidebar_category_link_id
+					WHERE wscl.tool_name = 'germplasm_import'
+            </sqlCheck>
+        </preConditions>
+        <comment>Deprecate old import germplasm</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE permission
+				SET workbench_sidebar_category_link_id = NULL
+				WHERE workbench_sidebar_category_link_id = (SELECT sidebar_category_link_id
+															FROM workbench_sidebar_category_link
+															WHERE tool_name = 'germplasm_import');
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
+
