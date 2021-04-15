@@ -1824,4 +1824,59 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			throw new MiddlewareQueryException("Error in countAll(): " + e.getMessage(), e);
 		}
 	}
+
+	/**
+	 * Cases covered by this function:
+	 * 1. If node is a terminal ancestor (gpid1=gpid2=0) with DER/MAN method and gpid1 and/or gpid2 are modified
+	 * and method remains DER/MAN
+	 * 2. If the node is GEN and it is not a terminal ancestor (gpid1!=0 gpid2=!0), and it is converted to DER/MAN
+	 * Then all the derivative progeny with group source = node will have a new group source.
+	 * With no need to traverse the tree
+	 *
+	 * @param oldGroupSource
+	 * @param newGroupSource
+	 */
+	public void updateGroupSource(final Integer oldGroupSource, final Integer newGroupSource) {
+		final String sql =
+			"UPDATE germplsm SET gpid1 = :newGroupSource WHERE gpid1 = :oldGroupSource and "
+				+ " deleted = 0 and methn in (select mid from methods where mtype in ('DER','MAN'))";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+		sqlQuery.setParameter("newGroupSource", newGroupSource);
+		sqlQuery.setParameter("oldGroupSource", oldGroupSource);
+		try {
+			final int updatedRows = sqlQuery.executeUpdate();
+			GermplasmDAO.LOG.debug("updateGroupSource has updated the group source for " + updatedRows + " rows");
+		} catch (final HibernateException e) {
+			final String message = "Error with updateGroupSource" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public void updateDerivativeProgenyGroupSource(final Integer parentNode, final Integer newGroupSource) {
+		final List<Integer> immediateDerivativeProgeny = this.getImmediateDerivativeProgeny(Collections.singletonList(parentNode));
+		this.recursiveUpdate(immediateDerivativeProgeny, newGroupSource);
+	}
+
+	private List<Integer> getImmediateDerivativeProgeny(final List<Integer> parentNodes) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery("");
+		try {
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getImmediateDerivativeProgeny" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	private void recursiveUpdate(final List<Integer> parentNodes, final Integer newGroupSource) {
+		if (parentNodes.isEmpty()) {
+			return;
+		}
+		//Execute update
+		final List<Integer> immediateDerivativeProgeny = this.getImmediateDerivativeProgeny(parentNodes);
+		this.recursiveUpdate(immediateDerivativeProgeny, newGroupSource);
+	}
+
+
 }

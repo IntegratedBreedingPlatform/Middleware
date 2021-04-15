@@ -46,9 +46,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * POJO for germplsm table.
@@ -115,7 +117,7 @@ import java.util.Map;
 @XmlType(propOrder = {"gid", "gnpgs", "gpid1", "gpid2", "gdate"})
 @XmlAccessorType(XmlAccessType.NONE)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "germplsm")
-public class Germplasm implements Serializable {
+public class Germplasm implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -990,5 +992,46 @@ public class Germplasm implements Serializable {
 
 	public void setOtherProgenitors(final List<Progenitor> otherProgenitors) {
 		this.otherProgenitors = otherProgenitors;
+	}
+
+	/**
+	 * @param gids
+	 * @return True if all gids are equals to the ones in otherProgenitors list in any order
+	 */
+	public boolean otherProgenitorsGidsEquals(final List<Integer> gids) {
+		List<Integer> sortedExistingGids = this.otherProgenitors.stream().map(Progenitor::getProgenitorGid).collect(Collectors.toList());
+		Collections.sort(sortedExistingGids);
+
+		if (sortedExistingGids.isEmpty() && gids == null) {
+			return true;
+		}
+
+		if ((sortedExistingGids == null && gids != null)
+			|| sortedExistingGids != null && gids == null
+			|| sortedExistingGids.size() != gids.size()) {
+			return false;
+		}
+
+		final List<Integer> sortedGids = new ArrayList<>(gids);
+		Collections.sort(sortedGids);
+
+		return sortedExistingGids.equals(sortedGids);
+	}
+
+	public boolean isTerminalAncestor() {
+		return new Integer(0).equals(this.gpid1) && new Integer(0).equals(gpid2);
+	}
+
+	@Override
+	public Object clone() {
+		Germplasm germplasm;
+		try {
+			germplasm = (Germplasm) super.clone();
+		} catch (final CloneNotSupportedException e) {
+			germplasm = new Germplasm(this.gid, this.methodId, this.gnpgs, this.gpid1, this.gpid2,
+				this.userId, this.lgid, this.locationId, this.gdate, this.preferredName);
+		}
+		germplasm.setMethod((Method) this.method.clone());
+		return germplasm;
 	}
 }

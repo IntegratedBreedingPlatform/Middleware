@@ -1,9 +1,13 @@
 package org.generationcp.middleware.domain.germplasm;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
 
+@AutoProperty
 public class ProgenitorsUpdateRequestDto {
 
 	private Integer breedingMethodId;
@@ -13,6 +17,11 @@ public class ProgenitorsUpdateRequestDto {
 	private Integer gpid2;
 
 	private List<Integer> otherProgenitors;
+
+	public boolean allAttributesNull() {
+		return Objects.isNull(breedingMethodId) && Objects.isNull(gpid1) && Objects.isNull(gpid2) && CollectionUtils
+			.isEmpty(otherProgenitors);
+	}
 
 	public Integer getBreedingMethodId() {
 		return breedingMethodId;
