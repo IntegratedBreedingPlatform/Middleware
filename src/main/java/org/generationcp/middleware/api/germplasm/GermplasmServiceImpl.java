@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -86,6 +87,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private GermplasmListService germplasmListService;
 
 	private final GermplasmMethodValidator germplasmMethodValidator;
 
@@ -338,6 +342,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public void deleteGermplasm(final List<Integer> gids) {
+		this.germplasmListService.performGermplasmListEntriesDeletion(gids);
 		this.daoFactory.getGermplasmDao().deleteGermplasm(gids);
 	}
 
@@ -359,8 +364,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Set<Integer> getGermplasmUsedInOneOrMoreList(final List<Integer> gids) {
-		return new HashSet<>(this.daoFactory.getGermplasmListDAO().getGermplasmUsedInOneOrMoreList(gids));
+	public Set<Integer> getGermplasmUsedInLockedList(final List<Integer> gids) {
+		return new HashSet<>(this.daoFactory.getGermplasmListDAO().getGermplasmUsedInLockedList(gids));
 	}
 
 	@Override
@@ -549,7 +554,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (femaleParentGid != null && maleParentGid != null) {
 			if (femaleParentGid == 0 && maleParentGid == 0) {
 				germplasm.setGnpgs(0);
-			} else if (newBreedingMethod.getMprgn().intValue() != 1) {
+			} else if (newBreedingMethod.getMprgn() != 1) {
 				germplasm.setGnpgs(2);
 			}
 			germplasm.setGpid1(femaleParentGid);
