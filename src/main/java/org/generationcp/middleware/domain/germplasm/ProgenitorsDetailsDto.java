@@ -11,7 +11,7 @@ import java.util.List;
 public class ProgenitorsDetailsDto {
 
 	private Integer breedingMethodId;
-	private Integer numberOfDerivativeProgeny;
+	private long numberOfDerivativeProgeny;
 	private String breedingMethodName;
 	private String breedingMethodCode;
 	private String breedingMethodType;
@@ -84,11 +84,11 @@ public class ProgenitorsDetailsDto {
 		this.breedingMethodType = breedingMethodType;
 	}
 
-	public Integer getNumberOfDerivativeProgeny() {
+	public long getNumberOfDerivativeProgeny() {
 		return this.numberOfDerivativeProgeny;
 	}
 
-	public void setNumberOfDerivativeProgeny(final Integer numberOfDerivativeProgeny) {
+	public void setNumberOfDerivativeProgeny(final long numberOfDerivativeProgeny) {
 		this.numberOfDerivativeProgeny = numberOfDerivativeProgeny;
 	}
 
