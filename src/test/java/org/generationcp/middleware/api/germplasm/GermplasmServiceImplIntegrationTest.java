@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasm;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -10,7 +11,6 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
-import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
@@ -25,8 +25,6 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
@@ -1510,7 +1508,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		request1.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), DRVNM));
 		request1.getAdditionalInfo().put(NOTE, RandomStringUtils.randomAlphabetic(20));
 		this.germplasmService.updateGermplasm(this.userId, germplasm.getGermplasmUUID(), request1);
-		
+
 		// Update the names and attributes with new values
 		final GermplasmUpdateRequest request2 = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), null,
 			null, RandomStringUtils.randomAlphabetic(20), null,
@@ -1522,7 +1520,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
 		request2.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), DRVNM));
 		request2.getAdditionalInfo().put(NOTE, RandomStringUtils.randomAlphabetic(20));
-		
+
 		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(this.userId, germplasm.getGermplasmUUID(), request2);
 		final Integer gid = germplasm.getGid();
 		assertThat(germplasmDTO.getGid(), equalTo(gid.toString()));
@@ -1751,25 +1749,26 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmUsedInOneOrMoreList() {
+	public void testGetGidsOfGermplasmWithDescendantsFilteredByMethod() {
+		final Method method = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), -1);
 
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+		// Create germplasm with descendants
+		final Germplasm germplasmWithDescendants = this.createGermplasm(method, null, null,0, 0, 0);
+		final Germplasm germplasmDescendant = this.createGermplasm(method, null, null, 0, 0, 0);
+		germplasmDescendant.setGpid1(germplasmWithDescendants.getGid());
+		germplasmDescendant.setGpid2(germplasmWithDescendants.getGid());
+		this.daoFactory.getGermplasmDao().saveOrUpdate(germplasmDescendant);
+		final Germplasm germplasmDescendant2 = this.createGermplasm(method, null, null, 0, 0, 0);
+		germplasmDescendant2.setGpid1(germplasmDescendant.getGpid1());
+		germplasmDescendant2.setGpid2(germplasmDescendant.getGid());
+		this.daoFactory.getGermplasmDao().saveOrUpdate(germplasmDescendant2);
 
-		// Create germplasm list with listdata associated with germplasm
-		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(null);
-		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+		this.sessionProvder.getSession().flush();
 
-		final GermplasmListData germplasmListData =
-			new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "EntryCode", "SeedSource", "Germplasm Name 5", "GroupName", 0,
-				1);
-		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
+		final List<Integer> lists = Arrays.asList(germplasmWithDescendants.getGid());
+		final Set<Integer> gids = this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(Sets.newHashSet(lists));
 
-		final Set<Integer> gids =
-			this.germplasmService.getGermplasmUsedInOneOrMoreList(Lists.newArrayList(germplasm.getGid()));
-
-		Assert.assertEquals(1, gids.size());
-
+		Assert.assertEquals(0, gids.size());
 	}
 
 	@Test

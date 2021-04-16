@@ -284,15 +284,6 @@ public interface GermplasmListManager {
 	int deleteGermplasmListDataByListId(Integer listId);
 
 	/**
-	 * Removes the specified {@code GermplasmListData} object from the database.
-	 *
-	 * @param germplasmListData - The {@code GermplasmListData} object to be removed from the database. Must be a valid
-	 *                          {@code GermplasmListData} object.
-	 * @return Returns the number of {@code GermplasmListData} objects deleted from the database.
-	 */
-	int deleteGermplasmListData(GermplasmListData germplasmListData);
-
-	/**
 	 * Removes the specified {@code GermplasmListData} objects from the database.
 	 *
 	 * @param germplasmListDatas - A list of {@code GermplasmListData} objects to be removed from the database. {@code GermplasmListData}
@@ -412,10 +403,9 @@ public interface GermplasmListManager {
 	 * Given a List of valid Germplasm objects, deleteGermplasms the corresponding records in the database.
 	 *
 	 * @param germplasms a list germplasm ID that need to delete
-	 * @param listId     for which we want the corresponding germplasms list
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Integer> deleteGermplasms(final List<Integer> germplasms, final Integer listId);
+	List<Integer> deleteGermplasms(final List<Integer> germplasms);
 
 	void populateGermplasmListCreatedByName(List<GermplasmList> germplasmLists);
 

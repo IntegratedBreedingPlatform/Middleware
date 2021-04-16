@@ -61,13 +61,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
 
-	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDAO.class);
+	static final Integer LOCKED_LIST_STATUS = 101;
 
-	public static final String GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST = " SELECT \n" + "   ld.gid, \n"
-			+ "   group_concat(l.listname) \n" + " FROM listnms l \n"
-			+ "   INNER JOIN listdata ld ON l.listid = ld.listid \n" + "   INNER JOIN germplsm g ON ld.gid = g.gid"
-			+ " WHERE ld.gid IN (:gids) \n" + "       AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " \n"
-			+ " GROUP BY ld.gid \n" + " HAVING count(1) > 1";
+	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDAO.class);
 
 	private static final String GET_GERMPLASM_LIST_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid "
 			+ "FROM udflds " + "WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' ";
@@ -623,6 +619,22 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		});
 	}
 
+	public List<Integer> getListIdsByGIDs(final List<Integer> gids) {
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT l.listid FROM listnms l ");
+			queryString.append("INNER JOIN listdata ld ON ld.listid = l.listid ");
+			queryString.append("WHERE ld.gid IN(:gids) AND l.liststatus != :status");
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("gids", gids);
+			query.setParameter("status", STATUS_DELETED);
+			return query.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with getListIdsByGIDs(gids=" + gids.toString() + ") query from GermplasmListDAO: " + e.getMessage(), e);
+		}
+	}
+
 	public int deleteGermplasmListByListIdPhysically(final Integer listId) {
 		final Query query = this.getSession().getNamedQuery(GermplasmList.DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY);
 		query.setInteger(GermplasmList.GERMPLASM_LIST_LIST_ID_COLUMN, listId);
@@ -630,37 +642,18 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	/**
-	 * Verify if the gids are used in more than one list
-	 *
-	 * @param gids
-	 *            gids to check
-	 * @return Map with GID as key and CSV of list where it is used
-	 */
-	public Map<Integer, String> getGermplasmUsedInMoreThanOneList(final List<Integer> gids) {
-		final Map<Integer, String> resultMap = new HashMap<>();
-
-		final SQLQuery query = this.getSession()
-				.createSQLQuery(GermplasmListDAO.GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST);
-		query.setParameterList("gids", gids);
-
-		final List<Object[]> results = query.list();
-		for (final Object[] result : results) {
-			resultMap.put((Integer) result[0], (String) result[1]);
-		}
-		return resultMap;
-	}
 
 	/**
-	 * Get germplasm that exist on one or more list.
+	 * Get germplasm that exist locked lists
 	 *
 	 * @param gids
 	 */
-	public List<Integer> getGermplasmUsedInOneOrMoreList(final List<Integer> gids) {
+	public List<Integer> getGermplasmUsedInLockedList(final List<Integer> gids) {
 		final SQLQuery query = this.getSession()
 			.createSQLQuery(" SELECT ld.gid as gid "
 				+ " FROM listnms l"
 				+ " INNER JOIN listdata ld ON l.listid = ld.listid INNER JOIN germplsm g ON ld.gid = g.gid"
-				+ " WHERE ld.gid IN (:gids) AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED
+				+ " WHERE ld.gid IN (:gids) AND l.liststatus = " + GermplasmListDAO.LOCKED_LIST_STATUS
 				+ " GROUP BY ld.gid \n" + " HAVING count(1) >= 1");
 		query.addScalar("gid", new IntegerType());
 		query.setParameterList("gids", gids);
