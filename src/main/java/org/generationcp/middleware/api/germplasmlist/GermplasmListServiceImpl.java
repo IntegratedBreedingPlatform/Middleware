@@ -31,6 +31,7 @@ import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -291,6 +292,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public Optional<GermplasmList> getGermplasmListByParentAndName(final String germplasmListName, final Integer parentId,
 		final String programUUID) {
 		return Optional.ofNullable(this.daoFactory.getGermplasmListDAO().getGermplasmListByParentAndName(germplasmListName, parentId, programUUID));
+	}
+
+	@Override
+	public List<MyListsDTO> getMyLists(final String programUUID, final Pageable pageable, final Integer userId) {
+		return this.daoFactory.getGermplasmListDAO().getMyLists(programUUID, pageable, userId);
 	}
 
 	@Override

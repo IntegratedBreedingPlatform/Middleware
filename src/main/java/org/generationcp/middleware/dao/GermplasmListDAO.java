@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
+import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -21,6 +22,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListMetadata;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -38,11 +40,11 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -736,6 +738,47 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 
 		return (GermplasmList) criteria.uniqueResult();
+	}
+
+	/**
+	 * @return lists owned by user (possibly along with statistical information in the future)
+	 */
+	public List<MyListsDTO> getMyLists(final String programUUID, final Pageable pageable, final Integer userId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
+				.add(Restrictions.eq("userId", userId));
+
+			criteria.add(Restrictions.ne(STATUS, STATUS_DELETED));
+			criteria.add(Restrictions.eq(PROGRAM_UUID, programUUID));
+			addOrder(criteria, pageable);
+			addPagination(criteria, pageable);
+
+			final List<GermplasmList> list = criteria.list();
+
+			if (list.isEmpty()) {
+				return Collections.emptyList();
+			}
+
+			final List<MyListsDTO> mylists = new ArrayList<>();
+			for (final GermplasmList germplasmList : list) {
+				final MyListsDTO mylist = new MyListsDTO();
+				mylist.setName(germplasmList.getName());
+				mylist.setDate(Util.tryConvertDate(String.valueOf(germplasmList.getDate()),
+					Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
+				final GermplasmList parent = germplasmList.getParent();
+				if (parent != null) {
+					mylist.setFolder(parent.getName());
+				}
+				mylist.setType(germplasmList.getType());
+				mylists.add(mylist);
+			}
+
+			return mylists;
+		} catch (final Exception e) {
+			final String message = "Error with getMyLists(programUUID=" + programUUID + ", userId= " + userId + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
 	}
 
 }
