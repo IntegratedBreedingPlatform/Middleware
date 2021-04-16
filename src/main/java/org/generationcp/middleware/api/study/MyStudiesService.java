@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface MyStudiesService {
 
-	List<MyStudiesDTO> getMyStudies(final String programUUID, Pageable pageable, Integer studyId);
+	List<MyStudiesDTO> getMyStudies(String programUUID, Pageable pageable, Integer userId);
 }

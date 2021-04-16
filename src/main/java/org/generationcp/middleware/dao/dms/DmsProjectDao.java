@@ -13,7 +13,6 @@ package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -24,7 +23,6 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -629,9 +627,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<MyStudiesDTO> getMyStudies(final String programUUID, final Pageable pageable, final int userId) {
 		try {
-			final int pageSize = pageable.getPageSize();
-			final int start = pageSize * pageable.getPageNumber();
-
 			final Map<Integer, MyStudiesDTO> myStudies = new LinkedHashMap<>();
 
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
@@ -644,7 +639,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			addOrder(criteria, pageable);
 			final List<DmsProject> projects = criteria.list();
 
-			if (CollectionUtils.isEmpty(projects)) {
+			if (projects.isEmpty()) {
 				return Collections.emptyList();
 			}
 
@@ -715,6 +710,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			return new ArrayList<>(myStudies.values());
 		} catch (final HibernateException e) {
+			final String errorMessage = "Error with getMyStudies(programUUID=" + programUUID + ", userId= " + userId + " ): "
+				+ e.getMessage();
+			LOG.error(errorMessage);
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}

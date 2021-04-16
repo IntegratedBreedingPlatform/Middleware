@@ -17,7 +17,7 @@ public class MyStudiesServiceImpl implements MyStudiesService {
 	}
 
 	@Override
-	public List<MyStudiesDTO> getMyStudies(final String programUUID, final Pageable pageable, final Integer studyId) {
-		return this.daoFactory.getDmsProjectDAO().getMyStudies(programUUID, pageable, studyId);
+	public List<MyStudiesDTO> getMyStudies(final String programUUID, final Pageable pageable, final Integer userId) {
+		return this.daoFactory.getDmsProjectDAO().getMyStudies(programUUID, pageable, userId);
 	}
 }
